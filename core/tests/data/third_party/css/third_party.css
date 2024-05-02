@@ -21311,7 +21311,10 @@ readers do not read off random characters that represent icons */
   content: "\f02a"; }
 
 .fa-bars:before {
-  content: "\f0c9"; }
+  content: "\f0c9";
+  position: absolute;
+  top: 15px; 
+  right: 18рх;}
 
 .fa-baseball-ball:before {
   content: "\f433"; }
@@ -24787,10 +24790,10 @@ readers do not read off random characters that represent icons */
 .fa-twitch:before {
   content: "\f1e8"; }
 
-.fa-twitter:before {
+.fa-x-twitter:before {
   content: "\f099"; }
 
-.fa-twitter-square:before {
+.fa-square-x-twitter:before {
   content: "\f081"; }
 
 .fa-typo3:before {

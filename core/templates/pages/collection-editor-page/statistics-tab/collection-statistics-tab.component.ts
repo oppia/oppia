@@ -16,17 +16,13 @@
  * @fileoverview Component for the statistics tab of the collection editor.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'collection-statistics-tab',
   templateUrl: './collection-statistics-tab.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class CollectionStatisticsTabComponent {
   constructor() {}
 }
-
-angular.module('oppia').directive('collectionStatisticsTab', downgradeComponent(
-  {component: CollectionStatisticsTabComponent}));

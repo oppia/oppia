@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the Translate Loader Factory.
  */
 
 // eslint-disable-next-line oppia/disallow-httpclient
-import { HttpClient } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
-import { TranslateLoaderFactory } from './translate-loader.factory';
+import {HttpClient} from '@angular/common/http';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {TranslateModule} from '@ngx-translate/core';
+import {TranslateLoaderFactory} from './translate-loader.factory';
 
 describe('Translate Loader Factory', () => {
   let httpClient: HttpClient;
@@ -35,9 +34,9 @@ describe('Translate Loader Factory', () => {
           useDefaultLang: true,
           isolate: false,
           extend: false,
-          defaultLanguage: 'en'
+          defaultLanguage: 'en',
         }),
-      ]
+      ],
     }).compileComponents();
   }));
 

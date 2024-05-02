@@ -8,13 +8,17 @@
              class="oppia-click-to-start-editing"
              (click)="openEditorModal()">
           <i class="material-icons oppia-editor-edit-icon float-right"
+             tabindex="0"
+             (keydown.enter)="openEditorModal()"
+             aria-label="Edit Solution"
+             role="button"
              title="Edit Solution">&#xE254;
           </i>
         </div>
-        <strong>
+        <strong tabindex="0">
           {{stateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One'}} solution is...
         </strong>
-        <span>
+        <span tabindex="0">
           <oppia-interaction-display [htmlData]="getAnswerHtml()">
           </oppia-interaction-display>
         </span>

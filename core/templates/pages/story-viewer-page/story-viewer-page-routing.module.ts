@@ -16,24 +16,19 @@
  * @fileoverview Routing module for story viewer page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { StoryViewerPageRootComponent } from './story-viewer-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {StoryViewerPageRootComponent} from './story-viewer-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: StoryViewerPageRootComponent
-  }
+    component: StoryViewerPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class StoryViewerPageRoutingModule {}

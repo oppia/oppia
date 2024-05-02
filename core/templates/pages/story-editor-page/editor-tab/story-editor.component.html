@@ -263,7 +263,7 @@
                 <span class="publish-upto-chapter-label">Publish up to Chapter ...</span>
                 <select [(ngModel)]="selectedChapterIndexInPublishUptoDropdown"
                         (ngModelChange)="updatePublishUptoChapterSelection(selectedChapterIndexInPublishUptoDropdown)"
-                        class="publish-upto-chapter-dropdown">
+                        class="publish-upto-chapter-dropdown e2e-test-publish-up-to-chapter-dropdown">
                   <option [value]="-1">None</option>
                   <option *ngFor="let node of linearNodesList;index as idx"
                           [disabled]="!chapterIsPublishable[idx]"
@@ -307,7 +307,7 @@
                     </td>
                     <td class="chapter-index"> {{ idx+1 }} </td>
                     <td class="e2e-test-chapter-title chapter-title">{{ node.getTitle() }}</td>
-                    <td class="chapter-status">
+                    <td class="chapter-status e2e-test-chapter-status">
                       {{ node.getStatus() }}
                     </td>
                     <td class="chapter-last-modified">

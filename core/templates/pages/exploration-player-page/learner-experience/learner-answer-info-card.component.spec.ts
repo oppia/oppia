@@ -16,16 +16,18 @@
  * @fileoverview Unit tests for LearnerAnswerInfoCard
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { BackgroundMaskService } from 'services/stateful/background-mask.service';
-import { LearnerAnswerInfoCard } from './learner-answer-info-card.component';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { PlayerTranscriptService } from '../services/player-transcript.service';
-import { LearnerAnswerInfoService } from '../services/learner-answer-info.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {BackgroundMaskService} from 'services/stateful/background-mask.service';
+import {LearnerAnswerInfoCard} from './learner-answer-info-card.component';
+import {ExplorationEngineService} from '../services/exploration-engine.service';
+import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {PlayerTranscriptService} from '../services/player-transcript.service';
+import {LearnerAnswerInfoService} from '../services/learner-answer-info.service';
 
 describe('LearnerAnswerInfoCard', () => {
   let component: LearnerAnswerInfoCard;
@@ -39,11 +41,15 @@ describe('LearnerAnswerInfoCard', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        LearnerAnswerInfoCard
+      declarations: [LearnerAnswerInfoCard],
+      providers: [
+        BackgroundMaskService,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService,
+        },
       ],
-      providers: [BackgroundMaskService],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -52,56 +58,56 @@ describe('LearnerAnswerInfoCard', () => {
     explorationHtmlFormatter = TestBed.get(ExplorationHtmlFormatterService);
     learnerAnswerInfoService = TestBed.get(LearnerAnswerInfoService);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
-    explorationEngineService = TestBed.get(
-      ExplorationEngineService);
-    spyOn(explorationEngineService, 'getState')
-      .and.returnValue(stateObjectFactory.createFromBackendDict(
-        'stateName', {
-          classifier_model_id: null,
-          content: {
-            html: '',
-            content_id: 'content'
-          },
-          interaction: {
-            id: 'FractionInput',
-            customization_args: {
-              requireSimplestForm: { value: false },
-              allowImproperFraction: { value: true },
-              allowNonzeroIntegerPart: { value: true },
-              customPlaceholder: { value: {
+    explorationEngineService = TestBed.get(ExplorationEngineService);
+    spyOn(explorationEngineService, 'getState').and.returnValue(
+      stateObjectFactory.createFromBackendDict('stateName', {
+        classifier_model_id: null,
+        content: {
+          html: '',
+          content_id: 'content',
+        },
+        interaction: {
+          id: 'FractionInput',
+          customization_args: {
+            requireSimplestForm: {value: false},
+            allowImproperFraction: {value: true},
+            allowNonzeroIntegerPart: {value: true},
+            customPlaceholder: {
+              value: {
                 content_id: '',
-                unicode_str: ''
-              } },
-            },
-            answer_groups: [],
-            default_outcome: {
-              dest: 'Introduction',
-              dest_if_really_stuck: null,
-              feedback: {
-                content_id: 'default_outcome',
-                html: ''
+                unicode_str: '',
               },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null
             },
-            confirmed_unclassified_answers: [],
-            hints: [],
-            solution: null
           },
-          linked_skill_id: null,
-          param_changes: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {}
-            }
+          answer_groups: [],
+          default_outcome: {
+            dest: 'Introduction',
+            dest_if_really_stuck: null,
+            feedback: {
+              content_id: 'default_outcome',
+              html: '',
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
           },
-          solicit_answer_details: false,
-          card_is_checkpoint: false
-        }
-      ));
+          confirmed_unclassified_answers: [],
+          hints: [],
+          solution: null,
+        },
+        linked_skill_id: null,
+        param_changes: [],
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+          },
+        },
+        solicit_answer_details: false,
+        card_is_checkpoint: false,
+      })
+    );
 
     fixture = TestBed.createComponent(LearnerAnswerInfoCard);
     component = fixture.componentInstance;

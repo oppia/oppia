@@ -16,23 +16,20 @@
  * @fileoverview Utility service for Hints in the learner's view.
  */
 
-import { EventEmitter, Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {EventEmitter, Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { Hint } from 'domain/exploration/hint-object.model';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import {Hint} from 'domain/exploration/hint-object.model';
+import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class HintsAndSolutionManagerService {
-  // This in initialized using the the class methods
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  solutionForLatestCard!: Solution;
+  solutionForLatestCard: Solution | null = null;
   // The following are set to null when the timeouts are cleared
   // or when the service is reset.
   timeout: NodeJS.Timeout | null = null;
@@ -77,13 +74,11 @@ export class HintsAndSolutionManagerService {
 
   constructor(private playerPositionService: PlayerPositionService) {
     // TODO(#10904): Refactor to move subscriptions into components.
-    playerPositionService.onNewCardAvailable.subscribe(
-      () => {
-        this.correctAnswerSubmitted = true;
-        this.tooltipIsOpen = false;
-        this.solutionTooltipIsOpen = false;
-      }
-    );
+    playerPositionService.onNewCardAvailable.subscribe(() => {
+      this.correctAnswerSubmitted = true;
+      this.tooltipIsOpen = false;
+      this.solutionTooltipIsOpen = false;
+    });
   }
 
   // This replaces any timeouts that are already queued.
@@ -112,7 +107,9 @@ export class HintsAndSolutionManagerService {
       this.numHintsReleased++;
       if (!this.hintsDiscovered && !this.tooltipTimeout) {
         this.tooltipTimeout = setTimeout(
-          this.showTooltip.bind(this), this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+          this.showTooltip.bind(this),
+          this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC
+        );
       }
     }
     this._timeoutElapsedEventEmitter.emit();
@@ -125,7 +122,8 @@ export class HintsAndSolutionManagerService {
     if (!this.solutionDiscovered && !this.solutionTooltipTimeout) {
       this.solutionTooltipTimeout = setTimeout(
         this.showSolutionTooltip.bind(this),
-        this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+        this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC
+      );
     }
     this._timeoutElapsedEventEmitter.emit();
   }
@@ -162,11 +160,12 @@ export class HintsAndSolutionManagerService {
     if (funcToEnqueue) {
       this.enqueueTimeout(
         funcToEnqueue,
-        ExplorationPlayerConstants.WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
+        ExplorationPlayerConstants.WAIT_FOR_SUBSEQUENT_HINTS_MSEC
+      );
     }
   }
 
-  reset(newHints: Hint[], newSolution: Solution): void {
+  reset(newHints: Hint[], newSolution: Solution | null): void {
     this.numHintsReleased = 0;
     this.numHintsConsumed = 0;
     this.solutionReleased = false;
@@ -192,7 +191,8 @@ export class HintsAndSolutionManagerService {
     if (this.hintsForLatestCard.length > 0) {
       this.enqueueTimeout(
         this.releaseHint,
-        ExplorationPlayerConstants.WAIT_FOR_FIRST_HINT_MSEC);
+        ExplorationPlayerConstants.WAIT_FOR_FIRST_HINT_MSEC
+      );
     }
   }
 
@@ -200,8 +200,10 @@ export class HintsAndSolutionManagerService {
   // pending hint that's being viewed, it starts the timer for the next
   // hint.
   displayHint(index: number): SubtitledHtml | null {
-    if (index === this.numHintsConsumed &&
-      this.numHintsConsumed < this.numHintsReleased) {
+    if (
+      index === this.numHintsConsumed &&
+      this.numHintsConsumed < this.numHintsReleased
+    ) {
       // The latest hint has been consumed. Start the timer.
       this.consumeHint();
     }
@@ -213,6 +215,9 @@ export class HintsAndSolutionManagerService {
   }
 
   displaySolution(): Solution {
+    if (!this.solutionForLatestCard) {
+      throw new Error('Solution must be not null to be displayed.');
+    }
     this.solutionConsumed = true;
     this._solutionViewedEventEmitter.emit();
     if (this.solutionTooltipTimeout) {
@@ -259,11 +264,13 @@ export class HintsAndSolutionManagerService {
     if (!this.areAllHintsExhausted()) {
       if (
         this.numHintsReleased === 0 &&
-        this.wrongAnswersSinceLastHintConsumed >= 2) {
+        this.wrongAnswersSinceLastHintConsumed >= 2
+      ) {
         this.accelerateHintRelease();
       } else if (
         this.numHintsReleased > 0 &&
-        this.wrongAnswersSinceLastHintConsumed >= 1) {
+        this.wrongAnswersSinceLastHintConsumed >= 1
+      ) {
         this.accelerateHintRelease();
       }
     } else if (this.getNumHints()) {
@@ -291,6 +298,9 @@ export class HintsAndSolutionManagerService {
   }
 }
 
-angular.module('oppia').factory(
-  'HintsAndSolutionManagerService',
-  downgradeInjectable(HintsAndSolutionManagerService));
+angular
+  .module('oppia')
+  .factory(
+    'HintsAndSolutionManagerService',
+    downgradeInjectable(HintsAndSolutionManagerService)
+  );

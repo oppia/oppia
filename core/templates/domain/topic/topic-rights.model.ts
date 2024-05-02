@@ -18,9 +18,9 @@
  */
 
 export interface TopicRightsBackendDict {
-  'published': boolean;
-  'can_publish_topic': boolean;
-  'can_edit_topic': boolean;
+  published: boolean;
+  can_publish_topic: boolean;
+  can_edit_topic: boolean;
 }
 
 export class TopicRights {
@@ -29,7 +29,10 @@ export class TopicRights {
   _canEditTopic: boolean;
 
   constructor(
-      published: boolean, canPublishTopic: boolean, canEditTopic: boolean) {
+    published: boolean,
+    canPublishTopic: boolean,
+    canEditTopic: boolean
+  ) {
     this._published = published;
     this._canPublishTopic = canPublishTopic;
     this._canEditTopic = canEditTopic;
@@ -79,7 +82,8 @@ export class TopicRights {
   // This function takes a JSON object which represents a backend
   // topic python dict.
   static createFromBackendDict(
-      topicRightsBackendObject: TopicRightsBackendDict): TopicRights {
+    topicRightsBackendObject: TopicRightsBackendDict
+  ): TopicRights {
     return new TopicRights(
       topicRightsBackendObject.published,
       topicRightsBackendObject.can_publish_topic,

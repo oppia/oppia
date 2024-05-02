@@ -1,0 +1,12 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are some additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-new-audio-bar {
+  background-color: #fff;
+  height: 40px;
+  position: absolute;
+  width: 100%;
+}

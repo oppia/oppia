@@ -227,9 +227,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                     url, [200, 301, 302, 400, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
-        # TODO(sll): Set a self.payload attr in the BaseHandler for
-        #     POST, PUT and DELETE. Something needs to regulate what
-        #     the fields in the payload should be.
 
     def test_requests_for_missing_csrf_token(self) -> None:
         """Tests request without csrf_token results in 401 error."""
@@ -939,6 +936,13 @@ class I18nDictsTests(test_utils.GenericTestBase):
             msg='Invalid HTML: %s at %s in %s' % (input_string, key, filename))
         return sorted(result)
 
+    def test_i18n_keys_format(self) -> None:
+        """Tests that the keys are correctly formatted."""
+        valid_key_pattern = re.compile(r'^I18N_[0-9A-Za-z-_&/]+$')
+        key_list = self._extract_keys_from_json_file('en.json')
+        for key in key_list:
+            self.assertTrue((valid_key_pattern.match(key)), key)
+
     def test_i18n_keys(self) -> None:
         """Tests that the keys in all JSON files are a subset of those in
         en.json.
@@ -971,9 +975,9 @@ class I18nDictsTests(test_utils.GenericTestBase):
                     self.log_line('- %s' % key)
                 self.log_line('')
 
-    def test_alphabetic_i18n_keys(self) -> None:
+    def test_lexicographic_i18n_keys(self) -> None:
         """Tests that the keys of all i18n json files are arranged in
-        alphabetical order.
+        lexicographical order.
         """
         filenames = os.listdir(
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
@@ -1043,7 +1047,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
         structure.
         """
         # For this test, show the entire diff if there is a mismatch.
-        self.maxDiff = 0
+        self.maxDiff = None
 
         master_translation_dict = json.loads(utils.get_file_contents(
             os.path.join(os.getcwd(), 'assets', 'i18n', 'en.json')))
@@ -2061,6 +2065,8 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
                 '/mock_play_exploration?exploration_id=%s' % self.exp_id,
                     expected_status_int=400)
             error_msg = (
+                'At \'http://localhost/mock_play_exploration?'
+                'exploration_id=exp_id\' these errors are happening:\n'
                 'Schema validation for \'exploration_id\' failed: Could not '
                 'convert str to int: %s' % self.exp_id)
             self.assertEqual(response['error'], error_msg)

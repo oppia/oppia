@@ -34,32 +34,15 @@ import tempfile
 import time
 from urllib import request as urlrequest
 
-from core import constants
 from core import feconf
 from core import utils
 from core.tests import test_utils
 from scripts import install_python_dev_dependencies
 from scripts import servers
 
-import github
 from typing import Generator, List, Literal, NoReturn
 
 from . import common
-
-
-_MOCK_REQUESTER = github.Requester.Requester(
-    login_or_token=None,
-    password=None,
-    jwt=None,
-    app_auth=None,
-    base_url='https://github.com',
-    timeout=0,
-    user_agent='user',
-    per_page=0,
-    verify=False,
-    retry=None,
-    pool_size=None,
-)
 
 
 class MockCompiler:
@@ -381,6 +364,44 @@ class CommonTests(test_utils.GenericTestBase):
                 subprocess, 'check_call', mock_check_call)
             input_swap = self.swap(builtins, 'input', mock_input)
             with call_swap, check_call_swap, input_swap:
+                common.open_new_tab_in_browser_if_possible('test-url')
+            self.assertEqual(
+                check_function_calls, expected_check_function_calls)
+        finally:
+            common.USER_PREFERENCES['open_new_tab_in_browser'] = None
+
+    def test_open_new_tab_in_browser_if_possible_no_new_tab(
+        self
+    ) -> None:
+        try:
+            check_function_calls = {
+                'input_gets_called': 0,
+                'check_call_gets_called': False
+            }
+            expected_check_function_calls = {
+                'input_gets_called': 0,
+                'check_call_gets_called': False
+            }
+
+            def mock_call(unused_cmd_tokens: List[str]) -> int:
+                return 0
+
+            def mock_check_call(unused_cmd_tokens: List[str]) -> None:
+                check_function_calls['check_call_gets_called'] = True
+
+            def mock_input() -> str:
+                check_function_calls['input_gets_called'] += 1
+                if check_function_calls['input_gets_called'] == 2:
+                    return '1'
+                return 'no'
+            call_swap = self.swap(subprocess, 'call', mock_call)
+            check_call_swap = self.swap(
+                subprocess, 'check_call', mock_check_call)
+            input_swap = self.swap(builtins, 'input', mock_input)
+            with call_swap, check_call_swap, input_swap:
+                # Make it so the program asks the user to
+                # Open the link in their browser.
+                common.USER_PREFERENCES['open_new_tab_in_browser'] = 'no'
                 common.open_new_tab_in_browser_if_possible('test-url')
             self.assertEqual(
                 check_function_calls, expected_check_function_calls)
@@ -718,7 +739,6 @@ class CommonTests(test_utils.GenericTestBase):
             target_stdout.getvalue(), 'These\n\nare\n\nsample\n\nstrings.\n\n')
 
     def test_install_npm_library(self) -> None:
-
         def _mock_subprocess_check_call(unused_command: str) -> None:
             """Mocks subprocess.check_call() to create a temporary file instead
             of the actual npm library.
@@ -744,8 +764,30 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertFalse(os.path.exists('temp_file'))
 
+    def test_install_npm_library_path_exists(self) -> None:
+        """Install an npm library that already exists."""
+        def mock_exists(unused_file: str) -> bool:
+            return True
+
+        with self.swap(os.path, 'exists', mock_exists):
+            common.install_npm_library(
+                'moment', '2.29.4', common.OPPIA_TOOLS_DIR)
+
     def test_ask_user_to_confirm(self) -> None:
         def mock_input() -> str:
+            return 'Y'
+        with self.swap(builtins, 'input', mock_input):
+            common.ask_user_to_confirm('Testing')
+
+    def test_ask_user_to_confirm_n_then_y(self) -> None:
+        check_function_calls = {
+            'input_gets_called': 0,
+        }
+
+        def mock_input() -> str:
+            check_function_calls['input_gets_called'] += 1
+            if check_function_calls['input_gets_called'] == 1:
+                return 'N'
             return 'Y'
         with self.swap(builtins, 'input', mock_input):
             common.ask_user_to_confirm('Testing')
@@ -767,116 +809,14 @@ class CommonTests(test_utils.GenericTestBase):
             'the script'):
             common.get_personal_access_token()
 
-    def test_check_prs_for_current_release_are_released_with_no_unreleased_prs(
-        self
-    ) -> None:
-        mock_repo = github.Repository.Repository(
-            requester=_MOCK_REQUESTER, headers={}, attributes={},
-            completed=True)
-        label_for_released_prs = (
-            constants.release_constants.LABEL_FOR_RELEASED_PRS)
-        label_for_current_release_prs = (
-            constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
-        pull1 = github.PullRequest.PullRequest(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'title': 'PR1', 'number': 1, 'labels': [
-                    {'name': label_for_released_prs},
-                    {'name': label_for_current_release_prs}]},
-            completed=True)
-        pull2 = github.PullRequest.PullRequest(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'title': 'PR2', 'number': 2, 'labels': [
-                    {'name': label_for_released_prs},
-                    {'name': label_for_current_release_prs}]},
-            completed=True)
-        label = github.Label.Label(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'name': label_for_current_release_prs},
-            completed=True)
-
-        def mock_get_issues(
-            unused_self: str, state: str, labels: List[github.Label.Label]  # pylint: disable=unused-argument
-        ) -> List[github.PullRequest.PullRequest]:
-            return [pull1, pull2]
-
-        def mock_get_label(
-            unused_self: str, unused_name: str
-        ) -> List[github.Label.Label]:
-            return [label]
-
-        get_issues_swap = self.swap(
-            github.Repository.Repository, 'get_issues', mock_get_issues)
-        get_label_swap = self.swap(
-            github.Repository.Repository, 'get_label', mock_get_label)
-        with get_issues_swap, get_label_swap:
-            common.check_prs_for_current_release_are_released(mock_repo)
-
-    def test_check_prs_for_current_release_are_released_with_unreleased_prs(
-        self
-    ) -> None:
-        mock_repo = github.Repository.Repository(
-            requester=_MOCK_REQUESTER, headers={}, attributes={},
-            completed=True)
-
-        def mock_open_tab(unused_url: str) -> None:
-            pass
-        label_for_released_prs = (
-            constants.release_constants.LABEL_FOR_RELEASED_PRS)
-        label_for_current_release_prs = (
-            constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
-        pull1 = github.PullRequest.PullRequest(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'title': 'PR1', 'number': 1, 'labels': [
-                    {'name': label_for_current_release_prs}]},
-            completed=True)
-        pull2 = github.PullRequest.PullRequest(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'title': 'PR2', 'number': 2, 'labels': [
-                    {'name': label_for_released_prs},
-                    {'name': label_for_current_release_prs}]},
-            completed=True)
-        label = github.Label.Label(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'name': label_for_current_release_prs},
-            completed=True)
-
-        def mock_get_issues(
-            unused_self: str, state: str, labels: List[str]  # pylint: disable=unused-argument
-        ) -> List[github.PullRequest.PullRequest]:
-            return [pull1, pull2]
-
-        def mock_get_label(
-            unused_self: str, unused_name: str
-        ) -> List[github.Label.Label]:
-            return [label]
-
-        get_issues_swap = self.swap(
-            github.Repository.Repository, 'get_issues', mock_get_issues)
-        get_label_swap = self.swap(
-            github.Repository.Repository, 'get_label', mock_get_label)
-        open_tab_swap = self.swap(
-            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        with get_issues_swap, get_label_swap, open_tab_swap:
-            with self.assertRaisesRegex(
-                Exception, (
-                    'There are PRs for current release which do not '
-                    'have a \'%s\' label. Please ensure that '
-                    'they are released before release summary '
-                    'generation.') % (
-                        constants.release_constants.LABEL_FOR_RELEASED_PRS)):
-                common.check_prs_for_current_release_are_released(mock_repo)
-
     def test_inplace_replace_file(self) -> None:
-        origin_file = os.path.join(
+        origin_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
-        backup_file = os.path.join(
+
+        backup_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json.bak')
+        shutil.copyfile(origin_filepath, backup_filepath)
+
         expected_lines = [
             '{\n',
             '    "RANDMON1" : "randomValue1",\n',
@@ -886,55 +826,60 @@ class CommonTests(test_utils.GenericTestBase):
             '}\n'
         ]
 
-        def mock_remove(unused_file: str) -> None:
-            return
-
-        remove_swap = self.swap_with_checks(
-            os, 'remove', mock_remove, expected_args=[(backup_file,)]
+        common.inplace_replace_file(
+            origin_filepath,
+            '"DEV_MODE": .*',
+            '"DEV_MODE": true,',
+            expected_number_of_replacements=1
         )
-        with remove_swap:
-            common.inplace_replace_file(
-                origin_file,
-                '"DEV_MODE": .*',
-                '"DEV_MODE": true,',
-                expected_number_of_replacements=1
-            )
-        with utils.open_file(origin_file, 'r') as f:
+
+        with utils.open_file(origin_filepath, 'r') as f:
             self.assertEqual(expected_lines, f.readlines())
         # Revert the file.
-        os.remove(origin_file)
-        shutil.move(backup_file, origin_file)
+        shutil.move(backup_filepath, origin_filepath)
 
     def test_inplace_replace_file_with_expected_number_of_replacements_raises(
         self
     ) -> None:
-        origin_file = os.path.join(
+        origin_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
-        backup_file = os.path.join(
+        new_filepath = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json.new')
+
+        backup_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json.bak')
-        with utils.open_file(origin_file, 'r') as f:
+        shutil.copyfile(origin_filepath, backup_filepath)
+
+        with utils.open_file(origin_filepath, 'r') as f:
             origin_content = f.readlines()
 
         with self.assertRaisesRegex(
             ValueError, 'Wrong number of replacements. Expected 1. Performed 0.'
         ):
             common.inplace_replace_file(
-                origin_file,
+                origin_filepath,
                 '"DEV_MODEa": .*',
                 '"DEV_MODE": true,',
                 expected_number_of_replacements=1
             )
-        self.assertFalse(os.path.isfile(backup_file))
-        with utils.open_file(origin_file, 'r') as f:
+        self.assertFalse(os.path.isfile(new_filepath))
+        with utils.open_file(origin_filepath, 'r') as f:
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
+        # Revert the file.
+        shutil.move(backup_filepath, origin_filepath)
 
     def test_inplace_replace_file_with_exception_raised(self) -> None:
-        origin_file = os.path.join(
+        origin_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
-        backup_file = os.path.join(
+        new_filepath = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json.new')
+
+        backup_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json.bak')
-        with utils.open_file(origin_file, 'r') as f:
+        shutil.copyfile(origin_filepath, backup_filepath)
+
+        with utils.open_file(origin_filepath, 'r') as f:
             origin_content = f.readlines()
 
         def mock_compile(unused_arg: str) -> NoReturn:
@@ -946,56 +891,13 @@ class CommonTests(test_utils.GenericTestBase):
             re.escape('Exception raised from compile()')
         ), compile_swap:
             common.inplace_replace_file(
-                origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
-        self.assertFalse(os.path.isfile(backup_file))
-        with utils.open_file(origin_file, 'r') as f:
+                origin_filepath, '"DEV_MODE": .*', '"DEV_MODE": true,')
+        self.assertFalse(os.path.isfile(new_filepath))
+        with utils.open_file(origin_filepath, 'r') as f:
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
-
-    def test_inplace_replace_file_context(self) -> None:
-        file_path = (
-            os.path.join('core', 'tests', 'data', 'inplace_replace_test.json'))
-        backup_file_path = '%s.bak' % file_path
-
-        with utils.open_file(file_path, 'r') as f:
-            self.assertEqual(f.readlines(), [
-                '{\n',
-                '    "RANDMON1" : "randomValue1",\n',
-                '    "312RANDOM" : "ValueRanDom2",\n',
-                '    "DEV_MODE": false,\n',
-                '    "RAN213DOM" : "raNdoVaLue3"\n',
-                '}\n',
-            ])
-
-        replace_file_context = common.inplace_replace_file_context(
-            file_path, '"DEV_MODE": .*', '"DEV_MODE": true,')
-        with replace_file_context, utils.open_file(file_path, 'r') as f:
-            self.assertEqual(f.readlines(), [
-                '{\n',
-                '    "RANDMON1" : "randomValue1",\n',
-                '    "312RANDOM" : "ValueRanDom2",\n',
-                '    "DEV_MODE": true,\n',
-                '    "RAN213DOM" : "raNdoVaLue3"\n',
-                '}\n',
-            ])
-            self.assertTrue(os.path.isfile(backup_file_path))
-
-        with utils.open_file(file_path, 'r') as f:
-            self.assertEqual(f.readlines(), [
-                '{\n',
-                '    "RANDMON1" : "randomValue1",\n',
-                '    "312RANDOM" : "ValueRanDom2",\n',
-                '    "DEV_MODE": false,\n',
-                '    "RAN213DOM" : "raNdoVaLue3"\n',
-                '}\n',
-            ])
-
-        try:
-            self.assertFalse(os.path.isfile(backup_file_path))
-        except AssertionError:
-            # Just in case the implementation is wrong, erase the file.
-            os.remove(backup_file_path)
-            raise
+        # Revert the file.
+        shutil.move(backup_filepath, origin_filepath)
 
     def test_convert_to_posixpath_on_windows(self) -> None:
         def mock_is_windows() -> Literal[True]:
@@ -1344,6 +1246,10 @@ class CommonTests(test_utils.GenericTestBase):
             constants_temp_file.close()
             feconf_temp_file.close()
 
+        # Clean up spare files.
+        os.remove(mock_constants_path)
+        os.remove(mock_feconf_path)
+
     def test_modify_constants(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'
         mock_feconf_path = 'mock_app.yaml'
@@ -1351,67 +1257,74 @@ class CommonTests(test_utils.GenericTestBase):
             common, 'CONSTANTS_FILE_PATH', mock_constants_path)
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
-        def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
-        ) -> str:
-            return 'test'
-        check_output_swap = self.swap(
-            subprocess, 'check_output', mock_check_output
-        )
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
+            def mock_check_output(
+                unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            ) -> str:
+                return 'test'
+            check_output_swap = self.swap(
+                subprocess, 'check_output', mock_check_output
+            )
 
-        constants_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(
-            constants_temp_file, 'name', mock_constants_path)
-        with utils.open_file(mock_constants_path, 'w') as tmp:
-            tmp.write('export = {\n')
-            tmp.write('  "DEV_MODE": true,\n')
-            tmp.write('  "EMULATOR_MODE": false,\n')
-            tmp.write('  "BRANCH_NAME": "",\n')
-            tmp.write('  "SHORT_COMMIT_HASH": ""\n')
-            tmp.write('};')
+            constants_temp_file = tempfile.NamedTemporaryFile()
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used
+            # to set the attribute.
+            setattr(
+                constants_temp_file, 'name', mock_constants_path)
+            with utils.open_file(mock_constants_path, 'w') as tmp:
+                tmp.write('export = {\n')
+                tmp.write('  "DEV_MODE": true,\n')
+                tmp.write('  "EMULATOR_MODE": false,\n')
+                tmp.write('  "BRANCH_NAME": "",\n')
+                tmp.write('  "SHORT_COMMIT_HASH": ""\n')
+                tmp.write('};')
 
-        feconf_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(feconf_temp_file, 'name', mock_feconf_path)
-        with utils.open_file(mock_feconf_path, 'w') as tmp:
-            tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
+            feconf_temp_file = tempfile.NamedTemporaryFile()
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used
+            # to set the attribute.
+            setattr(feconf_temp_file, 'name', mock_feconf_path)
+            with utils.open_file(mock_feconf_path, 'w') as tmp:
+                tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
 
-        with constants_path_swap, feconf_path_swap, check_output_swap:
-            common.modify_constants(prod_env=True, maintenance_mode=False)
-            with utils.open_file(
-                mock_constants_path, 'r') as constants_file:
-                self.assertEqual(
-                    constants_file.read(),
-                    'export = {\n'
-                    '  "DEV_MODE": false,\n'
-                    '  "EMULATOR_MODE": true,\n'
-                    '  "BRANCH_NAME": "test",\n'
-                    '  "SHORT_COMMIT_HASH": "test"\n'
-                    '};')
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
-                self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
+            with constants_path_swap, feconf_path_swap, check_output_swap:
+                common.modify_constants(prod_env=True, maintenance_mode=False)
+                with utils.open_file(
+                    mock_constants_path, 'r') as constants_file:
+                    self.assertEqual(
+                        constants_file.read(),
+                        'export = {\n'
+                        '  "DEV_MODE": false,\n'
+                        '  "EMULATOR_MODE": true,\n'
+                        '  "BRANCH_NAME": "test",\n'
+                        '  "SHORT_COMMIT_HASH": "test"\n'
+                        '};')
+                with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                    self.assertEqual(
+                        feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
 
-            common.modify_constants(prod_env=False, maintenance_mode=True)
-            with utils.open_file(
-                mock_constants_path, 'r') as constants_file:
-                self.assertEqual(
-                    constants_file.read(),
-                    'export = {\n'
-                    '  "DEV_MODE": true,\n'
-                    '  "EMULATOR_MODE": true,\n'
-                    '  "BRANCH_NAME": "test",\n'
-                    '  "SHORT_COMMIT_HASH": "test"\n'
-                    '};')
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
-                self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = True')
+                common.modify_constants(prod_env=False, maintenance_mode=True)
+                with utils.open_file(
+                    mock_constants_path, 'r') as constants_file:
+                    self.assertEqual(
+                        constants_file.read(),
+                        'export = {\n'
+                        '  "DEV_MODE": true,\n'
+                        '  "EMULATOR_MODE": true,\n'
+                        '  "BRANCH_NAME": "test",\n'
+                        '  "SHORT_COMMIT_HASH": "test"\n'
+                        '};')
+                with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                    self.assertEqual(
+                        feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = True')
 
-        constants_temp_file.close()
-        feconf_temp_file.close()
+            constants_temp_file.close()
+            feconf_temp_file.close()
+
+        # Clean up spare files.
+        os.remove(mock_constants_path)
+        os.remove(mock_feconf_path)
 
     def test_set_constants_to_default(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'
@@ -1440,23 +1353,28 @@ class CommonTests(test_utils.GenericTestBase):
         with utils.open_file(mock_feconf_path, 'w') as tmp:
             tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
         self.contextManager.__exit__(None, None, None)
-        with constants_path_swap, feconf_path_swap:
-            common.set_constants_to_default()
-            with utils.open_file(
-                mock_constants_path, 'r') as constants_file:
-                self.assertEqual(
-                    constants_file.read(),
-                    'export = {\n'
-                    '  "DEV_MODE": true,\n'
-                    '  "EMULATOR_MODE": true,\n'
-                    '  "BRANCH_NAME": "",\n'
-                    '  "SHORT_COMMIT_HASH": ""\n'
-                    '};')
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
-                self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
+            with constants_path_swap, feconf_path_swap:
+                common.set_constants_to_default()
+                with utils.open_file(
+                    mock_constants_path, 'r') as constants_file:
+                    self.assertEqual(
+                        constants_file.read(),
+                        'export = {\n'
+                        '  "DEV_MODE": true,\n'
+                        '  "EMULATOR_MODE": true,\n'
+                        '  "BRANCH_NAME": "",\n'
+                        '  "SHORT_COMMIT_HASH": ""\n'
+                        '};')
+                with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                    self.assertEqual(
+                        feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
         constants_temp_file.close()
         feconf_temp_file.close()
+
+        # Clean up spare files.
+        os.remove(mock_constants_path)
+        os.remove(mock_feconf_path)
 
     def test_is_oppia_server_already_running_when_ports_closed(self) -> None:
         with contextlib.ExitStack() as stack:

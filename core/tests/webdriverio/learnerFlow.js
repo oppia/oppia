@@ -24,29 +24,26 @@ var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
-var CreatorDashboardPage =
-  require('../webdriverio_utils/CreatorDashboardPage.js');
-var CollectionEditorPage =
-  require('../webdriverio_utils/CollectionEditorPage.js');
-var ExplorationEditorPage =
-  require('../webdriverio_utils/ExplorationEditorPage.js');
-var ExplorationPlayerPage =
-  require('../webdriverio_utils/ExplorationPlayerPage.js');
-var LearnerDashboardPage =
-  require('../webdriverio_utils/LearnerDashboardPage.js');
+var CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
+var CollectionEditorPage = require('../webdriverio_utils/CollectionEditorPage.js');
+var CollectionPlayerPage = require('../webdriverio_utils/CollectionPlayerPage.js');
+var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
+var ExplorationPlayerPage = require('../webdriverio_utils/ExplorationPlayerPage.js');
+var LearnerDashboardPage = require('../webdriverio_utils/LearnerDashboardPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
-describe('Learner dashboard functionality', function() {
+describe('Learner dashboard functionality', function () {
   var adminPage = null;
   var creatorDashboardPage = null;
   var collectionEditorPage = null;
+  var collectionPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
   var libraryPage = null;
   var learnerDashboardPage = null;
-  var clickContinueButton = async function() {
+  var clickContinueButton = async function () {
     var continueButton = $('.e2e-test-continue-button');
     await action.click('Continue button', continueButton);
     await waitFor.pageToFullyLoad();
@@ -55,7 +52,7 @@ describe('Learner dashboard functionality', function() {
   var collectionExplorationId = null;
   var dummyExplorationId = null;
 
-  var createDummyExplorationOnDesktop = async function(welcomeModalIsShown) {
+  var createDummyExplorationOnDesktop = async function (welcomeModalIsShown) {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
     await waitFor.pageToFullyLoad();
@@ -63,31 +60,43 @@ describe('Learner dashboard functionality', function() {
       await explorationEditorMainTab.exitTutorial();
     }
     await explorationEditorMainTab.setStateName('First');
-    await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'),
-    true);
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText(
+        'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'
+      ),
+      true
+    );
     await explorationEditorMainTab.setInteraction('Continue');
-    var responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
+    var responseEditor =
+      await explorationEditorMainTab.getResponseEditor('default');
     await responseEditor.setDestination('Second', true, null);
     await explorationEditorMainTab.moveToState('Second');
-    await explorationEditorMainTab.setContent(await forms.toRichText(
-      'So what can I tell you?'), true);
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('So what can I tell you?'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
       await forms.toRichText('How do your explorations work?'),
       await forms.toRichText('What can you tell me about this website?'),
       await forms.toRichText('How can I contribute to Oppia?'),
-      await forms.toRichText('Those were all the questions I had!')
+      await forms.toRichText('Those were all the questions I had!'),
     ]);
     await explorationEditorMainTab.addResponse(
-      'MultipleChoiceInput', null, 'End Card', true, 'Equals',
-      'Those were all the questions I had!');
-    responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
+      'MultipleChoiceInput',
+      null,
+      'End Card',
+      true,
+      'Equals',
+      'Those were all the questions I had!'
+    );
+    responseEditor =
+      await explorationEditorMainTab.getResponseEditor('default');
     await responseEditor.setFeedback(await forms.toRichText('I do not know!'));
     await explorationEditorMainTab.moveToState('End Card');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Congratulations, you have finished!'), true);
+      await forms.toRichText('Congratulations, you have finished!'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('Dummy Exploration');
@@ -99,13 +108,14 @@ describe('Learner dashboard functionality', function() {
     dummyExplorationId = await general.getExplorationIdFromEditor();
   };
 
-  beforeAll(function() {
+  beforeAll(function () {
     adminPage = new AdminPage.AdminPage();
     libraryPage = new LibraryPage.LibraryPage();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
     // The editor and player page objects are only required for desktop testing.
     if (!browser.isMobile) {
       collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
+      collectionPlayerPage = new CollectionPlayerPage.CollectionPlayerPage();
       creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
       explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
       explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -114,88 +124,102 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  it('should visit the exploration player and play the correct exploration',
-    async function() {
-      await users.createAndLoginSuperAdminUser(
-        'expCreator@learnerDashboard.com', 'expCreator');
-      // Create or load an exploration named 'Exploration Player Test'.
-      if (browser.isMobile) {
-        await adminPage.reloadExploration('exploration_player_test.yaml');
-      } else {
-        await workflow.createAndPublishExploration(
-          'Exploration Player Test',
-          'Astronomy',
-          'To test the exploration player',
-          'English',
-          true
-        );
-      }
-      // This change helps debugging issue
-      // #16260 E2E Flake: Splash page takes too long to appear.
-      await general.callFunctionAndCollectFullStackTraceOnError(
-        users.logout, new Error().stack);
-      var PLAYER_USERNAME = 'expPlayerDM';
-      await users.createAndLoginUser(
-        'expPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
-      await libraryPage.get();
-      await libraryPage.findExploration('Exploration Player Test');
-      await libraryPage.playExploration('Exploration Player Test');
-    });
-
-  it('should visit the collection player and play the correct collection',
-    async function() {
-      await users.createAndLoginSuperAdminUser(
-        'expOfCollectionCreator@learnerDashboard.com',
-        'expOfCollectionCreator');
-      // Create or load a collection named
-      // 'Introduction to Collections in Oppia'.
-      if (browser.isMobile) {
-        await adminPage.reloadCollection(0);
-      } else {
-        await workflow.createAndPublishExploration(
-          'Demo Exploration',
-          'Algebra',
-          'To test collection player',
-          'English',
-          true
-        );
-        testExplorationId = await general.getExplorationIdFromEditor();
-        // Update the role of the user to admin since only admin users
-        // can create a collection.
-        await adminPage.get();
-        await adminPage.addRole('expOfCollectionCreator', 'collection editor');
-        await workflow.createCollectionAsAdmin();
-        await collectionEditorPage.addExistingExploration(testExplorationId);
-        await collectionEditorPage.saveDraft();
-        await collectionEditorPage.closeSaveModal();
-        await collectionEditorPage.publishCollection();
-        await collectionEditorPage.setTitle(
-          'Introduction to Collections in Oppia');
-        await collectionEditorPage.setObjective(
-          'This is a collection to test player.');
-        await collectionEditorPage.setCategory('Algebra');
-        await collectionEditorPage.saveChanges();
-      }
-      // This change helps debugging issue
-      // #16260 E2E Flake: Splash page takes too long to appear.
-      await general.callFunctionAndCollectFullStackTraceOnError(
-        users.logout, new Error().stack);
-      var PLAYER_USERNAME = 'collectionPlayerDM';
-      await users.createAndLoginUser(
-        'collectionPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
-      await libraryPage.get();
-      await libraryPage.findCollection('Introduction to Collections in Oppia');
-      await libraryPage.playCollection('Introduction to Collections in Oppia');
-    });
-
-  it('should display incomplete and completed explorations', async function() {
+  it('should visit the exploration player and play the correct exploration', async function () {
     await users.createAndLoginSuperAdminUser(
-      'originalCreator@learnerDashboard.com', 'originalCreator');
+      'expCreator@learnerDashboard.com',
+      'expCreator'
+    );
+    // Create or load an exploration named 'Exploration Player Test'.
+    if (browser.isMobile) {
+      await adminPage.reloadExploration('exploration_player_test.yaml');
+    } else {
+      await workflow.createAndPublishExploration(
+        'Exploration Player Test',
+        'Astronomy',
+        'To test the exploration player',
+        'English',
+        true
+      );
+    }
+    // This change helps debugging issue
+    // #16260 E2E Flake: Splash page takes too long to appear.
+    await general.callFunctionAndCollectFullStackTraceOnError(
+      users.logout,
+      new Error().stack
+    );
+    var PLAYER_USERNAME = 'expPlayerDM';
+    await users.createAndLoginUser(
+      'expPlayerDesktopAndMobile@learnerFlow.com',
+      PLAYER_USERNAME
+    );
+    await libraryPage.get();
+    await libraryPage.findExploration('Exploration Player Test');
+    await libraryPage.playExploration('Exploration Player Test');
+  });
+
+  it('should visit the collection player and play the correct collection', async function () {
+    await users.createAndLoginSuperAdminUser(
+      'expOfCollectionCreator@learnerDashboard.com',
+      'expOfCollectionCreator'
+    );
+    // Create or load a collection named
+    // 'Introduction to Collections in Oppia'.
+    if (browser.isMobile) {
+      await adminPage.reloadCollection(0);
+    } else {
+      await workflow.createAndPublishExploration(
+        'Demo Exploration',
+        'Algebra',
+        'To test collection player',
+        'English',
+        true
+      );
+      testExplorationId = await general.getExplorationIdFromEditor();
+      // Update the role of the user to admin since only admin users
+      // can create a collection.
+      await adminPage.get();
+      await adminPage.addRole('expOfCollectionCreator', 'collection editor');
+      await workflow.createCollectionAsAdmin();
+      await collectionEditorPage.addExistingExploration(testExplorationId);
+      await collectionEditorPage.saveDraft();
+      await collectionEditorPage.closeSaveModal();
+      await collectionEditorPage.publishCollection();
+      await collectionEditorPage.setTitle(
+        'Introduction to Collections in Oppia'
+      );
+      await collectionEditorPage.setObjective(
+        'This is a collection to test player.'
+      );
+      await collectionEditorPage.setCategory('Algebra');
+      await collectionEditorPage.saveChanges();
+    }
+    // This change helps debugging issue
+    // #16260 E2E Flake: Splash page takes too long to appear.
+    await general.callFunctionAndCollectFullStackTraceOnError(
+      users.logout,
+      new Error().stack
+    );
+    var PLAYER_USERNAME = 'collectionPlayerDM';
+    await users.createAndLoginUser(
+      'collectionPlayerDesktopAndMobile@learnerFlow.com',
+      PLAYER_USERNAME
+    );
+    await libraryPage.get();
+    await libraryPage.findCollection('Introduction to Collections in Oppia');
+    await libraryPage.playCollection('Introduction to Collections in Oppia');
+  });
+
+  it('should display incomplete and completed explorations', async function () {
+    await users.createAndLoginSuperAdminUser(
+      'originalCreator@learnerDashboard.com',
+      'originalCreator'
+    );
     // Create or load explorations.
     if (browser.isMobile) {
       await adminPage.reloadExploration('learner_flow_test.yaml');
       await adminPage.reloadExploration(
-        'protractor_mobile_test_exploration.yaml');
+        'protractor_mobile_test_exploration.yaml'
+      );
     } else {
       // Create exploration 'Dummy Exploration'.
       await createDummyExplorationOnDesktop(true);
@@ -211,9 +235,13 @@ describe('Learner dashboard functionality', function() {
     // This change helps debugging issue
     // #16260 E2E Flake: Splash page takes too long to appear.
     await general.callFunctionAndCollectFullStackTraceOnError(
-      users.logout, new Error().stack);
+      users.logout,
+      new Error().stack
+    );
     await users.createAndLoginUser(
-      'learner@learnerDashboard.com', 'learnerlearnerDashboard');
+      'learner@learnerDashboard.com',
+      'learnerlearnerDashboard'
+    );
     // Go to 'Dummy Exploration'.
     await libraryPage.get();
     await libraryPage.findExploration('Dummy Exploration');
@@ -225,30 +253,31 @@ describe('Learner dashboard functionality', function() {
     } else {
       // The exploration header is only visible in desktop browsers.
       await explorationPlayerPage.expectExplorationNameToBe(
-        'Dummy Exploration');
+        'Dummy Exploration'
+      );
       await explorationPlayerPage.submitAnswer('Continue', null);
       await explorationPlayerPage.expectExplorationToNotBeOver();
     }
     // User clicks on Oppia logo to leave exploration, user should be
-    // able to leave the page directly without getting any alert message.
-    await libraryPage.getHomePage();
+    // able to always get an alert message.
+    await libraryPage.getHomePage(true);
 
     // Go to 'Test Exploration'.
     await libraryPage.get();
     await libraryPage.findExploration('Test Exploration');
     await libraryPage.playExploration('Test Exploration');
     await waitFor.pageToFullyLoad();
-    await libraryPage.getHomePage();
+    await libraryPage.getHomePage(false);
     // Learner Dashboard should display 'Dummy Exploration'
     // as incomplete.
-    await learnerDashboardPage
-      .navigateToCommunityLessonsAndCheckIncompleteExplorations(
-        'Dummy Exploration');
+    await learnerDashboardPage.navigateToCommunityLessonsAndCheckIncompleteExplorations(
+      'Dummy Exploration'
+    );
     // Learner Dashboard should display 'Test Exploration'
     // exploration as complete.
-    await learnerDashboardPage
-      .navigateToCommunityLessonsAndCheckCompleteExplorations(
-        'Test Exploration');
+    await learnerDashboardPage.navigateToCommunityLessonsAndCheckCompleteExplorations(
+      'Test Exploration'
+    );
 
     await libraryPage.get();
     await libraryPage.findExploration('Dummy Exploration');
@@ -261,30 +290,37 @@ describe('Learner dashboard functionality', function() {
       await clickContinueButton();
     } else {
       await explorationPlayerPage.expectExplorationNameToBe(
-        'Dummy Exploration');
+        'Dummy Exploration'
+      );
       await explorationPlayerPage.submitAnswer('Continue', null);
       await explorationPlayerPage.submitAnswer(
-        'MultipleChoiceInput', 'Those were all the questions I had!');
+        'MultipleChoiceInput',
+        'Those were all the questions I had!'
+      );
     }
     // Both should be added to the completed section.
     await learnerDashboardPage.get();
-    await learnerDashboardPage
-      .navigateToCommunityLessonsAndCheckCompleteExplorations(
-        'Dummy Exploration');
-    await learnerDashboardPage
-      .navigateToCommunityLessonsAndCheckCompleteExplorations(
-        'Test Exploration');
+    await learnerDashboardPage.navigateToCommunityLessonsAndCheckCompleteExplorations(
+      'Dummy Exploration'
+    );
+    await learnerDashboardPage.navigateToCommunityLessonsAndCheckCompleteExplorations(
+      'Test Exploration'
+    );
     // This change helps debugging issue
     // #16260 E2E Flake: Splash page takes too long to appear.
     await general.callFunctionAndCollectFullStackTraceOnError(
-      users.logout, new Error().stack);
+      users.logout,
+      new Error().stack
+    );
 
     // For desktop, go to the exploration editor page and
     // delete 'Dummy Exploration'.
     if (!browser.isMobile) {
       // Login as Moderator and delete exploration 'Dummy Exploration'.
       await users.createModerator(
-        'inspector@learnerDashboard.com', 'inspector');
+        'inspector@learnerDashboard.com',
+        'inspector'
+      );
       await users.login('inspector@learnerDashboard.com');
       await libraryPage.get();
       await libraryPage.findExploration('Dummy Exploration');
@@ -298,7 +334,9 @@ describe('Learner dashboard functionality', function() {
       // This change helps debugging issue
       // #16260 E2E Flake: Splash page takes too long to appear.
       await general.callFunctionAndCollectFullStackTraceOnError(
-        users.logout, new Error().stack);
+        users.logout,
+        new Error().stack
+      );
 
       // Verify exploration 'Dummy Exploration' is deleted
       // from learner dashboard.
@@ -306,15 +344,19 @@ describe('Learner dashboard functionality', function() {
       await learnerDashboardPage.get();
       await learnerDashboardPage.navigateToCommunityLessonsSection();
       await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-        'Test Exploration');
+        'Test Exploration'
+      );
       await learnerDashboardPage.expectTitleOfExplorationSummaryTileToBeHidden(
-        'Dummy Exploration');
+        'Dummy Exploration'
+      );
     }
   });
 
-  it('should display incomplete and completed collections', async function() {
+  it('should display incomplete and completed collections', async function () {
     await users.createAndLoginSuperAdminUser(
-      'explorationCreator@learnerDashboard.com', 'explorationCreator');
+      'explorationCreator@learnerDashboard.com',
+      'explorationCreator'
+    );
     // Create or load a collection.
     if (browser.isMobile) {
       await adminPage.reloadCollection(1);
@@ -349,23 +391,21 @@ describe('Learner dashboard functionality', function() {
     // This change helps debugging issue
     // #16260 E2E Flake: Splash page takes too long to appear.
     await general.callFunctionAndCollectFullStackTraceOnError(
-      users.logout, new Error().stack);
+      users.logout,
+      new Error().stack
+    );
     await users.createAndLoginUser(
-      'learner4@learnerDashboard.com', 'learner4learnerDashboard');
+      'learner4@learnerDashboard.com',
+      'learner4learnerDashboard'
+    );
 
     // Go to 'Test Collection' and play it.
     await libraryPage.get();
     await libraryPage.findCollection('Test Collection');
     await libraryPage.playCollection('Test Collection');
     await waitFor.pageToFullyLoad();
-    // The collection player has two sets of SVGs -- one which is
-    // rendered for desktop and the other which is rendered for mobile.
-    var firstExploration = browser.isMobile ? await $$(
-      '.e2e-test-mobile-collection-exploration')[0] :
-      await $$('.e2e-test-collection-exploration')[0];
-    // Click first exploration in collection.
-    await action.click('First exploration', firstExploration);
-    await waitFor.pageToFullyLoad();
+    await collectionPlayerPage.openFirstExplorationInCollection();
+
     // Leave this collection incomplete.
     if (browser.isMobile) {
       // In mobile, 'Play Exploration' button also needs to be clicked
@@ -379,27 +419,21 @@ describe('Learner dashboard functionality', function() {
       await explorationPlayerPage.expectExplorationToNotBeOver();
     }
     // User clicks on Oppia logo to leave collection, user should be
-    // able to leave the page directly without getting any alert message.
-    await libraryPage.getHomePage();
+    // able to always get an alert message.
+    await libraryPage.getHomePage(true);
 
     // Learner Dashboard should display
     // 'Test Collection' as incomplete.
-    await learnerDashboardPage
-      .navigateToCommunityLessonsAndCheckIncompleteCollections(
-        'Test Collection');
+    await learnerDashboardPage.navigateToCommunityLessonsAndCheckIncompleteCollections(
+      'Test Collection'
+    );
     // Now find and play 'Test Collection' completely.
     await libraryPage.get();
     await libraryPage.findCollection('Test Collection');
     await libraryPage.playCollection('Test Collection');
     await waitFor.pageToFullyLoad();
-    // The collection player has two sets of SVGs -- one which is
-    // rendered for desktop and the other which is rendered for mobile.
-    var firstExploration = browser.isMobile ? await $$(
-      '.e2e-test-mobile-collection-exploration')[0] :
-      await $$('.e2e-test-collection-exploration')[0];
-    // Click first exploration in collection.
-    await action.click('First exploration', firstExploration);
-    await waitFor.pageToFullyLoad();
+    await collectionPlayerPage.openFirstExplorationInCollection();
+
     if (browser.isMobile) {
       var playExploration = $('.e2e-test-play-exploration-button');
       await action.click('Play exploration', playExploration);
@@ -410,21 +444,26 @@ describe('Learner dashboard functionality', function() {
       await waitFor.pageToFullyLoad();
     } else {
       await explorationPlayerPage.expectExplorationNameToBe(
-        'Dummy Exploration');
+        'Dummy Exploration'
+      );
       await explorationPlayerPage.submitAnswer('Continue', null);
       await explorationPlayerPage.submitAnswer(
-        'MultipleChoiceInput', 'Those were all the questions I had!');
+        'MultipleChoiceInput',
+        'Those were all the questions I had!'
+      );
     }
     // Learner Dashboard should display
     // 'Test Collection' as complete.
     await learnerDashboardPage.get();
-    await learnerDashboardPage
-      .navigateToCommunityLessonsAndCheckCompleteCollections(
-        'Test Collection');
+    await learnerDashboardPage.navigateToCommunityLessonsAndCheckCompleteCollections(
+      'Test Collection'
+    );
     // This change helps debugging issue
     // #16260 E2E Flake: Splash page takes too long to appear.
     await general.callFunctionAndCollectFullStackTraceOnError(
-      users.logout, new Error().stack);
+      users.logout,
+      new Error().stack
+    );
 
     // This part of the test is desktop-only for the following reasons:
     // 1. A user can only add an existing exploration to a collection it has
@@ -450,29 +489,34 @@ describe('Learner dashboard functionality', function() {
       await action.click('Collections tab', collectionsTab);
       await creatorDashboardPage.navigateToCollectionEditor();
       await collectionEditorPage.addExistingExploration(
-        collectionExplorationId);
+        collectionExplorationId
+      );
       await collectionEditorPage.saveDraft();
       await collectionEditorPage.setCommitMessage('Add Collection Exploration');
       await collectionEditorPage.closeSaveModal();
       // This change helps debugging issue
       // #16260 E2E Flake: Splash page takes too long to appear.
       await general.callFunctionAndCollectFullStackTraceOnError(
-        users.logout, new Error().stack);
+        users.logout,
+        new Error().stack
+      );
 
       // Verify 'Test Collection' is now in the incomplete section.
       await users.login('learner4@learnerDashboard.com');
       await learnerDashboardPage.get();
-      await learnerDashboardPage
-        .navigateToCommunityLessonsAndCheckIncompleteCollections(
-          'Test Collection');
+      await learnerDashboardPage.navigateToCommunityLessonsAndCheckIncompleteCollections(
+        'Test Collection'
+      );
     }
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
     // This change helps debugging issue
     // #16260 E2E Flake: Splash page takes too long to appear.
     await general.callFunctionAndCollectFullStackTraceOnError(
-      users.logout, new Error().stack);
+      users.logout,
+      new Error().stack
+    );
   });
 });

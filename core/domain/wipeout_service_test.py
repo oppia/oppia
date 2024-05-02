@@ -1176,9 +1176,15 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        config_models.ConfigPropertyModel(
-            id=self.CONFIG_1_ID, value='a'
-        ).commit(self.user_1_id, [{'cmd': 'command'}])
+        param_model = config_models.PlatformParameterModel.create(
+            param_name=self.CONFIG_1_ID,
+            rule_dicts=[{'filters': [], 'value_when_matched': False}],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            default_value=False
+        )
+        param_model.commit(
+            self.user_1_id, 'commit message', [{'cmd': 'command'}])
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
         self.process_and_flush_pending_tasks()
@@ -1194,7 +1200,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
             ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
         )
         metadata_model = (
-            config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
+            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.CONFIG_1_ID)
         )
         self.assertEqual(
@@ -1208,7 +1214,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
 
         # Return metadata model to the original user ID.
         metadata_model = (
-            config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
+            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.CONFIG_1_ID)
         )
         metadata_model.committer_id = self.user_1_id
@@ -1230,9 +1236,15 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
             metadata_model.committer_id, config_mappings[self.CONFIG_1_ID])
 
     def test_multiple_config_properties_are_pseudonymized(self) -> None:
-        config_models.ConfigPropertyModel(
-            id=self.CONFIG_2_ID, value='b'
-        ).commit(self.user_1_id, [{'cmd': 'command'}])
+        param_model = config_models.PlatformParameterModel.create(
+            param_name=self.CONFIG_2_ID,
+            rule_dicts=[{'filters': [], 'value_when_matched': False}],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            default_value=False
+        )
+        param_model.commit(
+            self.user_1_id, 'commit message', [{'cmd': 'command'}])
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -1243,14 +1255,14 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
             ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
         )
         metadata_model_1 = (
-            config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
+            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.CONFIG_1_ID)
         )
         self.assertEqual(
             metadata_model_1.committer_id, config_mappings[self.CONFIG_1_ID])
 
         metadata_model_2 = (
-            config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
+            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.CONFIG_2_ID)
         )
         self.assertEqual(
@@ -1259,9 +1271,15 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
     def test_multiple_config_properties_with_multiple_users_are_pseudonymized(
         self
     ) -> None:
-        config_models.ConfigPropertyModel(
-            id=self.CONFIG_2_ID, value='b'
-        ).commit(self.user_2_id, [{'cmd': 'command'}])
+        param_model = config_models.PlatformParameterModel.create(
+            param_name=self.CONFIG_2_ID,
+            rule_dicts=[{'filters': [], 'value_when_matched': False}],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            default_value=False
+        )
+        param_model.commit(
+            self.user_2_id, 'commit message', [{'cmd': 'command'}])
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -1273,7 +1291,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
             ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
         )
         metadata_model_1 = (
-            config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
+            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.CONFIG_1_ID)
         )
         self.assertEqual(
@@ -1281,7 +1299,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
 
         # Verify second user is not yet deleted.
         metadata_model_2 = (
-            config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
+            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.CONFIG_2_ID)
         )
         self.assertEqual(
@@ -1297,7 +1315,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
             ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
         )
         metadata_model_3 = (
-            config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
+            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.CONFIG_2_ID)
         )
         self.assertEqual(
@@ -1306,9 +1324,11 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
     def test_one_config_property_with_multiple_users_is_pseudonymized(
         self
     ) -> None:
-        config_models.ConfigPropertyModel.get_by_id(
+        param_model = config_models.PlatformParameterModel.get_by_id(
             self.CONFIG_1_ID
-        ).commit(self.user_2_id, [{'cmd': 'command'}])
+        )
+        param_model.commit(
+            self.user_2_id, 'commit message', [{'cmd': 'command'}])
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -1320,7 +1340,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
             ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
         )
         metadata_model_1 = (
-            config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
+            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.CONFIG_1_ID)
         )
         self.assertEqual(
@@ -1328,7 +1348,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
 
         # Verify second user is not yet deleted.
         metadata_model_2 = (
-            config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
+            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
                 '%s-2' % self.CONFIG_1_ID)
         )
         self.assertEqual(metadata_model_2.committer_id, self.user_2_id)
@@ -1343,7 +1363,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
             ).pseudonymizable_entity_mappings[models.Names.CONFIG.value]
         )
         metadata_model_3 = (
-            config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
+            config_models.PlatformParameterSnapshotMetadataModel.get_by_id(
                 '%s-2' % self.CONFIG_1_ID)
         )
         self.assertEqual(
@@ -1362,14 +1382,17 @@ class WipeoutServiceVerifyDeleteConfigModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        config_model = config_models.ConfigPropertyModel(
-            id=self.CONFIG_2_ID, value='a'
+        param_model = config_models.PlatformParameterModel.create(
+            param_name=self.CONFIG_2_ID,
+            rule_dicts=[{'filters': [], 'value_when_matched': False}],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            default_value=False
         )
-        config_model.commit(self.user_1_id, [{'cmd': 'command'}])
-        config_model.commit(self.user_1_id, [{'cmd': 'command_2'}])
-        config_models.ConfigPropertyModel(
-            id=self.CONFIG_2_ID, value='a'
-        ).commit(self.user_1_id, [{'cmd': 'command'}])
+        param_model.commit(
+            self.user_1_id, 'commit message', [{'cmd': 'command'}])
+        param_model.commit(
+            self.user_1_id, 'commit message', [{'cmd': 'command_2'}])
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -1387,9 +1410,15 @@ class WipeoutServiceVerifyDeleteConfigModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
-        config_models.ConfigPropertyModel(
-            id=self.CONFIG_2_ID, value='a'
-        ).commit(self.user_1_id, [{'cmd': 'command'}])
+        param_model = config_models.PlatformParameterModel.create(
+            param_name=self.CONFIG_2_ID,
+            rule_dicts=[{'filters': [], 'value_when_matched': False}],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            default_value=False
+        )
+        param_model.commit(
+            self.user_1_id, 'commit message', [{'cmd': 'command'}])
 
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
@@ -3564,6 +3593,13 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': 'node_1',
                 'title': 'Title 2'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': 'exp_1'
             })],
             'Add node.'
         )
@@ -3664,6 +3700,13 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': 'node_1',
                 'title': 'Title 2'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': 'exp_1'
             })],
             'Add node.'
         )
@@ -4214,6 +4257,48 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .get_by_id(
                 self.QUESTION_STATS_1_ID))
+
+
+class WipeoutServiceDeletePinnedOpportunitiesModelsTest(
+    test_utils.GenericTestBase
+):
+    """Provides testing of the deletion part of wipeout service."""
+
+    USER_1_EMAIL: Final = 'some@example.com'
+    TOPIC_ID: Final = 'topic_1'
+    OPPORTUNITY_ID: Final = 'opportunity_1'
+    LANGUAGE_CODE: Final = 'en'
+    USER_1_USERNAME: Final = 'user1'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        user_models.PinnedOpportunityModel.create(
+            user_id=self.user_1_id,
+            topic_id=self.TOPIC_ID,
+            opportunity_id=self.OPPORTUNITY_ID,
+            language_code='en'
+        )
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+    def test_pinned_opportunities_are_deleted(self) -> None:
+        self.assertIsNotNone(
+            user_models.PinnedOpportunityModel.get_model(
+                user_id=self.user_1_id,
+                language_code=self.LANGUAGE_CODE,
+                topic_id=self.TOPIC_ID
+            ))
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertIsNone(
+            user_models.PinnedOpportunityModel.get_model(
+                user_id=self.user_1_id,
+                language_code=self.LANGUAGE_CODE,
+                topic_id=self.TOPIC_ID
+            ))
 
 
 class WipeoutServiceVerifyDeleteSuggestionModelsTests(
@@ -4898,12 +4983,15 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         ))
         with self.assertRaisesRegex(Exception, 'User not found.'):
             # Try to do some action with the deleted user.
-            user_services.update_preferred_language_codes(
-                self.user_1_id, ['en'])
+            user_settings = user_services.get_user_settings(self.user_1_id)
+            user_settings.preferred_language_codes = ['en']
+            user_services.save_user_settings(user_settings)
         with self.assertRaisesRegex(Exception, 'User not found.'):
             # Try to do some action with the deleted user.
-            user_services.update_preferred_language_codes(
-                self.profile_user_id, ['en'])
+            user_settings = user_services.get_user_settings(
+                self.profile_user_id)
+            user_settings.preferred_language_codes = ['en']
+            user_services.save_user_settings(user_settings)
 
 
 class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):

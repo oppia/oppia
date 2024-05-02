@@ -27,18 +27,6 @@ from core.domain import summary_services
 from typing import Dict, List, TypedDict
 
 
-class ModeratorPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """The moderator page."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_moderator_page
-    def get(self) -> None:
-        """Handles GET requests."""
-        self.render_template('moderator-page.mainpage.html')
-
-
 class FeaturedActivitiesHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of FeaturedActivitiesHandler's
     normalized_Payload dictionary.

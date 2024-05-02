@@ -22,7 +22,8 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import config_domain
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -94,23 +95,17 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
 
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-        new_config_value = [{
-            'name': 'math',
-            'url_fragment': 'math',
-            'topic_ids': [self.topic_id],
-            'course_details': '',
-            'topic_list_intro': ''
-        }]
-
-        payload = {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.CLASSROOM_PAGES_DATA.name: (
-                    new_config_value),
+        classroom = classroom_config_domain.Classroom(
+            classroom_id=classroom_config_services.get_new_classroom_id(),
+            name='math',
+            url_fragment='math',
+            course_details='',
+            topic_list_intro='',
+            topic_id_to_prerequisite_topic_ids={
+                self.topic_id: []
             }
-        }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        )
+        classroom_config_services.update_or_create_classroom_model(classroom)
         self.logout()
 
 
@@ -119,16 +114,13 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
     def test_handler_updates_story_summary_dicts(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.save_new_valid_exploration(
-            'exp-1', self.admin_id, title='Title 1', end_state_name='End',
-            correctness_feedback_enabled=True)
+            'exp-1', self.admin_id, title='Title 1', end_state_name='End')
         self.publish_exploration(self.admin_id, 'exp-1')
         self.save_new_valid_exploration(
-            'exp-2', self.admin_id, title='Title 2', end_state_name='End',
-            correctness_feedback_enabled=True)
+            'exp-2', self.admin_id, title='Title 2', end_state_name='End')
         self.publish_exploration(self.admin_id, 'exp-2')
         self.save_new_valid_exploration(
-            'exp-3', self.admin_id, title='Title 3', end_state_name='End',
-            correctness_feedback_enabled=True)
+            'exp-3', self.admin_id, title='Title 3', end_state_name='End')
         self.publish_exploration(self.admin_id, 'exp-3')
 
         topic_id = topic_fetchers.get_new_topic_id()
@@ -358,12 +350,13 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             expected_status_int=400)
 
         invalid_description = 'Story Description' * 60
-        self.assertEqual(
-            json_response['error'],
+        self.assertIn(
             'Schema validation for \'description\' failed: '
             'Validation failed: has_length_at_most '
             f'({{\'max_value\': {constants.MAX_CHARS_IN_STORY_DESCRIPTION}}}) '
-            f'for object {invalid_description}')
+            f'for object {invalid_description}',
+            json_response['error'],
+        )
 
         self.logout()
 
@@ -655,12 +648,13 @@ class TopicEditorTests(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=400)
-        self.assertEqual(
-            json_response['error'],
+        self.assertIn(
             'Schema validation for \'commit_message\' failed: '
             'Validation failed: has_length_at_most '
             f'({{\'max_value\': {constants.MAX_COMMIT_MESSAGE_LENGTH}}}) '
-            f'for object {commit_msg}')
+            f'for object {commit_msg}',
+            json_response['error'],
+        )
 
     def test_editable_topic_handler_put_raises_error_with_invalid_name(
         self
@@ -869,9 +863,10 @@ class TopicEditorTests(
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
-        self.assertEqual(
+        self.assertIn(
+            'Missing key in handler args: version.',
             json_response['error'],
-            'Missing key in handler args: version.')
+        )
 
         self.logout()
 
@@ -1116,10 +1111,11 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
             {'publish_status': invalid}, csrf_token=csrf_token,
             expected_status_int=400)
-        self.assertEqual(
-            response['error'],
+        self.assertIn(
             'Schema validation for \'publish_status\' failed: '
-            f'Expected bool, received {invalid}')
+            f'Expected bool, received {invalid}',
+            response['error'],
+        )
 
         self.logout()
 

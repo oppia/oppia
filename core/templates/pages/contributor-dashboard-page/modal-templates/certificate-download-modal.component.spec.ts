@@ -14,20 +14,31 @@
 
 /**
  * @fileoverview Unit tests for CertificateDownloadModalComponent.
-*/
+ */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
 
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-import { ContextService } from 'services/context.service';
-import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import { CertificateDownloadModalComponent } from './certificate-download-modal.component';
-import { ContributionAndReviewService } from '../services/contribution-and-review.service';
-import { AlertsService } from 'services/alerts.service';
-import { ContributorCertificateResponse } from '../services/contribution-and-review-backend-api.service';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flushMicrotasks,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
+import {ContextService} from 'services/context.service';
+import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import {CertificateDownloadModalComponent} from './certificate-download-modal.component';
+import {ContributionAndReviewService} from '../services/contribution-and-review.service';
+import {AlertsService} from 'services/alerts.service';
+import {ContributorCertificateResponse} from '../services/contribution-and-review-backend-api.service';
+import {HttpErrorResponse} from '@angular/common/http';
 
 class MockChangeDetectorRef {
   detectChanges(): void {}
@@ -46,27 +57,25 @@ describe('Contributor Certificate Download Modal Component', () => {
     to_date: '31 Oct 2022',
     team_lead: 'Test User',
     contribution_hours: 1.0,
-    language: 'Hindi'
+    language: 'Hindi',
   };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
+      imports: [HttpClientTestingModule],
       declarations: [
         CertificateDownloadModalComponent,
-        WrapTextWithEllipsisPipe
+        WrapTextWithEllipsisPipe,
       ],
       providers: [
         NgbActiveModal,
         AlertsService,
         {
           provide: ChangeDetectorRef,
-          useValue: changeDetectorRef
-        }
+          useValue: changeDetectorRef,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     OppiaAngularRootComponent.contextService = TestBed.inject(ContextService);
   }));
@@ -92,8 +101,8 @@ describe('Contributor Certificate Download Modal Component', () => {
     component.toDate = '2022/10/31';
     spyOn(
       contributionAndReviewService,
-      'downloadContributorCertificateAsync')
-      .and.returnValue(Promise.resolve(certificateDataResponse));
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(certificateDataResponse));
     spyOn(alertsService, 'addInfoMessage').and.stub();
 
     component.downloadCertificate();
@@ -110,8 +119,8 @@ describe('Contributor Certificate Download Modal Component', () => {
     component.suggestionType = 'add_question';
     spyOn(
       contributionAndReviewService,
-      'downloadContributorCertificateAsync')
-      .and.returnValue(Promise.resolve(certificateDataResponse));
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(certificateDataResponse));
     spyOn(alertsService, 'addInfoMessage').and.stub();
 
     component.downloadCertificate();
@@ -122,24 +131,19 @@ describe('Contributor Certificate Download Modal Component', () => {
     ).toHaveBeenCalled();
   });
 
-  it('should show error when contributions not found', fakeAsync(() => {
-    component.fromDate = '2022/01/01';
-    component.toDate = '2022/10/31';
-    spyOn(
-      contributionAndReviewService,
-      'downloadContributorCertificateAsync')
-      .and.returnValue(Promise.reject());
+  it('should set errorsFound and errorMessage for To date in the future', () => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
 
-    component.downloadCertificate();
-    tick();
-
-    expect(
-      contributionAndReviewService.downloadContributorCertificateAsync
-    ).toHaveBeenCalled();
-    expect(component.errorsFound).toBeTrue();
-    expect(component.errorMessage).toEqual(
-      'Not able to download contributor certificate');
-  }));
+    component.fromDate = '2023-10-01';
+    component.toDate = tomorrow.toISOString().split('T')[0];
+    component.validateDate();
+    expect(component.errorsFound).toBe(true);
+    expect(component.errorMessage).toBe(
+      "Please select a 'To' date that is earlier than today's date"
+    );
+  });
 
   it('should show error for invalid to date', () => {
     const today = new Date();
@@ -148,12 +152,11 @@ describe('Contributor Certificate Download Modal Component', () => {
     component.fromDate = today.toDateString();
     component.toDate = tomorrow.toDateString();
 
-    component.downloadCertificate();
+    component.validateDate();
 
     expect(component.errorsFound).toBeTrue();
     expect(component.errorMessage).toEqual(
-      'Please select a \'To\' date that is earlier than ' +
-      'today\'s date'
+      "Please select a 'To' date that is earlier than " + "today's date"
     );
   });
 
@@ -164,10 +167,25 @@ describe('Contributor Certificate Download Modal Component', () => {
     component.fromDate = tomorrow.toDateString();
     component.toDate = today.toDateString();
 
-    component.downloadCertificate();
+    component.validateDate();
 
     expect(component.errorsFound).toBeTrue();
     expect(component.errorMessage).toEqual('Invalid date range.');
+  });
+
+  it('should not show errors for valid dates', () => {
+    const today = new Date();
+    const fromDate = new Date();
+    const toDate = new Date();
+    fromDate.setDate(today.getDate() - 2);
+    toDate.setDate(today.getDate() - 1);
+    component.fromDate = fromDate.toDateString();
+    component.toDate = toDate.toDateString();
+
+    component.validateDate();
+
+    expect(component.errorsFound).toBeFalse();
+    expect(component.errorMessage).toEqual('');
   });
 
   it('should close', () => {
@@ -176,17 +194,31 @@ describe('Contributor Certificate Download Modal Component', () => {
     expect(activeModal.close).toHaveBeenCalled();
   });
 
+  it('should handle errors properly', fakeAsync(() => {
+    const mockError = new HttpErrorResponse({error: {error: 'Error message'}});
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.reject(mockError));
+
+    component.downloadCertificate();
+
+    flushMicrotasks();
+
+    expect(component.errorsFound).toBe(true);
+    expect(component.certificateDownloading).toBe(false);
+    expect(component.errorMessage).toBe('Error message');
+  }));
+
   it('should throw error when canvas context is null', () => {
     spyOn(document, 'createElement').and.callFake(
-      jasmine.createSpy('createElement').and.returnValue(
-        {
-          width: 0,
-          height: 0,
-          getContext: (txt: string) => {
-            return null;
-          },
-        }
-      )
+      jasmine.createSpy('createElement').and.returnValue({
+        width: 0,
+        height: 0,
+        getContext: (txt: string) => {
+          return null;
+        },
+      })
     );
 
     expect(() => {

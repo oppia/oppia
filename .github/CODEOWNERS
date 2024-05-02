@@ -34,17 +34,18 @@
 # be superseded by the relevant codeowners mentioned elsewhere in this file.
 # (Reference: https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners)
 /core/controllers/ @oppia/lace-backend-reviewers
-/core/domain/ @oppia/data-and-stability-reviewers
+/core/domain/ @oppia/lace-backend-reviewers
 /core/templates/components/ @oppia/lace-frontend-reviewers
 /core/templates/domain/ @oppia/lace-frontend-reviewers
 /core/templates/pages/ @oppia/lace-frontend-reviewers
 /core/templates/services/ @oppia/lace-frontend-reviewers
 /core/templates/utility/ @oppia/lace-frontend-reviewers
-/extensions/ @oppia/data-and-stability-reviewers
+/extensions/ @oppia/lace-backend-reviewers
 /scripts/ @oppia/dev-workflow-reviewers
 
 
 # Angular Migration team
+/core/templates/pages/base-root.component.ts @oppia/lace-frontend-reviewers
 /core/controllers/oppia_root*.py @oppia/lace-frontend-reviewers
 /core/templates/components/shared-component.module.ts @oppia/lace-frontend-reviewers
 /core/templates/services/loader.service*.ts @oppia/lace-frontend-reviewers
@@ -76,9 +77,9 @@
 /src @oppia/lace-frontend-reviewers
 
 # TS typing
-/typings/ @oppia/data-and-stability-reviewers
-/tsconfig*.json @oppia/data-and-stability-reviewers
-/scripts/typescript_checks*.py @oppia/data-and-stability-reviewers
+/typings/ @oppia/dev-workflow-reviewers
+/tsconfig*.json @oppia/dev-workflow-reviewers
+/scripts/run_typescript_checks*.py @oppia/dev-workflow-reviewers
 
 
 # Answer classification team.
@@ -110,6 +111,12 @@
 /core/templates/services/entity-translations.services.ts @oppia/lace-frontend-reviewers
 
 
+# Audio Voiceover project
+/core/controllers/voiceover*.py @oppia/lace-backend-reviewers
+/core/domain/voiceover*.py @oppia/lace-backend-reviewers
+/core/templates/domain/voiceover/ @oppia/lace-frontend-reviewers
+
+
 # Blog project
 /core/domain/blog*.py @oppia/lace-backend-reviewers
 /core/controllers/blog_dashboard*.py @oppia/lace-backend-reviewers
@@ -137,7 +144,6 @@
 /core/templates/domain/opportunity/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-page/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-admin-page/ @oppia/contributor-experience-team
-/scripts/populate_sample_contributor_data*.py @oppia/contributor-experience-team
 /core/templates/services/html-length.service.ts @oppia/contributor-experience-team
 /core/templates/services/html-length.service.spec.ts @oppia/contributor-experience-team
 
@@ -183,6 +189,8 @@
 /.gitattributes @oppia/dev-workflow-reviewers
 /.gitignore @oppia/dev-workflow-reviewers
 /.isort.cfg @oppia/dev-workflow-reviewers
+/.prettierignore @oppia/dev-workflow-reviewers
+/.prettierrc.json @oppia/dev-workflow-reviewers
 /.pylintrc @oppia/dev-workflow-reviewers
 /.stylelintrc @oppia/dev-workflow-reviewers
 /.yarnrc @oppia/dev-workflow-reviewers
@@ -194,26 +202,24 @@
 /scripts/*.py @oppia/dev-workflow-reviewers
 /scripts/check_e2e_tests_are_captured_in_ci*.py @oppia/dev-workflow-reviewers
 /scripts/check_frontend_test_coverage*.py @oppia/dev-workflow-reviewers
-/scripts/create_topological_sort_of_all_services*.py @oppia/dev-workflow-reviewers
 /scripts/install_prerequisites.sh @oppia/dev-workflow-reviewers
 /scripts/linters/ @oppia/dev-workflow-reviewers
 /scripts/linters/codeowner_linter*.py @oppia/dev-workflow-reviewers
 /scripts/linters/pylint_extensions*.py @oppia/dev-workflow-reviewers
 /scripts/linters/python_linter*.py @oppia/dev-workflow-reviewers
-/ubuntu_dockerfile @oppia/dev-workflow-reviewers
 
 
 # Exploration project.
 /core/controllers/editor*.py @oppia/lace-backend-reviewers
 /core/controllers/reader*.py @oppia/lace-backend-reviewers
-/core/controllers/resources*.py @oppia/data-and-stability-reviewers
+/core/controllers/resources*.py @oppia/lace-backend-reviewers
 /core/domain/exp*.py @oppia/lace-backend-reviewers
 /core/domain/fs*.py @oppia/lace-backend-reviewers
 /core/domain/param_domain*.py @oppia/lace-backend-reviewers
 /core/domain/rating_services*.py @oppia/lace-backend-reviewers
 /core/domain/state_domain*.py @oppia/lace-backend-reviewers
 /core/domain/summary_services*.py @oppia/lace-backend-reviewers
-/core/domain/value_generators_domain*.py @oppia/data-and-stability-reviewers
+/core/domain/value_generators_domain*.py @oppia/lace-backend-reviewers
 /core/templates/components/entity-creation-services/exploration-creation.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/button-directives/hint-and-solution-buttons.component*.ts @oppia/lace-frontend-reviewers
@@ -290,6 +296,7 @@
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component.html @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/common-elements.module.ts @oppia/lace-frontend-reviewers
+/core/templates/components/custom-snackbar/ @oppia/lace-frontend-reviewers
 /core/templates/components/profile-link-directives/ @oppia/lace-frontend-reviewers
 /core/templates/components/summary-tile/ @oppia/lace-frontend-reviewers
 /core/templates/directives/angular-html-bind.directive*.ts @oppia/lace-frontend-reviewers
@@ -306,7 +313,6 @@
 # Global frontend services
 /core/templates/services/alerts.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/date-time-format.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/debouncer.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/extension-tag-assembler.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/html-escaper.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/id-generation.service*.ts @oppia/lace-frontend-reviewers
@@ -358,37 +364,37 @@
 
 
 # Lesson Analytics team.
-/core/controllers/features*.py @oppia/learner-analytics-reviewers
-/core/controllers/improvements*.py @oppia/learner-analytics-reviewers
-/core/domain/action_registry*.py @oppia/learner-analytics-reviewers
-/core/domain/calculation_registry*.py @oppia/learner-analytics-reviewers
-/core/domain/event_services*.py @oppia/learner-analytics-reviewers
-/core/domain/improvements_domain*.py @oppia/learner-analytics-reviewers
-/core/domain/improvements_services*.py @oppia/learner-analytics-reviewers
-/core/domain/playthrough_issue_registry*.py @oppia/learner-analytics-reviewers
-/core/domain/stats*.py @oppia/learner-analytics-reviewers
-/core/domain/visualization_registry*.py @oppia/learner-analytics-reviewers
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.component*.ts @oppia/learner-analytics-reviewers
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.component.html @oppia/learner-analytics-reviewers
-/core/templates/components/statistics-directives/ @oppia/learner-analytics-reviewers
-/core/templates/domain/statistics/ @oppia/learner-analytics-reviewers
-/core/templates/domain/improvements/ @oppia/learner-analytics-reviewers
-/core/templates/pages/exploration-editor-page/improvements-tab/ @oppia/learner-analytics-reviewers
-/core/templates/pages/exploration-editor-page/statistics-tab/ @oppia/learner-analytics-reviewers
-/core/templates/services/exploration-improvements.service*.ts @oppia/learner-analytics-reviewers
-/core/templates/services/exploration-improvements-backend-api.service*.ts @oppia/learner-analytics-reviewers
-/core/templates/services/exploration-improvements-task-registry.service*.ts @oppia/learner-analytics-reviewers
-/core/templates/services/exploration-stats.service*.ts @oppia/learner-analytics-reviewers
-/core/templates/services/exploration-stats-backend-api.service*.ts @oppia/learner-analytics-reviewers
-/core/templates/services/improvements.service*.ts @oppia/learner-analytics-reviewers
-/core/templates/services/messenger.service.ts @oppia/learner-analytics-reviewers
-/core/templates/services/playthrough*.ts @oppia/learner-analytics-reviewers
-/core/templates/services/state-interaction-stats.service*.ts @oppia/learner-analytics-reviewers
-/core/templates/services/state-top-answers-stats*.ts @oppia/learner-analytics-reviewers
-/extensions/actions/ @oppia/learner-analytics-reviewers
-/extensions/answer_summarizers/ @oppia/learner-analytics-reviewers
-/extensions/issues/ @oppia/learner-analytics-reviewers
-/extensions/visualizations/ @oppia/learner-analytics-reviewers
+/core/controllers/features*.py @oppia/lace-backend-reviewers
+/core/controllers/improvements*.py @oppia/lace-backend-reviewers
+/core/domain/action_registry*.py @oppia/lace-backend-reviewers
+/core/domain/calculation_registry*.py @oppia/lace-backend-reviewers
+/core/domain/event_services*.py @oppia/lace-backend-reviewers
+/core/domain/improvements_domain*.py @oppia/lace-backend-reviewers
+/core/domain/improvements_services*.py @oppia/lace-backend-reviewers
+/core/domain/playthrough_issue_registry*.py @oppia/lace-backend-reviewers
+/core/domain/stats*.py @oppia/lace-backend-reviewers
+/core/domain/visualization_registry*.py @oppia/lace-backend-reviewers
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.component*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.component.html @oppia/lace-frontend-reviewers
+/core/templates/components/statistics-directives/ @oppia/lace-frontend-reviewers
+/core/templates/domain/statistics/ @oppia/lace-frontend-reviewers
+/core/templates/domain/improvements/ @oppia/lace-frontend-reviewers
+/core/templates/pages/exploration-editor-page/improvements-tab/ @oppia/lace-frontend-reviewers
+/core/templates/pages/exploration-editor-page/statistics-tab/ @oppia/lace-frontend-reviewers
+/core/templates/services/exploration-improvements.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/exploration-improvements-backend-api.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/exploration-improvements-task-registry.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/exploration-stats.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/exploration-stats-backend-api.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/improvements.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/messenger.service.ts @oppia/lace-frontend-reviewers
+/core/templates/services/playthrough*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/state-interaction-stats.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/state-top-answers-stats*.ts @oppia/lace-frontend-reviewers
+/extensions/actions/ @oppia/lace-backend-reviewers
+/extensions/answer_summarizers/ @oppia/lace-backend-reviewers
+/extensions/issues/ @oppia/lace-backend-reviewers
+/extensions/visualizations/ @oppia/lace-backend-reviewers
 
 
 # Library page.
@@ -417,7 +423,6 @@
 /core/controllers/review_tests*.py @oppia/lace-backend-reviewers
 /core/domain/classroom*.py @oppia/lace-backend-reviewers
 /core/controllers/diagnostic_test_player*.py @oppia/lace-backend-reviewers
-/core/domain/classroom_services*.py @oppia/lace-backend-reviewers
 /core/domain/question*.py @oppia/lace-backend-reviewers
 /core/domain/rights_domain*.py @oppia/lace-backend-reviewers
 /core/templates/components/concept-card/ @oppia/lace-frontend-reviewers
@@ -433,10 +438,10 @@
 
 
 # Readme
-/core/README.md @oppia/data-and-stability-reviewers
-/core/templates/css/README.md @oppia/lace-frontend-reviewers
-/extensions/README.md @oppia/data-and-stability-reviewers
-/scripts/README.md @oppia/data-and-stability-reviewers
+/core/README.md @oppia/dev-workflow-reviewers
+/core/templates/css/README.md @oppia/dev-workflow-reviewers
+/extensions/README.md @oppia/dev-workflow-reviewers
+/scripts/README.md @oppia/dev-workflow-reviewers
 
 # Skill project.
 /core/controllers/concept_card_viewer*.py @oppia/lace-backend-reviewers
@@ -491,26 +496,26 @@
 /core/templates/pages/learner-group-pages/ @oppia/lace-frontend-reviewers
 
 # Beam jobs
-/setup*.py @oppia/data-and-stability-reviewers
-/MANIFEST.in @oppia/data-and-stability-reviewers
-/core/jobs/ @oppia/data-and-stability-reviewers
-/core/jobs/transforms @oppia/data-and-stability-reviewers
-/core/jobs/types @oppia/data-and-stability-reviewers
-/core/templates/domain/jobs/ @oppia/data-and-stability-reviewers
-/core/controllers/beam_jobs*.py @oppia/data-and-stability-reviewers
-/core/domain/beam_job*.py @oppia/data-and-stability-reviewers
+/setup*.py @oppia/dev-workflow-reviewers
+/MANIFEST.in @oppia/lace-backend-reviewers
+/core/jobs/ @oppia/lace-backend-reviewers
+/core/jobs/transforms @oppia/lace-backend-reviewers
+/core/jobs/types @oppia/lace-backend-reviewers
+/core/templates/domain/jobs/ @oppia/lace-frontend-reviewers
+/core/controllers/beam_jobs*.py @oppia/lace-backend-reviewers
+/core/domain/beam_job*.py @oppia/lace-backend-reviewers
 
 # Infrastructure.
-/core/controllers/cron*.py @oppia/data-and-stability-reviewers
-/core/domain/cron_services*.py @oppia/data-and-stability-reviewers
-/main*.py @oppia/data-and-stability-reviewers
-/core/feconf*.py @oppia/data-and-stability-reviewers
-/core/constants*.py @oppia/data-and-stability-reviewers
-/assets/constants.ts @oppia/data-and-stability-reviewers
+/core/controllers/cron*.py @oppia/lace-backend-reviewers
+/core/domain/cron_services*.py @oppia/lace-backend-reviewers
+/main*.py @oppia/lace-backend-reviewers
+/core/feconf*.py @oppia/lace-backend-reviewers
+/core/constants*.py @oppia/lace-backend-reviewers
+/assets/constants.ts @oppia/lace-frontend-reviewers
 /core/controllers/tasks*.py @oppia/lace-backend-reviewers
 /core/domain/email*.py @oppia/lace-backend-reviewers
 /core/domain/image_service*.py @oppia/lace-backend-reviewers
-/core/platform/ @oppia/data-and-stability-reviewers
+/core/platform/ @oppia/lace-backend-reviewers
 /core/templates/App*.ts @oppia/lace-frontend-reviewers
 /core/templates/app.constants.ts @oppia/lace-frontend-reviewers
 /core/templates/app.constants.ajs.ts @oppia/lace-frontend-reviewers
@@ -526,48 +531,48 @@
 /core/templates/services/interaction-rules-registry.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/interaction-specs.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/translation-file-hash-loader-backend-api.service.ts @oppia/lace-frontend-reviewers
-/redis.conf @oppia/data-and-stability-reviewers
-/redis_docker.conf @oppia/data-and-stability-reviewers
-/.firebase.json @oppia/data-and-stability-reviewers
-/.firebase_docker.json @oppia/data-and-stability-reviewers
+/redis.conf @oppia/dev-workflow-reviewers
+/redis_docker.conf @oppia/dev-workflow-reviewers
+/.firebase.json @oppia/dev-workflow-reviewers
+/.firebase_docker.json @oppia/dev-workflow-reviewers
 
 
 # Miscellaneous.
-/__init__.py @oppia/data-and-stability-reviewers
-/core/__init__.py @oppia/data-and-stability-reviewers
-/core/controllers/__init__.py @oppia/data-and-stability-reviewers
-/core/domain/__init__.py @oppia/data-and-stability-reviewers
-/core/domain/config*.py @oppia/lace-backend-reviewers
+/__init__.py @oppia/dev-workflow-reviewers
+/core/__init__.py @oppia/lace-backend-reviewers
+/core/controllers/__init__.py @oppia/lace-backend-reviewers
+/core/domain/__init__.py @oppia/lace-backend-reviewers
 /core/domain/change_domain*.py @oppia/lace-backend-reviewers
 /core/templates/tests/ @oppia/lace-frontend-reviewers
 /core/templates/domain/utilities/ @oppia/lace-frontend-reviewers
 /core/templates/Polyfills.ts @oppia/lace-frontend-reviewers
 /extensions/extensions.module.ts @oppia/lace-frontend-reviewers
-/core/schema_utils*.py @oppia/data-and-stability-reviewers
+/core/schema_utils*.py @oppia/lace-backend-reviewers
 /core/utils*.py @oppia/lace-backend-reviewers
 /.rtlcssrc @oppia/lace-frontend-reviewers
 
 
 # Python typing
-/mypy.ini @oppia/mypy-reviewers
-/mypy_imports*.py @oppia/mypy-reviewers
-/mypy_requirements.txt @oppia/mypy-reviewers
-/stubs/ @oppia/mypy-reviewers
-/scripts/run_mypy_checks*.py @oppia/mypy-reviewers
+/mypy.ini @oppia/dev-workflow-reviewers
+/mypy_imports*.py @oppia/dev-workflow-reviewers
+/mypy_requirements.txt @oppia/dev-workflow-reviewers
+/stubs/ @oppia/dev-workflow-reviewers
+/scripts/run_mypy_checks*.py @oppia/dev-workflow-reviewers
 
 
 # Restricted pages.
-/core/controllers/admin*.py @oppia/data-and-stability-reviewers
+/core/controllers/admin*.py @oppia/lace-backend-reviewers
 /core/controllers/blog_admin*.py @oppia/lace-backend-reviewers
-/core/controllers/moderator*.py @oppia/data-and-stability-reviewers
-/core/controllers/recent_commits*.py @oppia/data-and-stability-reviewers
-/core/domain/moderator_services*.py @oppia/data-and-stability-reviewers
+/core/controllers/moderator*.py @oppia/lace-backend-reviewers
+/core/controllers/recent_commits*.py @oppia/lace-backend-reviewers
+/core/domain/moderator_services*.py @oppia/lace-backend-reviewers
 /core/templates/domain/admin/ @oppia/lace-frontend-reviewers
 /core/templates/domain/blog-admin/ @oppia/lace-frontend-reviewers
 /core/templates/pages/admin-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/moderator-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/blog-admin-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/classroom-admin-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/voiceover-admin-page/ @oppia/lace-frontend-reviewers
 
 
 # Release team.
@@ -576,7 +581,6 @@
 /core/templates/pages/release-coordinator-page/ @oppia/release-workflow-reviewers
 /scripts/release_scripts/ @oppia/release-workflow-reviewers
 /assets/release_constants.json @oppia/release-workflow-reviewers
-
 
 # Rich text editor team.
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.html @oppia/lace-frontend-reviewers
@@ -626,8 +630,8 @@
 
 
 # Simple pages.
-/core/controllers/pages*.py @oppia/data-and-stability-reviewers
-/core/controllers/custom_landing_pages*.py @oppia/data-and-stability-reviewers
+/core/controllers/pages*.py @oppia/lace-backend-reviewers
+/core/controllers/custom_landing_pages*.py @oppia/lace-backend-reviewers
 /core/templates/pages/contact-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/delete-account-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/donate-page/ @oppia/lace-frontend-reviewers
@@ -660,11 +664,11 @@
 /.lighthouserc*.js @oppia/dev-workflow-reviewers
 /puppeteer-login-script.js @oppia/dev-workflow-reviewers
 /scripts/run_lighthouse_tests.py @oppia/dev-workflow-reviewers
-/webpack.*.ts @oppia/data-and-stability-reviewers
+/webpack.*.ts @oppia/dev-workflow-reviewers
 
 
 # User’s profile page.
-/core/controllers/profile*.py @oppia/data-and-stability-reviewers
+/core/controllers/profile*.py @oppia/lace-backend-reviewers
 /core/templates/domain/user/ @oppia/lace-frontend-reviewers
 /core/templates/pages/profile-page/ @oppia/lace-frontend-reviewers
 /core/templates/services/user.service*.ts @oppia/lace-frontend-reviewers
@@ -674,16 +678,6 @@
 # Service constants
 /core/templates/services/services.constants.ajs.ts @oppia/lace-frontend-reviewers
 /core/templates/services/services.constants.ts @oppia/lace-frontend-reviewers
-
-
-# Dynamic Feature Gating project
-/core/controllers/platform_feature*.py @oppia/web-android-compatibility-reviewers
-/core/domain/platform_feature_services*.py @oppia/web-android-compatibility-reviewers
-/core/domain/platform_parameter*.py @oppia/web-android-compatibility-reviewers
-/core/platform_feature*.py @oppia/web-android-compatibility-reviewers
-/core/templates/domain/platform_feature/ @oppia/web-android-compatibility-reviewers
-/core/templates/pages/release-coordinator-page/features-tab/ @oppia/web-android-compatibility-reviewers
-/core/templates/services/platform-feature*.ts @oppia/web-android-compatibility-reviewers
 
 
 # Frontend unit tests
@@ -699,16 +693,16 @@
 /core/templates/domain/mailing-list/mailing-list-backend-api.service*.ts @oppia/lace-frontend-reviewers
 
 # Data stability.
-/core/controllers/domain_objects_validator*.py @oppia/data-and-stability-reviewers
-/core/controllers/payload_validator*.py @oppia/data-and-stability-reviewers
-/core/handler_schema_constants*.py @oppia/data-and-stability-reviewers
+/core/controllers/domain_objects_validator*.py @oppia/lace-backend-reviewers
+/core/controllers/payload_validator*.py @oppia/lace-backend-reviewers
+/core/handler_schema_constants*.py @oppia/lace-backend-reviewers
 
 
 # QA team.
 /core/tests/ @oppia/dev-workflow-reviewers
-/assets/ @oppia/data-and-stability-reviewers
-/data/ @oppia/data-and-stability-reviewers
-/core/templates/karma.module.ts @oppia/lace-frontend-reviewers
+/assets/ @oppia/lace-frontend-reviewers
+/data/ @oppia/lace-backend-reviewers
+/core/templates/karma.module.ts @oppia/dev-workflow-reviewers
 /core/tests/webdriverio_utils/ @oppia/dev-workflow-reviewers
 /core/tests/webdriverio_desktop/ @oppia/dev-workflow-reviewers
 /core/tests/webdriverio/ @oppia/dev-workflow-reviewers
@@ -719,17 +713,33 @@
 /extensions/rich_text_components/webdriverio.js @oppia/dev-workflow-reviewers
 /extensions/objects/webdriverio.js @oppia/dev-workflow-reviewers
 /scripts/backend_test_shards.json @oppia/dev-workflow-reviewers
-/scripts/backend_tests_incomplete_coverage.txt @oppia/dev-workflow-reviewers
 /.github/actions @oppia/dev-workflow-reviewers
 
 
 # Python 3 Migration project.
-/core/domain/auth*.py @oppia/data-and-stability-reviewers
-/core/domain/caching*.py @oppia/data-and-stability-reviewers
-/core/domain/taskqueue*.py @oppia/data-and-stability-reviewers
-/core/templates/services/auth.service*.ts @oppia/data-and-stability-reviewers
-/core/templates/services/auth-backend-api.service*.ts @oppia/data-and-stability-reviewers
+/core/domain/auth*.py @oppia/lace-backend-reviewers
+/core/domain/caching*.py @oppia/lace-backend-reviewers
+/core/domain/taskqueue*.py @oppia/lace-backend-reviewers
+/core/templates/services/auth.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/auth-backend-api.service*.ts @oppia/lace-frontend-reviewers
 
+
+# Dynamic Feature Gating project
+/core/domain/platform_parameter*.py @oppia/web-android-compatibility-reviewers
+/core/feature_flag*.py @oppia/web-android-compatibility-reviewers
+/core/controllers/feature_flag*.py @oppia/core-reviewers
+/core/domain/platform_parameter_services*.py @oppia/core-reviewers
+/core/domain/feature_flag*.py @oppia/core-reviewers
+/core/templates/domain/platform-parameter/ @oppia/core-reviewers
+/core/templates/domain/feature-flag/ @oppia/core-reviewers
+/core/templates/pages/release-coordinator-page/features-tab/ @oppia/core-reviewers
+/core/templates/services/platform-feature*.ts @oppia/core-reviewers
+
+# Acceptance Tests.
+/core/tests/puppeteer-acceptance-tests/ @oppia/acceptance-test-reviewers
+/core/tests/puppeteer/ @oppia/acceptance-test-reviewers
+/scripts/run_acceptance_tests_test.py @oppia/acceptance-test-reviewers
+/scripts/run_acceptance_tests.py @oppia/acceptance-test-reviewers
 
 # Critical files.
 #

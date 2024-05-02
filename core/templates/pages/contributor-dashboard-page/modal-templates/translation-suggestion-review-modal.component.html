@@ -27,6 +27,9 @@
 </div>
 
 <div class="modal-body">
+  <div *ngIf="status == 'rejected'" class="translation-suggestion-review-message alert alert-danger">
+    <p>See your submitted translation below. Please submit a new translation to address the requested revisions.</p>
+  </div>
   <section class="oppia-suggestion-review-container">
     <div class="oppia-suggestion-review-panel-container float-left">
       <div class="oppia-suggestion-review-panel-header-container">
@@ -87,24 +90,24 @@
                                [(ngModel)]="editedContent.html">
           </schema-based-editor>
         </div>
-        <div class="oppia-translation-review-edit-buttons">
-          <button class="btn btn-secondary mr-2"
-                  *ngIf="startedEditing"
-                  (click)="cancelEdit()">
-            Cancel
-          </button>
-          <button class="btn btn-success ml-2"
-                  *ngIf="startedEditing"
-                  (click)="updateSuggestion()">
-            Update
-          </button>
-        </div>
         <div class="oppia-translation-error-section"
              *ngIf="startedEditing && errorFound">
           <p>
             {{ errorMessage }}
           </p>
         </div>
+      </div>
+      <div class="oppia-translation-review-edit-buttons">
+        <button class="btn btn-secondary mr-2"
+                *ngIf="startedEditing"
+                (click)="cancelEdit()">
+          Cancel
+        </button>
+        <button class="btn btn-success ml-2"
+                *ngIf="startedEditing"
+                (click)="updateSuggestion()">
+          Update
+        </button>
       </div>
       <div class="oppia-collapse-content"
            *ngIf="isTranslationOverflowing"
@@ -133,7 +136,7 @@
       </oppia-rte-output-display>
     </div>
   </section>
-  <a [href]="'/create/' + activeSuggestion.target_id + '#/translation/' + activeSuggestion.change.state_name + '/'+ activeSuggestion.change.content_id" target="_blank" rel="noopener">
+  <a [href]="'/create/' + activeSuggestion.target_id + '#/translation/' + activeSuggestion.change_cmd.state_name + '/'+ activeSuggestion.change_cmd.content_id + '/' + languageCode" target="_blank" rel="noopener">
     See Lesson Card
   </a>
   <section [hidden]="!reviewable"
@@ -190,7 +193,7 @@
           [disableTooltip]="reviewMessage.length !== 0">
       <button class="btn btn-danger oppia-suggestion-resolve-button"
               *ngIf="reviewable"
-              [disabled]="reviewMessage.length == 0 || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH || resolvingSuggestion"
+              [disabled]="reviewMessage.length == 0 || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH || resolvingSuggestion || startedEditing"
               (click)="rejectAndReviewNext(reviewMessage)">
         <i [hidden]="!resolvingSuggestion"
            class="fa fa-spinner">
@@ -201,8 +204,8 @@
       </button>
     </span>
     <span>
-      <button class="btn btn-success oppia-suggestion-resolve-button"
-              [disabled]="resolvingSuggestion || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH"
+      <button class="btn btn-success oppia-suggestion-resolve-button e2e-test-translation-accept-button"
+              [disabled]="resolvingSuggestion || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH || startedEditing"
               *ngIf="reviewable"
               (click)="acceptAndReviewNext()">
         <i [hidden]="!resolvingSuggestion"
@@ -332,7 +335,7 @@
   }
   .oppia-suggestion-resolve-button {
     margin-left: 10px;
-    min-width: 165px;
+    min-width: 130px;
   }
   .oppia-suggestion-review-panel-header-container {
     height: 12%;

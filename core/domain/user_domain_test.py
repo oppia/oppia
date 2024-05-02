@@ -498,8 +498,10 @@ class UserSettingsTests(test_utils.GenericTestBase):
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)
         time_of_creation = user_settings_model.created_on
+        user_settings.created_on = time_of_creation
 
-        user_services.update_user_bio(user_settings.user_id, 'New bio.')
+        user_settings.user_bio = 'New bio.'
+        user_services.save_user_settings(user_settings)
 
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)
@@ -1694,3 +1696,59 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
                 'user1', ['group_id_1'], [learner_group_user_details], 1),
             'Learner cannot be invited to join learner group group_id_1 since '
             'they are already its learner.')
+
+
+class TranslationCoordinatorStatsUnitTests(
+    test_utils.GenericTestBase
+):
+    """Tests for the TranslationCoordinatorStats class."""
+
+    expected_stats_dict = {
+        'language_id': 'en',
+        'coordinator_ids': ['user1', 'user2'],
+        'coordinators_count': 2
+    }
+
+    def test_to_dict(self) -> None:
+        actual_stats = user_domain.TranslationCoordinatorStats(
+            'en',
+            ['user1', 'user2'],
+            2
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_dict(), self.expected_stats_dict)
+
+
+class UserContributionRightsUnitTest(
+    test_utils.GenericTestBase
+):
+    """Tests for the UserContributionRights class."""
+
+    def test_initialization(self) -> None:
+        user_contribution_rights = (
+            user_domain.UserContributionRights(
+                'a', ['en', 'es'], ['fr'], True, False))
+
+        self.assertEqual(user_contribution_rights.id, 'a')
+        self.assertEqual(user_contribution_rights.can_review_questions, True)
+        self.assertEqual(user_contribution_rights.can_submit_questions, False)
+        self.assertEqual(
+            user_contribution_rights.can_review_translation_for_language_codes,
+            ['en', 'es'])
+        self.assertEqual(
+            user_contribution_rights.can_review_voiceover_for_language_codes,
+             ['fr'])
+
+    def test_can_review_at_least_one_item(self) -> None:
+        user_contribution_rights = (
+            user_domain.UserContributionRights(
+                'a', [], [], True, True))
+        self.assertTrue(user_contribution_rights.can_review_at_least_one_item())
+
+    def test_can_submit_at_least_one_item(self) -> None:
+        user_contribution_rights = (
+            user_domain.UserContributionRights(
+                'a', [], [], True, False))
+        self.assertFalse(
+            user_contribution_rights.can_submit_at_least_one_item())

@@ -36,6 +36,7 @@ import string
 from types import TracebackType
 import unittest
 
+from core import feature_flag_list
 from core import feconf
 from core import schema_utils
 from core import utils
@@ -50,6 +51,8 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import feature_flag_domain
+from core.domain import feature_flag_services
 from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import object_registry
@@ -61,6 +64,7 @@ from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -80,7 +84,7 @@ import requests_mock
 from typing import (
     IO, Any, Callable, Collection, Dict, Final, Iterable, Iterator, List,
     Literal, Mapping, Optional, OrderedDict, Pattern, Sequence, Set, Tuple,
-    Type, TypedDict, Union, cast, overload
+    Type, TypedDict, TypeVar, Union, cast, overload
 )
 import webapp2
 import webtest
@@ -131,6 +135,8 @@ BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES: Final = (
     'BaseSnapshotMetadataModel',
     'VersionedModel',
 )
+
+_GenericHandlerFunctionReturnType = TypeVar('_GenericHandlerFunctionReturnType')
 
 
 class NewIndexDict(TypedDict):
@@ -320,6 +326,92 @@ def generate_random_hexa_str() -> str:
     uppercase = 'ABCDEF'
     lowercase = 'abcdef'
     return ''.join(random.choices(uppercase + lowercase + string.digits, k=32))
+
+
+@contextlib.contextmanager
+def swap_is_feature_flag_enabled_function(
+    feature_flag_names: List[feature_flag_list.FeatureNames]
+) -> Iterator[None]:
+    """Mocks is_feature_flag_enabled function within the context of a
+    'with' statement. is_feature_flag_enabled will return True for all
+    the features present in feature_flag_names.
+
+    Args:
+        feature_flag_names: List[FeatureNames]. The name of the feature
+            flags for which the value should be returned as True.
+
+    Yields:
+        context. The context with function replaced.
+    """
+    def mock_is_feature_flag_enabled(
+        feature_flag_name: str,
+        feature_flag: Optional[feature_flag_domain.FeatureFlag] = None, # pylint: disable=unused-argument
+        user_id: Optional[str] = None # pylint: disable=unused-argument
+    ) -> bool:
+        """Mocks is_feature_flag_enabled function to return True if the
+        target_feature_flag_name is present in feature_flag_names.
+
+        Args:
+            feature_flag_name: str. The name of the target feature flag.
+            feature_flag: FeatureFlag|None. The feature flag domain model.
+            user_id: str|None. The id of the user, if logged-out user
+                then None.
+
+        Returns:
+            enable_feature_flag: bool. Returns True if the target feature flag
+            name is in feature_flag_names list.
+        """
+        return any(
+            expected_feature_flag_name.value == feature_flag_name
+            for expected_feature_flag_name in feature_flag_names
+        )
+
+    original_is_feature_flag_enabled = getattr(
+       feature_flag_services, 'is_feature_flag_enabled')
+    setattr(
+       feature_flag_services,
+       'is_feature_flag_enabled',
+       mock_is_feature_flag_enabled
+    )
+    try:
+        yield
+    finally:
+        setattr(
+            feature_flag_services,
+            'is_feature_flag_enabled',
+            original_is_feature_flag_enabled
+       )
+
+
+def enable_feature_flags(
+   feature_flag_names: List[feature_flag_list.FeatureNames]
+) -> Callable[[Callable[
+        ..., _GenericHandlerFunctionReturnType]],
+        Callable[..., _GenericHandlerFunctionReturnType]
+]:
+    """This method guarantees to enable the given feature flags for the
+    scope of the test.
+
+    Args:
+        feature_flag_names: List[feature_flag_list.FeatureNames]. The list
+            of the names of the feature flags that will be enabled.
+
+    Returns:
+        function. The newly decorated function that enables given
+        feature flags for the scope of the test.
+    """
+    def decorator(
+        func: Callable[..., _GenericHandlerFunctionReturnType]
+    ) -> Callable[..., _GenericHandlerFunctionReturnType]:
+        # Here we use type Any because this method can accept arbitrary number
+        # of arguments with different types.
+        def wrapper(
+            *args: Any, **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
+            with swap_is_feature_flag_enabled_function(feature_flag_names):
+                return func(*args, **kwargs)
+        return wrapper
+    return decorator
 
 
 class ElasticSearchStub:
@@ -1153,7 +1245,7 @@ class MemoryCacheServicesStub:
 class TestBase(unittest.TestCase):
     """Base class for all tests."""
 
-    maxDiff: int = 2500
+    maxDiff: Optional[int] = 2500
 
     # A test unicode string.
     UNICODE_TEST_STRING: Final = 'unicode ¡马!'
@@ -2221,7 +2313,6 @@ class GenericTestBase(AppEngineTestBase):
 auto_tts_enabled: false
 blurb: ''
 category: Category
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: %s
 language_code: en
@@ -2553,6 +2644,23 @@ version: 1
                     'username': username,
                     'action': 'assign',
                     'topic_id': topic_id
+                }, csrf_token=self.get_new_csrf_token())
+
+    def set_translation_coordinators(
+        self, translation_coordinator_usernames: List[str], language_id: str
+    ) -> None:
+        """Sets role of given users as TRANSLATION_COORDINATOR.
+
+        Args:
+            translation_coordinator_usernames: list(str). List of usernames.
+            language_id: str. The language Id.
+        """
+        with self.super_admin_context():
+            for username in translation_coordinator_usernames:
+                self.put_json('/translationcoordinatorrolehandler', {
+                    'username': username,
+                    'action': 'assign',
+                    'language_id': language_id
                 }, csrf_token=self.get_new_csrf_token())
 
     def set_moderators(self, moderator_usernames: List[str]) -> None:
@@ -3257,7 +3365,6 @@ version: 1
         language_code: str = constants.DEFAULT_LANGUAGE_CODE,
         end_state_name: Optional[str] = None,
         interaction_id: str = 'TextInput',
-        correctness_feedback_enabled: bool = False,
         content_html: str = '',
     ) -> exp_domain.Exploration:
         """Saves a new strictly-validated exploration.
@@ -3271,8 +3378,6 @@ version: 1
             language_code: str. The language_code of this exploration.
             end_state_name: str. The name of the end state for the exploration.
             interaction_id: str. The id of the interaction.
-            correctness_feedback_enabled: bool. Whether correctness feedback is
-                enabled for the exploration.
             content_html: str. The html for the state content.
 
         Returns:
@@ -3289,7 +3394,6 @@ version: 1
             init_state, interaction_id, content_id_generator)
 
         exploration.objective = objective
-        exploration.correctness_feedback_enabled = correctness_feedback_enabled
 
         # If an end state name is provided, add terminal node with that name.
         if end_state_name is not None:
@@ -3316,8 +3420,6 @@ version: 1
             # assert here.
             assert init_interaction.default_outcome is not None
             init_interaction.default_outcome.dest = end_state_name
-            if correctness_feedback_enabled:
-                init_interaction.default_outcome.labelled_as_correct = True
         exploration.next_content_id_index = (
             content_id_generator.next_content_id_index)
 
@@ -3334,7 +3436,6 @@ version: 1
         category: str = 'A category',
         objective: str = 'An objective',
         language_code: str = constants.DEFAULT_LANGUAGE_CODE,
-        correctness_feedback_enabled: bool = False,
         content_html: str = ''
     ) -> exp_domain.Exploration:
         """Saves a new strictly-validated exploration with a sequence of states.
@@ -3353,8 +3454,6 @@ version: 1
             category: str. The category this exploration belongs to.
             objective: str. The objective of this exploration.
             language_code: str. The language_code of this exploration.
-            correctness_feedback_enabled: bool. Whether the correctness feedback
-                is enabled or not for the exploration.
             content_html: str. The html for the state content.
 
         Returns:
@@ -3379,7 +3478,6 @@ version: 1
         init_state = exploration.states[state_names[0]]
         init_state.content.html = content_html
 
-        exploration.correctness_feedback_enabled = correctness_feedback_enabled
         for state_name in state_names[1:]:
             exploration.add_state(
                 state_name,
@@ -3402,9 +3500,6 @@ version: 1
             # default_outcome, we used assert here.
             assert from_state.interaction.default_outcome is not None
             from_state.interaction.default_outcome.dest = dest_state_name
-            if correctness_feedback_enabled:
-                from_state.interaction.default_outcome.labelled_as_correct = (
-                    True)
         end_state = exploration.states[state_names[-1]]
         self.set_interaction_for_state(
             end_state, 'EndExploration', content_id_generator)
@@ -3507,6 +3602,44 @@ version: 1
         committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 
+    def add_explorations_to_story(
+        self, topic_id: str, story_id: str, exp_ids: List[str]
+    ) -> None:
+        """Appends a story node for each exploration id given in exp_ids to the
+        story with story_id. Each story node is assigned its exp id and then it
+        is published.
+
+        Args:
+            topic_id: str. ID of the topic that contains the story.
+            story_id: str. ID of the story containing the new node.
+            exp_ids: list(str). IDs of the exploration.
+        """
+        story = story_fetchers.get_story_by_id(story_id)
+        change_list = []
+
+        node_id = story.story_contents.next_node_id
+        for exp_id in exp_ids:
+            change_list.extend([
+                story_domain.StoryChange({
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': node_id,
+                    'title': node_id
+                }),
+                story_domain.StoryChange({
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name':
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
+                    'node_id': node_id,
+                    'old_value': None,
+                    'new_value': exp_id
+                })])
+            node_id = story_domain.StoryNode.get_incremented_node_id(node_id)
+
+        if len(change_list) > 0:
+            topic_services.update_story_and_topic_summary(
+                feconf.SYSTEM_COMMITTER_ID, story_id, change_list,
+                'Linked explorations to story %s' % story_id, topic_id)
+
     def create_story_for_translation_opportunity(
         self,
         owner_id: str,
@@ -3540,15 +3673,23 @@ version: 1
             topic_id, story.id, admin_id)
         story_services.update_story(
             owner_id, story.id, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': 'node_1',
                 'title': 'Node1',
             }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
                 'node_id': 'node_1',
                 'old_value': None,
                 'new_value': exploration_id
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_STATUS),
+                'node_id': 'node_1',
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
             })], 'Changes.')
 
     def save_new_story(
@@ -3680,13 +3821,15 @@ version: 1
         Returns:
             Topic. A newly-created topic.
         """
+        canonical_story_ids = canonical_story_ids or []
+        additional_story_ids = additional_story_ids or []
         canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in (canonical_story_ids or [])
+            for story_id in canonical_story_ids
         ]
         additional_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in (additional_story_ids or [])
+            for story_id in additional_story_ids
         ]
         uncategorized_skill_ids = uncategorized_skill_ids or []
         subtopics = subtopics or []

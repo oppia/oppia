@@ -27,10 +27,10 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import email_services
 from core.domain import html_cleaner
-from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
+from core.domain import platform_parameter_services
 from core.domain import rights_domain
 from core.domain import story_domain
 from core.domain import subscription_services
@@ -39,7 +39,7 @@ from core.domain import user_services
 from core.platform import models
 
 from typing import (
-    Callable, Dict, Final, List, Mapping, Optional, Sequence,
+    Callable, DefaultDict, Dict, Final, List, Mapping, Optional, Sequence,
     Set, Tuple, TypedDict, Union)
 
 MYPY = False
@@ -61,61 +61,56 @@ secrets_services = models.Registry.import_secrets_services()
 PlatformParameterRegistry = platform_parameter_registry.Registry
 
 
-NEW_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
-    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: {
-        'review_category': 'translations',
-        'to_check': 'translation suggestions',
+NEW_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
+    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION: {
+        'task': 'review',
+        'category': 'translations',
+        'to_review': 'translation suggestions',
         'description_template': '%s language translations',
         'rights_message_template': (
             'review translation suggestions made by contributors in the %s '
             'language')
     },
-    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER: {
-        'review_category': 'voiceovers',
-        'to_check': 'voiceover applications',
-        'description_template': '%s language voiceovers',
-        'rights_message_template': (
-            'review voiceover applications made by contributors in the %s '
-            'language')
-    },
-    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION: {
-        'review_category': 'questions',
-        'to_check': 'question suggestions',
+    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION: {
+        'task': 'review',
+        'category': 'questions',
+        'to_review': 'question suggestions',
         'description': 'questions',
         'rights_message': 'review question suggestions made by contributors'
+    },
+    constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION: {
+        'task': 'submit',
+        'category': 'questions',
+        'to_submit': 'question suggestions',
+        'description': 'questions',
+        'rights_message': 'submit question suggestions'
     }
 }
 
-REMOVED_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
-    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION: {
-        'review_category': 'translation',
+REMOVED_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
+    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION: {
+        'category': 'translation',
         'role_description_template': (
             'translation reviewer role in the %s language'),
         'rights_message_template': (
             'review translation suggestions made by contributors in the %s '
             'language'),
-        'contribution_allowed': 'translations'
     },
-    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER: {
-        'review_category': 'voiceover',
-        'role_description_template': (
-            'voiceover reviewer role in the %s language'),
-        'rights_message_template': (
-            'review voiceover applications made by contributors in the %s '
-            'language'),
-        'contribution_allowed': 'voiceovers'
-    },
-    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION: {
-        'review_category': 'question',
+    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION: {
+        'category': 'question',
         'role_description': 'question reviewer role',
         'rights_message': 'review question suggestions made by contributors',
-        'contribution_allowed': 'questions'
+    },
+    constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION: {
+        'category': 'question',
+        'role_description': 'question submitter role',
+        'rights_message': 'submit question suggestions'
     }
 }
 
 EMAIL_SENDER_NAME: platform_parameter_domain.PlatformParameter = (
     PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamNames.EMAIL_SENDER_NAME,
+        platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
         'The default sender name for outgoing emails.',
         platform_parameter_domain.DataTypes.STRING,
         default='Site Admin'
@@ -124,7 +119,7 @@ EMAIL_SENDER_NAME: platform_parameter_domain.PlatformParameter = (
 
 EMAIL_FOOTER: platform_parameter_domain.PlatformParameter = (
     PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamNames.EMAIL_FOOTER,
+        platform_parameter_list.ParamName.EMAIL_FOOTER,
         'The footer to append to all outgoing emails. (This should '
         'be written in HTML and include an unsubscribe link.)',
         platform_parameter_domain.DataTypes.STRING,
@@ -143,7 +138,7 @@ _PLACEHOLDER_HTML_BODY: Final = (
 
 SIGNUP_EMAIL_SUBJECT_CONTENT: platform_parameter_domain.PlatformParameter = (
     PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamNames.SIGNUP_EMAIL_SUBJECT_CONTENT,
+        platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
         'Content of email sent after a new user signs up. Set the email '
         'subject. These emails are only sent if the functionality is enabled '
         'in feconf.py.',
@@ -154,7 +149,7 @@ SIGNUP_EMAIL_SUBJECT_CONTENT: platform_parameter_domain.PlatformParameter = (
 
 SIGNUP_EMAIL_BODY_CONTENT: platform_parameter_domain.PlatformParameter = (
     PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamNames.SIGNUP_EMAIL_BODY_CONTENT,
+        platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
         'Content of email sent after a new user signs up. (The email body '
         'should be written with HTML and not include a salutation or footer.) '
         'These emails are only sent if the functionality is enabled in '
@@ -203,7 +198,7 @@ UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY: (
     platform_parameter_domain.PlatformParameter) = (
         PlatformParameterRegistry.create_platform_parameter(
             (
-                platform_parameter_list.ParamNames.
+                platform_parameter_list.ParamName.
                 UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY
             ),
             'Default content for the email sent after an exploration is '
@@ -329,7 +324,7 @@ ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA: Dict[str, str] = {
         'There are suggestions on the <a href="%s%s">Contributor Dashboard</a> '
         'that have been waiting for more than %s days for review. Please take '
         'a look at the suggestions mentioned below and help them get reviewed '
-        'by going to the <a href="%s%s#/roles">admin roles page</a> and either:'
+        'by going to the <a href="%s%s">admin roles page</a> and either:'
         '<br><br><ul>'
         '<li>Add more reviewers to the suggestion types that have suggestions '
         'waiting too long for a review</li><br>'
@@ -480,9 +475,9 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: user_services.is_moderator,
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_ONBOARD_REVIEWER: (
+    feconf.EMAIL_INTENT_ONBOARD_CD_USER: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_REMOVE_REVIEWER: (
+    feconf.EMAIL_INTENT_REMOVE_CD_USER: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -595,7 +590,7 @@ def _send_email(
 
     if sender_name is None:
         email_sender_name = (
-            platform_feature_services.get_platform_parameter_value(
+            platform_parameter_services.get_platform_parameter_value(
                 EMAIL_SENDER_NAME.name)
         )
         assert isinstance(email_sender_name, str)
@@ -784,7 +779,7 @@ def send_post_signup_email(
     """
 
     email_subject_content = (
-        platform_feature_services.get_platform_parameter_value(
+        platform_parameter_services.get_platform_parameter_value(
             SIGNUP_EMAIL_SUBJECT_CONTENT.name)
     )
     # Here we use assert because the get_platform_parameter_value returns
@@ -793,7 +788,7 @@ def send_post_signup_email(
     # avoid the mypy error.
     assert isinstance(email_subject_content, str)
     email_body_content = (
-        platform_feature_services.get_platform_parameter_value(
+        platform_parameter_services.get_platform_parameter_value(
             SIGNUP_EMAIL_BODY_CONTENT.name)
     )
     if not test_for_duplicate_email:
@@ -817,7 +812,7 @@ def send_post_signup_email(
             return
 
     recipient_username = user_services.get_username(user_id)
-    email_footer = platform_feature_services.get_platform_parameter_value(
+    email_footer = platform_parameter_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
     email_body = 'Hi %s,<br><br>%s<br><br>%s' % (
         recipient_username, email_body_content, email_footer)
@@ -844,7 +839,7 @@ def get_moderator_unpublish_exploration_email() -> str:
         return ''
 
     unpublish_exp_email_html_body = (
-        platform_feature_services.get_platform_parameter_value(
+        platform_parameter_services.get_platform_parameter_value(
             UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.name)
     )
     # Ruling out the possibility of Any for mypy type checking.
@@ -914,7 +909,7 @@ def send_moderator_action_email(
     # called.
     assert callable(email_signoff_html_fn)
     email_signoff_html = email_signoff_html_fn(sender_username)
-    email_footer = platform_feature_services.get_platform_parameter_value(
+    email_footer = platform_parameter_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
     full_email_content = (
         '%s<br><br>%s<br><br>%s<br><br>%s' % (
@@ -1001,7 +996,7 @@ def send_role_notification_email(
     rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_description]
 
     email_subject = email_subject_template % exploration_title
-    email_footer = platform_feature_services.get_platform_parameter_value(
+    email_footer = platform_parameter_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
     email_body = email_body_template % (
         recipient_username, inviter_username, role_description, exploration_id,
@@ -1062,7 +1057,7 @@ def send_emails_to_subscribers(
     for index, username in enumerate(recipients_usernames):
         if recipients_preferences[index].can_receive_subscription_email:
             email_footer = (
-                platform_feature_services.get_platform_parameter_value(
+                platform_parameter_services.get_platform_parameter_value(
                     EMAIL_FOOTER.name))
             email_body = email_body_template % (
                 username, creator_name, exploration_id,
@@ -1134,7 +1129,7 @@ def send_feedback_message_email(
     email_subject = email_subject_template % (
         (count_messages, 's') if count_messages > 1 else ('a', ''))
 
-    email_footer = platform_feature_services.get_platform_parameter_value(
+    email_footer = platform_parameter_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
 
     email_body = email_body_template % (
@@ -1235,7 +1230,7 @@ def send_suggestion_email(
         # Send email only if recipient wants to receive.
         if can_users_receive_email[index]:
             email_footer = (
-                platform_feature_services.get_platform_parameter_value(
+                platform_parameter_services.get_platform_parameter_value(
                     EMAIL_FOOTER.name))
             email_body = email_body_template % (
                 recipient_username, author_username, exploration_id,
@@ -1292,7 +1287,7 @@ def send_instant_feedback_message_email(
     recipient_preferences = user_services.get_email_preferences(recipient_id)
 
     if recipient_preferences.can_receive_feedback_message_email:
-        email_footer = platform_feature_services.get_platform_parameter_value(
+        email_footer = platform_parameter_services.get_platform_parameter_value(
             EMAIL_FOOTER.name)
         email_body = email_body_template % (
             recipient_username, thread_title, exploration_id,
@@ -1337,7 +1332,7 @@ def send_flag_exploration_email(
 
     reporter_username = user_services.get_username(reporter_id)
 
-    email_footer = platform_feature_services.get_platform_parameter_value(
+    email_footer = platform_parameter_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
 
     email_body = email_body_template % (
@@ -1376,7 +1371,7 @@ def send_query_completion_email(recipient_id: str, query_id: str) -> None:
         '<br>%s')
 
     recipient_username = user_services.get_username(recipient_id)
-    email_footer = platform_feature_services.get_platform_parameter_value(
+    email_footer = platform_parameter_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
     email_body = email_body_template % (
         recipient_username, query_id, query_id, email_footer)
@@ -1412,7 +1407,7 @@ def send_query_failure_email(
         '<br>%s')
 
     recipient_username = user_services.get_username(recipient_id)
-    email_footer = platform_feature_services.get_platform_parameter_value(
+    email_footer = platform_parameter_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
     email_body = email_body_template % (
         recipient_username, query_id, email_footer)
@@ -1522,13 +1517,13 @@ def send_mail_to_onboard_new_reviewers(
 
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
-        email_footer = platform_feature_services.get_platform_parameter_value(
+        email_footer = platform_parameter_services.get_platform_parameter_value(
             EMAIL_FOOTER.name)
         email_body = email_body_template % (
             recipient_username, category, category, email_footer)
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
-            feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
+            feconf.EMAIL_INTENT_ONBOARD_CD_USER,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
@@ -1568,7 +1563,7 @@ def send_mail_to_notify_users_to_review(
 
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
-        email_footer = platform_feature_services.get_platform_parameter_value(
+        email_footer = platform_parameter_services.get_platform_parameter_value(
             EMAIL_FOOTER.name)
         email_body = email_body_template % (
             recipient_username, category, email_footer)
@@ -1670,8 +1665,8 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
         logging.error('This app cannot send emails to users.')
         return
 
-    if not platform_feature_services.get_platform_parameter_value(
-        platform_parameter_list.ParamNames.
+    if not platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.
         ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
     ):
         logging.error(
@@ -1766,7 +1761,7 @@ def _send_suggestions_waiting_too_long_email(
             curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
             feconf.CONTRIBUTOR_DASHBOARD_URL,
             suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS,
-            feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
+            feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
             list_of_suggestion_descriptions)
 
         _send_email(
@@ -1774,6 +1769,69 @@ def _send_suggestions_waiting_too_long_email(
             feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
             recipient_email=admin_emails[index])
+
+
+def send_reviewer_notifications(
+    reviewer_ids_by_language: DefaultDict[str, List[str]],
+    suggestions_by_language: DefaultDict[str, List[
+        suggestion_registry.ReviewableSuggestionEmailInfo]],
+) -> None:
+    """Sends email notifications to reviewers about new suggestions.
+
+    Args:
+        suggestions_by_language: dict. A dictionary that organizes
+            new suggestions by language code.
+        reviewer_ids_by_language: dict. A dictionary that organizes reviewer
+            IDs by language code.
+    """
+    if not feconf.CAN_SEND_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
+    for language_code, suggestions in suggestions_by_language.items():
+        reviewer_ids = reviewer_ids_by_language[language_code]
+
+        if not reviewer_ids:
+            message = 'No reviewers found for language %s to notify'
+            logging.error(message % language_code)
+            continue
+
+        email_subject = 'Contributor Dashboard New Reviewer Opportunities'
+        email_body_template = (
+            'Hi %s,<br><br>'
+            'There are new <a href="%s%s">opportunities</a>' +
+            ' to review translations that we think you might be interested' +
+            ' in on the Contributor Dashboard page. Here are some examples' +
+            ' of contributions that are waiting for review:<br><br>' +
+            'The following suggestions are available for review: ' +
+            '<br><br><ul>%s</ul><br>Please take some time to review any ' +
+            'of the above contributions (if they still need a review)' +
+            ' or any other contributions on the dashboard.' +
+            ' We appreciate your help!<br><br>Thanks again, '
+            'and happy reviewing!<br><br>The Oppia Contributor Dashboard Team'
+        )
+        suggestion_descriptions = []
+        for suggestion in suggestions:
+            suggestion_descriptions.append(
+                _create_html_for_reviewable_suggestion_email_info(suggestion))
+
+        for reviewer_id in reviewer_ids:
+            reviewer_username = user_services.get_username(reviewer_id)
+            email_body = email_body_template % (
+                reviewer_username, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL, ''.join(
+                    suggestion_descriptions))
+
+            # Send the email to each reviewer.
+            reviewer_email = user_services.get_email_from_user_id(reviewer_id)
+
+            _send_email(
+                reviewer_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
+                email_subject,
+                email_body,
+                feconf.NOREPLY_EMAIL_ADDRESS,
+                recipient_email=reviewer_email)
 
 
 def send_mail_to_notify_admins_that_reviewers_are_needed(
@@ -1807,8 +1865,8 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         logging.error('This app cannot send emails to users.')
         return
 
-    if not platform_feature_services.get_platform_parameter_value(
-        platform_parameter_list.ParamNames.
+    if not platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.
         ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
     ):
         logging.error(
@@ -1955,8 +2013,8 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         logging.error('This app cannot send emails to users.')
         return
 
-    if not platform_feature_services.get_platform_parameter_value(
-        platform_parameter_list.ParamNames.
+    if not platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.
         CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
     ):
         logging.error(
@@ -1997,7 +2055,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                 _create_html_for_reviewable_suggestion_email_info(
                     reviewer_suggestion_email_info))
 
-        email_footer = platform_feature_services.get_platform_parameter_value(
+        email_footer = platform_parameter_services.get_platform_parameter_value(
             EMAIL_FOOTER.name)
 
         email_body = email_body_template % (
@@ -2055,14 +2113,14 @@ def send_mail_to_notify_contributor_ranking_achievement(
                     language,
                     feconf.OPPIA_SITE_URL,
                     feconf.CONTRIBUTOR_DASHBOARD_URL
-                )
+            )
         else:
             email_body = email_template['email_body_template'] % (
                     recipient_username,
                     contributor_ranking_email_info.rank_name,
                     feconf.OPPIA_SITE_URL,
                     feconf.CONTRIBUTOR_DASHBOARD_URL
-                )
+            )
 
         _send_email(
             contributor_ranking_email_info.contributor_user_id,
@@ -2197,132 +2255,162 @@ def send_account_deletion_failed_email(user_id: str, user_email: str) -> None:
     send_mail_to_admin(email_subject, email_body_template)
 
 
-def send_email_to_new_contribution_reviewer(
+def send_email_to_new_cd_user(
     recipient_id: str,
-    review_category: str,
+    category: str,
     language_code: Optional[str] = None
 ) -> None:
-    """Sends an email to user who is assigned as a reviewer.
+    """Sends an email to user who is assigned rights to either
+       review or submit contributions.
 
     Args:
         recipient_id: str. The ID of the user.
-        review_category: str. The category in which user can review.
-        language_code: None|str. The language code for a language if the review
-            item is translation or voiceover else None.
+        category: str. The category in which user can review or submit 
+            contributions.
+        language_code: None|str. The language code for a language if 
+            the category is 'translation' else None.
 
     Raises:
-        Exception. The review category is not valid.
-        Exception. The language_code cannot be None if the review category is
-            'translation' or 'voiceover'.
+        Exception. The contribution category is not valid.
+        Exception. The language_code cannot be None if the 
+            category is 'translation'.
     """
-    if review_category not in NEW_REVIEWER_EMAIL_DATA:
-        raise Exception('Invalid review_category: %s' % review_category)
+    if category not in NEW_CD_USER_EMAIL_DATA:
+        raise Exception('Invalid category: %s' % category)
 
-    review_category_data = NEW_REVIEWER_EMAIL_DATA[review_category]
-    email_subject = 'You have been invited to review Oppia %s' % (
-        review_category_data['review_category'])
+    category_data = NEW_CD_USER_EMAIL_DATA[category]
+    email_subject = 'You have been invited to %s Oppia %s' % (
+        category_data['task'],
+        category_data['category'])
 
-    if review_category in [
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
+    if category in [
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+    ]:
         if language_code is None:
             raise Exception(
                 'The language_code cannot be None if the review category is'
-                ' \'translation\' or \'voiceover\''
+                ' \'translation\''
             )
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
-        review_category_description = (
-            review_category_data['description_template'] % language_description)
-        reviewer_rights_message = (
-            review_category_data['rights_message_template'] % (
-                language_description))
+        category_description = (
+            category_data['description_template'] %
+                language_description)
+        rights_message = (
+            category_data['rights_message_template'] %
+                (language_description))
     else:
-        review_category_description = review_category_data['description']
-        reviewer_rights_message = review_category_data['rights_message']
-
-    to_review = review_category_data['to_check']
-
-    email_body_template = (
-        'Hi %s,<br><br>'
-        'This is to let you know that the Oppia team has added you as a '
-        'reviewer for %s. This allows you to %s.<br><br>'
-        'You can check the %s waiting for review in the '
-        '<a href="https://www.oppia.org/contributor-dashboard">'
-        'Contributor Dashboard</a>.<br><br>'
-        'Thanks, and happy contributing!<br><br>'
-        'Best wishes,<br>'
-        'The Oppia Community')
+        category_description = (
+            category_data['description'])
+        rights_message = (
+            category_data['rights_message'])
 
     if not feconf.CAN_SEND_EMAILS:
         logging.error('This app cannot send emails to users.')
         return
 
+    email_body_template = '%s %s %s %s'
     recipient_username = user_services.get_username(recipient_id)
+    if category in [
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION
+    ]:
+        to_review = category_data['to_review']
+        email_body_template = (
+            'Hi %s,<br><br>'
+            'This is to let you know that the Oppia team has added you as a '
+            'reviewer for %s. This allows you to %s.<br><br>'
+            'You can check the %s waiting for review in the '
+            '<a href="https://www.oppia.org/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Thanks, and happy contributing!<br><br>'
+            'Best wishes,<br>'
+            'The Oppia Community')
+        email_body = email_body_template % (
+            recipient_username, category_description,
+            rights_message, to_review)
+
+    elif category in [
+        constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
+    ]:
+        email_body_template = (
+            'Hi %s,<br><br>'
+            'This is to let you know that the Oppia team has added you as a '
+            'contributor to %s for use in lessons.<br><br>'
+            'You can now start to submit %s in the '
+            '<a href="https://www.oppia.org/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Thanks, and happy contributing!<br><br>'
+            'Best wishes,<br>'
+            'The Oppia Community')
+        email_body = email_body_template % (
+            recipient_username, rights_message,
+            category_description)
+
     can_user_receive_email = user_services.get_email_preferences(
         recipient_id).can_receive_email_updates
 
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
-        email_body = email_body_template % (
-            recipient_username, review_category_description,
-            reviewer_rights_message, to_review)
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
-            feconf.EMAIL_INTENT_ONBOARD_REVIEWER, email_subject, email_body,
+            feconf.EMAIL_INTENT_ONBOARD_CD_USER, email_subject, email_body,
             feconf.NOREPLY_EMAIL_ADDRESS)
 
 
-def send_email_to_removed_contribution_reviewer(
+def send_email_to_removed_cd_user(
     user_id: str,
-    review_category: str,
+    category: str,
     language_code: Optional[str] = None
 ) -> None:
-    """Sends an email to user who is removed from the reviewer position.
+    """Sends an email to user who is removed from a specific 
+        contributor position.
 
     Args:
         user_id: str. The ID of the user.
-        review_category: str. The category which for which review role is
-            removed.
+        category: str. The category in which user can no longer review or 
+            submit contributions.
         language_code: None|str. The language code for a language if the review
-            item is translation or voiceover else None.
+            item is translation else None.
 
     Raises:
-        Exception. The review category is not valid.
+        Exception. The contribution category is not valid.
         Exception. The language_code cannot be None if the review category is
-            'translation' or 'voiceover'.
+            'translation'.
     """
-    if review_category not in REMOVED_REVIEWER_EMAIL_DATA:
-        raise Exception('Invalid review_category: %s' % review_category)
+    if category not in REMOVED_CD_USER_EMAIL_DATA:
+        raise Exception('Invalid category: %s' % category)
 
-    review_category_data = REMOVED_REVIEWER_EMAIL_DATA[review_category]
-    email_subject = 'You have been unassigned as a %s reviewer' % (
-        review_category_data['review_category'])
+    category_data = REMOVED_CD_USER_EMAIL_DATA[category]
+    if category == constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION:
+        email_subject = 'You have been unassigned as a %s submitter' % (
+            category_data['category'])
+    else:
+        email_subject = 'You have been unassigned as a %s reviewer' % (
+            category_data['category'])
 
-    if review_category in [
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
+    if category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION:
         if language_code is None:
             raise Exception(
                 'The language_code cannot be None if the review category is'
-                ' \'translation\' or \'voiceover\''
+                ' \'translation\''
             )
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
-        reviewer_role_description = (
-            review_category_data['role_description_template'] % (
+        role_description = (
+            category_data['role_description_template'] % (
                 language_description))
-        reviewer_rights_message = (
-            review_category_data['rights_message_template'] % (
+        rights_message = (
+            category_data['rights_message_template'] % (
                 language_description))
     else:
-        reviewer_role_description = review_category_data['role_description']
-        reviewer_rights_message = review_category_data['rights_message']
+        role_description = category_data['role_description']
+        rights_message = category_data['rights_message']
 
     email_body_template = (
         'Hi %s,<br><br>'
         'The Oppia team has removed you from the %s. You won\'t be able to %s '
-        'any more, but you can still contribute %s through the '
+        'any more, but you can still contribute %ss through the '
         '<a href="https://www.oppia.org/contributor-dashboard">'
         'Contributor Dashboard</a>.<br><br>'
         'Thanks, and happy contributing!<br><br>'
@@ -2340,12 +2428,12 @@ def send_email_to_removed_contribution_reviewer(
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
         email_body = email_body_template % (
-            recipient_username, reviewer_role_description,
-            reviewer_rights_message,
-            review_category_data['contribution_allowed'])
+            recipient_username, role_description,
+            rights_message,
+            category_data['category'])
         _send_email(
             user_id, feconf.SYSTEM_COMMITTER_ID,
-            feconf.EMAIL_INTENT_REMOVE_REVIEWER, email_subject, email_body,
+            feconf.EMAIL_INTENT_REMOVE_CD_USER, email_subject, email_body,
             feconf.NOREPLY_EMAIL_ADDRESS)
 
 

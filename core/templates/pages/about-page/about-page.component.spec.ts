@@ -16,24 +16,15 @@
  * @fileoverview Unit tests for the about page.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { AboutPageComponent } from './about-page.component';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-
-class MockPlatformFeatureService {
-  status = {
-    AndroidBetaLandingPage: {
-      isEnabled: false
-    }
-  };
-}
+import {AboutPageComponent} from './about-page.component';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {PrimaryButtonComponent} from '../../components/button-directives/primary-button.component';
 
 class MockWindowRef {
   nativeWindow = {
@@ -42,9 +33,9 @@ class MockWindowRef {
     },
     sessionStorage: {
       last_uploaded_audio_lang: 'en',
-      removeItem: (name: string) => {}
+      removeItem: (name: string) => {},
     },
-    gtag: () => {}
+    gtag: () => {},
   };
 }
 
@@ -53,27 +44,23 @@ describe('About Page', () => {
   let component: AboutPageComponent;
   let siteAnalyticsService: SiteAnalyticsService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [
         AboutPageComponent,
-        MockTranslatePipe
+        MockTranslatePipe,
+        PrimaryButtonComponent,
       ],
       providers: [
         SiteAnalyticsService,
         UrlInterpolationService,
         {
           provide: WindowRef,
-          useValue: windowRef
+          useValue: windowRef,
         },
-        {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService
-        }
-      ]
+      ],
     }).compileComponents();
     const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
@@ -81,77 +68,59 @@ describe('About Page', () => {
     component = aboutPageComponent.componentInstance;
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
+      true
+    );
   });
   beforeEach(angular.mock.module('oppia'));
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', () => {
+    expect(component).toBeDefined();
+  });
 
-  it('should return correct static image url when calling getStaticImageUrl',
-    () => {
-      expect(component.getStaticImageUrl('/path/to/image')).toBe(
-        '/assets/images/path/to/image');
-    });
+  it('should return correct static image url when calling getStaticImageUrl', () => {
+    expect(component.getStaticImageUrl('/path/to/image')).toBe(
+      '/assets/images/path/to/image'
+    );
+  });
 
-  it('should redirect guest user to the login page when they click' +
-  'create lesson button', () => {
+  it(
+    'should redirect guest user to the login page when they click' +
+      'create lesson button',
+    () => {
+      spyOn(
+        siteAnalyticsService,
+        'registerCreateLessonButtonEvent'
+      ).and.callThrough();
+      component.onClickCreateLessonButton();
+
+      expect(
+        siteAnalyticsService.registerCreateLessonButtonEvent
+      ).toHaveBeenCalledWith();
+    }
+  );
+
+  it('should register correct event on calling onClickVisitClassroomButton', () => {
     spyOn(
-      siteAnalyticsService, 'registerCreateLessonButtonEvent')
-      .and.callThrough();
-    component.onClickCreateLessonButton();
+      siteAnalyticsService,
+      'registerClickVisitClassroomButtonEvent'
+    ).and.callThrough();
+    component.onClickVisitClassroomButton();
 
-    expect(siteAnalyticsService.registerCreateLessonButtonEvent)
-      .toHaveBeenCalledWith();
-    expect(windowRef.nativeWindow.location.href).toBe(
-      '/creator-dashboard?mode=create');
+    expect(
+      siteAnalyticsService.registerClickVisitClassroomButtonEvent
+    ).toHaveBeenCalledWith();
   });
 
-  it('should register correct event on calling onClickVisitClassroomButton',
-    () => {
-      spyOn(
-        siteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
-        .and.callThrough();
-      component.onClickVisitClassroomButton();
+  it('should register correct event on calling onClickBrowseLibraryButton', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickBrowseLibraryButtonEvent'
+    ).and.callThrough();
 
-      expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
-        .toHaveBeenCalledWith();
-      expect(windowRef.nativeWindow.location.href).toBe(
-        '/learn/math');
-    });
+    component.onClickBrowseLibraryButton();
 
-  it('should register correct event on calling onClickBrowseLibraryButton',
-    () => {
-      spyOn(
-        siteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
-        .and.callThrough();
-
-      component.onClickBrowseLibraryButton();
-
-      expect(siteAnalyticsService.registerClickBrowseLibraryButtonEvent)
-        .toHaveBeenCalledWith();
-      expect(windowRef.nativeWindow.location.href)
-        .toBe('/community-library');
-    });
-
-  it('should direct users to the android page on click', function() {
-    expect(windowRef.nativeWindow.location.href).not.toEqual('/android');
-
-    component.onClickAccessAndroidButton();
-
-    expect(windowRef.nativeWindow.location.href).toEqual('/android');
-  });
-
-  it('should show android button if the feature is enabled', () => {
-    // The androidPageIsEnabled property is set when the component is
-    // constructed and the value is not modified after that so there is no
-    // pre-check for this test.
-    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
-
-    const component = TestBed.createComponent(AboutPageComponent);
-
-    expect(component.componentInstance.androidPageIsEnabled).toBeTrue();
+    expect(
+      siteAnalyticsService.registerClickBrowseLibraryButtonEvent
+    ).toHaveBeenCalledWith();
   });
 });

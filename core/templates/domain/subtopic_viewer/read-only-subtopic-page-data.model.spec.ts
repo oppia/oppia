@@ -16,12 +16,9 @@
  * @fileoverview Tests for SubtopicData Model.
  */
 
+import {SubtopicPageContents} from 'domain/topic/subtopic-page-contents.model';
 
-import { SubtopicPageContents } from
-  'domain/topic/subtopic-page-contents.model';
-
-import { ReadOnlySubtopicPageData } from
-  'domain/subtopic_viewer/read-only-subtopic-page-data.model';
+import {ReadOnlySubtopicPageData} from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
 
 describe('Subtopic data object factory', () => {
   describe('subtopic data object factory', () => {
@@ -37,7 +34,7 @@ describe('Subtopic data object factory', () => {
         page_contents: {
           subtitled_html: {
             html: 'test content',
-            content_id: 'content'
+            content_id: 'content',
           },
           recorded_voiceovers: {
             voiceovers_mapping: {
@@ -46,19 +43,20 @@ describe('Subtopic data object factory', () => {
                   filename: 'test.mp3',
                   file_size_bytes: 100,
                   needs_update: false,
-                  duration_secs: 10
-                }
-              }
-            }
-          }
-        }
+                  duration_secs: 10,
+                },
+              },
+            },
+          },
+        },
       };
 
-      _sampleSubtopicData = ReadOnlySubtopicPageData.
-        createFromBackendDict(sampleSubtopicDataBackendDict);
+      _sampleSubtopicData = ReadOnlySubtopicPageData.createFromBackendDict(
+        sampleSubtopicDataBackendDict
+      );
     });
 
-    it('should be able to get all the values', function() {
+    it('should be able to get all the values', function () {
       expect(_sampleSubtopicData.getParentTopicId()).toEqual('topic_id');
       expect(_sampleSubtopicData.getParentTopicName()).toEqual('topic');
       expect(_sampleSubtopicData.getNextSubtopic()).toEqual(null);
@@ -67,7 +65,7 @@ describe('Subtopic data object factory', () => {
         SubtopicPageContents.createFromBackendDict({
           subtitled_html: {
             html: 'test content',
-            content_id: 'content'
+            content_id: 'content',
           },
           recorded_voiceovers: {
             voiceovers_mapping: {
@@ -76,11 +74,11 @@ describe('Subtopic data object factory', () => {
                   filename: 'test.mp3',
                   file_size_bytes: 100,
                   needs_update: false,
-                  duration_secs: 10
-                }
-              }
-            }
-          }
+                  duration_secs: 10,
+                },
+              },
+            },
+          },
         })
       );
     });

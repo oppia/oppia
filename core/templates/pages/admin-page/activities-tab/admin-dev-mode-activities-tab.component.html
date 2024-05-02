@@ -77,13 +77,14 @@
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
     <div class="container ml-0">
-      <h3>Load dummy new structures data (only admins)</h3>
+      <h3>Load dummy new structures data (only curriculum admins)</h3>
       <div class="row">
         <span class="col-lg-8 col-md-8 col-sm-8">
-          Loads 2 topics (one of which is empty), a story and three skills (two in a subtopic)
-          attached to the first topic and a question attached to each skill. 3 explorations
-          are loaded and associated with the story. Translation and skill question opportunties
-          are populated on the Contributor Dashboard.
+          Loads a published topic that contains a story with 3 explorations, as well as 3
+          skills (two of which are in a subtopic). There is a question attached to each of
+          the two skills in the subtopic, and 3 questions attached to the remaining uncategorized
+          skill. Translation and practice question opportunities are populated on the Contributor
+          Dashboard.
         </span>
         <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
           <button type="button"
@@ -93,12 +94,15 @@
           </button>
         </span>
       </div>
+      <p class="instruction">Note: To get curriculum admin access, go to the Roles tab and
+        assign this role to your username.
+      </p>
     </div>
   </mat-card>
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
     <div class="container ml-0">
-      <h3>Generate dummy skill with questions (only admins)</h3>
+      <h3>Generate dummy skill with questions (only curriculum admins)</h3>
       <div class="row">
         <span class="col-lg-4 col-md-4 col-sm-4">
           Generate a skill with 15 questions linked to it.
@@ -111,12 +115,15 @@
           </button>
         </span>
       </div>
+      <p class="instruction">Note: To get curriculum admin access, go to the Roles tab and
+        assign this role to your username.
+      </p>
     </div>
   </mat-card>
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
     <div class="container ml-0">
-      <h3>Generate a dummy math classroom</h3>
+      <h3>Generate a dummy math classroom (only curriculum admins)</h3>
       <div class="row">
         <span class="col-lg-8 col-md-8 col-sm-4">
           Generate a dummy math classroom with 5 published topics containing 1
@@ -130,8 +137,30 @@
           </button>
         </span>
       </div>
+      <p class="instruction">Note: To get curriculum admin access, go to the Roles tab and
+        assign this role to your username.
+      </p>
     </div>
   </mat-card>
+
+  <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+    <div class="container ml-0">
+      <h3>Generate dummy blog post.</h3>
+      <div class="row" *ngFor="let title of DUMMY_BLOG_POST_TITLES">
+        <span class="col-lg-4 col-md-4 col-sm-4">
+          {{title}}
+        </span>
+        <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
+          <button type="button"
+                  class="btn btn-secondary float-right"
+                  (click)="generateNewBlogPost(title)">
+            Generate
+          </button>
+        </span>
+      </div>
+    </div>
+  </mat-card>
+
 </div>
 
 <style>
@@ -152,5 +181,11 @@
   }
   .admin-dev-mode-activities-tab .oppia-generate-exploration-text {
     margin-top: 20px;
+  }
+  .admin-dev-mode-activities-tab .instruction {
+    color: #555;
+    font-size: smaller;
+    font-style: italic;
+    margin-top: 5px;
   }
 </style>

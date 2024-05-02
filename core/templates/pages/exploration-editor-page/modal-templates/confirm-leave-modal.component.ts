@@ -16,20 +16,21 @@
  * @fileoverview Component for confirm leave modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component, ViewChild, ElementRef} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-confirm-leave-modal',
-  templateUrl: './confirm-leave-modal.component.html'
+  templateUrl: './confirm-leave-modal.component.html',
 })
-
-export class ConfirmLeaveModalComponent
-  extends ConfirmOrCancelModal {
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {
+export class ConfirmLeaveModalComponent extends ConfirmOrCancelModal {
+  @ViewChild('confirmHeader') confirmHeaderRef!: ElementRef;
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
+  }
+
+  ngAfterViewInit(): void {
+    this.confirmHeaderRef.nativeElement.focus();
   }
 }

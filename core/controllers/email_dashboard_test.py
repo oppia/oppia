@@ -85,16 +85,6 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_that_page_is_accessible_to_authorised_users_only(self) -> None:
-        # Make sure that only authorised users can access query pages.
-        self.login(self.USER_A_EMAIL)
-        with self.assertRaisesRegex(Exception, '401 Unauthorized'):
-            self.get_html_response('/emaildashboard')
-        with self.assertRaisesRegex(Exception, '401 Unauthorized'):
-            self.get_html_response(
-                '/querystatuscheck?query_id=%s' % 'valid_query_id')
-        self.logout()
-
     def test_that_exception_is_raised_for_invalid_input(self) -> None:
         self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -125,14 +115,6 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
                     'edited_at_least_n_exps': None,
                     'created_collection': True,
                 }}, csrf_token=csrf_token)
-
-        self.logout()
-
-    def test_email_dashboard_page(self) -> None:
-        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
-
-        response = self.get_html_response('/emaildashboard')
-        self.assertIn(b'{"title": "Email Dashboard - Oppia"})', response.body)
 
         self.logout()
 
@@ -551,6 +533,8 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/emaildashboarddatahandler?'
+            'invalid_param_key=2\' these errors are happening:\n'
             'Missing key in handler args: num_queries_to_fetch.\n'
             'Found extra args: [\'invalid_param_key\'].')
         self.assertEqual(

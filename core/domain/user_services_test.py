@@ -48,13 +48,16 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import audit_models
     from mypy_imports import auth_models
+    from mypy_imports import suggestion_models
     from mypy_imports import user_models
 
 datastore_services = models.Registry.import_datastore_services()
-(auth_models, user_models, audit_models) = (models.Registry.import_models([
-    models.Names.AUTH,
-    models.Names.USER,
-    models.Names.AUDIT
+(auth_models, user_models, audit_models, suggestion_models) = (
+    models.Registry.import_models([
+        models.Names.AUTH,
+        models.Names.USER,
+        models.Names.AUDIT,
+        models.Names.SUGGESTION
 ]))
 bulk_email_services = models.Registry.import_bulk_email_services()
 
@@ -690,7 +693,28 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with fn_swap:
             self.assertTrue(
                 user_services.add_user_to_mailing_list(
-                    'email@example.com', 'Name', 'Android'))
+                    'email@example.com', 'Android', name='Name'))
+
+    def test_add_user_to_mailing_list_no_name(self) -> None:
+        def _mock_add_or_update_user_status(
+            unused_email: str,
+            merge_fields: Dict[str, str],
+            unused_tag: str,
+            *,
+            can_receive_email_updates: bool
+        ) -> bool:
+            """Mocks bulk_email_services.add_or_update_user_status()."""
+            # 'NAME' key is not present in merge_fields.
+            self.assertNotIn('NAME', merge_fields)
+            return can_receive_email_updates
+
+        fn_swap = self.swap(
+            bulk_email_services, 'add_or_update_user_status',
+            _mock_add_or_update_user_status)
+        with fn_swap:
+            self.assertTrue(
+                user_services.add_user_to_mailing_list(
+                    'email@example.com', 'Android'))
 
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'
@@ -1007,7 +1031,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'DELETE_ANY_QUESTION', 'EDIT_ANY_STORY', 'PUBLISH_ANY_ACTIVITY',
             'EDIT_ANY_QUESTION', 'CREATE_NEW_SKILL', 'CHANGE_STORY_STATUS',
             'CAN_MANAGE_VOICE_ARTIST', 'ACCESS_LEARNER_GROUPS',
-            'ACCESS_CLASSROOM_ADMIN_PAGE'])
+            'ACCESS_CLASSROOM_ADMIN_PAGE', 'ACCESS_VOICEOVER_ADMIN_PAGE'])
         expected_roles = set(
             ['EXPLORATION_EDITOR', 'ADMIN', 'MODERATOR',
             'VOICEOVER_ADMIN'])
@@ -1015,102 +1039,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(set(system_user_action.actions), expected_actions)
         self.assertEqual(set(system_user_action.roles), expected_roles)
         self.assertEqual(system_user_action.user_id, 'admin')
-
-    def test_update_user_bio(self) -> None:
-        auth_id = 'someUser'
-        user_email = 'user@example.com'
-        user_bio = 'new bio'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        pre_update_user_settings = user_services.get_user_settings(user_id)
-        self.assertNotEqual(pre_update_user_settings.user_bio, user_bio)
-
-        user_services.update_user_bio(user_id, user_bio)
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertEqual(user_bio, user_settings.user_bio)
-
-    def test_update_preferred_language_codes(self) -> None:
-        language_codes = ['es']
-
-        user_id = user_services.create_new_user(
-            'someUser',
-            'user@example.com').user_id
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertNotEqual(
-            language_codes,
-            user_settings.preferred_language_codes
-        )
-
-        user_services.update_preferred_language_codes(
-            user_id, language_codes)
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertEqual(
-            language_codes,
-            user_settings.preferred_language_codes
-        )
-
-    def test_update_preferred_site_language_code(self) -> None:
-        preferred_site_language_code = 'es'
-
-        user_id = user_services.create_new_user(
-            'someUser',
-            'user@example.com').user_id
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertNotEqual(
-            'es',
-            user_settings.preferred_site_language_code
-        )
-
-        user_services.update_preferred_site_language_code(
-            user_id, preferred_site_language_code)
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertEqual(
-            preferred_site_language_code,
-            user_settings.preferred_site_language_code
-        )
-
-    def test_update_preferred_audio_language_code(self) -> None:
-        audio_code = 'es'
-
-        user_id = user_services.create_new_user(
-            'someUser',
-            'user@example.com').user_id
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertNotEqual(
-            'es',
-            user_settings.preferred_audio_language_code
-        )
-        user_services.update_preferred_audio_language_code(
-            user_id, audio_code)
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertEqual(
-            audio_code,
-            user_settings.preferred_audio_language_code
-        )
-
-    def test_update_preferred_translation_language_code(self) -> None:
-        language_code = 'es'
-
-        user_id = user_services.create_new_user(
-            'someUser', 'user@example.com').user_id
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertNotEqual(
-            user_settings.preferred_translation_language_code, 'es')
-
-        user_services.update_preferred_translation_language_code(
-            user_id, language_code)
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertEqual(
-            language_code, user_settings.preferred_translation_language_code)
 
     def test_remove_user_role(self) -> None:
         user_id = user_services.create_new_user(
@@ -1137,26 +1065,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'Removing a default role is not allowed.'
         ):
             user_services.remove_user_role(user_id, feconf.ROLE_ID_FULL_USER)
-
-    def test_update_user_creator_dashboard_display(self) -> None:
-        auth_id = 'test_id'
-        username = 'testname'
-        user_email = 'test@email.com'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        user_services.set_username(user_id, username)
-
-        user_setting = user_services.get_user_settings(user_id)
-        self.assertEqual(
-            user_setting.creator_dashboard_display_pref,
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'])
-
-        user_services.update_user_creator_dashboard_display(
-            user_id, constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
-        user_setting = user_services.get_user_settings(user_id)
-        self.assertEqual(
-            user_setting.creator_dashboard_display_pref,
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
 
     def test_add_user_role(self) -> None:
         auth_id = 'test_id'
@@ -2289,7 +2197,6 @@ author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -3123,64 +3030,6 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
                 ' present.' % (feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION)
             ):
                 user_services.update_dashboard_stats_log(self.owner_id)
-
-
-class SubjectInterestsUnitTests(test_utils.GenericTestBase):
-    """Test the update_subject_interests method."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.auth_id = 'someUser'
-        self.username = 'username'
-        self.user_email = 'user@example.com'
-
-        self.user_id = user_services.create_new_user(
-            self.auth_id, self.user_email).user_id
-        user_services.set_username(self.user_id, self.username)
-
-    def test_invalid_subject_interests_are_not_accepted(self) -> None:
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError, 'to be a list'):
-            user_services.update_subject_interests(self.user_id, 'not a list')  # type: ignore[arg-type]
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError, 'to be a string'):
-            user_services.update_subject_interests(self.user_id, [1, 2, 3])  # type: ignore[list-item]
-
-        with self.assertRaisesRegex(utils.ValidationError, 'to be non-empty'):
-            user_services.update_subject_interests(self.user_id, ['', 'ab'])
-
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'to consist only of lowercase alphabetic characters and spaces'
-            ):
-            user_services.update_subject_interests(self.user_id, ['!'])
-
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'to consist only of lowercase alphabetic characters and spaces'
-            ):
-            user_services.update_subject_interests(
-                self.user_id, ['has-hyphens'])
-
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'to consist only of lowercase alphabetic characters and spaces'
-            ):
-            user_services.update_subject_interests(
-                self.user_id, ['HasCapitalLetters'])
-
-        with self.assertRaisesRegex(utils.ValidationError, 'to be distinct'):
-            user_services.update_subject_interests(self.user_id, ['a', 'a'])
-
-        # The following cases are all valid.
-        user_services.update_subject_interests(self.user_id, [])
-        user_services.update_subject_interests(
-            self.user_id, ['singleword', 'has spaces'])
 
 
 class LastLoginIntegrationTests(test_utils.GenericTestBase):
@@ -4052,7 +3901,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'Expected language_code to be None'):
             user_services.get_contributor_usernames(
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
 
     def test_raise_error_if_no_language_code_provided_with_translation_category(
@@ -4061,25 +3910,8 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'The language_code cannot be None'):
             user_services.get_contributor_usernames(
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
             )
-
-    def test_get_contributor_usernames_in_voiceover_category_returns_correctly(
-        self
-    ) -> None:
-        usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-            language_code='hi')
-        self.assertEqual(usernames, [])
-
-        user_services.allow_user_to_review_voiceover_in_language(
-            self.voice_artist_id, 'hi')
-
-        usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-            language_code='hi')
-
-        self.assertEqual(usernames, [self.VOICE_ARTIST_USERNAME])
 
     def test_get_contributor_usernames_with_invalid_category_raises(
         self
@@ -4093,14 +3925,14 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             language_code='hi')
         self.assertEqual(usernames, [])
 
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'hi')
         usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             language_code='hi')
         self.assertEqual(usernames, [self.TRANSLATOR_USERNAME])
 
@@ -4108,24 +3940,24 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION)
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION)
         self.assertEqual(usernames, [])
 
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION)
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION)
         self.assertEqual(usernames, [self.QUESTION_REVIEWER_USERNAME])
 
     def test_get_contributor_usernames_for_submit_returns_correctly(
         self
     ) -> None:
         usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION)
+            constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION)
         self.assertEqual(usernames, [])
 
         user_services.allow_user_to_submit_question(self.question_submitter_id)
         usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION)
+            constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION)
         self.assertEqual(usernames, [self.QUESTION_SUBMITTER_USERNAME])
 
     def test_remove_question_submit_rights(self) -> None:
@@ -4144,3 +3976,203 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         user_contribution_rights = (
             user_services.get_user_contribution_rights(user_id))
         self.assertFalse(user_contribution_rights.can_submit_questions)
+
+
+class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
+    """Tests for handling translation coordinator rights"""
+
+    def setUp(self) -> None:
+        self.test_list: List[str] = []
+        super().setUp()
+        self.signup('a@example.com', 'A')
+        self.signup('b@example.com', 'B')
+        self.signup(
+            'translationcoordinator@example.com', 'translationcoordinator')
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
+        self.user_id_translationcoordinator = self.get_user_id_from_email(
+            'translationcoordinator@example.com')
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
+
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_translation_coordinators([
+            user_services.get_username(
+                self.user_id_translationcoordinator
+            )
+        ], 'en')
+        self.user_a = user_services.get_user_actions_info(self.user_id_a)
+        self.user_b = user_services.get_user_actions_info(self.user_id_b)
+        self.user_translationcoordinator = user_services.get_user_actions_info(
+            self.user_id_translationcoordinator)
+        self.user_admin = user_services.get_user_actions_info(
+            self.user_id_admin)
+
+    def test_raises_error_if_guest_user_trying_to_deassign_roles_from_topic(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest users are not allowed to deassign users from all languages.'
+        ):
+            user_services.deassign_user_from_all_languages(
+                guest_user, 'user_id')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest user is not allowed to deassign roles to a user.'
+        ):
+            user_services.deassign_coordinator(
+                guest_user, self.user_a, 'en'
+            )
+
+    def test_non_admin_cannot_assign_roles(self) -> None:
+
+        with self.assertRaisesRegex(
+            Exception,
+            'UnauthorizedUserException: Could not assign new role.'
+        ):
+            user_services.assign_coordinator(
+                self.user_b, self.user_a, 'en')
+
+    def test_guest_user_cannot_assign_roles(self) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest user is not allowed to assign roles to a user.'
+        ):
+            user_services.assign_coordinator(
+                guest_user, self.user_b, 'en')
+
+    def test_roles_of_guest_user_cannot_be_changed_until_guest_is_logged_in(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Cannot change the role of the Guest user.'
+        ):
+            user_services.assign_coordinator(
+                self.user_admin, guest_user, 'en')
+
+    def test_reassigning_role_to_same_user(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'This user already is a coordinator for this language.'
+        ):
+            user_services.assign_coordinator(
+                self.user_admin, self.user_translationcoordinator, 'en'
+            )
+
+    def test_assigning_role_to_a_user(self) -> None:
+        self.signup('c@example.com', 'C')
+        user_id_c = self.get_user_id_from_email('a@example.com')
+        user_c = user_services.get_user_actions_info(user_id_c)
+
+        self.assertFalse(user_services.check_user_is_coordinator(
+            user_id_c, 'en'
+        ))
+
+        user_services.assign_coordinator(
+            self.user_admin, user_c, 'en'
+        )
+
+        self.assertTrue(user_services.check_user_is_coordinator(
+            user_id_c, 'en'
+        ))
+
+    def test_deassign_role_to_a_user(self) -> None:
+        self.signup('c@example.com', 'C')
+        user_id_c = self.get_user_id_from_email('a@example.com')
+        user_c = user_services.get_user_actions_info(user_id_c)
+        user_services.assign_coordinator(
+            self.user_admin, user_c, 'en'
+        )
+        self.assertTrue(user_services.check_user_is_coordinator(
+            user_id_c, 'en'
+        ))
+
+        user_services.deassign_coordinator(
+            self.user_admin, user_c, 'en'
+        )
+
+        self.assertFalse(user_services.check_user_is_coordinator(
+            user_id_c, 'en'
+        ))
+
+    def test_non_admin_cannot_deassign_roles(self) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'UnauthorizedUserException: Could not assign new role.'):
+            user_services.deassign_coordinator(
+                self.user_b, self.user_a, 'en')
+
+    def test_guest_user_cannot_deassign_roles(self) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest user is not allowed to deassign roles to a user.'
+        ):
+            user_services.deassign_coordinator(
+                guest_user, self.user_b, 'en')
+
+    def test_guest_user_cannot_be_deassgined(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No model exists for provided language.'
+        ):
+            user_services.deassign_coordinator(
+                self.user_admin, self.user_a, 'no_model')
+
+    def test_deassigning_for_non_existing_language_model(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Cannot change the role of the Guest user.'
+        ):
+            user_services.deassign_coordinator(
+                self.user_admin, guest_user, 'en')
+
+    def test_deassigning_role_from_non_coordinator(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'This user is not a coordinator for this language'):
+            user_services.deassign_coordinator(
+                self.user_admin, self.user_a, 'en')
+
+    def test_get_translation_rights_from_model(self) -> None:
+        model = suggestion_models.TranslationCoordinatorsModel.get(
+            'en', strict=False)
+        assert model is not None
+        model_object = user_services.get_translation_rights_from_model(
+            model)
+
+        # Asserting here because we have created a model for 'en' in setup.
+        assert model_object is not None
+        self.assertEqual(model.id, model_object.language_id)
+        self.assertEqual(
+            model.coordinators_count, model_object.coordinators_count)
+        self.assertEqual(
+            model.coordinator_ids, model_object.coordinator_ids)
+
+    def test_deassign_user_from_all_languages(self) -> None:
+        self.signup('c@example.com', 'C')
+        user_id_c = self.get_user_id_from_email('c@example.com')
+        self.set_translation_coordinators(['C'], 'en')
+        self.set_translation_coordinators(['C'], 'hi')
+
+        user_services.deassign_user_from_all_languages(
+            self.user_admin, user_id_c)
+
+        self.assertEqual(0, len(
+            user_services.get_translation_rights_with_user(user_id_c)))
+
+    def test_check_user_is_coordinator_for_no_language_model(self) -> None:
+        self.assertFalse(user_services.check_user_is_coordinator(
+            'user1', 'non_existing_language'))

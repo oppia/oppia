@@ -1,31 +1,40 @@
 <ng-template #EditorTabTourPreviewTab>
-  <h3 class="e2e-test-joyride-title">Preview</h3>
-  <p>At any time, you can click the <b>preview</b> button to play through your exploration.</p>
+  <h3 class="e2e-test-joyride-title" tabindex="0">Preview</h3>
+  <p tabindex="0">At any time, you can click the <b>preview</b> button to play through your exploration.</p>
 </ng-template>
 
 <div class="navbar-helper">
   <div class="navbar-tabs">
     <div class="navbar-text">
-      {{ getNavbarText() }}
+      <h1>{{ getNavbarText() }}</h1>
       <span class="e2e-test-autosave-indicator autosave-indicator" *ngIf="autosaveIsInProgress">
         &emsp;Auto Saving ...
       </span>
     </div>
-    <div class="navbar-icons">
+    <a role="button"
+       tabindex="0"
+       (click)="skipEditorNavbar()"
+       (keydown.enter)="skipEditorNavbar()"
+       class="oppia-skip-to-content e2e-test-skip-link">
+      Skip Editor Navigation Bar
+    </a>
+    <ul class="navbar-icons">
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'main', 'uib-dropdown': countWarnings()}" (click)="selectMainTab()"
           class="nav-item icon nav-list-item position-relative">
         <a href="#"
            class="nav-link navbar-tab e2e-test-main-tab"
            [ngbTooltip]="'Editor'"
            placement="{{countWarnings() ? 'left' : 'bottom'}}"
+           role="button"
            aria-label="Exploration Editor Button">
           <i class="fas fa-pen navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'main'}"></i>
         </a>
         <div [hidden]="!(countWarnings())" class="oppia-editor-warnings-indicator"
+             tabindex="0"
              (mouseover)="isWarningsAreShown(true)"
              (mouseleave)="isWarningsAreShown(false)"
              [ngClass]="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
-          <span class="oppia-editor-warnings-count">
+          <span class="oppia-editor-warnings-count" [attr.aria-label]="generateAriaLabelForWarnings()">
             {{ countWarnings() }}
           </span>
           <ul class="uib-dropdown-menu oppia-editor-warnings-box dropdown-menu exploration-editor-warning-box" *ngIf="warningsAreShown">
@@ -50,6 +59,7 @@
            placement="bottom"
            tabindex="0"
            aria-label="Exploration Translation Button"
+           role="button"
            (keydown.enter)="!connectedToInternet || editabilityService.isLockedByAdmin() || selectTranslationTab()">
           <i class="fas fa-microphone navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'translation'}"></i>
         </a>
@@ -62,6 +72,7 @@
            placement="bottom"
            tabindex="0"
            aria-label="Exploration Preview Button"
+           role="button"
            (keydown.enter)="!connectedToInternet || selectPreviewTab()">
           <i class="fas fa-play navbar-tab-icon nav-bar-preview-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'preview'}"></i>
         </a>
@@ -69,11 +80,12 @@
 
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'settings', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-settings-tab"
           (click)="!connectedToInternet || selectSettingsTab()" [ngbTooltip]="'Settings does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
-        <a class="nav-link  navbar-tab"
+        <a class="nav-link navbar-tab e2e-test-exploration-settings-tab"
            [ngbTooltip]="'Settings'"
            placement="bottom"
            tabindex="0"
            aria-label="Exploration Setting Button"
+           role="button"
            (keydown.enter)="!connectedToInternet || selectSettingsTab()">
           <i class="fas fa-cog navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'settings'}"></i>
         </a>
@@ -86,6 +98,7 @@
            placement="bottom"
            tabindex="0"
            aria-label="Exploration Statistics Button"
+           role="button"
            (keydown.enter)="!connectedToInternet || selectStatsTab()">
           <i class="fas fa-poll navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'stats'}"></i>
         </a>
@@ -98,6 +111,7 @@
            placement="bottom"
            tabindex="0"
            aria-label="Exploration Improvement Button"
+           role="button"
            (keydown.enter)="!connectedToInternet || selectImprovementsTab()">
           <i class="material-icons navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'improvements'}">trending_up</i>
         </a>
@@ -110,6 +124,7 @@
            placement="bottom"
            tabindex="0"
            aria-label="Exploration History Button"
+           role="button"
            (keydown.enter)="!connectedToInternet || selectHistoryTab()">
           <i class="fas fa-clock navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'history'}"></i>
         </a>
@@ -122,6 +137,7 @@
            placement="bottom"
            tabindex="0"
            aria-label="Exploration Feedback Button"
+           role="button"
            (keydown.enter)="!connectedToInternet || selectFeedbackTab()">
           <i class="fas fa-comment-alt navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'feedback'}"></i>
         </a>
@@ -140,11 +156,12 @@
            (keydown.enter)="!connectedToInternet || showUserHelpModal()"
            placement="bottom"
            class="nav-link oppia-editor-navbar-tab-anchor"
+           role="button"
            aria-label="Exploration Help Button">
           <i class="fas fa-question-circle navbar-tab-icon"></i>
         </a>
       </li>
-    </div>
+    </ul>
   </div>
   <div *ngIf="explorationEditorPageHasInitialized && editabilityService.isLockedByAdmin()" class="exploration-locked-for-editing-banner">
     This exploration is currently locked to new edits. Please contact an admin for assistance.
@@ -318,16 +335,20 @@
 
   .navbar-text {
     align-items: center;
-    color: #fff;
     display: flex;
+    margin-left: 1em;
+  }
+
+  .navbar-text h1 {
+    color: #fff;
     font-family: Capriola, Roboto, Arial, sans-serif;
     font-size: 20px;
-    margin-left: 3%;
   }
 
   .navbar-icons {
     display: flex;
-    margin-right: 5%;
+    margin-bottom: 0;
+    margin-right: 1em;
   }
 
   .nav-list-item {

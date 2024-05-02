@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import logging
+import unittest.mock
 
 from core import feconf
 from core.constants import constants
@@ -106,8 +107,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title %d' % i,
             category=constants.ALL_CATEGORIES[i],
-            end_state_name='End State',
-            correctness_feedback_enabled=True
+            end_state_name='End State'
         ) for i in range(5)]
 
         for exp in explorations:
@@ -847,8 +847,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title %d' % i,
             category=constants.ALL_CATEGORIES[i],
-            end_state_name='End State',
-            correctness_feedback_enabled=True
+            end_state_name='End State'
         ) for i in range(5)]
 
         for exp in explorations:
@@ -1046,6 +1045,65 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         ):
             opportunity_services.regenerate_opportunities_related_to_topic(
                 self.TOPIC_ID
+            )
+
+    def test_update_and_get_pinned_opportunity_model(self) -> None:
+        user_id = 'user123'
+        language_code = 'en'
+        topic_id = 'topic123'
+        lesson_id = 'lesson456'
+
+        mock_opportunity_summary = unittest.mock.MagicMock(
+            id=lesson_id,
+            topic_id=topic_id,
+            topic_name='topic',
+            story_id='story_id_1',
+            story_title='A story title',
+            chapter_title='Title 1',
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar', 'en'],
+            translation_counts={'hi': 1, 'ar': 2, 'en': 3},
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
+        )
+        # Mock the get method of ExplorationOpportunitySummaryModel.
+        with self.swap(
+            opportunity_models.ExplorationOpportunitySummaryModel, 'get',
+            lambda _id: mock_opportunity_summary if _id == lesson_id else None
+        ):
+            # Test pinning an opportunity.
+            opportunity_services.update_pinned_opportunity_model(
+                user_id, language_code, topic_id, lesson_id)
+
+            pinned_opportunity = opportunity_services.get_pinned_lesson(
+                user_id, language_code, topic_id)
+
+            self.assertIsNotNone(pinned_opportunity)
+            if pinned_opportunity is not None:
+                self.assertEqual(pinned_opportunity.id, lesson_id)
+
+            # Test unpinning the opportunity.
+            opportunity_services.update_pinned_opportunity_model(
+                user_id, language_code, topic_id, None)
+
+            pinned_opportunity = opportunity_services.get_pinned_lesson(
+                user_id, language_code, topic_id)
+
+            self.assertIsNone(pinned_opportunity)
+
+            # Test pinning an opportunity whose model exists.
+            opportunity_services.update_pinned_opportunity_model(
+                user_id,
+                language_code,
+                topic_id,
+                'lesson_2'
+            )
+
+            opportunity_services.update_pinned_opportunity_model(
+                user_id,
+                'lang',
+                topic_id,
+                None
             )
 
 

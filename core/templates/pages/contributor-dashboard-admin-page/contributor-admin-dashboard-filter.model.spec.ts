@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for ContributorAdminDashboardFilter model.
  */
 
-import { ContributorAdminDashboardFilter } from './contributor-admin-dashboard-filter.model';
+import {ContributorAdminDashboardFilter} from './contributor-admin-dashboard-filter.model';
 
 describe('Contributor Admin Dashboard Filter Model', () => {
   let filter: ContributorAdminDashboardFilter;
@@ -26,7 +26,7 @@ describe('Contributor Admin Dashboard Filter Model', () => {
   });
 
   it('should create a new dashboard filter object', () => {
-    expect(filter.languageCode).toEqual('es');
+    expect(filter.languageCode).toEqual('en');
     expect(filter.topicIds).toEqual([]);
   });
 });

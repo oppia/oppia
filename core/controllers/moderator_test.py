@@ -24,27 +24,6 @@ from core.tests import test_utils
 from typing import Final
 
 
-class ModeratorPageTests(test_utils.GenericTestBase):
-
-    def test_moderator_page(self) -> None:
-        """Tests access to the Moderator page."""
-        # Try accessing the moderator page without logging in.
-        self.get_html_response('/moderator', expected_status_int=302)
-
-        # Try accessing the moderator page without being a moderator.
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.login(self.VIEWER_EMAIL)
-        self.get_html_response('/moderator', expected_status_int=401)
-        self.logout()
-
-        # Try accessing the moderator page after logging in as a moderator.
-        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.set_moderators([self.MODERATOR_USERNAME])
-        self.login(self.MODERATOR_EMAIL)
-        self.get_html_response('/moderator')
-        self.logout()
-
-
 class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
     EXP_ID_1: Final = 'exp_id_1'

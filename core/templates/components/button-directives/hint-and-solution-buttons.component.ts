@@ -16,26 +16,26 @@
  * @fileoverview Component for hint and solution buttons.
  */
 
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
-import { HintAndSolutionModalService } from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
-import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
-import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
-import { Subscription } from 'rxjs';
-import { ContextService } from 'services/context.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
+import {HintsAndSolutionManagerService} from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
+import {StatsReportingService} from 'pages/exploration-player-page/services/stats-reporting.service';
+import {Subscription} from 'rxjs';
+import {ContextService} from 'services/context.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {UrlService} from 'services/contextual/url.service';
 
 import './hint-and-solution-buttons.component.css';
-
 
 @Component({
   selector: 'oppia-hint-and-solution-buttons',
   templateUrl: './hint-and-solution-buttons.component.html',
-  styleUrls: ['./hint-and-solution-buttons.component.css']
+  styleUrls: ['./hint-and-solution-buttons.component.css'],
 })
 export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -48,6 +48,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   activeHintIndex!: number | null;
   displayedCard!: StateCard;
   hintIndexes: number[] = [];
+  iframed!: boolean;
   solutionModalIsActive: boolean = false;
   currentlyOnLatestCard: boolean = true;
   isVisible: boolean = true;
@@ -56,6 +57,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
+    private urlService: UrlService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private hintAndSolutionModalService: HintAndSolutionModalService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
@@ -67,40 +69,42 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
+    this.iframed = this.urlService.isIframed();
     this.resetLocalHintsArray();
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardOpened.subscribe(
         (newCard: StateCard) => {
           this.displayedCard = newCard;
-          const solution = newCard.getSolution();
-          if (solution) {
-            this.hintsAndSolutionManagerService.reset(
-              newCard.getHints(), solution);
-          }
+          this.hintsAndSolutionManagerService.reset(
+            newCard.getHints(),
+            newCard.getSolution()
+          );
           this.resetLocalHintsArray();
         }
       )
     );
     this.directiveSubscriptions.add(
       this.playerPositionService.onActiveCardChanged.subscribe(() => {
-        let displayedCardIndex = (
-          this.playerPositionService.getDisplayedCardIndex());
-        this.currentlyOnLatestCard = (
-          this.playerTranscriptService.isLastCard(displayedCardIndex));
+        let displayedCardIndex =
+          this.playerPositionService.getDisplayedCardIndex();
+        this.currentlyOnLatestCard =
+          this.playerTranscriptService.isLastCard(displayedCardIndex);
         if (this.currentlyOnLatestCard) {
           this.resetLocalHintsArray();
         }
-      }));
+      })
+    );
     this.directiveSubscriptions.add(
       this.hintsAndSolutionManagerService.onHintConsumed.subscribe(() => {
         this.changeDetectorRef.detectChanges();
       })
     );
     this.directiveSubscriptions.add(
-      this.hintsAndSolutionManagerService.onSolutionViewedEventEmitter
-        .subscribe(() => {
+      this.hintsAndSolutionManagerService.onSolutionViewedEventEmitter.subscribe(
+        () => {
           this.changeDetectorRef.detectChanges();
-        })
+        }
+      )
     );
   }
 
@@ -124,9 +128,9 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
     return (
       this.hintsAndSolutionManagerService.isHintViewable(index) &&
       this.displayedCard &&
-      this.displayedCard.doesInteractionSupportHints());
+      this.displayedCard.doesInteractionSupportHints()
+    );
   }
-
 
   isSolutionButtonVisible(): boolean {
     return this.hintsAndSolutionManagerService.isSolutionViewable();
@@ -134,8 +138,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
 
   displayHintModal(index: number): void {
     this.activeHintIndex = index;
-    let promise = (
-      this.hintAndSolutionModalService.displayHintModal(index));
+    let promise = this.hintAndSolutionModalService.displayHintModal(index);
     promise.result.then(null, () => {
       this.activeHintIndex = null;
     });
@@ -147,24 +150,26 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
     if (this.hintsAndSolutionManagerService.isSolutionConsumed()) {
       this.displaySolutionModal();
     } else {
-      let interstitialModalPromise = (
-        this.hintAndSolutionModalService
-          .displaySolutionInterstitialModal());
-      interstitialModalPromise.result.then(() => {
-        this.displaySolutionModal();
-      }, () => {
-        this.solutionModalIsActive = false;
-      });
+      let interstitialModalPromise =
+        this.hintAndSolutionModalService.displaySolutionInterstitialModal();
+      interstitialModalPromise.result.then(
+        () => {
+          this.displaySolutionModal();
+        },
+        () => {
+          this.solutionModalIsActive = false;
+        }
+      );
     }
   }
 
   displaySolutionModal(): void {
     this.solutionModalIsActive = true;
-    let inQuestionMode = (
-      this.explorationPlayerStateService.isInQuestionMode());
+    let inQuestionMode = this.explorationPlayerStateService.isInQuestionMode();
     if (!this._editorPreviewMode && !inQuestionMode) {
       this.statsReportingService.recordSolutionHit(
-        this.playerPositionService.getCurrentStateName());
+        this.playerPositionService.getCurrentStateName()
+      );
     }
     let promise = this.hintAndSolutionModalService.displaySolutionModal();
     promise.result.then(null, () => {
@@ -189,7 +194,9 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive('oppiaHintAndSolutionButtons',
+angular.module('oppia').directive(
+  'oppiaHintAndSolutionButtons',
   downgradeComponent({
-    component: HintAndSolutionButtonsComponent
-  }) as angular.IDirectiveFactory);
+    component: HintAndSolutionButtonsComponent,
+  }) as angular.IDirectiveFactory
+);

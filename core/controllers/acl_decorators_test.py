@@ -21,6 +21,7 @@ from __future__ import annotations
 import json
 
 from core import android_validation_constants
+from core import feature_flag_list
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -29,7 +30,8 @@ from core.controllers import incoming_app_feedback_report
 from core.domain import blog_services
 from core.domain import classifier_domain
 from core.domain import classifier_services
-from core.domain import config_services
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -146,7 +148,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
                 )
 
         error_msg = (
-            'Could not find the page http://localhost'
+            'Could not find the resource http://localhost'
             '/mock_secret_page/%s.' % self.secret
         )
         self.assertEqual(response['error'], error_msg)
@@ -164,7 +166,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
             )
 
         error_msg = (
-            'Could not find the page http://localhost'
+            'Could not find the resource http://localhost'
             '/mock_secret_page/%s.' % self.invalid_secret
         )
         self.assertEqual(response['error'], error_msg)
@@ -240,7 +242,7 @@ class ViewSkillsDecoratorTests(test_utils.GenericTestBase):
                 '/mock_view_skills/%s' % json.dumps(skill_ids),
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page http://localhost/mock_view_skills/'
+            'Could not find the resource http://localhost/mock_view_skills/'
             '%5B%22invalid_id12%22,%20%22invalid_id13%22%5D.'
         )
         self.assertEqual(response['error'], error_msg)
@@ -299,7 +301,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
                 expected_status_int=404
             )
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_download_exploration/%s.' % (
                 feconf.DISABLED_EXPLORATION_IDS[0]
             )
@@ -318,7 +320,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
                 '/mock_download_exploration/%s' % self.private_exp_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_download_exploration/%s.' % (
                 self.private_exp_id
             )
@@ -348,7 +350,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
                 '/mock_download_exploration/%s' % self.private_exp_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_download_exploration/%s.' % (
                 self.private_exp_id
             )
@@ -368,7 +370,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
                 '/mock_download_exploration/%s' % self.published_exp_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_download_exploration/%s.' % (
                 self.published_exp_id
             )
@@ -430,7 +432,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
                 expected_status_int=404
             )
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_view_exploration_stats/%s.' % (
                 feconf.DISABLED_EXPLORATION_IDS[0]
             )
@@ -449,7 +451,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
                 '/mock_view_exploration_stats/%s' % self.private_exp_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_view_exploration_stats/%s.' % (
                 self.private_exp_id
             )
@@ -479,7 +481,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
                 '/mock_view_exploration_stats/%s' % self.private_exp_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_view_exploration_stats/%s.' % (
                 self.private_exp_id
             )
@@ -499,7 +501,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
                 '/mock_view_exploration_stats/%s' % self.published_exp_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_view_exploration_stats/%s.' % (
                 self.published_exp_id
             )
@@ -976,14 +978,20 @@ class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        config_services.set_property(
-            self.user_id_admin, 'classroom_pages_data', [{
-                'name': 'math',
-                'url_fragment': 'math',
-                'topic_ids': [],
-                'course_details': '',
-                'topic_list_intro': ''
-            }])
+
+        math_classroom_dict: classroom_config_domain.ClassroomDict = {
+            'classroom_id': 'math_classroom_id',
+            'name': 'math',
+            'url_fragment': 'math',
+            'course_details': 'Course details for classroom.',
+            'topic_list_intro': 'Topics covered for classroom',
+            'topic_id_to_prerequisite_topic_ids': {}
+        }
+        math_classroom = classroom_config_domain.Classroom.from_dict(
+            math_classroom_dict)
+
+        classroom_config_services.create_new_classroom(math_classroom)
+
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
                 '/mock_classroom_data/<classroom_url_fragment>',
@@ -2168,7 +2176,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
                 '/mock_delete_blog_post/%s' % self.blog_post_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_delete_blog_post/%s.' % self.blog_post_id
         )
         self.assertEqual(response['error'], error_msg)
@@ -2268,7 +2276,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
                 '/mock_edit_blog_post/%s' % self.blog_post_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_edit_blog_post/%s.' % self.blog_post_id
         )
         self.assertEqual(response['error'], error_msg)
@@ -2802,7 +2810,8 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock/%s' % invalid_id, expected_status_int=404)
         error_msg = (
-            'Could not find the page http://localhost/mock/%s.' % invalid_id)
+            'Could not find the resource http://localhost/mock/%s.'
+            % invalid_id)
         self.assertEqual(response['error'], error_msg)
         self.logout()
 
@@ -3280,6 +3289,8 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.banned_user_email, self.banned_user)
         self.signup(self.user_email, self.username)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.mark_user_banned(self.banned_user)
         self.user = user_services.get_user_actions_info(
             user_services.get_user_id_from_username(self.username))
@@ -3299,6 +3310,38 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
             'admin page.'
         )
         self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI])
+    def test_question_admin_cannot_access_new_contributor_dashboard_admin_page(
+        self
+    ) -> None:
+        self.add_user_role(
+            self.username, feconf.ROLE_ID_QUESTION_ADMIN)
+        self.login(self.user_email)
+        with self.swap(constants, 'DEV_MODE', True):
+            with self.swap(self, 'testapp', self.mock_testapp):
+                response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = (
+            'You do not have credentials to access contributor dashboard '
+            'admin page.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI])
+    def test_question_coordinator_can_access_new_cd_admin_page(
+        self
+    ) -> None:
+        self.add_user_role(
+            self.username, feconf.ROLE_ID_QUESTION_COORDINATOR)
+        self.login(self.user_email)
+        with self.swap(constants, 'DEV_MODE', True):
+            with self.swap(self, 'testapp', self.mock_testapp):
+                response = self.get_json('/mock/')
+        self.assertEqual(response['success'], 1)
         self.logout()
 
     def test_question_admin_can_access_contributor_dashboard_admin_page(
@@ -3910,7 +3953,7 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
                     self.TARGET_TYPE, 'invalid'),
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page http://localhost/'
+            'Could not find the resource http://localhost/'
             'mock_review_suggestion/%s/%s.' % (self.TARGET_TYPE, 'invalid')
         )
         self.assertEqual(response['error'], error_msg)
@@ -4731,8 +4774,8 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock_edit_story/%s' % self.story_id, expected_status_int=404)
         error_msg = (
-            'Could not find the page http://localhost/mock_edit_story/%s.' % (
-                self.story_id)
+            'Could not find the resource http://localhost/mock_edit_story/%s.' 
+            % (self.story_id)
         )
         self.assertEqual(response['error'], error_msg)
         self.logout()
@@ -6491,7 +6534,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
                 '/mock_view_question_editor/%s' % invalid_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page http://localhost/'
+            'Could not find the resource http://localhost/'
             'mock_view_question_editor/%s.' % invalid_id
         )
         self.assertEqual(response['error'], error_msg)
@@ -7797,11 +7840,69 @@ class CanAccessClassroomAdminPageDecoratorTests(test_utils.GenericTestBase):
             response['error'],
             'You must be logged in to access this resource.')
 
-    def test_classroom_admin_can_manage_blog_editors(self) -> None:
+    def test_classroom_admin_can_access_classroom_admin_page(self) -> None:
         self.login(self.CLASSROOM_ADMIN_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/classroom-admin')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanAccessVoiceoverAdminPageDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_access_voiceover_admin_page decorator."""
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_access_voiceover_admin_page
+        def get(self) -> None:
+            self.render_json({'success': 1})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.user_email, self.username)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+
+        self.add_user_role(
+            self.VOICEOVER_ADMIN_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/voiceover-admin', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_access_voiceover_admin_page(self) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/voiceover-admin', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access voiceover admin page.')
+        self.logout()
+
+    def test_guest_user_cannot_access_voiceover_admin_page(self) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/voiceover-admin', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
+    def test_voiceover_admin_can_access_voiceover_admin_page(self) -> None:
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/voiceover-admin')
 
         self.assertEqual(response['success'], 1)
         self.logout()

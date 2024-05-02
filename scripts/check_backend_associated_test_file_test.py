@@ -22,6 +22,7 @@ import os
 import sys
 import tempfile
 
+from core import feconf
 from core.tests import test_utils
 from scripts import check_backend_associated_test_file
 
@@ -88,7 +89,8 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
 
     def test_checks_pass_when_all_backend_files_have_an_associated_test_file(
             self) -> None:
-        tempdir = tempfile.TemporaryDirectory(prefix=os.getcwd() + '/core/')
+        tempdir = tempfile.TemporaryDirectory(
+            prefix=os.path.join(os.getcwd(), feconf.TESTS_DATA_DIR, ''))
         backend_file = os.path.join(tempdir.name, 'backend_file.py')
         backend_test_file = os.path.join(
             tempdir.name, 'backend_file_test.py')

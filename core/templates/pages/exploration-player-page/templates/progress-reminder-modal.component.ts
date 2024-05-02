@@ -16,10 +16,10 @@
  * @fileoverview Component for the progress reminder modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
 const CHECKPOINT_STATUS_COMPLETED = 'completed';
@@ -30,9 +30,8 @@ import './progress-reminder-modal.component.css';
 @Component({
   selector: 'oppia-progress-reminder-modal',
   templateUrl: './progress-reminder-modal.component.html',
-  styleUrls: ['./progress-reminder-modal.component.css']
+  styleUrls: ['./progress-reminder-modal.component.css'],
 })
-
 export class ProgressReminderModalComponent extends ConfirmOrCancelModal {
   // These properties below are initialized using Angular lifecycle hooks,
   // and hence we need non-null assertion here. For more information see
@@ -57,8 +56,8 @@ export class ProgressReminderModalComponent extends ConfirmOrCancelModal {
     // If not all checkpoints are completed, then the checkpoint immediately
     // following the last completed checkpoint is labeled 'in-progress'.
     if (this.checkpointCount > this.completedCheckpointsCount) {
-      this.checkpointStatusArray[this.completedCheckpointsCount] = (
-        CHECKPOINT_STATUS_IN_PROGRESS);
+      this.checkpointStatusArray[this.completedCheckpointsCount] =
+        CHECKPOINT_STATUS_IN_PROGRESS;
     }
     for (
       let i = this.completedCheckpointsCount + 1;
@@ -79,8 +78,9 @@ export class ProgressReminderModalComponent extends ConfirmOrCancelModal {
     }
     const spaceBetweenEachNode = 100 / (this.checkpointCount - 1);
     return (
-      ((this.completedCheckpointsCount - 1) * spaceBetweenEachNode) +
-      (spaceBetweenEachNode / 2));
+      (this.completedCheckpointsCount - 1) * spaceBetweenEachNode +
+      spaceBetweenEachNode / 2
+    );
   }
 
   getProgressInFractionForm(): string {

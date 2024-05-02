@@ -1204,6 +1204,14 @@ class UserContributionRights:
             self.can_review_voiceover_for_language_codes or
             self.can_review_questions)
 
+    def can_submit_at_least_one_item(self) -> bool:
+        """Checks whether user has rights to submit at least one item.
+
+        Returns:
+            boolean. Whether user has rights to submit at east one item.
+        """
+        return bool(self.can_submit_questions)
+
     def validate(self) -> None:
         """Validates different attributes of the class."""
         if not isinstance(self.can_review_translation_for_language_codes, list):
@@ -1651,3 +1659,37 @@ class LearnerGroupsUser:
                     'Learner cannot be invited to join learner group '
                     '%s since they are already its learner.' % (
                         learner_group_details.group_id))
+
+
+class TranslationCoordinatorStatsDict(TypedDict):
+    """Dict representation of TranslationCoordinatorStats domain object."""
+
+    language_id: str
+    coordinator_ids: List[str]
+    coordinators_count: int
+
+
+class TranslationCoordinatorStats:
+    """Domain object for the TranslationCoordinatorStatsModel."""
+
+    def __init__(
+        self,
+        language_id: str,
+        coordinator_ids: List[str],
+        coordinators_count: int
+    ) -> None:
+        self.language_id = language_id
+        self.coordinator_ids = coordinator_ids
+        self.coordinators_count = coordinators_count
+
+    def to_dict(self) -> TranslationCoordinatorStatsDict:
+        """Returns a dict representaion of TranslationCoordinatorStats.
+
+        Returns: dict. The dict representation.
+        """
+
+        return {
+            'language_id': self.language_id,
+            'coordinator_ids': self.coordinator_ids,
+            'coordinators_count': self.coordinators_count
+        }

@@ -18,11 +18,12 @@
 
 from __future__ import annotations
 
+from core import feature_flag_list
 from core.constants import constants
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
-from core.domain import platform_parameter_domain as param_domain
-from core.domain import platform_parameter_registry as registry
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
@@ -133,37 +134,12 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             self.learner_group.subtopic_page_ids, ['subtopic_id_1'])
         self.assertEqual(self.learner_group.story_ids, ['story_id_1'])
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
     def test_is_learner_group_feature_enabled(self) -> None:
-        registry.Registry.update_platform_parameter(
-            'learner_groups_are_enabled', self.admin_id, 'edit rules',
-            [
-                param_domain.PlatformParameterRule.from_dict({
-                    'filters': [],
-                    'value_when_matched': True
-                })
-            ],
-            False
-        )
         self.assertTrue(
-            learner_group_services.is_learner_group_feature_enabled())
-
-        registry.Registry.update_platform_parameter(
-            'learner_groups_are_enabled', self.admin_id, 'edit rules',
-            [
-                param_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'platform_type',
-                            'conditions': [['=', 'Backend']]
-                        }
-                    ],
-                    'value_when_matched': False
-                })
-            ],
-            False
-        )
-        self.assertFalse(
-            learner_group_services.is_learner_group_feature_enabled())
+            learner_group_services.is_learner_group_feature_enabled(
+                self.admin_id))
 
     def test_update_learner_group(self) -> None:
         updated_group = learner_group_services.update_learner_group(
@@ -270,6 +246,15 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_matching_syllabus_to_add_with_classroom_filter(self) -> None:
         # Test 4: Classroom name filter.
+        classroom = classroom_config_domain.Classroom(
+            classroom_id=classroom_config_services.get_new_classroom_id(),
+            name='math',
+            url_fragment='math',
+            course_details='',
+            topic_list_intro='',
+            topic_id_to_prerequisite_topic_ids={}
+        )
+        classroom_config_services.update_or_create_classroom_model(classroom)
         matching_syllabus = (
             learner_group_services.get_matching_learner_group_syllabus_to_add(
                 self.LEARNER_GROUP_ID, 'Place', 'All',

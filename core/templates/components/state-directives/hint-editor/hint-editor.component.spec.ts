@@ -16,14 +16,20 @@
  * @fileoverview Unit test for Hint Editor Component.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { HintEditorComponent } from './hint-editor.component';
-import { ContextService } from 'services/context.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { Hint } from 'domain/exploration/hint-object.model';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {HintEditorComponent} from './hint-editor.component';
+import {ContextService} from 'services/context.service';
+import {EditabilityService} from 'services/editability.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {Hint} from 'domain/exploration/hint-object.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 describe('HintEditorComponent', () => {
   let component: HintEditorComponent;
@@ -33,15 +39,9 @@ describe('HintEditorComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        HintEditorComponent
-      ],
-      providers: [
-        ContextService,
-        EditabilityService,
-        ExternalSaveService,
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [HintEditorComponent],
+      providers: [ContextService, EditabilityService, ExternalSaveService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -53,7 +53,8 @@ describe('HintEditorComponent', () => {
     externalSaveService = TestBed.inject(ExternalSaveService);
 
     component.hint = new Hint(
-      SubtitledHtml.createDefault('html text', 'contentID'));
+      SubtitledHtml.createDefault('html text', 'contentID')
+    );
 
     fixture.detectChanges();
   });
@@ -73,26 +74,29 @@ describe('HintEditorComponent', () => {
 
   it('should save hint when external save event is triggered', fakeAsync(() => {
     let onExternalSaveEmitter = new EventEmitter();
-    spyOnProperty(externalSaveService, 'onExternalSave')
-      .and.returnValue(onExternalSaveEmitter);
+    spyOnProperty(externalSaveService, 'onExternalSave').and.returnValue(
+      onExternalSaveEmitter
+    );
     component.ngOnInit();
 
     component.hintEditorIsOpen = true;
-    component.hint = new Hint(
-      SubtitledHtml.createDefault('change', 'data'));
+    component.hint = new Hint(SubtitledHtml.createDefault('change', 'data'));
     component.hintMemento = new Hint(
-      SubtitledHtml.createDefault('html text', 'contentID'));
+      SubtitledHtml.createDefault('html text', 'contentID')
+    );
 
     onExternalSaveEmitter.emit();
     tick();
   }));
 
-  it('should open hint editor when user clicks on \'Edit hint\'', () => {
+  it("should open hint editor when user clicks on 'Edit hint'", () => {
     component.isEditable = true;
     component.hintMemento = new Hint(
-      SubtitledHtml.createDefault('html text', 'contentID'));
+      SubtitledHtml.createDefault('html text', 'contentID')
+    );
     component.hint = new Hint(
-      SubtitledHtml.createDefault('html text edited', 'contentID'));
+      SubtitledHtml.createDefault('html text edited', 'contentID')
+    );
     component.hintEditorIsOpen = false;
 
     component.openHintEditor();
@@ -101,14 +105,16 @@ describe('HintEditorComponent', () => {
     expect(component.hintEditorIsOpen).toBe(true);
   });
 
-  it('should cancel hint edit if user clicks on \'Cancel\'', () => {
+  it("should cancel hint edit if user clicks on 'Cancel'", () => {
     jasmine.createSpy('valid').and.returnValue(true);
 
     component.hintEditorIsOpen = true;
-    const earlierHint = component.hintMemento = new Hint(
-      SubtitledHtml.createDefault('html text', 'contentID'));
+    const earlierHint = (component.hintMemento = new Hint(
+      SubtitledHtml.createDefault('html text', 'contentID')
+    ));
     component.hint = new Hint(
-      SubtitledHtml.createDefault('html text edited', 'contentID'));
+      SubtitledHtml.createDefault('html text edited', 'contentID')
+    );
 
     component.cancelThisHintEdit();
 
@@ -118,21 +124,23 @@ describe('HintEditorComponent', () => {
 
   it('should check if hint HTML length exceeds 500 characters', () => {
     component.hint = new Hint(
-      SubtitledHtml.createDefault('a'.repeat(500), 'contentID'));
+      SubtitledHtml.createDefault(`<p>${'a'.repeat(500)}</p>`, 'contentID')
+    );
     expect(component.isHintLengthExceeded()).toBe(false);
 
     component.hint = new Hint(
-      SubtitledHtml.createDefault('a'.repeat(501), 'contentID'));
+      SubtitledHtml.createDefault(`<p>${'a'.repeat(501)}</p>`, 'contentID')
+    );
     expect(component.isHintLengthExceeded()).toBe(true);
   });
 
   it('should check if hint HTML is updating', () => {
-    const schema = component.HINT_FORM_SCHEMA = {
+    const schema = (component.HINT_FORM_SCHEMA = {
       type: 'html',
       ui_config: {
-        hide_complex_extensions: true
-      }
-    };
+        hide_complex_extensions: true,
+      },
+    });
 
     expect(component.getSchema()).toBe(schema);
 

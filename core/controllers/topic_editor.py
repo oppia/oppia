@@ -25,7 +25,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import classroom_services
+from core.domain import classroom_config_services
 from core.domain import email_manager
 from core.domain import fs_services
 from core.domain import image_validation_services
@@ -342,7 +342,7 @@ class TopicEditorPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
         self.render_template('topic-editor-page.mainpage.html')
@@ -388,7 +388,7 @@ class EditableSubtopicPageDataHandler(
             topic_id, subtopic_id, strict=False)
 
         if subtopic_page is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'The subtopic page with the given id doesn\'t exist.')
 
         self.values.update({
@@ -486,7 +486,7 @@ class EditableTopicDataHandler(
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
         skill_id_to_description_dict, deleted_skill_ids = (
@@ -523,7 +523,7 @@ class EditableTopicDataHandler(
             grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
 
         classroom_url_fragment = (
-            classroom_services.get_classroom_url_fragment_for_topic_id(
+            classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic_id))
         skill_question_count_dict = {}
         for skill_id in topic.get_all_skill_ids():
@@ -628,7 +628,7 @@ class EditableTopicDataHandler(
         assert self.user_id is not None
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'The topic with the given id doesn\'t exist.')
         topic_services.delete_topic(self.user_id, topic_id)
 
@@ -797,14 +797,14 @@ class TopicPublishHandler(
             topic_id: str. The ID of the topic.
 
         Raises:
-            PageNotFoundException. The page cannot be found.
+            NotFoundException. The page cannot be found.
             UnauthorizedUserException. User does not have permission.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         publish_status = self.normalized_payload['publish_status']
 

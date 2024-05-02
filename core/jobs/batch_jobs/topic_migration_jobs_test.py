@@ -64,7 +64,8 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
             total_published_node_count=0,
             uncategorized_skill_count=0,
             subtopic_count=0,
-            version=1
+            version=1,
+            published_story_exploration_mapping={}
         )
         first_topic_summary_model.update_timestamps()
         first_topic_summary_model.put()
@@ -85,7 +86,8 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
             total_published_node_count=0,
             uncategorized_skill_count=0,
             subtopic_count=0,
-            version=1
+            version=1,
+            published_story_exploration_mapping={}
         )
         second_topic_summary_model.update_timestamps()
         second_topic_summary_model.put()
@@ -321,7 +323,8 @@ class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
             total_published_node_count=0,
             uncategorized_skill_count=0,
             subtopic_count=0,
-            version=1
+            version=1,
+            published_story_exploration_mapping={}
         )
         first_topic_summary_model.update_timestamps()
         first_topic_summary_model.put()
@@ -342,7 +345,8 @@ class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
             total_published_node_count=0,
             uncategorized_skill_count=0,
             subtopic_count=0,
-            version=1
+            version=1,
+            published_story_exploration_mapping={}
         )
         second_topic_summary_model.update_timestamps()
         second_topic_summary_model.put()

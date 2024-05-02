@@ -16,7 +16,7 @@
  * @fileoverview Tests for TopicRights model.
  */
 
-import { TopicRights } from 'domain/topic/topic-rights.model';
+import {TopicRights} from 'domain/topic/topic-rights.model';
 
 describe('Topic rights model', () => {
   let sampleTopicRights: TopicRights;
@@ -25,46 +25,49 @@ describe('Topic rights model', () => {
     var initialTopicRightsBackendObject = {
       published: false,
       can_edit_topic: true,
-      can_publish_topic: true
+      can_publish_topic: true,
     };
 
     sampleTopicRights = TopicRights.createFromBackendDict(
-      initialTopicRightsBackendObject);
+      initialTopicRightsBackendObject
+    );
   });
 
-  it('should be able to publish and unpublish topic when user can edit it',
+  it('should be able to publish and unpublish topic when user can edit it', () => {
+    expect(sampleTopicRights.isPublished()).toBe(false);
+
+    sampleTopicRights.markTopicAsPublished();
+    expect(sampleTopicRights.isPublished()).toBe(true);
+
+    sampleTopicRights.markTopicAsUnpublished();
+    expect(sampleTopicRights.isPublished()).toBe(false);
+  });
+
+  it(
+    'should throw error and not be able to publish or unpublish topic when ' +
+      'user cannot edit topic',
     () => {
       expect(sampleTopicRights.isPublished()).toBe(false);
 
-      sampleTopicRights.markTopicAsPublished();
-      expect(sampleTopicRights.isPublished()).toBe(true);
+      var exampleTopicRightsBackendObject = {
+        published: false,
+        can_edit_topic: true,
+        can_publish_topic: false,
+      };
 
-      sampleTopicRights.markTopicAsUnpublished();
-      expect(sampleTopicRights.isPublished()).toBe(false);
-    });
+      var exampleTopicRights = TopicRights.createFromBackendDict(
+        exampleTopicRightsBackendObject
+      );
 
-  it('should throw error and not be able to publish or unpublish topic when ' +
-    'user cannot edit topic',
-  () => {
-    expect(sampleTopicRights.isPublished()).toBe(false);
+      expect(() => {
+        exampleTopicRights.markTopicAsPublished();
+      }).toThrowError('User is not allowed to publish this topic.');
 
-    var exampleTopicRightsBackendObject = {
-      published: false,
-      can_edit_topic: true,
-      can_publish_topic: false
-    };
-
-    var exampleTopicRights = TopicRights.createFromBackendDict(
-      exampleTopicRightsBackendObject);
-
-    expect(() => {
-      exampleTopicRights.markTopicAsPublished();
-    }).toThrowError('User is not allowed to publish this topic.');
-
-    expect(() => {
-      exampleTopicRights.markTopicAsUnpublished();
-    }).toThrowError('User is not allowed to unpublish this topic.');
-  });
+      expect(() => {
+        exampleTopicRights.markTopicAsUnpublished();
+      }).toThrowError('User is not allowed to unpublish this topic.');
+    }
+  );
 
   it('should create an empty topic rights object', () => {
     let emptyTopicRightsBackendObject = new TopicRights(false, false, false);

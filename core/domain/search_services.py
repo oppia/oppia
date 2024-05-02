@@ -149,7 +149,6 @@ def get_search_rank_from_exp_summary(
     Returns:
         int. Document's rank in search.
     """
-    # TODO(sll): Improve this calculation.
     rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
 
     rank = _DEFAULT_RANK

@@ -58,6 +58,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
     from mypy_imports import topic_models
     from mypy_imports import user_models
+    from mypy_imports import voiceover_models
 
 (
     app_feedback_report_models,
@@ -76,7 +77,8 @@ if MYPY: # pragma: no cover
     subtopic_models,
     suggestion_models,
     topic_models,
-    user_models
+    user_models,
+    voiceover_models
 ) = models.Registry.import_models([
     models.Names.APP_FEEDBACK_REPORT,
     models.Names.AUTH,
@@ -94,7 +96,8 @@ if MYPY: # pragma: no cover
     models.Names.SUBTOPIC,
     models.Names.SUGGESTION,
     models.Names.TOPIC,
-    models.Names.USER
+    models.Names.USER,
+    models.Names.VOICEOVER
 ])
 
 
@@ -474,6 +477,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         20) Creates new BlogPostModel and BlogPostRightsModel.
         21) Creates a TranslationContributionStatsModel.
         22) Creates new LearnerGroupModel and LearnerGroupsUserModel.
+        23) Creates a VoiceArtistMetadataModel.
         """
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
@@ -828,6 +832,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
 
+        user_models.PinnedOpportunityModel.create(
+            user_id=self.USER_ID_1,
+            topic_id=self.TOPIC_ID_1,
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            opportunity_id=self.EXPLORATION_IDS[0]
+        )
+
         suggestion_models.QuestionReviewerTotalContributionStatsModel.create(
             contributor_id=self.USER_ID_1,
             topic_ids_with_question_reviews=(
@@ -921,12 +932,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
-        config_models.ConfigPropertySnapshotMetadataModel(
-            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
-            commit_cmds=self.COMMIT_CMDS
-        ).put()
-
         exploration_models.ExplorationRightsSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
@@ -963,6 +968,16 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             id=self.USER_ID_1,
             parent_user_id=self.PROFILE_ID_1
         ).put()
+
+        language_code_to_accent: Dict[str, str] = {
+            'en': 'en-US',
+            'hi': 'hi-IN'
+        }
+        # Setup for VoiceArtistMetadataModel.
+        voiceover_models.VoiceArtistMetadataModel.create_model(
+            voice_artist_id=self.USER_ID_1,
+            language_code_to_accent=language_code_to_accent
+        )
 
         # Set-up for AppFeedbackReportModel scrubbed by user.
         report_id = '%s.%s.%s' % (
@@ -1088,7 +1103,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     def test_export_data_for_full_user_trivial_is_correct(self) -> None:
         """Trivial test of export_data functionality."""
         self.set_up_trivial()
-        self.maxDiff = 0
+        self.maxDiff = None
         # Generate expected output.
         app_feedback_report: Dict[str, Dict[str, Union[str, int]]] = {}
         collection_progress_data: Dict[str, List[str]] = {}
@@ -1144,6 +1159,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'display_alias': None,
             'has_viewed_lesson_info_modal_once': False,
         }
+        user_group: Dict[str, str] = {}
         skill_data: Dict[str, str] = {}
         stats_data: Dict[str, stats_domain.AggregatedStatsDict] = {}
         story_progress_data: Dict[str, List[str]] = {}
@@ -1170,6 +1186,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_contribution_rights_data: Dict[
             str, Union[bool, List[str]]
         ] = {}
+
+        expected_pinned_opportunities_data: Dict[str, Dict[str, str]] = {}
         expected_collection_rights_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_collection_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_skill_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
@@ -1205,7 +1223,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_question_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_config_property_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_exploration_rights_sm: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
@@ -1222,6 +1239,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_blog_author_details: Dict[str, Dict[str, str]] = {}
         expected_learner_group_model_data: Dict[str, str] = {}
         expected_learner_grp_user_model_data: Dict[str, str] = {}
+        expected_voice_artist_data: Dict[str, str] = {}
 
         # Here we use type Any because this dictionary contains other
         # different types of dictionaries whose values can vary from int
@@ -1235,6 +1253,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'user_stats': stats_data,
             'user_settings': user_settings_data,
             'user_subscriptions': subscriptions_data,
+            'user_group': user_group,
             'user_skill_mastery': skill_data,
             'user_contributions': contribution_data,
             'exploration_user_data': exploration_data,
@@ -1285,19 +1304,19 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_submitter_total_contribution_stats,
             'question_reviewer_total_contribution_stats':
                 expected_question_reviewer_total_contribution_stats,
+            'pinned_opportunity': expected_pinned_opportunities_data,
             'translation_coordinators':
                 expected_translation_coordinator_stats,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
-            'config_property_snapshot_metadata':
-                expected_config_property_sm,
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
             'platform_parameter_snapshot_metadata':
                 expected_platform_parameter_sm,
             'user_auth_details': expected_user_auth_details,
-            'user_email_preferences': expected_user_email_preferences
+            'user_email_preferences': expected_user_email_preferences,
+            'voice_artist_metadata': expected_voice_artist_data
         }
 
         # Perform export and compare.
@@ -1554,6 +1573,17 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         )
         feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
+
+        user_group_model = user_models.UserGroupModel(
+            id='user_group_model', users=[self.USER_ID_1]
+        )
+        user_group_model.put()
+
+        expected_user_group_data = {
+            'user_group_model': {
+                'users': self.USER_ID_1
+            }
+        }
 
         blog_post_model = blog_models.BlogPostModel(
             id=self.BLOG_POST_ID_1,
@@ -1824,12 +1854,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'commit_message': self.COMMIT_MESSAGE,
             }
         }
-        expected_config_property_sm = {
-            self.GENERIC_MODEL_ID: {
-                'commit_type': self.COMMIT_TYPE,
-                'commit_message': self.COMMIT_MESSAGE,
-            }
-        }
 
         expected_exploration_rights_sm = {
             self.GENERIC_MODEL_ID: {
@@ -2081,11 +2105,23 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         self.LAST_CONTRIBUTION_DATE.isoformat())
                 }
         }
+        expected_pinned_opportunities_data: Dict[str, Dict[str, str]] = {
+            '%s_%s' % (
+                self.SUGGESTION_LANGUAGE_CODE,
+                self.TOPIC_ID_1): {
+                    'opportunity_id': self.EXPLORATION_IDS[0],
+                }
+        }
         expected_translation_coordinator_stats_data = {
             'coordinated_language_ids': ['es', 'hi']
         }
+        expected_language_code_to_accent: Dict[str, str] = {
+            'en': 'en-US',
+            'hi': 'hi-IN'
+        }
         expected_user_data = {
             'user_stats': expected_stats_data,
+            'user_group': expected_user_group_data,
             'user_settings': expected_user_settings_data,
             'user_subscriptions': expected_subscriptions_data,
             'user_skill_mastery': expected_user_skill_data,
@@ -2143,10 +2179,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_reviewer_total_contribution_stats_data,
             'translation_coordinators':
                 expected_translation_coordinator_stats_data,
+            'pinned_opportunity': expected_pinned_opportunities_data,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
-            'config_property_snapshot_metadata':
-                expected_config_property_sm,
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
@@ -2157,7 +2192,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'app_feedback_report': expected_app_feedback_report,
             'blog_post': expected_blog_post_data,
             'blog_post_rights': expected_blog_post_rights,
-            'blog_author_details': expected_blog_author_details
+            'blog_author_details': expected_blog_author_details,
+            'voice_artist_metadata': expected_language_code_to_accent
         }
 
         with utils.open_file(

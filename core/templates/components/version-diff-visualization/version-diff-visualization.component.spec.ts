@@ -16,17 +16,17 @@
  * @fileoverview Unit tests for Version diff visualization component.
  */
 
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { VersionDiffVisualizationComponent } from './version-diff-visualization.component';
-import { State } from 'domain/state/StateObjectFactory';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {VersionDiffVisualizationComponent} from './version-diff-visualization.component';
+import {State} from 'domain/state/StateObjectFactory';
 
 class MockNgbModal {
   open() {
     return {
-      result: Promise.resolve()
+      result: Promise.resolve(),
     };
   }
 }
@@ -39,16 +39,14 @@ describe('Version Diff Visualization Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        VersionDiffVisualizationComponent
-      ],
+      declarations: [VersionDiffVisualizationComponent],
       providers: [
         {
           provide: NgbModal,
-          useClass: MockNgbModal
-        }
+          useClass: MockNgbModal,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -67,42 +65,42 @@ describe('Version Diff Visualization Component', () => {
         1: {
           newestStateName: 'A',
           stateProperty: 'changed',
-          originalStateName: 'A'
+          originalStateName: 'A',
         },
         2: {
           newestStateName: 'B',
           stateProperty: 'added',
-          originalStateName: 'A'
+          originalStateName: 'A',
         },
         3: {
           newestStateName: 'C',
           stateProperty: 'deleted',
-          originalStateName: 'B'
+          originalStateName: 'B',
         },
         4: {
           newestStateName: 'D',
           stateProperty: 'unchanged',
-          originalStateName: 'B'
+          originalStateName: 'B',
         },
         5: {
           newestStateName: 'E',
           stateProperty: 'changed',
-          originalStateName: 'B'
+          originalStateName: 'B',
         },
         6: {
           newestStateName: 'F',
           stateProperty: 'unchanged',
-          originalStateName: 'F'
+          originalStateName: 'F',
         },
       },
       v2States: {
         C: {} as State,
-        D: {} as State
+        D: {} as State,
       },
       v1States: {
         A: {} as State,
         B: {} as State,
-      }
+      },
     };
   });
 
@@ -117,7 +115,7 @@ describe('Version Diff Visualization Component', () => {
 
     expect(component.diffGraphSecondaryLabels).toEqual({
       4: '(was: B)',
-      5: '(was: B)'
+      5: '(was: B)',
     });
     expect(component.diffGraphNodeColors).toEqual({
       1: '#1E90FF',
@@ -125,15 +123,15 @@ describe('Version Diff Visualization Component', () => {
       3: '#DC143C',
       4: '#FFD700',
       5: '#1E90FF',
-      6: 'beige'
+      6: 'beige',
     });
     expect(component.v1InitStateId).toEqual(0);
-    expect(component.diffGraphData).toEqual(
-      {
-        nodes: { 1: 'A', 2: 'B', 3: 'B', 4: 'D', 5: 'E', 6: 'F' },
-        links: [], initStateId: 1, finalStateIds: ['C', 'D']
-      }
-    );
+    expect(component.diffGraphData).toEqual({
+      nodes: {1: 'A', 2: 'B', 3: 'B', 4: 'D', 5: 'E', 6: 'F'},
+      links: [],
+      initStateId: 1,
+      finalStateIds: ['C', 'D'],
+    });
     expect(component.legendGraph).toEqual({
       nodes: {
         Added: 'Added',
@@ -141,94 +139,102 @@ describe('Version Diff Visualization Component', () => {
         Changed: 'Changed',
         Unchanged: 'Unchanged',
         Renamed: 'Renamed',
-        'Changed/renamed': 'Changed/renamed'
+        'Changed/renamed': 'Changed/renamed',
       },
-      links: [{
-        source: 'Added',
-        target: 'Deleted',
-        linkProperty: 'hidden'
-      }, {
-        source: 'Deleted',
-        target: 'Changed',
-        linkProperty: 'hidden'
-      }, {
-        source: 'Changed',
-        target: 'Unchanged',
-        linkProperty: 'hidden'
-      }, {
-        source: 'Unchanged',
-        target: 'Renamed',
-        linkProperty: 'hidden'
-      }, {
-        source: 'Renamed',
-        target: 'Changed/renamed',
-        linkProperty: 'hidden'
-      }],
+      links: [
+        {
+          source: 'Added',
+          target: 'Deleted',
+          linkProperty: 'hidden',
+        },
+        {
+          source: 'Deleted',
+          target: 'Changed',
+          linkProperty: 'hidden',
+        },
+        {
+          source: 'Changed',
+          target: 'Unchanged',
+          linkProperty: 'hidden',
+        },
+        {
+          source: 'Unchanged',
+          target: 'Renamed',
+          linkProperty: 'hidden',
+        },
+        {
+          source: 'Renamed',
+          target: 'Changed/renamed',
+          linkProperty: 'hidden',
+        },
+      ],
       initStateId: 'Changed/renamed',
-      finalStateIds: ['Changed/renamed']
+      finalStateIds: ['Changed/renamed'],
     });
   });
 
   it('should throw error if state property is invalid', () => {
-    component.diffData = (
-      {
-        nodes: {
-          1: {
-            newestStateName: 'A',
-            stateProperty: 'invalid',
-            originalStateName: 'A'
-          }
+    component.diffData = {
+      nodes: {
+        1: {
+          newestStateName: 'A',
+          stateProperty: 'invalid',
+          originalStateName: 'A',
         },
-        v2States: {},
-        v1States: {},
-        finalStateIds: [],
-        v2InitStateId: 0,
-        links: [],
-        v1InitStateId: 0,
-      }
-    );
+      },
+      v2States: {},
+      v1States: {},
+      finalStateIds: [],
+      v2InitStateId: 0,
+      links: [],
+      v1InitStateId: 0,
+    };
 
     expect(() => component.ngOnInit()).toThrowError('Invalid state property.');
   });
 
-  it('should open state diff modal when user clicks on a state in' +
-    ' difference graph', () => {
-    class MockComponentInstance {
-      compoenentInstance!: {
-        newState: null;
-        newStateName: 'A';
-        oldState: null;
-        oldStateName: 'B';
-        headers: {
-          leftPane: undefined;
-          rightPane: undefined;
+  it(
+    'should open state diff modal when user clicks on a state in' +
+      ' difference graph',
+    () => {
+      class MockComponentInstance {
+        compoenentInstance!: {
+          newState: null;
+          newStateName: 'A';
+          oldState: null;
+          oldStateName: 'B';
+          headers: {
+            leftPane: undefined;
+            rightPane: undefined;
+          };
         };
-      };
+      }
+
+      let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
+        return {
+          componentInstance: MockComponentInstance,
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      });
+
+      component.ngOnInit();
+      component.onClickStateInDiffGraph('2');
+
+      expect(spyObj).toHaveBeenCalled();
     }
+  );
 
-    let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
-      return ({
-        componentInstance: MockComponentInstance,
-        result: Promise.resolve()
-      }) as NgbModalRef;
-    });
-
-    component.ngOnInit();
-    component.onClickStateInDiffGraph('2');
-
-    expect(spyObj).toHaveBeenCalled();
-  });
-
-  it('should open state diff modal and return old and new states when' +
-    ' when user clicks on a state in difference graph', () => {
-    component.diffData = (
-      {
+  it(
+    'should open state diff modal and return old and new states when' +
+      ' when user clicks on a state in difference graph',
+    () => {
+      component.diffData = {
         nodes: {
           1: {
             newestStateName: 'A',
             stateProperty: 'changed',
-            originalStateName: 'B'
-          }
+            originalStateName: 'B',
+          },
         },
         v2States: {
           A: {} as State,
@@ -242,41 +248,41 @@ describe('Version Diff Visualization Component', () => {
         v2InitStateId: 0,
         links: [],
         v1InitStateId: 0,
-      }
-    );
-
-    class MockComponentInstance {
-      compoenentInstance!: {
-        newState: {};
-        newStateName: 'A';
-        oldState: {};
-        oldStateName: 'B';
-        headers: {
-          leftPane: undefined;
-          rightPane: undefined;
-        };
       };
+
+      class MockComponentInstance {
+        compoenentInstance!: {
+          newState: {};
+          newStateName: 'A';
+          oldState: {};
+          oldStateName: 'B';
+          headers: {
+            leftPane: undefined;
+            rightPane: undefined;
+          };
+        };
+      }
+
+      let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
+        return {
+          componentInstance: MockComponentInstance,
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      });
+
+      component.ngOnInit();
+      component.onClickStateInDiffGraph('1');
+
+      expect(spyObj).toHaveBeenCalled();
     }
-
-    let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
-      return ({
-        componentInstance: MockComponentInstance,
-        result: Promise.resolve()
-      }) as NgbModalRef;
-    });
-
-    component.ngOnInit();
-    component.onClickStateInDiffGraph('1');
-
-    expect(spyObj).toHaveBeenCalled();
-  });
+  );
 
   it('should close state diff modal when user clicks cancel', () => {
     let spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
-      return ({
+      return {
         componentInstance: {},
-        result: Promise.reject()
-      }) as NgbModalRef;
+        result: Promise.reject(),
+      } as NgbModalRef;
     });
 
     component.ngOnInit();

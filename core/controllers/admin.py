@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import io
 import logging
+import operator
 import random
 
 from core import feconf
@@ -31,18 +32,16 @@ from core.domain import blog_services
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import collection_services
-from core.domain import config_domain
-from core.domain import config_services
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import opportunity_services
-from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
+from core.domain import platform_parameter_services as parameter_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import recommendations_services
@@ -68,17 +67,86 @@ from typing import Dict, List, Optional, TypedDict, Union, cast
 
 # Platform paramters that we plan to show on the the release-coordinator page.
 PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set([
-    platform_parameter_list.ParamNames.PROMO_BAR_ENABLED.value,
-    platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE.value
+    platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value,
+    platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value
 ])
 
 # Platform parameters that we plan to show on the blog admin page.
 PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE = set([
     (
-        platform_parameter_list.ParamNames.
+        platform_parameter_list.ParamName.
         MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
     )
 ])
+
+supported_languages: List[str] = [
+    lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES]
+
+EDUCATION_BLOG_POST_TITLE = 'Education'
+
+EDUCATION_BLOG_POST_CONTENT = """
+    <p>
+        Education is a constantly evolving landscape, and innovation lies at its core. 
+        This summer, Oppia had the privilege of hosting a group of exceptional minds 
+        through the prestigious Google Summer of Code (GSoC) program. These talented 
+        individuals embarked on a journey to transform learning, one code at a time.
+    </p>\n
+    <p>
+        You should check out main 
+        <oppia-noninteractive-link 
+            text-with-value=\"&amp;quot;website.&amp;quot;\" 
+            url-with-value=\"&amp;quot;https://www.oppia.org&amp;quot;\">
+        </oppia-noninteractive-link><br>\n&nbsp;
+    </p>\n\n
+    <p>Introduction to Oppia - Youtube Video</p>
+    <oppia-noninteractive-video 
+        autoplay-with-value=\"false\" 
+        end-with-value=\"0\" 
+        start-with-value=\"0\" 
+        video_id-with-value=\"&amp;quot;Wmvt-HH5-dI&amp;quot;\">
+    </oppia-noninteractive-video>
+"""
+
+FORMATTING_BLOG_POST_TITLE = 'Blog with different font formatting'
+
+FORMATTING_BLOG_POST_CONTENT = """
+    <h1>Heading</h1>\n\n
+    <p>This is the normal text.</p>\n\n
+    <p><strong>Bold Text.</strong></p>\n\n
+    <p><em>Italic Text.</em></p>\n\n
+    <p><em><strong>Bold Italic.</strong></em></p>\n\n
+    Numbered List:</div>\n\n<ol>\n\t<li>List item&nbsp;</li>\n\t<li>List item\n\t<ol>\n\t\t<li>Sub list item</li>\n\t</ol>\n\t</li>\n</ol>\n\n
+    <p>Bullet List:</p>\n\n<ul>\n\t<li>List item</li>\n\t<li>List item\n\t<ul>\n\t\t<li>Sub list item</li>\n\t</ul>\n\t</li>\n</ul>\n\n
+    <pre>This is content in pre.</pre>\n\n
+    <blockquote>\n<p>Quote from some famous person. Two empty lines after this quote.</p>\n</blockquote>\n\n
+    <p>&nbsp;</p>\n\n<p>&nbsp;</p>\n\n<p>End of blog.</p>
+"""
+
+ARABIC_BLOG_POST_TITLE = 'Leading The Arabic Translations Team'
+
+ARABIC_BLOG_POST_CONTENT = """
+    <h1>Introduction:</h1>\n
+    <oppia-noninteractive-image alt-with-value=\"Oppia Arabic Blogpost Graphic\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;blog_post_image_height_326_width_490.svg&amp;quot;\"></oppia-noninteractive-image>\n\n
+    <p><strong>Editor’s note:</strong> <em>The Arabic team at Oppia plays a pivotal role in breaking down language barriers and making educational content accessible to Arabic-speaking learners. One of the primary challenges lies in finding a suitable tone and language that can resonate with all Arabic-speaking regions, each of which has its unique dialects.</em></p>\n\n
+    <p><em>In this blog post, our team lead, Sarah, explains how teamwork can lead not only to professional accomplishments but also personal growth and lasting connections. The Arabic team's journey exemplifies the transformative power of collaboration, cultural exchange, and the profound impact of education on individuals and communities.</em></p>\n\n<p>Translating educational lessons presents a unique set of challenges, particularly when it comes to bridging language barriers and adapting content to suit diverse regional dialects. In this blog post, we will delve into the experiences of our dedicated team and explore how we tackled these obstacles head-on. We will also highlight the inspiring stories of past members, shedding light on their motivations and the invaluable skills they acquired through their contributions.</p>\n\n<p>&nbsp;</p>\n\n<h1>Finding the Right Tone and Language</h1>\n\n\n
+    <p>Contributing to this project offered more than just an opportunity to make a difference. For many of us, it served as a valuable stepping stone in our career paths. As an example, some of our team members were students, and through their involvement, they received practical experience and exposure to real-world challenges. This helped them develop essential skills such as teamwork, project management, and time management. We expect these acquired competencies to prove beneficial in their future professional endeavors.</p>\n\n
+    <h1>Conclusion</h1>\n\n
+    <p>Overcoming the challenges associated with translating lessons into Arabic required a dedicated and passionate team. By focusing on finding the right tone and language, our team members collaborated to ensure that educational content reached a wider audience across diverse Arabic-speaking regions. Through their contributions, they not only empowered learners but also experienced personal growth and acquired valuable skills. With this blog post, I would like to thank and celebrate the contributions of all the members of Oppia’s Arabic translation team. Our journey together stands as a testament to the power of teamwork, cultural exchange, and the positive impact of education on individuals and communities.</p>\n\n
+    <h1>Arabic hashtags:</h1>\n\n
+    <p>&nbsp;#تحديات_الترجمة</p>\n\n
+    <p>&nbsp;#حاجز_اللغة</p>\n\n
+    <p>&nbsp;#محتوى_تعليمي</p>\n\n
+    <p>&nbsp;#ترجمة_عربية</p>\n\n
+    <p>&nbsp;#تبادل_ثقافي</p>\n\n
+    <p>&nbsp;#العمل_الجماعي</p>\n\n
+    <p>&nbsp;#مسار_المهنة</p>\n\n
+    <p>&nbsp;#التعليم_مهم</p>\n\n
+    <h1>Credit:</h1>\n\n
+    <ul>\n\t
+    <li>This blogpost was written by Sarah Bendiff who currently leads Oppia's Arabic Translations Team.</li>\n\t
+    <li>Edits were done by all of the marketing team! (Thanks to the best teammates)</li>
+    </ul>
+"""
 
 
 class ClassroomPageDataDict(TypedDict):
@@ -91,26 +159,6 @@ class ClassroomPageDataDict(TypedDict):
     url_fragment: str
 
 
-AllowedAdminConfigPropertyValueTypes = Union[
-    str, bool, float, Dict[str, str], List[str], ClassroomPageDataDict
-]
-
-
-class AdminPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Admin page shown in the App Engine admin console."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_admin_page
-    def get(self) -> None:
-        """Renders the admin page."""
-
-        self.render_template('admin-page.mainpage.html')
-
-
 class AdminHandlerNormalizePayloadDict(TypedDict):
     """Dict representation of AdminHandler's normalized_payload
     dictionary.
@@ -121,16 +169,13 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     collection_id: Optional[str]
     num_dummy_exps_to_generate: Optional[int]
     num_dummy_exps_to_publish: Optional[int]
-    new_config_property_values: Optional[
-        Dict[str, AllowedAdminConfigPropertyValueTypes]
-    ]
-    config_property_id: Optional[str]
     data: Optional[str]
     topic_id: Optional[str]
     platform_param_name: Optional[str]
     commit_message: Optional[str]
     new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
     exp_id: Optional[str]
+    blog_post_title: Optional[str]
     default_value: Dict[str, parameter_domain.PlatformDataTypes]
 
 
@@ -152,8 +197,8 @@ class AdminHandler(
                         'generate_dummy_explorations', 'clear_search_index',
                         'generate_dummy_new_structures_data',
                         'generate_dummy_new_skill_data',
+                        'generate_dummy_blog_post',
                         'generate_dummy_classroom',
-                        'save_config_properties', 'revert_config_property',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
                         'update_platform_parameter_rules',
@@ -186,20 +231,6 @@ class AdminHandler(
             'num_dummy_exps_to_publish': {
                 'schema': {
                     'type': 'int'
-                },
-                'default_value': None
-            },
-            'new_config_property_values': {
-                'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        validation_method.validate_new_config_property_values)
-                },
-                'default_value': None
-            },
-            'config_property_id': {
-                'schema': {
-                    'type': 'basestring'
                 },
                 'default_value': None
             },
@@ -237,6 +268,17 @@ class AdminHandler(
                 },
                 'default_value': None
             },
+            'blog_post_title': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        ARABIC_BLOG_POST_TITLE,
+                        EDUCATION_BLOG_POST_TITLE,
+                        FORMATTING_BLOG_POST_TITLE,
+                    ]
+                },
+                'default_value': None
+            },
             'exp_id': {
                 'schema': {
                     'type': 'basestring'
@@ -265,8 +307,8 @@ class AdminHandler(
             summary.to_dict() for summary in topic_summaries]
 
         platform_params_dicts = (
-            feature_services.
-            get_all_platform_parameters_except_feature_flag_dicts()
+            parameter_services.
+            get_all_platform_parameters_dicts()
         )
         # Removes promo-bar related and blog related platform params as
         # they are handled in release-coordinator page and blog admin page
@@ -279,10 +321,7 @@ class AdminHandler(
             )
         ]
 
-        config_properties = config_domain.Registry.get_config_property_schemas()
-
         self.render_json({
-            'config_properties': config_properties,
             'demo_collections': sorted(feconf.DEMO_COLLECTIONS.items()),
             'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.items()),
             'demo_exploration_ids': demo_exploration_ids,
@@ -310,10 +349,6 @@ class AdminHandler(
                 the action is generate_dummy_explorations.
             InvalidInputException. Generate count cannot be less than publish
                 count.
-            Exception. The new_config_property_values must be provided
-                when the action is save_config_properties.
-            Exception. The config_property_id must be provided when the
-                action is revert_config_property.
             Exception. The data must be provided when the action is
                 upload_topic_similarities.
             Exception. The topic_id must be provided when the action is
@@ -371,6 +406,14 @@ class AdminHandler(
 
                 self._generate_dummy_explorations(
                     num_dummy_exps_to_generate, num_dummy_exps_to_publish)
+            elif action == 'generate_dummy_blog_post':
+                blog_post_title = self.normalized_payload.get('blog_post_title')
+                if blog_post_title is None:
+                    raise Exception(
+                        'The \'blog_post_title\' must be provided when the'
+                        ' action is generate_dummy_blog_post.'
+                    )
+                self._load_dummy_blog_post(blog_post_title)
             elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
@@ -381,32 +424,6 @@ class AdminHandler(
                 self._generate_dummy_skill_and_questions()
             elif action == 'generate_dummy_classroom':
                 self._generate_dummy_classroom()
-            elif action == 'save_config_properties':
-                new_config_property_values = self.normalized_payload.get(
-                    'new_config_property_values')
-                if new_config_property_values is None:
-                    raise Exception(
-                        'The \'new_config_property_values\' must be provided'
-                        ' when the action is save_config_properties.'
-                    )
-                logging.info(
-                    '[ADMIN] %s saved config property values: %s' %
-                    (self.user_id, new_config_property_values))
-                for (name, value) in new_config_property_values.items():
-                    config_services.set_property(self.user_id, name, value)
-            elif action == 'revert_config_property':
-                config_property_id = self.normalized_payload.get(
-                    'config_property_id')
-                if config_property_id is None:
-                    raise Exception(
-                        'The \'config_property_id\' must be provided'
-                        ' when the action is revert_config_property.'
-                    )
-                logging.info(
-                    '[ADMIN] %s reverted config property: %s' %
-                    (self.user_id, config_property_id))
-                config_services.revert_property(
-                    self.user_id, config_property_id)
             elif action == 'upload_topic_similarities':
                 data = self.normalized_payload.get('data')
                 if data is None:
@@ -479,7 +496,7 @@ class AdminHandler(
                     )
                 except (
                     utils.ValidationError,
-                    feature_services.PlatformParameterNotFoundException
+                    parameter_services.PlatformParameterNotFoundException
                 ) as e:
                     raise self.InvalidInputException(e)
 
@@ -618,6 +635,73 @@ class AdminHandler(
         skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
         return skill
 
+    def _load_dummy_blog_post(self, blog_post_title: str) -> None:
+        """Loads the database with a blog post.
+
+        Raises:
+            Exception. Cannot load new blog post in production mode.
+        """
+        assert self.user_id is not None
+        if not constants.DEV_MODE:
+            raise Exception('Cannot load new blog post in production mode.')
+
+        blog_post = blog_services.create_new_blog_post(self.user_id)
+        fs = fs_services.GcsFileSystem('blog_post', blog_post.id)
+        with open(
+            './assets/images/general/learner1.png', 'rb'
+        ) as thumbnail:
+            fs.commit(
+                'thumbnail/blog_thumbnail.png',
+                thumbnail.read(),
+                'image/png'
+            )
+        with open(
+            './assets/images/subjects/Art.svg', 'rb'
+        ) as image:
+            fs.commit(
+                'image/blog_post_image_height_326_width_490.svg',
+                image.read(),
+                'image/svg+xml'
+            )
+
+        if blog_post_title == EDUCATION_BLOG_POST_TITLE:
+            blog_services.update_blog_post(blog_post.id, {
+                'title':
+                    '%s-%s' % (EDUCATION_BLOG_POST_TITLE, blog_post.id),
+                'thumbnail_filename': 'blog_thumbnail.png',
+                'content': EDUCATION_BLOG_POST_CONTENT,
+                'tags': ['Community']
+            })
+        elif blog_post_title == FORMATTING_BLOG_POST_TITLE:
+            blog_services.update_blog_post(blog_post.id, {
+                'title':
+                    '%s-%s' % (FORMATTING_BLOG_POST_TITLE, blog_post.id),
+                'content': FORMATTING_BLOG_POST_CONTENT,
+                'tags': ['Learners', 'Languages'],
+                'thumbnail_filename': 'blog_thumbnail.png'
+            })
+        else:
+            # The handler schema defines the possible values of
+            # 'blog_post_title'. If 'blog_post_title' has a value other than
+            # those defined in the schema, a Bad Request error will be thrown.
+            # Hence, 'blog_post_title' must be 'ARABIC_BLOG_POST_TITLE' if
+            # this branch is executed.
+            assert blog_post_title == ARABIC_BLOG_POST_TITLE
+            blog_services.update_blog_post(blog_post.id, {
+                'title':
+                    '%s-%s' % (ARABIC_BLOG_POST_TITLE, blog_post.id),
+                'content': ARABIC_BLOG_POST_CONTENT,
+                'tags': [
+                    'Learners',
+                    'Volunteer',
+                    'New features',
+                    'Community',
+                    'Languages'
+                ],
+                'thumbnail_filename': 'blog_thumbnail.png'
+            })
+        blog_services.publish_blog_post(blog_post.id)
+
     def _load_dummy_new_structures_data(self) -> None:
         """Loads the database with two topics (one of which is empty), a story
         and three skills in the topic (two of them in a subtopic) and a question
@@ -633,14 +717,17 @@ class AdminHandler(
                 raise Exception(
                     'User does not have enough rights to generate data.')
             topic_id_1 = topic_fetchers.get_new_topic_id()
-            topic_id_2 = topic_fetchers.get_new_topic_id()
             story_id = story_services.get_new_story_id()
+
             skill_id_1 = skill_services.get_new_skill_id()
             skill_id_2 = skill_services.get_new_skill_id()
             skill_id_3 = skill_services.get_new_skill_id()
+
             question_id_1 = question_services.get_new_question_id()
             question_id_2 = question_services.get_new_question_id()
             question_id_3 = question_services.get_new_question_id()
+            question_id_4 = question_services.get_new_question_id()
+            question_id_5 = question_services.get_new_question_id()
 
             skill_1 = self._create_dummy_skill(
                 skill_id_1, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>')
@@ -655,12 +742,22 @@ class AdminHandler(
                 question_id_2, 'Question 2', [skill_id_2])
             question_3 = self._create_dummy_question(
                 question_id_3, 'Question 3', [skill_id_3])
+            question_4 = self._create_dummy_question(
+                question_id_4, 'Question 4', [skill_id_1])
+            question_5 = self._create_dummy_question(
+                question_id_5, 'Question 5', [skill_id_1])
             question_services.add_question(self.user_id, question_1)
             question_services.add_question(self.user_id, question_2)
             question_services.add_question(self.user_id, question_3)
+            question_services.add_question(self.user_id, question_4)
+            question_services.add_question(self.user_id, question_5)
 
             question_services.create_new_question_skill_link(
                 self.user_id, question_id_1, skill_id_1, 0.3)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_4, skill_id_1, 0.3)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_5, skill_id_1, 0.3)
             question_services.create_new_question_skill_link(
                 self.user_id, question_id_2, skill_id_2, 0.5)
             question_services.create_new_question_skill_link(
@@ -669,15 +766,29 @@ class AdminHandler(
             topic_1 = topic_domain.Topic.create_default_topic(
                 topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description',
                 'fragm')
-            topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Empty Topic', 'empty-topic', 'description',
-                'fragm')
 
+            topic_1.update_meta_tag_content('dummy-meta')
+            raw_image = b''
+            with open(
+                'core/tests/data/thumbnail.svg', 'rt',
+                encoding='utf-8') as svg_file:
+                svg_file_content = svg_file.read()
+                raw_image = svg_file_content.encode('ascii')
+            fs_services.save_original_and_compressed_versions_of_image(
+                'thumbnail.svg', feconf.ENTITY_TYPE_TOPIC, topic_id_1,
+                raw_image, 'thumbnail', False)
+            topic_services.update_thumbnail_filename(topic_1, 'thumbnail.svg')
+            topic_1.update_thumbnail_bg_color('#C6DCDA')
             topic_1.add_canonical_story(story_id)
             topic_1.add_uncategorized_skill_id(skill_id_1)
             topic_1.add_uncategorized_skill_id(skill_id_2)
             topic_1.add_uncategorized_skill_id(skill_id_3)
+            topic_1.update_skill_ids_for_diagnostic_test([skill_id_1])
             topic_1.add_subtopic(1, 'Dummy Subtopic Title', 'dummysubtopic')
+            topic_services.update_subtopic_thumbnail_filename(
+                topic_1, 1, 'thumbnail.svg')
+            topic_1.update_subtopic_thumbnail_bg_color(
+                1, constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_2)
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_3)
 
@@ -689,24 +800,6 @@ class AdminHandler(
             self._reload_exploration('6')
             self._reload_exploration('25')
             self._reload_exploration('13')
-            exp_services.update_exploration(
-                self.user_id, '6', [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'correctness_feedback_enabled',
-                    'new_value': True
-                })], 'Changed correctness_feedback_enabled.')
-            exp_services.update_exploration(
-                self.user_id, '25', [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'correctness_feedback_enabled',
-                    'new_value': True
-                })], 'Changed correctness_feedback_enabled.')
-            exp_services.update_exploration(
-                self.user_id, '13', [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'correctness_feedback_enabled',
-                    'new_value': True
-                })], 'Changed correctness_feedback_enabled.')
 
             story = story_domain.Story.create_default_story(
                 story_id, 'Help Jaime win the Arcade', 'Description',
@@ -770,7 +863,6 @@ class AdminHandler(
             skill_services.save_new_skill(self.user_id, skill_3)
             story_services.save_new_story(self.user_id, story)
             topic_services.save_new_topic(self.user_id, topic_1)
-            topic_services.save_new_topic(self.user_id, topic_2)
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page, 'Added subtopic',
                 [topic_domain.TopicChange({
@@ -787,6 +879,7 @@ class AdminHandler(
                 story_id, exp_ids_in_story)
 
             topic_services.publish_story(topic_id_1, story_id, self.user_id)
+            topic_services.publish_topic(topic_id_1, self.user_id)
         else:
             raise Exception('Cannot load new structures data in production.')
 
@@ -1130,22 +1223,6 @@ class AdminHandler(
 
             classroom_config_services.update_or_create_classroom_model(
                 classroom_1)
-
-            classroom_pages_data = [{
-                'name': 'math',
-                'url_fragment': 'math',
-                'course_details': '',
-                'topic_list_intro': '',
-                'topic_ids': [
-                    topic_id_1,
-                    topic_id_2,
-                    topic_id_3,
-                    topic_id_4,
-                    topic_id_5
-                ],
-            }]
-            config_services.set_property(
-                self.user_id, 'classroom_pages_data', classroom_pages_data)
         else:
             raise Exception('Cannot generate dummy classroom in production.')
 
@@ -1244,7 +1321,7 @@ class AdminRoleHandler(
         }
     }
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves information about users based on different filter
         criteria to populate the roles tab.
@@ -1254,7 +1331,7 @@ class AdminRoleHandler(
                 is 'role'.
             Exception. The username must be provided when the filter
                 criterion is 'username'.
-            InvalidInputException. User with given username does not exist.
+            NotFoundException. User with given username does not exist.
         """
         assert self.user_id is not None
         # Here we use cast because we are narrowing down the type of
@@ -1303,19 +1380,26 @@ class AdminRoleHandler(
                 self.user_id, feconf.ROLE_ACTION_VIEW_BY_USERNAME,
                 username=username)
             if user_id is None:
-                raise self.InvalidInputException(
+                raise self.NotFoundException(
                     'User with given username does not exist.')
 
             user_settings = user_services.get_user_settings(user_id)
             user_roles = user_settings.roles
             managed_topic_ids = []
+            coordinated_language_ids = []
             if feconf.ROLE_ID_TOPIC_MANAGER in user_roles:
                 managed_topic_ids = [
                     rights.id for rights in
                     topic_fetchers.get_topic_rights_with_user(user_id)]
+            if feconf.ROLE_ID_TRANSLATION_COORDINATOR in user_roles:
+                coordinated_language_ids = [
+                    rights.language_id for rights in
+                    user_services.get_translation_rights_with_user(
+                        user_id)]
             user_roles_dict = {
                 'roles': user_roles,
                 'managed_topic_ids': managed_topic_ids,
+                'coordinated_language_ids': coordinated_language_ids,
                 'banned': user_settings.banned
             }
             self.render_json(user_roles_dict)
@@ -1325,7 +1409,7 @@ class AdminRoleHandler(
         """Adds a role to a user.
 
         Raises:
-            InvalidInputException. User with given username does not exist.
+            NotFoundException. User with given username does not exist.
             InvalidInputException. Unsupported role for this handler.
         """
         assert self.normalized_payload is not None
@@ -1334,7 +1418,7 @@ class AdminRoleHandler(
         user_settings = user_services.get_user_settings_from_username(username)
 
         if user_settings is None:
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'User with given username does not exist.')
 
         if role == feconf.ROLE_ID_TOPIC_MANAGER:
@@ -1352,7 +1436,7 @@ class AdminRoleHandler(
         """Removes a role from a user.
 
         Raises:
-            InvalidInputException. User with given username does not exist.
+            NotFoundException. User with given username does not exist.
         """
         # Here we use cast because we are narrowing down the type of
         # 'normalized_request' from Union of request TypedDicts to a
@@ -1367,11 +1451,15 @@ class AdminRoleHandler(
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'User with given username does not exist.')
 
         if role == feconf.ROLE_ID_TOPIC_MANAGER:
             topic_services.deassign_user_from_all_topics(self.user, user_id)
+
+        if role == feconf.ROLE_ID_TRANSLATION_COORDINATOR:
+            user_services.deassign_user_from_all_languages(
+                self.user, user_id)
 
         user_services.remove_user_role(user_id, role)
 
@@ -1424,7 +1512,7 @@ class TopicManagerRoleHandler(
         of a specific topic.
 
         Raises:
-            InvalidInputException. User with given username does not exist.
+            NotFoundException. User with given username does not exist.
         """
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
@@ -1434,7 +1522,7 @@ class TopicManagerRoleHandler(
         user_settings = user_services.get_user_settings_from_username(username)
 
         if user_settings is None:
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'User with given username does not exist.')
 
         user_id = user_settings.user_id
@@ -1514,14 +1602,14 @@ class BannedUsersHandler(
         """Marks a user as banned.
 
         Raises:
-            InvalidInputException. User with given username does not exist.
+            NotFoundException. User with given username does not exist.
         """
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'User with given username does not exist.')
         topic_services.deassign_user_from_all_topics(self.user, user_id)
         user_services.mark_user_banned(user_id)
@@ -1533,14 +1621,14 @@ class BannedUsersHandler(
         """Removes the banned status of the user.
 
         Raises:
-            InvalidInputException. User with given username does not exist.
+            NotFoundException. User with given username does not exist.
         """
         assert self.normalized_request is not None
         username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'User with given username does not exist.')
         user_services.unmark_user_banned(user_id)
 
@@ -1598,7 +1686,7 @@ class AdminSuperAdminPrivilegesHandler(
         Raises:
             UnauthorizedUserException. Only the default system admin can
                 manage super admins.
-            InvalidInputException. No such user exists.
+            NotFoundException. No such user exists.
         """
         assert self.normalized_payload is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
@@ -1608,7 +1696,7 @@ class AdminSuperAdminPrivilegesHandler(
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
-            raise self.InvalidInputException('No such user exists')
+            raise self.NotFoundException('No such user exists')
 
         auth_services.grant_super_admin_privileges(user_id)
         self.render_json(self.values)
@@ -1620,7 +1708,7 @@ class AdminSuperAdminPrivilegesHandler(
         Raises:
             UnauthorizedUserException. Only the default system admin can
                 manage super admins.
-            InvalidInputException. No such user exists.
+            NotFoundException. No such user exists.
             InvalidInputException. Cannot revoke privileges from the default
                 super admin account.
         """
@@ -1632,7 +1720,7 @@ class AdminSuperAdminPrivilegesHandler(
 
         user_settings = user_services.get_user_settings_from_username(username)
         if user_settings is None:
-            raise self.InvalidInputException('No such user exists')
+            raise self.NotFoundException('No such user exists')
 
         if user_settings.email == feconf.ADMIN_EMAIL_ADDRESS:
             raise self.InvalidInputException(
@@ -1717,7 +1805,7 @@ class DataExtractionQueryHandler(
         state within an exploration.
 
         Raises:
-            InvalidInputException. Entity not found.
+            NotFoundException. Entity not found.
             InvalidInputException. Exploration does not have such state.
             Exception. No state answer exists.
         """
@@ -1728,9 +1816,9 @@ class DataExtractionQueryHandler(
         exploration = exp_fetchers.get_exploration_by_id(
             exp_id, strict=False, version=exp_version)
         if exploration is None:
-            raise self.InvalidInputException(
-                'Entity for exploration with id %s and version %s not found.'
-                % (exp_id, exp_version))
+            raise self.NotFoundException(
+                'Entity for exploration with id %s and version '
+                '%s not found.' % (exp_id, exp_version))
 
         state_name = self.normalized_request['state_name']
         num_answers = self.normalized_request['num_answers']
@@ -1826,10 +1914,10 @@ class UpdateUsernameHandler(
         """Updates the username for a user.
 
         Raises:
-            InvalidInputException. Invalid username.
-            InvalidInputException. The user does not have a profile picture
+            NotFoundException. Invalid username.
+            NotFoundException. The user does not have a profile picture
                 with png extension.
-            InvalidInputException. The user does not have a profile picture
+            NotFoundException. The user does not have a profile picture
                 with webp extension.
         """
         assert self.user_id is not None
@@ -1839,7 +1927,7 @@ class UpdateUsernameHandler(
 
         user_id = user_services.get_user_id_from_username(old_username)
         if user_id is None:
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'Invalid username: %s' % old_username)
 
         if user_services.is_username_taken(new_username):
@@ -1852,16 +1940,14 @@ class UpdateUsernameHandler(
             feconf.ENTITY_TYPE_USER, new_username)
 
         if not old_fs.isfile('profile_picture.png'):
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'The user with username %s does not have a '
-                'profile picture with png extension.' % old_username
-            )
+                'profile picture with png extension.' % old_username)
 
         if not old_fs.isfile('profile_picture.webp'):
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'The user with username %s does not have a '
-                'profile picture with webp extension.' % old_username
-            )
+                'profile picture with webp extension.' % old_username)
 
         image_png = old_fs.get('profile_picture.png')
         old_fs.delete('profile_picture.png')
@@ -1977,7 +2063,7 @@ class DeleteUserHandler(
         """Initiates the pre-deletion process for a user.
 
         Raises:
-            InvalidInputException. The username doesn't belong to any user.
+            NotFoundException. The username doesn't belong to any user.
             InvalidInputException. The user ID retrieved from the username
                 and the user ID provided by admin differ.
         """
@@ -1988,9 +2074,9 @@ class DeleteUserHandler(
         user_id_from_username = (
             user_services.get_user_id_from_username(username))
         if user_id_from_username is None:
-            raise self.InvalidInputException(
-                'The username doesn\'t belong to any user'
-            )
+            raise self.NotFoundException(
+                'The username doesn\'t belong to any user')
+
         if user_id_from_username != user_id:
             raise self.InvalidInputException(
                 'The user ID retrieved from the username and '
@@ -2048,10 +2134,10 @@ class UpdateBlogPostHandler(
         """Updates the author and published date of a blog post.
 
         Raises:
-            InvalidInputException. Invalid username.
-            InvalidInputException. User does not have enough rights to be
+            NotFoundException. Invalid username.
+            UnauthorizedUserException. User does not have enough rights to be
                 blog post author.
-            PageNotFoundException. The blog post with the given id or url
+            NotFoundException. The blog post with the given id or url
                 doesn't exist.
         """
         assert self.normalized_payload is not None
@@ -2061,21 +2147,178 @@ class UpdateBlogPostHandler(
 
         author_id = user_services.get_user_id_from_username(author_username)
         if author_id is None:
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'Invalid username: %s' % author_username)
 
         user_actions = user_services.get_user_actions_info(author_id).actions
         if role_services.ACTION_ACCESS_BLOG_DASHBOARD not in user_actions:
-            raise self.InvalidInputException(
+            raise self.UnauthorizedUserException(
                 'User does not have enough rights to be blog post author.')
 
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
         if blog_post is None:
-            raise self.PageNotFoundException(
-                Exception(
-                    'The blog post with the given id or url doesn\'t exist.'))
+            raise self.NotFoundException(
+                'The blog post with the given id or url doesn\'t exist.')
 
         blog_services.update_blog_models_author_and_published_on_date(
             blog_post_id, author_id, published_on)
         self.render_json({})
+
+
+class RegenerateTopicSummariesHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler to regenerate the summaries of all topics."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'PUT': {}
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self) -> None:
+        """Regenerates all topic summary models."""
+
+        # Fetched topics are sorted only to make the backend tests pass.
+        topics = sorted(
+            topic_fetchers.get_all_topics(),
+            key=operator.attrgetter('created_on'))
+        for topic in topics:
+            topic_services.generate_topic_summary(topic.id)
+
+        self.render_json({})
+
+
+class TranslationCoordinatorRoleHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of TranslationCoordinatorRoleHandler's
+    normalized_payload dictionary.
+    """
+
+    username: str
+    action: str
+    language_id: str
+
+
+class TranslationCoordinatorRoleHandler(
+    base.BaseHandler[
+        TranslationCoordinatorRoleHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
+    """Handler to assign or deassigning coordinator to a language."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'action': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': ['assign', 'deassign']
+                }
+            },
+            'language_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': supported_languages
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self) -> None:
+        """Adds or removes the translation-coordinator role for a user in the
+        context of a specific language.
+
+        Raises:
+            NotFoundException. User with given username does not exist.
+        """
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
+        action = self.normalized_payload['action']
+        language_id = self.normalized_payload['language_id']
+
+        user_settings = user_services.get_user_settings_from_username(username)
+
+        if user_settings is None:
+            raise self.NotFoundException(
+                'User with given username does not exist.')
+
+        user_id = user_settings.user_id
+        if action == 'assign':
+            if not feconf.ROLE_ID_TRANSLATION_COORDINATOR in (
+                user_settings.roles):
+                user_services.add_user_role(
+                    user_id, feconf.ROLE_ID_TRANSLATION_COORDINATOR)
+
+            language_coordinator = user_services.get_user_actions_info(user_id)
+
+            user_services.assign_coordinator(
+                user_services.get_system_user(),
+                language_coordinator, language_id)
+        else:
+            # The handler schema defines the possible values of 'action'.
+            # If 'action' has a value other than those defined in the schema,
+            # a Bad Request error will be thrown. Hence, 'action' must be
+            # 'deassign' if this branch is executed.
+            assert action == 'deassign'
+            language_coordinator = user_services.get_user_actions_info(user_id)
+            user_services.deassign_coordinator(
+                user_services.get_system_user(),
+                language_coordinator, language_id)
+
+        self.render_json({})
+
+
+class InteractionsByExplorationIdHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of InteractionsByExplorationIdHandler's
+    normalized_request dictionary.
+    """
+
+    exp_id: str
+
+
+class InteractionsByExplorationIdHandler(
+    base.BaseHandler[
+        InteractionsByExplorationIdHandlerNormalizedRequestDict, Dict[str, str]
+    ]
+):
+    """Handler for admin to retrive the list of interactions used in
+    an exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'exp_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def get(self) -> None:
+        assert self.normalized_request is not None
+        exploration_id = self.normalized_request['exp_id']
+
+        exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, strict=False)
+        if exploration is None:
+            raise self.NotFoundException('Exploration does not exist.')
+
+        interaction_ids = [
+            state.interaction.id
+            for state in exploration.states.values()
+            if state.interaction.id is not None
+        ]
+
+        self.render_json({'interaction_ids': interaction_ids})

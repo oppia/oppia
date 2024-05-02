@@ -23,20 +23,21 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import config_domain
+from core.domain import classroom_config_services
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
-from core.domain import story_fetchers
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.domain import translation_domain
 from core.domain import translation_services
 from core.domain import user_services
 
-from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
-
+from typing import (
+    Dict, List, Optional, OrderedDict, Sequence, Tuple,
+    TypedDict, Union)
 
 ListOfContributorDashboardStatsTypes = Sequence[Union[
     suggestion_registry.TranslationContributionStats,
@@ -133,7 +134,7 @@ class ContributionOpportunitiesHandler(
             opportunity_type: str. The opportunity type.
 
         Raises:
-            PageNotFoundException. The opportunity type is invalid.
+            NotFoundException. The opportunity type is invalid.
             InvalidInputException. The language_code is invalid.
                 This happens when the opportunity type is of type
                 constant.OPPORTUNITY_TYPE_TRANSLATION and the
@@ -156,7 +157,7 @@ class ContributionOpportunitiesHandler(
                 self._get_translation_opportunity_dicts(
                     language_code, topic_name, search_cursor))
         else:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         self.values = {
             'opportunities': (
@@ -195,9 +196,10 @@ class ContributionOpportunitiesHandler(
         """
         # We want to focus attention on lessons that are part of a classroom.
         # See issue #12221.
-        classroom_topic_ids = []
-        for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
-            classroom_topic_ids.extend(classroom_dict['topic_ids'])
+        classroom_topic_ids: List[str] = []
+        classrooms = classroom_config_services.get_all_classrooms()
+        for classroom in classrooms:
+            classroom_topic_ids.extend(classroom.get_topic_ids())
         classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
         # Associate each skill with one classroom topic name.
         # TODO(#8912): Associate each skill/skill opportunity with all linked
@@ -323,17 +325,19 @@ class ReviewableOpportunitiesHandler(
     def get(self) -> None:
         """Fetches reviewable translation suggestions."""
         assert self.normalized_request is not None
-        topic_name = self.normalized_request.get('topic_name')
+        # Default value is None, since this is a GET request handler, which
+        # means all request parameters come in as strings.
+        topic_name = self.normalized_request.get('topic_name', None)
         language = self.normalized_request.get('language_code')
         opportunity_dicts: List[
             opportunity_domain.PartialExplorationOpportunitySummaryDict
-        ] = []
+            ] = []
         if self.user_id:
-            for opp in self._get_reviewable_exploration_opportunity_summaries(
-                self.user_id, topic_name, language
+            for opp in (
+                self._get_reviewable_exploration_opportunity_summaries(
+                    self.user_id, topic_name, language)
             ):
-                if opp is not None:
-                    opportunity_dicts.append(opp.to_dict())
+                opportunity_dicts.append(opp.to_dict())
         self.values = {
             'opportunities': opportunity_dicts,
         }
@@ -341,7 +345,7 @@ class ReviewableOpportunitiesHandler(
 
     def _get_reviewable_exploration_opportunity_summaries(
         self, user_id: str, topic_name: Optional[str], language: Optional[str]
-    ) -> List[Optional[opportunity_domain.ExplorationOpportunitySummary]]:
+    ) -> List[opportunity_domain.ExplorationOpportunitySummary]:
         """Returns exploration opportunity summaries that have translation
         suggestions that are reviewable by the supplied user. The result is
         sorted in descending order by topic, story, and story node order.
@@ -349,71 +353,140 @@ class ReviewableOpportunitiesHandler(
         Args:
             user_id: str. The user ID of the user for which to filter
                 translation suggestions.
-            topic_name: str or None. A topic name for which to filter the
-                exploration opportunity summaries. If 'All' is supplied, all
-                available exploration opportunity summaries will be returned.
-            language: str. ISO 639-1 language code for which to filter the
-                exploration opportunity summaries. If it is None, all
-                available exploration opportunity summaries will be returned.
+            topic_name: str|None. A topic name for which to filter the
+                exploration opportunity summaries. If it is None, all available
+                exploration opportunity summaries will be returned, regardless
+                of the topic.
+            language: str|None. ISO 639-1 language code for which to filter the
+                exploration opportunity summaries. If it is None, all available
+                exploration opportunity summaries will be returned, regardless
+                of the language.
 
         Returns:
             list(ExplorationOpportunitySummary). A list of the matching
             exploration opportunity summaries.
-
-        Raises:
-            Exception. No exploration_id found for the node_id.
         """
-        # 1. Fetch the eligible topics.
-        # 2. Fetch the stories for the topics.
-        # 3. Get the reviewable translation suggestion target IDs for the user.
-        # 4. Get story exploration nodes in order, filtering for explorations
-        # that have in review translation suggestions.
+        # 1. Fetch the IDs of all published explorations in the topics'
+        #    published stories.
+        # 2. Fetch all suggestions that the user can review, and collect their
+        #    exploration IDs. Filter these IDs to only include published
+        #    explorations in published stories (see step 1).
+        # 3. Fetch all exploration opportunity summaries for the resulting set
+        #    of explorations.
+        # 4. Move any pinned summaries to the top.
+
+        pinned_opportunity_summary = None
         if topic_name is None:
-            topics = topic_fetchers.get_all_topics()
+            topic_exp_ids = (
+                topic_services.get_all_published_story_exploration_ids())
         else:
             topic = topic_fetchers.get_topic_by_name(topic_name)
             if topic is None:
                 raise self.InvalidInputException(
                     'The supplied input topic: %s is not valid' % topic_name)
-            topics = [topic]
-        topic_stories = story_fetchers.get_stories_by_ids(
-            [
-                reference.story_id
-                for topic in topics
-                for reference in topic.get_all_story_references()
-                if reference.story_is_published
-            ],
-            strict=True
-        )
-        topic_exp_ids = []
-        for story in topic_stories:
-            for node in story.story_contents.get_ordered_nodes():
-                if node.exploration_id is None:
-                    raise Exception(
-                        'No exploration_id found for the node_id: %s'
-                        % node.id
-                    )
-                topic_exp_ids.append(node.exploration_id)
+            topic_exp_ids = (
+                topic_services.get_all_published_story_exploration_ids(
+                    topic_id=topic.id))
+            if language and self.user_id:
+                pinned_opportunity_summary = (
+                    opportunity_services.get_pinned_lesson(
+                        self.user_id,
+                        language,
+                        topic.id
+                    ))
+
+        # TODO (#19664): Implement fetching target IDs using GAE projection
+        # queries.
         in_review_suggestions, _ = (
             suggestion_services
             .get_reviewable_translation_suggestions_by_offset(
                 user_id, topic_exp_ids, None, 0, None, language))
-        # Filter out suggestions that should not be shown to the user.
         # This is defined as a set as we only care about the unique IDs.
         in_review_suggestion_target_ids = {
-            suggestion.target_id
-            for suggestion in
-            suggestion_services.get_suggestions_with_editable_explorations(
-                in_review_suggestions)
+            suggestion.target_id for suggestion in in_review_suggestions
         }
         exp_ids = [
             exp_id
             for exp_id in topic_exp_ids
             if exp_id in in_review_suggestion_target_ids
         ]
-        return list(
+
+        exp_opp_summaries = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                exp_ids).values())
+                exp_ids
+            )
+        )
+
+        # If there is a pinned opportunity summary,
+        # add it to the list of opportunities at the top.
+        ordered_exp_opp_summaries = OrderedDict()
+        if pinned_opportunity_summary:
+            pinned_opportunity_id = pinned_opportunity_summary.id
+            exp_opp_summaries.pop(pinned_opportunity_id, None)
+            ordered_exp_opp_summaries[
+                pinned_opportunity_id] = pinned_opportunity_summary
+
+        for item in exp_opp_summaries.values():
+            if item is not None:
+                ordered_exp_opp_summaries[getattr(item, 'id', None)] = item
+        return list(ordered_exp_opp_summaries.values())
+
+
+class LessonsPinningHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of ReviewableOpportunitiesHandler's
+    normalized_request dictionary.
+    """
+
+    language_code: str
+    topic_id: str
+    opportunity_id: Optional[str]
+
+
+class LessonsPinningHandler(
+    base.BaseHandler[
+        LessonsPinningHandlerNormalizedRequestDict,
+        Dict[str, str],
+    ]
+):
+    """Handler for pinning & unpinning lessons."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'language_code': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'topic_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'opportunity_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        },
+    }
+
+    @acl_decorators.open_access
+    def put(self) -> None:
+        """Handles pinning/unpinning lessons."""
+        assert self.normalized_payload is not None
+        assert self.user_id is not None
+        topic_name = self.normalized_payload.get('topic_id')
+        language_code = self.normalized_payload.get('language_code')
+        opportunity_id = self.normalized_payload.get('opportunity_id')
+        if language_code and topic_name:
+            topic = topic_fetchers.get_topic_by_name(topic_name)
+            topic_id = topic.id
+            opportunity_services.update_pinned_opportunity_model(
+                self.user_id, language_code, topic_id, opportunity_id
+            )
+        self.render_json(self.values)
 
 
 class TranslatableTextHandlerNormalizedRequestDict(TypedDict):
@@ -579,8 +652,8 @@ class TranslatableTextHandler(
         content_id: str,
         suggestions: List[suggestion_registry.BaseSuggestion]
     ) -> bool:
-        """Returns whether a suggestion exists in suggestions with a change dict
-        matching the supplied state_name and content_id.
+        """Returns whether a suggestion exists in suggestions with a
+        change_cmd dict matching the supplied state_name and content_id.
 
         Args:
             state_name: str. Exploration state name.
@@ -588,12 +661,12 @@ class TranslatableTextHandler(
             suggestions: list(Suggestion). A list of translation suggestions.
 
         Returns:
-            bool. True if suggestion exists in suggestions with a change dict
-            matching state_name and content_id, False otherwise.
+            bool. True if suggestion exists in suggestions with a change_cmd
+            dict matching state_name and content_id, False otherwise.
         """
         return any(
-            s.change.state_name == state_name and
-            s.change.content_id == content_id for s in suggestions)
+            s.change_cmd.state_name == state_name and
+            s.change_cmd.content_id == content_id for s in suggestions)
 
 
 class MachineTranslationStateTextsHandlerNormalizedRequestDict(TypedDict):
@@ -675,7 +748,7 @@ class MachineTranslationStateTextsHandler(
         Raises:
             400 (Bad Request): InvalidInputException. At least one input is
                 missing or improperly formatted.
-            404 (Not Found): PageNotFoundException. At least one identifier does
+            404 (Not Found): NotFoundException. At least one identifier does
                 not correspond to an entry in the datastore.
         """
         assert self.normalized_request is not None
@@ -696,7 +769,7 @@ class MachineTranslationStateTextsHandler(
 
         exp = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if exp is None:
-            raise self.PageNotFoundException()
+            raise self.NotFoundException()
         state_names_to_content_id_mapping: (
             Dict[str, Dict[str, translation_domain.TranslatableContent]]
         ) = (
@@ -704,7 +777,7 @@ class MachineTranslationStateTextsHandler(
                 exp, target_language_code)
         )
         if state_name not in state_names_to_content_id_mapping:
-            raise self.PageNotFoundException()
+            raise self.NotFoundException()
         content_id_to_translatable_item_mapping = (
             state_names_to_content_id_mapping[state_name])
         translated_texts: Dict[str, Optional[str]] = {}
@@ -861,8 +934,9 @@ class TranslationPreferenceHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         language_code = self.normalized_payload['language_code']
-        user_services.update_preferred_translation_language_code(
-            self.user_id, language_code)
+        user_settings = user_services.get_user_settings(self.user_id)
+        user_settings.preferred_translation_language_code = language_code
+        user_services.save_user_settings(user_settings)
         self.render_json({})
 
 

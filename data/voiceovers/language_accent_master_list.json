@@ -1,0 +1,336 @@
+{
+    "af": {
+        "af-ZA": "Afrikaans (South Africa)"
+    },
+    "am": {
+        "am-ET": "Amharic (Ethiopia)"
+    },
+    "ar": {
+        "ar-AE": "Arabic (United Arab Emirates)",
+        "ar-BH": "Arabic (Bahrain)",
+        "ar-DZ": "Arabic (Algeria)",
+        "ar-EG": "Arabic (Egypt)",
+        "ar-IQ": "Arabic (Iraq)",
+        "ar-JO": "Arabic (Jordan)",
+        "ar-KW": "Arabic (Kuwait)",
+        "ar-LB": "Arabic (Lebanon)",
+        "ar-LY": "Arabic (Libya)",
+        "ar-MA": "Arabic (Morocco)",
+        "ar-OM": "Arabic (Oman)",
+        "ar-PS": "Arabic (Palestinian Authority)",
+        "ar-QA": "Arabic (Qatar)",
+        "ar-SA": "Arabic (Saudi Arabia)",
+        "ar-SY": "Arabic (Syria)",
+        "ar-TN": "Arabic (Tunisia)",
+        "ar-YE": "Arabic (Yemen)"
+    },
+    "az": {
+        "az-AZ": "Azerbaijani (Latin, Azerbaijan)"
+    },
+    "bg": {
+        "bg-BG": "Bulgarian (Bulgaria)"
+    },
+    "bn": {
+        "bn-IN": "Bengali (India)",
+        "bn-BD": "Bangla (Bangladesh)"
+    },
+    "bs": {
+        "bs-BA": "Bosnian (Bosnia and Herzegovina)"
+    },
+    "ca": {
+        "ca-ES": "Catalan"
+    },
+    "cs": {
+        "cs-CZ": "Czech (Czechia)"
+    },
+    "cy": {
+        "cy-GB": "Welsh (United Kingdom)"
+    },
+    "da": {
+        "da-DK": "Danish (Denmark)"
+    },
+    "de": {
+        "de-AT": "German (Austria)",
+        "de-CH": "German (Switzerland)",
+        "de-DE": "German (Germany)"
+    },
+    "el": {
+        "el-GR": "Greek (Greece)"
+    },
+    "en": {
+        "en-AU": "English (Australia)",
+        "en-CA": "English (Canada)",
+        "en-GB": "English (United Kingdom)",
+        "en-GH": "English (Ghana)",
+        "en-HK": "English (Hong Kong SAR)",
+        "en-IE": "English (Ireland)",
+        "en-IN": "English (India)",
+        "en-KE": "English (Kenya)",
+        "en-NG": "English (Nigeria)",
+        "en-NZ": "English (New Zealand)",
+        "en-PH": "English (Philippines)",
+        "en-SG": "English (Singapore)",
+        "en-TZ": "English (Tanzania)",
+        "en-US": "English (United States)",
+        "en-ZA": "English (South Africa)"
+    },
+    "es": {
+        "es-AR": "Spanish (Argentina)",
+        "es-BO": "Spanish (Bolivia)",
+        "es-CL": "Spanish (Chile)",
+        "es-CO": "Spanish (Colombia)",
+        "es-CR": "Spanish (Costa Rica)",
+        "es-CU": "Spanish (Cuba)",
+        "es-DO": "Spanish (Dominican Republic)",
+        "es-EC": "Spanish (Ecuador)",
+        "es-ES": "Spanish (Spain)",
+        "es-GQ": "Spanish (Equatorial Guinea)",
+        "es-GT": "Spanish (Guatemala)",
+        "es-HN": "Spanish (Honduras)",
+        "es-MX": "Spanish (Mexico)",
+        "es-NI": "Spanish (Nicaragua)",
+        "es-PA": "Spanish (Panama)",
+        "es-PE": "Spanish (Peru)",
+        "es-PR": "Spanish (Puerto Rico)",
+        "es-PY": "Spanish (Paraguay)",
+        "es-SV": "Spanish (El Salvador)",
+        "es-US": "Spanish (United States)",
+        "es-UY": "Spanish (Uruguay)",
+        "es-VE": "Spanish (Venezuela)"
+    },
+    "et": {
+        "et-EE": "Estonian (Estonia)"
+    },
+    "eu": {
+        "eu-ES": "Basque"
+    },
+    "fa": {
+        "fa-IR": "Persian (Iran)"
+    },
+    "fat": {
+        "fat-GH": "Fanti (Ghana)"
+    },
+    "fi": {
+        "fi-FI": "Finnish (Finland)",
+        "fil-PH": "Filipino (Philippines)"
+    },
+    "fr": {
+        "fr-BE": "French (Belgium)",
+        "fr-CA": "French (Canada)",
+        "fr-CH": "French (Switzerland)",
+        "fr-FR": "French (France)"
+    },
+    "ga": {
+        "ga-IE": "Irish (Ireland)"
+    },
+    "gl": {
+        "gl-ES": "Galician"
+    },
+    "gu": {
+        "gu-IN": "Gujarati (India)"
+    },
+    "ha": {
+        "ha-NG": "Hausa (Nigeria)"
+    },
+    "he": {
+        "he-IL": "Hebrew (Israel)"
+    },
+    "hi": {
+        "hi-IN": "Hindi (India)"
+    },
+    "hi-en": {
+        "hi-en-IN": "Hinglish (India)"
+    },
+    "hr": {
+        "hr-HR": "Croatian (Croatia)"
+    },
+    "hu": {
+        "hu-HU": "Hungarian (Hungary)"
+    },
+    "hy": {
+        "hy-AM": "Armenian (Armenia)"
+    },
+    "id": {
+        "id-ID": "Indonesian (Indonesia)"
+    },
+    "ig": {
+        "ig-NG": "Igbo (Nigeria)"
+    },
+    "is": {
+        "is-IS": "Icelandic (Iceland)"
+    },
+    "it": {
+        "it-CH": "Italian (Switzerland)",
+        "it-IT": "Italian (Italy)"
+    },
+    "ja": {
+        "ja-JP": "Japanese (Japan)"
+    },
+    "jv": {
+        "jv-ID": "Javanese (Latin, Indonesia)"
+    },
+    "ka": {
+        "ka-GE": "Georgian (Georgia)"
+    },
+    "kab": {
+        "kab-DZ": "Kabyle (Algeria)"
+    },
+    "kk": {
+        "kk-KZ": "Kazakh (Kazakhstan)"
+    },
+    "km": {
+        "km-KH": "Khmer (Cambodia)"
+    },
+    "kn": {
+        "kn-IN": "Kannada (India)"
+    },
+    "ko": {
+        "ko-KR": "Korean (Korea)"
+    },
+    "lg": {
+        "lg-UG": "Ganda (Uganda)"
+    },
+    "lo": {
+        "lo-LA": "Lao (Laos)"
+    },
+    "lt": {
+        "lt-LT": "Lithuanian (Lithuania)"
+    },
+    "lv": {
+        "lv-LV": "Latvian (Latvia)"
+    },
+    "mk": {
+        "mk-MK": "Macedonian (North Macedonia)"
+    },
+    "ml": {
+        "ml-IN": "Malayalam (India)"
+    },
+    "mn": {
+        "mn-MN": "Mongolian (Mongolia)"
+    },
+    "mr": {
+        "mr-IN": "Marathi (India)"
+    },
+    "ms": {
+        "ms-MY": "Malay (Malaysia)"
+    },
+    "mt": {
+        "mt-MT": "Maltese (Malta)"
+    },
+    "my": {
+        "my-MM": "Burmese (Myanmar)"
+    },
+    "nb": {
+        "nb-NO": "Norwegian Bokmål (Norway)"
+    },
+    "ne": {
+        "ne-NP": "Nepali (Nepal)"
+    },
+    "nl": {
+        "nl-BE": "Dutch (Belgium)",
+        "nl-NL": "Dutch (Netherlands)"
+    },
+    "no": {
+        "no-NO": "Norsk (Norway)"
+    },
+    "pa": {
+        "pa-IN": "Punjabi (India)"
+    },
+    "pcm": {
+        "pcm-NG": "Nigerian Pidgin (Nigeria)"
+    },
+    "pl": {
+        "pl-PL": "Polish (Poland)"
+    },
+    "prs": {
+        "prs-AF": "Dari (Afghanistan)"
+    },
+    "ps": {
+        "ps-AF": "Pashto (Afghanistan)"
+    },
+    "pt": {
+        "pt-BR": "Portuguese (Brazil)",
+        "pt-PT": "Portuguese (Portugal)"
+    },
+    "ro": {
+        "ro-RO": "Romanian (Romania)"
+    },
+    "ru": {
+        "ru-RU": "Russian (Russia)"
+    },
+    "si": {
+        "si-LK": "Sinhala (Sri Lanka)"
+    },
+    "sk": {
+        "sk-SK": "Slovak (Slovakia)"
+    },
+    "sl": {
+        "sl-SI": "Slovenian (Slovenia)"
+    },
+    "so": {
+        "so-SO": "Somali (Somalia)"
+    },
+    "sq": {
+        "sq-AL": "Albanian (Albania)"
+    },
+    "sr": {
+        "sr-RS": "Serbian (Cyrillic, Serbia)"
+    },
+    "sv": {
+        "sv-SE": "Swedish (Sweden)"
+    },
+    "sw": {
+        "sw-KE": "Swahili (Kenya)",
+        "sw-TZ": "Swahili (Tanzania)"
+    },
+    "ta": {
+        "ta-IN": "Tamil (India)",
+        "ta-LK": "Tamil (Sri Lanka)",
+        "ta-MY": "Tamil (Malaysia)",
+        "ta-SG": "Tamil (Singapore)"
+    },
+    "te": {
+        "te-IN": "Telugu (India)"
+    },
+    "th": {
+        "th-TH": "Thai (Thailand)"
+    },
+    "tl": {
+        "tl-PH": "Tagalog (Philippines)"
+    },
+    "tr": {
+        "tr-TR": "Turkish (Türkiye)"
+    },
+    "uk": {
+        "uk-UA": "Ukrainian (Ukraine)"
+    },
+    "ur": {
+        "ur-IN": "Urdu (India)",
+        "ur-PK": "Urdu (Pakistan)"
+    },
+    "uz": {
+        "uz-UZ": "Uzbek (Latin, Uzbekistan)"
+    },
+    "vi": {
+        "vi-VN": "Vietnamese (Vietnam)"
+    },
+    "wu": {
+        "wuu-CN": "Chinese (Wu, Simplified)"
+    },
+    "yo": {
+        "yo-NG": "Yoruba (Nigeria)"
+    },
+    "yu": {
+        "yue-CN": "Chinese (Cantonese, Simplified)"
+    },
+    "zh": {
+        "zh-CN": "Chinese (Mandarin, Simplified)",
+        "zh-CN-shandong": "Chinese (Jilu Mandarin, Simplified)",
+        "zh-CN-sichuan": "Chinese (Southwestern Mandarin, Simplified)",
+        "zh-HK": "Chinese (Cantonese, Traditional)",
+        "zh-TW": "Chinese (Taiwanese Mandarin, Traditional)"
+    },
+    "zu": {
+        "zu-ZA": "Zulu (South Africa)"
+    }
+}

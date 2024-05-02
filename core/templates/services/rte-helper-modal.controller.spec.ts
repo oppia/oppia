@@ -16,21 +16,32 @@
  * @fileoverview Unit tests for RteHelperModalController.
  */
 
-import { TestBed, ComponentFixture, waitForAsync, fakeAsync, flush } from '@angular/core/testing';
-import { RteHelperModalComponent } from './rte-helper-modal.controller';
-import { ExternalRteSaveService } from './external-rte-save.service';
-import { AlertsService } from './alerts.service';
-import { ContextService } from './context.service';
-import { ImageLocalStorageService } from './image-local-storage.service';
-import { AssetsBackendApiService } from './assets-backend-api.service';
-import { ImageUploadHelperService } from './image-upload-helper.service';
-import { SharedFormsModule } from 'components/forms/shared-forms.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { DirectivesModule } from 'directives/directives.module';
-import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter } from '@angular/core';
-import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import {
+  TestBed,
+  ComponentFixture,
+  waitForAsync,
+  fakeAsync,
+  flush,
+} from '@angular/core/testing';
+import {RteHelperModalComponent} from './rte-helper-modal.controller';
+import {ExternalRteSaveService} from './external-rte-save.service';
+import {AlertsService} from './alerts.service';
+import {ContextService} from './context.service';
+import {ImageLocalStorageService} from './image-local-storage.service';
+import {AssetsBackendApiService} from './assets-backend-api.service';
+import {ImageUploadHelperService} from './image-upload-helper.service';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {DirectivesModule} from 'directives/directives.module';
+import {NgbActiveModal, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {EventEmitter} from '@angular/core';
+import {
+  TranslateFakeLoader,
+  TranslateLoader,
+  TranslateModule,
+  TranslateService,
+} from '@ngx-translate/core';
 
 describe('RteHelperModalComponent', () => {
   let component: RteHelperModalComponent;
@@ -51,9 +62,9 @@ describe('RteHelperModalComponent', () => {
         TranslateModule.forRoot({
           loader: {
             provide: TranslateLoader,
-            useClass: TranslateFakeLoader
-          }
-        })
+            useClass: TranslateFakeLoader,
+          },
+        }),
       ],
       declarations: [RteHelperModalComponent],
       providers: [
@@ -64,13 +75,13 @@ describe('RteHelperModalComponent', () => {
         ImageUploadHelperService,
         {
           provide: NgbActiveModal,
-          useValue: jasmine.createSpyObj('activeModal', ['close', 'dismiss'])
+          useValue: jasmine.createSpyObj('activeModal', ['close', 'dismiss']),
         },
         {
           provide: ExternalRteSaveService,
-          useValue: { onExternalRteSave: mockExternalRteSaveEventEmitter }
+          useValue: {onExternalRteSave: mockExternalRteSaveEventEmitter},
         },
-        TranslateService
+        TranslateService,
       ],
     }).compileComponents();
   }));
@@ -82,21 +93,24 @@ describe('RteHelperModalComponent', () => {
     activeModal = TestBed.inject(NgbActiveModal);
   });
 
-  describe('when customization args has a valid youtube video', function() {
-    var customizationArgSpecs = [{
-      name: 'heading',
-      default_value: 'default value'
-    }, {
-      name: 'video_id',
-      default_value: 'https://www.youtube.com/watch?v=Ntcw0H0hwPU'
-    }];
-
+  describe('when customization args has a valid youtube video', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'heading',
+        default_value: 'default value',
+      },
+      {
+        name: 'video_id',
+        default_value: 'https://www.youtube.com/watch?v=Ntcw0H0hwPU',
+      },
+    ];
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
+      component.componentId = 'video';
       component.attrsCustomizationArgsDict = {
-        heading: 'This value is not default.'
+        heading: 'This value is not default.',
       };
       component.customizationArgSpecs = customizationArgSpecs;
     });
@@ -110,6 +124,8 @@ describe('RteHelperModalComponent', () => {
     }));
 
     it('should close modal when clicking on cancel button', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
       component.cancel();
       expect(activeModal.dismiss).toHaveBeenCalledWith(false);
     }));
@@ -119,34 +135,42 @@ describe('RteHelperModalComponent', () => {
       spyOn(contextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
-      expect(component.disableSaveButtonForMathRte()).toBe(false);
+      component.onCustomizationArgsFormChange(
+        component.attrsCustomizationArgsDict.heading
+      );
+      expect(component.isErrorMessageNonempty()).toBe(false);
       component.save();
       flush();
       expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
       expect(activeModal.close).toHaveBeenCalledWith({
         heading: 'This value is not default.',
-        video_id: 'Ntcw0H0hwPU'
+        video_id: 'Ntcw0H0hwPU',
       });
     }));
   });
-  describe('when there are validation errors in any form control', function() {
-    var customizationArgSpecs = [{
-      name: 'alt',
-      default_value: 'def',
-      schema: {
-        type: 'unicode',
-        validators: [{
-          id: 'has_length_at_least',
-          min_value: 5
-        }]
-      }
-    }];
+
+  describe('when there are validation errors in any form control', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'alt',
+        default_value: 'def',
+        schema: {
+          type: 'unicode',
+          validators: [
+            {
+              id: 'has_length_at_least',
+              min_value: 5,
+            },
+          ],
+        },
+      },
+    ];
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
       component.attrsCustomizationArgsDict = {
-        heading: 'This value is not default.'
+        heading: 'This value is not default.',
       };
       component.customizationArgSpecs = customizationArgSpecs;
     });
@@ -155,6 +179,134 @@ describe('RteHelperModalComponent', () => {
       component.ngOnInit();
       flush();
       fixture.detectChanges();
+      flush();
+    }));
+  });
+
+  describe('when there are validation errors in link form control', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'url',
+        default_value: 'oppia.org',
+      },
+      {
+        name: 'text',
+        default_value: 'oppia',
+      },
+    ];
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(RteHelperModalComponent);
+      component = fixture.componentInstance;
+      (component.componentId = 'link'),
+        (component.attrsCustomizationArgsDict = {
+          url: 'oppia.org',
+          text: 'oppia',
+        });
+      component.customizationArgSpecs = customizationArgSpecs;
+    });
+
+    it('should disable save button and display error message', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = 'oppia.org';
+      component.customizationArgsForm.value[1] = 'oppia.com';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      expect(component.errorMessage).toBe(
+        'It seems like clicking on this link will lead the user to a ' +
+          'different URL than the text specifies. Please change the text.'
+      );
+      flush();
+    }));
+  });
+
+  describe('when the text is empty in link form control', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'url',
+        default_value: 'oppia.org',
+      },
+      {
+        name: 'text',
+        default_value: ' ',
+      },
+    ];
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(RteHelperModalComponent);
+      component = fixture.componentInstance;
+      (component.componentId = 'link'),
+        (component.attrsCustomizationArgsDict = {
+          url: 'oppia.org',
+          text: ' ',
+        });
+      component.customizationArgSpecs = customizationArgSpecs;
+    });
+
+    it('should make the text equal to url when text is empty', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = 'oppia.org';
+      component.customizationArgsForm.value[1] = '';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(false);
+      expect(component.customizationArgsForm.value[1]).toBe('oppia.org');
+      flush();
+    }));
+  });
+
+  describe('when there are validation errors in video form control', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'video_id',
+        default_value: 'https://www.youtube.com/watch?v=Ntcw0H0hwPU',
+      },
+      {
+        name: 'start',
+        default_value: 0,
+      },
+      {
+        name: 'end',
+        default_value: 0,
+      },
+      {
+        name: 'autoplay',
+        default_value: false,
+      },
+    ];
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(RteHelperModalComponent);
+      component = fixture.componentInstance;
+      (component.componentId = 'video'),
+        (component.attrsCustomizationArgsDict = {
+          video_id: 'Ntcw0H0hwPU',
+          start: 0,
+          end: 0,
+          autoplay: false,
+        });
+      component.customizationArgSpecs = customizationArgSpecs;
+    });
+
+    it('should disable save button and display error message', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+
+      component.customizationArgsForm.value[1] = 10;
+      component.customizationArgsForm.value[2] = 0;
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      expect(component.errorMessage).toBe(
+        'Please ensure that the start time of the video is earlier than ' +
+          'the end time.'
+      );
       flush();
     }));
   });

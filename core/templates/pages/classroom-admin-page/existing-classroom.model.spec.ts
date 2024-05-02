@@ -16,17 +16,15 @@
  * @fileoverview Tests for existing classroom model.
  */
 
-
-import { TestBed } from '@angular/core/testing';
-import { ExistingClassroomData } from './existing-classroom.model';
-
+import {TestBed} from '@angular/core/testing';
+import {ExistingClassroomData} from './existing-classroom.model';
 
 describe('Classroom admin model', () => {
   let existingClassroomData: ExistingClassroomData;
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
-      providers: []
+      providers: [],
     });
 
     existingClassroomData = new ExistingClassroomData(
@@ -41,22 +39,26 @@ describe('Classroom admin model', () => {
 
   it('should be able to get and set course details', () => {
     expect(existingClassroomData.getCourseDetails()).toEqual(
-      'Curated math foundations course.');
+      'Curated math foundations course.'
+    );
 
     existingClassroomData.setCourseDetails('Test data for course details.');
 
     expect(existingClassroomData.getCourseDetails()).toEqual(
-      'Test data for course details.');
+      'Test data for course details.'
+    );
   });
 
   it('should be able to get and set topic list intro', () => {
     expect(existingClassroomData.getTopicListIntro()).toEqual(
-      'Start from the basics with our first topic.');
+      'Start from the basics with our first topic.'
+    );
 
     existingClassroomData.setTopicListIntro('Test data for topic list intro.');
 
     expect(existingClassroomData.getTopicListIntro()).toEqual(
-      'Test data for topic list intro.');
+      'Test data for topic list intro.'
+    );
   });
 
   it('should be able to get and set topic dependency', () => {
@@ -65,14 +67,16 @@ describe('Classroom admin model', () => {
     const sampleTopicIdToprerequisiteTopicIds = {
       topic1: [],
       topic2: ['topic1'],
-      topic3: ['topic2']
+      topic3: ['topic2'],
     };
 
     existingClassroomData.setTopicIdToPrerequisiteTopicId(
-      sampleTopicIdToprerequisiteTopicIds);
+      sampleTopicIdToprerequisiteTopicIds
+    );
 
     expect(existingClassroomData.getTopicIdToPrerequisiteTopicId()).toEqual(
-      sampleTopicIdToprerequisiteTopicIds);
+      sampleTopicIdToprerequisiteTopicIds
+    );
   });
 
   it('should be able to create existing classroom model from dict', () => {
@@ -84,12 +88,12 @@ describe('Classroom admin model', () => {
       topicListIntro: 'Test topic intro',
       topicIdToPrerequisiteTopicIds: {
         topic1: [],
-        topic2: ['topic1']
-      }
+        topic2: ['topic1'],
+      },
     };
 
-    let classroom: ExistingClassroomData = (
-      ExistingClassroomData.createClassroomFromDict(classroomDict));
+    let classroom: ExistingClassroomData =
+      ExistingClassroomData.createClassroomFromDict(classroomDict);
 
     expect(classroom.getClassroomId()).toEqual('pysicsClassroomId');
     expect(classroom.getClassroomName()).toEqual('physics');
@@ -98,7 +102,7 @@ describe('Classroom admin model', () => {
     expect(classroom.getTopicListIntro()).toEqual('Test topic intro');
     expect(classroom.getTopicIdToPrerequisiteTopicId()).toEqual({
       topic1: [],
-      topic2: ['topic1']
+      topic2: ['topic1'],
     });
   });
 
@@ -109,18 +113,19 @@ describe('Classroom admin model', () => {
       urlFragment: 'math',
       courseDetails: 'Curated math foundations course.',
       topicListIntro: 'Start from the basics with our first topic.',
-      topicIdToPrerequisiteTopicIds: {}
+      topicIdToPrerequisiteTopicIds: {},
     };
 
     expect(existingClassroomData.getClassroomDict()).toEqual(
-      expectedClassroomDict);
+      expectedClassroomDict
+    );
   });
 
   it('should not present error for valid dependency graph', () => {
     existingClassroomData.setTopicIdToPrerequisiteTopicId({
       topic_id_1: ['topic_id_2', 'topic_id_3'],
       topic_id_2: [],
-      topic_id_3: ['topic_id_2']
+      topic_id_3: ['topic_id_2'],
     });
 
     expect(existingClassroomData.validateDependencyGraph()).toEqual('');
@@ -128,7 +133,7 @@ describe('Classroom admin model', () => {
     existingClassroomData.setTopicIdToPrerequisiteTopicId({
       topic_id_1: [],
       topic_id_2: ['topic_id_1'],
-      topic_id_3: ['topic_id_2']
+      topic_id_3: ['topic_id_2'],
     });
 
     expect(existingClassroomData.validateDependencyGraph()).toEqual('');
@@ -136,7 +141,7 @@ describe('Classroom admin model', () => {
     existingClassroomData.setTopicIdToPrerequisiteTopicId({
       topic_id_1: [],
       topic_id_2: ['topic_id_1'],
-      topic_id_3: ['topic_id_2', 'topic_id_1']
+      topic_id_3: ['topic_id_2', 'topic_id_1'],
     });
 
     expect(existingClassroomData.validateDependencyGraph()).toEqual('');
@@ -146,15 +151,18 @@ describe('Classroom admin model', () => {
     existingClassroomData.setTopicIdToPrerequisiteTopicId({
       topic_id_1: ['topic_id_3'],
       topic_id_2: ['topic_id_1'],
-      topic_id_3: ['topic_id_2']
+      topic_id_3: ['topic_id_2'],
     });
     existingClassroomData.setTopicIdToTopicName({
       topic_id_1: 'Topic1',
       topic_id_2: 'Topic2',
-      topic_id_3: 'Topic3'
+      topic_id_3: 'Topic3',
     });
-    const errorMsg = existingClassroomData.generateGraphErrorMsg(
-      ['Topic2', 'Topic3', 'Topic1']);
+    const errorMsg = existingClassroomData.generateGraphErrorMsg([
+      'Topic2',
+      'Topic3',
+      'Topic1',
+    ]);
 
     expect(existingClassroomData.validateDependencyGraph()).toEqual(errorMsg);
   });
@@ -163,10 +171,11 @@ describe('Classroom admin model', () => {
     existingClassroomData.setTopicIdToPrerequisiteTopicId({
       topic_id_1: ['topic_id_2', 'topic_id_3'],
       topic_id_2: [],
-      topic_id_3: ['topic_id_2']
+      topic_id_3: ['topic_id_2'],
     });
 
     expect(existingClassroomData.getPrerequisiteTopicIds('topic_id_1')).toEqual(
-      ['topic_id_2', 'topic_id_3']);
+      ['topic_id_2', 'topic_id_3']
+    );
   });
 });

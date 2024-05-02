@@ -78,6 +78,20 @@
 </mat-card>
 
 <mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Regenerate topic summaries:</h3>
+  <p>
+    Creates new topic summaries to replace the old topic summaries with.
+  </p>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="regenerateTopicSummaries()">
+      <div class="form-group row">
+        <input type="submit" value="Regenerate">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Rollback exploration to latest known safe state:</h3>
   <em>
     Here, a "safe state" refers to the latest version of the exploration for
@@ -264,6 +278,31 @@
         <input type="submit" value="Revoke">
       </div>
     </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Lookup exploration interactions</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="retrieveExplorationInteractionIds()">
+      <div class="form-group row">
+        <label>Exploration ID:</label>
+        <input type="text"
+               [(ngModel)]="expIdToGetInteractionIdsFor"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Get">
+      </div>
+    </form>
+  </div>
+
+  <div>
+    <p *ngIf="explorationInteractionIds.length > 0">Interaction IDs:</p>
+    <ul>
+      <li *ngFor="let interactionId of explorationInteractionIds" [innerHTML]="interactionId"></li>
+    </ul>
   </div>
 </mat-card>
 

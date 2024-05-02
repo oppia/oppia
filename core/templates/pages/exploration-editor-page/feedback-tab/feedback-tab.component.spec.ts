@@ -16,23 +16,28 @@
  * @fileoverview Unit tests for feedbackTab.
  */
 
-import { ComponentFixture, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { FormsModule } from '@angular/forms';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { AlertsService } from 'services/alerts.service';
-import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { UserService } from 'services/user.service';
-import { ChangeListService } from '../services/change-list.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExplorationStatesService } from '../services/exploration-states.service';
-import { ThreadDataBackendApiService } from './services/thread-data-backend-api.service';
-import { FeedbackTabComponent } from './feedback-tab.component';
-import { UserInfo } from 'domain/user/user-info.model';
-import { FeedbackThread } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import {
+  ComponentFixture,
+  fakeAsync,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TestBed} from '@angular/core/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {FormsModule} from '@angular/forms';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {AlertsService} from 'services/alerts.service';
+import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import {UserService} from 'services/user.service';
+import {ChangeListService} from '../services/change-list.service';
+import {EditabilityService} from 'services/editability.service';
+import {ExplorationStatesService} from '../services/exploration-states.service';
+import {ThreadDataBackendApiService} from './services/thread-data-backend-api.service';
+import {FeedbackTabComponent} from './feedback-tab.component';
+import {UserInfo} from 'domain/user/user-info.model';
+import {FeedbackThread} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 
 describe('Feedback Tab Component', () => {
   let component: FeedbackTabComponent;
@@ -49,34 +54,28 @@ describe('Feedback Tab Component', () => {
   class MockNgbModal {
     open() {
       return {
-        result: Promise.resolve()
+        result: Promise.resolve(),
       };
     }
   }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        FormsModule,
-      ],
-      declarations: [
-        FeedbackTabComponent
-      ],
+      imports: [HttpClientTestingModule, FormsModule],
+      declarations: [FeedbackTabComponent],
       providers: [
         ChangeListService,
         {
           provide: NgbModal,
-          useClass: MockNgbModal
-        }
+          useClass: MockNgbModal,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(
-      FeedbackTabComponent);
+    fixture = TestBed.createComponent(FeedbackTabComponent);
     component = fixture.componentInstance;
 
     alertsService = TestBed.inject(AlertsService);
@@ -85,17 +84,18 @@ describe('Feedback Tab Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     editabilityService = TestBed.inject(EditabilityService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
-    threadDataBackendApiService = (
-      TestBed.inject(ThreadDataBackendApiService));
+    threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
     userService = TestBed.inject(UserService);
 
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve({
-      isLoggedIn: () => true
-    } as UserInfo));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve({
+        isLoggedIn: () => true,
+      } as UserInfo)
+    );
     spyOn(
       threadDataBackendApiService,
-      'getFeedbackThreadsAsync').and.returnValue(Promise.resolve(
-         {} as FeedbackThread[]));
+      'getFeedbackThreadsAsync'
+    ).and.returnValue(Promise.resolve({} as FeedbackThread[]));
 
     component.ngOnInit();
   });
@@ -104,98 +104,33 @@ describe('Feedback Tab Component', () => {
     component.ngOnDestroy();
   });
 
-  it('should get threads after feedback threads are available',
-    fakeAsync(() => {
-      let onFeedbackThreadsInitializedEmitter = new EventEmitter();
-      spyOnProperty(
-        threadDataBackendApiService, 'onFeedbackThreadsInitialized')
-        .and.returnValue(onFeedbackThreadsInitializedEmitter);
-      spyOn(threadDataBackendApiService, 'getThread').and.stub();
-      spyOn(component, 'fetchUpdatedThreads');
+  it('should get threads after feedback threads are available', fakeAsync(() => {
+    let onFeedbackThreadsInitializedEmitter = new EventEmitter();
+    spyOnProperty(
+      threadDataBackendApiService,
+      'onFeedbackThreadsInitialized'
+    ).and.returnValue(onFeedbackThreadsInitializedEmitter);
+    spyOn(threadDataBackendApiService, 'getThread').and.stub();
+    spyOn(component, 'fetchUpdatedThreads');
 
-      component.ngOnInit();
-      tick();
-
-      onFeedbackThreadsInitializedEmitter.emit();
-
-      expect(component.fetchUpdatedThreads).toHaveBeenCalled();
-    }));
-
-  it('should throw an error when trying to active a non-existent thread',
-    () => {
-      expect(() => {
-        component.setActiveThread('0');
-      }).toThrowError('Trying to display a non-existent thread');
-    });
-
-  it('should set active thread when it exists', fakeAsync(() => {
-    let thread = SuggestionThread.createFromBackendDicts({
-      status: 'review',
-      subject: '',
-      summary: '',
-      original_author_username: 'Username1',
-      last_updated_msecs: 0,
-      message_count: 1,
-      thread_id: '1',
-      state_name: '',
-      last_nonempty_message_author: '',
-      last_nonempty_message_text: ''
-    }, {
-      suggestion_type: 'edit_exploration_state_content',
-      suggestion_id: '1',
-      target_type: '',
-      target_id: '',
-      status: '',
-      author_name: '',
-      change: {
-        state_name: '',
-        new_value: {html: ''},
-        old_value: {html: ''},
-        skill_id: '',
-      },
-      last_updated_msecs: 0
-    });
-    spyOn(threadDataBackendApiService, 'getThread').and.returnValue(thread);
-    spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-      Promise.resolve(null));
-
-    component.setActiveThread('1');
+    component.ngOnInit();
     tick();
 
-    expect(component.activeThread).toEqual(thread);
-    expect(component.feedbackMessage.status).toBe('review');
+    onFeedbackThreadsInitializedEmitter.emit();
+
+    expect(component.fetchUpdatedThreads).toHaveBeenCalled();
   }));
 
-  it('should add warning when trying to add a message in a thread with id' +
-     ' null', () => {
-    let addWarningSpy = spyOn(alertsService, 'addWarning').and.callThrough();
-    component.addNewMessage(null, 'Text', 'Open');
-    expect(addWarningSpy).toHaveBeenCalledWith(
-      'Cannot add message to thread with ID: null.');
+  it('should throw an error when trying to active a non-existent thread', () => {
+    expect(() => {
+      component.setActiveThread('0');
+    }).toThrowError('Trying to display a non-existent thread');
   });
 
-  it('should add warning when trying to add a invalid message in a thread',
-    () => {
-      let addWarningSpy = spyOn(alertsService, 'addWarning').and.callThrough();
-      component.addNewMessage('0', 'Text', null);
-      expect(addWarningSpy).toHaveBeenCalledWith(
-        'Invalid message status: null');
-    });
-
-  it('should throw error when trying to add a message in an invalid thread',
-    () => {
-      expect(() => {
-        component.addNewMessage('0', 'Text', 'Open');
-      }).toThrowError('Trying to add message to a non-existent thread.');
-      expect(component.threadIsStale).toBe(true);
-      expect(component.messageSendingInProgress).toBe(true);
-    });
-
-  it('should add new message to a thread and then go back to feedback' +
-     ' threads list', fakeAsync(() => {
-    spyOn(threadDataBackendApiService, 'getThread').and.returnValue(
-      SuggestionThread.createFromBackendDicts({
-        status: 'Open',
+  it('should set active thread when it exists', fakeAsync(() => {
+    let thread = SuggestionThread.createFromBackendDicts(
+      {
+        status: 'review',
         subject: '',
         summary: '',
         original_author_username: 'Username1',
@@ -204,49 +139,127 @@ describe('Feedback Tab Component', () => {
         thread_id: '1',
         state_name: '',
         last_nonempty_message_author: '',
-        last_nonempty_message_text: ''
-      }, {
+        last_nonempty_message_text: '',
+      },
+      {
         suggestion_type: 'edit_exploration_state_content',
         suggestion_id: '1',
         target_type: '',
         target_id: '',
         status: '',
         author_name: '',
-        change: {
+        change_cmd: {
           state_name: '',
           new_value: {html: ''},
           old_value: {html: ''},
           skill_id: '',
         },
-        last_updated_msecs: 0
-      }));
+        last_updated_msecs: 0,
+      }
+    );
+    spyOn(threadDataBackendApiService, 'getThread').and.returnValue(thread);
     spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-      Promise.resolve(null));
+      Promise.resolve(null)
+    );
 
     component.setActiveThread('1');
     tick();
 
-    spyOn(threadDataBackendApiService, 'addNewMessageAsync').and.returnValue(
-      Promise.resolve(null));
-
-    component.addNewMessage('1', 'Text', 'Open');
-    tick();
-
-    expect(component.messageSendingInProgress).toBe(false);
-    expect(component.messageSendingInProgress).toBe(false);
-    expect(component.feedbackMessage.status).toBe('Open');
-    expect(component.feedbackMessage.text).toBe('');
-
-    component.onBackButtonClicked();
-    tick();
-
-    expect(threadDataBackendApiService.getThread).toHaveBeenCalledWith('1');
+    expect(component.activeThread).toEqual(thread);
+    expect(component.feedbackMessage.status).toBe('review');
   }));
 
-  it('should use reject handler when trying to add a message in a thread fails',
+  it(
+    'should add warning when trying to add a message in a thread with id' +
+      ' null',
+    () => {
+      let addWarningSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+      component.addNewMessage(null, 'Text', 'Open');
+      expect(addWarningSpy).toHaveBeenCalledWith(
+        'Cannot add message to thread with ID: null.'
+      );
+    }
+  );
+
+  it('should add warning when trying to add a invalid message in a thread', () => {
+    let addWarningSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+    component.addNewMessage('0', 'Text', null);
+    expect(addWarningSpy).toHaveBeenCalledWith('Invalid message status: null');
+  });
+
+  it('should throw error when trying to add a message in an invalid thread', () => {
+    expect(() => {
+      component.addNewMessage('0', 'Text', 'Open');
+    }).toThrowError('Trying to add message to a non-existent thread.');
+    expect(component.threadIsStale).toBe(true);
+    expect(component.messageSendingInProgress).toBe(true);
+  });
+
+  it(
+    'should add new message to a thread and then go back to feedback' +
+      ' threads list',
     fakeAsync(() => {
       spyOn(threadDataBackendApiService, 'getThread').and.returnValue(
-        SuggestionThread.createFromBackendDicts({
+        SuggestionThread.createFromBackendDicts(
+          {
+            status: 'Open',
+            subject: '',
+            summary: '',
+            original_author_username: 'Username1',
+            last_updated_msecs: 0,
+            message_count: 1,
+            thread_id: '1',
+            state_name: '',
+            last_nonempty_message_author: '',
+            last_nonempty_message_text: '',
+          },
+          {
+            suggestion_type: 'edit_exploration_state_content',
+            suggestion_id: '1',
+            target_type: '',
+            target_id: '',
+            status: '',
+            author_name: '',
+            change_cmd: {
+              state_name: '',
+              new_value: {html: ''},
+              old_value: {html: ''},
+              skill_id: '',
+            },
+            last_updated_msecs: 0,
+          }
+        )
+      );
+      spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
+        Promise.resolve(null)
+      );
+
+      component.setActiveThread('1');
+      tick();
+
+      spyOn(threadDataBackendApiService, 'addNewMessageAsync').and.returnValue(
+        Promise.resolve(null)
+      );
+
+      component.addNewMessage('1', 'Text', 'Open');
+      tick();
+
+      expect(component.messageSendingInProgress).toBe(false);
+      expect(component.messageSendingInProgress).toBe(false);
+      expect(component.feedbackMessage.status).toBe('Open');
+      expect(component.feedbackMessage.text).toBe('');
+
+      component.onBackButtonClicked();
+      tick();
+
+      expect(threadDataBackendApiService.getThread).toHaveBeenCalledWith('1');
+    })
+  );
+
+  it('should use reject handler when trying to add a message in a thread fails', fakeAsync(() => {
+    spyOn(threadDataBackendApiService, 'getThread').and.returnValue(
+      SuggestionThread.createFromBackendDicts(
+        {
           status: 'Open',
           subject: '',
           summary: '',
@@ -256,191 +269,213 @@ describe('Feedback Tab Component', () => {
           thread_id: '1',
           state_name: '',
           last_nonempty_message_author: '',
-          last_nonempty_message_text: ''
-        }, {
+          last_nonempty_message_text: '',
+        },
+        {
           suggestion_type: 'edit_exploration_state_content',
           suggestion_id: '1',
           target_type: '',
           target_id: '',
           status: '',
           author_name: '',
-          change: {
+          change_cmd: {
             state_name: '',
             new_value: {html: ''},
             old_value: {html: ''},
             skill_id: '',
           },
-          last_updated_msecs: 0
-        }));
+          last_updated_msecs: 0,
+        }
+      )
+    );
+    spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
+      Promise.resolve(null)
+    );
+
+    component.setActiveThread('1');
+    tick();
+
+    spyOn(threadDataBackendApiService, 'addNewMessageAsync').and.returnValue(
+      Promise.reject()
+    );
+
+    component.addNewMessage('1', 'Text', 'Open');
+    tick();
+
+    expect(component.messageSendingInProgress).toBe(false);
+  }));
+
+  it(
+    'should evaluate suggestion button type to be default when a feedback' +
+      ' thread is selected',
+    () => {
+      let thread = SuggestionThread.createFromBackendDicts(
+        {
+          status: 'open',
+          subject: '',
+          summary: '',
+          original_author_username: 'Username1',
+          last_updated_msecs: 0,
+          message_count: 1,
+          thread_id: '1',
+          state_name: '',
+          last_nonempty_message_author: '',
+          last_nonempty_message_text: '',
+        },
+        {
+          suggestion_type: 'edit_exploration_state_content',
+          suggestion_id: '1',
+          target_type: '',
+          target_id: '',
+          status: 'open',
+          author_name: '',
+          change_cmd: {
+            state_name: '',
+            new_value: {html: ''},
+            old_value: {html: ''},
+            skill_id: '',
+          },
+          last_updated_msecs: 0,
+        }
+      );
+      spyOn(threadDataBackendApiService, 'getThread').and.returnValue(thread);
       spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-        Promise.resolve(null));
+        Promise.resolve(null)
+      );
+
+      component.setActiveThread('1');
+
+      expect(component.getSuggestionButtonType()).toBe('default');
+    }
+  );
+
+  it(
+    'should evaluate suggestion button type to be primary when a feedback' +
+      ' thread is selected',
+    fakeAsync(() => {
+      let thread = SuggestionThread.createFromBackendDicts(
+        {
+          status: 'review',
+          subject: '',
+          summary: '',
+          original_author_username: 'Username1',
+          last_updated_msecs: 0,
+          message_count: 1,
+          thread_id: '1',
+          state_name: '',
+          last_nonempty_message_author: '',
+          last_nonempty_message_text: '',
+        },
+        {
+          suggestion_type: 'edit_exploration_state_content',
+          suggestion_id: '1',
+          target_type: '',
+          target_id: '',
+          status: 'review',
+          author_name: '',
+          change_cmd: {
+            state_name: '',
+            new_value: {html: ''},
+            old_value: {html: ''},
+            skill_id: '',
+          },
+          last_updated_msecs: 0,
+        }
+      );
+      spyOn(threadDataBackendApiService, 'getThread').and.returnValue(thread);
+      spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
+        Promise.resolve(null)
+      );
 
       component.setActiveThread('1');
       tick();
 
-      spyOn(threadDataBackendApiService, 'addNewMessageAsync').and.returnValue(
-        Promise.reject());
+      spyOn(explorationStatesService, 'hasState').and.returnValue(true);
+      spyOn(changeListService, 'getChangeList').and.returnValue([]);
 
-      component.addNewMessage('1', 'Text', 'Open');
-      tick();
-
-      expect(component.messageSendingInProgress).toBe(false);
-    }));
-
-  it('should evaluate suggestion button type to be default when a feedback' +
-     ' thread is selected', () => {
-    let thread = SuggestionThread.createFromBackendDicts({
-      status: 'open',
-      subject: '',
-      summary: '',
-      original_author_username: 'Username1',
-      last_updated_msecs: 0,
-      message_count: 1,
-      thread_id: '1',
-      state_name: '',
-      last_nonempty_message_author: '',
-      last_nonempty_message_text: ''
-    }, {
-      suggestion_type: 'edit_exploration_state_content',
-      suggestion_id: '1',
-      target_type: '',
-      target_id: '',
-      status: 'open',
-      author_name: '',
-      change: {
-        state_name: '',
-        new_value: {html: ''},
-        old_value: {html: ''},
-        skill_id: '',
-      },
-      last_updated_msecs: 0
-    });
-    spyOn(threadDataBackendApiService, 'getThread').and.returnValue(thread);
-    spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-      Promise.resolve(null));
-
-    component.setActiveThread('1');
-
-    expect(component.getSuggestionButtonType()).toBe('default');
-  });
-
-  it('should evaluate suggestion button type to be primary when a feedback' +
-     ' thread is selected', fakeAsync(() => {
-    let thread = SuggestionThread.createFromBackendDicts({
-      status: 'review',
-      subject: '',
-      summary: '',
-      original_author_username: 'Username1',
-      last_updated_msecs: 0,
-      message_count: 1,
-      thread_id: '1',
-      state_name: '',
-      last_nonempty_message_author: '',
-      last_nonempty_message_text: ''
-    }, {
-      suggestion_type: 'edit_exploration_state_content',
-      suggestion_id: '1',
-      target_type: '',
-      target_id: '',
-      status: 'review',
-      author_name: '',
-      change: {
-        state_name: '',
-        new_value: {html: ''},
-        old_value: {html: ''},
-        skill_id: '',
-      },
-      last_updated_msecs: 0
-    });
-    spyOn(threadDataBackendApiService, 'getThread').and.returnValue(thread);
-    spyOn(threadDataBackendApiService, 'getMessagesAsync').and.returnValue(
-      Promise.resolve(null));
-
-    component.setActiveThread('1');
-    tick();
-
-    spyOn(explorationStatesService, 'hasState').and.returnValue(true);
-    spyOn(changeListService, 'getChangeList').and.returnValue([]);
-
-    expect(component.getSuggestionButtonType()).toBe('primary');
-  }));
+      expect(component.getSuggestionButtonType()).toBe('primary');
+    })
+  );
 
   it('should call fetchUpdatedThreads', fakeAsync(() => {
-    component.activeThread = SuggestionThread.createFromBackendDicts({
-      status: 'review',
-      subject: '',
-      summary: '',
-      original_author_username: 'Username1',
-      last_updated_msecs: 0,
-      message_count: 1,
-      thread_id: '1',
-      state_name: '',
-      last_nonempty_message_author: '',
-      last_nonempty_message_text: ''
-    }, {
-      suggestion_type: 'edit_exploration_state_content',
-      suggestion_id: '1',
-      target_type: '',
-      target_id: '2',
-      status: '',
-      author_name: '',
-      change: {
+    component.activeThread = SuggestionThread.createFromBackendDicts(
+      {
+        status: 'review',
+        subject: '',
+        summary: '',
+        original_author_username: 'Username1',
+        last_updated_msecs: 0,
+        message_count: 1,
+        thread_id: '1',
         state_name: '',
-        new_value: {html: ''},
-        old_value: {html: ''},
-        skill_id: '',
+        last_nonempty_message_author: '',
+        last_nonempty_message_text: '',
       },
-      last_updated_msecs: 0
-    });
+      {
+        suggestion_type: 'edit_exploration_state_content',
+        suggestion_id: '1',
+        target_type: '',
+        target_id: '2',
+        status: '',
+        author_name: '',
+        change_cmd: {
+          state_name: '',
+          new_value: {html: ''},
+          old_value: {html: ''},
+          skill_id: '',
+        },
+        last_updated_msecs: 0,
+      }
+    );
 
-    spyOn(threadDataBackendApiService, 'getThread')
-      .and.returnValue(null);
-    component.fetchUpdatedThreads().then(()=> {});
+    spyOn(threadDataBackendApiService, 'getThread').and.returnValue(null);
+    component.fetchUpdatedThreads().then(() => {});
     tick();
 
-    expect(threadDataBackendApiService.getThread)
-      .toHaveBeenCalled();
+    expect(threadDataBackendApiService.getThread).toHaveBeenCalled();
   }));
 
-  it('should create a new thread when closing create new thread modal',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return ({
-          result: Promise.resolve({
-            newThreadSubject: 'New subject',
-            newThreadText: 'New text'
-          })
-        } as NgbModalRef);
-      });
-      spyOn(alertsService, 'addSuccessMessage').and.callThrough();
-      spyOn(threadDataBackendApiService, 'createNewThreadAsync').and.
-        returnValue(Promise.resolve());
-
-      component.showCreateThreadModal();
-      tick();
-      tick();
-
-      expect(threadDataBackendApiService.createNewThreadAsync)
-        .toHaveBeenCalledWith('New subject', 'New text');
-      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'Feedback thread created.');
-      expect(component.feedbackMessage.status).toBe(null);
-      expect(component.feedbackMessage.text).toBe('');
-    }));
-
-  it('should not create a new thread when dismissing create new thread modal',
-    () => {
-      spyOn(threadDataBackendApiService, 'createNewThreadAsync');
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return ({
-          result: Promise.reject()
-        } as NgbModalRef);
-      });
-      component.showCreateThreadModal();
-
-      expect(threadDataBackendApiService.createNewThreadAsync).not
-        .toHaveBeenCalled();
+  it('should create a new thread when closing create new thread modal', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        result: Promise.resolve({
+          newThreadSubject: 'New subject',
+          newThreadText: 'New text',
+        }),
+      } as NgbModalRef;
     });
+    spyOn(alertsService, 'addSuccessMessage').and.callThrough();
+    spyOn(threadDataBackendApiService, 'createNewThreadAsync').and.returnValue(
+      Promise.resolve()
+    );
+
+    component.showCreateThreadModal();
+    tick();
+    tick();
+
+    expect(
+      threadDataBackendApiService.createNewThreadAsync
+    ).toHaveBeenCalledWith('New subject', 'New text');
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'Feedback thread created.'
+    );
+    expect(component.feedbackMessage.status).toBe(null);
+    expect(component.feedbackMessage.text).toBe('');
+  }));
+
+  it('should not create a new thread when dismissing create new thread modal', () => {
+    spyOn(threadDataBackendApiService, 'createNewThreadAsync');
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        result: Promise.reject(),
+      } as NgbModalRef;
+    });
+    component.showCreateThreadModal();
+
+    expect(
+      threadDataBackendApiService.createNewThreadAsync
+    ).not.toHaveBeenCalled();
+  });
 
   it('should get css classes based on status', () => {
     expect(component.getLabelClass('open')).toBe('badge badge-info');
@@ -452,19 +487,22 @@ describe('Feedback Tab Component', () => {
     expect(component.getHumanReadableStatus('open')).toBe('Open');
     expect(component.getHumanReadableStatus('compliment')).toBe('Compliment');
     expect(component.getHumanReadableStatus('not_actionable')).toBe(
-      'Not Actionable');
+      'Not Actionable'
+    );
   });
 
-  it('should get formatted date string from the timestamp in milliseconds',
-    () => {
-      // This method is being spied to avoid any timezone issues.
-      spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString').and
-        .returnValue('11/21/14');
-      // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-      let NOW_MILLIS = 1416563100000;
-      expect(component.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
-        '11/21/14');
-    });
+  it('should get formatted date string from the timestamp in milliseconds', () => {
+    // This method is being spied to avoid any timezone issues.
+    spyOn(
+      dateTimeFormatService,
+      'getLocaleAbbreviatedDatetimeString'
+    ).and.returnValue('11/21/14');
+    // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
+    let NOW_MILLIS = 1416563100000;
+    expect(component.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
+      '11/21/14'
+    );
+  });
 
   it('should evaluate if exploration is editable', () => {
     let isEditableSpy = spyOn(editabilityService, 'isEditable');

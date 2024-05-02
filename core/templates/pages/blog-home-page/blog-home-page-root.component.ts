@@ -16,20 +16,19 @@
  * @fileoverview Root component for blog home page.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { LoaderService } from 'services/loader.service';
-import { PageHeadService } from 'services/page-head.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { UserService } from 'services/user.service';
+import {AppConstants} from 'app.constants';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {LoaderService} from 'services/loader.service';
+import {PageHeadService} from 'services/page-head.service';
+import {UserService} from 'services/user.service';
 
 @Component({
   selector: 'oppia-blog-home-page-root',
-  templateUrl: './blog-home-page-root.component.html'
+  templateUrl: './blog-home-page-root.component.html',
 })
 export class BlogHomePageRootComponent implements OnDestroy, OnInit {
   directiveSubscriptions = new Subscription();
@@ -37,13 +36,11 @@ export class BlogHomePageRootComponent implements OnDestroy, OnInit {
   pageIsShown: boolean = false;
 
   constructor(
-    private accessValidationBackendApiService:
-      AccessValidationBackendApiService,
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
     private loaderService: LoaderService,
     private pageHeadService: PageHeadService,
     private translateService: TranslateService,
-    private userService: UserService,
-    private platformFeatureService: PlatformFeatureService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -56,34 +53,31 @@ export class BlogHomePageRootComponent implements OnDestroy, OnInit {
     );
 
     this.loaderService.showLoadingScreen('Loading');
-    this.userService.canUserEditBlogPosts().then((userCanEditBlogPost) => {
-      if (
-        this.platformFeatureService.status.BlogPages.isEnabled ||
-        userCanEditBlogPost
-      ) {
-        this.accessValidationBackendApiService
-          .validateAccessToBlogHomePage()
-          .then((resp) => {
+    this.userService.canUserEditBlogPosts().then(userCanEditBlogPost => {
+      this.accessValidationBackendApiService
+        .validateAccessToBlogHomePage()
+        .then(
+          resp => {
             this.pageIsShown = true;
-          }, (err) => {
+          },
+          err => {
             this.errorPageIsShown = true;
-          }).then(() => {
-            this.loaderService.hideLoadingScreen();
-          });
-      } else {
-        this.errorPageIsShown = true;
-        this.loaderService.hideLoadingScreen();
-      }
+          }
+        )
+        .then(() => {
+          this.loaderService.hideLoadingScreen();
+        });
     });
   }
 
   setPageTitleAndMetaTags(): void {
     const blogHomePage =
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE;
-    const translatedTitle = this.translateService.instant(
-      blogHomePage.TITLE);
+    const translatedTitle = this.translateService.instant(blogHomePage.TITLE);
     this.pageHeadService.updateTitleAndMetaTags(
-      translatedTitle, blogHomePage.META);
+      translatedTitle,
+      blogHomePage.META
+    );
   }
 
   ngOnDestroy(): void {

@@ -16,20 +16,24 @@
  * @fileoverview Unit tests for the StartNewBeamJobDialogComponent.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { of, throwError } from 'rxjs';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {MatButtonModule} from '@angular/material/button';
+import {
+  MatDialogModule,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from '@angular/material/dialog';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {of, throwError} from 'rxjs';
 
-import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
-import { BeamJob } from 'domain/jobs/beam-job.model';
-import { StartNewBeamJobDialogComponent } from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
-import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {BeamJobRun} from 'domain/jobs/beam-job-run.model';
+import {BeamJob} from 'domain/jobs/beam-job.model';
+import {StartNewBeamJobDialogComponent} from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
+import {ReleaseCoordinatorBackendApiService} from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Start new beam job dialog', () => {
   const beamJob = new BeamJob('FooJob');
@@ -41,13 +45,11 @@ describe('Start new beam job dialog', () => {
   let alertsService: AlertsService;
   let matDialogRef: MatDialogRef<StartNewBeamJobDialogComponent, BeamJobRun>;
 
-  beforeEach(waitForAsync(async() => {
-    const mockDialogRef = { disableClose: false, close: () => {} };
+  beforeEach(waitForAsync(async () => {
+    const mockDialogRef = {disableClose: false, close: () => {}};
 
     TestBed.configureTestingModule({
-      declarations: [
-        StartNewBeamJobDialogComponent,
-      ],
+      declarations: [StartNewBeamJobDialogComponent],
       imports: [
         HttpClientTestingModule,
         MatDialogModule,
@@ -57,18 +59,16 @@ describe('Start new beam job dialog', () => {
         BrowserDynamicTestingModule,
       ],
       providers: [
-        { provide: MAT_DIALOG_DATA, useValue: beamJob },
-        { provide: MatDialogRef, useValue: mockDialogRef },
+        {provide: MAT_DIALOG_DATA, useValue: beamJob},
+        {provide: MatDialogRef, useValue: mockDialogRef},
         ReleaseCoordinatorBackendApiService,
       ],
     });
     // NOTE: This allows tests to compile the DOM of each dialog component.
     TestBed.overrideModule(BrowserDynamicTestingModule, {
       set: {
-        entryComponents: [
-          StartNewBeamJobDialogComponent,
-        ],
-      }
+        entryComponents: [StartNewBeamJobDialogComponent],
+      },
     });
     await TestBed.compileComponents();
 
@@ -82,10 +82,18 @@ describe('Start new beam job dialog', () => {
   }));
 
   it('should lock the dialog and start a job before finally closing', () => {
-    const newBeamJobRun = (
-      new BeamJobRun('123', 'FooJob', 'PENDING', 0, 0, false));
-    const startNewBeamJobSpy = spyOn(backendApiService, 'startNewBeamJob')
-      .and.returnValue(of(newBeamJobRun));
+    const newBeamJobRun = new BeamJobRun(
+      '123',
+      'FooJob',
+      'PENDING',
+      0,
+      0,
+      false
+    );
+    const startNewBeamJobSpy = spyOn(
+      backendApiService,
+      'startNewBeamJob'
+    ).and.returnValue(of(newBeamJobRun));
     const closeDialogSpy = spyOn(matDialogRef, 'close');
 
     expect(component.isRunning).toBeFalse();
@@ -102,10 +110,12 @@ describe('Start new beam job dialog', () => {
     expect(closeDialogSpy).toHaveBeenCalledWith(newBeamJobRun);
   });
 
-  it('should show the error dialog if the operation failed', async() => {
+  it('should show the error dialog if the operation failed', async () => {
     const error = new Error();
-    const startNewBeamJobSpy = spyOn(backendApiService, 'startNewBeamJob')
-      .and.returnValue(throwError(error));
+    const startNewBeamJobSpy = spyOn(
+      backendApiService,
+      'startNewBeamJob'
+    ).and.returnValue(throwError(error));
     const addWarningSpy = spyOn(alertsService, 'addWarning');
 
     component.onActionClick();

@@ -16,17 +16,22 @@
  * @fileoverview Unit tests for CreateNewChapterModalController.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { Story } from 'domain/story/story.model';
-import { CuratedExplorationValidationService } from 'domain/exploration/curated-exploration-validation.service';
-import { NewChapterTitleModalComponent } from './new-chapter-title-modal.component';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { EditableStoryBackendApiService } from '../../../domain/story/editable-story-backend-api.service';
-import { StoryEditorStateService } from '../services/story-editor-state.service';
-import { StoryUpdateService } from '../../../domain/story/story-update.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { PlatformFeatureService } from '../../../services/platform-feature.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flushMicrotasks,
+  TestBed,
+} from '@angular/core/testing';
+import {Story} from 'domain/story/story.model';
+import {CuratedExplorationValidationService} from 'domain/exploration/curated-exploration-validation.service';
+import {NewChapterTitleModalComponent} from './new-chapter-title-modal.component';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {EditableStoryBackendApiService} from '../../../domain/story/editable-story-backend-api.service';
+import {StoryEditorStateService} from '../services/story-editor-state.service';
+import {StoryUpdateService} from '../../../domain/story/story-update.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {PlatformFeatureService} from '../../../services/platform-feature.service';
 
 class MockActiveModal {
   close(): void {
@@ -41,8 +46,8 @@ class MockActiveModal {
 class MockPlatformFeatureService {
   status = {
     SerialChapterLaunchCurriculumAdminView: {
-      isEnabled: false
-    }
+      isEnabled: false,
+    },
   };
 }
 
@@ -54,15 +59,12 @@ describe('Create New Chapter Modal Component', () => {
   let curatedExplorationValidationService;
   let nodeTitles = ['title 1', 'title 2', 'title 3'];
   let mockPlatformFeatureService = new MockPlatformFeatureService();
-  let editableStoryBackendApiService:
-    EditableStoryBackendApiService;
+  let editableStoryBackendApiService: EditableStoryBackendApiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        NewChapterTitleModalComponent
-      ],
+      declarations: [NewChapterTitleModalComponent],
       providers: [
         StoryEditorStateService,
         StoryUpdateService,
@@ -70,28 +72,31 @@ describe('Create New Chapter Modal Component', () => {
         EditableStoryBackendApiService,
         {
           provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService
+          useValue: mockPlatformFeatureService,
         },
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
-        }
+          useClass: MockActiveModal,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     });
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(NewChapterTitleModalComponent);
     component = fixture.componentInstance;
-    curatedExplorationValidationService = (
-      TestBed.inject(CuratedExplorationValidationService));
-    editableStoryBackendApiService = (
-      TestBed.inject(EditableStoryBackendApiService));
+    curatedExplorationValidationService = TestBed.inject(
+      CuratedExplorationValidationService
+    );
+    editableStoryBackendApiService = TestBed.inject(
+      EditableStoryBackendApiService
+    );
     storyUpdateService = TestBed.inject(StoryUpdateService);
     storyEditorStateService = TestBed.inject(StoryEditorStateService);
     curatedExplorationValidationService = TestBed.inject(
-      CuratedExplorationValidationService);
+      CuratedExplorationValidationService
+    );
     component.nodeTitles = nodeTitles;
 
     let sampleStoryBackendObject = {
@@ -113,8 +118,9 @@ describe('Create New Chapter Modal Component', () => {
             destination_node_ids: [],
             outline: 'Outline',
             exploration_id: null,
-            outline_is_finalized: false
-          }, {
+            outline_is_finalized: false,
+          },
+          {
             id: 'node_2',
             title: 'Title 2',
             description: 'Description 2',
@@ -123,14 +129,14 @@ describe('Create New Chapter Modal Component', () => {
             destination_node_ids: ['node_1'],
             outline: 'Outline 2',
             exploration_id: 'exp_1',
-            outline_is_finalized: true
-          }],
-        next_node_id: 'node_3'
+            outline_is_finalized: true,
+          },
+        ],
+        next_node_id: 'node_3',
       },
-      language_code: 'en'
+      language_code: 'en',
     };
-    let story = Story.createFromBackendDict(
-      sampleStoryBackendObject);
+    let story = Story.createFromBackendDict(sampleStoryBackendObject);
     spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
 
     component.ngOnInit();
@@ -138,13 +144,16 @@ describe('Create New Chapter Modal Component', () => {
 
   it('should add story node with data', () => {
     let storyUpdateSpyThumbnailBgColor = spyOn(
-      storyUpdateService, 'setStoryNodeThumbnailBgColor');
+      storyUpdateService,
+      'setStoryNodeThumbnailBgColor'
+    );
     let storyUpdateSpyThumbnailFilename = spyOn(
-      storyUpdateService, 'setStoryNodeThumbnailFilename');
-    let storyUpdateSpyStatus = spyOn(
-      storyUpdateService, 'setStoryNodeStatus');
-    mockPlatformFeatureService.
-      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+      storyUpdateService,
+      'setStoryNodeThumbnailFilename'
+    );
+    let storyUpdateSpyStatus = spyOn(storyUpdateService, 'setStoryNodeStatus');
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+      true;
 
     component.addStoryNodeWithData();
 
@@ -153,114 +162,122 @@ describe('Create New Chapter Modal Component', () => {
     expect(storyUpdateSpyStatus).toHaveBeenCalled();
   });
 
-  it('should initialize component properties after controller is initialized',
-    () => {
-      expect(component.nodeTitles).toEqual(nodeTitles);
-      expect(component.errorMsg).toBe(null);
-      expect(component.correctnessFeedbackDisabled).toBe(false);
-      expect(component.categoryIsDefault).toBe(true);
-    });
-
-  it('should validate explorationId correctly',
-    () => {
-      component.explorationId = 'validId';
-      expect(component.validateExplorationId()).toBeTrue();
-      component.explorationId = 'oppia.org/validId';
-      expect(component.validateExplorationId()).toBeFalse();
-    });
-
-  it('should update thumbnail filename when changing thumbnail file',
-    () => {
-      component.updateThumbnailFilename('abc');
-      expect(component.editableThumbnailFilename).toEqual('abc');
-    });
-
-  it('should update thumbnail bg color when changing thumbnail color',
-    () => {
-      component.updateThumbnailBgColor('abc');
-      component.cancel();
-      expect(component.editableThumbnailBgColor).toEqual('abc');
-    });
-
-  it('should check if chapter is valid when it has title, exploration id and' +
-    ' thumbnail file', () => {
-    expect(component.isValid()).toEqual(false);
-    component.title = 'title';
-    component.explorationId = '1';
-    expect(component.isValid()).toEqual(false);
-    component.editableThumbnailFilename = '1';
-    expect(component.isValid()).toEqual(true);
-    component.explorationId = '';
-    expect(component.isValid()).toEqual(false);
+  it('should initialize component properties after controller is initialized', () => {
+    expect(component.nodeTitles).toEqual(nodeTitles);
+    expect(component.errorMsg).toBe(null);
+    expect(component.categoryIsDefault).toBe(true);
   });
 
-  it('should show warning message when exploration cannot be curated',
-    fakeAsync(() => {
-      spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
-      spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
-        .and.resolveTo(true);
-      spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
-        .and.resolveTo(true);
-      spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
-        .and.resolveTo(true);
-      spyOn(
-        curatedExplorationValidationService,
-        'getStatesWithRestrictedInteractions').and.resolveTo([]);
-      spyOn(
-        curatedExplorationValidationService,
-        'getStatesWithInvalidMultipleChoices').and.resolveTo([]);
-      spyOn(
-        editableStoryBackendApiService, 'validateExplorationsAsync'
-      ).and.resolveTo([
-        'Explorations in a story are not expected to contain ' +
-        'training data for any answer group. State Introduction of ' +
-        'exploration with ID 1 contains training data in one of ' +
-        'its answer groups.'
-      ]);
-      component.saveAsync();
-      flushMicrotasks();
+  it('should validate explorationId correctly', () => {
+    component.explorationId = 'validId';
+    expect(component.validateExplorationId()).toBeTrue();
+    component.explorationId = 'oppia.org/validId';
+    expect(component.validateExplorationId()).toBeFalse();
+  });
 
-      expect(component.invalidExpId).toEqual(true);
-      expect(component.invalidExpErrorStrings).toEqual([
-        'Explorations in a story are not expected to contain ' +
-        'training data for any answer group. State Introduction of ' +
-        'exploration with ID 1 contains training data in one of ' +
-        'its answer groups.'
-      ]);
-    }));
+  it('should update thumbnail filename when changing thumbnail file', () => {
+    component.updateThumbnailFilename('abc');
+    expect(component.editableThumbnailFilename).toEqual('abc');
+  });
 
-  it('should warn that the exploration is not published when trying to save' +
-    ' a chapter with an invalid exploration id', fakeAsync(() => {
+  it('should update thumbnail bg color when changing thumbnail color', () => {
+    component.updateThumbnailBgColor('abc');
+    component.cancel();
+    expect(component.editableThumbnailBgColor).toEqual('abc');
+  });
+
+  it(
+    'should check if chapter is valid when it has title, exploration id and' +
+      ' thumbnail file',
+    () => {
+      expect(component.isValid()).toEqual(false);
+      component.title = 'title';
+      component.explorationId = '1';
+      expect(component.isValid()).toEqual(false);
+      component.editableThumbnailFilename = '1';
+      expect(component.isValid()).toEqual(true);
+      component.explorationId = '';
+      expect(component.isValid()).toEqual(false);
+    }
+  );
+
+  it('should show warning message when exploration cannot be curated', fakeAsync(() => {
     spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
-    spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
-      .and.resolveTo(false);
     spyOn(
-      editableStoryBackendApiService, 'validateExplorationsAsync'
+      curatedExplorationValidationService,
+      'isExpPublishedAsync'
+    ).and.resolveTo(true);
+    spyOn(
+      curatedExplorationValidationService,
+      'isDefaultCategoryAsync'
+    ).and.resolveTo(true);
+    spyOn(
+      curatedExplorationValidationService,
+      'getStatesWithRestrictedInteractions'
     ).and.resolveTo([]);
+    spyOn(
+      curatedExplorationValidationService,
+      'getStatesWithInvalidMultipleChoices'
+    ).and.resolveTo([]);
+    spyOn(
+      editableStoryBackendApiService,
+      'validateExplorationsAsync'
+    ).and.resolveTo([
+      'Explorations in a story are not expected to contain ' +
+        'training data for any answer group. State Introduction of ' +
+        'exploration with ID 1 contains training data in one of ' +
+        'its answer groups.',
+    ]);
     component.saveAsync();
     flushMicrotasks();
 
     expect(component.invalidExpId).toEqual(true);
+    expect(component.invalidExpErrorStrings).toEqual([
+      'Explorations in a story are not expected to contain ' +
+        'training data for any answer group. State Introduction of ' +
+        'exploration with ID 1 contains training data in one of ' +
+        'its answer groups.',
+    ]);
   }));
 
-  it('should warn that the exploration already exists in the story when' +
-    ' trying to save a chapter with an already used exploration id',
-  () => {
-    component.explorationId = 'exp_1';
-    component.updateExplorationId();
-    expect(component.invalidExpErrorStrings).toEqual([
-      'The given exploration already exists in the story.'
-    ]);
-    expect(component.invalidExpId).toEqual(true);
-  });
+  it(
+    'should warn that the exploration is not published when trying to save' +
+      ' a chapter with an invalid exploration id',
+    fakeAsync(() => {
+      spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
+      spyOn(
+        curatedExplorationValidationService,
+        'isExpPublishedAsync'
+      ).and.resolveTo(false);
+      spyOn(
+        editableStoryBackendApiService,
+        'validateExplorationsAsync'
+      ).and.resolveTo([]);
+      component.saveAsync();
+      flushMicrotasks();
 
-  it('should set story node exploration id when updating exploration id',
+      expect(component.invalidExpId).toEqual(true);
+    })
+  );
+
+  it(
+    'should warn that the exploration already exists in the story when' +
+      ' trying to save a chapter with an already used exploration id',
     () => {
-      let storyUpdateSpy = spyOn(
-        storyUpdateService, 'setStoryNodeExplorationId');
+      component.explorationId = 'exp_1';
       component.updateExplorationId();
-      expect(storyUpdateSpy).toHaveBeenCalled();
-    });
+      expect(component.invalidExpErrorStrings).toEqual([
+        'The given exploration already exists in the story.',
+      ]);
+      expect(component.invalidExpId).toEqual(true);
+    }
+  );
+
+  it('should set story node exploration id when updating exploration id', () => {
+    let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryNodeExplorationId');
+    component.updateExplorationId();
+    expect(storyUpdateSpy).toHaveBeenCalled();
+  });
 
   it('should not save when the chapter title is already used', () => {
     component.title = nodeTitles[0];
@@ -268,136 +285,152 @@ describe('Create New Chapter Modal Component', () => {
     expect(component.errorMsg).toBe('A chapter with this title already exists');
   });
 
-  it('should prevent exploration from being added if it doesn\'t exist ' +
-    'or isn\'t published yet', fakeAsync(() => {
-    component.title = 'dummy_title';
-    spyOn(
-      editableStoryBackendApiService, 'validateExplorationsAsync'
-    ).and.resolveTo([]);
-    spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
-      .and.returnValue(false);
-    const correctnessFeedbackSpy = spyOn(
-      curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled');
-    const categorySpy = spyOn(
-      curatedExplorationValidationService, 'isDefaultCategoryAsync');
-    component.saveAsync();
-    flushMicrotasks();
-    expect(component.invalidExpId).toEqual(true);
-    expect(correctnessFeedbackSpy).not.toHaveBeenCalled();
-    expect(categorySpy).not.toHaveBeenCalled();
-  }));
-
-  it('should prevent exploration from being added if its correctness ' +
-  'feedback is disabled', fakeAsync(() => {
-    component.title = 'dummy_title';
-    spyOn(
-      editableStoryBackendApiService, 'validateExplorationsAsync'
-    ).and.resolveTo([]);
-    spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
-      .and.resolveTo(true);
-    spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
-      .and.resolveTo(false);
-    component.saveAsync();
-    flushMicrotasks();
-    expect(component.correctnessFeedbackDisabled).toBe(true);
-  }));
-
-  it('should prevent exploration from being added if its category ' +
-  'is not default', fakeAsync(() => {
-    component.title = 'dummy_title';
-
-    spyOn(
-      editableStoryBackendApiService, 'validateExplorationsAsync'
-    ).and.resolveTo([]);
-    spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
-      .and.resolveTo(true);
-    spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
-      .and.resolveTo(true);
-    spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
-      .and.resolveTo(false);
-
-    component.saveAsync();
-    flushMicrotasks();
-
-    expect(component.categoryIsDefault).toBe(false);
-  }));
-
-  it('should prevent exploration from being added if it contains restricted ' +
-  'interaction types', fakeAsync(() => {
-    component.title = 'dummy_title';
-    const invalidStates = ['some_invalid_state'];
-
-    spyOn(
-      editableStoryBackendApiService, 'validateExplorationsAsync'
-    ).and.resolveTo([]);
-    spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
-      .and.resolveTo(true);
-    spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
-      .and.resolveTo(true);
-    spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
-      .and.resolveTo(true);
-    spyOn(
-      curatedExplorationValidationService,
-      'getStatesWithRestrictedInteractions').and.resolveTo(invalidStates);
-
-    component.saveAsync();
-    flushMicrotasks();
-
-    expect(component.statesWithRestrictedInteractions).toBe(invalidStates);
-  }));
-
-  it('should prevent exploration from being added if it contains an invalid ' +
-  'multiple choice input', fakeAsync(() => {
-    component.title = 'dummy_title';
-    const invalidStates = ['some_invalid_state'];
-
-    spyOn(
-      editableStoryBackendApiService, 'validateExplorationsAsync'
-    ).and.resolveTo([]);
-    spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
-      .and.resolveTo(true);
-    spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
-      .and.resolveTo(true);
-    spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
-      .and.resolveTo(true);
-    spyOn(
-      curatedExplorationValidationService,
-      'getStatesWithRestrictedInteractions').and.resolveTo([]);
-    spyOn(
-      curatedExplorationValidationService,
-      'getStatesWithInvalidMultipleChoices').and.resolveTo(invalidStates);
-
-    component.saveAsync();
-    flushMicrotasks();
-
-    expect(component.statesWithTooFewMultipleChoiceOptions).toBe(invalidStates);
-  }));
-
-  it('should attempt to save exploration when all validation checks pass',
+  it(
+    "should prevent exploration from being added if it doesn't exist " +
+      "or isn't published yet",
     fakeAsync(() => {
       component.title = 'dummy_title';
       spyOn(
-        editableStoryBackendApiService, 'validateExplorationsAsync'
+        editableStoryBackendApiService,
+        'validateExplorationsAsync'
       ).and.resolveTo([]);
-      spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
-        .and.resolveTo(true);
       spyOn(
         curatedExplorationValidationService,
-        'isCorrectnessFeedbackEnabled').and.resolveTo(true);
-      spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
-        .and.resolveTo(true);
+        'isExpPublishedAsync'
+      ).and.returnValue(false);
+      const categorySpy = spyOn(
+        curatedExplorationValidationService,
+        'isDefaultCategoryAsync'
+      );
+      component.saveAsync();
+      flushMicrotasks();
+      expect(component.invalidExpId).toEqual(true);
+      expect(categorySpy).not.toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should prevent exploration from being added if its category ' +
+      'is not default',
+    fakeAsync(() => {
+      component.title = 'dummy_title';
+
+      spyOn(
+        editableStoryBackendApiService,
+        'validateExplorationsAsync'
+      ).and.resolveTo([]);
       spyOn(
         curatedExplorationValidationService,
-        'getStatesWithRestrictedInteractions').and.resolveTo([]);
+        'isExpPublishedAsync'
+      ).and.resolveTo(true);
       spyOn(
         curatedExplorationValidationService,
-        'getStatesWithInvalidMultipleChoices').and.resolveTo([]);
-      const updateExplorationIdSpy = spyOn(component, 'updateExplorationId');
+        'isDefaultCategoryAsync'
+      ).and.resolveTo(false);
+
       component.saveAsync();
       flushMicrotasks();
 
-      expect(updateExplorationIdSpy).toHaveBeenCalled();
-    }));
+      expect(component.categoryIsDefault).toBe(false);
+    })
+  );
+
+  it(
+    'should prevent exploration from being added if it contains restricted ' +
+      'interaction types',
+    fakeAsync(() => {
+      component.title = 'dummy_title';
+      const invalidStates = ['some_invalid_state'];
+
+      spyOn(
+        editableStoryBackendApiService,
+        'validateExplorationsAsync'
+      ).and.resolveTo([]);
+      spyOn(
+        curatedExplorationValidationService,
+        'isExpPublishedAsync'
+      ).and.resolveTo(true);
+      spyOn(
+        curatedExplorationValidationService,
+        'isDefaultCategoryAsync'
+      ).and.resolveTo(true);
+      spyOn(
+        curatedExplorationValidationService,
+        'getStatesWithRestrictedInteractions'
+      ).and.resolveTo(invalidStates);
+
+      component.saveAsync();
+      flushMicrotasks();
+
+      expect(component.statesWithRestrictedInteractions).toBe(invalidStates);
+    })
+  );
+
+  it(
+    'should prevent exploration from being added if it contains an invalid ' +
+      'multiple choice input',
+    fakeAsync(() => {
+      component.title = 'dummy_title';
+      const invalidStates = ['some_invalid_state'];
+
+      spyOn(
+        editableStoryBackendApiService,
+        'validateExplorationsAsync'
+      ).and.resolveTo([]);
+      spyOn(
+        curatedExplorationValidationService,
+        'isExpPublishedAsync'
+      ).and.resolveTo(true);
+      spyOn(
+        curatedExplorationValidationService,
+        'isDefaultCategoryAsync'
+      ).and.resolveTo(true);
+      spyOn(
+        curatedExplorationValidationService,
+        'getStatesWithRestrictedInteractions'
+      ).and.resolveTo([]);
+      spyOn(
+        curatedExplorationValidationService,
+        'getStatesWithInvalidMultipleChoices'
+      ).and.resolveTo(invalidStates);
+
+      component.saveAsync();
+      flushMicrotasks();
+
+      expect(component.statesWithTooFewMultipleChoiceOptions).toBe(
+        invalidStates
+      );
+    })
+  );
+
+  it('should attempt to save exploration when all validation checks pass', fakeAsync(() => {
+    component.title = 'dummy_title';
+    spyOn(
+      editableStoryBackendApiService,
+      'validateExplorationsAsync'
+    ).and.resolveTo([]);
+    spyOn(
+      curatedExplorationValidationService,
+      'isExpPublishedAsync'
+    ).and.resolveTo(true);
+    spyOn(
+      curatedExplorationValidationService,
+      'isDefaultCategoryAsync'
+    ).and.resolveTo(true);
+    spyOn(
+      curatedExplorationValidationService,
+      'getStatesWithRestrictedInteractions'
+    ).and.resolveTo([]);
+    spyOn(
+      curatedExplorationValidationService,
+      'getStatesWithInvalidMultipleChoices'
+    ).and.resolveTo([]);
+    const updateExplorationIdSpy = spyOn(component, 'updateExplorationId');
+    component.saveAsync();
+    flushMicrotasks();
+
+    expect(updateExplorationIdSpy).toHaveBeenCalled();
+  }));
 
   it('should clear error message when changing exploration id', () => {
     component.title = nodeTitles[0];
@@ -408,7 +441,7 @@ describe('Create New Chapter Modal Component', () => {
     expect(component.errorMsg).toBe(null);
     expect(component.invalidExpId).toBe(false);
     expect(component.invalidExpErrorStrings).toEqual([
-      'Please enter a valid exploration id.'
+      'Please enter a valid exploration id.',
     ]);
   });
 });

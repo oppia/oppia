@@ -78,10 +78,10 @@
       </div>
     </div>
     <div class="button-row">
-      <button class="progress-info" (click)="openLessonInfoModal()">
+      <button class="progress-info" (click)="openLessonInfoModal()" [attr.tabindex]="(messageModalIsShown || miniMessageTooltipIsShown) ? 1 : -1">
         <i class="material-icons progress-info-icon">&#xE88E;</i>
       </button>
-      <button class="modal-close-button" (click)="dismissMessage()">
+      <button class="modal-close-button" (click)="dismissMessage()" tabindex="-1" [attr.tabindex]="(messageModalIsShown || miniMessageTooltipIsShown) ? 1 : -1">
         <i class="material-icons">&#xE5CD;</i>
       </button>
     </div>

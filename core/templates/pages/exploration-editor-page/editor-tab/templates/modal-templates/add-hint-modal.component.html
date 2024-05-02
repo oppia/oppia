@@ -1,9 +1,9 @@
 <div class="modal-header e2e-test-hint-modal">
-  <h3>Add Hint</h3>
-  <i class="fa fa-times" (click)="cancel()"></i>
+  <h3 tabindex="0">Add Hint</h3>
+  <i class="fa fa-times" tabindex="0" aria-label="close" role="button" (keydown.enter)="cancel()" (click)="cancel()"></i>
 </div>
 
-<div class="modal-body">
+<div class="modal-body" tabindex="0">
   <h4>
     Provide a helpful hint to the learner. For example, you could show how to break the question into smaller sub-problems, show how to solve a sub-problem, or relate this question to a previous one.
   </h4>
@@ -12,7 +12,7 @@
 <div class="modal-body">
   <form class="form-inline">
     <div class="oppia-rule-details-header">
-      <strong>Hint #{{ hintIndex }} is...</strong>
+      <strong tabindex="0">Hint #{{ hintIndex }} is...</strong>
       <schema-based-editor class="e2e-test-hint-text"
                            [schema]="getSchema()"
                            [localValue]="this.tmpHint"
@@ -20,7 +20,7 @@
       </schema-based-editor>
     </div>
   </form>
-  <div *ngIf="isHintLengthExceeded(tmpHint)" class="oppia-length-validation-error">
+  <div *ngIf="isHintLengthExceeded(tmpHint)" class="oppia-length-validation-error" tabindex="0">
     The hint length is too long. Please use at most 500 characters.
   </div>
 </div>

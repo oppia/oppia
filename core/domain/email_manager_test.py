@@ -25,10 +25,10 @@ from core.constants import constants
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import html_cleaner
-from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
+from core.domain import platform_parameter_services
 from core.domain import question_domain
 from core.domain import rights_domain
 from core.domain import story_domain
@@ -41,7 +41,8 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import (
-    Callable, Dict, Final, List, Optional, Sequence, Set, Type, Union)
+    Callable, DefaultDict, Dict, Final, List, Optional, Sequence, Set, Type,
+    Union)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -442,64 +443,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             self.assertEqual(messages[0].html, expected_email_html_body)
             self.assertEqual(messages[0].body, expected_email_text_body)
 
-    def test_correct_rights_are_written_in_voice_artist_role_email_body(
-        self
-    ) -> None:
-        expected_email_html_body = (
-            'Hi newuser,<br>'
-            '<br>'
-            '<b>editor</b> has granted you voice artist rights to their '
-            'exploration, '
-            '"<a href="https://www.oppia.org/create/A">Title</a>"'
-            ', on Oppia.org.<br>'
-            '<br>'
-            'This allows you to:<br>'
-            '<ul>'
-            '<li>Voiceover the exploration</li><br>'
-            '<li>View and playtest the exploration</li><br>'
-            '</ul>'
-            'You can find the exploration '
-            '<a href="https://www.oppia.org/create/A">here</a>.<br>'
-            '<br>'
-            'Thanks, and happy collaborating!<br>'
-            '<br>'
-            'Best wishes,<br>'
-            'The Oppia Team<br>'
-            '<br>'
-            'You can change your email preferences via the '
-            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
-
-        expected_email_text_body = (
-            'Hi newuser,\n'
-            '\n'
-            'editor has granted you voice artist rights to their '
-            'exploration, "Title", on Oppia.org.\n'
-            '\n'
-            'This allows you to:\n'
-            '- Voiceover the exploration\n'
-            '- View and playtest the exploration\n'
-            'You can find the exploration here.\n'
-            '\n'
-            'Thanks, and happy collaborating!\n'
-            '\n'
-            'Best wishes,\n'
-            'The Oppia Team\n'
-            '\n'
-            'You can change your email preferences via the Preferences page.')
-
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
-            # Check that correct email content is sent for Voice Artist.
-            email_manager.send_role_notification_email(
-                self.editor_id, self.new_user_id,
-                rights_domain.ROLE_VOICE_ARTIST, self.exploration.id,
-                self.exploration.title)
-
-            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
-            self.assertEqual(len(messages), 1)
-
-            self.assertEqual(messages[0].html, expected_email_html_body)
-            self.assertEqual(messages[0].body, expected_email_text_body)
-
     def test_correct_rights_are_written_in_playtester_role_email_body(
         self
     ) -> None:
@@ -689,7 +632,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_config_does_not_permit_it(self) -> None:
         swap_get_platform_parameter_value_return_email_footer = (
             self.swap_to_always_return(
-                platform_feature_services,
+                platform_parameter_services,
                 'get_platform_parameter_value',
                 self.new_footer
             )
@@ -949,7 +892,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     ) -> None:
         swap_get_platform_parameter_value_return_email_footer = (
             self.swap_to_always_return(
-                platform_feature_services,
+                platform_parameter_services,
                 'get_platform_parameter_value',
                 self.new_footer
             )
@@ -1003,7 +946,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     def test_email_only_sent_if_signup_was_successful(self) -> None:
         swap_get_platform_parameter_value_return_email_footer = (
             self.swap_to_always_return(
-                platform_feature_services,
+                platform_parameter_services,
                 'get_platform_parameter_value',
                 self.new_footer
             )
@@ -1249,7 +1192,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             logging, 'error', log_new_error_counter)
 
         swap_get_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             'Email Sender'
         )
@@ -2165,7 +2108,8 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ONBOARD_CD_USER)
 
 
 class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
@@ -2722,16 +2666,16 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             PlatformDataTypes. The defined data type of the platform parameter.
         """
         if param_name == (
-            platform_parameter_list.ParamNames.
+            platform_parameter_list.ParamName.
             CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
             return True
         elif param_name == (
-            platform_parameter_list.ParamNames.EMAIL_SENDER_NAME.value
+            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
         ):
             return email_manager.EMAIL_SENDER_NAME.default_value
         elif param_name == (
-            platform_parameter_list.ParamNames.EMAIL_FOOTER.value
+            platform_parameter_list.ParamName.EMAIL_FOOTER.value
         ):
             return email_manager.EMAIL_FOOTER.default_value
         return ''
@@ -2777,7 +2721,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
         self.swap_get_platform_parameter_value = self.swap(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             self._swap_get_platform_parameter_value_function
         )
@@ -4308,12 +4252,12 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             PlatformDataTypes. The defined data type of the platform parameter.
         """
         if param_name == (
-            platform_parameter_list.ParamNames.
+            platform_parameter_list.ParamName.
             ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
         ):
             return True
         elif param_name == (
-            platform_parameter_list.ParamNames.EMAIL_SENDER_NAME.value
+            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
         ):
             return email_manager.EMAIL_SENDER_NAME.default_value
         return ''
@@ -4359,7 +4303,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
         self.swap_get_platform_parameter_value = self.swap(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             self._swap_get_platform_parameter_value_function
         )
@@ -4497,7 +4441,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
             'for more than 0 days for review. Please take a look at the '
             'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
+            'to the <a href="%s%s">admin roles page</a> and either:'
             '<br><br><ul>'
             '<li>Add more reviewers to the suggestion types that have '
             'suggestions waiting too long for a review</li><br>'
@@ -4516,7 +4460,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
@@ -4570,7 +4514,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
             'for more than 0 days for review. Please take a look at the '
             'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
+            'to the <a href="%s%s">admin roles page</a> and either:'
             '<br><br><ul>'
             '<li>Add more reviewers to the suggestion types that have '
             'suggestions waiting too long for a review</li><br>'
@@ -4592,7 +4536,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
@@ -4640,7 +4584,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
             'for more than 0 days for review. Please take a look at the '
             'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
+            'to the <a href="%s%s">admin roles page</a> and either:'
             '<br><br><ul>'
             '<li>Add more reviewers to the suggestion types that have '
             'suggestions waiting too long for a review</li><br>'
@@ -4659,7 +4603,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
@@ -4713,7 +4657,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
             'for more than 0 days for review. Please take a look at the '
             'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
+            'to the <a href="%s%s">admin roles page</a> and either:'
             '<br><br><ul>'
             '<li>Add more reviewers to the suggestion types that have '
             'suggestions waiting too long for a review</li><br>'
@@ -4735,7 +4679,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
@@ -4797,7 +4741,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
             'for more than 0 days for review. Please take a look at the '
             'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
+            'to the <a href="%s%s">admin roles page</a> and either:'
             '<br><br><ul>'
             '<li>Add more reviewers to the suggestion types that have '
             'suggestions waiting too long for a review</li><br>'
@@ -4819,7 +4763,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
@@ -4898,7 +4842,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
             'for more than 0 days for review. Please take a look at the '
             'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
+            'to the <a href="%s%s">admin roles page</a> and either:'
             '<br><br><ul>'
             '<li>Add more reviewers to the suggestion types that have '
             'suggestions waiting too long for a review</li><br>'
@@ -4917,7 +4861,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
         expected_email_html_body_admin_2 = (
             'Hi user2,'
@@ -4926,7 +4870,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
             'for more than 0 days for review. Please take a look at the '
             'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
+            'to the <a href="%s%s">admin roles page</a> and either:'
             '<br><br><ul>'
             '<li>Add more reviewers to the suggestion types that have '
             'suggestions waiting too long for a review</li><br>'
@@ -4945,7 +4889,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL))
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             with self.swap_get_platform_parameter_value, self.swap(
@@ -4975,6 +4919,284 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_admin_2, self.admin_2_id,
             self.CURRICULUM_ADMIN_2_EMAIL)
+
+
+class NotifyReviewersNewSuggestionsTests(
+    test_utils.EmailTestBase):
+    """Tests the send_mail_to_notify_contributor_dashboard_reviewers method,
+    which sends an email to reviewers with information regarding the suggestions
+    that have waited the longest for review.
+    """
+
+    target_id: str = 'exp1'
+    skill_id: str = 'skill_123456'
+    timezone = datetime.timezone.utc
+    mocked_review_submission_datetime: datetime.datetime = (
+        datetime.datetime(2023, 10, 23, 5, tzinfo=timezone)
+    )
+    mocked_review_submission_datetime = (
+        mocked_review_submission_datetime.replace(
+            tzinfo=None))
+    AUTHOR_USERNAME: Final = 'author'
+    AUTHOR_EMAIL: Final = 'author@example.com'
+    REVIEWER_1_USERNAME: Final = 'reviewer1'
+    REVIEWER_1_EMAIL: Final = 'reviewer1@community.org'
+    REVIEWER_2_USERNAME: Final = 'reviewer2'
+    REVIEWER_2_EMAIL: Final = 'reviewer2@community.org'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(self.REVIEWER_1_EMAIL, self.REVIEWER_1_USERNAME)
+        self.reviewer_1_id = self.get_user_id_from_email(self.REVIEWER_1_EMAIL)
+        user_services.update_email_preferences(
+            self.reviewer_1_id, True, False, False, False)
+        self.signup(self.REVIEWER_2_EMAIL, self.REVIEWER_2_USERNAME)
+        self.reviewer_2_id = self.get_user_id_from_email(self.REVIEWER_2_EMAIL)
+        user_services.update_email_preferences(
+            self.reviewer_2_id, True, False, False, False)
+
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
+        self.log_new_error_counter = test_utils.CallCounter(
+            logging.error)
+        self.log_new_error_ctx = self.swap(
+            logging, 'error', self.log_new_error_counter)
+        self.logged_info: List[str] = []
+        self.log_new_info_ctx = self.swap(
+            logging, 'info', self._mock_logging_info)
+
+        self.save_new_valid_exploration(self.target_id, self.author_id)
+        self.save_new_skill(self.skill_id, self.author_id)
+        translation_suggestion = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(  # pylint: disable=line-too-long
+                'en', '<p>What is the meaning of life?</p>',
+                self.mocked_review_submission_datetime))
+        self.reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion))
+        self.swap_get_platform_parameter_value = self.swap(
+            platform_parameter_services,
+            'get_platform_parameter_value',
+            self._swap_get_platform_parameter_value_function
+        )
+
+    def _create_reviewable_suggestion_email_infos_from_suggestions(
+            self,
+            suggestions: List[suggestion_registry.BaseSuggestion]
+    ) -> List[suggestion_registry.ReviewableSuggestionEmailInfo]:
+        """Creates a list of ReviewableSuggestionEmailInfo objects from
+        the given suggestions.
+        """
+
+        return [
+            (
+                suggestion_services
+                .create_reviewable_suggestion_email_info_from_suggestion(
+                    suggestion)
+            ) for suggestion in suggestions
+        ]
+
+    def _assert_email_data_stored_in_sent_email_model_is_correct(
+        self,
+        expected_email_html_body: str,
+        reviewer_id: Optional[str],
+        reviewer_email: str
+    ) -> None:
+        """Asserts that the created sent email model from the sent email
+        contains the right information.
+        """
+        sent_email_models: Sequence[
+            email_models.SentEmailModel
+        ] = email_models.SentEmailModel.get_all().filter(
+            email_models.SentEmailModel.recipient_id == reviewer_id).fetch()
+        self.assertEqual(len(sent_email_models), 1)
+        sent_email_model = sent_email_models[0]
+        self.assertEqual(
+            sent_email_model.subject,
+            email_manager
+            .CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA[
+                'email_subject'])
+        self.assertEqual(
+            sent_email_model.recipient_id, reviewer_id)
+        self.assertEqual(
+            sent_email_model.recipient_email, reviewer_email)
+        self.assertEqual(
+            sent_email_model.html_body, expected_email_html_body)
+        self.assertEqual(
+            sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+        self.assertEqual(
+            sent_email_model.sender_email,
+            'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+        self.assertEqual(
+            sent_email_model.intent,
+            feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
+
+    def _swap_get_platform_parameter_value_function(
+        self, param_name: str
+    ) -> platform_parameter_domain.PlatformDataTypes:
+        """Swap function for get_platform_parameter_value.
+
+        Args:
+            param_name: str. The name of the platform parameter.
+
+        Returns:
+            PlatformDataTypes. The defined data type of the platform parameter.
+        """
+        if param_name == (
+            platform_parameter_list.ParamName.
+            CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
+        ):
+            return True
+        elif param_name == (
+            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
+        ):
+            return email_manager.EMAIL_SENDER_NAME.default_value
+        elif param_name == (
+            platform_parameter_list.ParamName.EMAIL_FOOTER.value
+        ):
+            return email_manager.EMAIL_FOOTER.default_value
+        return ''
+
+    def _mock_logging_info(self, msg: str, *args: str) -> None:
+        """Mocks logging.info() by appending the log message to the logged info
+        list.
+        """
+        self.logged_info.append(msg % args)
+
+    def _create_translation_suggestion_in_lang_with_html_and_datetime(
+        self,
+        language_code: str,
+        translation_html: str,
+        submission_datetime: datetime.datetime
+    ) -> suggestion_registry.BaseSuggestion:
+        """Creates a translation suggestion in the given language_code with the
+        given translation html and submission datetime.
+        """
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'content_id': 'content_0',
+            'language_code': language_code,
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': translation_html,
+            'data_format': 'html'
+        }
+
+        translation_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, add_translation_change_dict,
+            'test description')
+
+        translation_suggestion.last_updated = submission_datetime
+        return translation_suggestion
+
+    def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
+        with self.swap_get_platform_parameter_value, self.capture_logging(
+            min_level=logging.ERROR) as logs:
+            with self.cannot_send_emails_ctx, self.log_new_error_ctx:
+                reviewer_ids_by_language: DefaultDict[
+                        str, List[str]] = DefaultDict(list)
+                suggestions_by_language: DefaultDict[str, List[
+                        suggestion_registry.
+                            ReviewableSuggestionEmailInfo]] = DefaultDict(list)
+                reviewer_ids_by_language['en'] = []
+                suggestions_by_language['en'] = []
+
+                email_manager.send_reviewer_notifications(
+                    reviewer_ids_by_language,
+                    suggestions_by_language
+                )
+
+            messages = self._get_all_sent_email_messages()
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0], 'This app cannot send emails to users.')
+
+    def test_email_not_sent_if_no_reviewers_to_notify(self) -> None:
+        with self.swap_get_platform_parameter_value, self.capture_logging(
+            min_level=logging.ERROR) as logs:
+            with self.can_send_emails_ctx, self.log_new_error_ctx:
+                reviewer_ids_by_language: DefaultDict[
+                        str, List[str]] = DefaultDict(list)
+                suggestions_by_language: (DefaultDict[str, List[
+                        suggestion_registry.
+                            ReviewableSuggestionEmailInfo]]) = DefaultDict(
+                                list)
+                reviewer_ids_by_language['en'] = []
+                suggestions_by_language['en'] = []
+
+                email_manager.send_reviewer_notifications(
+                    reviewer_ids_by_language,
+                    suggestions_by_language
+                )
+
+            messages = self._get_all_sent_email_messages()
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0],
+                'No reviewers found for language en to notify')
+
+    def test_email_sent_to_reviewer_with_translation_waiting_days_for_review(
+        self
+    ) -> None:
+        translation_suggestion = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                'en',
+                '<p>What is the meaning of life?</p>',
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion))
+        review_wait_time = 2
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(days=review_wait_time))
+        expected_email_html_body = (
+            'Hi reviewer1' +
+            ',<br><br>There are new <a href="%s%s">opportunities</a>' +
+            ' to review translations that we think you might be interested' +
+            ' in on the Contributor Dashboard page. Here are some examples' +
+            ' of contributions that are waiting for review:'
+            '<br><br>The following suggestions are available for review: ' +
+            '<br><br><ul><li>The following English translation suggestion ' +
+            'was submitted for review 2 days ago:<br>What is the' +
+            ' meaning of life?</li><br></ul><br>Please take some time ' +
+            'to review any of the above contributions '
+            '(if they still need a review) or any other contributions ' +
+            'on the dashboard. We appreciate your help!<br><br>Thanks again,' +
+            ' and happy reviewing!<br><br>The Oppia Contributor Dashboard Team'
+            )
+
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    reviewer_ids_by_language: DefaultDict[
+                        str, List[str]] = DefaultDict(list)
+                    suggestions_by_language: DefaultDict[str, List[suggestion_registry.ReviewableSuggestionEmailInfo]] = ( # pylint: disable=line-too-long
+                        DefaultDict(list))
+                    reviewer_ids_by_language['en'] = [self.reviewer_1_id]
+                    suggestions_by_language['en'] = [
+                        reviewable_suggestion_email_info]
+
+                    email_manager.send_reviewer_notifications(
+                        reviewer_ids_by_language,
+                        suggestions_by_language
+                    )
+
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html, (expected_email_html_body % (
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL)))
 
 
 class NotifyAdminsContributorDashboardReviewersNeededTests(
@@ -5097,12 +5319,12 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             PlatformDataTypes. The defined data type of the platform parameter.
         """
         if param_name == (
-            platform_parameter_list.ParamNames.
+            platform_parameter_list.ParamName.
             ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
         ):
             return True
         elif param_name == (
-            platform_parameter_list.ParamNames.EMAIL_SENDER_NAME.value
+            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
         ):
             return email_manager.EMAIL_SENDER_NAME.default_value
         return ''
@@ -5139,7 +5361,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         }
 
         self.swap_get_platform_parameter_value = self.swap(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             self._swap_get_platform_parameter_value_function
         )
@@ -6249,32 +6471,32 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 1)
 
 
-class ContributionReviewerEmailTest(test_utils.EmailTestBase):
+class CDUserEmailTest(test_utils.EmailTestBase):
     """Test for assignment and removal of contribution reviewers."""
 
     TRANSLATION_REVIEWER_EMAIL: Final = 'translationreviewer@example.com'
-    VOICEOVER_REVIEWER_EMAIL: Final = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL: Final = 'questionreviewer@example.com'
+    QUESTION_SUBMITTER_EMAIL: Final = 'questionsubmitter@example.com'
 
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
-        self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
+        self.signup(self.QUESTION_SUBMITTER_EMAIL, 'questionSuggestor')
 
         self.translation_reviewer_id = self.get_user_id_from_email(
             self.TRANSLATION_REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.translation_reviewer_id, True, False, False, False)
-        self.voiceover_reviewer_id = self.get_user_id_from_email(
-            self.VOICEOVER_REVIEWER_EMAIL)
-        user_services.update_email_preferences(
-            self.voiceover_reviewer_id, True, False, False, False)
         self.question_reviewer_id = self.get_user_id_from_email(
             self.QUESTION_REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.question_reviewer_id, True, False, False, False)
+        self.question_submitter_id = self.get_user_id_from_email(
+            self.QUESTION_SUBMITTER_EMAIL)
+        user_services.update_email_preferences(
+            self.question_submitter_id, True, False, False, False)
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
@@ -6285,9 +6507,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         self
     ) -> None:
         with self.can_not_send_emails_ctx:
-            email_manager.send_email_to_new_contribution_reviewer(
+            email_manager.send_email_to_new_cd_user(
                 self.translation_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
 
         messages = self._get_sent_email_messages(
@@ -6302,9 +6524,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The language_code cannot be None'
         ):
             with self.can_not_send_emails_ctx:
-                email_manager.send_email_to_new_contribution_reviewer(
+                email_manager.send_email_to_new_cd_user(
                     self.translation_reviewer_id,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION
+                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
                 )
 
     def test_without_language_code_email_not_sent_to_removed_translation_reviewer(   # pylint: disable=line-too-long
@@ -6315,32 +6537,38 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The language_code cannot be None'
         ):
             with self.can_not_send_emails_ctx:
-                email_manager.send_email_to_removed_contribution_reviewer(
+                email_manager.send_email_to_removed_cd_user(
                     self.translation_reviewer_id,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION)
+                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION)
 
-    def test_assign_translation_reviewer_email_for_invalid_review_category(
+    def test_assign_translation_reviewer_email_for_invalid_category(
         self
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'Invalid review_category'):
-            email_manager.send_email_to_new_contribution_reviewer(
+        with self.assertRaisesRegex(Exception, 'Invalid category'):
+            email_manager.send_email_to_new_cd_user(
                 self.translation_reviewer_id, 'invalid_category')
 
-    def test_schema_of_new_reviewer_email_data_constant(self) -> None:
-        self.assertEqual(sorted(email_manager.NEW_REVIEWER_EMAIL_DATA.keys()), [
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER])
-        for category_details in email_manager.NEW_REVIEWER_EMAIL_DATA.values():
-            self.assertEqual(len(category_details), 4)
+    def test_schema_of_new_cd_user_email_data_constant(self) -> None:
+        self.assertEqual(
+            sorted(email_manager.NEW_CD_USER_EMAIL_DATA.keys()),
+            [
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
+            ])
+        for category_details in (
+            email_manager.NEW_CD_USER_EMAIL_DATA.values()
+        ):
+            self.assertEqual(len(category_details), 5)
             self.assertTrue(
                 'description' in category_details or (
                     'description_template' in category_details))
-            self.assertTrue('review_category' in category_details)
+            self.assertTrue('category' in category_details)
             self.assertTrue(
                 'rights_message' in category_details or (
                     'rights_message_template' in category_details))
-            self.assertTrue('to_check' in category_details)
+            self.assertTrue('to_review' in category_details or (
+                    'to_submit' in category_details))
 
     def test_send_assigned_translation_reviewer_email(self) -> None:
         expected_email_subject = (
@@ -6359,9 +6587,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_contribution_reviewer(
+            email_manager.send_email_to_new_cd_user(
                 self.translation_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
 
             # Make sure correct email is sent.
@@ -6388,55 +6616,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
-
-    def test_send_assigned_voiceover_reviewer_email(self) -> None:
-        expected_email_subject = (
-            'You have been invited to review Oppia voiceovers')
-        expected_email_html_body = (
-            'Hi voiceartist,<br><br>'
-            'This is to let you know that the Oppia team has added you as a '
-            'reviewer for हिन्दी (hindi) language voiceovers. This allows you '
-            'to review voiceover applications made by contributors in the '
-            'हिन्दी (hindi) language.<br><br>'
-            'You can check the voiceover applications waiting for review in '
-            'the <a href="https://www.oppia.org/contributor-dashboard">'
-            'Contributor Dashboard</a>.<br><br>'
-            'Thanks, and happy contributing!<br><br>'
-            'Best wishes,<br>'
-            'The Oppia Community')
-
-        with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_contribution_reviewer(
-                self.voiceover_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                language_code='hi')
-
-            # Make sure correct email is sent.
-            messages = self._get_sent_email_messages(
-                self.VOICEOVER_REVIEWER_EMAIL)
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].html, expected_email_html_body)
-
-            # Make sure correct email model is stored.
-            all_models: Sequence[
-                email_models.SentEmailModel
-            ] = email_models.SentEmailModel.get_all().fetch()
-            sent_email_model = all_models[0]
-            self.assertEqual(
-                sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.voiceover_reviewer_id)
-            self.assertEqual(
-                sent_email_model.recipient_email,
-                self.VOICEOVER_REVIEWER_EMAIL)
-            self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
-            self.assertEqual(
-                sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
-            self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ONBOARD_CD_USER)
 
     def test_send_assigned_question_reviewer_email(self) -> None:
         expected_email_subject = (
@@ -6454,9 +6635,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_contribution_reviewer(
+            email_manager.send_email_to_new_cd_user(
                 self.question_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
 
             # Make sure correct email is sent.
@@ -6482,43 +6663,92 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ONBOARD_CD_USER)
+
+    def test_send_assigned_question_submitter_email(self) -> None:
+        expected_email_subject = (
+            'You have been invited to submit Oppia questions')
+        expected_email_html_body = (
+            'Hi questionSuggestor,<br><br>'
+            'This is to let you know that the Oppia team has added you as a '
+            'contributor to submit question suggestions ' 
+            'for use in lessons.<br><br>'
+            'You can now start to submit questions in the '
+            '<a href="https://www.oppia.org/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Thanks, and happy contributing!<br><br>'
+            'Best wishes,<br>'
+            'The Oppia Community')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_email_to_new_cd_user(
+                self.question_submitter_id,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                language_code='hi')
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(
+                self.QUESTION_SUBMITTER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[
+                email_models.SentEmailModel
+            ] = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.question_submitter_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.QUESTION_SUBMITTER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ONBOARD_CD_USER)
 
     def test_email_is_not_sent_can_send_emails_is_false(self) -> None:
         with self.can_not_send_emails_ctx:
-            email_manager.send_email_to_removed_contribution_reviewer(
+            email_manager.send_email_to_removed_cd_user(
                 self.translation_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
 
         messages = self._get_sent_email_messages(
             self.TRANSLATION_REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
-    def test_remove_translation_reviewer_email_for_invalid_review_category(
+    def test_remove_translation_reviewer_email_for_invalid_category(
         self
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'Invalid review_category'):
-            email_manager.send_email_to_removed_contribution_reviewer(
+        with self.assertRaisesRegex(Exception, 'Invalid category'):
+            email_manager.send_email_to_removed_cd_user(
                 self.translation_reviewer_id, 'invalid_category')
 
     def test_schema_of_removed_reviewer_email_data_constant(self) -> None:
         self.assertEqual(
-            sorted(email_manager.REMOVED_REVIEWER_EMAIL_DATA.keys()), [
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER])
+            sorted(email_manager.REMOVED_CD_USER_EMAIL_DATA.keys()),
+                [
+                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                    constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
+                ])
         for category_details in (
-                email_manager.REMOVED_REVIEWER_EMAIL_DATA.values()):
-            self.assertEqual(len(category_details), 4)
+                email_manager.REMOVED_CD_USER_EMAIL_DATA.values()):
+            self.assertEqual(len(category_details), 3)
             self.assertTrue(
                 'role_description' in category_details or (
                     'role_description_template' in category_details))
-            self.assertTrue('review_category' in category_details)
+            self.assertTrue('category' in category_details)
             self.assertTrue(
                 'rights_message' in category_details or (
                     'rights_message_template' in category_details))
-            self.assertTrue('contribution_allowed' in category_details)
 
     def test_send_removed_translation_reviewer_email(self) -> None:
         expected_email_subject = (
@@ -6536,9 +6766,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_contribution_reviewer(
+            email_manager.send_email_to_removed_cd_user(
                 self.translation_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
 
             # Make sure correct email is sent.
@@ -6565,53 +6795,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_REVIEWER)
-
-    def test_send_removed_voiceover_reviewer_email(self) -> None:
-        expected_email_subject = (
-            'You have been unassigned as a voiceover reviewer')
-        expected_email_html_body = (
-            'Hi voiceartist,<br><br>'
-            'The Oppia team has removed you from the voiceover reviewer role '
-            'in the हिन्दी (hindi) language. You won\'t be able to review '
-            'voiceover applications made by contributors in the हिन्दी (hindi)'
-            ' language any more, but you can still contribute voiceovers '
-            'through the <a href="https://www.oppia.org/contributor-dashboard">'
-            'Contributor Dashboard</a>.<br><br>'
-            'Thanks, and happy contributing!<br><br>'
-            'Best wishes,<br>'
-            'The Oppia Community')
-
-        with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_contribution_reviewer(
-                self.voiceover_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                language_code='hi')
-
-            # Make sure correct email is sent.
-            messages = self._get_sent_email_messages(
-                self.VOICEOVER_REVIEWER_EMAIL)
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].html, expected_email_html_body)
-
-            # Make sure correct email model is stored.
-            all_models: Sequence[
-                email_models.SentEmailModel
-            ] = email_models.SentEmailModel.get_all().fetch()
-            sent_email_model = all_models[0]
-            self.assertEqual(
-                sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.voiceover_reviewer_id)
-            self.assertEqual(
-                sent_email_model.recipient_email, self.VOICEOVER_REVIEWER_EMAIL)
-            self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
-            self.assertEqual(
-                sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
-            self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_REVIEWER)
+                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CD_USER)
 
     def test_send_removed_question_reviewer_email(self) -> None:
         expected_email_subject = (
@@ -6628,9 +6812,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_contribution_reviewer(
+            email_manager.send_email_to_removed_cd_user(
                 self.question_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
 
             # Make sure correct email is sent.
@@ -6656,7 +6840,52 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_REVIEWER)
+                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CD_USER)
+
+    def test_send_removed_question_submitter_email(self) -> None:
+        expected_email_subject = (
+            'You have been unassigned as a question submitter')
+        expected_email_html_body = (
+            'Hi questionSuggestor,<br><br>'
+            'The Oppia team has removed you from the question submitter role. '
+            'You won\'t be able to submit question suggestions '
+            'any more, but you can still contribute questions '
+            'through the <a href="https://www.oppia.org/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Thanks, and happy contributing!<br><br>'
+            'Best wishes,<br>'
+            'The Oppia Community')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_email_to_removed_cd_user(
+                self.question_submitter_id,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                language_code='hi')
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(
+                self.QUESTION_SUBMITTER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[
+                email_models.SentEmailModel
+            ] = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.question_submitter_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.QUESTION_SUBMITTER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CD_USER)
 
 
 class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):

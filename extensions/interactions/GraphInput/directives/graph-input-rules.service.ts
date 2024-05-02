@@ -16,24 +16,28 @@
  * @fileoverview Rules service for the interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AdjacencyMatrix, GraphUtilsService } from
-  'interactions/GraphInput/directives/graph-utils.service';
-import { UtilsService } from 'services/utils.service';
-import { GraphAnswer } from 'interactions/answer-defs';
+import {
+  AdjacencyMatrix,
+  GraphUtilsService,
+} from 'interactions/GraphInput/directives/graph-utils.service';
+import {UtilsService} from 'services/utils.service';
+import {GraphAnswer} from 'interactions/answer-defs';
 import {
   GraphIsomorphicRuleInputs,
-  GraphPropertyRuleInputs
+  GraphPropertyRuleInputs,
 } from 'interactions/rule-input-defs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GraphInputRulesService {
   constructor(
-    private gus: GraphUtilsService, private utilsService: UtilsService) {}
+    private gus: GraphUtilsService,
+    private utilsService: UtilsService
+  ) {}
 
   /**
    * @param {object} graph - A graph object.
@@ -47,27 +51,31 @@ export class GraphInputRulesService {
     }
 
     var adjacencyLists = this.gus.constructAdjacencyLists(
-      graph, this.gus.GRAPH_ADJACENCY_MODE.DIRECTED);
+      graph,
+      this.gus.GRAPH_ADJACENCY_MODE.DIRECTED
+    );
     var invertedAdjacencyLists = this.gus.constructAdjacencyLists(
-      graph, this.gus.GRAPH_ADJACENCY_MODE.INVERTED);
+      graph,
+      this.gus.GRAPH_ADJACENCY_MODE.INVERTED
+    );
 
-    var isVisited = graph.vertices.map(function() {
+    var isVisited = graph.vertices.map(function () {
       return false;
     });
     this.gus.markAccessible(0, adjacencyLists, isVisited);
-    var isAnyVertexUnreachable = isVisited.some(function(visited) {
+    var isAnyVertexUnreachable = isVisited.some(function (visited) {
       return visited === false;
     });
 
-    var isVisitedInReverse = graph.vertices.map(function() {
+    var isVisitedInReverse = graph.vertices.map(function () {
       return false;
     });
-    this.gus.markAccessible(
-      0, invertedAdjacencyLists, isVisitedInReverse);
-    var isAnyVertexUnreachableInReverse =
-      isVisitedInReverse.some(function(visited) {
+    this.gus.markAccessible(0, invertedAdjacencyLists, isVisitedInReverse);
+    var isAnyVertexUnreachableInReverse = isVisitedInReverse.some(
+      function (visited) {
         return visited === false;
-      });
+      }
+    );
 
     return !isAnyVertexUnreachable && !isAnyVertexUnreachableInReverse;
   }
@@ -84,12 +92,14 @@ export class GraphInputRulesService {
     }
 
     var adjacencyLists = this.gus.constructAdjacencyLists(
-      graph, this.gus.GRAPH_ADJACENCY_MODE.UNDIRECTED);
-    var isVisited = graph.vertices.map(function() {
+      graph,
+      this.gus.GRAPH_ADJACENCY_MODE.UNDIRECTED
+    );
+    var isVisited = graph.vertices.map(function () {
       return false;
     });
     this.gus.markAccessible(0, adjacencyLists, isVisited);
-    return isVisited.every(function(visited) {
+    return isVisited.every(function (visited) {
       return visited === true;
     });
   }
@@ -105,13 +115,24 @@ export class GraphInputRulesService {
       return this.gus.DFS_STATUS.UNVISITED;
     });
     var adjacencyLists = this.gus.constructAdjacencyLists(
-      graph, this.gus.GRAPH_ADJACENCY_MODE.DIRECTED);
-    for (var startVertex = 0;
+      graph,
+      this.gus.GRAPH_ADJACENCY_MODE.DIRECTED
+    );
+    for (
+      var startVertex = 0;
       startVertex < graph.vertices.length;
-      startVertex++) {
+      startVertex++
+    ) {
       if (nodeStatus[startVertex] === this.gus.DFS_STATUS.UNVISITED) {
-        if (this.gus.findCycle(
-          startVertex, -1, adjacencyLists, nodeStatus, graph.isDirected)) {
+        if (
+          this.gus.findCycle(
+            startVertex,
+            -1,
+            adjacencyLists,
+            nodeStatus,
+            graph.isDirected
+          )
+        ) {
           return false;
         }
       }
@@ -130,36 +151,40 @@ export class GraphInputRulesService {
     }
 
     var adjacencyLists = this.gus.constructAdjacencyLists(
-      graph, this.gus.GRAPH_ADJACENCY_MODE.DIRECTED);
-    var outdegreeCounts = adjacencyLists.map(function(list) {
+      graph,
+      this.gus.GRAPH_ADJACENCY_MODE.DIRECTED
+    );
+    var outdegreeCounts = adjacencyLists.map(function (list) {
       return list.length;
     });
-    var indegreeCounts = adjacencyLists.map(function() {
+    var indegreeCounts = adjacencyLists.map(function () {
       return 0;
     });
-    adjacencyLists.forEach(function(list) {
-      list.forEach(function(destination) {
+    adjacencyLists.forEach(function (list) {
+      list.forEach(function (destination) {
         indegreeCounts[destination]++;
       });
     });
 
-    var areIndegreeCountsEqual = indegreeCounts.every(function(indegree) {
+    var areIndegreeCountsEqual = indegreeCounts.every(function (indegree) {
       return indegree === indegreeCounts[0];
     });
-    var areOutdegreeCountsEqual = outdegreeCounts.every(function(outdegree) {
+    var areOutdegreeCountsEqual = outdegreeCounts.every(function (outdegree) {
       return outdegree === outdegreeCounts[0];
     });
     return areIndegreeCountsEqual && areOutdegreeCountsEqual;
   }
 
   private _getDegreesOfMatrix(adj: AdjacencyMatrix): number[] {
-    return adj.map((value) => {
-      return value.reduce((prev, cur) => {
-        prev = (prev === null) ? 0 : prev;
-        cur = (cur === null) ? 0 : cur;
-        return prev + cur;
-      });
-    }).sort() as number[];
+    return adj
+      .map(value => {
+        return value.reduce((prev, cur) => {
+          prev = prev === null ? 0 : prev;
+          cur = cur === null ? 0 : cur;
+          return prev + cur;
+        });
+      })
+      .sort() as number[];
   }
 
   private isIsomorphic(graph1: GraphAnswer, graph2: GraphAnswer): boolean {
@@ -188,14 +213,20 @@ export class GraphInputRulesService {
       permutation.push(i);
     }
     while (permutation !== null) {
-      var doLabelsMatch = (!graph1.isLabeled && !graph2.isLabeled) ||
+      var doLabelsMatch =
+        (!graph1.isLabeled && !graph2.isLabeled) ||
         graph2.vertices.every((vertex, index) => {
           const _permutation = permutation as number[];
           return vertex.label === graph1.vertices[_permutation[index]].label;
         });
-      if (doLabelsMatch &&
-          this.gus.areAdjacencyMatricesEqualWithPermutation(
-            adj1, adj2, permutation)) {
+      if (
+        doLabelsMatch &&
+        this.gus.areAdjacencyMatricesEqualWithPermutation(
+          adj1,
+          adj2,
+          permutation
+        )
+      ) {
         return true;
       }
       permutation = this.gus.nextPermutation(permutation);
@@ -204,8 +235,9 @@ export class GraphInputRulesService {
   }
 
   HasGraphProperty(
-      answer: GraphAnswer,
-      inputs: GraphPropertyRuleInputs): boolean {
+    answer: GraphAnswer,
+    inputs: GraphPropertyRuleInputs
+  ): boolean {
     if (inputs.p === 'strongly_connected') {
       return this.isStronglyConnected(answer);
     } else if (inputs.p === 'weakly_connected') {
@@ -220,11 +252,16 @@ export class GraphInputRulesService {
   }
 
   IsIsomorphicTo(
-      answer: GraphAnswer,
-      inputs: GraphIsomorphicRuleInputs): boolean {
+    answer: GraphAnswer,
+    inputs: GraphIsomorphicRuleInputs
+  ): boolean {
     return this.isIsomorphic(answer, inputs.g);
   }
 }
 
-angular.module('oppia').factory(
-  'GraphInputRulesService', downgradeInjectable(GraphInputRulesService));
+angular
+  .module('oppia')
+  .factory(
+    'GraphInputRulesService',
+    downgradeInjectable(GraphInputRulesService)
+  );

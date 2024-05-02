@@ -24,6 +24,7 @@ import site
 import subprocess
 import sys
 
+from core import feconf
 from scripts import common
 from scripts import install_third_party_libs
 
@@ -35,6 +36,9 @@ EXCLUDED_DIRECTORIES: Final = [
     'scripts/linters/test_files/',
     'third_party/',
     'venv/',
+    # This file is an edited copy of a file from the Google Cloud SDK. To keep
+    # the changes minimal, we do not add types to this file.
+    'docker/patched_wsgi_server.py',
     # The files in 'build_sources' and 'data' directories can be
     # ignored while type checking, because these files are only
     # used as resources for the tests.
@@ -177,16 +181,19 @@ def main(args: Optional[List[str]] = None) -> int:
         # https://stackoverflow.com/q/10095037 for more details.
         sys.path.insert(1, directory)
 
-    install_third_party_libraries(parsed_args.skip_install)
+    if not feconf.OPPIA_IS_DOCKERIZED:
+        install_third_party_libraries(parsed_args.skip_install)
 
-    print('Installing Mypy and stubs for third party libraries.')
-    return_code, mypy_exec_path = install_mypy_prerequisites(
-        parsed_args.install_globally)
-    if return_code != 0:
-        print('Cannot install Mypy and stubs for third party libraries.')
-        sys.exit(1)
+        print('Installing Mypy and stubs for third party libraries.')
+        return_code, mypy_exec_path = install_mypy_prerequisites(
+            parsed_args.install_globally)
+        if return_code != 0:
+            print('Cannot install Mypy and stubs for third party libraries.')
+            sys.exit(1)
 
-    print('Installed Mypy and stubs for third party libraries.')
+        print('Installed Mypy and stubs for third party libraries.')
+
+    mypy_exec_path = os.path.join(MYPY_TOOLS_DIR, 'bin', 'mypy')
 
     print('Starting Mypy type checks.')
     cmd = get_mypy_cmd(

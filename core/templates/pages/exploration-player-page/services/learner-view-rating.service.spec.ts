@@ -16,10 +16,12 @@
  * @fileoverview Tests for Learner View Rating Service.
  */
 
-import { async, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { LearnerViewRatingService } from './learner-view-rating.service';
-import { LearnerViewRatingBackendApiService } from './learner-view-rating-backend-api.service';
+import {async, fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TranslateService} from '@ngx-translate/core';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {LearnerViewRatingService} from './learner-view-rating.service';
+import {LearnerViewRatingBackendApiService} from './learner-view-rating-backend-api.service';
 
 describe('Learner View Rating Service', () => {
   let learnerViewRatingService: LearnerViewRatingService;
@@ -27,42 +29,57 @@ describe('Learner View Rating Service', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService,
+        },
+      ],
     });
   }));
 
   beforeEach(() => {
     learnerViewRatingService = TestBed.inject(LearnerViewRatingService);
     learnerViewRatingBackendApiService = TestBed.inject(
-      LearnerViewRatingBackendApiService);
+      LearnerViewRatingBackendApiService
+    );
   });
 
-  it('should send request to backend for fetching user rating info' +
-    ' when initialized', fakeAsync(() => {
-    let userRatingSpy = spyOn(
-      learnerViewRatingBackendApiService, 'getUserRatingAsync')
-      .and.resolveTo({
-        user_rating: 2
+  it(
+    'should send request to backend for fetching user rating info' +
+      ' when initialized',
+    fakeAsync(() => {
+      let userRatingSpy = spyOn(
+        learnerViewRatingBackendApiService,
+        'getUserRatingAsync'
+      ).and.resolveTo({
+        user_rating: 2,
       });
-    let successCb = jasmine.createSpy('success');
+      let successCb = jasmine.createSpy('success');
 
-    learnerViewRatingService.init(successCb);
-    tick();
+      learnerViewRatingService.init(successCb);
+      tick();
 
-    expect(userRatingSpy).toHaveBeenCalled();
-  }));
+      expect(userRatingSpy).toHaveBeenCalled();
+    })
+  );
 
-  it('should send request to backend for submiting user rating info' +
-    ' when calling \'submitUserRating\'', fakeAsync(() => {
-    let userRatingSpy = spyOn(
-      learnerViewRatingBackendApiService, 'submitUserRatingAsync')
-      .and.resolveTo();
+  it(
+    'should send request to backend for submiting user rating info' +
+      " when calling 'submitUserRating'",
+    fakeAsync(() => {
+      let userRatingSpy = spyOn(
+        learnerViewRatingBackendApiService,
+        'submitUserRatingAsync'
+      ).and.resolveTo();
 
-    learnerViewRatingService.submitUserRating(2);
-    tick();
+      learnerViewRatingService.submitUserRating(2);
+      tick();
 
-    expect(userRatingSpy).toHaveBeenCalled();
-  }));
+      expect(userRatingSpy).toHaveBeenCalled();
+    })
+  );
 
   it('should test getters', () => {
     let userRating = 4;
