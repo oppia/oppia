@@ -23,8 +23,8 @@ export class ContributorAdminDashboardFilter {
   topicIds: string[];
   languageCode?: string;
   sort?: string | null;
-  numberOfDaysSinceLastActivityStartDate?: number;
-  numberOfDaysSinceLastActivityEndDate?: number;
+  startDate?: Date;
+  endDate?: Date;
 
   /**
    * @param {String} languageCode - Language Code to filter for.
@@ -37,16 +37,14 @@ export class ContributorAdminDashboardFilter {
     topicIds: string[],
     languageCode?: string,
     sort?: string | null,
-    numberOfDaysSinceLastActivityStartDate?: number,
-    numberOfDaysSinceLastActivityEndDate?: number
+    startDate?: Date,
+    endDate?: Date
   ) {
     this.languageCode = languageCode;
     this.topicIds = topicIds;
     this.sort = sort;
-    this.numberOfDaysSinceLastActivityStartDate =
-      numberOfDaysSinceLastActivityStartDate;
-    this.numberOfDaysSinceLastActivityEndDate =
-      numberOfDaysSinceLastActivityEndDate;
+    this.startDate = startDate;
+    this.endDate = endDate;
   }
 
   /**

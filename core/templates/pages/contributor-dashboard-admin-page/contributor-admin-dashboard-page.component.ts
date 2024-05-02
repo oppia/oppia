@@ -281,35 +281,13 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     );
   }
 
-  getNumberOfDaysSinceStartDateForLastActivity(): number {
-    const oneDay = this.ONE_DAY_IN_MILLIS;
-    const today = new Date();
-    return Math.floor(
-      Math.abs(
-        today.getTime() - this.startDateForUsersLastActivity?.getTime()
-      ) / oneDay
-    );
-  }
-
-  getNumberOfDaysSinceEndDateForLastActivity(): number {
-    const today = new Date();
-    return Math.floor(
-      Math.abs(today.getTime() - this.endDateForUsersLastActivity?.getTime()) /
-        this.ONE_DAY_IN_MILLIS
-    );
-  }
-
   createFilter(): void {
-    const numberOfDaysSinceStartDate =
-      this.getNumberOfDaysSinceStartDateForLastActivity();
-    const numberOfDaysSinceEndDate =
-      this.getNumberOfDaysSinceEndDateForLastActivity();
     const tempFilter = new ContributorAdminDashboardFilter(
       this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
-      numberOfDaysSinceStartDate,
-      numberOfDaysSinceEndDate
+      this.startDateForUsersLastActivity,
+      this.endDateForUsersLastActivity
     );
 
     if (this.filter === undefined || !isEqual(tempFilter, this.filter)) {

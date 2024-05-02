@@ -516,8 +516,8 @@ class ContributorDashboardAdminStatsHandlerNormalizedPayloadDict(TypedDict):
     language_code: Optional[str]
     sort_by: Optional[str]
     topic_ids: Optional[List[str]]
-    max_days_since_start_date_for_last_activity: Optional[int]
-    max_days_since_end_date_for_last_activity: Optional[int]
+    start_date: Optional[int]
+    end_date: Optional[int]
 
 
 class ContributorDashboardAdminStatsHandler(
@@ -595,25 +595,17 @@ class ContributorDashboardAdminStatsHandler(
                 },
                 'default_value': None
             },
-            'max_days_since_start_date_for_last_activity': {
+            'start_date': {
                 'schema': {
-                    'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
+                    'type': 'basestring'
                 },
-                'default_value': None
+                'default_value': '3000-01-01'
             },
-            'max_days_since_end_date_for_last_activity': {
+            'end_date': {
                 'schema': {
-                    'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
+                    'type': 'basestring'
                 },
-                'default_value': None
+                'default_value': '1970-01-01'
             }
         }
     }
@@ -632,11 +624,12 @@ class ContributorDashboardAdminStatsHandler(
         language_code = self.normalized_request.get('language_code')
         sort_by = self.normalized_request.get('sort_by')
         topic_ids = self.normalized_request.get('topic_ids')
-        max_days_since_start_date_for_last_activity = (
-            self.normalized_request.get(
-                'max_days_since_start_date_for_last_activity'))
-        max_days_since_end_date_for_last_activity = self.normalized_request.get(
-            'max_days_since_end_date_for_last_activity')
+        start_date = datetime.datetime.strptime(self.normalized_request.get(
+                'start_date').split(',')[0], "%m/%d/%Y").date()
+        end_date = datetime.datetime.strptime(self.normalized_request.get(
+                'end_date').split(',')[0], "%m/%d/%Y").date()
+
+        print(end_date)
 
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
@@ -653,8 +646,8 @@ class ContributorDashboardAdminStatsHandler(
                         language_code,
                         sort_by,
                         topic_ids,
-                        max_days_since_start_date_for_last_activity,
-                        max_days_since_end_date_for_last_activity
+                        start_date,
+                        end_date
                     ))
                 translation_submitter_frontend_dicts = [stat.to_frontend_dict()
                     for stat in translation_submitter_stats]
@@ -677,8 +670,8 @@ class ContributorDashboardAdminStatsHandler(
                         offset,
                         language_code,
                         sort_by,
-                        max_days_since_start_date_for_last_activity,
-                        max_days_since_end_date_for_last_activity
+                        start_date,
+                        end_date
                     ))
                 translation_reviewer_frontend_dicts = [stat.to_frontend_dict()
                     for stat in translation_reviewer_stats]
@@ -713,8 +706,8 @@ class ContributorDashboardAdminStatsHandler(
                         offset,
                         sort_by,
                         topic_ids,
-                        max_days_since_start_date_for_last_activity,
-                        max_days_since_end_date_for_last_activity
+                        start_date,
+                        end_date
                     ))
                 question_submitter_frontend_dicts = [stat.to_frontend_dict()
                     for stat in question_submitter_stats]
@@ -735,8 +728,8 @@ class ContributorDashboardAdminStatsHandler(
                         page_size,
                         offset,
                         sort_by,
-                        max_days_since_start_date_for_last_activity,
-                        max_days_since_end_date_for_last_activity
+                        start_date,
+                        end_date
                     ))
                 question_reviewer_frontend_dicts = [stat.to_frontend_dict()
                     for stat in question_reviewer_stats]

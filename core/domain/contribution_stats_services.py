@@ -15,11 +15,13 @@
 """Service methods for operating on contributor admin dashboard user stats.
 """
 
+
 from __future__ import annotations
 
 from core.domain import suggestion_registry
 from core.domain import user_domain
 from core.platform import models
+import datetime
 
 from typing import List, Optional, Sequence, Tuple
 
@@ -236,8 +238,8 @@ def get_translation_submitter_total_stats(
     language_code: str,
     sort_by: Optional[str],
     topic_ids: Optional[List[str]],
-    max_days_since_start_date_for_last_activity: Optional[int],
-    max_days_since_end_date_for_last_activity: Optional[int]
+    start_date: datetime.date,
+    end_date: datetime.date
 ) -> Tuple[
         List[suggestion_registry.TranslationSubmitterTotalContributionStats],
         int,
@@ -253,9 +255,9 @@ def get_translation_submitter_total_stats(
             result.
         topic_ids: List[str]|None. List of topic ID(s) to fetch
             contributor stats for.
-        max_days_since_start_date_for_last_activity: int. Number of days before
+        start_date: int. Number of days before
             today to start including users' contributions.
-        max_days_since_end_date_for_last_activity: int. Number of days before
+        end_date: int. Number of days before
             today from which to stop including users' contributions.
 
     Returns:
@@ -264,8 +266,8 @@ def get_translation_submitter_total_stats(
                     list(TranslationSubmitterTotalContributionStats).
                     The list of domain objects which match the supplied
                     language_code, topic_ids,
-                    max_days_since_start_date_for_last_activity and
-                    max_days_since_end_date_for_last_activity filters, returned
+                    start_date and
+                    end_date filters, returned
                     in the order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
@@ -280,10 +282,10 @@ def get_translation_submitter_total_stats(
             language_code=language_code,
             sort_by=sort_by,
             topic_ids=topic_ids,
-            max_days_since_start_date_for_last_activity=(
-                max_days_since_start_date_for_last_activity),
-            max_days_since_end_date_for_last_activity=(
-                max_days_since_end_date_for_last_activity)
+            start_date=(
+                start_date),
+            end_date=(
+                end_date)
         )
     )
 
@@ -303,8 +305,8 @@ def get_translation_reviewer_total_stats(
         offset: int,
         language_code: str,
         sort_by: Optional[str],
-        max_days_since_start_date_for_last_activity: Optional[int],
-        max_days_since_end_date_for_last_activity: Optional[int]
+        start_date: datetime.date,
+        end_date: datetime.date
 ) -> Tuple[
         List[suggestion_registry.TranslationReviewerTotalContributionStats],
         int,
@@ -319,9 +321,9 @@ def get_translation_reviewer_total_stats(
         language_code: str. The language code to get results for.
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
-        max_days_since_start_date_for_last_activity: int. Number of days before
+        start_date: int. Number of days before
             today to start including users' contributions.
-        max_days_since_end_date_for_last_activity: int. Number of days before
+        end_date: int. Number of days before
             today from which to stop including users' contributions.
 
     Returns:
@@ -329,8 +331,8 @@ def get_translation_reviewer_total_stats(
             sorted_results:
                 list(TranslationReviewerTotalContributionStats).
                 The list of domain objects which match the supplied
-                language_code, max_days_since_start_date_for_last_activity and
-                max_days_since_end_date_for_last_activity filters, returned in
+                language_code, start_date and
+                end_date filters, returned in
                 the order specified by sort_by.
             next_offset: int. Number of results to skip in next batch.
             more: bool. If True, there are (probably) more results after
@@ -344,10 +346,10 @@ def get_translation_reviewer_total_stats(
             offset=offset,
             language_code=language_code,
             sort_by=sort_by,
-            max_days_since_start_date_for_last_activity=(
-                max_days_since_start_date_for_last_activity),
-            max_days_since_end_date_for_last_activity=(
-                max_days_since_end_date_for_last_activity)
+            start_date=(
+                start_date),
+            end_date=(
+                end_date)
         )
     )
 
@@ -368,8 +370,8 @@ def get_question_submitter_total_stats(
     offset: int,
     sort_by: Optional[str],
     topic_ids: Optional[List[str]],
-    max_days_since_start_date_for_last_activity: Optional[int],
-    max_days_since_end_date_for_last_activity: Optional[int]
+    start_date: datetime.date,
+    end_date: datetime.date
 ) -> Tuple[
         List[suggestion_registry.QuestionSubmitterTotalContributionStats],
         int,
@@ -385,9 +387,9 @@ def get_question_submitter_total_stats(
             result.
         topic_ids: List[str]|None. List of topic ID(s) to fetch
             contributor stats for.
-        max_days_since_start_date_for_last_activity: int. Number of days before
+        start_date: int. Number of days before
             today to start including users' contributions.
-        max_days_since_end_date_for_last_activity: int. Number of days before
+        end_date: int. Number of days before
             today from which to stop including users' contributions.
 
     Returns:
@@ -395,8 +397,8 @@ def get_question_submitter_total_stats(
             sorted_results:
                 list(QuestionSubmitterTotalContributionStats).
                 The list of domain objects which match the supplied topic_ids
-                max_days_since_start_date_for_last_activity and
-                max_days_since_end_date_for_last_activity filters, returned
+                start_date and
+                end_date filters, returned
                 in the order specified by sort_by.
             next_offset: int. Number of results to skip in next batch.
             more: bool. If True, there are (probably) more results after
@@ -410,10 +412,10 @@ def get_question_submitter_total_stats(
             offset=offset,
             sort_by=sort_by,
             topic_ids=topic_ids,
-            max_days_since_start_date_for_last_activity=(
-                max_days_since_start_date_for_last_activity),
-            max_days_since_end_date_for_last_activity=(
-                max_days_since_end_date_for_last_activity)
+            start_date=(
+                start_date),
+            end_date=(
+                end_date)
         )
     )
 
@@ -433,8 +435,8 @@ def get_question_reviewer_total_stats(
         page_size: int,
         offset: int,
         sort_by: Optional[str],
-        max_days_since_start_date_for_last_activity: Optional[int],
-        max_days_since_end_date_for_last_activity: Optional[int]
+        start_date: datetime.date,
+        end_date: datetime.date
 ) -> Tuple[
         List[suggestion_registry.QuestionReviewerTotalContributionStats],
         int,
@@ -448,9 +450,9 @@ def get_question_reviewer_total_stats(
             results matching the query.
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
-        max_days_since_start_date_for_last_activity: int. Number of days before
+        start_date: int. Number of days before
             today to start including users' contributions.
-        max_days_since_end_date_for_last_activity: int. Number of days before
+        end_date: int. Number of days before
             today from which to stop including users' contributions.
 
     Returns:
@@ -458,7 +460,7 @@ def get_question_reviewer_total_stats(
             sorted_results:
                 list(QuestionReviewerTotalContributionStats).
                 The list of domain objects which match the supplied
-                max_days_since_end_date_for_last_activity filter,
+                end_date filter,
                 returned in the order specified by sort_by.
             next_offset: int. Number of results to skip in next batch.
             more: bool. If True, there are (probably) more results after
@@ -471,10 +473,10 @@ def get_question_reviewer_total_stats(
             page_size=page_size,
             offset=offset,
             sort_by=sort_by,
-            max_days_since_start_date_for_last_activity=(
-                max_days_since_start_date_for_last_activity),
-            max_days_since_end_date_for_last_activity=(
-                max_days_since_end_date_for_last_activity)
+            start_date=(
+                start_date),
+            end_date=(
+                end_date)
         )
     )
 
