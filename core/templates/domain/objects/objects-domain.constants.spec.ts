@@ -16,51 +16,52 @@
  * @fileoverview unit tests for the units object domain constants.
  */
 
-import {ObjectsDomainConstants} from './objects-domain.constants';
-import {getCurrencyUnits} from './NumberWithUnitsObjectFactory';
 import {all, create} from 'mathjs';
-
-const math = create(all);
-
-const getUnitPrefixes = (): string[] => {
-  const prefixes = math.Unit.PREFIXES;
-  let prefixSet = new Set<string>();
-  for (const name in prefixes) {
-    if (name === 'NONE') {
-      continue;
-    }
-    for (const prefix in prefixes[name]) {
-      if (prefix === '') {
-        continue;
-      }
-      prefixSet.add(prefix);
-    }
-  }
-
-  return Array.from(prefixSet);
-};
-
-const getAllMathjsUnits = (): string[] => {
-  let mathjsUnits: string[] = [];
-  for (const unit in math.Unit.UNITS) {
-    mathjsUnits.push(unit);
-  }
-  return mathjsUnits;
-};
-
-const unitPrefixes = getUnitPrefixes();
-const currencyUnits = getCurrencyUnits();
-const mathjsUnits = getAllMathjsUnits();
-
-const isValidUnit = (unit: string): boolean => {
-  return currencyUnits.includes(unit) || math.Unit.isValuelessUnit(unit);
-};
-
-const isValidPrefix = (prefix: string): boolean => {
-  return unitPrefixes.includes(prefix);
-};
+import {getCurrencyUnits} from './NumberWithUnitsObjectFactory';
+import {ObjectsDomainConstants} from './objects-domain.constants';
 
 describe('ObjectsDomainConstants', () => {
+  let unitPrefixes: string[] = [];
+  let currencyUnits: string[] = [];
+  let mathjsUnits: string[] = [];
+  const math = create(all);
+
+  const isValidUnit = (unit: string): boolean => {
+    return currencyUnits.includes(unit) || math.Unit.isValuelessUnit(unit);
+  };
+
+  const isValidPrefix = (prefix: string): boolean => {
+    return unitPrefixes.includes(prefix);
+  };
+
+  const getUnitPrefixes = (): string[] => {
+    const prefixes = math.Unit.PREFIXES;
+    let prefixSet = new Set<string>();
+    for (const name in prefixes) {
+      if (name === 'NONE') {
+        continue;
+      }
+      for (const prefix in prefixes[name]) {
+        if (prefix === '') {
+          continue;
+        }
+        prefixSet.add(prefix);
+      }
+    }
+
+    return Array.from(prefixSet);
+  };
+
+  const getAllMathjsUnits = (): string[] => {
+    return Object.keys(math.Unit.UNITS);
+  };
+
+  beforeEach(() => {
+    unitPrefixes = getUnitPrefixes();
+    currencyUnits = getCurrencyUnits();
+    mathjsUnits = getAllMathjsUnits();
+  });
+
   it(
     'should check that every value in UNIT_TO_' +
       'NORMALIZED_UNIT_MAPPING is a valid unit',
