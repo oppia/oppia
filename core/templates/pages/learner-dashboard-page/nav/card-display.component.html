@@ -16,10 +16,10 @@
     </div>
   </div>
   <hr color="#00645c" class="mt-2 mb-4" size="2" width="100%">
-  <!--[ngClass]="(cardWidth === 216) && (numCards === 1 ? 'px-1 card-display-one-card' : (currentShift === getMaxShifts(cards.offsetWidth) ? 'pr-1 ml-1 mr-n1' : 'pl-1 ml-n1'))"-->
   <div class="d-flex card-display-content-container pb-1 mb-n1" #cards [ngClass]="cardWidth === 216 && 'card-display-content-container-offset'"> 
     <ng-content></ng-content>
   </div>
+  <!--TODO(#18384): Implement view more for progress tab-->
   <button *ngIf="!tabType.includes('home')" class="align-self-end">  {{ 'I18N_LEARNER_DASHBOARD_CARD_DISPLAY_BUTTON' | translate }} </button>
 </div>
 
@@ -58,13 +58,6 @@
   }
 
   .card-display-heading {
-    color: #333;
-    font-size: 20px;
-    font-weight: 500;
-    margin-bottom: 0;
-  }
-
-  .oppia-learner-dash-section-subheading {
     color: #333;
     font-size: 20px;
     font-weight: 500;

@@ -95,7 +95,8 @@
           ) | translate
         }}
       </p>
-      <div #container class="d-flex flex-wrap justify-content-between w-100"> 
+      <div class="d-flex flex-wrap justify-content-between w-100"> 
+        <!--TODO(#18384): Replace with all lessons in progress data (only contains classroom cards); affects ngIf, numCards, ng-content-->
         <card-display *ngIf="continueWhereYouLeftOffList.length !== 0" [heading]="'Lessons in progress'" [numCards]="4" [tabType]="'home'">
           <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
             <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
@@ -108,6 +109,8 @@
             <lesson-card [story]="lesson" [last]="last"></lesson-card>
           </ng-container>
         </card-display>
+        <!--TODO(#18384): Replace with recommended lessons data (placeholder with explorations); affects numCards and ng-content-->
+        <!--TODO(#18384): Styling: https://shorturl.at/oAUY5 (links to Figma frame) -->
         <card-display [heading]="'Recommended for you'" [numCards]="incompleteExplorationsList.length" [tabType]="'home'">
           <ng-container *ngFor="let lesson of incompleteExplorationsList; last as last">
             <lesson-card [story]="lesson" [last]="last"></lesson-card>
@@ -117,14 +120,15 @@
     </div>
     <div class="oppia-learner-dash-section e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
       <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
+      <!--TODO(#18384): Search bar -->
+      <!--TODO(#18384): Replace with classroom topic data, only untracked topics at the moment-->
       <ng-container *ngFor="let item of untrackedTopics | keyvalue">
-        <card-display [heading]="'Basic math'" [numCards]="3" [tabType]="'homeTopics'" [cardWidth]="226">
-          <ng-container *ngFor="let topicSummaryTile of item.value.slice(0,3); last as last">
+        <card-display [heading]="'Basic math'" [numCards]="item.value.length" [tabType]="'homeTopics'" [cardWidth]="226">
+          <ng-container *ngFor="let topicSummaryTile of item.value; last as last">
             <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [redesignFeatureFlag]="redesignFeatureFlag" [last]="last">
             </oppia-learner-topic-summary-tile>
           </ng-container>
         </card-display>
-        <p *ngIf="item.value.length !== 0" class="oppia-learner-dash-section-subheading"> {{ 'I18N_LEARNER_DASHBOARD_CLASSROOM_TITLE' | translate: {classroomName: item.key} }} </p>
         <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
            class="align-items-center d-inline-flex justify-content-center mt-4 oppia-learner-dash-home-button text-center">
           <span class="fas fa-arrow-right mr-2"></span>
@@ -141,12 +145,3 @@
     </div>
   </div>
 </div>
-
-<style>
-  .subsection-container {
-    display: flex;
-    max-width: 100%;
-
-    overflow-x: hidden;
-  }
-</style>
