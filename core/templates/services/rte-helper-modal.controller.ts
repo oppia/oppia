@@ -258,12 +258,12 @@ export class RteHelperModalComponent {
       for (let tabIndex = 0; tabIndex < value[0].length; tabIndex++) {
         if (value[0][tabIndex].title === '') {
           this.updateRteErrorMessage(
-            'Please ensure that tab ' + (tabIndex + 1) + ' title is filled'
+            'Please ensure that tab ' + (tabIndex + 1) + ' title is filled.'
           );
           break;
-        } else if (value[0][tabIndex].content === ''){
+        } else if (value[0][tabIndex].content === '') {
           this.updateRteErrorMessage(
-            'Please ensure that tab ' + (tabIndex + 1) + ' content is filled'
+            'Please ensure that tab ' + (tabIndex + 1) + ' content is filled.'
           );
           break;
         } else {
