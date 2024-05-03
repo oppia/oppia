@@ -238,6 +238,11 @@ URLS = [
         access_validators.ClassroomAccessValidationHandler),
 
     get_redirect_route(
+        r'%s/can_access_collection_editor_page/<collection_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.CollectionEditorAccessValidationPage
+    ),
+    get_redirect_route(
         r'%s/can_access_blog_home_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.BlogHomePageAccessValidationHandler),
@@ -317,6 +322,9 @@ URLS = [
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
         r'/updateblogpostdatahandler', admin.UpdateBlogPostHandler),
+    get_redirect_route(
+        r'%s' % feconf.REGENERATE_TOPIC_SUMMARIES_URL,
+        admin.RegenerateTopicSummariesHandler),
     get_redirect_route(
         r'/contributionrightshandler/<category>',
         contributor_dashboard_admin.ContributionRightsHandler),
@@ -886,10 +894,6 @@ URLS = [
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
         collection_viewer.CollectionDataHandler),
-
-    get_redirect_route(
-        r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
-        collection_editor.CollectionEditorPage),
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
         collection_editor.EditableCollectionDataHandler),
