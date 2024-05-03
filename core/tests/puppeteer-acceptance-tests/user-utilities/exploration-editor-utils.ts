@@ -1081,7 +1081,9 @@ export class ExplorationEditor extends BaseUser {
         `Expected exactly ${expectedRevisionCount} revisions, but found ${revisions.length}`
       );
     } else {
-      showMessage(`Found exactly ${expectedRevisionCount} revisions as expected`);
+      showMessage(
+        `Found exactly ${expectedRevisionCount} revisions as expected`
+      );
     }
   }
 
@@ -1170,9 +1172,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(
       `${panel1} mat-option[value="${versionNumber1}"]`
     );
-    await this.clickOn(
-      `${panel1} mat-option[value="${versionNumber1}"]`
-    );
+    await this.clickOn(`${panel1} mat-option[value="${versionNumber1}"]`);
 
     await this.page.waitForSelector(secondRevisionDropdown);
     await this.clickOn(secondRevisionDropdown);
@@ -1180,9 +1180,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(
       `${panel2} mat-option[value="${versionNumber2}"]`
     );
-    await this.clickOn(
-      `${panel2} mat-option[value="${versionNumber2}"]`
-    );
+    await this.clickOn(`${panel2} mat-option[value="${versionNumber2}"]`);
   }
 
   /**
@@ -1221,9 +1219,7 @@ export class ExplorationEditor extends BaseUser {
             ) {
               return el.nextElementSibling.nextElementSibling.textContent;
             } else {
-              throw new Error(
-                `Unable to find "${property}" property's value`
-              );
+              throw new Error(`Unable to find "${property}" property's value`);
             }
           });
         })
