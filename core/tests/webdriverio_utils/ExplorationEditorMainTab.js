@@ -181,9 +181,9 @@ var ExplorationEditorMainTab = function () {
       'Responses',
       'Preview',
       'Save',
+      'NonExistentHeading' // This heading does not exist
     ];
     for (const HEADING of tutorialTabHeadings) {
-      // Use: await tutorialTabHeadings.forEach(async function(heading) {
       var tutorialTabHeadingElement = $(`.e2e-test-joyride-title=${HEADING}`);
       await waitFor.visibilityOf(
         tutorialTabHeadingElement,
