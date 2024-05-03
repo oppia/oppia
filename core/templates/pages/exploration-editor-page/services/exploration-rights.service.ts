@@ -33,7 +33,6 @@ export class ExplorationRightsService {
   // These properties are initialized using init method and we need to do
   // non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  [key: string]: any;
   ownerNames!: string[];
   editorNames!: string[];
   voiceArtistNames!: string[];
@@ -231,10 +230,10 @@ export class ExplorationRightsService {
   }
 
   removeRoleAsync(memberUsername: string): Promise<void> {
-    const categories = ['ownerNames', 'editorNames', 'viewerNames'];
+    const categories = ['ownerNames', 'editorNames', 'viewerNames'] as const;
     let initialState: {[key: string]: string[]} = {};
     categories.forEach(category => {
-      if (this[category] && this[category].includes(memberUsername)) {
+      if (this[category]?.includes(memberUsername)) {
         initialState[category] = [...this[category]];
         this[category] = this[category].filter(name => name !== memberUsername);
       }
@@ -262,10 +261,7 @@ export class ExplorationRightsService {
       })
       .catch(error => {
         categories.forEach(category => {
-          if (
-            initialState[category] &&
-            initialState[category].includes(memberUsername)
-          ) {
+          if (initialState[category]?.includes(memberUsername)) {
             this[category] = initialState[category];
           }
         });
