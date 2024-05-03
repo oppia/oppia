@@ -46,10 +46,6 @@ describe('Full exploration editor', function () {
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next', async function () {
-    await users.createUser(
-      'userTutorial@stateEditor.com',
-      'userTutorialStateEditor'
-    );
     await users.login('userTutorial@stateEditor.com');
     await workflow.createExplorationAndStartTutorial(false);
     await explorationEditorMainTab.startTutorial();
