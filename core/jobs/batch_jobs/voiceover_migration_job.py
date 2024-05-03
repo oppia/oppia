@@ -14,19 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs used for migrating voiceovers from exploration models to entity
-voiceover models."""
+"""Job for migrating voiceovers from exploration model to entity
+voiceovers model."""
 
 from __future__ import annotations
 
+from core import feconf
+
 from core.domain import state_domain
+from core.domain import voiceover_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -39,12 +42,8 @@ datastore_services = models.Registry.import_datastore_services()
 (voiceover_models, exp_models) = models.Registry.import_models([
     models.Names.VOICEOVER, models.Names.EXPLORATION])
 
-ExplorationAndVoiceArtistLinkType = Tuple[str, Dict[str, List[Union[
-    voiceover_models.ExplorationVoiceArtistsLinkModel,
-    exp_models.ExplorationModel]]]]
 
-
-class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
+class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
     """Migrates voiceovers stored in the exploration model to the new
     EntityVoiceovers storage models.
     """
@@ -54,203 +53,140 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
     @classmethod
     def create_entity_voiceovers_model_instance(
         cls,
-        entity_type: str,
-        entity_id: str,
-        entity_version: int,
-        language_accent_code: str
+        entity_voiceovers_instance: voiceover_domain.EntityVoiceovers
     ) -> voiceover_models.EntityVoiceoversModel:
-        """Returns a unique entity voiceovers model instance.
+        """Creates an entity voiceovers model instance.
 
         Args:
-            entity_type: str. The type of the entity.
-            entity_id: str. The ID of the entity.
-            entity_version: int. The version of the entity.
-            language_accent_code: str. The language-accent code of the
-                voiceover.
+            entity_voiceovers_instance: EntityVoiceovers. An instance of the
+                entity voiceovers domain class.
 
         Returns:
             EntityVoiceoversModel. An instance of the entity voiceover model.
         """
+        entity_voiceovers_dict = entity_voiceovers_instance.to_dict()
+
+        entity_id = entity_voiceovers_dict['entity_id']
+        entity_type = entity_voiceovers_dict['entity_type']
+        entity_version = entity_voiceovers_dict['entity_version']
+        language_accent_code = entity_voiceovers_dict['language_accent_code']
+        voiceovers = entity_voiceovers_dict['voiceovers']
+
         with datastore_services.get_ndb_context():
             entity_voiceovers_model = (
                 voiceover_models.EntityVoiceoversModel.create_new(
-                    entity_id, entity_type, entity_version,
-                    language_accent_code, {}
+                    entity_type, entity_id, entity_version,
+                    language_accent_code, voiceovers
                 )
             )
         entity_voiceovers_model.update_timestamps()
         return entity_voiceovers_model
 
     @classmethod
-    def update_entity_voiceover_for_given_id(
+    def create_entity_voiceovers_instances(
         cls,
-        entity_type: str,
-        entity_id: str,
-        entity_version: int,
-        accent_code: str,
-        content_id: str,
-        voiceover_dict: state_domain.VoiceoverDict,
-        entity_voiceover_id_to_entity_voiceovers: Dict[
-            str, voiceover_models.EntityVoiceoversModel]
-    ) -> Dict[str, voiceover_models.EntityVoiceoversModel]:
-        """Updates the entity voiceover model instance for the given language
-        accent code for a specific content of an exploration.
-
-        Args:
-            entity_type: str. The entity type of an entity voiceovers instance.
-            entity_id: str. The given entity ID.
-            entity_version: int. The version number of the given exploration.
-            accent_code: str. The language accent code for the given entity
-                voiceover instance.
-            content_id: str. The content ID for a specific content in an
-                exploration.
-            voiceover_dict: VoiceoverDict. A voiceover dict that should be
-                added to the entity voiceover instance of the given language
-                accent code of the content.
-            entity_voiceover_id_to_entity_voiceovers:
-                dict(str, EntityVoiceoversModel). A dict with entity voiceover
-                ID as keys and its corresponding EntityVoiceoversModel as
-                values.
-
-        Returns:
-            dict(str, EntityVoiceoversModel). The updated dict with entity
-            voiceover ID as keys and its corresponding EntityVoiceoversModel as
-            values.
-        """
-        entity_voiceover_id = (
-            voiceover_models.EntityVoiceoversModel.generate_id(
-                entity_type,
-                entity_id,
-                entity_version,
-                accent_code
-            )
-        )
-
-        if entity_voiceover_id not in entity_voiceover_id_to_entity_voiceovers:
-            entity_voiceovers_object = (
-                cls.create_entity_voiceovers_model_instance(
-                    entity_id, entity_type, entity_version, accent_code))
-        else:
-            entity_voiceovers_object = (
-                entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id])
-
-        entity_voiceovers_object.voiceovers[content_id] = {
-            'manual': voiceover_dict
-        }
-
-        entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id] = (
-            entity_voiceovers_object)
-        return entity_voiceover_id_to_entity_voiceovers
-
-    @classmethod
-    def generate_entity_voiceover_models(
-        cls,
-        element: ExplorationAndVoiceArtistLinkType,
+        exploration_model: exp_models.ExplorationModel,
+        exploration_voice_artists_link_model: (
+            voiceover_models.ExplorationVoiceArtistsLinkModel),
         voice_artist_metadata_models_list: List[
             voiceover_models.VoiceArtistMetadataModel]
-    ) -> List[voiceover_models.EntityVoiceoversModel]:
-        """Generates an entity voiceovers model using the voiceover data stored
-        in current exploration models.
+    ) -> List[voiceover_domain.EntityVoiceovers]:
+        """Creates a list of EntityVoiceovers instances containing voiceovers
+        from the given exploration data.
 
         Args:
-            element: ExplorationAndVoiceArtistLinkType.
-                A 2-tuple with the following elements:
-                a. A string value representing exploration ID.
-                b. A dict with exploration_model and voice_artist_link as keys
-                and their respective model instances as values. The models are
-                used to fetch voiceover data that will be stored in new entity
-                voiceovers model.
+            exploration_model: ExplorationModel. An instance of an
+                exploration model.
+            exploration_voice_artists_link_model:
+                ExplorationVoiceArtistsLinkModel. An instance of an
+                ExplorationVoiceArtistsLinkModel model.
             voice_artist_metadata_models_list: list(VoiceArtistMetadataModel). A
                 list of VoiceArtistMetadataModel instances. Language accent code
                 for a given voice artist should be fetched from this model.
 
         Returns:
-            list(EntityVoiceoversModel). A list of entity voiceover models
+            list(EntityVoiceovers). A list of EntityVoiceovers instances
             containing voiceovers from the given exploration data.
 
         Raises:
             Exception. All voice artists are not assigned accents in the
                 VoiceArtistMetadataModel.
         """
-        exploration_model = (
-            element[1]['exploration_model'][0])
-        assert isinstance(exploration_model, exp_models.ExplorationModel)
-
-        voice_artist_link = (
-            element[1]['voice_artist_link'][0])
-        assert isinstance(
-            voice_artist_link,
-            voiceover_models.ExplorationVoiceArtistsLinkModel
-        )
 
         voice_artist_id_to_language_code_mapping = {}
-
-        content_id_to_voiceovers_mapping = (
-            voice_artist_link.content_id_to_voiceovers_mapping)
 
         for voice_artist_metadata_model in voice_artist_metadata_models_list:
             voice_artist_id_to_language_code_mapping[
                 voice_artist_metadata_model.id] = (
                     voice_artist_metadata_model.language_code_to_accent)
 
-        entity_id = voice_artist_link.id
         entity_type = 'exploration'
+        entity_id = exploration_model.id
         entity_version = exploration_model.version
 
-        entity_voiceover_id_to_entity_voiceovers: Dict[
-            str, voiceover_models.EntityVoiceoversModel] = {}
+        entity_voiceovers_id_to_entity_voiceovers: Dict[
+            str, voiceover_domain.EntityVoiceovers] = {}
 
-        for content_id, lang_code_to_voiceover_mapping in (
+        content_id_to_voiceovers_mapping = (
+            exploration_voice_artists_link_model.
+            content_id_to_voiceovers_mapping)
+
+        for content_id, language_code_to_voiceover_mapping in (
                 content_id_to_voiceovers_mapping.items()):
-            for lang_code, voiceover_mapping in (
-                    lang_code_to_voiceover_mapping.items()):
+            for language_code, voiceover_mapping in (
+                    language_code_to_voiceover_mapping.items()):
+
                 voice_artist_id = voiceover_mapping[0]
                 voiceover_dict = voiceover_mapping[1]
+                manual_voiceover_instance = state_domain.Voiceover.from_dict(
+                    voiceover_dict)
 
                 try:
-                    accent_code = voice_artist_id_to_language_code_mapping[
-                        voice_artist_id][lang_code]
+                    language_accent_code = (
+                        voice_artist_id_to_language_code_mapping[
+                            voice_artist_id][language_code]
+                    )
                 except Exception as e:
                     raise Exception(
                         'Please assign all the accents for voice artists in '
-                        'language code %s.' % lang_code) from e
+                        'language code %s.' % language_code) from e
 
-                entity_voiceover_id_to_entity_voiceovers = (
-                    cls.update_entity_voiceover_for_given_id(
+                entity_voiceovers_id = (
+                    voiceover_models.EntityVoiceoversModel.generate_id(
                         entity_type,
                         entity_id,
                         entity_version,
-                        accent_code,
-                        content_id,
-                        voiceover_dict,
-                        entity_voiceover_id_to_entity_voiceovers
+                        language_accent_code
                     )
                 )
-        return list(entity_voiceover_id_to_entity_voiceovers.values())
 
-    @classmethod
-    def count_voiceovers(
-        cls,
-        entity_voiceovers_model: voiceover_models.EntityVoiceoversModel
-    ) -> int:
-        """Calculates the number of voiceovers for a given entity
-        voiceover model.
+                if (
+                    entity_voiceovers_id not in
+                    entity_voiceovers_id_to_entity_voiceovers
+                ):
+                    entity_voiceovers_object = (
+                        voiceover_domain.EntityVoiceovers.create_empty(
+                            entity_id, entity_type,
+                            entity_version, language_accent_code)
+                    )
+                else:
+                    entity_voiceovers_object = (
+                        entity_voiceovers_id_to_entity_voiceovers[
+                            entity_voiceovers_id]
+                    )
 
-        Args:
-            entity_voiceovers_model: EntityVoiceoversModel. An instance of an
-                entity voiceover model from which the number of voiceovers will
-                be calculated.
+                entity_voiceovers_object.add_new_content_for_voiceover(
+                    content_id)
+                entity_voiceovers_object.add_voiceover(
+                    content_id,
+                    feconf.VoiceoverType.MANUAL,
+                    manual_voiceover_instance
+                )
 
-        Returns:
-            int. The number of voiceovers present in the given entity
-            voiceovers model.
-        """
-        total_voiceovers: int = 0
-        for voiceover_type_to_voiceovers in (
-                entity_voiceovers_model.voiceovers.values()):
-            if 'manual' in voiceover_type_to_voiceovers:
-                total_voiceovers += 1
-        return total_voiceovers
+                entity_voiceovers_id_to_entity_voiceovers[
+                    entity_voiceovers_id] = entity_voiceovers_object
+
+        return list(entity_voiceovers_id_to_entity_voiceovers.values())
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results for the exploration for which an
@@ -266,14 +202,6 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
                 exp_models.ExplorationModel.get_all())
         )
 
-        # Pair each exploration model with its exploration ID and create
-        # key-value pairs.
-        paired_exploration_models = (
-            exploration_models
-            | 'Pair Exploration ID to model' >> beam.Map(
-                lambda model: (model.id, model))
-        )
-
         exploration_voice_artists_link_models = (
             self.pipeline
             | 'Get exploration voice artists link models' >> (
@@ -282,21 +210,6 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
                 )
             )
         )
-
-        # Pair each exploration voice artist model with its exploration ID and
-        # create key-value pairs.
-        paired_exploration_voice_artists_link_models = (
-            exploration_voice_artists_link_models
-            | 'Pair Exploration ID to voice artist link model' >> beam.Map(
-                lambda model: (model.id, model))
-        )
-
-        # Group the key-value pairs from both PCollections by the
-        # Exploration ID.
-        grouped_models = {
-            'exploration_model': paired_exploration_models,
-            'voice_artist_link': paired_exploration_voice_artists_link_models,
-        } | 'Group by Exploration ID' >> beam.CoGroupByKey()
 
         voice_artist_metadata_models = (
             self.pipeline
@@ -307,51 +220,94 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
             )
         )
 
-        entity_voiceover_models = (
+        # Pair each exploration model with its exploration ID and create
+        # key-value pairs.
+        paired_exploration_models = (
+            exploration_models
+            | 'Pair Exploration ID to model' >> beam.Map(
+                lambda model: (model.id, model))
+        )
+
+        # Pair each exploration voice artists link model with its exploration
+        # ID and create key-value pairs.
+        paired_exploration_voice_artists_link_models = (
+            exploration_voice_artists_link_models
+            | 'Pair Exploration ID to voice artist link model' >> beam.Map(
+                lambda model: (model.id, model))
+        )
+
+        # Group the key-value pairs from both PCollections by the
+        # Exploration ID.
+        grouped_models = {
+            'exploration_model': paired_exploration_models,
+            'exploration_voice_artists_link_model': (
+                paired_exploration_voice_artists_link_models),
+        } | 'Group by Exploration ID' >> beam.CoGroupByKey()
+
+        entity_voiceovers_instances = (
             grouped_models
             | 'Filter invalid exploration and voice artist link models' >> (
                 beam.Filter(
                     lambda element: (
                         element[0] != '' and
                         len(element[1]['exploration_model']) > 0 and
-                        len(element[1]['voice_artist_link']) > 0
+                        len(element[1][
+                            'exploration_voice_artists_link_model']) > 0
                     )
                 )
             )
-            | 'Get entity voiceover models' >> beam.Map(
-                PopulateManualVoiceoversToEntityVoiceoverModelJob.
-                generate_entity_voiceover_models,
+            | 'Get entity voiceovers instances' >> beam.Map(
+                lambda element, voice_artist_metadata_models_list: (
+                    PopulateManualVoiceoversToEntityVoiceoversModelJob.
+                    create_entity_voiceovers_instances(
+                        exploration_model=(
+                            element[1]['exploration_model'][0]),
+                        exploration_voice_artists_link_model=(
+                            element[1][
+                                'exploration_voice_artists_link_model'][0]),
+                        voice_artist_metadata_models_list=(
+                            voice_artist_metadata_models_list)
+                    )
+                ),
                 beam.pvalue.AsList(voice_artist_metadata_models)
             )
-            | 'Merge all entity voiceovers model' >> beam.FlatMap(
-                lambda entity_voiceovers_model: entity_voiceovers_model)
+            | 'Merge all entity voiceovers instances' >> beam.FlatMap(
+                lambda entity_voiceovers: entity_voiceovers)
         )
 
-        entity_voiceover_models_result = (
-            entity_voiceover_models
+        entity_voiceovers_models = (
+            entity_voiceovers_instances
+            | 'Create model instance' >> beam.Map(
+                PopulateManualVoiceoversToEntityVoiceoversModelJob.
+                create_entity_voiceovers_model_instance)
+        )
+
+        entity_voiceovers_models_result = (
+            entity_voiceovers_models
             | 'Get result data from migrated models' >> beam.Map(
                 lambda model: job_run_result.JobRunResult.as_stdout(
                     'Migrated %s voiceovers for exploration: %s, in language '
                     'accent code %s.' % (
-                        PopulateManualVoiceoversToEntityVoiceoverModelJob.
-                        count_voiceovers(model), model.entity_id,
-                        model.language_accent_code)
+                        len(list(model.voiceovers.keys())),
+                        model.entity_id,
+                        model.language_accent_code
+                    )
                 )
             )
         )
 
         if self.DATASTORE_UPDATES_ALLOWED:
             unused_put_results = (
-                entity_voiceover_models
+                entity_voiceovers_models
                 | 'Put models into datastore' >> ndb_io.PutModels()
             )
             pass
 
-        return entity_voiceover_models_result
+        return entity_voiceovers_models_result
 
 
 class AuditEntityVoiceoverModelJob(
-    PopulateManualVoiceoversToEntityVoiceoverModelJob
+    PopulateManualVoiceoversToEntityVoiceoversModelJob
 ):
     """Audit PopulateManualVoiceoversToEntityVoiceoverModelJob."""
 

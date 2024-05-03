@@ -32,7 +32,7 @@ from core.domain import user_services
 from core.domain import voiceover_domain
 from core.platform import models
 
-from typing import Dict, List, Sequence
+from typing import Dict, List, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -59,21 +59,27 @@ def _get_entity_voiceovers_from_model(
         EntityVoiceovers. An instance of EntityVoiceovers object, created from
         its model.
     """
-    content_id_to_voiceovers_dict = {}
+    content_id_to_voiceovers: Dict[str, Dict[
+        feconf.VoiceoverType, Optional[state_domain.Voiceover]]] = {}
     for content_id, voiceover_type_to_voiceover_dict in (
             entity_voiceovers_model.voiceovers.items()):
-        content_id_to_voiceovers_dict[content_id] = {
-            voiceover_type: state_domain.Voiceover.from_dict(
-                    voiceover_type_to_voiceover_dict[voiceover_type.value])
-                for voiceover_type in feconf.VoiceoverType
-        }
+        content_id_to_voiceovers[content_id] = {}
+        for voiceover_type in feconf.VoiceoverType:
+            voiceover_dict = voiceover_type_to_voiceover_dict[
+                voiceover_type.value]
+            voiceover: Optional[state_domain.Voiceover] = None
+
+            if voiceover_dict is not None:
+                voiceover = state_domain.Voiceover.from_dict(voiceover_dict)
+
+            content_id_to_voiceovers[content_id][voiceover_type] = voiceover
 
     entity_voiceovers_instance = voiceover_domain.EntityVoiceovers(
         entity_id=entity_voiceovers_model.entity_id,
         entity_type=entity_voiceovers_model.entity_type,
         entity_version=entity_voiceovers_model.entity_version,
         language_accent_code=entity_voiceovers_model.language_accent_code,
-        voiceovers=content_id_to_voiceovers_dict
+        voiceovers=content_id_to_voiceovers
     )
     return entity_voiceovers_instance
 

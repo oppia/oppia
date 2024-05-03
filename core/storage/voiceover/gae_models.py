@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-from typing import Dict, Final
+from typing import Dict, Final, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -146,7 +146,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int,
         language_accent_code: str,
-        voiceovers: Dict[str, Dict[str, state_domain.VoiceoverDict]]
+        voiceovers: Dict[str, Dict[str, Optional[state_domain.VoiceoverDict]]]
     ) -> EntityVoiceoversModel:
         """Creates and returns a new EntityVoiceoversModel instance.
 

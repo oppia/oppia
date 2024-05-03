@@ -193,9 +193,11 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         }
         new_voiceover_object = state_domain.Voiceover.from_dict(
             dummy_new_voiceover_dict)
+        manual_voiceover = self.entity_voiceovers_instance.voiceovers[
+            'content_id_0'][feconf.VoiceoverType.MANUAL]
+        assert isinstance(manual_voiceover, state_domain.Voiceover)
         self.assertDictEqual(
-            self.entity_voiceovers_instance.voiceovers['content_id_0'][
-                feconf.VoiceoverType.MANUAL].to_dict(),
+            manual_voiceover.to_dict(),
             self.dummy_manual_voiceover_dict
         )
 
@@ -204,9 +206,11 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             voiceover_type=feconf.VoiceoverType.MANUAL,
             voiceover=new_voiceover_object)
 
+        manual_voiceover = self.entity_voiceovers_instance.voiceovers[
+            'content_id_0'][feconf.VoiceoverType.MANUAL]
+        assert isinstance(manual_voiceover, state_domain.Voiceover)
         self.assertDictEqual(
-            self.entity_voiceovers_instance.voiceovers['content_id_0'][
-                feconf.VoiceoverType.MANUAL].to_dict(),
+            manual_voiceover.to_dict(),
             dummy_new_voiceover_dict
         )
 
@@ -236,3 +240,30 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             empty_entity_voiceovers_object.language_accent_code, 'en-US')
         self.assertEqual(empty_entity_voiceovers_object.voiceovers, {})
+
+    def test_should_be_able_to_add_new_content_id(self) -> None:
+        entity_voiceovers_object = (
+            voiceover_domain.EntityVoiceovers.create_empty(
+                'exp_id', 'exploration', 1, 'en-US'))
+
+        self.assertEqual(entity_voiceovers_object.entity_id, 'exp_id')
+        self.assertEqual(entity_voiceovers_object.entity_version, 1)
+        self.assertEqual(
+            entity_voiceovers_object.entity_type, 'exploration')
+        self.assertEqual(
+            entity_voiceovers_object.language_accent_code, 'en-US')
+        self.assertEqual(entity_voiceovers_object.voiceovers, {})
+
+        entity_voiceovers_object.add_new_content_for_voiceover('content_1')
+        entity_voiceovers_object.add_voiceover(
+            'content_1',
+            feconf.VoiceoverType.MANUAL,
+            state_domain.Voiceover.from_dict(self.dummy_manual_voiceover_dict))
+
+        manual_voiceover = entity_voiceovers_object.voiceovers[
+            'content_1'][feconf.VoiceoverType.MANUAL]
+        assert isinstance(manual_voiceover, state_domain.Voiceover)
+
+        self.assertDictEqual(
+            manual_voiceover.to_dict(),
+            self.dummy_manual_voiceover_dict)

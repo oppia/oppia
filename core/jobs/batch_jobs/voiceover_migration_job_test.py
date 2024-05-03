@@ -497,10 +497,10 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
 
     JOB_CLASS: Type[
         voiceover_migration_job.
-        PopulateManualVoiceoversToEntityVoiceoverModelJob
+        PopulateManualVoiceoversToEntityVoiceoversModelJob
     ] = (
         voiceover_migration_job.
-        PopulateManualVoiceoversToEntityVoiceoverModelJob
+        PopulateManualVoiceoversToEntityVoiceoversModelJob
     )
 
     def test_empty_storage(self) -> None:
@@ -537,30 +537,38 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
         expected_entity_voiceover_id_to_model = {
             'exploration-exploration_id_1-5-en-US': {
                 'content_0': {
-                    'manual': self.voiceover_dict_1
+                    'manual': self.voiceover_dict_1,
+                    'auto': None
                 },
                 'ca_placeholder_2': {
-                    'manual': self.voiceover_dict_3}
+                    'manual': self.voiceover_dict_3,
+                    'auto': None
+                }
             },
             'exploration-exploration_id_1-5-hi-IN': {
                 'content_0': {
-                    'manual': self.voiceover_dict_2
+                    'manual': self.voiceover_dict_2,
+                    'auto': None
                 }
             },
             'exploration-exploration_id_2-4-en-US': {
                 'content_0': {
-                    'manual': self.voiceover_dict_5
+                    'manual': self.voiceover_dict_5,
+                    'auto': None
                 },
                 'ca_placeholder_2': {
-                    'manual': self.voiceover_dict_4
+                    'manual': self.voiceover_dict_4,
+                    'auto': None
                 }
             },
             'exploration-exploration_id_2-4-hi-IN': {
                 'content_0': {
-                    'manual': self.voiceover_dict_6
+                    'manual': self.voiceover_dict_6,
+                    'auto': None
                 },
                 'ca_placeholder_2': {
-                    'manual': self.voiceover_dict_7
+                    'manual': self.voiceover_dict_7,
+                    'auto': None
                 }
             }
         }
