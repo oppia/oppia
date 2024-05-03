@@ -254,11 +254,16 @@ export class RteHelperModalComponent {
         return;
       }
     } else if (this.componentId === this.COMPONENT_ID_TABS) {
-      // Value[0] corresponds to tab Contents.
-      for (let tab = 0; tab < value[0].length; tab++) {
-        if (value[0][tab].title === '' || value[0][tab].content === '') {
+      // Value[0] corresponds to all tabs Contents and titles.
+      for (let tabIndex = 0; tabIndex < value[0].length; tabIndex++) {
+        if (value[0][tabIndex].title === '') {
           this.updateRteErrorMessage(
-            'Please ensure that each title and content are filled'
+            'Please ensure that tab ' + (tabIndex + 1) + ' title is filled'
+          );
+          break;
+        } else if (value[0][tabIndex].content === ''){
+          this.updateRteErrorMessage(
+            'Please ensure that tab ' + (tabIndex + 1) + ' content is filled'
           );
           break;
         } else {

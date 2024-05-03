@@ -356,7 +356,7 @@ describe('RteHelperModalComponent', () => {
       );
       expect(component.isErrorMessageNonempty()).toBe(true);
       expect(component.errorMessage).toBe(
-        'Please ensure that each title and content are filled'
+        'Please ensure that tab 1 title is filled'
       );
       flush();
     }));
@@ -370,7 +370,7 @@ describe('RteHelperModalComponent', () => {
       );
       expect(component.isErrorMessageNonempty()).toBe(true);
       expect(component.errorMessage).toBe(
-        'Please ensure that each title and content are filled'
+        'Please ensure that tab 2 content is filled'
       );
       flush();
     }));
