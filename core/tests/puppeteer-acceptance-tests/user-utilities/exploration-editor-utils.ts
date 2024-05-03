@@ -1066,22 +1066,22 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Checks if the number of revisions matches the expected number.
-   * @param {number} expectedNumber - The expected number of revisions.
+   * @param {number} expectedRevisionCount - The expected number of revisions.
    */
-  async expectNumberOfRevisions(expectedNumber: number): Promise<void> {
-    if (!Number.isInteger(expectedNumber) || expectedNumber < 0) {
+  async expectNumberOfRevisions(expectedRevisionCount: number): Promise<void> {
+    if (!Number.isInteger(expectedRevisionCount) || expectedRevisionCount < 0) {
       throw new Error(
-        `Invalid expected number of revisions: ${expectedNumber}`
+        `Invalid expected number of revisions: ${expectedRevisionCount}`
       );
     }
 
     let revisions = await this.page.$$(historyListItem);
-    if (revisions.length !== expectedNumber) {
+    if (revisions.length !== expectedRevisionCount) {
       throw new Error(
-        `Expected exactly ${expectedNumber} revisions, but found ${revisions.length}`
+        `Expected exactly ${expectedRevisionCount} revisions, but found ${revisions.length}`
       );
     } else {
-      showMessage(`Found exactly ${expectedNumber} revisions as expected`);
+      showMessage(`Found exactly ${expectedRevisionCount} revisions as expected`);
     }
   }
 
@@ -1153,35 +1153,35 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Selects two revisions of an exploration for comparison.
-   * @param {number} revisionIndex1 - The index of the first revision to select.
-   * @param {number} revisionIndex2 - The index of the second revision to select.
+   * @param {number} versionNumber1 - The version number of the first revision to select.
+   * @param {number} versionNumber2 - The version number of the second revision to select.
    */
   async selectTwoRevisionsForComparison(
-    revisionIndex1: number,
-    revisionIndex2: number
+    versionNumber1: number,
+    versionNumber2: number
   ): Promise<void> {
-    if (revisionIndex1 === revisionIndex2) {
-      throw new Error('Both revision indexes cannot be the same.');
+    if (versionNumber1 === versionNumber2) {
+      throw new Error('Both version numbers cannot be the same.');
     }
 
     await this.page.waitForSelector(firstRevisionDropdown);
     await this.clickOn(firstRevisionDropdown);
     const panel1 = '#mat-select-0-panel';
     await this.page.waitForSelector(
-      `${panel1} mat-option:nth-last-child(${revisionIndex1})`
+      `${panel1} mat-option[value="${versionNumber1}"]`
     );
     await this.clickOn(
-      `${panel1} mat-option:nth-last-child(${revisionIndex1})`
+      `${panel1} mat-option[value="${versionNumber1}"]`
     );
 
     await this.page.waitForSelector(secondRevisionDropdown);
     await this.clickOn(secondRevisionDropdown);
     const panel2 = '#mat-select-2-panel';
     await this.page.waitForSelector(
-      `${panel2} mat-option:nth-last-child(${revisionIndex2})`
+      `${panel2} mat-option[value="${versionNumber2}"]`
     );
     await this.clickOn(
-      `${panel2} mat-option:nth-last-child(${revisionIndex2})`
+      `${panel2} mat-option[value="${versionNumber2}"]`
     );
   }
 
@@ -1222,7 +1222,7 @@ export class ExplorationEditor extends BaseUser {
               return el.nextElementSibling.nextElementSibling.textContent;
             } else {
               throw new Error(
-                `Unable to find third sibling for property ${property}`
+                `Unable to find "${property}" property's value`
               );
             }
           });
