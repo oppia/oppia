@@ -25,6 +25,78 @@ describe('ResponseGraphInput', () => {
   let component: ResponseGraphInput;
   let fixture: ComponentFixture<ResponseGraphInput>;
 
+  let answerUnlabeledNoNeedToResize =
+    '{' +
+    '  "isWeighted": false,' +
+    '  "edges": [' +
+    '      {' +
+    '          "src": 0,' +
+    '          "dst": 1,' +
+    '          "weight": 1' +
+    '      },' +
+    '      {' +
+    '          "src": 1,' +
+    '          "dst": 2,' +
+    '          "weight": 1' +
+    '      }' +
+    '  ],' +
+    '  "isDirected": false,' +
+    '  "vertices": [' +
+    '      {' +
+    '          "x": 10,' +
+    '          "y": 10,' +
+    '          "label": ""' +
+    '      },' +
+    '      {' +
+    '          "x": 60,' +
+    '          "y": 10,' +
+    '          "label": ""' +
+    '      },' +
+    '      {' +
+    '          "x": 10,' +
+    '          "y": 60,' +
+    '          "label": ""' +
+    '      }' +
+    '  ],' +
+    '  "isLabeled": false' +
+    '}';
+
+  let answerLabeledNeedsResize =
+    '{' +
+    '  "isWeighted": false,' +
+    '  "edges": [' +
+    '      {' +
+    '          "src": 0,' +
+    '          "dst": 1,' +
+    '          "weight": 1' +
+    '      },' +
+    '      {' +
+    '          "src": 1,' +
+    '          "dst": 2,' +
+    '          "weight": 1' +
+    '      }' +
+    '  ],' +
+    '  "isDirected": false,' +
+    '  "vertices": [' +
+    '      {' +
+    '          "x": 10,' +
+    '          "y": 10,' +
+    '          "label": "foo"' +
+    '      },' +
+    '      {' +
+    '          "x": 480,' +
+    '          "y": 10,' +
+    '          "label": "bar"' +
+    '      },' +
+    '      {' +
+    '          "x": 10,' +
+    '          "y": 480,' +
+    '          "label": "qux"' +
+    '      }' +
+    '  ],' +
+    '  "isLabeled": true' +
+    '}';
+
   let mockHtmlEscaperService = {
     escapedJsonToObj: function (answer: string) {
       return JSON.parse(answer);
@@ -47,47 +119,10 @@ describe('ResponseGraphInput', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ResponseGraphInput);
     component = fixture.componentInstance;
-
-    component.answer =
-      '{' +
-      '  "isWeighted": false,' +
-      '  "edges": [' +
-      '      {' +
-      '          "src": 0,' +
-      '          "dst": 1,' +
-      '          "weight": 1' +
-      '      },' +
-      '      {' +
-      '          "src": 1,' +
-      '          "dst": 2,' +
-      '          "weight": 1' +
-      '      }' +
-      '  ],' +
-      '  "isDirected": false,' +
-      '  "vertices": [' +
-      '      {' +
-      '          "x": 10,' +
-      '          "y": 10,' +
-      '          "label": ""' +
-      '      },' +
-      '      {' +
-      '          "x": 60,' +
-      '          "y": 10,' +
-      '          "label": ""' +
-      '      },' +
-      '      {' +
-      '          "x": 10,' +
-      '          "y": 60,' +
-      '          "label": ""' +
-      '      }' +
-      '  ],' +
-      '  "isLabeled": false' +
-      '}';
-
-    component.ngOnInit();
   });
 
-  it('should create', () => {
+  it('should create without resize', () => {
+    component.answer = answerUnlabeledNoNeedToResize;
     component.ngOnInit();
 
     expect(component.graph).toEqual({
@@ -132,11 +167,72 @@ describe('ResponseGraphInput', () => {
   });
 
   it('should return directed edge arrow points when called', () => {
+    component.answer = answerUnlabeledNoNeedToResize;
+    component.ngOnInit();
     expect(component.getDirectedEdgeArrowPoints(0)).toBe('56,10 46,5 46,15');
   });
 
   it('should return edge center when called', () => {
+    component.answer = answerUnlabeledNoNeedToResize;
+    component.ngOnInit();
     expect(component.getEdgeCenter(0)).toEqual({x: 35, y: 10});
+  });
+
+  it('should return max x when called', () => {
+    component.answer = answerUnlabeledNoNeedToResize;
+    component.ngOnInit();
+    expect(component.getMaxX()).toBe(60);
+  });
+
+  it('should return max y when called', () => {
+    component.answer = answerUnlabeledNoNeedToResize;
+    component.ngOnInit();
+    expect(component.getMaxY()).toBe(60);
+  });
+
+  it('should create with resize', () => {
+    component.answer = answerLabeledNeedsResize;
+    component.ngOnInit();
+
+    expect(component.graph).toEqual({
+      isWeighted: false,
+      edges: [
+        {
+          src: 0,
+          dst: 1,
+          weight: 1,
+        },
+        {
+          src: 1,
+          dst: 2,
+          weight: 1,
+        },
+      ],
+      isDirected: false,
+      vertices: [
+        {
+          x: 7.5,
+          y: 5,
+          label: 'foo',
+        },
+        {
+          x: 242.5,
+          y: 5,
+          label: 'bar',
+        },
+        {
+          x: 7.5,
+          y: 240,
+          label: 'qux',
+        },
+      ],
+      isLabeled: true,
+    });
+    expect(component.VERTEX_RADIUS).toBe(6);
+    expect(component.EDGE_WIDTH).toBe(3);
+    expect(component.MIN_LEFT_MARGIN).toBe(15);
+    expect(component.minX).toBe(10);
+    expect(component.maxX).toBe(470);
   });
 
   it('should return svg border', () => {
