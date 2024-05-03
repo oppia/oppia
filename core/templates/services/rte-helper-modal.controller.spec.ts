@@ -364,6 +364,7 @@ describe('RteHelperModalComponent', () => {
     it('should disable save button and display error message', fakeAsync(() => {
       component.ngOnInit();
       flush();
+      component.customizationArgsForm.value[0][0].title = 'Tab 1';
       component.customizationArgsForm.value[0][1].content = '';
       component.onCustomizationArgsFormChange(
         component.customizationArgsForm.value
