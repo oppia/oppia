@@ -2337,10 +2337,9 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch
                 contributor stats for.
-            start_date: int|None. Number of
-                days before today to start including users with contributions.
-            end_date: int|None. Number of
-                days before today from which to stop including users with
+            start_date: datetime.date. The date from which to start including users'
+                contributions.
+            end_date: datetime.date. The date from which to stop including users'
                 contributions.
 
         Returns:
@@ -2756,10 +2755,9 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             language_code: str. The language code to get results for.
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
-            start_date: int|None. Number of
-                days before today to start including users with contributions.
-            end_date: int|None. Number of
-                days before today from which to stop including users with
+            start_date: datetime.date. The date from which to start including users'
+                contributions.
+            end_date: datetime.date. The date from which to stop including users'
                 contributions.
 
         Returns:
@@ -3082,10 +3080,9 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch contributor
                 stats for.
-            start_date: int|None. Number of
-                days before today to start including users with contributions.
-            end_date: int|None. Number of
-                days before today from which to stop including users with
+            start_date: datetime.date. The date from which to start including users'
+                contributions.
+            end_date: datetime.date. The date from which to stop including users'
                 contributions.
 
         Returns:
@@ -3378,10 +3375,9 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                 results matching the query.
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
-            start_date: int|None. Number of
-                days before today to start including users with contributions.
-            end_date: int|None. Number of
-                days before today from which to stop including users with
+            start_date: datetime.date. The date from which to start including users'
+                contributions.
+            end_date: datetime.date. The date from which to stop including users'
                 contributions.
 
         Returns:

@@ -595,17 +595,17 @@ class ContributorDashboardAdminStatsHandler(
                 },
                 'default_value': None
             },
-            'start_date': {
+            'start_date_locale_string': {
                 'schema': {
                     'type': 'basestring'
                 },
-                'default_value': '3000-01-01'
+                'default_value': '01/01/3000'
             },
-            'end_date': {
+            'end_date_locale_string': {
                 'schema': {
                     'type': 'basestring'
                 },
-                'default_value': '1970-01-01'
+                'default_value': '01/01/1970'
             }
         }
     }
@@ -625,9 +625,9 @@ class ContributorDashboardAdminStatsHandler(
         sort_by = self.normalized_request.get('sort_by')
         topic_ids = self.normalized_request.get('topic_ids')
         start_date = datetime.datetime.strptime(self.normalized_request.get(
-                'start_date').split(',')[0], "%m/%d/%Y").date()
+                'start_date_locale_string'), "%m/%d/%Y").date()
         end_date = datetime.datetime.strptime(self.normalized_request.get(
-                'end_date').split(',')[0], "%m/%d/%Y").date()
+                'end_date_locale_string'), "%m/%d/%Y").date()
 
         print(end_date)
 

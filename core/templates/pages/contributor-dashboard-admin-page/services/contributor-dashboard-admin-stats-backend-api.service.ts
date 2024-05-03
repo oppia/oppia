@@ -228,12 +228,13 @@ export class ContributorDashboardAdminStatsBackendApiService {
         : PageConstants.DEFAULT_LANGUAGE_FILTER,
       ...(filter.startDate
         ? {
-            start_date: filter.startDate.toLocaleString('en-US'),
+            start_date_locale_string:
+              filter.startDate.toLocaleDateString('en-US'),
           }
         : {}),
       ...(filter.endDate
         ? {
-            end_date: filter.endDate.toLocaleString('en-US'),
+            end_date_locale_string: filter.endDate.toLocaleDateString('en-US'),
           }
         : {}),
     };

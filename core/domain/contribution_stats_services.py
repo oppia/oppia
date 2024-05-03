@@ -255,10 +255,10 @@ def get_translation_submitter_total_stats(
             result.
         topic_ids: List[str]|None. List of topic ID(s) to fetch
             contributor stats for.
-        start_date: int. Number of days before
-            today to start including users' contributions.
-        end_date: int. Number of days before
-            today from which to stop including users' contributions.
+        start_date: datetime.date. The date from which to start including
+            users' contributions.
+        end_date: datetime.date. The date from which to stop including
+            users' contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
@@ -321,10 +321,10 @@ def get_translation_reviewer_total_stats(
         language_code: str. The language code to get results for.
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
-        start_date: int. Number of days before
-            today to start including users' contributions.
-        end_date: int. Number of days before
-            today from which to stop including users' contributions.
+        start_date: datetime.date. The date from which to start including
+            users' contributions.
+        end_date: datetime.date. The date from which to stop including
+            users' contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
@@ -387,10 +387,10 @@ def get_question_submitter_total_stats(
             result.
         topic_ids: List[str]|None. List of topic ID(s) to fetch
             contributor stats for.
-        start_date: int. Number of days before
-            today to start including users' contributions.
-        end_date: int. Number of days before
-            today from which to stop including users' contributions.
+        start_date: datetime.date. The date from which to start including
+            users' contributions.
+        end_date: datetime.date. The date from which to stop including
+            users' contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
@@ -450,10 +450,10 @@ def get_question_reviewer_total_stats(
             results matching the query.
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
-        start_date: int. Number of days before
-            today to start including users' contributions.
-        end_date: int. Number of days before
-            today from which to stop including users' contributions.
+        start_date: datetime.date. The date from which to start including
+            users' contributions.
+        end_date: datetime.date. The date from which to stop including
+            users' contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
