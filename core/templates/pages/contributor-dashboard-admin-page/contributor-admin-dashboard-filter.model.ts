@@ -30,8 +30,8 @@ export class ContributorAdminDashboardFilter {
    * @param {String} languageCode - Language Code to filter for.
    * @param {String[]} topicIds - keywords to filter for.
    * @param {string} sort - sort options.
-   * @param {number} numberOfDaysSinceLastActivityStartDate - number of days since start date of last activity.
-   * @param {number} numberOfDaysSinceLastActivityEndDate - number of days since end date of last activity.
+   * @param {number} startDate - the date from which to start considering user contributions.
+   * @param {number} endDate - the date from which to stop considering user contributions.
    */
   constructor(
     topicIds: string[],
