@@ -2337,10 +2337,10 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch
                 contributor stats for.
-            start_date: datetime.date. The date from which to start including users'
-                contributions.
-            end_date: datetime.date. The date from which to stop including users'
-                contributions.
+            start_date: datetime.date. The date from which to start including
+                users' contributions.
+            end_date: datetime.date. The date from which to stop including
+                users' contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
@@ -2755,10 +2755,10 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             language_code: str. The language code to get results for.
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
-            start_date: datetime.date. The date from which to start including users'
-                contributions.
-            end_date: datetime.date. The date from which to stop including users'
-                contributions.
+            start_date: datetime.date. The date from which to start including
+                users' contributions.
+            end_date: datetime.date. The date from which to stop including
+                users' contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
@@ -2801,7 +2801,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         sorted_results: List[
             TranslationReviewerTotalContributionStatsModel] = []
-        
+
         next_offset = offset
         while len(sorted_results) < page_size:
             result_models: Sequence[
@@ -3080,10 +3080,10 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch contributor
                 stats for.
-            start_date: datetime.date. The date from which to start including users'
-                contributions.
-            end_date: datetime.date. The date from which to stop including users'
-                contributions.
+            start_date: datetime.date. The date from which to start including
+                users' contributions.
+            end_date: datetime.date. The date from which to stop including
+                users' contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
@@ -3137,7 +3137,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
         sorted_results: List[
             QuestionSubmitterTotalContributionStatsModel] = []
-        
+
         next_offset = offset
         while len(sorted_results) < page_size:
             result_models: Sequence[
@@ -3375,10 +3375,10 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                 results matching the query.
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
-            start_date: datetime.date. The date from which to start including users'
-                contributions.
-            end_date: datetime.date. The date from which to stop including users'
-                contributions.
+            start_date: datetime.date. The date from which to start including
+                users' contributions.
+            end_date: datetime.date. The date from which to stop including
+                users' contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
@@ -3418,7 +3418,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         sorted_results: List[
             QuestionReviewerTotalContributionStatsModel] = []
-        
+
         next_offset = offset
         while len(sorted_results) < page_size:
             result_models: Sequence[

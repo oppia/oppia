@@ -625,11 +625,9 @@ class ContributorDashboardAdminStatsHandler(
         sort_by = self.normalized_request.get('sort_by')
         topic_ids = self.normalized_request.get('topic_ids')
         start_date = datetime.datetime.strptime(self.normalized_request.get(
-                'start_date_locale_string'), "%m/%d/%Y").date()
+                'start_date_locale_string'), '%m/%d/%Y').date()
         end_date = datetime.datetime.strptime(self.normalized_request.get(
-                'end_date_locale_string'), "%m/%d/%Y").date()
-
-        print(end_date)
+                'end_date_locale_string'), '%m/%d/%Y').date()
 
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:

@@ -307,7 +307,7 @@ describe('Contributor dashboard Admin page', () => {
     }));
   });
 
-  fdescribe('when user is logged in', () => {
+  describe('when user is logged in', () => {
     beforeEach(() => {
       spyOn(
         contributorDashboardAdminStatsBackendApiService,

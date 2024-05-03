@@ -15,13 +15,13 @@
 """Service methods for operating on contributor admin dashboard user stats.
 """
 
-
 from __future__ import annotations
+
+import datetime
 
 from core.domain import suggestion_registry
 from core.domain import user_domain
 from core.platform import models
-import datetime
 
 from typing import List, Optional, Sequence, Tuple
 
