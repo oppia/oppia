@@ -66,18 +66,18 @@ describe('ResponseGraphInput', () => {
       '  "isDirected": false,' +
       '  "vertices": [' +
       '      {' +
-      '          "x": 150,' +
-      '          "y": 50,' +
+      '          "x": 10,' +
+      '          "y": 10,' +
       '          "label": ""' +
       '      },' +
       '      {' +
-      '          "x": 200,' +
-      '          "y": 50,' +
+      '          "x": 60,' +
+      '          "y": 10,' +
       '          "label": ""' +
       '      },' +
       '      {' +
-      '          "x": 150,' +
-      '          "y": 100,' +
+      '          "x": 10,' +
+      '          "y": 60,' +
       '          "label": ""' +
       '      }' +
       '  ],' +
@@ -107,18 +107,18 @@ describe('ResponseGraphInput', () => {
       isDirected: false,
       vertices: [
         {
-          x: 150,
-          y: 50,
+          x: 10,
+          y: 10,
           label: '',
         },
         {
-          x: 200,
-          y: 50,
+          x: 60,
+          y: 10,
           label: '',
         },
         {
-          x: 150,
-          y: 100,
+          x: 10,
+          y: 60,
           label: '',
         },
       ],
@@ -126,16 +126,17 @@ describe('ResponseGraphInput', () => {
     });
     expect(component.VERTEX_RADIUS).toBe(6);
     expect(component.EDGE_WIDTH).toBe(3);
+    expect(component.MIN_LEFT_MARGIN).toBe(10);
+    expect(component.minX).toBe(10);
+    expect(component.maxX).toBe(50);
   });
 
   it('should return directed edge arrow points when called', () => {
-    expect(component.getDirectedEdgeArrowPoints(0)).toBe(
-      '196,50 186,45 186,55'
-    );
+    expect(component.getDirectedEdgeArrowPoints(0)).toBe('56,10 46,5 46,15');
   });
 
   it('should return edge center when called', () => {
-    expect(component.getEdgeCenter(0)).toEqual({x: 175, y: 50});
+    expect(component.getEdgeCenter(0)).toEqual({x: 35, y: 10});
   });
 
   it('should return svg border', () => {
