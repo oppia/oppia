@@ -6,7 +6,14 @@
     <span>Back to Topic</span>
   </p>
   <div class="subtopic-header-text">
-    <span class="topic-name" (click)="navigateToTopicEditor()" tabindex="0" role="button" [attr.aria-label]="'Navigate back to ' + topic?.getName()" (keydown.enter)="navigateToTopicEditor()">{{ topic?.getName() }} / </span>
+    <span class="topic-name"
+          (click)="navigateToTopicEditor()"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="'Navigate back to ' + topic?.getName()"
+          (keydown.enter)="navigateToTopicEditor()">
+      {{ topic?.getName() + ' / ' }}
+    </span>
     <span class="subtopic-name">{{ editableTitle }}</span>
   </div>
   <div class="subtopic-content-box">

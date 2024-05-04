@@ -30,7 +30,11 @@ import {BlogAdminFactory, BlogAdmin} from '../user-utilities/blog-admin-utils';
 import {QuestionAdminFactory} from '../user-utilities/question-admin-utils';
 import {BlogPostEditorFactory} from '../user-utilities/blog-post-editor-utils';
 import {VoiceoverAdminFactory} from '../user-utilities/voiceover-admin-utils';
-import {ExplorationEditorFactory} from '../user-utilities/exploration-creator-utils';
+import {
+  ExplorationEditorFactory,
+  ExplorationEditor,
+} from '../user-utilities/exploration-editor-utils';
+import {CurriculumAdminFactory} from '../user-utilities/curriculum-admin-utils';
 import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
@@ -43,6 +47,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.TRANSLATION_ADMIN]: TranslationAdminFactory,
   [ROLES.BLOG_ADMIN]: BlogAdminFactory,
   [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
+  [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
 } as const;
@@ -141,7 +146,9 @@ export class UserFactory {
     username: string,
     email: string,
     roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
-  ): Promise<LoggedInUser & MultipleRoleIntersection<TRoles>> {
+  ): Promise<
+    LoggedInUser & ExplorationEditor & MultipleRoleIntersection<TRoles>
+  > {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
       LoggedInUserFactory(),
       ExplorationEditorFactory(),
