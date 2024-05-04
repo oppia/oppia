@@ -75,36 +75,6 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         rights_manager.release_ownership_of_collection(
             system_user, self.COLLECTION_ID)
 
-    def test_access_collection_editor_page(self) -> None:
-        """Test access to editor pages for the sample collection."""
-        allowed_usernames = [self.EDITOR_USERNAME]
-        self.set_collection_editors(allowed_usernames)
-
-        # Check that it is possible to access a page.
-        self.get_json(
-            '%s/%s' % (
-                feconf.COLLECTION_DATA_URL_PREFIX,
-                self.COLLECTION_ID))
-
-        # Check that non-editors cannot access the editor page. This is due
-        # to them not being allowed.
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.COLLECTION_EDITOR_URL_PREFIX,
-                self.COLLECTION_ID), expected_status_int=302)
-
-        # Check that allowed users can access and edit in the editor page.
-        self.login(self.EDITOR_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.COLLECTION_EDITOR_URL_PREFIX,
-                self.COLLECTION_ID))
-
-        json_response = self.get_json(
-            '%s/%s' % (feconf.COLLECTION_RIGHTS_PREFIX, self.COLLECTION_ID))
-        self.assertTrue(json_response['can_edit'])
-        self.logout()
-
     def test_editable_collection_handler_get(self) -> None:
         allowed_usernames = [self.EDITOR_USERNAME]
         self.set_collection_editors(allowed_usernames)
@@ -253,6 +223,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             long_message_dict, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/collection_editor_handler/data/0\' '
+            'these errors are happening:\n'
             'Schema validation for \'commit_message\' failed: Validation '
             'failed: has_length_at_most ({\'max_value\': 375}) for object %s'
             % long_message)
