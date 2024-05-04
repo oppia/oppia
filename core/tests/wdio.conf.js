@@ -208,7 +208,7 @@ exports.config = {
   // ====================
   // Runner Configuration
   // ====================
-  // Set 'bail' to 1 to stop the entire test suite execution after the first test failure. 
+  // Set 'bail' to 1 to stop the entire test suite execution after the first test failure.
   // Set it to 0 to allow all tests to run to completion, regardless of any individual test failures.
   bail: 1,
   //
@@ -300,6 +300,9 @@ exports.config = {
   // Make sure you have the wdio adapter package for the specific
   // framework installed before running any tests.
   framework: 'jasmine',
+  jasmineNodeOpts: {
+    jasmineConfigFile: 'puppeteer-acceptance-tests/jasmine.json'
+  },
 
   // Test reporter for stdout.
   // The only one supported by default is 'dot'

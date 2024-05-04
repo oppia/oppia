@@ -205,7 +205,7 @@ var createUserWithRole = async function (email, username, role) {
   // fails the test with error '$ is not defined for Admin.js file'.
   var adminPage = new AdminPage.AdminPage();
   await _createFirebaseAccount(email, true);
-  login(email);
+  await login(email);
   await _completeSignup(username);
   await adminPage.get();
   await adminPage.addRole(username, role);
