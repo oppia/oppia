@@ -104,7 +104,12 @@ export class CertificateDownloadModalComponent {
         this.toDate
       )
       .then((response: ContributorCertificateResponse) => {
-        this.createCertificate(response);
+        if (response) {
+          this.createCertificate(response);
+        } else {
+          this.errorsFound = true;
+          this.errorMessage = 'There are no contributions for the given date range.';
+        }
         this.certificateDownloading = false;
       })
       .catch((err: HttpErrorResponse) => {
