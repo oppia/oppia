@@ -181,6 +181,7 @@ var ExplorationEditorMainTab = function () {
       'Responses',
       'Preview',
       'Save',
+      'noneeeee',
     ];
     for (const HEADING of tutorialTabHeadings) {
       // Use: await tutorialTabHeadings.forEach(async function(heading) {
