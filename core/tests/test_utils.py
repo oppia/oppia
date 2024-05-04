@@ -325,7 +325,7 @@ def generate_random_hexa_str() -> str:
     lowercase = 'abcdef'
     characters = '%s%s%s' % (uppercase, lowercase, string.digits)
 
-    return random.choices(characters, k=32)
+    return ''.join(random.choices(characters, k=32))
 
 
 @contextlib.contextmanager
