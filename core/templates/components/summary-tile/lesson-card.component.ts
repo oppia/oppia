@@ -61,23 +61,22 @@ export class LessonCardComponent implements OnInit {
     const completedStories = storyModel.getCompletedNodeTitles().length;
     this.desc = storyModel.getTitle();
     this.imgColor = storyModel.getThumbnailBgColor();
-    this.imgUrl = this.getStorySummaryThumbnailUrl({
-      filename: storyModel.getThumbnailFilename(),
-      id: storyModel.getId(),
-    });
+    this.imgUrl = this.getStorySummaryThumbnailUrl(
+      storyModel.getThumbnailFilename(),
+      storyModel.getId()
+    );
 
     const nextStory =
       completedStories === storyModel.getAllNodes().length
         ? completedStories - 1
         : completedStories;
 
-    const lessonArgs = {
-      classroom: storyModel.getClassroomUrlFragment(),
-      topicFragment: storyModel.getTopicUrlFragment(),
-      currentStory: storyModel.getAllNodes()[nextStory],
-      story: storyModel.getUrlFragment(),
-    };
-    this.lessonUrl = this.getStorySummaryLessonUrl(lessonArgs);
+    this.lessonUrl = this.getStorySummaryLessonUrl(
+      storyModel.getClassroomUrlFragment(),
+      storyModel.getTopicUrlFragment(),
+      storyModel.getUrlFragment(),
+      storyModel.getAllNodes()[nextStory]
+    );
 
     this.title = `Chapter ${nextStory + 1}: ${storyModel.getNodeTitles()[nextStory]}`;
     this.progress = Math.floor(
@@ -110,37 +109,24 @@ export class LessonCardComponent implements OnInit {
     this.lessonTopic = 'Community Lessons';
   }
 
-  getStorySummaryThumbnailUrl(storyData: {
-    filename: string;
-    id: string;
-  }): string {
+  getStorySummaryThumbnailUrl(filename: string, id: string): string {
     return this.assetsBackendApiService.getThumbnailUrlForPreview(
       AppConstants.ENTITY_TYPE.STORY,
-      storyData.id,
-      storyData.filename
+      id,
+      filename
     );
   }
 
-  getStorySummaryLessonUrl(storyData: {
-    classroom: string | undefined;
-    topicFragment: string | undefined;
-    story: string;
-    currentStory: StoryNode;
-  }): string {
-    if (!storyData.classroom || !storyData.topicFragment) {
+  getStorySummaryLessonUrl(
+    classroomUrl: string | undefined,
+    topicUrl: string | undefined,
+    storyUrl: string,
+    currentStory: StoryNode
+  ): string {
+    if (!classroomUrl || !topicUrl) {
       throw new Error('Class and/or topic does not exist');
     }
-    return (
-      `/explore/${storyData.currentStory.getExplorationId()}?` +
-      Object.entries({
-        topic_url_fragment: storyData.topicFragment,
-        classroom_url_fragment: storyData.classroom,
-        story_url_fragment: storyData.story,
-        node_id: storyData.currentStory.getId(),
-      })
-        .map(([key, value]) => `${key}=${value}`)
-        .join('&')
-    );
+    return `/explore/${currentStory.getExplorationId()}?topic_url_fragment=${topicUrl}&classroom_url_fragment=${classroomUrl}&story_url_fragment=${storyUrl}&node_id=${currentStory.getId()}`;
   }
 
   getButtonTranslationKey(): string {
