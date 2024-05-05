@@ -725,6 +725,7 @@ export class LoggedInUser extends BaseUser {
         'The dismiss button does not close the Thanks for Donating popup!'
       );
     }
+    await this.page.waitForSelector(donatePage);
     const donatePageShowed = await this.page.$(donatePage);
     if (donatePageShowed === null) {
       throw new Error('The dismiss button does not show the Donate page!');
