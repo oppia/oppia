@@ -21,6 +21,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ContributorAdminDashboardFilter} from '../contributor-admin-dashboard-filter.model';
+import {DateTimeFormatService} from 'services/date-time-format.service';
 import {
   TranslationSubmitterStats,
   TranslationReviewerStats,
@@ -161,7 +162,8 @@ export class ContributorDashboardAdminStatsBackendApiService {
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService,
-    private classroomBackendApiService: ClassroomBackendApiService
+    private classroomBackendApiService: ClassroomBackendApiService,
+    private dateTimeFormatService: DateTimeFormatService
   ) {}
 
   async fetchCommunityStats(): Promise<CommunityContributionStatsBackendDict> {
@@ -228,13 +230,16 @@ export class ContributorDashboardAdminStatsBackendApiService {
         : PageConstants.DEFAULT_LANGUAGE_FILTER,
       ...(filter.startDate
         ? {
-            start_date_locale_string:
-              filter.startDate.toLocaleDateString('en-US'),
+            start_date: this.dateTimeFormatService.getModifiedLocalDateString(
+              filter.startDate
+            ),
           }
         : {}),
       ...(filter.endDate
         ? {
-            end_date_locale_string: filter.endDate.toLocaleDateString('en-US'),
+            end_date: this.dateTimeFormatService.getModifiedLocalDateString(
+              filter.endDate
+            ),
           }
         : {}),
     };

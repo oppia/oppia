@@ -238,6 +238,27 @@ var ContributorDashboardAdminPage = function () {
     await action.click(`${language} option selector`, selectorOption);
   };
 
+  this.waitForMonthToAppear = async function (monthCode) {
+    /**
+    We need to use element selector classes without the "e2e-" prefix
+    because the mat-datepicker that we use here does not contain any
+    such classes. Since the datepicker is a third-party dependency,
+    we cannot edit it to add "e2e-" classes. We cannot use an ancestor
+    element with the "e2e-" class because the datepicker's ancestor is
+    the body tag.
+    **/
+    var monthCodeContainer = $('.mat-calendar-content')
+      .$('.mat-calendar-table')
+      .$('.mat-calendar-body')
+      .$('tr')
+      .$(`td=${monthCode}`);
+
+    await waitFor.visibilityOf(
+      monthCodeContainer,
+      'Month code container is not visible'
+    );
+  };
+
   this.navigateThroughMonths = async function (numberOfMonths) {
     /**
     We need to use element selector classes without the "e2e-" prefix
@@ -255,7 +276,7 @@ var ContributorDashboardAdminPage = function () {
       .$('tr')
       .$('td');
 
-    var months = [
+    var monthCodes = [
       'JAN',
       'FEB',
       'MAR',
@@ -270,10 +291,10 @@ var ContributorDashboardAdminPage = function () {
       'DEC',
     ];
 
-    var monthText = await calenderBody.getText();
+    var monthCode = await calenderBody.getText();
     var monthIndex;
     for (let i = 0; i < 12; i++) {
-      if (months[i] === monthText) {
+      if (monthCodes[i] === monthCode) {
         monthIndex = i;
       }
     }
@@ -286,8 +307,7 @@ var ContributorDashboardAdminPage = function () {
         } else {
           monthIndex++;
         }
-        monthText = await calenderBody.getText();
-        expect(months[monthIndex]).toBe(monthText);
+        await this.waitForMonthToAppear(monthCodes[monthIndex]);
       }
     } else if (numberOfMonths < 0) {
       for (let i = 0; i < Math.abs(numberOfMonths); i++) {
@@ -297,8 +317,8 @@ var ContributorDashboardAdminPage = function () {
         } else {
           monthIndex--;
         }
-        monthText = await calenderBody.getText();
-        expect(months[monthIndex]).toBe(monthText);
+        monthCode = await calenderBody.getText();
+        await this.waitForMonthToAppear(monthCodes[monthIndex]);
       }
     }
   };

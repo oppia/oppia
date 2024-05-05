@@ -599,13 +599,13 @@ class ContributorDashboardAdminStatsHandler(
                 'schema': {
                     'type': 'basestring'
                 },
-                'default_value': '1/1/3000'
+                'default_value': '3000-01-01'
             },
             'end_date': {
                 'schema': {
                     'type': 'basestring'
                 },
-                'default_value': '1/1/1970'
+                'default_value': '1970-01-01'
             }
         }
     }
@@ -625,9 +625,9 @@ class ContributorDashboardAdminStatsHandler(
         sort_by = self.normalized_request.get('sort_by')
         topic_ids = self.normalized_request.get('topic_ids')
         start_date = datetime.datetime.strptime(str(self.normalized_request.get(
-                'start_date')), '%m/%d/%Y').date()
+                'start_date')), '%Y-%m-%d').date()
         end_date = datetime.datetime.strptime(str(self.normalized_request.get(
-                'end_date')), '%m/%d/%Y').date()
+                'end_date')), '%Y-%m-%d').date()
 
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:

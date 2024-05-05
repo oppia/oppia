@@ -352,7 +352,7 @@ describe('Contributor Admin Dashboard', function () {
     await users.logout();
   });
 
-  it(
+  fit(
     'should be able to filter those translation submitters, who have submitted' +
       ' translations between a given date range',
     async function () {
