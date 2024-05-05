@@ -2347,9 +2347,8 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 sorted_results:
                     list(TranslationSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied language_code,
-                    topic_ids, max_days_since_start_date_for_last_activity and
-                    max_days_since_end_date_for_last_activity filters, returned
-                    in the order specified by sort_by.
+                    topic_ids, start_date and end_date filters, returned in
+                    the order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -2765,9 +2764,8 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                 sorted_results:
                     list(TranslationSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied language_code,
-                    max_days_since_start_date_for_last_activity and
-                    max_days_since_end_date_for_last_activityfilters, returned
-                    in the order specified by sort_by.
+                    start_date and end_date filters, returned in the order
+                    specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -3090,9 +3088,8 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 sorted_results:
                     list(QuestionSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied topic_ids
-                    max_days_since_start_date_for_last_activity and
-                    max_days_since_end_date_for_last_activity filters, returned
-                    in the order specified by sort_by.
+                    start_date and end_date filters, returned in the
+                    order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -3385,9 +3382,8 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                 sorted_results:
                     list(QuestionReviewerTotalContributionStatsModel).
                     The list of models which match the supplied
-                    max_days_since_start_date_for_last_activity,
-                    max_days_since_end_date_for_last_activity filters, returned
-                    in the order specified by sort_by.
+                    start_date, end_date filters, returned in the
+                    order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results

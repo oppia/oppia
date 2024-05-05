@@ -516,8 +516,8 @@ class ContributorDashboardAdminStatsHandlerNormalizedPayloadDict(TypedDict):
     language_code: Optional[str]
     sort_by: Optional[str]
     topic_ids: Optional[List[str]]
-    start_date_locale_string: str
-    end_date_locale_string: str
+    start_date: str
+    end_date: str
 
 
 class ContributorDashboardAdminStatsHandler(
@@ -595,13 +595,13 @@ class ContributorDashboardAdminStatsHandler(
                 },
                 'default_value': None
             },
-            'start_date_locale_string': {
+            'start_date': {
                 'schema': {
                     'type': 'basestring'
                 },
                 'default_value': '1/1/3000'
             },
-            'end_date_locale_string': {
+            'end_date': {
                 'schema': {
                     'type': 'basestring'
                 },
@@ -625,9 +625,9 @@ class ContributorDashboardAdminStatsHandler(
         sort_by = self.normalized_request.get('sort_by')
         topic_ids = self.normalized_request.get('topic_ids')
         start_date = datetime.datetime.strptime(str(self.normalized_request.get(
-                'start_date_locale_string')), '%m/%d/%Y').date()
+                'start_date')), '%m/%d/%Y').date()
         end_date = datetime.datetime.strptime(str(self.normalized_request.get(
-                'end_date_locale_string')), '%m/%d/%Y').date()
+                'end_date')), '%m/%d/%Y').date()
 
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:

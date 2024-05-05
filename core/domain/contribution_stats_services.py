@@ -282,10 +282,8 @@ def get_translation_submitter_total_stats(
             language_code=language_code,
             sort_by=sort_by,
             topic_ids=topic_ids,
-            start_date=(
-                start_date),
-            end_date=(
-                end_date)
+            start_date=start_date,
+            end_date=end_date
         )
     )
 
@@ -346,10 +344,8 @@ def get_translation_reviewer_total_stats(
             offset=offset,
             language_code=language_code,
             sort_by=sort_by,
-            start_date=(
-                start_date),
-            end_date=(
-                end_date)
+            start_date=start_date,
+            end_date=end_date
         )
     )
 
@@ -412,10 +408,8 @@ def get_question_submitter_total_stats(
             offset=offset,
             sort_by=sort_by,
             topic_ids=topic_ids,
-            start_date=(
-                start_date),
-            end_date=(
-                end_date)
+            start_date=start_date,
+            end_date=end_date
         )
     )
 
@@ -473,10 +467,8 @@ def get_question_reviewer_total_stats(
             page_size=page_size,
             offset=offset,
             sort_by=sort_by,
-            start_date=(
-                start_date),
-            end_date=(
-                end_date)
+            start_date=start_date,
+            end_date=end_date
         )
     )
 

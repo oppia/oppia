@@ -358,7 +358,7 @@ describe('Contributor Admin Dashboard', function () {
     async function () {
       /**
       One translation submission was created previously by the beforeAll block in
-      this describe block for earlier e2e test, it was created within the last 24
+      this describe block for earlier e2e test, so it was created within the last 24
       hours.
       **/
       await users.login(TRANSLATION_COORDINATOR_EMAIL);
@@ -393,7 +393,7 @@ describe('Contributor Admin Dashboard', function () {
     async function () {
       /**
       One translation review was created previously by the beforeAll block in this
-      describe block for earlier e2e test, it was created within the last 24
+      describe block for earlier e2e test, so it was created within the last 24
       hours.
       **/
       await users.login(TRANSLATION_COORDINATOR_EMAIL);
@@ -428,7 +428,7 @@ describe('Contributor Admin Dashboard', function () {
     async function () {
       /**
       One question submission was created previously by the beforeAll block in this
-      describe block for earlier e2e test, it was created within the last 24
+      describe block for earlier e2e test, so it was created within the last 24
       hours.
       **/
       await users.login(QUESTION_COORDINATOR_EMAIL);
@@ -460,7 +460,7 @@ describe('Contributor Admin Dashboard', function () {
     async function () {
       /**
       One question review was created previously by the beforeAll block in this
-      describe block for earlier e2e test, it was created within the last 24
+      describe block for earlier e2e test, so it was created within the last 24
       hours.
       **/
       await users.login(QUESTION_COORDINATOR_EMAIL);
