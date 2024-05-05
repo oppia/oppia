@@ -355,6 +355,14 @@ export class ChangeListService {
     );
   }
 
+  getVoiceoverChangeList(): ExplorationChange[] {
+    return angular.copy(
+      this.explorationChangeList.filter(change => {
+        return change.cmd === 'update_voiceovers';
+      })
+    );
+  }
+
   isExplorationLockedForEditing(): boolean {
     return this.explorationChangeList.length > 0;
   }

@@ -64,17 +64,6 @@ export class TranslationLanguageService {
       );
       return;
     }
-    if (
-      this.localStorageService.getLastSelectedTranslationLanguageCode() !==
-      newActiveLanguageCode
-    ) {
-      console.log('Different language');
-      console.log(
-        this.localStorageService.getLastSelectedTranslationLanguageCode()
-      );
-      console.log(newActiveLanguageCode);
-      this.localStorageService.setLastSelectedLanguageAccentCode(undefined);
-    }
     this.activeLanguageCode = newActiveLanguageCode;
     this._activeLanguageChangedEventEmitter.emit();
   }

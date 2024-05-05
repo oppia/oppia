@@ -2,11 +2,11 @@
   <h3>Voiceovers</h3>
   <div *ngIf="pageIsLoaded">
     <mat-form-field class="oppia-language-accent-dropdown-selector language-accent-selector"
-                    *ngIf="availableLanguageAccentCodesLength > 0">
+                    *ngIf="supportedLanguageAccentCodesLength > 0">
       <mat-label>Select Accent: </mat-label>
-      <mat-select (selectionChange)="getVoiceovers($event.value)"
+      <mat-select (selectionChange)="updateLanguageAccentCode($event.value)"
                   [ngModel]="languageAccentCode">
-        <mat-option *ngFor="let languageAccentCodeToDescription of availableLanguageAccentCodesToDescriptions | keyvalue"
+        <mat-option *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue"
                     [value]="languageAccentCodeToDescription.key">
           <span>
             {{languageAccentCodeToDescription.value}}
@@ -14,15 +14,15 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
-    <div *ngIf="availableLanguageAccentCodesLength === 0">
-      No accent available for the selected voiceover.
+    <div *ngIf="supportedLanguageAccentCodesLength === 0">
+      No accent available for the selected voiceover language.
     </div>
-    <div *ngIf="(!!languageAccentCode) && (availableLanguageAccentCodesLength > 0)">
+    <div *ngIf="(!languageAccentCodeIsSelected) && (supportedLanguageAccentCodesLength > 0)">
       <p>Please select an accent to get voiceovers!</p>
     </div>
   </div>
 
-  <div *ngIf="pageIsLoaded && voiceoversAreLoaded">
+  <div *ngIf="pageIsLoaded && voiceoversAreLoaded && languageAccentCodeIsSelected">
     <div class="manual-voiceovers">
       <div class="voiceovers-component" *ngIf="manualVoiceover">
         <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(manualVoiceover.filename)">

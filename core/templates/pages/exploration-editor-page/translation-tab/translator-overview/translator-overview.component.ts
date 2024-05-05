@@ -42,7 +42,11 @@ import {
   ExplorationChangeMarkTranslationsNeedsUpdate,
   ExplorationChangeRemoveTranslations,
   ExplorationTranslationChange,
+  ExplorationChangeEditVoiceovers,
 } from 'domain/exploration/exploration-draft.model';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
+import {Voiceover} from 'domain/exploration/voiceover.model';
 
 @Component({
   selector: 'oppia-translator-overview',
@@ -68,6 +72,7 @@ export class TranslatorOverviewComponent implements OnInit {
   constructor(
     private contextService: ContextService,
     private entityTranslationsService: EntityTranslationsService,
+    private entityVoiceoversService: EntityVoiceoversService,
     private changeListService: ChangeListService,
     private explorationLanguageCodeService: ExplorationLanguageCodeService,
     private focusManagerService: FocusManagerService,
@@ -180,6 +185,8 @@ export class TranslatorOverviewComponent implements OnInit {
         this.routerService.onCenterGraph.emit();
         this.loaderService.hideLoadingScreen();
       });
+    this.entityVoiceoversService.setLanguageCode(this.languageCode);
+    this.entityVoiceoversService.fetchEntityVoiceovers();
   }
 
   getTranslationProgressAriaLabel(): string {
@@ -230,6 +237,40 @@ export class TranslatorOverviewComponent implements OnInit {
     });
   }
 
+  updateVoiceoverWithChangeList(): void {
+    this.changeListService.getVoiceoverChangeList().forEach(changeDict => {
+      changeDict = changeDict as ExplorationChangeEditVoiceovers;
+      let contentId = changeDict.content_id;
+      let voiceovers = changeDict.voiceovers;
+      let languageAccentCode = changeDict.language_accent_code;
+
+      let entityVoiceovers =
+        this.entityVoiceoversService.getVoiceoverInGivenLanguageAccentCode(
+          languageAccentCode
+        );
+
+      if (entityVoiceovers === undefined) {
+        entityVoiceovers = new EntityVoiceovers(
+          this.entityVoiceoversService.entityId,
+          this.entityVoiceoversService.entityType,
+          this.entityVoiceoversService.entityVersion,
+          languageAccentCode,
+          {}
+        );
+      }
+      let manualVoiceover = Voiceover.createFromBackendDict(voiceovers.manual);
+
+      entityVoiceovers.voiceovers[contentId] = {
+        manual: manualVoiceover,
+      };
+
+      this.entityVoiceoversService.addManualVoiceover(
+        languageAccentCode,
+        entityVoiceovers
+      );
+    });
+  }
+
   ngOnInit(): void {
     this.LAST_SELECTED_TRANSLATION_LANGUAGE = 'last_selected_translation_lang';
     let lastSelectedTranslationLanguage =
@@ -272,6 +313,9 @@ export class TranslatorOverviewComponent implements OnInit {
         this.inVoiceoverMode = false;
         this.refreshDirectiveScope();
       });
+    this.entityVoiceoversService.setLanguageCode(this.languageCode);
+    this.entityVoiceoversService.fetchEntityVoiceovers();
+    this.updateVoiceoverWithChangeList();
   }
 }
 
