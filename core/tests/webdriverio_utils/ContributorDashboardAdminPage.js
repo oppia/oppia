@@ -317,7 +317,6 @@ var ContributorDashboardAdminPage = function () {
         } else {
           monthIndex--;
         }
-        monthCode = await calenderBody.getText();
         await this.waitForMonthToAppear(monthCodes[monthIndex]);
       }
     }

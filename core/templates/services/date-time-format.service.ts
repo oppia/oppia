@@ -127,7 +127,7 @@ export class DateTimeFormatService {
       day: '2-digit',
     });
 
-    const [day, month, year] = inputDate.split('/');
+    const [month, day, year] = inputDate.split('/');
     const formatedDate: string = `${year}-${month}-${day}`;
     return formatedDate;
   }
