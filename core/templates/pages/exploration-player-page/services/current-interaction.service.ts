@@ -157,8 +157,16 @@ export class CurrentInteractionService {
     this.getDisplayedCard()?.updateCurrentAnswer(answer);
   }
 
+  updateIsValidAnswer(isValid: boolean): void {
+    this.getDisplayedCard()?.updateIsValidAnswer(isValid);
+  }
+
   showNoResponseError(): boolean {
     return this.getDisplayedCard().showNoResponseError();
+  }
+
+  showInvalidResponseError(): boolean {
+    return this.getDisplayedCard().showInvalidResponseError();
   }
 
   submitAnswer(): void {

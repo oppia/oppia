@@ -73,6 +73,7 @@ describe('NumericExpressionInputInteractive', () => {
     ) {}
 
     updateCurrentAnswer(answer: InteractionAnswer): void {}
+    updateIsValidAnswer(isValid: boolean) {}
 
     registerCurrentInteraction(
       submitAnswerFn: Function,

@@ -78,6 +78,7 @@ export class InteractiveMathEquationInput implements OnInit {
         this.guppyInitializationService.getAllowedVariables()
       );
       this.warningText = this.mathInteractionsService.getWarningText();
+      this.currentInteractionService.updateIsValidAnswer(answerIsValid);
       return answerIsValid;
     }
     this.warningText = '';

@@ -136,6 +136,7 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
         throw parsingError;
       }
       this.isValid = false;
+      this.currentInteractionService.updateIsValidAnswer(false);
     }
   }
 

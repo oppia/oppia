@@ -50,6 +50,7 @@ describe('Number with units interaction component', () => {
     ) => {},
     showNoResponseError: (): boolean => false,
     updateCurrentAnswer: (answer: InteractionAnswer) => {},
+    updateIsValidAnswer: (answer: boolean) => {},
     registerCurrentInteraction: (
       submitAnswerFn: Function,
       validateExpressionFn: Function

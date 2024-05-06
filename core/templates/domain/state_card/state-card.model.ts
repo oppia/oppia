@@ -89,6 +89,10 @@ export class StateCard {
     this.toggleSubmitClicked(false);
   }
 
+  updateIsValidAnswer(value: boolean): void {
+    this.getInteraction().isAnswerValid = value;
+  }
+
   showNoResponseError(): boolean {
     const currentAnswer = this.getInteraction().currentAnswer;
     const notNumber = !(typeof currentAnswer === 'number');
@@ -96,6 +100,13 @@ export class StateCard {
       Array.isArray(currentAnswer) && currentAnswer.length === 0;
     const noResponse = notNumber && (isEmptyArray || !currentAnswer);
     return noResponse && this.getInteraction().submitClicked;
+  }
+
+  showInvalidResponseError(): boolean {
+    return (
+      !this.getInteraction().isAnswerValid &&
+      this.getInteraction().submitClicked
+    );
   }
 
   // Restore everything immutably so that Angular can detect changes.

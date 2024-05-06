@@ -69,6 +69,7 @@ describe('InteractiveNumericInput', () => {
       rulesService: CurrentInteractionService
     ) => {},
     updateCurrentAnswer: (answer: InteractionAnswer) => {},
+    updateIsValidAnswer: (isValid: boolean) => {},
     showNoResponseError: (): boolean => false,
     registerCurrentInteraction: (
       submitAnswerFn: Function,

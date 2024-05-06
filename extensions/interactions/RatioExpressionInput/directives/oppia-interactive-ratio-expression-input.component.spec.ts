@@ -62,6 +62,7 @@ describe('InteractiveRatioExpressionInput', () => {
       rulesService: CurrentInteractionService
     ) => {},
     updateCurrentAnswer: (): boolean => false,
+    updateIsValidAnswer: (isValid: boolean) => {},
     registerCurrentInteraction: (
       submitAnswerFn: Function,
       validateExpressionFn: Function

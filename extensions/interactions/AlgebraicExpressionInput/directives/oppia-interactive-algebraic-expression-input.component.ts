@@ -83,6 +83,7 @@ export class AlgebraicExpressionInputInteractionComponent
           this.guppyInitializationService.getAllowedVariables()
         );
       this.warningText = this.mathInteractionsService.getWarningText();
+      this.currentInteractionService.updateIsValidAnswer(answerIsValid);
       return answerIsValid;
     }
     this.warningText = '';
