@@ -34,6 +34,25 @@ jobs:
           make build
           docker compose up angular-build -d
           sudo docker cp oppia-angular-build:/app/oppia/node_modules .
+      - name: Modify Lighthouse source-maps.js
+        run: |
+          # Replace the 1.5 second timeout in lighthouse for retrieving
+          # sourcemaps with a 10 second timeout. This timeout is not
+          # configurable through Lighthouse's exposed API, so we have
+          # resorted to patching the code instead.
+          set -e
+          FILEPATH=$GITHUB_WORKSPACE/node_modules/lighthouse/lighthouse-core/gather/gatherers/source-maps.js
+          SEARCH_TARGET="1500"
+          REPLACEMENT="10000"
+          occurrences=$(grep -c $SEARCH_TARGET $FILEPATH)
+          echo "Found $occurrences occurrences of '$SEARCH_TARGET'"
+          # Assert that there is only one match for the target string.
+          # If there are ever zero or multiple matches, the lighthouse
+          # code has changed and this logic needs to be reviewed.
+          [[ $occurrences == "1" ]]
+          # Replace the target string with the replacement string.
+          sed -i 's/$SEARCH_TARGET/$REPLACEMENT/' $FILEPATH
+          echo "Replaced '$SEARCH_TARGET' with '$REPLACEMENT' in $FILEPATH"
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: ./.github/actions/install-chrome
