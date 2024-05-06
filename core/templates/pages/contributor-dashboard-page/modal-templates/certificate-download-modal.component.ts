@@ -103,12 +103,13 @@ export class CertificateDownloadModalComponent {
         this.fromDate,
         this.toDate
       )
-      .then((response: ContributorCertificateResponse) => {
+      .then((response: ContributorCertificateResponse | null) => {
         if (response) {
           this.createCertificate(response);
         } else {
           this.errorsFound = true;
-          this.errorMessage = 'There are no contributions for the given date range.';
+          this.errorMessage =
+            'There are no contributions for the given date range.';
         }
         this.certificateDownloading = false;
       })

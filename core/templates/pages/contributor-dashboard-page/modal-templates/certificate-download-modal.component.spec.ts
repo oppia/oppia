@@ -160,6 +160,25 @@ describe('Contributor Certificate Download Modal Component', () => {
     );
   });
 
+  it('should show error for no contributions found', fakeAsync(() => {
+    component.fromDate = '2020/01/01';
+    component.toDate = '2020/01/31';
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(null));
+    spyOn(alertsService, 'addInfoMessage').and.stub();
+
+    component.downloadCertificate();
+
+    flushMicrotasks();
+
+    expect(component.errorsFound).toBeTrue();
+    expect(component.errorMessage).toEqual(
+      'There are no contributions for the given date range.'
+    );
+  }));
+
   it('should show error for invalid date ranges', () => {
     const today = new Date();
     let tomorrow = new Date();

@@ -501,7 +501,7 @@ export class ContributionAndReviewService {
     languageCode: string | null,
     fromDate: string,
     toDate: string
-  ): Promise<ContributorCertificateResponse> {
+  ): Promise<ContributorCertificateResponse | null> {
     return this.contributionAndReviewBackendApiService.downloadContributorCertificateAsync(
       username,
       suggestionType,

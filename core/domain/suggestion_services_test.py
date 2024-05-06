@@ -7343,7 +7343,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             self.to_date,
         )
 
-        self.assertIsNotNone(response)
+        assert response is not None
         self.assertEqual(
             response['contribution_hours'],
             self._calculate_translation_contribution_hours(3)
@@ -7372,7 +7372,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             self.to_date,
         )
 
-        self.assertIsNotNone(response)
+        assert response is not None
         self.assertEqual(
             response['contribution_hours'],
             self._calculate_translation_contribution_hours(4)
@@ -7409,7 +7409,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             self.to_date,
         )
 
-        self.assertIsNotNone(response)
+        assert response is not None
         self.assertEqual(
             response['contribution_hours'],
             self._calculate_translation_contribution_hours(3)
@@ -7464,7 +7464,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             self.to_date,
         )
 
-        self.assertIsNotNone(response)
+        assert response is not None
         self.assertEqual(
             response['contribution_hours'],
             self._calculate_question_contribution_hours(False)
@@ -7521,7 +7521,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             self.to_date,
         )
 
-        self.assertIsNotNone(response)
+        assert response is not None
         self.assertEqual(
             response['contribution_hours'],
             self._calculate_question_contribution_hours(True)
@@ -7530,32 +7530,28 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
     def test_create_contributor_certificate_raises_exception_for_no_suggestions(
         self
     ) -> None:
-        with self.assertRaisesRegex(
-            Exception,
-            'There are no contributions for the given time range.'
-        ):
-            suggestion_services.generate_contributor_certificate_data(
+        data = suggestion_services.generate_contributor_certificate_data(
                 self.username,
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 'hi',
                 self.from_date,
                 self.to_date,
-            )
+        )
+
+        self.assertIsNone(data)
 
     def test_create_certificate_raises_exception_for_no_question_suggestions(
         self
     ) -> None:
-        with self.assertRaisesRegex(
-            Exception,
-            'There are no contributions for the given time range.'
-        ):
-            suggestion_services.generate_contributor_certificate_data(
+        data = suggestion_services.generate_contributor_certificate_data(
                 self.username,
                 feconf.SUGGESTION_TYPE_ADD_QUESTION,
                 None,
                 self.from_date,
                 self.to_date,
             )
+        
+        self.assertIsNone(data)
 
     def test_create_contributor_certificate_raises_exception_for_wrong_language(
         self
