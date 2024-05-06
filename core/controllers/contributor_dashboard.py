@@ -378,34 +378,34 @@ class ReviewableOpportunitiesHandler(
         pinned_opportunity_summary = None
         if topic_name is None:
             topic_exp_ids = (
-                topic_services.get_all_published_story_exploration_ids())
+                topic_services.get_all_published_story_exploration_ids()
+            )
         else:
             topic = topic_fetchers.get_topic_by_name(topic_name)
             if topic is None:
                 raise self.InvalidInputException(
-                    'The supplied input topic: %s is not valid' % topic_name)
-            topic_exp_ids = (
-                topic_services.get_all_published_story_exploration_ids(
-                    topic_id=topic.id))
+                    'The supplied input topic: %s is not valid' % topic_name
+                )
             if language and self.user_id:
                 pinned_opportunity_summary = (
                     opportunity_services.get_pinned_lesson(
                         self.user_id,
                         language,
                         topic.id
-                    ))
-
-        # TODO (#19664): Implement fetching target IDs using GAE projection
-        # queries.
-        in_review_suggestions, _ = (
+                    )
+                )
+            topic_exp_ids = (
+                topic_services.get_all_published_story_exploration_ids(
+                    topic_id=topic.id
+                )
+            )
+        in_review_suggestion_target_ids = (
             suggestion_services
-            .get_reviewable_translation_suggestions_by_offset(
-                user_id, topic_exp_ids, None, 0, None, language))
-        # This is defined as a set as we only care about the unique IDs.
-        in_review_suggestion_target_ids = {
-            suggestion.target_id for suggestion in in_review_suggestions
-        }
-        exp_ids = [
+            .get_reviewable_translation_suggestion_target_ids(
+                user_id, language
+            )
+        )
+        topic_exp_ids_targeted_by_in_review_suggestions = [
             exp_id
             for exp_id in topic_exp_ids
             if exp_id in in_review_suggestion_target_ids
@@ -413,7 +413,7 @@ class ReviewableOpportunitiesHandler(
 
         exp_opp_summaries = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                exp_ids
+                topic_exp_ids_targeted_by_in_review_suggestions
             )
         )
 

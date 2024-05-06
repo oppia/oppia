@@ -1852,6 +1852,72 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         expected_language_code_list: List[str] = []
         self.assertEqual(actual_language_code_list, expected_language_code_list)
 
+    def test_get_target_ids_of_reviewable_translation_suggestions_for_user(
+        self
+    ) -> None:
+        language_code = 'hi'
+        fetched_target_id_1, fetched_target_id_2 = ('exp1', 'exp2')
+        self._create_translation_suggestion(language_code, fetched_target_id_1)
+        self._create_translation_suggestion(language_code, fetched_target_id_2)
+        self._create_translation_suggestion(language_code, fetched_target_id_2)
+        self._create_translation_suggestion('bn', 'exp3')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'hi'
+        )
+
+        target_ids = (
+            suggestion_services.
+            get_reviewable_translation_suggestion_target_ids(
+                self.reviewer_id_1, language_code
+            )
+        )
+
+        self.assertCountEqual(
+            target_ids, [fetched_target_id_1, fetched_target_id_2]
+        )
+
+    def test_get_target_ids_of_translations_in_user_reviewable_languages_when_not_filtering_by_language( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        fetched_target_id_1, fetched_target_id_2 = ('exp1', 'exp2')
+        self._create_translation_suggestion('hi', fetched_target_id_1)
+        self._create_translation_suggestion('fr', fetched_target_id_2)
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'hi'
+        )
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'fr'
+        )
+        language_code = None
+
+        target_ids = (
+            suggestion_services.
+            get_reviewable_translation_suggestion_target_ids(
+                self.reviewer_id_1, language_code
+            )
+        )
+
+        self.assertCountEqual(
+            target_ids, [fetched_target_id_1, fetched_target_id_2]
+        )
+
+    def test_get_no_translation_target_ids_when_user_cannot_review_in_given_language( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        language_code = 'cs'
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'hi'
+        )
+
+        target_ids = (
+            suggestion_services.
+            get_reviewable_translation_suggestion_target_ids(
+                self.reviewer_id_1, language_code
+            )
+        )
+
+        self.assertCountEqual(target_ids, [])
+
     def test_get_reviewable_question_suggestions(self) -> None:
         # Add a few translation suggestions in different languages.
         self._create_translation_suggestion_with_language_code('hi')

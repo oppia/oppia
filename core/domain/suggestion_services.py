@@ -1103,6 +1103,50 @@ def get_reviewable_translation_suggestions_by_offset(
     return translation_suggestions, next_offset
 
 
+def get_reviewable_translation_suggestion_target_ids(
+    user_id: str,
+    language_code: Optional[str] = None
+) -> List[str]:
+    """Returns a list of translation suggestions matching the
+    passed opportunity IDs which the user can review.
+
+    Args:
+        user_id: str. The ID of the user.
+        language_code: str|None. ISO 639-1 language code for which to filter.
+            If it is None, all available languages will be returned.
+
+    Returns:
+        list(str). A list of translation suggestion target ids
+        which the supplied user is permitted to review.
+    """
+    contribution_rights = user_services.get_user_contribution_rights(
+        user_id
+    )
+    allowed_language_codes_for_review = (
+        contribution_rights.can_review_translation_for_language_codes
+    )
+
+    filtering_by_language_code = language_code is not None
+    language_codes = (
+        allowed_language_codes_for_review if not filtering_by_language_code
+        else [language_code]
+        if language_code in allowed_language_codes_for_review
+        else []
+    )
+
+    user_can_review_translations = len(language_codes) != 0
+    if not user_can_review_translations:
+        return []
+
+    return (
+        suggestion_models.GeneralSuggestionModel
+        .get_in_review_translation_suggestion_target_ids(
+            user_id,
+            language_codes
+        )
+    )
+
+
 def get_reviewable_translation_suggestions_for_single_exp(
     user_id: str,
     opportunity_summary_exp_id: str,

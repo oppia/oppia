@@ -869,6 +869,71 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(sorted_results[1].id, suggestion_1_id)
         self.assertEqual(offset_4, 3)
 
+    def test_get_target_ids_of_translation_suggestions_in_review(self) -> None:
+        user_id = 'author1'
+        language_codes = [self.translation_language_code, 'fr']
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_2',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'matched_en_1', self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp2', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_2',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'matched_en_2', self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp2', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'matched_en_2_duplicate', self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp3', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'matched_fr_1', 'fr')
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp4', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'not_matched_since_language_not_in_codes', 'na')
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp5', self.target_version_at_submission,
+            suggestion_models.STATUS_ACCEPTED, 'author_4',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'not_matched_since_not_in_review',
+            self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp6', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, user_id,
+            'reviewer_2', self.change_cmd, self.score_category,
+            'not_matched_since_reviewer_is_author',
+            self.translation_language_code)
+
+        target_ids = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_translation_suggestion_target_ids(
+                user_id,
+                language_codes
+            )
+        )
+
+        self.assertCountEqual(target_ids, ['exp1', 'exp2', 'exp3'])
+
     def test_get_in_review_question_suggestions_by_offset(self) -> None:
         suggestion_1_id = 'skill1.thread1'
         suggestion_2_id = 'skill1.thread2'
