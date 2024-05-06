@@ -128,35 +128,34 @@ export class LessonCardComponent implements OnInit {
     if (!classroomUrl || !topicUrl) {
       throw new Error('Class and/or topic does not exist');
     }
-    let resultUrl = '';
 
     if (currentStory.getExplorationId()) {
-      resultUrl = this.urlInterpolationService.interpolateUrl(
+      let resultUrl = this.urlInterpolationService.interpolateUrl(
         '/explore/<exp_id>',
         {exp_id: currentStory.getExplorationId()}
       );
+      resultUrl = this.urlService.addField(
+        resultUrl,
+        'topic_url_fragment',
+        topicUrl
+      );
+      resultUrl = this.urlService.addField(
+        resultUrl,
+        'classroom_url_fragment',
+        classroomUrl
+      );
+      resultUrl = this.urlService.addField(
+        resultUrl,
+        'story_url_fragment',
+        storyUrl
+      );
+      resultUrl = this.urlService.addField(
+        resultUrl,
+        'node_id',
+        currentStory.getId()
+      );
+      return resultUrl;
     }
-    resultUrl = this.urlService.addField(
-      resultUrl,
-      'topic_url_fragment',
-      topicUrl
-    );
-    resultUrl = this.urlService.addField(
-      resultUrl,
-      'classroom_url_fragment',
-      classroomUrl
-    );
-    resultUrl = this.urlService.addField(
-      resultUrl,
-      'story_url_fragment',
-      storyUrl
-    );
-    resultUrl = this.urlService.addField(
-      resultUrl,
-      'node_id',
-      currentStory.getId()
-    );
-    return resultUrl;
   }
 
   getButtonTranslationKey(): string {
