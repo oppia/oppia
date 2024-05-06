@@ -49,7 +49,7 @@ import {
 } from '../contributor-dashboard-admin-summary.model';
 
 describe('Contributor stats component', () => {
-  var createQuestionReviewerStats = function createQuestionReviewerStats(
+  const createQuestionReviewerStats = function createQuestionReviewerStats(
     numStats: number
   ): QuestionReviewerStats[] {
     let stats: QuestionReviewerStats[] = [];
@@ -314,21 +314,31 @@ describe('Contributor stats component', () => {
       expect(component.getOverallItemCount()).toEqual('1+');
     }));
 
-    it('should index last item on page as "overall item count" when "current page\'s cumulative item count" exceeds "overall item count".', fakeAsync(() => {
-      component.statsPageNumber = 1;
-      component.itemsPerPage = 4;
-      fixture.detectChanges();
-      component.allStats = createQuestionReviewerStats(3);
-      expect(component.getIndexOfLastItemOnPage()).toEqual(3);
-    }));
+    it(
+      'should index last item on page as "overall item count" when ' +
+        '"current page\'s cumulative item count"' +
+        ' exceeds "overall item count".',
+      fakeAsync(() => {
+        component.statsPageNumber = 1;
+        component.itemsPerPage = 4;
+        fixture.detectChanges();
+        component.allStats = createQuestionReviewerStats(3);
+        expect(component.getIndexOfLastItemOnPage()).toEqual(3);
+      })
+    );
 
-    it('should index last item on page as "current page\'s cumulative item count" when "overall item count" exceeds "current page\'s cumulative item count".', fakeAsync(() => {
-      component.statsPageNumber = 1;
-      component.itemsPerPage = 1;
-      fixture.detectChanges();
-      component.allStats = createQuestionReviewerStats(3);
-      expect(component.getIndexOfLastItemOnPage()).toEqual(2);
-    }));
+    it(
+      'should index last item on page as "current page\'s ' +
+        'cumulative item count" when "overall item count"' +
+        ' exceeds "current page\'s cumulative item count".',
+      fakeAsync(() => {
+        component.statsPageNumber = 1;
+        component.itemsPerPage = 1;
+        fixture.detectChanges();
+        component.allStats = createQuestionReviewerStats(3);
+        expect(component.getIndexOfLastItemOnPage()).toEqual(2);
+      })
+    );
 
     it('should retrieve the index of the first item on the page', fakeAsync(() => {
       component.statsPageNumber = 2;
@@ -346,14 +356,18 @@ describe('Contributor stats component', () => {
       );
     }));
 
-    it('should show a "+" at the end of the overall item count when the number of items exceeds max expected', fakeAsync(() => {
-      component.statsPageNumber = 1;
-      component.itemsPerPage = 1;
-      component.tableHasMoreThanMaximumExpectedItems = true;
-      fixture.detectChanges();
-      component.allStats = createQuestionReviewerStats(1000);
-      expect(component.getOverallItemCount()).toEqual('1000+');
-    }));
+    it(
+      'should show a "+" at the end of the overall item count when ' +
+        'the number of items exceeds max expected',
+      fakeAsync(() => {
+        component.statsPageNumber = 1;
+        component.itemsPerPage = 1;
+        component.tableHasMoreThanMaximumExpectedItems = true;
+        fixture.detectChanges();
+        component.allStats = createQuestionReviewerStats(1000);
+        expect(component.getOverallItemCount()).toEqual('1000+');
+      })
+    );
 
     it('should navigate to next page', fakeAsync(() => {
       const goToSpy = spyOn(component, 'goToPageNumber');
