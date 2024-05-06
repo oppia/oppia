@@ -132,9 +132,6 @@ run_tests.third_party_size_check: ## Runs the third party size check
 run_tests.lint: ## Runs the linter tests
 	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.run_lint_checks $(PYTHON_ARGS)'" dev-server
 
-run_tests.third_party_size_check: ## Runs the third party size check
-	docker compose run --no-deps --entrypoint "python -m scripts.third_party_size_check" dev-server
-
 run_tests.backend: ## Runs the backend tests
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
