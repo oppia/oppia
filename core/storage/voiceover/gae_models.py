@@ -62,7 +62,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
     # A dict representing content IDs as keys and nested dicts as values.
     # Each nested dict contains 'manual' and 'auto' as keys and VoiceoverDict
     # as values.
-    voiceovers = datastore_services.JsonProperty(required=True)
+    voiceovers_mapping = datastore_services.JsonProperty(required=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -83,7 +83,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
             'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_accent_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'voiceovers': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'voiceovers_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         })
 
     @staticmethod
@@ -146,7 +146,8 @@ class EntityVoiceoversModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int,
         language_accent_code: str,
-        voiceovers: Dict[str, Dict[str, Optional[state_domain.VoiceoverDict]]]
+        voiceovers_mapping: Dict[str, Dict[
+            feconf.VoiceoverType.value, Optional[state_domain.VoiceoverDict]]]
     ) -> EntityVoiceoversModel:
         """Creates and returns a new EntityVoiceoversModel instance.
 
@@ -155,10 +156,9 @@ class EntityVoiceoversModel(base_models.BaseModel):
             entity_id: str. The ID of the entity.
             entity_version: int. The version of the entity.
             language_accent_code: str. The language code for the entity.
-            voiceovers: dict(str, dict(str, VoiceoverDict)). A dict
-                containing content IDs as keys and nested dicts as values.
-                Each nested dict contains str as keys and
-                VoiceoverDict as values.
+            voiceovers_mapping: dict(str, dict(str, VoiceoverDict)). A dict
+                containing content IDs as keys and nested dicts as values. Each
+                nested dict contains str as keys and VoiceoverDict as values.
 
         Returns:
             EntityVoiceoversModel. Returns a new EntityVoiceoversModel.
@@ -170,7 +170,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
             entity_id=entity_id,
             entity_version=entity_version,
             language_accent_code=language_accent_code,
-            voiceovers=voiceovers
+            voiceovers_mapping=voiceovers_mapping
         )
 
 

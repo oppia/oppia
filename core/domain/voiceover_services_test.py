@@ -80,9 +80,9 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
         self.assertEqual(entity_voiceovers_instance.entity_version, 1)
         self.assertEqual(
             entity_voiceovers_instance.language_accent_code, 'en-US')
-        automatic_voiceover = entity_voiceovers_instance.voiceovers[
+        automatic_voiceover = entity_voiceovers_instance.voiceovers_mapping[
             'content_0'][feconf.VoiceoverType.AUTO]
-        manual_voiceover = entity_voiceovers_instance.voiceovers[
+        manual_voiceover = entity_voiceovers_instance.voiceovers_mapping[
             'content_0'][feconf.VoiceoverType.MANUAL]
         assert isinstance(automatic_voiceover, state_domain.Voiceover)
         assert isinstance(manual_voiceover, state_domain.Voiceover)
@@ -103,7 +103,7 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
         self.assertEqual(entity_voiceovers_instance.entity_version, 1)
         self.assertEqual(
             entity_voiceovers_instance.language_accent_code, 'en-US')
-        self.assertDictEqual(entity_voiceovers_instance.voiceovers, {})
+        self.assertDictEqual(entity_voiceovers_instance.voiceovers_mapping, {})
 
 
 class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):

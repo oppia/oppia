@@ -70,13 +70,13 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
         entity_type = entity_voiceovers_dict['entity_type']
         entity_version = entity_voiceovers_dict['entity_version']
         language_accent_code = entity_voiceovers_dict['language_accent_code']
-        voiceovers = entity_voiceovers_dict['voiceovers']
+        voiceovers_mapping = entity_voiceovers_dict['voiceovers_mapping']
 
         with datastore_services.get_ndb_context():
             entity_voiceovers_model = (
                 voiceover_models.EntityVoiceoversModel.create_new(
                     entity_type, entity_id, entity_version,
-                    language_accent_code, voiceovers
+                    language_accent_code, voiceovers_mapping
                 )
             )
         entity_voiceovers_model.update_timestamps()
@@ -109,8 +109,8 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
             containing voiceovers from the given exploration data.
 
         Raises:
-            Exception. All voice artists are not assigned accents in the
-                VoiceArtistMetadataModel.
+            KeyError. At least one voice artist is not assigned an accent in
+                the VoiceArtistMetadataModel.
         """
 
         voice_artist_id_to_language_code_mapping = {}
@@ -133,11 +133,8 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
 
         for content_id, language_code_to_voiceover_mapping in (
                 content_id_to_voiceovers_mapping.items()):
-            for language_code, voiceover_mapping in (
+            for language_code, (voice_artist_id, voiceover_dict) in (
                     language_code_to_voiceover_mapping.items()):
-
-                voice_artist_id = voiceover_mapping[0]
-                voiceover_dict = voiceover_mapping[1]
                 manual_voiceover_instance = state_domain.Voiceover.from_dict(
                     voiceover_dict)
 
@@ -146,8 +143,8 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
                         voice_artist_id_to_language_code_mapping[
                             voice_artist_id][language_code]
                     )
-                except Exception as e:
-                    raise Exception(
+                except KeyError as e:
+                    raise KeyError(
                         'Please assign all the accents for voice artists in '
                         'language code %s.' % language_code) from e
 
@@ -164,27 +161,27 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
                     entity_voiceovers_id not in
                     entity_voiceovers_id_to_entity_voiceovers
                 ):
-                    entity_voiceovers_object = (
+                    entity_voiceovers = (
                         voiceover_domain.EntityVoiceovers.create_empty(
                             entity_id, entity_type,
                             entity_version, language_accent_code)
                     )
                 else:
-                    entity_voiceovers_object = (
+                    entity_voiceovers = (
                         entity_voiceovers_id_to_entity_voiceovers[
                             entity_voiceovers_id]
                     )
 
-                entity_voiceovers_object.add_new_content_for_voiceover(
+                entity_voiceovers.add_new_content_id_without_voiceovers(
                     content_id)
-                entity_voiceovers_object.add_voiceover(
+                entity_voiceovers.add_voiceover(
                     content_id,
                     feconf.VoiceoverType.MANUAL,
                     manual_voiceover_instance
                 )
 
                 entity_voiceovers_id_to_entity_voiceovers[
-                    entity_voiceovers_id] = entity_voiceovers_object
+                    entity_voiceovers_id] = entity_voiceovers
 
         return list(entity_voiceovers_id_to_entity_voiceovers.values())
 
@@ -244,7 +241,7 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
                 paired_exploration_voice_artists_link_models),
         } | 'Group by Exploration ID' >> beam.CoGroupByKey()
 
-        entity_voiceovers_instances = (
+        entity_voiceovers = (
             grouped_models
             | 'Filter invalid exploration and voice artist link models' >> (
                 beam.Filter(
@@ -276,8 +273,8 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
         )
 
         entity_voiceovers_models = (
-            entity_voiceovers_instances
-            | 'Create model instance' >> beam.Map(
+            entity_voiceovers
+            | 'Create models for entity voiceover domain objects' >> beam.Map(
                 PopulateManualVoiceoversToEntityVoiceoversModelJob.
                 create_entity_voiceovers_model_instance)
         )
@@ -288,7 +285,7 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
                 lambda model: job_run_result.JobRunResult.as_stdout(
                     'Migrated %s voiceovers for exploration: %s, in language '
                     'accent code %s.' % (
-                        len(list(model.voiceovers.keys())),
+                        len(list(model.voiceovers_mapping.keys())),
                         model.entity_id,
                         model.language_accent_code
                     )

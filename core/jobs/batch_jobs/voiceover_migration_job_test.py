@@ -578,7 +578,7 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
         for model in entity_voiceovers_models:
             self.assertDictEqual(
                 expected_entity_voiceover_id_to_model[model.id],
-                model.voiceovers
+                model.voiceovers_mapping
             )
 
     def test_should_raise_exception_for_empty_accent_code(self) -> None:
@@ -590,7 +590,7 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
             'Please assign all the accents for voice artists in '
             'language code hi.')
 
-        with self.assertRaisesRegex(Exception, error_message):
+        with self.assertRaisesRegex(KeyError, error_message):
             self.assert_job_output_is([])
 
 
