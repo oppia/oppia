@@ -3887,8 +3887,7 @@ def generate_contributor_certificate_data(
             contributions were created.
 
     Returns:
-        ContributorCertificateInfoDict (data to generate the certificate), or
-        None if no contributions are found.
+        ContributorCertificateInfoDict|None. Data to generate the certificate.
 
     Raises:
         Exception. The suggestion type is invalid.
@@ -3933,8 +3932,8 @@ def _generate_translation_contributor_certificate_data(
         user_id: str. The user ID of the contributor.
 
     Returns:
-        ContributorCertificateInfo (data to generate translation submitter
-        certificate), or None if no contributions are found.
+        ContributorCertificateInfo|None. Data to generate translation submitter
+        certificate.
 
     Raises:
         Exception. The language is invalid.
@@ -4025,8 +4024,8 @@ def _generate_question_contributor_certificate_data(
         user_id: str. The user ID of the contributor.
 
     Returns:
-        ContributorCertificateInfo (data to generate question submitter
-        certificate), or None if no contributions are found.
+        ContributorCertificateInfo|None. Data to generate question submitter
+        certificate.
 
     Raises:
         Exception. The suggestion type given to generate the certificate is

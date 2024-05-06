@@ -7550,7 +7550,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
                 self.from_date,
                 self.to_date,
             )
-        
+
         self.assertIsNone(data)
 
     def test_create_contributor_certificate_raises_exception_for_wrong_language(
