@@ -20,6 +20,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
@@ -44,7 +45,8 @@ export class LessonCardComponent implements OnInit {
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private assetsBackendApiService: AssetsBackendApiService
+    private assetsBackendApiService: AssetsBackendApiService,
+    private urlService: UrlService
   ) {}
 
   ngOnInit(): void {
@@ -126,7 +128,31 @@ export class LessonCardComponent implements OnInit {
     if (!classroomUrl || !topicUrl) {
       throw new Error('Class and/or topic does not exist');
     }
-    return `/explore/${currentStory.getExplorationId()}?topic_url_fragment=${topicUrl}&classroom_url_fragment=${classroomUrl}&story_url_fragment=${storyUrl}&node_id=${currentStory.getId()}`;
+    let resultUrl = this.urlInterpolationService.interpolateUrl(
+      '/explore/<exp_id>',
+      {exp_id: currentStory.getExplorationId()}
+    );
+    resultUrl = this.urlService.addField(
+      resultUrl,
+      'topic_url_fragment',
+      topicUrl
+    );
+    resultUrl = this.urlService.addField(
+      resultUrl,
+      'classroom_url_fragment',
+      classroomUrl
+    );
+    resultUrl = this.urlService.addField(
+      resultUrl,
+      'story_url_fragment',
+      storyUrl
+    );
+    resultUrl = this.urlService.addField(
+      resultUrl,
+      'node_id',
+      currentStory.getId()
+    );
+    return resultUrl;
   }
 
   getButtonTranslationKey(): string {
