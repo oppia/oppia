@@ -51,7 +51,7 @@ jobs:
           # code has changed and this logic needs to be reviewed.
           [[ $occurrences == "1" ]]
           # Replace the target string with the replacement string.
-          sed -i 's/$SEARCH_TARGET/$REPLACEMENT/' $FILEPATH
+          sudo sed -i 's/$SEARCH_TARGET/$REPLACEMENT/' $FILEPATH
           echo "Replaced '$SEARCH_TARGET' with '$REPLACEMENT' in $FILEPATH"
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
