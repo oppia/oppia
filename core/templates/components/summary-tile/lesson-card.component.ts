@@ -128,9 +128,9 @@ export class LessonCardComponent implements OnInit {
     if (!classroomUrl || !topicUrl) {
       throw new Error('Class and/or topic does not exist');
     }
-
-    if (currentStory.getExplorationId()) {
-      let resultUrl = this.urlInterpolationService.interpolateUrl(
+    let resultUrl = '';
+    if (currentStory.getExplorationId() !== null) {
+      resultUrl = this.urlInterpolationService.interpolateUrl(
         '/explore/<exp_id>',
         {exp_id: currentStory.getExplorationId()}
       );
@@ -154,8 +154,8 @@ export class LessonCardComponent implements OnInit {
         'node_id',
         currentStory.getId()
       );
-      return resultUrl;
     }
+    return resultUrl;
   }
 
   getButtonTranslationKey(): string {
