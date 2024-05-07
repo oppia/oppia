@@ -125,36 +125,34 @@ export class LessonCardComponent implements OnInit {
     storyUrl: string,
     currentStory: StoryNode
   ): string {
-    if (!classroomUrl || !topicUrl) {
+    const explorationId = currentStory.getExplorationId();
+    if (!classroomUrl || !topicUrl || explorationId === null) {
       throw new Error('Class and/or topic does not exist');
     }
-    let resultUrl = '';
-    if (currentStory.getExplorationId() !== null) {
-      resultUrl = this.urlInterpolationService.interpolateUrl(
-        '/explore/<exp_id>',
-        {exp_id: currentStory.getExplorationId()}
-      );
-      resultUrl = this.urlService.addField(
-        resultUrl,
-        'topic_url_fragment',
-        topicUrl
-      );
-      resultUrl = this.urlService.addField(
-        resultUrl,
-        'classroom_url_fragment',
-        classroomUrl
-      );
-      resultUrl = this.urlService.addField(
-        resultUrl,
-        'story_url_fragment',
-        storyUrl
-      );
-      resultUrl = this.urlService.addField(
-        resultUrl,
-        'node_id',
-        currentStory.getId()
-      );
-    }
+    let resultUrl = this.urlInterpolationService.interpolateUrl(
+      '/explore/<exp_id>',
+      {exp_id: explorationId}
+    );
+    resultUrl = this.urlService.addField(
+      resultUrl,
+      'topic_url_fragment',
+      topicUrl
+    );
+    resultUrl = this.urlService.addField(
+      resultUrl,
+      'classroom_url_fragment',
+      classroomUrl
+    );
+    resultUrl = this.urlService.addField(
+      resultUrl,
+      'story_url_fragment',
+      storyUrl
+    );
+    resultUrl = this.urlService.addField(
+      resultUrl,
+      'node_id',
+      currentStory.getId()
+    );
     return resultUrl;
   }
 
