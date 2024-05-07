@@ -410,6 +410,29 @@ export class BaseUser {
   getCurrentUrlWithoutParameters(): string {
     return this.page.url().split('?')[0];
   }
+
+  /**
+   * This function Waits for a specific text to appear in the body of the page.
+   * This function only waits for rendered text. It does not wait for text in iframes or text that is hidden or not rendered for some reason.
+   * The text matching is case-sensitive and space-sensitive, so it might not find the text if there are differences in case or white space.
+   * @param {string} text - The text to wait for.
+   * @param {number} [timeout=30000] - The maximum time to wait in milliseconds. Defaults to 30000 (30 seconds).
+   */
+  async waitForText(text: string, timeout: number = 30000): Promise<void> {
+    try {
+      await this.page.waitForFunction(
+        textToFind => {
+          const bodyText = document.querySelector('body')?.innerText || '';
+          return bodyText.includes(textToFind);
+        },
+        {timeout},
+        text
+      );
+    } catch (error) {
+      error.message = `Failed to find text "${text}" within ${timeout} ms.`;
+      throw error;
+    }
+  }
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();

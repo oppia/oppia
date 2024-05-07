@@ -674,10 +674,11 @@ export class LoggedInUser extends BaseUser {
       throw new Error('The Watch A Video button does not exist!');
     }
     await Promise.all([
-      this.page.waitForNavigation(),
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
       this.clickOn(watchAVideoButton),
     ]);
 
+    await this.waitForText('Create New Account');
     const url = this.getCurrentUrlWithoutParameters();
     const expectedWatchAVideoUrl = this.isViewportAtMobileWidth()
       ? mobileWatchAVideoUrl
