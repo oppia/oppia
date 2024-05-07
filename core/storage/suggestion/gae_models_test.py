@@ -5252,7 +5252,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -5270,7 +5270,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -5288,7 +5288,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -5306,7 +5306,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
@@ -5726,7 +5726,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -5744,7 +5744,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -5762,7 +5762,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -5780,7 +5780,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
@@ -5837,7 +5837,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -5855,7 +5855,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -5873,7 +5873,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -5891,7 +5891,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
@@ -6083,7 +6083,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -6098,7 +6098,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -6113,7 +6113,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
@@ -6390,7 +6390,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -6405,7 +6405,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -6420,7 +6420,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
@@ -6493,7 +6493,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -6508,7 +6508,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -6523,7 +6523,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            first_contribution_date=datetime.date.today(),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()

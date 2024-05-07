@@ -2407,9 +2407,10 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 if len(sorted_results) == page_size:
                     break
                 next_offset += 1
-                if (((result_model.first_contribution_date) <= (
-                    date_range.start_date)) and (
-                    result_model.last_contribution_date >= date_range.end_date)):
+                if (date_range.is_date_in_the_date_range(
+                    result_model.first_contribution_date) and (
+                    date_range.is_date_in_the_date_range(
+                        result_model.last_contribution_date))):
                     sorted_results.append(result_model)
 
         # Check whether we have more results.
@@ -2806,9 +2807,10 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                 if len(sorted_results) == page_size:
                     break
                 next_offset += 1
-                if (((result_model.first_contribution_date) <= (
-                    date_range.start_date)) and (
-                    result_model.last_contribution_date >= date_range.end_date)):
+                if (date_range.is_date_in_the_date_range(
+                    result_model.first_contribution_date) and (
+                    date_range.is_date_in_the_date_range(
+                        result_model.last_contribution_date))):
                     sorted_results.append(result_model)
 
         # Check whether we have more results.
@@ -3138,9 +3140,10 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 if len(sorted_results) == page_size:
                     break
                 next_offset += 1
-                if (((result_model.first_contribution_date) <= (
-                    date_range.start_date)) and (
-                    result_model.last_contribution_date >= date_range.end_date)):
+                if (date_range.is_date_in_the_date_range(
+                    result_model.first_contribution_date) and (
+                    date_range.is_date_in_the_date_range(
+                        result_model.last_contribution_date))):
                     sorted_results.append(result_model)
 
         # Check whether we have more results.
@@ -3415,9 +3418,10 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                 if len(sorted_results) == page_size:
                     break
                 next_offset += 1
-                if (((result_model.first_contribution_date) <= (
-                    date_range.start_date)) and (
-                    result_model.last_contribution_date >= date_range.end_date)):
+                if (date_range.is_date_in_the_date_range(
+                    result_model.first_contribution_date) and (
+                    date_range.is_date_in_the_date_range(
+                        result_model.last_contribution_date))):
                     sorted_results.append(result_model)
 
         # Check whether we have more results.
