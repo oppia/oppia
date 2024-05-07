@@ -98,6 +98,7 @@ const readOurBlogButton =
 const dismissButton = 'i.e2e-test-thanks-for-donating-page-dismiss-button';
 const thanksForDonatingClass = '.modal-open';
 const donatePage = '.donate-content-container';
+const _420millionPageHeaderSelector = '.page-header';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
@@ -401,6 +402,9 @@ export class LoggedInUser extends BaseUser {
     await this.page.$eval(weCannotContentId, element =>
       element.getElementsByTagName('a')[0].click()
     );
+    await this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']});
+    await this.page.waitForSelector(_420millionPageHeaderSelector);
+
     if (this.page.url() !== _420MillionUrl) {
       throw new Error('The 420 Million link does not open the right page!');
     } else {
