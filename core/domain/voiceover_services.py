@@ -129,6 +129,36 @@ def get_all_language_accent_codes_for_voiceovers(
     return language_codes_mapping
 
 
+def create_entity_voiceovers_model_instance(
+    entity_voiceovers_instance: voiceover_domain.EntityVoiceovers
+) -> voiceover_models.EntityVoiceoversModel:
+    """Creates an entity voiceovers model instance.
+
+    Args:
+        entity_voiceovers_instance: EntityVoiceovers. An instance of the
+            entity voiceovers domain class.
+
+    Returns:
+        EntityVoiceoversModel. An instance of the entity voiceover model.
+    """
+    entity_voiceovers_dict = entity_voiceovers_instance.to_dict()
+
+    entity_id = entity_voiceovers_dict['entity_id']
+    entity_type = entity_voiceovers_dict['entity_type']
+    entity_version = entity_voiceovers_dict['entity_version']
+    language_accent_code = entity_voiceovers_dict['language_accent_code']
+    voiceovers_mapping = entity_voiceovers_dict['voiceovers_mapping']
+
+    entity_voiceovers_model = (
+        voiceover_models.EntityVoiceoversModel.create_new(
+            entity_type, entity_id, entity_version,
+            language_accent_code, voiceovers_mapping
+        )
+    )
+    entity_voiceovers_model.update_timestamps()
+    return entity_voiceovers_model
+
+
 def save_language_accent_support(
     language_codes_mapping: Dict[str, Dict[str, bool]]
 ) -> None:
