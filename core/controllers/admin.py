@@ -1109,7 +1109,7 @@ class AdminHandler(
                     self.user_id, question_id_3, skill_id, 0.3)
                 topic_1 = topic_domain.Topic.create_default_topic(
                     topic_id, 'Dummy Topic 1', 'dummy-topic-one', 'description',
-                    'fragm') #TODO Update the topic url fragment to be distict -> you can use topic id
+                    'fragm')
                 topic_1.update_meta_tag_content('dummy-meta')
                 raw_image = b''
                 with open(
@@ -1253,7 +1253,7 @@ class AdminHandler(
                         'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                         'subtopic_id': 1,
                         'title': 'Dummy Subtopic Title',
-                        'url_fragment': 'dummy-subtopic-fragment' #TODO Change this line
+                        'url_fragment': 'dummy-subtopic-fragment'
                     })]
                 )                                            
                 
