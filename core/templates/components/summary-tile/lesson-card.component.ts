@@ -128,8 +128,8 @@ export class LessonCardComponent implements OnInit {
     if (!classroomUrl || !topicUrl) {
       throw new Error('Class and/or topic does not exist');
     }
-    let resultUrl: string | null = '';
-    if (currentStory.getExplorationId()) {
+    let resultUrl = '';
+    if (currentStory.getExplorationId() !== null) {
       resultUrl = this.urlInterpolationService.interpolateUrl(
         '/explore/<exp_id>',
         {exp_id: currentStory.getExplorationId()}
