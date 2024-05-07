@@ -1226,15 +1226,15 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with end_date_locale_string filter and pagination.
+        # Test with end_date filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/submission', {
                 'page_size': 4,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'end_date_locale_string': (
+                'end_date': (
                 datetime.date.today() - datetime.timedelta(120)).strftime(
-                    '%m/%d/%Y'),
+                    '%Y-%m-%d'),
                 'topic_ids': []
             })
 
@@ -1265,15 +1265,15 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with start_date_locale_string filter and pagination.
+        # Test with start_date filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/submission', {
                 'page_size': 4,
                 'offset': 0,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'start_date_locale_string': (
+                'start_date': (
                 datetime.date.today() - datetime.timedelta(5)).strftime(
-                    '%m/%d/%Y'),
+                    '%Y-%m-%d'),
                 'topic_ids': []
             })
 
@@ -1361,15 +1361,15 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with end_date_locale_string filter and pagination.
+        # Test with end_date filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/review', {
                 'page_size': 4,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'end_date_locale_string': (
+                'end_date': (
                 datetime.date.today() - datetime.timedelta(120)).strftime(
-                    '%m/%d/%Y'),
+                    '%Y-%m-%d'),
                 'topic_ids': []
             })
 
@@ -1400,15 +1400,15 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with start_date_locale_string filter and pagination.
+        # Test with start_date filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/review', {
                 'page_size': 4,
                 'offset': 0,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'start_date_locale_string': (
+                'start_date': (
                 datetime.date.today() - datetime.timedelta(5)).strftime(
-                    '%m/%d/%Y'),
+                    '%Y-%m-%d'),
                 'topic_ids': []
             })
 
@@ -1527,14 +1527,14 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with end_date_locale_string filter and pagination.
+        # Test with end_date filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 4,
                 'offset': 1,
-                'end_date_locale_string': (
+                'end_date': (
                 datetime.date.today() - datetime.timedelta(120)).strftime(
-                    '%m/%d/%Y'),
+                    '%Y-%m-%d'),
                 'topic_ids': []
             })
 
@@ -1565,14 +1565,14 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with start_date_locale_string filter and pagination.
+        # Test with start_date filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 4,
                 'offset': 0,
-                'start_date_locale_string': (
+                'start_date': (
                 datetime.date.today() - datetime.timedelta(5)).strftime(
-                    '%m/%d/%Y'),
+                    '%Y-%m-%d'),
                 'topic_ids': []
             })
 
@@ -1658,14 +1658,14 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with end_date_locale_string filter and pagination.
+        # Test with end_date filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 4,
                 'offset': 1,
-                'end_date_locale_string': (
+                'end_date': (
                 datetime.date.today() - datetime.timedelta(120)).strftime(
-                    '%m/%d/%Y'),
+                    '%Y-%m-%d'),
                 'topic_ids': []
             })
 
@@ -1696,14 +1696,14 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with start_date_locale_string filter and pagination.
+        # Test with start_date filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 4,
                 'offset': 0,
-                'start_date_locale_string': (
+                'start_date': (
                 datetime.date.today() - datetime.timedelta(5)).strftime(
-                    '%m/%d/%Y'),
+                    '%Y-%m-%d'),
                 'topic_ids': []
             })
 
@@ -1732,8 +1732,8 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/translation/coordinate', {
                 'page_size': 0,
                 'offset': 0,
-                'end_date_locale_string': (
-                datetime.date.today()).strftime('%m/%d/%Y'),
+                'end_date': (
+                datetime.date.today()).strftime('%Y-%m-%d'),
                 'topic_ids': [],
                 'sort_by': 'DecreasingCoordinatorCounts'
             })
@@ -1755,8 +1755,8 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/translation/coordinate', {
                 'page_size': 0,
                 'offset': 0,
-                'end_date_locale_string': (
-                datetime.date.today()).strftime('%m/%d/%Y'),
+                'end_date': (
+                datetime.date.today()).strftime('%Y-%m-%d'),
                 'topic_ids': [],
                 'sort_by': 'IncreasingCoordinatorCounts'
             })
@@ -1782,8 +1782,8 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/question/coordinate', {
                 'page_size': 0,
                 'offset': 0,
-                'end_date_locale_string': (
-                datetime.date.today()).strftime('%m/%d/%Y'),
+                'end_date': (
+                datetime.date.today()).strftime('%Y-%m-%d'),
                 'topic_ids': []
             })
 

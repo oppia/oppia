@@ -29,6 +29,7 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.domain import user_domain
 from core.domain import user_services
+from core.platform import models
 
 from typing import Dict, List, Optional, TypedDict, Union
 
@@ -628,6 +629,7 @@ class ContributorDashboardAdminStatsHandler(
                 'start_date')), '%Y-%m-%d').date()
         end_date = datetime.datetime.strptime(str(self.normalized_request.get(
                 'end_date')), '%Y-%m-%d').date()
+        date_range = utils.DateRange(start_date, end_date)
 
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
@@ -644,8 +646,7 @@ class ContributorDashboardAdminStatsHandler(
                         language_code,
                         sort_by,
                         topic_ids,
-                        start_date,
-                        end_date
+                        date_range
                     ))
                 translation_submitter_frontend_dicts = [stat.to_frontend_dict()
                     for stat in translation_submitter_stats]
@@ -668,8 +669,7 @@ class ContributorDashboardAdminStatsHandler(
                         offset,
                         language_code,
                         sort_by,
-                        start_date,
-                        end_date
+                        date_range
                     ))
                 translation_reviewer_frontend_dicts = [stat.to_frontend_dict()
                     for stat in translation_reviewer_stats]
@@ -704,8 +704,7 @@ class ContributorDashboardAdminStatsHandler(
                         offset,
                         sort_by,
                         topic_ids,
-                        start_date,
-                        end_date
+                        date_range
                     ))
                 question_submitter_frontend_dicts = [stat.to_frontend_dict()
                     for stat in question_submitter_stats]
@@ -726,8 +725,7 @@ class ContributorDashboardAdminStatsHandler(
                         page_size,
                         offset,
                         sort_by,
-                        start_date,
-                        end_date
+                        date_range
                     ))
                 question_reviewer_frontend_dicts = [stat.to_frontend_dict()
                     for stat in question_reviewer_stats]

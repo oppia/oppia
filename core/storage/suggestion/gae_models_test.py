@@ -3263,8 +3263,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 3)
@@ -3282,8 +3283,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 4)
@@ -3301,8 +3303,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_ACCURACY.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 4)
@@ -3320,8 +3323,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_ACCURACY.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3339,8 +3343,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3358,8 +3363,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -3376,8 +3382,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3395,8 +3402,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3566,8 +3574,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 3)
@@ -3584,8 +3593,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -3601,8 +3611,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=['topic1', 'topic2'],
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3619,8 +3630,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=7),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=7)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -3636,8 +3648,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=90),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=90)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -3653,8 +3666,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=7),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=7)),
                 language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 0)
@@ -3669,8 +3683,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=8),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=8),
+                    datetime.date(1970, 1, 1)),
                 language_code='de'
             ))
         self.assertEqual(len(sorted_results), 0)
@@ -3685,8 +3700,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=5),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=5),
+                    datetime.date(1970, 1, 1)),
                 language_code='de'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -3702,8 +3718,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=5),
-                end_date=datetime.date.today() - datetime.timedelta(days=90),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=5),
+                    datetime.date.today() - datetime.timedelta(days=90)),
                 language_code='de'
             ))
         self.assertEqual(len(sorted_results), 0)
@@ -3718,8 +3735,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=5),
-                end_date=datetime.date.today() - datetime.timedelta(days=130),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=5),
+                    datetime.date.today() - datetime.timedelta(days=130)),
                 language_code='de'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -3835,8 +3853,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
                 topic_ids=['topic1', 'topic2'],
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3854,8 +3873,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
                 topic_ids=['topic1', 'topic2'],
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3973,8 +3993,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=2,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3992,8 +4013,9 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 0)
@@ -4382,8 +4404,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=4,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 4)
@@ -4400,8 +4423,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 4)
@@ -4418,8 +4442,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -4436,8 +4461,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 3)
@@ -4566,8 +4592,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=4,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 3)
@@ -4583,8 +4610,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=3,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4599,8 +4627,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=4,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=7),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=7)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4615,8 +4644,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=90),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=90)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4631,8 +4661,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=7),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=7)),
                 language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 0)
@@ -4646,8 +4677,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=5),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=5),
+                    datetime.date(1970, 1, 1)),
                 language_code='de'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4662,8 +4694,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=5),
-                end_date=datetime.date.today() - datetime.timedelta(days=130),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=5),
+                    datetime.date.today() - datetime.timedelta(days=130)),
                 language_code='de'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4678,8 +4711,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=5),
-                end_date=datetime.date.today() - datetime.timedelta(days=120),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=5),
+                    datetime.date.today() - datetime.timedelta(days=120)),
                 language_code='de'
             ))
         self.assertEqual(len(sorted_results), 0)
@@ -4693,8 +4727,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=8),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=8),
+                    datetime.date(1970, 1, 1)),
                 language_code='de'
             ))
         self.assertEqual(len(sorted_results), 0)
@@ -4782,8 +4817,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4800,8 +4836,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=7),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=7)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4888,8 +4925,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=2,
                 sort_by=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1)),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -4978,8 +5016,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             offset=0,
             sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
-            start_date=datetime.date(3000, 1, 1),
-            end_date=datetime.date.today() - datetime.timedelta(days=7),
+            date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=7)),
             language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -4994,8 +5033,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             offset=0,
             sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
-            start_date=datetime.date(3000, 1, 1),
-            end_date=datetime.date.today() - datetime.timedelta(days=90),
+            date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=90)),
             language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5009,8 +5049,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             page_size=1,
             offset=0,
             sort_by=None,
-            start_date=datetime.date(3000, 1, 1),
-            end_date=datetime.date.today() - datetime.timedelta(days=7),
+            date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=7)),
             language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 0)
@@ -5278,8 +5319,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5296,8 +5338,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5314,8 +5357,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_ACCURACY.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5332,8 +5376,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_ACCURACY.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5350,8 +5395,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5368,8 +5414,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5386,8 +5433,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5404,8 +5452,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5533,8 +5582,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=['topic1', 'topic2'],
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -5550,8 +5600,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=7)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=7))
             ))
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5566,8 +5617,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=90)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=90))
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5585,8 +5637,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 topic_ids=[
                     'non_existent_topic'
                 ],
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=7)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=7))
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -5600,8 +5653,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=5),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=5),
+                    datetime.date(1970, 1, 1)),
             ))
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_5')
@@ -5616,8 +5670,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=5),
-                end_date=datetime.date.today() - datetime.timedelta(days=130),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=5),
+                    datetime.date.today() - datetime.timedelta(days=130)),
             ))
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_5')
@@ -5632,8 +5687,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=5),
-                end_date=datetime.date.today() - datetime.timedelta(days=120),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=5),
+                    datetime.date.today() - datetime.timedelta(days=120)),
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -5647,8 +5703,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=8),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=8),
+                    datetime.date(1970, 1, 1)),
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -5737,8 +5794,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
                 topic_ids=['topic1', 'topic2'],
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertFalse(more)
@@ -5754,8 +5812,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=90)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=90))
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -5845,8 +5904,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=2,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -5862,8 +5922,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=4,
                 sort_by=None,
                 topic_ids=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -6064,8 +6125,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=3,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6081,8 +6143,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -6098,8 +6161,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -6115,8 +6179,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6210,8 +6275,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=7)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=7))
             ))
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6225,8 +6291,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=90)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=90))
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6241,8 +6308,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=1))
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -6255,8 +6323,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=5),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=5),
+                    datetime.date(1970, 1, 1)),
             ))
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -6270,8 +6339,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=5),
-                end_date=datetime.date.today() - datetime.timedelta(days=130),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=5),
+                    datetime.date.today() - datetime.timedelta(days=130)),
             ))
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -6285,8 +6355,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=5),
-                end_date=datetime.date.today() - datetime.timedelta(days=120),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=5),
+                    datetime.date.today() - datetime.timedelta(days=120)),
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -6299,8 +6370,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                start_date=datetime.date.today() - datetime.timedelta(days=8),
-                end_date=datetime.date(1970, 1, 1),
+                date_range=utils.DateRange(
+                    datetime.date.today() - datetime.timedelta(days=8),
+                    datetime.date(1970, 1, 1)),
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -6362,8 +6434,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=90)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=90))
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -6380,8 +6453,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=7)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=7))
             ))
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6397,8 +6471,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date.today() - datetime.timedelta(days=90)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date.today() - datetime.timedelta(days=90))
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6460,8 +6535,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=1,
                 sort_by=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -6476,8 +6552,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=3,
                 sort_by=None,
-                start_date=datetime.date(3000, 1, 1),
-                end_date=datetime.date(1970, 1, 1)
+                date_range=utils.DateRange(
+                    datetime.date(3000, 1, 1),
+                    datetime.date(1970, 1, 1))
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)

@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import datetime
 
+from core import utils
 from core.domain import contribution_stats_services
 from core.platform import models
 from core.tests import test_utils
@@ -378,8 +379,9 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             language_code='es',
             sort_by=None,
             topic_ids=None,
-            start_date=datetime.date(3000, 1, 1),
-            end_date=datetime.date.today() - datetime.timedelta(days=90)
+            date_range=utils.DateRange(
+                datetime.date(3000, 1, 1),
+                datetime.date.today() - datetime.timedelta(days=90))
             )
         )
 
@@ -396,8 +398,9 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             offset=1,
             language_code='es',
             sort_by=None,
-            start_date=datetime.date(3000, 1, 1),
-            end_date=datetime.date(1970, 1, 1)
+            date_range=utils.DateRange(
+                datetime.date(3000, 1, 1),
+                datetime.date(1970, 1, 1))
             )
         )
 
@@ -414,8 +417,9 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             offset=1,
             sort_by=None,
             topic_ids=None,
-            start_date=datetime.date(3000, 1, 1),
-            end_date=datetime.date(1970, 1, 1)
+            date_range=utils.DateRange(
+                datetime.date(3000, 1, 1),
+                datetime.date(1970, 1, 1))
             )
         )
 
@@ -431,8 +435,9 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             page_size=2,
             offset=1,
             sort_by=None,
-            start_date=datetime.date(3000, 1, 1),
-            end_date=datetime.date(1970, 1, 1)
+            date_range=utils.DateRange(
+                datetime.date(3000, 1, 1),
+                datetime.date(1970, 1, 1))
             )
         )
 

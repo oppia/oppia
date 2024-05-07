@@ -17,8 +17,7 @@
 
 from __future__ import annotations
 
-import datetime
-
+from core import utils
 from core.domain import suggestion_registry
 from core.domain import user_domain
 from core.platform import models
@@ -238,8 +237,7 @@ def get_translation_submitter_total_stats(
     language_code: str,
     sort_by: Optional[str],
     topic_ids: Optional[List[str]],
-    start_date: datetime.date,
-    end_date: datetime.date
+    date_range: utils.DateRange
 ) -> Tuple[
         List[suggestion_registry.TranslationSubmitterTotalContributionStats],
         int,
@@ -255,20 +253,16 @@ def get_translation_submitter_total_stats(
             result.
         topic_ids: List[str]|None. List of topic ID(s) to fetch
             contributor stats for.
-        start_date: datetime.date. The date from which to start including
-            users' contributions.
-        end_date: datetime.date. The date from which to stop including
-            users' contributions.
+        date_range: utils.DateRange. The date range
+            within which to fetch users' contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(TranslationSubmitterTotalContributionStats).
                     The list of domain objects which match the supplied
-                    language_code, topic_ids,
-                    start_date and
-                    end_date filters, returned
-                    in the order specified by sort_by.
+                    language_code, topic_ids and date_range filters,
+                    returned in the order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -282,8 +276,7 @@ def get_translation_submitter_total_stats(
             language_code=language_code,
             sort_by=sort_by,
             topic_ids=topic_ids,
-            start_date=start_date,
-            end_date=end_date
+            date_range=date_range
         )
     )
 
@@ -299,12 +292,11 @@ def get_translation_submitter_total_stats(
 
 
 def get_translation_reviewer_total_stats(
-        page_size: int,
-        offset: int,
-        language_code: str,
-        sort_by: Optional[str],
-        start_date: datetime.date,
-        end_date: datetime.date
+    page_size: int,
+    offset: int,
+    language_code: str,
+    sort_by: Optional[str],
+    date_range: utils.DateRange
 ) -> Tuple[
         List[suggestion_registry.TranslationReviewerTotalContributionStats],
         int,
@@ -319,18 +311,15 @@ def get_translation_reviewer_total_stats(
         language_code: str. The language code to get results for.
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
-        start_date: datetime.date. The date from which to start including
-            users' contributions.
-        end_date: datetime.date. The date from which to stop including
-            users' contributions.
+        date_range: utils.DateRange. The date range
+            within which to fetch users' contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
             sorted_results:
                 list(TranslationReviewerTotalContributionStats).
                 The list of domain objects which match the supplied
-                language_code, start_date and
-                end_date filters, returned in
+                language_code and date_range filters, returned in
                 the order specified by sort_by.
             next_offset: int. Number of results to skip in next batch.
             more: bool. If True, there are (probably) more results after
@@ -344,8 +333,7 @@ def get_translation_reviewer_total_stats(
             offset=offset,
             language_code=language_code,
             sort_by=sort_by,
-            start_date=start_date,
-            end_date=end_date
+            date_range=date_range
         )
     )
 
@@ -366,8 +354,7 @@ def get_question_submitter_total_stats(
     offset: int,
     sort_by: Optional[str],
     topic_ids: Optional[List[str]],
-    start_date: datetime.date,
-    end_date: datetime.date
+    date_range: utils.DateRange
 ) -> Tuple[
         List[suggestion_registry.QuestionSubmitterTotalContributionStats],
         int,
@@ -383,19 +370,16 @@ def get_question_submitter_total_stats(
             result.
         topic_ids: List[str]|None. List of topic ID(s) to fetch
             contributor stats for.
-        start_date: datetime.date. The date from which to start including
-            users' contributions.
-        end_date: datetime.date. The date from which to stop including
-            users' contributions.
+        date_range: utils.DateRange. The date range
+            within which to fetch users' contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
             sorted_results:
                 list(QuestionSubmitterTotalContributionStats).
                 The list of domain objects which match the supplied topic_ids
-                start_date and
-                end_date filters, returned
-                in the order specified by sort_by.
+                and date_range filters, returned in the order specified by
+                sort_by.
             next_offset: int. Number of results to skip in next batch.
             more: bool. If True, there are (probably) more results after
                 this batch. If False, there are no further results
@@ -408,8 +392,7 @@ def get_question_submitter_total_stats(
             offset=offset,
             sort_by=sort_by,
             topic_ids=topic_ids,
-            start_date=start_date,
-            end_date=end_date
+            date_range=date_range
         )
     )
 
@@ -426,11 +409,10 @@ def get_question_submitter_total_stats(
 
 
 def get_question_reviewer_total_stats(
-        page_size: int,
-        offset: int,
-        sort_by: Optional[str],
-        start_date: datetime.date,
-        end_date: datetime.date
+    page_size: int,
+    offset: int,
+    sort_by: Optional[str],
+    date_range: utils.DateRange
 ) -> Tuple[
         List[suggestion_registry.QuestionReviewerTotalContributionStats],
         int,
@@ -444,18 +426,16 @@ def get_question_reviewer_total_stats(
             results matching the query.
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
-        start_date: datetime.date. The date from which to start including
-            users' contributions.
-        end_date: datetime.date. The date from which to stop including
-            users' contributions.
+        date_range: utils.DateRange. The date range
+            within which to fetch users' contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
             sorted_results:
                 list(QuestionReviewerTotalContributionStats).
                 The list of domain objects which match the supplied
-                end_date filter,
-                returned in the order specified by sort_by.
+                date_range filter, returned in the order specified by
+                sort_by.
             next_offset: int. Number of results to skip in next batch.
             more: bool. If True, there are (probably) more results after
                 this batch. If False, there are no further results
@@ -467,8 +447,7 @@ def get_question_reviewer_total_stats(
             page_size=page_size,
             offset=offset,
             sort_by=sort_by,
-            start_date=start_date,
-            end_date=end_date
+            date_range=date_range
         )
     )
 

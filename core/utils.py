@@ -566,6 +566,46 @@ class JSONEncoderForHTML(json.JSONEncoder):
                 '<', '\\u003c').replace('>', '\\u003e')
 
 
+class DateRange:
+    """Domain object for the DateRange."""
+
+    stary_date: datetime.date
+    end_date: datetime.date
+
+    def __init__(
+        self,
+        start_date: datetime.date,
+        end_date: datetime.date
+    ) -> None:
+        self.start_date = start_date
+        self.end_date = end_date
+
+    def is_valid_date_range(self) -> bool:
+        """Returns whether the date range is valid.
+
+        Returns:
+            bool. The boolean representing whether the date range is valid.
+        """
+
+        return (
+            self.start_date <= datetime.date.today() and (
+                self.end_date <= self.start_date))
+
+    def is_date_in_the_date_range(
+            self,
+            date: datetime.date) -> bool:
+        """Returns whether a particular date lies within the date range.
+
+        Args:
+            date: datetime.date. The date object to be checked.
+
+        Returns:
+            bool. The boolean representing whether a date in the date range.
+        """
+
+        return self.end_date <= date <= self.start_date
+
+
 def convert_to_hash(input_string: str, max_length: int) -> str:
     """Convert a string to a SHA1 hash.
 

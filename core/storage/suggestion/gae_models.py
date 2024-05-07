@@ -2321,8 +2321,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         language_code: str,
         sort_by: Optional[SortChoices.value],
         topic_ids: Optional[List[str]],
-        start_date: datetime.date,
-        end_date: datetime.date
+        date_range: utils.DateRange
     ) -> Tuple[Sequence[TranslationSubmitterTotalContributionStatsModel],
                 int,
                 bool]:
@@ -2337,17 +2336,15 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch
                 contributor stats for.
-            start_date: datetime.date. The date from which to start including
-                users' contributions.
-            end_date: datetime.date. The date from which to stop including
-                users' contributions.
+            date_range: utils.DateRange. The date range
+                within which to fetch users' contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(TranslationSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied language_code,
-                    topic_ids, start_date and end_date filters, returned in
+                    topic_ids and date_range filters, returned in
                     the order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
@@ -2411,8 +2408,8 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     break
                 next_offset += 1
                 if (((result_model.first_contribution_date) <= (
-                    start_date)) and (
-                    result_model.last_contribution_date >= end_date)):
+                    date_range.start_date)) and (
+                    result_model.last_contribution_date >= date_range.end_date)):
                     sorted_results.append(result_model)
 
         # Check whether we have more results.
@@ -2740,8 +2737,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         offset: int,
         language_code: str,
         sort_by: Optional[SortChoices.value],
-        start_date: datetime.date,
-        end_date: datetime.date
+        date_range: utils.DateRange
     ) -> Tuple[Sequence[TranslationReviewerTotalContributionStatsModel],
                 int,
                 bool]:
@@ -2754,17 +2750,15 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             language_code: str. The language code to get results for.
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
-            start_date: datetime.date. The date from which to start including
-                users' contributions.
-            end_date: datetime.date. The date from which to stop including
-                users' contributions.
+            date_range: utils.DateRange. The date range
+                within which to fetch users' contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(TranslationSubmitterTotalContributionStatsModel).
-                    The list of models which match the supplied language_code,
-                    start_date and end_date filters, returned in the order
+                    The list of models which match the supplied language_code
+                    and date_range filters, returned in the order
                     specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
@@ -2813,8 +2807,8 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                     break
                 next_offset += 1
                 if (((result_model.first_contribution_date) <= (
-                    start_date)) and (
-                    result_model.last_contribution_date >= end_date)):
+                    date_range.start_date)) and (
+                    result_model.last_contribution_date >= date_range.end_date)):
                     sorted_results.append(result_model)
 
         # Check whether we have more results.
@@ -3063,8 +3057,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         offset: int,
         sort_by: Optional[SortChoices.value],
         topic_ids: Optional[List[str]],
-        start_date: datetime.date,
-        end_date: datetime.date
+        date_range: utils.DateRange
     ) -> Tuple[Sequence[QuestionSubmitterTotalContributionStatsModel],
                 int,
                 bool]:
@@ -3078,17 +3071,15 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch contributor
                 stats for.
-            start_date: datetime.date. The date from which to start including
-                users' contributions.
-            end_date: datetime.date. The date from which to stop including
-                users' contributions.
+            date_range: utils.DateRange. The date range
+                within which to fetch users' contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(QuestionSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied topic_ids
-                    start_date and end_date filters, returned in the
+                    and date_range filters, returned in the
                     order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
@@ -3148,8 +3139,8 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     break
                 next_offset += 1
                 if (((result_model.first_contribution_date) <= (
-                    start_date)) and (
-                    result_model.last_contribution_date >= end_date)):
+                    date_range.start_date)) and (
+                    result_model.last_contribution_date >= date_range.end_date)):
                     sorted_results.append(result_model)
 
         # Check whether we have more results.
@@ -3359,8 +3350,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         sort_by: Optional[SortChoices.value],
-        start_date: datetime.date,
-        end_date: datetime.date
+        date_range: utils.DateRange
     ) -> Tuple[Sequence[QuestionReviewerTotalContributionStatsModel],
                 int,
                 bool]:
@@ -3372,17 +3362,15 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                 results matching the query.
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
-            start_date: datetime.date. The date from which to start including
-                users' contributions.
-            end_date: datetime.date. The date from which to stop including
-                users' contributions.
+            date_range: utils.DateRange. The date range
+                within which to fetch users' contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(QuestionReviewerTotalContributionStatsModel).
                     The list of models which match the supplied
-                    start_date, end_date filters, returned in the
+                    date_range filter, returned in the
                     order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
@@ -3428,8 +3416,8 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                     break
                 next_offset += 1
                 if (((result_model.first_contribution_date) <= (
-                    start_date)) and (
-                    result_model.last_contribution_date >= end_date)):
+                    date_range.start_date)) and (
+                    result_model.last_contribution_date >= date_range.end_date)):
                     sorted_results.append(result_model)
 
         # Check whether we have more results.
