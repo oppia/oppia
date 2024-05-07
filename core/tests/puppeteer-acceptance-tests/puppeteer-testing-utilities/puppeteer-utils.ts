@@ -420,12 +420,13 @@ export class BaseUser {
    */
   async waitForText(text: string, timeout: number = 30000): Promise<void> {
     try {
+      await this.page.waitForSelector('body');
       await this.page.waitForFunction(
         (textToFind: string) => {
           const bodyText = document.querySelector('body')?.innerText || '';
           return bodyText.includes(textToFind);
         },
-        {timeout},
+        { timeout },
         text
       );
     } catch (error) {
