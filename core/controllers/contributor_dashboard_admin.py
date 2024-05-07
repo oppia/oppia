@@ -29,7 +29,6 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.domain import user_domain
 from core.domain import user_services
-from core.platform import models
 
 from typing import Dict, List, Optional, TypedDict, Union
 
