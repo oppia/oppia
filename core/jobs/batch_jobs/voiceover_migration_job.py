@@ -181,7 +181,7 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
                 of VoiceArtistMetadataModel instances.
 
         Returns:
-            dict(str, dict(str, str)): A dictionary maps voice artist IDs to
+            dict(str, dict(str, str)): A dictionary mapping voice artist IDs to
             nested dicts. Each nested dict maps language code to language
             accent code.
         """

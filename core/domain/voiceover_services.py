@@ -139,7 +139,7 @@ def create_entity_voiceovers_model_instance(
             entity voiceovers domain class.
 
     Returns:
-        EntityVoiceoversModel. An instance of the entity voiceover model.
+        EntityVoiceoversModel. An instance of the entity voiceovers model.
     """
     entity_voiceovers_dict = entity_voiceovers_instance.to_dict()
 
