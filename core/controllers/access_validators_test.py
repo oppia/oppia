@@ -207,6 +207,28 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
             ACCESS_VALIDATION_HANDLER_PREFIX)
 
 
+class DiagnosticTestPlayerPageAccessValidationHandlerTests(
+        test_utils.GenericTestBase):
+    """Test for diagnostic test player access validation."""
+
+    def test_should_not_access_diagnostic_test_page_when_feature_is_disabled(
+        self) -> None:
+        self.get_json(
+            '%s/can_access_diagnostic_test_player_page' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX),
+                expected_status_int=404)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.DIAGNOSTIC_TEST])
+    def test_should_access_diagnostic_test_page_when_feature_is_enabled(
+        self) -> None:
+        self.get_html_response(
+           '%s/can_access_diagnostic_test_player_page' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX),
+            expected_status_int=200
+        )
+
+
 class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -374,6 +396,34 @@ class EditLearnerGroupPageAccessValidationHandlerTests(
         self.get_html_response(
             '%s/can_access_edit_learner_group_page/%s' % (
                 ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID))
+
+
+class FacilitatorDashboardPageAccessValidationHandlerTests(
+        test_utils.GenericTestBase):
+    """Test for facilitator dashboard access validation."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+
+    def test_should_not_access_facilitator_dashboard_when_feature_is_disabled(
+        self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/can_access_facilitator_dashboard_page' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX),
+                expected_status_int=404)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
+    def test_should_access_facilitator_dashboard_page_when_feature_is_enabled(
+        self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+           '%s/can_access_facilitator_dashboard_page' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX),
+            expected_status_int=200
+        )
 
 
 class CreateLearnerGroupPageAccessValidationHandlerTests(
@@ -563,3 +613,60 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
             ), expected_status_int=404
         )
         self.logout()
+
+
+class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
+    """Test for collection editor page access validation"""
+
+    COLLECTION_ID: Final = '0'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.collection_editor_username = 'collectionEditor'
+        self.user_email = 'collectionEditor@example.com'
+        self.guest_username = 'guest'
+        self.guest_email = 'guest@example.com'
+
+        self.signup(self.user_email, self.collection_editor_username)
+        self.signup(self.guest_email, self.guest_username)
+        self.add_user_role(
+            self.collection_editor_username, feconf.ROLE_ID_COLLECTION_EDITOR)
+        self.user_id = self.get_user_id_from_email(self.user_email)
+        self.user = user_services.get_user_actions_info(self.user_id)
+        self.save_new_valid_collection(self.COLLECTION_ID, self.user_id)
+
+    def test_for_logged_in_user_without_rights(self) -> None:
+        self.login(self.guest_email)
+        self.get_html_response(
+            '%s/can_access_collection_editor_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID
+            ), expected_status_int=401
+        )
+        self.logout()
+
+    def test_for_logged_in_user_with_rights(self) -> None:
+        rights_manager.publish_collection(self.user, self.COLLECTION_ID)
+        self.login(self.user_email)
+        self.get_html_response(
+            '%s/can_access_collection_editor_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID
+            ), expected_status_int=200
+        )
+        self.logout()
+
+    def test_validation_returns_false_if_given_collection_id_non_existent(
+        self) -> None:
+        self.login(self.guest_email)
+        self.get_html_response(
+            '%s/can_access_collection_editor_page/invalid_collectionId' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX,
+            ), expected_status_int=404
+        )
+        self.logout()
+
+    def test_should_not_access_for_logged_out_user(self) -> None:
+        self.get_html_response(
+            '%s/can_access_collection_editor_page/' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX,
+            ), expected_status_int=404
+        )
