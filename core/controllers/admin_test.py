@@ -1383,8 +1383,9 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
-            'Schema validation for \'num_dummy_translation_exps_to_generate\' '
-            'failed: Could not convert str to int: invalid_type')
+        'At \'http://localhost/adminhandler\' these errors are happening:\n'
+        'Schema validation for \'num_dummy_translation_exps_to_generate\' '
+        'failed: Could not convert str to int: invalid_type')
         self.assertEqual(response['error'], error_msg)
         generated_exps = exp_services.get_all_exploration_summaries()
         published_exps = exp_services.get_recently_published_exp_summaries(5)
