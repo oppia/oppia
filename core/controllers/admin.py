@@ -148,7 +148,7 @@ ARABIC_BLOG_POST_CONTENT = """
     </ul>
 """
 
-SAMPLE_EXPLORATION_DICT = {
+SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict({
     'id': '%s',
     'title': 'Dummy Exploration',
     'category': 'Algorithms',
@@ -196,7 +196,7 @@ SAMPLE_EXPLORATION_DICT = {
         }
     },
     'version': 3
-}
+})
 
 
 class ClassroomPageDataDict(TypedDict):
@@ -1111,10 +1111,10 @@ class AdminHandler(
                     self.user_id, question_id_2, skill_id, 0.3)
                 question_services.create_new_question_skill_link(
                     self.user_id, question_id_3, skill_id, 0.3)
-                topic_1 = topic_domain.Topic.create_default_topic(
+                topic = topic_domain.Topic.create_default_topic(
                     topic_id, 'Dummy Topic 1', 'dummy-topic-one', 'description',
                     'fragm')
-                topic_1.update_meta_tag_content('dummy-meta')
+                topic.update_meta_tag_content('dummy-meta')
                 raw_image = b''
                 with open(
                     'core/tests/data/thumbnail.svg', 'rt',
@@ -1125,17 +1125,17 @@ class AdminHandler(
                     'thumbnail.svg', feconf.ENTITY_TYPE_TOPIC, topic_id,
                     raw_image, 'thumbnail', False)
                 topic_services.update_thumbnail_filename(
-                    topic_1, 'thumbnail.svg')
-                topic_1.update_thumbnail_bg_color('#C6DCDA')
-                topic_1.add_canonical_story(story_id)
-                topic_1.add_uncategorized_skill_id(skill_id)
-                topic_1.update_skill_ids_for_diagnostic_test([skill_id])
-                topic_1.add_subtopic(1, 'Dummy Subtopic Title', 'dummysubtopic')
+                    topic, 'thumbnail.svg')
+                topic.update_thumbnail_bg_color('#C6DCDA')
+                topic.add_canonical_story(story_id)
+                topic.add_uncategorized_skill_id(skill_id)
+                topic.update_skill_ids_for_diagnostic_test([skill_id])
+                topic.add_subtopic(1, 'Dummy Subtopic Title', 'dummysubtopic')
                 topic_services.update_subtopic_thumbnail_filename(
-                    topic_1, 1, 'thumbnail.svg')
-                topic_1.update_subtopic_thumbnail_bg_color(
+                    topic, 1, 'thumbnail.svg')
+                topic.update_subtopic_thumbnail_bg_color(
                     1, constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])
-                topic_1.move_skill_id_to_subtopic(None, 1, skill_id)
+                topic.move_skill_id_to_subtopic(None, 1, skill_id)
 
                 subtopic_page = (
                     subtopic_page_domain.SubtopicPage
@@ -1165,10 +1165,9 @@ class AdminHandler(
                 exploration = exp_domain.Exploration.from_dict(
                     exploration_dict)
                 exp_services.save_new_exploration(self.user_id, exploration)
-                if i <= num_dummy_exps_to_publish - 1:
-                    exploration_ids_to_publish.append(new_exploration_id)
-                    rights_manager.publish_exploration(
-                        self.user, new_exploration_id)
+                exploration_ids_to_publish.append(new_exploration_id)
+                rights_manager.publish_exploration(
+                    self.user, new_exploration_id)
                 story_node_dict = {
                     'exp_id': new_exploration_id,
                     'title': title,
@@ -1265,7 +1264,7 @@ class AdminHandler(
             if initial_dummy_opportunites_generation:
                 skill_services.save_new_skill(self.user_id, skill)
                 story_services.save_new_story(self.user_id, story)
-                topic_services.save_new_topic(self.user_id, topic_1)
+                topic_services.save_new_topic(self.user_id, topic)
                 subtopic_page_services.save_subtopic_page(
                     self.user_id, subtopic_page, 'Added subtopic',
                     [topic_domain.TopicChange({
