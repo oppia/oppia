@@ -21,6 +21,9 @@ import testConstants from './test-constants';
 import isElementClickable from '../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
 
+import {toMatchImageSnapshot} from 'jest-image-snapshot';
+(<any>expect).extend({toMatchImageSnapshot});
+
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
@@ -279,6 +282,24 @@ export class BaseUser {
    */
   getCurrentUrlWithoutParameters(): string {
     return this.page.url().split('?')[0];
+  }
+
+  /**
+   * This function takes a screenshot of the current page
+   * If there's no image named as the given string, it stores the screenshot with the given string in the file __image_snapshots__
+   * Otherwise, it compares the screenshot with the image named as the given string to check if they match.
+   * If they don't match, it generates an image in the file __diff_output__ to show the difference.
+   */
+  async screenshotMatch(imageName: string): Promise<void> {
+    try {
+      (<any>expect(await this.page.screenshot())).toMatchImageSnapshot({
+        failureThreshold: '0.01',
+        failureThresholdType: 'percent',
+        customSnapshotIdentifier: imageName,
+      });
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 }
 

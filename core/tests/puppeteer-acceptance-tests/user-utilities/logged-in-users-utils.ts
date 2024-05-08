@@ -121,11 +121,6 @@ export class LoggedInUser extends BaseUser {
     await this.goto(homeUrl);
   }
 
-  async pageScreenshot(): Promise<string | Buffer> {
-    const screenshot = await this.page.screenshot();
-    return screenshot;
-  }
-
   /**
    * Function to navigate to the about page.
    */
@@ -168,11 +163,7 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     await Promise.all([this.page.waitForNavigation(), this.clickOn(button)]);
 
-    expect(this.page.url())
-      .withContext(
-        `${buttonName} should open the ${expectedDestinationPageName} page`
-      )
-      .toBe(expectedDestinationPageUrl);
+    expect(this.page.url()).toBe(expectedDestinationPageUrl);
   }
 
   /**

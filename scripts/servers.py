@@ -84,9 +84,10 @@ def managed_process(
 
     stripped_args = (('%s' % arg).strip() for arg in command_args)
     non_empty_args = (s for s in stripped_args if s)
-
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
     human_readable_command = command if shell else ' '.join(command)
+    # if (human_readable_name == 'Acceptance Tests Server'):
+    #     raise Exception('command: %s' % command)
     msg = 'Starting new %s: %s' % (human_readable_name, human_readable_command)
     print(msg)
     popen_proc = psutil.Popen(command, shell=shell, **popen_kwargs)
@@ -787,13 +788,32 @@ def managed_acceptance_tests_server(
     # OK to use shell=True here because we are passing string literals,
     # and verifying that the passed suite-name are within the list of
     # the suites we have, so there is no risk of a shell-injection attack.
-    managed_acceptance_tests_proc = managed_process(
-        acceptance_tests_args,
-        human_readable_name='Acceptance Tests Server',
+    # managed_acceptance_tests_proc = managed_process(
+    #     acceptance_tests_args,
+    #     human_readable_name='Acceptance Tests Server',
+    #     shell=True,
+    #     raise_on_nonzero_exit=False,
+    #     stdout=stdout,
+    # )
+
+    nodemodules_jest_bin_path = os.path.join(
+        common.NODE_MODULES_PATH, '.bin', 'jest')
+
+    jest_args = [
+        nodemodules_jest_bin_path, 
+        '--config=jest.config.js --detectOpenHandles --forceExit'
+    ]
+
+    jest_proc = managed_process(
+        jest_args,
+        human_readable_name='Jest-image-snapshot',
         shell=True,
         raise_on_nonzero_exit=False,
         stdout=stdout,
     )
 
-    with managed_acceptance_tests_proc as proc:
+    # with managed_acceptance_tests_proc as proc:
+    #     yield proc
+
+    with jest_proc as proc:
         yield proc
