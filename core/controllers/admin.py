@@ -149,52 +149,52 @@ ARABIC_BLOG_POST_CONTENT = """
 """
 
 SAMPLE_EXPLORATION_DICT = {
-    'id': '%s', 
-    'title': 'Dummy Exploration', 
-    'category': 'Algorithms', 
-    'author_notes': '', 
-    'blurb': '', 
-    'states_schema_version': 55, 
-    'init_state_name': 'Introduction', 
-    'language_code': 'en', 
-    'objective': 'Learn the exploration', 
-    'param_changes': [], 
-    'param_specs': {}, 
-    'tags': ['exploration'], 
-    'auto_tts_enabled': False, 
-    'next_content_id_index': 2, 
-    'edits_allowed': True, 
+    'id': '%s',
+    'title': 'Dummy Exploration',
+    'category': 'Algorithms',
+    'author_notes': '',
+    'blurb': '',
+    'states_schema_version': 55,
+    'init_state_name': 'Introduction',
+    'language_code': 'en',
+    'objective': 'Learn the exploration',
+    'param_changes': [],
+    'param_specs': {},
+    'tags': ['exploration'],
+    'auto_tts_enabled': False,
+    'next_content_id_index': 2,
+    'edits_allowed': True,
     'states': {
         'Introduction': {
             'content': {
-                'content_id': 'content_0', 
+                'content_id': 'content_0',
                 'html': 'Congratulations, you have finished!'
-            }, 
-            'param_changes': [], 
+            },
+            'param_changes': [],
             'interaction': {
-                'id': 'EndExploration', 
+                'id': 'EndExploration',
                 'customization_args': {
                     'recommendedExplorationIds': {
                         'value': []
                     }
-                }, 
-                'answer_groups': [], 
-                'default_outcome': None, 
-                'confirmed_unclassified_answers': [], 
-                'hints': [], 
+                },
+                'answer_groups': [],
+                'default_outcome': None,
+                'confirmed_unclassified_answers': [],
+                'hints': [],
                 'solution': None
-            }, 
-            'classifier_model_id': None, 
-            'linked_skill_id': None, 
+            },
+            'classifier_model_id': None,
+            'linked_skill_id': None,
             'recorded_voiceovers': {
                     'voiceovers_mapping': {
                     'content_0': {}
                 }
-            }, 
-        'solicit_answer_details': False, 
-        'card_is_checkpoint': True
+            },
+        'solicit_answer_details': False,
+        'card_is_checkpoint': True,
         }
-    }, 
+    },
     'version': 3
 }
 
@@ -406,8 +406,9 @@ class AdminHandler(
                 the action is generate_dummy_explorations.
             Exception. The num_dummy_exps_to_publish must be provided when
                 the action is generate_dummy_explorations.
-            Exception. The num_dummy_translation_exps_to_generate must be provided when
-                the action is generate_dummy_translation_opportunities.
+            Exception. The num_dummy_translation_exps_to_generate must be
+                provided when the action is
+                generate_dummy_translation_opportunities.
             InvalidInputException. Generate count cannot be less than publish
                 count.
             Exception. The data must be provided when the action is
@@ -468,19 +469,21 @@ class AdminHandler(
                 self._generate_dummy_explorations(
                     num_dummy_exps_to_generate, num_dummy_exps_to_publish)
             elif action == 'generate_dummy_translation_opportunities':
-                num_dummy_translation_exps_to_generate = self.normalized_payload.get(
-                    'num_dummy_translation_exps_to_generate')
+                num_dummy_translation_exps_to_generate = (
+                    self.normalized_payload.get(
+                        'num_dummy_translation_exps_to_generate'))
                 if num_dummy_translation_exps_to_generate is None:
                     raise Exception(
-                        'The \'num_dummy_translation_exps_to_generate\' must be provided'
-                        ' when the action is '
+                        'The \'num_dummy_translation_exps_to_generate\' '
+                        'must be provided when the action is '
                         'generate_dummy_translation_opportunities.'
                     )
-                
+
                 self._generate_dummy_translation_opportunities(
                     num_dummy_translation_exps_to_generate)
             elif action == 'generate_dummy_blog_post':
-                blog_post_title = self.normalized_payload.get('blog_post_title')
+                blog_post_title = self.normalized_payload.get(
+                    'blog_post_title')
                 if blog_post_title is None:
                     raise Exception(
                         'The \'blog_post_title\' must be provided when the'
@@ -1049,7 +1052,7 @@ class AdminHandler(
                 exploration_ids_to_publish)
         else:
             raise Exception('Cannot generate dummy explorations in production.')
-    
+
     def _generate_dummy_translation_opportunities(
         self, num_dummy_translation_exps_to_generate: int
     ) -> None:
@@ -1068,9 +1071,10 @@ class AdminHandler(
                 raise Exception(
                     'User does not have enough rights to generate data.')
             logging.info(
-                '[ADMIN] %s generated %s number of dummy translatable explorations(opportunities)' 
+                '[ADMIN] %s generated %s number of dummy '
+                'translatable explorations(opportunities)'
                 % (self.user_id, num_dummy_translation_exps_to_generate))
-            
+
             # Generate a new topic, story, skill and questions id.
             topic_id = 'dummyTopicId'
             story_id = 'dummyStoryId'
@@ -1080,11 +1084,11 @@ class AdminHandler(
             question_id_2 = 'dummyQuestionId2'
             question_id_3 = 'dummyQuestionId3'
 
-            initial_dummy_opportunites_generation = (skill_services.
-                does_skill_with_description_exist(
+            initial_dummy_opportunites_generation = (
+                skill_services.does_skill_with_description_exist(
                 'Dummy Skill 1') is False)
 
-            if (initial_dummy_opportunites_generation):
+            if initial_dummy_opportunites_generation:
                 skill = self._create_dummy_skill(
                     skill_id, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>')
                 question_1 = self._create_dummy_question(
@@ -1120,7 +1124,8 @@ class AdminHandler(
                 fs_services.save_original_and_compressed_versions_of_image(
                     'thumbnail.svg', feconf.ENTITY_TYPE_TOPIC, topic_id,
                     raw_image, 'thumbnail', False)
-                topic_services.update_thumbnail_filename(topic_1, 'thumbnail.svg')
+                topic_services.update_thumbnail_filename(
+                    topic_1, 'thumbnail.svg')
                 topic_1.update_thumbnail_bg_color('#C6DCDA')
                 topic_1.add_canonical_story(story_id)
                 topic_1.add_uncategorized_skill_id(skill_id)
@@ -1133,8 +1138,8 @@ class AdminHandler(
                 topic_1.move_skill_id_to_subtopic(None, 1, skill_id)
 
                 subtopic_page = (
-                    subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                        1, topic_id))
+                    subtopic_page_domain.SubtopicPage
+                    .create_default_subtopic_page(1, topic_id))
             else:
                 skill = skill_services.skill_fetchers.get_skill_by_id(skill_id)
                 question_1 = question_services.get_question_by_id(question_id_1)
@@ -1147,7 +1152,7 @@ class AdminHandler(
             exploration_ids_to_publish = []
             story_node_dicts = []
             exp_counter = len(story.story_contents.nodes)
-            
+
             for i in range(num_dummy_translation_exps_to_generate):
                 exp_counter += 1
                 title = 'Dummy Exploration %s' % str(exp_counter)
@@ -1174,7 +1179,8 @@ class AdminHandler(
                 exploration_ids_to_publish)
 
             def generate_dummy_story_nodes(
-                node_id: int, stop_update: bool, exp_id: str, title: str, description: str
+                node_id: int, stop_update: bool, exp_id: str,
+                title: str, description: str
             ) -> None:
                 """Generates and connects sequential story nodes.
 
@@ -1183,6 +1189,8 @@ class AdminHandler(
                     exp_id: str. The exploration id.
                     title: str. The title of the story node.
                     description: str. The description of the story node.
+                    stop_update: bool. Flag to update the node destination
+                        node id.
                 """
                 assert self.user_id is not None
                 if initial_dummy_opportunites_generation:
@@ -1194,36 +1202,43 @@ class AdminHandler(
                         description)
                     story.update_node_exploration_id(
                         '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
-                    
+
                     if stop_update is False:
                         story.update_node_destination_node_ids(
                             '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                            ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
-                else :
+                            ['%s%d' % (
+                                story_domain.NODE_ID_PREFIX, node_id + 1)])
+                else:
                     change_list = [
                         story_domain.StoryChange({
                             'cmd': 'add_story_node',
-                            'node_id': '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                            'node_id': '%s%d' % (
+                                story_domain.NODE_ID_PREFIX, node_id),
                             'title': title,
                         }),
                         story_domain.StoryChange({
                             'cmd': 'update_story_node_property',
-                            'node_id': '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                            'property_name': story_domain.STORY_NODE_PROPERTY_DESCRIPTION,
+                            'node_id': '%s%d' % (
+                                story_domain.NODE_ID_PREFIX, node_id),
+                            'property_name': '%s' % (
+                                story_domain.STORY_NODE_PROPERTY_DESCRIPTION),
                             'old_value': None,
                             'new_value': description
                         }),
                         story_domain.StoryChange({
                             'cmd': 'update_story_node_property',
-                            'node_id': '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                            'property_name': story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
+                            'node_id': '%s%d' % (
+                                story_domain.NODE_ID_PREFIX, node_id),
+                            'property_name': '%s' % (
+                                story_domain
+                                .STORY_NODE_PROPERTY_EXPLORATION_ID),
                             'old_value': None,
                             'new_value': exp_id
                         })
                     ]
                     story_services.update_story(
-                        self.user_id, story_id, change_list, 'Added story node')
-
+                        self.user_id, story_id, change_list, 'Added story node'
+                    )
 
                 exp_services.update_exploration(
                     self.user_id, exp_id, [exp_domain.ExplorationChange({
@@ -1232,18 +1247,22 @@ class AdminHandler(
                         'new_value': 'Astronomy'
                     })], 'Change category')
 
-            story_node_index = int(story.story_contents.next_node_id[5:]) - 1 if story.story_contents is not None else 0
-
-            if (story_node_index > 0):
-                    story.update_node_destination_node_ids(
-                        '%s%d' % (story_domain.NODE_ID_PREFIX, story_node_index),
-                        [story.story_contents.next_node_id])
+            story_node_index = 0
+            if story.story_contents is not None:
+                story_node_index = int(
+                    story.story_contents.next_node_id[5:]) - 1
+            if story_node_index > 0:
+                story.update_node_destination_node_ids(
+                    '%s%d' % (
+                        story_domain.NODE_ID_PREFIX, story_node_index),
+                    [story.story_contents.next_node_id])
             for i, story_node_dict in enumerate(story_node_dicts):
                 story_node_index += 1
                 stop_update = i is len(story_node_dicts) - 1
-                generate_dummy_story_nodes(story_node_index, stop_update, **story_node_dict)
-            
-            if (initial_dummy_opportunites_generation):
+                generate_dummy_story_nodes(
+                    story_node_index, stop_update, **story_node_dict)
+
+            if initial_dummy_opportunites_generation:
                 skill_services.save_new_skill(self.user_id, skill)
                 story_services.save_new_story(self.user_id, story)
                 topic_services.save_new_topic(self.user_id, topic_1)
@@ -1255,9 +1274,10 @@ class AdminHandler(
                         'title': 'Dummy Subtopic Title',
                         'url_fragment': 'dummy-subtopic-fragment'
                     })]
-                )                                            
-                
-            # Generates translation opportunities for the Contributor Dashboard.
+                )
+
+            # Generates translation opportunities for the
+            # Contributor Dashboard.
             exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
             exp_ids_in_story = exploration_ids_to_publish
             opportunity_services.add_new_exploration_opportunities(
