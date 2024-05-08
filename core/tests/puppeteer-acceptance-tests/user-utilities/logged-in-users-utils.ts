@@ -97,7 +97,7 @@ const readOurBlogButton =
   'a.e2e-test-thanks-for-donating-page-read-our-blog-button';
 const dismissButton = 'i.e2e-test-thanks-for-donating-page-dismiss-button';
 const thanksForDonatingClass = '.modal-open';
-const donatePage = '.modal-backdrop.fade';
+const donatePage = '.donate-content-container';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
@@ -719,12 +719,14 @@ export class LoggedInUser extends BaseUser {
    */
   async clickDismissButtonInThanksForDonatingPage(): Promise<void> {
     await this.clickOn(dismissButton);
+    await this.page.waitForSelector(thanksForDonatingClass, {hidden: true});
     const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
     if (thanksForDonatingHeader !== null) {
       throw new Error(
         'The dismiss button does not close the Thanks for Donating popup!'
       );
     }
+    await this.page.waitForSelector(donatePage);
     const donatePageShowed = await this.page.$(donatePage);
     if (donatePageShowed === null) {
       throw new Error('The dismiss button does not show the Donate page!');
