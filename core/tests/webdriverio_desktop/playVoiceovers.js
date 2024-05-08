@@ -21,17 +21,21 @@ var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
+var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage = require('../webdriverio_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
+var ReleaseCoordinatorPage = require('../webdriverio_utils/ReleaseCoordinatorPage.js');
 
 describe('Voiceover player', function () {
+  var adminPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorTranslationTab = null;
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
   var libraryPage = null;
+  var releaseCoordinatorPage = null;
 
   beforeAll(async function () {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -40,11 +44,27 @@ describe('Voiceover player', function () {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
+    releaseCoordinatorPage =
+      new ReleaseCoordinatorPage.ReleaseCoordinatorPage();
+    adminPage = new AdminPage.AdminPage();
 
-    await users.createAndLoginUser(
+    await users.createAndLoginCurriculumAdminUser(
       'testVoiceovers@voiceovers.com',
       'testVoiceovers'
     );
+
+    // The below lines enable the enable_voiceover_contribution flag in
+    // prod mode.
+    // They should be removed after the enable_voiceover_contribution flag is
+    // deprecated.
+    await adminPage.get();
+    await adminPage.addRole('testVoiceovers', 'release coordinator');
+    await releaseCoordinatorPage.getFeaturesTab();
+
+    var voiceoverContributionFlag =
+      await releaseCoordinatorPage.getVoiceoverContributionFeatureElement();
+    await releaseCoordinatorPage.enableFeature(voiceoverContributionFlag);
+
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(
