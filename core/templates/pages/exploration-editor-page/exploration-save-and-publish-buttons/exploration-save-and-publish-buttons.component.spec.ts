@@ -264,6 +264,28 @@ describe('Exploration save and publish buttons component', () => {
     }
   );
 
+  it('should update autosaveIsInProgress when autosaveInProgressEventEmitter emits true', () => {
+    spyOn(
+      changeListService.autosaveInProgressEventEmitter,
+      'subscribe'
+    ).and.callFake((callback: (autosaveInProgress: boolean) => void) => {
+      callback(true);
+    });
+    component.ngOnInit();
+    expect(component.autosaveIsInProgress).toBe(true);
+  });
+
+  it('should update autosaveIsInProgress when autosaveInProgressEventEmitter emits false', () => {
+    spyOn(
+      changeListService.autosaveInProgressEventEmitter,
+      'subscribe'
+    ).and.callFake((callback: (autosaveInProgress: boolean) => void) => {
+      callback(false);
+    });
+    component.ngOnInit();
+    expect(component.autosaveIsInProgress).toBe(false);
+  });
+
   it(
     'should publish exploration changes when it has no warnings and it is' +
       ' public',

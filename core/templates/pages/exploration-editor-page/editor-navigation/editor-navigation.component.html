@@ -119,7 +119,8 @@
         </div>
 
         <ul class="dropdown-menu" aria-labelledby="discardButtonPopup">
-          <div class="e2e-test-mobile-exploration-discard-tab" (click)="discardChanges()">
+<!-- The 'disabled' class is added when autosave is in progress. This disables user interactions with the discard button, preventing changes from being discarded before they are saved. -->
+          <div class="e2e-test-mobile-exploration-discard-tab" (click)="discardChanges()" [class.disabled]="autosaveIsInProgress">
             <i class="fa fa-pen oppia-mobile-exploration-editor-tabs-icon"></i>
             Discard
           </div>
@@ -154,6 +155,11 @@
   /* Overwrite the Bootstrap defaults. */
   .nav > li > a.oppia-editor-navbar-tab-anchor {
     padding: 15px 11px;
+  }
+  /* Ensures targeted styling only affects 'Discard Draft' tab. */
+  div.e2e-test-mobile-exploration-discard-tab.disabled {
+    opacity: 0.6;
+    pointer-events: none;
   }
   .oppia-exploration-open-threads-count {
     background-color: #4078c0;
