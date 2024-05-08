@@ -80,7 +80,7 @@ describe('LessonCardComponent', () => {
     acquired_skill_ids: ['skill_2'],
     destination_node_ids: ['node_2'],
     outline: 'Outline',
-    exploration_id: null,
+    exploration_id: 'exp_id_1',
     outline_is_finalized: false,
     thumbnail_bg_color: '#a33f40',
     status: 'Published',
@@ -240,7 +240,6 @@ describe('LessonCardComponent', () => {
   it('should set story to StorySummary and set its imgUrl correctly', () => {
     component.story = StorySummary.createFromBackendDict(sampleTopic);
     component.topic = sampleTopic.topic_name;
-
     fixture.detectChanges();
 
     expect(component.imgUrl).toBe(
