@@ -268,26 +268,10 @@ export class ExplorationEditor extends BaseUser {
    * Deletes the previous written title and updates the new title.
    */
   async updateTitleTo(title: string): Promise<void> {
-    await this.page.waitForSelector(explorationTitleSelector);
-    const titleInput = await this.page.$(explorationTitleSelector);
-    const oldTitle = await this.page.evaluate(input => input.value, titleInput);
-
     await this.clearAllTextFrom(addTitleBar);
     await this.type(addTitleBar, title);
     await this.page.keyboard.press('Tab');
 
-    // Auto save pop up bar is visible only when current input is different from
-    // old input.
-    if (oldTitle !== title) {
-      if (this.isViewportAtMobileWidth()) {
-        // Navbar text is hidden in mobile view port due to less screen so there is no visible
-        // change in the UI (specially Auto save pop up bar) after we update the input bar.
-        // Hence we need to explicitly wait for 2 seconds.
-        await this.page.waitForTimeout(2000);
-      } else {
-        await this.waitForAutosaveIndicator();
-      }
-    }
     showMessage(`Title has been updated to ${title}`);
   }
 
