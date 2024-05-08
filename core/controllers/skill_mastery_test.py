@@ -343,7 +343,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Schema validation for \'mastery_change_per_skill\' failed: ' +
+            'Schema validation for \'mastery_change_per_skill\' failed: '
             'Could not convert dict to float: {}')
 
         mastery_change_per_skill = {
@@ -358,7 +358,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-           'Schema validation for \'mastery_change_per_skill\' failed: ' +
+           'Schema validation for \'mastery_change_per_skill\' failed: '
            'Expected float, received True')
 
         self.logout()
