@@ -314,7 +314,9 @@ exports.config = {
   // Options to be passed to Jasmine.
   jasmineOpts: {
     // Default time to wait in ms before a test fails.
-    defaultTimeoutInterval: 1200000
+    defaultTimeoutInterval: 1200000,
+    // Option to stop execution of the suite after the first spec failure.
+    stopOnSpecFailure: true,
   },
 
 
