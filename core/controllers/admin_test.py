@@ -1387,6 +1387,23 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
             self.assertEqual(len(published_exps), 5 * (i + 1))
         self.logout()
 
+    def test_admins_can_generate_dummy_translation_opportunities_multiple_times(self) -> None: # pylint: disable=line-too-long
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        for i in range(3):
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_translation_opportunities',
+                    'num_dummy_translation_exps_to_generate': 5
+                }, csrf_token=csrf_token)
+            generated_exps = exp_services.get_all_exploration_summaries()
+            published_exps = (
+                exp_services.get_recently_published_exp_summaries(15))
+            self.assertEqual(len(generated_exps), 5 * (i + 1))
+            self.assertEqual(len(published_exps), 5 * (i + 1))
+        self.logout()
+
     def test_handler_raises_error_with_non_int_num_dummy_translation_exps_to_generate(self) -> None: # pylint: disable=line-too-long
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)

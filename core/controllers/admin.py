@@ -1148,7 +1148,6 @@ class AdminHandler(
                 story = story_services.story_fetchers.get_story_by_id(story_id)
 
             # Generating the explorations to be added to the story.
-            num_dummy_exps_to_publish = num_dummy_translation_exps_to_generate
             exploration_ids_to_publish = []
             story_node_dicts = []
             exp_counter = len(story.story_contents.nodes)
