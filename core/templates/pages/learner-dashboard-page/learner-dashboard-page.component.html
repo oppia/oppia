@@ -159,7 +159,7 @@
           </oppia-learner-groups-tab>
         </div>
         <ng-container *ngIf="isShowRedesignedLearnerDashboardActive()"> 
-          <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS">
+          <div class="w-100" *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS">
             <oppia-community-lessons-tab [incompleteExplorationsList]="incompleteExplorationsList"
                                          [incompleteCollectionsList]="incompleteCollectionsList"
                                          [completedExplorationsList]="completedExplorationsList"
@@ -168,7 +168,8 @@
                                          [collectionPlaylist]="collectionPlaylist"
                                          [subscriptionsList]="subscriptionsList"
                                          [completedToIncompleteCollections]="completedToIncompleteCollections"
-                                         [redesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()">
+                                         [redesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()"
+                                         [username]="username">
             </oppia-community-lessons-tab>
           </div>
         </ng-container>
@@ -182,7 +183,8 @@
                                          [collectionPlaylist]="collectionPlaylist"
                                          [subscriptionsList]="subscriptionsList"
                                          [completedToIncompleteCollections]="completedToIncompleteCollections"
-                                         [redesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()">
+                                         [redesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()"
+                                         [username]="username">
             </oppia-community-lessons-tab>
           </div>
           <div *ngIf="((!windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS) || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS)) && communityLessonsDataLoaded">
@@ -194,7 +196,8 @@
                                          [collectionPlaylist]="collectionPlaylist"
                                          [subscriptionsList]="subscriptionsList"
                                          [completedToIncompleteCollections]="completedToIncompleteCollections"
-                                         [redesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()">
+                                         [redesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()"
+                                         [username]="username">
             </oppia-community-lessons-tab>
           </div>
         </ng-container>
