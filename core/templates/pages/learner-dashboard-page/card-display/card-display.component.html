@@ -16,7 +16,10 @@
     <ng-content></ng-content>
   </div>
   <!--TODO(#18384): Implement view more for progress tab-->
-  <button *ngIf="!tabType.includes('home')" class="align-self-end">  {{ 'I18N_LEARNER_DASHBOARD_CARD_DISPLAY_BUTTON' | translate }} </button>
+  <button *ngIf="!tabType.includes('home')" class="align-self-end card-display-more-button mt-4">
+    {{ 'I18N_LEARNER_DASHBOARD_CARD_DISPLAY_BUTTON' | translate }}
+    <span class="fas fa-chevron-down ml-2"></span>
+  </button>
 </div>
 
 <style>
@@ -43,6 +46,17 @@
 
   .card-display-button:not(:disabled):hover {
     background-color:#429488;
+  }
+
+  .card-display-more-button {
+    align-items: center;
+    border: none;
+    border-radius: .25em;
+    color: #00645c;
+    display: flex;
+    font-weight: 500;
+    justify-content: center;
+    padding: 4px 8px;
   }
 
   .card-display-content-container {
