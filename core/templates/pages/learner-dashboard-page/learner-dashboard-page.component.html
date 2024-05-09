@@ -69,9 +69,9 @@
         </li>
         <li>
           <button class="align-items-center d-inline-flex e2e-test-progress-section rounded oppia-learner-dash-sidebar_btn text-left w-100" tabindex="0"
-                  [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS}"
-                  (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)"
-                  (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)">
+                  [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS}"
+                  (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)"
+                  (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)">
             <span class="fas fa-chart-line fa-lg"></span>
             {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate }}
           </button>
@@ -158,17 +158,46 @@
                                     (setActiveSection)="setActiveSection($event)">
           </oppia-learner-groups-tab>
         </div>
-        <div *ngIf="((!windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS) || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS)) && communityLessonsDataLoaded">
-          <oppia-community-lessons-tab [incompleteExplorationsList]="incompleteExplorationsList"
-                                       [incompleteCollectionsList]="incompleteCollectionsList"
-                                       [completedExplorationsList]="completedExplorationsList"
-                                       [completedCollectionsList]="completedCollectionsList"
-                                       [explorationPlaylist]="explorationPlaylist"
-                                       [collectionPlaylist]="collectionPlaylist"
-                                       [subscriptionsList]="subscriptionsList"
-                                       [completedToIncompleteCollections]="completedToIncompleteCollections">
-          </oppia-community-lessons-tab>
-        </div>
+        <ng-container *ngIf="isShowRedesignedLearnerDashboardActive()"> 
+          <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS">
+            <oppia-community-lessons-tab [incompleteExplorationsList]="incompleteExplorationsList"
+                                         [incompleteCollectionsList]="incompleteCollectionsList"
+                                         [completedExplorationsList]="completedExplorationsList"
+                                         [completedCollectionsList]="completedCollectionsList"
+                                         [explorationPlaylist]="explorationPlaylist"
+                                         [collectionPlaylist]="collectionPlaylist"
+                                         [subscriptionsList]="subscriptionsList"
+                                         [completedToIncompleteCollections]="completedToIncompleteCollections"
+                                         [redesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()">
+            </oppia-community-lessons-tab>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="!isShowRedesignedLearnerDashboardActive()"> 
+          <div *ngIf="((!windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS) || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS)) && communityLessonsDataLoaded">
+            <oppia-community-lessons-tab [incompleteExplorationsList]="incompleteExplorationsList"
+                                         [incompleteCollectionsList]="incompleteCollectionsList"
+                                         [completedExplorationsList]="completedExplorationsList"
+                                         [completedCollectionsList]="completedCollectionsList"
+                                         [explorationPlaylist]="explorationPlaylist"
+                                         [collectionPlaylist]="collectionPlaylist"
+                                         [subscriptionsList]="subscriptionsList"
+                                         [completedToIncompleteCollections]="completedToIncompleteCollections"
+                                         [redesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()">
+            </oppia-community-lessons-tab>
+          </div>
+          <div *ngIf="((!windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS) || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS)) && communityLessonsDataLoaded">
+            <oppia-community-lessons-tab [incompleteExplorationsList]="incompleteExplorationsList"
+                                         [incompleteCollectionsList]="incompleteCollectionsList"
+                                         [completedExplorationsList]="completedExplorationsList"
+                                         [completedCollectionsList]="completedCollectionsList"
+                                         [explorationPlaylist]="explorationPlaylist"
+                                         [collectionPlaylist]="collectionPlaylist"
+                                         [subscriptionsList]="subscriptionsList"
+                                         [completedToIncompleteCollections]="completedToIncompleteCollections"
+                                         [redesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()">
+            </oppia-community-lessons-tab>
+          </div>
+        </ng-container>
       </div>
     </div>
 
