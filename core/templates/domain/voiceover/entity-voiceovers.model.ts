@@ -17,26 +17,6 @@
  * voiceovers.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
-
-import {AppConstants} from 'app.constants';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {
-  BindableVoiceovers,
-  RecordedVoiceovers,
-} from 'domain/exploration/recorded-voiceovers.model';
-import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
-import {Hint} from 'domain/exploration/hint-object.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
-
-import {
-  InteractionSpecsConstants,
-  InteractionSpecsKey,
-} from 'pages/interaction-specs.constants';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
-import {InteractionAnswer} from 'interactions/answer-defs';
 import {
   Voiceover,
   VoiceoverBackendDict,
@@ -50,11 +30,11 @@ export interface VoiceoverTypeToVoiceoversBackendDict {
   [voiceoverType: string]: VoiceoverBackendDict;
 }
 
-export interface ContentIdToVoiceoverMapping {
+export interface ContentIdToVoiceoversMapping {
   [contentId: string]: VoiceoverTypeToVoiceovers;
 }
 
-export interface ContentIdToVoiceoverMappingBackendDict {
+export interface ContentIdToVoiceoversMappingBackendDict {
   [contentId: string]: VoiceoverTypeToVoiceoversBackendDict;
 }
 
@@ -63,7 +43,7 @@ export interface EntityVoiceoversBackendDict {
   entity_type: string;
   entity_version: number;
   language_accent_code: string;
-  voiceovers: ContentIdToVoiceoverMappingBackendDict;
+  voiceovers_mapping: ContentIdToVoiceoversMappingBackendDict;
 }
 
 export class EntityVoiceovers {
@@ -71,30 +51,31 @@ export class EntityVoiceovers {
   entityType: string;
   entityVersion: number;
   languageAccentCode: string;
-  voiceovers: ContentIdToVoiceoverMapping;
+  voiceoversMapping: ContentIdToVoiceoversMapping;
 
   constructor(
     entityId: string,
     entityType: string,
     entityVersion: number,
     languageAccentCode: string,
-    voiceovers: ContentIdToVoiceoverMapping
+    voiceoversMapping: ContentIdToVoiceoversMapping
   ) {
     this.entityId = entityId;
     this.entityType = entityType;
     this.entityVersion = entityVersion;
     this.languageAccentCode = languageAccentCode;
-    this.voiceovers = voiceovers;
+    this.voiceoversMapping = voiceoversMapping;
   }
 
   static createFromBackendDict(
     entityVoiceoversBackendDict: EntityVoiceoversBackendDict
-  ) {
-    let voiceovers = {};
+  ): EntityVoiceovers {
+    let contentIdToVoiceoversMapping = {};
     for (let contentId in entityVoiceoversBackendDict['voiceovers']) {
       let voiceoverTypeToVoiceovers =
         entityVoiceoversBackendDict['voiceovers'][contentId];
-      voiceovers[contentId] = {
+
+      contentIdToVoiceoversMapping[contentId] = {
         manual: Voiceover.createFromBackendDict(
           voiceoverTypeToVoiceovers['manual']
         ),
@@ -105,27 +86,12 @@ export class EntityVoiceovers {
       entityVoiceoversBackendDict['entity_type'],
       entityVoiceoversBackendDict['entity_version'],
       entityVoiceoversBackendDict['language_accent_code'],
-      voiceovers
+      contentIdToVoiceoversMapping
     );
   }
 
-  getVoiceovers() {
-    this.voiceovers;
-  }
-
-  countTotalVoiceovers(): number {
-    let totalVoiceovers = 0;
-
-    for (let contentId in this.voiceovers) {
-      let manualVoieover = this.voiceovers[contentId]['manual'];
-      totalVoiceovers += 1;
-    }
-
-    return totalVoiceovers;
-  }
-
   getManualVoiceover(contentId: string): Voiceover | undefined {
-    let voiceoverTypeToVoiceovers = this.voiceovers[contentId];
+    let voiceoverTypeToVoiceovers = this.voiceoversMapping[contentId];
 
     if (voiceoverTypeToVoiceovers) {
       return voiceoverTypeToVoiceovers.manual;

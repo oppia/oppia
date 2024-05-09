@@ -112,7 +112,7 @@ def get_voiceovers_for_given_language_accent_code(
 def get_entity_voiceovers_for_given_exploration(
     entity_id: str, entity_type: str, entity_version: int
 ) -> List[voiceover_domain.EntityVoiceovers]:
-    """Retrieve voiceover models for the specified exploration version.
+    """Retrieve entity voiceovers models for the specified exploration version.
 
     Args:
         entity_id: str. The entity ID for which entity voiceovers need to be
@@ -127,18 +127,19 @@ def get_entity_voiceovers_for_given_exploration(
         the specified exploration and version.
     """
     entity_voiceovers_objects: List[voiceover_domain.EntityVoiceovers] = []
-    entity_voiceover_models = (
+    entity_voiceovers_models = (
         voiceover_models.EntityVoiceoversModel.
         get_entity_voiceovers_for_given_exploration(
-            entity_id, entity_type, entity_version))
+            entity_id, entity_type, entity_version)
+    )
 
-    for model_instance in entity_voiceover_models:
+    for model_instance in entity_voiceovers_models:
         entity_voiceovers_objects.append(
             _get_entity_voiceovers_from_model(model_instance))
     return entity_voiceovers_objects
 
 
-def get_entity_voiceovers_for_given_language_code_of_exploration(
+def fetch_entity_voiceovers_by_language_code(
     entity_id: str, entity_type: str, entity_version: int, language_code: str
 ) -> List[voiceover_domain.EntityVoiceovers]:
     """Retrieve entity voiceover models for the specified exploration and
@@ -152,28 +153,26 @@ def get_entity_voiceovers_for_given_language_code_of_exploration(
         entity_version: int. The entity version of the given exploration for
             which entity voiceovers need to be fetched.
         language_code: str. The language code in which entity voiceovers need
-            to be fetched for exploration.
+            to be fetched for the given exploration ID.
 
     Returns:
         list(EntityVoiceovers). Returns a list of entity voiceover models for
-        the specified exploration and version.
+        the specified exploration data.
     """
     entity_voiceovers_for_exp = get_entity_voiceovers_for_given_exploration(
         entity_id, entity_type, entity_version)
 
-    print('Inside service file')
-    print(entity_voiceovers_for_exp)
-    print('Done')
-
     language_codes_mapping = get_all_language_accent_codes_for_voiceovers()
+
     supported_language_accent_codes = (
         language_codes_mapping.get(language_code, {}))
 
     entity_voiceovers_list = []
 
     for entity_voiceovers in entity_voiceovers_for_exp:
-        if entity_voiceovers.language_accent_code not in (
-                supported_language_accent_codes
+        if (
+            entity_voiceovers.language_accent_code not in
+            supported_language_accent_codes
         ):
             continue
         if not bool(entity_voiceovers.voiceovers):

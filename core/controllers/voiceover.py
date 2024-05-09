@@ -220,67 +220,6 @@ class GetSampleVoiceoversForGivenVoiceArtistHandler(
         self.render_json(self.values)
 
 
-class EntityVoiceoversHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Handler class to get entity voiceover data for a given language accent
-    code for a specific content.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'entity_type': {
-            'schema': {
-                'type': 'basestring'
-            }
-        },
-        'entity_id': {
-            'schema': {
-                'type': 'basestring'
-            }
-        },
-        'entity_version': {
-            'schema': {
-                'type': 'int'
-            }
-        },
-        'language_accent_code': {
-            'schema': {
-                'type': 'basestring'
-            }
-        },
-        'content_id': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.open_access
-    def get(
-        self,
-        entity_type: str,
-        entity_id: str,
-        entity_version: int,
-        language_accent_code: str,
-        content_id: str
-    ):
-        entity_voiceovers = (
-            voiceover_services.get_voiceovers_for_given_language_accent_code(
-                entity_type, entity_id, entity_version, language_accent_code
-            )
-        )
-        entity_voiceovers_dict = entity_voiceovers.to_dict()
-        voiceover_type_to_voiceovers = entity_voiceovers_dict['voiceovers'].get(
-            content_id, {})
-
-        self.values.update({
-            'voiceover_type_to_voiceovers': voiceover_type_to_voiceovers
-        })
-        self.render_json(self.values)
-
-
 class EntityVoiceoversBulkHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -322,8 +261,7 @@ class EntityVoiceoversBulkHandler(
         language_code: str,
     ):
         entity_voiceovers_list = (
-            voiceover_services.
-            get_entity_voiceovers_for_given_language_code_of_exploration(
+            voiceover_services.fetch_entity_voiceovers_by_language_code(
                 entity_id, entity_type, entity_version, language_code)
         )
 

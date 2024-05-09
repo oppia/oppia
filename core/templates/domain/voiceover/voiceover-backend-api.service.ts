@@ -22,7 +22,6 @@ import {Injectable} from '@angular/core';
 
 import {VoiceoverDomainConstants} from './voiceover-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {RecordedVoiceOverBackendDict} from 'domain/exploration/recorded-voiceovers.model';
 import {
   Voiceover,
   VoiceoverBackendDict,
@@ -118,6 +117,7 @@ interface VoiceArtistMetaDataBackendDict {
     [voiceArtistId: string]: string;
   };
 }
+
 export interface VoiceArtistMetadataResponse {
   voiceArtistIdToLanguageMapping: VoiceArtistIdToLanguageMapping;
   voiceArtistIdToVoiceArtistName: VoiceArtistIdToVoiceArtistName;
@@ -248,44 +248,7 @@ export class VoiceoverBackendApiService {
     });
   }
 
-  async fetchVoiceoversAsync(
-    entityType: string,
-    entitytId: string,
-    entityVersion: number,
-    languageAccentCode: string,
-    contentId: string
-  ): Promise<VoiceoverTypeToVoiceover> {
-    return new Promise((resolve, reject) => {
-      this.http
-        .get<VoiceoverTypeToVoiceoverBackendDict>(
-          this.urlInterpolationService.interpolateUrl(
-            VoiceoverDomainConstants.GET_ENTITY_VOICEOVERS,
-            {
-              entity_type: entityType,
-              entity_id: entitytId,
-              entity_version: String(entityVersion),
-              language_accent_code: languageAccentCode,
-              content_id: contentId,
-            }
-          )
-        )
-        .toPromise()
-        .then(response => {
-          let manualVoiceover = null;
-          if ('manual' in response.voiceover_type_to_voiceovers) {
-            manualVoiceover = Voiceover.createFromBackendDict(
-              response.voiceover_type_to_voiceovers['manual']
-            );
-          }
-
-          resolve({
-            manualVoiceover: manualVoiceover,
-          });
-        });
-    });
-  }
-
-  async fetchEntityVoiceoversForGivenLanguageCodeAsync(
+  async fetchEntityVoiceoversByLanguageCodeAsync(
     entityType: string,
     entitytId: string,
     entityVersion: number,

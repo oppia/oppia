@@ -51,13 +51,6 @@ angular
 angular
   .module('oppia')
   .constant(
-    'GET_ENTITY_VOICEOVERS',
-    VoiceoverDomainConstants.GET_ENTITY_VOICEOVERS
-  );
-
-angular
-  .module('oppia')
-  .constant(
     'GET_ENTITY_VOICEOVERS_BULK',
     VoiceoverDomainConstants.GET_ENTITY_VOICEOVERS_BULK
   );

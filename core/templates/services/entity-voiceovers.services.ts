@@ -13,32 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to fetch and store EntityVoiceovers for the given
- * entity in a given langauge code.
+ * @fileoverview Service to fetch EntityVoiceovers for the given entity in a
+ * given langauge code.
  */
 
 import {Injectable} from '@angular/core';
 import {downgradeInjectable} from '@angular/upgrade/static';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
-import {AlertsService} from './alerts.service';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 
-export interface LanguageCodeToEntityTranslations {
-  [languageCode: string]: EntityTranslation;
+export interface LanguageAccentCodeToEntityVoiceovers {
+  [languageAccentCode: string]: EntityVoiceovers;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class EntityVoiceoversService {
-  public entityId: string;
-  public entityType: string;
-  public entityVersion: number;
-  public languageCode: string;
-  public entityVoiceoversList: EntityVoiceovers[] = [];
-  public languageAccentCodeToEntityVoiceovers = {};
+  public entityId!: string;
+  public entityType!: string;
+  public entityVersion!: number;
+  public languageCode!: string;
+  public activeLanguageAccentCode!: string;
+  public languageAccentCodeToEntityVoiceovers: LanguageAccentCodeToEntityVoiceovers =
+    {};
 
   constructor(private voiceoverBackendApiService: VoiceoverBackendApiService) {}
 
@@ -58,53 +56,53 @@ export class EntityVoiceoversService {
     this.languageCode = languageCode;
   }
 
-  createLanguageAccentCodeToEntityVoiceovers() {
-    for (let entityVoiceovers of this.entityVoiceoversList) {
+  getLanguageCode(): string {
+    return this.languageCode;
+  }
+
+  setActiveLanguageAccentCode(languageAccentCode: string): void {
+    this.activeLanguageAccentCode = languageAccentCode;
+  }
+
+  getActiveLanguageAccentCode(): string {
+    return this.activeLanguageAccentCode;
+  }
+
+  createLanguageAccentCodeToEntityVoiceovers(
+    entityVoiceoversList: EntityVoiceovers[]
+  ): void {
+    for (let entityVoiceovers of entityVoiceoversList) {
       this.languageAccentCodeToEntityVoiceovers[
         entityVoiceovers.languageAccentCode
       ] = entityVoiceovers;
     }
   }
 
-  fetchEntityVoiceovers() {
+  fetchEntityVoiceovers(): void {
     this.voiceoverBackendApiService
-      .fetchEntityVoiceoversForGivenLanguageCodeAsync(
+      .fetchEntityVoiceoversByLanguageCodeAsync(
         this.entityType,
         this.entityId,
         this.entityVersion,
         this.languageCode
       )
-      .then(response => {
-        this.entityVoiceoversList = response;
-        this.createLanguageAccentCodeToEntityVoiceovers();
+      .then(entityVoiceoversList => {
+        this.createLanguageAccentCodeToEntityVoiceovers(entityVoiceoversList);
       });
   }
 
-  getLanguageCodes() {
-    let voiceoverLanguageCodes = [];
-    for (let entityVoiceovers of this.entityVoiceoversList) {
-      let languageAccentCode = entityVoiceovers.languageAccentCode;
-      voiceoverLanguageCodes.push(languageAccentCode);
-    }
-
-    return voiceoverLanguageCodes;
-  }
-
-  setEntityVoiceovers(entityVoiceoversList) {
-    this.entityVoiceoversList = entityVoiceoversList;
-    this.createLanguageAccentCodeToEntityVoiceovers();
-  }
-
-  getVoiceoverInGivenLanguageAccentCode(
+  getEntityVoiceoversByLanguageAccentCode(
     languageAccentCode
   ): EntityVoiceovers | undefined {
     return this.languageAccentCodeToEntityVoiceovers[languageAccentCode];
   }
 
-  addManualVoiceover(languageCode, newlyAddedEntityVoiceovers) {
-    this.languageAccentCodeToEntityVoiceovers[languageCode] =
+  addNewEntityVoiceovers(
+    languageAccentCode: string,
+    newlyAddedEntityVoiceovers: EntityVoiceovers
+  ): void {
+    this.languageAccentCodeToEntityVoiceovers[languageAccentCode] =
       newlyAddedEntityVoiceovers;
-    this.entityVoiceoversList.push(newlyAddedEntityVoiceovers);
   }
 }
 

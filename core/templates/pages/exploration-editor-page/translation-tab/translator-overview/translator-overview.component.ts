@@ -186,7 +186,9 @@ export class TranslatorOverviewComponent implements OnInit {
         this.loaderService.hideLoadingScreen();
       });
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
+    this.entityVoiceoversService.setActiveLanguageAccentCode(undefined);
     this.entityVoiceoversService.fetchEntityVoiceovers();
+    // this.translationStatusService.refresh();
   }
 
   getTranslationProgressAriaLabel(): string {
@@ -245,7 +247,7 @@ export class TranslatorOverviewComponent implements OnInit {
       let languageAccentCode = changeDict.language_accent_code;
 
       let entityVoiceovers =
-        this.entityVoiceoversService.getVoiceoverInGivenLanguageAccentCode(
+        this.entityVoiceoversService.getEntityVoiceoversByLanguageAccentCode(
           languageAccentCode
         );
 
@@ -258,16 +260,19 @@ export class TranslatorOverviewComponent implements OnInit {
           {}
         );
       }
-      let manualVoiceover = Voiceover.createFromBackendDict(voiceovers.manual);
+      if (Object.keys(voiceovers).length > 0) {
+        let manualVoiceover = Voiceover.createFromBackendDict(
+          voiceovers.manual
+        );
+        entityVoiceovers.voiceoversMapping[contentId] = {
+          manual: manualVoiceover,
+        };
 
-      entityVoiceovers.voiceovers[contentId] = {
-        manual: manualVoiceover,
-      };
-
-      this.entityVoiceoversService.addManualVoiceover(
-        languageAccentCode,
-        entityVoiceovers
-      );
+        this.entityVoiceoversService.addNewEntityVoiceovers(
+          languageAccentCode,
+          entityVoiceovers
+        );
+      }
     });
   }
 

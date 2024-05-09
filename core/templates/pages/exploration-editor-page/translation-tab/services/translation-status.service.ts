@@ -32,6 +32,7 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
 interface AvailabilityStatus {
   available: boolean;
@@ -65,7 +66,8 @@ export class TranslationStatusService implements OnInit {
     private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
     private entityTranslationsService: EntityTranslationsService,
     private stateEditorService: StateEditorService,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private entityVoiceoversService: EntityVoiceoversService
   ) {}
 
   ngOnInit(): void {
@@ -159,6 +161,9 @@ export class TranslationStatusService implements OnInit {
         let noVoiceoverCount = 0;
         let recordedVoiceovers =
           this.explorationStatesService.getRecordedVoiceoversMemento(stateName);
+
+        let state = this.explorationStatesService.getState(stateName);
+        let constentIds = state.getAllContentIds();
         let allContentIds = recordedVoiceovers.getAllContentIds();
         let interactionId =
           this.explorationStatesService.getInteractionIdMemento(stateName);
@@ -232,13 +237,36 @@ export class TranslationStatusService implements OnInit {
             }
           }
         });
+        let activeLanguageAccentCode =
+          this.entityVoiceoversService.getActiveLanguageAccentCode();
+        console.log('Computing colors of graph');
+        console.log(activeLanguageAccentCode);
+
+        let activeEntityVoiceovers =
+          this.entityVoiceoversService.getEntityVoiceoversByLanguageAccentCode(
+            activeLanguageAccentCode
+          );
+
+        let voiceoverContentIds = [];
+        if (activeEntityVoiceovers) {
+          voiceoverContentIds = Object.keys(
+            activeEntityVoiceovers.voiceoversMapping
+          );
+        }
+
         this.explorationTranslationContentNotAvailableCount +=
           noTranslationCount;
         this.explorationVoiceoverContentNotAvailableCount += noVoiceoverCount;
         if (
           this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled
         ) {
-          this.stateWiseStatusColor[stateName] = '#fff';
+          console.log(stateName);
+          let color = this.getStateGraphColorInVoiceoverMode(
+            constentIds,
+            voiceoverContentIds
+          );
+          console.log(color);
+          this.stateWiseStatusColor[stateName] = color;
         } else if (noTranslationCount === 0 && !stateNeedsUpdate) {
           this.stateWiseStatusColor[stateName] =
             this.ALL_ASSETS_AVAILABLE_COLOR;
@@ -255,7 +283,26 @@ export class TranslationStatusService implements OnInit {
     }
   }
 
-  numberOfContentNeedsVoiceovers() {}
+  getStateGraphColorInVoiceoverMode(
+    stateContentIdsNeedingVoiceover,
+    explorationContentIdsWithVoiceover
+  ) {
+    let color = this.NO_ASSETS_AVAILABLE_COLOR;
+    let allContentsHaveVoiceover: boolean = true;
+    for (let contentId of stateContentIdsNeedingVoiceover) {
+      if (explorationContentIdsWithVoiceover.indexOf(contentId) !== -1) {
+        color = this.FEW_ASSETS_AVAILABLE_COLOR;
+      } else {
+        allContentsHaveVoiceover = false;
+      }
+    }
+
+    if (allContentsHaveVoiceover) {
+      color = this.ALL_ASSETS_AVAILABLE_COLOR;
+    }
+
+    return color;
+  }
 
   _getContentIdListRelatedToComponent(
     componentName: string,
