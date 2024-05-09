@@ -401,7 +401,7 @@
     <div tabindex="0" class="oppia-learner-dash-section">
       <p class="oppia-learner-dash-section-heading">{{ 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate }}</p>
       <div *ngIf="noCommunityLessonActivity">
-        <h2 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" [innerHTML]="'I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION' | translate" class="empty-section"></h2>
+        <h2 class="empty-section"> {{ 'I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION' | translate }}</h2>
         <oppia-primary-button [customClasses]="'btn oppia-dashboard-intro-button'"
                               [buttonHref]="communityLibraryUrl"
                               [buttonText]="'I18N_ACTION_BROWSE_LESSONS' | translate">
@@ -425,7 +425,7 @@
         </ng-container>
       </card-display>
     </div>
-    <!--TODO(#18384): Moved saved data to home tab, totalLessonsInPlaylist/displayLessonsInPlaylist-->
+    <!--TODO(#18384): Move saved data to home tab, totalLessonsInPlaylist/displayLessonsInPlaylist-->
     <!--TODO(#18384): Remove subscriptions-->
     <div tabindex="0" class="subscriptions-section e2e-test-subscriptions-section" *ngIf="subscriptionsList.length !== 0">
       <h1 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION' | translate"></h1>
