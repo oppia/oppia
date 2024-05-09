@@ -289,8 +289,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 'default_value': 1,
             }, {
                 'name': 'catchMisspellings',
-                'description': 'Catch Misspellings (Detect if answer is' +
-                ' misspelled and nudge the learner to correct the' +
+                'description': 'Catch Misspellings (Detect if answer is'
+                ' misspelled and nudge the learner to correct the'
                 ' misspelling)',
                 'schema': {
                     'type': 'bool'
