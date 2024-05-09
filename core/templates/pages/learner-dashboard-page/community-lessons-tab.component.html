@@ -397,7 +397,7 @@
     </div>
   </ng-container>
   <div *ngIf="redesignFeatureFlag">
-    <p class="oppia-learner-dash-greeting mt-4"> {{ username }}'s Progress </p>
+    <p class="oppia-learner-dash-greeting mt-4"> {{ 'I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_HEADING' | translate: {username: username} }} </p>
     <div tabindex="0" class="oppia-learner-dash-section">
       <p class="oppia-learner-dash-section-heading">{{ 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate }}</p>
       <div *ngIf="noCommunityLessonActivity">
@@ -407,9 +407,8 @@
                               [buttonText]="'I18N_ACTION_BROWSE_LESSONS' | translate">
         </oppia-primary-button>
       </div>
-      <!--TODO(#18384): Rename headingI18n to community lessons-->
       <div class="incomplete-section e2e-test-incomplete-community-lessons-section" *ngIf="totalIncompleteLessonsList.length !== 0">
-        <card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION'" [numCards]="totalIncompleteLessonsList.length" [tabType]="'progress'">
+        <card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION'" [numCards]="totalIncompleteLessonsList.length" [tabType]="'progress'">
           <ng-container *ngFor="let summaryTile of displayIncompleteLessonsList; last as last">
             <lesson-card [story]="summaryTile" [last]="last"> </lesson-card>
           </ng-container>
@@ -418,8 +417,7 @@
     </div>
      <div tabindex="0" class="oppia-learner-dash-section e2e-test-completed-community-lessons-section" *ngIf="totalCompletedLessonsList.length !== 0">
       <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate }} </p>
-      <!--TODO(#18384): Rename headingI18n to community lessons-->
-      <card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION'" [numCards]="totalCompletedLessonsList.length" [tabType]="'progress'">
+      <card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION'" [numCards]="totalCompletedLessonsList.length" [tabType]="'progress'">
         <ng-container *ngFor="let summaryTile of displayCompletedLessonsList; last as last">
           <lesson-card [story]="summaryTile" [last]="last"> </lesson-card>
         </ng-container>
