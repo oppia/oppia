@@ -52,7 +52,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     """Test the story services module."""
 
     EXP_ID: Final = 'exp_id'
-    NODE_ID_1: Final = story_domain.NODE_ID_PREFIX + '1'
+    NODE_ID_1: Final = f'{story_domain.NODE_ID_PREFIX}1'
     NODE_ID_2: Final = 'node_2'
     USER_ID: Final = 'user'
 
