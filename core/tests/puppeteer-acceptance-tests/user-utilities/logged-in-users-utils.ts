@@ -94,6 +94,7 @@ const oppiaInstagramLinkIcon = '.oppia-instagram-follow';
 const oppiaTwitterLinkIcon = '.oppia-twitter-follow';
 const oppiaGithubLinkIcon = '.oppia-github-follow';
 const oppiaLinkedInLinkIcon = '.oppia-linkedin-follow';
+const oppiaAndroidAppButton = '.oppia-android-app-button';
 
 const browseOurLessonsButton = '.e2e-test-about-page-browse-our-lessons-button';
 const accessAndroidAppButton = '.e2e-test-about-page-access-android-app-button';
@@ -1333,6 +1334,17 @@ export class LoggedInUser extends BaseUser {
       oppiaLinkedInLinkIcon,
       testConstants.OppiaSocials.LinkedIn.Domain,
       testConstants.OppiaSocials.LinkedIn.Id
+    );
+  }
+
+  /**
+   * Clicks the Google Play banner in the footer.
+   */
+  async clickGooglePlayButtonInFooter(): Promise<void> {
+    await this.openSocialLinkInNewTabViaIcon(
+      oppiaAndroidAppButton,
+      testConstants.OppiaSocials.GooglePlay.Domain,
+      testConstants.OppiaSocials.GooglePlay.Id
     );
   }
 }

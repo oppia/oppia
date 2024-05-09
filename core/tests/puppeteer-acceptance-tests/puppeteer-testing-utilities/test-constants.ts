@@ -136,6 +136,10 @@ export default {
       Domain: 'linkedin.com',
       Id: 'oppia-org',
     },
+    GooglePlay: {
+      Domain: 'play.google.com',
+      Id: 'org.oppia.android',
+    },
   },
   DEFAULT_SPEC_TIMEOUT_MSECS: 300000,
 };

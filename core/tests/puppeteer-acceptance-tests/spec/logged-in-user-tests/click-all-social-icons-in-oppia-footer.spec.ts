@@ -85,6 +85,14 @@ describe('Logged-in Users', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
+  it(
+    'shoud be able to visit the Oppia Google Play page',
+    async function () {
+      await testUser.clickGooglePlayButtonInFooter();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
