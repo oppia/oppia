@@ -44,6 +44,7 @@ import {UserExplorationPermissionsService} from '../services/user-exploration-pe
 })
 export class EditorNavigationComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+  autosaveIsInProgress: boolean = false;
   screenIsLarge: boolean = false;
   isPublishButtonEnabled: boolean = false;
   postTutorialHelpPopoverIsShown: boolean = false;
@@ -276,6 +277,14 @@ export class EditorNavigationComponent implements OnInit, OnDestroy {
           } else {
             this.postTutorialHelpPopoverIsShown = false;
           }
+        }
+      )
+    );
+
+    this.directiveSubscriptions.add(
+      this.changeListService.autosaveInProgressEventEmitter.subscribe(
+        (autosaveInProgress: boolean) => {
+          this.autosaveIsInProgress = autosaveInProgress;
         }
       )
     );
