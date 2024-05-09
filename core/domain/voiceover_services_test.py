@@ -138,7 +138,7 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
             }
         )
         entity_voiceovers_model = (
-            voiceover_services.create_entity_voiceovers_model_instance(
+            voiceover_services.create_entity_voiceovers_model(
                 entity_voiceovers))
 
         self.assertEqual(

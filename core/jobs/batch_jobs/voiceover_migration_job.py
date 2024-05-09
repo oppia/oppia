@@ -52,11 +52,11 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
     DATASTORE_UPDATES_ALLOWED = True
 
     @classmethod
-    def create_entity_voiceovers_model_instance(
+    def create_entity_voiceovers_model(
         cls,
         entity_voiceovers: voiceover_domain.EntityVoiceovers
     ) -> voiceover_models.EntityVoiceoversModel:
-        """Creates an entity voiceovers model instance.
+        """Creates an instance of entity voiceovers model.
 
         Args:
             entity_voiceovers: EntityVoiceovers. An instance of the
@@ -67,10 +67,9 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
         """
         with datastore_services.get_ndb_context():
             entity_voiceovers_model = (
-                voiceover_services.create_entity_voiceovers_model_instance(
+                voiceover_services.create_entity_voiceovers_model(
                     entity_voiceovers))
 
-        entity_voiceovers_model.update_timestamps()
         return entity_voiceovers_model
 
     @classmethod
@@ -117,7 +116,7 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
                 content_id_to_voiceovers_mapping.items()):
             for language_code, (voice_artist_id, voiceover_dict) in (
                     language_code_to_voiceover_mapping.items()):
-                manual_voiceover_instance = state_domain.Voiceover.from_dict(
+                manual_voiceover = state_domain.Voiceover.from_dict(
                     voiceover_dict)
 
                 try:
@@ -159,7 +158,7 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
                 entity_voiceovers.add_voiceover(
                     content_id,
                     feconf.VoiceoverType.MANUAL,
-                    manual_voiceover_instance
+                    manual_voiceover
                 )
 
                 entity_voiceovers_id_to_entity_voiceovers[
@@ -168,7 +167,7 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
         return list(entity_voiceovers_id_to_entity_voiceovers.values())
 
     @classmethod
-    def extract_voice_artist_id_to_language_mapping(
+    def extract_voice_artist_id_to_language_code_mapping(
         cls,
         voice_artist_metadata_models: List[
             voiceover_models.VoiceArtistMetadataModel]
@@ -230,7 +229,7 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
             | 'Combine all model instances to a list' >> beam.combiners.ToList()
             | 'Create a dict with model IDs to model instances' >> beam.Map(
                 PopulateManualVoiceoversToEntityVoiceoversModelJob.
-                extract_voice_artist_id_to_language_mapping
+                extract_voice_artist_id_to_language_code_mapping
             )
         )
 
@@ -263,7 +262,6 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
             | 'Filter invalid exploration and voice artist link models' >> (
                 beam.Filter(
                     lambda element: (
-                        element[0] != '' and
                         len(element[1]['exploration_model']) > 0 and
                         len(element[1][
                             'exploration_voice_artists_link_model']) > 0
@@ -294,7 +292,7 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
             entity_voiceovers
             | 'Create models for entity voiceover domain objects' >> beam.Map(
                 PopulateManualVoiceoversToEntityVoiceoversModelJob.
-                create_entity_voiceovers_model_instance)
+                create_entity_voiceovers_model)
         )
 
         entity_voiceovers_models_result = (

@@ -156,7 +156,8 @@ class EntityVoiceoversModel(base_models.BaseModel):
             entity_id: str. The ID of the entity.
             entity_version: int. The version of the entity.
             language_accent_code: str. The language code for the entity.
-            voiceovers_mapping: dict(str, dict(str, VoiceoverDict)). A dict
+            voiceovers_mapping:
+                dict(str, dict(VoiceoverType.value, VoiceoverDict)). A dict
                 containing content IDs as keys and nested dicts as values. Each
                 nested dict contains str as keys and VoiceoverDict as values.
 

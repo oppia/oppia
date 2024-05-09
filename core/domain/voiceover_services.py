@@ -129,19 +129,20 @@ def get_all_language_accent_codes_for_voiceovers(
     return language_codes_mapping
 
 
-def create_entity_voiceovers_model_instance(
-    entity_voiceovers_instance: voiceover_domain.EntityVoiceovers
+def create_entity_voiceovers_model(
+    entity_voiceovers: voiceover_domain.EntityVoiceovers
 ) -> voiceover_models.EntityVoiceoversModel:
-    """Creates an entity voiceovers model instance.
+    """Creates an entity voiceovers model instance without putting it into
+    the datastore.
 
     Args:
-        entity_voiceovers_instance: EntityVoiceovers. An instance of the
+        entity_voiceovers: EntityVoiceovers. An instance of the
             entity voiceovers domain class.
 
     Returns:
         EntityVoiceoversModel. An instance of the entity voiceovers model.
     """
-    entity_voiceovers_dict = entity_voiceovers_instance.to_dict()
+    entity_voiceovers_dict = entity_voiceovers.to_dict()
 
     entity_id = entity_voiceovers_dict['entity_id']
     entity_type = entity_voiceovers_dict['entity_type']
