@@ -86,7 +86,7 @@ describe('Logged-in Users', function () {
   );
 
   it(
-    'shoud be able to visit the Oppia Google Play page',
+    'should be able to visit the Oppia Google Play page',
     async function () {
       await testUser.clickGooglePlayButtonInFooter();
     },
