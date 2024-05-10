@@ -32,15 +32,15 @@ export interface EdgeCentre {
 export class GraphDetailService {
   VERTEX_RADIUS: number = 6;
   EDGE_WIDTH: number = 3;
-  MIN_LEFT_MARGIN: number = 10;
+  MIN_MARGIN: number = 10;
 
-  getMinLeftMargin(graph: GraphAnswer): number {
+  getMinMargin(graph: GraphAnswer): number {
     if (!graph.isLabeled) {
-      return this.MIN_LEFT_MARGIN;
+      return this.MIN_MARGIN;
     }
     return Math.max(
       ...graph.vertices.map(
-        vertex => vertex.label.length * (this.MIN_LEFT_MARGIN / 2)
+        vertex => vertex.label.length * (this.MIN_MARGIN / 2)
       )
     );
   }

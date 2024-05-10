@@ -44,7 +44,7 @@ export class ResponseGraphInput {
   graph!: GraphAnswer;
   VERTEX_RADIUS!: number;
   EDGE_WIDTH!: number;
-  MIN_LEFT_MARGIN!: number;
+  MIN_MARGIN!: number;
   minX!: number;
   maxX!: number;
   WIDTH: number = 250;
@@ -65,7 +65,7 @@ export class ResponseGraphInput {
     this.VERTEX_RADIUS = this.graphDetailService.VERTEX_RADIUS;
     this.EDGE_WIDTH = this.graphDetailService.EDGE_WIDTH;
 
-    this.MIN_LEFT_MARGIN = this.graphDetailService.getMinLeftMargin(this.graph);
+    this.MIN_MARGIN = this.graphDetailService.getMinMargin(this.graph);
     this.minX = this.graphDetailService.getMinX(this.graph);
     this.maxX = this.graphDetailService.getMaxX(this.graph);
 
@@ -75,7 +75,7 @@ export class ResponseGraphInput {
   removeWhiteSpace(): void {
     this.graph.vertices = this.graph.vertices.map(vertex => {
       return {
-        x: vertex.x - this.minX + this.MIN_LEFT_MARGIN,
+        x: vertex.x - this.minX + this.MIN_MARGIN,
         y: vertex.y,
         label: vertex.label,
       };
@@ -112,12 +112,12 @@ export class ResponseGraphInput {
 
     var maxY = this.getMaxY();
     if (this.HEIGHT < maxY) {
-      scale = this.HEIGHT / (maxY + this.MIN_LEFT_MARGIN);
+      scale = this.HEIGHT / (maxY + this.MIN_MARGIN);
     }
 
     var maxX = this.getMaxX();
     if (this.WIDTH < maxX) {
-      var scaleX = this.WIDTH / (maxX + this.MIN_LEFT_MARGIN);
+      var scaleX = this.WIDTH / (maxX + this.MIN_MARGIN);
       if (scaleX < scale) {
         scale = scaleX;
       }

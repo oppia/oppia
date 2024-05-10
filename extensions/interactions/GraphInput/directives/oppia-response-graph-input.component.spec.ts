@@ -161,7 +161,7 @@ describe('ResponseGraphInput', () => {
     });
     expect(component.VERTEX_RADIUS).toBe(6);
     expect(component.EDGE_WIDTH).toBe(3);
-    expect(component.MIN_LEFT_MARGIN).toBe(10);
+    expect(component.MIN_MARGIN).toBe(10);
     expect(component.minX).toBe(10);
     expect(component.maxX).toBe(50);
   });
@@ -230,7 +230,7 @@ describe('ResponseGraphInput', () => {
     });
     expect(component.VERTEX_RADIUS).toBe(6);
     expect(component.EDGE_WIDTH).toBe(3);
-    expect(component.MIN_LEFT_MARGIN).toBe(15);
+    expect(component.MIN_MARGIN).toBe(15);
     expect(component.minX).toBe(10);
     expect(component.maxX).toBe(470);
   });

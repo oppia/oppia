@@ -57,7 +57,6 @@ export class InteractionDisplayComponent {
 
   ngAfterViewInit(): void {
     this.buildInteraction();
-    this.changeDetectorRef.detectChanges();
   }
 
   buildInteraction(): void {
