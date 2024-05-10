@@ -4844,3 +4844,16 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_binop(node)
+
+    def test_datetime_concatenation(self) -> None:
+        node = astroid.extract_node(
+        """
+        from datetime import datetime, timedelta
+        new_date = datetime.today() + timedelta(days=1) #@
+        """)
+
+        expression_node = node.value
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_binop(expression_node)
+
