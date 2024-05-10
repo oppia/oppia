@@ -800,7 +800,7 @@ def managed_acceptance_tests_server(
         common.NODE_MODULES_PATH, '.bin', 'jest')
 
     jest_args = [
-        nodemodules_jest_bin_path, 
+        nodemodules_jest_bin_path, 'logged-in-user-tests/click-all-buttons-on-about-page',
         '--config=jest.config.js --detectOpenHandles --forceExit'
     ]
 

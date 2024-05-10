@@ -201,6 +201,8 @@ export class LoggedInUser extends BaseUser {
       mathClassroomUrl,
       'Math Classroom'
     );
+
+    await this.screenshotMatch('Math Classroom');
   }
 
   /**

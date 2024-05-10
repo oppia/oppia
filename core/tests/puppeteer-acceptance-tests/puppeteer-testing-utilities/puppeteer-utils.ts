@@ -420,9 +420,9 @@ export class BaseUser {
    * Otherwise, it compares the screenshot with the image named as the given string to check if they match.
    * If they don't match, it generates an image in the file __diff_output__ to show the difference.
    */
-  async screenshotMatch(imageName: string): Promise<void> {
+  screenshotMatch(imageName: string) {
     try {
-      (<any>expect(await this.page.screenshot())).toMatchImageSnapshot({
+      (<any>expect(this.page.screenshot())).toMatchImageSnapshot({
         failureThreshold: '0.01',
         failureThresholdType: 'percent',
         customSnapshotIdentifier: imageName,
