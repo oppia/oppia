@@ -23,10 +23,11 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.platform import models
+from google.cloud.ndb.query import Query as Query
 
 from typing import (
-    Dict, Final, List, Literal, Mapping, Optional, Sequence, Tuple, TypedDict,
-    Union)
+    Dict, Final, Generic, List, Literal, Mapping, Optional, Sequence, Tuple, TypedDict,
+    TypeVar, Union)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -138,6 +139,8 @@ COMMUNITY_CONTRIBUTION_STATS_MODEL_ID: Final = 'community_contribution_stats'
 
 # Number of models to fetch for contributor admin dashboard stats.
 NUM_MODELS_PER_FETCH: Final = 500
+
+T = TypeVar('T')
 
 
 class SortChoices(enum.Enum):
@@ -2165,6 +2168,62 @@ class QuestionReviewStatsModel(base_models.BaseModel):
             }
         return user_data
 
+class TotalContributionStats(Generic[T]):
+    """Contains methods common in total contribution stats models for
+    translation submitter, translation reviewer, question submitter, question
+    reviewer.
+    """
+
+    @classmethod
+    def fetch_models_within_date_range(
+        self,
+        offset: int,
+        page_size: int,
+        sort_query: Query,
+        sorted_results: List[T],
+        date_range: utils.DateRange
+    ) -> Tuple[Sequence[T],
+            int]:
+        """fetch the models within a specified date range.
+
+        Args:
+            offset: int. Number of results to skip from the beginning of all
+                results matching the query.
+            page_size: int. Number of models to fetch.
+            sort_query: Query. A query for a given language code and topic ids.
+            sorted_results: List[T]. A list to store fetched models in sorted
+                order. 
+            date_range: utils.DateRange. The date range within which to fetch
+                users' contributions.
+
+        Returns:
+            2-tuple(sorted_results, next_offset). where:
+                sorted_results: Sequence[T]. The list of models which match the
+                    query.
+                next_offset: int. Number of results to skip in next batch.
+        """
+
+        next_offset = offset
+        while len(sorted_results) < page_size:
+            result_models: Sequence[T] = (
+                sort_query.fetch(
+                    NUM_MODELS_PER_FETCH, offset=next_offset))
+            if not result_models:
+                break
+            for result_model in result_models:
+                if len(sorted_results) == page_size:
+                    break
+                next_offset += 1
+                if (date_range.is_date_in_the_date_range(
+                    result_model.first_contribution_date) and (
+                    date_range.is_date_in_the_date_range(
+                        result_model.last_contribution_date))):
+                    sorted_results.append(result_model)
+
+        return (
+            sorted_results,
+            next_offset
+        )
 
 class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     """Records the Total Translation contribution stats and data of
@@ -2386,6 +2445,9 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     after this batch.
         """
 
+        totalContributionStats=TotalContributionStats[
+            TranslationSubmitterTotalContributionStatsModel]()
+
         sort_options_dict = {
             SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
                 -cls.last_contribution_date,
@@ -2429,23 +2491,13 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         sorted_results: List[
             TranslationSubmitterTotalContributionStatsModel] = []
 
-        next_offset = offset
-        while len(sorted_results) < page_size:
-            result_models: Sequence[
-                TranslationSubmitterTotalContributionStatsModel] = (
-                sort_query.fetch(
-                    NUM_MODELS_PER_FETCH, offset=next_offset))
-            if not result_models:
-                break
-            for result_model in result_models:
-                if len(sorted_results) == page_size:
-                    break
-                next_offset += 1
-                if (date_range.is_date_in_the_date_range(
-                    result_model.first_contribution_date) and (
-                    date_range.is_date_in_the_date_range(
-                        result_model.last_contribution_date))):
-                    sorted_results.append(result_model)
+        (sorted_results, next_offset) = (
+            totalContributionStats.fetch_models_within_date_range(
+                offset,
+                page_size,
+                sort_query,
+                sorted_results,
+                date_range))
 
         # Check whether we have more results.
         next_result_model: Sequence[
@@ -2791,7 +2843,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
-                    list(TranslationSubmitterTotalContributionStatsModel).
+                    list(TranslationReviewerTotalContributionStatsModel).
                     The list of models which match the supplied language_code
                     and date_range filters, returned in the order
                     specified by sort_by.
@@ -2800,6 +2852,9 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                     this batch. If False, there are no further results
                     after this batch.
         """
+
+        totalContributionStats=TotalContributionStats[
+            TranslationReviewerTotalContributionStatsModel]()
 
         sort_options_dict = {
             SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
@@ -2829,23 +2884,13 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         sorted_results: List[
             TranslationReviewerTotalContributionStatsModel] = []
 
-        next_offset = offset
-        while len(sorted_results) < page_size:
-            result_models: Sequence[
-                TranslationReviewerTotalContributionStatsModel] = (
-                sort_query.fetch(
-                    NUM_MODELS_PER_FETCH, offset=next_offset))
-            if not result_models:
-                break
-            for result_model in result_models:
-                if len(sorted_results) == page_size:
-                    break
-                next_offset += 1
-                if (date_range.is_date_in_the_date_range(
-                    result_model.first_contribution_date) and (
-                    date_range.is_date_in_the_date_range(
-                        result_model.last_contribution_date))):
-                    sorted_results.append(result_model)
+        (sorted_results, next_offset) = (
+            totalContributionStats.fetch_models_within_date_range(
+                offset,
+                page_size,
+                sort_query,
+                sorted_results,
+                date_range))
 
         # Check whether we have more results.
         next_result_model: Sequence[
@@ -3123,6 +3168,9 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     after this batch.
         """
 
+        totalContributionStats=TotalContributionStats[
+            QuestionSubmitterTotalContributionStatsModel]()
+
         sort_options_dict = {
             SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
                 -cls.last_contribution_date,
@@ -3162,23 +3210,13 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         sorted_results: List[
             QuestionSubmitterTotalContributionStatsModel] = []
 
-        next_offset = offset
-        while len(sorted_results) < page_size:
-            result_models: Sequence[
-                QuestionSubmitterTotalContributionStatsModel] = (
-                sort_query.fetch(
-                    NUM_MODELS_PER_FETCH, offset=next_offset))
-            if not result_models:
-                break
-            for result_model in result_models:
-                if len(sorted_results) == page_size:
-                    break
-                next_offset += 1
-                if (date_range.is_date_in_the_date_range(
-                    result_model.first_contribution_date) and (
-                    date_range.is_date_in_the_date_range(
-                        result_model.last_contribution_date))):
-                    sorted_results.append(result_model)
+        (sorted_results, next_offset) = (
+            totalContributionStats.fetch_models_within_date_range(
+                offset,
+                page_size,
+                sort_query,
+                sorted_results,
+                date_range))
 
         # Check whether we have more results.
         next_result_model: Sequence[
@@ -3415,6 +3453,9 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                     after this batch.
         """
 
+        totalContributionStats=TotalContributionStats[
+            QuestionReviewerTotalContributionStatsModel]()
+
         sort_options_dict = {
             SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
                 -cls.last_contribution_date,
@@ -3440,23 +3481,13 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         sorted_results: List[
             QuestionReviewerTotalContributionStatsModel] = []
 
-        next_offset = offset
-        while len(sorted_results) < page_size:
-            result_models: Sequence[
-                QuestionReviewerTotalContributionStatsModel] = (
-                sort_query.fetch(
-                    NUM_MODELS_PER_FETCH, offset=next_offset))
-            if not result_models:
-                break
-            for result_model in result_models:
-                if len(sorted_results) == page_size:
-                    break
-                next_offset += 1
-                if (date_range.is_date_in_the_date_range(
-                    result_model.first_contribution_date) and (
-                    date_range.is_date_in_the_date_range(
-                        result_model.last_contribution_date))):
-                    sorted_results.append(result_model)
+        (sorted_results, next_offset) = (
+            totalContributionStats.fetch_models_within_date_range(
+                offset,
+                page_size,
+                sort_query,
+                sorted_results,
+                date_range))
 
         # Check whether we have more results.
         next_result_model: Sequence[

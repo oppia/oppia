@@ -296,17 +296,19 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   changeStartDate(value: Date): void {
-    if (this.isValidStartDate(value)) {
-      this.startDateForUsersLastActivity = new Date(value);
-      this.createFilter();
+    if (!this.isValidStartDate(value)) {
+      return;
     }
+    this.startDateForUsersLastActivity = new Date(value);
+    this.createFilter();
   }
 
   changeEndDate(value: Date): void {
-    if (this.isValidEndDate(value)) {
-      this.endDateForUsersLastActivity = new Date(value);
-      this.createFilter();
+    if (!this.isValidEndDate(value)) {
+      return;
     }
+    this.endDateForUsersLastActivity = new Date(value);
+    this.createFilter();
   }
 
   applyTopicFilter(): void {
