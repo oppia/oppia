@@ -233,12 +233,12 @@ export class ExplorationRightsService {
     const categories = ['ownerNames', 'editorNames', 'viewerNames'] as const;
     let initialUsernamesByCategory: string[];
     type Category = (typeof categories)[number];
-    let userRole: Category;
+    let roleOfRemovedUser: Category;
     categories.forEach(category => {
-      if (this[category]?.includes(memberUsername)) {
+      if (this[category].includes(memberUsername)) {
         initialUsernamesByCategory = [...this[category]];
         this[category] = this[category].filter(name => name !== memberUsername);
-        userRole = category;
+        roleOfRemovedUser = category;
       }
     });
     return this.explorationRightsBackendApiService
@@ -263,7 +263,7 @@ export class ExplorationRightsService {
         );
       })
       .catch(error => {
-        this[userRole] = initialUsernamesByCategory;
+        this[roleOfRemovedUser] = initialUsernamesByCategory;
         this.alertsService.addWarning(
           'Failed to remove the user role. Please try again.'
         );

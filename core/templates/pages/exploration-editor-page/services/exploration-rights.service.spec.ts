@@ -265,7 +265,10 @@ describe('Exploration rights service', () => {
   }));
 
   it('should remove existing user', fakeAsync(() => {
-    serviceData.rights.viewer_names = ['newUser'];
+    ers.viewerNames = ['newUser'];
+    ers.editorNames = [];
+    ers.ownerNames = [];
+    serviceData.rights.viewer_names = [];
     spyOn(
       explorationRightsBackendApiService,
       'removeRoleAsyncDeleteData'
@@ -282,6 +285,8 @@ describe('Exploration rights service', () => {
 
   it('should remove user from UI before updating with backend data', fakeAsync(() => {
     ers.editorNames = ['editorName', 'newEditor'];
+    ers.viewerNames = [];
+    ers.ownerNames = [];
     serviceData.rights.editor_names = [];
     spyOn(
       explorationRightsBackendApiService,
