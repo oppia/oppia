@@ -38,10 +38,12 @@ describe('ObjectsDomainConstants', () => {
     const prefixes = math.Unit.PREFIXES;
     let prefixSet = new Set<string>();
     for (const name in prefixes) {
+      // Skip if prefix type is 'NONE'.
       if (name === 'NONE') {
         continue;
       }
       for (const prefix in prefixes[name]) {
+        // Each prefix type has an empty key that we can ignore.
         if (prefix === '') {
           continue;
         }
