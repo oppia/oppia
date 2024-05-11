@@ -62,6 +62,7 @@ export default {
     ProgrammingWithCarla: 'https://www.oppia.org/collection/inDXV0w8-p1C',
     Volunteer: 'http://localhost:8181/volunteer',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
+    ProfilePagePrefix: 'http://localhost:8181/profile',
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',

@@ -67,6 +67,9 @@ const CONSOLE_ERRORS_TO_IGNORE = [
       'the server responded with a status of 405 ()',
     'g'
   ),
+  // Error occurs due to ExpressionChangedAfterItHasBeenCheckedError.
+  // This can be removed after solving the issue #20189.
+  new RegExp('ERROR CONTEXT JSHandle@object.*'),
 ];
 
 const CONSOLE_ERRORS_TO_FIX = [
@@ -83,6 +86,11 @@ const CONSOLE_ERRORS_TO_FIX = [
   // TODO(#18372): KeyError: <state name> when the version history handler is hit.
   escapeRegExp(
     'Failed to load resource: the server responded with a status of 500'
+  ),
+  // TODO(#20189): ExpressionChangedAfterItHasBeenCheckedError console error In creator dashboard's Subscribers tab.
+  new RegExp(
+    'ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was ' +
+      "checked. Previous value: 'srcset: .*'\\. Current value: 'srcset: .*'\\."
   ),
 ];
 

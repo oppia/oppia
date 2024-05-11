@@ -20,6 +20,7 @@ import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
+const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const homeUrl = testConstants.URLs.Home;
 const aboutUrl = testConstants.URLs.About;
 const mathClassroomUrl = testConstants.URLs.MathClassroom;
@@ -113,6 +114,11 @@ const mobileSidevbarGetInvolvedMenuDonateButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
 const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
+
+const subscribeButton = 'button.oppia-subscription-button';
+const unsubscribeLabel = '.e2e-test-unsubscribe-label';
+const explorationCard = '.e2e-test-exploration-dashboard-card';
+
 export class LoggedInUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -709,6 +715,57 @@ export class LoggedInUser extends BaseUser {
       throw new Error('The Read Our Blog button does not open the Blog page!');
     } else {
       showMessage('The Read Our Blog button opens the Blog page.');
+    }
+  }
+
+  /**
+   * Function for navigating to the profile page for a given username.
+   */
+  async navigateToProfilePage(username: string): Promise<void> {
+    const profilePageUrl = `${profilePageUrlPrefix}/${username}`;
+    if (this.page.url() === profilePageUrl) {
+      return;
+    }
+    await this.goto(profilePageUrl);
+  }
+
+  /**
+   * Function to subscribe to a creator with the given username.
+   */
+  async subscribeToCreator(username: string): Promise<void> {
+    const profilePageUrl = `${profilePageUrlPrefix}/${username}`;
+
+    if (this.page.url() !== profilePageUrl) {
+      await this.navigateToProfilePage(username);
+    }
+
+    await this.clickOn(subscribeButton);
+    await this.page.waitForSelector(unsubscribeLabel);
+    showMessage(`Subscribed to the creator with username ${username}.`);
+  }
+
+  /**
+   * Checks whether the exploration with the given title is authored by the creator.
+   */
+  async expectExplorationToBePresentInProfilePageWithTitle(
+    title: string
+  ): Promise<void> {
+    await this.page.waitForSelector(explorationCard);
+    const explorations = await this.page.$$(explorationCard);
+
+    if (explorations.length === 0) {
+      throw new Error('There are no explorations authored by the creator.');
+    }
+
+    const explorationTitle = await explorations[0].$eval(
+      '.e2e-test-exp-summary-tile-title span span',
+      element => (element as HTMLElement).textContent
+    );
+
+    if (explorationTitle?.trim() === title) {
+      showMessage(`Exploration with title ${title} is present.`);
+    } else {
+      throw new Error(`Exploration with title ${title} is not present.`);
     }
   }
 
