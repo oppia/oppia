@@ -273,7 +273,7 @@ export class ContributionAndReviewBackendApiService {
     language: string | null,
     fromDate: string,
     toDate: string
-  ): Promise<ContributorCertificateResponse | null> {
+  ): Promise<ContributorCertificateResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.CONTRIBUTOR_CERTIFICATE_HANDLER_URL,
       {
@@ -293,7 +293,7 @@ export class ContributionAndReviewBackendApiService {
       params.language = language;
     }
     return this.http
-      .get<ContributorCertificateResponse | null>(url, {params} as Object)
+      .get<ContributorCertificateResponse>(url, {params} as Object)
       .toPromise();
   }
 }
