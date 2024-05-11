@@ -7335,20 +7335,23 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'reviewer_1', change_cmd, score_category,
             'exploration.exp1.thread_6', 'hi')
 
-        response = suggestion_services.generate_contributor_certificate_data(
-            self.username,
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            'hi',
-            self.from_date,
-            self.to_date,
-        )
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi',
+                self.from_date,
+                self.to_date,
+            ))
 
-        assert response is not None
+        # Ruling out the possibility of None for mypy type checking.
+        assert certificate_data is not None
+
         self.assertEqual(
-            response['contribution_hours'],
+            certificate_data['contribution_hours'],
             self._calculate_translation_contribution_hours(3)
         )
-        self.assertEqual(response['language'], 'Hindi')
+        self.assertEqual(certificate_data['language'], 'Hindi')
 
     def test_create_translation_contributor_certificate_for_rule_translation(
         self
@@ -7364,20 +7367,23 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'reviewer_1', change_cmd, score_category,
             'exploration.exp1.thread_6', 'hi')
 
-        response = suggestion_services.generate_contributor_certificate_data(
-            self.username,
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            'hi',
-            self.from_date,
-            self.to_date,
-        )
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi',
+                self.from_date,
+                self.to_date,
+            ))
 
-        assert response is not None
+        # Ruling out the possibility of None for mypy type checking.
+        assert certificate_data is not None
+
         self.assertEqual(
-            response['contribution_hours'],
+            certificate_data['contribution_hours'],
             self._calculate_translation_contribution_hours(4)
         )
-        self.assertEqual(response['language'], 'Hindi')
+        self.assertEqual(certificate_data['language'], 'Hindi')
 
     def test_create_translation_contributor_certificate_for_english(
         self
@@ -7401,20 +7407,23 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'reviewer_1', change_cmd, score_category,
             'exploration.exp1.thread_6', 'en')
 
-        response = suggestion_services.generate_contributor_certificate_data(
-            self.username,
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            'en',
-            self.from_date,
-            self.to_date,
-        )
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'en',
+                self.from_date,
+                self.to_date,
+            ))
 
-        assert response is not None
+        # Ruling out the possibility of None for mypy type checking.
+        assert certificate_data is not None
+
         self.assertEqual(
-            response['contribution_hours'],
+            certificate_data['contribution_hours'],
             self._calculate_translation_contribution_hours(3)
         )
-        self.assertEqual(response['language'], 'English')
+        self.assertEqual(certificate_data['language'], 'English')
 
     def test_create_question_contributor_certificate(self) -> None:
         content_id_generator = translation_domain.ContentIdGenerator()
@@ -7456,17 +7465,20 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'reviewer_2', suggestion_change, 'category1',
             'thread_1', 'en')
 
-        response = suggestion_services.generate_contributor_certificate_data(
-            self.username,
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            None,
-            self.from_date,
-            self.to_date,
-        )
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                None,
+                self.from_date,
+                self.to_date,
+            ))
 
-        assert response is not None
+        # Ruling out the possibility of None for mypy type checking.
+        assert certificate_data is not None
+
         self.assertEqual(
-            response['contribution_hours'],
+            certificate_data['contribution_hours'],
             self._calculate_question_contribution_hours(False)
         )
 
@@ -7513,45 +7525,50 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'reviewer_2', suggestion_change, 'category1',
             'thread_1', 'en')
 
-        response = suggestion_services.generate_contributor_certificate_data(
-            self.username,
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            None,
-            self.from_date,
-            self.to_date,
-        )
-
-        assert response is not None
-        self.assertEqual(
-            response['contribution_hours'],
-            self._calculate_question_contribution_hours(True)
-        )
-
-    def test_create_contributor_certificate_raises_exception_for_no_suggestions(
-        self
-    ) -> None:
-        data = suggestion_services.generate_contributor_certificate_data(
-                self.username,
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                'hi',
-                self.from_date,
-                self.to_date,
-        )
-
-        self.assertIsNone(data)
-
-    def test_create_certificate_raises_exception_for_no_question_suggestions(
-        self
-    ) -> None:
-        data = suggestion_services.generate_contributor_certificate_data(
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
                 self.username,
                 feconf.SUGGESTION_TYPE_ADD_QUESTION,
                 None,
                 self.from_date,
                 self.to_date,
-            )
+            ))
 
-        self.assertIsNone(data)
+        # Ruling out the possibility of None for mypy type checking.
+        assert certificate_data is not None
+
+        self.assertEqual(
+            certificate_data['contribution_hours'],
+            self._calculate_question_contribution_hours(True)
+        )
+
+    def test_create_certificate_returns_none_for_no_translation_suggestions(
+        self
+    ) -> None:
+        certificate_data = (
+                suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi',
+                self.from_date,
+                self.to_date,
+            ))
+
+        self.assertIsNone(certificate_data)
+
+    def test_create_certificate_returns_none_for_no_question_suggestions(
+        self
+    ) -> None:
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                None,
+                self.from_date,
+                self.to_date,
+            ))
+
+        self.assertIsNone(certificate_data)
 
     def test_create_contributor_certificate_raises_exception_for_wrong_language(
         self
