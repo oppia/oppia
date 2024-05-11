@@ -63,7 +63,7 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
                 entity voiceovers domain class.
 
         Returns:
-            EntityVoiceoversModel. An instance of the entity voiceover model.
+            EntityVoiceoversModel. An instance of the entity voiceovers model.
         """
         with datastore_services.get_ndb_context():
             entity_voiceovers_model = (
@@ -257,7 +257,7 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
                 paired_exploration_voice_artists_link_models),
         } | 'Group by Exploration ID' >> beam.CoGroupByKey()
 
-        entity_voiceovers = (
+        entity_voiceovers_objects = (
             grouped_models
             | 'Filter invalid exploration and voice artist link models' >> (
                 beam.Filter(
@@ -289,7 +289,7 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
         )
 
         entity_voiceovers_models = (
-            entity_voiceovers
+            entity_voiceovers_objects
             | 'Create models for entity voiceover domain objects' >> beam.Map(
                 PopulateManualVoiceoversToEntityVoiceoversModelJob.
                 create_entity_voiceovers_model)
