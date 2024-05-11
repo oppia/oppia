@@ -243,6 +243,11 @@ URLS = [
         access_validators.BlogHomePageAccessValidationHandler),
 
     get_redirect_route(
+        r'%s/can_access_subtopic_viewer_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.SubtopicViewerPageAccessValidator),
+
+    get_redirect_route(
         r'%s/can_access_blog_post_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.BlogPostPageAccessValidationHandler),

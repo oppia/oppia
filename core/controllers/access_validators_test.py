@@ -20,7 +20,7 @@ import datetime
 
 from core import feature_flag_list
 from core import feconf
-from core.domain import classroom_config_domain
+from core.domain import classroom_config_domain, state_domain, subtopic_page_domain, subtopic_page_services, topic_domain, topic_services, translation_domain
 from core.domain import classroom_config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
@@ -171,6 +171,91 @@ class CollectionViewerPageAccessValidationHandlerTests(
             (ACCESS_VALIDATION_HANDLER_PREFIX, 'none'),
             expected_status_int=404)
         self.logout()
+
+
+class SubtopicViewerPageAccessValidationHandlerTests(
+    test_utils.GenericTestBase):
+    """Test for subtopic viewer page access validation."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.topic_id = 'topic_id'
+        self.subtopic_id_1 = 1
+        self.subtopic_id_2 = 2
+        self.subtopic_page_1 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id_1, self.topic_id))
+        self.subtopic_page_2 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id_2, self.topic_id))
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id, self.subtopic_page_1, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': self.subtopic_id_1,
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment'
+            })]
+        )
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id, self.subtopic_page_2, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': self.subtopic_id_2,
+                'title': 'Sample',
+                'url_fragment': 'dummy-fragment'
+            })]
+        )
+        subtopic_page_private_topic = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id_1, 'topic_id_2'))
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id, subtopic_page_private_topic, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': self.subtopic_id_1,
+                'title': 'Sample',
+                'url_fragment': 'dummy-fragment-one'
+            })]
+        )
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title', 'url-frag')
+        subtopic.skill_ids = ['skill_id_1']
+        subtopic.url_fragment = 'sub-url-frag-one'
+        subtopic2 = topic_domain.Subtopic.create_default_subtopic(
+            2, 'Subtopic Title 2', 'url-frag-two')
+        subtopic2.skill_ids = ['skill_id_2']
+        subtopic2.url_fragment = 'sub-url-frag-two'
+
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='name', url_fragment='name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic, subtopic2], next_subtopic_id=3)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        self.save_new_topic(
+            'topic_id_2', self.admin_id, name='Private_Name',
+            abbreviated_name='pvttopic', url_fragment='pvttopic',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
+
+
+    def test_any_user_can_access_subtopic_viewer_page(self) -> None:
+        params = {
+            "classroom_url_fragment": "staging",
+            "topic_url_fragment": "name",
+            "subtopic_url_fragment": "sub-url-frag-one"
+        }
+        self.get_json(
+            '%s/can_access_subtopic_viewer_page' %
+            ACCESS_VALIDATION_HANDLER_PREFIX, params=params, expected_status_int=200)
 
 
 class ReleaseCoordinatorAccessValidationHandlerTests(
