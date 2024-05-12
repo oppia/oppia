@@ -247,15 +247,11 @@ class SubtopicViewerPageAccessValidationHandlerTests(
             subtopics=[subtopic], next_subtopic_id=2)
 
 
+    # TODO: verift this after making frontend changes, add tests for failures as well.
     def test_any_user_can_access_subtopic_viewer_page(self) -> None:
-        params = {
-            "classroom_url_fragment": "staging",
-            "topic_url_fragment": "name",
-            "subtopic_url_fragment": "sub-url-frag-one"
-        }
         self.get_json(
-            '%s/can_access_subtopic_viewer_page' %
-            ACCESS_VALIDATION_HANDLER_PREFIX, params=params, expected_status_int=200)
+            '%s/can_access_subtopic_viewer_page/staging/name/revision/sub-url-frag-one' %
+            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
 
 
 class ReleaseCoordinatorAccessValidationHandlerTests(
