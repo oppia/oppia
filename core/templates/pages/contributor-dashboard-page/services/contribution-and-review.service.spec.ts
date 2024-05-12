@@ -300,7 +300,7 @@ describe('Contribution and review service', () => {
             contribution_hours: 1.0,
             team_lead: 'Test User',
             language: 'Hindi',
-          }
+          },
         })
       );
 
@@ -328,7 +328,7 @@ describe('Contribution and review service', () => {
     it('should return null when contributor certificate data is unavailable', () => {
       downloadContributorCertificateAsyncSpy.and.returnValue(
         Promise.resolve({
-          certificate_data: null
+          certificate_data: null,
         })
       );
 
