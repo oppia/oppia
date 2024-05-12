@@ -201,6 +201,9 @@ def add_or_update_user_status(
 
     Raises:
         Exception. Raised if the tag or merge fields are invalid.
+        MailChimpError. Raised if MailChimp throws an error besides a 404 error
+            for a missing user. Should be caught by outer try-except block so
+            long as the error thrown by MailChimp inherits from Exception.
     """
     client = _get_mailchimp_class()
     if not client:
