@@ -252,7 +252,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         explorationData.version,
         explorationData.language_code
       );
-      this.entityVoiceoversService.fetchEntityVoiceovers();
 
       this.explorationTitleService.init(explorationData.title);
       this.explorationCategoryService.init(

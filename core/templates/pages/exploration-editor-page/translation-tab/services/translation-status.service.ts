@@ -101,6 +101,36 @@ export class TranslationStatusService implements OnInit {
     return availabilityStatus;
   }
 
+  _getEntityVoiceoverStatus(contentId): AvailabilityStatus {
+    let availabilityStatus = {
+      available: false,
+      needsUpdate: false,
+    };
+    let activeLanguageAccentCode =
+      this.entityVoiceoversService.getActiveLanguageAccentCode();
+    let entityVoiceovers =
+      this.entityVoiceoversService.getEntityVoiceoversByLanguageAccentCode(
+        activeLanguageAccentCode
+      );
+
+    // console.log('Calculating status')
+    // console.log(entityVoiceovers)
+    if (entityVoiceovers === undefined) {
+      return availabilityStatus;
+    }
+
+    let voiceover = entityVoiceovers.getManualVoiceover(contentId);
+
+    if (voiceover === undefined) {
+      return availabilityStatus;
+    }
+    // console.log(voiceover)
+    availabilityStatus.available = true;
+    availabilityStatus.needsUpdate = voiceover.needsUpdate;
+
+    return availabilityStatus;
+  }
+
   _getTranslationStatus(contentId: string): AvailabilityStatus {
     let availabilityStatus = {
       available: false,
@@ -128,6 +158,9 @@ export class TranslationStatusService implements OnInit {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return this._getTranslationStatus(contentId);
     } else {
+      if (this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled) {
+        return this._getEntityVoiceoverStatus(contentId);
+      }
       this.langCode = this.translationLanguageService.getActiveLanguageCode();
       let recordedVoiceovers =
         this.explorationStatesService.getRecordedVoiceoversMemento(stateName);
@@ -162,8 +195,6 @@ export class TranslationStatusService implements OnInit {
         let recordedVoiceovers =
           this.explorationStatesService.getRecordedVoiceoversMemento(stateName);
 
-        let state = this.explorationStatesService.getState(stateName);
-        let constentIds = state.getAllContentIds();
         let allContentIds = recordedVoiceovers.getAllContentIds();
         let interactionId =
           this.explorationStatesService.getInteractionIdMemento(stateName);
@@ -239,8 +270,8 @@ export class TranslationStatusService implements OnInit {
         });
         let activeLanguageAccentCode =
           this.entityVoiceoversService.getActiveLanguageAccentCode();
-        console.log('Computing colors of graph');
-        console.log(activeLanguageAccentCode);
+        // console.log('Computing colors of graph');
+        // console.log(activeLanguageAccentCode);
 
         let activeEntityVoiceovers =
           this.entityVoiceoversService.getEntityVoiceoversByLanguageAccentCode(
@@ -260,12 +291,12 @@ export class TranslationStatusService implements OnInit {
         if (
           this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled
         ) {
-          console.log(stateName);
+          // console.log(stateName);
           let color = this.getStateGraphColorInVoiceoverMode(
-            constentIds,
+            allContentIds,
             voiceoverContentIds
           );
-          console.log(color);
+          // console.log(color);
           this.stateWiseStatusColor[stateName] = color;
         } else if (noTranslationCount === 0 && !stateNeedsUpdate) {
           this.stateWiseStatusColor[stateName] =

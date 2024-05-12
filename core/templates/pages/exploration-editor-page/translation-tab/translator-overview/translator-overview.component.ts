@@ -47,6 +47,8 @@ import {
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {LocalStorageService} from 'services/local-storage.service';
 
 @Component({
   selector: 'oppia-translator-overview',
@@ -68,6 +70,12 @@ export class TranslatorOverviewComponent implements OnInit {
   allAudioLanguageCodes!: string[];
   LAST_SELECTED_TRANSLATION_LANGUAGE!: string;
   languageCodesAndDescriptions!: {id: string; description: string}[];
+  languageAccentMasterList;
+  languageCodesMapping;
+  availableLanguageAccentCodesToDescriptions;
+  supportedLanguageAccentCodesToDescriptions;
+  supportedLanguageAccentCodesLength;
+  selectedLanguageAccentCode = '';
 
   constructor(
     private contextService: ContextService,
@@ -85,6 +93,8 @@ export class TranslatorOverviewComponent implements OnInit {
     private translationStatusService: TranslationStatusService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private platformFeatureService: PlatformFeatureService,
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private localStorageService: LocalStorageService,
     private windowRef: WindowRef
   ) {}
 
@@ -186,9 +196,10 @@ export class TranslatorOverviewComponent implements OnInit {
         this.loaderService.hideLoadingScreen();
       });
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
-    this.entityVoiceoversService.setActiveLanguageAccentCode(undefined);
-    this.entityVoiceoversService.fetchEntityVoiceovers();
-    // this.translationStatusService.refresh();
+    this.localStorageService.setLastSelectedLanguageAccentCode(undefined);
+    this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+      this.updateLanguageAccentCodesDropdownOptions();
+    });
   }
 
   getTranslationProgressAriaLabel(): string {
@@ -239,43 +250,6 @@ export class TranslatorOverviewComponent implements OnInit {
     });
   }
 
-  updateVoiceoverWithChangeList(): void {
-    this.changeListService.getVoiceoverChangeList().forEach(changeDict => {
-      changeDict = changeDict as ExplorationChangeEditVoiceovers;
-      let contentId = changeDict.content_id;
-      let voiceovers = changeDict.voiceovers;
-      let languageAccentCode = changeDict.language_accent_code;
-
-      let entityVoiceovers =
-        this.entityVoiceoversService.getEntityVoiceoversByLanguageAccentCode(
-          languageAccentCode
-        );
-
-      if (entityVoiceovers === undefined) {
-        entityVoiceovers = new EntityVoiceovers(
-          this.entityVoiceoversService.entityId,
-          this.entityVoiceoversService.entityType,
-          this.entityVoiceoversService.entityVersion,
-          languageAccentCode,
-          {}
-        );
-      }
-      if (Object.keys(voiceovers).length > 0) {
-        let manualVoiceover = Voiceover.createFromBackendDict(
-          voiceovers.manual
-        );
-        entityVoiceovers.voiceoversMapping[contentId] = {
-          manual: manualVoiceover,
-        };
-
-        this.entityVoiceoversService.addNewEntityVoiceovers(
-          languageAccentCode,
-          entityVoiceovers
-        );
-      }
-    });
-  }
-
   ngOnInit(): void {
     this.LAST_SELECTED_TRANSLATION_LANGUAGE = 'last_selected_translation_lang';
     let lastSelectedTranslationLanguage =
@@ -319,8 +293,67 @@ export class TranslatorOverviewComponent implements OnInit {
         this.refreshDirectiveScope();
       });
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
-    this.entityVoiceoversService.fetchEntityVoiceovers();
-    this.updateVoiceoverWithChangeList();
+
+    this.voiceoverBackendApiService
+      .fetchVoiceoverAdminDataAsync()
+      .then(voiceoverLanguages => {
+        this.languageAccentMasterList =
+          voiceoverLanguages.languageAccentMasterList;
+        this.languageCodesMapping = voiceoverLanguages.languageCodesMapping;
+
+        this.updateLanguageAccentCodesDropdownOptions();
+      });
+  }
+
+  updateLanguageAccentCodesDropdownOptions(): void {
+    this.availableLanguageAccentCodesToDescriptions = {};
+    this.supportedLanguageAccentCodesToDescriptions = {};
+    this.supportedLanguageAccentCodesLength = 0;
+
+    this.availableLanguageAccentCodesToDescriptions =
+      this.languageAccentMasterList[this.languageCode];
+
+    const supportedLanguageAccentCodes =
+      this.languageCodesMapping[this.languageCode];
+
+    for (let accentCode in supportedLanguageAccentCodes) {
+      const description =
+        this.availableLanguageAccentCodesToDescriptions[accentCode];
+      this.supportedLanguageAccentCodesToDescriptions[accentCode] = description;
+    }
+
+    this.supportedLanguageAccentCodesLength = Object.keys(
+      this.supportedLanguageAccentCodesToDescriptions
+    ).length;
+
+    if (this.supportedLanguageAccentCodesLength === 0) {
+      this.selectedLanguageAccentCode = '';
+      this.updateLanguageAccentCode(this.selectedLanguageAccentCode);
+      return;
+    }
+
+    let firstLanguageAccentCode = Object.keys(
+      this.supportedLanguageAccentCodesToDescriptions
+    )[0];
+
+    let lastSelectedLanguageAccentCode =
+      this.localStorageService.getLastSelectedLanguageAccentCode();
+    if (lastSelectedLanguageAccentCode !== 'undefined') {
+      this.selectedLanguageAccentCode = lastSelectedLanguageAccentCode;
+    } else {
+      this.selectedLanguageAccentCode = firstLanguageAccentCode;
+      this.localStorageService.setLastSelectedLanguageAccentCode(
+        firstLanguageAccentCode
+      );
+    }
+    this.updateLanguageAccentCode(this.selectedLanguageAccentCode);
+  }
+
+  updateLanguageAccentCode(languageAccentCode: string): void {
+    this.selectedLanguageAccentCode = languageAccentCode;
+    this.translationLanguageService.setActiveLanguageAccentCode(
+      languageAccentCode
+    );
   }
 }
 

@@ -220,6 +220,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   }
 
   onTabClick(tabId: string): void {
+    console.log(tabId);
     if (this.isDisabled(tabId)) {
       return;
     }
@@ -270,6 +271,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       activeDataFormat = this.RULE_INPUT_TYPES_TO_DATA_FORMATS[inputType];
       this.activeRuleContentIndex = 0;
     }
+    console.log('1');
     this.translationTabActiveContentIdService.setActiveContent(
       activeContentId,
       activeDataFormat
@@ -434,6 +436,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
     this.activeHintIndex = newIndex;
     let activeContentId = this.stateHints[newIndex].hintContent.contentId;
+    console.log('2');
     this.translationTabActiveContentIdService.setActiveContent(
       activeContentId,
       TRANSLATION_DATA_FORMAT_HTML
@@ -454,6 +457,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     const activeContentId = contentId;
     const inputType = rule.inputTypes[inputName];
     const activeDataFormat = this.RULE_INPUT_TYPES_TO_DATA_FORMATS[inputType];
+    console.log('3');
 
     this.translationTabActiveContentIdService.setActiveContent(
       activeContentId,
@@ -483,6 +487,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     } else if (activeContent instanceof SubtitledHtml) {
       activeDataFormat = TRANSLATION_DATA_FORMAT_HTML;
     }
+    console.log('4');
 
     this.translationTabActiveContentIdService.setActiveContent(
       activeContentId,
@@ -507,6 +512,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         activeContentId =
           this.stateAnswerGroups[newIndex].outcome.feedback.contentId;
       }
+      console.log('5');
 
       this.translationTabActiveContentIdService.setActiveContent(
         activeContentId,
@@ -732,9 +738,9 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         'Translation needs update ' +
         'to match text. Please re-translate the content.';
     }
-    this.isDisabled(this.activeTab) || !this.activeTab
+    this.isDisabled(this.activatedTabId) || !this.activatedTabId
       ? this.onTabClick(this.TAB_ID_CONTENT)
-      : this.onTabClick(this.activeTab);
+      : this.onTabClick(this.activatedTabId);
 
     this.updateTranslatedContent();
   }
@@ -770,7 +776,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         this.initStateTranslation()
       )
     );
-
+    console.log('init state translation');
     this.initStateTranslation();
     this.initActiveIndex = this.getIndexOfActiveCard();
     this.stateEditorService.setInitActiveContentId(null);

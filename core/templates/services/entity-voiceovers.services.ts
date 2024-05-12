@@ -78,17 +78,32 @@ export class EntityVoiceoversService {
     }
   }
 
-  fetchEntityVoiceovers(): void {
-    this.voiceoverBackendApiService
-      .fetchEntityVoiceoversByLanguageCodeAsync(
-        this.entityType,
-        this.entityId,
-        this.entityVersion,
-        this.languageCode
-      )
-      .then(entityVoiceoversList => {
-        this.createLanguageAccentCodeToEntityVoiceovers(entityVoiceoversList);
-      });
+  async fetchEntityVoiceovers(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      console.log('service method');
+      console.log('----------');
+      console.log('----------');
+      console.log('----------');
+
+      this.voiceoverBackendApiService
+        .fetchEntityVoiceoversByLanguageCodeAsync(
+          this.entityType,
+          this.entityId,
+          this.entityVersion,
+          this.languageCode
+        )
+        .then(entityVoiceoversList => {
+          console.log('----------');
+          console.log('----------');
+          console.log('----------');
+          console.log('----------');
+          console.log('----------');
+
+          console.log('Data entity voiceovers fetched');
+          this.createLanguageAccentCodeToEntityVoiceovers(entityVoiceoversList);
+          resolve();
+        });
+    });
   }
 
   getEntityVoiceoversByLanguageAccentCode(
@@ -97,12 +112,16 @@ export class EntityVoiceoversService {
     return this.languageAccentCodeToEntityVoiceovers[languageAccentCode];
   }
 
-  addNewEntityVoiceovers(
+  addEntityVoiceovers(
     languageAccentCode: string,
     newlyAddedEntityVoiceovers: EntityVoiceovers
   ): void {
     this.languageAccentCodeToEntityVoiceovers[languageAccentCode] =
       newlyAddedEntityVoiceovers;
+  }
+
+  removeEntityVoiceovers(languageAccentCode: string): void {
+    delete this.languageAccentCodeToEntityVoiceovers[languageAccentCode];
   }
 }
 
