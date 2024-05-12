@@ -27,6 +27,9 @@ from core.constants import constants
 
 from typing import Callable, Dict, Final, List, TypedDict, Union
 
+# Constant to dictate initial value for the version
+INITIAL_ENTITY_VERSION = 0
+
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
 ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'

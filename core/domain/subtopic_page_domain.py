@@ -345,7 +345,7 @@ class SubtopicPage:
             subtopic_page_id, topic_id,
             SubtopicPageContents.create_default_subtopic_page_contents(),
             feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0)
+            constants.DEFAULT_LANGUAGE_CODE, feconf.INITIAL_ENTITY_VERSION)
 
     @classmethod
     def convert_html_fields_in_subtopic_page_contents(
