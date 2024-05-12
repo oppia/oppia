@@ -452,5 +452,88 @@ describe('NumberWithUnitsObjectFactory', () => {
         ).toThrowError('Number with type fraction cannot have a real part.');
       }
     );
+
+    it('should convert units to their canonical form', () => {
+      expect(
+        new NumberWithUnits(
+          'real',
+          1,
+          new Fraction(false, 0, 0, 1),
+          uof.fromRawInputString('celsius / meter')
+        ).getCanonicalRepresentationOfUnits()
+      ).toEqual(
+        new Units([
+          {unit: 'degC', exponent: 1},
+          {unit: 'm', exponent: -1},
+        ]).units
+      );
+
+      expect(
+        new NumberWithUnits(
+          'real',
+          24,
+          new Fraction(false, 0, 0, 1),
+          uof.fromRawInputString('dollar / megatonne')
+        ).getCanonicalRepresentationOfUnits()
+      ).toEqual(
+        new Units([
+          {unit: 'dollar', exponent: 1},
+          {unit: 'Mton', exponent: -1},
+        ]).units
+      );
+
+      expect(
+        new NumberWithUnits(
+          'real',
+          1,
+          new Fraction(false, 0, 0, 1),
+          uof.fromRawInputString('m / in')
+        ).getCanonicalRepresentationOfUnits()
+      ).toEqual(
+        new Units([
+          {unit: 'in', exponent: -1},
+          {unit: 'm', exponent: 1},
+        ]).units
+      );
+
+      expect(
+        new NumberWithUnits(
+          'real',
+          1,
+          new Fraction(false, 0, 0, 1),
+          uof.fromRawInputString('m / Rupee')
+        ).getCanonicalRepresentationOfUnits()
+      ).toEqual(
+        new Units([
+          {unit: 'm', exponent: 1},
+          {unit: 'Rs', exponent: -1},
+        ]).units
+      );
+    });
+
+    it('should convert units to their canonical form and sort them lexographically', () => {
+      expect(
+        new NumberWithUnits(
+          'real',
+          1,
+          new Fraction(false, 0, 0, 1),
+          new Units([
+            {unit: 'newton', exponent: 1},
+            {unit: 'meter', exponent: -1},
+            {unit: 'celsius', exponent: -2},
+            {unit: 'arcminutes', exponent: -3},
+            {unit: 'cycle', exponent: -1},
+          ])
+        ).getCanonicalRepresentationOfUnits()
+      ).toEqual(
+        new Units([
+          {unit: 'arcmin', exponent: -3},
+          {unit: 'cycle', exponent: -1},
+          {unit: 'degC', exponent: -2},
+          {unit: 'm', exponent: -1},
+          {unit: 'N', exponent: 1},
+        ]).units
+      );
+    });
   });
 });

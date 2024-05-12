@@ -24,8 +24,21 @@ import {Fraction} from 'domain/objects/fraction.model';
 import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
 import {Units, UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
 import {Unit, NumberWithUnitsAnswer} from 'interactions/answer-defs';
+import {unit as mathjsUnit} from 'mathjs';
 
 type CurrencyUnitsKeys = (keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[];
+
+export const getCurrencyUnits = (): string[] => {
+  let currencyUnits: string[] = [];
+  for (const currency in ObjectsDomainConstants.CURRENCY_UNITS) {
+    const currencyInfo = ObjectsDomainConstants.CURRENCY_UNITS[currency];
+    currencyUnits.push(currency, ...currencyInfo.aliases);
+  }
+
+  return currencyUnits;
+};
+
+let currencyUnits = getCurrencyUnits();
 
 /* Guidelines for adding new custom currency units in Number with Units
   interaction:
@@ -122,6 +135,35 @@ export class NumberWithUnits {
       fraction: this.fraction?.toDict(),
       units: this.units,
     };
+  }
+
+  getCanonicalRepresentationOfUnits(): Unit[] {
+    const updatedUnits = this.units.map(({unit, exponent}: Unit) => {
+      const baseUnit = currencyUnits.includes(unit)
+        ? ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING[unit]
+        : mathjsUnit(unit).units[0].unit.name;
+
+      const unitPrefix = currencyUnits.includes(unit)
+        ? ''
+        : mathjsUnit(unit).units[0].prefix.name;
+
+      let normalizedUnit =
+        (ObjectsDomainConstants.PREFIX_TO_NORMALIZED_PREFIX_MAPPING[
+          unitPrefix
+        ] ?? '') +
+        ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING[baseUnit];
+
+      return {
+        unit: normalizedUnit,
+        exponent: exponent,
+      };
+    });
+
+    updatedUnits.sort((a: Unit, b: Unit) => {
+      return a.unit.localeCompare(b.unit);
+    });
+
+    return updatedUnits;
   }
 }
 
