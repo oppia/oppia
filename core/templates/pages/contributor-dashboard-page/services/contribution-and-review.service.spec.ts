@@ -291,14 +291,16 @@ describe('Contribution and review service', () => {
   });
 
   describe('downloadContributorCertificateAsync', () => {
-    it('should download the contributor certificate', () => {
+    it('should download the contributor certificate when available', () => {
       downloadContributorCertificateAsyncSpy.and.returnValue(
         Promise.resolve({
-          from_date: '1 Nov 2022',
-          to_date: '1 Dec 2022',
-          contribution_hours: 1.0,
-          team_lead: 'Test User',
-          language: 'Hindi',
+          certificate_data: {
+            from_date: '1 Nov 2022',
+            to_date: '1 Dec 2022',
+            contribution_hours: 1.0,
+            team_lead: 'Test User',
+            language: 'Hindi',
+          }
         })
       );
 
@@ -311,11 +313,36 @@ describe('Contribution and review service', () => {
           '2022-01-02'
         )
         .then(response => {
-          expect(response.from_date).toEqual('1 Nov 2022');
-          expect(response.to_date).toEqual('1 Dec 2022');
-          expect(response.contribution_hours).toEqual(1.0);
-          expect(response.team_lead).toEqual('Test User');
-          expect(response.language).toEqual('Hindi');
+          const data = response.certificate_data;
+          expect(data).toBeDefined();
+          expect(data?.from_date).toEqual('1 Nov 2022');
+          expect(data?.to_date).toEqual('1 Dec 2022');
+          expect(data?.contribution_hours).toEqual(1.0);
+          expect(data?.team_lead).toEqual('Test User');
+          expect(data?.language).toEqual('Hindi');
+        });
+
+      expect(downloadContributorCertificateAsyncSpy).toHaveBeenCalled();
+    });
+
+    it('should return null when contributor certificate data is unavailable', () => {
+      downloadContributorCertificateAsyncSpy.and.returnValue(
+        Promise.resolve({
+          certificate_data: null
+        })
+      );
+
+      cars
+        .downloadContributorCertificateAsync(
+          'user',
+          'translate_content',
+          'hi',
+          '1022-01-01',
+          '1022-01-02'
+        )
+        .then(response => {
+          const data = response.certificate_data;
+          expect(data).toBeNull();
         });
 
       expect(downloadContributorCertificateAsyncSpy).toHaveBeenCalled();
