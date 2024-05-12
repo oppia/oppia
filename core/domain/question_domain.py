@@ -2062,7 +2062,7 @@ class Question(translation_domain.BaseTranslatableObject):
         return cls(
             question_id, default_question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, skill_ids, [],
+            constants.DEFAULT_LANGUAGE_CODE, feconf.INITIAL_ENTITY_VERSION, skill_ids, [],
             content_id_generator.next_content_id_index)
 
     def update_language_code(self, language_code: str) -> None:

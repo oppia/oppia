@@ -539,7 +539,7 @@ class Collection:
         """
         return cls(
             collection_id, title, category, objective, language_code, [],
-            feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], 0)
+            feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], feconf.INITIAL_ENTITY_VERSION)
 
     @classmethod
     def from_dict(

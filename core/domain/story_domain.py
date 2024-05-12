@@ -1668,7 +1668,7 @@ class Story:
             story_id, title, None, None, None, description,
             feconf.DEFAULT_STORY_NOTES, story_contents,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0,
+            constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, feconf.INITIAL_ENTITY_VERSION,
             url_fragment, '')
 
     @classmethod

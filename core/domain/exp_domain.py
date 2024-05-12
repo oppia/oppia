@@ -1455,7 +1455,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
-            init_state_name, states_dict, {}, [], 0,
+            init_state_name, states_dict, {}, [], feconf.INITIAL_ENTITY_VERSION,
             feconf.DEFAULT_AUTO_TTS_ENABLED,
             content_id_generator.next_content_id_index, True)
 

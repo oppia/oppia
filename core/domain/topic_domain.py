@@ -1641,7 +1641,7 @@ class Topic:
             topic_id, name, name, url_fragment, None, None, None,
             description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
-            constants.DEFAULT_LANGUAGE_CODE, 0,
+            constants.DEFAULT_LANGUAGE_CODE, feconf.INITIAL_ENTITY_VERSION,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '',
             False, page_title_frag, [])
 
