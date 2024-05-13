@@ -72,9 +72,10 @@ if MYPY:  # pragma: no cover
 class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     """Test the functions in suggestion_services."""
 
-    score_category: str = (
-        suggestion_models.SCORE_TYPE_CONTENT +
-        suggestion_models.SCORE_CATEGORY_DELIMITER + 'Algebra')
+    score_category: str = ('%s%s%s' % (
+        suggestion_models.SCORE_TYPE_CONTENT,
+        suggestion_models.SCORE_CATEGORY_DELIMITER, 'Algebra')
+        )
 
     target_id: str = 'exp1'
     target_id_2: str = 'exp2'
@@ -1155,9 +1156,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
-    score_category: str = (
-        suggestion_models.SCORE_TYPE_TRANSLATION +
-        suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+    score_category: str = '%s%s%s' % (
+        suggestion_models.SCORE_TYPE_TRANSLATION,
+        suggestion_models.SCORE_CATEGORY_DELIMITER, 'English')
 
     target_id_1: str = 'exp1'
     target_id_2: str = 'exp2'
@@ -2081,9 +2082,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     AUTHOR_EMAIL: Final = 'author@example.com'
 
-    score_category: str = (
-        suggestion_models.SCORE_TYPE_CONTENT +
-        suggestion_models.SCORE_CATEGORY_DELIMITER + 'Algebra')
+    score_category: str = ('%s%s%s' % (
+        suggestion_models.SCORE_TYPE_CONTENT,
+        suggestion_models.SCORE_CATEGORY_DELIMITER, 'Algebra')
+        )
 
     THREAD_ID: Final = 'exploration.exp1.thread_1'
 
@@ -7259,9 +7261,10 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         self.to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
     def test_create_translation_contributor_certificate(self) -> None:
-        score_category: str = (
-            suggestion_models.SCORE_TYPE_TRANSLATION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        score_category: str = ('%s%s%s' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER, 'English')
+            )
         change_cmd = {
             'cmd': 'add_translation',
             'content_id': 'content',
@@ -7290,9 +7293,10 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
     def test_create_translation_contributor_certificate_for_english(
         self
     ) -> None:
-        score_category: str = (
-            suggestion_models.SCORE_TYPE_TRANSLATION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        score_category: str = '%s%s%s' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER, 'English')
+
         change_cmd = {
             'cmd': 'add_translation',
             'content_id': 'content',
