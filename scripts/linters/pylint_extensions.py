@@ -2953,12 +2953,12 @@ class PreventStringConcatenationChecker(checkers.BaseChecker): # type: ignore[mi
                 right_inferred = next(node.right.infer())
             except astroid.exceptions.InferenceError:
                 return
-            
-                # Check if either inferred type is a datetime object
+
             if any(isinstance(inferred, (astroid.Instance, astroid.Const)) and
                     isinstance(inferred.pytype(), str) and
-                    'datetime.datetime' in inferred.pytype() for inferred in [left_inferred, right_inferred]):
-                return  # Skip this node as it involves datetime
+                    'datetime.datetime' in inferred.pytype() 
+                    for inferred in [left_inferred, right_inferred]):
+                return
             if (
                 isinstance(left_inferred, astroid.Const) and
                 isinstance(right_inferred, astroid.Const) and
@@ -2966,7 +2966,7 @@ class PreventStringConcatenationChecker(checkers.BaseChecker): # type: ignore[mi
                 isinstance(right_inferred.value, str)
             ):
                 self.add_message('use-string-interpolation', node=node)
-    
+
 
 def register(linter: lint.PyLinter) -> None:
     """Registers the checker with pylint.
