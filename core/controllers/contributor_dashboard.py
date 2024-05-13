@@ -1053,7 +1053,8 @@ class ContributorStatsSummariesHandler(
 
 
 class CertificateDataResponse(TypedDict):
-    """Dict holding info.
+    """Dict holding a ContributorCertificateInfoDict, or None to represent
+    no contributor certificate information.
     """
 
     certificate_data: Optional[

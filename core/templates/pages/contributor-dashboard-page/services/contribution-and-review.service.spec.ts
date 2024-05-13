@@ -314,12 +314,17 @@ describe('Contribution and review service', () => {
         )
         .then(response => {
           const data = response.certificate_data;
-          expect(data).toBeDefined();
-          expect(data?.from_date).toEqual('1 Nov 2022');
-          expect(data?.to_date).toEqual('1 Dec 2022');
-          expect(data?.contribution_hours).toEqual(1.0);
-          expect(data?.team_lead).toEqual('Test User');
-          expect(data?.language).toEqual('Hindi');
+
+          if (!data) {
+            fail("expected data to not be null");
+            return;
+          }
+
+          expect(data.from_date).toEqual('1 Nov 2022');
+          expect(data.to_date).toEqual('1 Dec 2022');
+          expect(data.contribution_hours).toEqual(1.0);
+          expect(data.team_lead).toEqual('Test User');
+          expect(data.language).toEqual('Hindi');
         });
 
       expect(downloadContributorCertificateAsyncSpy).toHaveBeenCalled();
