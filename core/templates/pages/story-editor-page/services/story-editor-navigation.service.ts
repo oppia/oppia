@@ -32,8 +32,7 @@ const STORY_PREVIEW = 'story_preview';
 export class StoryEditorNavigationService {
   activeTab: string = 'story_editor';
   chapterId!: string;
-  // 'chapterIndex' is null when we are navigating to a chapter with its ID.
-  chapterIndex: number | null = null;
+  chapterIndex: number;
 
   private _activeTabIsSwitchedEventEmitter: EventEmitter<string> =
     new EventEmitter<string>();
@@ -61,7 +60,7 @@ export class StoryEditorNavigationService {
 
   navigateToChapterEditorWithId(
     id: string,
-    index: number | null,
+    index: number,
     title: string
   ): void {
     this.activeTab = CHAPTER_EDITOR;
@@ -87,10 +86,6 @@ export class StoryEditorNavigationService {
       this.windowRef.nativeWindow.location.hash.split('/')[1] ===
       'story_preview'
     );
-  }
-
-  navigateToChapterEditor(): void {
-    this.navigateToChapterEditorWithId(this.chapterId, null, '');
   }
 
   navigateToStoryEditor(): void {

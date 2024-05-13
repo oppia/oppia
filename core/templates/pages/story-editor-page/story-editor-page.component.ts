@@ -224,6 +224,29 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
     this.storyEditorNavigationService.navigateToStoryEditor();
   }
 
+  async navigateToChapterEditorWithChapterId() {
+    if (this.storyEditorStateService.isLoadingStory()) {
+      await new Promise<void>(resolve => {
+        const subscription =
+          this.storyEditorStateService.onStoryInitialized.subscribe(() => {
+            resolve();
+            subscription.unsubscribe(); // Unsubscribe after the event is emitted to prevent memory leaks
+          });
+      });
+    }
+    let linearNodesList = this.story.getStoryContents().getLinearNodesList();
+    let chapterId = this.storyEditorNavigationService.getChapterId();
+    let chapterIdx = linearNodesList.findIndex(
+      node => node.getId() === chapterId
+    );
+    let chapterTitle = linearNodesList[chapterIdx].getTitle();
+    this.storyEditorNavigationService.navigateToChapterEditorWithId(
+      chapterId,
+      chapterIdx,
+      chapterTitle
+    );
+  }
+
   onClosingStoryEditorBrowserTab(): void {
     const story = this.storyEditorStateService.getStory();
 
@@ -333,7 +356,7 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
     this.pageTitleService.setNavbarTitleForMobileView('Story Editor');
 
     if (this.storyEditorNavigationService.checkIfPresentInChapterEditor()) {
-      this.storyEditorNavigationService.navigateToChapterEditor();
+      this.navigateToChapterEditorWithChapterId();
     } else if (
       this.storyEditorNavigationService.checkIfPresentInStoryPreviewTab()
     ) {
