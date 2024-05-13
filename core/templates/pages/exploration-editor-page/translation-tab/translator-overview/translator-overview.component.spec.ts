@@ -44,6 +44,9 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ChangeListService} from '../../services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 
 class MockNgbModal {
   open() {
@@ -63,6 +66,19 @@ class MockContextService {
   }
 }
 
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EnableVoiceoverContribution: {
+        isEnabled: true,
+      },
+      AddVoiceoverWithAccent: {
+        isEnabled: false,
+      },
+    };
+  }
+}
+
 describe('Translator Overview component', () => {
   let component: TranslatorOverviewComponent;
   let contextService: ContextService;
@@ -78,9 +94,11 @@ describe('Translator Overview component', () => {
   let focusManagerService: FocusManagerService;
   let routerService: RouterService;
   let entityTranslationsService: EntityTranslationsService;
+  let entityVoiceoversService: EntityVoiceoversService;
   let changeListService: ChangeListService;
   let windowRef: WindowRef;
   let entityTranslation: EntityTranslation;
+  let voiceoverBackendApiService: VoiceoverBackendApiService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -95,6 +113,10 @@ describe('Translator Overview component', () => {
         {
           provide: ContextService,
           useClass: MockContextService,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
         WindowRef,
       ],
@@ -122,6 +144,8 @@ describe('Translator Overview component', () => {
     focusManagerService = TestBed.inject(FocusManagerService);
     routerService = TestBed.inject(RouterService);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
+    entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
+    voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     changeListService = TestBed.inject(ChangeListService);
     windowRef = TestBed.inject(WindowRef);
 
@@ -137,6 +161,29 @@ describe('Translator Overview component', () => {
       entityTranslationsService,
       'getEntityTranslationsAsync'
     ).and.resolveTo();
+    spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.resolveTo();
+    let languageAccentMasterList = {
+      en: {
+        'en-US': 'English (United State)',
+      },
+      hi: {
+        'hi-IN': 'Hindi (India)',
+      },
+    };
+    let languageCodesMapping = {
+      en: {
+        'en-US': true,
+      },
+    };
+
+    let voiceoverAdminDataResponse = {
+      languageAccentMasterList: languageAccentMasterList,
+      languageCodesMapping: languageCodesMapping,
+    };
+    spyOn(
+      voiceoverBackendApiService,
+      'fetchVoiceoverAdminDataAsync'
+    ).and.resolveTo(Promise.resolve(voiceoverAdminDataResponse));
 
     explorationLanguageCodeService.init(explorationLanguageCode);
     component.isTranslationTabBusy = false;

@@ -42,12 +42,12 @@ import {
   ExplorationChangeMarkTranslationsNeedsUpdate,
   ExplorationChangeRemoveTranslations,
   ExplorationTranslationChange,
-  ExplorationChangeEditVoiceovers,
 } from 'domain/exploration/exploration-draft.model';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
-import {Voiceover} from 'domain/exploration/voiceover.model';
-import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {
+  LanguageAccentToDescription,
+  VoiceoverBackendApiService,
+} from 'domain/voiceover/voiceover-backend-api.service';
 import {LocalStorageService} from 'services/local-storage.service';
 
 @Component({
@@ -71,11 +71,11 @@ export class TranslatorOverviewComponent implements OnInit {
   LAST_SELECTED_TRANSLATION_LANGUAGE!: string;
   languageCodesAndDescriptions!: {id: string; description: string}[];
   languageAccentMasterList;
-  languageCodesMapping;
-  availableLanguageAccentCodesToDescriptions;
-  supportedLanguageAccentCodesToDescriptions;
-  supportedLanguageAccentCodesLength;
-  selectedLanguageAccentCode = '';
+  languageCodesMapping = {};
+  availableLanguageAccentCodesToDescriptions: LanguageAccentToDescription = {};
+  supportedLanguageAccentCodesToDescriptions: LanguageAccentToDescription = {};
+  supportedLanguageAccentCodesLength: number = 0;
+  selectedLanguageAccentCode: string = '';
 
   constructor(
     private contextService: ContextService,
