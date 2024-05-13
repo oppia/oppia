@@ -164,7 +164,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   communityLibraryUrl =
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
 
-  communtiyLessonsDataLoaded: boolean = false;
+  communityLessonsDataLoaded: boolean = false;
   loadingIndicatorIsShown: boolean = false;
   homeImageUrl: string = '';
   todolistImageUrl: string = '';
@@ -258,6 +258,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     learnerGroupFeatureIsEnabledPromise.then(featureIsEnabled => {
       this.LEARNER_GROUP_FEATURE_IS_ENABLED = featureIsEnabled;
     });
+
+    this.getExplorationAndCollectionData();
 
     Promise.all([
       userInfoPromise,
@@ -371,7 +373,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         .then(() => {
           setTimeout(() => {
             this.loaderService.hideLoadingScreen();
-            this.communtiyLessonsDataLoaded = true;
+            this.communityLessonsDataLoaded = true;
             // So that focus is applied after the loading screen has dissapeared.
             this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
           }, 0);
@@ -440,7 +442,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         .then(() => {
           setTimeout(() => {
             this.loaderService.hideLoadingScreen();
-            this.communtiyLessonsDataLoaded = true;
+            this.communityLessonsDataLoaded = true;
             // So that focus is applied after the loading screen has dissapeared.
             this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
           }, 0);
@@ -497,5 +499,65 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
   isShowRedesignedLearnerDashboardActive(): boolean {
     return this.platFeatService.status.ShowRedesignedLearnerDashboard.isEnabled;
+  }
+
+  getExplorationAndCollectionData(): void {
+    let dashboardCollectionsDataPromise =
+      this.learnerDashboardBackendApiService.fetchLearnerDashboardCollectionsDataAsync();
+    dashboardCollectionsDataPromise.then(
+      responseData => {
+        this.completedCollectionsList = responseData.completedCollectionsList;
+        this.incompleteCollectionsList = responseData.incompleteCollectionsList;
+        this.completedToIncompleteCollections =
+          responseData.completedToIncompleteCollections;
+        this.collectionPlaylist = responseData.collectionPlaylist;
+      },
+      errorResponseStatus => {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
+        ) {
+          this.alertsService.addWarning(
+            'Failed to get learner dashboard collections data'
+          );
+        }
+      }
+    );
+
+    let dashboardExplorationsDataPromise =
+      this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync();
+    dashboardExplorationsDataPromise.then(
+      responseData => {
+        this.completedExplorationsList = responseData.completedExplorationsList;
+        this.incompleteExplorationsList =
+          responseData.incompleteExplorationsList;
+        this.subscriptionsList = responseData.subscriptionList;
+        this.explorationPlaylist = responseData.explorationPlaylist;
+      },
+      errorResponseStatus => {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
+        ) {
+          this.alertsService.addWarning(
+            'Failed to get learner dashboard explorations data'
+          );
+        }
+      }
+    );
+
+    Promise.all([
+      dashboardCollectionsDataPromise,
+      dashboardExplorationsDataPromise,
+    ])
+      .then(() => {
+        setTimeout(() => {
+          this.loaderService.hideLoadingScreen();
+          this.communityLessonsDataLoaded = true;
+          // So that focus is applied after the loading screen has dissapeared.
+          this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
+        }, 0);
+      })
+      .catch(errorResponse => {
+        // This is placed here in order to satisfy Unit tests.
+      });
   }
 }

@@ -1,5 +1,5 @@
 <div class="home-tab">
-  <ng-container *ngIf="!featureFlag">
+  <ng-container *ngIf="!redesignFeatureFlag">
     <div tabindex="0" class="greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
       {{ getTimeOfDay() | translate }}, {{ username }}!
     </div>
@@ -84,7 +84,7 @@
     </div>
   </ng-container>
 
-  <div *ngIf="featureFlag">
+  <div *ngIf="redesignFeatureFlag">
     <p class="oppia-learner-dash-greeting mt-4"> {{ getTimeOfDay() | translate }}, {{ username }}! </p>
     <div class="oppia-learner-dash-section" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
       <p class="oppia-learner-dash-section-heading">
@@ -95,24 +95,24 @@
           ) | translate
         }}
       </p>
-      <div [ngStyle]="{'min-width': 'fit-content'}">
-        <ng-container *ngIf="continueWhereYouLeftOffList.length === 0; else continueTiles">
+      <div class="w-100">
+        <ng-container *ngIf="continueWhereYouLeftOffList.length === 0">
           <p class="oppia-learner-dash-section-heading mb-0">
             {{ 'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate }}
           </p>
-          <a id="setting-a-goal-link" class="d-inline-block mb-0" (click)="changeActiveSection()">
-            {{ 'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_SET_A_GOAL' | translate }}
-          </a>
-          <ng-template #continueTiles>
-            <ng-container *ngFor="let topicSummaryTile of continueWhereYouLeftOffList">
-              <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts" class="gap-4 w-100">
-                <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
-                  [topicName]="topicSummaryTile.name">
-                </oppia-learner-story-summary-tile>
-              </div>
-            </ng-container>
-          </ng-template>
         </ng-container>
+        <div class="d-flex mt-4 subsection-container" *ngIf="continueWhereYouLeftOffList.length !== 0">
+          <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
+            <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
+              <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [redesignFeatureFlag]="redesignFeatureFlag" [displayArea]="'homeTab'"
+                [topicName]="topicSummaryTile.name">
+              </oppia-learner-story-summary-tile>
+            </ng-container>
+          </ng-container>
+          <ng-container *ngFor="let lesson of incompleteExplorationsList">
+            <lesson-card [story]="lesson"></lesson-card>
+          </ng-container>
+        </div>
       </div>
     </div>
     <div class="oppia-learner-dash-section e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
@@ -122,7 +122,7 @@
         <hr width="100%" color="#00645c" class="mt-2" size="2">
         <div class="oppia-learner-dash-classes d-flex gap-4 mt-4 overflow-hidden w-100">
           <ng-container *ngFor="let topicSummaryTile of item.value.slice(0,3)">
-            <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [featureFlag]="featureFlag">
+            <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [redesignFeatureFlag]="redesignFeatureFlag">
             </oppia-learner-topic-summary-tile>
           </ng-container>
         </div>
@@ -142,3 +142,11 @@
     </div>
   </div>
 </div>
+
+<style>
+  .subsection-container {
+    display: flex;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+</style>
