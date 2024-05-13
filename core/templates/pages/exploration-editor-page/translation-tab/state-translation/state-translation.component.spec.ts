@@ -81,6 +81,9 @@ class MockPlatformFeatureService {
       EnableVoiceoverContribution: {
         isEnabled: true,
       },
+      AddVoiceoverWithAccent: {
+        isEnabled: false,
+      },
     };
   }
 }
@@ -438,6 +441,28 @@ describe('State translation component', () => {
         } as FeatureStatusChecker);
 
         expect(component.isVoiceoverContributionEnabled()).toBeTrue();
+      });
+
+      it('should get disabled voiceover with accent feature flag data', () => {
+        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+          AddVoiceoverWithAccent: {
+            isEnabled: false,
+          },
+        } as FeatureStatusChecker);
+
+        expect(
+          component.isVoiceoverContributionWithAccentEnabled()
+        ).toBeFalse();
+      });
+
+      it('should get enabled voiceover with accent feature flag data', () => {
+        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+          AddVoiceoverWithAccent: {
+            isEnabled: true,
+          },
+        } as FeatureStatusChecker);
+
+        expect(component.isVoiceoverContributionWithAccentEnabled()).toBeTrue();
       });
 
       it(
