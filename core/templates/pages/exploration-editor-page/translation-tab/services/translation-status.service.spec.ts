@@ -43,7 +43,7 @@ class MockPlatformFeatureService {
   get status(): object {
     return {
       AddVoiceoverWithAccent: {
-        isEnabled: true,
+        isEnabled: false,
       },
     };
   }
