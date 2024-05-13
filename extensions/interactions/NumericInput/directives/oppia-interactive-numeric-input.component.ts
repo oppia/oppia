@@ -105,7 +105,7 @@ export class InteractiveNumericInput implements OnInit {
     }
     this.answer = answer;
     this.errorMessageI18nKey = '';
-    this.currentInteractionService.updateIsValidAnswer(this.isAnswerValid());
+    this.currentInteractionService.updateAnswerIsValid(this.isAnswerValid());
     this.currentInteractionService.updateCurrentAnswer(this.answer);
     this.changeDetectorRef.detectChanges();
   }

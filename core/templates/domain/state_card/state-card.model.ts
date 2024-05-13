@@ -13,359 +13,223 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model class for creating new frontend instances of State
- * card domain objects used in the exploration player.
+ * @fileoverview Facilitates communication between the current interaction
+ * and the progress nav. The former holds data about the learner's answer,
+ * while the latter contains the actual "Submit" button which triggers the
+ * answer submission process.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import {AppConstants} from 'app.constants';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {
-  BindableVoiceovers,
-  RecordedVoiceovers,
-} from 'domain/exploration/recorded-voiceovers.model';
-import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
-import {Hint} from 'domain/exploration/hint-object.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
-
-import {
-  InteractionSpecsConstants,
-  InteractionSpecsKey,
-} from 'pages/interaction-specs.constants';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {ContextService} from 'services/context.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
+import {Observable, Subject} from 'rxjs';
+import {AlgebraicExpressionInputRulesService} from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
+import {CodeReplRulesService} from 'interactions/CodeRepl/directives/code-repl-rules.service';
+import {ContinueRulesService} from 'interactions/Continue/directives/continue-rules.service';
+import {FractionInputRulesService} from 'interactions/FractionInput/directives/fraction-input-rules.service';
+import {ImageClickInputRulesService} from 'interactions/ImageClickInput/directives/image-click-input-rules.service';
+import {InteractiveMapRulesService} from 'interactions/InteractiveMap/directives/interactive-map-rules.service';
+import {MathEquationInputRulesService} from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
+import {NumericExpressionInputRulesService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
+import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
+import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
+import {GraphInputRulesService} from 'interactions/GraphInput/directives/graph-input-rules.service';
+import {SetInputRulesService} from 'interactions/SetInput/directives/set-input-rules.service';
+import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
 import {InteractionAnswer} from 'interactions/answer-defs';
+import {StateCard} from 'domain/state_card/state-card.model';
 
-export interface InputResponsePair {
-  learnerInput: string | {answerDetails: string};
-  // 'oppiaResponse' is null when the response for the input has
-  // not been received yet.
-  oppiaResponse: string | null;
-  isHint: boolean;
-}
+type SubmitAnswerFn = () => void;
 
-export class StateCard {
-  _stateName: string;
-  _contentHtml: string;
-  _interactionHtml: string;
-  _interaction: Interaction;
-  _inputResponsePairs: InputResponsePair[];
-  _recordedVoiceovers: RecordedVoiceovers;
-  _contentId: string;
-  _completed: boolean;
-  audioTranslationLanguageService: AudioTranslationLanguageService;
+type InteractionRulesService =
+  | AlgebraicExpressionInputRulesService
+  | CodeReplRulesService
+  | ContinueRulesService
+  | FractionInputRulesService
+  | ImageClickInputRulesService
+  | InteractiveMapRulesService
+  | MathEquationInputRulesService
+  | NumericExpressionInputRulesService
+  | NumericInputRulesService
+  | PencilCodeEditorRulesService
+  | GraphInputRulesService
+  | SetInputRulesService
+  | TextInputRulesService;
+
+export type OnSubmitFn = (
+  answer: InteractionAnswer,
+  interactionRulesService: InteractionRulesService
+) => void;
+
+export type ValidityCheckFn = () => boolean;
+
+export type PresubmitHookFn = () => void;
+
+@Injectable({
+  providedIn: 'root',
+})
+export class CurrentInteractionService {
   constructor(
-    stateName: string,
-    contentHtml: string,
-    interactionHtml: string,
-    interaction: Interaction,
-    inputResponsePairs: InputResponsePair[],
-    recordedVoiceovers: RecordedVoiceovers,
-    contentId: string,
-    audioTranslationLanguageService: AudioTranslationLanguageService
-  ) {
-    this._stateName = stateName;
-    this._contentHtml = contentHtml;
-    this._interactionHtml = interactionHtml;
-    this._inputResponsePairs = inputResponsePairs;
-    this._interaction = interaction;
-    this._recordedVoiceovers = recordedVoiceovers;
-    this._contentId = contentId;
-    this._completed = false;
-    this.audioTranslationLanguageService = audioTranslationLanguageService;
+    private contextService: ContextService,
+    private playerPositionService: PlayerPositionService,
+    private playerTranscriptService: PlayerTranscriptService
+  ) {}
+
+  // The 'submitAnswerFn' function should grab the learner's answer and pass
+  // it to onSubmit. The interaction can pass in 'null' for this property if
+  // it does not use the progress nav's submit button
+  // (for example 'MultipleChoiceInput').
+  private static submitAnswerFn: SubmitAnswerFn | null = null;
+  // The 'validityCheckFn' function is used by the progress nav to decide
+  // whether or not to disable the submit button. If the interaction passes
+  // in 'null', the submit button will remain enabled (for the entire duration
+  // of the current interaction).
+  private static validityCheckFn: ValidityCheckFn | null = null;
+  private static onSubmitFn: OnSubmitFn;
+  private static presubmitHooks: PresubmitHookFn[] = [];
+  private static answerChangedSubject: Subject<void> = new Subject<void>();
+
+  setOnSubmitFn(onSubmit: OnSubmitFn): void {
+    /**
+     * The ConversationSkinDirective should register its onSubmit
+     * callback here.
+     *
+     * @param {function(answer, interactionRulesService)} onSubmit
+     */
+    CurrentInteractionService.onSubmitFn = onSubmit;
   }
 
-  toggleSubmitClicked(value: boolean): void {
-    if (this.getInteraction().id === 'Continue') {
-      return;
+  registerCurrentInteraction(
+    submitAnswerFn: SubmitAnswerFn | null,
+    validityCheckFn: ValidityCheckFn | null
+  ): void {
+    /**
+     * Each interaction directive should call registerCurrentInteraction
+     * when the interaction directive is first created.
+     *
+     * @param {function|null} submitAnswerFn - Should grab the learner's
+     *   answer and pass it to onSubmit. The interaction can pass in
+     *   null if it does not use the progress nav's submit button
+     *   (ex: MultipleChoiceInput).
+     * @param {function|null} validityCheckFn - The progress nav will use this
+     *   to decide whether or not to disable the submit button. If the
+     *   interaction passes in null, the submit button will remain
+     *   enabled (for the entire duration of the current interaction).
+     */
+    CurrentInteractionService.submitAnswerFn = submitAnswerFn || null;
+    CurrentInteractionService.validityCheckFn = validityCheckFn || null;
+  }
+
+  registerPresubmitHook(hookFn: PresubmitHookFn): void {
+    /* Register a hook that will be called right before onSubmit.
+     * All hooks for the current interaction will be cleared right
+     * before loading the next card.
+     */
+    CurrentInteractionService.presubmitHooks.push(hookFn);
+  }
+
+  clearPresubmitHooks(): void {
+    /* Clear out all the hooks for the current interaction. Should
+     * be called before loading the next card.
+     */
+    CurrentInteractionService.presubmitHooks = [];
+  }
+
+  onSubmit(
+    answer: InteractionAnswer,
+    interactionRulesService: InteractionRulesService
+  ): void {
+    for (let i = 0; i < CurrentInteractionService.presubmitHooks.length; i++) {
+      CurrentInteractionService.presubmitHooks[i]();
     }
-    this.getInteraction().submitClicked = value;
+    CurrentInteractionService.onSubmitFn(answer, interactionRulesService);
   }
 
-  updateCurrentAnswer(value: InteractionAnswer | null): void {
-    this.getInteraction().currentAnswer = value;
-    this.toggleSubmitClicked(false);
+  getDisplayedCard(): StateCard {
+    const index = this.playerPositionService.getDisplayedCardIndex();
+    return this.playerTranscriptService.getCard(index);
   }
 
-  updateIsValidAnswer(value: boolean): void {
-    this.getInteraction().isAnswerValid = value;
+  updateCurrentAnswer(answer: InteractionAnswer | null): void {
+    this.getDisplayedCard()?.updateCurrentAnswer(answer);
+  }
+
+  updateAnswerIsValid(isValid: boolean): void {
+    this.getDisplayedCard()?.updateAnswerIsValid(isValid);
   }
 
   showNoResponseError(): boolean {
-    const currentAnswer = this.getInteraction().currentAnswer;
-    const notNumber = !(typeof currentAnswer === 'number');
-    const isEmptyArray =
-      Array.isArray(currentAnswer) && currentAnswer.length === 0;
-    const noResponse = notNumber && (isEmptyArray || !currentAnswer);
-    return noResponse && this.getInteraction().submitClicked;
+    return this.getDisplayedCard().showNoResponseError();
   }
 
   showInvalidResponseError(): boolean {
-    return (
-      !this.getInteraction().isAnswerValid &&
-      this.getInteraction().submitClicked
-    );
+    return this.getDisplayedCard().showInvalidResponseError();
   }
 
-  // Restore everything immutably so that Angular can detect changes.
-  restoreImmutable(stateCard: StateCard): void {
-    Object.assign(this, stateCard);
-  }
-
-  getStateName(): string {
-    return this._stateName;
-  }
-
-  getInteraction(): Interaction {
-    return this._interaction;
-  }
-
-  getVoiceovers(): BindableVoiceovers {
-    let recordedVoiceovers = this._recordedVoiceovers;
-    let contentId = this._contentId;
-    if (recordedVoiceovers) {
-      return recordedVoiceovers.getBindableVoiceovers(contentId);
-    }
-    return {};
-  }
-
-  getRecordedVoiceovers(): RecordedVoiceovers {
-    return this._recordedVoiceovers;
-  }
-
-  isContentAudioTranslationAvailable(): boolean {
-    return (
-      Object.keys(this.getVoiceovers()).length > 0 ||
-      this.audioTranslationLanguageService.isAutogeneratedAudioAllowed()
-    );
-  }
-
-  getInteractionId(): string | null {
-    if (this.getInteraction()) {
-      return this.getInteraction().id;
-    }
-    return null;
-  }
-
-  isTerminal(): boolean {
-    let interactionId = this.getInteractionId();
-    return (
-      Boolean(interactionId) &&
-      InteractionSpecsConstants.INTERACTION_SPECS[
-        interactionId as InteractionSpecsKey
-      ].is_terminal
-    );
-  }
-
-  getHints(): Hint[] {
-    return this.getInteraction().hints;
-  }
-
-  // A null 'solution' indicates that this Interaction does not have a hint
-  // or there is a hint, but no solution.
-  getSolution(): Solution | null {
-    return this.getInteraction().solution;
-  }
-
-  doesInteractionSupportHints(): boolean {
-    let interactionId = this.getInteractionId();
-    if (interactionId) {
-      return (
-        !InteractionSpecsConstants.INTERACTION_SPECS[
-          interactionId as InteractionSpecsKey
-        ].is_terminal &&
-        !InteractionSpecsConstants.INTERACTION_SPECS[
-          interactionId as InteractionSpecsKey
-        ].is_linear
+  submitAnswer(): void {
+    /* This starts the answer submit process, it should be called once the
+     * learner presses the "Submit" button.
+     */
+    if (CurrentInteractionService.submitAnswerFn === null) {
+      let index = this.playerPositionService.getDisplayedCardIndex();
+      let displayedCard = this.playerTranscriptService.getCard(index);
+      let additionalInfo =
+        '\nUndefined submit answer debug logs:' +
+        '\nInteraction ID: ' +
+        displayedCard.getInteractionId() +
+        '\nExploration ID: ' +
+        this.contextService.getExplorationId() +
+        '\nState Name: ' +
+        displayedCard.getStateName() +
+        '\nContext: ' +
+        this.contextService.getPageContext() +
+        '\nErrored at index: ' +
+        index;
+      throw new Error(
+        'The current interaction did not ' +
+          'register a _submitAnswerFn.' +
+          additionalInfo
       );
-    }
-    return false;
-  }
-
-  isCompleted(): boolean {
-    return this._completed;
-  }
-
-  markAsCompleted(): void {
-    this._completed = true;
-  }
-
-  markAsNotCompleted(): void {
-    this._completed = false;
-  }
-
-  // Some interaction specifications do not have instructions, thus we return
-  // 'null' in that case.
-  getInteractionInstructions(): string | null {
-    let interactionId = this.getInteractionId();
-    if (interactionId) {
-      return InteractionSpecsConstants.INTERACTION_SPECS[
-        interactionId as InteractionSpecsKey
-      ].instructions;
-    }
-    return null;
-  }
-
-  // This returns 'null' when no interaction is set for the card.
-  getInteractionCustomizationArgs(): InteractionCustomizationArgs | null {
-    let interaction = this.getInteraction();
-    if (!interaction) {
-      return null;
-    }
-    return interaction.customizationArgs;
-  }
-
-  isInteractionInline(): boolean {
-    let interactionId = this.getInteractionId();
-    if (interactionId) {
-      var interactionDisplayMode: string | null =
-        InteractionSpecsConstants.INTERACTION_SPECS[
-          interactionId as InteractionSpecsKey
-        ].display_mode;
     } else {
-      var interactionDisplayMode: string | null = null;
-    }
-    return (
-      !interactionId ||
-      interactionDisplayMode === AppConstants.INTERACTION_DISPLAY_MODE_INLINE
-    );
-  }
-
-  getContentHtml(): string {
-    return this._contentHtml;
-  }
-
-  getInteractionHtml(): string {
-    return this._interactionHtml;
-  }
-
-  // This will return null when the response for the input has
-  // not been received yet.
-  getOppiaResponse(index: number): string | null {
-    return this._inputResponsePairs[index].oppiaResponse;
-  }
-
-  getInputResponsePairs(): InputResponsePair[] {
-    return this._inputResponsePairs;
-  }
-
-  // This will return null if there are no input response pairs present.
-  getLastInputResponsePair(): InputResponsePair | null {
-    if (this._inputResponsePairs.length === 0) {
-      return null;
-    }
-    return this._inputResponsePairs[this._inputResponsePairs.length - 1];
-  }
-
-  // This will return null when there is no input response pair.
-  getLastAnswer(): string | null | {answerDetails: string} {
-    const lastInputResponsePair = this.getLastInputResponsePair();
-    if (lastInputResponsePair === null) {
-      return null;
-    }
-    return lastInputResponsePair.learnerInput;
-  }
-
-  // This will return null when no previous response exists.
-  getLastOppiaResponse(): string | null {
-    const lastInputResponsePair = this.getLastInputResponsePair();
-    if (lastInputResponsePair === null) {
-      return null;
-    }
-    return lastInputResponsePair.oppiaResponse;
-  }
-
-  addInputResponsePair(inputResponsePair: InputResponsePair): void {
-    this._inputResponsePairs.push(cloneDeep(inputResponsePair));
-  }
-
-  setLastOppiaResponse(response: string): void {
-    // This check is added here to ensure that this._inputReponsePairs is
-    // accessed only if there is atleast one input response pair present.
-    // In the editor preview tab if a user clicks on restart from beginning
-    // option just after submitting an answer for a card while the response
-    // is still loading, this function is called after
-    // this._inputResponsePairs is set to null as we are starting from the
-    // first card again. Adding a check here makes sure that element at index
-    // -1 is not accessed even in the above case.
-    if (this._inputResponsePairs.length >= 1) {
-      this._inputResponsePairs[
-        this._inputResponsePairs.length - 1
-      ].oppiaResponse = response;
+      CurrentInteractionService.submitAnswerFn();
     }
   }
 
-  addToExistingFeedback(response: string): void {
-    if (this._inputResponsePairs.length >= 1) {
-      let newResponse =
-        this._inputResponsePairs[this._inputResponsePairs.length - 1]
-          .oppiaResponse +
-        '\n' +
-        response;
-      this._inputResponsePairs[
-        this._inputResponsePairs.length - 1
-      ].oppiaResponse = newResponse;
+  isSubmitButtonDisabled(): boolean {
+    /* The submit button should be disabled if the current interaction
+     * did not register a _submitAnswerFn. This could occur in
+     * low-bandwidth scenarios where the interaction has not finished
+     * loading.
+     */
+    if (CurrentInteractionService.submitAnswerFn === null) {
+      return true;
     }
-  }
-
-  setInteractionHtml(interactionHtml: string): void {
-    this._interactionHtml = interactionHtml;
-  }
-
-  get contentHtml(): string {
-    return this._contentHtml;
-  }
-
-  set contentHtml(html: string) {
-    this._contentHtml = html;
-  }
-
-  get contentId(): string {
-    return this._contentId;
-  }
-
-  swapContentsWithTranslation(entityTranslation: EntityTranslation): void {
-    let writtenTranslation = entityTranslation.getWrittenTranslation(
-      this._contentId
-    ) as TranslatedContent;
-    if (writtenTranslation) {
-      this.contentHtml = writtenTranslation.translation as string;
+    /* Returns whether or not the Submit button should be disabled based on
+     * the validity of the current answer. If the interaction does not pass
+     * in a _validityCheckFn, then _validityCheckFn will be null and by
+     * default we assume the answer is valid, so the submit button should
+     * not be disabled.
+     */
+    if (CurrentInteractionService.validityCheckFn === null) {
+      return false;
     }
-    this._interaction.swapContentsWithTranslation(entityTranslation);
+    return !CurrentInteractionService.validityCheckFn();
   }
 
-  /**
-   * @param {string} stateName - The state name for the current card.
-   * @param {string} contentHtml - The HTML string for the content displayed
-   *        on the content card.
-   * @param {string} interactionHtml - The HTML that calls the interaction
-   *        directive for the current card.
-   * @param {Interaction} interaction - An interaction object that stores all
-   *        the properties of the card's interaction.
-   * @param {RecordedVoiceovers} recordedVoiceovers
-   * @param {string} contentId
-   * @param {AudioTranslationLanguageService} audioTranslationLanguageService
-   */
-  static createNewCard(
-    stateName: string,
-    contentHtml: string,
-    interactionHtml: string,
-    interaction: Interaction,
-    recordedVoiceovers: RecordedVoiceovers,
-    contentId: string,
-    audioTranslationLanguageService: AudioTranslationLanguageService
-  ): StateCard {
-    return new StateCard(
-      stateName,
-      contentHtml,
-      interactionHtml,
-      cloneDeep(interaction),
-      [],
-      recordedVoiceovers,
-      contentId,
-      audioTranslationLanguageService
-    );
+  updateViewWithNewAnswer(): void {
+    CurrentInteractionService.answerChangedSubject.next();
+  }
+
+  get onAnswerChanged$(): Observable<void> {
+    return CurrentInteractionService.answerChangedSubject.asObservable();
   }
 }
+angular
+  .module('oppia')
+  .factory(
+    'CurrentInteractionService',
+    downgradeInjectable(CurrentInteractionService)
+  );

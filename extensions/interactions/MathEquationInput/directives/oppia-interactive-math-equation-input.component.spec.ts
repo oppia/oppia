@@ -77,7 +77,7 @@ describe('MathEquationInputInteractive', () => {
 
     updateCurrentAnswer(answer: InteractionAnswer): void {}
 
-    updateIsValidAnswer(isValid: boolean) {}
+    updateAnswerIsValid(isValid: boolean) {}
 
     registerCurrentInteraction(
       submitAnswerFn: Function,

@@ -78,7 +78,7 @@ describe('AlgebraicExpressionInputInteractive', () => {
       rulesService: CurrentInteractionService
     ) => {},
     updateCurrentAnswer: (answer: InteractionAnswer) => {},
-    updateIsValidAnswer(isValid: boolean) {},
+    updateAnswerIsValid(isValid: boolean) {},
     registerCurrentInteraction: (
       submitAnswerFn: Function,
       validateExpressionFn: Function
