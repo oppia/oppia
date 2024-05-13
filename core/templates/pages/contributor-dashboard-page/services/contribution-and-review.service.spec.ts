@@ -316,7 +316,7 @@ describe('Contribution and review service', () => {
           const data = response.certificate_data;
 
           if (!data) {
-            fail("expected data to not be null");
+            fail('expected data to not be null');
             return;
           }
 
