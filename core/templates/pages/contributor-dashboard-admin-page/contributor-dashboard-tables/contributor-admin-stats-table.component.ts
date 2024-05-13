@@ -71,11 +71,8 @@ export class ContributorAdminStatsTable implements OnInit {
   };
 
   columnsToDisplay: string[] = [];
-
-  dataSource: ContributorStats[] = [];
-
-  nextOffset: number = 0;
-  more: boolean = true;
+  allStats: ContributorStats[] = [];
+  tableCanShowMoreItems: boolean = true;
 
   expandedElement: ContributorStats[] | null = null;
 
@@ -90,21 +87,26 @@ export class ContributorAdminStatsTable implements OnInit {
   itemsPerPageChoice: number[] = [20, 50, 100];
   itemsPerPage: number = 20;
   statsPageNumber: number = 0;
+  // The maximumExpectedItems readony variable is used while fetching data from the datastore. We don't expect to ever exceed
+  // this number of items, so when we fetch the data, we retrieve all the items at once, and then handle the pagination within the component.
+  // If the number of items does happen to be exceeded, we will display a '+' sign next to the total number of items.
+  readonly maximumExpectedItems: number = 1000;
+  tableHasMoreThanMaximumExpectedItems: boolean = false;
   MOVE_TO_NEXT_PAGE: string = 'next_page';
   MOVE_TO_PREV_PAGE: string = 'prev_page';
-  firstTimeFetchingData: boolean = true;
 
   constructor(
     private windowRef: WindowRef,
-    private ContributorDashboardAdminStatsBackendApiService: ContributorDashboardAdminStatsBackendApiService,
+    private contributorDashboardAdminStatsBackendApiService: ContributorDashboardAdminStatsBackendApiService,
     private contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService,
     private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
+    this.allStats = [];
     this.loadingMessage = 'Loading';
     if (this.inputs.filter) {
-      this.updateColumnsToDisplay();
+      this.displayContributorAdminStats();
     }
   }
 
@@ -229,10 +231,25 @@ export class ContributorAdminStatsTable implements OnInit {
       });
   }
 
-  getUpperLimitValueForPagination(): number {
+  getIndexOfLastItemOnPage(): number {
     return Math.min(
       this.statsPageNumber * this.itemsPerPage + this.itemsPerPage,
-      this.statsPageNumber * this.itemsPerPage + this.dataSource.length
+      this.allStats.length
+    );
+  }
+
+  getDisplayedIndexOfFirstItemOnPage(): number {
+    return this.getIndexOfFirstItemOnPage() + 1;
+  }
+
+  private getIndexOfFirstItemOnPage(): number {
+    return this.statsPageNumber * this.itemsPerPage;
+  }
+
+  getOverallItemCount(): string {
+    return (
+      this.allStats.length.toString() +
+      (this.tableHasMoreThanMaximumExpectedItems ? '+' : '')
     );
   }
 
@@ -336,7 +353,14 @@ export class ContributorAdminStatsTable implements OnInit {
     }
   }
 
-  updateColumnsToDisplay(): void {
+  displayStatsForCurrentPage(): ContributorStats[] {
+    return this.allStats.slice(
+      this.getIndexOfFirstItemOnPage(),
+      this.getIndexOfLastItemOnPage()
+    );
+  }
+
+  fetchContributorAdminStats(): void {
     let contributionType: string = this.getContributionType(
       this.inputs.activeTab
     );
@@ -344,39 +368,60 @@ export class ContributorAdminStatsTable implements OnInit {
       this.inputs.activeTab
     );
 
-    this.ContributorDashboardAdminStatsBackendApiService.fetchContributorAdminStats(
-      this.inputs.filter,
-      this.itemsPerPage,
-      this.nextOffset,
-      contributionType,
-      contributionSubType
-    ).then(response => {
-      this.dataSource = response.stats;
-      this.nextOffset = response.nextOffset;
-      this.more = response.more;
+    this.contributorDashboardAdminStatsBackendApiService
+      .fetchContributorAdminStats(
+        this.inputs.filter,
+        this.maximumExpectedItems,
+        0,
+        contributionType,
+        contributionSubType
+      )
+      .then(response => {
+        this.allStats = response.stats;
+        this.tableHasMoreThanMaximumExpectedItems = response.more;
+        this.tableCanShowMoreItems =
+          this.getIndexOfLastItemOnPage() < this.allStats.length;
+        this.loadingMessage = '';
+        if (!this.hasSomeStats()) {
+          this.noDataMessage = 'No statistics to display';
+        } else {
+          this.noDataMessage = '';
+          this.updateColumns(contributionSubType);
+        }
+      });
+  }
+
+  hasSomeStats(): boolean {
+    return this.allStats.length > 0;
+  }
+
+  displayContributorAdminStats(): void {
+    if (!this.hasSomeStats()) {
+      this.fetchContributorAdminStats();
+    } else {
+      this.tableCanShowMoreItems =
+        this.getIndexOfLastItemOnPage() < this.allStats.length;
       this.loadingMessage = '';
       this.noDataMessage = '';
-      if (this.dataSource.length === 0) {
-        this.noDataMessage = 'No statistics to display';
-      } else {
-        this.updateColumns(contributionSubType);
-      }
-    });
+    }
   }
 
   refreshPagination(): void {
     this.loadingMessage = 'Loading';
-    this.nextOffset = 0;
-    this.dataSource = [];
-    this.more = true;
-    this.firstTimeFetchingData = true;
+    this.allStats = [];
     this.goToPageNumber(0);
+  }
+
+  onItemsPerPageChange(newItemsPerPage: string): void {
+    // Convert newItemsPerPage to a number, as Angular has converted
+    // the numbers in the dropdown that calls this function to strings.
+    this.itemsPerPage = Number(newItemsPerPage);
+    this.refreshPagination();
   }
 
   goToPageNumber(pageNumber: number): void {
     this.statsPageNumber = pageNumber;
-    this.nextOffset = pageNumber * this.itemsPerPage;
-    this.updateColumnsToDisplay();
+    this.displayContributorAdminStats();
   }
 
   navigatePage(direction: string): void {
