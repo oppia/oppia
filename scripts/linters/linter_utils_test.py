@@ -111,7 +111,7 @@ class ColorMessagePrintTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self.log,
-            red_color_message_prefix + message + escape_sequence)
+            f'{red_color_message_prefix}{message}{escape_sequence}')
 
     def test_print_success_message_in_green_color(self) -> None:
         message = 'Failure Message'
@@ -123,4 +123,4 @@ class ColorMessagePrintTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self.log,
-            green_color_message_prefix + message + escape_sequence)
+            f'{green_color_message_prefix}{message}{escape_sequence}')
