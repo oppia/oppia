@@ -71,21 +71,21 @@ export class EntityVoiceovers {
     entityVoiceoversBackendDict: EntityVoiceoversBackendDict
   ): EntityVoiceovers {
     let contentIdToVoiceoversMapping = {};
-    for (let contentId in entityVoiceoversBackendDict['voiceovers']) {
+    for (let contentId in entityVoiceoversBackendDict.voiceovers_mapping) {
       let voiceoverTypeToVoiceovers =
-        entityVoiceoversBackendDict['voiceovers'][contentId];
+        entityVoiceoversBackendDict.voiceovers_mapping[contentId];
 
       contentIdToVoiceoversMapping[contentId] = {
         manual: Voiceover.createFromBackendDict(
-          voiceoverTypeToVoiceovers['manual']
+          voiceoverTypeToVoiceovers.manual
         ),
       };
     }
     return new EntityVoiceovers(
-      entityVoiceoversBackendDict['entity_id'],
-      entityVoiceoversBackendDict['entity_type'],
-      entityVoiceoversBackendDict['entity_version'],
-      entityVoiceoversBackendDict['language_accent_code'],
+      entityVoiceoversBackendDict.entity_id,
+      entityVoiceoversBackendDict.entity_type,
+      entityVoiceoversBackendDict.entity_version,
+      entityVoiceoversBackendDict.language_accent_code,
       contentIdToVoiceoversMapping
     );
   }

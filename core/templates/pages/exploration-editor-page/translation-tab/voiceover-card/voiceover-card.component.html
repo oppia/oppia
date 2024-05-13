@@ -3,7 +3,8 @@
   <div *ngIf="pageIsLoaded">
     <div *ngIf="unsupportedLanguageCode">
       <i>Voiceover functionality for this language is not yet supported in Oppia.
-        Please contact a server admin for more details.</i>
+        Please contact a server admin for more details.
+      </i>
     </div>
   </div>
   {{languageAccentCodeIsSelected}}
@@ -57,12 +58,12 @@
     margin-bottom: 4px;
   }
   .needs-update-button-icon {
-    color: white;
-    background-color: #E9B330;
+    background-color: #e9b330;
+    color: #fff;
   }
   .does-not-needs-update-button-icon {
-    color: white;
     background-color: #009688;
+    color: #fff;
   }
   .language-accent-selector {
     width: 350px;
@@ -71,19 +72,19 @@
     margin: 10px;
   }
   .audio-button {
-    border-radius: 20px;
-    margin: 10px;
-    color: white;
     background-color: #009688;
+    border-radius: 20px;
+    color: #fff;
+    margin: 10px;
   }
   .voiceover-progress {
     margin: 10px;
     width: 50%;
   }
   .voiceovers-component {
-    display: flex;
     align-items: center;
-    justify-content: space-evenly
+    display: flex;
+    justify-content: space-evenly;
   }
   .add-new-manual-voiceovers {
     text-align: center;
