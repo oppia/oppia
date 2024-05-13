@@ -177,7 +177,7 @@ export class ContributionOpportunitiesBackendApiService {
           const opportunities = data.opportunities.map(dict =>
             ExplorationOpportunitySummary.createFromBackendDict(dict)
           );
-
+          console.log(opportunities);
           return {
             opportunities: opportunities,
             nextCursor: data.next_cursor,

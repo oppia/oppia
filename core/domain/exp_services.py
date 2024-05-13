@@ -62,6 +62,7 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
+from core.domain import translation_fetchers
 from core.domain import translation_services
 from core.domain import user_domain
 from core.domain import user_services
@@ -2103,13 +2104,30 @@ def compute_models_to_put_when_saving_new_exp_version(
             )
         translation_changes.append(change)
 
-    new_translation_models, translation_counts = (
+    translation_models, translation_counts = (
         translation_services.compute_translation_related_change(
             updated_exploration,
             translation_changes
         )
     )
+
+    print('=======================================================================')
+    print('=======================================================================')
+    print('=======================================================================')
+    print('=======================================================================')
+    new_translation_models = []
+    for translation_model in translation_models:
+        new_translation_model = translation_model
+        for content_id in content_ids_corresponding_translations_to_remove:
+            if content_id in translation_model.translations:
+                del translation_model.translations[content_id]
+        new_translation_models.append(new_translation_model)
+    print('=======================================================================')
+    print('=======================================================================')
+    print('=======================================================================')
+    print('=======================================================================')
     models_to_put.extend(new_translation_models)
+
     # Auto-reject any pending translation suggestions that are now obsolete due
     # to the corresponding content being deleted. See issue #16022 for context.
     # TODO(#16022): Refactor to compute the suggestion, suggestion stats, and
@@ -2545,8 +2563,6 @@ def revert_exploration(
 
     revert_version_history(exploration_id, current_version, revert_to_version)
 
-    regenerate_exploration_and_contributors_summaries(exploration_id)
-
     exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, list(exploration.states.keys()),
         None, revert_to_version)
@@ -2562,6 +2578,8 @@ def revert_exploration(
         )
     )
     datastore_services.put_multi(exp_issues_models_to_put)
+
+    regenerate_exploration_and_contributors_summaries(exploration_id)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
