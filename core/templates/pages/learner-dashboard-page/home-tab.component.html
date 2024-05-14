@@ -95,7 +95,7 @@
           ) | translate
         }}
       </p>
-      <div class="d-flex flex-wrap justify-content-between w-100"> 
+      <div class="d-flex flex-wrap justify-content-between w-100">
         <!--TODO(#18384): Replace with all lessons in progress data (only contains classroom cards); affects ngIf, numCards, ng-content-->
         <card-display *ngIf="continueWhereYouLeftOffList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_PROGRESS_SECTION'" [numCards]="1" [tabType]="'home'">
           <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
