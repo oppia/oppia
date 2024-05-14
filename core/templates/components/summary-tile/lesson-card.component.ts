@@ -109,7 +109,7 @@ export class LessonCardComponent implements OnInit {
     this.progress = 0;
     this.title = explorationModel.title;
     this.lessonUrl = `/explore/${explorationModel.id}`;
-    this.lessonTopic = 'Community Lessons';
+    this.lessonTopic = 'Community Lesson';
   }
 
   getStorySummaryThumbnailUrl(filename: string, id: string): string {

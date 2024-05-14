@@ -12,7 +12,7 @@
         <p class="lesson-card-title mb-0"> {{ title }} </p>
       </div>
       <p class="lesson-card-topic mb-0"> {{ 'I18N_LEARNER_DASHBOARD_CARD_TOPIC' | translate: {cardTopic: lessonTopic} }} </p>
-      <p class="lesson-card-desc mb-0"> {{ desc }} </p>
+      <p class="lesson-card-desc mb-0"> {{ desc.charAt(0).toUpperCase() + desc.slice(1) }} </p>
     </div>
     <div class="align-items-center d-flex justify-content-between mt-2">
       <circle-progress [percent]="progress"> </circle-progress>
