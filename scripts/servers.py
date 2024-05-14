@@ -799,9 +799,14 @@ def managed_acceptance_tests_server(
     nodemodules_jest_bin_path = os.path.join(
         common.NODE_MODULES_PATH, '.bin', 'jest')
 
+    # jest_args = [
+    #     nodemodules_jest_bin_path, 'logged-in-user-tests/click-all-buttons-on-about-page',
+    #     '--config=jest.config.js --detectOpenHandles --forceExit'
+    # ]
+
     jest_args = [
-        nodemodules_jest_bin_path, 'logged-in-user-tests/click-all-buttons-on-about-page',
-        '--config=jest.config.js --detectOpenHandles --forceExit'
+        nodemodules_jest_bin_path, suite_name,
+        '--config=jest.config.js'
     ]
 
     jest_proc = managed_process(

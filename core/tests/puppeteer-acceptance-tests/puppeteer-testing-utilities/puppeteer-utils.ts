@@ -415,18 +415,26 @@ export class BaseUser {
   }
 
   /**
+   * await page.$("body")
    * This function takes a screenshot of the current page
    * If there's no image named as the given string, it stores the screenshot with the given string in the file __image_snapshots__
    * Otherwise, it compares the screenshot with the image named as the given string to check if they match.
    * If they don't match, it generates an image in the file __diff_output__ to show the difference.
    */
-  screenshotMatch(imageName: string) {
+  async screenshotMatch(imageName: string): Promise<void> {
     try {
-      (<any>expect(this.page.screenshot())).toMatchImageSnapshot({
+      console.log(`start screenshot for ${imageName}, ${this.page.url()}`);
+      // await this.page.$('body');
+      // await this.page.waitForTimeout(3000);
+      // await this.page.waitForNavigation({
+      //   waitUntil: 'networkidle0',
+      // });
+      (<any>expect(await this.page.screenshot())).toMatchImageSnapshot({
         failureThreshold: '0.01',
         failureThresholdType: 'percent',
         customSnapshotIdentifier: imageName,
       });
+      console.log(`done screenshot for ${imageName}, ${this.page.url()}`);
     } catch (e) {
       throw new Error(e);
     }

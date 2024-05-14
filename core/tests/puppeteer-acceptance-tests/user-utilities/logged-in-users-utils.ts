@@ -126,6 +126,7 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToAboutPage(): Promise<void> {
     await this.goto(aboutUrl);
+    showMessage('called navigateToAboutPage');
   }
 
   /**
@@ -161,9 +162,21 @@ export class LoggedInUser extends BaseUser {
     expectedDestinationPageUrl: string,
     expectedDestinationPageName: string
   ): Promise<void> {
-    await Promise.all([this.page.waitForNavigation(), this.clickOn(button)]);
-
-    expect(this.page.url()).toBe(expectedDestinationPageUrl);
+    showMessage(`start ${buttonName}, ${this.page.url()}`);
+    await Promise.all([
+      this.page.waitForNavigation({
+        waitUntil: 'networkidle0',
+      }),
+      this.clickOn(button),
+    ]);
+    try {
+      expect(this.page.url()).toBe(expectedDestinationPageUrl);
+      showMessage(`done ${buttonName}, ${this.page.url()}`);
+    } catch (e) {
+      throw new Error(
+        `${buttonName} should open the ${expectedDestinationPageName} page`
+      );
+    }
   }
 
   /**
@@ -201,8 +214,6 @@ export class LoggedInUser extends BaseUser {
       mathClassroomUrl,
       'Math Classroom'
     );
-
-    await this.screenshotMatch('Math Classroom');
   }
 
   /**
@@ -249,6 +260,7 @@ export class LoggedInUser extends BaseUser {
    * and check if it opens the Creator Dashboard page in Create Mode.
    */
   async clickCreateLessonsButtonInAboutPage(): Promise<void> {
+    showMessage('start clickCreateLessonsButtonInAboutPage');
     await this.clickOn(createLessonsButton);
     if (this.page.url() !== creatorDashboardCreateModeUrl) {
       throw new Error(
@@ -261,7 +273,9 @@ export class LoggedInUser extends BaseUser {
           'in Create Mode.'
       );
     }
-    await this.page.waitForNavigation();
+    await this.page.waitForNavigation({
+      waitUntil: 'networkidle0',
+    });
     const urlRegex =
       /http:\/\/localhost:8181\/create\/\w*(\/gui\/Introduction)?/;
     if (this.page.url().match(urlRegex) === null) {
@@ -274,6 +288,7 @@ export class LoggedInUser extends BaseUser {
         'The Create Lessons button displays the Exploration Editor page.'
       );
     }
+    showMessage('done clickCreateLessonsButtonInAboutPage');
   }
 
   /**
