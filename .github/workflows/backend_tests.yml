@@ -65,6 +65,7 @@ jobs:
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: pip install coverage
       - name: Initialze Containers
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: |
           make build
           sudo make run-devserver
