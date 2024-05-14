@@ -67,6 +67,7 @@ export default {
     Terms: 'http://localhost:8181/terms',
     Volunteer: 'http://localhost:8181/volunteer',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
+    ProfilePagePrefix: 'http://localhost:8181/profile',
     GoogleGroups: {
       Oppia: 'https://groups.google.com/g/oppia',
       OppiaAnnounce: 'https://groups.google.com/g/oppia-announce',

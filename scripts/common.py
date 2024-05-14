@@ -230,6 +230,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user-tests/click-all-links-on-terms-page',
     'logged-in-user-tests/click-all-social-icons-in-oppia-footer',
     'logged-in-user-tests/click-more-links-in-oppia-footer',
+    'logged-in-user-tests/subscribe-to-creator-and-view-all-explorations-' +
+        'by-that-creator',
     'practice-question-admin-tests/add-and-remove-contribution-rights',
     'translation-admin-tests/add-translation-rights',
     'translation-admin-tests/remove-translation-rights',
