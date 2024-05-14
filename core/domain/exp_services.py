@@ -2104,28 +2104,18 @@ def compute_models_to_put_when_saving_new_exp_version(
             )
         translation_changes.append(change)
 
-    translation_models, translation_counts = (
+    new_translation_models, translation_counts = (
         translation_services.compute_translation_related_change(
             updated_exploration,
             translation_changes
         )
     )
 
-    print('=======================================================================')
-    print('=======================================================================')
-    print('=======================================================================')
-    print('=======================================================================')
-    new_translation_models = []
-    for translation_model in translation_models:
-        new_translation_model = translation_model
+    for new_translation_model in new_translation_models:
         for content_id in content_ids_corresponding_translations_to_remove:
-            if content_id in translation_model.translations:
-                del translation_model.translations[content_id]
-        new_translation_models.append(new_translation_model)
-    print('=======================================================================')
-    print('=======================================================================')
-    print('=======================================================================')
-    print('=======================================================================')
+            if content_id in new_translation_model.translations:
+                del new_translation_model.translations[content_id]
+    
     models_to_put.extend(new_translation_models)
 
     # Auto-reject any pending translation suggestions that are now obsolete due
@@ -2531,6 +2521,16 @@ def revert_exploration(
     exploration_model = exp_models.ExplorationModel.get(
         exploration_id, strict=True)
 
+    models_to_put: List[
+        base_models.BaseModel
+    ] = []
+
+    new_translation_models, translation_counts = (
+        translation_services.compute_translation_related_change_upon_revert(
+            exploration_model, revert_to_version))
+
+    models_to_put.extend(new_translation_models)
+
     if current_version > exploration_model.version:
         raise Exception(
             'Unexpected error: trying to update version %s of exploration '
@@ -2563,6 +2563,18 @@ def revert_exploration(
 
     revert_version_history(exploration_id, current_version, revert_to_version)
 
+    if opportunity_services.is_exploration_available_for_contribution(
+        exploration_id
+    ):
+        models_to_put.extend(
+            opportunity_services
+            .compute_opportunity_models_with_updated_exploration(
+                exploration_id,
+                exploration.get_content_count(),
+                translation_counts
+            )
+        )
+
     exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, list(exploration.states.keys()),
         None, revert_to_version)
@@ -2578,6 +2590,7 @@ def revert_exploration(
         )
     )
     datastore_services.put_multi(exp_issues_models_to_put)
+    datastore_services.put_multi(models_to_put)
 
     regenerate_exploration_and_contributors_summaries(exploration_id)
 

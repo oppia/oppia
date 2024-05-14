@@ -22,6 +22,7 @@ import logging
 
 from core import feconf
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import translation_domain
 from core.domain import translation_fetchers
 from core.platform import models
@@ -226,6 +227,56 @@ def compute_translation_related_change(
                 entity_translation.entity_type,
                 entity_translation.entity_id,
                 entity_translation.entity_version + 1,
+                entity_translation.language_code,
+                entity_translation.to_dict()['translations']
+            )
+        )
+    return new_translation_models, translation_counts
+
+def compute_translation_related_change_upon_revert(
+    exploration: exp_domain.Exploration,
+    revert_to_version: int
+) -> Tuple[List[translation_models.EntityTranslationsModel], Dict[str, int]]:
+    """Cretase new EntityTranslation models corresponding to translation related
+    changes.
+
+    Args:
+        exploration: Exploration. The updated exploration object.
+        translation_changes: list(ExplorationChange). The list of changes to be
+            applied.
+
+    Returns:
+        Tuple(list(EntityTranslationsModel), dict(str, int)). A tuple containing
+        list of new EntityTranslationsModel and a dict with count of translated
+        contents as value and the languages as key.
+    """
+    revert_to_exploration = exp_fetchers.get_exploration_by_id(exploration.id, revert_to_version)
+    current_exploration = exp_fetchers.get_exploration_by_id(exploration.id)
+
+    language_code_to_entity_translation = {
+        entity_translation.language_code: entity_translation
+        for entity_translation in (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION,
+                exploration.id,
+                revert_to_version
+            )
+        )
+    }
+
+    # Create entity_translation models for all languages.
+    new_translation_models = []
+    translation_counts = {}
+    for entity_translation in language_code_to_entity_translation.values():
+
+        translation_counts[entity_translation.language_code] = (
+            current_exploration.get_translation_count(entity_translation))
+
+        new_translation_models.append(
+            translation_models.EntityTranslationsModel.create_new(
+                entity_translation.entity_type,
+                entity_translation.entity_id,
+                exploration.version + 1,
                 entity_translation.language_code,
                 entity_translation.to_dict()['translations']
             )
