@@ -22,7 +22,7 @@ import logging
 import textwrap
 
 from core import feconf
-from core.domain import platform_parameter_services
+from core.domain import platform_parameter_list
 from core.platform.email import dev_mode_email_services
 from core.tests import test_utils
 
@@ -32,6 +32,9 @@ from typing import Dict, Union
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_send_mail_logs_to_terminal(self) -> None:
         """In DEV Mode, platforms email_service API that sends a singular email
         logs the correct email info to terminal.
@@ -68,15 +71,7 @@ class EmailTests(test_utils.GenericTestBase):
             'dev environment. Emails are sent out in the production' +
             ' environment.')
 
-        allow_emailing = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
-        with allow_emailing, (
-            self.swap(logging, 'info', _mock_logging_function)):
+        with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_email_services.send_email_to_recipients(
                 feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
                 'subject', 'body', 'html')
@@ -85,6 +80,9 @@ class EmailTests(test_utils.GenericTestBase):
             observed_log_messages,
             [logging_info_email_body, logging_info_notification])
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_send_mail_to_multiple_recipients_logs_to_terminal(self) -> None:
         """In DEV Mode, platform email_services that sends mail to multiple
         recipients logs the correct info to terminal.
@@ -131,15 +129,7 @@ class EmailTests(test_utils.GenericTestBase):
             'dev environment. Emails are sent out in the production' +
             ' environment.')
 
-        allow_emailing = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
-        with allow_emailing, (
-            self.swap(logging, 'info', _mock_logging_function)):
+        with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_email_services.send_email_to_recipients(
                 feconf.SYSTEM_EMAIL_ADDRESS,
                 ['a@a.com', 'b@b.com', 'c@c.com', 'd@d.com'],

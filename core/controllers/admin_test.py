@@ -2394,36 +2394,25 @@ class SendDummyMailTest(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-    def test_send_dummy_mail(self) -> None:
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
+    def test_can_send_dummy_mail(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
+        generated_response = self.post_json(
+            '/senddummymailtoadminhandler', {},
+            csrf_token=csrf_token, expected_status_int=200)
+        self.assertEqual(generated_response, {})
 
-        swap_can_send_email_platform_parameter_value = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
-        with swap_can_send_email_platform_parameter_value:
-            generated_response = self.post_json(
-                '/senddummymailtoadminhandler', {},
-                csrf_token=csrf_token, expected_status_int=200)
-            self.assertEqual(generated_response, {})
-
-        swap_can_send_email_platform_parameter_value = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                False
-            )
-        )
-        with swap_can_send_email_platform_parameter_value:
-            generated_response = self.post_json(
-                '/senddummymailtoadminhandler', {},
-                csrf_token=csrf_token, expected_status_int=400)
-            self.assertEqual(
-                generated_response['error'], 'This app cannot send emails.')
+    def test_cannot_send_dummy_mail(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        generated_response = self.post_json(
+            '/senddummymailtoadminhandler', {},
+            csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            generated_response['error'], 'This app cannot send emails.')
 
 
 class UpdateUsernameHandlerTest(test_utils.GenericTestBase):

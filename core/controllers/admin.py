@@ -1865,13 +1865,13 @@ class SendDummyMailToAdminHandler(
         """
         username = self.username
         assert username is not None
-        can_send_emails = (
+        server_can_send_emails = (
             parameter_services.get_platform_parameter_value(
                 platform_parameter_list.ParamName.
-                CAN_SEND_EMAILS.value
+                SERVER_CAN_SEND_EMAILS.value
             )
         )
-        if can_send_emails:
+        if server_can_send_emails:
             email_manager.send_dummy_mail_to_admin(username)
             self.render_json({})
         else:

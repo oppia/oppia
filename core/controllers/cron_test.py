@@ -352,32 +352,24 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
 
-        self.can_send_emails = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
-        self.cannot_send_emails = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                False
-            )
-        )
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
         self.reviewers_suggestion_email_infos = []
         self.reviewer_ids = []
 
+    @test_utils.use_platform_parameters(
+        [
+            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
+            [platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, False], # pylint: disable=line-too-long
+        ]
+    )
     def test_email_not_sent_if_sending_reviewer_emails_is_not_enabled(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
@@ -398,7 +390,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             True
         )
 
-        with self.cannot_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with swap_platform_parameter_value, self.swap(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
@@ -411,6 +403,9 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
         self.logout()
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(
         self
     ) -> None:
@@ -421,7 +416,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             True
         )
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with swap_platform_parameter_value, self.swap(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
@@ -437,6 +432,9 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             self.reviewers_suggestion_email_infos[0][0],
             self.expected_reviewable_suggestion_email_info)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_email_not_sent_if_reviewer_ids_is_empty(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         swap_platform_parameter_value = self.swap_to_always_return(
@@ -447,7 +445,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         user_services.remove_translation_review_rights_in_language(
             self.reviewer_id, self.language_code)
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with swap_platform_parameter_value, self.swap(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
@@ -530,7 +528,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 False
             )
 
-            with self.can_send_emails, self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
+            with self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
                 self.get_json(
                     '/cron/mail/reviewers/new_cont' +
                     'ributor_dashboard_suggestions')
@@ -564,20 +562,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
 
-        self.can_send_emails = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
-        self.cannot_send_emails = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                False
-            )
-        )
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
@@ -597,7 +581,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 True
             )
 
-            with self.cannot_send_emails, self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
+            with self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
                 self.get_json(
                     '/cron/mail/reviewers/new_contr' +
                     'ibutor_dashboard_suggestions')
@@ -605,6 +589,9 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             mock_send.assert_not_called()
             self.logout()
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(self) -> None: # pylint: disable=line-too-long
         # Here we use object because we need to spy on
         # send_reviewer_notifications method and assert
@@ -621,7 +608,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 True
             )
 
-            with self.can_send_emails, self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
+            with self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
                 self.get_json(
                     '/cron/mail/reviewers/new_cont' +
                     'ributor_dashboard_suggestions')
@@ -632,6 +619,9 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
             self.logout()
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_email_not_sent_if_reviewer_ids_is_empty(self) -> None:
         # Here we use object because we need to spy on
         # send_reviewer_notifications method and assert
@@ -653,7 +643,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             user_services.remove_translation_review_rights_in_language(
                 self.reviewer_id, 'hi'
             )
-            with self.can_send_emails, self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
+            with self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
                 self.get_json(
                     '/cron/mail/reviewers/new_contr' +
                     'ibutor_dashboard_suggestions')
@@ -663,6 +653,9 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             )
             self.logout()
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_email_sent_to_reviewers_successfully(self) -> None:
         # Here we use object because we need to spy on
         # send_reviewer_notifications method and assert
@@ -677,7 +670,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 True
             )
 
-            with self.can_send_emails, self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
+            with self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
                 self.get_json(
                     '/cron/mail/reviewers/new_contr' +
                     'ibutor_dashboard_suggestions')
@@ -844,20 +837,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
         }
 
-        self.can_send_emails = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
-        self.cannot_send_emails = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                False
-            )
-        )
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
@@ -875,7 +854,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             True
         )
 
-        with self.cannot_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with swap_platform_parameter_value, self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
@@ -895,12 +874,19 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.assertEqual(len(self.reviewable_suggestion_email_infos), 0)
         self.assertDictEqual(self.suggestion_types_needing_reviewers, {})
 
+    @test_utils.use_platform_parameters(
+        [
+            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
+            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True], # pylint: disable=line-too-long
+            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, False] # pylint: disable=line-too-long
+        ]
+    )
     def test_email_not_sent_if_notifying_admins_reviewers_needed_is_disabled(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
@@ -913,12 +899,19 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
         self.logout()
 
+    @test_utils.use_platform_parameters(
+        [
+            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
+            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True], # pylint: disable=line-too-long
+            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, False] # pylint: disable=line-too-long
+        ]
+    )
     def test_email_not_sent_if_notifying_admins_about_suggestions_is_disabled(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
@@ -931,6 +924,9 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
         self.logout()
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_email_sent_to_admin_if_sending_admin_need_reviewers_emails_enabled(
         self
     ) -> None:
@@ -941,7 +937,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             True
         )
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with swap_platform_parameter_value, self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
@@ -955,6 +951,15 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             self.suggestion_types_needing_reviewers,
             self.expected_suggestion_types_needing_reviewers)
 
+    @test_utils.use_platform_parameters(
+        [
+            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
+            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin'],
+            [platform_parameter_list.ParamName.EMAIL_FOOTER, 'dummy_footer'],
+            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True], # pylint: disable=line-too-long
+            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True] # pylint: disable=line-too-long
+        ]
+    )
     def test_email_sent_to_admin_if_notifying_admins_about_suggestions_enabled(
         self
     ) -> None:
@@ -982,7 +987,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             False
         )
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
@@ -1073,20 +1078,6 @@ class CronMailChapterPublicationsNotificationsHandlerTests(
             story_domain.StoryPublicationTimeliness(
             'story_2', 'Story 2', 'Topic', ['Chapter 3'], ['Chapter 4']))
 
-        self.can_send_emails = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
-        self.cannot_send_emails = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                False
-            )
-        )
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
@@ -1122,7 +1113,7 @@ class CronMailChapterPublicationsNotificationsHandlerTests(
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        with self.cannot_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_reminder_mail_to_notify_curriculum_admins',
@@ -1136,10 +1127,13 @@ class CronMailChapterPublicationsNotificationsHandlerTests(
 
         self.logout()
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_email_sent_if_sending_emails_is_enabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_reminder_mail_to_notify_curriculum_admins',

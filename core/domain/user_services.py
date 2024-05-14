@@ -1662,12 +1662,12 @@ def update_email_preferences(
     email = get_email_from_user_id(user_id)
     # Mailchimp database should not be updated in servers where sending
     # emails is not allowed.
-    can_send_emails = (
+    server_can_send_emails = (
         platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.CAN_SEND_EMAILS.value
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
         )
     )
-    if not bulk_email_db_already_updated and can_send_emails:
+    if not bulk_email_db_already_updated and server_can_send_emails:
         user_creation_successful = (
             bulk_email_services.add_or_update_user_status(
                 email, {}, 'Account',

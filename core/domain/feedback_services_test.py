@@ -21,7 +21,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import feedback_domain
 from core.domain import feedback_services
-from core.domain import platform_parameter_services
+from core.domain import platform_parameter_list
 from core.domain import subscription_services
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
@@ -888,18 +888,14 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
-        self.can_send_emails_ctx = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_pop_feedback_message_references(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -927,8 +923,11 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.editor_id, strict=False)
             self.assertIsNone(model)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_update_feedback_message_references(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             # There are no feedback message references to remove.
             self.assertIsNone(
                 feedback_services
@@ -963,8 +962,11 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 model.feedback_message_references[0]['thread_id'],
                 thread_id)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_update_feedback_email_retries(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -983,8 +985,11 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.editor_id)
             self.assertEqual(model.retries, 1)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_send_feedback_message_email(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -1015,8 +1020,11 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 expected_feedback_message_dict)
             self.assertEqual(model.retries, 0)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_add_new_feedback_message(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -1060,13 +1068,16 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 expected_feedback_message_dict2)
             self.assertEqual(model.retries, 0)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_email_is_not_sent_recipient_has_muted_emails_globally(
         self
     ) -> None:
         user_services.update_email_preferences(
             self.editor_id, True, False, False, False)
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -1075,6 +1086,9 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_email_is_not_sent_recipient_has_muted_this_exploration(
         self
     ) -> None:
@@ -1082,7 +1096,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.editor_id, self.exploration.id,
             mute_feedback_notifications=True)
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -1091,8 +1105,11 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_that_emails_are_not_sent_for_anonymous_user(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id, 'test_id',
                 'a subject', 'some text')
@@ -1101,8 +1118,11 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_that_emails_are_sent_for_registered_user(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -1125,16 +1145,9 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 1)
 
     def test_that_emails_are_not_sent_if_service_is_disabled(self) -> None:
-        cannot_send_emails_ctx = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                False
-            )
-        )
         cannot_send_feedback_message_email_ctx = self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False)
-        with cannot_send_emails_ctx, cannot_send_feedback_message_email_ctx:
+        with cannot_send_feedback_message_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -1143,8 +1156,11 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_that_emails_are_not_sent_for_thread_status_changes(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', '')
@@ -1153,8 +1169,11 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_that_email_are_not_sent_to_author_himself(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.editor_id, 'a subject', 'A message')
@@ -1163,8 +1182,11 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_that_email_is_sent_for_reply_on_feedback(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'A message')
@@ -1187,8 +1209,11 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
             self.process_and_flush_pending_tasks()
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_that_email_is_sent_for_changing_status_of_thread(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'A message')
@@ -1215,8 +1240,11 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
             self.process_and_flush_pending_tasks()
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_that_email_is_sent_for_each_feedback_message(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.user_id_a, 'a subject', 'A message')
@@ -1258,16 +1286,12 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
-        self.can_send_emails_ctx = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_that_emails_are_sent(self) -> None:
         expected_email_html_body = (
             'Hi editor,<br>'
@@ -1304,7 +1328,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1323,6 +1347,9 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             self.assertEqual(messages[0].html, expected_email_html_body)
             self.assertEqual(messages[0].body, expected_email_text_body)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_that_correct_emails_are_sent_for_multiple_feedback(self) -> None:
         expected_email_html_body = (
             'Hi editor,<br>'
@@ -1361,7 +1388,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1384,8 +1411,11 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             self.assertEqual(messages[0].html, expected_email_html_body)
             self.assertEqual(messages[0].body, expected_email_text_body)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_that_emails_are_not_sent_if_already_seen(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1419,16 +1449,12 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
-        self.can_send_emails_ctx = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_that_emails_are_sent_for_feedback_message(self) -> None:
         expected_email_html_body = (
             'Hi newuser,<br><br>'
@@ -1456,7 +1482,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1475,6 +1501,9 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             self.assertEqual(messages[0].html, expected_email_html_body)
             self.assertEqual(messages[0].body, expected_email_text_body)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_that_emails_are_sent_for_status_change(self) -> None:
         expected_email_html_body = (
             'Hi newuser,<br><br>'
@@ -1501,7 +1530,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia team\n'
             '\n'
             'You can change your email preferences via the Preferences page.')
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1521,6 +1550,9 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             self.assertEqual(messages[0].html, expected_email_html_body)
             self.assertEqual(messages[0].body, expected_email_text_body)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_that_emails_are_sent_for_both_status_change_and_message(
         self
     ) -> None:
@@ -1575,7 +1607,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia team\n'
             '\n'
             'You can change your email preferences via the Preferences page.')
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
@@ -1598,8 +1630,11 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             self.assertEqual(messages[1].html, expected_email_html_body_message)
             self.assertEqual(messages[1].body, expected_email_text_body_message)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_that_emails_are_not_sent_to_anonymous_user(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             # Create thread as anonoymous user.
             feedback_services.create_thread(
                 'exploration', self.exploration.id,

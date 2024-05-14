@@ -30,7 +30,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
-from core.domain import platform_parameter_services
+from core.domain import platform_parameter_list
 from core.platform import models
 from core.tests import test_utils
 from proto_files import text_classifier_pb2
@@ -187,6 +187,9 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             classifier_training_job.status,
             feconf.TRAINING_JOB_STATUS_COMPLETE)
 
+    @test_utils.use_platform_parameters(
+        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+    )
     def test_email_sent_on_failed_job(self) -> None:
 
         class FakeTrainingJob:
@@ -198,13 +201,6 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         def mock_get_classifier_training_job_by_id(_: str) -> FakeTrainingJob:
             return FakeTrainingJob()
 
-        can_send_emails_ctx = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
         can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
         fail_training_job = self.swap(
@@ -212,7 +208,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             'get_classifier_training_job_by_id',
             mock_get_classifier_training_job_by_id)
 
-        with can_send_emails_ctx, can_send_feedback_email_ctx:
+        with can_send_feedback_email_ctx:
             with fail_training_job:
                 # Check that there are no sent emails to the
                 # email address before posting json.

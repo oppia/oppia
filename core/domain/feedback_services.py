@@ -381,19 +381,26 @@ def create_messages(
     suggestion_models.GeneralSuggestionModel.put_multi(
         suggestion_models_to_update)
 
-    can_send_emails = (
+    server_can_send_emails = (
         platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.CAN_SEND_EMAILS.value
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
         )
     )
-    if (can_send_emails and (
+    # TODO(#12079): Figure out a better way to avoid sending feedback
+    # thread emails for contributor dashboard suggestions.
+    message_changed = (
+        len(text) > 0 or old_statuses[index] != new_statuses[index]
+    )
+    if (
+        server_can_send_emails and
+        (
             feconf.CAN_SEND_TRANSACTIONAL_EMAILS and
             author_id is not None and
-            user_services.is_user_registered(author_id)) and
-            # TODO(#12079): Figure out a better way to avoid sending feedback
-            # thread emails for contributor dashboard suggestions.
-            (len(text) > 0 or old_statuses[index] != new_statuses[index]) and
-            should_send_email):
+            user_services.is_user_registered(author_id)
+        ) and
+        message_changed and
+        should_send_email
+    ):
         for index, thread_model in enumerate(thread_models):
             _add_message_to_email_buffer(
                 author_id, thread_model.id, message_ids[index],

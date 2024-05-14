@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from core.domain import platform_parameter_services
+from core.domain import platform_parameter_list
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
@@ -88,14 +88,12 @@ class EmailDraftHandlerTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
 
-        self.can_send_emails_ctx = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
-
+    @test_utils.use_platform_parameters(
+        [
+            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]
+            [platform_parameter_list.ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY, 'dummy body'], # pylint: disable=line-too-long
+        ]
+    )
     def test_get_draft_email_body(self) -> None:
         self.login(self.MODERATOR_EMAIL)
         d_text = self.get_json(
@@ -104,8 +102,7 @@ class EmailDraftHandlerTests(test_utils.GenericTestBase):
         expected_draft_text_body = (
             'I\'m writing to inform you that '
             'I have unpublished the above exploration.')
-        with self.can_send_emails_ctx:
-            d_text = self.get_json(
-                '/moderatorhandler/email_draft')['draft_email_body']
-            self.assertEqual(d_text, expected_draft_text_body)
+        d_text = self.get_json(
+            '/moderatorhandler/email_draft')['draft_email_body']
+        self.assertEqual(d_text, expected_draft_text_body)
         self.logout()

@@ -112,12 +112,12 @@ def send_mail(
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """
-    can_send_emails = (
+    server_can_send_emails = (
         platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.CAN_SEND_EMAILS.value
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
         )
     )
-    if not can_send_emails:
+    if not server_can_send_emails:
         raise Exception('This app cannot send emails to users.')
 
     if not _is_email_valid(recipient_email):
@@ -171,12 +171,12 @@ def send_bulk_mail(
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """
-    can_send_emails = (
+    server_can_send_emails = (
         platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.CAN_SEND_EMAILS.value
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
         )
     )
-    if not can_send_emails:
+    if not server_can_send_emails:
         raise Exception('This app cannot send emails to users.')
 
     for recipient_email in recipient_emails:

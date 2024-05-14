@@ -63,7 +63,7 @@ class FailedMLTest(test_utils.EmailTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.ADMIN_USERNAME = 'admusername'
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -77,7 +77,7 @@ class FailedMLTest(test_utils.EmailTestBase):
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
     def test_send_failed_ml_email(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_send_feedback_email_ctx:
             # Make sure there are no emails already sent.
             messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
@@ -255,7 +255,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
         self.expected_email_subject = (
             '%s - invitation to collaborate') % self.EXPLORATION_TITLE
 
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -275,7 +275,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False)
 
     def test_role_email_is_sent_when_editor_assigns_role(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             self.login(self.EDITOR_EMAIL)
 
             csrf_token = self.get_new_csrf_token()
@@ -295,7 +295,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
         user_services.update_email_preferences(
             self.new_user_id, True, False, False, False)
 
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_domain.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
@@ -303,7 +303,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
-    def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         with self.can_not_send_emails_ctx:
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_domain.ROLE_OWNER,
@@ -314,7 +314,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
     def test_that_email_not_sent_if_can_send_transactional_emails_is_false(
         self
     ) -> None:
-        with self.can_send_emails_ctx, self.can_not_send_editor_role_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_not_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id,
                 rights_domain.ROLE_EDITOR, self.exploration.id,
@@ -323,7 +323,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     def test_role_emails_sent_are_correct(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_domain.ROLE_VIEWER,
                 self.exploration.id, self.exploration.title)
@@ -401,7 +401,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that correct email content is sent for Manager.
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_domain.ROLE_OWNER,
@@ -458,7 +458,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that correct email content is sent for Editor.
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_domain.ROLE_EDITOR,
@@ -513,7 +513,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that correct email content is sent for Playtester.
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_domain.ROLE_VIEWER,
@@ -526,7 +526,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_correct_undefined_role_raises_an_exception(self) -> None:
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that an exception is raised when an invalid
             # role is supplied.
             with self.assertRaisesRegex(Exception, 'Invalid role'):
@@ -698,7 +698,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self._reset_signup_email_content_platform_parameters()
 
     def test_email_not_sent_if_content_parameter_is_not_modified(self) -> None:
-        can_send_emails_ctx = (
+        server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -711,7 +711,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             logging, 'error', log_new_error_counter)
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
-            with can_send_emails_ctx, log_new_error_ctx:
+            with server_can_send_emails_ctx, log_new_error_ctx:
                 self.assertEqual(log_new_error_counter.times_called, 0)
 
                 self.login(self.EDITOR_EMAIL)
@@ -748,7 +748,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_content_config_is_partially_modified(
         self
     ) -> None:
-        can_send_emails_ctx = (
+        server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -781,7 +781,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             logging, 'error', log_new_error_counter)
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
-            with can_send_emails_ctx, log_new_error_ctx:
+            with server_can_send_emails_ctx, log_new_error_ctx:
                 self.assertEqual(log_new_error_counter.times_called, 0)
 
                 self.login(self.EDITOR_EMAIL)
@@ -817,7 +817,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
         self._reset_signup_email_content_platform_parameters()
 
     def test_email_with_bad_content_is_not_sent(self) -> None:
-        can_send_emails_ctx = (
+        server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -832,7 +832,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             logging, 'error', log_new_error_counter)
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
-            with can_send_emails_ctx, log_new_error_ctx:
+            with server_can_send_emails_ctx, log_new_error_ctx:
                 self.assertEqual(log_new_error_counter.times_called, 0)
 
                 self.login(self.EDITOR_EMAIL)
@@ -1207,7 +1207,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 _generate_hash_for_tests, email_models.SentEmailModel))
 
     def test_send_email_does_not_resend_if_same_hash_exists(self) -> None:
-        can_send_emails_ctx = (
+        server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -1223,7 +1223,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             logging, 'error', log_new_error_counter)
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
-            with can_send_emails_ctx, duplicate_email_ctx, log_new_error_ctx:
+            with server_can_send_emails_ctx, duplicate_email_ctx, log_new_error_ctx:
                 all_models: Sequence[
                     email_models.SentEmailModel
                 ] = email_models.SentEmailModel.get_all().fetch()
@@ -1263,7 +1263,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 self.assertEqual(len(all_models), 1)
 
     def test_send_email_does_not_resend_within_duplicate_interval(self) -> None:
-        can_send_emails_ctx = (
+        server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -1287,7 +1287,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
         with swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR
         ) as logs:
-            with can_send_emails_ctx, duplicate_email_ctx, log_new_error_ctx:
+            with server_can_send_emails_ctx, duplicate_email_ctx, log_new_error_ctx:
                 all_models: Sequence[
                     email_models.SentEmailModel
                 ] = email_models.SentEmailModel.get_all().fetch()
@@ -1330,7 +1330,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     def test_sending_email_with_different_recipient_but_same_hash(self) -> None:
         """Hash for both messages is same but recipients are different."""
-        can_send_emails_ctx = (
+        server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -1341,7 +1341,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-        with can_send_emails_ctx, duplicate_email_ctx, self.generate_hash_ctx:
+        with server_can_send_emails_ctx, duplicate_email_ctx, self.generate_hash_ctx:
             all_models: Sequence[
                 email_models.SentEmailModel
             ] = email_models.SentEmailModel.get_all().fetch()
@@ -1385,7 +1385,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     def test_sending_email_with_different_subject_but_same_hash(self) -> None:
         """Hash for both messages is same but subjects are different."""
-        can_send_emails_ctx = (
+        server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -1396,7 +1396,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-        with can_send_emails_ctx, duplicate_email_ctx, self.generate_hash_ctx:
+        with server_can_send_emails_ctx, duplicate_email_ctx, self.generate_hash_ctx:
             all_models: Sequence[
                 email_models.SentEmailModel
             ] = email_models.SentEmailModel.get_all().fetch()
@@ -1441,7 +1441,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     def test_sending_email_with_different_body_but_same_hash(self) -> None:
         """Hash for both messages is same but body is different."""
-        can_send_emails_ctx = (
+        server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -1452,7 +1452,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-        with can_send_emails_ctx, duplicate_email_ctx, self.generate_hash_ctx:
+        with server_can_send_emails_ctx, duplicate_email_ctx, self.generate_hash_ctx:
             all_models: Sequence[
                 email_models.SentEmailModel
             ] = email_models.SentEmailModel.get_all().fetch()
@@ -1498,7 +1498,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
     def test_duplicate_emails_are_sent_after_some_time_has_elapsed(
         self
     ) -> None:
-        can_send_emails_ctx = (
+        server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -1509,7 +1509,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-        with can_send_emails_ctx, duplicate_email_ctx:
+        with server_can_send_emails_ctx, duplicate_email_ctx:
             all_models: Sequence[
                 email_models.SentEmailModel
             ] = email_models.SentEmailModel.get_all().fetch()
@@ -1580,7 +1580,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
         self.expected_email_subject = (
             'You\'ve received 3 new messages on your explorations')
 
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -1599,7 +1599,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
         self.can_not_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False)
 
-    def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         feedback_messages: Dict[str, email_manager.FeedbackMessagesDict] = {
             self.exploration.id: {
                 'title': self.exploration.title,
@@ -1621,7 +1621,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
                 'title': self.exploration.title,
                 'messages': ['Message 1.1', 'Message 1.2', 'Message 1.3']}
         }
-        with self.can_send_emails_ctx, self.can_not_send_feedback_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_not_send_feedback_email_ctx:
             email_manager.send_feedback_message_email(
                 self.editor_id, feedback_messages)
 
@@ -1631,7 +1631,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
 
     def test_that_email_not_sent_if_feedback_messages_are_empty(self) -> None:
         feedback_messages: Dict[str, email_manager.FeedbackMessagesDict] = {}
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_send_feedback_email_ctx:
             email_manager.send_feedback_message_email(
                 self.editor_id, feedback_messages)
 
@@ -1685,7 +1685,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
                 'messages': ['Message 1.1', 'Message 1.2', 'Message 1.3']}
         }
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_send_feedback_email_ctx:
             email_manager.send_feedback_message_email(
                 self.editor_id, feedback_messages)
 
@@ -1731,7 +1731,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
             'A', self.editor_id, title='Title')
         self.recipient_list = [self.editor_id]
 
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -1750,7 +1750,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
         self.can_not_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False)
 
-    def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         with self.can_not_send_emails_ctx:
             email_manager.send_suggestion_email(
                 self.exploration.title, self.exploration.id, self.new_user_id,
@@ -1764,7 +1764,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_can_send_transactional_emails_is_false(
         self
     ) -> None:
-        with self.can_send_emails_ctx, self.can_not_send_feedback_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_not_send_feedback_email_ctx:
             email_manager.send_suggestion_email(
                 self.exploration.title, self.exploration.id, self.new_user_id,
                 self.recipient_list)
@@ -1805,7 +1805,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_send_feedback_email_ctx:
             email_manager.send_suggestion_email(
                 self.exploration.title, self.exploration.id, self.new_user_id,
                 self.recipient_list)
@@ -1850,7 +1850,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
         subscription_services.subscribe_to_creator(
             self.new_user_id, self.editor_id)
 
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -1869,7 +1869,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
         self.can_not_send_subscription_email_ctx = self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False)
 
-    def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         with self.can_not_send_emails_ctx:
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
@@ -1880,7 +1880,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
     def test_that_email_not_sent_if_can_send_transactional_emails_is_false(
         self
     ) -> None:
-        with self.can_send_emails_ctx, self.can_not_send_subscription_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_not_send_subscription_email_ctx:
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
 
@@ -1917,7 +1917,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_subscription_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_send_subscription_email_ctx:
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
 
@@ -1960,7 +1960,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
             'A', self.editor_id, title='Title')
         self.recipient_list = [self.editor_id]
 
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -1979,7 +1979,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
         self.can_not_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False)
 
-    def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         with self.can_not_send_emails_ctx:
             email_manager.send_instant_feedback_message_email(
                 self.new_user_id, self.editor_id, 'editor message',
@@ -1993,7 +1993,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_can_send_transactional_emails_is_false(
         self
     ) -> None:
-        with self.can_send_emails_ctx, self.can_not_send_feedback_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_not_send_feedback_email_ctx:
             email_manager.send_instant_feedback_message_email(
                 self.new_user_id, self.editor_id, 'editor message',
                 'New Oppia message in "a subject"', self.exploration.title,
@@ -2032,7 +2032,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.server_can_send_emails_ctx, self.can_send_feedback_email_ctx:
             email_manager.send_instant_feedback_message_email(
                 self.new_user_id, self.editor_id, 'editor message',
                 'New Oppia message in "a subject"', self.exploration.title,
@@ -2092,7 +2092,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
 
         self.report_text = 'AD'
 
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -2107,7 +2107,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
             )
         )
 
-    def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         with self.can_not_send_emails_ctx:
             email_manager.send_flag_exploration_email(
                 self.exploration.title, self.exploration.id, self.new_user_id,
@@ -2147,7 +2147,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_flag_exploration_email(
                 self.exploration.title, self.exploration.id, self.new_user_id,
                 self.report_text)
@@ -2206,7 +2206,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.reviewer_id, True, False, False, False)
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -2221,7 +2221,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
             )
         )
 
-    def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         with self.can_not_send_emails_ctx:
             email_manager.send_mail_to_onboard_new_reviewers(
                 self.reviewer_id, 'Algebra')
@@ -2254,7 +2254,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
             'You can change your email preferences via the '
             '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_mail_to_onboard_new_reviewers(
                 self.reviewer_id, 'Algebra')
 
@@ -2294,7 +2294,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.reviewer_id, True, False, False, False)
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -2309,7 +2309,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
             )
         )
 
-    def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         with self.can_not_send_emails_ctx:
             email_manager.send_mail_to_notify_users_to_review(
                 self.reviewer_id, 'Algebra')
@@ -2334,7 +2334,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
             'You can change your email preferences via the '
             '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_mail_to_notify_users_to_review(
                 self.reviewer_id, 'Algebra')
 
@@ -2375,7 +2375,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         user_services.update_email_preferences(
             self.user_id, True, False, False, False)
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -2390,7 +2390,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             )
         )
 
-    def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         contributor_ranking_email_info = (
             suggestion_registry.ContributorMilestoneEmailInfo(
                 self.user_id, 'question', 'edit', None,
@@ -2441,7 +2441,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
                 self.user_id, 'translation', 'acceptance', 'hi',
                 'Initial Contributor'
             ))
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_mail_to_notify_contributor_ranking_achievement(
                 contributor_ranking_email_info)
 
@@ -2488,7 +2488,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
                 self.user_id, 'question', 'acceptance', None,
                 'Initial Contributor'
             ))
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_mail_to_notify_contributor_ranking_achievement(
                 contributor_ranking_email_info)
 
@@ -2535,7 +2535,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
                 self.user_id, 'translation', 'review', 'hi',
                 'Initial Contributor'
             ))
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_mail_to_notify_contributor_ranking_achievement(
                 contributor_ranking_email_info)
 
@@ -2582,7 +2582,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
                 self.user_id, 'question', 'review', None,
                 'Initial Contributor'
             ))
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_mail_to_notify_contributor_ranking_achievement(
                 contributor_ranking_email_info)
 
@@ -2629,7 +2629,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
                 self.user_id, 'translation', 'edit', 'hi',
                 'Initial Contributor'
             ))
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_mail_to_notify_contributor_ranking_achievement(
                 contributor_ranking_email_info)
 
@@ -2676,7 +2676,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
                 self.user_id, 'question', 'edit', None,
                 'Initial Contributor'
             ))
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_mail_to_notify_contributor_ranking_achievement(
                 contributor_ranking_email_info)
 
@@ -2891,7 +2891,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         user_services.update_email_preferences(
             self.reviewer_2_id, True, False, False, False)
 
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -2929,7 +2929,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             self._swap_get_platform_parameter_value_function
         )
 
-    def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
             with self.cannot_send_emails_ctx, self.log_new_error_ctx:
@@ -2946,7 +2946,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_if_reviewer_notifications_is_disabled(self) -> None:
         with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.server_can_send_emails_ctx, self.log_new_error_ctx:
                 email_manager.send_mail_to_notify_contributor_dashboard_reviewers(  # pylint: disable=line-too-long
                     [self.reviewer_1_id],
                     [[self.reviewable_suggestion_email_info]]
@@ -2964,7 +2964,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_reviewer_email_does_not_exist(self) -> None:
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
-            with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.server_can_send_emails_ctx, self.log_new_error_ctx:
                 email_manager.send_mail_to_notify_contributor_dashboard_reviewers(  # pylint: disable=line-too-long
                     ['reviewer_id_with_no_email'],
                     [[self.reviewable_suggestion_email_info]]
@@ -2981,7 +2981,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_no_reviewers_to_notify(self) -> None:
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
-            with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.server_can_send_emails_ctx, self.log_new_error_ctx:
                 email_manager.send_mail_to_notify_contributor_dashboard_reviewers(  # pylint: disable=line-too-long
                     [], [[self.reviewable_suggestion_email_info]]
                 )
@@ -2996,7 +2996,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_no_suggestions_to_notify_the_reviewer_about(
         self
     ) -> None:
-        with self.can_send_emails_ctx, self.log_new_info_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_info_ctx:
             with self.swap_get_platform_parameter_value:
                 email_manager.send_mail_to_notify_contributor_dashboard_reviewers( # pylint: disable=line-too-long
                     [self.reviewer_1_id], [[]]
@@ -3046,7 +3046,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -3103,7 +3103,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -3160,7 +3160,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -3218,7 +3218,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -3276,7 +3276,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -3333,7 +3333,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -3390,7 +3390,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -3456,7 +3456,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -3562,7 +3562,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -3630,7 +3630,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -3686,7 +3686,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -3745,7 +3745,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -3804,7 +3804,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -3863,7 +3863,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -3922,7 +3922,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -3981,7 +3981,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -4047,7 +4047,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -4153,7 +4153,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -4268,7 +4268,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 email_manager.EMAIL_FOOTER.default_value))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     (
@@ -4484,7 +4484,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self.admin_2_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_2_EMAIL)
 
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -4522,7 +4522,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             self._swap_get_platform_parameter_value_function
         )
 
-    def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
             with self.cannot_send_emails_ctx, self.log_new_error_ctx:
@@ -4548,7 +4548,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self
     ) -> None:
         with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.server_can_send_emails_ctx, self.log_new_error_ctx:
                 with self.swap(
                     suggestion_models,
                     'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
@@ -4571,7 +4571,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     def test_email_not_sent_if_admin_email_does_not_exist(self) -> None:
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
-            with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.server_can_send_emails_ctx, self.log_new_error_ctx:
                 with self.swap(
                     suggestion_models,
                     'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
@@ -4595,7 +4595,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     def test_email_not_sent_if_no_admins_to_notify(self) -> None:
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
-            with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.server_can_send_emails_ctx, self.log_new_error_ctx:
                 with self.swap(
                     suggestion_models,
                     'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
@@ -4615,7 +4615,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     def test_email_not_sent_if_no_suggestions_to_notify_the_admin_about(
         self
     ) -> None:
-        with self.can_send_emails_ctx, self.log_new_info_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_info_ctx:
             with self.swap_get_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
@@ -4677,7 +4677,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.swap_get_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
@@ -4753,7 +4753,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.swap_get_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
@@ -4820,7 +4820,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.swap_get_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
@@ -4896,7 +4896,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.swap_get_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
@@ -4980,7 +4980,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.swap_get_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
@@ -5105,7 +5105,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL))
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.swap_get_platform_parameter_value, self.swap(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
@@ -5171,7 +5171,7 @@ class NotifyReviewersNewSuggestionsTests(
         user_services.update_email_preferences(
             self.reviewer_2_id, True, False, False, False)
 
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -5321,7 +5321,7 @@ class NotifyReviewersNewSuggestionsTests(
         translation_suggestion.last_updated = submission_datetime
         return translation_suggestion
 
-    def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
             with self.cannot_send_emails_ctx, self.log_new_error_ctx:
@@ -5347,7 +5347,7 @@ class NotifyReviewersNewSuggestionsTests(
     def test_email_not_sent_if_no_reviewers_to_notify(self) -> None:
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
-            with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.server_can_send_emails_ctx, self.log_new_error_ctx:
                 reviewer_ids_by_language: DefaultDict[
                         str, List[str]] = DefaultDict(list)
                 suggestions_by_language: (DefaultDict[str, List[
@@ -5401,7 +5401,7 @@ class NotifyReviewersNewSuggestionsTests(
             ' and happy reviewing!<br><br>The Oppia Contributor Dashboard Team'
             )
 
-        with self.can_send_emails_ctx, self.log_new_error_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     reviewer_ids_by_language: DefaultDict[
@@ -5570,7 +5570,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.save_new_valid_exploration(self.target_id, self.author_id)
         self.save_new_skill(self.skill_id, self.author_id)
 
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -5602,7 +5602,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             self._swap_get_platform_parameter_value_function
         )
 
-    def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR
         ) as logs:
@@ -5621,7 +5621,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self
     ) -> None:
         with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.server_can_send_emails_ctx, self.log_new_error_ctx:
                 email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(  # pylint: disable=line-too-long
                     [self.admin_1_id], [], [],
                     self.suggestion_types_needing_reviewers)
@@ -5639,7 +5639,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR
         ) as logs:
-            with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.server_can_send_emails_ctx, self.log_new_error_ctx:
                 email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(  # pylint: disable=line-too-long
                     [], [], [],
                     self.suggestion_types_needing_reviewers)
@@ -5653,7 +5653,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_email_not_sent_if_no_suggestion_types_that_need_reviewers(
         self
     ) -> None:
-        with self.can_send_emails_ctx, self.log_new_info_ctx:
+        with self.server_can_send_emails_ctx, self.log_new_info_ctx:
             with self.swap_get_platform_parameter_value:
                 (
                     email_manager.
@@ -5671,7 +5671,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def test_email_not_sent_if_admin_email_does_not_exist(self) -> None:
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
-            with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.server_can_send_emails_ctx, self.log_new_error_ctx:
                 email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(  # pylint: disable=line-too-long
                     ['admin_id_without_email'], [], [],
                     self.suggestion_types_needing_reviewers)
@@ -5713,7 +5713,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
-        with self.swap_get_platform_parameter_value, self.can_send_emails_ctx:
+        with self.swap_get_platform_parameter_value, self.server_can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], [], [],
                 self.suggestion_types_needing_reviewers)
@@ -5774,7 +5774,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
-        with self.swap_get_platform_parameter_value, self.can_send_emails_ctx:
+        with self.swap_get_platform_parameter_value, self.server_can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id, self.admin_2_id], [], [],
                 suggestion_types_needing_reviewers)
@@ -5822,7 +5822,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
-        with self.swap_get_platform_parameter_value, self.can_send_emails_ctx:
+        with self.swap_get_platform_parameter_value, self.server_can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], [], [],
                 suggestion_types_needing_reviewers)
@@ -5881,7 +5881,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
-        with self.swap_get_platform_parameter_value, self.can_send_emails_ctx:
+        with self.swap_get_platform_parameter_value, self.server_can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id, self.admin_2_id], [], [],
                 suggestion_types_needing_reviewers)
@@ -5936,7 +5936,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
-        with self.swap_get_platform_parameter_value, self.can_send_emails_ctx:
+        with self.swap_get_platform_parameter_value, self.server_can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], [], [],
                 suggestion_types_needing_reviewers)
@@ -6007,7 +6007,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
-        with self.swap_get_platform_parameter_value, self.can_send_emails_ctx:
+        with self.swap_get_platform_parameter_value, self.server_can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id, self.admin_2_id], [], [],
                 suggestion_types_needing_reviewers)
@@ -6088,7 +6088,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 feconf.CONTRIBUTOR_DASHBOARD_URL)
         )
 
-        with self.swap_get_platform_parameter_value, self.can_send_emails_ctx:
+        with self.swap_get_platform_parameter_value, self.server_can_send_emails_ctx:
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], [self.admin_2_id], [],
                 suggestion_types_needing_reviewers)
@@ -6163,7 +6163,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
         self.submitter_id = self.get_user_id_from_email(self.SUBMITTER_EMAIL)
         self.signup(self.SENDER_EMAIL, self.SENDER_USERNAME)
         self.sender_id = self.get_user_id_from_email(self.SENDER_EMAIL)
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -6208,7 +6208,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_query_completion_email(
                 self.submitter_id, query_id)
 
@@ -6280,7 +6280,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
             'key1: val1\n'
             'key2: val2\n')
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_query_failure_email(
                 self.submitter_id, query_id, query_params)
 
@@ -6322,7 +6322,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
         email_subject = 'Bulk Email User Query Subject'
         email_body = 'Bulk Email User Query Body'
         email_intent = feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_user_query_email(
                 self.sender_id, self.recipient_ids,
                 email_subject,
@@ -6364,7 +6364,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
         super().setUp()
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
         self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -6379,7 +6379,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
             )
         )
 
-    def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         with self.can_not_send_emails_ctx:
             email_manager.send_account_deleted_email(
                 self.applicant_id, self.APPLICANT_EMAIL)
@@ -6394,7 +6394,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
         admin_email_ctx = self.swap(
             feconf, 'ADMIN_EMAIL_ADDRESS', dummy_admin_address)
 
-        with self.can_send_emails_ctx, admin_email_ctx:
+        with self.server_can_send_emails_ctx, admin_email_ctx:
             # Make sure there are no emails already sent.
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
@@ -6427,7 +6427,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
             'Your account was successfully deleted.<br><br>'
             '- The Oppia Team')
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_account_deleted_email(
                 self.applicant_id, self.APPLICANT_EMAIL)
 
@@ -6486,7 +6486,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         self.recipient_ids = [self.recipient_a_id, self.recipient_b_id]
 
         self.set_curriculum_admins([self.SENDER_USERNAME])
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -6499,7 +6499,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         email_html_body = 'Dummy email body.<br>'
         email_text_body = 'Dummy email body.\n'
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_user_query_email(
                 self.sender_id, self.recipient_ids, email_subject,
                 email_html_body, feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION)
@@ -6541,7 +6541,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         email_subject = 'Dummy Email Subject'
         email_html_body = 'Dummy email body.<td>'
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_user_query_email(
                 self.sender_id, self.recipient_ids,
                 email_subject, email_html_body,
@@ -6557,7 +6557,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages_b), 0)
 
     def test_that_exception_is_raised_for_unauthorised_sender(self) -> None:
-        with self.can_send_emails_ctx, (
+        with self.server_can_send_emails_ctx, (
             self.assertRaisesRegex(
                 Exception, 'Invalid sender_id for email')):
             email_manager.send_user_query_email(
@@ -6580,7 +6580,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
     def test_that_test_email_is_sent_for_bulk_emails(self) -> None:
         email_subject = 'Test Subject'
         email_body = 'Test Body'
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_test_email_for_bulk_emails(
                 self.sender_id, email_subject, email_body
             )
@@ -6675,7 +6675,7 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         self.signup(self.RECIPIENT_EMAIL, self.RECIPIENT_USERNAME)
         self.recipient_id = self.get_user_id_from_email(
             self.RECIPIENT_EMAIL)
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -6690,11 +6690,11 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
             )
         )
 
-    def test_exception_raised_if_can_send_emails_is_false(self) -> None:
+    def test_exception_raised_if_server_can_send_emails_is_false(self) -> None:
         with self.assertRaisesRegex(
             Exception,
             'For moderator emails to be sent, please ensure that '
-            'CAN_SEND_EMAILS is set to True.'):
+            'SERVER_CAN_SEND_EMAILS is set to True.'):
             email_manager.require_moderator_email_prereqs_are_satisfied()
 
     def test_correct_email_draft_received_on_exploration_unpublish(
@@ -6703,7 +6703,7 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         expected_draft_text_body = (
             'I\'m writing to inform you that '
             'I have unpublished the above exploration.')
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             d_text = email_manager.get_moderator_unpublish_exploration_email()
             self.assertEqual(d_text, expected_draft_text_body)
 
@@ -6719,7 +6719,7 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         email_intent = 'unpublish_exploration'
         exploration_title = 'Title'
         email_html_body = 'Dummy email body.<br>'
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_moderator_action_email(
                 self.moderator_id, self.recipient_id,
                 email_intent, exploration_title, email_html_body)
@@ -6755,7 +6755,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
         user_services.update_email_preferences(
             self.question_submitter_id, True, False, False, False)
 
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -6770,7 +6770,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             )
         )
 
-    def test_assign_translation_reviewer_email_for_can_send_emails_is_false(
+    def test_assign_translation_reviewer_email_for_server_can_send_emails_is_false(
         self
     ) -> None:
         with self.can_not_send_emails_ctx:
@@ -6853,7 +6853,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             'Best wishes,<br>'
             'The Oppia Community')
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_email_to_new_cd_user(
                 self.translation_reviewer_id,
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
@@ -6901,7 +6901,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             'Best wishes,<br>'
             'The Oppia Community')
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_email_to_new_cd_user(
                 self.question_reviewer_id,
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
@@ -6948,7 +6948,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             'Best wishes,<br>'
             'The Oppia Community')
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_email_to_new_cd_user(
                 self.question_submitter_id,
                 constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
@@ -6980,7 +6980,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_ONBOARD_CD_USER)
 
-    def test_email_is_not_sent_can_send_emails_is_false(self) -> None:
+    def test_email_is_not_sent_server_can_send_emails_is_false(self) -> None:
         with self.can_not_send_emails_ctx:
             email_manager.send_email_to_removed_cd_user(
                 self.translation_reviewer_id,
@@ -7032,7 +7032,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             'Best wishes,<br>'
             'The Oppia Community')
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_email_to_removed_cd_user(
                 self.translation_reviewer_id,
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
@@ -7078,7 +7078,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             'Best wishes,<br>'
             'The Oppia Community')
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_email_to_removed_cd_user(
                 self.question_reviewer_id,
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
@@ -7123,7 +7123,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             'Best wishes,<br>'
             'The Oppia Community')
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_email_to_removed_cd_user(
                 self.question_submitter_id,
                 constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
@@ -7162,7 +7162,7 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -7173,7 +7173,7 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
             feconf, 'ADMIN_EMAIL_ADDRESS', self.dummy_admin_address)
 
     def test_not_mergeable_change_list_email_is_sent_correctly(self) -> None:
-        with self.can_send_emails_ctx, self.admin_email_ctx:
+        with self.server_can_send_emails_ctx, self.admin_email_ctx:
             # Make sure there are no emails already sent.
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
@@ -7258,7 +7258,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             self.CURRICULUM_ADMIN_2_EMAIL, self.CURRICULUM_ADMIN_2_USERNAME)
         self.admin_2_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_2_EMAIL)
-        self.can_send_emails_ctx = (
+        self.server_can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -7275,7 +7275,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
         self.log_new_error_counter = test_utils.CallCounter(
             logging.error)
 
-    def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         with self.can_not_send_emails_ctx:
             email_manager.send_reminder_mail_to_notify_curriculum_admins(
                 [self.CURRICULUM_ADMIN_1_EMAIL, self.CURRICULUM_ADMIN_2_EMAIL],
@@ -7290,7 +7290,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
 
     def test_email_not_sent_if_no_admins_to_notify(self) -> None:
         with self.capture_logging(min_level=logging.ERROR) as logs:
-            with self.can_send_emails_ctx:
+            with self.server_can_send_emails_ctx:
                 email_manager.send_reminder_mail_to_notify_curriculum_admins(
                     [], [])
 
@@ -7302,7 +7302,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
     def test_email_not_sent_if_no_overdue_or_upcoming_chapters(self) -> None:
         story_publication_timeliness = story_domain.StoryPublicationTimeliness(
             'story_1', 'Story', 'Topic', [], [])
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_reminder_mail_to_notify_curriculum_admins(
                 [self.admin_1_id], [story_publication_timeliness])
 
@@ -7330,7 +7330,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             '/story_1')
         expected_email_subject = 'Chapter Publication Notifications'
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_reminder_mail_to_notify_curriculum_admins(
                 [self.admin_1_id], [story_publication_timeliness]
             )
@@ -7384,7 +7384,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             '/story_1')
         expected_email_subject = 'Chapter Publication Notifications'
 
-        with self.can_send_emails_ctx:
+        with self.server_can_send_emails_ctx:
             email_manager.send_reminder_mail_to_notify_curriculum_admins(
                 [self.admin_1_id], [story_publication_timeliness]
             )

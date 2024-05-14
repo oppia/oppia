@@ -148,12 +148,12 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'The deleted skills: %s are still present in topic with id %s'
                 % (deleted_skills_string, topic.id)
             )
-            can_send_emails = (
+            server_can_send_emails = (
                 platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamName.CAN_SEND_EMAILS.value
+                    platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
                 )
             )
-            if can_send_emails:
+            if server_can_send_emails:
                 email_manager.send_mail_to_admin(
                     'Deleted skills present in topic',
                     'The deleted skills: %s are still present in topic with '
