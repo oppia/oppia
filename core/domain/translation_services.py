@@ -251,7 +251,6 @@ def compute_translation_related_change_upon_revert(
         contents as value and the languages as key.
     """
     revert_to_exploration = exp_fetchers.get_exploration_by_id(exploration.id, revert_to_version)
-    current_exploration = exp_fetchers.get_exploration_by_id(exploration.id)
 
     language_code_to_entity_translation = {
         entity_translation.language_code: entity_translation
@@ -270,7 +269,7 @@ def compute_translation_related_change_upon_revert(
     for entity_translation in language_code_to_entity_translation.values():
 
         translation_counts[entity_translation.language_code] = (
-            current_exploration.get_translation_count(entity_translation))
+            exploration.get_translation_count(entity_translation))
 
         new_translation_models.append(
             translation_models.EntityTranslationsModel.create_new(

@@ -2521,16 +2521,6 @@ def revert_exploration(
     exploration_model = exp_models.ExplorationModel.get(
         exploration_id, strict=True)
 
-    models_to_put: List[
-        base_models.BaseModel
-    ] = []
-
-    new_translation_models, translation_counts = (
-        translation_services.compute_translation_related_change_upon_revert(
-            exploration_model, revert_to_version))
-
-    models_to_put.extend(new_translation_models)
-
     if current_version > exploration_model.version:
         raise Exception(
             'Unexpected error: trying to update version %s of exploration '
@@ -2562,6 +2552,16 @@ def revert_exploration(
         [exploration.id])
 
     revert_version_history(exploration_id, current_version, revert_to_version)
+    
+    models_to_put: List[
+        base_models.BaseModel
+    ] = []
+
+    new_translation_models, translation_counts = (
+        translation_services.compute_translation_related_change_upon_revert(
+            exploration_model, revert_to_version))
+
+    models_to_put.extend(new_translation_models)
 
     if opportunity_services.is_exploration_available_for_contribution(
         exploration_id
