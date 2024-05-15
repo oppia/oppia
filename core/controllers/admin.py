@@ -219,7 +219,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     collection_id: Optional[str]
     num_dummy_exps_to_generate: Optional[int]
     num_dummy_exps_to_publish: Optional[int]
-    num_dummy_translation_exps_to_generate: Optional[int]
+    num_dummy_translation_opportunities_to_generate: Optional[int]
     data: Optional[str]
     topic_id: Optional[str]
     platform_param_name: Optional[str]
@@ -287,7 +287,7 @@ class AdminHandler(
                 },
                 'default_value': None
             },
-            'num_dummy_translation_exps_to_generate': {
+            'num_dummy_translation_opportunities_to_generate': {
                 'schema': {
                     'type': 'int'
                 },
@@ -406,8 +406,8 @@ class AdminHandler(
                 the action is generate_dummy_explorations.
             Exception. The num_dummy_exps_to_publish must be provided when
                 the action is generate_dummy_explorations.
-            Exception. The num_dummy_translation_exps_to_generate must be
-                provided when the action is
+            Exception. The num_dummy_translation_opportunities_to_generate
+                must be provided when the action is 
                 generate_dummy_translation_opportunities.
             InvalidInputException. Generate count cannot be less than publish
                 count.
@@ -469,18 +469,19 @@ class AdminHandler(
                 self._generate_dummy_explorations(
                     num_dummy_exps_to_generate, num_dummy_exps_to_publish)
             elif action == 'generate_dummy_translation_opportunities':
-                num_dummy_translation_exps_to_generate = (
+                num_dummy_translation_opportunities_to_generate = (
                     self.normalized_payload.get(
-                        'num_dummy_translation_exps_to_generate'))
-                if num_dummy_translation_exps_to_generate is None:
+                        'num_dummy_translation_opportunities_to_generate'))
+                if num_dummy_translation_opportunities_to_generate is None:
                     raise Exception(
-                        'The \'num_dummy_translation_exps_to_generate\' '
+                        'The '
+                        '\'num_dummy_translation_opportunities_to_generate\' '
                         'must be provided when the action is '
                         'generate_dummy_translation_opportunities.'
                     )
 
                 self._generate_dummy_translation_opportunities(
-                    num_dummy_translation_exps_to_generate)
+                    num_dummy_translation_opportunities_to_generate)
             elif action == 'generate_dummy_blog_post':
                 blog_post_title = self.normalized_payload.get(
                     'blog_post_title')
@@ -1054,7 +1055,7 @@ class AdminHandler(
             raise Exception('Cannot generate dummy explorations in production.')
 
     def _generate_dummy_translation_opportunities(
-        self, num_dummy_translation_exps_to_generate: int
+        self, num_dummy_translation_opportunities_to_generate: int
     ) -> None:
         """Loads the database with a topic, a story
         and a skill in the topic (and skill in a subtopic) and 3 questions
@@ -1072,8 +1073,9 @@ class AdminHandler(
                     'User does not have enough rights to generate data.')
             logging.info(
                 '[ADMIN] %s generated %s number of dummy '
-                'translatable explorations(opportunities)'
-                % (self.user_id, num_dummy_translation_exps_to_generate))
+                'translation opportunities (explorations)' % 
+                (self.user_id, num_dummy_translation_opportunities_to_generate)
+            )
 
             # Generate a new topic, story, skill and questions id.
             topic_id = 'dummyTopicId'
@@ -1152,7 +1154,7 @@ class AdminHandler(
             story_node_dicts = []
             exp_counter = len(story.story_contents.nodes)
 
-            for i in range(num_dummy_translation_exps_to_generate):
+            for i in range(num_dummy_translation_opportunities_to_generate):
                 exp_counter += 1
                 title = 'Dummy Exploration %s' % str(exp_counter)
                 category = 'Astronomy'

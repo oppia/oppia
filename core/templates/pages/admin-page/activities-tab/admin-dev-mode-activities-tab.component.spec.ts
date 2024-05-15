@@ -377,8 +377,8 @@ describe('Admin dev mode activities tab', () => {
   });
 
   describe('.generateDummyTranslationOpportunities', () => {
-    it('should generate dummy explorations', waitForAsync(() => {
-      component.numDummyTranslationExpsToGenerate = 2;
+    it('should generate dummy translation opportunities', waitForAsync(() => {
+      component.numDummyTranslationOpportunitiesToGenerate = 2;
 
       spyOn(
         adminBackendApiService,
@@ -399,8 +399,6 @@ describe('Admin dev mode activities tab', () => {
     }));
 
     it('should show error message when dummy translation opportunities are not generated', waitForAsync(() => {
-      component.numDummyExpsToPublish = 2;
-
       spyOn(
         adminBackendApiService,
         'generateDummyTranslationOpportunitiesAsync'

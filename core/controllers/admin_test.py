@@ -1363,7 +1363,7 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
         self.post_json(
             '/adminhandler', {
                 'action': 'generate_dummy_translation_opportunities',
-                'num_dummy_translation_exps_to_generate': 10
+                'num_dummy_translation_opportunities_to_generate': 10
             }, csrf_token=csrf_token)
         generated_exps = exp_services.get_all_exploration_summaries()
         published_exps = exp_services.get_recently_published_exp_summaries(10)
@@ -1379,7 +1379,7 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
             self.post_json(
                 '/adminhandler', {
                     'action': 'generate_dummy_translation_opportunities',
-                    'num_dummy_translation_exps_to_generate': 5
+                    'num_dummy_translation_opportunities_to_generate': 5
                 }, csrf_token=csrf_token)
             generated_exps = exp_services.get_all_exploration_summaries()
             published_exps = (
@@ -1388,7 +1388,7 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
             self.assertEqual(len(published_exps), 5 * (i + 1))
         self.logout()
 
-    def test_handler_raises_error_with_non_int_num_dummy_translation_exps_to_generate(self) -> None: # pylint: disable=line-too-long
+    def test_handler_raises_error_with_non_int_num_dummy_translation_opportunities_to_generate(self) -> None: # pylint: disable=line-too-long
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -1396,13 +1396,15 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
         response = self.post_json(
             '/adminhandler', {
                 'action': 'generate_dummy_translation_opportunities',
-                'num_dummy_translation_exps_to_generate': 'invalid_type'
+                'num_dummy_translation_opportunities_to_generate': 
+                    'invalid_type'
             }, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
-        'At \'http://localhost/adminhandler\' these errors are happening:\n'
-        'Schema validation for \'num_dummy_translation_exps_to_generate\' '
-        'failed: Could not convert str to int: invalid_type')
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
+            'Schema validation for '
+            '\'num_dummy_translation_opportunities_to_generate\' '
+            'failed: Could not convert str to int: invalid_type')
         self.assertEqual(response['error'], error_msg)
         generated_exps = exp_services.get_all_exploration_summaries()
         published_exps = exp_services.get_recently_published_exp_summaries(5)
@@ -1418,15 +1420,20 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
 
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
-            'The \'num_dummy_translation_exps_to_generate\' must be provided '
-            'when the action is generate_dummy_translation_opportunities.'
+            'The \'num_dummy_translation_opportunities_to_generate\' must be '
+            'provided when the action is generate_dummy_translation_'
+            'opportunities.'
         )
         with assert_raises_regexp_context_manager:
             self.post_json(
                 '/adminhandler', {
                     'action': 'generate_dummy_translation_opportunities',
-                    'num_dummy_translation_exps_to_generate': None
+                    'num_dummy_translation_opportunities_to_generate': None
                 }, csrf_token=csrf_token)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
 
         self.logout()
 
@@ -1442,8 +1449,13 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
             self.post_json(
                 '/adminhandler', {
                     'action': 'generate_dummy_translation_opportunities',
-                    'num_dummy_translation_exps_to_generate': 5
+                    'num_dummy_translation_opportunities_to_generate': 5
                 }, csrf_token=csrf_token)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
         self.logout()
 
     def test_non_admins_cannot_generate_dummy_translation_opportunities(
@@ -1456,8 +1468,13 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
             self.post_json(
                 '/adminhandler', {
                     'action': 'generate_dummy_translation_opportunities',
-                    'num_dummy_translation_exps_to_generate': 1
+                    'num_dummy_translation_opportunities_to_generate': 1
                 }, csrf_token=csrf_token)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
         self.logout()
 
 

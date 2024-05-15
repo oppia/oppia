@@ -550,11 +550,12 @@ export class AdminBackendApiService {
   }
 
   async generateDummyTranslationOpportunitiesAsync(
-    numDummyTranslationExpsToGenerate: number
+    numDummyTranslationOpportunitiesToGenerate: number
   ): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_translation_opportunities',
-      num_dummy_translation_exps_to_generate: numDummyTranslationExpsToGenerate,
+      num_dummy_translation_opportunities_to_generate:
+        numDummyTranslationOpportunitiesToGenerate,
     });
   }
 

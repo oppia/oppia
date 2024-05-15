@@ -1264,15 +1264,16 @@ describe('Admin backend api service', () => {
 
   it('should generate dummy translation opportunities', fakeAsync(() => {
     let action = 'generate_dummy_translation_opportunities';
-    let numDummyTranslationExpsToGenerate = 2;
+    let numDummyTranslationOpportunitiesToGenerate = 2;
     let payload = {
       action: action,
-      num_dummy_translation_exps_to_generate: numDummyTranslationExpsToGenerate,
+      num_dummy_translation_opportunities_to_generate:
+        numDummyTranslationOpportunitiesToGenerate,
     };
 
     abas
       .generateDummyTranslationOpportunitiesAsync(
-        numDummyTranslationExpsToGenerate
+        numDummyTranslationOpportunitiesToGenerate
       )
       .then(successHandler, failHandler);
 
@@ -1291,16 +1292,16 @@ describe('Admin backend api service', () => {
       'request failure',
     fakeAsync(() => {
       let action = 'generate_dummy_translation_opportunities';
-      let numDummyTranslationExpsToGenerate = 2;
+      let numDummyTranslationOpportunitiesToGenerate = 2;
       let payload = {
         action: action,
-        num_dummy_translation_exps_to_generate:
-          numDummyTranslationExpsToGenerate,
+        num_dummy_translation_opportunities_to_generate:
+          numDummyTranslationOpportunitiesToGenerate,
       };
 
       abas
         .generateDummyTranslationOpportunitiesAsync(
-          numDummyTranslationExpsToGenerate
+          numDummyTranslationOpportunitiesToGenerate
         )
         .then(successHandler, failHandler);
 
