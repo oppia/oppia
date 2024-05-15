@@ -163,7 +163,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
               return;
             }
             this.today = new Date();
-            console.log(this.today);
             this.lastDateToFilterUsersActivity =
               this.getDateThatIsDaysBeforeToday(90);
             this.isQuestionCoordinator = userInfo.isQuestionCoordinator();

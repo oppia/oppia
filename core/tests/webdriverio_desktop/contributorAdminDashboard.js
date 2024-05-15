@@ -352,7 +352,7 @@ describe('Contributor Admin Dashboard', function () {
     await users.logout();
   });
 
-  fit(
+  it(
     'should be able to filter those translation submitters, who have submitted' +
       ' translations between a given date range',
     async function () {
@@ -381,7 +381,7 @@ describe('Contributor Admin Dashboard', function () {
     }
   );
 
-  fit(
+  it(
     'should be able to filter those translation reviewers, who have reviewed' +
       ' translations between a given date range',
     async function () {
@@ -410,7 +410,7 @@ describe('Contributor Admin Dashboard', function () {
     }
   );
 
-  fit(
+  it(
     'should be able to filter those question submitters, who have submitted' +
       ' questiions between a given date range',
     async function () {
@@ -436,7 +436,7 @@ describe('Contributor Admin Dashboard', function () {
     }
   );
 
-  fit(
+  it(
     'should be able to filter those question reviewers, who have reviewed' +
       ' questions between a given date range',
     async function () {

@@ -23,11 +23,10 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.platform import models
-from google.cloud.ndb.query import Query as Query
 
 from typing import (
-    Dict, Final, Generic, List, Literal, Mapping, Optional, Sequence, Tuple, TypedDict,
-    TypeVar, Union)
+    Dict, Final, Generic, List, Literal, Mapping, Optional, Sequence, Tuple,
+    TypedDict, TypeVar, Union)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -2168,6 +2167,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
             }
         return user_data
 
+
 class TotalContributionStats(Generic[T]):
     """Contains methods common in total contribution stats models for
     translation submitter, translation reviewer, question submitter, question
@@ -2176,10 +2176,10 @@ class TotalContributionStats(Generic[T]):
 
     @classmethod
     def fetch_models_after_last_date_filter(
-        self,
+        cls,
         offset: int,
         page_size: int,
-        sort_query: Query,
+        sort_query: datastore_services.query.Query,
         sorted_results: List[T],
         last_date: datetime.date
     ) -> Tuple[Sequence[T],
@@ -2187,18 +2187,10 @@ class TotalContributionStats(Generic[T]):
         """fetch the models within a specified date range.
 
         Args:
-            offset: int. Number of results to skip from the beginning of all
-                results matching the query.
-            page_size: int. Number of models to fetch.
-            sort_query: Query. A query for a given language code and topic ids.
-            sorted_results: List[T]. A list to store fetched models in sorted
-                order. 
-            last_date: datetime.date. The date after which to start including
-            contributions.
 
         Returns:
             2-tuple(sorted_results, next_offset). where:
-                sorted_results: Sequence[T]. The list of models which match the
+                sorted_results: sequence. The list of models which match the
                     query.
                 next_offset: int. Number of results to skip in next batch.
         """
@@ -2221,6 +2213,7 @@ class TotalContributionStats(Generic[T]):
             sorted_results,
             next_offset
         )
+
 
 class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     """Records the Total Translation contribution stats and data of
@@ -2427,7 +2420,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             topic_ids: List[str]|None. List of topic ID(s) to fetch
                 contributor stats for.
             last_date: datetime.date. The date after which to start including
-            contributions.
+                contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
@@ -2442,7 +2435,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     after this batch.
         """
 
-        totalContributionStats=TotalContributionStats[
+        total_contribution_stats = TotalContributionStats[
             TranslationSubmitterTotalContributionStatsModel]()
 
         sort_options_dict = {
@@ -2489,7 +2482,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             TranslationSubmitterTotalContributionStatsModel] = []
 
         (sorted_results, next_offset) = (
-            totalContributionStats.fetch_models_after_last_date_filter(
+            total_contribution_stats.fetch_models_after_last_date_filter(
                 offset,
                 page_size,
                 sort_query,
@@ -2835,7 +2828,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
             last_date: datetime.date. The date after which to start including
-            contributions.
+                contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
@@ -2850,7 +2843,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                     after this batch.
         """
 
-        totalContributionStats=TotalContributionStats[
+        total_contribution_stats = TotalContributionStats[
             TranslationReviewerTotalContributionStatsModel]()
 
         sort_options_dict = {
@@ -2882,7 +2875,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             TranslationReviewerTotalContributionStatsModel] = []
 
         (sorted_results, next_offset) = (
-            totalContributionStats.fetch_models_after_last_date_filter(
+            total_contribution_stats.fetch_models_after_last_date_filter(
                 offset,
                 page_size,
                 sort_query,
@@ -3150,7 +3143,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             topic_ids: List[str]|None. List of topic ID(s) to fetch contributor
                 stats for.
             last_date: datetime.date. The date after which to start including
-            contributions.
+                contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
@@ -3165,7 +3158,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     after this batch.
         """
 
-        totalContributionStats=TotalContributionStats[
+        total_contribution_stats = TotalContributionStats[
             QuestionSubmitterTotalContributionStatsModel]()
 
         sort_options_dict = {
@@ -3208,7 +3201,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             QuestionSubmitterTotalContributionStatsModel] = []
 
         (sorted_results, next_offset) = (
-            totalContributionStats.fetch_models_after_last_date_filter(
+            total_contribution_stats.fetch_models_after_last_date_filter(
                 offset,
                 page_size,
                 sort_query,
@@ -3435,7 +3428,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
             last_date: datetime.date. The date after which to start including
-            contributions.
+                contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
@@ -3450,7 +3443,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                     after this batch.
         """
 
-        totalContributionStats=TotalContributionStats[
+        total_contribution_stats = TotalContributionStats[
             QuestionReviewerTotalContributionStatsModel]()
 
         sort_options_dict = {
@@ -3479,7 +3472,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
             QuestionReviewerTotalContributionStatsModel] = []
 
         (sorted_results, next_offset) = (
-            totalContributionStats.fetch_models_after_last_date_filter(
+            total_contribution_stats.fetch_models_after_last_date_filter(
                 offset,
                 page_size,
                 sort_query,
