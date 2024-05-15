@@ -2175,13 +2175,13 @@ class TotalContributionStats(Generic[T]):
     """
 
     @classmethod
-    def fetch_models_within_date_range(
+    def fetch_models_after_last_date_filter(
         self,
         offset: int,
         page_size: int,
         sort_query: Query,
         sorted_results: List[T],
-        date_range: utils.DateRange
+        last_date: datetime.date
     ) -> Tuple[Sequence[T],
             int]:
         """fetch the models within a specified date range.
@@ -2193,8 +2193,8 @@ class TotalContributionStats(Generic[T]):
             sort_query: Query. A query for a given language code and topic ids.
             sorted_results: List[T]. A list to store fetched models in sorted
                 order. 
-            date_range: utils.DateRange. The date range within which to fetch
-                users' contributions.
+            last_date: datetime.date. The date after which to start including
+            contributions.
 
         Returns:
             2-tuple(sorted_results, next_offset). where:
@@ -2214,10 +2214,7 @@ class TotalContributionStats(Generic[T]):
                 if len(sorted_results) == page_size:
                     break
                 next_offset += 1
-                if (date_range.is_date_in_the_date_range(
-                    result_model.first_contribution_date) and (
-                    date_range.is_date_in_the_date_range(
-                        result_model.last_contribution_date))):
+                if result_model.last_contribution_date >= last_date:
                     sorted_results.append(result_model)
 
         return (
@@ -2414,7 +2411,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         language_code: str,
         sort_by: Optional[SortChoices.value],
         topic_ids: Optional[List[str]],
-        date_range: utils.DateRange
+        last_date: datetime.date
     ) -> Tuple[Sequence[TranslationSubmitterTotalContributionStatsModel],
                 int,
                 bool]:
@@ -2429,15 +2426,15 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch
                 contributor stats for.
-            date_range: utils.DateRange. The date range
-                within which to fetch users' contributions.
+            last_date: datetime.date. The date after which to start including
+            contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(TranslationSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied language_code,
-                    topic_ids and date_range filters, returned in
+                    topic_ids and last_date filters, returned in
                     the order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
@@ -2492,12 +2489,12 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             TranslationSubmitterTotalContributionStatsModel] = []
 
         (sorted_results, next_offset) = (
-            totalContributionStats.fetch_models_within_date_range(
+            totalContributionStats.fetch_models_after_last_date_filter(
                 offset,
                 page_size,
                 sort_query,
                 sorted_results,
-                date_range))
+                last_date))
 
         # Check whether we have more results.
         next_result_model: Sequence[
@@ -2824,7 +2821,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         offset: int,
         language_code: str,
         sort_by: Optional[SortChoices.value],
-        date_range: utils.DateRange
+        last_date: datetime.date
     ) -> Tuple[Sequence[TranslationReviewerTotalContributionStatsModel],
                 int,
                 bool]:
@@ -2837,15 +2834,15 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             language_code: str. The language code to get results for.
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
-            date_range: utils.DateRange. The date range
-                within which to fetch users' contributions.
+            last_date: datetime.date. The date after which to start including
+            contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(TranslationReviewerTotalContributionStatsModel).
                     The list of models which match the supplied language_code
-                    and date_range filters, returned in the order
+                    and last_date filters, returned in the order
                     specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
@@ -2885,12 +2882,12 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             TranslationReviewerTotalContributionStatsModel] = []
 
         (sorted_results, next_offset) = (
-            totalContributionStats.fetch_models_within_date_range(
+            totalContributionStats.fetch_models_after_last_date_filter(
                 offset,
                 page_size,
                 sort_query,
                 sorted_results,
-                date_range))
+                last_date))
 
         # Check whether we have more results.
         next_result_model: Sequence[
@@ -3138,7 +3135,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         offset: int,
         sort_by: Optional[SortChoices.value],
         topic_ids: Optional[List[str]],
-        date_range: utils.DateRange
+        last_date: datetime.date
     ) -> Tuple[Sequence[QuestionSubmitterTotalContributionStatsModel],
                 int,
                 bool]:
@@ -3152,15 +3149,15 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch contributor
                 stats for.
-            date_range: utils.DateRange. The date range
-                within which to fetch users' contributions.
+            last_date: datetime.date. The date after which to start including
+            contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(QuestionSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied topic_ids
-                    and date_range filters, returned in the
+                    and last_date filters, returned in the
                     order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
@@ -3211,12 +3208,12 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             QuestionSubmitterTotalContributionStatsModel] = []
 
         (sorted_results, next_offset) = (
-            totalContributionStats.fetch_models_within_date_range(
+            totalContributionStats.fetch_models_after_last_date_filter(
                 offset,
                 page_size,
                 sort_query,
                 sorted_results,
-                date_range))
+                last_date))
 
         # Check whether we have more results.
         next_result_model: Sequence[
@@ -3425,7 +3422,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         sort_by: Optional[SortChoices.value],
-        date_range: utils.DateRange
+        last_date: datetime.date
     ) -> Tuple[Sequence[QuestionReviewerTotalContributionStatsModel],
                 int,
                 bool]:
@@ -3437,15 +3434,15 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                 results matching the query.
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
-            date_range: utils.DateRange. The date range
-                within which to fetch users' contributions.
+            last_date: datetime.date. The date after which to start including
+            contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(QuestionReviewerTotalContributionStatsModel).
                     The list of models which match the supplied
-                    date_range filter, returned in the
+                    last_date filter, returned in the
                     order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
@@ -3482,12 +3479,12 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
             QuestionReviewerTotalContributionStatsModel] = []
 
         (sorted_results, next_offset) = (
-            totalContributionStats.fetch_models_within_date_range(
+            totalContributionStats.fetch_models_after_last_date_filter(
                 offset,
                 page_size,
                 sort_query,
                 sorted_results,
-                date_range))
+                last_date))
 
         # Check whether we have more results.
         next_result_model: Sequence[

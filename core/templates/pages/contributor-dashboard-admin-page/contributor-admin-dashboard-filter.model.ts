@@ -23,28 +23,24 @@ export class ContributorAdminDashboardFilter {
   topicIds: string[];
   languageCode?: string;
   sort?: string | null;
-  startDate?: Date;
-  endDate?: Date;
+  lastDate?: Date;
 
   /**
    * @param {String} languageCode - Language Code to filter for.
    * @param {String[]} topicIds - keywords to filter for.
    * @param {string} sort - sort options.
-   * @param {number} startDate - the date from which to start considering user contributions.
-   * @param {number} endDate - the date from which to stop considering user contributions.
+   * @param {Date} lastDate - The date after which to start including users' contributions.
    */
   constructor(
     topicIds: string[],
     languageCode?: string,
     sort?: string | null,
-    startDate?: Date,
-    endDate?: Date
+    lastDate?: Date
   ) {
     this.languageCode = languageCode;
     this.topicIds = topicIds;
     this.sort = sort;
-    this.startDate = startDate;
-    this.endDate = endDate;
+    this.lastDate = lastDate;
   }
 
   /**

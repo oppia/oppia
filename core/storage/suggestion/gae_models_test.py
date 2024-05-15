@@ -3241,7 +3241,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -3266,7 +3266,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(65))
         ).put()
@@ -3291,7 +3291,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -3315,7 +3315,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -3328,9 +3328,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 3)
@@ -3348,9 +3346,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 4)
@@ -3368,9 +3364,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_ACCURACY.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 4)
@@ -3388,9 +3382,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_ACCURACY.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3408,9 +3400,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3428,9 +3418,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -3447,9 +3435,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3467,9 +3453,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3500,7 +3484,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
@@ -3525,7 +3509,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -3550,7 +3534,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -3574,59 +3558,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125))
-        ).put()
-        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
-            id='model_5',
-            language_code='de',
-            contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_submissions=[
-                'topic5'
-            ],
-            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
-            recent_performance=4,
-            overall_accuracy=1,
-            submitted_translations_count=4,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT),
-            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT),
-            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=(
-                datetime.date.today() - datetime.timedelta(7)),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125))
-        ).put()
-        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
-            id='model_6',
-            language_code='de',
-            contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_submissions=[
-                'topic6'
-            ],
-            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
-            recent_performance=4,
-            overall_accuracy=1,
-            submitted_translations_count=4,
-            submitted_translation_word_count=(
-                self.SUBMITTED_TRANSLATION_WORD_COUNT),
-            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_without_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT),
-            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translation_word_count=(
-                self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=(
-                datetime.date.today() - datetime.timedelta(6)),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -3639,9 +3571,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 3)
@@ -3658,9 +3588,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -3676,9 +3604,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=['topic1', 'topic2'],
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3695,9 +3621,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=7)),
+                last_date=datetime.date.today() - datetime.timedelta(days=7),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -3713,9 +3637,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=90)),
+                last_date=datetime.date.today() - datetime.timedelta(days=90),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -3731,83 +3653,11 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=7)),
+                last_date=datetime.date.today() - datetime.timedelta(days=7),
                 language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for no activity before last 8 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=8),
-                    datetime.date(1970, 1, 1)),
-                language_code='de'
-            ))
-        self.assertEqual(len(sorted_results), 0)
-        self.assertFalse(more)
-        self.assertEqual(next_offset, 2)
-
-        # Check for activites before last 5 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=5),
-                    datetime.date(1970, 1, 1)),
-                language_code='de'
-            ))
-        self.assertEqual(len(sorted_results), 1)
-        self.assertEqual(sorted_results[0].id, 'model_5')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for no activity before last 5 days and after last 120 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=5),
-                    datetime.date.today() - datetime.timedelta(days=90)),
-                language_code='de'
-            ))
-        self.assertEqual(len(sorted_results), 0)
-        self.assertFalse(more)
-        self.assertEqual(next_offset, 2)
-
-        # Check for activites before last 5 days and after last 130 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=5),
-                    datetime.date.today() - datetime.timedelta(days=130)),
-                language_code='de'
-            ))
-        self.assertEqual(len(sorted_results), 1)
-        self.assertEqual(sorted_results[0].id, 'model_5')
-        self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
     def test_fetch_page_with_sorting_and_filtering(self) -> None:
@@ -3832,7 +3682,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=datetime.datetime.utcnow()
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -3856,7 +3706,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=datetime.datetime.utcnow()
         ).put()
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -3880,7 +3730,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(65))
         ).put()
@@ -3904,7 +3754,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -3918,9 +3768,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
                 topic_ids=['topic1', 'topic2'],
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3938,9 +3786,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
                 topic_ids=['topic1', 'topic2'],
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -3971,7 +3817,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
             datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -3996,7 +3842,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(65))
         ).put()
@@ -4021,7 +3867,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -4045,7 +3891,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -4058,9 +3904,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=2,
                 sort_by=None,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -4078,9 +3922,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 0)
@@ -4403,7 +4245,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(65))
         ).put()
@@ -4421,7 +4263,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -4439,7 +4281,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -4457,7 +4299,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(155))
         ).put()
@@ -4469,9 +4311,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=4,
                 offset=0,
                 sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 4)
@@ -4488,9 +4328,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 4)
@@ -4507,9 +4345,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -4526,9 +4362,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 3)
@@ -4552,7 +4386,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -4570,7 +4404,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -4588,7 +4422,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=datetime.datetime.utcnow()
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -4605,49 +4439,9 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(65))
-        ).put()
-        suggestion_models.TranslationReviewerTotalContributionStatsModel(
-            id='model_5',
-            language_code='de',
-            contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=[
-                'topic5'
-            ],
-            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
-            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT),
-            rejected_translations_count=(
-                self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=(
-                datetime.date.today() - datetime.timedelta(7)),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125))
-        ).put()
-        suggestion_models.TranslationReviewerTotalContributionStatsModel(
-            id='model_6',
-            language_code='de',
-            contributor_id=self.USER_ID_1,
-            topic_ids_with_translation_reviews=[
-                'topic6'
-            ],
-            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
-            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
-            accepted_translations_with_reviewer_edits_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
-            accepted_translation_word_count=(
-                self.ACCEPTED_TRANSLATION_WORD_COUNT),
-            rejected_translations_count=(
-                self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=(
-                datetime.date.today() - datetime.timedelta(6)),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125))
         ).put()
 
         # Check for 'es' language filter.
@@ -4657,9 +4451,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=4,
                 offset=0,
                 sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 3)
@@ -4675,9 +4467,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=3,
                 offset=0,
                 sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4685,16 +4475,14 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
 
-        # max_days_since_end_date_for_last_activity filter within 7 days.
+        # last_date filter within 7 days.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
                 page_size=4,
                 offset=0,
                 sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=7)),
+                last_date=datetime.date.today() - datetime.timedelta(days=7),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4702,16 +4490,14 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
-        # max_days_since_end_date_for_last_activity filter within 90 days.
+        # last_date filter within 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=90)),
+                last_date=datetime.date.today() - datetime.timedelta(days=90),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4726,80 +4512,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=7)),
+                last_date=datetime.date.today() - datetime.timedelta(days=7),
                 language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
-
-        # Check for activites before last 5 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=5),
-                    datetime.date(1970, 1, 1)),
-                language_code='de'
-            ))
-        self.assertEqual(len(sorted_results), 1)
-        self.assertEqual(sorted_results[0].id, 'model_5')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for activites before last 5 days and after last 130 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=5),
-                    datetime.date.today() - datetime.timedelta(days=130)),
-                language_code='de'
-            ))
-        self.assertEqual(len(sorted_results), 1)
-        self.assertEqual(sorted_results[0].id, 'model_5')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for no activity before last 5 days and after last 120 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=5),
-                    datetime.date.today() - datetime.timedelta(days=120)),
-                language_code='de'
-            ))
-        self.assertEqual(len(sorted_results), 0)
-        self.assertFalse(more)
-        self.assertEqual(next_offset, 2)
-
-        # Check for no activity before last 8 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=8),
-                    datetime.date(1970, 1, 1)),
-                language_code='de'
-            ))
-        self.assertEqual(len(sorted_results), 0)
-        self.assertFalse(more)
-        self.assertEqual(next_offset, 2)
 
     def test_fetch_page_with_sorting_and_filtering(self) -> None:
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -4816,7 +4534,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=datetime.date.today()
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -4833,7 +4551,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -4851,7 +4569,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -4869,7 +4587,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -4882,9 +4600,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4892,7 +4608,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
 
-        # max_days_since_end_date_for_last_activity filter within 7 days
+        # last_date filter within 7 days
         # and IncreasingReviewedTranslations sort.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
@@ -4901,9 +4617,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=7)),
+                last_date=datetime.date.today() - datetime.timedelta(days=7),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -4926,7 +4640,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(65))
         ).put()
@@ -4944,7 +4658,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=datetime.datetime.utcnow()
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -4961,7 +4675,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=datetime.datetime.utcnow()
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -4978,7 +4692,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(65))
         ).put()
@@ -4990,9 +4704,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=2,
                 sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1)),
+                last_date=datetime.date(1970, 1, 1),
                 language_code='es'
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -5016,7 +4728,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(65))
         ).put()
@@ -5034,7 +4746,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=datetime.datetime.utcnow()
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -5051,7 +4763,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=datetime.datetime.utcnow()
         ).put()
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
@@ -5068,7 +4780,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(65))
         ).put()
@@ -5081,9 +4793,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             offset=0,
             sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
-            date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=7)),
+            last_date=datetime.date.today() - datetime.timedelta(days=7),
             language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -5098,9 +4808,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             offset=0,
             sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value,
-            date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=90)),
+            last_date=datetime.date.today() - datetime.timedelta(days=90),
             language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5114,9 +4822,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             page_size=1,
             offset=0,
             sort_by=None,
-            date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=7)),
+            last_date=datetime.date.today() - datetime.timedelta(days=7),
             language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 0)
@@ -5317,7 +5023,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -5335,7 +5041,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -5353,7 +5059,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -5371,7 +5077,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
@@ -5384,9 +5090,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5403,9 +5107,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5422,9 +5124,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_ACCURACY.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5441,9 +5141,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_ACCURACY.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 4)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5460,9 +5158,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5479,9 +5175,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5498,9 +5192,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -5517,9 +5209,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_4')
@@ -5542,7 +5232,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -5560,7 +5250,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -5578,7 +5268,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -5596,47 +5286,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(5))
-        ).put()
-        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
-            id='model_5',
-            contributor_id=self.USER_ID_3,
-            topic_ids_with_question_submissions=[
-                'topic5'
-            ],
-            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
-            recent_performance=40,
-            overall_accuracy=5.0,
-            submitted_questions_count=40,
-            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=(
-                datetime.date.today() - datetime.timedelta(7)),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125))
-        ).put()
-        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
-            id='model_6',
-            contributor_id=self.USER_ID_3,
-            topic_ids_with_question_submissions=[
-                'topic6'
-            ],
-            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
-            recent_performance=40,
-            overall_accuracy=5.0,
-            submitted_questions_count=40,
-            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_without_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=(
-                datetime.date.today() - datetime.timedelta(6)),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125))
         ).put()
 
         # Check for topic filter.
@@ -5647,9 +5299,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=['topic1', 'topic2'],
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -5657,7 +5307,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 2)
 
-        # Check for max_days_since_end_date_for_last_activity under 7 days.
+        # Check for last_date under 7 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
@@ -5665,16 +5315,14 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=7))
+                last_date=datetime.date.today() - datetime.timedelta(days=7)
             ))
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertFalse(more)
-        self.assertEqual(next_offset, 6)
+        self.assertEqual(next_offset, 4)
 
-        # Check for max_days_since_end_date_for_last_activity under 90 days.
+        # Check for last_date under 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
@@ -5682,15 +5330,13 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=90))
+                last_date=datetime.date.today() - datetime.timedelta(days=90)
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertEqual(sorted_results[1].id, 'model_3')
         self.assertTrue(more)
-        self.assertEqual(next_offset, 4)
+        self.assertEqual(next_offset, 2)
 
         # Check for no sorted_results in given time.
         sorted_results, next_offset, more = (
@@ -5699,82 +5345,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                topic_ids=[
-                    'non_existent_topic'
-                ],
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=7))
+                topic_ids=['non_existent_topic'],
+                last_date=datetime.date.today() - datetime.timedelta(days=7)
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
         self.assertEqual(next_offset, 0)
-
-        # Check for activites before last 5 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=5),
-                    datetime.date(1970, 1, 1)),
-            ))
-        self.assertEqual(len(sorted_results), 1)
-        self.assertEqual(sorted_results[0].id, 'model_5')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 2)
-
-        # Check for activites before last 5 days and after last 130 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=5),
-                    datetime.date.today() - datetime.timedelta(days=130)),
-            ))
-        self.assertEqual(len(sorted_results), 1)
-        self.assertEqual(sorted_results[0].id, 'model_5')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 2)
-
-        # Check for no activity before last 5 days and after last 120 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=5),
-                    datetime.date.today() - datetime.timedelta(days=120)),
-            ))
-        self.assertEqual(len(sorted_results), 0)
-        self.assertFalse(more)
-        self.assertEqual(next_offset, 6)
-
-        # Check for no activity before last 8 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=8),
-                    datetime.date(1970, 1, 1)),
-            ))
-        self.assertEqual(len(sorted_results), 0)
-        self.assertFalse(more)
-        self.assertEqual(next_offset, 6)
 
     def test_fetch_page_with_sorting_and_filtering(self) -> None:
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
@@ -5791,7 +5367,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -5809,7 +5385,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -5827,7 +5403,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -5845,7 +5421,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
@@ -5859,15 +5435,13 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value,
                 topic_ids=['topic1', 'topic2'],
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertFalse(more)
         self.assertEqual(next_offset, 2)
 
-        # Check for max_days_since_end_date_for_last_activity in 90 days
+        # Check for last_date in 90 days
         # and DecreasingLastActivity order.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
@@ -5877,9 +5451,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=90))
+                last_date=datetime.date.today() - datetime.timedelta(days=90)
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -5902,7 +5474,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -5920,7 +5492,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -5938,7 +5510,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -5956,7 +5528,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
@@ -5969,9 +5541,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=2,
                 sort_by=None,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -5987,9 +5557,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 offset=4,
                 sort_by=None,
                 topic_ids=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
@@ -6148,7 +5716,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -6163,7 +5731,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -6178,7 +5746,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
@@ -6190,9 +5758,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=3,
                 offset=0,
                 sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6208,9 +5774,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -6226,9 +5790,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -6244,9 +5806,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6266,7 +5826,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -6281,7 +5841,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -6296,75 +5856,39 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
-        suggestion_models.QuestionReviewerTotalContributionStatsModel(
-            id='model_4',
-            contributor_id=self.USER_ID_3,
-            topic_ids_with_question_reviews=[
-                'topic4'
-            ],
-            reviewed_questions_count=40,
-            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
-            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=(
-                datetime.date.today() - datetime.timedelta(7)),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125))
-        ).put()
-        suggestion_models.QuestionReviewerTotalContributionStatsModel(
-            id='model_5',
-            contributor_id=self.USER_ID_3,
-            topic_ids_with_question_reviews=[
-                'topic5'
-            ],
-            reviewed_questions_count=40,
-            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
-            accepted_questions_with_reviewer_edits_count=(
-                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
-            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=(
-                datetime.date.today() - datetime.timedelta(6)),
-            last_contribution_date=(
-                datetime.date.today() - datetime.timedelta(125))
-        ).put()
 
-        # max_days_since_end_date_for_last_activity filter within 7 days.
+        # last_date filter within 7 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
                 page_size=2,
                 offset=0,
                 sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=7))
+                last_date=datetime.date.today() - datetime.timedelta(days=7)
             ))
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertFalse(more)
-        self.assertEqual(next_offset, 5)
+        self.assertEqual(next_offset, 3)
 
-        # max_days_since_end_date_for_last_activity filter within 90 days.
+        # last_date filter within 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
                 page_size=2,
                 offset=0,
                 sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=90))
+                last_date=datetime.date.today() - datetime.timedelta(days=90)
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertEqual(sorted_results[1].id, 'model_2')
         self.assertTrue(more)
-        self.assertEqual(next_offset, 4)
+        self.assertEqual(next_offset, 2)
 
         # Check for no sorted_results within 1 day.
         sorted_results, next_offset, more = (
@@ -6373,75 +5897,11 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=1))
+                last_date=datetime.date.today() - datetime.timedelta(days=1)
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
-        self.assertEqual(next_offset, 5)
-
-        # Check for activites before last 5 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=5),
-                    datetime.date(1970, 1, 1)),
-            ))
-        self.assertEqual(len(sorted_results), 1)
-        self.assertEqual(sorted_results[0].id, 'model_4')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for activites before last 5 days and after last 130 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=5),
-                    datetime.date.today() - datetime.timedelta(days=130)),
-            ))
-        self.assertEqual(len(sorted_results), 1)
-        self.assertEqual(sorted_results[0].id, 'model_4')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for no activity before last 5 days and after last 120 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=5),
-                    datetime.date.today() - datetime.timedelta(days=120)),
-            ))
-        self.assertEqual(len(sorted_results), 0)
-        self.assertFalse(more)
-        self.assertEqual(next_offset, 5)
-
-        # Check for no activity before last 8 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date.today() - datetime.timedelta(days=8),
-                    datetime.date(1970, 1, 1)),
-            ))
-        self.assertEqual(len(sorted_results), 0)
-        self.assertFalse(more)
-        self.assertEqual(next_offset, 5)
+        self.assertEqual(next_offset, 3)
 
     def test_fetch_page_with_sorting_and_filtering(self) -> None:
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
@@ -6455,7 +5915,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -6470,7 +5930,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -6485,12 +5945,12 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
 
-        # max_days_since_end_date_for_last_activity filter within 90 days
+        # last_date filter within 90 days
         # and IncreasingReviewedQuestions sort.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
@@ -6499,9 +5959,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=90))
+                last_date=datetime.date.today() - datetime.timedelta(days=90)
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -6509,7 +5967,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
-        # max_days_since_end_date_for_last_activity filter within 7 days
+        # last_date filter within 7 days
         # and IncreasingReviewedQuestions sort.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
@@ -6518,16 +5976,14 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=7))
+                last_date=datetime.date.today() - datetime.timedelta(days=7)
             ))
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
-        # max_days_since_end_date_for_last_activity filter within 90 days
+        # last_date filter within 90 days
         # and IncreasingLastActivity sort.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
@@ -6536,9 +5992,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=suggestion_models.
                     SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date.today() - datetime.timedelta(days=90))
+                last_date=datetime.date.today() - datetime.timedelta(days=90)
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
@@ -6558,7 +6012,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -6573,7 +6027,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -6588,7 +6042,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
@@ -6600,9 +6054,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=1,
                 sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -6617,9 +6069,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 page_size=2,
                 offset=3,
                 sort_by=None,
-                date_range=utils.DateRange(
-                    datetime.date(3000, 1, 1),
-                    datetime.date(1970, 1, 1))
+                last_date=datetime.date(1970, 1, 1)
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)

@@ -379,8 +379,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             language_code='es',
             sort_by=None,
             topic_ids=None,
-            date_range=utils.DateRange(
-                datetime.date(3000, 1, 1),
+            last_date=(
                 datetime.date.today() - datetime.timedelta(days=90))
             )
         )
@@ -398,9 +397,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             offset=1,
             language_code='es',
             sort_by=None,
-            date_range=utils.DateRange(
-                datetime.date(3000, 1, 1),
-                datetime.date(1970, 1, 1))
+            last_date=datetime.date(1970, 1, 1)
             )
         )
 
@@ -417,9 +414,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             offset=1,
             sort_by=None,
             topic_ids=None,
-            date_range=utils.DateRange(
-                datetime.date(3000, 1, 1),
-                datetime.date(1970, 1, 1))
+            last_date=datetime.date(1970, 1, 1)
             )
         )
 
@@ -435,9 +430,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             page_size=2,
             offset=1,
             sort_by=None,
-            date_range=utils.DateRange(
-                datetime.date(3000, 1, 1),
-                datetime.date(1970, 1, 1))
+            last_date=datetime.date(1970, 1, 1)
             )
         )
 

@@ -1226,13 +1226,13 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with end_date filter and pagination.
+        # Test with last_date filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/submission', {
                 'page_size': 4,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'end_date': (
+                'last_date': (
                 datetime.date.today() - datetime.timedelta(120)).strftime(
                     '%Y-%m-%d'),
                 'topic_ids': []
@@ -1249,41 +1249,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['stats'][1]['contributor_name'],
             'user2'
-        )
-        self.assertEqual(
-            response['next_offset'],
-            4
-        )
-        self.assertEqual(
-            response['more'],
-            False
-        )
-        self.logout()
-
-    def test_get_translation_submitter_stats_for_first_activity_filter(
-        self
-    ) -> None:
-        self.login(self.CONTRIBUTOR_EMAIL)
-
-        # Test with start_date filter and pagination.
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/translation/submission', {
-                'page_size': 4,
-                'offset': 0,
-                'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'start_date': (
-                datetime.date.today() - datetime.timedelta(5)).strftime(
-                    '%Y-%m-%d'),
-                'topic_ids': []
-            })
-
-        self.assertEqual(
-            len(response['stats']),
-            1
-        )
-        self.assertEqual(
-            response['stats'][0]['contributor_name'],
-            'user4'
         )
         self.assertEqual(
             response['next_offset'],
@@ -1361,13 +1326,13 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with end_date filter and pagination.
+        # Test with last_date filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/review', {
                 'page_size': 4,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'end_date': (
+                'last_date': (
                 datetime.date.today() - datetime.timedelta(120)).strftime(
                     '%Y-%m-%d'),
                 'topic_ids': []
@@ -1384,41 +1349,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['stats'][1]['contributor_name'],
             'user2'
-        )
-        self.assertEqual(
-            response['next_offset'],
-            4
-        )
-        self.assertEqual(
-            response['more'],
-            False
-        )
-        self.logout()
-
-    def test_get_translation_reviewer_stats_for_first_activity_filter(
-        self
-    ) -> None:
-        self.login(self.CONTRIBUTOR_EMAIL)
-
-        # Test with start_date filter and pagination.
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/translation/review', {
-                'page_size': 4,
-                'offset': 0,
-                'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'start_date': (
-                datetime.date.today() - datetime.timedelta(5)).strftime(
-                    '%Y-%m-%d'),
-                'topic_ids': []
-            })
-
-        self.assertEqual(
-            len(response['stats']),
-            1
-        )
-        self.assertEqual(
-            response['stats'][0]['contributor_name'],
-            'user4'
         )
         self.assertEqual(
             response['next_offset'],
@@ -1527,12 +1457,12 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with end_date filter and pagination.
+        # Test with last_date filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 4,
                 'offset': 1,
-                'end_date': (
+                'last_date': (
                 datetime.date.today() - datetime.timedelta(120)).strftime(
                     '%Y-%m-%d'),
                 'topic_ids': []
@@ -1549,40 +1479,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['stats'][1]['contributor_name'],
             'user2'
-        )
-        self.assertEqual(
-            response['next_offset'],
-            4
-        )
-        self.assertEqual(
-            response['more'],
-            False
-        )
-        self.logout()
-
-    def test_get_question_submitter_stats_for_first_activity_filter(
-        self
-    ) -> None:
-        self.login(self.CONTRIBUTOR_EMAIL)
-
-        # Test with start_date filter and pagination.
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/question/submission', {
-                'page_size': 4,
-                'offset': 0,
-                'start_date': (
-                datetime.date.today() - datetime.timedelta(5)).strftime(
-                    '%Y-%m-%d'),
-                'topic_ids': []
-            })
-
-        self.assertEqual(
-            len(response['stats']),
-            1
-        )
-        self.assertEqual(
-            response['stats'][0]['contributor_name'],
-            'user4'
         )
         self.assertEqual(
             response['next_offset'],
@@ -1658,12 +1554,12 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with end_date filter and pagination.
+        # Test with last_date filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 4,
                 'offset': 1,
-                'end_date': (
+                'last_date': (
                 datetime.date.today() - datetime.timedelta(120)).strftime(
                     '%Y-%m-%d'),
                 'topic_ids': []
@@ -1691,40 +1587,6 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
-    def test_get_question_reviewer_stats_for_first_activity_filter(
-        self
-    ) -> None:
-        self.login(self.CONTRIBUTOR_EMAIL)
-
-        # Test with start_date filter and pagination.
-        response = self.get_json(
-            '/contributor-dashboard-admin-stats/question/review', {
-                'page_size': 4,
-                'offset': 0,
-                'start_date': (
-                datetime.date.today() - datetime.timedelta(5)).strftime(
-                    '%Y-%m-%d'),
-                'topic_ids': []
-            })
-
-        self.assertEqual(
-            len(response['stats']),
-            1
-        )
-        self.assertEqual(
-            response['stats'][0]['contributor_name'],
-            'user4'
-        )
-        self.assertEqual(
-            response['next_offset'],
-            4
-        )
-        self.assertEqual(
-            response['more'],
-            False
-        )
-        self.logout()
-
     def test_get_translation_coordinator_stats(self) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
@@ -1732,7 +1594,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/translation/coordinate', {
                 'page_size': 0,
                 'offset': 0,
-                'end_date': (
+                'last_date': (
                 datetime.date.today()).strftime('%Y-%m-%d'),
                 'topic_ids': [],
                 'sort_by': 'DecreasingCoordinatorCounts'
@@ -1755,7 +1617,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/translation/coordinate', {
                 'page_size': 0,
                 'offset': 0,
-                'end_date': (
+                'last_date': (
                 datetime.date.today()).strftime('%Y-%m-%d'),
                 'topic_ids': [],
                 'sort_by': 'IncreasingCoordinatorCounts'
@@ -1782,7 +1644,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/question/coordinate', {
                 'page_size': 0,
                 'offset': 0,
-                'end_date': (
+                'last_date': (
                 datetime.date.today()).strftime('%Y-%m-%d'),
                 'topic_ids': []
             })

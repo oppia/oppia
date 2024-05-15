@@ -110,8 +110,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   loadingMessage!: string;
   allTopicNames: string[] = [];
   today!: Date;
-  startDateForUsersLastActivity!: Date;
-  endDateForUsersLastActivity!: Date;
+  lastDateToFilterUsersActivity!: Date;
   selectedTopicIds: string[] = [];
   selectedTopicNames: string[] = [];
   languageChoices: LanguageChoice[] = [];
@@ -164,8 +163,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
               return;
             }
             this.today = new Date();
-            this.startDateForUsersLastActivity = new Date();
-            this.endDateForUsersLastActivity =
+            console.log(this.today);
+            this.lastDateToFilterUsersActivity =
               this.getDateThatIsDaysBeforeToday(90);
             this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
             this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
@@ -265,20 +264,9 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     );
   }
 
-  isValidStartDate(selectedStartDate: Date): boolean {
+  isValidLastDate(selectedLastDate: Date): boolean {
     const today = new Date();
-    return (
-      today.getTime() >= selectedStartDate.getTime() &&
-      selectedStartDate.getTime() >= this.endDateForUsersLastActivity.getTime()
-    );
-  }
-
-  isValidEndDate(selectedEndDate: Date): boolean {
-    const today = new Date();
-    return (
-      today.getTime() >= selectedEndDate.getTime() &&
-      selectedEndDate.getTime() <= this.startDateForUsersLastActivity.getTime()
-    );
+    return today.getTime() >= selectedLastDate.getTime();
   }
 
   createFilter(): void {
@@ -286,8 +274,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
-      this.startDateForUsersLastActivity,
-      this.endDateForUsersLastActivity
+      this.lastDateToFilterUsersActivity
     );
 
     if (this.filter === undefined || !isEqual(tempFilter, this.filter)) {
@@ -295,19 +282,11 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     }
   }
 
-  changeStartDate(value: Date): void {
-    if (!this.isValidStartDate(value)) {
+  changeLastDate(value: Date): void {
+    if (!this.isValidLastDate(value)) {
       return;
     }
-    this.startDateForUsersLastActivity = new Date(value);
-    this.createFilter();
-  }
-
-  changeEndDate(value: Date): void {
-    if (!this.isValidEndDate(value)) {
-      return;
-    }
-    this.endDateForUsersLastActivity = new Date(value);
+    this.lastDateToFilterUsersActivity = new Date(value);
     this.createFilter();
   }
 

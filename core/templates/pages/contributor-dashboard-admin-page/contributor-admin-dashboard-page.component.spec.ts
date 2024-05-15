@@ -422,64 +422,9 @@ describe('Contributor dashboard Admin page', () => {
         tick();
         fixture.detectChanges();
 
-        expect(component.filter.startDate).toEqual(
-          component.getDateThatIsDaysBeforeToday(0)
-        );
-
-        expect(component.filter.endDate).toEqual(
+        expect(component.filter.lastDate).toEqual(
           component.getDateThatIsDaysBeforeToday(90)
         );
-      })
-    );
-
-    it("should changes filter by users' last activity when start date changes", fakeAsync(() => {
-      const numberOfDaysSinceStartDate = 7;
-      component.ngOnInit();
-      tick();
-      fixture.detectChanges();
-
-      component.changeStartDate(
-        component.getDateThatIsDaysBeforeToday(numberOfDaysSinceStartDate)
-      );
-
-      expect(component.filter.startDate).toEqual(
-        component.getDateThatIsDaysBeforeToday(numberOfDaysSinceStartDate)
-      );
-    }));
-
-    it(
-      "should not change filter by users' last activity when given start date " +
-        'is in the future',
-      fakeAsync(() => {
-        const numberOfDaysSinceStartDate = -1;
-        component.ngOnInit();
-        tick();
-        fixture.detectChanges();
-        const initialStartDate = component.filter.startDate;
-
-        component.changeStartDate(
-          component.getDateThatIsDaysBeforeToday(numberOfDaysSinceStartDate)
-        );
-
-        expect(component.filter.startDate).toEqual(initialStartDate);
-      })
-    );
-
-    it(
-      "should not change filter by users' last activity when given start date " +
-        "comes after filter's current end date",
-      fakeAsync(() => {
-        const numberOfDaysSinceStartDate = 91;
-        component.ngOnInit();
-        tick();
-        fixture.detectChanges();
-        const initialStartDate = component.filter.startDate;
-
-        component.changeStartDate(
-          component.getDateThatIsDaysBeforeToday(numberOfDaysSinceStartDate)
-        );
-
-        expect(component.filter.startDate).toEqual(initialStartDate);
       })
     );
 
@@ -489,11 +434,11 @@ describe('Contributor dashboard Admin page', () => {
       tick();
       fixture.detectChanges();
 
-      component.changeEndDate(
+      component.changeLastDate(
         component.getDateThatIsDaysBeforeToday(numberOfDaysSinceEndDate)
       );
 
-      expect(component.filter.endDate).toEqual(
+      expect(component.filter.lastDate).toEqual(
         component.getDateThatIsDaysBeforeToday(numberOfDaysSinceEndDate)
       );
     }));
@@ -506,31 +451,13 @@ describe('Contributor dashboard Admin page', () => {
         component.ngOnInit();
         tick();
         fixture.detectChanges();
-        const initialEndDate = component.filter.endDate;
+        const initialLastDate = component.filter.lastDate;
 
-        component.changeEndDate(
+        component.changeLastDate(
           component.getDateThatIsDaysBeforeToday(numberOfDaysSinceEndDate)
         );
 
-        expect(component.filter.endDate).toEqual(initialEndDate);
-      })
-    );
-
-    it(
-      "should not change filter by users' last activity when given end date " +
-        "comes before filter's current start date",
-      fakeAsync(() => {
-        const numberOfDaysSinceEndDate = -1;
-        component.ngOnInit();
-        tick();
-        fixture.detectChanges();
-        const initialEndDate = component.filter.endDate;
-
-        component.changeEndDate(
-          component.getDateThatIsDaysBeforeToday(numberOfDaysSinceEndDate)
-        );
-
-        expect(component.filter.endDate).toEqual(initialEndDate);
+        expect(component.filter.lastDate).toEqual(initialLastDate);
       })
     );
 

@@ -228,17 +228,10 @@ export class ContributorDashboardAdminStatsBackendApiService {
       language_code: filter.languageCode
         ? filter.languageCode
         : PageConstants.DEFAULT_LANGUAGE_FILTER,
-      ...(filter.startDate
+      ...(filter.lastDate
         ? {
-            start_date: this.dateTimeFormatService.getModifiedLocalDateString(
-              filter.startDate
-            ),
-          }
-        : {}),
-      ...(filter.endDate
-        ? {
-            end_date: this.dateTimeFormatService.getModifiedLocalDateString(
-              filter.endDate
+            last_date: this.dateTimeFormatService.getModifiedLocalDateString(
+              filter.lastDate
             ),
           }
         : {}),

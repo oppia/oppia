@@ -392,14 +392,6 @@ var ContributorDashboardAdminPage = function () {
     );
   };
 
-  this.setFirstDatePickerValue = async function (selectedDate) {
-    await this.selectDate(
-      firstDatePickerToggle,
-      firstDatePickerInput,
-      selectedDate
-    );
-  };
-
   this.expectUserToBeTranslationReviewer = async function (
     username,
     languageDescription
