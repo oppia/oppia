@@ -265,7 +265,10 @@ describe('Exploration rights service', () => {
   }));
 
   it('should remove existing user', fakeAsync(() => {
-    serviceData.rights.viewer_names = ['newUser'];
+    ers.viewerNames = ['newUser'];
+    ers.editorNames = [];
+    ers.ownerNames = [];
+    serviceData.rights.viewer_names = [];
     spyOn(
       explorationRightsBackendApiService,
       'removeRoleAsyncDeleteData'
@@ -278,6 +281,89 @@ describe('Exploration rights service', () => {
     expect(failHandler).not.toHaveBeenCalled();
 
     expect(ers.viewerNames).toEqual(serviceData.rights.viewer_names);
+  }));
+
+  it('should remove user from UI before updating with backend data', fakeAsync(() => {
+    ers.editorNames = ['editorName', 'newEditor'];
+    ers.viewerNames = [];
+    ers.ownerNames = [];
+    serviceData.rights.editor_names = [];
+    spyOn(
+      explorationRightsBackendApiService,
+      'removeRoleAsyncDeleteData'
+    ).and.returnValue(Promise.resolve(serviceData));
+
+    ers.removeRoleAsync('editorName').then(successHandler, failHandler);
+    expect(ers.editorNames).toEqual(['newEditor']);
+    expect(ers.editorNames).not.toEqual(serviceData.rights.editor_names);
+    tick();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+
+    expect(ers.editorNames).toEqual(serviceData.rights.editor_names);
+
+    ers.viewerNames = ['viewerName', 'newViewer'];
+    serviceData.rights.viewer_names = [];
+
+    ers.removeRoleAsync('viewerName').then(successHandler, failHandler);
+    expect(ers.viewerNames).toEqual(['newViewer']);
+    expect(ers.viewerNames).not.toEqual(serviceData.rights.viewer_names);
+    tick();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+
+    expect(ers.viewerNames).toEqual(serviceData.rights.viewer_names);
+  }));
+
+  it('should redisplay users when removing a user fails', fakeAsync(() => {
+    ers.ownerNames = ['ownerName'];
+    ers.editorNames = ['editorName'];
+    ers.viewerNames = ['viewerName'];
+    spyOn(
+      explorationRightsBackendApiService,
+      'removeRoleAsyncDeleteData'
+    ).and.returnValue(Promise.reject());
+
+    ers.removeRoleAsync('ownerName').then(successHandler, failHandler);
+    expect(ers.ownerNames).toEqual([]);
+    expect(ers.editorNames).toEqual(['editorName']);
+    expect(ers.viewerNames).toEqual(['viewerName']);
+    tick();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+
+    expect(ers.ownerNames).toEqual(['ownerName']);
+    expect(ers.editorNames).toEqual(['editorName']);
+    expect(ers.viewerNames).toEqual(['viewerName']);
+
+    ers.removeRoleAsync('editorName').then(successHandler, failHandler);
+    expect(ers.editorNames).toEqual([]);
+    expect(ers.ownerNames).toEqual(['ownerName']);
+    expect(ers.viewerNames).toEqual(['viewerName']);
+    tick();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+
+    expect(ers.editorNames).toEqual(['editorName']);
+    expect(ers.ownerNames).toEqual(['ownerName']);
+    expect(ers.viewerNames).toEqual(['viewerName']);
+
+    ers.removeRoleAsync('viewerName').then(successHandler, failHandler);
+    expect(ers.viewerNames).toEqual([]);
+    expect(ers.ownerNames).toEqual(['ownerName']);
+    expect(ers.editorNames).toEqual(['editorName']);
+    tick();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+
+    expect(ers.viewerNames).toEqual(['viewerName']);
+    expect(ers.ownerNames).toEqual(['ownerName']);
+    expect(ers.editorNames).toEqual(['editorName']);
   }));
 
   it('should save a new voice artist', fakeAsync(() => {
