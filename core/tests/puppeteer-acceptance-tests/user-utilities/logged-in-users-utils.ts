@@ -62,6 +62,7 @@ const googleAnalyticsPartnerPoliciesUrl =
 const googleAnalyticsOptOutUrl = testConstants.URLs.GoogleAnalytics.OptOut;
 const CreativeCommonsLegalCodeUrl =
   testConstants.URLs.ExternalLink.CreativeCommonsLegalCode;
+const explorationDesignTipsUrl = testConstants.URLs.ExplorationDesignTips;
 
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
@@ -1131,7 +1132,7 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn('Design Tips'),
     ]);
 
-    expect(this.page.url()).toBe('http://oppia.github.io/#/DesignTips');
+    expect(this.page.url()).toBe(explorationDesignTipsUrl);
   }
 
   /**
@@ -1148,6 +1149,7 @@ export class LoggedInUser extends BaseUser {
     ]);
 
     expect(this.page.url()).toBe(
+      creatorDashboardInCreateModeUrl,
       'http://localhost:8181/creator-dashboard?mode=create'
     );
   }

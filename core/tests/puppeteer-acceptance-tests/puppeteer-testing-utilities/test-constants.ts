@@ -42,6 +42,7 @@ export default {
     Donate: 'http://localhost:8181/donate',
     DonateWithThanksModal: 'http://localhost:8181/donate?thanks=',
     EmbeddingAnExploration: 'https://oppia.github.io/#/EmbeddingAnExploration',
+    ExplorationDesignTips: 'http://oppia.github.io/#/DesignTips',
     ExternalLink61MillionChildren:
       'https://uis.unesco.org/en/news/world-poverty-could-be-cut-half-if-all-adults-completed-secondary-education',
     ExternalLinkEvenThoseWhoAreInSchool:
