@@ -187,7 +187,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Function to navigate to the Creator Guidelines page.
    */
-  async clickOnCreatorGuidelinesLinkinFooter(): Promise<void> {
+  async navigateToCreatorGuidelinesPage(): Promise<void> {
     await this.goto(creatorGuidelinesUrl);
   }
 
@@ -896,7 +896,7 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the GetStarted page using the oppia website footer.
+   * Navigates to the Get Started page using the oppia website footer.
    */
   async clickOnGetStartedLinkInFooter(): Promise<void> {
     await this.page.waitForSelector(footerGetStartedLink);
@@ -909,9 +909,9 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the GetStarted page using the oppia website footer.
+   * Navigates to the Creator Guidelines page using the oppia website footer.
    */
-  async navigateToCreatorGuidelinesPageViaFooter(): Promise<void> {
+  async clickOnCreatorGuidelinesLinkinFooter(): Promise<void> {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
       footerCreatorGuidelinesLink,
@@ -937,7 +937,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the Terms page using the oppia website footer.
    */
-  async navigateToTermsPageViaFooter(): Promise<void> {
+  async clickOnTermsOfServiceLinkInFooter(): Promise<void> {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
       footerTermsLink,
@@ -950,7 +950,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the Privacy Policy page using the oppia website footer.
    */
-  async navigateToPrivacyPolicyPageViaFooter(): Promise<void> {
+  async clickOnPrivacyPolicyLinkInFooter(): Promise<void> {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
       footerPrivacyPolicyLink,

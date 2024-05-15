@@ -55,9 +55,17 @@ describe('Logged-in User', function () {
   );
 
   it(
-    'should open "Community Library" page via the footer',
+    'should open "Terms" page via the footer',
     async function () {
-      await testUser.clickOnBrowseTheLibraryLinkInFooter();
+      await testUser.clickOnTermsOfServiceLinkInFooter();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should open "Privacy Policy" page via the footer',
+    async function () {
+      await testUser.clickOnPrivacyPolicyLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

@@ -33,52 +33,41 @@ describe('Logged-in Users', function () {
     );
   }, DEFAULT_SPEC_TIMEOUT);
 
+  beforeEach(async function () {
+    await testUser.navigateToCreatorGuidelinesPage();
+  }, DEFAULT_SPEC_TIMEOUT);
+
   it(
-    'should be able to navigate to the Creator Guidelines page using the footer',
+    'should be able to use the "forum" link',
     async function () {
-      await testUser.navigateToAboutFoundationPage();
-      await testUser.navigateToCreatorGuidelinesPageViaFooter();
+      await testUser.clickForumLinkOnCreatorGuidelinesPage();
     },
     DEFAULT_SPEC_TIMEOUT
   );
 
-  describe('on the Creator Guidelines page', function () {
-    beforeEach(async function () {
-      await testUser.navigateToCreatorGuidelinesPage();
-    }, DEFAULT_SPEC_TIMEOUT);
+  it(
+    'should be able to use the "Design Tips" link',
+    async function () {
+      await testUser.clickDesignTipsLinkOnCreatorGuidelinesPage();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-    it(
-      'should be able to use the "forum" link',
-      async function () {
-        await testUser.clickForumLinkOnCreatorGuidelinesPage();
-      },
-      DEFAULT_SPEC_TIMEOUT
-    );
+  it(
+    'should be able to use the "Create an Exploration" link',
+    async function () {
+      await testUser.clickCreateAnExplorationLinkOnCreatorGuidelinesPage();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-    it(
-      'should be able to use the "Design Tips" link',
-      async function () {
-        await testUser.clickDesignTipsLinkOnCreatorGuidelinesPage();
-      },
-      DEFAULT_SPEC_TIMEOUT
-    );
-
-    it(
-      'should be able to use the "Create an Exploration" link',
-      async function () {
-        await testUser.clickCreateAnExplorationLinkOnCreatorGuidelinesPage();
-      },
-      DEFAULT_SPEC_TIMEOUT
-    );
-
-    it(
-      'should be able to use the "Browse our Expectations" link',
-      async function () {
-        await testUser.clickBrowseOurExpectationsLinkOnCreatorGuidelinesPage();
-      },
-      DEFAULT_SPEC_TIMEOUT
-    );
-  });
+  it(
+    'should be able to use the "Browse our Expectations" link',
+    async function () {
+      await testUser.clickBrowseOurExpectationsLinkOnCreatorGuidelinesPage();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
