@@ -253,6 +253,27 @@ export class RteHelperModalComponent {
         );
         return;
       }
+    } else if (this.componentId === this.COMPONENT_ID_TABS) {
+      // Value[0] corresponds to all tab contents and titles.
+      for (let tabIndex = 0; tabIndex < value[0].length; tabIndex++) {
+        if (value[0][tabIndex].title === '') {
+          this.updateRteErrorMessage(
+            'Please ensure that the title of tab ' +
+              (tabIndex + 1) +
+              ' is filled.'
+          );
+          break;
+        } else if (value[0][tabIndex].content === '') {
+          this.updateRteErrorMessage(
+            'Please ensure that the content of tab ' +
+              (tabIndex + 1) +
+              ' is filled.'
+          );
+          break;
+        } else {
+          this.updateRteErrorMessage('');
+        }
+      }
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
       let url: string = value[0];
       let text: string = value[1];
