@@ -60,6 +60,8 @@ const allAboutCookiesUrl = testConstants.URLs.ExternalLink.AboutCookies;
 const googleAnalyticsPartnerPoliciesUrl =
   testConstants.URLs.GoogleAnalytics.PartnerPolicies;
 const googleAnalyticsOptOutUrl = testConstants.URLs.GoogleAnalytics.OptOut;
+const CreativeCommonsLegalCodeUrl =
+  testConstants.URLs.ExternalLink.CreativeCommonsLegalCode;
 
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
@@ -1163,7 +1165,7 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn('Browse our Explorations'),
     ]);
 
-    expect(this.page.url()).toBe('http://localhost:8181/community-library');
+    expect(this.page.url()).toBe(communityLibraryUrl);
   }
 
   /**
@@ -1234,9 +1236,7 @@ export class LoggedInUser extends BaseUser {
     const [link] = await this.page.$x('(//a[contains(text(),"here")])[1]');
     await Promise.all([this.page.waitForNavigation(), await link.click()]);
 
-    expect(this.page.url()).toBe(
-      'https://creativecommons.org/licenses/by-sa/4.0/legalcode'
-    );
+    expect(this.page.url()).toBe(CreativeCommonsLegalCodeUrl);
   }
 
   /**

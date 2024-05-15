@@ -78,6 +78,8 @@ export default {
     },
     ExternalLink: {
       AboutCookies: 'https://allaboutcookies.org/how-to-manage-cookies',
+      CreativeCommonsLegalCode:
+        'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
     },
   },
   Dashboard: {
