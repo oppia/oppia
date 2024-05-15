@@ -13,11 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of State
+ * @fileoverview Model class for creating new frontend instances of State
  * domain objects.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
-import {Injectable} from '@angular/core';
 
 import {
   InteractionBackendDict,
@@ -129,9 +127,6 @@ export class State extends BaseTranslatableObject {
   }
 }
 
-@Injectable({
-  providedIn: 'root',
-})
 export class StateObjectFactory {
   constructor(
     private interactionObject: InteractionObjectFactory,
@@ -195,7 +190,3 @@ export class StateObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('StateObjectFactory', downgradeInjectable(StateObjectFactory));
