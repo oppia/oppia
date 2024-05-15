@@ -120,7 +120,7 @@ class LearnerGroupModel(base_models.BaseModel):
         """
         for _ in range(base_models.MAX_RETRIES):
             group_id = ''.join(
-                random.choice(string.ascii_lowercase + string.ascii_uppercase)
+                random.choice(f'{string.ascii_lowercase}{string.ascii_uppercase}')
                 for _ in range(base_models.ID_LENGTH))
             if not cls.get_by_id(group_id):
                 return group_id
