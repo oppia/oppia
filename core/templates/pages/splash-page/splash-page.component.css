@@ -170,7 +170,6 @@
 
 .splash-page .oppia-splash-offerings-section-title {
   color: #005c5e;
-  font-size: 32px;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 3.2rem;
   margin: 0 0;
@@ -473,8 +472,8 @@
   background-color: #fcfcfd;
   display: flex;
   flex-direction: row-reverse;
-  justify-content: space-between;
   height: fit-content;
+  justify-content: space-between;
   padding: 0 5vw;
   width: 100%;
 }
@@ -858,10 +857,6 @@
 
   .splash-page .oppia-splash-learn-more-title {
     font-size: 2rem;
-  }
-
-  .splash-page .oppia-splash-features-section-card-h2 {
-    font-size: 1.4rem;
   }
 
   .splash-page .oppia-splash-features-section-header1 h2 {
