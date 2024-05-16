@@ -687,6 +687,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     REJECTED_TRANSLATION_WORD_COUNT: Final = 0
     REVIEWED_QUESTIONS_COUNT = 2
     ACCEPTED_QUESTIONS_COUNT = 1
+    FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
     ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT = 0
     ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
     REJECTED_QUESTIONS_COUNT: Final = 20
@@ -795,7 +796,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -820,7 +821,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(65))
         ).put()
@@ -845,7 +846,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -869,8 +870,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=(
-                datetime.date.today() - datetime.timedelta(7)),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -889,7 +889,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -907,7 +907,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(65))
         ).put()
@@ -925,7 +925,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -943,8 +943,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=(
-                datetime.date.today() - datetime.timedelta(7)),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -963,7 +962,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -981,7 +980,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(65))
         ).put()
@@ -999,7 +998,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -1017,8 +1016,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=(
-                datetime.date.today() - datetime.timedelta(7)),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -1034,7 +1032,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -1049,7 +1047,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(65))
         ).put()
@@ -1064,7 +1062,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -1079,8 +1077,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=(
-                datetime.date.today() - datetime.timedelta(7)),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
