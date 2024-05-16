@@ -20,9 +20,9 @@
     <div *ngIf="isVoiceoverContributionWithAccentEnabled()">
       <div class="language-selector-container">
         <span class="language-selector-text">
-          <strong>Language Code: </strong>
+          <strong>Voiceover Language Code: </strong>
         </span>
-        <mat-form-field class="language-selector">
+        <mat-form-field class="language-selector-form">
           <mat-select (selectionChange)="changeTranslationLanguage()" [(ngModel)]="languageCode">
             <mat-option *ngFor="let language of languageCodesAndDescriptions"
                         [value]="language.id">
@@ -38,7 +38,7 @@
           <strong>Language Accent Code: </strong>
         </span>
         <span *ngIf="selectedLanguageAccentCode === ''"><i>No Accent Selection Available</i></span>
-        <mat-form-field class="language-selector" *ngIf="selectedLanguageAccentCode !== ''">
+        <mat-form-field class="language-selector-form" *ngIf="selectedLanguageAccentCode !== ''">
           <mat-select [(value)]="selectedLanguageAccentCode" (selectionChange)="updateLanguageAccentCode($event.value)">
             <mat-option *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue"
                         [value]="languageAccentCodeToDescription.key">
@@ -83,8 +83,20 @@
 </div>
 
 <style>
+  .language-selector-text {
+    float: left;
+    width: 50%;
+  }
+  .language-selector-form {
+    width: 210px;
+  }
   .language-selector-container {
-    justify-content: space-evenly;
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+    margin: auto;
+    text-align: center;
+    width: 500px;
   }
   .oppia-translator-overview {
     display: -webkit-flex;

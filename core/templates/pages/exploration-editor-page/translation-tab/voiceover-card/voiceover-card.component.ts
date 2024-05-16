@@ -35,10 +35,7 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {TranslationStatusService} from '../services/translation-status.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
-import {
-  LanguageAccentToDescription,
-  VoiceoverBackendApiService,
-} from 'domain/voiceover/voiceover-backend-api.service';
+import {LanguageAccentToDescription} from 'domain/voiceover/voiceover-backend-api.service';
 import {ExplorationChangeEditVoiceovers} from 'domain/exploration/exploration-draft.model';
 
 @Component({
@@ -80,7 +77,6 @@ export class VoiceoverCardComponent implements OnInit {
     private contextService: ContextService,
     private translationLanguageService: TranslationLanguageService,
     private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
-    private voiceoverBackendApiService: VoiceoverBackendApiService,
     private ngbModal: NgbModal,
     private idGenerationService: IdGenerationService,
     private alertsService: AlertsService,
@@ -133,8 +129,9 @@ export class VoiceoverCardComponent implements OnInit {
         this.voiceoverProgress = Math.round(
           (this.currentVoiceoverDuration / this.manualVoiceoverDuration) * 100
         );
-      } else {
+      } else if (!this.audioPlayerService.isTrackLoaded()) {
         this.voiceoverProgress = 0;
+        this.currentVoiceoverDuration = 0;
       }
     }, 1000);
   }
@@ -237,9 +234,8 @@ export class VoiceoverCardComponent implements OnInit {
           this.entityVoiceoversService.setActiveLanguageAccentCode(
             this.languageAccentCode
           );
-          this.setActiveContentManualVoiceover();
           this.updateVoiceoverWithChangeList();
-
+          this.setActiveContentManualVoiceover();
           this.updateStatusGraph();
         }
       });
@@ -251,10 +247,6 @@ export class VoiceoverCardComponent implements OnInit {
 
     this.languageCode = newLanguageCode;
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
-
-    // if (this.languageAccentCodesAreLoaded) {
-    //   this.updateLanguageAccentCodesDropdownOptions();
-    // }
   }
 
   setActiveContentManualVoiceover(): void {
@@ -335,10 +327,6 @@ export class VoiceoverCardComponent implements OnInit {
     const modalRef = this.ngbModal.open(VoiceoverRemovalConfirmModalComponent, {
       backdrop: 'static',
     });
-    // this.translationTabActiveContentIdService.setActiveContent(
-    //   this.activeContentId,
-    //   this.translationTabActiveContentIdService.getActiveDataFormat());
-
     modalRef.result.then(
       () => {
         this.manualVoiceover = null;
@@ -399,11 +387,6 @@ export class VoiceoverCardComponent implements OnInit {
     modalRef.componentInstance.generatedFilename = this.generateNewFilename();
     modalRef.componentInstance.languageCode = this.languageCode;
     modalRef.componentInstance.isAudioAvailable = this.isAudioAvailable;
-
-    // this.translationTabActiveContentIdService.setActiveContent(
-    //   this.activeContentId,
-    //   this.translationTabActiveContentIdService.getActiveDataFormat());
-
     modalRef.result.then(
       result => {
         this.manualVoiceover = new Voiceover(
