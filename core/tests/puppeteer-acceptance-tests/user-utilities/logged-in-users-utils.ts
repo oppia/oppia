@@ -1228,6 +1228,17 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Clicks the link on the Terms page that leads to the Privacy Policy page.
+   */
+  async clickLinkToPrivacyPolicyOnTermsPage(): Promise<void> {
+    await this.page.waitForXPath('//a[contains(text(),"Privacy Policy")]');
+    const [link] = await this.page.$x('//a[contains(text(),"Privacy Policy")]');
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
+
+    expect(this.page.url()).toBe(privacyPolicyUrl);
+  }
+
+  /**
    * Clicks the link on the Terms page about the CC-BY-SA 4.0 license.
    */
   async clickLinkToLicenseOnTermsPage(): Promise<void> {

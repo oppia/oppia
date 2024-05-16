@@ -38,6 +38,14 @@ describe('Logged-in Users', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
+    'should be able to follow the link to view the Privacy Policy',
+    async function () {
+      await testUser.clickLinkToPrivacyPolicyOnTermsPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
     'should be able to follow the link about the CC-BY-SA 4.0 license',
     async function () {
       await testUser.clickLinkToLicenseOnTermsPage();
