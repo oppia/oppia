@@ -106,8 +106,9 @@ class SubtopicViewerPageAccessValidator(
 
     @acl_decorators.can_access_subtopic_viewer_page
     def get(self, *args: str) -> None:
-        """ Handles GET requests """
+        """Handles GET requests."""
         pass
+
 
 class CollectionViewerPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]

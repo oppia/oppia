@@ -32,7 +32,7 @@ describe('SubtopicViewerAuthGuard', () => {
     guard = TestBed.inject(SubtopicViewerAuthGuard);
   });
 
-  it('should allow users to access the subtopic viewer page', () => {
-    expect(guard.canActivate()).toBeTrue();
+  it('should allow users to access the subtopic viewer page', async () => {
+    expect(await guard.canActivate()).toBeTrue();
   });
 });

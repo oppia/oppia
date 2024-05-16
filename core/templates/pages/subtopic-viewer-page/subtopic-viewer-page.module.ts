@@ -56,4 +56,4 @@ import { ToastrModule } from 'ngx-toastr';
   ]
 })
 
-export class SubtopicViewerPageModule{}
+export class SubtopicViewerPageModule {}

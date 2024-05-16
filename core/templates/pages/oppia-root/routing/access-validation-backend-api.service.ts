@@ -77,15 +77,15 @@ export class AccessValidationBackendApiService {
   ) {}
 
   validateAccessToSubtopicViewerPage(
-    classroom_url_fragment: string,
-    topic_url_fragment: string,
-    subtopic_url_fragment: string): Promise<void> {
+    classroomUrlFragment: string,
+    topicUrlFragment: string,
+    subtopicUrlFragment: string): Promise<void> {
       let url = this.urlInterpolationService.interpolateUrl(
         this.SUBTOPIC_VIEWER_PAGE_PAGE_ACCESS_VALIDATOR,
         {
-          classroom_url_fragment: classroom_url_fragment,
-          topic_url_fragment: topic_url_fragment,
-          subtopic_url_fragment: subtopic_url_fragment
+          classroom_url_fragment: classroomUrlFragment,
+          topic_url_fragment: topicUrlFragment,
+          subtopic_url_fragment: subtopicUrlFragment
         }
       );
 

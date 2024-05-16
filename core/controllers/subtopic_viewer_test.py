@@ -153,6 +153,7 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             })]
         )
 
+
 class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
     def test_get_for_first_subtopic_in_topic(self) -> None:
         json_response = self.get_json(
