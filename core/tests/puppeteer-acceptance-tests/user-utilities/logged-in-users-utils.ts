@@ -63,6 +63,7 @@ const googleAnalyticsOptOutUrl = testConstants.URLs.GoogleAnalytics.OptOut;
 const CreativeCommonsLegalCodeUrl =
   testConstants.URLs.ExternalLink.CreativeCommonsLegalCode;
 const explorationDesignTipsUrl = testConstants.URLs.ExplorationDesignTips;
+const googleSignUpUrl = testConstants.URLs.ExternalLink.GoogleSignUp;
 
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
@@ -1045,9 +1046,7 @@ export class LoggedInUser extends BaseUser {
     const newTabPage = await newTarget.page();
     await newTabPage?.waitForNetworkIdle();
 
-    expect(newTabPage?.url()).toContain(
-      'https://accounts.google.com/lifecycle/steps/signup/name'
-    );
+    expect(newTabPage?.url()).toContain(googleSignUpUrl);
     await newTabPage?.close();
   }
 
@@ -1173,9 +1172,9 @@ export class LoggedInUser extends BaseUser {
   async clickBrowseOurLessonsOnTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'Browse our Lessons',
-      'Creator Guidelines in the About Menu on navbar',
+      'Browse our Lessons link on the teach page',
       mathClassroomUrl,
-      'Creator Guidelines'
+      'The Oppia Classroom - Math'
     );
   }
 
@@ -1185,9 +1184,9 @@ export class LoggedInUser extends BaseUser {
   async clickAccessTheAndroidAppOnTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'Access the Android app',
-      'Creator Guidelines in the About Menu on navbar',
+      'Access the Android app link on the Teach page',
       androidUrl,
-      'Creator Guidelines'
+      'Android'
     );
   }
 
@@ -1197,9 +1196,9 @@ export class LoggedInUser extends BaseUser {
   async clickVisitClassroomOnTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'VISIT CLASSROOM',
-      'Creator Guidelines in the About Menu on navbar',
+      'VISIT CLASSROOM link on the Teach page',
       mathClassroomUrl,
-      'Creator Guidelines'
+      'The Oppia Classroom - Math'
     );
   }
 
@@ -1209,9 +1208,9 @@ export class LoggedInUser extends BaseUser {
   async clickBrowseLibraryOnTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'BROWSE LIBRARY',
-      'Creator Guidelines in the About Menu on navbar',
+      'BROWSE LIBRARY link on the Teach page',
       communityLibraryUrl,
-      'Creator Guidelines'
+      'Community Library'
     );
   }
 
@@ -1221,9 +1220,9 @@ export class LoggedInUser extends BaseUser {
   async clickExploreLessonsOnTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'Explore lessons',
-      'Creator Guidelines in the About Menu on navbar',
+      'Explore Lessons link on the Teach page',
       mathClassroomUrl,
-      'Creator Guidelines'
+      'The Oppia Classroom - Math'
     );
   }
 
@@ -1281,9 +1280,9 @@ export class LoggedInUser extends BaseUser {
   async clickLinkAboutCookiesOnPrivacyPolicyPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'http://www.allaboutcookies.org/manage-cookies/index.html',
-      'Creator Guidelines in the About Menu on navbar',
+      'link to learn about cookies on the Privacy Policy page',
       allAboutCookiesUrl,
-      'Creator Guidelines'
+      'All About Cookies'
     );
   }
 
@@ -1293,9 +1292,9 @@ export class LoggedInUser extends BaseUser {
   async clickLinkAboutGoogleAnalyticsOnPrivacyPolicyPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'https://www.google.com/policies/privacy/partners/',
-      'Creator Guidelines in the About Menu on navbar',
+      'link to learn about Google Analytivs on the Privacy Policy page',
       googleAnalyticsPartnerPoliciesUrl,
-      'Creator Guidelines'
+      'Google Privacy & Terms'
     );
   }
 
@@ -1305,9 +1304,9 @@ export class LoggedInUser extends BaseUser {
   async clickLinkAboutGoogleAnalyticsOptOutOnPrivacyPolicyPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       googleAnalyticsOptOutUrl,
-      'Creator Guidelines in the About Menu on navbar',
+      'link to opt out of cookies on the Privacy Policy pager',
       googleAnalyticsOptOutUrl,
-      'Creator Guidelines'
+      'Google Analytics Opt-out Browser Add-on'
     );
   }
 

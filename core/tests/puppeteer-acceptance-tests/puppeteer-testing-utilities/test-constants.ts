@@ -81,6 +81,7 @@ export default {
       AboutCookies: 'https://allaboutcookies.org/how-to-manage-cookies',
       CreativeCommonsLegalCode:
         'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
+      GoogleSignUp: 'https://accounts.google.com/lifecycle/steps/signup/name',
     },
   },
   Dashboard: {
