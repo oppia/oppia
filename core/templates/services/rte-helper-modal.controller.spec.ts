@@ -108,6 +108,7 @@ describe('RteHelperModalComponent', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
+      component.componentId = 'video';
       component.attrsCustomizationArgsDict = {
         heading: 'This value is not default.',
       };
@@ -123,6 +124,8 @@ describe('RteHelperModalComponent', () => {
     }));
 
     it('should close modal when clicking on cancel button', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
       component.cancel();
       expect(activeModal.dismiss).toHaveBeenCalledWith(false);
     }));
@@ -132,7 +135,10 @@ describe('RteHelperModalComponent', () => {
       spyOn(contextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
-      expect(component.disableSaveButtonForMathRte()).toBe(false);
+      component.onCustomizationArgsFormChange(
+        component.attrsCustomizationArgsDict.heading
+      );
+      expect(component.isErrorMessageNonempty()).toBe(false);
       component.save();
       flush();
       expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
@@ -142,6 +148,7 @@ describe('RteHelperModalComponent', () => {
       });
     }));
   });
+
   describe('when there are validation errors in any form control', function () {
     var customizationArgSpecs = [
       {
@@ -172,6 +179,200 @@ describe('RteHelperModalComponent', () => {
       component.ngOnInit();
       flush();
       fixture.detectChanges();
+      flush();
+    }));
+  });
+
+  describe('when there are validation errors in link form control', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'url',
+        default_value: 'oppia.org',
+      },
+      {
+        name: 'text',
+        default_value: 'oppia',
+      },
+    ];
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(RteHelperModalComponent);
+      component = fixture.componentInstance;
+      (component.componentId = 'link'),
+        (component.attrsCustomizationArgsDict = {
+          url: 'oppia.org',
+          text: 'oppia',
+        });
+      component.customizationArgSpecs = customizationArgSpecs;
+    });
+
+    it('should disable save button and display error message', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = 'oppia.org';
+      component.customizationArgsForm.value[1] = 'oppia.com';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      expect(component.errorMessage).toBe(
+        'It seems like clicking on this link will lead the user to a ' +
+          'different URL than the text specifies. Please change the text.'
+      );
+      flush();
+    }));
+  });
+
+  describe('when the text is empty in link form control', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'url',
+        default_value: 'oppia.org',
+      },
+      {
+        name: 'text',
+        default_value: ' ',
+      },
+    ];
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(RteHelperModalComponent);
+      component = fixture.componentInstance;
+      (component.componentId = 'link'),
+        (component.attrsCustomizationArgsDict = {
+          url: 'oppia.org',
+          text: ' ',
+        });
+      component.customizationArgSpecs = customizationArgSpecs;
+    });
+
+    it('should make the text equal to url when text is empty', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = 'oppia.org';
+      component.customizationArgsForm.value[1] = '';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(false);
+      expect(component.customizationArgsForm.value[1]).toBe('oppia.org');
+      flush();
+    }));
+  });
+
+  describe('when there are validation errors in video form control', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'video_id',
+        default_value: 'https://www.youtube.com/watch?v=Ntcw0H0hwPU',
+      },
+      {
+        name: 'start',
+        default_value: 0,
+      },
+      {
+        name: 'end',
+        default_value: 0,
+      },
+      {
+        name: 'autoplay',
+        default_value: false,
+      },
+    ];
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(RteHelperModalComponent);
+      component = fixture.componentInstance;
+      (component.componentId = 'video'),
+        (component.attrsCustomizationArgsDict = {
+          video_id: 'Ntcw0H0hwPU',
+          start: 0,
+          end: 0,
+          autoplay: false,
+        });
+      component.customizationArgSpecs = customizationArgSpecs;
+    });
+
+    it('should disable save button and display error message', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+
+      component.customizationArgsForm.value[1] = 10;
+      component.customizationArgsForm.value[2] = 0;
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      expect(component.errorMessage).toBe(
+        'Please ensure that the start time of the video is earlier than ' +
+          'the end time.'
+      );
+      flush();
+    }));
+  });
+
+  describe('when there are validation errors in tabs form control', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'tab_contents',
+        default_value: [
+          {
+            title: 'Tab 1',
+            content: 'Content for Tab 1',
+          },
+          {
+            title: 'Tab 2',
+            content: 'Content for Tab 2',
+          },
+        ],
+      },
+    ];
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(RteHelperModalComponent);
+      component = fixture.componentInstance;
+      (component.componentId = 'tabs'),
+        (component.attrsCustomizationArgsDict = {
+          tabs_contents: [
+            {
+              title: 'Tab 1',
+              content: 'Content for Tab 1',
+            },
+            {
+              title: 'Tab 2',
+              content: 'Content for Tab 2',
+            },
+          ],
+        });
+      component.customizationArgSpecs = customizationArgSpecs;
+    });
+
+    it('should disable save button and display error message', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0][0].title = '';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      expect(component.errorMessage).toBe(
+        'Please ensure that the title of tab 1 is filled.'
+      );
+      flush();
+    }));
+
+    it('should disable save button and display error message', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0][0].title = 'Tab 1';
+      component.customizationArgsForm.value[0][1].content = '';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      expect(component.errorMessage).toBe(
+        'Please ensure that the content of tab 2 is filled.'
+      );
       flush();
     }));
   });

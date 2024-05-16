@@ -43,6 +43,7 @@ export interface RteHelperService {
   isInlineComponent: (string) => boolean;
   openCustomizationModal: (
     componentIsNewlyCreated,
+    componentId,
     customizationArgSpecs,
     attrsCustomizationArgsDict,
     onSubmitCallback,
@@ -79,6 +80,7 @@ export class CkEditorInitializerService {
         var tagName = 'oppia-noninteractive-ckeditor-' + componentDefn.id;
         var customizationArgSpecs = componentDefn.customizationArgSpecs;
         var isInline = rteHelperService.isInlineComponent(componentDefn.id);
+        var componentId = componentDefn.id;
 
         // Inline components will be wrapped in a span, while block components
         // will be wrapped in a div.
@@ -137,6 +139,7 @@ export class CkEditorInitializerService {
 
                 rteHelperService.openCustomizationModal(
                   componentIsNewlyCreated,
+                  componentId,
                   customizationArgSpecs,
                   customizationArgs,
                   function (customizationArgsDict) {
