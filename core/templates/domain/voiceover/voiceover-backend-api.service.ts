@@ -23,10 +23,6 @@ import {Injectable} from '@angular/core';
 import {VoiceoverDomainConstants} from './voiceover-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {
-  Voiceover,
-  VoiceoverBackendDict,
-} from 'domain/exploration/voiceover.model';
-import {
   EntityVoiceovers,
   EntityVoiceoversBackendDict,
 } from './entity-voiceovers.model';
@@ -44,18 +40,8 @@ interface VoiceoverAdminDataBackendDict {
   };
 }
 
-interface VoiceoverTypeToVoiceoverBackendDict {
-  voiceover_type_to_voiceovers: {
-    [type: string]: VoiceoverBackendDict;
-  };
-}
-
 interface EntityVoiceoversBulkBackendDict {
   entity_voiceovers_list: EntityVoiceoversBackendDict[];
-}
-
-interface VoiceoverTypeToVoiceover {
-  manualVoiceover: Voiceover;
 }
 
 interface ExplorationIdToFilenamesBackendDict {
@@ -95,16 +81,6 @@ export interface VoiceArtistIdToLanguageMapping {
 
 export interface VoiceArtistIdToVoiceArtistName {
   [voiceArtistId: string]: string;
-}
-
-interface VoiceoverTypeToVoiceoverBackendDict {
-  voiceover_type_to_voiceovers: {
-    [type: string]: VoiceoverBackendDict;
-  };
-}
-
-interface VoiceoverTypeToVoiceover {
-  manualVoiceover: Voiceover;
 }
 
 interface VoiceArtistMetaDataBackendDict {
@@ -269,15 +245,22 @@ export class VoiceoverBackendApiService {
       this.http
         .get<EntityVoiceoversBulkBackendDict>(entityVoiceoversBulkHandlerUrl)
         .toPromise()
-        .then(response => {
-          let entityVoiceoversList = [];
-          for (let entityVoiceoverBackendDict of response.entity_voiceovers_list) {
-            entityVoiceoversList.push(
-              EntityVoiceovers.createFromBackendDict(entityVoiceoverBackendDict)
-            );
+        .then(
+          response => {
+            let entityVoiceoversList = [];
+            for (let entityVoiceoverBackendDict of response.entity_voiceovers_list) {
+              entityVoiceoversList.push(
+                EntityVoiceovers.createFromBackendDict(
+                  entityVoiceoverBackendDict
+                )
+              );
+            }
+            resolve(entityVoiceoversList);
+          },
+          errorResponse => {
+            reject(errorResponse?.error);
           }
-          resolve(entityVoiceoversList);
-        });
+        );
     });
   }
 }

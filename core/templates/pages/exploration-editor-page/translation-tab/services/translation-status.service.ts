@@ -101,7 +101,7 @@ export class TranslationStatusService implements OnInit {
     return availabilityStatus;
   }
 
-  _getEntityVoiceoverStatus(contentId): AvailabilityStatus {
+  _getEntityVoiceoverStatus(contentId: string): AvailabilityStatus {
     let availabilityStatus = {
       available: false,
       needsUpdate: false,
@@ -113,8 +113,6 @@ export class TranslationStatusService implements OnInit {
         activeLanguageAccentCode
       );
 
-    // console.log('Calculating status')
-    // console.log(entityVoiceovers)
     if (entityVoiceovers === undefined) {
       return availabilityStatus;
     }
@@ -124,7 +122,6 @@ export class TranslationStatusService implements OnInit {
     if (voiceover === undefined) {
       return availabilityStatus;
     }
-    // console.log(voiceover)
     availabilityStatus.available = true;
     availabilityStatus.needsUpdate = voiceover.needsUpdate;
 
@@ -270,8 +267,6 @@ export class TranslationStatusService implements OnInit {
         });
         let activeLanguageAccentCode =
           this.entityVoiceoversService.getActiveLanguageAccentCode();
-        // console.log('Computing colors of graph');
-        // console.log(activeLanguageAccentCode);
 
         let activeEntityVoiceovers =
           this.entityVoiceoversService.getEntityVoiceoversByLanguageAccentCode(
@@ -288,15 +283,14 @@ export class TranslationStatusService implements OnInit {
         this.explorationTranslationContentNotAvailableCount +=
           noTranslationCount;
         this.explorationVoiceoverContentNotAvailableCount += noVoiceoverCount;
+
         if (
           this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled
         ) {
-          // console.log(stateName);
           let color = this.getStateGraphColorInVoiceoverMode(
             allContentIds,
             voiceoverContentIds
           );
-          // console.log(color);
           this.stateWiseStatusColor[stateName] = color;
         } else if (noTranslationCount === 0 && !stateNeedsUpdate) {
           this.stateWiseStatusColor[stateName] =
@@ -315,9 +309,9 @@ export class TranslationStatusService implements OnInit {
   }
 
   getStateGraphColorInVoiceoverMode(
-    stateContentIdsNeedingVoiceover,
-    explorationContentIdsWithVoiceover
-  ) {
+    stateContentIdsNeedingVoiceover: string[],
+    explorationContentIdsWithVoiceover: string[]
+  ): string {
     let color = this.NO_ASSETS_AVAILABLE_COLOR;
     let allContentsHaveVoiceover: boolean = true;
     for (let contentId of stateContentIdsNeedingVoiceover) {

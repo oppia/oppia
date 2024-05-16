@@ -30,6 +30,10 @@ import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
+import {Voiceover} from 'domain/exploration/voiceover.model';
 
 class MockNgbModal {
   open() {
@@ -57,6 +61,8 @@ describe('Translation status service', () => {
   let srvs: StateRecordedVoiceoversService;
   let ttams: TranslationTabActiveModeService;
   let tls: TranslationLanguageService;
+  let platformFeatureService: PlatformFeatureService;
+  let entityVoiceoversService: EntityVoiceoversService;
 
   let ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
   let FEW_ASSETS_AVAILABLE_COLOR = '#E9B330';
@@ -101,6 +107,8 @@ describe('Translation status service', () => {
     srvs = TestBed.inject(StateRecordedVoiceoversService);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
+    entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     let currentIndex = 9;
     generateContentIdService.init(
       () => currentIndex++,
@@ -432,6 +440,48 @@ describe('Translation status service', () => {
       expect(explorationTranslationsRequiredCount).toBe(9);
     }
   );
+
+  it('should return a correct count of missing audio with accent in an exploration', () => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      AddVoiceoverWithAccent: {
+        isEnabled: true,
+      },
+    } as FeatureStatusChecker);
+
+    let manualVoiceover1 = new Voiceover('a.mp3', 1000, false, 10.0);
+    let manualVoiceover2 = new Voiceover('b.mp3', 1000, false, 10.0);
+
+    let entityVoiceovers = new EntityVoiceovers(
+      'exp_id',
+      'exploration',
+      5,
+      'en-US',
+      {
+        content_0: {
+          manual: manualVoiceover1,
+        },
+        content_8: {
+          manual: manualVoiceover2,
+        },
+      }
+    );
+
+    entityVoiceoversService.init('exp_id', 'exploration', 5);
+    entityVoiceoversService.setLanguageCode('en');
+    entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
+
+    ttams.activateVoiceoverMode();
+
+    expect(tss.getExplorationContentRequiredCount()).toBe(8);
+
+    entityVoiceoversService.setActiveLanguageAccentCode('en-US');
+    tss.refresh();
+    expect(tss.getExplorationContentNotAvailableCount()).toEqual(6);
+
+    entityVoiceoversService.setActiveLanguageAccentCode('en-IN');
+    tss.refresh();
+    expect(tss.getExplorationContentNotAvailableCount()).toEqual(8);
+  });
 
   it('should return a correct count of audio not available in an exploration', () => {
     ttams.activateVoiceoverMode();

@@ -45,14 +45,14 @@ export class EntityVoiceoversService {
     entityType: string,
     entityVersion: number,
     languageCode: string
-  ) {
+  ): void {
     this.entityId = entityId;
     this.entityType = entityType;
     this.entityVersion = entityVersion;
     this.languageCode = languageCode;
   }
 
-  setLanguageCode(languageCode: string) {
+  setLanguageCode(languageCode: string): void {
     this.languageCode = languageCode;
   }
 
@@ -80,11 +80,6 @@ export class EntityVoiceoversService {
 
   async fetchEntityVoiceovers(): Promise<void> {
     return new Promise((resolve, reject) => {
-      console.log('service method');
-      console.log('----------');
-      console.log('----------');
-      console.log('----------');
-
       this.voiceoverBackendApiService
         .fetchEntityVoiceoversByLanguageCodeAsync(
           this.entityType,
@@ -93,13 +88,6 @@ export class EntityVoiceoversService {
           this.languageCode
         )
         .then(entityVoiceoversList => {
-          console.log('----------');
-          console.log('----------');
-          console.log('----------');
-          console.log('----------');
-          console.log('----------');
-
-          console.log('Data entity voiceovers fetched');
           this.createLanguageAccentCodeToEntityVoiceovers(entityVoiceoversList);
           resolve();
         });
@@ -107,7 +95,7 @@ export class EntityVoiceoversService {
   }
 
   getEntityVoiceoversByLanguageAccentCode(
-    languageAccentCode
+    languageAccentCode: string
   ): EntityVoiceovers | undefined {
     return this.languageAccentCodeToEntityVoiceovers[languageAccentCode];
   }

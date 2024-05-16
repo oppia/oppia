@@ -47,6 +47,9 @@ import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFacto
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {EntityVoiceovers} from '../../../../domain/voiceover/entity-voiceovers.model';
+import {Voiceover} from '../../../../domain/exploration/voiceover.model';
+import {LocalStorageService} from 'services/local-storage.service';
 
 class MockNgbModal {
   open() {
@@ -99,6 +102,7 @@ describe('Translator Overview component', () => {
   let windowRef: WindowRef;
   let entityTranslation: EntityTranslation;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
+  let localStorageService: LocalStorageService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -148,6 +152,7 @@ describe('Translator Overview component', () => {
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     changeListService = TestBed.inject(ChangeListService);
     windowRef = TestBed.inject(WindowRef);
+    localStorageService = TestBed.inject(LocalStorageService);
 
     spyOn(
       translationTabActiveModeService,
@@ -457,5 +462,63 @@ describe('Translator Overview component', () => {
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
       'audioTranslationLanguageCodeField'
     );
+  }));
+
+  it('should be able to update language accent dropdown on language change', fakeAsync(() => {
+    spyOn(component, 'updateLanguageAccentCode');
+    let manualVoiceover1 = new Voiceover('a.mp3', 1000, false, 10.0);
+    let manualVoiceover2 = new Voiceover('b.mp3', 1000, false, 10.0);
+
+    let entityVoiceovers = new EntityVoiceovers(
+      'exp_id',
+      'exploration',
+      5,
+      'en-US',
+      {
+        content_0: {
+          manual: manualVoiceover1,
+        },
+        content_8: {
+          manual: manualVoiceover2,
+        },
+      }
+    );
+    component.languageAccentMasterList = {
+      en: {
+        'en-IN': 'English (India)',
+        'en-US': 'English (United States)',
+      },
+      hi: {
+        'hi-IN': 'Hindi (India)',
+      },
+    };
+    component.languageCodesMapping = {
+      en: {
+        'en-US': false,
+        'en-IN': false,
+      },
+      hi: {
+        'hi-IN': false,
+      },
+    };
+
+    entityVoiceoversService.setLanguageCode('en');
+    entityVoiceoversService.addEntityVoiceovers('en-IN', entityVoiceovers);
+
+    localStorageService.setLastSelectedLanguageAccentCode('en-IN');
+
+    component.updateLanguageAccentCodesDropdownOptions();
+    flush();
+    discardPeriodicTasks();
+
+    expect(component.selectedLanguageAccentCode).toEqual('en-IN');
+
+    localStorageService.setLastSelectedLanguageAccentCode(undefined);
+
+    component.updateLanguageAccentCodesDropdownOptions();
+    flush();
+    discardPeriodicTasks();
+
+    expect(component.selectedLanguageAccentCode).toEqual('en-US');
   }));
 });
