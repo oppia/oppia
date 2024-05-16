@@ -62,7 +62,6 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
-from core.domain import translation_fetchers
 from core.domain import translation_services
 from core.domain import user_domain
 from core.domain import user_services
@@ -2115,7 +2114,7 @@ def compute_models_to_put_when_saving_new_exp_version(
         for content_id in content_ids_corresponding_translations_to_remove:
             if content_id in new_translation_model.translations:
                 del new_translation_model.translations[content_id]
-    
+
     models_to_put.extend(new_translation_models)
 
     # Auto-reject any pending translation suggestions that are now obsolete due
@@ -2552,7 +2551,7 @@ def revert_exploration(
         [exploration.id])
 
     revert_version_history(exploration_id, current_version, revert_to_version)
-    
+
     models_to_put: List[
         base_models.BaseModel
     ] = []
