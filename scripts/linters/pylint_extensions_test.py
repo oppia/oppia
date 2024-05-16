@@ -4780,7 +4780,7 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
             pylint_extensions.PreventStringConcatenationChecker)
         self.checker_test_object.setup_method()
 
-    def test_two_strings_concatenation(self) -> None:
+    def test_encourages_interpolation_when_joining_multiple_strings(self) -> None: # pylint: disable=line-too-long
         node = astroid.extract_node(
             """
             a = 'a' + 'b' #@
@@ -4797,7 +4797,7 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
         ):
             self.checker_test_object.checker.visit_binop(expression_node)
 
-    def test_concatenation_of_variables(self) -> None:
+    def test_concatenation_of_string_variables(self) -> None:
         node = astroid.extract_node(
             """
             var1 = 'Super'
@@ -4836,7 +4836,7 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_binop(expression_node)
 
-    def test_infererence_exception(self) -> None:
+    def test_infererence_error(self) -> None:
         node = astroid.extract_node(
             """
             undefined_var + 'somthing here' #@
