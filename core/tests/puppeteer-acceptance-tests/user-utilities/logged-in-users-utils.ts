@@ -1148,10 +1148,7 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn('Create an Exploration'),
     ]);
 
-    expect(this.page.url()).toBe(
-      creatorDashboardInCreateModeUrl,
-      'http://localhost:8181/creator-dashboard?mode=create'
-    );
+    expect(this.page.url()).toBe(creatorDashboardCreateModeUrl);
   }
 
   /**
