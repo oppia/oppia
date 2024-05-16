@@ -241,10 +241,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         explorationData.version
       );
 
-      var pr =
-        await this.entityTranslationsService.getEntityTranslationsAsync('ak');
-      console.log(pr);
-
       this.explorationTitleService.init(explorationData.title);
       this.explorationCategoryService.init(
         (explorationData as ExplorationData).category

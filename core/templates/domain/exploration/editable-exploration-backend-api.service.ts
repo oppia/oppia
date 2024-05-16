@@ -59,8 +59,6 @@ export class EditableExplorationBackendApiService {
       change_list: changeList,
     };
 
-    console.log(changeList);
-
     return this.httpClient
       .put<ExplorationBackendDict>(
         this._getExplorationUrl(explorationId, false),

@@ -2575,6 +2575,8 @@ def revert_exploration(
             )
         )
 
+    regenerate_exploration_and_contributors_summaries(exploration_id)
+
     exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, list(exploration.states.keys()),
         None, revert_to_version)
@@ -2591,8 +2593,6 @@ def revert_exploration(
     )
     datastore_services.put_multi(exp_issues_models_to_put)
     datastore_services.put_multi(models_to_put)
-
-    regenerate_exploration_and_contributors_summaries(exploration_id)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
