@@ -23,43 +23,33 @@ import {
 } from 'domain/exploration/voiceover.model';
 
 describe('EntityVoiceovers model class', function () {
-  let entity_id: string = 'exp_1';
-  let entity_type: string = 'exploration';
-  let entity_version: number = 1;
-  let language_accent_code: string = 'en-In';
-  let manual_voiceover: VoiceoverBackendDict = {
+  let entityId: string = 'exp_1';
+  let entityType: string = 'exploration';
+  let entityVersion: number = 1;
+  let languageAccentCode: string = 'en-In';
+  let manualVoiceoverBackendDict: VoiceoverBackendDict = {
     filename: 'a.mp3',
     file_size_bytes: 200000,
     needs_update: false,
     duration_secs: 10.0,
   };
-  let autotmatic_voiceover: VoiceoverBackendDict = {
-    filename: 'b.mp3',
-    file_size_bytes: 100000,
-    needs_update: false,
-    duration_secs: 12.0,
-  };
-  let content_id_to_voiceovers_mapping = {
+  let contentIdToVoiceoversMappingBackendDict = {
     content0: {
-      manual: manual_voiceover,
-      auto: autotmatic_voiceover,
+      manual: manualVoiceoverBackendDict,
     },
   };
 
-  let entity_voiceovers_backend_dict = {
-    entity_id: entity_id,
-    entity_type: entity_type,
-    entity_version: entity_version,
-    language_accent_code: language_accent_code,
-    voiceovers_mapping: content_id_to_voiceovers_mapping,
+  let entityVoiceoversBackendDict = {
+    entity_id: entityId,
+    entity_type: entityType,
+    entity_version: entityVersion,
+    language_accent_code: languageAccentCode,
+    voiceovers_mapping: contentIdToVoiceoversMappingBackendDict,
   };
 
-  let entityId: string = entity_id;
-  let entityType: string = entity_type;
-  let entityVersion: number = entity_version;
-  let languageAccentCode: string = language_accent_code;
-
-  let manualVoiceover = Voiceover.createFromBackendDict(manual_voiceover);
+  let manualVoiceover = Voiceover.createFromBackendDict(
+    manualVoiceoverBackendDict
+  );
 
   let contentIdToVoiceoversMapping = {
     content0: {
@@ -69,16 +59,13 @@ describe('EntityVoiceovers model class', function () {
 
   it('should be able to create model instance', () => {
     let entityVoiceovers = EntityVoiceovers.createFromBackendDict(
-      entity_voiceovers_backend_dict
+      entityVoiceoversBackendDict
     );
 
     expect(entityVoiceovers.entityId).toEqual(entityId);
     expect(entityVoiceovers.entityType).toEqual(entityType);
     expect(entityVoiceovers.entityVersion).toEqual(entityVersion);
     expect(entityVoiceovers.languageAccentCode).toEqual(languageAccentCode);
-    console.log(entityVoiceovers.voiceoversMapping);
-    console.log('---');
-    console.log(contentIdToVoiceoversMapping);
     expect(entityVoiceovers.voiceoversMapping).toEqual(
       contentIdToVoiceoversMapping
     );
@@ -86,7 +73,7 @@ describe('EntityVoiceovers model class', function () {
 
   it('should be able to get manual voiceovers', () => {
     let entityVoiceovers = EntityVoiceovers.createFromBackendDict(
-      entity_voiceovers_backend_dict
+      entityVoiceoversBackendDict
     );
 
     let retrievedManualVoiceover =
@@ -96,7 +83,7 @@ describe('EntityVoiceovers model class', function () {
 
   it('should be able to undefined for unknown content IDs', () => {
     let entityVoiceovers = EntityVoiceovers.createFromBackendDict(
-      entity_voiceovers_backend_dict
+      entityVoiceoversBackendDict
     );
 
     let retrievedManualVoiceover =

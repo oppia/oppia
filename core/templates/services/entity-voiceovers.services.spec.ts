@@ -22,10 +22,7 @@ import {TestBed, fakeAsync, flushMicrotasks, tick} from '@angular/core/testing';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {EntityVoiceoversService} from './entity-voiceovers.services';
-import {
-  Voiceover,
-  VoiceoverBackendDict,
-} from '../domain/exploration/voiceover.model';
+import {VoiceoverBackendDict} from '../domain/exploration/voiceover.model';
 
 describe('Entity voiceovers service', () => {
   let entityVoiceoversService: EntityVoiceoversService;

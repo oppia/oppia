@@ -199,8 +199,6 @@ class EntityVoiceoversModel(base_models.BaseModel):
         ).fetch()
 
 
-
-
 class VoiceoverAutogenerationPolicyModel(base_models.BaseModel):
     """Model for storing language-accent codes for Oppia supported voiceovers.
 

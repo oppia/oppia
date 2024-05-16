@@ -39,15 +39,15 @@
         </span>
         <span *ngIf="selectedLanguageAccentCode === ''"><i>No Accent Selection Available</i></span>
         <mat-form-field class="language-selector" *ngIf="selectedLanguageAccentCode !== ''">
-        <mat-select [(value)]="selectedLanguageAccentCode" (selectionChange)="updateLanguageAccentCode($event.value)">
-          <mat-option *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue"
-                      [value]="languageAccentCodeToDescription.key">
-            <span>
-              {{languageAccentCodeToDescription.value}}
-            </span>
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+          <mat-select [(value)]="selectedLanguageAccentCode" (selectionChange)="updateLanguageAccentCode($event.value)">
+            <mat-option *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue"
+                        [value]="languageAccentCodeToDescription.key">
+              <span>
+                {{languageAccentCodeToDescription.value}}
+              </span>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
     </div>
     <div>
