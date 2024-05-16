@@ -204,7 +204,7 @@
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_5": "如果您对账户删除有疑问或担心，请联系<strong>privacy@oppia.org</strong>。",
 	"I18N_DELETE_ACCOUNT_PAGE_REDIRECT_INFO": "这将带您到一个页面，您可以在其中删除您的 Oppia 帐户。",
 	"I18N_DELETE_ACCOUNT_PAGE_TITLE": "删除账号 | Oppia",
-	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "将文件拖放到此区域",
+	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "拖放图像到此区域",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "上传一个文件",
 	"I18N_DONATE_PAGE_BREADCRUMB": "捐赠",
 	"I18N_DONATE_PAGE_BROWSER_TAB_TITLE": "捐款 | 做出正面影响 | Oppia",
