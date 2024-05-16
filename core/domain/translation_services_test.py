@@ -409,6 +409,73 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             'ar' in [et.language_code for et in entity_translation_models]
         )
 
+    def test_compute_translation_related_change_upon_revert(
+        self
+    ) -> None:
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 5, 'hi',
+            'content_1', translation_domain.TranslatedContent(
+                'Translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 5, 'hi',
+            'content_2', translation_domain.TranslatedContent(
+                'Translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 6, 'hi',
+            'content_3', translation_domain.TranslatedContent(
+                'Translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 6, 'hi',
+            'content_4', translation_domain.TranslatedContent(
+                'Translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 6, 'hi',
+            'content_5', translation_domain.TranslatedContent(
+                'Translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+
+        self.exp.version = 6
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
+
+        self.assertEqual(len(entity_translation_models), 2)
+        self.assertEqual(len(
+            entity_translation_models[0].translations), 2)
+        self.assertEqual(len(
+            entity_translation_models[1].translations), 3)
+
+        entity_translation_models, _ = (
+            translation_services.compute_translation_related_change_upon_revert(
+                self.EXP_ID, 5
+            )
+        )
+
+        self.assertEqual(len(entity_translation_models), 1)
+        self.assertEqual(len(entity_translation_models[0].translations), 2)
+        self.assertTrue(
+            'hi' in [et.language_code for et in entity_translation_models]
+        )
+
     def test_invalid_translation_change_raise_error(self) -> None:
         translation_services.add_new_translation(
             feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 5, 'hi',
