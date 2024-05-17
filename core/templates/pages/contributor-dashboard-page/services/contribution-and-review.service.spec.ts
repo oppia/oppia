@@ -24,7 +24,10 @@ import {
   FetchSuggestionsResponse,
 } from './contribution-and-review.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {ContributionAndReviewBackendApiService} from './contribution-and-review-backend-api.service';
+import {
+  ContributionAndReviewBackendApiService,
+  ContributorCertificateInfo,
+} from './contribution-and-review-backend-api.service';
 import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {
@@ -291,7 +294,7 @@ describe('Contribution and review service', () => {
   });
 
   describe('downloadContributorCertificateAsync', () => {
-    it('should download the contributor certificate when available', () => {
+    it('should download the contributor certificate when available', async () => {
       downloadContributorCertificateAsyncSpy.and.returnValue(
         Promise.resolve({
           certificate_data: {
@@ -304,7 +307,7 @@ describe('Contribution and review service', () => {
         })
       );
 
-      cars
+      await cars
         .downloadContributorCertificateAsync(
           'user',
           'translate_content',
@@ -315,29 +318,28 @@ describe('Contribution and review service', () => {
         .then(response => {
           const data = response.certificate_data;
 
-          if (!data) {
-            fail('expected data to not be null');
-            return;
-          }
+          expect(data).not.toBeNull();
 
-          expect(data.from_date).toEqual('1 Nov 2022');
-          expect(data.to_date).toEqual('1 Dec 2022');
-          expect(data.contribution_hours).toEqual(1.0);
-          expect(data.team_lead).toEqual('Test User');
-          expect(data.language).toEqual('Hindi');
+          // Type assertion needed to satisfy type checker.
+          const definedData = data as ContributorCertificateInfo;
+          expect(definedData.from_date).toEqual('1 Nov 2022');
+          expect(definedData.to_date).toEqual('1 Dec 2022');
+          expect(definedData.contribution_hours).toEqual(1.0);
+          expect(definedData.team_lead).toEqual('Test User');
+          expect(definedData.language).toEqual('Hindi');
         });
 
       expect(downloadContributorCertificateAsyncSpy).toHaveBeenCalled();
     });
 
-    it('should return null when contributor certificate data is unavailable', () => {
+    it('should return null when contributor certificate data is unavailable', async () => {
       downloadContributorCertificateAsyncSpy.and.returnValue(
         Promise.resolve({
           certificate_data: null,
         })
       );
 
-      cars
+      await cars
         .downloadContributorCertificateAsync(
           'user',
           'translate_content',
