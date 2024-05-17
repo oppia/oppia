@@ -112,6 +112,10 @@ const previewRestartButton = '.e2e-test-preview-restart-button';
 const stateConversationContent = '.e2e-test-conversation-content';
 const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 
+const subscriberCountLabel = '.e2e-test-oppia-total-subscribers';
+const subscriberTabButton = '.e2e-test-subscription-tab';
+const subscriberCard = '.e2e-test-subscription-card';
+
 export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to creator dashboard page.
@@ -871,6 +875,90 @@ export class ExplorationEditor extends BaseUser {
       }
     }
     await this.clickOn(previewRestartButton);
+  }
+
+  /**
+   * Function for creating an exploration with only EndExploration interaction with given title.
+   */
+  async createAndPublishAMinimalExplorationWithTitle(
+    title: string
+  ): Promise<string | null> {
+    await this.navigateToCreatorDashboardPage();
+    await this.navigateToExplorationEditorPage();
+    await this.dismissWelcomeModal();
+    await this.createExplorationWithMinimumContent(
+      'Exploration intro text',
+      'End Exploration'
+    );
+    await this.saveExplorationDraft();
+    return await this.publishExplorationWithContent(
+      title,
+      'This is Goal here.',
+      'Algebra'
+    );
+  }
+
+  /**
+   * This function checks the number of subscribers in the Subscribers tab of the creator dashboard.
+   */
+  async expectNumberOfSubscribersToBe(subscriberCount: number): Promise<void> {
+    await this.page.waitForSelector(subscriberCountLabel);
+    const currentSubscriberCount = await this.page.$eval(
+      subscriberCountLabel,
+      element => element.textContent
+    );
+
+    if (
+      currentSubscriberCount &&
+      parseInt(currentSubscriberCount) === subscriberCount
+    ) {
+      showMessage(`Number of subscribers is equal to ${subscriberCount}.`);
+    } else {
+      throw new Error(
+        `Number of subscribers is not equal to ${subscriberCount}.`
+      );
+    }
+  }
+
+  /**
+   * Function for opening the subscribers tab.
+   */
+  async openSubscribersTab(): Promise<void> {
+    if (this.page.url() !== creatorDashboardPage) {
+      await this.navigateToCreatorDashboardPage();
+    }
+
+    await this.clickOn(subscriberTabButton);
+    await this.page.waitForSelector('.e2e-test-subscription-card');
+  }
+
+  /**
+   * This function checks whether given user is a subscriber or not.
+   */
+  async expectUserToBeASubscriber(username: string): Promise<void> {
+    let truncatedUsername = username;
+    if (username.length > 10) {
+      const ellipsis = '...';
+      truncatedUsername =
+        username.substring(0, 10 - ellipsis.length) + ellipsis;
+    }
+
+    const subscribers = await this.page.$$(subscriberCard);
+
+    if (subscribers.length === 0) {
+      throw new Error(`User "${username}" is not subscribed.`);
+    }
+
+    const subscriberUsername = await subscribers[0].$eval(
+      '.e2e-test-subscription-name',
+      element => (element as HTMLElement).textContent?.trim()
+    );
+
+    if (truncatedUsername === subscriberUsername) {
+      showMessage(`User ${username} is a subscriber.`);
+    } else {
+      throw new Error(`User ${username} is not a subscriber.`);
+    }
   }
 }
 
