@@ -121,7 +121,7 @@ describe('Access validation backend api service', () => {
   }));
 
   it('should validate whether user can view any skill editor', fakeAsync(() => {
-    let skillId = 'skillId';
+    let skillId = 'skill_id';
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
       '/access_validation_handler/can_access_skill_editor/' + skillId
