@@ -80,7 +80,7 @@ class ClassroomAccessValidationHandler(
             raise self.NotFoundException
 
 
-class SubtopicViewerPageAccessValidator(
+class SubtopicViewerPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """ Validates access to the Subtopic Viewer Page """
@@ -105,7 +105,7 @@ class SubtopicViewerPageAccessValidator(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_subtopic_viewer_page
-    def get(self, *args: str) -> None:
+    def get(self, _: str) -> None:
         """Handles GET requests."""
         pass
 
