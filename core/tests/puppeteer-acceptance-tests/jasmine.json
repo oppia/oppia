@@ -1,11 +1,15 @@
 {
   "spec_dir": "core/tests/puppeteer-acceptance-tests/build/spec",
-  "spec_files": ["**/*.spec.js"],
-  "helpers": ["helpers/**/*.js"],
+  "spec_files": [
+    "**/*.spec.js"
+  ],
+  "helpers": [
+    "helpers/**/*.js"
+  ],
   "env": {
     "failSpecWithNoExpectations": false,
     "stopSpecOnExpectationFailure": false,
-    "stopOnSpecFailure": false,
+    "stopOnSpecFailure": true,
     "random": false
   }
 }
