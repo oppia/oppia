@@ -115,6 +115,7 @@
             </span>
             <div class="named-contributors-container">
               <li *ngFor="let name of (contributorNames | limitTo: 2); index as idx"
+                  (click)="cancel()"
                   [ngbTooltip]="name"
                   placement="top"
                   class="contributor-{{idx}}">

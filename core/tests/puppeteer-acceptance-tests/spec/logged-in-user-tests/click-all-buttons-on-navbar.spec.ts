@@ -20,8 +20,15 @@
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
+import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+
+// Exclude the error related to Google Docs Viewer since it's from an external service
+// and cannot be controlled by us. (https://stackoverflow.com/q/50909239)
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /https:\/\/content\.googleapis\.com\/drive\/v2internal\/viewerimpressions\?key=[^&]+&alt=json/,
+]);
 
 describe('Logged-in User', function () {
   let testUser: LoggedInUser;

@@ -46,6 +46,9 @@ export class AccessValidationBackendApiService {
   DIAGNOSTIC_TEST_PLAYER_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_diagnostic_test_player_page';
 
+  FACILITATOR_DASHBOARD_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_facilitator_dashboard_page';
+
   DOES_LEARNER_GROUP_EXIST =
     '/access_validation_handler/does_learner_group_exist/<learner_group_id>';
 
@@ -60,6 +63,10 @@ export class AccessValidationBackendApiService {
 
   COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE =
     '/access_validation_handler/can_access_collection_player_page/<collection_id>'; // eslint-disable-line max-len
+
+  COLLECTION_EDITOR_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/' +
+    'can_access_collection_editor_page/<collection_id>';
 
   constructor(
     private http: HttpClient,
@@ -161,11 +168,28 @@ export class AccessValidationBackendApiService {
       .toPromise();
   }
 
+  validateAccessToFacilitatorDashboardPage(): Promise<void> {
+    return this.http
+      .get<void>(this.FACILITATOR_DASHBOARD_PAGE_ACCESS_VALIDATOR)
+      .toPromise();
+  }
+
   doesLearnerGroupExist(learnerGroupId: string): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this.DOES_LEARNER_GROUP_EXIST,
       {
         learner_group_id: learnerGroupId,
+      }
+    );
+
+    return this.http.get<void>(url).toPromise();
+  }
+
+  validateAccessCollectionEditorPage(collectionId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.COLLECTION_EDITOR_PAGE_ACCESS_VALIDATOR,
+      {
+        collection_id: collectionId,
       }
     );
 
