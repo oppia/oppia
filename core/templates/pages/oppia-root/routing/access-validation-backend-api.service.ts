@@ -25,7 +25,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 })
 export class AccessValidationBackendApiService {
   SUBTOPIC_VIEWER_PAGE_PAGE_ACCESS_VALIDATOR =
-  '/access_validation_handler/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>';
+    '/access_validation_handler/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>';
 
   CLASSROOM_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_classroom_page';
@@ -79,17 +79,18 @@ export class AccessValidationBackendApiService {
   validateAccessToSubtopicViewerPage(
     classroomUrlFragment: string,
     topicUrlFragment: string,
-    subtopicUrlFragment: string): Promise<void> {
-      let url = this.urlInterpolationService.interpolateUrl(
-        this.SUBTOPIC_VIEWER_PAGE_PAGE_ACCESS_VALIDATOR,
-        {
-          classroom_url_fragment: classroomUrlFragment,
-          topic_url_fragment: topicUrlFragment,
-          subtopic_url_fragment: subtopicUrlFragment
-        }
-      );
+    subtopicUrlFragment: string
+  ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.SUBTOPIC_VIEWER_PAGE_PAGE_ACCESS_VALIDATOR,
+      {
+        classroom_url_fragment: classroomUrlFragment,
+        topic_url_fragment: topicUrlFragment,
+        subtopic_url_fragment: subtopicUrlFragment,
+      }
+    );
 
-      return this.http.get<void>(url).toPromise();
+    return this.http.get<void>(url).toPromise();
   }
 
   validateAccessToClassroomPage(classroomUrlFragment: string): Promise<void> {

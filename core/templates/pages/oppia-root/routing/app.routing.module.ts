@@ -31,7 +31,7 @@ const routes: Route[] = [
     loadChildren: () =>
       import('pages/subtopic-viewer-page/subtopic-viewer-page.module').then(
         m => m.SubtopicViewerPageModule
-      )
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.ROUTE,

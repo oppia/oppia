@@ -23,11 +23,11 @@ import {SharedComponentsModule} from 'components/shared-component.module';
 import {SubtopicViewerNavbarBreadcrumbComponent} from './navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component';
 import {SubtopicViewerPageComponent} from './subtopic-viewer-page.component';
 import {SubtopicViewerNavbarPreLogoActionComponent} from './navbar-pre-logo-action/subtopic-viewer-navbar-pre-logo-action.component';
-import { toastrConfig} from 'pages/oppia-root/app.module';
-import { SubtopicViewerRootComponent } from './subtopic-viewer-page-root.component';
-import { SubtopicViewerAuthGuard } from './subtopic-viewer-auth.guard';
-import { CommonModule } from '@angular/common';
-import { ToastrModule } from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {SubtopicViewerRootComponent} from './subtopic-viewer-page-root.component';
+import {SubtopicViewerAuthGuard} from './subtopic-viewer-auth.guard';
+import {CommonModule} from '@angular/common';
+import {ToastrModule} from 'ngx-toastr';
 
 @NgModule({
   imports: [
@@ -53,7 +53,6 @@ import { ToastrModule } from 'ngx-toastr';
     SubtopicViewerPageComponent,
     SubtopicViewerNavbarPreLogoActionComponent,
     SubtopicViewerNavbarBreadcrumbComponent,
-  ]
+  ],
 })
-
 export class SubtopicViewerPageModule {}

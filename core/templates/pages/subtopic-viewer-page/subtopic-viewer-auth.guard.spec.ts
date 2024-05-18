@@ -16,17 +16,17 @@
  * @fileoverview Tests for SubtopicCiewerAuthGuard
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { SubtopicViewerAuthGuard } from './subtopic-viewer-auth.guard';
+import {SubtopicViewerAuthGuard} from './subtopic-viewer-auth.guard';
 
 describe('SubtopicViewerAuthGuard', () => {
   let guard: SubtopicViewerAuthGuard;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     }).compileComponents();
 
     guard = TestBed.inject(SubtopicViewerAuthGuard);

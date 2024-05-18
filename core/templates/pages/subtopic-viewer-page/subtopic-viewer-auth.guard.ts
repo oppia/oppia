@@ -16,13 +16,11 @@
  * @fileoverview Auth guard for Subtopic viewer page.
  */
 
-import { Injectable } from '@angular/core';
-import {
-  CanActivate
-} from '@angular/router';
+import {Injectable} from '@angular/core';
+import {CanActivate} from '@angular/router';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SubtopicViewerAuthGuard implements CanActivate {
   async canActivate(): Promise<boolean> {

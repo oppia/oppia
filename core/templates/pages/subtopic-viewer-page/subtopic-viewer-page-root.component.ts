@@ -16,17 +16,17 @@
  * @fileoverview Subtopic Viewer page root component.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
+import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
 @Component({
   selector: 'oppia-subtopic-viewer-page-root',
   templateUrl: './subtopic-viewer-page-root.component.html',
 })
 export class SubtopicViewerRootComponent extends BaseRootComponent {
-  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SUBTOPIC_VIEWER.TITLE;
-  meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SUBTOPIC_VIEWER.META as
-    unknown as Readonly<MetaTagData>[];
+  title: string =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SUBTOPIC_VIEWER.TITLE;
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+    .SUBTOPIC_VIEWER.META as unknown as Readonly<MetaTagData>[];
 }
