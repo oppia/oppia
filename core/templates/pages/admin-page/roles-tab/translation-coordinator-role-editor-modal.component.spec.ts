@@ -16,16 +16,22 @@
  * @fileoverview Unit tests for TranslationCoordinatorRoleEditorModalComponent.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, async, tick } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { MaterialModule } from 'modules/material.module';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  async,
+  tick,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {FormsModule} from '@angular/forms';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {MaterialModule} from 'modules/material.module';
 
-import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
+import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 
-import { TranslationCoordinatorRoleEditorModalComponent } from './translation-coordinator-role-editor-modal.component';
+import {TranslationCoordinatorRoleEditorModalComponent} from './translation-coordinator-role-editor-modal.component';
 
 describe('TranslationCoordinatorRoleEditorModalComponent', () => {
   let component: TranslationCoordinatorRoleEditorModalComponent;
@@ -36,23 +42,16 @@ describe('TranslationCoordinatorRoleEditorModalComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        FormsModule,
-        MaterialModule,
-        HttpClientTestingModule
-      ],
+      imports: [FormsModule, MaterialModule, HttpClientTestingModule],
       declarations: [TranslationCoordinatorRoleEditorModalComponent],
-      providers: [
-        NgbActiveModal,
-        AdminBackendApiService,
-        AlertsService
-      ]
+      providers: [NgbActiveModal, AdminBackendApiService, AlertsService],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      TranslationCoordinatorRoleEditorModalComponent);
+      TranslationCoordinatorRoleEditorModalComponent
+    );
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.get(NgbActiveModal);
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
@@ -62,7 +61,7 @@ describe('TranslationCoordinatorRoleEditorModalComponent', () => {
       en: 'English',
       hi: 'Hindi',
       ak: 'Ákán (Akan)',
-      sk: 'shqip (Albanian)'
+      sk: 'shqip (Albanian)',
     };
     fixture.detectChanges();
   });
@@ -82,7 +81,9 @@ describe('TranslationCoordinatorRoleEditorModalComponent', () => {
 
     it('should make request to add topic', fakeAsync(() => {
       spyOn(
-        adminBackendApiService, 'assignTranslationCoordinator').and.resolveTo();
+        adminBackendApiService,
+        'assignTranslationCoordinator'
+      ).and.resolveTo();
       component.newLanguageId = 'en';
 
       component.addLanguage();
@@ -90,13 +91,15 @@ describe('TranslationCoordinatorRoleEditorModalComponent', () => {
       tick();
 
       expect(
-        adminBackendApiService.assignTranslationCoordinator).toHaveBeenCalled();
+        adminBackendApiService.assignTranslationCoordinator
+      ).toHaveBeenCalled();
     }));
 
     it('should alert warning if request fails', fakeAsync(() => {
       spyOn(
-        adminBackendApiService, 'assignTranslationCoordinator').and.returnValue(
-        Promise.reject());
+        adminBackendApiService,
+        'assignTranslationCoordinator'
+      ).and.returnValue(Promise.reject());
       spyOn(alertsService, 'addWarning').and.callThrough();
 
       component.newLanguageId = 'en';
@@ -124,21 +127,23 @@ describe('TranslationCoordinatorRoleEditorModalComponent', () => {
     it('should make request to remove topic', fakeAsync(() => {
       spyOn(
         adminBackendApiService,
-        'deassignTranslationCoordinator').and.resolveTo();
+        'deassignTranslationCoordinator'
+      ).and.resolveTo();
 
       component.removeLanguageId('hi');
       expect(component.languageIdInUpdate).toEqual('hi');
       tick();
 
       expect(
-        adminBackendApiService
-          .deassignTranslationCoordinator).toHaveBeenCalled();
+        adminBackendApiService.deassignTranslationCoordinator
+      ).toHaveBeenCalled();
     }));
 
     it('should alert warning if request fails', fakeAsync(() => {
       spyOn(
         adminBackendApiService,
-        'deassignTranslationCoordinator').and.returnValue(Promise.reject());
+        'deassignTranslationCoordinator'
+      ).and.returnValue(Promise.reject());
       spyOn(alertsService, 'addWarning').and.callThrough();
 
       component.removeLanguageId('hi');

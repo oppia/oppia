@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { SummaryListHeaderComponent } from './summary-list-header.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {SummaryListHeaderComponent} from './summary-list-header.component';
 
 /**
  * @fileoverview Unit tests for SummaryListHeaderComponent.
@@ -25,7 +25,7 @@ describe('SummaryListHeaderComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [SummaryListHeaderComponent]
+      declarations: [SummaryListHeaderComponent],
     }).compileComponents();
   }));
 
@@ -43,7 +43,7 @@ describe('SummaryListHeaderComponent', () => {
 
     expect(component.summaryDelete.emit).toHaveBeenCalledWith({
       index: 1,
-      event: itemDeletionEvent
+      event: itemDeletionEvent,
     });
   });
 });

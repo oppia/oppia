@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for the donate page root component.
  */
 
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import { AppConstants } from 'app.constants';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { DonatePageRootComponent } from './donate-page-root.component';
+import {AppConstants} from 'app.constants';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {DonatePageRootComponent} from './donate-page-root.component';
 
 describe('Donate Page Root', () => {
   let fixture: ComponentFixture<DonatePageRootComponent>;
@@ -29,13 +29,9 @@ describe('Donate Page Root', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        DonatePageRootComponent,
-        MockTranslatePipe,
-      ],
-      providers: [
-      ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+      declarations: [DonatePageRootComponent, MockTranslatePipe],
+      providers: [],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
     fixture = TestBed.createComponent(DonatePageRootComponent);
     component = fixture.componentInstance;
@@ -44,8 +40,10 @@ describe('Donate Page Root', () => {
   it('should be defined', () => {
     expect(component).toBeDefined();
     expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.TITLE
+    );
     expect(component.meta).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.META
+    );
   });
 });

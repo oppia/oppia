@@ -35,25 +35,26 @@ ruleTester.run('sorted-dependencies', rule, {
     'canReviewActiveThread', 'description', 'scope', 'newContent', 'oldContent',
     'stateName', 'suggestionIsHandled', 'suggestionStatus',
     'suggestionType', 'IMPORT_STATEMENT', function(){
-    }])`
+    }])`,
   ],
 
   invalid: [
     {
-      code:
-      `angular.module('oppia').directive('SuggestionModalForCreatorViewCont', [
+      code: `angular.module('oppia').directive('SuggestionModalForCreatorViewCont', [
       '$uibModalInstance', 'SuggestionModalService',
       'canReviewActiveThread', 'description', '$scope', 'newContent', 'oldCont',
       'stateName', 'suggestionIsHandled', 'suggestionStatus',
       'suggestionType', 'IMPORT_STATEMENT', function(){
       }])`,
-      errors: [{
-        message: (
-          'Please ensure that the injected dependencies should be in the' +
-          ' following manner: dollar imports, local imports and' +
-          ' constant imports, all in sorted-order.'),
-        type: 'ArrayExpression'
-      }]
-    }
-  ]
+      errors: [
+        {
+          message:
+            'Please ensure that the injected dependencies should be in the' +
+            ' following manner: dollar imports, local imports and' +
+            ' constant imports, all in sorted-order.',
+          type: 'ArrayExpression',
+        },
+      ],
+    },
+  ],
 });

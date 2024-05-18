@@ -74,7 +74,7 @@ class ClassroomDataHandler(
         # in the decorator `does_classroom_exist` we are already handling
         # the None case of classroom.
         assert classroom is not None
-        topic_ids = list(classroom.topic_id_to_prerequisite_topic_ids.keys())
+        topic_ids = classroom.get_topic_ids()
         topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
         topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
         topic_summary_dicts: List[ClassroomTopicSummaryDict] = []
@@ -104,6 +104,9 @@ class ClassroomDataHandler(
                         topic_summary_dict['thumbnail_filename']),
                     'thumbnail_bg_color': (
                         topic_summary_dict['thumbnail_bg_color']),
+                    'published_story_exploration_mapping': (
+                        topic_summary_dict[
+                            'published_story_exploration_mapping']),
                     'topic_model_created_on': (
                         topic_summary_dict['topic_model_created_on']),
                     'topic_model_last_updated': (
@@ -246,13 +249,13 @@ class ClassroomHandler(
             classroom_id: str. The ID of the classroom.
 
         Raises:
-            PageNotFoundException. The classroom with the given id or
+            NotFoundException. The classroom with the given id or
                 url doesn't exist.
         """
         classroom = classroom_config_services.get_classroom_by_id(
             classroom_id, strict=False)
         if classroom is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'The classroom with the given id or url doesn\'t exist.')
 
         self.values.update({
@@ -344,13 +347,13 @@ class ClassroomIdHandler(
             classroom_url_fragment: str. The classroom URL fragment.
 
         Raises:
-            PageNotFoundException. The classroom with the given url doesn't
+            NotFoundException. The classroom with the given url doesn't
                 exist.
         """
         classroom = classroom_config_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
         if classroom is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'The classroom with the given url doesn\'t exist.')
 
         self.render_json({

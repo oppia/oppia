@@ -157,6 +157,8 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                 'invalid'),
             expected_status_int=400)
         error_msg = (
+            'At \'http://localhost/practice_session/data/staging/invalid?'
+            'selected_subtopic_ids=1,2\' these errors are happening:\n'
             'Schema validation for \'selected_subtopic_ids\' failed: '
             'Extra data: line 1 column 2 (char 1)'
         )

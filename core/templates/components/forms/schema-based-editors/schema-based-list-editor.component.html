@@ -16,11 +16,16 @@
     height: 30px;
     margin-top: 4px;
   }
+  @media screen and (max-width: 700px) {
+    .schema-based-list-editor {
+      margin-top: 1rem;
+    }
+  }
 </style>
 <div class="schema-based-list-editor">
   <form #listEditorForm="ngForm">
     <table class="w-100">
-      <tr *ngFor="let item of localValue; let idx = index" id="e2e-test-schema-based-list-editor-table-row">
+      <tr *ngFor="let item of localValue; let idx = index; trackBy: trackByIndex" id="e2e-test-schema-based-list-editor-table-row">
         <td class="e2e-test-schema-based-list-editor-table-data">
           <schema-based-editor [schema]="itemSchema"
                                [disabled]="disabled"

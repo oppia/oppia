@@ -17,15 +17,21 @@
  * of the exploration editor page.
  */
 
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { AlertsService } from 'services/alerts.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { ExplorationRightsService } from './exploration-rights.service';
-import { ExplorationRightsBackendApiService, ExplorationRightsBackendData } from './exploration-rights-backend-api.service';
+import {TestBed, fakeAsync, tick} from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {AlertsService} from 'services/alerts.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
+import {ExplorationRightsService} from './exploration-rights.service';
+import {
+  ExplorationRightsBackendApiService,
+  ExplorationRightsBackendData,
+} from './exploration-rights-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
-import { HttpErrorResponse } from '@angular/common/http';
+import {HttpErrorResponse} from '@angular/common/http';
 
 describe('Exploration rights service', () => {
   let ers: ExplorationRightsService;
@@ -46,8 +52,8 @@ describe('Exploration rights service', () => {
       status: 'private',
       cloned_from: 'e1234',
       community_owned: true,
-      viewable_if_private: true
-    }
+      viewable_if_private: true,
+    },
   };
 
   beforeEach(() => {
@@ -59,12 +65,12 @@ describe('Exploration rights service', () => {
           useValue: {
             explorationId: '12345',
             data: {
-              version: 1
-            }
-          }
+              version: 1,
+            },
+          },
         },
-        ExplorationRightsBackendApiService
-      ]
+        ExplorationRightsBackendApiService,
+      ],
     });
 
     als = TestBed.inject(AlertsService);
@@ -72,8 +78,9 @@ describe('Exploration rights service', () => {
     ers = TestBed.inject(ExplorationRightsService);
     explorationDataService = TestBed.inject(ExplorationDataService);
     httpTestingController = TestBed.inject(HttpTestingController);
-    explorationRightsBackendApiService =
-      TestBed.inject(ExplorationRightsBackendApiService);
+    explorationRightsBackendApiService = TestBed.inject(
+      ExplorationRightsBackendApiService
+    );
   });
 
   beforeEach(() => {
@@ -113,15 +120,14 @@ describe('Exploration rights service', () => {
 
     expect(ers.ownerNames).toEqual(serviceData.rights.owner_names);
     expect(ers.editorNames).toEqual(serviceData.rights.editor_names);
-    expect(ers.voiceArtistNames).toEqual(
-      serviceData.rights.voice_artist_names);
+    expect(ers.voiceArtistNames).toEqual(serviceData.rights.voice_artist_names);
     expect(ers.viewerNames).toEqual(serviceData.rights.viewer_names);
     expect(ers.isPrivate()).toEqual(true);
     expect(ers.clonedFrom()).toEqual(serviceData.rights.cloned_from);
-    expect(ers.isCommunityOwned()).toBe(
-      serviceData.rights.community_owned);
+    expect(ers.isCommunityOwned()).toBe(serviceData.rights.community_owned);
     expect(ers.viewableIfPrivate()).toBe(
-      serviceData.rights.viewable_if_private);
+      serviceData.rights.viewable_if_private
+    );
   });
 
   it('should throw error if version of data is null', fakeAsync(() => {
@@ -176,55 +182,52 @@ describe('Exploration rights service', () => {
     expect(ers.isPublic()).toBe(true);
   });
 
-  it('should reports correcty if exploration rights is viewable when private',
-    () => {
-      ers.init(['abc'], [], [], [], 'private', 'e1234', true, true);
-      expect(ers.viewableIfPrivate()).toBe(true);
+  it('should reports correcty if exploration rights is viewable when private', () => {
+    ers.init(['abc'], [], [], [], 'private', 'e1234', true, true);
+    expect(ers.viewableIfPrivate()).toBe(true);
 
-      ers.init(['abc'], [], [], [], 'private', 'e1234', false, false);
-      expect(ers.viewableIfPrivate()).toBe(false);
-    });
+    ers.init(['abc'], [], [], [], 'private', 'e1234', false, false);
+    expect(ers.viewableIfPrivate()).toBe(false);
+  });
 
   it('should change community owned to true', fakeAsync(() => {
     serviceData.rights.community_owned = true;
     spyOn(
       explorationRightsBackendApiService,
-      'makeCommunityOwnedPutData').and.returnValue(
-      Promise.resolve(serviceData));
+      'makeCommunityOwnedPutData'
+    ).and.returnValue(Promise.resolve(serviceData));
 
     ers.init(['abc'], [], [], [], 'private', 'e1234', false, true);
     ers.makeCommunityOwned();
     tick();
-    expect(explorationRightsBackendApiService.makeCommunityOwnedPutData)
-      .toHaveBeenCalled();
+    expect(
+      explorationRightsBackendApiService.makeCommunityOwnedPutData
+    ).toHaveBeenCalled();
     expect(ers.isCommunityOwned()).toBe(true);
   }));
 
-  it('should use reject handler when changing community owned to true fails',
-    fakeAsync(() => {
-      spyOn(
-        explorationRightsBackendApiService,
-        'makeCommunityOwnedPutData').and.returnValue(
-        Promise.reject());
+  it('should use reject handler when changing community owned to true fails', fakeAsync(() => {
+    spyOn(
+      explorationRightsBackendApiService,
+      'makeCommunityOwnedPutData'
+    ).and.returnValue(Promise.reject());
 
-      ers.init(
-        ['abc'], [], [], [], 'private', 'e1234', false, true);
-      ers.makeCommunityOwned().then(
-        successHandler, failHandler);
-      tick();
+    ers.init(['abc'], [], [], [], 'private', 'e1234', false, true);
+    ers.makeCommunityOwned().then(successHandler, failHandler);
+    tick();
 
-      expect(ers.isCommunityOwned()).toBe(false);
-      expect(clearWarningsSpy).not.toHaveBeenCalled();
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    }));
+    expect(ers.isCommunityOwned()).toBe(false);
+    expect(clearWarningsSpy).not.toHaveBeenCalled();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 
   it('should change exploration right viewability', fakeAsync(() => {
     serviceData.rights.viewable_if_private = true;
     spyOn(
       explorationRightsBackendApiService,
-      'setViewabilityPutData').and.returnValue(
-      Promise.resolve(serviceData));
+      'setViewabilityPutData'
+    ).and.returnValue(Promise.resolve(serviceData));
 
     ers.setViewability(true);
     tick();
@@ -232,45 +235,44 @@ describe('Exploration rights service', () => {
     expect(ers.viewableIfPrivate()).toBe(true);
   }));
 
-  it('should use reject when changing exploration right viewability fails',
-    fakeAsync(() => {
-      spyOn(
-        explorationRightsBackendApiService,
-        'setViewabilityPutData').and.returnValue(
-        Promise.reject());
+  it('should use reject when changing exploration right viewability fails', fakeAsync(() => {
+    spyOn(
+      explorationRightsBackendApiService,
+      'setViewabilityPutData'
+    ).and.returnValue(Promise.reject());
 
-      ers.init(
-        ['abc'], [], [], [], 'private', 'e1234', false, false);
-      ers.setViewability(true).then(
-        successHandler, failHandler);
-      tick();
+    ers.init(['abc'], [], [], [], 'private', 'e1234', false, false);
+    ers.setViewability(true).then(successHandler, failHandler);
+    tick();
 
-      expect(ers.viewableIfPrivate()).toBe(false);
-      expect(clearWarningsSpy).not.toHaveBeenCalled();
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    }));
+    expect(ers.viewableIfPrivate()).toBe(false);
+    expect(clearWarningsSpy).not.toHaveBeenCalled();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 
   it('should save a new member', fakeAsync(() => {
     serviceData.rights.viewer_names = ['viewerName'];
     spyOn(
       explorationRightsBackendApiService,
-      'saveRoleChangesPutData').and.returnValue(
-      Promise.resolve(serviceData));
+      'saveRoleChangesPutData'
+    ).and.returnValue(Promise.resolve(serviceData));
 
     ers.saveRoleChanges('newUser', 'viewer');
     tick();
 
-    expect(ers.viewerNames).toEqual(
-      ['viewerName']);
+    expect(ers.viewerNames).toEqual(['viewerName']);
   }));
 
   it('should remove existing user', fakeAsync(() => {
-    serviceData.rights.viewer_names = ['newUser'];
+    ers.viewerNames = ['newUser'];
+    ers.editorNames = [];
+    ers.ownerNames = [];
+    serviceData.rights.viewer_names = [];
     spyOn(
       explorationRightsBackendApiService,
-      'removeRoleAsyncDeleteData').and.returnValue(
-      Promise.resolve(serviceData));
+      'removeRoleAsyncDeleteData'
+    ).and.returnValue(Promise.resolve(serviceData));
 
     ers.removeRoleAsync('newUser').then(successHandler, failHandler);
     tick();
@@ -278,22 +280,105 @@ describe('Exploration rights service', () => {
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
 
-    expect(ers.viewerNames).toEqual(
-      serviceData.rights.viewer_names);
+    expect(ers.viewerNames).toEqual(serviceData.rights.viewer_names);
+  }));
+
+  it('should remove user from UI before updating with backend data', fakeAsync(() => {
+    ers.editorNames = ['editorName', 'newEditor'];
+    ers.viewerNames = [];
+    ers.ownerNames = [];
+    serviceData.rights.editor_names = [];
+    spyOn(
+      explorationRightsBackendApiService,
+      'removeRoleAsyncDeleteData'
+    ).and.returnValue(Promise.resolve(serviceData));
+
+    ers.removeRoleAsync('editorName').then(successHandler, failHandler);
+    expect(ers.editorNames).toEqual(['newEditor']);
+    expect(ers.editorNames).not.toEqual(serviceData.rights.editor_names);
+    tick();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+
+    expect(ers.editorNames).toEqual(serviceData.rights.editor_names);
+
+    ers.viewerNames = ['viewerName', 'newViewer'];
+    serviceData.rights.viewer_names = [];
+
+    ers.removeRoleAsync('viewerName').then(successHandler, failHandler);
+    expect(ers.viewerNames).toEqual(['newViewer']);
+    expect(ers.viewerNames).not.toEqual(serviceData.rights.viewer_names);
+    tick();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+
+    expect(ers.viewerNames).toEqual(serviceData.rights.viewer_names);
+  }));
+
+  it('should redisplay users when removing a user fails', fakeAsync(() => {
+    ers.ownerNames = ['ownerName'];
+    ers.editorNames = ['editorName'];
+    ers.viewerNames = ['viewerName'];
+    spyOn(
+      explorationRightsBackendApiService,
+      'removeRoleAsyncDeleteData'
+    ).and.returnValue(Promise.reject());
+
+    ers.removeRoleAsync('ownerName').then(successHandler, failHandler);
+    expect(ers.ownerNames).toEqual([]);
+    expect(ers.editorNames).toEqual(['editorName']);
+    expect(ers.viewerNames).toEqual(['viewerName']);
+    tick();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+
+    expect(ers.ownerNames).toEqual(['ownerName']);
+    expect(ers.editorNames).toEqual(['editorName']);
+    expect(ers.viewerNames).toEqual(['viewerName']);
+
+    ers.removeRoleAsync('editorName').then(successHandler, failHandler);
+    expect(ers.editorNames).toEqual([]);
+    expect(ers.ownerNames).toEqual(['ownerName']);
+    expect(ers.viewerNames).toEqual(['viewerName']);
+    tick();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+
+    expect(ers.editorNames).toEqual(['editorName']);
+    expect(ers.ownerNames).toEqual(['ownerName']);
+    expect(ers.viewerNames).toEqual(['viewerName']);
+
+    ers.removeRoleAsync('viewerName').then(successHandler, failHandler);
+    expect(ers.viewerNames).toEqual([]);
+    expect(ers.ownerNames).toEqual(['ownerName']);
+    expect(ers.editorNames).toEqual(['editorName']);
+    tick();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+
+    expect(ers.viewerNames).toEqual(['viewerName']);
+    expect(ers.ownerNames).toEqual(['ownerName']);
+    expect(ers.editorNames).toEqual(['editorName']);
   }));
 
   it('should save a new voice artist', fakeAsync(() => {
     serviceData.rights.voice_artist_names = ['voiceArtist'];
     spyOn(
       explorationRightsBackendApiService,
-      'assignVoiceArtistRoleAsyncPostData').and.returnValue(
-      Promise.resolve(serviceData));
+      'assignVoiceArtistRoleAsyncPostData'
+    ).and.returnValue(Promise.resolve(serviceData));
 
     ers.init(['abc'], [], [], [], 'public', '1234', true, false);
     expect(ers.voiceArtistNames).toEqual([]);
 
-    ers.assignVoiceArtistRoleAsync('voiceArtist').then(
-      successHandler, failHandler);
+    ers
+      .assignVoiceArtistRoleAsync('voiceArtist')
+      .then(successHandler, failHandler);
     tick();
 
     expect(ers.voiceArtistNames).toEqual(['voiceArtist']);
@@ -304,15 +389,16 @@ describe('Exploration rights service', () => {
 
     spyOn(
       explorationRightsBackendApiService,
-      'removeVoiceArtistRoleAsyncDeleteData').and.returnValue(
-      Promise.resolve(serviceData));
+      'removeVoiceArtistRoleAsyncDeleteData'
+    ).and.returnValue(Promise.resolve(serviceData));
 
     ers.init(['abc'], [], ['voiceArtist'], [], 'public', '1234', true, false);
     tick();
     expect(ers.voiceArtistNames).toEqual(['voiceArtist']);
 
-    ers.removeVoiceArtistRoleAsync('voiceArtist').then(
-      successHandler, failHandler);
+    ers
+      .removeVoiceArtistRoleAsync('voiceArtist')
+      .then(successHandler, failHandler);
     tick();
 
     expect(successHandler).toHaveBeenCalled();
@@ -323,25 +409,23 @@ describe('Exploration rights service', () => {
 
   it('should reject handler when saving a voice artist fails', fakeAsync(() => {
     const errorMessage = 'An error occurred while assigning voice artist role.';
-    const responseError = { error: { error: errorMessage } };
+    const responseError = {error: {error: errorMessage}};
     spyOn(
       explorationRightsBackendApiService,
-      'assignVoiceArtistRoleAsyncPostData').and.returnValue(
-      Promise.reject(responseError));
+      'assignVoiceArtistRoleAsyncPostData'
+    ).and.returnValue(Promise.reject(responseError));
     spyOn(als, 'addWarning');
 
-    ers.assignVoiceArtistRoleAsync('voiceArtist').then(
-      successHandler, failHandler);
+    ers
+      .assignVoiceArtistRoleAsync('voiceArtist')
+      .then(successHandler, failHandler);
     tick();
 
     expect(
-      explorationRightsBackendApiService
-        .assignVoiceArtistRoleAsyncPostData
+      explorationRightsBackendApiService.assignVoiceArtistRoleAsyncPostData
     ).toHaveBeenCalled();
 
-    expect(als.addWarning).toHaveBeenCalledWith(
-      errorMessage
-    );
+    expect(als.addWarning).toHaveBeenCalledWith(errorMessage);
   }));
 
   it('should check user already has roles', () => {
@@ -395,12 +479,10 @@ describe('Exploration rights service', () => {
   it('should reject handler when saving a new member fails', fakeAsync(() => {
     spyOn(
       explorationRightsBackendApiService,
-      'saveRoleChangesPutData').and.returnValue(
-      Promise.reject());
+      'saveRoleChangesPutData'
+    ).and.returnValue(Promise.reject());
 
-    ers.saveRoleChanges(
-      'newUser', 'viewer').then(
-      successHandler, failHandler);
+    ers.saveRoleChanges('newUser', 'viewer').then(successHandler, failHandler);
 
     tick();
 
@@ -413,10 +495,9 @@ describe('Exploration rights service', () => {
     let sampleDataResultsCopy = angular.copy(serviceData);
     sampleDataResultsCopy.rights.status = 'public';
 
-    spyOn(
-      explorationRightsBackendApiService,
-      'publishPutData').and.returnValue(
-      Promise.resolve(sampleDataResultsCopy));
+    spyOn(explorationRightsBackendApiService, 'publishPutData').and.returnValue(
+      Promise.resolve(sampleDataResultsCopy)
+    );
 
     ers.publish();
     tick();
@@ -424,75 +505,69 @@ describe('Exploration rights service', () => {
     expect(ers.isPublic()).toBe(true);
   }));
 
-  it('should call reject handler when making exploration rights public fails',
-    fakeAsync(() => {
-      spyOn(
-        explorationRightsBackendApiService,
-        'publishPutData').and.returnValue(
-        Promise.reject(new HttpErrorResponse({
+  it('should call reject handler when making exploration rights public fails', fakeAsync(() => {
+    spyOn(explorationRightsBackendApiService, 'publishPutData').and.returnValue(
+      Promise.reject(
+        new HttpErrorResponse({
           error: {
-            error: 'error_message'
-          }
-        })));
-      spyOn(als, 'addWarning');
+            error: 'error_message',
+          },
+        })
+      )
+    );
+    spyOn(als, 'addWarning');
 
-      ers.publish().then(successHandler, failHandler);
-      tick();
+    ers.publish().then(successHandler, failHandler);
+    tick();
 
-      expect(clearWarningsSpy).not.toHaveBeenCalled();
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-      expect(als.addWarning).toHaveBeenCalledWith(
-        'Failed to publish an exploration: error_message'
-      );
-    }));
+    expect(clearWarningsSpy).not.toHaveBeenCalled();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+    expect(als.addWarning).toHaveBeenCalledWith(
+      'Failed to publish an exploration: error_message'
+    );
+  }));
 
   it('should save moderator change to backend', fakeAsync(() => {
     spyOn(
       explorationRightsBackendApiService,
-      'saveModeratorChangeToBackendAsyncPutData').and.returnValue(
-      Promise.resolve(serviceData));
+      'saveModeratorChangeToBackendAsyncPutData'
+    ).and.returnValue(Promise.resolve(serviceData));
 
     ers.saveModeratorChangeToBackendAsync('');
     tick();
 
     expect(clearWarningsSpy).toHaveBeenCalled();
-    expect(ers.ownerNames).toEqual(
-      serviceData.rights.owner_names);
-    expect(ers.editorNames).toEqual(
-      serviceData.rights.editor_names);
-    expect(ers.voiceArtistNames).toEqual(
-      serviceData.rights.voice_artist_names);
-    expect(ers.viewerNames).toEqual(
-      serviceData.rights.viewer_names);
+    expect(ers.ownerNames).toEqual(serviceData.rights.owner_names);
+    expect(ers.editorNames).toEqual(serviceData.rights.editor_names);
+    expect(ers.voiceArtistNames).toEqual(serviceData.rights.voice_artist_names);
+    expect(ers.viewerNames).toEqual(serviceData.rights.viewer_names);
     expect(ers.isPrivate()).toEqual(true);
-    expect(ers.clonedFrom()).toEqual(
-      serviceData.rights.cloned_from);
-    expect(ers.isCommunityOwned()).toBe(
-      serviceData.rights.community_owned);
+    expect(ers.clonedFrom()).toEqual(serviceData.rights.cloned_from);
+    expect(ers.isCommunityOwned()).toBe(serviceData.rights.community_owned);
     expect(ers.viewableIfPrivate()).toBe(
-      serviceData.rights.viewable_if_private);
+      serviceData.rights.viewable_if_private
+    );
   }));
 
-  it('should reject handler when saving moderator change to backend fails',
-    fakeAsync(() => {
-      spyOn(
-        explorationRightsBackendApiService,
-        'saveModeratorChangeToBackendAsyncPutData').and.returnValue(
-        Promise.reject());
+  it('should reject handler when saving moderator change to backend fails', fakeAsync(() => {
+    spyOn(
+      explorationRightsBackendApiService,
+      'saveModeratorChangeToBackendAsyncPutData'
+    ).and.returnValue(Promise.reject());
 
-      ers.saveModeratorChangeToBackendAsync('');
-      tick();
+    ers.saveModeratorChangeToBackendAsync('');
+    tick();
 
-      expect(clearWarningsSpy).not.toHaveBeenCalled();
-      expect(ers.ownerNames).toBeUndefined();
-      expect(ers.editorNames).toBeUndefined();
-      expect(ers.voiceArtistNames).toBeUndefined();
-      expect(ers.viewerNames).toBeUndefined();
-      expect(ers.isPrivate()).toBeFalsy();
-      expect(ers.isPublic()).toBeFalsy();
-      expect(ers.clonedFrom()).toBeUndefined();
-      expect(ers.isCommunityOwned()).toBeUndefined();
-      expect(ers.viewableIfPrivate()).toBeUndefined();
-    }));
+    expect(clearWarningsSpy).not.toHaveBeenCalled();
+    expect(ers.ownerNames).toBeUndefined();
+    expect(ers.editorNames).toBeUndefined();
+    expect(ers.voiceArtistNames).toBeUndefined();
+    expect(ers.viewerNames).toBeUndefined();
+    expect(ers.isPrivate()).toBeFalsy();
+    expect(ers.isPublic()).toBeFalsy();
+    expect(ers.clonedFrom()).toBeUndefined();
+    expect(ers.isCommunityOwned()).toBeUndefined();
+    expect(ers.viewableIfPrivate()).toBeUndefined();
+  }));
 });

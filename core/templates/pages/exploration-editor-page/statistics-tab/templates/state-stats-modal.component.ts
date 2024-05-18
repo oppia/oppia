@@ -16,11 +16,11 @@
  * @fileoverview Component for state stats modal.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
+import {RouterService} from 'pages/exploration-editor-page/services/router.service';
 
 import './state-stats-modal.component.css';
 
@@ -39,10 +39,12 @@ interface PieChartOpitons {
 
 @Component({
   selector: 'oppia-state-stats-modal',
-  templateUrl: './state-stats-modal.component.html'
+  templateUrl: './state-stats-modal.component.html',
 })
 export class StateStatsModalComponent
-   extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -51,7 +53,7 @@ export class StateStatsModalComponent
     options: string;
     id: string;
     addressed_info_is_supported: boolean;
-  } [];
+  }[];
 
   @Input() interactionArgs!: InteractionCustomizationArgs;
   @Input() stateName!: string;
@@ -75,8 +77,8 @@ export class StateStatsModalComponent
   hasExplorationBeenAnswered!: boolean;
 
   constructor(
-     private ngbActiveModal: NgbActiveModal,
-     private routerService: RouterService,
+    private ngbActiveModal: NgbActiveModal,
+    private routerService: RouterService
   ) {
     super(ngbActiveModal);
   }
@@ -97,7 +99,7 @@ export class StateStatsModalComponent
       height: 270,
       legendPosition: 'right',
       title: title,
-      width: 240
+      width: 240,
     };
   }
 
@@ -108,13 +110,15 @@ export class StateStatsModalComponent
 
     this.hasExplorationBeenAnswered = this.totalAnswersCount > 0;
     this.numEnters = this.stateStats.totalHitCount;
-    this.numQuits = (
-      this.stateStats.totalHitCount - this.stateStats.numCompletions);
+    this.numQuits =
+      this.stateStats.totalHitCount - this.stateStats.numCompletions;
 
-    this.answerFeedbackPieChartOptions = (
-      this.makeCompletionRatePieChartOptions('Answer feedback statistics'));
-    this.solutionUsagePieChartOptions = (
-      this.makeCompletionRatePieChartOptions('Solution usage statistics'));
+    this.answerFeedbackPieChartOptions = this.makeCompletionRatePieChartOptions(
+      'Answer feedback statistics'
+    );
+    this.solutionUsagePieChartOptions = this.makeCompletionRatePieChartOptions(
+      'Solution usage statistics'
+    );
 
     this.answerFeedbackPieChartData = [
       ['Type', 'Number'],
@@ -125,8 +129,10 @@ export class StateStatsModalComponent
     this.solutionUsagePieChartData = [
       ['Type', 'Number'],
       ['Solutions used to answer', this.numTimesSolutionViewed],
-      ['Solutions not used',
-        this.totalAnswersCount - this.numTimesSolutionViewed]
+      [
+        'Solutions not used',
+        this.totalAnswersCount - this.numTimesSolutionViewed,
+      ],
     ];
   }
 }

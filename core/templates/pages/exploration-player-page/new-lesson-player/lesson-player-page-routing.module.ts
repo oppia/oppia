@@ -16,24 +16,19 @@
  * @fileoverview Routing module for new lesson player page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { NewLessonPlayerPageRootComponent } from './lesson-player-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {NewLessonPlayerPageRootComponent} from './lesson-player-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: NewLessonPlayerPageRootComponent
-  }
+    component: NewLessonPlayerPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class NewLessonPlayerPageRoutingModule {}

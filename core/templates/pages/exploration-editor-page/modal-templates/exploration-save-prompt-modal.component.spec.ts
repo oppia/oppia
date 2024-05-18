@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for the Exploration save prompt modal.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ContextService } from 'services/context.service';
-import { ExplorationSavePromptModalComponent } from './exploration-save-prompt-modal.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ContextService} from 'services/context.service';
+import {ExplorationSavePromptModalComponent} from './exploration-save-prompt-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -42,17 +42,15 @@ describe('Exploration Save Prompt Modal Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        ExplorationSavePromptModalComponent
-      ],
+      declarations: [ExplorationSavePromptModalComponent],
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
         ContextService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -64,8 +62,7 @@ describe('Exploration Save Prompt Modal Component', () => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     contextService = TestBed.inject(ContextService);
 
-    spyOn(contextService, 'getExplorationId').and.returnValue(
-      'explorationId');
+    spyOn(contextService, 'getExplorationId').and.returnValue('explorationId');
     fixture.detectChanges();
   });
 

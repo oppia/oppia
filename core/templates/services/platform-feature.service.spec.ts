@@ -16,19 +16,20 @@
  * @fileoverview Unit tests for PlatformFeatureService.
  */
 
-import { TestBed, fakeAsync, flushMicrotasks, tick } from
-  '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks, tick} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { PlatformFeatureService, platformFeatureInitFactory } from
-  'services/platform-feature.service';
-import { FeatureFlagBackendApiService } from
-  'domain/feature-flag/feature-flag-backend-api.service';
-import { FeatureNames, FeatureStatusSummary } from
-  'domain/feature-flag/feature-status-summary.model';
-import { UrlService } from 'services/contextual/url.service';
-
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {
+  PlatformFeatureService,
+  platformFeatureInitFactory,
+} from 'services/platform-feature.service';
+import {FeatureFlagBackendApiService} from 'domain/feature-flag/feature-flag-backend-api.service';
+import {
+  FeatureNames,
+  FeatureStatusSummary,
+} from 'domain/feature-flag/feature-status-summary.model';
+import {UrlService} from 'services/contextual/url.service';
 
 describe('PlatformFeatureService', () => {
   let windowRef: WindowRef;
@@ -78,28 +79,28 @@ describe('PlatformFeatureService', () => {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       sessionStorage: {
         getItem: (key: string) => store[key] || null,
-        setItem: (key: string, value: string) => store[key] = value,
-        removeItem: (key: string) => delete store[key]
+        setItem: (key: string, value: string) => (store[key] = value),
+        removeItem: (key: string) => delete store[key],
       },
       document: {
         get cookie() {
           return cookie;
-        }
+        },
       },
       navigator: {
         get userAgent() {
           return userAgent;
-        }
-      }
+        },
+      },
     } as unknown as Window);
     mockSessionStore = (obj: object) => {
       Object.assign(store, obj);
     };
-    mockCookie = (cookieStr: string) => cookie = cookieStr;
+    mockCookie = (cookieStr: string) => (cookie = cookieStr);
 
     let pathName = '/';
     spyOn(urlService, 'getPathname').and.callFake(() => pathName);
-    mockPathName = path => pathName = path;
+    mockPathName = path => (pathName = path);
 
     apiSpy = spyOn(apiService, 'fetchFeatureFlags').and.resolveTo(
       FeatureStatusSummary.createFromBackendDict({
@@ -113,8 +114,7 @@ describe('PlatformFeatureService', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
       platformFeatureService = TestBed.inject(PlatformFeatureService);
-      platformFeatureService.initialize()
-        .then(successHandler, failHandler);
+      platformFeatureService.initialize().then(successHandler, failHandler);
 
       flushMicrotasks();
 
@@ -124,7 +124,33 @@ describe('PlatformFeatureService', () => {
       expect(platformFeatureService.isInitializedWithError).toBeFalse();
     }));
 
-    it('should load from server if saved results have expired.',
+    it('should load from server if saved results have expired.', fakeAsync(() => {
+      const sessionId = 'session_id';
+      mockCookie(`session=${sessionId}`);
+      mockSessionStore({
+        SAVED_FEATURE_FLAGS: JSON.stringify({
+          sessionId: sessionId,
+          timestamp: Date.now(),
+          featureStatusSummary: {
+            [FeatureNames.DummyFeatureFlagForE2ETests]: true,
+          },
+        }),
+      });
+
+      // Ticks 13 hrs, as stored results are valid for 12 hrs, ths results
+      // should have expired.
+      tick(13 * 3600 * 1000);
+      platformFeatureService = TestBed.inject(PlatformFeatureService);
+
+      flushMicrotasks();
+
+      expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
+      expect(platformFeatureService.isInitializedWithError).toBeFalse();
+    }));
+
+    it(
+      "should load from server if the stored features don't match with" +
+        ' feature list',
       fakeAsync(() => {
         const sessionId = 'session_id';
         mockCookie(`session=${sessionId}`);
@@ -132,15 +158,10 @@ describe('PlatformFeatureService', () => {
           SAVED_FEATURE_FLAGS: JSON.stringify({
             sessionId: sessionId,
             timestamp: Date.now(),
-            featureStatusSummary: {
-              [FeatureNames.DummyFeatureFlagForE2ETests]: true,
-            }
-          })
+            featureStatusSummary: {},
+          }),
         });
 
-        // Ticks 13 hrs, as stored results are valid for 12 hrs, ths results
-        // should have expired.
-        tick(13 * 3600 * 1000);
         platformFeatureService = TestBed.inject(PlatformFeatureService);
 
         flushMicrotasks();
@@ -150,38 +171,21 @@ describe('PlatformFeatureService', () => {
       })
     );
 
-    it('should load from server if the stored features don\'t match with' +
-      ' feature list', fakeAsync(() => {
-      const sessionId = 'session_id';
-      mockCookie(`session=${sessionId}`);
-      mockSessionStore({
-        SAVED_FEATURE_FLAGS: JSON.stringify({
-          sessionId: sessionId,
-          timestamp: Date.now(),
-          featureStatusSummary: {}
-        })
-      });
+    it(
+      'should request only once if there are more than one call to ' +
+        '.initialize.',
+      fakeAsync(() => {
+        platformFeatureService = TestBed.inject(PlatformFeatureService);
 
-      platformFeatureService = TestBed.inject(PlatformFeatureService);
+        platformFeatureService.initialize();
+        platformFeatureService.initialize();
 
-      flushMicrotasks();
+        flushMicrotasks();
 
-      expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
-      expect(platformFeatureService.isInitializedWithError).toBeFalse();
-    }));
-
-    it('should request only once if there are more than one call to ' +
-      '.initialize.', fakeAsync(() => {
-      platformFeatureService = TestBed.inject(PlatformFeatureService);
-
-      platformFeatureService.initialize();
-      platformFeatureService.initialize();
-
-      flushMicrotasks();
-
-      expect(apiService.fetchFeatureFlags).toHaveBeenCalledTimes(1);
-      expect(platformFeatureService.isInitializedWithError).toBeFalse();
-    }));
+        expect(apiService.fetchFeatureFlags).toHaveBeenCalledTimes(1);
+        expect(platformFeatureService.isInitializedWithError).toBeFalse();
+      })
+    );
 
     it('should disable all features when loading fails.', fakeAsync(() => {
       apiSpy.and.throwError('mock error');
@@ -220,21 +224,18 @@ describe('PlatformFeatureService', () => {
       expect(platformFeatureService.isInitializedWithError).toBeFalse();
     }));
 
-    it('should throw error when accessed before initialization.', fakeAsync(
-      () => {
-        platformFeatureService = TestBed.inject(PlatformFeatureService);
-        expect(
-          () => (
-            platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled)
-        ).toThrowError(
-          'The platform feature service has not been initialized.');
-      })
-    );
+    it('should throw error when accessed before initialization.', fakeAsync(() => {
+      platformFeatureService = TestBed.inject(PlatformFeatureService);
+      expect(
+        () =>
+          platformFeatureService.status.DummyFeatureFlagForE2ETests.isEnabled
+      ).toThrowError('The platform feature service has not been initialized.');
+    }));
   });
 
   describe('platformFeatureInitFactory', () => {
     let factoryFn = (service: PlatformFeatureService) => {
-      return async(): Promise<void> => service.initialize();
+      return async (): Promise<void> => service.initialize();
     };
 
     beforeEach(() => {
@@ -242,10 +243,11 @@ describe('PlatformFeatureService', () => {
       platformFeatureService = TestBed.inject(PlatformFeatureService);
     });
 
-    it('should return a function that calls initialize', async() => {
+    it('should return a function that calls initialize', async () => {
       const mockPromise = Promise.resolve();
-      const spy = spyOn(platformFeatureService, 'initialize')
-        .and.returnValue(mockPromise);
+      const spy = spyOn(platformFeatureService, 'initialize').and.returnValue(
+        mockPromise
+      );
 
       const returnedFn = factoryFn(platformFeatureService);
       const returnedPromise = returnedFn();

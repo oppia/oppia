@@ -18,32 +18,34 @@
  * with base class as ExplorationPropertyService.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter } from '@angular/core';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {EventEmitter} from '@angular/core';
+import {Injectable} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
-import { AlertsService } from 'services/alerts.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { ParamChange, ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
-import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
+import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
+import {AlertsService} from 'services/alerts.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {
+  ParamChange,
+  ParamChangeBackendDict,
+} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
 
-export type ExplorationPropertyValues = (
-  null |
-  number |
-  string |
-  string[] |
-  boolean |
-  ParamChange |
-  ParamChange[] |
-  ParamSpecs |
-  ParamChangeBackendDict |
-  ParamChangeBackendDict[]
-);
+export type ExplorationPropertyValues =
+  | null
+  | number
+  | string
+  | string[]
+  | boolean
+  | ParamChange
+  | ParamChange[]
+  | ParamSpecs
+  | ParamChangeBackendDict
+  | ParamChangeBackendDict[];
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationPropertyService {
   // These properties are initialized using private methods and we need to do
@@ -61,7 +63,7 @@ export class ExplorationPropertyService {
   constructor(
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,
-    protected loggerService: LoggerService,
+    protected loggerService: LoggerService
   ) {}
 
   private BACKEND_CONVERSIONS = {
@@ -81,7 +83,8 @@ export class ExplorationPropertyService {
     }
 
     this.loggerService.info(
-      'Initializing exploration ' + this.propertyName + ': ' + value);
+      'Initializing exploration ' + this.propertyName + ': ' + value
+    );
 
     // The current value of the property (which may not have been saved to
     // the frontend yet). In general, this will be bound directly to the UI.
@@ -134,18 +137,19 @@ export class ExplorationPropertyService {
     let oldBackendValue = cloneDeep(this.savedMemento);
     const that = this;
     if (this.BACKEND_CONVERSIONS.hasOwnProperty(this.propertyName)) {
-      newBackendValue =
-        this.BACKEND_CONVERSIONS[
-          this.propertyName as keyof typeof that.BACKEND_CONVERSIONS
-        ](this.displayed as ParamChange[] & ParamChange);
-      oldBackendValue =
-        this.BACKEND_CONVERSIONS[
-          this.propertyName as keyof typeof that.BACKEND_CONVERSIONS
-        ](this.savedMemento as ParamChange[] & ParamChange);
+      newBackendValue = this.BACKEND_CONVERSIONS[
+        this.propertyName as keyof typeof that.BACKEND_CONVERSIONS
+      ](this.displayed as ParamChange[] & ParamChange);
+      oldBackendValue = this.BACKEND_CONVERSIONS[
+        this.propertyName as keyof typeof that.BACKEND_CONVERSIONS
+      ](this.savedMemento as ParamChange[] & ParamChange);
     }
 
     this.changeListService.editExplorationProperty(
-      this.propertyName, newBackendValue as string, oldBackendValue as string);
+      this.propertyName,
+      newBackendValue as string,
+      oldBackendValue as string
+    );
     this.savedMemento = cloneDeep(this.displayed);
 
     this._explorationPropertyChangedEventEmitter.emit();
@@ -161,6 +165,9 @@ export class ExplorationPropertyService {
   }
 }
 
-angular.module('oppia').factory(
-  'ExplorationPropertyService', downgradeInjectable(
-    ExplorationPropertyService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationPropertyService',
+    downgradeInjectable(ExplorationPropertyService)
+  );

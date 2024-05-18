@@ -16,7 +16,8 @@
  * @fileoverview Constant file for the INTERACTION_SPECS constant.
  */
 
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 
-angular.module('oppia').constant(
-  'INTERACTION_SPECS', InteractionSpecsConstants.INTERACTION_SPECS);
+angular
+  .module('oppia')
+  .constant('INTERACTION_SPECS', InteractionSpecsConstants.INTERACTION_SPECS);

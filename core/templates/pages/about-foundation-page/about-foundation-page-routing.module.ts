@@ -16,24 +16,19 @@
  * @fileoverview Routing module for about foundation page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { AboutFoundationPageRootComponent } from './about-foundation-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {AboutFoundationPageRootComponent} from './about-foundation-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: AboutFoundationPageRootComponent
-  }
+    component: AboutFoundationPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class AboutFoundationPageRoutingModule {}

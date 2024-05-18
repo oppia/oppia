@@ -16,10 +16,8 @@
  * @fileoverview Unit tests for EmailDashboardQueryResultsModel.
  */
 
-import { EmailDashboardQuery } from
-  'domain/email-dashboard/email-dashboard-query.model';
-import { EmailDashboardQueryResults } from
-  'domain/email-dashboard/email-dashboard-query-results.model';
+import {EmailDashboardQuery} from 'domain/email-dashboard/email-dashboard-query.model';
+import {EmailDashboardQueryResults} from 'domain/email-dashboard/email-dashboard-query-results.model';
 
 describe('email dashboard query results model', () => {
   it('should correctly convert backend dict to query results object', () => {
@@ -31,15 +29,16 @@ describe('email dashboard query results model', () => {
           status: 'processing',
           submitter_username: 'testUser',
           id: 'buQW4Qhoxpjg',
-          num_qualified_users: 0
-        }
-      ]
+          num_qualified_users: 0,
+        },
+      ],
     };
 
-    let queryResultsObject = EmailDashboardQueryResults.createFromBackendDict(
-      backendDict);
+    let queryResultsObject =
+      EmailDashboardQueryResults.createFromBackendDict(backendDict);
     let recentQueryObjects = backendDict.recent_queries.map(
-      EmailDashboardQuery.createFromQueryDict);
+      EmailDashboardQuery.createFromQueryDict
+    );
 
     expect(queryResultsObject.cursor).toEqual('test');
     expect(queryResultsObject.recentQueries).toEqual(recentQueryObjects);

@@ -37,6 +37,7 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import taskqueue_services
+from core.domain import translation_domain
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
@@ -199,7 +200,8 @@ def create_suggestion(
             suggestion_registry.SuggestionEditStateContent(
                 thread_id, target_id, target_version_at_submission, status,
                 author_id, None, change_cmd, score_category, language_code,
-                False
+                False, datetime.datetime.utcnow(),
+                datetime.datetime.utcnow()
             )
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
@@ -222,8 +224,8 @@ def create_suggestion(
                 'was submitted.')
         suggestion = suggestion_registry.SuggestionTranslateContent(
             thread_id, target_id, target_version_at_submission, status,
-            author_id, None, change_cmd, score_category, language_code, False
-        )
+            author_id, None, change_cmd, score_category, language_code, False,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow())
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = ('%s%s%s' % (
             suggestion_models.SCORE_TYPE_QUESTION,
@@ -247,7 +249,8 @@ def create_suggestion(
         suggestion = suggestion_registry.SuggestionAddQuestion(
             thread_id, target_id, target_version_at_submission, status,
             author_id, None, change_cmd, score_category,
-            add_question_language_code, False
+            add_question_language_code, False,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow()
         )
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
@@ -1101,6 +1104,50 @@ def get_reviewable_translation_suggestions_by_offset(
         translation_suggestions.append(suggestion)
 
     return translation_suggestions, next_offset
+
+
+def get_reviewable_translation_suggestion_target_ids(
+    user_id: str,
+    language_code: Optional[str] = None
+) -> List[str]:
+    """Returns a list of translation suggestions matching the
+    passed opportunity IDs which the user can review.
+
+    Args:
+        user_id: str. The ID of the user.
+        language_code: str|None. ISO 639-1 language code for which to filter.
+            If it is None, all available languages will be returned.
+
+    Returns:
+        list(str). A list of translation suggestion target ids
+        which the supplied user is permitted to review.
+    """
+    contribution_rights = user_services.get_user_contribution_rights(
+        user_id
+    )
+    allowed_language_codes_for_review = (
+        contribution_rights.can_review_translation_for_language_codes
+    )
+
+    filtering_by_language_code = language_code is not None
+    language_codes = (
+        allowed_language_codes_for_review if not filtering_by_language_code
+        else [language_code]
+        if language_code in allowed_language_codes_for_review
+        else []
+    )
+
+    user_can_review_translations = len(language_codes) != 0
+    if not user_can_review_translations:
+        return []
+
+    return (
+        suggestion_models.GeneralSuggestionModel
+        .get_in_review_translation_suggestion_target_ids(
+            user_id,
+            language_codes
+        )
+    )
 
 
 def get_reviewable_translation_suggestions_for_single_exp(
@@ -3967,22 +4014,34 @@ def _generate_translation_contributor_certificate_data(
     words_count = 0
     for model in suggestions:
         suggestion = get_suggestion_from_model(model)
-
-        # Retrieve the html content that is emphasized on the
-        # Contributor Dashboard pages. This content is what stands
-        # out for each suggestion when a user views a list of
-        # suggestions.
-        get_html_representing_suggestion = (
-            SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
-                suggestion.suggestion_type]
+        suggestion_change = suggestion.change_cmd
+        data_is_list = (
+            translation_domain.TranslatableContentFormat
+            .is_data_format_list(suggestion_change.data_format)
         )
-        plain_text = _get_plain_text_from_html_content_string(
-            get_html_representing_suggestion(suggestion))
+        if (
+                suggestion_change.cmd == 'add_written_translation' and
+                data_is_list
+        ):
+            words_count += sum(
+                len(item.split()) for item in suggestion_change.translation_html
+            )
+        else:
+            # Retrieve the html content that is emphasized on the
+            # Contributor Dashboard pages. This content is what stands
+            # out for each suggestion when a user views a list of
+            # suggestions.
+            get_html_representing_suggestion = (
+                SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
+                    suggestion.suggestion_type]
+            )
+            plain_text = _get_plain_text_from_html_content_string(
+                get_html_representing_suggestion(suggestion))
 
-        words = plain_text.split(' ')
-        words_without_empty_strings = [
-            word for word in words if word != '']
-        words_count += len(words_without_empty_strings)
+            words = plain_text.split(' ')
+            words_without_empty_strings = [
+                word for word in words if word != '']
+            words_count += len(words_without_empty_strings)
     # Go to the below link for more information about how we count hours
     # contributed.# Goto the below link for more information.
     # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing

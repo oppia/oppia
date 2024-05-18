@@ -16,51 +16,56 @@
  * @fileoverview Unit test for the Translation tab active mode service.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
+import {TestBed} from '@angular/core/testing';
+import {TranslationTabActiveModeService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
 
 describe('Translation tab active mode service', () => {
   let translationTabActiveModeService: TranslationTabActiveModeService;
 
-  beforeEach(()=> {
+  beforeEach(() => {
     translationTabActiveModeService = TestBed.get(
-      TranslationTabActiveModeService);
+      TranslationTabActiveModeService
+    );
   });
 
   it('should correctly activate translation mode', () => {
     expect(
-      translationTabActiveModeService.isTranslationModeActive()).toBeFalsy();
+      translationTabActiveModeService.isTranslationModeActive()
+    ).toBeFalsy();
     translationTabActiveModeService.activateTranslationMode();
     expect(
-      translationTabActiveModeService.isTranslationModeActive()).toBeTruthy();
+      translationTabActiveModeService.isTranslationModeActive()
+    ).toBeTruthy();
   });
 
   it('should correctly activate voiceover mode', () => {
-    expect(
-      translationTabActiveModeService.isVoiceoverModeActive()).toBeFalsy();
+    expect(translationTabActiveModeService.isVoiceoverModeActive()).toBeFalsy();
     translationTabActiveModeService.activateVoiceoverMode();
     expect(
-      translationTabActiveModeService.isVoiceoverModeActive()).toBeTruthy();
+      translationTabActiveModeService.isVoiceoverModeActive()
+    ).toBeTruthy();
   });
 
   it('should correctly report the active mode', () => {
+    expect(translationTabActiveModeService.isVoiceoverModeActive()).toBeFalsy();
     expect(
-      translationTabActiveModeService.isVoiceoverModeActive()).toBeFalsy();
-    expect(
-      translationTabActiveModeService.isTranslationModeActive()).toBeFalsy();
+      translationTabActiveModeService.isTranslationModeActive()
+    ).toBeFalsy();
 
     translationTabActiveModeService.activateVoiceoverMode();
 
     expect(
-      translationTabActiveModeService.isVoiceoverModeActive()).toBeTruthy();
+      translationTabActiveModeService.isVoiceoverModeActive()
+    ).toBeTruthy();
     expect(
-      translationTabActiveModeService.isTranslationModeActive()).toBeFalsy();
+      translationTabActiveModeService.isTranslationModeActive()
+    ).toBeFalsy();
 
     translationTabActiveModeService.activateTranslationMode();
 
+    expect(translationTabActiveModeService.isVoiceoverModeActive()).toBeFalsy();
     expect(
-      translationTabActiveModeService.isVoiceoverModeActive()).toBeFalsy();
-    expect(
-      translationTabActiveModeService.isTranslationModeActive()).toBeTruthy();
+      translationTabActiveModeService.isTranslationModeActive()
+    ).toBeTruthy();
   });
 });

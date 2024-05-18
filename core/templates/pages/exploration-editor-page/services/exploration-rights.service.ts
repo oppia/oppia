@@ -17,18 +17,17 @@
  * about the rights for this exploration.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { ExplorationDataService } from
-  'pages/exploration-editor-page/services/exploration-data.service';
-import { AlertsService } from 'services/alerts.service';
-import { ExplorationRightsBackendApiService } from './exploration-rights-backend-api.service';
-import { ExplorationRightsBackendData } from './exploration-rights-backend-api.service';
-import { HttpErrorResponse } from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
+import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
+import {AlertsService} from 'services/alerts.service';
+import {ExplorationRightsBackendApiService} from './exploration-rights-backend-api.service';
+import {ExplorationRightsBackendData} from './exploration-rights-backend-api.service';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationRightsService {
   // These properties are initialized using init method and we need to do
@@ -46,14 +45,19 @@ export class ExplorationRightsService {
   constructor(
     private alertsService: AlertsService,
     private explorationDataService: ExplorationDataService,
-    private explorationRightsBackendApiService:
-      ExplorationRightsBackendApiService
+    private explorationRightsBackendApiService: ExplorationRightsBackendApiService
   ) {}
 
   init(
-      ownerNames: string[], editorNames: string[], voiceArtistNames: string[],
-      viewerNames: string[], status: string, clonedFrom: string,
-      isCommunityOwned: boolean, viewableIfPrivate: boolean): void {
+    ownerNames: string[],
+    editorNames: string[],
+    voiceArtistNames: string[],
+    viewerNames: string[],
+    status: string,
+    clonedFrom: string,
+    isCommunityOwned: boolean,
+    viewableIfPrivate: boolean
+  ): void {
     this.ownerNames = ownerNames;
     this.editorNames = editorNames;
     this.voiceArtistNames = voiceArtistNames;
@@ -95,71 +99,106 @@ export class ExplorationRightsService {
     }
     return this.explorationRightsBackendApiService
       .makeCommunityOwnedPutData(
-        this.explorationDataService.explorationId, version, true)
+        this.explorationDataService.explorationId,
+        version,
+        true
+      )
       .then((response: ExplorationRightsBackendData) => {
         this.alertsService.clearWarnings();
         this.init(
-          response.rights.owner_names, response.rights.editor_names,
-          response.rights.voice_artist_names, response.rights.viewer_names,
-          response.rights.status, response.rights.cloned_from,
-          response.rights.community_owned, response.rights.viewable_if_private);
+          response.rights.owner_names,
+          response.rights.editor_names,
+          response.rights.voice_artist_names,
+          response.rights.viewer_names,
+          response.rights.status,
+          response.rights.cloned_from,
+          response.rights.community_owned,
+          response.rights.viewable_if_private
+        );
       });
   }
 
   saveRoleChanges(
-      newMemberUsername: string, newMemberRole: string): Promise<void> {
+    newMemberUsername: string,
+    newMemberRole: string
+  ): Promise<void> {
     const version = this.explorationDataService.data.version;
     if (version === undefined) {
       throw new Error('Exploration version is undefined');
     }
-    return this.explorationRightsBackendApiService.saveRoleChangesPutData(
-      this.explorationDataService.explorationId, version, newMemberRole,
-      newMemberUsername)
+    return this.explorationRightsBackendApiService
+      .saveRoleChangesPutData(
+        this.explorationDataService.explorationId,
+        version,
+        newMemberRole,
+        newMemberUsername
+      )
+      .then(
+        (response: ExplorationRightsBackendData) => {
+          this.alertsService.clearWarnings();
+          this.init(
+            response.rights.owner_names,
+            response.rights.editor_names,
+            response.rights.voice_artist_names,
+            response.rights.viewer_names,
+            response.rights.status,
+            response.rights.cloned_from,
+            response.rights.community_owned,
+            response.rights.viewable_if_private
+          );
+        },
+        response => {
+          this.alertsService.addWarning(response.error.error);
+        }
+      );
+  }
+
+  setViewability(viewableIfPrivate: boolean): Promise<void> {
+    const version = this.explorationDataService.data.version;
+    if (version === undefined) {
+      throw new Error('Exploration version is undefined');
+    }
+    return this.explorationRightsBackendApiService
+      .setViewabilityPutData(
+        this.explorationDataService.explorationId,
+        version,
+        viewableIfPrivate
+      )
       .then((response: ExplorationRightsBackendData) => {
         this.alertsService.clearWarnings();
         this.init(
-          response.rights.owner_names, response.rights.editor_names,
-          response.rights.voice_artist_names, response.rights.viewer_names,
-          response.rights.status, response.rights.cloned_from,
-          response.rights.community_owned, response.rights.viewable_if_private);
-      }, (response) => {
-        this.alertsService.addWarning(response.error.error);
-      });
-  }
-
-  setViewability(
-      viewableIfPrivate: boolean): Promise<void> {
-    const version = this.explorationDataService.data.version;
-    if (version === undefined) {
-      throw new Error('Exploration version is undefined');
-    }
-    return this.explorationRightsBackendApiService.setViewabilityPutData(
-      this.explorationDataService.explorationId, version, viewableIfPrivate
-    ).then(
-      (response: ExplorationRightsBackendData) => {
-        this.alertsService.clearWarnings();
-        this.init(
-          response.rights.owner_names, response.rights.editor_names,
-          response.rights.voice_artist_names, response.rights.viewer_names,
-          response.rights.status, response.rights.cloned_from,
-          response.rights.community_owned, response.rights.viewable_if_private);
+          response.rights.owner_names,
+          response.rights.editor_names,
+          response.rights.voice_artist_names,
+          response.rights.viewer_names,
+          response.rights.status,
+          response.rights.cloned_from,
+          response.rights.community_owned,
+          response.rights.viewable_if_private
+        );
       });
   }
 
   publish(): Promise<void> {
-    return this.explorationRightsBackendApiService.publishPutData(
-      this.explorationDataService.explorationId, true).then(
-      (response: ExplorationRightsBackendData) => {
+    return this.explorationRightsBackendApiService
+      .publishPutData(this.explorationDataService.explorationId, true)
+      .then((response: ExplorationRightsBackendData) => {
         this.alertsService.clearWarnings();
         this.init(
-          response.rights.owner_names, response.rights.editor_names,
-          response.rights.voice_artist_names, response.rights.viewer_names,
-          response.rights.status, response.rights.cloned_from,
-          response.rights.community_owned, response.rights.viewable_if_private);
-      }).catch(
-      (response: HttpErrorResponse) => {
+          response.rights.owner_names,
+          response.rights.editor_names,
+          response.rights.voice_artist_names,
+          response.rights.viewer_names,
+          response.rights.status,
+          response.rights.cloned_from,
+          response.rights.community_owned,
+          response.rights.viewable_if_private
+        );
+      })
+      .catch((response: HttpErrorResponse) => {
         this.alertsService.addWarning(
-          'Failed to publish an exploration: ' + response.error.error);
+          'Failed to publish an exploration: ' + response.error.error
+        );
         throw response;
       });
   }
@@ -169,30 +208,66 @@ export class ExplorationRightsService {
     return this.explorationRightsBackendApiService
       .saveModeratorChangeToBackendAsyncPutData(
         this.explorationDataService.explorationId,
-        version as number, emailBody).then(
-        (response: ExplorationRightsBackendData) => {
-          this.alertsService.clearWarnings();
-          this.init(
-            response.rights.owner_names, response.rights.editor_names,
-            response.rights.voice_artist_names, response.rights.viewer_names,
-            response.rights.status, response.rights.cloned_from,
-            response.rights.community_owned, response.rights.viewable_if_private
-          );
-        }).catch((response) => {
+        version as number,
+        emailBody
+      )
+      .then((response: ExplorationRightsBackendData) => {
+        this.alertsService.clearWarnings();
+        this.init(
+          response.rights.owner_names,
+          response.rights.editor_names,
+          response.rights.voice_artist_names,
+          response.rights.viewer_names,
+          response.rights.status,
+          response.rights.cloned_from,
+          response.rights.community_owned,
+          response.rights.viewable_if_private
+        );
+      })
+      .catch(response => {
         this.alertsService.addWarning('Failed to send email: ' + response);
       });
   }
 
   removeRoleAsync(memberUsername: string): Promise<void> {
-    return this.explorationRightsBackendApiService.removeRoleAsyncDeleteData(
-      this.explorationDataService.explorationId, memberUsername).then(
-      (response: ExplorationRightsBackendData) => {
+    const categories = ['ownerNames', 'editorNames', 'viewerNames'] as const;
+    let initialUsernamesByCategory: string[];
+    type Category = (typeof categories)[number];
+    let roleOfRemovedUser: Category;
+    categories.forEach(category => {
+      if (this[category].includes(memberUsername)) {
+        initialUsernamesByCategory = [...this[category]];
+        this[category] = this[category].filter(name => name !== memberUsername);
+        roleOfRemovedUser = category;
+      }
+    });
+    return this.explorationRightsBackendApiService
+      .removeRoleAsyncDeleteData(
+        this.explorationDataService.explorationId,
+        memberUsername
+      )
+      .then((response: ExplorationRightsBackendData) => {
         this.alertsService.clearWarnings();
         this.init(
-          response.rights.owner_names, response.rights.editor_names,
-          response.rights.voice_artist_names, response.rights.viewer_names,
-          response.rights.status, response.rights.cloned_from,
-          response.rights.community_owned, response.rights.viewable_if_private);
+          response.rights.owner_names,
+          response.rights.editor_names,
+          response.rights.voice_artist_names,
+          response.rights.viewer_names,
+          response.rights.status,
+          response.rights.cloned_from,
+          response.rights.community_owned,
+          response.rights.viewable_if_private
+        );
+        this.alertsService.addSuccessMessage(
+          'Successfully removed user ' + memberUsername
+        );
+      })
+      .catch(error => {
+        this[roleOfRemovedUser] = initialUsernamesByCategory;
+        this.alertsService.addWarning(
+          'Failed to remove the user role. Please try again.'
+        );
+        throw error;
       });
   }
 
@@ -200,32 +275,42 @@ export class ExplorationRightsService {
     return this.explorationRightsBackendApiService
       .assignVoiceArtistRoleAsyncPostData(
         this.explorationDataService.explorationId,
-        newVoiceArtistUsername).then((response) => {
-        this.alertsService.clearWarnings();
-        this.voiceArtistNames.push(newVoiceArtistUsername);
-      }, (response) => {
-        this.alertsService.addWarning(
-          response.error.error);
-      });
+        newVoiceArtistUsername
+      )
+      .then(
+        response => {
+          this.alertsService.clearWarnings();
+          this.voiceArtistNames.push(newVoiceArtistUsername);
+        },
+        response => {
+          this.alertsService.addWarning(response.error.error);
+        }
+      );
   }
 
   removeVoiceArtistRoleAsync(voiceArtistUsername: string): Promise<void> {
     return this.explorationRightsBackendApiService
       .removeVoiceArtistRoleAsyncDeleteData(
-        this.explorationDataService.explorationId, voiceArtistUsername).then(
-        (response) => {
-          this.alertsService.clearWarnings();
-          this.voiceArtistNames.forEach((username, index) => {
-            if (username === voiceArtistUsername) {
-              this.voiceArtistNames.splice(index, 1);
-            }
-          });
+        this.explorationDataService.explorationId,
+        voiceArtistUsername
+      )
+      .then(response => {
+        this.alertsService.clearWarnings();
+        this.voiceArtistNames.forEach((username, index) => {
+          if (username === voiceArtistUsername) {
+            this.voiceArtistNames.splice(index, 1);
+          }
         });
+      });
   }
 
   checkUserAlreadyHasRoles(username: string): boolean {
-    return [...this.ownerNames, ...this.editorNames, ...this.viewerNames,
-      ...this.voiceArtistNames].includes(username);
+    return [
+      ...this.ownerNames,
+      ...this.editorNames,
+      ...this.viewerNames,
+      ...this.voiceArtistNames,
+    ].includes(username);
   }
 
   getOldRole(username: string): string {
@@ -240,5 +325,9 @@ export class ExplorationRightsService {
     }
   }
 }
-angular.module('oppia').factory(
-  'ExplorationRightsService', downgradeInjectable(ExplorationRightsService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationRightsService',
+    downgradeInjectable(ExplorationRightsService)
+  );

@@ -16,16 +16,22 @@
  * @fileoverview Unit tests for the graph-viz.
  */
 
-import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { GraphVizComponent } from './graph-viz.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { GraphDetailService } from './graph-detail.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { EventEmitter } from '@angular/core';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {GraphVizComponent} from './graph-viz.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {GraphDetailService} from './graph-detail.service';
+import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {EventEmitter} from '@angular/core';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 describe('GraphVizComponent', () => {
   let component: GraphVizComponent;
@@ -41,11 +47,8 @@ describe('GraphVizComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [GraphVizComponent, MockTranslatePipe],
-      providers: [
-        GraphDetailService,
-        DeviceInfoService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: [GraphDetailService, DeviceInfoService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -59,7 +62,8 @@ describe('GraphVizComponent', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
+      true
+    );
 
     // Graph visulization
     //      1
@@ -84,23 +88,23 @@ describe('GraphVizComponent', () => {
         {
           x: 150,
           y: 50,
-          label: ''
+          label: '',
         },
         {
           x: 200,
           y: 50,
-          label: ''
+          label: '',
         },
         {
           x: 150,
           y: 100,
-          label: ''
+          label: '',
         },
         {
           x: 196.60939025878906,
           y: 95.05902099609375,
-          label: ''
-        }
+          label: '',
+        },
       ],
       isDirected: false,
       isWeighted: true,
@@ -109,14 +113,14 @@ describe('GraphVizComponent', () => {
         {
           src: 0,
           weight: 1,
-          dst: 1
+          dst: 1,
         },
         {
           src: 1,
           weight: 1,
-          dst: 2
-        }
-      ]
+          dst: 2,
+        },
+      ],
     };
 
     component.canAddVertex = true;
@@ -145,18 +149,22 @@ describe('GraphVizComponent', () => {
     expect(component.isMobile).toBe(false);
   });
 
-  it('should set isMobile to true on initailisation if device' +
-  ' used by the user is a mobile', () => {
-    spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
+  it(
+    'should set isMobile to true on initailisation if device' +
+      ' used by the user is a mobile',
+    () => {
+      spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    expect(component.isMobile).toBe(true);
-  });
+      expect(component.isMobile).toBe(true);
+    }
+  );
 
   it('should reset current mode when user submits answer', () => {
     spyOnProperty(playerPositionService, 'onNewCardAvailable').and.returnValue(
-      mockNewCardAvailableEmitter);
+      mockNewCardAvailableEmitter
+    );
     // Function ngOnInit is run to add the componentSubscriptions.
     component.ngOnInit();
 
@@ -174,14 +182,14 @@ describe('GraphVizComponent', () => {
 
   it('should set graph properties after the view is initialized', () => {
     spyOn(Element.prototype, 'querySelectorAll').and.callFake(
-      jasmine.createSpy('querySelectorAll').and
-        .returnValue([{
+      jasmine.createSpy('querySelectorAll').and.returnValue([
+        {
           width: {
             baseVal: {
-              value: 527
-            }
+              value: 527,
+            },
           },
-          getAttribute: (attr) => {
+          getAttribute: attr => {
             if (attr === 'height') {
               return 250;
             }
@@ -194,23 +202,27 @@ describe('GraphVizComponent', () => {
               y: -14,
             };
           },
-        }]));
+        },
+      ])
+    );
     spyOn(component, 'init').and.stub();
 
     component.ngAfterViewInit();
 
-    expect(component.graphOptions).toEqual([{
-      text: 'Labeled',
-      option: 'isLabeled'
-    },
-    {
-      text: 'Directed',
-      option: 'isDirected'
-    },
-    {
-      text: 'Weighted',
-      option: 'isWeighted'
-    }]);
+    expect(component.graphOptions).toEqual([
+      {
+        text: 'Labeled',
+        option: 'isLabeled',
+      },
+      {
+        text: 'Directed',
+        option: 'isDirected',
+      },
+      {
+        text: 'Weighted',
+        option: 'isWeighted',
+      },
+    ]);
     expect(component.helpText).toBeNull();
     expect(component.svgViewBox).toBe('0 0 527 250');
     // Function init() is only called when the interaction is active.
@@ -220,70 +232,75 @@ describe('GraphVizComponent', () => {
     expect(component.init).toHaveBeenCalled();
   });
 
-  it('should not intialise buttons and help text if interaction is not active'
-    , () => {
-      spyOn(Element.prototype, 'querySelectorAll').and.callFake(
-        jasmine.createSpy('querySelectorAll').and
-          .returnValue([{
-            width: {
-              baseVal: {
-                value: 120
-              }
+  it('should not intialise buttons and help text if interaction is not active', () => {
+    spyOn(Element.prototype, 'querySelectorAll').and.callFake(
+      jasmine.createSpy('querySelectorAll').and.returnValue([
+        {
+          width: {
+            baseVal: {
+              value: 120,
             },
-            getAttribute: (attr) => {
-              if (attr === 'height') {
-                return 250;
-              }
-            },
-            getBBox: () => {
-              return {
-                height: 120,
-                width: 527,
-                x: 144,
-                y: -14,
-              };
-            },
-          }]));
-      spyOn(component, 'init').and.stub();
-      component.interactionIsActive = false;
+          },
+          getAttribute: attr => {
+            if (attr === 'height') {
+              return 250;
+            }
+          },
+          getBBox: () => {
+            return {
+              height: 120,
+              width: 527,
+              x: 144,
+              y: -14,
+            };
+          },
+        },
+      ])
+    );
+    spyOn(component, 'init').and.stub();
+    component.interactionIsActive = false;
 
-      component.ngAfterViewInit();
+    component.ngAfterViewInit();
 
-      // Function init() is only called when the interaction is active.
-      // Therefore, we verify that the value of interactionIsActive is false
-      // before verifying that the function init() is not called.
-      expect(component.interactionIsActive).toBe(false);
-      expect(component.init).not.toHaveBeenCalled();
-    });
-
-  it('should initialise buttons when interaction is initialised and is' +
-  ' active', () => {
-    expect(component.buttons).toEqual([]);
-
-    component.initButtons();
-
-    expect(component.buttons).toEqual([{
-      text: '\uF0B2',
-      description: 'I18N_INTERACTIONS_GRAPH_MOVE',
-      mode: component._MODES.MOVE
-    },
-    {
-      text: '\uF0C1',
-      description: 'I18N_INTERACTIONS_GRAPH_ADD_EDGE',
-      mode: component._MODES.ADD_EDGE
-    },
-    {
-      text: '\uF067',
-      description: 'I18N_INTERACTIONS_GRAPH_ADD_NODE',
-      mode: component._MODES.ADD_VERTEX
-    },
-    {
-      text: '\uF068',
-      description: 'I18N_INTERACTIONS_GRAPH_DELETE',
-      mode: component._MODES.DELETE
-    }
-    ]);
+    // Function init() is only called when the interaction is active.
+    // Therefore, we verify that the value of interactionIsActive is false
+    // before verifying that the function init() is not called.
+    expect(component.interactionIsActive).toBe(false);
+    expect(component.init).not.toHaveBeenCalled();
   });
+
+  it(
+    'should initialise buttons when interaction is initialised and is' +
+      ' active',
+    () => {
+      expect(component.buttons).toEqual([]);
+
+      component.initButtons();
+
+      expect(component.buttons).toEqual([
+        {
+          text: '\uF0B2',
+          description: 'I18N_INTERACTIONS_GRAPH_MOVE',
+          mode: component._MODES.MOVE,
+        },
+        {
+          text: '\uF0C1',
+          description: 'I18N_INTERACTIONS_GRAPH_ADD_EDGE',
+          mode: component._MODES.ADD_EDGE,
+        },
+        {
+          text: '\uF067',
+          description: 'I18N_INTERACTIONS_GRAPH_ADD_NODE',
+          mode: component._MODES.ADD_VERTEX,
+        },
+        {
+          text: '\uF068',
+          description: 'I18N_INTERACTIONS_GRAPH_DELETE',
+          mode: component._MODES.DELETE,
+        },
+      ]);
+    }
+  );
 
   it('should not initialise buttons when all flags are false', () => {
     component.canMoveVertex = false;
@@ -301,21 +318,23 @@ describe('GraphVizComponent', () => {
 
   // Please note that the conditions where both canDeleteVertex
   // and canDeleteEdge are either true or false is tested above.
-  it('should initialise delete button when canDeleteVertex' +
-  ' flag is true', () => {
-    component.canDeleteVertex = true;
-    component.canDeleteEdge = false;
+  it(
+    'should initialise delete button when canDeleteVertex' + ' flag is true',
+    () => {
+      component.canDeleteVertex = true;
+      component.canDeleteEdge = false;
 
-    expect(component.buttons).toEqual([]);
+      expect(component.buttons).toEqual([]);
 
-    component.initButtons();
+      component.initButtons();
 
-    expect(component.buttons).toContain({
-      text: '\uF068',
-      description: 'I18N_INTERACTIONS_GRAPH_DELETE',
-      mode: component._MODES.DELETE
-    });
-  });
+      expect(component.buttons).toContain({
+        text: '\uF068',
+        description: 'I18N_INTERACTIONS_GRAPH_DELETE',
+        mode: component._MODES.DELETE,
+      });
+    }
+  );
 
   it('should initialise delete button when canDeleteEdge flag is true', () => {
     component.canDeleteVertex = false;
@@ -328,7 +347,7 @@ describe('GraphVizComponent', () => {
     expect(component.buttons).toContain({
       text: '\uF068',
       description: 'I18N_INTERACTIONS_GRAPH_DELETE',
-      mode: component._MODES.DELETE
+      mode: component._MODES.DELETE,
     });
   });
 
@@ -352,69 +371,77 @@ describe('GraphVizComponent', () => {
     expect(component.buttons[0]).toEqual({
       text: '\uF0C1',
       description: 'I18N_INTERACTIONS_GRAPH_ADD_EDGE',
-      mode: component._MODES.ADD_EDGE
+      mode: component._MODES.ADD_EDGE,
     });
     expect(component.state.currentMode).toBe(component._MODES.ADD_EDGE);
     expect(component.isMobile).toBe(true);
-    expect(component.helpText)
-      .toBe('I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT');
+    expect(component.helpText).toBe(
+      'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT'
+    );
   });
 
-  it('should set help text when user in mobile and user can move' +
-  ' vertices in the graph', () => {
-    spyOn(component, 'initButtons').and.callThrough();
-    component.canMoveVertex = true;
-    component.canAddEdge = false;
-    component.canAddVertex = false;
-    component.canDeleteVertex = false;
-    component.canDeleteEdge = false;
-    component.isMobile = true;
-    component.helpText = null;
-    component.state.currentMode = component._MODES.ADD_EDGE;
+  it(
+    'should set help text when user in mobile and user can move' +
+      ' vertices in the graph',
+    () => {
+      spyOn(component, 'initButtons').and.callThrough();
+      component.canMoveVertex = true;
+      component.canAddEdge = false;
+      component.canAddVertex = false;
+      component.canDeleteVertex = false;
+      component.canDeleteEdge = false;
+      component.isMobile = true;
+      component.helpText = null;
+      component.state.currentMode = component._MODES.ADD_EDGE;
 
-    expect(component.buttons).toEqual([]);
+      expect(component.buttons).toEqual([]);
 
-    component.init();
+      component.init();
 
-    expect(component.initButtons).toHaveBeenCalled();
-    expect(component.buttons[0]).toEqual({
-      text: '\uF0B2',
-      description: 'I18N_INTERACTIONS_GRAPH_MOVE',
-      mode: component._MODES.MOVE
-    });
-    expect(component.state.currentMode).toBe(component._MODES.MOVE);
-    // The help text must be displayed only if the user is using a mobile.
-    // Therefore we check that the value of isMobile is true.
-    expect(component.isMobile).toBe(true);
-    expect(component.helpText)
-      .toBe('I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT');
-  });
+      expect(component.initButtons).toHaveBeenCalled();
+      expect(component.buttons[0]).toEqual({
+        text: '\uF0B2',
+        description: 'I18N_INTERACTIONS_GRAPH_MOVE',
+        mode: component._MODES.MOVE,
+      });
+      expect(component.state.currentMode).toBe(component._MODES.MOVE);
+      // The help text must be displayed only if the user is using a mobile.
+      // Therefore we check that the value of isMobile is true.
+      expect(component.isMobile).toBe(true);
+      expect(component.helpText).toBe(
+        'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT'
+      );
+    }
+  );
 
-  it('should not set help text when user is in mobile and cannot move' +
-  ' vertices and add edges', () => {
-    spyOn(component, 'initButtons').and.callThrough();
-    component.canAddEdge = false;
-    component.canMoveVertex = false;
-    component.isMobile = true;
-    component.helpText = null;
+  it(
+    'should not set help text when user is in mobile and cannot move' +
+      ' vertices and add edges',
+    () => {
+      spyOn(component, 'initButtons').and.callThrough();
+      component.canAddEdge = false;
+      component.canMoveVertex = false;
+      component.isMobile = true;
+      component.helpText = null;
 
-    expect(component.buttons).toEqual([]);
-    expect(component.state.currentMode).toBe(component._MODES.MOVE);
+      expect(component.buttons).toEqual([]);
+      expect(component.state.currentMode).toBe(component._MODES.MOVE);
 
-    component.init();
+      component.init();
 
-    expect(component.buttons[0]).toEqual({
-      text: '\uF067',
-      description: 'I18N_INTERACTIONS_GRAPH_ADD_NODE',
-      mode: component._MODES.ADD_VERTEX
-    });
-    expect(component.state.currentMode).toBe(component._MODES.ADD_VERTEX);
-    expect(component.initButtons).toHaveBeenCalled();
-    // The help text must be displayed only if the user is using a mobile.
-    // Therefore we check that the value of isMobile is true.
-    expect(component.isMobile).toBe(true);
-    expect(component.helpText).toBe('');
-  });
+      expect(component.buttons[0]).toEqual({
+        text: '\uF067',
+        description: 'I18N_INTERACTIONS_GRAPH_ADD_NODE',
+        mode: component._MODES.ADD_VERTEX,
+      });
+      expect(component.state.currentMode).toBe(component._MODES.ADD_VERTEX);
+      expect(component.initButtons).toHaveBeenCalled();
+      // The help text must be displayed only if the user is using a mobile.
+      // Therefore we check that the value of isMobile is true.
+      expect(component.isMobile).toBe(true);
+      expect(component.helpText).toBe('');
+    }
+  );
 
   it('should not set help text when user is not in mobile', () => {
     spyOn(component, 'initButtons').and.callThrough();
@@ -437,17 +464,20 @@ describe('GraphVizComponent', () => {
     expect(component.getEdgeColor(0)).toBe(component.DEFAULT_COLOR);
   });
 
-  it('should return delete edge colour when mouse hovers over edge' +
-  'to delete it', () => {
-    component.interactionIsActive = true;
-    component.state.hoveredEdge = 0;
-    component.state.currentMode = component._MODES.DELETE;
+  it(
+    'should return delete edge colour when mouse hovers over edge' +
+      'to delete it',
+    () => {
+      component.interactionIsActive = true;
+      component.state.hoveredEdge = 0;
+      component.state.currentMode = component._MODES.DELETE;
 
-    // Pre-check.
-    expect(component.canDeleteEdge).toBe(true);
+      // Pre-check.
+      expect(component.canDeleteEdge).toBe(true);
 
-    expect(component.getEdgeColor(0)).toBe(component.DELETE_COLOR);
-  });
+      expect(component.getEdgeColor(0)).toBe(component.DELETE_COLOR);
+    }
+  );
 
   it('should return hover edge colour when mouse hovers over edge', () => {
     component.interactionIsActive = true;
@@ -474,17 +504,20 @@ describe('GraphVizComponent', () => {
     expect(component.getEdgeColor(0)).toBe(component.SELECT_COLOR);
   });
 
-  it('should return default edge colour when edge is not selected' +
-  ' or hovered over', () => {
-    component.interactionIsActive = true;
-    component.state.selectedEdge = 0;
+  it(
+    'should return default edge colour when edge is not selected' +
+      ' or hovered over',
+    () => {
+      component.interactionIsActive = true;
+      component.state.selectedEdge = 0;
 
-    // Pre-check.
-    expect(component.state.hoveredEdge).toBeNull();
-    expect(component.interactionIsActive).toBe(true);
+      // Pre-check.
+      expect(component.state.hoveredEdge).toBeNull();
+      expect(component.interactionIsActive).toBe(true);
 
-    expect(component.getEdgeColor(1)).toBe(component.DEFAULT_COLOR);
-  });
+      expect(component.getEdgeColor(1)).toBe(component.DEFAULT_COLOR);
+    }
+  );
 
   // Tests for getVertexColor function.
   it('should return default vertex colour if interaction is not active', () => {
@@ -493,18 +526,21 @@ describe('GraphVizComponent', () => {
     expect(component.getVertexColor(0)).toBe(component.DEFAULT_COLOR);
   });
 
-  it('should return delete vertex colour when mouse hovers over vertex' +
-  'to delete it', () => {
-    component.interactionIsActive = true;
-    component.state.hoveredVertex = 0;
-    component.state.currentMode = component._MODES.DELETE;
+  it(
+    'should return delete vertex colour when mouse hovers over vertex' +
+      'to delete it',
+    () => {
+      component.interactionIsActive = true;
+      component.state.hoveredVertex = 0;
+      component.state.currentMode = component._MODES.DELETE;
 
-    // Pre-check.
-    expect(component.canDeleteEdge).toBe(true);
-    expect(component.interactionIsActive).toBe(true);
+      // Pre-check.
+      expect(component.canDeleteEdge).toBe(true);
+      expect(component.interactionIsActive).toBe(true);
 
-    expect(component.getVertexColor(0)).toBe(component.DELETE_COLOR);
-  });
+      expect(component.getVertexColor(0)).toBe(component.DELETE_COLOR);
+    }
+  );
 
   it('should return hover vertex colour when mouse drags a vertex', () => {
     component.interactionIsActive = true;
@@ -543,136 +579,149 @@ describe('GraphVizComponent', () => {
     expect(component.getVertexColor(0)).toBe(component.SELECT_COLOR);
   });
 
-  it('should return default vertex colour when vertex is not selected' +
-  ' or hovered over', () => {
-    component.interactionIsActive = true;
-    component.state.selectedVertex = 0;
+  it(
+    'should return default vertex colour when vertex is not selected' +
+      ' or hovered over',
+    () => {
+      component.interactionIsActive = true;
+      component.state.selectedVertex = 0;
 
-    // Pre-check.
-    expect(component.state.hoveredVertex).toBeNull();
-    expect(component.interactionIsActive).toBe(true);
+      // Pre-check.
+      expect(component.state.hoveredVertex).toBeNull();
+      expect(component.interactionIsActive).toBe(true);
 
-    expect(component.getVertexColor(1)).toBe(component.DEFAULT_COLOR);
-  });
+      expect(component.getVertexColor(1)).toBe(component.DEFAULT_COLOR);
+    }
+  );
 
-  it('should return arrow points when directed option is selected in' +
-  'the graph interaction', () => {
-    spyOn(graphDetailService, 'getDirectedEdgeArrowPoints').and.callThrough();
-    // Pre-check;
-    expect(component.graph).toEqual({
-      vertices: [
-        {
-          x: 150,
-          y: 50,
-          label: ''
-        },
-        {
-          x: 200,
-          y: 50,
-          label: ''
-        },
-        {
-          x: 150,
-          y: 100,
-          label: ''
-        },
-        {
-          x: 196.60939025878906,
-          y: 95.05902099609375,
-          label: ''
-        }
-      ],
-      isDirected: false,
-      isWeighted: true,
-      isLabeled: false,
-      edges: [
-        {
-          src: 0,
-          weight: 1,
-          dst: 1
-        },
-        {
-          src: 1,
-          weight: 1,
-          dst: 2
-        }
-      ]
-    });
+  it(
+    'should return arrow points when directed option is selected in' +
+      'the graph interaction',
+    () => {
+      spyOn(graphDetailService, 'getDirectedEdgeArrowPoints').and.callThrough();
+      // Pre-check;
+      expect(component.graph).toEqual({
+        vertices: [
+          {
+            x: 150,
+            y: 50,
+            label: '',
+          },
+          {
+            x: 200,
+            y: 50,
+            label: '',
+          },
+          {
+            x: 150,
+            y: 100,
+            label: '',
+          },
+          {
+            x: 196.60939025878906,
+            y: 95.05902099609375,
+            label: '',
+          },
+        ],
+        isDirected: false,
+        isWeighted: true,
+        isLabeled: false,
+        edges: [
+          {
+            src: 0,
+            weight: 1,
+            dst: 1,
+          },
+          {
+            src: 1,
+            weight: 1,
+            dst: 2,
+          },
+        ],
+      });
 
-    expect(component.getDirectedEdgeArrowPoints(0))
-      .toBe('196,50 186,45 186,55');
-    expect(graphDetailService.getDirectedEdgeArrowPoints).toHaveBeenCalledWith(
-      component.graph, 0);
-  });
+      expect(component.getDirectedEdgeArrowPoints(0)).toBe(
+        '196,50 186,45 186,55'
+      );
+      expect(
+        graphDetailService.getDirectedEdgeArrowPoints
+      ).toHaveBeenCalledWith(component.graph, 0);
+    }
+  );
 
-  it('should return edge center points when weighted option is selected in' +
-  'the graph interaction', () => {
-    spyOn(graphDetailService, 'getEdgeCentre').and.callThrough();
-    // Pre-check;
-    expect(component.graph).toEqual({
-      vertices: [
-        {
-          x: 150,
-          y: 50,
-          label: ''
-        },
-        {
-          x: 200,
-          y: 50,
-          label: ''
-        },
-        {
-          x: 150,
-          y: 100,
-          label: ''
-        },
-        {
-          x: 196.60939025878906,
-          y: 95.05902099609375,
-          label: ''
-        }
-      ],
-      isDirected: false,
-      isWeighted: true,
-      isLabeled: false,
-      edges: [
-        {
-          src: 0,
-          weight: 1,
-          dst: 1
-        },
-        {
-          src: 1,
-          weight: 1,
-          dst: 2
-        }
-      ]
-    });
+  it(
+    'should return edge center points when weighted option is selected in' +
+      'the graph interaction',
+    () => {
+      spyOn(graphDetailService, 'getEdgeCentre').and.callThrough();
+      // Pre-check;
+      expect(component.graph).toEqual({
+        vertices: [
+          {
+            x: 150,
+            y: 50,
+            label: '',
+          },
+          {
+            x: 200,
+            y: 50,
+            label: '',
+          },
+          {
+            x: 150,
+            y: 100,
+            label: '',
+          },
+          {
+            x: 196.60939025878906,
+            y: 95.05902099609375,
+            label: '',
+          },
+        ],
+        isDirected: false,
+        isWeighted: true,
+        isLabeled: false,
+        edges: [
+          {
+            src: 0,
+            weight: 1,
+            dst: 1,
+          },
+          {
+            src: 1,
+            weight: 1,
+            dst: 2,
+          },
+        ],
+      });
 
-    expect(component.getEdgeCentre(0)).toEqual({
-      x: 175,
-      y: 50
-    });
-    expect(graphDetailService.getEdgeCentre).toHaveBeenCalledWith(
-      component.graph, 0);
-  });
+      expect(component.getEdgeCentre(0)).toEqual({
+        x: 175,
+        y: 50,
+      });
+      expect(graphDetailService.getEdgeCentre).toHaveBeenCalledWith(
+        component.graph,
+        0
+      );
+    }
+  );
 
   it('should change location of vertex when dragged by mouse', () => {
     // These values are the coordinates of the mouse when the mouse event
     // was triggered.
     let dummyMouseEvent = new MouseEvent('mousemove', {
       clientX: 775,
-      clientY: 307
+      clientY: 307,
     });
     spyOn(Element.prototype, 'querySelectorAll').and.callFake(
-      jasmine.createSpy('querySelectorAll').and
-        .returnValue([{
+      jasmine.createSpy('querySelectorAll').and.returnValue([
+        {
           width: {
             baseVal: {
-              value: 120
-            }
+              value: 120,
+            },
           },
-          getAttribute: (attr) => {
+          getAttribute: attr => {
             if (attr === 'height') {
               return 250;
             }
@@ -687,24 +736,26 @@ describe('GraphVizComponent', () => {
           },
           createSVGPoint: () => {
             return {
-              matrixTransform: (matrix) => {
+              matrixTransform: matrix => {
                 return {
                   x: 775,
-                  y: 307
+                  y: 307,
                 };
               },
               x: 0,
-              y: 0
+              y: 0,
             };
           },
           getScreenCTM: () => {
             return {
               inverse: () => {
                 return;
-              }
+              },
             };
           },
-        }]));
+        },
+      ])
+    );
     spyOn(component, 'init').and.stub();
     component.state.currentlyDraggedVertex = 0;
     component.state.vertexDragStartX = 0;
@@ -717,158 +768,166 @@ describe('GraphVizComponent', () => {
 
     expect(component.state.mouseX).toBe(775);
     expect(component.state.mouseY).toBe(307);
-    expect(component.graph.vertices[component.state.currentlyDraggedVertex])
-      .toEqual({x: 775, y: 307, label: ''});
+    expect(
+      component.graph.vertices[component.state.currentlyDraggedVertex]
+    ).toEqual({x: 775, y: 307, label: ''});
   });
 
-  it('should not change position of vertex when interaction is not' +
-  ' active', () => {
-    component.state.currentlyDraggedVertex = 0;
-    component.interactionIsActive = false;
-    // These values are the coordinates of the mouse when the mouse event
-    // was triggered.
-    let dummyMouseEvent = new MouseEvent('mousemove', {
-      clientX: 775,
-      clientY: 307
-    });
-
-    component.mousemoveGraphSVG(dummyMouseEvent);
-
-    expect(component.state.mouseX).toBe(0);
-    expect(component.state.mouseY).toBe(0);
-    expect(component.graph.vertices[component.state.currentlyDraggedVertex])
-      .toEqual({
-        x: 150,
-        y: 50,
-        label: ''
+  it(
+    'should not change position of vertex when interaction is not' + ' active',
+    () => {
+      component.state.currentlyDraggedVertex = 0;
+      component.interactionIsActive = false;
+      // These values are the coordinates of the mouse when the mouse event
+      // was triggered.
+      let dummyMouseEvent = new MouseEvent('mousemove', {
+        clientX: 775,
+        clientY: 307,
       });
-  });
 
-  it('should add vertex when graph is clicked and interaction is' +
-  ' active', () => {
-    component.state.currentMode = component._MODES.ADD_VERTEX;
-    component.state.mouseX = 20;
-    component.state.mouseY = 20;
+      component.mousemoveGraphSVG(dummyMouseEvent);
 
-    expect(component.graph.vertices).toEqual([
-      {
+      expect(component.state.mouseX).toBe(0);
+      expect(component.state.mouseY).toBe(0);
+      expect(
+        component.graph.vertices[component.state.currentlyDraggedVertex]
+      ).toEqual({
         x: 150,
         y: 50,
-        label: ''
-      },
-      {
-        x: 200,
-        y: 50,
-        label: ''
-      },
-      {
-        x: 150,
-        y: 100,
-        label: ''
-      },
-      {
-        x: 196.60939025878906,
-        y: 95.05902099609375,
-        label: ''
-      }
-    ]);
+        label: '',
+      });
+    }
+  );
 
-    component.onClickGraphSVG();
+  it(
+    'should add vertex when graph is clicked and interaction is' + ' active',
+    () => {
+      component.state.currentMode = component._MODES.ADD_VERTEX;
+      component.state.mouseX = 20;
+      component.state.mouseY = 20;
 
-    // Function onClickGraphSVG() must only run if the interaction is active.
-    // Therefore the value of interactionIsActive is verified to be true before
-    // the rest of the lines are executed.
-    expect(component.interactionIsActive).toBe(true);
-    expect(component.canAddEdge).toBe(true);
-    expect(component.graph.vertices).toEqual([
-      {
-        x: 150,
-        y: 50,
-        label: ''
-      },
-      {
-        x: 200,
-        y: 50,
-        label: ''
-      },
-      {
-        x: 150,
-        y: 100,
-        label: ''
-      },
-      {
-        x: 196.60939025878906,
-        y: 95.05902099609375,
-        label: ''
-      },
-      {
-        x: 20,
-        y: 20,
-        label: ''
-      }
-    ]);
-  });
+      expect(component.graph.vertices).toEqual([
+        {
+          x: 150,
+          y: 50,
+          label: '',
+        },
+        {
+          x: 200,
+          y: 50,
+          label: '',
+        },
+        {
+          x: 150,
+          y: 100,
+          label: '',
+        },
+        {
+          x: 196.60939025878906,
+          y: 95.05902099609375,
+          label: '',
+        },
+      ]);
 
-  it('should not add vertex when the user is not allowed to add a' +
-  ' vertex', () => {
-    component.state.currentMode = component._MODES.ADD_VERTEX;
-    component.state.mouseX = 20;
-    component.state.mouseY = 20;
-    component.interactionIsActive = true;
-    component.canAddVertex = false;
+      component.onClickGraphSVG();
 
-    expect(component.graph.vertices).toEqual([
-      {
-        x: 150,
-        y: 50,
-        label: ''
-      },
-      {
-        x: 200,
-        y: 50,
-        label: ''
-      },
-      {
-        x: 150,
-        y: 100,
-        label: ''
-      },
-      {
-        x: 196.60939025878906,
-        y: 95.05902099609375,
-        label: ''
-      }
-    ]);
+      // Function onClickGraphSVG() must only run if the interaction is active.
+      // Therefore the value of interactionIsActive is verified to be true before
+      // the rest of the lines are executed.
+      expect(component.interactionIsActive).toBe(true);
+      expect(component.canAddEdge).toBe(true);
+      expect(component.graph.vertices).toEqual([
+        {
+          x: 150,
+          y: 50,
+          label: '',
+        },
+        {
+          x: 200,
+          y: 50,
+          label: '',
+        },
+        {
+          x: 150,
+          y: 100,
+          label: '',
+        },
+        {
+          x: 196.60939025878906,
+          y: 95.05902099609375,
+          label: '',
+        },
+        {
+          x: 20,
+          y: 20,
+          label: '',
+        },
+      ]);
+    }
+  );
 
-    component.onClickGraphSVG();
+  it(
+    'should not add vertex when the user is not allowed to add a' + ' vertex',
+    () => {
+      component.state.currentMode = component._MODES.ADD_VERTEX;
+      component.state.mouseX = 20;
+      component.state.mouseY = 20;
+      component.interactionIsActive = true;
+      component.canAddVertex = false;
 
-    // Function onClickGraphSVG() must only run if the interaction is active.
-    // Therefore the value of interactionIsActive is verified to be true before
-    // the rest of the lines are executed.
-    expect(component.interactionIsActive).toBe(true);
-    expect(component.graph.vertices).toEqual([
-      {
-        x: 150,
-        y: 50,
-        label: ''
-      },
-      {
-        x: 200,
-        y: 50,
-        label: ''
-      },
-      {
-        x: 150,
-        y: 100,
-        label: ''
-      },
-      {
-        x: 196.60939025878906,
-        y: 95.05902099609375,
-        label: ''
-      }
-    ]);
-  });
+      expect(component.graph.vertices).toEqual([
+        {
+          x: 150,
+          y: 50,
+          label: '',
+        },
+        {
+          x: 200,
+          y: 50,
+          label: '',
+        },
+        {
+          x: 150,
+          y: 100,
+          label: '',
+        },
+        {
+          x: 196.60939025878906,
+          y: 95.05902099609375,
+          label: '',
+        },
+      ]);
+
+      component.onClickGraphSVG();
+
+      // Function onClickGraphSVG() must only run if the interaction is active.
+      // Therefore the value of interactionIsActive is verified to be true before
+      // the rest of the lines are executed.
+      expect(component.interactionIsActive).toBe(true);
+      expect(component.graph.vertices).toEqual([
+        {
+          x: 150,
+          y: 50,
+          label: '',
+        },
+        {
+          x: 200,
+          y: 50,
+          label: '',
+        },
+        {
+          x: 150,
+          y: 100,
+          label: '',
+        },
+        {
+          x: 196.60939025878906,
+          y: 95.05902099609375,
+          label: '',
+        },
+      ]);
+    }
+  );
 
   it('should not add vertex when interaction is not active', () => {
     component.state.currentMode = component._MODES.ADD_VERTEX;
@@ -882,23 +941,23 @@ describe('GraphVizComponent', () => {
       {
         x: 150,
         y: 50,
-        label: ''
+        label: '',
       },
       {
         x: 200,
         y: 50,
-        label: ''
+        label: '',
       },
       {
         x: 150,
         y: 100,
-        label: ''
+        label: '',
       },
       {
         x: 196.60939025878906,
         y: 95.05902099609375,
-        label: ''
-      }
+        label: '',
+      },
     ]);
     expect(component.state.selectedVertex).toBe(1);
     expect(component.state.selectedEdge).toBe(1);
@@ -913,23 +972,23 @@ describe('GraphVizComponent', () => {
       {
         x: 150,
         y: 50,
-        label: ''
+        label: '',
       },
       {
         x: 200,
         y: 50,
-        label: ''
+        label: '',
       },
       {
         x: 150,
         y: 100,
-        label: ''
+        label: '',
       },
       {
         x: 196.60939025878906,
         y: 95.05902099609375,
-        label: ''
-      }
+        label: '',
+      },
     ]);
     expect(component.state.selectedVertex).toBe(1);
     expect(component.state.selectedEdge).toBe(1);
@@ -946,20 +1005,22 @@ describe('GraphVizComponent', () => {
     expect(component.state.selectedVertex).toBeNull();
   });
 
-  it('should not set selectedVertex to null if hoveredVertex is not' +
-  ' null', () => {
-    component.state.selectedVertex = 1;
-    component.state.hoveredVertex = 1;
+  it(
+    'should not set selectedVertex to null if hoveredVertex is not' + ' null',
+    () => {
+      component.state.selectedVertex = 1;
+      component.state.hoveredVertex = 1;
 
-    expect(component.state.selectedVertex).toBe(1);
+      expect(component.state.selectedVertex).toBe(1);
 
-    component.onClickGraphSVG();
+      component.onClickGraphSVG();
 
-    expect(component.interactionIsActive).toBe(true);
-    // This to test the pre-condition for setting selectedVertex to null.
-    expect(component.state.hoveredVertex).toBe(1);
-    expect(component.state.selectedVertex).toBe(1);
-  });
+      expect(component.interactionIsActive).toBe(true);
+      // This to test the pre-condition for setting selectedVertex to null.
+      expect(component.state.hoveredVertex).toBe(1);
+      expect(component.state.selectedVertex).toBe(1);
+    }
+  );
 
   it('should set selectedEdge to null if hoveredVertex is null', () => {
     component.state.selectedEdge = 1;
@@ -972,20 +1033,22 @@ describe('GraphVizComponent', () => {
     expect(component.state.selectedEdge).toBeNull();
   });
 
-  it('should not set selectedEdge to null if hoveredEdge is not' +
-  ' null', () => {
-    component.state.selectedEdge = 1;
-    component.state.hoveredEdge = 1;
+  it(
+    'should not set selectedEdge to null if hoveredEdge is not' + ' null',
+    () => {
+      component.state.selectedEdge = 1;
+      component.state.hoveredEdge = 1;
 
-    expect(component.state.selectedEdge).toBe(1);
+      expect(component.state.selectedEdge).toBe(1);
 
-    component.onClickGraphSVG();
+      component.onClickGraphSVG();
 
-    expect(component.interactionIsActive).toBe(true);
-    // This to test the pre-condition for setting selectedVertex to null.
-    expect(component.state.hoveredEdge).toBe(1);
-    expect(component.state.selectedEdge).toBe(1);
-  });
+      expect(component.interactionIsActive).toBe(true);
+      // This to test the pre-condition for setting selectedVertex to null.
+      expect(component.state.hoveredEdge).toBe(1);
+      expect(component.state.selectedEdge).toBe(1);
+    }
+  );
 
   it('should toggle isLabeled flag when user selects Labeled option', () => {
     expect(component.graph.isLabeled).toBe(false);
@@ -999,18 +1062,20 @@ describe('GraphVizComponent', () => {
     expect(component.graph.isLabeled).toBe(false);
   });
 
-  it('should toggle isWeighted option when user selects' +
-  ' Weighted option', () => {
-    expect(component.graph.isWeighted).toBe(true);
+  it(
+    'should toggle isWeighted option when user selects' + ' Weighted option',
+    () => {
+      expect(component.graph.isWeighted).toBe(true);
 
-    component.toggleGraphOption('isWeighted');
+      component.toggleGraphOption('isWeighted');
 
-    expect(component.graph.isWeighted).toBe(false);
+      expect(component.graph.isWeighted).toBe(false);
 
-    component.toggleGraphOption('isWeighted');
+      component.toggleGraphOption('isWeighted');
 
-    expect(component.graph.isWeighted).toBe(true);
-  });
+      expect(component.graph.isWeighted).toBe(true);
+    }
+  );
 
   it('should set isDirected to true when user selects Directed option', () => {
     expect(component.graph.isDirected).toBe(false);
@@ -1020,31 +1085,34 @@ describe('GraphVizComponent', () => {
     expect(component.graph.isDirected).toBe(true);
   });
 
-  it('should set isDirected to false and extra edges are removed' +
-  'when user deselects Directed option', () => {
-    component.graph.isDirected = true;
-    component.graph.edges.push({
-      src: 2,
-      weight: 1,
-      dst: 1
-    });
-
-    component.toggleGraphOption('isDirected');
-
-    expect(component.graph.isDirected).toBe(false);
-    expect(component.graph.edges).toEqual([
-      {
-        src: 0,
+  it(
+    'should set isDirected to false and extra edges are removed' +
+      'when user deselects Directed option',
+    () => {
+      component.graph.isDirected = true;
+      component.graph.edges.push({
+        src: 2,
         weight: 1,
-        dst: 1
-      },
-      {
-        src: 1,
-        weight: 1,
-        dst: 2
-      }
-    ]);
-  });
+        dst: 1,
+      });
+
+      component.toggleGraphOption('isDirected');
+
+      expect(component.graph.isDirected).toBe(false);
+      expect(component.graph.edges).toEqual([
+        {
+          src: 0,
+          weight: 1,
+          dst: 1,
+        },
+        {
+          src: 1,
+          weight: 1,
+          dst: 2,
+        },
+      ]);
+    }
+  );
 
   it('should set to move mode when move button is clicked', () => {
     spyOn(Event.prototype, 'preventDefault');
@@ -1089,8 +1157,9 @@ describe('GraphVizComponent', () => {
     expect(Event.prototype.preventDefault).toHaveBeenCalled();
     expect(component.state.currentMode).toBe(component._MODES.MOVE);
     // The value of help text changes only if user is using a mobile.
-    expect(component.helpText)
-      .toBe('I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT');
+    expect(component.helpText).toBe(
+      'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT'
+    );
   });
 
   it('should set to add edge mode when add edge button is clicked', () => {
@@ -1136,8 +1205,9 @@ describe('GraphVizComponent', () => {
     expect(Event.prototype.preventDefault).toHaveBeenCalled();
     expect(component.state.currentMode).toBe(component._MODES.ADD_EDGE);
     // The value of help text changes only if user is using a mobile.
-    expect(component.helpText)
-      .toBe('I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT');
+    expect(component.helpText).toBe(
+      'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT'
+    );
   });
 
   it('should set to add edge mode when add edge button is clicked', () => {
@@ -1168,24 +1238,27 @@ describe('GraphVizComponent', () => {
     expect(component.helpText).toBeNull();
   });
 
-  it('should set help text to null for add vertex button if user is' +
-  ' using mobile', () => {
-    spyOn(Event.prototype, 'preventDefault');
-    component.isMobile = true;
+  it(
+    'should set help text to null for add vertex button if user is' +
+      ' using mobile',
+    () => {
+      spyOn(Event.prototype, 'preventDefault');
+      component.isMobile = true;
 
-    expect(component.helpText).toBe('');
+      expect(component.helpText).toBe('');
 
-    let dummyMouseEvent = new MouseEvent('click');
+      let dummyMouseEvent = new MouseEvent('click');
 
-    component.onClickModeButton(component._MODES.ADD_VERTEX, dummyMouseEvent);
+      component.onClickModeButton(component._MODES.ADD_VERTEX, dummyMouseEvent);
 
-    // This is a pre-condition for setting a mode.
-    expect(component.interactionIsActive).toBe(true);
-    expect(Event.prototype.preventDefault).toHaveBeenCalled();
-    expect(component.state.currentMode).toBe(component._MODES.ADD_VERTEX);
-    // The value of help text changes only if user is using a mobile.
-    expect(component.helpText).toBeNull();
-  });
+      // This is a pre-condition for setting a mode.
+      expect(component.interactionIsActive).toBe(true);
+      expect(Event.prototype.preventDefault).toHaveBeenCalled();
+      expect(component.state.currentMode).toBe(component._MODES.ADD_VERTEX);
+      // The value of help text changes only if user is using a mobile.
+      expect(component.helpText).toBeNull();
+    }
+  );
 
   it('should set to add delete mode when delete button is clicked', () => {
     spyOn(Event.prototype, 'preventDefault');
@@ -1215,24 +1288,27 @@ describe('GraphVizComponent', () => {
     expect(component.helpText).toBeNull();
   });
 
-  it('should set help text to null for delete button if user is' +
-  ' using mobile', () => {
-    spyOn(Event.prototype, 'preventDefault');
-    component.isMobile = true;
+  it(
+    'should set help text to null for delete button if user is' +
+      ' using mobile',
+    () => {
+      spyOn(Event.prototype, 'preventDefault');
+      component.isMobile = true;
 
-    expect(component.helpText).toBe('');
+      expect(component.helpText).toBe('');
 
-    let dummyMouseEvent = new MouseEvent('click');
+      let dummyMouseEvent = new MouseEvent('click');
 
-    component.onClickModeButton(component._MODES.DELETE, dummyMouseEvent);
+      component.onClickModeButton(component._MODES.DELETE, dummyMouseEvent);
 
-    // This is a pre-condition for setting a mode.
-    expect(component.interactionIsActive).toBe(true);
-    expect(Event.prototype.preventDefault).toHaveBeenCalled();
-    expect(component.state.currentMode).toBe(component._MODES.DELETE);
-    // The value of help text changes only if user is using a mobile.
-    expect(component.helpText).toBeNull();
-  });
+      // This is a pre-condition for setting a mode.
+      expect(component.interactionIsActive).toBe(true);
+      expect(Event.prototype.preventDefault).toHaveBeenCalled();
+      expect(component.state.currentMode).toBe(component._MODES.DELETE);
+      // The value of help text changes only if user is using a mobile.
+      expect(component.helpText).toBeNull();
+    }
+  );
 
   it('should set mode if interaction is not active', () => {
     spyOn(Event.prototype, 'preventDefault');
@@ -1249,45 +1325,49 @@ describe('GraphVizComponent', () => {
     component.state.currentMode = component._MODES.DELETE;
     spyOn(component, 'deleteVertex').and.callThrough();
 
-    expect(component.graph.vertices).toEqual([{
-      x: 150,
-      y: 50,
-      label: ''
-    },
-    {
-      x: 200,
-      y: 50,
-      label: ''
-    },
-    {
-      x: 150,
-      y: 100,
-      label: ''
-    },
-    {
-      x: 196.60939025878906,
-      y: 95.05902099609375,
-      label: ''
-    }]);
+    expect(component.graph.vertices).toEqual([
+      {
+        x: 150,
+        y: 50,
+        label: '',
+      },
+      {
+        x: 200,
+        y: 50,
+        label: '',
+      },
+      {
+        x: 150,
+        y: 100,
+        label: '',
+      },
+      {
+        x: 196.60939025878906,
+        y: 95.05902099609375,
+        label: '',
+      },
+    ]);
 
     component.onClickVertex(0);
 
     expect(component.deleteVertex).toHaveBeenCalledWith(0);
-    expect(component.graph.vertices).toEqual([{
-      x: 200,
-      y: 50,
-      label: ''
-    },
-    {
-      x: 150,
-      y: 100,
-      label: ''
-    },
-    {
-      x: 196.60939025878906,
-      y: 95.05902099609375,
-      label: ''
-    }]);
+    expect(component.graph.vertices).toEqual([
+      {
+        x: 200,
+        y: 50,
+        label: '',
+      },
+      {
+        x: 150,
+        y: 100,
+        label: '',
+      },
+      {
+        x: 196.60939025878906,
+        y: 95.05902099609375,
+        label: '',
+      },
+    ]);
   });
 
   it('should add vertex when user clicks on the graph', () => {
@@ -1302,8 +1382,9 @@ describe('GraphVizComponent', () => {
 
     expect(component.beginEditVertexLabel).toHaveBeenCalledWith(0);
     expect(component.state.selectedVertex).toBe(0);
-    expect(focusManagerService.setFocus)
-      .toHaveBeenCalledWith('vertexLabelEditBegun');
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      'vertexLabelEditBegun'
+    );
   });
 
   it('should start adding edge when user clicks a vertex in a mobile', () => {
@@ -1322,8 +1403,9 @@ describe('GraphVizComponent', () => {
     expect(component.state.hoveredVertex).toBe(0);
     expect(component.beginAddEdge).toHaveBeenCalledWith(0);
     expect(component.state.addEdgeVertex).toBe(0);
-    expect(component.helpText)
-      .toBe('I18N_INTERACTIONS_GRAPH_EDGE_FINAL_HELPTEXT');
+    expect(component.helpText).toBe(
+      'I18N_INTERACTIONS_GRAPH_EDGE_FINAL_HELPTEXT'
+    );
   });
 
   it('should move vertex when user clicks a vertex in a mobile', () => {
@@ -1352,69 +1434,82 @@ describe('GraphVizComponent', () => {
     expect(component.state.vertexDragStartY).toBe(50);
     expect(component.state.mouseDragStartX).toBe(20);
     expect(component.state.mouseDragStartY).toBe(20);
-    expect(component.helpText)
-      .toBe('I18N_INTERACTIONS_GRAPH_MOVE_FINAL_HELPTEXT');
+    expect(component.helpText).toBe(
+      'I18N_INTERACTIONS_GRAPH_MOVE_FINAL_HELPTEXT'
+    );
   });
 
-  it('should show help text to start edge creation when a user is using a' +
-  ' mobile', () => {
-    component.state.addEdgeVertex = 0;
-    component.state.hoveredVertex = 1;
-    component.isMobile = true;
+  it(
+    'should show help text to start edge creation when a user is using a' +
+      ' mobile',
+    () => {
+      component.state.addEdgeVertex = 0;
+      component.state.hoveredVertex = 1;
+      component.isMobile = true;
 
-    expect(component.helpText).toBe('');
+      expect(component.helpText).toBe('');
 
-    component.onClickVertex(0);
+      component.onClickVertex(0);
 
-    expect(component.state.hoveredVertex).toBeNull();
-    expect(component.helpText)
-      .toBe('I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT');
-    expect(component.state.addEdgeVertex).toBeNull();
-  });
+      expect(component.state.hoveredVertex).toBeNull();
+      expect(component.helpText).toBe(
+        'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT'
+      );
+      expect(component.state.addEdgeVertex).toBeNull();
+    }
+  );
 
-  it('should stop moving vertex when user is using a mobile clicks on the' +
-  ' graph', () => {
-    component.state.currentMode = component._MODES.MOVE;
-    component.state.addEdgeVertex = 1;
-    component.state.hoveredVertex = 1;
-    component.state.currentlyDraggedVertex = 1;
-    component.isMobile = true;
-    spyOn(component, 'onTouchFinalVertex').and.callThrough();
-    spyOn(component, 'endDragVertex').and.callThrough();
+  it(
+    'should stop moving vertex when user is using a mobile clicks on the' +
+      ' graph',
+    () => {
+      component.state.currentMode = component._MODES.MOVE;
+      component.state.addEdgeVertex = 1;
+      component.state.hoveredVertex = 1;
+      component.state.currentlyDraggedVertex = 1;
+      component.isMobile = true;
+      spyOn(component, 'onTouchFinalVertex').and.callThrough();
+      spyOn(component, 'endDragVertex').and.callThrough();
 
-    expect(component.helpText).toBe('');
+      expect(component.helpText).toBe('');
 
-    component.onClickVertex(0);
+      component.onClickVertex(0);
 
-    expect(component.onTouchFinalVertex).toHaveBeenCalledWith(0);
-    expect(component.helpText)
-      .toBe('I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT');
-    expect(component.endDragVertex).toHaveBeenCalled();
-    expect(component.state.hoveredVertex).toBeNull();
-  });
+      expect(component.onTouchFinalVertex).toHaveBeenCalledWith(0);
+      expect(component.helpText).toBe(
+        'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT'
+      );
+      expect(component.endDragVertex).toHaveBeenCalled();
+      expect(component.state.hoveredVertex).toBeNull();
+    }
+  );
 
-  it('should add an edge when user using a mobile clicks on the final' +
-  ' vertex', () => {
-    component.state.currentMode = component._MODES.ADD_EDGE;
-    component.state.addEdgeVertex = 1;
-    component.state.hoveredVertex = 1;
-    component.state.currentlyDraggedVertex = 1;
-    component.isMobile = true;
-    spyOn(component, 'onTouchFinalVertex').and.callThrough();
-    spyOn(component, 'tryAddEdge').and.callThrough();
-    spyOn(component, 'endAddEdge').and.callThrough();
+  it(
+    'should add an edge when user using a mobile clicks on the final' +
+      ' vertex',
+    () => {
+      component.state.currentMode = component._MODES.ADD_EDGE;
+      component.state.addEdgeVertex = 1;
+      component.state.hoveredVertex = 1;
+      component.state.currentlyDraggedVertex = 1;
+      component.isMobile = true;
+      spyOn(component, 'onTouchFinalVertex').and.callThrough();
+      spyOn(component, 'tryAddEdge').and.callThrough();
+      spyOn(component, 'endAddEdge').and.callThrough();
 
-    expect(component.helpText).toBe('');
+      expect(component.helpText).toBe('');
 
-    component.onClickVertex(0);
+      component.onClickVertex(0);
 
-    expect(component.onTouchFinalVertex).toHaveBeenCalledWith(0);
-    expect(component.tryAddEdge).toHaveBeenCalledWith(1, 0);
-    expect(component.endAddEdge).toHaveBeenCalled();
-    expect(component.helpText)
-      .toBe('I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT');
-    expect(component.state.hoveredVertex).toBeNull();
-  });
+      expect(component.onTouchFinalVertex).toHaveBeenCalledWith(0);
+      expect(component.tryAddEdge).toHaveBeenCalledWith(1, 0);
+      expect(component.endAddEdge).toHaveBeenCalled();
+      expect(component.helpText).toBe(
+        'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT'
+      );
+      expect(component.state.hoveredVertex).toBeNull();
+    }
+  );
 
   it('should add edge when user presses mouse down.', () => {
     component.state.currentMode = component._MODES.ADD_EDGE;
@@ -1479,14 +1574,17 @@ describe('GraphVizComponent', () => {
     expect(component.state.hoveredVertex).toBeNull();
   });
 
-  it('should set hoveredVertex to null from index when' +
-  ' once user\'s mouse leaves vertex', () => {
-    component.state.hoveredVertex = 0;
+  it(
+    'should set hoveredVertex to null from index when' +
+      " once user's mouse leaves vertex",
+    () => {
+      component.state.hoveredVertex = 0;
 
-    component.onMouseleaveVertex(0);
+      component.onMouseleaveVertex(0);
 
-    expect(component.state.hoveredVertex).toBeNull();
-  });
+      expect(component.state.hoveredVertex).toBeNull();
+    }
+  );
 
   it('should edit vertex label when user clicks the label', () => {
     component.graph.isLabeled = true;
@@ -1500,8 +1598,9 @@ describe('GraphVizComponent', () => {
     expect(component.canEditVertexLabel).toBe(true);
     expect(component.state.hoveredVertex).toBeNull();
     expect(component.beginEditVertexLabel).toHaveBeenCalledWith(0);
-    expect(focusManagerService.setFocus)
-      .toHaveBeenCalledWith('vertexLabelEditBegun');
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      'vertexLabelEditBegun'
+    );
   });
 
   it('should delete edge when user clicks the edge', () => {
@@ -1514,13 +1613,13 @@ describe('GraphVizComponent', () => {
       {
         src: 0,
         weight: 1,
-        dst: 1
+        dst: 1,
       },
       {
         src: 1,
         weight: 1,
-        dst: 2
-      }
+        dst: 2,
+      },
     ]);
 
     component.onClickEdge(0);
@@ -1531,8 +1630,8 @@ describe('GraphVizComponent', () => {
       {
         src: 1,
         weight: 1,
-        dst: 2
-      }
+        dst: 2,
+      },
     ]);
   });
 
@@ -1554,8 +1653,9 @@ describe('GraphVizComponent', () => {
     expect(component.state.selectedEdge).toBe(0);
     expect(component.selectedEdgeWeightValue).toBe(1);
     expect(component.shouldShowWrongWeightWarning).toBe(false);
-    expect(focusManagerService.setFocus)
-      .toHaveBeenCalledWith('edgeWeightEditBegun');
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      'edgeWeightEditBegun'
+    );
   });
 
   // This function only executes on mouse actions.
@@ -1572,195 +1672,196 @@ describe('GraphVizComponent', () => {
     expect(component.endDragVertex).not.toHaveBeenCalled();
   });
 
-  it('should start adding edge when user\'s mouse button goes up',
-    fakeAsync(() => {
-      component.state.currentMode = component._MODES.ADD_EDGE;
-      component.state.hoveredVertex = 2;
-      component.state.addEdgeVertex = 0;
-      spyOn(component, 'tryAddEdge').and.callThrough();
-
-      expect(component.isMobile).toBe(false);
-      expect(component.graph.edges).toEqual([
-        {
-          src: 0,
-          weight: 1,
-          dst: 1
-        },
-        {
-          src: 1,
-          weight: 1,
-          dst: 2
-        }
-      ]);
-
-      component.onMouseupDocument();
-      tick(10);
-
-      expect(component.tryAddEdge).toHaveBeenCalledWith(0, 2);
-      expect(component.graph.edges).toEqual([
-        {
-          src: 0,
-          weight: 1,
-          dst: 1
-        },
-        {
-          src: 1,
-          weight: 1,
-          dst: 2
-        },
-        {
-          src: 0,
-          weight: 1,
-          dst: 2
-        }
-      ]);
-    }));
-
-  it('should not add edge if it is already present',
-    fakeAsync(() => {
-      component.state.currentMode = component._MODES.ADD_EDGE;
-      component.state.hoveredVertex = 1;
-      component.state.addEdgeVertex = 0;
-      spyOn(component, 'tryAddEdge').and.callThrough();
-
-      expect(component.isMobile).toBe(false);
-      expect(component.graph.edges).toEqual([
-        {
-          src: 0,
-          weight: 1,
-          dst: 1
-        },
-        {
-          src: 1,
-          weight: 1,
-          dst: 2
-        }
-      ]);
-
-      component.onMouseupDocument();
-      tick(10);
-
-      expect(component.tryAddEdge).toHaveBeenCalledWith(0, 1);
-      expect(component.graph.edges).toEqual([
-        {
-          src: 0,
-          weight: 1,
-          dst: 1
-        },
-        {
-          src: 1,
-          weight: 1,
-          dst: 2
-        }
-      ]);
-    }));
-
-  it('should not add edge if the start and end are same',
-    fakeAsync(() => {
-      component.state.currentMode = component._MODES.ADD_EDGE;
-      component.state.hoveredVertex = 0;
-      component.state.addEdgeVertex = 0;
-      spyOn(component, 'tryAddEdge').and.callThrough();
-
-      expect(component.isMobile).toBe(false);
-      expect(component.graph.edges).toEqual([
-        {
-          src: 0,
-          weight: 1,
-          dst: 1
-        },
-        {
-          src: 1,
-          weight: 1,
-          dst: 2
-        }
-      ]);
-
-      component.onMouseupDocument();
-      tick(10);
-
-      expect(component.tryAddEdge).toHaveBeenCalledWith(0, 0);
-      expect(component.graph.edges).toEqual([
-        {
-          src: 0,
-          weight: 1,
-          dst: 1
-        },
-        {
-          src: 1,
-          weight: 1,
-          dst: 2
-        }
-      ]);
-    }));
-
-  it('should not add edge if an edge is already present between' +
-  'the destination and source for a non directed graph', fakeAsync(() => {
+  it("should start adding edge when user's mouse button goes up", fakeAsync(() => {
     component.state.currentMode = component._MODES.ADD_EDGE;
-    component.state.hoveredVertex = 0;
-    component.state.addEdgeVertex = 1;
+    component.state.hoveredVertex = 2;
+    component.state.addEdgeVertex = 0;
     spyOn(component, 'tryAddEdge').and.callThrough();
-    spyOn(component, 'endAddEdge').and.callThrough();
 
     expect(component.isMobile).toBe(false);
     expect(component.graph.edges).toEqual([
       {
         src: 0,
         weight: 1,
-        dst: 1
+        dst: 1,
       },
       {
         src: 1,
         weight: 1,
-        dst: 2
-      }
+        dst: 2,
+      },
     ]);
 
     component.onMouseupDocument();
     tick(10);
 
-    expect(component.tryAddEdge).toHaveBeenCalledWith(1, 0);
+    expect(component.tryAddEdge).toHaveBeenCalledWith(0, 2);
     expect(component.graph.edges).toEqual([
       {
         src: 0,
         weight: 1,
-        dst: 1
+        dst: 1,
       },
       {
         src: 1,
         weight: 1,
-        dst: 2
-      }
+        dst: 2,
+      },
+      {
+        src: 0,
+        weight: 1,
+        dst: 2,
+      },
     ]);
-    expect(component.endAddEdge).toHaveBeenCalled();
   }));
 
-  it('should end add edge when user clicks anything other than a' +
-  ' vertex', fakeAsync(() => {
+  it('should not add edge if it is already present', fakeAsync(() => {
     component.state.currentMode = component._MODES.ADD_EDGE;
+    component.state.hoveredVertex = 1;
     component.state.addEdgeVertex = 0;
-    spyOn(component, 'endAddEdge').and.callThrough();
+    spyOn(component, 'tryAddEdge').and.callThrough();
+
+    expect(component.isMobile).toBe(false);
+    expect(component.graph.edges).toEqual([
+      {
+        src: 0,
+        weight: 1,
+        dst: 1,
+      },
+      {
+        src: 1,
+        weight: 1,
+        dst: 2,
+      },
+    ]);
 
     component.onMouseupDocument();
     tick(10);
 
-    expect(component.state.hoveredVertex).toBeNull();
-    expect(component.endAddEdge).toHaveBeenCalled();
-    expect(component.state.addEdgeVertex).toBeNull();
+    expect(component.tryAddEdge).toHaveBeenCalledWith(0, 1);
+    expect(component.graph.edges).toEqual([
+      {
+        src: 0,
+        weight: 1,
+        dst: 1,
+      },
+      {
+        src: 1,
+        weight: 1,
+        dst: 2,
+      },
+    ]);
   }));
 
-  it('should end moving vertex when user releases mouse button',
+  it('should not add edge if the start and end are same', fakeAsync(() => {
+    component.state.currentMode = component._MODES.ADD_EDGE;
+    component.state.hoveredVertex = 0;
+    component.state.addEdgeVertex = 0;
+    spyOn(component, 'tryAddEdge').and.callThrough();
+
+    expect(component.isMobile).toBe(false);
+    expect(component.graph.edges).toEqual([
+      {
+        src: 0,
+        weight: 1,
+        dst: 1,
+      },
+      {
+        src: 1,
+        weight: 1,
+        dst: 2,
+      },
+    ]);
+
+    component.onMouseupDocument();
+    tick(10);
+
+    expect(component.tryAddEdge).toHaveBeenCalledWith(0, 0);
+    expect(component.graph.edges).toEqual([
+      {
+        src: 0,
+        weight: 1,
+        dst: 1,
+      },
+      {
+        src: 1,
+        weight: 1,
+        dst: 2,
+      },
+    ]);
+  }));
+
+  it(
+    'should not add edge if an edge is already present between' +
+      'the destination and source for a non directed graph',
     fakeAsync(() => {
-      component.state.currentMode = component._MODES.MOVE;
-      component.state.currentlyDraggedVertex = 0;
-      spyOn(component, 'endDragVertex').and.callThrough();
+      component.state.currentMode = component._MODES.ADD_EDGE;
+      component.state.hoveredVertex = 0;
+      component.state.addEdgeVertex = 1;
+      spyOn(component, 'tryAddEdge').and.callThrough();
+      spyOn(component, 'endAddEdge').and.callThrough();
+
+      expect(component.isMobile).toBe(false);
+      expect(component.graph.edges).toEqual([
+        {
+          src: 0,
+          weight: 1,
+          dst: 1,
+        },
+        {
+          src: 1,
+          weight: 1,
+          dst: 2,
+        },
+      ]);
 
       component.onMouseupDocument();
       tick(10);
 
-      expect(component.endDragVertex).toHaveBeenCalled();
-      expect(component.state.currentlyDraggedVertex).toBeNull();
-    }));
+      expect(component.tryAddEdge).toHaveBeenCalledWith(1, 0);
+      expect(component.graph.edges).toEqual([
+        {
+          src: 0,
+          weight: 1,
+          dst: 1,
+        },
+        {
+          src: 1,
+          weight: 1,
+          dst: 2,
+        },
+      ]);
+      expect(component.endAddEdge).toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should end add edge when user clicks anything other than a' + ' vertex',
+    fakeAsync(() => {
+      component.state.currentMode = component._MODES.ADD_EDGE;
+      component.state.addEdgeVertex = 0;
+      spyOn(component, 'endAddEdge').and.callThrough();
+
+      component.onMouseupDocument();
+      tick(10);
+
+      expect(component.state.hoveredVertex).toBeNull();
+      expect(component.endAddEdge).toHaveBeenCalled();
+      expect(component.state.addEdgeVertex).toBeNull();
+    })
+  );
+
+  it('should end moving vertex when user releases mouse button', fakeAsync(() => {
+    component.state.currentMode = component._MODES.MOVE;
+    component.state.currentlyDraggedVertex = 0;
+    spyOn(component, 'endDragVertex').and.callThrough();
+
+    component.onMouseupDocument();
+    tick(10);
+
+    expect(component.endDragVertex).toHaveBeenCalled();
+    expect(component.state.currentlyDraggedVertex).toBeNull();
+  }));
 
   it('should return selected vertex label when called', () => {
     component.state.selectedVertex = 0;
@@ -1781,8 +1882,7 @@ describe('GraphVizComponent', () => {
   it('should set selected vertex label when called', () => {
     component.state.selectedVertex = 0;
     component.graph.vertices[0].label = 'vertex_label';
-    spyOnProperty(component, 'selectedVertexLabel', 'set').and
-      .callThrough();
+    spyOnProperty(component, 'selectedVertexLabel', 'set').and.callThrough();
 
     component.selectedVertexLabel = 'test';
 
@@ -1791,24 +1891,25 @@ describe('GraphVizComponent', () => {
 
   it('should set selected edge weight when called', () => {
     component.selectedEdgeWeightValue = 0;
-    spyOnProperty(component, 'selectedEdgeWeight', 'set').and
-      .callThrough();
+    spyOnProperty(component, 'selectedEdgeWeight', 'set').and.callThrough();
 
     component.selectedEdgeWeight = 2;
 
     expect(component.selectedEdgeWeightValue).toBe(2);
   });
 
-  it('should set selected edge weight to an empty string when' +
-  ' null is passed', () => {
-    component.selectedEdgeWeightValue = 0;
-    spyOnProperty(component, 'selectedEdgeWeight', 'set').and
-      .callThrough();
+  it(
+    'should set selected edge weight to an empty string when' +
+      ' null is passed',
+    () => {
+      component.selectedEdgeWeightValue = 0;
+      spyOnProperty(component, 'selectedEdgeWeight', 'set').and.callThrough();
 
-    component.selectedEdgeWeight = null;
+      component.selectedEdgeWeight = null;
 
-    expect(component.selectedEdgeWeightValue).toBe('');
-  });
+      expect(component.selectedEdgeWeightValue).toBe('');
+    }
+  );
 
   it('should return selected edge weight when called', () => {
     component.state.selectedEdge = 0;
@@ -1868,7 +1969,8 @@ describe('GraphVizComponent', () => {
     expect(component.state.selectedEdge).toBe(0);
     expect(component.selectedEdgeWeightValue).toBe(1);
     expect(component.shouldShowWrongWeightWarning).toBe(false);
-    expect(focusManagerService.setFocus)
-      .toHaveBeenCalledWith('edgeWeightEditBegun');
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      'edgeWeightEditBegun'
+    );
   });
 });

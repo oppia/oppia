@@ -16,12 +16,18 @@
  * @fileoverview Unit tests for collection navbar component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, ComponentFixture, waitForAsync, fakeAsync, tick } from '@angular/core/testing';
-import { CollectionNavbarComponent } from './collection-navbar.component';
-import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  TestBed,
+  ComponentFixture,
+  waitForAsync,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {CollectionNavbarComponent} from './collection-navbar.component';
+import {ReadOnlyCollectionBackendApiService} from 'domain/collection/read-only-collection-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
 
 describe('Collection navbar component', () => {
   let us: UrlService;
@@ -31,19 +37,10 @@ describe('Collection navbar component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        CollectionNavbarComponent
-      ],
-      providers: [
-        UrlService,
-        ReadOnlyCollectionBackendApiService
-      ],
-      schemas: [
-        NO_ERRORS_SCHEMA
-      ]
+      imports: [HttpClientTestingModule],
+      declarations: [CollectionNavbarComponent],
+      providers: [UrlService, ReadOnlyCollectionBackendApiService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -57,11 +54,12 @@ describe('Collection navbar component', () => {
   it('should load the component properly on playing a collection', () => {
     const expectedCollectionDetail = {
       canEdit: true,
-      title: 'Test title'
+      title: 'Test title',
     };
     spyOn(us, 'getCollectionIdFromUrl').and.returnValue('abcdef');
     spyOn(rocbas, 'getCollectionDetails').and.returnValue(
-      expectedCollectionDetail);
+      expectedCollectionDetail
+    );
 
     component.ngOnInit();
     rocbas.onCollectionLoad.emit();
@@ -74,11 +72,12 @@ describe('Collection navbar component', () => {
   it('should throw error if collection title is null', fakeAsync(() => {
     const expectedCollectionDetail = {
       canEdit: true,
-      title: null
+      title: null,
     };
     spyOn(us, 'getCollectionIdFromUrl').and.returnValue('abcdef');
     spyOn(rocbas, 'getCollectionDetails').and.returnValue(
-      expectedCollectionDetail);
+      expectedCollectionDetail
+    );
 
     component.ngOnInit();
     expect(() => {

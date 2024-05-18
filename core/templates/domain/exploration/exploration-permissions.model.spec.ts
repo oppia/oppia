@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for ExplorationPermissions.
  */
 
-import { ExplorationPermissions } from
-  'domain/exploration/exploration-permissions.model';
+import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 
 describe('Exploration permissions model', () => {
   it('should correctly convert backend dict to permissions object.', () => {
@@ -29,11 +28,11 @@ describe('Exploration permissions model', () => {
       can_delete: false,
       can_modify_roles: true,
       can_edit: true,
-      can_manage_voice_artist: true
+      can_manage_voice_artist: true,
     };
 
-    let permissionsObject = ExplorationPermissions.createFromBackendDict(
-      backendDict);
+    let permissionsObject =
+      ExplorationPermissions.createFromBackendDict(backendDict);
 
     expect(permissionsObject.canUnpublish).toEqual(true);
     expect(permissionsObject.canReleaseOwnership).toEqual(false);

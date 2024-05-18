@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for skill editor save modal.
  */
 
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { SkillEditorSaveModalComponent } from './skill-editor-save-modal.component';
+import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {SkillEditorSaveModalComponent} from './skill-editor-save-modal.component';
 
 class MockChangeDetectorRef {
   detectChanges(): void {}
@@ -32,17 +32,15 @@ describe('Skill editor save modal component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        SkillEditorSaveModalComponent
-      ],
+      declarations: [SkillEditorSaveModalComponent],
       providers: [
         NgbActiveModal,
         {
           provide: ChangeDetectorRef,
-          useValue: changeDetectorRef
-        }
+          useValue: changeDetectorRef,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

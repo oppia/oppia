@@ -16,11 +16,9 @@
  * @fileoverview Unit tests for the Fatigue Detection service.
  */
 
-
-
-import { TestBed } from '@angular/core/testing';
-import { FatigueDetectionService } from 'pages/exploration-player-page/services/fatigue-detection.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import {TestBed} from '@angular/core/testing';
+import {FatigueDetectionService} from 'pages/exploration-player-page/services/fatigue-detection.service';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
 describe('Fatigue detection service', () => {
   let fatigueDetectionService: FatigueDetectionService;
@@ -42,37 +40,35 @@ describe('Fatigue detection service', () => {
   });
 
   describe('isSubmittingTooFast', () => {
-    it('should return true for 4 or more submissions in under 10 seconds',
-      () => {
-        fatigueDetectionService.recordSubmissionTimestamp();
-        jasmine.clock().tick(100);
-        fatigueDetectionService.recordSubmissionTimestamp();
-        jasmine.clock().tick(100);
-        fatigueDetectionService.recordSubmissionTimestamp();
-        jasmine.clock().tick(100);
-        fatigueDetectionService.recordSubmissionTimestamp();
-        expect(fatigueDetectionService.isSubmittingTooFast()).toBe(true);
+    it('should return true for 4 or more submissions in under 10 seconds', () => {
+      fatigueDetectionService.recordSubmissionTimestamp();
+      jasmine.clock().tick(100);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      jasmine.clock().tick(100);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      jasmine.clock().tick(100);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      expect(fatigueDetectionService.isSubmittingTooFast()).toBe(true);
 
-        jasmine.clock().tick(100);
-        fatigueDetectionService.recordSubmissionTimestamp();
-        expect(fatigueDetectionService.isSubmittingTooFast()).toBe(true);
-      });
+      jasmine.clock().tick(100);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      expect(fatigueDetectionService.isSubmittingTooFast()).toBe(true);
+    });
 
-    it('should return false for 4 or more submissions in over 10 seconds',
-      () => {
-        fatigueDetectionService.recordSubmissionTimestamp();
-        jasmine.clock().tick(100);
-        fatigueDetectionService.recordSubmissionTimestamp();
-        jasmine.clock().tick(100);
-        fatigueDetectionService.recordSubmissionTimestamp();
-        jasmine.clock().tick(10000);
-        fatigueDetectionService.recordSubmissionTimestamp();
-        expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
+    it('should return false for 4 or more submissions in over 10 seconds', () => {
+      fatigueDetectionService.recordSubmissionTimestamp();
+      jasmine.clock().tick(100);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      jasmine.clock().tick(100);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      jasmine.clock().tick(10000);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
 
-        jasmine.clock().tick(100);
-        fatigueDetectionService.recordSubmissionTimestamp();
-        expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
-      });
+      jasmine.clock().tick(100);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
+    });
 
     it('should return false for less than 4 submissions', () => {
       fatigueDetectionService.recordSubmissionTimestamp();
@@ -108,7 +104,7 @@ describe('Fatigue detection service', () => {
   it('should display take break message', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
       return {
-        result: Promise.resolve()
+        result: Promise.resolve(),
       } as NgbModalRef;
     });
     fatigueDetectionService.displayTakeBreakMessage();

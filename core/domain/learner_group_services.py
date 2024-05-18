@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core import feature_flag_list
 from core.constants import constants
-from core.domain import config_domain
+from core.domain import classroom_config_services
 from core.domain import feature_flag_services
 from core.domain import learner_group_domain
 from core.domain import learner_group_fetchers
@@ -55,8 +55,8 @@ def is_learner_group_feature_enabled(user_id: Optional[str]) -> bool:
         bool. Whether the learner group feature is enabled.
     """
     return bool(feature_flag_services.is_feature_flag_enabled(
-        user_id,
-        feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value))
+        feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value,
+        user_id))
 
 
 def create_learner_group(
@@ -286,7 +286,7 @@ def get_matching_learner_group_syllabus_to_add(
         group_story_ids = learner_group_model.story_ids
 
     matching_topic_ids: List[str] = []
-    all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
+    classrooms = classroom_config_services.get_all_classrooms()
 
     matching_subtopics_dicts: List[
         subtopic_page_domain.SubtopicPageSummaryDict] = []
@@ -294,9 +294,9 @@ def get_matching_learner_group_syllabus_to_add(
         story_domain.LearnerGroupSyllabusStorySummaryDict] = []
 
     if category != constants.DEFAULT_ADD_SYLLABUS_FILTER:
-        for classroom in all_classrooms_dict:
-            if category and classroom['name'] == category:
-                matching_topic_ids.extend(classroom['topic_ids'])
+        for classroom in classrooms:
+            if category and classroom.name == category:
+                matching_topic_ids.extend(classroom.get_topic_ids())
         matching_topics: List[topic_domain.Topic] = (
             topic_fetchers.get_topics_by_ids(matching_topic_ids, strict=True)
         )

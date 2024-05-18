@@ -17,25 +17,24 @@
  *     Action domain objects.
  */
 
-import { StatisticsDomainConstants } from
-  'domain/statistics/statistics-domain.constants';
+import {StatisticsDomainConstants} from 'domain/statistics/statistics-domain.constants';
 
 export interface ExplorationStartCustomizationArgs {
-  'state_name': {value: string};
+  state_name: {value: string};
 }
 
 export interface AnswerSubmitCustomizationArgs {
-  'state_name': {value: string};
-  'dest_state_name': {value: string};
-  'interaction_id': {value: string};
-  'submitted_answer': {value: string};
-  'feedback': {value: string};
-  'time_spent_state_in_msecs': {value: number};
+  state_name: {value: string};
+  dest_state_name: {value: string};
+  interaction_id: {value: string};
+  submitted_answer: {value: string};
+  feedback: {value: string};
+  time_spent_state_in_msecs: {value: number};
 }
 
 export interface ExplorationQuitCustomizationArgs {
-  'state_name': {value: string};
-  'time_spent_in_state_in_msecs': {value: number};
+  state_name: {value: string};
+  time_spent_in_state_in_msecs: {value: number};
 }
 
 type LearnerActionCustomizationArgs =
@@ -71,7 +70,7 @@ export class LearnerAction {
   }
 
   static createNewExplorationStartAction(
-      actionCustomizationArgs: ExplorationStartCustomizationArgs
+    actionCustomizationArgs: ExplorationStartCustomizationArgs
   ): LearnerAction {
     return new LearnerAction(
       LearnerActionType.ExplorationStart,
@@ -81,7 +80,7 @@ export class LearnerAction {
   }
 
   static createNewAnswerSubmitAction(
-      actionCustomizationArgs: AnswerSubmitCustomizationArgs
+    actionCustomizationArgs: AnswerSubmitCustomizationArgs
   ): LearnerAction {
     return new LearnerAction(
       LearnerActionType.AnswerSubmit,
@@ -91,7 +90,7 @@ export class LearnerAction {
   }
 
   static createNewExplorationQuitAction(
-      actionCustomizationArgs: ExplorationQuitCustomizationArgs
+    actionCustomizationArgs: ExplorationQuitCustomizationArgs
   ): LearnerAction {
     return new LearnerAction(
       LearnerActionType.ExplorationQuit,
@@ -114,28 +113,25 @@ export class LearnerAction {
    * @returns {LearnerAction}
    */
   static createFromBackendDict(
-      learnerActionBackendDict: LearnerActionBackendDict
+    learnerActionBackendDict: LearnerActionBackendDict
   ): LearnerAction {
     switch (learnerActionBackendDict.action_type) {
       case LearnerActionType.ExplorationStart:
         return new LearnerAction(
           learnerActionBackendDict.action_type,
-          learnerActionBackendDict
-            .action_customization_args as ExplorationStartCustomizationArgs,
+          learnerActionBackendDict.action_customization_args as ExplorationStartCustomizationArgs,
           learnerActionBackendDict.schema_version
         );
       case LearnerActionType.AnswerSubmit:
         return new LearnerAction(
           learnerActionBackendDict.action_type,
-          learnerActionBackendDict
-            .action_customization_args as AnswerSubmitCustomizationArgs,
+          learnerActionBackendDict.action_customization_args as AnswerSubmitCustomizationArgs,
           learnerActionBackendDict.schema_version
         );
       case LearnerActionType.ExplorationQuit:
         return new LearnerAction(
           learnerActionBackendDict.action_type,
-          learnerActionBackendDict
-            .action_customization_args as ExplorationQuitCustomizationArgs,
+          learnerActionBackendDict.action_customization_args as ExplorationQuitCustomizationArgs,
           learnerActionBackendDict.schema_version
         );
       default:

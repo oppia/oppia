@@ -16,15 +16,15 @@
  * @fileoverview Unit tests for WorkedExampleEditorComponent
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { ConceptCard } from 'domain/skill/concept-card.model';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { WorkedExample } from 'domain/skill/worked-example.model';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { WorkedExampleEditorComponent } from './worked-example-editor.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ConceptCard} from 'domain/skill/concept-card.model';
+import {SkillUpdateService} from 'domain/skill/skill-update.service';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {WorkedExample} from 'domain/skill/worked-example.model';
+import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {WorkedExampleEditorComponent} from './worked-example-editor.component';
 
 describe('Worked example editor component', () => {
   let component: WorkedExampleEditorComponent;
@@ -36,15 +36,13 @@ describe('Worked example editor component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        WorkedExampleEditorComponent
-      ],
+      declarations: [WorkedExampleEditorComponent],
       providers: [
         ChangeDetectorRef,
         SkillEditorStateService,
-        SkillUpdateService
+        SkillUpdateService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -55,8 +53,18 @@ describe('Worked example editor component', () => {
     skillUpdateService = TestBed.inject(SkillUpdateService);
 
     sampleSkill = new Skill(
-      'id1', 'description', [], [], {} as ConceptCard, 'en',
-      1, 0, 'id1', false, []);
+      'id1',
+      'description',
+      [],
+      [],
+      {} as ConceptCard,
+      'en',
+      1,
+      0,
+      'id1',
+      false,
+      []
+    );
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
 
     component.isEditable = true;
@@ -74,7 +82,7 @@ describe('Worked example editor component', () => {
           html: 'worked example explanation 1',
           content_id: 'worked_example_e_1',
         };
-      }
+      },
     } as WorkedExample;
     component.ngOnInit();
   });
@@ -84,7 +92,7 @@ describe('Worked example editor component', () => {
     expect(component.explanationEditorIsOpen).toBe(false);
     expect(component.WORKED_EXAMPLE_FORM_SCHEMA).toEqual({
       type: 'html',
-      ui_config: {}
+      ui_config: {},
     });
   });
 
@@ -141,8 +149,10 @@ describe('Worked example editor component', () => {
   });
 
   it('should save worked example when clicking on save button', () => {
-    let skillUpdateSpy = spyOn(skillUpdateService, 'updateWorkedExample')
-      .and.returnValue();
+    let skillUpdateSpy = spyOn(
+      skillUpdateService,
+      'updateWorkedExample'
+    ).and.returnValue();
 
     component.saveWorkedExample(true);
 
@@ -150,12 +160,15 @@ describe('Worked example editor component', () => {
       sampleSkill,
       2,
       'worked example question 1',
-      'worked example explanation 1');
+      'worked example explanation 1'
+    );
   });
 
   it('should save worked example when clicking on save button', () => {
-    let skillUpdateSpy = spyOn(skillUpdateService, 'updateWorkedExample')
-      .and.returnValue();
+    let skillUpdateSpy = spyOn(
+      skillUpdateService,
+      'updateWorkedExample'
+    ).and.returnValue();
 
     component.saveWorkedExample(false);
 
@@ -163,12 +176,12 @@ describe('Worked example editor component', () => {
       sampleSkill,
       2,
       'worked example question 1',
-      'worked example explanation 1');
+      'worked example explanation 1'
+    );
   });
 
   it('should get schema', () => {
-    expect(component.getSchema())
-      .toEqual(component.WORKED_EXAMPLE_FORM_SCHEMA);
+    expect(component.getSchema()).toEqual(component.WORKED_EXAMPLE_FORM_SCHEMA);
   });
 
   it('should update tmpWorkedExampleQuestionHtml', () => {

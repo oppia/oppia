@@ -21,5 +21,6 @@
 export const BlogAuthorProfilePageConstants = {
   MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_AUTHOR_PROFILE_PAGE: 12,
   BLOG_AUTHOR_PROFILE_PAGE_URL_TEMPLATE: '/blog/author/<author_username>',
-  BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_TEMPLATE: '/blog/author/data/<author_username>', // eslint-disable-line max-len
+  BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_TEMPLATE:
+    '/blog/author/data/<author_username>', // eslint-disable-line max-len
 } as const;

@@ -16,11 +16,14 @@
  * @fileoverview Search service for activityTilesInfinityGrid.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable, EventEmitter } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable, EventEmitter} from '@angular/core';
 
-import { SearchBackendApiService, SearchResponseBackendDict } from './search-backend-api.service';
-import { ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
+import {
+  SearchBackendApiService,
+  SearchResponseBackendDict,
+} from './search-backend-api.service';
+import {ExplorationSummaryDict} from 'domain/summary/exploration-summary-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 
 export interface SelectionList {
@@ -46,7 +49,7 @@ export interface SelectionDetails {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SearchService {
   // These properties are initialized using functions
@@ -58,18 +61,18 @@ export class SearchService {
   private _lastSelectedLanguageCodes: SelectionList = {};
   private _isCurrentlyFetchingResults = false;
   private _searchBarLoadedEventEmitter = new EventEmitter<string>();
-  private _initialSearchResultsLoadedEventEmitter =
-    new EventEmitter<ExplorationSummaryDict[]>();
+  private _initialSearchResultsLoadedEventEmitter = new EventEmitter<
+    ExplorationSummaryDict[]
+  >();
 
   public numSearchesInProgress = 0;
 
-  constructor(
-    private _searchBackendApiService: SearchBackendApiService) {
-  }
+  constructor(private _searchBackendApiService: SearchBackendApiService) {}
 
   private _getSuffixForQuery(
-      selectedCategories: SelectionList,
-      selectedLanguageCodes: SelectionList): string {
+    selectedCategories: SelectionList,
+    selectedLanguageCodes: SelectionList
+  ): string {
     let querySuffix = '';
 
     let _categories = '';
@@ -106,8 +109,9 @@ export class SearchService {
   }
 
   updateSearchFields(
-      itemsType: string, urlComponent: string,
-      selectionDetails: SelectionDetails
+    itemsType: string,
+    urlComponent: string,
+    selectionDetails: SelectionDetails
   ): void {
     const itemCodeGroup = urlComponent.match(/=\("[A-Za-z%20" ]+"\)/);
     const itemCodes = itemCodeGroup ? itemCodeGroup[0] : null;
@@ -115,19 +119,27 @@ export class SearchService {
     const EXPECTED_PREFIX = '=("';
     const EXPECTED_SUFFIX = '")';
 
-    if (!itemCodes ||
-        itemCodes.indexOf(EXPECTED_PREFIX) !== 0 ||
-        itemCodes.lastIndexOf(EXPECTED_SUFFIX) !==
-          itemCodes.length - EXPECTED_SUFFIX.length ||
-          itemCodes.lastIndexOf(EXPECTED_SUFFIX) === -1) {
+    if (
+      !itemCodes ||
+      itemCodes.indexOf(EXPECTED_PREFIX) !== 0 ||
+      itemCodes.lastIndexOf(EXPECTED_SUFFIX) !==
+        itemCodes.length - EXPECTED_SUFFIX.length ||
+      itemCodes.lastIndexOf(EXPECTED_SUFFIX) === -1
+    ) {
       throw new Error(
         'Invalid search query url fragment for ' +
-        itemsType + ': ' + urlComponent);
+          itemsType +
+          ': ' +
+          urlComponent
+      );
     }
 
-    const items = itemCodes.substring(
-      EXPECTED_PREFIX.length, itemCodes.length - EXPECTED_SUFFIX.length
-    ).split('" OR "');
+    const items = itemCodes
+      .substring(
+        EXPECTED_PREFIX.length,
+        itemCodes.length - EXPECTED_SUFFIX.length
+      )
+      .split('" OR "');
 
     const selections = selectionDetails[itemsType].selections;
     for (let i = 0; i < items.length; i++) {
@@ -140,45 +152,57 @@ export class SearchService {
   }
 
   getSearchUrlQueryString(
-      searchQuery: string,
-      selectedCategories: SelectionList,
-      selectedLanguageCodes: SelectionList): string {
-    return encodeURIComponent(searchQuery) +
-      this._getSuffixForQuery(selectedCategories, selectedLanguageCodes);
+    searchQuery: string,
+    selectedCategories: SelectionList,
+    selectedLanguageCodes: SelectionList
+  ): string {
+    return (
+      encodeURIComponent(searchQuery) +
+      this._getSuffixForQuery(selectedCategories, selectedLanguageCodes)
+    );
   }
-
 
   // Note that an empty query results in all activities being shown.
   executeSearchQuery(
-      searchQuery: string,
-      selectedCategories: SelectionList,
-      selectedLanguageCodes: SelectionList,
-      successCallback: () => void,
-      errorCallback?: (reason: string) => void): void {
+    searchQuery: string,
+    selectedCategories: SelectionList,
+    selectedLanguageCodes: SelectionList,
+    successCallback: () => void,
+    errorCallback?: (reason: string) => void
+  ): void {
     const queryUrl = this.getQueryUrl(
       this.getSearchUrlQueryString(
-        searchQuery, selectedCategories, selectedLanguageCodes));
+        searchQuery,
+        selectedCategories,
+        selectedLanguageCodes
+      )
+    );
 
     this._isCurrentlyFetchingResults = true;
     this.numSearchesInProgress++;
-    this._searchBackendApiService.fetchExplorationSearchResultAsync(queryUrl)
-      .then((response) => {
-        this._lastQuery = searchQuery;
-        this._lastSelectedCategories = cloneDeep(selectedCategories);
-        this._lastSelectedLanguageCodes = cloneDeep(selectedLanguageCodes);
-        this._searchOffset = response.search_cursor;
-        this.numSearchesInProgress--;
+    this._searchBackendApiService
+      .fetchExplorationSearchResultAsync(queryUrl)
+      .then(
+        response => {
+          this._lastQuery = searchQuery;
+          this._lastSelectedCategories = cloneDeep(selectedCategories);
+          this._lastSelectedLanguageCodes = cloneDeep(selectedLanguageCodes);
+          this._searchOffset = response.search_cursor;
+          this.numSearchesInProgress--;
 
-        this._initialSearchResultsLoadedEventEmitter.emit(
-          response.activity_list);
+          this._initialSearchResultsLoadedEventEmitter.emit(
+            response.activity_list
+          );
 
-        this._isCurrentlyFetchingResults = false;
-      }, (errorResponse) => {
-        this.numSearchesInProgress--;
-        if (errorCallback) {
-          errorCallback(errorResponse.error.error);
+          this._isCurrentlyFetchingResults = false;
+        },
+        errorResponse => {
+          this.numSearchesInProgress--;
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
         }
-      });
+      );
 
     if (successCallback) {
       successCallback();
@@ -194,9 +218,11 @@ export class SearchService {
    * selectionDetails. It will update selectionDetails with the relevant
    * fields that were extracted from the url.
    * @returns the unencoded search query string.
-  */
+   */
   updateSearchFieldsBasedOnUrlQuery(
-      urlComponent: string, selectionDetails: SelectionDetails): string {
+    urlComponent: string,
+    selectionDetails: SelectionDetails
+  ): string {
     const urlQuery = urlComponent.substring('?q='.length);
     // The following will split the urlQuery into 3 components:
     // 1. query
@@ -237,11 +263,11 @@ export class SearchService {
   // Here failure callback is optional so that it gets invoked
   // only when the end of page has reached and return void otherwise.
   loadMoreData(
-      successCallback: (
-        SearchResponseData: SearchResponseBackendDict,
-        boolean: boolean
-      ) => void,
-      failureCallback?: (arg0: boolean) => void
+    successCallback: (
+      SearchResponseData: SearchResponseBackendDict,
+      boolean: boolean
+    ) => void,
+    failureCallback?: (arg0: boolean) => void
   ): void {
     // If a new query is still being sent, or the end of the page has been
     // reached, do not fetch more results.
@@ -259,8 +285,9 @@ export class SearchService {
     }
 
     this._isCurrentlyFetchingResults = true;
-    this._searchBackendApiService.fetchExplorationSearchResultAsync(queryUrl)
-      .then((response) => {
+    this._searchBackendApiService
+      .fetchExplorationSearchResultAsync(queryUrl)
+      .then(response => {
         this._searchOffset = response.search_cursor;
         this._isCurrentlyFetchingResults = false;
 
@@ -274,13 +301,11 @@ export class SearchService {
     return this._searchBarLoadedEventEmitter;
   }
 
-  get onInitialSearchResultsLoaded():
-    EventEmitter<ExplorationSummaryDict[]> {
+  get onInitialSearchResultsLoaded(): EventEmitter<ExplorationSummaryDict[]> {
     return this._initialSearchResultsLoadedEventEmitter;
   }
 }
 
-angular.module('oppia').factory(
-  'SearchService',
-  downgradeInjectable(SearchService)
-);
+angular
+  .module('oppia')
+  .factory('SearchService', downgradeInjectable(SearchService));

@@ -16,20 +16,26 @@
  * @fileoverview Unit tests for contributor dashboard page component.
  */
 
-import { ComponentFixture, fakeAsync, flush, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { ContributorDashboardPageComponent } from 'pages/contributor-dashboard-page/contributor-dashboard-page.component';
-import { ContributionAndReviewService } from './services/contribution-and-review.service';
-import { ContributionOpportunitiesService } from './services/contribution-opportunities.service';
-import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
-import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import { UserService } from 'services/user.service';
-import { LocalStorageService } from 'services/local-storage.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { UserInfo } from 'domain/user/user-info.model';
-import { AppConstants } from 'app.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flush,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {ContributorDashboardPageComponent} from 'pages/contributor-dashboard-page/contributor-dashboard-page.component';
+import {ContributionAndReviewService} from './services/contribution-and-review.service';
+import {ContributionOpportunitiesService} from './services/contribution-opportunities.service';
+import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
+import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import {UserService} from 'services/user.service';
+import {LocalStorageService} from 'services/local-storage.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {UserInfo} from 'domain/user/user-info.model';
+import {AppConstants} from 'app.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 describe('Contributor dashboard page', () => {
   let component: ContributorDashboardPageComponent;
@@ -54,18 +60,16 @@ describe('Contributor dashboard page', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        ContributorDashboardPageComponent
-      ],
+      declarations: [ContributorDashboardPageComponent],
       providers: [
         LocalStorageService,
         UserService,
         TranslationLanguageService,
         TranslationTopicService,
         ContributionOpportunitiesService,
-        ContributionAndReviewService
+        ContributionAndReviewService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -74,8 +78,9 @@ describe('Contributor dashboard page', () => {
     component = fixture.componentInstance;
 
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
-    contributionOpportunitiesService =
-      TestBed.inject(ContributionOpportunitiesService);
+    contributionOpportunitiesService = TestBed.inject(
+      ContributionOpportunitiesService
+    );
     localStorageService = TestBed.inject(LocalStorageService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTopicService = TestBed.inject(TranslationTopicService);
@@ -84,34 +89,45 @@ describe('Contributor dashboard page', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
     getTranslatableTopicNamesAsyncSpy = spyOn(
-      contributionOpportunitiesService, 'getTranslatableTopicNamesAsync');
+      contributionOpportunitiesService,
+      'getTranslatableTopicNamesAsync'
+    );
     getTranslatableTopicNamesAsyncSpy.and.returnValue(
-      Promise.resolve(['Topic 1', 'Topic 2']));
-    spyOn(localStorageService, 'getLastSelectedTranslationLanguageCode').and
-      .returnValue('');
-    spyOn(localStorageService, 'getLastSelectedTranslationTopicName').and
-      .returnValue('Topic 1');
-    spyOn(translationLanguageService, 'setActiveLanguageCode').and
-      .callThrough();
+      Promise.resolve(['Topic 1', 'Topic 2'])
+    );
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('');
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationTopicName'
+    ).and.returnValue('Topic 1');
+    spyOn(
+      translationLanguageService,
+      'setActiveLanguageCode'
+    ).and.callThrough();
     spyOn(translationTopicService, 'setActiveTopicName').and.callThrough();
 
     let userInfo = {
       isLoggedIn: () => true,
-      getUsername: () => 'username1'
+      getUsername: () => 'username1',
     };
 
     getUserInfoAsyncSpy = spyOn(userService, 'getUserInfoAsync');
-    getUserInfoAsyncSpy.and.returnValue(
-      Promise.resolve(userInfo as UserInfo));
-    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-      ['default-image-url-png', 'default-image-url-webp']);
+    getUserInfoAsyncSpy.and.returnValue(Promise.resolve(userInfo as UserInfo));
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
+      'default-image-url-png',
+      'default-image-url-webp',
+    ]);
 
     component.ngOnInit();
   });
 
   it('should set focus on select lang field', fakeAsync(() => {
-    spyOn(userService, 'getUserContributionRightsDataAsync')
-      .and.returnValue(Promise.resolve(userContributionRights));
+    spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+      Promise.resolve(userContributionRights)
+    );
     let focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
 
     component.onTabClick('translateTextTab');
@@ -121,47 +137,51 @@ describe('Contributor dashboard page', () => {
   }));
 
   it('should throw error if contribution rights is null', fakeAsync(() => {
-    spyOn(userService, 'getUserContributionRightsDataAsync')
-      .and.returnValue(Promise.resolve(null));
+    spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+      Promise.resolve(null)
+    );
     expect(() => {
       component.ngOnInit();
       flush();
     }).toThrowError();
   }));
 
-  it('should set default profile pictures when username is null',
-    fakeAsync(() => {
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
-      let userInfo = {
-        isLoggedIn: () => true,
-        getUsername: () => null
-      };
-
-      getUserInfoAsyncSpy.and.returnValue(
-        Promise.resolve(userInfo as UserInfo));
-
-      component.ngOnInit();
-      flush();
-
-      expect(component.profilePicturePngDataUrl).toBe(
-        urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
-      expect(component.profilePictureWebpDataUrl).toBe(
-        urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
-    }));
-
-  it('should username equal to "" when user is not loggedIn', fakeAsync(() => {
-    spyOn(userService, 'getUserContributionRightsDataAsync')
-      .and.returnValue(Promise.resolve(userContributionRights));
+  it('should set default profile pictures when username is null', fakeAsync(() => {
+    spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+      Promise.resolve(userContributionRights)
+    );
     let userInfo = {
-      isLoggedIn: () => false,
-      getUsername: () => 'username1'
+      isLoggedIn: () => true,
+      getUsername: () => null,
     };
 
-    getUserInfoAsyncSpy.and.returnValue(
-      Promise.resolve(userInfo as UserInfo));
+    getUserInfoAsyncSpy.and.returnValue(Promise.resolve(userInfo as UserInfo));
+
+    component.ngOnInit();
+    flush();
+
+    expect(component.profilePicturePngDataUrl).toBe(
+      urlInterpolationService.getStaticImageUrl(
+        AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
+      )
+    );
+    expect(component.profilePictureWebpDataUrl).toBe(
+      urlInterpolationService.getStaticImageUrl(
+        AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
+      )
+    );
+  }));
+
+  it('should username equal to "" when user is not loggedIn', fakeAsync(() => {
+    spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+      Promise.resolve(userContributionRights)
+    );
+    let userInfo = {
+      isLoggedIn: () => false,
+      getUsername: () => 'username1',
+    };
+
+    getUserInfoAsyncSpy.and.returnValue(Promise.resolve(userInfo as UserInfo));
 
     component.ngOnInit();
     flush();
@@ -170,93 +190,110 @@ describe('Contributor dashboard page', () => {
     expect(component.userIsLoggedIn).toBeFalse();
     expect(component.profilePicturePngDataUrl).toBe(
       urlInterpolationService.getStaticImageUrl(
-        AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+        AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
+      )
+    );
     expect(component.profilePictureWebpDataUrl).toBe(
       urlInterpolationService.getStaticImageUrl(
-        AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+        AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
+      )
+    );
   }));
 
   describe('when user is logged in', () => {
-    it('should set specific properties after $onInit is called',
-      fakeAsync(() => {
-        spyOn(userService, 'getUserContributionRightsDataAsync')
-          .and.returnValue(Promise.resolve(userContributionRights));
-        component.ngOnInit();
-        flush();
+    it('should set specific properties after $onInit is called', fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      component.ngOnInit();
+      flush();
 
-        expect(component.topicName).toBe('Topic 1');
-        expect(translationTopicService.setActiveTopicName)
-          .toHaveBeenCalled();
-        expect(component.activeTabName).toBe('myContributionTab');
-        expect(component.OPPIA_AVATAR_IMAGE_URL).toBe(
-          '/assets/images/avatar/oppia_avatar_100px.svg');
-        expect(component.profilePicturePngDataUrl).toEqual(
-          'default-image-url-png');
-        expect(component.profilePictureWebpDataUrl).toEqual(
-          'default-image-url-webp');
-      }));
+      expect(component.topicName).toBe('Topic 1');
+      expect(translationTopicService.setActiveTopicName).toHaveBeenCalled();
+      expect(component.activeTabName).toBe('myContributionTab');
+      expect(component.OPPIA_AVATAR_IMAGE_URL).toBe(
+        '/assets/images/avatar/oppia_avatar_100px.svg'
+      );
+      expect(component.profilePicturePngDataUrl).toEqual(
+        'default-image-url-png'
+      );
+      expect(component.profilePictureWebpDataUrl).toEqual(
+        'default-image-url-webp'
+      );
+    }));
 
-    it('should set active topic name as default when no topics are returned',
-      fakeAsync(() => {
-        spyOn(userService, 'getUserContributionRightsDataAsync')
-          .and.returnValue(Promise.resolve(userContributionRights));
-        getTranslatableTopicNamesAsyncSpy.and.returnValue(
-          Promise.resolve([]));
+    it('should set active topic name as default when no topics are returned', fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      getTranslatableTopicNamesAsyncSpy.and.returnValue(Promise.resolve([]));
 
-        component.ngOnInit();
-        flush();
+      component.ngOnInit();
+      flush();
 
-        expect(component.topicName).toBeUndefined();
-        expect(translationTopicService.setActiveTopicName).toHaveBeenCalled();
-      }));
+      expect(component.topicName).toBeUndefined();
+      expect(translationTopicService.setActiveTopicName).toHaveBeenCalled();
+    }));
 
     it('should return language description in kebab case format', () => {
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
       let languageDescription = 'Deutsch (German)';
 
-      expect(component.provideLanguageForProtractorClass(
-        languageDescription)).toEqual('deutsch-german');
+      expect(
+        component.provideLanguageForProtractorClass(languageDescription)
+      ).toEqual('deutsch-german');
     });
 
-    it('should initialize $scope properties after controller is initialized' +
-      ' and get data from backend', () => {
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
-      expect(component.userIsLoggedIn).toBe(false);
-      expect(component.username).toBe('');
-      expect(component.userCanReviewQuestions).toBe(false);
-      expect(component.userIsReviewer).toBe(false);
+    it(
+      'should initialize $scope properties after controller is initialized' +
+        ' and get data from backend',
+      () => {
+        spyOn(
+          userService,
+          'getUserContributionRightsDataAsync'
+        ).and.returnValue(Promise.resolve(userContributionRights));
+        expect(component.userIsLoggedIn).toBe(false);
+        expect(component.username).toBe('');
+        expect(component.userCanReviewQuestions).toBe(false);
+        expect(component.userIsReviewer).toBe(false);
+      }
+    );
+
+    it('should change active tab name when clicking on translate text tab', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      let changedTab = 'translateTextTab';
+      expect(component.activeTabName).toBe('myContributionTab');
+      component.onTabClick(changedTab);
+      expect(component.activeTabName).toBe(changedTab);
     });
 
-    it('should change active tab name when clicking on translate text tab',
-      () => {
-        spyOn(userService, 'getUserContributionRightsDataAsync')
-          .and.returnValue(Promise.resolve(userContributionRights));
-        let changedTab = 'translateTextTab';
-        expect(component.activeTabName).toBe('myContributionTab');
-        component.onTabClick(changedTab);
-        expect(component.activeTabName).toBe(changedTab);
-      });
+    it('should change active language when clicking on language selector', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      spyOn(
+        localStorageService,
+        'updateLastSelectedTranslationLanguageCode'
+      ).and.callThrough();
 
-    it('should change active language when clicking on language selector',
-      () => {
-        spyOn(userService, 'getUserContributionRightsDataAsync')
-          .and.returnValue(Promise.resolve(userContributionRights));
-        spyOn(localStorageService, 'updateLastSelectedTranslationLanguageCode')
-          .and.callThrough();
+      component.onChangeLanguage('hi');
 
-        component.onChangeLanguage('hi');
-
-        expect(translationLanguageService.setActiveLanguageCode)
-          .toHaveBeenCalledWith('hi');
-        expect(localStorageService.updateLastSelectedTranslationLanguageCode)
-          .toHaveBeenCalledWith('hi');
-      });
+      expect(
+        translationLanguageService.setActiveLanguageCode
+      ).toHaveBeenCalledWith('hi');
+      expect(
+        localStorageService.updateLastSelectedTranslationLanguageCode
+      ).toHaveBeenCalledWith('hi');
+    });
 
     it('should show language selector based on active tab', () => {
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
       let changedTab = 'translateTextTab';
 
       expect(component.activeTabName).toBe('myContributionTab');
@@ -267,24 +304,29 @@ describe('Contributor dashboard page', () => {
       expect(component.showLanguageSelector()).toBe(true);
     });
 
-    it('should change active topic when clicking on topic selector',
-      () => {
-        spyOn(userService, 'getUserContributionRightsDataAsync')
-          .and.returnValue(Promise.resolve(userContributionRights));
-        spyOn(localStorageService, 'updateLastSelectedTranslationTopicName')
-          .and.callThrough();
+    it('should change active topic when clicking on topic selector', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      spyOn(
+        localStorageService,
+        'updateLastSelectedTranslationTopicName'
+      ).and.callThrough();
 
-        component.onChangeTopic('Topic 2');
+      component.onChangeTopic('Topic 2');
 
-        expect(translationTopicService.setActiveTopicName)
-          .toHaveBeenCalledWith('Topic 2');
-        expect(localStorageService.updateLastSelectedTranslationTopicName)
-          .toHaveBeenCalledWith('Topic 2');
-      });
+      expect(translationTopicService.setActiveTopicName).toHaveBeenCalledWith(
+        'Topic 2'
+      );
+      expect(
+        localStorageService.updateLastSelectedTranslationTopicName
+      ).toHaveBeenCalledWith('Topic 2');
+    });
 
     it('should show topic selector based on active tab', () => {
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
       let changedTab = 'translateTextTab';
 
       expect(component.activeTabName).toBe('myContributionTab');
@@ -296,12 +338,16 @@ describe('Contributor dashboard page', () => {
     });
 
     it('should show topic selector for questions reviews', () => {
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(Promise.resolve(userContributionRights));
-      spyOn(contributionAndReviewService, 'getActiveSuggestionType')
-        .and.returnValue('add_question');
-      spyOn(contributionAndReviewService, 'getActiveTabType')
-        .and.returnValue('reviews');
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      spyOn(
+        contributionAndReviewService,
+        'getActiveSuggestionType'
+      ).and.returnValue('add_question');
+      spyOn(contributionAndReviewService, 'getActiveTabType').and.returnValue(
+        'reviews'
+      );
       let changedTab = 'myContributionTab';
 
       component.onTabClick(changedTab);
