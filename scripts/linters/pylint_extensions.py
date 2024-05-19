@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0041.
+presubmit checks. Next message id would be C0042.
 """
 
 from __future__ import annotations
@@ -2933,7 +2933,7 @@ class PreventStringConcatenationChecker(checkers.BaseChecker): # type: ignore[mi
     name = 'use-string-interpolation'
     priority = -1
     msgs = {
-        'C0042': (
+        'C0041': (
             'Please use string interpolation over string concatenation',
             'use-string-interpolation',
             'Used when string concatenation is detected.',
