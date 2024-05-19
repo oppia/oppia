@@ -489,7 +489,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a *ngIf="(isCurriculumAdmin || isTopicManager)"
+          <a *ngIf="(isCurriculumAdmin || isQuestionAdmin || isTopicManager)"
              (click)="closeSubmenuIfNotMobile($event)"
              href="/topics-and-skills-dashboard"
              class="dropdown-item nav-link e2e-test-topics-and-skills-dashboard-link">
