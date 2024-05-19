@@ -38,8 +38,8 @@ if MYPY: # pragma: no cover
 class StoryFetchersUnitTests(test_utils.GenericTestBase):
     """Test the story fetchers module."""
 
-    NODE_ID_1: Final = story_domain.NODE_ID_PREFIX + '1'
-    NODE_ID_2: Final = story_domain.NODE_ID_PREFIX + '2'
+    NODE_ID_1: Final = f'{story_domain.NODE_ID_PREFIX}1'
+    NODE_ID_2: Final = f'{story_domain.NODE_ID_PREFIX}2'
     EXP_ID_1: Final = 'exp_1'
     USER_ID: Final = 'user'
 
