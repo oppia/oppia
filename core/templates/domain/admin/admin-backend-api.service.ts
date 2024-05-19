@@ -636,9 +636,9 @@ export class AdminBackendApiService {
     numberOfQuestions: number
   ): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'generate_dummy_suggestion_questions',
+      action: 'generate_dummy_question_suggestions',
       skill_id: skillId,
-      num_dummy_suggestion_ques_generate: numberOfQuestions,
+      num_dummy_question_suggestions_generate: numberOfQuestions,
     });
   }
 

@@ -1310,13 +1310,13 @@ describe('Admin backend api service', () => {
   }));
 
   it('should generate dummy suggestion questions', fakeAsync(() => {
-    let action = 'generate_dummy_suggestion_questions';
+    let action = 'generate_dummy_question_suggestions';
     let skillId = 'dc3k2ldd';
     let numberOfQuestions = 2;
     let payload = {
       action: action,
       skill_id: skillId,
-      num_dummy_suggestion_ques_generate: numberOfQuestions,
+      num_dummy_question_suggestions_generate: numberOfQuestions,
     };
 
     abas
@@ -1333,40 +1333,37 @@ describe('Admin backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it(
-    'should handle generate dummy suggestion questions ' + 'request failure',
-    fakeAsync(() => {
-      let action = 'generate_dummy_suggestion_questions';
-      let skillId = 'dc3k2ldd';
-      let numberOfQuestions = 2;
-      let payload = {
-        action: action,
-        skill_id: skillId,
-        num_dummy_suggestion_ques_generate: numberOfQuestions,
-      };
+  it('should handle generate dummy suggestion questions request failure', fakeAsync(() => {
+    let action = 'generate_dummy_question_suggestions';
+    let skillId = 'dc3k2ldd';
+    let numberOfQuestions = 2;
+    let payload = {
+      action: action,
+      skill_id: skillId,
+      num_dummy_question_suggestions_generate: numberOfQuestions,
+    };
 
-      abas
-        .generateDummySuggestionQuestionsAsync(skillId, numberOfQuestions)
-        .then(successHandler, failHandler);
+    abas
+      .generateDummySuggestionQuestionsAsync(skillId, numberOfQuestions)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/adminhandler');
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(payload);
-      req.flush(
-        {
-          error: 'Failed to get data.',
-        },
-        {
-          status: 500,
-          statusText: 'Internal Server Error',
-        }
-      );
-      flushMicrotasks();
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(
+      {
+        error: 'Failed to get data.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+  }));
 
   it('should handle generate dummy blog request failure', fakeAsync(() => {
     let action = 'generate_dummy_blog_post';

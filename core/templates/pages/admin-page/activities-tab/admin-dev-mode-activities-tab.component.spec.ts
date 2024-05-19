@@ -615,31 +615,28 @@ describe('Admin dev mode activities tab', () => {
       });
     }));
 
-    it(
-      'should show error message when dummy explorations' + 'are not generated',
-      async(() => {
-        component.numDummyExpsToPublish = 2;
-        component.numDummyExpsToGenerate = 2;
+    it('should show error message when dummy explorations are not generated', async(() => {
+      component.numDummyExpsToPublish = 2;
+      component.numDummyExpsToGenerate = 2;
 
-        spyOn(
-          adminBackendApiService,
-          'generateDummyExplorationsAsync'
-        ).and.returnValue(Promise.reject('Dummy explorations not generated.'));
-        spyOn(component.setStatusMessage, 'emit');
+      spyOn(
+        adminBackendApiService,
+        'generateDummyExplorationsAsync'
+      ).and.returnValue(Promise.reject('Dummy explorations not generated.'));
+      spyOn(component.setStatusMessage, 'emit');
 
-        component.generateDummyExplorations();
+      component.generateDummyExplorations();
 
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Processing...'
+      );
+
+      fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
-          'Processing...'
+          'Server error: Dummy explorations not generated.'
         );
-
-        fixture.whenStable().then(() => {
-          expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
-            'Server error: Dummy explorations not generated.'
-          );
-        });
-      })
-    );
+      });
+    }));
   });
 
   describe('.generateDummySuggestionQuestions', () => {

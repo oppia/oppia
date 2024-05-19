@@ -170,7 +170,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     collection_id: Optional[str]
     num_dummy_exps_to_generate: Optional[int]
     num_dummy_exps_to_publish: Optional[int]
-    num_dummy_suggestion_ques_generate: Optional[int]
+    num_dummy_question_suggestions_generate: Optional[int]
     skill_id: Optional[str]
     data: Optional[str]
     topic_id: Optional[str]
@@ -202,7 +202,7 @@ class AdminHandler(
                         'generate_dummy_new_skill_data',
                         'generate_dummy_blog_post',
                         'generate_dummy_classroom',
-                        'generate_dummy_suggestion_questions',
+                        'generate_dummy_question_suggestions',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
                         'update_platform_parameter_rules',
@@ -238,7 +238,7 @@ class AdminHandler(
                 },
                 'default_value': None
             },
-            'num_dummy_suggestion_ques_generate': {
+            'num_dummy_question_suggestions_generate': {
                 'schema': {
                     'type': 'int'
                 },
@@ -319,7 +319,6 @@ class AdminHandler(
         skill_summaries = skill_services.get_all_skill_summaries()
         skill_summary_dicts = [
             summary.to_dict() for summary in skill_summaries]
-        logging.error(skill_summary_dicts)
         demo_exploration_ids = list(feconf.DEMO_EXPLORATIONS.keys())
 
         topic_summaries = topic_fetchers.get_all_topic_summaries()
@@ -384,9 +383,9 @@ class AdminHandler(
                 is update_platform_parameter_rules.
             InvalidInputException. The input provided is not valid.
             Exception. The skill_id must be provided when
-                the action is generate_dummy_suggestion_questions.
-            Exception. The num_dummy_suggestion_ques_generate must be provided
-                when the action is generate_dummy_suggestion_questions.
+                the action is generate_dummy_question_suggestions.
+            Exception. The num_dummy_question_suggestions_generate must be 
+                provided when the action is generate_dummy_question_suggestions.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -449,25 +448,25 @@ class AdminHandler(
                 self._generate_dummy_skill_and_questions()
             elif action == 'generate_dummy_classroom':
                 self._generate_dummy_classroom()
-            elif action == 'generate_dummy_suggestion_questions':
+            elif action == 'generate_dummy_question_suggestions':
                 skill_id = self.normalized_payload.get('skill_id')
                 if skill_id is None:
                     raise Exception(
                         'The \'skill_id\' must be provided when'
-                        ' the action is _generate_dummy_suggestion_questions.'
+                        ' the action is _generate_dummy_question_suggestions.'
                     )
-                num_dummy_suggestion_ques_generate = (
+                num_dummy_question_suggestions_generate = (
                     self.normalized_payload.get(
-                        'num_dummy_suggestion_ques_generate')
+                        'num_dummy_question_suggestions_generate')
                 )
-                if num_dummy_suggestion_ques_generate is None:
+                if num_dummy_question_suggestions_generate is None:
                     raise Exception(
-                        'The \'num_dummy_suggestion_ques_generate\' must'
+                        'The \'num_dummy_question_suggestions_generate\' must'
                         ' be provided when the action is '
-                        '_generate_dummy_suggestion_questions.'
+                        '_generate_dummy_question_suggestions.'
                     )
-                self._generate_dummy_suggestion_questions(
-                    skill_id, num_dummy_suggestion_ques_generate)
+                self._generate_dummy_question_suggestions(
+                    skill_id, num_dummy_question_suggestions_generate)
             elif action == 'upload_topic_similarities':
                 data = self.normalized_payload.get('data')
                 if data is None:
@@ -1270,9 +1269,9 @@ class AdminHandler(
         else:
             raise Exception('Cannot generate dummy classroom in production.')
 
-    def _generate_dummy_suggestion_questions(
+    def _generate_dummy_question_suggestions(
             self, skill_id: str,
-            num_dummy_suggestion_ques_generate: int) -> None:
+            num_dummy_question_suggestions_generate: int) -> None:
         """Generates and loads the database with a specified number of
             suggestion question for the selected skill.
 
@@ -1286,20 +1285,21 @@ class AdminHandler(
                 or not user_services.can_submit_question_suggestions(
                     self.user_id)):
                 raise Exception(
-                    'User does not have enough rights to generate data.')
-            for _ in range(num_dummy_suggestion_ques_generate):
+                    'User "${self.username}" must be a question submitter or ' +
+                    'question admin in order to generate question suggestions.')
+            for _ in range(num_dummy_question_suggestions_generate):
                 content_id_generator = translation_domain.ContentIdGenerator()
                 content_id_generator.generate(
                     translation_domain.ContentType.CONTENT)
                 content_id_generator.generate(
                     translation_domain.ContentType.DEFAULT_OUTCOME)
                 state = state_domain.State.create_default_state(
-                'default_state',
-                content_id_generator.generate(
-                    translation_domain.ContentType.CONTENT),
-                content_id_generator.generate(
-                    translation_domain.ContentType.DEFAULT_OUTCOME),
-                is_initial_state=True)
+                    'default_state',
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT),
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME),
+                    is_initial_state=True)
                 state.update_interaction_id('TextInput')
                 solution_dict: state_domain.SolutionDict = {
                     'answer_is_exclusive': False,
@@ -1317,9 +1317,8 @@ class AdminHandler(
                                 translation_domain.ContentType.HINT),
                             '<p>This is a hint.</p>')),
                 ]
-                # Ruling out the possibility of None for mypy type checking,
-                # because we above we are already updating the value
-                # of interaction_id.
+                # Ruling out None for mypy type checking,
+                # as interaction_id is already updated.
                 assert state.interaction.id is not None
                 solution = state_domain.Solution.from_dict(
                     state.interaction.id, solution_dict)
@@ -1367,10 +1366,10 @@ class AdminHandler(
                 }
 
                 suggestion = suggestion_services.create_suggestion(
-                feconf.SUGGESTION_TYPE_ADD_QUESTION,
-                feconf.ENTITY_TYPE_SKILL,
-                skill_id, 1,
-                self.user_id, suggestion_change, 'test description')
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                    feconf.ENTITY_TYPE_SKILL,
+                    skill_id, 1,
+                    self.user_id, suggestion_change, 'test description')
 
                 (
                     suggestion_services
