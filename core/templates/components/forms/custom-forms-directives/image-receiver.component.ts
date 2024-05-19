@@ -39,10 +39,10 @@ interface ImageTypeMapping {
 }
 
 @Component({
-  selector: 'oppia-image-uploader',
-  templateUrl: './image-uploader.component.html',
+  selector: 'oppia-image-receiver',
+  templateUrl: './image-receiver.component.html',
 })
-export class ImageUploaderComponent {
+export class ImageUploaderReceiver {
   @Output() fileChanged: EventEmitter<File> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -211,5 +211,5 @@ angular
   .module('oppia')
   .directive(
     'oppiaImageUploader',
-    downgradeComponent({component: ImageUploaderComponent})
+    downgradeComponent({component: ImageUploaderReceiver})
   );

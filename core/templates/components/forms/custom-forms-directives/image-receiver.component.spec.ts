@@ -25,14 +25,14 @@ import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {IdGenerationService} from 'services/id-generation.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {ImageUploaderComponent} from './image-uploader.component';
+import {ImageUploaderReceiver} from './image-receiver.component';
 import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ContextService} from 'services/context.service';
 
-describe('ImageUploaderComponent', () => {
-  let component: ImageUploaderComponent;
-  let fixture: ComponentFixture<ImageUploaderComponent>;
+describe('ImageUploaderReceiver', () => {
+  let component: ImageUploaderReceiver;
+  let fixture: ComponentFixture<ImageUploaderReceiver>;
   let igs: IdGenerationService;
   let windowRef: WindowRef;
   let contextService: ContextService;
@@ -61,7 +61,7 @@ describe('ImageUploaderComponent', () => {
         HttpClientTestingModule,
         RouterModule.forRoot([]),
       ],
-      declarations: [ImageUploaderComponent, MockTranslatePipe],
+      declarations: [ImageUploaderReceiver, MockTranslatePipe],
       providers: [
         BlogDashboardPageService,
         {provide: WindowRef, useValue: windowRef},
@@ -71,7 +71,7 @@ describe('ImageUploaderComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ImageUploaderComponent);
+    fixture = TestBed.createComponent(ImageUploaderReceiver);
     component = fixture.componentInstance;
     igs = TestBed.inject(IdGenerationService);
     contextService = TestBed.inject(ContextService);
