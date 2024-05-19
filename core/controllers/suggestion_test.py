@@ -1453,9 +1453,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertIn(
             'An image in the submitted translation\'s original content '
             'named "img.png" cannot be found. Please save it to the '
-            'backend file system at /exploration/%s/assets/image/ ' % (
-                exp_id
-            ) + 'before submitting this translation again.',
+            'backend file system at /exploration/%s/assets/image/ %s' % (
+                exp_id, 'before submitting this translation again.'),
             response_dict['error']
         )
 
