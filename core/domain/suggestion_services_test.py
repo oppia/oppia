@@ -7422,9 +7422,10 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
     def test_create_translation_contributor_certificate_for_rule_translation(
         self
     ) -> None:
-        score_category: str = (
-            suggestion_models.SCORE_TYPE_TRANSLATION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        score_category: str = ( '%s%s%s' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER, 'English')
+        )
         change_cmd = self._get_change_with_normalized_string()
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
