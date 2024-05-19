@@ -1,5 +1,5 @@
 <ng-container>
-  <mat-card *ngIf="!featureFlag" class="oppia-topic-dashboard-card">
+  <mat-card *ngIf="!redesignFeatureFlag" class="oppia-topic-dashboard-card">
     <a [href]="getTopicLink()"
        target="{{ openInNewWindow ? '_blank' : '_self' }}"
        class="oppia-topic-link">
@@ -23,8 +23,8 @@
       </div>
     </a>
   </mat-card>
-  <a *ngIf="featureFlag" class="d-flex flex-column flex-shrink-0 oppia-class-card text-decoration-none" [href]="getTopicLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
-    <div class="oppia-class-card-img" [ngStyle]="{'background-color': thumbnailBgColor}">
+  <a *ngIf="redesignFeatureFlag" class="d-flex flex-column flex-shrink-0 oppia-class-card text-decoration-none" [href]="getTopicLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
+    <div class="oppia-class-card-img rounded-top" [ngStyle]="{'background-color': thumbnailBgColor}">
       <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl">
     </div>
     <div class="oppia-class-card-info">
@@ -90,7 +90,7 @@
 
   .oppia-class-card {
     background-color: #205d86;
-    border-radius: 0 0 .25em .25em;
+    border-radius: .25em;
     box-shadow: 0 2px 2px 0 #00000040;
     height: 220px;
     margin-right: 16px;
