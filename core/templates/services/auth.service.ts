@@ -112,7 +112,7 @@ export class AuthService {
     }
   }
 
-  static getConfig: () => FirebaseOptions = function() {
+  static getConfig: () => FirebaseOptions = function () {
     let config: string = '';
     let request = new XMLHttpRequest();
     try {
@@ -120,13 +120,18 @@ export class AuthService {
       request.send(null);
       if (request.status === 200) {
         let jsonResponse = request.responseText.substr(
-          request.responseText.indexOf(')]}\'') + 4); // Extract the JSON part.
+          request.responseText.indexOf(")]}'") + 4
+        ); // Extract the JSON part.
         config = jsonResponse;
       }
     } catch (e) {
       console.error('Unable to fetch firebase config : ', e);
     }
-    return JSON.parse(config);
+    if (config === '') {
+      return null;
+    } else {
+      return JSON.parse(config);
+    }
   };
 
   static get firebaseEmulatorIsEnabled(): boolean {

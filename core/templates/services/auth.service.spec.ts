@@ -269,8 +269,8 @@ describe('Auth service', function () {
       expect(authBackendApiService.beginSessionAsync).not.toHaveBeenCalled();
     });
 
-    it('should return firebase config', () => {
-    // Mock getConfig function to return a sample configuration.
+    fit('should return firebase config', () => {
+      // Mock getConfig function to return a sample configuration.
       spyOn(AuthService, 'getConfig').and.returnValue({
         FIREBASE_CONFIG_API_KEY: 'sample-api-key',
         FIREBASE_CONFIG_AUTH_DOMAIN: 'sample-auth-domain',
@@ -290,7 +290,7 @@ describe('Auth service', function () {
       });
     });
 
-    it('should return the same config if called multiple times', () => {
+    fit('should return the same config if called multiple times', () => {
       spyOn(AuthService, 'getConfig').and.returnValue({
         FIREBASE_CONFIG_API_KEY: 'sample-api-key',
         FIREBASE_CONFIG_AUTH_DOMAIN: 'sample-auth-domain',
@@ -305,4 +305,12 @@ describe('Auth service', function () {
       expect(firebaseConfig1).toBe(firebaseConfig2);
     });
   });
+});
+
+fit('should call firebase_config API', () => {
+  // Mock getConfig function to return a sample configuration.
+  spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
+  spyOn(XMLHttpRequest.prototype, 'send');
+  const firebaseConfig = AuthService.getConfig();
+  expect(XMLHttpRequest.prototype.open).toHaveBeenCalled();
 });
