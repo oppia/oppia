@@ -263,6 +263,13 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     );
   }
 
+  getNumberOfDaysForDateBeforeToday(date: Date): number {
+    const today = new Date();
+    return (
+      (today.getTime() - new Date(date).getTime()) / this.ONE_DAY_IN_MILLIS
+    );
+  }
+
   isValidLastDate(selectedLastDate: Date): boolean {
     const today = new Date();
     return today.getTime() >= selectedLastDate.getTime();
@@ -273,7 +280,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
-      this.lastDateToFilterUsersActivity
+      this.getNumberOfDaysForDateBeforeToday(this.lastDateToFilterUsersActivity)
     );
 
     if (this.filter === undefined || !isEqual(tempFilter, this.filter)) {

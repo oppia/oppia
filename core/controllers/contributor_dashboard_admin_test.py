@@ -1229,9 +1229,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 'page_size': 4,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'last_date': (
-                datetime.date.today() - datetime.timedelta(120)).strftime(
-                    '%Y-%m-%d'),
+                'max_days_since_last_activity': 120,
                 'topic_ids': []
             })
 
@@ -1329,9 +1327,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 'page_size': 4,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'last_date': (
-                datetime.date.today() - datetime.timedelta(120)).strftime(
-                    '%Y-%m-%d'),
+                'max_days_since_last_activity': 120,
                 'topic_ids': []
             })
 
@@ -1459,9 +1455,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 4,
                 'offset': 1,
-                'last_date': (
-                datetime.date.today() - datetime.timedelta(120)).strftime(
-                    '%Y-%m-%d'),
+                'max_days_since_last_activity': 120,
                 'topic_ids': []
             })
 
@@ -1556,9 +1550,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 4,
                 'offset': 1,
-                'last_date': (
-                datetime.date.today() - datetime.timedelta(120)).strftime(
-                    '%Y-%m-%d'),
+                'max_days_since_last_activity': 120,
                 'topic_ids': []
             })
 
@@ -1591,8 +1583,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/translation/coordinate', {
                 'page_size': 0,
                 'offset': 0,
-                'last_date': (
-                datetime.date.today()).strftime('%Y-%m-%d'),
+                'max_days_since_last_activity': 0,
                 'topic_ids': [],
                 'sort_by': 'DecreasingCoordinatorCounts'
             })
@@ -1614,8 +1605,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/translation/coordinate', {
                 'page_size': 0,
                 'offset': 0,
-                'last_date': (
-                datetime.date.today()).strftime('%Y-%m-%d'),
+                'max_days_since_last_activity': 0,
                 'topic_ids': [],
                 'sort_by': 'IncreasingCoordinatorCounts'
             })
@@ -1641,8 +1631,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/question/coordinate', {
                 'page_size': 0,
                 'offset': 0,
-                'last_date': (
-                datetime.date.today()).strftime('%Y-%m-%d'),
+                'max_days_since_last_activity': 0,
                 'topic_ids': []
             })
 
