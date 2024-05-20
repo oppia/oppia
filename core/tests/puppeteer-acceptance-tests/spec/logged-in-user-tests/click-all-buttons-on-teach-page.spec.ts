@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users
- * can open links by clicking all buttons in about foundation page
+ * @fileoverview Acceptance Test for checking if Parent/Teacher
+ * can open links by clicking all buttons in teach page
  */
 
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
@@ -23,24 +23,30 @@ import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-in User in About page', function () {
+const now = new Date();
+const i =
+  now.getHours().toString() +
+  now.getMinutes().toString() +
+  now.getSeconds().toString();
+
+describe('Parent in Parents and Teachers page', function () {
   let testUser: LoggedInUser;
 
   beforeAll(async function () {
     testUser = await UserFactory.createNewUser(
-      'testuser2',
-      'testuser2@example.com'
+      `parent${i}`,
+      `parent${i}@example.com`
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await testUser.navigateToAboutPage();
+    await testUser.navigateToTeachPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open Math Classroom page with the Browse Our Lessons button.',
     async function () {
-      await testUser.clickBrowseOurLessonsButtonInAboutPage();
+      await testUser.clickBrowseOurLessonsButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -48,7 +54,7 @@ describe('Logged-in User in About page', function () {
   it(
     'should open Android page with the Access Android App button.',
     async function () {
-      await testUser.clickAccessAndroidAppButtonInAboutPage();
+      await testUser.clickAccessAndroidAppButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -56,7 +62,7 @@ describe('Logged-in User in About page', function () {
   it(
     'should open Math Classroom page with the Visit Classroom button.',
     async function () {
-      await testUser.clickVisitClassroomButtonInAboutPage();
+      await testUser.clickVisitClassroomButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -64,16 +70,7 @@ describe('Logged-in User in About page', function () {
   it(
     'should open Community Library page with the Browse Library button.',
     async function () {
-      await testUser.clickBrowseLibraryButtonInAboutPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open Creator Dashboard page and Exploration Editor ' +
-      'with the Create Lessons button',
-    async function () {
-      await testUser.clickCreateLessonsButtonInAboutPage();
+      await testUser.clickBrowseLibraryButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -81,7 +78,7 @@ describe('Logged-in User in About page', function () {
   it(
     'should open Math Classroom page with the Explore Lessons button.',
     async function () {
-      await testUser.clickExploreLessonsButtonInAboutPage();
+      await testUser.clickExploreLessonsButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

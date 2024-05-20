@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users
- * can open links by clicking all buttons in about foundation page
+ * @fileoverview Acceptance Test for checking if Parent/Teacher
+ * can open links by clicking all buttons in teach page
  */
 
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
@@ -23,65 +23,64 @@ import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-in User in About page', function () {
+const now = new Date();
+const i =
+  now.getHours().toString() +
+  now.getMinutes().toString() +
+  now.getSeconds().toString();
+
+describe('Partner in Partnerships page', function () {
   let testUser: LoggedInUser;
 
   beforeAll(async function () {
     testUser = await UserFactory.createNewUser(
-      'testuser2',
-      'testuser2@example.com'
+      `partner${i}`,
+      `partner${i}@example.com`
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await testUser.navigateToAboutPage();
+    await testUser.navigateToPartnershipsPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should open Math Classroom page with the Browse Our Lessons button.',
+    'should open Blog page with the Read More Stories button.',
     async function () {
-      await testUser.clickBrowseOurLessonsButtonInAboutPage();
+      await testUser.clickReadMoreStoriesButtonInPartnershipsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should open Android page with the Access Android App button.',
+    'should open Partnerships form with the Partner with us button at the top.',
     async function () {
-      await testUser.clickAccessAndroidAppButtonInAboutPage();
+      await testUser.clickPartnerWithUsButtonInPartnershipsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should open Math Classroom page with the Visit Classroom button.',
+    'should open Partnerships form with the Partner with us button at the bottom.',
     async function () {
-      await testUser.clickVisitClassroomButtonInAboutPage();
+      await testUser.clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
+        'pt-br'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should open Community Library page with the Browse Library button.',
+    'should open Partnerships Brochure with the Download Brochure button.',
     async function () {
-      await testUser.clickBrowseLibraryButtonInAboutPage();
+      await testUser.clickDownloadBrochureButtonInPartnershipsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should open Creator Dashboard page and Exploration Editor ' +
-      'with the Create Lessons button',
+    'should open Blog Post with the Read Blog Post button.',
     async function () {
-      await testUser.clickCreateLessonsButtonInAboutPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open Math Classroom page with the Explore Lessons button.',
-    async function () {
-      await testUser.clickExploreLessonsButtonInAboutPage();
+      await testUser.clickReadBlogPostLinkInPartnershipsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

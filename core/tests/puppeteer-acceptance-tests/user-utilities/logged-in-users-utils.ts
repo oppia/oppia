@@ -48,6 +48,14 @@ const electromagnetismUrl = testConstants.URLs.Electromagnetism;
 const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
 const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
+const teachUrl = testConstants.URLs.Teach;
+const blogPostUrlinPartnershipsPage =
+  testConstants.URLs.BlogPostUrlInPartnershipsPage;
+const partnershipsFormUrl = testConstants.URLs.PartnershipsForm;
+const partnershipsFormInPortugueseUrl =
+  testConstants.URLs.PartnershipsFormInPortuguese;
+const partnershipsBrochureUrl = testConstants.URLs.PartnershipsBrochure;
+const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
@@ -114,6 +122,30 @@ const mobileSidevbarGetInvolvedMenuDonateButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
 const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
+const browseOurLessonsButtonInTeachPage =
+  '.e2e-test-teach-page-browse-our-lessons-button';
+const accessAndroidAppButtonInTeachPage =
+  '.e2e-test-teach-page-access-android-app-button';
+const visitClassroomButtonInTeachPage =
+  '.e2e-test-teach-page-visit-classroom-button';
+const exploreLessonsButtonInTeachPage =
+  '.e2e-test-teach-page-explore-lessons-button';
+const browseLibraryButtonInTeachPage =
+  '.e2e-test-teach-page-browse-library-button';
+const partnerWithUsButtonAtTheTopOfPartnershipsPage =
+  '.e2e-test-partnerships-page-partner-with-us-button-at-the-top';
+const partnerWithUsButtonAtTheBottomOfPartnershipsPage =
+  '.e2e-test-partnerships-page-partner-with-us-button-at-the-bottom';
+const brochureButtonInPartnershipsPage =
+  '.e2e-test-partnerships-page-brochure-button';
+const readMoreStoriesButtonInPartnershipsPage =
+  '.e2e-test-partnerships-page-partner-stories-button';
+const readBlogPostButtonInPartnershipsPage =
+  '.e2e-test-partnerships-page-blog-post-button';
+const applyToVolunteerButtonAtTheTopOfVolunteerPage =
+  '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-top';
+const applyToVolunteerButtonAtTheBottomOfVolunteerPage =
+  '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-bottom';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -156,6 +188,30 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToGetStartedPage(): Promise<void> {
     await this.goto(getStartedUrl);
+  }
+
+  /**
+   * Function to navigate to the Parents and Teachers page.
+   */
+  async navigateToTeachPage(): Promise<void> {
+    await this.goto(teachUrl);
+    this.page.waitForNavigation();
+  }
+
+  /**
+   * Function to navigate to the Partnerships page.
+   */
+  async navigateToPartnershipsPage(): Promise<void> {
+    await this.goto(partnershipsUrl);
+    this.page.waitForNavigation();
+  }
+
+  /**
+   * Function to navigate to the Volunteer page.
+   */
+  async navigateToVolunteerPage(): Promise<void> {
+    await this.goto(volunteerUrl);
+    this.page.waitForNavigation();
   }
 
   /**
@@ -950,6 +1006,198 @@ export class LoggedInUser extends BaseUser {
     ]);
 
     expect(this.page.url()).toBe(contactUrl);
+  }
+
+  /**
+   * Function to click the Browse Our Lessons button in the Teach page
+   * and check if it opens the Math Classroom page.
+   */
+  async clickBrowseOurLessonsButtonInTeachPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      browseOurLessonsButtonInTeachPage,
+      'Browse Our Lessons button',
+      mathClassroomUrl,
+      'Math Classroom'
+    );
+  }
+
+  /**
+   * Function to click the Access Android App button in the Teach page
+   * and check if it opens the Android page.
+   */
+  async clickAccessAndroidAppButtonInTeachPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      accessAndroidAppButtonInTeachPage,
+      'Access the Android App button',
+      androidUrl,
+      'Android'
+    );
+  }
+
+  /**
+   * Function to click the Visit Classroom button in the Teach page
+   * and check if it opens the Math Classroom page.
+   */
+  async clickVisitClassroomButtonInTeachPage(): Promise<void> {
+    await this.page.waitForSelector(visitClassroomButtonInTeachPage);
+    await this.clickButtonToNavigateToNewPage(
+      visitClassroomButtonInTeachPage,
+      'Visit Classroom button',
+      mathClassroomUrl,
+      'Math Classroom'
+    );
+  }
+
+  /**
+   * Function to click the Browse Library button in the Teach page
+   * and check if it opens the Community Library page.
+   */
+  async clickBrowseLibraryButtonInTeachPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      browseLibraryButtonInTeachPage,
+      'Browse Library button',
+      communityLibraryUrl,
+      'Community Library'
+    );
+  }
+
+  /**
+   * Function to click the Browse Our Lessons button in the Teach page
+   * and check if it opens the Math Classroom page.
+   */
+  async clickExploreLessonsButtonInTeachPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      exploreLessonsButtonInTeachPage,
+      'Explore Lessons button',
+      mathClassroomUrl,
+      'Math Classroom'
+    );
+  }
+
+  /**
+   * Function to click the Partner With Us button in the Partnerships page
+   * and check if it opens the Partnerships Google form.
+   * The button is in the first section of the page.
+   */
+  async clickPartnerWithUsButtonInPartnershipsPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage,
+      'Partner With Us button at the top of the Partnerships page',
+      partnershipsFormUrl,
+      'Partnerships Google Form'
+    );
+  }
+
+  /**
+   * Function to change the site language to the given language code.
+   * @param langCode - The language code to change the site language to. Example: 'pt-br', 'en'
+   */
+  async _changeSiteLanguage(langCode: string): Promise<void> {
+    const languageDropdown = '.e2e-test-language-dropdown';
+    const languageOption = `.e2e-test-i18n-language-${langCode} a`;
+    await this.clickOn(languageDropdown);
+    await this.clickOn(languageOption);
+    await this.page.waitForTimeout(2000);
+  }
+
+  /**
+   * Function to click the Partner With Us button in the Partnerships page
+   * and check if it opens the Partnerships Google form in Portuguese.
+   * The button is in the bottom section of the page.
+   */
+  async clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
+    langCode: string
+  ): Promise<void> {
+    await this._changeSiteLanguage(langCode);
+
+    await this.clickButtonToNavigateToNewPage(
+      partnerWithUsButtonAtTheBottomOfPartnershipsPage,
+      'Partner With Us button at the bottom of the Partnerships page',
+      partnershipsFormInPortugueseUrl,
+      'Partnerships Google Form'
+    );
+  }
+
+  /**
+   * Function to click the Download Brochure button in the Partnerships page
+   * and check if it opens the Partnerships Brochure.
+   */
+  async clickDownloadBrochureButtonInPartnershipsPage(): Promise<void> {
+    await this.openExternalPdfLink(
+      brochureButtonInPartnershipsPage,
+      partnershipsBrochureUrl
+    );
+  }
+
+  /**
+   * Function to click the first Read blog post  in the Partnerships page
+   * and check if it opens the blog page.
+   */
+  async clickReadBlogPostLinkInPartnershipsPage(): Promise<void> {
+    await this.page.waitForXPath('//a[contains(text(),"Read blog post")]');
+    await this.clickButtonToNavigateToNewPage(
+      readBlogPostButtonInPartnershipsPage,
+      'Read blog post button',
+      blogPostUrlinPartnershipsPage,
+      'Blog Post'
+    );
+  }
+
+  /**
+   * Function to click the Read more stories button in the Partnerships page
+   * and check if it opens the blog page.
+   */
+  async clickReadMoreStoriesButtonInPartnershipsPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      readMoreStoriesButtonInPartnershipsPage,
+      'Read more stories button',
+      blogUrl,
+      'Blog'
+    );
+  }
+
+  /**
+   * Function to click the Apply To Volunteer at the top of the Volunteer page
+   * and check if it opens the Volunteer form.
+   */
+  async clickApplyToVolunteerAtTheTopOfVolunteerPage(): Promise<void> {
+    await this.page.waitForSelector(
+      applyToVolunteerButtonAtTheTopOfVolunteerPage
+    );
+    await this.page.click(applyToVolunteerButtonAtTheTopOfVolunteerPage);
+
+    await this.page.waitForTimeout(100);
+    const pages = await this.page.browser().pages();
+    const newTab = pages[pages.length - 1];
+    await newTab.waitForNavigation();
+
+    if (this.page.url() !== volunteerFormUrl) {
+      throw new Error(
+        'The volunteer button did not navigate to the expected URL.'
+      );
+    }
+  }
+
+  /**
+   * Function to click the Apply To Volunteer at the bottom of the Volunteer page
+   * and check if it opens the Volunteer form.
+   */
+  async clickApplyToVolunteerAtTheBottomOfVolunteerPage(): Promise<void> {
+    await this.page.waitForSelector(
+      applyToVolunteerButtonAtTheBottomOfVolunteerPage
+    );
+    await this.page.click(applyToVolunteerButtonAtTheBottomOfVolunteerPage);
+
+    await this.page.waitForTimeout(100);
+    const pages = await this.page.browser().pages();
+    const newTab = pages[pages.length - 1];
+    await newTab.waitForNavigation();
+
+    if (this.page.url() !== volunteerFormUrl) {
+      throw new Error(
+        'The volunteer button did not navigate to the expected URL.'
+      );
+    }
   }
 }
 

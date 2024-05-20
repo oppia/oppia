@@ -1,0 +1,65 @@
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Acceptance Test for checking if Parent/Teacher
+ * can open links by clicking all buttons in teach page
+ */
+
+import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
+import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
+import testConstants from '../../puppeteer-testing-utilities/test-constants';
+
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+
+const now = new Date();
+const i =
+  now.getHours().toString() +
+  now.getMinutes().toString() +
+  now.getSeconds().toString();
+
+describe('Volunteer in Volunteer page', function () {
+  let testUser: LoggedInUser;
+
+  beforeAll(async function () {
+    testUser = await UserFactory.createNewUser(
+      `volunteer${i}`,
+      `volunteer${i}@example.com`
+    );
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
+  beforeEach(async function () {
+    await testUser.navigateToVolunteerPage();
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
+  it(
+    'should open Volunteer form with the Apply to Volunteer button at the top.',
+    async function () {
+      await testUser.clickApplyToVolunteerAtTheTopOfVolunteerPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should open Volunteer form with the Apply to Volunteer button at the bottom.',
+    async function () {
+      await testUser.clickApplyToVolunteerAtTheBottomOfVolunteerPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
+});
