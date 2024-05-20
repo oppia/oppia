@@ -76,6 +76,8 @@ import {CreateNewSkillModalComponent} from 'pages/topics-and-skills-dashboard-pa
 import {CreateActivityModalComponent} from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import {UploadActivityModalComponent} from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 import {ThumbnailUploaderComponent} from './forms/custom-forms-directives/thumbnail-uploader.component';
+import {ImageUploaderComponent} from './forms/custom-forms-directives/image-uploader.component';
+import {ImageUploaderModalComponent} from './forms/custom-forms-directives/image-uploader-modal.component';
 import {EditThumbnailModalComponent} from './forms/custom-forms-directives/edit-thumbnail-modal.component';
 import {CorrectnessFooterComponent} from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import {ContinueButtonComponent} from 'pages/exploration-player-page/learner-experience/continue-button.component';
@@ -297,6 +299,8 @@ import {DirectivesModule} from 'directives/directives.module';
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailUploaderComponent,
+    ImageUploaderComponent,
+    ImageUploaderModalComponent,
     EditThumbnailModalComponent,
     SupplementalCardComponent,
     ThanksForDonatingModalComponent,
@@ -434,6 +438,8 @@ import {DirectivesModule} from 'directives/directives.module';
     ThumbnailDisplayComponent,
     TutorCardComponent,
     ThumbnailUploaderComponent,
+    ImageUploaderComponent,
+    ImageUploaderModalComponent,
     EditThumbnailModalComponent,
     UploadActivityModalComponent,
     ThreadTableComponent,
@@ -577,6 +583,8 @@ import {DirectivesModule} from 'directives/directives.module';
     ThanksForDonatingModalComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
+    ImageUploaderComponent,
+    ImageUploaderModalComponent,
     EditThumbnailModalComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TutorCardComponent,
