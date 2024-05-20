@@ -54,7 +54,7 @@ class MockStoryEditorNavigationService {
   checkIfPresentInChapterEditor = () => this.activeTab === 'chapter_editor';
   checkIfPresentInStoryPreviewTab = () => this.activeTab === 'story_preview';
   getActiveTab = () => this.activeTab;
-  navigateToChapterEditor = () => {
+  navigateToChapterEditorWithChapterId = () => {
     this.activeTab = 'chapter_editor';
   };
 
@@ -648,4 +648,16 @@ describe('Story Editor Page Component', () => {
       ).toHaveBeenCalled();
     }
   );
+  
+  it('should navigate to chapter editor with chapter id after story is loaded', () => {
+    spyOn(urlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(pageTitleService, 'setDocumentTitle');
+    storyEditorNavigationService.checkIfPresentInChapterEditor = () => true;
+
+    spyOn(component, 'navigateToChapterEditorWithChapterId');
+
+    component.ngOnInit();
+
+    expect(component.navigateToChapterEditorWithChapterId).toHaveBeenCalled();
+  });
 });
