@@ -23,7 +23,6 @@ import {md5} from 'hash-wasm';
 import {AuthService} from 'services/auth.service';
 import {AuthBackendApiService} from 'services/auth-backend-api.service';
 import firebase from 'firebase';
-import {SystemJsNgModuleLoaderConfig} from '@angular/core';
 
 describe('Auth service', function () {
   let authService: AuthService;
