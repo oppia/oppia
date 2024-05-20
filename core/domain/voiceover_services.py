@@ -166,7 +166,7 @@ def fetch_entity_voiceovers_by_language_code(
             supported_language_accent_codes
         ):
             continue
-        if not bool(entity_voiceovers.voiceovers):
+        if not bool(entity_voiceovers.voiceovers_mapping):
             continue
 
         entity_voiceovers_list.append(entity_voiceovers.to_dict())
@@ -226,10 +226,10 @@ def compute_voiceover_related_change(
         else:
             entity_voiceovers = voiceover_domain.EntityVoiceovers.create_empty(
                 entity_id, entity_type, entity_version, language_accent_code)
-
-        if content_id not in entity_voiceovers.voiceovers:
+        if content_id not in entity_voiceovers.voiceovers_mapping:
             manual_voiceover = state_domain.Voiceover.from_dict(
                 change.voiceovers['manual'])
+            entity_voiceovers.add_new_content_id_without_voiceovers(content_id)
             entity_voiceovers.add_voiceover(
                 content_id,
                 feconf.VoiceoverType.MANUAL,
@@ -244,7 +244,7 @@ def compute_voiceover_related_change(
             else:
                 manual_voiceover = state_domain.Voiceover.from_dict(
                     change.voiceovers['manual'])
-                entity_voiceovers.voiceovers[content_id][
+                entity_voiceovers.voiceovers_mapping[content_id][
                     feconf.VoiceoverType.MANUAL] = manual_voiceover
 
         entity_voiceovers.validate()
@@ -260,7 +260,7 @@ def compute_voiceover_related_change(
                 entity_voiceovers_dict['entity_id'],
                 entity_voiceovers_dict['entity_version'] + 1,
                 entity_voiceovers_dict['language_accent_code'],
-                entity_voiceovers_dict['voiceovers']
+                entity_voiceovers_dict['voiceovers_mapping']
             )
         )
 

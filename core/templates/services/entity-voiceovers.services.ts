@@ -100,6 +100,15 @@ export class EntityVoiceoversService {
     return this.languageAccentCodeToEntityVoiceovers[languageAccentCode];
   }
 
+  getActiveEntityVoiceovers() {
+    if (this.activeLanguageAccentCode === undefined) {
+      this.activeLanguageAccentCode = this.getLanguageAccentCodes()[0];
+    }
+    return this.languageAccentCodeToEntityVoiceovers[
+      this.activeLanguageAccentCode
+    ];
+  }
+
   addEntityVoiceovers(
     languageAccentCode: string,
     newlyAddedEntityVoiceovers: EntityVoiceovers
@@ -110,6 +119,38 @@ export class EntityVoiceoversService {
 
   removeEntityVoiceovers(languageAccentCode: string): void {
     delete this.languageAccentCodeToEntityVoiceovers[languageAccentCode];
+  }
+
+  getLanguageAccentCodes(): string[] {
+    let languageAccentCodes = [];
+    for (let languageAccentCode in this.languageAccentCodeToEntityVoiceovers) {
+      languageAccentCodes.push(languageAccentCode);
+    }
+    return languageAccentCodes;
+  }
+
+  getAllContentIdsToEntityVoiceovers() {
+    let contentIdToEntityVoiceovers = {};
+    let allEntityVoiceovers = Object.values(
+      this.languageAccentCodeToEntityVoiceovers
+    );
+    for (let entityVoiceovers of allEntityVoiceovers) {
+      for (let contentId in entityVoiceovers.voiceoversMapping) {
+        if (
+          Object.keys(contentIdToEntityVoiceovers).indexOf(contentId) !== -1
+        ) {
+          contentIdToEntityVoiceovers[contentId].push(
+            entityVoiceovers.getManualVoiceover(contentId)
+          );
+        } else {
+          contentIdToEntityVoiceovers[contentId] = [
+            entityVoiceovers.getManualVoiceover(contentId),
+          ];
+        }
+      }
+    }
+
+    return contentIdToEntityVoiceovers;
   }
 }
 

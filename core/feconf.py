@@ -1707,3 +1707,4 @@ class VoiceoverType(enum.Enum):
     """
 
     MANUAL = 'manual'
+    AUTO = 'auto'

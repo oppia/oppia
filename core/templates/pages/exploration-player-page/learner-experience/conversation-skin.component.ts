@@ -82,6 +82,8 @@ import './conversation-skin.component.css';
 import {ConceptCardManagerService} from '../services/concept-card-manager.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -113,6 +115,7 @@ export class ConversationSkinComponent {
     ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL;
 
   isLoggedIn: boolean;
+  voiceoversAreLoaded: boolean = false;
   storyNodeIdToAdd: string;
   inStoryMode: boolean = false;
   collectionId: string;
@@ -223,7 +226,9 @@ export class ConversationSkinComponent {
     private platformFeatureService: PlatformFeatureService,
     private translateService: TranslateService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
-    private conversationFlowService: ConversationFlowService
+    private conversationFlowService: ConversationFlowService,
+    private entityVoiceoversService: EntityVoiceoversService,
+    private voiceoverPlayerService: VoiceoverPlayerService
   ) {}
 
   adjustPageHeightOnresize(): void {
@@ -1361,6 +1366,13 @@ export class ConversationSkinComponent {
 
         setTimeout(() => {
           this.explorationPlayerStateService.onOppiaFeedbackAvailable.emit();
+          let feedbackContentId = this.displayedCard
+            .getInteraction()
+            .getContentIdForMatchingHtml(feedbackHtml);
+
+          if (feedbackContentId) {
+            this.voiceoverPlayerService.setActiveVoiceover(feedbackContentId);
+          }
 
           this.audioPlayerService.onAutoplayAudio.emit({
             audioTranslations: feedbackAudioTranslations,

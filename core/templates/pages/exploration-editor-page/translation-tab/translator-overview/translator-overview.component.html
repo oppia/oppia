@@ -1,6 +1,6 @@
 <div class="oppia-translator-overview">
   <div>
-    <div id="tutorialTranslationLanguage" *ngIf="!isVoiceoverContributionWithAccentEnabled()">
+    <div id="tutorialTranslationLanguage" *ngIf="inTranslationMode || !isVoiceoverContributionWithAccentEnabled()">
       <span class="e2e-test-language-selector-label oppia-language-selector-label">
         <strong>
           <span *ngIf="inVoiceoverMode">Voiceovers</span>
@@ -17,7 +17,7 @@
         </option>
       </select>
     </div>
-    <div *ngIf="isVoiceoverContributionWithAccentEnabled()">
+    <div *ngIf="isVoiceoverContributionWithAccentEnabled() && inVoiceoverMode">
       <div class="language-selector-container">
         <span class="language-selector-text">
           <strong>Voiceover Language Code: </strong>

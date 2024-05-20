@@ -171,6 +171,9 @@ export class TranslationStatusService implements OnInit {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return this._getTranslationStatus(contentId);
     } else {
+      if (this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled) {
+        return this._getEntityVoiceoverStatus(contentId);
+      }
       let recordedVoiceovers = this.stateRecordedVoiceoversService.displayed;
       return this._getVoiceOverStatus(recordedVoiceovers, contentId);
     }
@@ -285,6 +288,7 @@ export class TranslationStatusService implements OnInit {
         this.explorationVoiceoverContentNotAvailableCount += noVoiceoverCount;
 
         if (
+          this.translationTabActiveModeService.isVoiceoverModeActive() &&
           this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled
         ) {
           let color = this.getStateGraphColorInVoiceoverMode(

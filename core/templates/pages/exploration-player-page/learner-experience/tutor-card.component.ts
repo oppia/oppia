@@ -71,6 +71,7 @@ const STANDARD_ANIMATION_DURATION_IN_MSECS = 4000;
 const MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS = [1, 5, 10, 25, 50];
 
 import './tutor-card.component.css';
+import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 
 @Component({
   selector: 'oppia-tutor-card',
@@ -179,7 +180,8 @@ export class TutorCardComponent {
     private windowRef: WindowRef,
     public platformFeatureService: PlatformFeatureService,
     private renderer: Renderer2,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private voiceoverPlayerService: VoiceoverPlayerService
   ) {}
 
   async getUserInfoAsync(): Promise<void> {
@@ -410,6 +412,11 @@ export class TutorCardComponent {
       this.interactionInstructions =
         this.displayedCard.getInteractionInstructions();
       this.contentAudioTranslations = this.displayedCard.getVoiceovers();
+
+      this.voiceoverPlayerService.setActiveVoiceover(
+        this.displayedCard.contentId
+      );
+
       this.audioTranslationManagerService.clearSecondaryAudioTranslations();
       this.audioTranslationManagerService.setContentAudioTranslations(
         cloneDeep(this.contentAudioTranslations),

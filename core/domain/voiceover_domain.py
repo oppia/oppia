@@ -241,7 +241,7 @@ class EntityVoiceovers:
             voiceover_type: VoiceoverType. The voiceover type of the given
                 voiceover.
         """
-        del self.voiceovers_mapping[content_id][voiceover_type]
+        self.voiceovers_mapping[content_id][voiceover_type] = None
 
     @classmethod
     def create_empty(
