@@ -224,13 +224,14 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
     this.storyEditorNavigationService.navigateToStoryEditor();
   }
 
-  async navigateToChapterEditorWithChapterId() {
+  async navigateToChapterEditorWithChapterId(): Promise<void> {
     if (this.storyEditorStateService.isLoadingStory()) {
       await new Promise<void>(resolve => {
         const subscription =
           this.storyEditorStateService.onStoryInitialized.subscribe(() => {
             resolve();
-            subscription.unsubscribe(); // Unsubscribe after the event is emitted to prevent memory leaks
+            // Unsubscribe after the event is emitted to prevent memory leaks.
+            subscription.unsubscribe();
           });
       });
     }
