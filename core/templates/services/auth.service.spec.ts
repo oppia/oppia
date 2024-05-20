@@ -23,6 +23,7 @@ import {md5} from 'hash-wasm';
 import {AuthService} from 'services/auth.service';
 import {AuthBackendApiService} from 'services/auth-backend-api.service';
 import firebase from 'firebase';
+import {SystemJsNgModuleLoaderConfig} from '@angular/core';
 
 describe('Auth service', function () {
   let authService: AuthService;
@@ -269,7 +270,7 @@ describe('Auth service', function () {
       expect(authBackendApiService.beginSessionAsync).not.toHaveBeenCalled();
     });
 
-    fit('should return firebase config', () => {
+    it('should return firebase config', () => {
       // Mock getConfig function to return a sample configuration.
       spyOn(AuthService, 'getConfig').and.returnValue({
         FIREBASE_CONFIG_API_KEY: 'sample-api-key',
@@ -290,7 +291,7 @@ describe('Auth service', function () {
       });
     });
 
-    fit('should return the same config if called multiple times', () => {
+    it('should return the same config if called multiple times', () => {
       spyOn(AuthService, 'getConfig').and.returnValue({
         FIREBASE_CONFIG_API_KEY: 'sample-api-key',
         FIREBASE_CONFIG_AUTH_DOMAIN: 'sample-auth-domain',
@@ -305,12 +306,13 @@ describe('Auth service', function () {
       expect(firebaseConfig1).toBe(firebaseConfig2);
     });
   });
-});
 
-fit('should call firebase_config API', () => {
-  // Mock getConfig function to return a sample configuration.
-  spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
-  spyOn(XMLHttpRequest.prototype, 'send');
-  const firebaseConfig = AuthService.getConfig();
-  expect(XMLHttpRequest.prototype.open).toHaveBeenCalled();
+  it('should call firebase_config API', () => {
+    // Mock getConfig function to return a sample configuration.
+    spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
+    spyOn(XMLHttpRequest.prototype, 'send');
+    const firebaseConfig = AuthService.getConfig();
+    expect(firebaseConfig).toBe(null);
+    expect(XMLHttpRequest.prototype.open).toHaveBeenCalled();
+  });
 });
