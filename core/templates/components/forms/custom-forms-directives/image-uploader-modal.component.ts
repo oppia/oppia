@@ -68,15 +68,15 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
 
   initializeCropper(): void {
     if (this.croppableImageRef) {
-      let profilePicture = this.croppableImageRef.nativeElement;
+      let imageElement = this.croppableImageRef.nativeElement;
       if (!this.windowIsNarrow) {
-        this.cropper = new Cropper(profilePicture, {
+        this.cropper = new Cropper(imageElement, {
           minContainerWidth: 500,
           minContainerHeight: 350,
           aspectRatio: 1.3,
         });
       } else {
-        this.cropper = new Cropper(profilePicture, {
+        this.cropper = new Cropper(imageElement, {
           minContainerWidth: 200,
           minContainerHeight: 200,
           aspectRatio: 1.3,
