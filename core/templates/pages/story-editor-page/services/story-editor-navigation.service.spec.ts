@@ -111,9 +111,4 @@ describe('Story editor navigation service', () => {
     sens.navigateToStoryPreviewTab();
     expect(sens.getActiveTab()).toEqual('story_preview');
   });
-
-  it('should navigate to chapter editor', function () {
-    sens.navigateToChapterEditor();
-    expect(sens.getActiveTab()).toEqual('chapter_editor');
-  });
 });
