@@ -7578,7 +7578,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
                 '/mock/%s' % 'suggestion-id',
                 expected_status_int=400)
         self.assertEqual(
-            response['error'], 'Invalid format for suggestion_id.'
+            response['error'], 'Invalid format for suggestion_id. '
             'It must contain 3 parts separated by \'.\'')
         self.logout()
 
