@@ -32,7 +32,8 @@ const STORY_PREVIEW = 'story_preview';
 export class StoryEditorNavigationService {
   activeTab: string = 'story_editor';
   chapterId!: string;
-  chapterIndex: number;
+  // Chapter index is null only before the story is loaded.
+  chapterIndex: number | null = null;
 
   private _activeTabIsSwitchedEventEmitter: EventEmitter<string> =
     new EventEmitter<string>();
