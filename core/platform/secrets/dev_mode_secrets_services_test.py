@@ -28,7 +28,7 @@ class DevModeSecretsServicesTests(test_utils.GenericTestBase):
     """Tests for the Python Cloud Secret services."""
 
     def test_get_secret_returns_existing_secret(self) -> None:
-        with self.swap(os, 'environ', {'SECRETS': '{"name": "secret", "name1": {"FIREBASE_CONFIG_API_KEY":"fake-api-key","FIREBASE_CONFIG_AUTH_DOMAIN":""}}'}): # pylint: line-too-long
+        with self.swap(os, 'environ', {'SECRETS': '{"name": "secret", "name1": {"FIREBASE_CONFIG_API_KEY":"fake-api-key","FIREBASE_CONFIG_AUTH_DOMAIN":""}}'}): # pylint: disable=line-too-long
             self.assertEqual(
                 dev_mode_secrets_services.get_secret('name'), 'secret')
 
