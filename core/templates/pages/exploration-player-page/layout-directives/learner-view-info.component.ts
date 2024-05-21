@@ -22,6 +22,7 @@ import {downgradeComponent} from '@angular/upgrade/static';
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {StoryPlaythrough} from 'domain/story_viewer/story-playthrough.model';
+import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
 import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.factory';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
@@ -50,6 +51,7 @@ export class LearnerViewInfoComponent {
   explorationId!: string;
   explorationTitle!: string;
   explorationTitleTranslationKey!: string;
+  explorationStoryChapter!: number;
   storyPlaythroughObject!: StoryPlaythrough;
   topicName!: string;
   topicNameTranslationKey!: string;
@@ -65,7 +67,8 @@ export class LearnerViewInfoComponent {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private topicViewerBackendApiService: TopicViewerBackendApiService
+    private topicViewerBackendApiService: TopicViewerBackendApiService,
+    private storyViewerBackendApiService: StoryViewerBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -112,6 +115,8 @@ export class LearnerViewInfoComponent {
         this.urlService.getTopicUrlFragmentFromLearnerUrl();
       let classroomUrlFragment =
         this.urlService.getClassroomUrlFragmentFromLearnerUrl();
+      let storyUrlFragment =
+        this.urlService.getStoryUrlFragmentFromLearnerUrl();
       this.topicViewerBackendApiService
         .fetchTopicDataAsync(topicUrlFragment, classroomUrlFragment)
         .then((readOnlyTopic: ReadOnlyTopic) => {
@@ -127,6 +132,25 @@ export class LearnerViewInfoComponent {
               TranslationKeyType.TITLE
             );
         });
+      if (topicUrlFragment && classroomUrlFragment && storyUrlFragment) {
+        this.storyViewerBackendApiService
+          .fetchStoryDataAsync(
+            topicUrlFragment,
+            classroomUrlFragment,
+            storyUrlFragment
+          )
+          .then((storyPlaythrough: StoryPlaythrough) => {
+            this.storyPlaythroughObject = storyPlaythrough;
+            if (this.storyPlaythroughObject) {
+              this.explorationStoryChapter =
+                this.storyPlaythroughObject
+                  .getStoryNodes()
+                  .findIndex(
+                    node => node.getExplorationId() === this.explorationId
+                  ) + 1;
+            }
+          });
+      }
     } else {
       this.siteAnalyticsService.registerCommunityLessonStarted(
         this.explorationId
@@ -175,7 +199,7 @@ export class LearnerViewInfoComponent {
     );
   }
 
-  ngOnDestory(): void {
+  ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }

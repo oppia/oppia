@@ -34,6 +34,8 @@ import {
   ReadOnlyTopicObjectFactory,
 } from 'domain/topic_viewer/read-only-topic-object.factory';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
+import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
+import {StoryPlaythrough} from 'domain/story_viewer/story-playthrough.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ContextService} from 'services/context.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -48,6 +50,7 @@ describe('Learner view info component', () => {
   let componentInstance: LearnerViewInfoComponent;
   let contextService: ContextService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
+  let storyViewerBackendApiService: StoryViewerBackendApiService;
   let siteAnalyticsService: SiteAnalyticsService;
   let statsReportingService: StatsReportingService;
   let urlInterpolationService: UrlInterpolationService;
@@ -68,6 +71,7 @@ describe('Learner view info component', () => {
         UrlInterpolationService,
         UrlService,
         TopicViewerBackendApiService,
+        StoryViewerBackendApiService,
         ReadOnlyTopicObjectFactory,
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -88,6 +92,7 @@ describe('Learner view info component', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
+    storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
 
     spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.resolveTo(
       readOnlyTopicObjectFactory.createFromBackendDict({
@@ -112,7 +117,7 @@ describe('Learner view info component', () => {
   });
 
   afterEach(() => {
-    componentInstance.ngOnDestory();
+    componentInstance.ngOnDestroy();
   });
 
   it('should initialize when component loads into view', fakeAsync(() => {
@@ -208,6 +213,130 @@ describe('Learner view info component', () => {
     expect(componentInstance.getTopicUrl()).toEqual(topicUrl);
   });
 
+  it('should not show chapter when exploration is not part of Topic', () => {
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      ''
+    );
+
+    componentInstance.ngOnInit();
+
+    expect(componentInstance.explorationStoryChapter).toBeUndefined();
+  });
+
+  it('should show chapter when exploration is part of Topic', fakeAsync(() => {
+    var firstSampleReadOnlyStoryNodeBackendDict = {
+      id: 'node_1',
+      description: 'description',
+      title: 'Title 1',
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      destination_node_ids: ['node_2'],
+      outline: 'Outline',
+      exploration_id: 'exp_id_1',
+      outline_is_finalized: false,
+      exp_summary_dict: {
+        title: 'Title',
+        status: 'private',
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cc4b00',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+        },
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+      },
+      completed: true,
+      thumbnail_bg_color: '#927117',
+      thumbnail_filename: 'filename',
+    };
+
+    var secondSampleReadOnlyStoryNodeBackendDict = {
+      id: 'node_2',
+      description: 'description',
+      title: 'Title 2',
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      destination_node_ids: ['node_3'],
+      outline: 'Outline',
+      exploration_id: 'test_id',
+      outline_is_finalized: false,
+      exp_summary_dict: {
+        title: 'Title',
+        status: 'private',
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cc4b00',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+        },
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+      },
+      completed: false,
+      thumbnail_bg_color: '#927117',
+      thumbnail_filename: 'filename',
+    };
+
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic_url_fragment'
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'classroom_url_fragment'
+    );
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+      'story_url_fragment'
+    );
+
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+      Promise.resolve(
+        StoryPlaythrough.createFromBackendDict({
+          story_id: 'story_id',
+          story_nodes: [
+            firstSampleReadOnlyStoryNodeBackendDict,
+            secondSampleReadOnlyStoryNodeBackendDict,
+          ],
+          story_title: 'story',
+          story_description: 'Story_Description',
+          topic_name: 'Topic 1',
+          meta_tag_content: 'Story meta tag content',
+        })
+      )
+    );
+
+    componentInstance.ngOnInit();
+
+    tick();
+    tick();
+
+    expect(componentInstance.explorationStoryChapter).toBe(2);
+  }));
+
   it(
     'should set topic name and subtopic title translation key and ' +
       'check whether hacky translations are displayed or not correctly',
@@ -219,6 +348,9 @@ describe('Learner view info component', () => {
         urlService,
         'getClassroomUrlFragmentFromLearnerUrl'
       ).and.returnValue('classroom_url_fragment');
+      spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+        'story_url_fragment'
+      );
       spyOn(componentInstance, 'getTopicUrl').and.returnValue('topic_url');
 
       componentInstance.ngOnInit();

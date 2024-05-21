@@ -3,6 +3,13 @@
     <span class="oppia-navbar-breadcrumb-separator"></span>
     <div class="lesson-info-section">
       <h1 class="oppia-exploration-h1">
+        <span *ngIf="explorationStoryChapter">
+          <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
+          </span>
+          <span class="chapter-identifier">
+            {{ explorationStoryChapter }}-
+          </span>
+        </span>
         <span class="e2e-test-exploration-header oppia-exploration-header"
               itemprop="description">
           <span *ngIf="!isHackyExpTitleTranslationDisplayed()">
