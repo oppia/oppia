@@ -265,7 +265,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
   getNumberOfDaysForDateBeforeToday(date: Date): number {
     const today = new Date();
-    return (
+    return Math.floor(
       (today.getTime() - new Date(date).getTime()) / this.ONE_DAY_IN_MILLIS
     );
   }
