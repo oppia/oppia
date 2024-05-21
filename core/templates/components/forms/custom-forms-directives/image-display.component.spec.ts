@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /**
- * @fileoverview Unit tests for Thumbnail Display component.
+ * @fileoverview Unit tests for Image Display component.
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -24,11 +24,11 @@ import {
 } from '@angular/core/testing';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
-import {ThumbnailDisplayComponent} from './thumbnail-display.component';
+import {ImageDisplayComponent} from './image-display.component';
 
 describe('Thumbnail Component', () => {
-  let component: ThumbnailDisplayComponent;
-  let fixture: ComponentFixture<ThumbnailDisplayComponent>;
+  let component: ImageDisplayComponent;
+  let fixture: ComponentFixture<ImageDisplayComponent>;
   let svgSanitizerService: SvgSanitizerService;
   class MockSvgSanitizerService {
     getTrustedSvgResourceUrl(str: string): string {
@@ -71,7 +71,7 @@ describe('Thumbnail Component', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [ThumbnailDisplayComponent],
+      declarations: [ImageDisplayComponent],
       providers: [
         {
           provide: SvgSanitizerService,
@@ -80,7 +80,7 @@ describe('Thumbnail Component', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ThumbnailDisplayComponent);
+    fixture = TestBed.createComponent(ImageDisplayComponent);
     component = fixture.componentInstance;
     svgSanitizerService = TestBed.get(SvgSanitizerService);
   }));
