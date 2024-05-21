@@ -97,14 +97,6 @@ export class PrimaryButtonComponent implements OnInit {
       this.windowRef.nativeWindow.location.href = link;
     }
   }
-
-  private openExternalLink(link: string): void {
-    const newTab = window.open();
-    if (newTab) {
-      newTab.opener = null;
-      newTab.location.href = link;
-    }
-  }
 }
 
 angular.module('oppia').directive(
