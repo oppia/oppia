@@ -1375,7 +1375,7 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        for i in range(3):
+        for i in range(1, 4):
             self.post_json(
                 '/adminhandler', {
                     'action': 'generate_dummy_translation_opportunities',
@@ -1384,8 +1384,8 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
             generated_exps = exp_services.get_all_exploration_summaries()
             published_exps = (
                 exp_services.get_recently_published_exp_summaries(15))
-            self.assertEqual(len(generated_exps), 5 * (i + 1))
-            self.assertEqual(len(published_exps), 5 * (i + 1))
+            self.assertEqual(len(generated_exps), 5 * i)
+            self.assertEqual(len(published_exps), 5 * i)
         self.logout()
 
     def test_handler_raises_error_with_non_int_num_dummy_translation_opportunities_to_generate(self) -> None: # pylint: disable=line-too-long
