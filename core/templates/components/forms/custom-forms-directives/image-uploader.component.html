@@ -1,34 +1,34 @@
-<div class="thumbnail-editor e2e-test-thumbnail-editor form-group">
+<div class="image-editor e2e-test-thumbnail-editor form-group">
     <div>
-      <div class="oppia-editable-section float-left edit-btn-container" title="Change Thumbnail"
+      <div class="oppia-editable-section float-left edit-btn-container" [attr.title]="'Change ' + imageName"
            [ngStyle]="{background: bgColor}">
         <div tabindex="0" class="oppia-click-to-start-editing e2e-test-photo-button"
              (click)="showImageUploaderModal()"
              role="button"
-             aria-label="upload or edit thumbnail"
+             aria-label="upload or edit image"
              (keydown.enter)="showImageUploaderModal()">
         </div>
         <i class="fas fa-pen oppia-editor-edit-icon oppia-pencil-icon" [hidden]="disabled">
         </i>
-        <img [hidden]="!hidePlaceholder" [src]="placeholderImageUrl" align="center" class="oppia-thumbnail-placeholder" alt="">
-        <oppia-thumbnail-display *ngIf="editableImageDataUrl"
+        <img [hidden]="!hidePlaceholder" [src]="placeholderImageUrl" align="center" class="oppia-image-placeholder" alt="">
+        <oppia-image-display *ngIf="editableImageDataUrl"
                                  [hidden]="imageIsLoading"
                                  [imgSrc]="editableImageDataUrl"
                                  [aspectRatio]="aspectRatio"
                                  [classes]="['img-thumbnail', 'e2e-test-custom-photo']"
                                  [background]="bgColor">
-        </oppia-thumbnail-display>
+        </oppia-image-display>
       </div>
     </div>
   </div>
   
   <style>
-    .oppia-thumbnail-placeholder {
+    .oppia-image-placeholder {
       height: 180px;
       width: 180px;
     }
   
-    .thumbnail-editor {
+    .image-editor {
       height: 200px;
     }
   
@@ -39,7 +39,7 @@
       vertical-align: middle;
     }
   
-    .img-thumbnail {
+    .img-image {
       border: none;
       max-height: 100%;
       max-width: 100%;

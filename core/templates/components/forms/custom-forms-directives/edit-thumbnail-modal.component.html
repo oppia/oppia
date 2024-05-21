@@ -53,12 +53,12 @@
             <i class="fas fa-times oppia-vcenter"></i>
           </button>
           <div>
-            <oppia-thumbnail-display *ngIf="uploadedImage"
+            <oppia-image-display *ngIf="uploadedImage"
                                      [classes]="['oppia-thumbnail-image']"
                                      [imgSrc]="uploadedImage"
                                      [aspectRatio]="'16:9'"
                                      [background]="bgColor">
-            </oppia-thumbnail-display>
+            </oppia-image-display>
             <div class="oppia-thumbnail-preview-title">
               {{ previewTitle }}
             </div>

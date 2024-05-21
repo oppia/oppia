@@ -23,11 +23,11 @@ import {downgradeComponent} from '@angular/upgrade/static';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
 @Component({
-  selector: 'oppia-thumbnail-display',
-  templateUrl: './thumbnail-display.component.html',
+  selector: 'oppia-image-display',
+  templateUrl: './image-display.component.html',
   styleUrls: [],
 })
-export class ThumbnailDisplayComponent implements OnInit, OnChanges {
+export class ImageDisplayComponent implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -80,5 +80,5 @@ angular
   .module('oppia')
   .directive(
     'oppiaThumbnailDisplay',
-    downgradeComponent({component: ThumbnailDisplayComponent})
+    downgradeComponent({component: ImageDisplayComponent})
   );

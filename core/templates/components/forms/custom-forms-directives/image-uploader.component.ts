@@ -47,8 +47,8 @@ export class ImageUploaderComponent implements OnInit {
   @Input() previewFooter!: string;
   @Input() previewTitle!: string;
   @Input() allowedImageFormats!: string[];
+  @Input() imageName!: string;
 
-  tempImageName!: string;
   uploadedImage!: string;
   uploadedImageMimeType!: string;
   dimensions!: {height: number; width: number};
@@ -97,7 +97,6 @@ export class ImageUploaderComponent implements OnInit {
     if (!this.uploadedImage) {
       this.openInUploadMode = true;
     }
-    this.tempImageName = '';
     this.uploadedImageMimeType = '';
     this.dimensions = {
       height: 0,
@@ -114,6 +113,7 @@ export class ImageUploaderComponent implements OnInit {
       this.previewDescriptionBgColor;
     modalRef.componentInstance.previewTitle = this.previewTitle;
     modalRef.componentInstance.previewDescription = this.previewDescription;
+    modalRef.componentInstance.imageName = this.imageName;
 
     modalRef.result.then(
       data => {

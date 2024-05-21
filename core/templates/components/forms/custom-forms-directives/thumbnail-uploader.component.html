@@ -11,19 +11,19 @@
       <i class="fas fa-pen oppia-editor-edit-icon oppia-pencil-icon" [hidden]="disabled">
       </i>
       <img [hidden]="!hidePlaceholder" [src]="placeholderImageUrl" align="center" class="oppia-thumbnail-placeholder" alt="">
-      <oppia-thumbnail-display *ngIf="editableThumbnailDataUrl"
-                               [hidden]="thumbnailIsLoading"
-                               [imgSrc]="editableThumbnailDataUrl"
-                               [aspectRatio]="aspectRatio"
-                               [classes]="['img-thumbnail', 'e2e-test-custom-photo']"
-                               [background]="bgColor">
-      </oppia-thumbnail-display>
-      <oppia-thumbnail-display *ngIf="useLocalStorage && newThumbnailDataUrl"
-                               [imgSrc]="newThumbnailDataUrl"
-                               [aspectRatio]="aspectRatio"
-                               [classes]="['img-thumbnail', 'e2e-test-custom-photo']"
-                               [background]="localStorageBgcolor">
-      </oppia-thumbnail-display>
+      <oppia-image-display  *ngIf="editableThumbnailDataUrl"
+                            [hidden]="thumbnailIsLoading"
+                            [imgSrc]="editableThumbnailDataUrl"
+                            [aspectRatio]="aspectRatio"
+                            [classes]="['img-thumbnail', 'e2e-test-custom-photo']"
+                            [background]="bgColor">
+      </oppia-image-display>
+      <oppia-image-display *ngIf="useLocalStorage && newThumbnailDataUrl"
+                            [imgSrc]="newThumbnailDataUrl"
+                            [aspectRatio]="aspectRatio"
+                            [classes]="['img-thumbnail', 'e2e-test-custom-photo']"
+                            [background]="localStorageBgcolor">
+      </oppia-image-display>
     </div>
   </div>
 </div>

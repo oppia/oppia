@@ -40,6 +40,11 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   @Input() allowedImageFormats!: string[];
   @Input() isThumbnail: boolean = true;
   @Input() bgColor!: string;
+  @Input() previewFooter!: string;
+  @Input() previewDescription!: string;
+  @Input() previewTitle!: string;
+  @Input() previewDescriptionBgColor!: string;
+  @Input() imageName!: string;
 
   // 'uploadedImage' will be null if the uploaded svg is invalid or not trusted.
   uploadedImage: SafeResourceUrl | null = null;
@@ -177,6 +182,10 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   }
 
   ngOnInit(): void {
+    if (this.imageName === 'thumbnail') {
+      this.isThumbnail = true;
+    }
+
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
 
     this.windowDimensionService.getResizeEvent().subscribe(() => {

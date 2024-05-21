@@ -58,7 +58,7 @@ import {SkillSelectorComponent} from './skill-selector/skill-selector.component'
 import {ProfileLinkImageComponent} from 'components/profile-link-directives/profile-link-image.component';
 import {ProfileLinkTextComponent} from 'components/profile-link-directives/profile-link-text.component';
 import {AudioFileUploaderComponent} from './forms/custom-forms-directives/audio-file-uploader.component';
-import {ThumbnailDisplayComponent} from './forms/custom-forms-directives/thumbnail-display.component';
+import {ImageDisplayComponent} from './forms/custom-forms-directives/image-display.component';
 import {SkillMasteryViewerComponent} from './skill-mastery/skill-mastery.component';
 import {ExplorationSummaryTileComponent} from './summary-tile/exploration-summary-tile.component';
 import {PracticeTabComponent} from 'pages/topic-viewer-page/practice-tab/practice-tab.component';
@@ -304,7 +304,7 @@ import {DirectivesModule} from 'directives/directives.module';
     EditThumbnailModalComponent,
     SupplementalCardComponent,
     ThanksForDonatingModalComponent,
-    ThumbnailDisplayComponent,
+    ImageDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TutorCardComponent,
@@ -435,7 +435,7 @@ import {DirectivesModule} from 'directives/directives.module';
     SummaryListHeaderComponent,
     SupplementalCardComponent,
     ThanksForDonatingModalComponent,
-    ThumbnailDisplayComponent,
+    ImageDisplayComponent,
     TutorCardComponent,
     ThumbnailUploaderComponent,
     ImageUploaderComponent,
@@ -581,7 +581,7 @@ import {DirectivesModule} from 'directives/directives.module';
     TakeBreakModalComponent,
     ThreadTableComponent,
     ThanksForDonatingModalComponent,
-    ThumbnailDisplayComponent,
+    ImageDisplayComponent,
     ThumbnailUploaderComponent,
     ImageUploaderComponent,
     ImageUploaderModalComponent,
