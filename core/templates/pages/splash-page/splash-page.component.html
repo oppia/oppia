@@ -190,8 +190,7 @@
         {{ "I18N_SPLASH_FOR_TEACHERS" | translate }}
       </h2>
       <div class="oppia-splash-teachers-section-body-text">
-        <p class="oppia-splash-text oppia-splash-right-aligned-text">
-          {{ "I18N_SPLASH_TEACHERS_CONTENT" | translate }}
+        <p class="oppia-splash-text oppia-splash-right-aligned-text" [innerHTML]="'I18N_SPLASH_TEACHERS_CONTENT' | translate" >
         </p>
       </div>
       <button class="oppia-splash-button oppia-splash-desktop-content oppia-splash-teach-button"

@@ -856,7 +856,7 @@
   }
 
   .splash-page .oppia-splash-learn-more-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
 
   .splash-page .oppia-splash-features-section-header1 h2 {
@@ -875,7 +875,7 @@
     text-align: center;
   }
 
-  .splash-page .oppia-splash-features-section-card-text {
+  .splash-page .oppia-splash-features-section-card .oppia-splash-features-section-card-text p{
     font-size: 13px;
   }
 
