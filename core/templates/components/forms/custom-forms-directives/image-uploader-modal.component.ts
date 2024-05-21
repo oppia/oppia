@@ -38,10 +38,12 @@ require('cropperjs/dist/cropper.min.css');
 })
 export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   @Input() allowedImageFormats!: string[];
+  @Input() isThumbnail: boolean = true;
+  @Input() bgColor!: string;
 
   // 'uploadedImage' will be null if the uploaded svg is invalid or not trusted.
   uploadedImage: SafeResourceUrl | null = null;
-  cropppedImageDataUrl: string = '';
+  cropppedImageDataUrl: string | SafeResourceUrl | null = null;
   invalidImageWarningIsShown: boolean = false;
   windowIsNarrow: boolean = false;
   invalidTagsAndAttributes: {tags: string[]; attrs: string[]} = {
@@ -99,6 +101,8 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
           this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
             imageData
           );
+        this.cropppedImageDataUrl =
+          this.svgSanitizerService.removeAllInvalidTagsAndAttributes(imageData);
         this.uploadedImage =
           this.svgSanitizerService.getTrustedSvgResourceUrl(imageData);
       }
@@ -120,7 +124,9 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
           //   Attempt to use a destroyed view: detectChanges thrown.
           // No further action is needed.
         }
-        this.initializeCropper();
+        if (!this.isThumbnail) {
+          this.initializeCropper();
+        }
       };
       img.src = imageData;
       this.imageType = file.type;
@@ -134,7 +140,7 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
       attrs: [],
     };
     this.uploadedImage = null;
-    this.cropppedImageDataUrl = '';
+    this.cropppedImageDataUrl = null;
   }
 
   onInvalidImageLoaded(): void {
@@ -142,19 +148,31 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
     this.invalidImageWarningIsShown = true;
   }
 
-  confirm(): void {
-    if (this.cropper === undefined) {
-      throw new Error('Cropper has not been initialized');
+  updateBackgroundColor(color: string): void {
+    if (color !== this.bgColor) {
+      this.bgColor = color;
     }
-    this.cropppedImageDataUrl = this.cropper
-      .getCroppedCanvas({
-        height: this.dimensions.height,
-        width: this.dimensions.width,
-      })
-      .toDataURL(this.imageType);
+  }
+
+  confirm(): void {
+    if (this.isThumbnail === false) {
+      if (this.cropper === undefined) {
+        throw new Error('Cropper has not been initialized');
+      }
+      this.cropppedImageDataUrl = this.cropper
+        .getCroppedCanvas({
+          height: this.dimensions.height,
+          width: this.dimensions.width,
+        })
+        .toDataURL(this.imageType);
+    }
+
+    console.log(this.bgColor);
+
     super.confirm({
       newImageDataUrl: this.cropppedImageDataUrl,
       dimensions: this.dimensions,
+      newBgColor: this.bgColor,
     });
   }
 

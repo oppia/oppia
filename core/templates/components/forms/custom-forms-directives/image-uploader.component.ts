@@ -108,6 +108,12 @@ export class ImageUploaderComponent implements OnInit {
     });
     modalRef.componentInstance.allowedImageFormats = this.allowedImageFormats;
     modalRef.componentInstance.allowedBgColors = this.allowedBgColors;
+    modalRef.componentInstance.bgColor =
+      this.bgColor || this.allowedBgColors[0];
+    modalRef.componentInstance.previewDescriptionBgColor =
+      this.previewDescriptionBgColor;
+    modalRef.componentInstance.previewTitle = this.previewTitle;
+    modalRef.componentInstance.previewDescription = this.previewDescription;
 
     modalRef.result.then(
       data => {
@@ -125,8 +131,10 @@ export class ImageUploaderComponent implements OnInit {
 
         this.hidePlaceholder = false;
         this.imageIsLoading = false;
+        this.bgColor = data.newBgColor;
+
         this.imageSave.emit(imageBlobData);
-        this.updateBgColor.emit(this.allowedBgColors[0] || this.bgColor);
+        this.updateBgColor.emit(data.newBgColor);
         this.updateFilename.emit(imageFilename);
       },
       () => {
