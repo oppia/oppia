@@ -92,7 +92,7 @@ export class AudioBarComponent {
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.voiceoverPlayerService.onTranslationLanguageChanged.subscribe(() => {
-        this.displayableLanguageAccentDescription();
+        this.updateDisplayableLanguageAccentDescription();
       })
     );
 
@@ -262,7 +262,7 @@ export class AudioBarComponent {
     this.audioPlayerService.forward(5);
   }
 
-  displayableLanguageAccentDescription() {
+  updateDisplayableLanguageAccentDescription() {
     this.languageAccentDecriptions =
       this.voiceoverPlayerService.getLanguageAccentDescriptions();
 

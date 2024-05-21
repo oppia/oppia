@@ -907,12 +907,11 @@ class EditTranslationsChangesCmd(ExplorationChange):
 
 
 class VoiceoversChangesCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_UPDATE_VOICEOVERS command.
+    """Class representing the ExplorationChange's CMD_UPDATE_VOICEOVERS command.
     """
 
-    language_accent_code: str
     content_id: str
+    language_accent_code: str
     voiceovers: Dict[str, state_domain.VoiceoverDict]
 
 

@@ -81,7 +81,7 @@ describe('EntityVoiceovers model class', function () {
     expect(retrievedManualVoiceover).toEqual(manualVoiceover);
   });
 
-  it('should be able to undefined for unknown content IDs', () => {
+  it('should get undefined for unknown content IDs', () => {
     let entityVoiceovers = EntityVoiceovers.createFromBackendDict(
       entityVoiceoversBackendDict
     );

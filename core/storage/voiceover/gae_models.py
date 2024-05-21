@@ -178,7 +178,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
     def get_entity_voiceovers_for_given_exploration(
         cls, entity_id: str, entity_type: str, entity_version: int
     ) -> Sequence[EntityVoiceoversModel]:
-        """Retrieve voiceover models for the specified exploration version.
+        """Retrieves voiceovers models for the specified exploration data.
 
         Args:
             entity_id: str. The entity ID for which entity voiceovers need to be

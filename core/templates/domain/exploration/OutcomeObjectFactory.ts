@@ -69,7 +69,7 @@ export class Outcome extends BaseTranslatableObject {
     return [this.feedback];
   }
 
-  getContentIdToHtml() {
+  getContentIdToHtml(): {[contentId: string]: string} {
     let outcomeContentIdToHtml = {};
     outcomeContentIdToHtml[this.feedback.contentId] = this.feedback.html;
     return outcomeContentIdToHtml;

@@ -106,12 +106,8 @@ export class TranslationStatusService implements OnInit {
       available: false,
       needsUpdate: false,
     };
-    let activeLanguageAccentCode =
-      this.entityVoiceoversService.getActiveLanguageAccentCode();
     let entityVoiceovers =
-      this.entityVoiceoversService.getEntityVoiceoversByLanguageAccentCode(
-        activeLanguageAccentCode
-      );
+      this.entityVoiceoversService.getActiveEntityVoiceovers();
 
     if (entityVoiceovers === undefined) {
       return availabilityStatus;
@@ -268,13 +264,13 @@ export class TranslationStatusService implements OnInit {
             }
           }
         });
-        let activeLanguageAccentCode =
-          this.entityVoiceoversService.getActiveLanguageAccentCode();
+
+        this.explorationTranslationContentNotAvailableCount +=
+          noTranslationCount;
+        this.explorationVoiceoverContentNotAvailableCount += noVoiceoverCount;
 
         let activeEntityVoiceovers =
-          this.entityVoiceoversService.getEntityVoiceoversByLanguageAccentCode(
-            activeLanguageAccentCode
-          );
+          this.entityVoiceoversService.getActiveEntityVoiceovers();
 
         let voiceoverContentIds = [];
         if (activeEntityVoiceovers) {
@@ -283,19 +279,15 @@ export class TranslationStatusService implements OnInit {
           );
         }
 
-        this.explorationTranslationContentNotAvailableCount +=
-          noTranslationCount;
-        this.explorationVoiceoverContentNotAvailableCount += noVoiceoverCount;
-
         if (
           this.translationTabActiveModeService.isVoiceoverModeActive() &&
           this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled
         ) {
-          let color = this.getStateGraphColorInVoiceoverMode(
-            allContentIds,
-            voiceoverContentIds
-          );
-          this.stateWiseStatusColor[stateName] = color;
+          this.stateWiseStatusColor[stateName] =
+            this.getStateGraphColorInVoiceoverMode(
+              allContentIds,
+              voiceoverContentIds
+            );
         } else if (noTranslationCount === 0 && !stateNeedsUpdate) {
           this.stateWiseStatusColor[stateName] =
             this.ALL_ASSETS_AVAILABLE_COLOR;

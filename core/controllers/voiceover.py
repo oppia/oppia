@@ -223,7 +223,7 @@ class GetSampleVoiceoversForGivenVoiceArtistHandler(
 class EntityVoiceoversBulkHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Handler class to get entity voiceover data for a given language code
+    """Handler class to get entity voiceovers data for a given language code
     of an exploration.
     """
 
@@ -259,13 +259,17 @@ class EntityVoiceoversBulkHandler(
         entity_id: str,
         entity_version: int,
         language_code: str,
-    ):
-        entity_voiceovers_list = (
+    ) -> None:
+        entity_voiceovers_objects = (
             voiceover_services.fetch_entity_voiceovers_by_language_code(
                 entity_id, entity_type, entity_version, language_code)
         )
+        entity_voiceovers_dicts = []
+
+        for entity_voiceovers in entity_voiceovers_objects:
+            entity_voiceovers_dicts.append(entity_voiceovers.to_dict())
 
         self.values.update({
-            'entity_voiceovers_list': entity_voiceovers_list
+            'entity_voiceovers_list': entity_voiceovers_dicts
         })
         self.render_json(self.values)

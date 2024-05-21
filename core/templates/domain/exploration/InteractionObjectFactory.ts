@@ -144,9 +144,8 @@ export class Interaction extends BaseTranslatableObject {
     return translatableObjects;
   }
 
-  getContentIdToHtml() {
+  getContentIdToHtml(): {[contentId: string]: string} {
     let contentIdToHtml = {};
-
     let answerGroupsContentIdToHtml = {};
     let outcomeContentIdToHtml = {};
 
@@ -169,7 +168,7 @@ export class Interaction extends BaseTranslatableObject {
     );
   }
 
-  getContentIdForMatchingHtml(contentHtml) {
+  getContentIdForMatchingHtml(contentHtml: string): string | undefined {
     let contentIdToHtml = this.getContentIdToHtml();
     for (let contentId in contentIdToHtml) {
       let retrievedHtml = contentIdToHtml[contentId];

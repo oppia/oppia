@@ -770,6 +770,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         this.initStateTranslation()
       )
     );
+
     this.initStateTranslation();
     this.initActiveIndex = this.getIndexOfActiveCard();
     this.stateEditorService.setInitActiveContentId(null);

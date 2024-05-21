@@ -103,7 +103,7 @@ def get_voiceovers_for_given_language_accent_code(
 def get_entity_voiceovers_for_given_exploration(
     entity_id: str, entity_type: str, entity_version: int
 ) -> List[voiceover_domain.EntityVoiceovers]:
-    """Retrieve entity voiceovers models for the specified exploration version.
+    """Retrieves entity voiceovers models for the specified exploration version.
 
     Args:
         entity_id: str. The entity ID for which entity voiceovers need to be
@@ -133,7 +133,7 @@ def get_entity_voiceovers_for_given_exploration(
 def fetch_entity_voiceovers_by_language_code(
     entity_id: str, entity_type: str, entity_version: int, language_code: str
 ) -> List[voiceover_domain.EntityVoiceovers]:
-    """Retrieve entity voiceover models for the specified exploration and
+    """Retrieves entity voiceovers models for the specified exploration and
     version for a given language code.
 
     Args:
@@ -147,8 +147,8 @@ def fetch_entity_voiceovers_by_language_code(
             to be fetched for the given exploration ID.
 
     Returns:
-        list(EntityVoiceovers). Returns a list of entity voiceover models for
-        the specified exploration data.
+        list(EntityVoiceovers). Returns a list of entity voiceovers domain
+        instances for the specified exploration data.
     """
     entity_voiceovers_for_exp = get_entity_voiceovers_for_given_exploration(
         entity_id, entity_type, entity_version)
@@ -169,7 +169,7 @@ def fetch_entity_voiceovers_by_language_code(
         if not bool(entity_voiceovers.voiceovers_mapping):
             continue
 
-        entity_voiceovers_list.append(entity_voiceovers.to_dict())
+        entity_voiceovers_list.append(entity_voiceovers)
 
     return entity_voiceovers_list
 
@@ -178,7 +178,7 @@ def compute_voiceover_related_change(
     updated_exploration: exp_domain.Exploration,
     voiceover_changes: List[exp_domain.ExplorationChange]
 ) -> List[voiceover_models.EntityVoiceoversModel]:
-    """Cretase new EntityVoiceovers models corresponding to voiceover related
+    """Creates new EntityVoiceovers models corresponding to voiceover related
     changes.
 
     Args:
@@ -212,8 +212,8 @@ def compute_voiceover_related_change(
             entity_voiceovers)
 
     for change in voiceover_changes:
-        language_accent_code = change.language_accent_code
         content_id = change.content_id
+        language_accent_code = change.language_accent_code
 
         entity_voiceover_id = generate_id_method(
             entity_type, entity_id, entity_version, language_accent_code)

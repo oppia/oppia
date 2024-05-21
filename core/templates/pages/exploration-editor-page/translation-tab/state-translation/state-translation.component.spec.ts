@@ -443,7 +443,7 @@ describe('State translation component', () => {
         expect(component.isVoiceoverContributionEnabled()).toBeTrue();
       });
 
-      it('should get disabled voiceover with accent feature flag data', () => {
+      it('should disable voiceover with accent feature flag data', () => {
         spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
           AddVoiceoverWithAccent: {
             isEnabled: false,
@@ -455,7 +455,7 @@ describe('State translation component', () => {
         ).toBeFalse();
       });
 
-      it('should get enabled voiceover with accent feature flag data', () => {
+      it('should enable voiceover with accent feature flag data', () => {
         spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
           AddVoiceoverWithAccent: {
             isEnabled: true,
