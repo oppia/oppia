@@ -876,12 +876,12 @@ export class ExplorationEditor extends BaseUser {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
     await this.dismissWelcomeModal();
-    await this.createExplorationWithMinimumContent(
+    await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
     );
     await this.saveExplorationDraft();
-    return await this.publishExplorationWithContent(
+    return await this.publishExplorationWithMetadata(
       title,
       'This is Goal here.',
       'Algebra'
