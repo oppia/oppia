@@ -126,7 +126,9 @@ export class ImageReceiverComponent {
   }
 
   getAllowedImageFormatsString(allowedImageFormats: string[]): string {
-    if (!allowedImageFormats) return '';
+    if (!allowedImageFormats) {
+      return '';
+    }
     if (allowedImageFormats.length === 1) {
       return `Is in .${allowedImageFormats[0]} format`;
     }
@@ -205,8 +207,9 @@ export class ImageReceiverComponent {
 
       let fileSizeUnit = this.maxAllowedFileSize <= 100 * 1024 ? 'KB' : 'MB';
 
-      if (fileSizeUnit == 'MB')
+      if (fileSizeUnit == 'MB') {
         currentSize = (parseInt(currentSize) / 100).toFixed(1);
+      }
 
       return (
         `The maximum allowed file size is ${this.maxAllowedFileSize / 1024}` +
