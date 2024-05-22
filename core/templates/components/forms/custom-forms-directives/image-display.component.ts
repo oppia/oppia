@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for thumbnail display.
+ * @fileoverview Component for image display.
  */
 
 import {Component, Input, OnChanges, OnInit} from '@angular/core';

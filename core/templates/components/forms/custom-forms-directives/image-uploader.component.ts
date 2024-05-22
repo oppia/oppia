@@ -56,6 +56,7 @@ export class ImageUploaderComponent implements OnInit {
   openInUploadMode: boolean = false;
   hidePlaceholder: boolean = true;
   imageIsLoading: boolean = true;
+  imageBgColor: string;
   placeholderImageUrl: string = this.urlInterpolationService.getStaticImageUrl(
     '/icons/story-image-icon.png'
   );
@@ -114,6 +115,7 @@ export class ImageUploaderComponent implements OnInit {
     modalRef.componentInstance.previewTitle = this.previewTitle;
     modalRef.componentInstance.previewDescription = this.previewDescription;
     modalRef.componentInstance.imageName = this.imageName;
+    modalRef.componentInstance.aspectRatio = this.aspectRatio;
 
     modalRef.result.then(
       data => {
@@ -131,7 +133,7 @@ export class ImageUploaderComponent implements OnInit {
 
         this.hidePlaceholder = false;
         this.imageIsLoading = false;
-        this.bgColor = data.newBgColor;
+        this.imageBgColor = data.newBgColor;
 
         this.imageSave.emit(imageBlobData);
         this.updateBgColor.emit(data.newBgColor);
