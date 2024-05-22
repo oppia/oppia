@@ -29,8 +29,9 @@
         <div [hidden]="!allowedBgColors">
           <div [hidden]="!(allowedBgColors.length > 1)">Choose background color:</div>
           <div [hidden]="!(allowedBgColors.length > 1)" class="oppia-thumbnail-colour-select">
-            <div *ngFor="let color of allowedBgColors" [ngStyle]="{'background': color}"
-              (click)="updateBackgroundColor(color)">
+            <div *ngFor="let color of allowedBgColors"
+                  [ngStyle]="{'background': color}"
+                  (click)="updateBackgroundColor(color)">
             </div>
           </div>
           <div [hidden]="!(allowedBgColors.length === 1)" class="alert alert-warning">
