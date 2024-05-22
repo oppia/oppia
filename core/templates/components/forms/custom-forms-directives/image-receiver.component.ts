@@ -207,7 +207,7 @@ export class ImageReceiverComponent {
 
       let fileSizeUnit = this.maxAllowedFileSize <= 100 * 1024 ? 'KB' : 'MB';
 
-      if (fileSizeUnit == 'MB') {
+      if (fileSizeUnit === 'MB') {
         currentSize = (parseInt(currentSize) / 100).toFixed(1);
       }
 

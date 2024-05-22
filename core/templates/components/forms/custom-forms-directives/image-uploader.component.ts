@@ -130,8 +130,6 @@ export class ImageUploaderComponent implements OnInit {
             data.newImageDataUrl
           );
 
-        console.log(data.newImageDataUrl);
-
         if (imageBlobData) {
           const imageFilename =
             this.imageUploadHelperService.generateImageFilename(
