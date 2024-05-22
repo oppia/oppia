@@ -63,6 +63,7 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   dimensions = {height: 0, width: 0};
   imageType!: string;
   isThumbnail!: boolean;
+  aspectRatioNumber!: number;
 
   // 'cropper' is initialized before it is to be used, hence we need to do
   // non-null assertion, for more information see
@@ -87,13 +88,13 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
         this.cropper = new Cropper(imageElement, {
           minContainerWidth: 500,
           minContainerHeight: 350,
-          aspectRatio: 1.3,
+          aspectRatio: this.aspectRatioNumber,
         });
       } else {
         this.cropper = new Cropper(imageElement, {
           minContainerWidth: 200,
           minContainerHeight: 200,
-          aspectRatio: 1.3,
+          aspectRatio: this.aspectRatioNumber,
         });
       }
     }
@@ -168,7 +169,7 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   }
 
   confirm(): void {
-    if (this.isThumbnail === false) {
+    if (!this.isThumbnail) {
       if (this.cropper === undefined) {
         throw new Error('Cropper has not been initialized');
       }
@@ -192,7 +193,13 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   ngOnInit(): void {
     if (this.imageName === 'Thumbnail') {
       this.isThumbnail = true;
+    } else {
+      this.isThumbnail = false;
     }
+
+    this.aspectRatioNumber =
+      parseInt(this.aspectRatio.split(':')[0]) /
+      parseInt(this.aspectRatio.split(':')[1]);
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
 

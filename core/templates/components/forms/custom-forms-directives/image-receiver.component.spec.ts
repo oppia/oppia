@@ -25,14 +25,14 @@ import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {IdGenerationService} from 'services/id-generation.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {ImageUploaderReceiver} from './image-receiver.component';
+import {ImageReceiverComponent} from './image-receiver.component';
 import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ContextService} from 'services/context.service';
 
-describe('ImageUploaderReceiver', () => {
-  let component: ImageUploaderReceiver;
-  let fixture: ComponentFixture<ImageUploaderReceiver>;
+describe('ImageReceiverComponent', () => {
+  let component: ImageReceiverComponent;
+  let fixture: ComponentFixture<ImageReceiverComponent>;
   let igs: IdGenerationService;
   let windowRef: WindowRef;
   let contextService: ContextService;
@@ -61,7 +61,7 @@ describe('ImageUploaderReceiver', () => {
         HttpClientTestingModule,
         RouterModule.forRoot([]),
       ],
-      declarations: [ImageUploaderReceiver, MockTranslatePipe],
+      declarations: [ImageReceiverComponent, MockTranslatePipe],
       providers: [
         BlogDashboardPageService,
         {provide: WindowRef, useValue: windowRef},
@@ -71,7 +71,7 @@ describe('ImageUploaderReceiver', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ImageUploaderReceiver);
+    fixture = TestBed.createComponent(ImageReceiverComponent);
     component = fixture.componentInstance;
     igs = TestBed.inject(IdGenerationService);
     contextService = TestBed.inject(ContextService);
@@ -263,6 +263,7 @@ describe('ImageUploaderReceiver', () => {
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
+    component.maxAllowedFileSize = 100 * 1024;
 
     let dataTransfer = new DataTransfer();
     let fileWithLargeSize = new File([''], 'image.jpg', {type: 'image/jpg'});
@@ -292,10 +293,11 @@ describe('ImageUploaderReceiver', () => {
     spyOn(contextService, 'getEntityType').and.returnValue('blog_post');
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
+    component.maxAllowedFileSize = 1024 * 1024;
 
     let dataTransfer = new DataTransfer();
     let fileWithLargeSize = new File([''], 'image.jpg', {type: 'image/jpg'});
-    let sizeOfLargeFileInBytes = 1024 * 1024 + 100;
+    let sizeOfLargeFileInBytes = 1024 * 1024 * 100;
 
     Object.defineProperty(fileWithLargeSize, 'size', {
       value: sizeOfLargeFileInBytes,

@@ -42,7 +42,7 @@ interface ImageTypeMapping {
   selector: 'oppia-image-receiver',
   templateUrl: './image-receiver.component.html',
 })
-export class ImageUploaderReceiver {
+export class ImageReceiverComponent {
   @Output() fileChanged: EventEmitter<File> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -126,6 +126,7 @@ export class ImageUploaderReceiver {
   }
 
   getAllowedImageFormatsString(allowedImageFormats: string[]): string {
+    if (!allowedImageFormats) return '';
     if (allowedImageFormats.length === 1) {
       return `Is in .${allowedImageFormats[0]} format`;
     }
@@ -201,9 +202,15 @@ export class ImageUploaderReceiver {
         (file.size * 100) /
         this.maxAllowedFileSize
       ).toFixed(1);
+
+      let fileSizeUnit = this.maxAllowedFileSize <= 100 * 1024 ? 'KB' : 'MB';
+
+      if (fileSizeUnit == 'MB')
+        currentSize = (parseInt(currentSize) / 100).toFixed(1);
+
       return (
         `The maximum allowed file size is ${this.maxAllowedFileSize / 1024}` +
-        ` KB (${currentSize} KB given).`
+        ` KB (${currentSize} ${fileSizeUnit} given).`
       );
     }
     return null;
@@ -214,5 +221,5 @@ angular
   .module('oppia')
   .directive(
     'oppiaImageUploader',
-    downgradeComponent({component: ImageUploaderReceiver})
+    downgradeComponent({component: ImageReceiverComponent})
   );
