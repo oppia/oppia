@@ -5,7 +5,13 @@
 
   <div class="modal-body oppia-image-uploader-container">
     <div *ngIf="(imageName==='Thumbnail')">
-      <span>Uploaded image should have a transparent background.</span>
+      <strong tabindex="0">Please upload an SVG image.</strong>
+      <div class="alert alert-warning" tabindex="0">
+        <span>Here are some guidelines to follow:</span>
+        <ul>
+          <li>Uploaded image should have a transparent background.</li>
+        </ul>
+      </div>
     </div>
     <div class="oppia-image-uploader">
       <div *ngIf="!uploadedImage">
