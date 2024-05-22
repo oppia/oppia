@@ -140,7 +140,7 @@ export class ImageUploaderComponent implements OnInit {
         this.imageIsLoading = false;
         this.imageBgColor = data.newBgColor;
 
-        this.imageSave.emit(imageBlobData!);
+        this.imageSave.emit(imageBlobData);
         this.updateBgColor.emit(data.newBgColor);
         this.updateFilename.emit(imageFilename);
       },
