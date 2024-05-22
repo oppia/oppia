@@ -255,7 +255,7 @@
       <h2 class="oppia-splash-title oppia-splash-volunteer-section-title">
         {{ "I18N_SPLASH_FOR_VOLUNTEERS" | translate }}
       </h2>
-      <div class="oppia-splash-volunteer-section-body-text" >
+      <div class="oppia-splash-volunteer-section-body-text oppia-splash-desktop-content" >
         <p class="oppia-splash-text oppia-splash-right-aligned-text">
           {{ "I18N_SPLASH_VOLUNTEERS_CONTENT" | translate }}
         </p>
@@ -274,6 +274,11 @@
         <img [src]="getStaticImageUrl('/splash/volunteer_section1x.png')"
              alt="Logo of Oppia containing photos of contributors">
       </picture>
+    </div>
+    <div class="oppia-splash-volunteer-section-body-text oppia-splash-mobile-content" >
+      <p class="oppia-splash-text oppia-splash-right-aligned-text">
+        {{ "I18N_SPLASH_VOLUNTEERS_CONTENT" | translate }}
+      </p>
     </div>
     <button (click)="onClickStartContributingButton()"
             class="oppia-splash-button oppia-splash-mobile-content oppia-splash-volunteer-button"

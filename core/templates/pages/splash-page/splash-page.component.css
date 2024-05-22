@@ -154,7 +154,7 @@
 }
 
 .splash-page .oppia-splash-offerings-section-product .oppia-splash-offerings-section-product-text {
-  width: 289px;
+  width: 282px;
 }
 
 .splash-page .oppia-splash-title {
@@ -172,6 +172,7 @@
   color: #005c5e;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 3.2rem;
+  font-weight: 400;
   margin: 0 0;
   text-align: center;
 }
@@ -193,7 +194,7 @@
   height: auto;
   margin: 0 auto;
   padding: 0.5rem;
-  row-gap: 12px;
+  row-gap: 24px;
   width: 50%;
 }
 
@@ -252,13 +253,13 @@
   flex-direction: column;
   justify-content: center;
   padding: 32px 0;
-  row-gap: 16px;
+  row-gap: 24px;
   text-align: start;
   width: 100%;
 }
 
 .splash-page .oppia-splash-students-section-left .oppia-splash-students-section-body-text {
-  width: 682px;
+  width: 690px;
 }
 
 .splash-page .oppia-splash-indigo-text {
@@ -345,7 +346,7 @@
   flex-direction: column;
   height: 100%;
   padding: 52px 5rem 52px 4rem;
-  row-gap: 12px;
+  row-gap: 24px;
   text-align: end;
   width: fit-content;
 }
@@ -425,7 +426,7 @@
   flex-direction: column;
   justify-content: center;
   padding: 32px;
-  row-gap: 16px;
+  row-gap: 24px;
   text-align: start;
   width: 100%;
 }
@@ -483,13 +484,13 @@
   display: flex;
   flex-direction: column;
   padding: 52px 0;
-  row-gap: 12px;
+  row-gap: 24px;
   text-align: end;
   width: fit-content;
 }
 
 .splash-page .oppia-splash-volunteer-section-right .oppia-splash-volunteer-section-body-text {
-  width: 456px;
+  width: 476px;
 }
 
 .splash-page .oppia-splash-volunteer-section-title {
@@ -626,6 +627,10 @@
     font-size: 2.8rem;
   }
 
+  .splash-page .oppia-splash-features-section-top {
+    gap: 3.7vw;
+  }
+
   .splash-page .oppia-splash-features-section-top-text {
     font-size: 2rem;
   }
@@ -635,11 +640,11 @@
   }
 
   .splash-page .oppia-splash-teachers-section-right .oppia-splash-teachers-section-body-text {
-    width: 467px;
+    width: 472px;
   }
 
   .splash-page .oppia-splash-parents-section-left .oppia-splash-parents-section-body-text {
-    width: 415px;
+    width: 440px;
   }
 
   .splash-page .oppia-splash-volunteer-section-right .oppia-splash-volunteer-section-body-text {
@@ -682,6 +687,10 @@
 
   .splash-page .oppia-splash-features-section-card .oppia-splash-features-section-card-text {
     width: 100%;
+  }
+
+  .splash-page .oppia-splash-features-section-card .oppia-splash-features-section-card-text p{
+    font-size: 15px;
   }
 
   .splash-page .image-mobile {
@@ -745,7 +754,7 @@
   }
 
   .splash-page .oppia-splash-students-section-left .oppia-splash-students-section-body-text {
-    width: 357px;
+    width: 379px;
   }
 
   .splash-page .oppia-splash-teachers-section-right .oppia-splash-teachers-section-body-text {
@@ -779,6 +788,14 @@
 
   .splash-page .oppia-splash-features-section-header1 h2 {
     max-width: 100%;
+  }
+
+  .splash-page .oppia-splash-features-section-card .oppia-splash-features-section-card-text {
+    width: 105%;
+  }
+
+  .splash-page .oppia-splash-features-section-card .oppia-splash-features-section-card-text p{
+    font-size: 13px;
   }
 
   .splash-page .oppia-splash-offerings-section-title {
@@ -859,6 +876,19 @@
     font-size: 1.8rem;
   }
 
+  .splash-page .oppia-splash-offerings-section {
+    align-items: center;
+  }
+
+  .splash-page .oppia-splash-offerings-section-title {
+    line-height: 30px;
+    width: 220px;
+  }
+
+  .splash-page .oppia-splash-offerings-section-product {
+    row-gap: 16px;
+  }
+
   .splash-page .oppia-splash-features-section-header1 h2 {
     width: 270px;
   }
@@ -873,11 +903,9 @@
 
   .splash-page .oppia-splash-features-section-content p {
     text-align: center;
+    width: 324px;
   }
 
-  .splash-page .oppia-splash-features-section-card .oppia-splash-features-section-card-text p{
-    font-size: 13px;
-  }
 
   .splash-page .oppia-splash-features-section-card-h2 {
     font-size: 1.6rem;
@@ -912,7 +940,7 @@
   }
 
   .splash-page .oppia-splash-parents-section-left .oppia-splash-parents-section-body-text {
-    width: 100%;
+    width: 103%;
   }
 
   .splash-page .oppia-splash-volunteer-section-right .oppia-splash-volunteer-section-body-text {
