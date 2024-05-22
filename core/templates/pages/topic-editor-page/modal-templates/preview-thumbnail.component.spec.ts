@@ -18,7 +18,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {ThumbnailDisplayComponent} from 'components/forms/custom-forms-directives/thumbnail-display.component';
+import {ImageDisplayComponent} from 'components/forms/custom-forms-directives/image-display.component';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {PreviewThumbnailComponent} from './preview-thumbnail.component';
 import {ContextService} from 'services/context.service';
@@ -33,7 +33,7 @@ describe('Preview Thumbnail Component', function () {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [PreviewThumbnailComponent, ThumbnailDisplayComponent],
+      declarations: [PreviewThumbnailComponent, ImageDisplayComponent],
       providers: [ImageUploadHelperService, ContextService],
     }).compileComponents();
   }));

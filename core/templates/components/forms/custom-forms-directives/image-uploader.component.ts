@@ -48,18 +48,16 @@ export class ImageUploaderComponent implements OnInit {
   @Input() previewTitle!: string;
   @Input() allowedImageFormats!: string[];
   @Input() imageName!: string;
+  @Input() orientation!: string;
 
   uploadedImage!: string;
-  uploadedImageMimeType!: string;
   dimensions!: {height: number; width: number};
   editableImageDataUrl!: string;
   openInUploadMode: boolean = false;
   hidePlaceholder: boolean = true;
   imageIsLoading: boolean = true;
   imageBgColor: string;
-  placeholderImageUrl: string = this.urlInterpolationService.getStaticImageUrl(
-    '/icons/story-image-icon.png'
-  );
+  placeholderImageUrl: string;
 
   constructor(
     private imageUploadHelperService: ImageUploadHelperService,
@@ -70,6 +68,14 @@ export class ImageUploaderComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.placeholderImageUrl = this.urlInterpolationService.getStaticImageUrl(
+      this.orientation === 'landscape'
+        ? '/icons/story-image-icon-landscape.png'
+        : '/icons/story-image-icon.png'
+    );
+
+    console.log(this.orientation);
+
     if (
       this.filename !== null &&
       this.filename !== undefined &&
@@ -98,7 +104,6 @@ export class ImageUploaderComponent implements OnInit {
     if (!this.uploadedImage) {
       this.openInUploadMode = true;
     }
-    this.uploadedImageMimeType = '';
     this.dimensions = {
       height: 0,
       width: 0,
