@@ -89,7 +89,7 @@ const mobileChangesDropdown = 'div.e2e-test-mobile-changes-dropdown';
 const mobileSaveChangesButton =
   'button.e2e-test-save-changes-for-small-screens';
 const mobilePublishButton = 'button.e2e-test-mobile-publish-button';
-const mobileDiscardButton = 'div.e2e-test-mobile-exploration-discard-tab';
+const mobileDiscardButton = 'button.e2e-test-mobile-exploration-discard-tab';
 const mobileStateGraphResizeButton = '.e2e-test-mobile-graph-resize-button';
 const mobileNavbarDropdown = 'div.e2e-test-mobile-options-dropdown';
 const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
