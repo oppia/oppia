@@ -57,8 +57,8 @@ export class ImageUploaderComponent implements OnInit {
   openInUploadMode: boolean = false;
   hidePlaceholder: boolean = true;
   imageIsLoading: boolean = true;
-  imageBgColor: string;
-  placeholderImageUrl: string;
+  imageBgColor!: string;
+  placeholderImageUrl!: string;
 
   constructor(
     private imageUploadHelperService: ImageUploadHelperService,
@@ -133,14 +133,14 @@ export class ImageUploaderComponent implements OnInit {
           this.imageUploadHelperService.generateImageFilename(
             this.dimensions.height,
             this.dimensions.width,
-            imageBlobData.type.split('/')[1]
+            imageBlobData?.type?.split('/')[1]
           );
 
         this.hidePlaceholder = false;
         this.imageIsLoading = false;
         this.imageBgColor = data.newBgColor;
 
-        this.imageSave.emit(imageBlobData);
+        this.imageSave.emit(imageBlobData!);
         this.updateBgColor.emit(data.newBgColor);
         this.updateFilename.emit(imageFilename);
       },

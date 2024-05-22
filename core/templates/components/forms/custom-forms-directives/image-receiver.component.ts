@@ -56,8 +56,8 @@ export class ImageUploaderReceiver {
   errorMessage!: string | null;
   backgroundWhileUploading: boolean = false;
   licenseUrl = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE;
-  allowedImageFormatsString: string;
-  maxAllowedFileSize: number;
+  allowedImageFormatsString!: string;
+  maxAllowedFileSize!: number;
 
   constructor(
     public blogDashboardPageService: BlogDashboardPageService,

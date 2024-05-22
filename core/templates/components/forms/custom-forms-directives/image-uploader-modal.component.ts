@@ -29,7 +29,6 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import Cropper from 'cropperjs';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {Dimensions} from 'objects/templates/svg-editor.component';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 require('cropperjs/dist/cropper.min.css');
 
@@ -61,9 +60,9 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
     tags: [],
     attrs: [],
   };
-  dimensions: Dimensions = {height: 0, width: 0};
-  imageType: string;
-  isThumbnail: boolean = false;
+  dimensions = {height: 0, width: 0};
+  imageType!: string;
+  isThumbnail!: boolean;
 
   // 'cropper' is initialized before it is to be used, hence we need to do
   // non-null assertion, for more information see
