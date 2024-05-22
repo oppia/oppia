@@ -4,10 +4,14 @@
   </div>
 
   <div class="modal-body oppia-image-uploader-container">
+    <div *ngIf="(imageName==='Thumbnail')">
+      <span>Uploaded image should have a transparent background.</span>
+    </div>
     <div class="oppia-image-uploader">
       <div *ngIf="!uploadedImage">
         <oppia-image-receiver (fileChanged)="onFileChanged($event)" [allowedImageFormats]="allowedImageFormats"
-          [isBlogPostThumbnailUploader]="false">
+        [maxImageSize]="maxImageSize"
+        >
         </oppia-image-receiver>
       </div>
 

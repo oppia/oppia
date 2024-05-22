@@ -49,6 +49,7 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   @Input() previewDescriptionBgColor!: string;
   @Input() imageName!: string;
   @Input() aspectRatio!: string;
+  @Input() maxImageSize!: number;
 
   // 'uploadedImage' will be null if the uploaded svg is invalid or not trusted.
   uploadedImage: SafeResourceUrl | null = null;

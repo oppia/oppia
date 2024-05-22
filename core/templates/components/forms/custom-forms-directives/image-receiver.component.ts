@@ -48,7 +48,7 @@ export class ImageUploaderReceiver {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() allowedImageFormats!: string[];
-  @Input() isBlogPostThumbnailUploader!: boolean;
+  @Input() maxImageSize!: number;
   @ViewChild('dropArea') dropAreaRef!: ElementRef;
   @ViewChild('imageInput') imageInputRef!: ElementRef;
   fileInputClassName!: string;
@@ -56,6 +56,8 @@ export class ImageUploaderReceiver {
   errorMessage!: string | null;
   backgroundWhileUploading: boolean = false;
   licenseUrl = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE;
+  allowedImageFormatsString: string;
+  maxAllowedFileSize: number;
 
   constructor(
     public blogDashboardPageService: BlogDashboardPageService,
@@ -69,6 +71,12 @@ export class ImageUploaderReceiver {
     // others in the DOM.
     this.fileInputClassName =
       'image-uploader-file-input' + this.idGenerationService.generateNewId();
+
+    this.allowedImageFormatsString = this.getAllowedImageFormatsString(
+      this.allowedImageFormats
+    );
+
+    this.maxAllowedFileSize = this.maxImageSize * 1024;
   }
 
   ngAfterViewInit(): void {
@@ -115,6 +123,14 @@ export class ImageUploaderReceiver {
   onDragEnd(e: Event): void {
     e.preventDefault();
     this.backgroundWhileUploading = false;
+  }
+
+  getAllowedImageFormatsString(allowedImageFormats: string[]): string {
+    if (allowedImageFormats.length == 1) {
+      return `Is in .${allowedImageFormats[0]} format`;
+    }
+    const formats = allowedImageFormats.map(f => `.${f}`);
+    return `Is in ${formats.slice(0, -1).join(', ')} or ${formats[formats.length - 1]} format`;
   }
 
   handleFile(): void {
@@ -180,27 +196,14 @@ export class ImageUploaderReceiver {
       return 'This image format is not supported';
     }
 
-    let maxAllowedFileSize: number;
-    let fileSizeUnit: string;
-    if (
-      this.contextService.getEntityType() === AppConstants.ENTITY_TYPE.BLOG_POST
-    ) {
-      const ONE_MB_IN_BYTES: number = 1 * 1024 * 1024;
-      maxAllowedFileSize = ONE_MB_IN_BYTES;
-      fileSizeUnit = 'MB';
-    } else {
-      const HUNDRED_KB_IN_BYTES: number = 100 * 1024;
-      maxAllowedFileSize = HUNDRED_KB_IN_BYTES;
-      fileSizeUnit = 'KB';
-    }
-    if (file.size > maxAllowedFileSize) {
+    if (file.size > this.maxAllowedFileSize) {
       let currentSize: string = (
         (file.size * 100) /
-        maxAllowedFileSize
+        this.maxAllowedFileSize
       ).toFixed(1);
       return (
-        `The maximum allowed file size is ${maxAllowedFileSize / 1024}` +
-        ` KB (${currentSize} ${fileSizeUnit} given).`
+        `The maximum allowed file size is ${this.maxAllowedFileSize / 1024}` +
+        ` KB (${currentSize} KB given).`
       );
     }
     return null;

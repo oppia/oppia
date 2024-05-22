@@ -30,7 +30,9 @@
          [attr.style]="getImageContainerDynamicStyles()">
       <div *ngIf="isNoImageUploaded()">
         <oppia-image-receiver (fileChanged)="onFileChanged($event)"
-                              [allowedImageFormats]="allowedImageFormats">
+                              [allowedImageFormats]="allowedImageFormats"
+                              maxImageSize="100"
+                              >
         </oppia-image-receiver>
       </div>
       <div *ngIf="isImageUploaded()"

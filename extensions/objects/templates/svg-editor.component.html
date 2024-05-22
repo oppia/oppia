@@ -24,7 +24,8 @@
       <div *ngIf="!isFileUploaded()">
         <oppia-image-receiver (fileChanged)="onFileChanged($event)"
                               [allowedImageFormats]="allowedImageFormats"
-                              [isBlogPostThumbnailUploader]="false">
+                              maxImageSize="100"
+                              >
         </oppia-image-receiver>
       </div>
       <div *ngIf="isFileUploaded()">

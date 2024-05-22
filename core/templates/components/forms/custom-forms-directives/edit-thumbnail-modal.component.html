@@ -17,7 +17,8 @@
         </div>
         <oppia-image-receiver (fileChanged)="onFileChanged($event)"
                               [allowedImageFormats]="allowedImageFormats"
-                              [isBlogPostThumbnailUploader]="false">
+                              maxImageSize="100"
+                              >
         </oppia-image-receiver>
       </div>
       <div class="oppia-form-error" *ngIf="invalidImageWarningIsShown">

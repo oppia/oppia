@@ -49,6 +49,7 @@ export class ImageUploaderComponent implements OnInit {
   @Input() allowedImageFormats!: string[];
   @Input() imageName!: string;
   @Input() orientation!: string;
+  @Input() maxImageSize!: number;
 
   uploadedImage!: string;
   dimensions!: {height: number; width: number};
@@ -73,8 +74,6 @@ export class ImageUploaderComponent implements OnInit {
         ? '/icons/story-image-icon-landscape.png'
         : '/icons/story-image-icon.png'
     );
-
-    console.log(this.orientation);
 
     if (
       this.filename !== null &&
@@ -121,6 +120,7 @@ export class ImageUploaderComponent implements OnInit {
     modalRef.componentInstance.previewDescription = this.previewDescription;
     modalRef.componentInstance.imageName = this.imageName;
     modalRef.componentInstance.aspectRatio = this.aspectRatio;
+    modalRef.componentInstance.maxImageSize = this.maxImageSize;
 
     modalRef.result.then(
       data => {
