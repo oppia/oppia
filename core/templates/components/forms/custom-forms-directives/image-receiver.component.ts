@@ -126,7 +126,7 @@ export class ImageUploaderReceiver {
   }
 
   getAllowedImageFormatsString(allowedImageFormats: string[]): string {
-    if (allowedImageFormats.length == 1) {
+    if (allowedImageFormats.length === 1) {
       return `Is in .${allowedImageFormats[0]} format`;
     }
     const formats = allowedImageFormats.map(f => `.${f}`);
