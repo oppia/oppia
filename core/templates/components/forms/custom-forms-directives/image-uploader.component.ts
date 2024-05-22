@@ -129,20 +129,23 @@ export class ImageUploaderComponent implements OnInit {
           this.imageUploadHelperService.convertImageDataToImageFile(
             data.newImageDataUrl
           );
-        const imageFilename =
-          this.imageUploadHelperService.generateImageFilename(
-            this.dimensions.height,
-            this.dimensions.width,
-            imageBlobData?.type?.split('/')[1]
-          );
 
-        this.hidePlaceholder = false;
-        this.imageIsLoading = false;
-        this.imageBgColor = data.newBgColor;
+        if (imageBlobData) {
+          const imageFilename =
+            this.imageUploadHelperService.generateImageFilename(
+              this.dimensions.height,
+              this.dimensions.width,
+              imageBlobData?.type?.split('/')[1]
+            );
 
-        this.imageSave.emit(imageBlobData);
-        this.updateBgColor.emit(data.newBgColor);
-        this.updateFilename.emit(imageFilename);
+          this.hidePlaceholder = false;
+          this.imageIsLoading = false;
+          this.imageBgColor = data.newBgColor;
+
+          this.imageSave.emit(imageBlobData);
+          this.updateBgColor.emit(data.newBgColor);
+          this.updateFilename.emit(imageFilename);
+        }
       },
       () => {
         // Note to developers:
