@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the Preferences page.
  */
 
+import {AppConstants} from 'app.constants';
 import {NO_ERRORS_SCHEMA, Pipe, ElementRef} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {
@@ -61,6 +62,15 @@ describe('Preferences Page Component', () => {
       return value;
     }
   }
+
+  const ImageUploaderModalProps = {
+    allowedImageFormats: AppConstants.ALLOWED_IMAGE_FORMATS,
+    imageName: 'Profile Picture',
+    aspectRatio: '1:1',
+    maxImageSize: 100,
+    bgColor: 'transparent',
+  };
+
   describe('on dev mode', () => {
     let componentInstance: PreferencesPageComponent;
     let fixture: ComponentFixture<PreferencesPageComponent>;
@@ -494,9 +504,13 @@ describe('Preferences Page Component', () => {
 
     it('should show edit profile picture modal', fakeAsync(() => {
       let profilePictureDataUrl = 'data:image/png;base64,JUMzJTg3JTJD';
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.resolve(profilePictureDataUrl),
-      } as NgbModalRef);
+
+      let modalRef = {
+        result: Promise.resolve({newImageDataUrl: profilePictureDataUrl}),
+        componentInstance: ImageUploaderModalProps,
+      };
+
+      spyOn(ngbModal, 'open').and.returnValue(modalRef as NgbModalRef);
       spyOn(mockWindowRef.nativeWindow.location, 'reload');
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(
@@ -514,12 +528,14 @@ describe('Preferences Page Component', () => {
           )
         )
       );
+
       componentInstance.ngOnInit();
       tick();
       componentInstance.showEditProfilePictureModal();
       tick();
       componentInstance.savePreferences();
       tick();
+
       expect(mockWindowRef.nativeWindow.sessionStorage.getItem('file')).toEqual(
         profilePictureDataUrl
       );
@@ -529,9 +545,12 @@ describe('Preferences Page Component', () => {
     it('should edit profile picture modal raise error when image is invalid', fakeAsync(() => {
       let error = 'Image uploaded is not valid.';
       let profilePictureDataUrl = 'data:text/plain;base64,JUMzJTg3JTJD';
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.resolve(profilePictureDataUrl),
-      } as NgbModalRef);
+      let modalRef = {
+        result: Promise.resolve({newImageDataUrl: profilePictureDataUrl}),
+        componentInstance: ImageUploaderModalProps,
+      };
+
+      spyOn(ngbModal, 'open').and.returnValue(modalRef as NgbModalRef);
       spyOn(
         imageUploadHelperService,
         'convertImageDataToImageFile'
@@ -563,9 +582,12 @@ describe('Preferences Page Component', () => {
     }));
 
     it('should handle edit profile picture modal is canceled', fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.resolve(null),
-      } as NgbModalRef);
+      let modalRef = {
+        result: Promise.resolve({newImageDataUrl: null}),
+        componentInstance: ImageUploaderModalProps,
+      };
+
+      spyOn(ngbModal, 'open').and.returnValue(modalRef as NgbModalRef);
       spyOn(userService, 'setProfileImageDataUrlAsync');
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(
@@ -717,9 +739,12 @@ describe('Preferences Page Component', () => {
     it('should show edit profile picture modal', fakeAsync(() => {
       mockUserBackendApiService = TestBed.inject(UserBackendApiService);
       let profilePictureDataUrl = 'data:image/png;base64,JUMzJTg3JTJD';
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.resolve(profilePictureDataUrl),
-      } as NgbModalRef);
+      let modalRef = {
+        result: Promise.resolve({newImageDataUrl: profilePictureDataUrl}),
+        componentInstance: ImageUploaderModalProps,
+      };
+
+      spyOn(ngbModal, 'open').and.returnValue(modalRef as NgbModalRef);
       spyOn(
         mockUserBackendApiService,
         'updateMultiplePreferencesDataAsync'

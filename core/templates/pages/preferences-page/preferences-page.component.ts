@@ -92,6 +92,8 @@ export class PreferencesPageComponent {
   showEmailSignupLink: boolean = false;
   emailSignupLink: string = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
+  ALLOWED_PROFILE_PICTURE_FORMATS: readonly string[] =
+    AppConstants.ALLOWED_IMAGE_FORMATS;
 
   subscriptionList: SubscriptionSummary[] = [];
   preferencesForm!: FormGroup;
@@ -179,7 +181,7 @@ export class PreferencesPageComponent {
     });
 
     modalRef.componentInstance.allowedImageFormats =
-      AppConstants.ALLOWED_IMAGE_FORMATS;
+      this.ALLOWED_PROFILE_PICTURE_FORMATS;
     modalRef.componentInstance.imageName = 'Profile Picture';
     modalRef.componentInstance.aspectRatio = '1:1';
     modalRef.componentInstance.maxImageSize = 100;
