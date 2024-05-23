@@ -160,6 +160,10 @@ describe('Edit Profile Picture Modal Component', () => {
 
       expect(componentInstance.isThumbnail).toBeTrue();
       expect(componentInstance.thumbnailImageDataUrl).toBe('test_url');
+
+      componentInstance.confirm();
+
+      expect(componentInstance.croppedImageDataUrl).toBe('test_url');
     }
   );
 
