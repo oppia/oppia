@@ -30,6 +30,7 @@ import {AlertsService} from 'services/alerts.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
+import {ImageUploaderModalComponent} from 'components/forms/custom-forms-directives/image-uploader-modal.component';
 import {LoaderService} from 'services/loader.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {
@@ -42,7 +43,6 @@ import {
 import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
-import {EditProfilePictureModalComponent} from './modal-templates/edit-profile-picture-modal.component';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 require('cropperjs/dist/cropper.min.css');
 
@@ -174,14 +174,22 @@ export class PreferencesPageComponent {
   }
 
   showEditProfilePictureModal(): void {
-    let modalRef = this.ngbModal.open(EditProfilePictureModalComponent, {
+    let modalRef = this.ngbModal.open(ImageUploaderModalComponent, {
       backdrop: 'static',
     });
 
+    modalRef.componentInstance.allowedImageFormats =
+      AppConstants.ALLOWED_IMAGE_FORMATS;
+    modalRef.componentInstance.imageName = 'Blog Image';
+    modalRef.componentInstance.aspectRatio = '1:1';
+    modalRef.componentInstance.maxImageSize = 100;
+    modalRef.componentInstance.allowedBgColors = [];
+    modalRef.componentInstance.bgColor = 'transparent';
+
     modalRef.result.then(
-      newProfilePictureDataUrl => {
-        if (newProfilePictureDataUrl) {
-          this.updateAndMarkProfileImageAsChanged(newProfilePictureDataUrl);
+      data => {
+        if (data) {
+          this.updateAndMarkProfileImageAsChanged(data.newImageDataUrl);
         }
       },
       () => {
