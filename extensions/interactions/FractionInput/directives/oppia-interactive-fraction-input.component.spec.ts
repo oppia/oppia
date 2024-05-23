@@ -70,6 +70,7 @@ describe('InteractiveFractionInputComponent', () => {
       rulesService: CurrentInteractionService
     ) => {},
     updateCurrentAnswer: (answer: InteractionAnswer | null): void => {},
+    updateAnswerIsValid(isValid: boolean) {},
     registerCurrentInteraction: (
       submitAnswerFn: Function,
       validateExpressionFn: Function
@@ -264,12 +265,17 @@ describe('InteractiveFractionInputComponent', () => {
       component.requireSimplestForm = true;
       component.answer = '2/6';
 
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+
       component.submitAnswer();
 
       expect(component.errorMessageI18nKey).toBe(
         'I18N_INTERACTIONS_FRACTIONS_SIMPLEST_FORM'
       );
       expect(component.isValid).toBe(false);
+      expect(
+        currentInteractionService.updateAnswerIsValid
+      ).toHaveBeenCalledWith(false);
     }
   );
 
@@ -280,12 +286,17 @@ describe('InteractiveFractionInputComponent', () => {
       component.allowImproperFraction = false;
       component.answer = '5/3';
 
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+
       component.submitAnswer();
 
       expect(component.errorMessageI18nKey).toBe(
         'I18N_INTERACTIONS_FRACTIONS_PROPER_FRACTION'
       );
       expect(component.isValid).toBe(false);
+      expect(
+        currentInteractionService.updateAnswerIsValid
+      ).toHaveBeenCalledWith(false);
     }
   );
 
@@ -296,12 +307,17 @@ describe('InteractiveFractionInputComponent', () => {
       component.allowNonzeroIntegerPart = false;
       component.answer = '1 1/3';
 
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+
       component.submitAnswer();
 
       expect(component.errorMessageI18nKey).toBe(
         'I18N_INTERACTIONS_FRACTIONS_NON_MIXED'
       );
       expect(component.isValid).toBe(false);
+      expect(
+        currentInteractionService.updateAnswerIsValid
+      ).toHaveBeenCalledWith(false);
     }
   );
 

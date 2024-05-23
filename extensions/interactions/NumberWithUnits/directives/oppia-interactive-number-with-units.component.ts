@@ -121,6 +121,9 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
         this.currentInteractionService.showNoResponseError()
       ) {
         this.errorMessageI18nKey = 'I18N_INTERACTIONS_INPUT_NO_RESPONSE';
+        this.currentInteractionService.updateAnswerIsValid(
+          this.isAnswerValid()
+        );
         return;
       }
       const numberWithUnits =
@@ -163,6 +166,7 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
   answerValueChanged(): void {
     this.answerChanged.next(this.answer);
     this.currentInteractionService.updateCurrentAnswer(this.answer);
+    this.currentInteractionService.updateAnswerIsValid(this.isAnswerValid());
   }
 
   ngOnDestroy(): void {

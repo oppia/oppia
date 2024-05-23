@@ -202,6 +202,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
       }
       this.isValid = false;
     }
+    this.currentInteractionService.updateAnswerIsValid(this.isAnswerValid());
   }
 
   isAnswerValid(): boolean {
@@ -211,6 +212,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   answerValueChanged(): void {
     this.answerChanged.next(this.answer);
     this.currentInteractionService.updateCurrentAnswer(this.answer);
+    this.currentInteractionService.updateAnswerIsValid(this.isAnswerValid());
   }
 
   getPlaceholderText(): string {

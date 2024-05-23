@@ -140,8 +140,12 @@ describe('AlgebraicExpressionInputInteractive', () => {
     component.value = 'x/';
 
     spyOn(currentInteractionService, 'onSubmit');
+    spyOn(currentInteractionService, 'updateAnswerIsValid');
     component.submitAnswer();
     expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
+    expect(currentInteractionService.updateAnswerIsValid).toHaveBeenCalledWith(
+      false
+    );
     expect(component.warningText).toBe(
       'Your answer seems to be missing a variable/number after the "/".'
     );

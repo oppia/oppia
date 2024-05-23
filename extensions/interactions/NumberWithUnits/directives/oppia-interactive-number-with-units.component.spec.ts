@@ -203,12 +203,16 @@ describe('Number with units interaction component', () => {
   it('should show error when user submits answer in incorrect format', () => {
     component.answer = '24 k';
     spyOn(currentInteractionService, 'showNoResponseError');
+    spyOn(currentInteractionService, 'updateAnswerIsValid');
 
     expect(component.errorMessageI18nKey).toBe('');
 
     component.submitAnswer();
 
     expect(component.errorMessageI18nKey).toBe('Unit "k" not found.');
+    expect(currentInteractionService.updateAnswerIsValid).toHaveBeenCalledWith(
+      false
+    );
     expect(
       currentInteractionService.showNoResponseError
     ).not.toHaveBeenCalled();
@@ -219,12 +223,16 @@ describe('Number with units interaction component', () => {
     spyOn(currentInteractionService, 'showNoResponseError').and.returnValue(
       true
     );
+    spyOn(currentInteractionService, 'updateAnswerIsValid');
     expect(component.errorMessageI18nKey).toBe('');
 
     component.submitAnswer();
 
     expect(component.errorMessageI18nKey).toBe(
       'I18N_INTERACTIONS_INPUT_NO_RESPONSE'
+    );
+    expect(currentInteractionService.updateAnswerIsValid).toHaveBeenCalledWith(
+      false
     );
     expect(currentInteractionService.showNoResponseError).toHaveBeenCalledTimes(
       1
