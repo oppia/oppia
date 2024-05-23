@@ -81,7 +81,6 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   @Input() interactionIsShown!: boolean;
   @Input() stateContentSaveButtonPlaceholder!: string;
   @Input() stateContentPlaceholder!: string;
-  @Input() stateContentShouldStayVisibleOnScroll!: boolean;
 
   oppiaBlackImgUrl!: string;
   // State name is null if their is no state selected or have no active state.
