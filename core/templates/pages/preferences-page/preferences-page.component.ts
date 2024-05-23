@@ -180,7 +180,7 @@ export class PreferencesPageComponent {
 
     modalRef.componentInstance.allowedImageFormats =
       AppConstants.ALLOWED_IMAGE_FORMATS;
-    modalRef.componentInstance.imageName = 'Blog Image';
+    modalRef.componentInstance.imageName = 'Profile Picture';
     modalRef.componentInstance.aspectRatio = '1:1';
     modalRef.componentInstance.maxImageSize = 100;
     modalRef.componentInstance.allowedBgColors = [];
