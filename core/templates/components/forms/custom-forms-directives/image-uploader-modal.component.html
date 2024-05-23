@@ -4,7 +4,7 @@
   </div>
 
   <div class="modal-body oppia-image-uploader-container">
-    <div *ngIf="(imageName==='Thumbnail')">
+    <div *ngIf="(imageName==='Thumbnail' && !uploadedImage && !thumbnailImageDataUrl)">
       <strong tabindex="0">Please upload an SVG image.</strong>
       <div class="alert alert-warning" tabindex="0">
         <span>Here are some guidelines to follow:</span>
@@ -14,7 +14,7 @@
       </div>
     </div>
     <div class="oppia-image-uploader">
-      <div *ngIf="!uploadedImage">
+      <div *ngIf="(!uploadedImage && !thumbnailImageDataUrl)">
         <oppia-image-receiver (fileChanged)="onFileChanged($event)" [allowedImageFormats]="allowedImageFormats"
         [maxImageSize]="maxImageSize"
         >

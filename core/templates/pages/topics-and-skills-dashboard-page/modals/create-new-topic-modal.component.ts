@@ -31,7 +31,7 @@ import {ImageLocalStorageService} from 'services/image-local-storage.service';
   templateUrl: './create-new-topic-modal.component.html',
 })
 export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
-  allowedBgColors: object = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story;
+  allowedBgColors: object = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic;
   validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
   newlyCreatedTopic: NewlyCreatedTopic = NewlyCreatedTopic.createDefault();
   hostname: string = this.windowRef.nativeWindow.location.hostname;

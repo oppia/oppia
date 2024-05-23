@@ -81,6 +81,7 @@ export class ImageUploaderComponent implements OnInit {
       this.filename !== ''
     ) {
       this.hidePlaceholder = false;
+      this.imageIsLoading = true;
       let entityType = this.contextService.getEntityType();
       if (entityType === undefined) {
         throw new Error('No image present for preview');
@@ -91,6 +92,7 @@ export class ImageUploaderComponent implements OnInit {
           entityType,
           this.contextService.getEntityId()
         );
+      this.imageBgColor = this.bgColor;
       this.uploadedImage = this.editableImageDataUrl;
       this.imageIsLoading = false;
     }
@@ -121,9 +123,11 @@ export class ImageUploaderComponent implements OnInit {
     modalRef.componentInstance.imageName = this.imageName;
     modalRef.componentInstance.aspectRatio = this.aspectRatio;
     modalRef.componentInstance.maxImageSize = this.maxImageSize;
+    modalRef.componentInstance.previewImageUrl = this.uploadedImage;
 
     modalRef.result.then(
       data => {
+        this.imageIsLoading = true;
         this.editableImageDataUrl = data.newImageDataUrl;
         const imageBlobData =
           this.imageUploadHelperService.convertImageDataToImageFile(

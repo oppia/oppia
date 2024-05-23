@@ -49,6 +49,7 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   @Input() imageName!: string;
   @Input() aspectRatio!: string;
   @Input() maxImageSize!: number;
+  @Input() previewImageUrl!: string;
 
   // 'uploadedImage' will be null if the uploaded svg is invalid or not trusted.
   uploadedImage: SafeResourceUrl | null = null;
@@ -195,6 +196,10 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
       this.isThumbnail = true;
     } else {
       this.isThumbnail = false;
+    }
+
+    if (this.previewImageUrl) {
+      this.thumbnailImageDataUrl = this.previewImageUrl;
     }
 
     this.aspectRatioNumber =
