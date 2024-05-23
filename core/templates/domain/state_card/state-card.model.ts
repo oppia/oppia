@@ -89,8 +89,8 @@ export class StateCard {
     this.toggleSubmitClicked(false);
   }
 
-  updateIsValidAnswer(value: boolean): void {
-    this.getInteraction().isAnswerValid = value;
+  updateAnswerIsValid(value: boolean): void {
+    this.getInteraction().answerIsValid = value;
   }
 
   showNoResponseError(): boolean {
@@ -104,7 +104,7 @@ export class StateCard {
 
   showInvalidResponseError(): boolean {
     return (
-      !this.getInteraction().isAnswerValid &&
+      !this.getInteraction().answerIsValid &&
       this.getInteraction().submitClicked
     );
   }
