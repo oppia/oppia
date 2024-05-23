@@ -200,6 +200,29 @@ describe('ImageReceiverComponent', () => {
     }
   );
 
+  it('should return correct format string when there is one allowed image format', () => {
+    component.allowedImageFormats = ['jpeg'];
+    const formatString = component.getAllowedImageFormatsString(
+      component.allowedImageFormats
+    );
+    expect(formatString).toBe('Is in .jpeg format');
+  });
+
+  it('should emit fileChanged event if validation passes', () => {
+    const validFile = new File(['image'], 'image.jpg', {type: 'image/jpg'});
+    component.imageInputRef.nativeElement = {
+      files: [validFile],
+      value: 'image.jpg',
+    };
+    component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
+    spyOn(component.fileChanged, 'emit');
+    spyOn(component, 'validateUploadedFile').and.returnValue(null);
+
+    component.handleFile();
+
+    expect(component.fileChanged.emit).toHaveBeenCalledWith(validFile);
+  });
+
   it(
     'should not upload image on drop if the allowed image formats list' +
       ' contains non allowed file formats',
