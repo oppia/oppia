@@ -657,7 +657,10 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [
+            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False],
+            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'], # pylint: disable=line-too-long
+        ]
     )
     def test_send_post_signup_email(self) -> None:
         self.login(self.EDITOR_EMAIL)
@@ -1081,7 +1084,13 @@ class SignupTests(test_utils.GenericTestBase):
         self.logout()
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [
+            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
+            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'], # pylint: disable=line-too-long
+            [platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, 'body'], # pylint: disable=line-too-long
+            [platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'], # pylint: disable=line-too-long
+            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'], # pylint: disable=line-too-long
+        ]
     )
     def test_user_settings_of_existing_user(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -1268,6 +1277,13 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
 
     def test_post(self) -> None:
         with self.swap_secret, self.swap_audience_id:
+            user_services.update_email_preferences(
+                self.editor_id,
+                False,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
+            )
             email_preferences = user_services.get_email_preferences(
                 self.editor_id)
             self.assertEqual(email_preferences.can_receive_email_updates, False)
