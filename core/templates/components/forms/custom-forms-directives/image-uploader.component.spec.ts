@@ -25,7 +25,6 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {AlertsService} from 'services/alerts.service';
 import {ContextService} from 'services/context.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -37,7 +36,6 @@ describe('ImageUploaderComponent', () => {
   let component: ImageUploaderComponent;
   let contextService: ContextService;
   let imageUploadHelperService: ImageUploadHelperService;
-  let alertsService: AlertsService;
   let ngbModal: NgbModal;
 
   beforeEach(waitForAsync(() => {
@@ -58,7 +56,6 @@ describe('ImageUploaderComponent', () => {
     component = fixture.componentInstance;
     contextService = TestBed.inject(ContextService);
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
-    alertsService = TestBed.inject(AlertsService);
     ngbModal = TestBed.inject(NgbModal);
   });
 
