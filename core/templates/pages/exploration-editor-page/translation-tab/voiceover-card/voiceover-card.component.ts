@@ -174,30 +174,6 @@ export class VoiceoverCardComponent implements OnInit {
     });
   }
 
-  updateLanguageAccentCodesDropdownOptions(): void {
-    this.availableLanguageAccentCodesToDescriptions = {};
-    this.supportedLanguageAccentCodesToDescriptions = {};
-    this.supportedLanguageAccentCodesLength = 0;
-
-    this.availableLanguageAccentCodesToDescriptions =
-      this.languageAccentMasterList[this.languageCode];
-
-    const supportedLanguageAccentCodes =
-      this.languageCodesMapping[this.languageCode];
-
-    for (let accentCode in supportedLanguageAccentCodes) {
-      const description =
-        this.availableLanguageAccentCodesToDescriptions[accentCode];
-      this.supportedLanguageAccentCodesToDescriptions[accentCode] = description;
-    }
-
-    if (this.supportedLanguageAccentCodesToDescriptions) {
-      this.supportedLanguageAccentCodesLength = Object.keys(
-        this.supportedLanguageAccentCodesToDescriptions
-      ).length;
-    }
-  }
-
   updateActiveContent(): void {
     this.voiceoversAreLoaded = false;
     this.activeContentId =
