@@ -20,7 +20,12 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  flushMicrotasks,
+} from '@angular/core/testing';
 
 import {
   ExplorationBackendDict,
@@ -30,15 +35,37 @@ import {InteractionAnswer} from 'interactions/answer-defs';
 import {AudioPreloaderService} from 'pages/exploration-player-page/services/audio-preloader.service';
 import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {ContextService} from 'services/context.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EnableVoiceoverContribution: {
+        isEnabled: true,
+      },
+      AddVoiceoverWithAccent: {
+        isEnabled: false,
+      },
+    };
+  }
+}
 
 describe('Audio preloader service', () => {
   let httpTestingController: HttpTestingController;
   let interactionAnswer: InteractionAnswer[] = ['Ans1'];
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
+      ],
+    }).compileComponents();
     httpTestingController = TestBed.inject(HttpTestingController);
-  });
+  }));
 
   afterEach(() => {
     httpTestingController.verify();

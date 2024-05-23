@@ -39,6 +39,7 @@ import {AudioTranslationLanguageService} from 'pages/exploration-player-page/ser
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockContentTranslationLanguageService {
   currentLanguageCode!: string;
@@ -75,6 +76,19 @@ class MockWindowRef {
   };
 }
 
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EnableVoiceoverContribution: {
+        isEnabled: true,
+      },
+      AddVoiceoverWithAccent: {
+        isEnabled: false,
+      },
+    };
+  }
+}
+
 describe('Content language selector component', () => {
   let component: ContentLanguageSelectorComponent;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
@@ -104,6 +118,10 @@ describe('Content language selector component', () => {
         {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
       ],
     })

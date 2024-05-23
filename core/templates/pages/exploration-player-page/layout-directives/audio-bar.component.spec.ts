@@ -41,6 +41,20 @@ import {AudioTranslationManagerService} from '../services/audio-translation-mana
 import {PlayerPositionService} from '../services/player-position.service';
 import {ContextService} from 'services/context.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EnableVoiceoverContribution: {
+        isEnabled: false,
+      },
+      AddVoiceoverWithAccent: {
+        isEnabled: false,
+      },
+    };
+  }
+}
 
 describe('Audio Bar Component', () => {
   let component: AudioBarComponent;
@@ -61,7 +75,12 @@ describe('Audio Bar Component', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [AudioBarComponent, MockTranslatePipe],
-      providers: [],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));

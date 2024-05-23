@@ -169,6 +169,7 @@ describe('Translator Overview component', () => {
     spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.resolveTo();
     let languageAccentMasterList = {
       en: {
+        'en-IN': 'English (India)',
         'en-US': 'English (United State)',
       },
       hi: {
@@ -179,12 +180,16 @@ describe('Translator Overview component', () => {
       en: {
         'en-US': true,
       },
+      hi: {
+        'hi-IN': true,
+      },
     };
 
     let voiceoverAdminDataResponse = {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping,
     };
+    spyOn(translationLanguageService, 'setActiveLanguageAccentCode');
     spyOn(
       voiceoverBackendApiService,
       'fetchVoiceoverAdminDataAsync'
@@ -464,8 +469,7 @@ describe('Translator Overview component', () => {
     );
   }));
 
-  it('should be able to update language accent dropdown on language change', fakeAsync(() => {
-    spyOn(component, 'updateLanguageAccentCode');
+  it('should be able to update language accent dropdown options on language change', fakeAsync(() => {
     let manualVoiceover1 = new Voiceover('a.mp3', 1000, false, 10.0);
     let manualVoiceover2 = new Voiceover('b.mp3', 1000, false, 10.0);
 
@@ -483,7 +487,8 @@ describe('Translator Overview component', () => {
         },
       }
     );
-    component.languageAccentMasterList = {
+    component.languageCode = 'en';
+    let languageAccentMasterList = {
       en: {
         'en-IN': 'English (India)',
         'en-US': 'English (United States)',
@@ -492,7 +497,8 @@ describe('Translator Overview component', () => {
         'hi-IN': 'Hindi (India)',
       },
     };
-    component.languageCodesMapping = {
+
+    let languageCodesMapping = {
       en: {
         'en-US': false,
         'en-IN': false,
@@ -502,12 +508,16 @@ describe('Translator Overview component', () => {
       },
     };
 
+    component.languageAccentMasterList = languageAccentMasterList;
+    component.languageCodesMapping = languageCodesMapping;
+
     entityVoiceoversService.setLanguageCode('en');
     entityVoiceoversService.addEntityVoiceovers('en-IN', entityVoiceovers);
 
     localStorageService.setLastSelectedLanguageAccentCode('en-IN');
 
     component.updateLanguageAccentCodesDropdownOptions();
+    tick(5);
     flush();
     discardPeriodicTasks();
 
@@ -516,6 +526,7 @@ describe('Translator Overview component', () => {
     localStorageService.setLastSelectedLanguageAccentCode(undefined);
 
     component.updateLanguageAccentCodesDropdownOptions();
+    tick(5);
     flush();
     discardPeriodicTasks();
 
