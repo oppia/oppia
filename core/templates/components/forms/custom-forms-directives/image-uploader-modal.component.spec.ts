@@ -130,26 +130,38 @@ describe('Edit Profile Picture Modal Component', () => {
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
   });
 
-  it('should update background color if the new color is different from the current color', () => {
-    componentInstance.bgColor = 'red';
-    componentInstance.updateBackgroundColor('blue');
-    expect(componentInstance.bgColor).toBe('blue');
-  });
+  it(
+    'should update background color if the new color is different' +
+      ' from the current color',
+    () => {
+      componentInstance.bgColor = 'red';
+      componentInstance.updateBackgroundColor('blue');
+      expect(componentInstance.bgColor).toBe('blue');
+    }
+  );
 
-  it('should not update background color if the new color is the same as the current color', () => {
-    componentInstance.bgColor = 'red';
-    componentInstance.updateBackgroundColor('red');
-    expect(componentInstance.bgColor).toBe('red');
-  });
+  it(
+    'should not update background color if the new color is the same' +
+      'as the current color',
+    () => {
+      componentInstance.bgColor = 'red';
+      componentInstance.updateBackgroundColor('red');
+      expect(componentInstance.bgColor).toBe('red');
+    }
+  );
 
-  it('should set isThumbnail to true and set thumbnailImageDataUrl if previewImageUrl is provided', () => {
-    componentInstance.imageName = 'Thumbnail';
-    componentInstance.previewImageUrl = 'test_url';
-    componentInstance.ngOnInit();
+  it(
+    'should set isThumbnail to true and set thumbnailImageDataUrl' +
+      ' if previewImageUrl is provided',
+    () => {
+      componentInstance.imageName = 'Thumbnail';
+      componentInstance.previewImageUrl = 'test_url';
+      componentInstance.ngOnInit();
 
-    expect(componentInstance.isThumbnail).toBeTrue();
-    expect(componentInstance.thumbnailImageDataUrl).toBe('test_url');
-  });
+      expect(componentInstance.isThumbnail).toBeTrue();
+      expect(componentInstance.thumbnailImageDataUrl).toBe('test_url');
+    }
+  );
 
   it('should handle invalid image', () => {
     spyOn(componentInstance, 'reset');
