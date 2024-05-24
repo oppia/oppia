@@ -31,8 +31,6 @@ class FeatureNames(enum.Enum):
     DUMMY_FEATURE_FLAG_FOR_E2E_TESTS = 'dummy_feature_flag_for_e2e_tests'
     END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
     CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
-    CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS = (
-        'contributor_dashboard_accomplishments')
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
     BLOG_PAGES = 'blog_pages'
     DIAGNOSTIC_TEST = 'diagnostic_test'
@@ -99,7 +97,6 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
     FeatureNames.END_CHAPTER_CELEBRATION,
     FeatureNames.CHECKPOINT_CELEBRATION,
-    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
     FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED,
     FeatureNames.LEARNER_GROUPS_ARE_ENABLED
 ]
@@ -128,13 +125,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.CHECKPOINT_CELEBRATION.value: (
         (
             'This flag is for the checkpoint celebration feature.',
-            feature_flag_domain.ServerMode.PROD
-        )
-    ),
-    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS.value: (
-        (
-            'This flag enables showing per-contributor accomplishments on the '
-            'contributor dashboard.',
             feature_flag_domain.ServerMode.PROD
         )
     ),
