@@ -24,6 +24,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import blog_services
+from core.domain import caching_services
 from core.domain import classroom_config_services
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -85,11 +86,24 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         """Complete the signup process for self.CURRICULUM_ADMIN_EMAIL."""
         super().setUp()
+
+        self.original_parameter_registry = (
+            platform_parameter_registry.Registry.parameter_registry.copy())
+        platform_parameter_registry.Registry.parameter_registry.clear()
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
+            ['test_param_1'])
+
         self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+
+    def tearDown(self) -> None:
+        super().tearDown()
+        platform_parameter_registry.Registry.parameter_registry = (
+            self.original_parameter_registry)
 
     def test_admin_get(self) -> None:
         """Test `/admin` returns a 200 response."""
