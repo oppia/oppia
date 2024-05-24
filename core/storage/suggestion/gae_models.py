@@ -2388,7 +2388,8 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         """
 
         total_contribution_stats_helper = TotalContributionStatsHelper[
-        TranslationSubmitterTotalContributionStatsModel]()
+            TranslationSubmitterTotalContributionStatsModel
+        ]()
 
         sort_options_dict = {
             SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
@@ -2802,7 +2803,8 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         """
 
         total_contribution_stats_helper = TotalContributionStatsHelper[
-        TranslationReviewerTotalContributionStatsModel]()
+            TranslationReviewerTotalContributionStatsModel
+        ]()
 
         sort_options_dict = {
             SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
@@ -3123,7 +3125,8 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         """
 
         total_contribution_stats_helper = TotalContributionStatsHelper[
-        QuestionSubmitterTotalContributionStatsModel]()
+            QuestionSubmitterTotalContributionStatsModel
+        ]()
 
         sort_options_dict = {
             SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
@@ -3414,7 +3417,8 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         """
 
         total_contribution_stats_helper = TotalContributionStatsHelper[
-        QuestionReviewerTotalContributionStatsModel]()
+            QuestionReviewerTotalContributionStatsModel
+        ]()
 
         sort_options_dict = {
             SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
@@ -3548,15 +3552,16 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         return user_data
 
 
-T = TypeVar(
-    'T',
+TotalContributionStatsModelType = TypeVar(
+    'TotalContributionStatsModelType',
     TranslationSubmitterTotalContributionStatsModel,
     TranslationReviewerTotalContributionStatsModel,
     QuestionSubmitterTotalContributionStatsModel,
-    QuestionReviewerTotalContributionStatsModel)
+    QuestionReviewerTotalContributionStatsModel
+)
 
 
-class TotalContributionStatsHelper(Generic[T]):
+class TotalContributionStatsHelper(Generic[TotalContributionStatsModelType]):
     """Helper class for total contribution stats models
     """
 
@@ -3566,9 +3571,9 @@ class TotalContributionStatsHelper(Generic[T]):
         offset: int,
         page_size: int,
         sort_query: datastore_services.Query,
-        sorted_results: List[T],
+        sorted_results: List[TotalContributionStatsModelType],
         max_days_since_last_activity: int
-    ) -> Tuple[List[T], int]:
+    ) -> Tuple[List[TotalContributionStatsModelType], int]:
         """Returns the models according to values specified.
 
         Args:
@@ -3595,7 +3600,7 @@ class TotalContributionStatsHelper(Generic[T]):
                 days=max_days_since_last_activity)
         next_offset = offset
         while len(sorted_results) < page_size:
-            result_models: Sequence[T] = (
+            result_models: Sequence[TotalContributionStatsModelType] = (
                 sort_query.fetch(
                     NUM_MODELS_PER_FETCH, offset=next_offset))
             if not result_models:
