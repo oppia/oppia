@@ -200,20 +200,24 @@ export class ImageReceiverComponent {
     }
 
     if (file.size > this.maxAllowedFileSize) {
-      let currentSize: string = (
-        (file.size * 100) /
-        this.maxAllowedFileSize
-      ).toFixed(1);
+      const KB_IN_BYTES = 1024;
+      const MB_IN_BYTES = 1024 * 1024;
 
-      let fileSizeUnit = this.maxAllowedFileSize <= 100 * 1024 ? 'KB' : 'MB';
+      let fileSizeUnit =
+        this.maxAllowedFileSize <= 100 * KB_IN_BYTES ? 'KB' : 'MB';
+      let maxAllowedFileSizeInUnit =
+        fileSizeUnit === 'KB'
+          ? (this.maxAllowedFileSize / KB_IN_BYTES).toFixed(1)
+          : (this.maxAllowedFileSize / MB_IN_BYTES).toFixed(1);
 
-      if (fileSizeUnit === 'MB') {
-        currentSize = (parseInt(currentSize) / 100).toFixed(1);
-      }
+      let currentSizeInUnit =
+        fileSizeUnit === 'KB'
+          ? (file.size / KB_IN_BYTES).toFixed(1)
+          : (file.size / MB_IN_BYTES).toFixed(1);
 
       return (
-        `The maximum allowed file size is ${this.maxAllowedFileSize / 1024}` +
-        ` KB (${currentSize} ${fileSizeUnit} given).`
+        `The maximum allowed file size is ${maxAllowedFileSizeInUnit}` +
+        ` ${fileSizeUnit} (${currentSizeInUnit} ${fileSizeUnit} given).`
       );
     }
     return null;

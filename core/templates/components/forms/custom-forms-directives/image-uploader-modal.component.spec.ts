@@ -27,7 +27,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {of} from 'rxjs';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-describe('Edit Profile Picture Modal Component', () => {
+describe('Image Uploader Modal', () => {
   let fixture: ComponentFixture<ImageUploaderModalComponent>;
   let componentInstance: ImageUploaderModalComponent;
   let windowDimensionsService: WindowDimensionsService;
@@ -99,6 +99,7 @@ describe('Edit Profile Picture Modal Component', () => {
     componentInstance.reset();
     expect(componentInstance.uploadedImage).toBeNull();
     expect(componentInstance.croppedImageDataUrl).toBeNull();
+    expect(componentInstance.thumbnailImageDataUrl).toBeNull();
   });
 
   it('should handle image', () => {
@@ -108,7 +109,7 @@ describe('Edit Profile Picture Modal Component', () => {
     const arrayBuffer = Uint8Array.from(window.atob(dataBase64Mock), c =>
       c.charCodeAt(0)
     );
-    let file = new File([arrayBuffer], 'filename.mp3');
+    let file = new File([arrayBuffer], 'filename.png');
     componentInstance.onFileChanged(file);
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
   });
