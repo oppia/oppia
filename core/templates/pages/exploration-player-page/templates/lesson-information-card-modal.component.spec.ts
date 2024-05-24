@@ -43,6 +43,9 @@ import {ExplorationPlayerStateService} from 'pages/exploration-player-page/servi
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
+import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {
@@ -80,6 +83,13 @@ class MockCheckpointCelebrationUtilityService {
   getIsOnCheckpointedState(): boolean {
     return this.isOnCheckpointedState;
   }
+
+  getStateListForCheckpointMessages(
+    statesbackendDict: StateObjectsBackendDict,
+    initStateName: string
+  ): string[] {
+    return [];
+  }
 }
 
 class MockWindowRef {
@@ -110,6 +120,167 @@ class MockWindowRef {
   };
 }
 
+const dummyExplorationBackendDict = {
+  init_state_name: 'Introduction',
+  param_changes: [],
+  param_specs: {},
+  states: {
+    Introduction: {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: '',
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {},
+        },
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          buttonText: {
+            value: 'Continue',
+          },
+        },
+        default_outcome: {
+          dest: 'Middle State',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'default_outcome',
+            html: '',
+          },
+          param_changes: [],
+          labelled_as_correct: true,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        },
+        hints: [],
+        solution: null,
+        id: 'Continue',
+      },
+      linked_skill_id: null,
+      param_changes: [],
+      solicit_answer_details: false,
+      card_is_checkpoint: true,
+    },
+    'Middle State': {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: '',
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {},
+        },
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          buttonText: {
+            value: 'Continue',
+          },
+        },
+        default_outcome: {
+          dest: 'End State',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'default_outcome',
+            html: '',
+          },
+          param_changes: [],
+          labelled_as_correct: true,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        },
+        hints: [],
+        solution: null,
+        id: 'Continue',
+      },
+      linked_skill_id: null,
+      param_changes: [],
+      solicit_answer_details: false,
+      card_is_checkpoint: true,
+    },
+    'End State': {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: '',
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {},
+        },
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          recommendedExplorationIds: {
+            value: [],
+          },
+        },
+        default_outcome: null,
+        hints: [],
+        solution: null,
+        id: 'EndExploration',
+      },
+      linked_skill_id: null,
+      param_changes: [],
+      solicit_answer_details: false,
+      card_is_checkpoint: false,
+    },
+  },
+  title: 'Dummy Title',
+  language_code: 'en',
+  objective: 'Dummy Objective',
+  next_content_id_index: 4,
+};
+
+const dummyExplorationMetadata = {
+  title: 'Dummy Title',
+  category: 'Dummy Category',
+  objective: 'Dummy Objective',
+  language_code: 'en',
+  tags: [],
+  blurb: 'Dummy Blurb',
+  author_notes: 'Dummy Author Notes',
+  states_schema_version: 50,
+  init_state_name: 'Introduction',
+  param_specs: {},
+  param_changes: [],
+  auto_tts_enabled: false,
+  edits_allowed: true,
+};
+
+const dummyExplorationBackendResponse = {
+  can_edit: true,
+  exploration: dummyExplorationBackendDict,
+  exploration_metadata: dummyExplorationMetadata,
+  exploration_id: 'expId',
+  is_logged_in: true,
+  session_id: 'dummy_session_id',
+  version: 1,
+  preferred_audio_language_code: 'en',
+  preferred_language_codes: ['en'],
+  auto_tts_enabled: false,
+  record_playthrough_probability: 1.0,
+  draft_change_list_id: 1,
+  has_viewed_lesson_info_modal_once: false,
+  furthest_reached_checkpoint_exp_version: 0,
+  furthest_reached_checkpoint_state_name: '',
+  most_recently_reached_checkpoint_state_name: 'Introduction',
+  most_recently_reached_checkpoint_exp_version: 0,
+  displayable_language_codes: [],
+};
+
 describe('Lesson Information card modal component', () => {
   let fixture: ComponentFixture<LessonInformationCardModalComponent>;
   let componentInstance: LessonInformationCardModalComponent;
@@ -121,8 +292,11 @@ describe('Lesson Information card modal component', () => {
   let urlService: UrlService;
   let userService: UserService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
+  let playerTranscriptService: PlayerTranscriptService;
   let localStorageService: LocalStorageService;
   let checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService;
+  let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
+  let playerPositionService: PlayerPositionService;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
@@ -148,6 +322,7 @@ describe('Lesson Information card modal component', () => {
         DateTimeFormatService,
         RatingComputationService,
         UrlInterpolationService,
+        ReadOnlyExplorationBackendApiService,
         {
           provide: CheckpointCelebrationUtilityService,
           useClass: MockCheckpointCelebrationUtilityService,
@@ -201,6 +376,7 @@ describe('Lesson Information card modal component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
     userService = TestBed.inject(UserService);
+    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     localStorageService = TestBed.inject(LocalStorageService);
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService
@@ -208,6 +384,12 @@ describe('Lesson Information card modal component', () => {
     checkpointCelebrationUtilityService = TestBed.inject(
       CheckpointCelebrationUtilityService
     );
+
+    readOnlyExplorationBackendApiService = TestBed.inject(
+      ReadOnlyExplorationBackendApiService
+    );
+
+    playerPositionService = TestBed.inject(PlayerPositionService);
 
     spyOn(
       i18nLanguageCodeService,
@@ -324,6 +506,63 @@ describe('Lesson Information card modal component', () => {
 
     expect(componentInstance.getCompletedProgressBarWidth()).toEqual(75);
   });
+
+  it('should not go to invalid or incomplete checkpoint index', () => {
+    componentInstance.checkpointCount = 4;
+    componentInstance.completedCheckpointsCount = 2;
+
+    componentInstance.ngOnInit();
+
+    expect(() => {
+      componentInstance.validateIndexAndGoToCheckpoint(-1);
+    }).toThrowError('Checkpoint index out of bounds.');
+
+    expect(() => {
+      componentInstance.validateIndexAndGoToCheckpoint(4);
+    }).toThrowError('Checkpoint index out of bounds.');
+
+    expect(() => {
+      componentInstance.validateIndexAndGoToCheckpoint(3);
+    }).toThrowError('Checkpoint not reached yet.');
+
+    expect(() => {
+      componentInstance.validateIndexAndGoToCheckpoint(2);
+    }).toThrowError('Checkpoint not reached yet.');
+  });
+
+  it('should go to checkpoint index', fakeAsync(() => {
+    let mockStates = dummyExplorationBackendDict.states;
+    let mockInitStateName = dummyExplorationBackendDict.init_state_name;
+    const checkpointIndex = 1;
+    componentInstance.checkpointCount = 2;
+    componentInstance.completedCheckpointsCount = 2;
+
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchExplorationAsync'
+    ).and.returnValue(Promise.resolve(dummyExplorationBackendResponse));
+
+    spyOn(
+      checkpointCelebrationUtilityService,
+      'getStateListForCheckpointMessages'
+    )
+      .withArgs(mockStates, mockInitStateName)
+      .and.returnValue(['Introduction', 'Middle State']);
+
+    spyOn(playerTranscriptService, 'findIndexOfLatestStateWithName')
+      .withArgs('Middle State')
+      .and.returnValue(1);
+
+    spyOn(playerPositionService, 'setDisplayedCardIndex');
+
+    componentInstance.ngOnInit();
+    tick();
+    componentInstance.validateIndexAndGoToCheckpoint(checkpointIndex);
+
+    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(
+      checkpointIndex
+    );
+  }));
 
   it(
     'should correctly set logged-out progress learner URL ' +

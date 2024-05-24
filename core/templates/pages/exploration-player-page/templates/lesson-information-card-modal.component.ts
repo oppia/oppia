@@ -35,6 +35,12 @@ import {RatingComputationService} from 'components/ratings/rating-computation/ra
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
+import {
+  ReadOnlyExplorationBackendApiService,
+  ReadOnlyExplorationBackendDict,
+} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 
 interface ExplorationTagSummary {
   tagsToShow: string[];
@@ -64,6 +70,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   expTitle!: string;
   expDesc!: string;
   expCategory!: string;
+  exploration: ReadOnlyExplorationBackendDict | undefined;
   contributorNames!: string[];
   checkpointCount!: number;
   expInfo!: LearnerExplorationSummaryBackendDict;
@@ -99,7 +106,10 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private windowRef: WindowRef,
     private localStorageService: LocalStorageService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
-    private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService
+    private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService,
+    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
+    private playerTranscriptService: PlayerTranscriptService,
+    private PlayerPositionService: PlayerPositionService
   ) {
     super(ngbActiveModal);
   }
@@ -134,6 +144,12 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
         this.explorationId,
         TranslationKeyType.DESCRIPTION
       );
+
+    this.readOnlyExplorationBackendApiService
+      .fetchExplorationAsync(this.explorationId, null)
+      .then(response => {
+        this.exploration = response.exploration;
+      });
 
     // This array is used to keep track of the status of each checkpoint,
     // i.e. whether it is completed, in-progress, or yet-to-be-completed by the
@@ -195,6 +211,43 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       (this.completedCheckpointsCount / this.checkpointCount) * 100
     );
     return progressPercentage.toString();
+  }
+
+  validateIndexAndGoToCheckpoint(checkpointIndex: number): void {
+    if (checkpointIndex >= 0 && checkpointIndex < this.checkpointCount) {
+      if (
+        this.checkpointStatusArray[checkpointIndex] ===
+        CHECKPOINT_STATUS_COMPLETED
+      ) {
+        if (
+          !this.exploration ||
+          !this.exploration.states ||
+          !this.exploration.init_state_name
+        ) {
+          throw new Error('Exploration or its properties are undefined.');
+        }
+        let orderedCheckpointList =
+          this.checkpointCelebrationUtilityService.getStateListForCheckpointMessages(
+            this.exploration.states,
+            this.exploration.init_state_name
+          );
+        let checkpointStateName = orderedCheckpointList[checkpointIndex];
+        let checkpointStateCardIndex =
+          this.playerTranscriptService.findIndexOfLatestStateWithName(
+            checkpointStateName
+          );
+        if (checkpointStateCardIndex === null) {
+          throw new Error('Checkpoint state card index is null.');
+        }
+        this.PlayerPositionService.setDisplayedCardIndex(
+          checkpointStateCardIndex
+        );
+      } else {
+        throw new Error('Checkpoint not reached yet.');
+      }
+    } else {
+      throw new Error('Checkpoint index out of bounds.');
+    }
   }
 
   getExplorationTagsSummary(arrayOfTags: string[]): ExplorationTagSummary {
