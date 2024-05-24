@@ -286,7 +286,7 @@ describe('ImageReceiverComponent', () => {
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
-    component.maxAllowedFileSize = 100 * 1024;
+    component.maxAllowedFileSizeInBytes = 100 * 1024;
 
     let dataTransfer = new DataTransfer();
     let fileWithLargeSize = new File([''], 'image.jpg', {type: 'image/jpg'});
@@ -316,7 +316,7 @@ describe('ImageReceiverComponent', () => {
     spyOn(contextService, 'getEntityType').and.returnValue('blog_post');
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
-    component.maxAllowedFileSize = 1024 * 1024;
+    component.maxAllowedFileSizeInBytes = 1024 * 1024;
 
     let dataTransfer = new DataTransfer();
     let fileWithLargeSize = new File([''], 'image.jpg', {type: 'image/jpg'});

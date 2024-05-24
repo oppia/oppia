@@ -57,7 +57,7 @@ export class ImageReceiverComponent {
   backgroundWhileUploading: boolean = false;
   licenseUrl = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE;
   allowedImageFormatsString!: string;
-  maxAllowedFileSize!: number;
+  maxAllowedFileSizeInBytes!: number;
 
   constructor(
     public blogDashboardPageService: BlogDashboardPageService,
@@ -76,7 +76,7 @@ export class ImageReceiverComponent {
       this.allowedImageFormats
     );
 
-    this.maxAllowedFileSize = this.maxImageSize * 1024;
+    this.maxAllowedFileSizeInBytes = this.maxImageSize * 1024;
   }
 
   ngAfterViewInit(): void {
@@ -199,25 +199,20 @@ export class ImageReceiverComponent {
       return 'This image format is not supported';
     }
 
-    if (file.size > this.maxAllowedFileSize) {
-      const KB_IN_BYTES = 1024;
-      const MB_IN_BYTES = 1024 * 1024;
+    if (file.size > this.maxAllowedFileSizeInBytes) {
+      const ONE_KB_IN_BYTES = 1024;
+      const ONE_MB_IN_BYTES = 1024 * 1024;
+      let currentFileSizeUnit = 'KB';
+      let currentFileSize = file.size / ONE_KB_IN_BYTES;
 
-      let fileSizeUnit =
-        this.maxAllowedFileSize <= 100 * KB_IN_BYTES ? 'KB' : 'MB';
-      let maxAllowedFileSizeInUnit =
-        fileSizeUnit === 'KB'
-          ? (this.maxAllowedFileSize / KB_IN_BYTES).toFixed(1)
-          : (this.maxAllowedFileSize / MB_IN_BYTES).toFixed(1);
-
-      let currentSizeInUnit =
-        fileSizeUnit === 'KB'
-          ? (file.size / KB_IN_BYTES).toFixed(1)
-          : (file.size / MB_IN_BYTES).toFixed(1);
+      if (this.maxAllowedFileSizeInBytes >= ONE_MB_IN_BYTES) {
+        currentFileSizeUnit = 'MB';
+        currentFileSize = file.size / ONE_MB_IN_BYTES;
+      }
 
       return (
-        `The maximum allowed file size is ${maxAllowedFileSizeInUnit}` +
-        ` ${fileSizeUnit} (${currentSizeInUnit} ${fileSizeUnit} given).`
+        `The maximum allowed file size is ${this.maxAllowedFileSizeInBytes / ONE_KB_IN_BYTES}` +
+        ` KB (${currentFileSize.toFixed(1)} ${currentFileSizeUnit} given).`
       );
     }
     return null;
