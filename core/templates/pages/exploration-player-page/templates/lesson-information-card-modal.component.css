@@ -251,6 +251,20 @@
   z-index: 0;
 }
 
+.completed-checkpoint-node:hover {
+  background-color: #004d40;
+}
+
+.completed-checkpoint-node a {
+  align-items: center;
+  color: inherit;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  text-decoration: none;
+  width: 100%;
+}
+
 .in-progress-checkpoint-node {
   align-items: flex-start;
   background-color: #fff;
