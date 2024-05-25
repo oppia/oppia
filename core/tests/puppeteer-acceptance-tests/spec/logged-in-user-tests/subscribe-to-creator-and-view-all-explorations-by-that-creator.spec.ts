@@ -41,6 +41,9 @@ describe('Logged-in User', function () {
     await explorationCreator.createAndPublishAMinimalExplorationWithTitle(
       'Test Exploration'
     );
+    await explorationCreator.screenshotMatch(
+      'createAndPublishAMinimalExplorationWithTitle'
+    );
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
@@ -48,18 +51,30 @@ describe('Logged-in User', function () {
     async function () {
       await explorationCreator.navigateToCreatorDashboardPage();
       await explorationCreator.expectNumberOfSubscribersToBe(0);
+      await explorationCreator.screenshotMatch(
+        'expectNumberOfSubscribersToBe0'
+      );
 
       await testLearner.navigateToProfilePage('explorationCreator');
+      await testLearner.screenshotMatch('navigateToProfilePage');
       await testLearner.subscribeToCreator('explorationCreator');
+      await testLearner.screenshotMatch('subscribeToCreator');
 
       await explorationCreator.reloadPage();
       await explorationCreator.expectNumberOfSubscribersToBe(1);
+      await explorationCreator.screenshotMatch(
+        'expectNumberOfSubscribersToBe1'
+      );
 
       await explorationCreator.openSubscribersTab();
       await explorationCreator.expectUserToBeASubscriber('testLearner');
+      await explorationCreator.screenshotMatch('expectUserToBeASubscriber');
 
       await testLearner.expectExplorationToBePresentInProfilePageWithTitle(
         'Test Exploration'
+      );
+      await testLearner.screenshotMatch(
+        'expectExplorationToBePresentInProfilePageWithTitle'
       );
     },
     DEFAULT_SPEC_TIMEOUT

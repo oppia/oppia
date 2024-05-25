@@ -49,20 +49,27 @@ describe('Blog Editor', function () {
     async function () {
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
+      await blogPostEditor.screenshotMatch('expectNumberOfBlogPostsToBe0');
       await blogPostEditor.publishNewBlogPostWithTitle('Test-Blog');
+      await blogPostEditor.screenshotMatch('publishNewBlogPostWithTitle');
 
       await blogPostEditor.navigateToPublishTab();
       await blogPostEditor.expectNumberOfBlogPostsToBe(1);
       await blogPostEditor.expectPublishedBlogPostWithTitleToBePresent(
         'Test-Blog'
       );
+      await blogPostEditor.screenshotMatch(
+        'expectPublishedBlogPostWithTitleToBePresent'
+      );
 
       await blogPostEditor.navigateToBlogDashboardPage();
+      await blogPostEditor.screenshotMatch('navigateToBlogDashboardPage');
       await blogPostEditor.createNewBlogPostWithTitle('Test-Blog');
 
       await blogPostEditor.expectUserUnableToPublishBlogPost(
         duplicateBlogPostWarning
       );
+      await blogPostEditor.screenshotMatch('expectUserUnableToPublishBlogPost');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

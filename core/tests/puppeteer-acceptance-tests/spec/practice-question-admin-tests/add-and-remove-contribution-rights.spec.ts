@@ -45,26 +45,51 @@ describe('Question Admin', function () {
       await UserFactory.closeBrowserForUser(Tester);
 
       await questionAdmin.navigateToContributorDashboardAdminPage();
+      await questionAdmin.screenshotMatch(
+        'navigateToContributorDashboardAdminPage'
+      );
+
       await questionAdmin.verifyUserCannotReviewQuestions('Tester');
+      await questionAdmin.screenshotMatch('verifyUserCannotReviewQuestions');
+
       await questionAdmin.verifyQuestionReviewersExcludeUser('Tester');
+      await questionAdmin.screenshotMatch('verifyQuestionReviewersExcludeUser');
+
       await questionAdmin.verifyUserCannotSubmitQuestions('Tester');
+      await questionAdmin.screenshotMatch('verifyUserCannotSubmitQuestions');
+
       await questionAdmin.verifyQuestionSubmittersExcludeUser('Tester');
+      await questionAdmin.screenshotMatch(
+        'verifyQuestionSubmittersExcludeUser'
+      );
 
       await questionAdmin.addSubmitQuestionRights('Tester');
       await questionAdmin.addReviewQuestionRights('Tester');
 
       await questionAdmin.verifyUserCanReviewQuestions('Tester');
+      await questionAdmin.screenshotMatch('verifyUserCanReviewQuestions');
       await questionAdmin.verifyQuestionReviewersIncludeUser('Tester');
+      await questionAdmin.screenshotMatch('verifyQuestionReviewersIncludeUser');
       await questionAdmin.verifyUserCanSubmitQuestions('Tester');
+      await questionAdmin.screenshotMatch('verifyUserCanSubmitQuestions');
       await questionAdmin.verifyQuestionSubmittersIncludeUser('Tester');
+      await questionAdmin.screenshotMatch(
+        'verifyQuestionSubmittersIncludeUser'
+      );
 
       await questionAdmin.removeSubmitQuestionRights('Tester');
       await questionAdmin.removeReviewQuestionRights('Tester');
 
       await questionAdmin.verifyUserCannotReviewQuestions('Tester');
+      await questionAdmin.screenshotMatch('verifyUserCannotReviewQuestions');
       await questionAdmin.verifyQuestionReviewersExcludeUser('Tester');
+      await questionAdmin.screenshotMatch('verifyQuestionReviewersExcludeUser');
       await questionAdmin.verifyUserCannotSubmitQuestions('Tester');
+      await questionAdmin.screenshotMatch('verifyUserCannotSubmitQuestions');
       await questionAdmin.verifyQuestionSubmittersExcludeUser('Tester');
+      await questionAdmin.screenshotMatch(
+        'verifyQuestionSubmittersExcludeUser'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

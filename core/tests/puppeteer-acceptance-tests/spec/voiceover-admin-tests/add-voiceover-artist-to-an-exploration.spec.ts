@@ -65,33 +65,52 @@ describe('Voiceover Admin', function () {
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.navigateToExplorationEditorPage();
       await explorationEditor.dismissWelcomeModal();
+      await explorationEditor.screenshotMatch(
+        'explorationEditordismissWelcomeModal'
+      );
 
       await explorationEditor.createExplorationWithMinimumContent(
         'Exploration one',
         INTERACTION_TYPES.END_EXPLORATION
       );
+      await explorationEditor.screenshotMatch(
+        'createExplorationWithMinimumContent_ExplorationOne'
+      );
+
       await explorationEditor.saveExplorationDraft();
+      await explorationEditor.screenshotMatch(
+        'saveExplorationDraft_ExplorationOne'
+      );
       explorationId = await explorationEditor.publishExplorationWithContent(
         'Exploration one',
         'Exploration one',
         'Algebra'
       );
+      await explorationEditor.screenshotMatch('publishExplorationWithContent');
 
       await voiceoverAdmin.navigateToExplorationEditor(explorationId);
       await voiceoverAdmin.dismissWelcomeModal();
+      await voiceoverAdmin.screenshotMatch('voiceoverAdmindismissWelcomeModal');
 
       await voiceoverAdmin.navigateToExplorationSettingsTab();
 
       await voiceoverAdmin.expectVoiceoverArtistsListDoesNotContain(
         'invalidUserId'
       );
+      await voiceoverAdmin.screenshotMatch(
+        'expectVoiceoverArtistsListDoesNotContain'
+      );
+
       await voiceoverAdmin.addVoiceoverArtistsToExploration(['invalidUserId']);
 
       await voiceoverAdmin.expectToSeeErrorToastMessage(
         invalidIdErrorToastMessage
       );
+      await voiceoverAdmin.screenshotMatch('expectToSeeErrorToastMessage');
       await voiceoverAdmin.closeToastMessage();
+
       await voiceoverAdmin.verifyVoiceoverArtistStillOmitted('invalidUserId');
+      await voiceoverAdmin.screenshotMatch('verifyVoiceoverArtistStillOmitted');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -110,17 +129,27 @@ describe('Voiceover Admin', function () {
         'Exploration two',
         INTERACTION_TYPES.END_EXPLORATION
       );
+      await explorationEditor.screenshotMatch(
+        'createExplorationWithMinimumContent_ExplorationTwo'
+      );
       await explorationEditor.saveExplorationDraft();
+      await explorationEditor.screenshotMatch(
+        'saveExplorationDraft_ExplorationTwo'
+      );
       explorationId = await explorationEditor.publishExplorationWithContent(
         'Exploration one',
         'Exploration one',
         'Algebra'
       );
+      await explorationEditor.screenshotMatch('publishExplorationWithContent');
       await voiceoverAdmin.navigateToExplorationEditor(explorationId);
       await voiceoverAdmin.navigateToExplorationSettingsTab();
 
       await voiceoverAdmin.expectVoiceoverArtistsListDoesNotContain(
         'voiceoverartist'
+      );
+      await voiceoverAdmin.screenshotMatch(
+        'expectVoiceoverArtistsListDoesNotContain'
       );
       await voiceoverAdmin.addVoiceoverArtistsToExploration([
         'voiceoverartist',
@@ -128,6 +157,9 @@ describe('Voiceover Admin', function () {
 
       await voiceoverAdmin.expectVoiceoverArtistsListContains(
         'voiceoverartist'
+      );
+      await voiceoverAdmin.screenshotMatch(
+        'expectVoiceoverArtistsListContains'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

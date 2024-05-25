@@ -15,7 +15,7 @@
 /**
  * @fileoverview Logged-in users utility file.
  */
-
+import {Page} from 'puppeteer';
 import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
@@ -132,7 +132,6 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToAboutPage(): Promise<void> {
     await this.goto(aboutUrl);
-    showMessage('called navigateToAboutPage');
   }
 
   /**
@@ -146,10 +145,7 @@ export class LoggedInUser extends BaseUser {
    * Function to navigate to the Thanks for Donating page.
    */
   async navigateToThanksForDonatingPage(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.page.goto(thanksForDonatingUrl),
-    ]);
+    await this.goto(thanksForDonatingUrl);
   }
 
   /**
@@ -168,16 +164,9 @@ export class LoggedInUser extends BaseUser {
     expectedDestinationPageUrl: string,
     expectedDestinationPageName: string
   ): Promise<void> {
-    showMessage(`start ${buttonName}, ${this.page.url()}`);
-    await Promise.all([
-      this.page.waitForNavigation({
-        waitUntil: 'networkidle0',
-      }),
-      this.clickOn(button),
-    ]);
+    await this.clickAndWaitForNavigation(button);
     try {
       expect(this.page.url()).toBe(expectedDestinationPageUrl);
-      showMessage(`done ${buttonName}, ${this.page.url()}`);
     } catch (e) {
       throw new Error(
         `${buttonName} should open the ${expectedDestinationPageName} page`
@@ -266,7 +255,6 @@ export class LoggedInUser extends BaseUser {
    * and check if it opens the Creator Dashboard page in Create Mode.
    */
   async clickCreateLessonsButtonInAboutPage(): Promise<void> {
-    showMessage('start clickCreateLessonsButtonInAboutPage');
     await this.clickOn(createLessonsButton);
     if (this.page.url() !== creatorDashboardCreateModeUrl) {
       throw new Error(
@@ -280,21 +268,21 @@ export class LoggedInUser extends BaseUser {
       );
     }
     await this.page.waitForNavigation({
-      waitUntil: 'networkidle0',
+      waitUntil: ['networkidle0', 'networkidle2', 'domcontentloaded', 'load'],
     });
     const urlRegex =
       /http:\/\/localhost:8181\/create\/\w*(\/gui\/Introduction)?/;
     if (this.page.url().match(urlRegex) === null) {
       throw new Error(
         'The Create Lessons button does not display ' +
-          'the Exploration Editor page!'
+          'the Exploration Editor page! It opens this url instead:' +
+          this.page.url()
       );
     } else {
       showMessage(
         'The Create Lessons button displays the Exploration Editor page.'
       );
     }
-    showMessage('done clickCreateLessonsButtonInAboutPage');
   }
 
   /**
@@ -357,9 +345,14 @@ export class LoggedInUser extends BaseUser {
     if (buttonText !== '61 million children') {
       throw new Error('The 61 Million Children button does not exist!');
     }
-    await this.page.$eval(millionsOfContentId, element =>
-      element.getElementsByTagName('a')[0].click()
-    );
+    await Promise.all([
+      this.page.waitForNavigation({
+        waitUntil: ['domcontentloaded', 'networkidle2', 'networkidle0', 'load'],
+      }),
+      this.page.$eval(millionsOfContentId, element =>
+        element.getElementsByTagName('a')[0].click()
+      ),
+    ]);
     if (this.page.url() !== _61MillionChildrenUrl) {
       throw new Error(
         'The 61 Million Children link does not open the right page!'
@@ -417,9 +410,14 @@ export class LoggedInUser extends BaseUser {
     if (buttonText !== '420 million') {
       throw new Error('The 420 Million link does not exist!');
     }
-    await this.page.$eval(weCannotContentId, element =>
-      element.getElementsByTagName('a')[0].click()
-    );
+    await Promise.all([
+      this.page.waitForNavigation({
+        waitUntil: ['domcontentloaded', 'networkidle2', 'networkidle0', 'load'],
+      }),
+      this.page.$eval(weCannotContentId, element =>
+        element.getElementsByTagName('a')[0].click()
+      ),
+    ]);
     if (this.page.url() !== _420MillionUrl) {
       throw new Error('The 420 Million link does not open the right page!');
     } else {
@@ -432,17 +430,12 @@ export class LoggedInUser extends BaseUser {
    * in the About Foundation page and check if it opens the About page.
    */
   async clickLearnMoreAboutOppiaButtonInAboutFoundation(): Promise<void> {
-    await this.clickOn(learnMoreAboutOppiaButton);
-    const newTab = await this.browserObject.waitForTarget(
-      target => target.url() === aboutUrl
+    await this.clickButtonToNavigateToNewPage(
+      learnMoreAboutOppiaButton,
+      'Learn More About Oppia button',
+      aboutUrl,
+      'About'
     );
-    if (newTab.url() !== aboutUrl) {
-      throw new Error(
-        'The Learn More About Oppia button does not open the About page!'
-      );
-    } else {
-      showMessage('The Learn More About Oppia button opens the About page.');
-    }
   }
 
   /**
@@ -450,17 +443,12 @@ export class LoggedInUser extends BaseUser {
    * in the About Foundation page and check if it opens the Volunteer page.
    */
   async clickBecomeAVolunteerButtonInAboutFoundation(): Promise<void> {
-    await this.clickOn(becomeAVolunteerButton);
-    const newTab = await this.browserObject.waitForTarget(
-      target => target.url() === volunteerUrl
+    await this.clickButtonToNavigateToNewPage(
+      becomeAVolunteerButton,
+      'Become A Volunteer button',
+      volunteerUrl,
+      'Volunteer'
     );
-    if (newTab.url() !== volunteerUrl) {
-      throw new Error(
-        'The Become A Volunteer button does not open the Volunteer page!'
-      );
-    } else {
-      showMessage('The Become A Volunteer button opens the Volunteer page.');
-    }
   }
 
   /**
@@ -478,9 +466,14 @@ export class LoggedInUser extends BaseUser {
         'The Consider becoming a partner today! link does not exist!'
       );
     }
-    await this.page.$eval(sectionSixPart1, element =>
-      element.getElementsByTagName('a')[0].click()
-    );
+    await Promise.all([
+      this.page.waitForNavigation({
+        waitUntil: ['domcontentloaded', 'networkidle2', 'networkidle0', 'load'],
+      }),
+      this.page.$eval(sectionSixPart1, element =>
+        element.getElementsByTagName('a')[0].click()
+      ),
+    ]);
     if (this.page.url() !== partnershipsUrl) {
       throw new Error(
         'The Consider becoming a partner today! link does not open ' +
@@ -509,9 +502,14 @@ export class LoggedInUser extends BaseUser {
         'The Join our large volunteer community! link does not exist!'
       );
     }
-    await this.page.$eval(sectionSixPart2, element =>
-      element.getElementsByTagName('a')[0].click()
-    );
+    await Promise.all([
+      this.page.waitForNavigation({
+        waitUntil: ['domcontentloaded', 'networkidle2', 'networkidle0', 'load'],
+      }),
+      this.page.$eval(sectionSixPart2, element =>
+        element.getElementsByTagName('a')[0].click()
+      ),
+    ]);
     if (this.page.url() !== volunteerUrl) {
       throw new Error(
         'The Join our large volunteer community! link does not open ' +
@@ -538,9 +536,14 @@ export class LoggedInUser extends BaseUser {
     if (buttonText !== 'donations') {
       throw new Error('The donations link does not exist!');
     }
-    await this.page.$eval(sectionSixPart3, element =>
-      element.getElementsByTagName('a')[0].click()
-    );
+    await Promise.all([
+      this.page.waitForNavigation({
+        waitUntil: ['domcontentloaded', 'networkidle2', 'networkidle0', 'load'],
+      }),
+      this.page.$eval(sectionSixPart3, element =>
+        element.getElementsByTagName('a')[0].click()
+      ),
+    ]);
     if (this.page.url() !== donateUrl) {
       throw new Error('The donations link does not open the Donate page!');
     } else {
@@ -692,10 +695,7 @@ export class LoggedInUser extends BaseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error('The Watch A Video button does not exist!');
     }
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(watchAVideoButton),
-    ]);
+    await this.clickAndWaitForNavigation(watchAVideoButton);
 
     const url = this.getCurrentUrlWithoutParameters();
     const expectedWatchAVideoUrl = this.isViewportAtMobileWidth()
@@ -720,10 +720,8 @@ export class LoggedInUser extends BaseUser {
     if (buttonText !== 'Read our blog') {
       throw new Error('The Read Our Blog button does not exist!');
     }
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(readOurBlogButton),
-    ]);
+    await this.clickAndWaitForNavigation(readOurBlogButton);
+
     if (this.page.url() !== blogUrl) {
       throw new Error('The Read Our Blog button does not open the Blog page!');
     } else {
@@ -846,10 +844,7 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the Forum page using the oppia website footer.
    */
   async navigateToForumPageViaFooter(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      await this.clickOn(footerForumlink),
-    ]);
+    await this.clickAndWaitForNavigation(footerForumlink);
 
     expect(this.page.url()).toBe('https://groups.google.com/g/oppia');
   }
@@ -874,7 +869,7 @@ export class LoggedInUser extends BaseUser {
   private async clickLinkAnchorToNewTab(
     anchorInnerText: string,
     expectedDestinationPageUrl: string
-  ): Promise<void> {
+  ): Promise<Page> {
     await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
     const pageTarget = this.page.target();
     await this.clickOn(anchorInnerText);
@@ -883,14 +878,20 @@ export class LoggedInUser extends BaseUser {
     );
     const newTabPage = await newTarget.page();
     expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
-    await newTabPage?.close();
+    if (newTabPage === null) {
+      throw new Error(`The ${anchorInnerText} link did not open a new tab`);
+    }
+    expect(newTabPage.url()).toBe(expectedDestinationPageUrl);
+    await newTabPage.reload({
+      waitUntil: ['domcontentloaded', 'networkidle2', 'networkidle0', 'load'],
+    });
+    return newTabPage;
   }
 
   /**
    * Clicks the link with the text "create on here" on the Get Stated page.
    */
-  async clickCreateOneHereLinkInGetStartedPage(): Promise<void> {
+  async clickCreateOneHereLinkInGetStartedPage(): Promise<Page> {
     await this.page.waitForXPath('//a[contains(text(),"create one here")]');
     const pageTarget = this.page.target();
     await this.clickOn('create one here');
@@ -898,32 +899,43 @@ export class LoggedInUser extends BaseUser {
       target => target.opener() === pageTarget
     );
     const newTabPage = await newTarget.page();
-    await newTabPage?.waitForNetworkIdle();
-    expect(newTabPage?.url()).toContain(
+    if (newTabPage === null) {
+      throw new Error('The "create on here" link did not open a new tab');
+    }
+    expect(newTabPage.url()).toContain(
       'https://accounts.google.com/lifecycle/steps/signup/name'
     );
-    await newTabPage?.close();
+    await newTabPage.reload({
+      waitUntil: ['networkidle0', 'networkidle2', 'domcontentloaded', 'load'],
+    });
+    return newTabPage;
   }
 
   /**
    * Clicks the link with the text "Welcome to Oppia" on the Get Stated page.
    */
-  async clickWelcomeToOppiaLinkInGetStartedPage(): Promise<void> {
-    await this.clickLinkAnchorToNewTab('Welcome to Oppia', welcomeToOppiaUrl);
+  async clickWelcomeToOppiaLinkInGetStartedPage(): Promise<Page> {
+    return await this.clickLinkAnchorToNewTab(
+      'Welcome to Oppia',
+      welcomeToOppiaUrl
+    );
   }
 
   /**
    * Clicks the link with the text "Get Electrified!" on the Get Stated page.
    */
-  async clickGetElectrifiedLinkInGetStartedPage(): Promise<void> {
-    await this.clickLinkAnchorToNewTab('Get Electrified!', electromagnetismUrl);
+  async clickGetElectrifiedLinkInGetStartedPage(): Promise<Page> {
+    return await this.clickLinkAnchorToNewTab(
+      'Get Electrified!',
+      electromagnetismUrl
+    );
   }
 
   /**
    * Clicks the link with the text "Programming with Carla" on the Get Stated page.
    */
-  async clickProgrammingWithCarlaLinkInGetStartedPage(): Promise<void> {
-    await this.clickLinkAnchorToNewTab(
+  async clickProgrammingWithCarlaLinkInGetStartedPage(): Promise<Page> {
+    return await this.clickLinkAnchorToNewTab(
       'Programming with Carla',
       programmingWithCarlaUrl
     );
@@ -932,8 +944,8 @@ export class LoggedInUser extends BaseUser {
   /**
    * Clicks the link with the text "in our user documentation" on the Get Stated page.
    */
-  async clickInOurUserDocumentationLinkInGetStartedPage(): Promise<void> {
-    await this.clickLinkAnchorToNewTab(
+  async clickInOurUserDocumentationLinkInGetStartedPage(): Promise<Page> {
+    return await this.clickLinkAnchorToNewTab(
       'in our user documentation',
       creatingAnExplorationUrl
     );
@@ -942,8 +954,8 @@ export class LoggedInUser extends BaseUser {
   /**
    * Clicks the link with the text "embed it in your own web page" on the Get Stated page.
    */
-  async clickEmbedItInYourOwnWebPageLinkInGetStartedPage(): Promise<void> {
-    await this.clickLinkAnchorToNewTab(
+  async clickEmbedItInYourOwnWebPageLinkInGetStartedPage(): Promise<Page> {
+    return await this.clickLinkAnchorToNewTab(
       'embed it in your own web page',
       embeddingAnExplorationUrl
     );
@@ -957,10 +969,7 @@ export class LoggedInUser extends BaseUser {
       '//a[contains(text(),"discover more ways to get involved")]'
     );
 
-    await Promise.all([
-      this.page.waitForNavigation(),
-      await this.clickOn('discover more ways to get involved'),
-    ]);
+    await this.clickAndWaitForNavigation('discover more ways to get involved');
 
     expect(this.page.url()).toBe(contactUrl);
   }

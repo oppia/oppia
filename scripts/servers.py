@@ -86,8 +86,6 @@ def managed_process(
     non_empty_args = (s for s in stripped_args if s)
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
     human_readable_command = command if shell else ' '.join(command)
-    # if (human_readable_name == 'Acceptance Tests Server'):
-    #     raise Exception('command: %s' % command)
     msg = 'Starting new %s: %s' % (human_readable_name, human_readable_command)
     print(msg)
     popen_proc = psutil.Popen(command, shell=shell, **popen_kwargs)
@@ -766,49 +764,17 @@ def managed_acceptance_tests_server(
     os.environ['HEADLESS'] = 'true' if headless else 'false'
     os.environ['MOBILE'] = 'true' if mobile else 'false'
 
-    nodemodules_jasmine_bin_path = os.path.join(
-        common.NODE_MODULES_PATH, '.bin', 'jasmine')
-    puppeteer_acceptance_tests_dir_path = os.path.join(
-        common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
-    puppeteer_build_dir_path = os.path.join(
-        puppeteer_acceptance_tests_dir_path, 'build')
-    spec_dir_path = os.path.join(
-        puppeteer_build_dir_path, 'spec')
-    jasmine_config_file_path = os.path.join(
-        puppeteer_acceptance_tests_dir_path, 'jasmine.json')
+    nodemodules_jest_bin_path = os.path.join(
+        common.NODE_MODULES_PATH, '.bin', 'jest')
 
-    suite_name_with_extension = '%s.spec.js' % suite_name
-
-    acceptance_tests_args = [
-        nodemodules_jasmine_bin_path,
-        '--config="%s"' % jasmine_config_file_path,
-        '%s' % os.path.join(spec_dir_path, suite_name_with_extension)
+    jest_args = [
+        nodemodules_jest_bin_path, suite_name,
+        '--config=./core/tests/puppeteer-acceptance-tests/jest.config.js'
     ]
 
     # OK to use shell=True here because we are passing string literals,
     # and verifying that the passed suite-name are within the list of
     # the suites we have, so there is no risk of a shell-injection attack.
-    # managed_acceptance_tests_proc = managed_process(
-    #     acceptance_tests_args,
-    #     human_readable_name='Acceptance Tests Server',
-    #     shell=True,
-    #     raise_on_nonzero_exit=False,
-    #     stdout=stdout,
-    # )
-
-    nodemodules_jest_bin_path = os.path.join(
-        common.NODE_MODULES_PATH, '.bin', 'jest')
-
-    # jest_args = [
-    #     nodemodules_jest_bin_path, 'logged-in-user-tests/click-all-buttons-on-about-page',
-    #     '--config=jest.config.js --detectOpenHandles --forceExit'
-    # ]
-
-    jest_args = [
-        nodemodules_jest_bin_path, suite_name,
-        '--config=jest.config.js'
-    ]
-
     jest_proc = managed_process(
         jest_args,
         human_readable_name='Jest-image-snapshot',
@@ -816,9 +782,6 @@ def managed_acceptance_tests_server(
         raise_on_nonzero_exit=False,
         stdout=stdout,
     )
-
-    # with managed_acceptance_tests_proc as proc:
-    #     yield proc
 
     with jest_proc as proc:
         yield proc

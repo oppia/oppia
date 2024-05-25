@@ -22,7 +22,8 @@ import isElementClickable from '../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
 
 import {toMatchImageSnapshot} from 'jest-image-snapshot';
-(<any>expect).extend({toMatchImageSnapshot});
+expect.extend({toMatchImageSnapshot});
+const backgroundBanner = '.oppia-background-image';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
@@ -307,6 +308,49 @@ export class BaseUser {
       await this.page.click(selector);
     }
   }
+
+  /**
+   * The function clicks the element using the text on the button
+   * and wait until the new page is fully loaded.
+   */
+  async clickAndWaitForNavigation(selector: string): Promise<void> {
+    /** Normalize-space is used to remove the extra spaces in the text.
+     * Check the documentation for the normalize-space function here :
+     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
+    const [button] = await this.page.$x(
+      `\/\/*[contains(text(), normalize-space('${selector}'))]`
+    );
+    // If we fail to find the element by its XPATH, then the button is undefined and
+    // we try to find it by its CSS selector.
+    if (button !== undefined) {
+      await this.waitForElementToBeClickable(button);
+      await Promise.all([
+        this.page.waitForNavigation({
+          waitUntil: [
+            'domcontentloaded',
+            'networkidle2',
+            'networkidle0',
+            'load',
+          ],
+        }),
+        button.click(),
+      ]);
+    } else {
+      await this.waitForElementToBeClickable(selector);
+      await Promise.all([
+        this.page.waitForNavigation({
+          waitUntil: [
+            'domcontentloaded',
+            'networkidle2',
+            'networkidle0',
+            'load',
+          ],
+        }),
+        this.page.click(selector),
+      ]);
+    }
+  }
+
   /**
    * The function selects all text content and delete it.
    */
@@ -337,7 +381,9 @@ export class BaseUser {
    * This function navigates to the given URL.
    */
   async goto(url: string): Promise<void> {
-    await this.page.goto(url, {waitUntil: 'networkidle0'});
+    await this.page.goto(url, {
+      waitUntil: ['networkidle0', 'networkidle2', 'domcontentloaded', 'load'],
+    });
   }
 
   /**
@@ -415,28 +461,32 @@ export class BaseUser {
   }
 
   /**
-   * await page.$("body")
-   * This function takes a screenshot of the current page
+   * This function takes a screenshot of the page
+   * If there's no parameter for newPage, it check this.page instead of newPage.
    * If there's no image named as the given string, it stores the screenshot with the given string in the file __image_snapshots__
    * Otherwise, it compares the screenshot with the image named as the given string to check if they match.
    * If they don't match, it generates an image in the file __diff_output__ to show the difference.
    */
-  async screenshotMatch(imageName: string): Promise<void> {
-    try {
-      console.log(`start screenshot for ${imageName}, ${this.page.url()}`);
-      // await this.page.$('body');
-      // await this.page.waitForTimeout(3000);
-      // await this.page.waitForNavigation({
-      //   waitUntil: 'networkidle0',
-      // });
-      (<any>expect(await this.page.screenshot())).toMatchImageSnapshot({
-        failureThreshold: '0.01',
-        failureThresholdType: 'percent',
-        customSnapshotIdentifier: imageName,
-      });
-      console.log(`done screenshot for ${imageName}, ${this.page.url()}`);
-    } catch (e) {
-      throw new Error(e);
+  async screenshotMatch(imageName: string, newPage?: Page): Promise<void> {
+    if (process.env.MOBILE !== 'true') {
+      try {
+        const currentPage =
+          typeof newPage !== 'undefined' ? newPage : this.page;
+        await currentPage.mouse.move(0, 0);
+        await currentPage.waitForTimeout(5000);
+        expect(await currentPage.screenshot()).toMatchImageSnapshot({
+          failureThreshold: (await currentPage.$(backgroundBanner))
+            ? 0.03
+            : 0.003,
+          failureThresholdType: 'percent',
+          customSnapshotIdentifier: imageName,
+        });
+        if (typeof newPage !== 'undefined') {
+          await newPage.close();
+        }
+      } catch (e) {
+        throw new Error(e);
+      }
     }
   }
 }
