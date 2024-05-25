@@ -126,8 +126,8 @@ def install_buf_and_protoc() -> None:
         os.remove(os.path.join(BUF_DIR, protoc_file))
     except Exception as e:
         raise Exception('Error installing protoc binary') from e
-    common.recursive_chmod(buf_path, 0o744)
-    common.recursive_chmod(protoc_path, 0o744)
+    common.recursive_chmod(buf_path, 744)
+    common.recursive_chmod(protoc_path, 744)
 
 
 def compile_protobuf_files(proto_files_paths: List[str]) -> None:
