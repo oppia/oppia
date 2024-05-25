@@ -230,6 +230,17 @@ export class ExplorationRightsService {
   }
 
   removeRoleAsync(memberUsername: string): Promise<void> {
+    const categories = ['ownerNames', 'editorNames', 'viewerNames'] as const;
+    let initialUsernamesByCategory: string[];
+    type Category = (typeof categories)[number];
+    let roleOfRemovedUser: Category;
+    categories.forEach(category => {
+      if (this[category].includes(memberUsername)) {
+        initialUsernamesByCategory = [...this[category]];
+        this[category] = this[category].filter(name => name !== memberUsername);
+        roleOfRemovedUser = category;
+      }
+    });
     return this.explorationRightsBackendApiService
       .removeRoleAsyncDeleteData(
         this.explorationDataService.explorationId,
@@ -247,6 +258,16 @@ export class ExplorationRightsService {
           response.rights.community_owned,
           response.rights.viewable_if_private
         );
+        this.alertsService.addSuccessMessage(
+          'Successfully removed user ' + memberUsername
+        );
+      })
+      .catch(error => {
+        this[roleOfRemovedUser] = initialUsernamesByCategory;
+        this.alertsService.addWarning(
+          'Failed to remove the user role. Please try again.'
+        );
+        throw error;
       });
   }
 
