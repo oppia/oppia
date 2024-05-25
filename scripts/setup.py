@@ -201,8 +201,8 @@ def main(args: Optional[List[str]] = None) -> None:
     # Change ownership of node_modules.
     # Note: on some machines, these commands seem to take quite a long time.
     if not common.is_windows_os():
-        common.recursive_chown(common.NODE_MODULES_PATH, os.getuid(), -1)
-        common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)
+        common.recursive_chown(common.NODE_MODULES_PATH, os.getuid())
+        common.recursive_chmod(common.NODE_MODULES_PATH, 744)
 
     # Download and install yarn.
     print('Checking if yarn is installed in %s' % common.OPPIA_TOOLS_DIR)

@@ -682,8 +682,8 @@ class CommonTests(test_utils.GenericTestBase):
         with utils.open_file(temp_file_path, 'w') as f:
             f.write('content')
 
-        common.recursive_chown(root_temp_dir, os.getuid(), -1)
-        common.recursive_chmod(root_temp_dir, 0o744)
+        common.recursive_chown(root_temp_dir, os.getuid())
+        common.recursive_chmod(root_temp_dir, 744)
 
         for root, directories, filenames in os.walk(root_temp_dir):
             for directory in directories:

@@ -497,7 +497,7 @@ def is_port_in_use(port: int) -> bool:
         return bool(not s.connect_ex(('localhost', port)))
 
 
-def recursive_chown(path: str, uid: int, gid: int) -> None:
+def recursive_chown(path: str, uid: Optional[int] = None, gid: Optional[int] = None) -> None:
     """Changes the owner and group id of all files in a path to the numeric
     uid and gid.
 
@@ -506,12 +506,17 @@ def recursive_chown(path: str, uid: int, gid: int) -> None:
         uid: int. Owner ID to be set.
         gid: int. Group ID to be set.
     """
-    os.chown(path, uid, gid)
-    for root, directories, filenames in os.walk(path):
-        for directory in directories:
-            os.chown(os.path.join(root, directory), uid, gid)
-        for filename in filenames:
-            os.chown(os.path.join(root, filename), uid, gid)
+    chown_command = 'chown -R '
+
+    if uid is not None and gid is not None:
+        chown_command += '%s:%s %s' % (uid, gid, path)
+    elif uid is not None:
+        chown_command += '%s %s' % (uid, path)
+    elif gid is not None:
+        chown_command += ':%s %s' % (gid, path)
+    else:
+        return
+    os.system(chown_command)
 
 
 def recursive_chmod(path: str, mode: int) -> None:
@@ -521,12 +526,7 @@ def recursive_chmod(path: str, mode: int) -> None:
         path: str. The path for which mode would be set.
         mode: int. The mode to be set.
     """
-    os.chmod(path, mode)
-    for root, directories, filenames in os.walk(path):
-        for directory in directories:
-            os.chmod(os.path.join(root, directory), mode)
-        for filename in filenames:
-            os.chmod(os.path.join(root, filename), mode)
+    os.system('chmod -R %s %s' % (mode, path))
 
 
 def print_each_string_after_two_new_lines(strings: List[str]) -> None:
