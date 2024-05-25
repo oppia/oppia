@@ -39,7 +39,6 @@ export class NumberWithUnitsEditorComponent implements OnInit {
   numberWithUnitsString!: string;
   problematicUnit: string = '';
   errorMessageI18nKey: string = '';
-  hasDuppedUnit: boolean = false;
   eventBusGroup: EventBusGroup;
 
   constructor(
@@ -74,6 +73,7 @@ export class NumberWithUnitsEditorComponent implements OnInit {
         })
       );
       this.errorMessageI18nKey = '';
+      this.problematicUnit = '';
       // We use unknown type because we are unsure of the type of error
       // that was thrown. Since the catch block cannot identify the
       // specific type of error, we are unable to further optimise the
@@ -86,18 +86,21 @@ export class NumberWithUnitsEditorComponent implements OnInit {
         })
       );
       if (parsingError instanceof Error) {
-        var temp = parsingError.message.split(' ');
+        var errorMessageSplit = parsingError.message.split(' ');
         var message = parsingError.message;
-        if(temp[0] == "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS"){
-          message = temp[0];
-          this.hasDuppedUnit = true;
-          this.problematicUnit = temp[1];
+        if(errorMessageSplit[0] == "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS"){
+          message = errorMessageSplit[0];
+          this.problematicUnit = errorMessageSplit[1];
         }else{
-          this.hasDuppedUnit = false;
+          this.problematicUnit = '';
         }
         this.errorMessageI18nKey = message;
       }
     }
+  }
+
+  hasDuplicatedUnit():boolean {
+    return this.problematicUnit != '';
   }
 }
 

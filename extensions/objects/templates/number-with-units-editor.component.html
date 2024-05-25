@@ -1,12 +1,12 @@
 <input type="text" [(ngModel)]="numberWithUnitsString" (ngModelChange)="updateValue($event)" class="form-control">
 
-<div *ngIf="hasDuppedUnit" class="oppia-form-error oppia-units-input-error">
+<div *ngIf="hasDuplicatedUnit()" class="oppia-form-error oppia-units-input-error">
   <span [innerHTML]="'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS' | translate: {
     duppedunit: problematicUnit,
     messageFormat: true
   }"></span>
 </div>
 
-<div *ngIf="!hasDuppedUnit" class="oppia-form-error oppia-units-input-error">
+<div *ngIf="!hasDuplicatedUnit()" class="oppia-form-error oppia-units-input-error">
   {{ errorMessageI18nKey | translate }}
 </div>

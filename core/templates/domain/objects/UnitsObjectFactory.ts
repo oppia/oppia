@@ -265,27 +265,33 @@ export class UnitsObjectFactory {
     return new Units(this.fromStringToList(units));
   }
 
-  duppedUnit(units: string): string{
-    var buffer = "";
-    var map = new Map<String, number>();
-    for(var i = 0; i<=units.length; i++){
-      if(i<units.length && units[i] != ' ' && i<units.length && units[i] != '^' && 
-         this.isunit(units[i]) && !(units[i]>='0' && units[i]<='9')){
-        buffer+=units[i];
+  getAllInstancesOfUnits(units : string[]): string[]{
+    //returns a list with all the instances of unit in a units list
+    var instancesOfUnits = [];
+    units.forEach(entry => {
+      if(entry.includes('^')){
+        this.getAllInstancesOfUnits(entry.split('^')).forEach(entryWoutExp => {
+          instancesOfUnits.push(entryWoutExp);
+        });
+      }else if(this.isunit(entry) && entry.length > 0){
+        instancesOfUnits.push(entry.replace(/[0-9]/g, ''));
       }
-      else{
-        if(buffer.length>0){
-          if(!map.get(buffer)){
-            map.set(buffer, 1);
-          }else{
-            map.clear();
-            return buffer;
-          }
-        }
-        buffer = "";
+    });
+    return instancesOfUnits;
+  }
+
+  duplicatedUnit(units: string): string{
+    var inputList = this.getAllInstancesOfUnits(this.stringToLexical(units));
+    var unitsRead = [];
+    
+    for(var i in inputList){
+      var unit = inputList[i];
+      if(unitsRead.indexOf(unit) >= 0){  //if index >= 0 then unit has already been seen
+        return unit;
+      }else{
+        unitsRead.push(unit);
       }
     }
-    map.clear();
     return null;
   }
 }

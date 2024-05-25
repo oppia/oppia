@@ -273,10 +273,10 @@ export class NumberWithUnitsObjectFactory {
     }
 
     const unitsObj = this.unitsFactory.fromRawInputString(units);
-    let duppedUnit = this.unitsFactory.duppedUnit(units);
-    if (duppedUnit != null){
+    let duplicatedUnit = this.unitsFactory.duplicatedUnit(units);
+    if (duplicatedUnit != null){
       throw new Error(
-        ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_DOUBLE_UNIT + " " + duppedUnit
+        ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_DOUBLE_UNIT + " " + duplicatedUnit
       );
     }
     return new NumberWithUnits(type, real, fractionObj, unitsObj);
