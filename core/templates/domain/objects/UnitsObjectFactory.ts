@@ -264,6 +264,30 @@ export class UnitsObjectFactory {
     }
     return new Units(this.fromStringToList(units));
   }
+
+  duppedUnit(units: string): string{
+    var buffer = "";
+    var map = new Map<String, number>();
+    for(var i = 0; i<=units.length; i++){
+      if(i<units.length && units[i] != ' ' && i<units.length && units[i] != '^' && 
+         this.isunit(units[i]) && !(units[i]>='0' && units[i]<='9')){
+        buffer+=units[i];
+      }
+      else{
+        if(buffer.length>0){
+          if(!map.get(buffer)){
+            map.set(buffer, 1);
+          }else{
+            map.clear();
+            return buffer;
+          }
+        }
+        buffer = "";
+      }
+    }
+    map.clear();
+    return null;
+  }
 }
 
 angular

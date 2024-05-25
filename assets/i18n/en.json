@@ -712,6 +712,7 @@
     "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_CURRENCY": "Please enter a valid currency (e.g., $5 or Rs 5)",
     "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_CURRENCY_FORMAT": "Please write currency units at the beginning",
     "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_UNIT_CHARS": "Please ensure that the unit only contains numbers, alphabets, (, ), *, ^, /, -",
+    "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS" : "The unit {duppedunit} is used more than once.",
     "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_VALUE": "Please ensure that the value is either a fraction or a number",
     "I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS": "Possible unit formats",
     "I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_DECIMAL": "At most 1 decimal point should be present.",

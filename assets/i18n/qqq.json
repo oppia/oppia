@@ -713,6 +713,7 @@
 	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_CURRENCY_FORMAT": "Error message shown below the input field for the number with units interaction",
 	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_UNIT_CHARS": "Error message shown below the input field for the number with units interaction",
 	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_VALUE": "Error message shown below the input field for the number with units interaction",
+	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS" : "Error message shown when the input contains more than one instance of a unit",
 	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS": "Text displayed in number with units interaction. - The text is shown inside a button. When the user clicks the button, a dialog is shown with the explanation of the accepted syntax that can be used inside number with units in Oppia.",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_DECIMAL": "Error message shown when number has more than one decimal points.",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_EXPONENT": "Error message shown when number has more than 1 exponent sign.",

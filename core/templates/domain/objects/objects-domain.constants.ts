@@ -31,9 +31,8 @@ export const ObjectsDomainConstants = {
       'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_CURRENCY_FORMAT',
     INVALID_UNIT_CHARS:
       'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_UNIT_CHARS',
-    INVALID_DOUBLE_UNITS:
-      //TODO: #20044 unable to create a proper error due to local error
-      'There can\'t be the same unit twice',
+    INVALID_DOUBLE_UNIT:
+      'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS',
   },
 
   CURRENCY_UNITS: {

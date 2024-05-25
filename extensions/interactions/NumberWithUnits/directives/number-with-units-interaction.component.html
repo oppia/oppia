@@ -6,8 +6,15 @@
          (ngModelChange)="answerValueChanged()"
          class="form-control"
          [oppiaFocusOn]="labelForFocusTarget">
+  
+  <div *ngIf="isDoubleUnit" class="oppia-form-error oppia-units-input-error">
+    <span [innerHTML]="'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS' | translate: {
+      duppedunit: problematicUnit,
+      messageFormat: true
+    }"></span>
+  </div>
 
-  <div class="oppia-form-error oppia-units-input-error">
+  <div *ngIf="!isDoubleUnit" class="oppia-form-error oppia-units-input-error">
     {{ errorMessageI18nKey | translate }}
   </div>
 </form>

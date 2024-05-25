@@ -37,7 +37,9 @@ export class NumberWithUnitsEditorComponent implements OnInit {
   @Input() value!: NumberWithUnitsAnswer | null;
   @Output() valueChanged = new EventEmitter();
   numberWithUnitsString!: string;
+  problematicUnit: string = '';
   errorMessageI18nKey: string = '';
+  hasDuppedUnit: boolean = false;
   eventBusGroup: EventBusGroup;
 
   constructor(
@@ -84,7 +86,16 @@ export class NumberWithUnitsEditorComponent implements OnInit {
         })
       );
       if (parsingError instanceof Error) {
-        this.errorMessageI18nKey = parsingError.message;
+        var temp = parsingError.message.split(' ');
+        var message = parsingError.message;
+        if(temp[0] == "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS"){
+          message = temp[0];
+          this.hasDuppedUnit = true;
+          this.problematicUnit = temp[1];
+        }else{
+          this.hasDuppedUnit = false;
+        }
+        this.errorMessageI18nKey = message;
       }
     }
   }

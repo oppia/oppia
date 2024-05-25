@@ -47,7 +47,9 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
   componentSubscriptions: Subscription = new Subscription();
   FORM_ERROR_TYPE: string = 'NUMBER_WITH_UNITS_FORMAT_ERROR';
   errorMessageI18nKey: string = '';
+  problematicUnit: string = ''
   answer: string = '';
+  isDoubleUnit: boolean = false;
   isValid: boolean = true;
   answerChanged: Subject<string> = new Subject<string>();
   NUMBER_WITH_UNITS_FORM_SCHEMA = {
@@ -75,9 +77,19 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
             this.numberWithUnitsObjectFactory.fromRawInputString(newValue);
             this.errorMessageI18nKey = '';
             this.isValid = true;
+            this.isDoubleUnit = false;
           } catch (parsingError) {
             if (parsingError instanceof Error) {
-              this.errorMessageI18nKey = parsingError.message;
+              var temp = parsingError.message.split(' ');
+              var message = parsingError.message;
+              if(temp[0] == "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS"){
+                message = temp[0];
+                this.isDoubleUnit = true;
+                this.problematicUnit = temp[1];
+              }else{
+                this.isDoubleUnit = false;
+              }
+              this.errorMessageI18nKey = message;
             }
             this.isValid = false;
           }
@@ -131,7 +143,16 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
       );
     } catch (parsingError) {
       if (parsingError instanceof Error) {
-        this.errorMessageI18nKey = parsingError.message;
+        var temp = parsingError.message.split(' ');
+        var message = parsingError.message;
+        if(temp[0] == "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS"){
+          message = temp[0];
+          this.isDoubleUnit = true;
+          this.problematicUnit = temp[1];
+        }else{
+          this.isDoubleUnit = false;
+        }
+        this.errorMessageI18nKey = message;
       } else {
         throw parsingError;
       }
