@@ -497,7 +497,9 @@ def is_port_in_use(port: int) -> bool:
         return bool(not s.connect_ex(('localhost', port)))
 
 
-def recursive_chown(path: str, uid: Optional[int] = None, gid: Optional[int] = None) -> None:
+def recursive_chown(
+    path: str, uid: Optional[int] = None, gid: Optional[int] = None
+) -> None:
     """Changes the owner and group id of all files in a path to the numeric
     uid and gid.
 
