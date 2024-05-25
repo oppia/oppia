@@ -203,7 +203,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             else:
                 return
         def mock_recursive_chmod(unused_fname: str, mode: str) -> None: # pylint: disable=unused-argument
-            self.assertEqual(mode, 0o744)
+            self.assertEqual(mode, 744)
             check_mock_function_calls['recursive_chmod_is_called'] = True
         def mock_isfile(unused_fname: str) -> bool:
             return False
