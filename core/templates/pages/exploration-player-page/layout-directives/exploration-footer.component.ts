@@ -199,6 +199,21 @@ export class ExplorationFooterComponent {
     return this.conceptCardManagerService.isConceptCardViewable();
   }
 
+  getCheckpointsCardIndexs(): number[] {
+    let checkpointCardIndexs: number[] = [];
+    let numberOfCards = this.playerTranscriptService.getNumCards();
+
+    for (let i = 0; i < numberOfCards; i++) {
+      let stateName = this.playerTranscriptService.getCard(i).getStateName();
+      let correspondingState =
+        this.explorationEngineService.getStateFromStateName(stateName);
+      if (correspondingState.cardIsCheckpoint) {
+        checkpointCardIndexs.push(i);
+      }
+    }
+    return checkpointCardIndexs;
+  }
+
   showProgressReminderModal(): void {
     const mostRecentlyReachedCheckpointIndex =
       this.getMostRecentlyReachedCheckpointIndex();
@@ -280,6 +295,10 @@ export class ExplorationFooterComponent {
     let modalRef = this.ngbModal.open(LessonInformationCardModalComponent, {
       windowClass: 'oppia-modal-lesson-information-card',
     });
+
+    const checkpointCardsIndex = this.getCheckpointsCardIndexs();
+
+    modalRef.componentInstance.checkpointCardsIndex = checkpointCardsIndex;
 
     modalRef.componentInstance.checkpointCount = this.checkpointCount;
 

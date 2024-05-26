@@ -26,6 +26,7 @@ import {UrlService} from 'services/contextual/url.service';
 import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {
   I18nLanguageCodeService,
   TranslationKeyType,
@@ -86,6 +87,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   userIsLoggedIn: boolean = false;
   lessonAuthorsSubmenuIsShown: boolean = false;
   saveProgressMenuIsShown: boolean = false;
+  checkpointCardsIndex!: number[];
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -99,7 +101,8 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private windowRef: WindowRef,
     private localStorageService: LocalStorageService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
-    private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService
+    private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService,
+    private playerPositionService: PlayerPositionService
   ) {
     super(ngbActiveModal);
   }
@@ -274,6 +277,16 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(urlId);
       this.windowRef.nativeWindow.location.href = loginUrl;
     });
+  }
+
+  returnToCheckpoint(index: number): void {
+    const cardIndex = this.checkpointCardsIndex[index];
+    if (cardIndex !== undefined) {
+      this.playerPositionService.setDisplayedCardIndex(cardIndex);
+      this.playerPositionService.onActiveCardChanged.emit();
+    } else {
+      console.error('No card index associated with this checkpoint.');
+    }
   }
 
   closeSaveProgressMenu(): void {

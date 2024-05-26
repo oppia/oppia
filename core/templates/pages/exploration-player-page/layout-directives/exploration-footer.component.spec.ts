@@ -401,6 +401,31 @@ describe('ExplorationFooterComponent', () => {
     })
   );
 
+  it('should get checkpoints card indexes', () => {
+    const numCards = 5;
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(numCards);
+
+    let cards: StateCard[] = [];
+    for (let i = 0; i < numCards; i++) {
+      cards.push({
+        getStateName: jasmine.createSpy('getStateName').and.returnValue(i),
+      });
+    }
+
+    spyOn(playerTranscriptService, 'getCard').and.callFake((index: number) => {
+      return cards[index];
+    });
+
+    spyOn(explorationEngineService, 'getStateFromStateName').and.callFake(
+      (stateName: string) => {
+        return {cardIsCheckpoint: parseInt(stateName) % 2 === 0};
+      }
+    );
+
+    const result = component.getCheckpointsCardIndexs();
+    expect(result).toEqual([0, 2, 4]);
+  });
+
   it('should check if progress reminder modal can be shown and show it', () => {
     const recentlyReachedCheckpointSpy = spyOn(
       component,
