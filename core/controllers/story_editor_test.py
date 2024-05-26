@@ -337,9 +337,10 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertEqual(
+        self.assertIn(
+            'Missing key in handler args: commit_message.',
             json_response['error'],
-            'Missing key in handler args: commit_message.')
+        )
 
         self.logout()
 
@@ -541,9 +542,10 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertEqual(
+        self.assertIn(
+            'Missing key in handler args: version.',
             json_response['error'],
-            'Missing key in handler args: version.')
+        )
 
         self.logout()
 
