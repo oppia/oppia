@@ -236,7 +236,8 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     ),
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value: (
         (
-            'The flag enables flow for multiple classrooms.',
+            'The flag enables flow for multiple classrooms '
+            'and makes the classrooms page available to learners.',
             feature_flag_domain.ServerMode.DEV
         )
     )
