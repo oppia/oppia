@@ -73,6 +73,7 @@ export class ResponseGraphInput {
   }
 
   removeWhiteSpace(): void {
+    // The first vertex should be at (MIN_MARGIN, MIN_MARGIN).
     this.graph.vertices = this.graph.vertices.map(vertex => {
       return {
         x: vertex.x - this.minX + this.MIN_MARGIN,
@@ -90,6 +91,7 @@ export class ResponseGraphInput {
       return;
     }
 
+    // If the scale is not 1, resize the graph with the scale factor.
     this.graph.vertices = this.graph.vertices.map(vertex => {
       return {
         x: vertex.x * scale,
@@ -107,18 +109,23 @@ export class ResponseGraphInput {
     return Math.max(...this.graph.vertices.map(vertex => vertex.y));
   }
 
+  // This function calculates the scale factor required to fit the graph.
   getScale(): number {
     var scale = 1;
 
     var maxY = this.getMaxY();
     if (this.HEIGHT < maxY) {
+      // Only apply the scale if the graph is larger than the display area.
       scale = this.HEIGHT / (maxY + this.MIN_MARGIN);
     }
 
     var maxX = this.getMaxX();
     if (this.WIDTH < maxX) {
+      // Only apply the scale if the graph is larger than the display area.
       var scaleX = this.WIDTH / (maxX + this.MIN_MARGIN);
       if (scaleX < scale) {
+        // If the graph is larger than the display area in both dimensions,
+        // we need to scale it down uniformly by the smaller scale factor.
         scale = scaleX;
       }
     }

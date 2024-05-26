@@ -32,12 +32,18 @@ export interface EdgeCentre {
 export class GraphDetailService {
   VERTEX_RADIUS: number = 6;
   EDGE_WIDTH: number = 3;
+
+  // The minimum margin to the left and top of the display.
+  // The first vertex should be at (MIN_MARGIN, MIN_MARGIN).
+  // This value should not be 0 because only half of the vertex will be shown.
   MIN_MARGIN: number = 10;
 
   getMinMargin(graph: GraphAnswer): number {
     if (!graph.isLabeled) {
       return this.MIN_MARGIN;
     }
+    // If the graph is labeled, the labels size should be taken into account
+    // because in arabic, the labels will be shown on the left side of the vertex.
     return Math.max(
       ...graph.vertices.map(
         vertex => vertex.label.length * (this.MIN_MARGIN / 2)
