@@ -2375,6 +2375,95 @@ class UserBulkEmailsModel(base_models.BaseModel):
         })
 
 
+class UserGroupModel(base_models.BaseModel):
+    """Model for storing user-groups and the users associated.
+
+    This model stores the user-groups for which feature-flag or
+    platform-parameters can be enabled.
+
+    ID for this model is the name of the user-group.
+    """
+
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
+
+    # The user ids of the users.
+    users = datastore_services.StringProperty(repeated=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model contains data corresponding to a user: user present
+        in the 'users' field.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as multiple instances per user since a user can
+        be part of multiple user groups.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'users': base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether UserGroupModel exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return cls.query(cls.users == user_id).get(keys_only=True) is not None
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instance of UserGroupModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        user_group_models: List[UserGroupModel] = list(cls.query(
+            cls.users == user_id
+        ).fetch())
+
+        for user_group_model in user_group_models:
+            user_group_model.users.remove(user_id)
+
+        # Delete the references to this user from other user subscribers models.
+        cls.update_timestamps_multi(user_group_models)
+        cls.put_multi(user_group_models)
+
+    @classmethod
+    def export_data(cls, user_id: str) -> Dict[str, Dict[str, str]]:
+        """Exports the data from UserGroupModel into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from UserGroupModel.
+        """
+        user_data = {}
+        user_group_models: List[UserGroupModel] = list(cls.query(
+            cls.users == user_id
+        ).fetch())
+        for user_group_model in user_group_models:
+            user_data[user_group_model.id] = {
+                'users': user_id
+            }
+
+        return user_data
+
+
 class UserSkillMasteryModel(base_models.BaseModel):
     """Model for storing a user's degree of mastery of a skill in Oppia.
 

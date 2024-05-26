@@ -45,6 +45,7 @@ from typing import List, Type
 # of every job.
 from core.jobs.batch_jobs import blog_post_search_indexing_jobs      # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import blog_validation_jobs                # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import user_validation_jobs                # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import collection_info_jobs                # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import email_deletion_jobs                 # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import exp_migration_jobs                  # pylint: disable=unused-import  # isort: skip
@@ -58,6 +59,8 @@ from core.jobs.batch_jobs import skill_migration_jobs                # pylint: d
 from core.jobs.batch_jobs import story_migration_jobs                # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import subtopic_migration_jobs                # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import topic_migration_jobs                # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import (                                    # pylint: disable=unused-import  # isort: skip
+    suggestion_edit_state_content_deletion_jobs)
 from core.jobs.batch_jobs import suggestion_stats_computation_jobs   # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import suggestion_migration_jobs   # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import translation_migration_jobs         # pylint: disable=unused-import  # isort: skip
@@ -72,6 +75,8 @@ from core.jobs.batch_jobs import (                                   # pylint: d
 from core.jobs.batch_jobs import contributor_admin_stats_jobs        # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     story_node_jobs)
+from core.jobs.batch_jobs import manual_voice_artist_name_job        # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import voiceover_migration_job             # pylint: disable=unused-import  # isort: skip
 
 
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:
