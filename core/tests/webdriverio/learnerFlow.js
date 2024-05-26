@@ -259,15 +259,15 @@ describe('Learner dashboard functionality', function () {
       await explorationPlayerPage.expectExplorationToNotBeOver();
     }
     // User clicks on Oppia logo to leave exploration, user should be
-    // able to leave the page directly without getting any alert message.
-    await libraryPage.getHomePage();
+    // able to always get an alert message.
+    await libraryPage.getHomePage(true);
 
     // Go to 'Test Exploration'.
     await libraryPage.get();
     await libraryPage.findExploration('Test Exploration');
     await libraryPage.playExploration('Test Exploration');
     await waitFor.pageToFullyLoad();
-    await libraryPage.getHomePage();
+    await libraryPage.getHomePage(false);
     // Learner Dashboard should display 'Dummy Exploration'
     // as incomplete.
     await learnerDashboardPage.navigateToCommunityLessonsAndCheckIncompleteExplorations(
@@ -419,8 +419,8 @@ describe('Learner dashboard functionality', function () {
       await explorationPlayerPage.expectExplorationToNotBeOver();
     }
     // User clicks on Oppia logo to leave collection, user should be
-    // able to leave the page directly without getting any alert message.
-    await libraryPage.getHomePage();
+    // able to always get an alert message.
+    await libraryPage.getHomePage(true);
 
     // Learner Dashboard should display
     // 'Test Collection' as incomplete.
