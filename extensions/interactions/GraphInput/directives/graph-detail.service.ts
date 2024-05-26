@@ -49,9 +49,8 @@ export class GraphDetailService {
     return Math.min(...graph.vertices.map(vertex => vertex.x));
   }
 
-  getMaxX(graph: GraphAnswer): number {
-    var minX = this.getMinX(graph);
-    return Math.max(...graph.vertices.map(vertex => vertex.x - minX));
+  getMinY(graph: GraphAnswer): number {
+    return Math.min(...graph.vertices.map(vertex => vertex.y));
   }
 
   getDirectedEdgeArrowPoints(graph: GraphAnswer, index: number): string {

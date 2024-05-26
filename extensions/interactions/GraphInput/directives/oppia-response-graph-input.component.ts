@@ -46,7 +46,7 @@ export class ResponseGraphInput {
   EDGE_WIDTH!: number;
   MIN_MARGIN!: number;
   minX!: number;
-  maxX!: number;
+  minY!: number;
   WIDTH: number = 250;
   HEIGHT: number = 250;
 
@@ -67,7 +67,7 @@ export class ResponseGraphInput {
 
     this.MIN_MARGIN = this.graphDetailService.getMinMargin(this.graph);
     this.minX = this.graphDetailService.getMinX(this.graph);
-    this.maxX = this.graphDetailService.getMaxX(this.graph);
+    this.minY = this.graphDetailService.getMinY(this.graph);
 
     this.reduceGraph();
   }
@@ -76,7 +76,7 @@ export class ResponseGraphInput {
     this.graph.vertices = this.graph.vertices.map(vertex => {
       return {
         x: vertex.x - this.minX + this.MIN_MARGIN,
-        y: vertex.y,
+        y: vertex.y - this.minY + this.MIN_MARGIN,
         label: vertex.label,
       };
     });

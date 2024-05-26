@@ -163,7 +163,7 @@ describe('ResponseGraphInput', () => {
     expect(component.EDGE_WIDTH).toBe(3);
     expect(component.MIN_MARGIN).toBe(10);
     expect(component.minX).toBe(10);
-    expect(component.maxX).toBe(50);
+    expect(component.minY).toBe(10);
   });
 
   it('should return directed edge arrow points when called', () => {
@@ -212,17 +212,17 @@ describe('ResponseGraphInput', () => {
       vertices: [
         {
           x: 7.5,
-          y: 5,
+          y: 7.5,
           label: 'foo',
         },
         {
           x: 242.5,
-          y: 5,
+          y: 7.5,
           label: 'bar',
         },
         {
           x: 7.5,
-          y: 240,
+          y: 242.5,
           label: 'qux',
         },
       ],
@@ -232,7 +232,7 @@ describe('ResponseGraphInput', () => {
     expect(component.EDGE_WIDTH).toBe(3);
     expect(component.MIN_MARGIN).toBe(15);
     expect(component.minX).toBe(10);
-    expect(component.maxX).toBe(470);
+    expect(component.minY).toBe(10);
   });
 
   it('should return svg border', () => {
