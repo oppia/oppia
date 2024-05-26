@@ -752,7 +752,7 @@ def managed_acceptance_tests_server(
             output file handle.
 
     Yields:
-        psutil.Process. The jasmine testing process.
+        psutil.Process. The jest testing process.
 
     Raises:
         Exception. The suite_name is not in the list of the acceptance tests
