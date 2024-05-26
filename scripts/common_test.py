@@ -671,6 +671,41 @@ class CommonTests(test_utils.GenericTestBase):
         with sleep_swap, is_port_in_use_swap, exit_swap:
             common.wait_for_port_to_be_in_use(9999)
 
+    def test_recursive_chown_with_uid_without_gid(self) -> None:
+        def mock_os_system_call(cmd: str) -> int:
+            uid = os.getuid()
+            self.assertEqual(cmd, 'chown -R %s %s' % (uid, 'path'))
+        
+        os_system_swap = self.swap(os, 'system', mock_os_system_call)
+        with os_system_swap:
+            common.recursive_chown('path', os.getuid())
+            
+    def test_recursive_chown_with_gid_without_uid(self) -> None:
+        def mock_os_system_call(cmd: str) -> int:
+            gid = os.getgid()
+            self.assertEqual(cmd, 'chown -R :%s %s' % (gid, 'path'))
+        
+        os_system_swap = self.swap(os, 'system', mock_os_system_call)
+        with os_system_swap:
+            common.recursive_chown('path', None, os.getgid())
+            
+    def test_recursive_chown_with_uid_and_gid(self) -> None:
+        def mock_os_system_call(cmd: str) -> int:
+            uid = os.getuid()
+            gid = os.getgid()
+            self.assertEqual(
+                cmd, 'chown -R %s:%s %s' % (uid, gid, 'path'))
+        
+        os_system_swap = self.swap(os, 'system', mock_os_system_call)
+        with os_system_swap:
+            common.recursive_chown('path', os.getuid(), os.getgid())
+            
+    def test_recursive_chown_without_uid_and_gid(self) -> None:
+        error_message = (
+            'ERROR: Either uid or gid should be provided for chown.')
+        with self.assertRaisesRegex(Exception, error_message):
+            common.recursive_chown('path')
+
     def test_permissions_of_file(self) -> None:
         root_temp_dir = tempfile.mkdtemp()
         temp_dirpath = tempfile.mkdtemp(dir=root_temp_dir)

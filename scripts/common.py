@@ -517,7 +517,8 @@ def recursive_chown(
     elif gid is not None:
         chown_command += ':%s %s' % (gid, path)
     else:
-        return
+        raise Exception(
+            'ERROR: Either uid or gid should be provided for chown.')
     os.system(chown_command)
 
 
