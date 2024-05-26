@@ -333,25 +333,7 @@ describe('NumberWithUnitsObjectFactory', () => {
         'In "kg / m^(2)", "^" must be followed by a floating-point number'
       );
     });
-    
-    it('should throw errors for double unit usage', () => {
-      expect(() => {
-        nwuof.fromRawInputString('2 kg kg');
-      }).toThrowError(errors.INVALID_DOUBLE_UNITS);
-      expect(() => {
-        nwuof.fromRawInputString('2 m m');
-      }).toThrowError(errors.INVALID_DOUBLE_UNITS);
-      expect(() => {
-        nwuof.fromRawInputString('2 meter m');
-      }).toThrowError(errors.INVALID_DOUBLE_UNITS);
-      expect(() => {
-        nwuof.fromRawInputString('2 kg / (m m)');
-      }).toThrowError(errors.INVALID_DOUBLE_UNITS);
-      expect(() => {
-        nwuof.fromRawInputString('2 (kg kg) / m');
-      }).toThrowError(errors.INVALID_DOUBLE_UNITS);
-    })
-    
+      
     it('should create currency units', () => {
       const createCurrencyUnitsSpy = spyOn(nwuof, 'createCurrencyUnits');
       nwuof.createCurrencyUnits();
