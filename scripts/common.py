@@ -507,6 +507,9 @@ def recursive_chown(
         path: str. The path for which owner id and group id need to be setup.
         uid: int. Owner ID to be set.
         gid: int. Group ID to be set.
+
+    Raises:
+        Exception. Uid and gid are both None.
     """
     chown_command = 'chown -R '
 
