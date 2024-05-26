@@ -27,7 +27,7 @@ import tarfile
 
 from core.tests import test_utils
 
-from typing import Final, List
+from typing import Final, List, Optional
 
 from . import clean
 from . import common
@@ -79,7 +79,9 @@ class SetupTests(test_utils.GenericTestBase):
         ) -> None:
             self.urls.append(url)
         def mock_recursive_chown(
-            unused_path: str, unused_uid: str, unused_gid: str
+            unused_path: str,
+            unused_uid: Optional[str] = None,
+            unused_gid: Optional[str] = None
         ) -> None:
             self.check_function_calls['recursive_chown_is_called'] = True
         def mock_recursive_chmod(unused_path: str, unused_mode: str) -> None:
