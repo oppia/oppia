@@ -676,21 +676,21 @@ class CommonTests(test_utils.GenericTestBase):
             uid = os.getuid()
             self.assertEqual(cmd, 'chown -R %s %s' % (uid, 'path'))
             return 0
-        
+
         os_system_swap = self.swap(os, 'system', mock_os_system_call)
         with os_system_swap:
             common.recursive_chown('path', os.getuid())
-            
+
     def test_recursive_chown_with_gid_without_uid(self) -> None:
         def mock_os_system_call(cmd: str) -> int:
             gid = os.getgid()
             self.assertEqual(cmd, 'chown -R :%s %s' % (gid, 'path'))
             return 0
-        
+
         os_system_swap = self.swap(os, 'system', mock_os_system_call)
         with os_system_swap:
             common.recursive_chown('path', None, os.getgid())
-            
+
     def test_recursive_chown_with_uid_and_gid(self) -> None:
         def mock_os_system_call(cmd: str) -> int:
             uid = os.getuid()
@@ -698,11 +698,11 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertEqual(
                 cmd, 'chown -R %s:%s %s' % (uid, gid, 'path'))
             return 0
-        
+
         os_system_swap = self.swap(os, 'system', mock_os_system_call)
         with os_system_swap:
             common.recursive_chown('path', os.getuid(), os.getgid())
-            
+
     def test_recursive_chown_without_uid_and_gid(self) -> None:
         error_message = (
             'ERROR: Either uid or gid should be provided for chown.')
