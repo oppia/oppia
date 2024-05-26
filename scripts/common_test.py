@@ -675,6 +675,7 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_os_system_call(cmd: str) -> int:
             uid = os.getuid()
             self.assertEqual(cmd, 'chown -R %s %s' % (uid, 'path'))
+            return 0
         
         os_system_swap = self.swap(os, 'system', mock_os_system_call)
         with os_system_swap:
@@ -684,6 +685,7 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_os_system_call(cmd: str) -> int:
             gid = os.getgid()
             self.assertEqual(cmd, 'chown -R :%s %s' % (gid, 'path'))
+            return 0
         
         os_system_swap = self.swap(os, 'system', mock_os_system_call)
         with os_system_swap:
@@ -695,6 +697,7 @@ class CommonTests(test_utils.GenericTestBase):
             gid = os.getgid()
             self.assertEqual(
                 cmd, 'chown -R %s:%s %s' % (uid, gid, 'path'))
+            return 0
         
         os_system_swap = self.swap(os, 'system', mock_os_system_call)
         with os_system_swap:
