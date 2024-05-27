@@ -213,10 +213,26 @@ oppia-library-page .oppia-search-bar-container {
   padding-bottom: 60px;
   width: 100%;
 }
+
+.oppia-checkbox-filter-container {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  left: 200px;
+  position: absolute;
+  top: 100px;
+  width: 250px;
+  z-index: 10;
+}
+
 .oppia-library-no-exploration-groups {
   margin: 150px auto;
 }
 @media (min-width: 630px) {
+  .oppia-checkbox-filter-container {
+    max-width: 100%;
+  }
   .oppia-library-h1 {
     font-size: 2.5em;
   }
@@ -233,9 +249,37 @@ oppia-library-page .oppia-search-bar-container {
     font-size: 1.05em;
   }
 }
+@media (max-width: 1720px) {
+  .oppia-checkbox-filter-container {
+    left: 0;
+    margin-bottom: 20px;
+    max-width: 300px;
+    position: relative;
+    top: 0;
+    width: 100%;
+  }
+}
+@media (max-width: 1440px) {
+  .oppia-checkbox-filter-container {
+    left: 0;
+    margin-bottom: 20px;
+    max-width: 300px;
+    position: relative;
+    top: 0;
+    width: 100%;
+  }
+}
 @media (max-width: 1126px) {
   oppia-library-page .oppia-classroom-div {
     margin-top: 100px;
+  }
+  .oppia-checkbox-filter-container {
+    left: 0;
+    margin-bottom: 20px;
+    max-width: 300px;
+    position: relative;
+    top: 0;
+    width: 100%;
   }
 }
 @media (max-width: 900px) {
@@ -252,6 +296,14 @@ oppia-library-page .oppia-search-bar-container {
   oppia-library-page .oppia-classroom-div > img {
     height: 80%;
     transform: translateY(35px);
+  }
+  .oppia-checkbox-filter-container {
+    left: 0;
+    margin-bottom: 20px;
+    max-width: 300px;
+    position: relative;
+    top: 0;
+    width: 100%;
   }
 }
 @media (max-width: 727px) {
@@ -273,8 +325,19 @@ oppia-library-page .oppia-search-bar-container {
     right: 10px;
     transform: translateY(45px);
   }
+  .oppia-checkbox-filter-container {
+    left: 0;
+    margin-bottom: 20px;
+    max-width: 300px;
+    position: relative;
+    top: 0;
+    width: 100%;
+  }
 }
 @media (max-width: 536px) {
+  .oppia-checkbox-filter-container {
+    max-width: 100%;
+  }
   .oppia-library-group-header {
     font-size: 1.2em;
     margin-left: 7%;
@@ -312,6 +375,9 @@ oppia-library-page .oppia-search-bar-container {
   oppia-library-page .oppia-classroom-p {
     font-size: 0.85em;
   }
+  .oppia-checkbox-filter-container {
+    max-width: 100%;
+  }
 }
 @media (max-width: 344px) {
   oppia-library-page .oppia-classroom-div > img {
@@ -320,6 +386,9 @@ oppia-library-page .oppia-search-bar-container {
   }
   oppia-library-page .oppia-classroom-text > a {
     margin-top: 40px;
+  }
+  .oppia-checkbox-filter-container {
+    max-width: 100%;
   }
 }
 oppia-library-page .oppia-exp-summary-tiles-container {

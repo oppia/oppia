@@ -18,6 +18,7 @@
 
 import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable, EventEmitter} from '@angular/core';
+import {Subject} from 'rxjs';
 
 import {
   SearchBackendApiService,
@@ -67,7 +68,36 @@ export class SearchService {
 
   public numSearchesInProgress = 0;
 
+  public selectionDetails: SelectionDetails = {
+    categories: {
+      description: '',
+      itemsName: 'categories',
+      masterList: [], // Should be initialized by the component.
+      selections: {},
+      numSelections: 0,
+      summary: '',
+    },
+    languageCodes: {
+      description: '',
+      itemsName: 'languages',
+      masterList: [], // Should be initialized by the component.
+      selections: {},
+      numSelections: 0,
+      summary: '',
+    },
+  };
+
+  private searchTrigger = new Subject<void>();
+
   constructor(private _searchBackendApiService: SearchBackendApiService) {}
+
+  // Observable for search trigger.
+  searchTriggered$ = this.searchTrigger.asObservable();
+
+  // Method to trigger search.
+  triggerSearch(): void {
+    this.searchTrigger.next();
+  }
 
   private _getSuffixForQuery(
     selectedCategories: SelectionList,

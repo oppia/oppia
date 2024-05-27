@@ -4,7 +4,10 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 oppia-learner-view-info .oppia-navbar-breadcrumb {
-  padding-top: 10px;
+  padding-top: 18px;
+}
+.oppia-navbar-breadcrumb-separator.second-separator {
+  margin-left: 5px;
 }
 oppia-learner-view-info .oppia-learner-navbar-container {
   display: flex;
@@ -19,7 +22,7 @@ oppia-learner-view-info .oppia-navbar-title-container {
 oppia-learner-view-info .oppia-exploration-h1 {
   color: #fff;
   display: inline;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: normal;
   margin-bottom: 1px;
 }

@@ -2,12 +2,6 @@
   <form class="search-bar-float-left oppia-search-bar-form" role="search">
     <div class="form-group">
       <div class="input-group oppia-input-group inptcls" [ngClass]="{'classroom-page-input-group': isSearchButtonActive()}">
-        <div class="input-group-addon oppia-search-bar-icon">
-          <i class="fas fa-search oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()"></i>
-          <span *ngIf="isSearchInProgress()">
-            <i class="fas fa-sync oppia-animate-spin"></i>
-          </span>
-        </div>
         <input type="text"
                class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
                [placeholder]="searchBarPlaceholder"
@@ -17,11 +11,18 @@
                aria-label="Search bar"
                (keydown.enter)="$event.target.blur(); onSearchQueryChangeExec()"
                (input)="searchToBeExec($event)">
+        <div class="input-group-addon oppia-search-bar-icon">
+          <i class="fas fa-search oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()"></i>
+          <span *ngIf="isSearchInProgress()">
+            <i class="fas fa-sync oppia-animate-spin"></i>
+          </span>
+        </div>
       </div>
     </div>
   </form>
 </div>
 
+<!--
 <div class="oppia-same-row-container">
   <div [ngClass]="{'open' : activeMenuName === 'category', 'dropup' : enableDropup}"
        ngbDropdown
@@ -228,6 +229,7 @@
       </ng-container>
     </ul>
   </div>
+
   <div class="oppia-same-row-container">
     <div class="search-bar-float-left oppia-navbar-button-container">
       <div *ngIf="searchButtonIsActive"
@@ -240,7 +242,8 @@
       </div>
     </div>
   </div>
-</div>
+ </div>
+-->
 <style>
   :lang(ar) .oppia-search-bar-dropdown-toggle-button:after {
      margin-right: 30px;
@@ -248,11 +251,17 @@
   :lang(ar) .oppia-search-bar-dropdown-toggle:after {
     margin-right: 2px;
   }
-  @media (max-width: 445px) {
+
+.classroom-page-input-group.inptcls {
+    font-size: 15.7px;
+    width: 40em;
+ }
+
+@media (max-width: 445px) {
 
 .classroom-page-input-group.inptcls {
       font-size: 15.7px;
-      width: 14em;
+      width: 40em;
  }
 
 /* stylelint-disable order/properties-alphabetical-order */

@@ -1,0 +1,69 @@
+.oppia-library-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.oppia-checkbox-filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-right: 20px;
+}
+
+.filter-box {
+  background-color: white;
+  border: 2px solid #8f8f8f;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: auto;
+  padding: 16px;
+  width: 250px;
+}
+
+.filter-box h3 {
+  color: #333;
+  font-size: 16px;
+  font-weight: normal;
+  margin: 0 0 10px 0;
+}
+
+.custom-divider {
+  border: none;
+  border-top: 1px solid #000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 10px 0;
+}
+
+.checkbox-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.filter-box mat-checkbox {
+  width: 100%;
+}
+
+.filter-box .custom-arrow {
+  color: #00645c;
+  font-size: 14px;
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.filter-box .custom-link {
+  color: #00645c;
+  cursor: pointer;
+  display: inline;
+  font-size: 14px;
+  font-weight: normal;
+  margin-top: 10px;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.filter-box .custom-link:hover {
+  color: #00645c;
+}

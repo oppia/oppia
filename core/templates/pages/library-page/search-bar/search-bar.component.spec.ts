@@ -28,7 +28,7 @@ import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api
 import {FormsModule} from '@angular/forms';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {TranslateService} from '@ngx-translate/core';
-import {SearchService, SelectionDetails} from 'services/search.service';
+import {SearchService} from 'services/search.service';
 import {ConstructTranslationIdsService} from 'services/construct-translation-ids.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -226,6 +226,12 @@ describe('Search bar component', () => {
     expect(component.searchButtonIsActive).toBe(false);
   });
 
+  it('should update selection details if there are no selections', () => {
+    spyOn(translateService, 'instant').and.returnValue('key');
+    component.updateSelectionDetails('categories');
+    expect(component.selectionDetails.categories.numSelections).toEqual(0);
+  });
+
   it(
     'should update selection details if selected languages' +
       ' are greater than zero',
@@ -233,7 +239,7 @@ describe('Search bar component', () => {
       expect(component.selectionDetails.languageCodes.description).toEqual(
         'I18N_LIBRARY_ALL_LANGUAGES_SELECTED'
       );
-      component.selectionDetails = selectionDetailsStub;
+      searchService.selectionDetails = selectionDetailsStub;
       spyOn(translateService, 'instant').and.returnValue('English');
       component.updateSelectionDetails('languageCodes');
       expect(component.selectionDetails.languageCodes.description).toEqual(
@@ -241,12 +247,6 @@ describe('Search bar component', () => {
       );
     }
   );
-
-  it('should update selection details if there are no selections', () => {
-    spyOn(translateService, 'instant').and.returnValue('key');
-    component.updateSelectionDetails('categories');
-    expect(component.selectionDetails.categories.numSelections).toEqual(0);
-  });
 
   it('should search', () => {
     component.searchButtonIsActive = true;
@@ -261,6 +261,12 @@ describe('Search bar component', () => {
     component.searchButtonIsActive = false;
     component.searchToBeExec(search);
     expect(component.searchQueryChanged.next).toHaveBeenCalled();
+  });
+
+  it('should be triggered by search service to make a search', () => {
+    spyOn(component, 'onSearchQueryChangeExec');
+    searchService.triggerSearch();
+    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
   });
 
   it('should open submenu', () => {
@@ -285,24 +291,6 @@ describe('Search bar component', () => {
     // @ts-ignore
     component.onMenuKeypress(null, null, null);
     expect(component.activeMenuName).toEqual(activeMenuName);
-  });
-
-  it('should toggle selection', () => {
-    spyOn(component, 'updateSelectionDetails');
-    spyOn(component, 'refreshSearchBarLabels');
-    component.toggleSelection('categories', 'id_1');
-    component.toggleSelection('categories', 'id_1');
-    expect(component.updateSelectionDetails).toHaveBeenCalled();
-    expect(component.refreshSearchBarLabels).toHaveBeenCalled();
-  });
-
-  it('should deselectAll', () => {
-    spyOn(component, 'updateSelectionDetails');
-    spyOn(component, 'refreshSearchBarLabels');
-    component.deselectAll('categories');
-    expect(component.selectionDetails.categories.selections).toEqual({});
-    expect(component.updateSelectionDetails).toHaveBeenCalled();
-    expect(component.refreshSearchBarLabels).toHaveBeenCalled();
   });
 
   it('should handle search query change with language param in URL', () => {
@@ -451,6 +439,14 @@ describe('Search bar component', () => {
     expect(component.searchDropdownCategories()).toBeDefined();
   });
 
+  it('should update selected details', () => {
+    spyOn(component, 'updateSelectionDetails');
+    searchService.selectionDetails.categories.selections.id_1 = true;
+    component.updateSelectionDetails('categories');
+    component.updateSelectionDetails('categories');
+    expect(component.updateSelectionDetails).toHaveBeenCalled();
+  });
+
   it('should initialize', () => {
     spyOn(component, 'searchDropdownCategories').and.returnValue([]);
     spyOn(languageUtilService, 'getLanguageIdsAndTexts').and.returnValue([]);
@@ -488,6 +484,7 @@ describe('Search bar component', () => {
         };
       },
     } as Subject<string>;
+
     component.ngOnInit();
     expect(component.searchDropdownCategories).toHaveBeenCalled();
     expect(languageUtilService.getLanguageIdsAndTexts).toHaveBeenCalled();

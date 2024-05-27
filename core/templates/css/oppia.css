@@ -930,8 +930,8 @@ textarea {
   color: #fff;
   cursor: default;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 20px;
-  padding-top: 13px;
+  font-size: 14px;
+  padding-top: 18px;
 }
 
 .oppia-navbar-breadcrumb li {

@@ -1,5 +1,13 @@
 <oppia-angular-root *ngIf="pageIsShown">
   <oppia-base-content>
+    <navbar-breadcrumb>
+      <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+        <li>
+          <span class="oppia-navbar-breadcrumb-separator"></span>
+          <span>{{ 'I18N_CLASSROOM_MATH_TITLE' | translate }}</span>
+        </li>
+      </ul>
+    </navbar-breadcrumb>
 
     <content>
       <oppia-classroom-page></oppia-classroom-page>

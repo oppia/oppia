@@ -1,0 +1,96 @@
+<div class="modal-header">
+  <h2 class="modal-title">Languages</h2>
+  <button type="button" class="close" (click)="closeModal()">&times;</button>
+</div>
+<div class="modal-body">
+  <div class="checkbox-container">
+    <h3>Select options</h3>
+    <div class="subjects-grid">
+      <mat-checkbox class="oppia-checkbox"
+                    *ngFor="let option of selectionDetails.languageCodes.masterList"
+                    [ngModel]="tempSelectionDetails.languageCodes.selections[option.id]"
+                    (ngModelChange)="toggleSelection('languageCodes', option.id)">
+              {{ option.text }}
+      </mat-checkbox>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="clearAll()">Clear all</button>
+  <button type="button" class="btn btn-success" (click)="applySelections()">Save</button>
+</div>
+
+<style>
+  .modal-header {
+    align-items: flex-start;
+    background-color: #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 20px 10px 20px;
+  }
+  .modal-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0;
+  }
+  .modal-body {
+    background-color: #e0e0e0;
+    padding: 20px;
+  }
+  .checkbox-container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  .checkbox-container h3 {
+    color: #a0a0a0;
+    font-weight: normal;
+    margin-top: 0;
+    padding-top: 0;
+  }
+  .subjects-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .oppia-checkbox {
+    align-items: center;
+    display: flex;
+    font-weight: normal;
+    margin-bottom: 10px;
+  }
+  .modal-footer {
+    background-color: #e0e0e0;
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px;
+  }
+  .btn-outline-secondary {
+    border: 1px solid #00645c;
+    color: #00645c;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-right: 15px;
+    padding: 8px 16px;
+  }
+  .btn-success {
+    background-color: #00645c;
+    color: #fff;
+    font-size: 2rem;
+    padding: 8px 16px;
+  }
+  .close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 3rem;
+  }
+  .modal {
+    margin: auto;
+    max-width: 2000px;
+    width: 100%;
+  }
+</style>

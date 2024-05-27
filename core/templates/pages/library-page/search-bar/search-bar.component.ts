@@ -59,7 +59,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   ACTION_OPEN!: string;
   ACTION_CLOSE!: string;
   SUPPORTED_CONTENT_LANGUAGES!: LanguageIdAndText[];
-  selectionDetails!: SelectionDetails;
   SEARCH_DROPDOWN_CATEGORIES!: SearchDropDownCategories[];
   KEYBOARD_EVENT_TO_KEY_CODES!: {};
   directiveSubscriptions: Subscription = new Subscription();
@@ -69,6 +68,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   searchQueryChanged: Subject<string> = new Subject<string>();
   translationData: Record<string, number> = {};
   activeMenuName: string = '';
+  private searchTriggerSub: Subscription;
   @Input() enableDropup: boolean = false;
 
   constructor(
@@ -87,6 +87,12 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       .getPathname()
       .startsWith('/learn');
     this.isSearchButtonActive();
+
+    this.searchTriggerSub = this.searchService.searchTriggered$.subscribe(
+      () => {
+        this.onSearchQueryChangeExec(); // Execute search when triggered.
+      }
+    );
   }
 
   isMobileViewActive(): boolean {
@@ -142,20 +148,21 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   // Update the description, numSelections and summary fields of the
   // relevant entry of selectionDetails.
   updateSelectionDetails(itemsType: string): void {
-    let itemsName = this.selectionDetails[itemsType].itemsName;
-    let masterList = this.selectionDetails[itemsType].masterList;
+    let selectionDetails = this.selectionDetails;
+    let itemsName = selectionDetails[itemsType].itemsName;
+    let masterList = selectionDetails[itemsType].masterList;
 
     let selectedItems = [];
     for (let i = 0; i < masterList.length; i++) {
-      if (this.selectionDetails[itemsType].selections[masterList[i].id]) {
+      if (selectionDetails[itemsType].selections[masterList[i].id]) {
         selectedItems.push(masterList[i].text);
       }
     }
 
     let totalCount = selectedItems.length;
-    this.selectionDetails[itemsType].numSelections = totalCount;
+    selectionDetails[itemsType].numSelections = totalCount;
 
-    this.selectionDetails[itemsType].summary =
+    selectionDetails[itemsType].summary =
       totalCount === 0
         ? 'I18N_LIBRARY_ALL_' + itemsName.toUpperCase()
         : totalCount === 1
@@ -168,41 +175,24 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       for (let i = 0; i < selectedItems.length; i++) {
         translatedItems.push(this.translateService.instant(selectedItems[i]));
       }
-      this.selectionDetails[itemsType].description = translatedItems.join(', ');
+      selectionDetails[itemsType].description = translatedItems.join(', ');
     } else {
-      this.selectionDetails[itemsType].description =
+      selectionDetails[itemsType].description =
         'I18N_LIBRARY_ALL_' + itemsName.toUpperCase() + '_SELECTED';
     }
   }
 
-  toggleSelection(itemsType: string, optionName: string): void {
-    let selections = this.selectionDetails[itemsType].selections;
-    if (!selections.hasOwnProperty(optionName)) {
-      selections[optionName] = true;
-    } else {
-      selections[optionName] = !selections[optionName];
-    }
-
-    this.updateSelectionDetails(itemsType);
-    this.refreshSearchBarLabels();
-  }
-
-  deselectAll(itemsType: string): void {
-    this.selectionDetails[itemsType].selections = {};
-    this.updateSelectionDetails(itemsType);
-    this.refreshSearchBarLabels();
-  }
-
   onSearchQueryChangeExec(): void {
+    let selectionDetails = this.selectionDetails;
     let searchUrlQueryString = this.searchService.getSearchUrlQueryString(
       this.searchQuery,
-      this.selectionDetails.categories.selections,
-      this.selectionDetails.languageCodes.selections
+      selectionDetails.categories.selections,
+      selectionDetails.languageCodes.selections
     );
     this.searchService.executeSearchQuery(
       this.searchQuery,
-      this.selectionDetails.categories.selections,
-      this.selectionDetails.languageCodes.selections,
+      selectionDetails.categories.selections,
+      selectionDetails.languageCodes.selections,
       () => {
         let url = new URL(this.windowRef.nativeWindow.location.toString());
         let siteLangCode: string | null = url.searchParams.get('lang');
@@ -224,12 +214,13 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   updateSearchFieldsBasedOnUrlQuery(): void {
-    this.selectionDetails.categories.selections = {};
-    this.selectionDetails.languageCodes.selections = {};
+    let selectionDetails = this.selectionDetails;
+    selectionDetails.categories.selections = {};
+    selectionDetails.languageCodes.selections = {};
 
     let newQuery = this.searchService.updateSearchFieldsBasedOnUrlQuery(
       this.windowRef.nativeWindow.location.search,
-      this.selectionDetails
+      selectionDetails
     );
 
     if (this.searchQuery !== newQuery) {
@@ -248,17 +239,18 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     // would generate FOUC for languages other than English. As an
     // exception, we translate them here and update the translation
     // every time the language is changed.
+    let selectionDetails = this.selectionDetails;
     this.searchBarPlaceholder = this.translateService.instant(
       'I18N_LIBRARY_SEARCH_PLACEHOLDER'
     );
     // 'messageformat' is the interpolation method for plural forms.
     // http://angular-translate.github.io/docs/#/guide/14_pluralization.
     this.categoryButtonText = this.translateService.instant(
-      this.selectionDetails.categories.summary,
+      selectionDetails.categories.summary,
       {...this.translationData, messageFormat: true}
     );
     this.languageButtonText = this.translateService.instant(
-      this.selectionDetails.languageCodes.summary,
+      selectionDetails.languageCodes.summary,
       {...this.translationData, messageFormat: true}
     );
   }
@@ -275,6 +267,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     });
   }
 
+  get selectionDetails(): SelectionDetails {
+    return this.searchService.selectionDetails;
+  }
+
   ngOnInit(): void {
     this.SEARCH_DROPDOWN_CATEGORIES = this.searchDropdownCategories();
     this.KEYBOARD_EVENT_TO_KEY_CODES =
@@ -283,7 +279,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.ACTION_CLOSE = this.navigationService.ACTION_CLOSE;
     this.SUPPORTED_CONTENT_LANGUAGES =
       this.languageUtilService.getLanguageIdsAndTexts();
-    this.selectionDetails = {
+    this.searchService.selectionDetails = {
       categories: {
         description: '',
         itemsName: 'categories',
@@ -302,11 +298,13 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       },
     };
 
+    let selectionDetails = this.selectionDetails;
+
     // Non-translatable parts of the html strings, like numbers or user
     // names.
     this.translationData = {};
     // Initialize the selection descriptions and summaries.
-    for (let itemsType in this.selectionDetails) {
+    for (let itemsType in selectionDetails) {
       this.updateSelectionDetails(itemsType);
     }
 
@@ -323,7 +321,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.subscribe(
         preferredLanguageCodesList => {
           preferredLanguageCodesList.forEach(languageCode => {
-            let selections = this.selectionDetails.languageCodes.selections;
+            let selections = selectionDetails.languageCodes.selections;
             if (!selections.hasOwnProperty(languageCode)) {
               selections[languageCode] = true;
             } else {
@@ -331,7 +329,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
             }
           });
 
-          let selections = this.selectionDetails.languageCodes.selections;
+          let selections = selectionDetails.languageCodes.selections;
           selections[
             this.i18nLanguageCodeService.getCurrentI18nLanguageCode()
           ] = true;

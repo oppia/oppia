@@ -91,6 +91,7 @@ export class LibraryPageComponent {
   libraryWindowIsNarrow!: boolean;
   mobileLibraryGroupsProperties!: MobileLibraryGroupProperties[];
   pageMode!: string;
+  displayedCollectionTags: string[] = [...AppConstants.ALL_CATEGORIES];
 
   constructor(
     private loggerService: LoggerService,
