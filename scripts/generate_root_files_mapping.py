@@ -20,12 +20,17 @@ import os
 import subprocess
 
 from scripts import common
+from scripts import run_typescript_checks
+
+TEST_DEPENDENCIES_TSCONFIG_FILEPATH = 'tsconfig.test-dependencies.json'
 
 
 def main() -> None:
     """Generates a mapping of files and their root files.""" 
 
-    common.compile_typescript_test_dependencies()
+    run_typescript_checks.compile_and_check_typescript(
+        TEST_DEPENDENCIES_TSCONFIG_FILEPATH)
+        
     print('Generating root files mapping...')
     root_files_mapping_generator_path = os.path.join(
         'core', 'tests', 'test-dependencies', 'root-files-mapping-generator.js')

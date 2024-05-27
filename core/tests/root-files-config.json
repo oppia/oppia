@@ -111,7 +111,8 @@
     "extensions/interactions/interactions-extension.constants.ajs.ts",
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-short-response.component.html",
     "extensions/objects/templates/svg-editor.constants.ajs.ts",
-    "extensions/rich_text_components/README.md"
+    "extensions/rich_text_components/README.md",
+    "core/tests/ci-test-suite-configs/README.md"
   ],
   "RUN_ALL_TESTS_ROOT_FILES": [
     "core/templates/pages/oppia-root/index.ts",
