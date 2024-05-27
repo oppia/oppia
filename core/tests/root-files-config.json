@@ -111,6 +111,7 @@
     "extensions/interactions/interactions-extension.constants.ajs.ts",
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-short-response.component.html",
     "extensions/objects/templates/svg-editor.constants.ajs.ts",
+    "core/templates/components/forms/schema-based-editors/schema-based-expression-editor.component.ts",
     "extensions/rich_text_components/README.md",
     "core/tests/ci-test-suite-configs/README.md"
   ],
