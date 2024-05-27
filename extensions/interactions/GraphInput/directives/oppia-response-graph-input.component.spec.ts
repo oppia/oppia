@@ -84,7 +84,7 @@ describe('ResponseGraphInput', () => {
     '          "label": "foo"' +
     '      },' +
     '      {' +
-    '          "x": 480,' +
+    '          "x": 605,' +
     '          "y": 10,' +
     '          "label": "bar"' +
     '      },' +
@@ -211,18 +211,18 @@ describe('ResponseGraphInput', () => {
       isDirected: false,
       vertices: [
         {
-          x: 7.5,
-          y: 7.5,
+          x: 6,
+          y: 6,
           label: 'foo',
         },
         {
-          x: 242.5,
-          y: 7.5,
+          x: 244,
+          y: 6,
           label: 'bar',
         },
         {
-          x: 7.5,
-          y: 242.5,
+          x: 6,
+          y: 194,
           label: 'qux',
         },
       ],
