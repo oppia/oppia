@@ -1,0 +1,68 @@
+{
+  "suites": [
+    {
+      "name": "blog-admin-tests/assign-roles-to-users-and-change-tag-properties",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.ts"
+    },
+    {
+      "name": "blog-editor-tests/try-to-publish-a-duplicate-blog-post-and-get-blocked",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/blog-editor-tests/try-to-publish-a-duplicate-blog-post-and-get-blocked.spec.ts"
+    },
+    {
+      "name": "curriculum-admin-tests/create-and-publish-topics-and-stories",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/curriculum-admin-tests/create-and-publish-topics-and-stories.spec.ts"
+    },
+    {
+      "name": "exploration-editor-tests/load-complete-and-restart-exploration-preview",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/exploration-editor-tests/load-complete-and-restart-exploration-preview.spec.ts"
+    },
+    {
+      "name": "exploration-editor-tests/create-exploration-and-change-basic-settings",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/exploration-editor-tests/create-exploration-and-change-basic-settings.spec.ts"
+    },
+    {
+      "name": "logged-in-user-tests/click-all-buttons-on-about-page",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/logged-in-user-tests/click-all-buttons-on-about-page.spec.ts"
+    },
+    {
+      "name": "logged-in-user-tests/click-all-buttons-on-about-foundation-page",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/logged-in-user-tests/click-all-buttons-on-about-foundation-page.spec.ts"
+    },
+    {
+      "name": "logged-in-user-tests/click-all-buttons-on-thanks-for-donating-page",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/logged-in-user-tests/click-all-buttons-on-thanks-for-donating-page.spec.ts"
+    },
+    {
+      "name": "logged-in-user-tests/click-all-buttons-on-navbar",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/logged-in-user-tests/click-all-buttons-on-navbar.spec.ts"
+    },
+    {
+      "name": "logged-in-user-tests/click-all-links-in-about-oppia-footer",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/logged-in-user-tests/click-all-links-in-about-oppia-footer.spec.ts"
+    },
+    {
+      "name": "logged-in-user-tests/click-all-links-on-get-started-page",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/logged-in-user-tests/click-all-links-on-get-started-page.spec.ts"
+    },
+    {
+      "name": "practice-question-admin-tests/add-and-remove-contribution-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/practice-question-admin-tests/add-and-remove-contribution-rights.spec.ts"
+    },
+    {
+      "name": "translation-admin-tests/add-translation-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/translation-admin-tests/add-translation-rights.spec.ts"
+    },
+    {
+      "name": "translation-admin-tests/remove-translation-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/translation-admin-tests/remove-translation-rights.spec.ts"
+    },
+    {
+      "name": "voiceover-admin-tests/add-voiceover-artist-to-an-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/voiceover-admin-tests/add-voiceover-artist-to-an-exploration.spec.ts"
+    },
+    {
+      "name": "logged-in-user-tests/subscribe-to-creator-and-view-all-explorations-by-that-creator",
+      "module": "core/tests/puppeteer-acceptance-tests/spec/logged-in-user-tests/subscribe-to-creator-and-view-all-explorations-by-that-creator.spec.ts"
+    }
+  ]
+}
