@@ -79,7 +79,6 @@
     "core/templates/pages/contributor-dashboard-page/contributor-dashboard-page.constants.ajs.ts",
     "core/templates/pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts",
     "core/templates/pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts",
-    "core/templates/pages/exploration-editor-page/editor-tab/graph-directives/state-graph-visualization.directive.html",
     "core/templates/pages/exploration-player-page/new-lesson-player/README.md",
     "core/templates/pages/exploration-player-page/new-lesson-player/lesson-player-page.constants.ts",
     "core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.constants.ajs.ts",
