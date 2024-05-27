@@ -4797,7 +4797,7 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
         ):
             self.checker_test_object.checker.visit_binop(expression_node)
 
-    def test_concatenation_of_string_variables(self) -> None:
+    def test_encourages_interpolation_for_string_variable_concatenation(self) -> None: # pylint: disable=line-too-long
         node = astroid.extract_node(
             """
             var1 = 'Super'
@@ -4816,7 +4816,7 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
         ):
             self.checker_test_object.checker.visit_binop(expression_node)
 
-    def test_addition(self) -> None:
+    def test_does_not_encourage_string_interpolation_for_addition(self) -> None: # pylint: disable=line-too-long
         node = astroid.extract_node(
             """
             total = 5 + 5 #@
@@ -4826,7 +4826,7 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_binop(expression_node)
 
-    def test_one_side_string_concatenation(self) -> None:
+    def test_does_not_encourage_string_interpolation_for_one_side_string_concatenation(self) -> None: # pylint: disable=line-too-long
         node = astroid.extract_node(
             """
             result = 'super' + 500 #@
@@ -4836,7 +4836,7 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_binop(expression_node)
 
-    def test_infererence_error(self) -> None:
+    def test_does_not_encourage_string_interpolation_with_undefined_variable(self) -> None: # pylint: disable=line-too-long
         node = astroid.extract_node(
             """
             undefined_var + 'somthing here' #@
@@ -4845,7 +4845,7 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_binop(node)
 
-    def test_datetime_concatenation(self) -> None:
+    def test_does_not_encourage_string_interpolation_with_datetime_concatenation(self) -> None: # pylint: disable=line-too-long
         node = astroid.extract_node(
         """
         from datetime import datetime, timedelta
