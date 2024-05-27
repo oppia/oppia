@@ -80,7 +80,6 @@
     "core/templates/pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts",
     "core/templates/pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts",
     "core/templates/pages/exploration-editor-page/editor-tab/graph-directives/state-graph-visualization.directive.html",
-    "core/templates/pages/exploration-editor-page/statistics-tab/templates/playthrough-modal.template.html",
     "core/templates/pages/exploration-player-page/new-lesson-player/README.md",
     "core/templates/pages/exploration-player-page/new-lesson-player/lesson-player-page.constants.ts",
     "core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.constants.ajs.ts",
@@ -105,6 +104,7 @@
     "extensions/classifiers/winnowing-preprocessing.service.ts",
     "extensions/interactions/interactions-extension.constants.ajs.ts",
     "extensions/objects/templates/svg-editor.constants.ajs.ts",
+    "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-short-response.component.html",
     "extensions/rich_text_components/README.md",
     "core/tests/ci-test-suite-configs/README.md"
   ],
