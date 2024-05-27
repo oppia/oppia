@@ -1,0 +1,56 @@
+<div class="modal-header">
+  <h3 *ngIf="topicsAssignmentsAreFetched">
+    Are you sure you want to copy the question from this skill?
+  </h3>
+  <h3 *ngIf="!topicsAssignmentsAreFetched">
+    Checking whether the question can be copied ...
+  </h3>
+</div>
+<div class="loading-spinner" *ngIf="!topicsAssignmentsAreFetched">
+  <mat-spinner [diameter]="30"></mat-spinner>
+</div>
+<div class="modal-body" *ngIf="topicsAssignmentsAreFetched">
+  <div *ngIf="!canEditQuestion">
+    <p>User does not have enough rights to copy the question.</p>
+  </div>
+  <div *ngIf="canEditQuestion">
+    <p>
+      Deep Copy - Create a perfect copy of the selected question, including
+      the layout of the elements in it as well as the content it contains.
+    </p>
+    <p>
+      Layout Copy - Create a copy of the selected question, but only keeping
+      the interaction type, then opens the editor with a valid question state 
+      to change the default values.
+    </p>
+  </div>
+</div>
+<div class="modal-footer" *ngIf="topicsAssignmentsAreFetched">
+  <button class="btn btn-success " (click)="confirm(1)" >Deep Copy</button>
+  <button class="btn btn-info" (click)="confirm(2)" >Layout Copy</button>
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+</div>
+  
+  <style>
+    .loading-spinner {
+      margin-left: 45%;
+    }
+    @media screen and (max-width: 768px) {
+      .remove-question-skill-link-modal .modal-dialog {
+        border: 0;
+        border-radius: 0;
+        margin: 0 auto;
+        padding: 0;
+        width: 95vw;
+      }
+      .remove-question-skill-link-modal .modal-header {
+        display: inline-block;
+        padding: 10px 15px;
+      }
+      .remove-question-skill-link-modal .modal-content {
+        border: 0;
+        border-radius: 0;
+        top: 20vh;
+      }
+    }
+  </style>

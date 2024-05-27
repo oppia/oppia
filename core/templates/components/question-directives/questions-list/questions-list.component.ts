@@ -68,7 +68,10 @@ import {LoggerService} from 'services/contextual/logger.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {RemoveQuestionSkillLinkModalComponent} from '../modal-templates/remove-question-skill-link-modal.component';
+import {DuplicateQuestionSkillLinkModalComponent} from '../modal-templates/duplicate-question-skill-link-modal.component';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { error } from 'selenium-webdriver';
+import { Hint } from 'domain/exploration/hint-object.model';
 
 interface GroupedSkillSummaries {
   current: SkillSummaryBackendDict[];
@@ -92,6 +95,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
   associatedSkillSummaries: ShortSkillSummary[];
   deletedQuestionIds: string[];
+  duplicatedQuestionIds: string[];
   difficulty: number;
   difficultyCardIsShown: boolean;
   editorIsOpen: boolean;
@@ -373,6 +377,177 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     );
 
     this.updateSkillLinkage();
+  }
+
+  deepCopyQuestion(
+    questionId: string,
+    skillDescription: string,
+    difficulty: number
+  ):void{
+    this.newQuestionSkillIds = [this.selectedSkillId];
+    this.linkedSkillsWithDifficulty = [];
+    this.newQuestionSkillIds.forEach(skillId => {
+      this.linkedSkillsWithDifficulty.push(
+        SkillDifficulty.create(skillId, skillDescription, difficulty)
+      );
+    });
+    this.difficulty = difficulty;
+    this.newQuestionSkillDifficulties = [difficulty];
+    this.misconceptionsBySkill = {};
+    this.associatedSkillSummaries = [];
+    this.editableQuestionBackendApiService
+      .fetchQuestionAsync(questionId)
+      .then(
+        response => {
+          if (response.associated_skill_dicts) {
+            response.associated_skill_dicts.forEach(skillDict => {
+              this.misconceptionsBySkill[skillDict.id] =
+                skillDict.misconceptions.map(misconception => {
+                  return this.misconceptionObjectFactory.createFromBackendDict(
+                    misconception
+                  );
+                });
+              this.associatedSkillSummaries.push(
+                ShortSkillSummary.create(skillDict.id, skillDict.description)
+              );
+            });
+          }
+          this.question = cloneDeep(response.questionObject);
+
+          this.questionId = this.question.getId();
+          this.questionStateData = this.question.getStateData();
+          this.questionIsBeingUpdated = false;
+          this.newQuestionIsBeingCreated = true;
+          var newName = this.question._stateData.content.html.replace('<p>', '').replace('</p>', '');
+          this.question._stateData.content.html = this.transformNameToCopy(newName);
+          this.saveAndPublishQuestion('Duplicate of ' + questionId); 
+        },
+        errorResponse => {
+          this.alertsService.addWarning(
+            errorResponse.error || 'Failed to fetch question.'
+          );
+        }
+      );
+  }
+
+  layoutCopyQuestion(
+    questionId: string,
+    skillDescription: string,
+    difficulty: number
+  ):void{
+    this.newQuestionSkillIds = [this.selectedSkillId];
+    this.linkedSkillsWithDifficulty = [];
+    this.newQuestionSkillIds.forEach(skillId => {
+      this.linkedSkillsWithDifficulty.push(
+        SkillDifficulty.create(skillId, skillDescription, difficulty)
+      );
+    });
+    this.difficulty = difficulty;
+    this.newQuestionSkillDifficulties = [difficulty];
+    this.misconceptionsBySkill = {};
+    this.associatedSkillSummaries = [];
+    this.editableQuestionBackendApiService
+      .fetchQuestionAsync(questionId)
+      .then(
+        response => {
+          if (response.associated_skill_dicts) {
+            response.associated_skill_dicts.forEach(skillDict => {
+              this.misconceptionsBySkill[skillDict.id] =
+                skillDict.misconceptions.map(misconception => {
+                  return this.misconceptionObjectFactory.createFromBackendDict(
+                    misconception
+                  );
+                });
+              this.associatedSkillSummaries.push(
+                ShortSkillSummary.create(skillDict.id, skillDict.description)
+              );
+            });
+          }
+          this.question = cloneDeep(response.questionObject);
+          this.questionId = this.question.getId();
+          this.questionStateData = this.question.getStateData();
+          this.questionIsBeingUpdated = false;
+          this.newQuestionIsBeingCreated = true;
+          console.log(this.question);
+          this.openQuestionEditor();
+          var newName = this.question._stateData.content.html.replace('<p>', '').replace('</p>', '');
+          this.question._stateData.content.html = this.transformNameToCopy(newName);
+          try{
+            this.question._stateData.interaction.solution.explanation.html = "<p>solution reset</p>"
+          }finally{
+            var hintCounter = 1;
+            this.question._stateData.interaction.hints.forEach(hint => {
+            hint.hintContent._html = '<p>hint '+hintCounter+'</p>';
+            hintCounter++; 
+          })
+          }
+        },
+        errorResponse => {
+          this.alertsService.addWarning(
+            errorResponse.error || 'Failed to fetch question.'
+          );
+        }
+      );
+  }
+
+  duplicateQuestionSkillLinkAsync(
+    type: number,
+    questionId: string,
+    skillId: string,
+    skillDifficulty: number
+  ): void {
+      if(type == 1){
+        this.deepCopyQuestion(questionId, skillId, skillDifficulty);
+      }else {
+        this.layoutCopyQuestion(questionId, skillId, skillDifficulty);
+      }
+  }
+
+  duplicateQuestionFromSkill(questionId: string, skillDifficulty: number): void {
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      DuplicateQuestionSkillLinkModalComponent,
+      {
+        backdrop: 'static',
+      }
+    );
+
+    modalRef.componentInstance.skillId = this.selectedSkillId;
+    modalRef.componentInstance.canEditQuestion = this.canEditQuestion;
+    modalRef.componentInstance.numberOfQuestions =
+      this.questionSummariesForOneSkill.length;
+
+    modalRef.result.then(
+      (result) => {
+        var type = result;
+        this.duplicatedQuestionIds.push(questionId);
+        this.duplicateQuestionSkillLinkAsync(
+          type,
+          questionId,
+          this.selectedSkillId,
+          skillDifficulty
+        );
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
+  }
+
+  transformNameToCopy(name: string):string{
+    var replicaNumber = 1;
+    if(name.substr(name.length-3)[0] == '(' && name.substr(name.length-3)[2] == ')'){
+      name = name.slice(0,name.length-3);
+    }
+    var questionsTitles = [];
+    this.questionSummariesForOneSkill.forEach((summary) => {
+      questionsTitles.push(summary.getQuestionSummary().getQuestionContent());
+    });
+    while(questionsTitles.indexOf(name+'('+replicaNumber+')') > -1){
+      replicaNumber++;
+    }
+    return '<p>' + name + '(' + replicaNumber + ')</p>';
   }
 
   isQuestionSavable(): boolean {
@@ -755,6 +930,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.difficultyCardIsShown = !this.windowDimensionsService.isWindowNarrow();
     this.associatedSkillSummaries = [];
     this.editorIsOpen = false;
+    this.duplicatedQuestionIds = [];
     this.deletedQuestionIds = [];
     // The _initTab function is written separately since it is also
     // called in subscription when some external events are triggered.

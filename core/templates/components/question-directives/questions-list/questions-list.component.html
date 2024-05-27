@@ -72,10 +72,16 @@
                     matTooltipClass="oppia-mat-tooltip-list">
                     ⚠️
               </span>
-              <span (click)="removeQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(),questionSummaryForOneSkill.getSkillDifficulty());$event.stopPropagation();"
-                    class="link-off-icon">
-                <i class="fas fa-trash"></i>
-              </span>
+              <div class="question-footer">
+                <span (click)="duplicateQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(),questionSummaryForOneSkill.getSkillDifficulty());$event.stopPropagation();"
+                      class="link-off-icon">
+                  <i class="fa fa-clone"></i>
+                </span>
+                <span (click)="removeQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(),questionSummaryForOneSkill.getSkillDifficulty());$event.stopPropagation();"
+                      class="link-off-icon">
+                  <i class="fas fa-trash"></i>
+                </span>
+              </div>
             </div>
             <div class="question-interaction-id e2e-test-question-interaction-id">
               <span>{{questionSummaryForOneSkill.getQuestionSummary().getInteractionId()}}</span>
@@ -215,6 +221,13 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+  }
+  .question-footer {
+    cursor: pointer;
+    display: flex;
+    margin-left: auto; /* Pushes the footer to the right */
+    flex-wrap: wrap;
+    gap: 10px; /* Adjusts the spacing between icons, if needed */
   }
   .create-question-header {
     border-bottom: none;
