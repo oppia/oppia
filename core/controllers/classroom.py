@@ -282,7 +282,7 @@ class ClassroomHandler(
                 'given in the classroom payload dict.'
             )
 
-        classroom_config_services.update_or_create_classroom_model(classroom)
+        classroom_config_services.update_classroom(classroom)
         self.render_json(self.values)
 
     @acl_decorators.can_access_classroom_admin_page

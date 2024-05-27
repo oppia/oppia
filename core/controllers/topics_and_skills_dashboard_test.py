@@ -73,20 +73,23 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             subtopics=[subtopic], next_subtopic_id=2)
 
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
-        math_classroom: classroom_config_domain.Classroom = (
-            classroom_config_domain.Classroom(
-                classroom_id='math_classroom_id',
-                name='math',
-                url_fragment='math',
-                course_details='Course details',
-                topic_list_intro='Topics covered',
-                topic_id_to_prerequisite_topic_ids={
-                    self.topic_id: []
-                }
-            )
+        math_classroom = classroom_config_domain.Classroom(
+            classroom_id='math_classroom_id',
+            name='math',
+            url_fragment='math',
+            course_details='Course details for classroom.',
+            teaser_text='Teaser text for math classroom',
+            topic_list_intro='Topics covered for classroom',
+            topic_id_to_prerequisite_topic_ids={self.topic_id: []},
+            is_published=True,
+            thumbnail_filename='thumbnail.svg',
+            thumbnail_bg_color='transparent',
+            thumbnail_size_in_bytes=1000,
+            banner_filename='banner.png',
+            banner_bg_color='transparent',
+            banner_size_in_bytes=1000
         )
-        classroom_config_services.update_or_create_classroom_model(
-            math_classroom)
+        classroom_config_services.create_new_classroom(math_classroom)
 
 
 class TopicsAndSkillsDashboardPageDataHandlerTests(

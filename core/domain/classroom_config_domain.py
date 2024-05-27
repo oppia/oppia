@@ -32,15 +32,23 @@ class ClassroomDict(TypedDict):
     name: str
     url_fragment: str
     course_details: str
+    teaser_text: str
     topic_list_intro: str
     topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]
-
+    is_published: bool
+    thumbnail_filename: str
+    thumbnail_bg_color: str
+    thumbnail_size_in_bytes: int
+    banner_filename: str
+    banner_bg_color: str
+    banner_size_in_bytes: int
 
 # TODO(#17246): Currently, the classroom data is stored in the config model and
 # we are planning to migrate the storage into a new Classroom model. After the
 # successful migration, this file should be renamed as classroom_domain and
 # the exiting classroom domain file should be deleted, until then both of
 # the files will exist simultaneously.
+
 
 class Classroom:
     """Domain object for a classroom."""
@@ -51,8 +59,16 @@ class Classroom:
         name: str,
         url_fragment: str,
         course_details: str,
+        teaser_text: str,
         topic_list_intro: str,
-        topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]
+        topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
+        is_published: bool,
+        thumbnail_filename: str,
+        thumbnail_bg_color: str,
+        thumbnail_size_in_bytes: int,
+        banner_filename: str,
+        banner_bg_color: str,
+        banner_size_in_bytes: int
     ) -> None:
         """Constructs a Classroom domain object.
 
@@ -61,18 +77,34 @@ class Classroom:
             name: str. The name of the classroom.
             url_fragment: str. The url fragment of the classroom.
             course_details: str. Course details for the classroom.
+            teaser_text: str. A text to provide a summary of the classroom.
             topic_list_intro: str. Topic list introduction for the classroom.
             topic_id_to_prerequisite_topic_ids: dict(str, list(str)). A dict
                 with topic ID as key and a list of prerequisite topic IDs as
                 value.
+            is_published: bool. Whether this classroom is published or not.
+            thumbnail_filename: str. Classroom's thumbnail filename.
+            thumbnail_bg_color: str. Classroom's thumbnail background color.
+            thumbnail_size_in_bytes: int. The thumbnail size in bytes.
+            banner_filename: str. Classroom's banner filename.
+            banner_bg_color: str. Classroom's banner background color.
+            banner_size_in_bytes: int. The banner size in bytes.
         """
         self.classroom_id = classroom_id
         self.name = name
         self.url_fragment = url_fragment
         self.course_details = course_details
+        self.teaser_text = teaser_text
         self.topic_list_intro = topic_list_intro
         self.topic_id_to_prerequisite_topic_ids = (
             topic_id_to_prerequisite_topic_ids)
+        self.is_published = is_published
+        self.thumbnail_filename = thumbnail_filename
+        self.thumbnail_bg_color = thumbnail_bg_color
+        self.thumbnail_size_in_bytes = thumbnail_size_in_bytes
+        self.banner_filename = banner_filename
+        self.banner_bg_color = banner_bg_color
+        self.banner_size_in_bytes = banner_size_in_bytes
 
     @classmethod
     def from_dict(cls, classroom_dict: ClassroomDict) -> Classroom:
@@ -90,8 +122,16 @@ class Classroom:
             classroom_dict['name'],
             classroom_dict['url_fragment'],
             classroom_dict['course_details'],
+            classroom_dict['teaser_text'],
             classroom_dict['topic_list_intro'],
-            classroom_dict['topic_id_to_prerequisite_topic_ids']
+            classroom_dict['topic_id_to_prerequisite_topic_ids'],
+            classroom_dict['is_published'],
+            classroom_dict['thumbnail_filename'],
+            classroom_dict['thumbnail_bg_color'],
+            classroom_dict['thumbnail_size_in_bytes'],
+            classroom_dict['banner_filename'],
+            classroom_dict['banner_bg_color'],
+            classroom_dict['banner_size_in_bytes']
         )
 
     def to_dict(self) -> ClassroomDict:
@@ -105,9 +145,17 @@ class Classroom:
             'name': self.name,
             'url_fragment': self.url_fragment,
             'course_details': self.course_details,
+            'teaser_text': self.teaser_text,
             'topic_list_intro': self.topic_list_intro,
             'topic_id_to_prerequisite_topic_ids': (
-                self.topic_id_to_prerequisite_topic_ids)
+                self.topic_id_to_prerequisite_topic_ids),
+            'is_published': self.is_published,
+            'thumbnail_filename': self.thumbnail_filename,
+            'thumbnail_bg_color': self.thumbnail_bg_color,
+            'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
+            'banner_filename': self.banner_filename,
+            'banner_bg_color': self.banner_bg_color,
+            'banner_size_in_bytes': self.banner_size_in_bytes
         }
 
     def get_topic_ids(self) -> List[str]:
@@ -139,6 +187,87 @@ class Classroom:
                 % (constants.MAX_CHARS_IN_CLASSROOM_NAME, name))
 
     @classmethod
+    def require_valid_teaser_text(cls, teaser_text: str) -> None:
+        """Checks whether the teaser text of the classroom is a valid one.
+
+        Args:
+            teaser_text: str. The teaser text to validate.
+        """
+        if not isinstance(teaser_text, str):
+            raise utils.ValidationError(
+                'Expected teaser_text of the classroom to be a string, '
+                'received: %s.' % teaser_text)
+
+        if teaser_text == '':
+            raise utils.ValidationError('teaser_text field should not be empty')
+
+        if len(teaser_text) > constants.MAX_CHARS_IN_CLASSROOM_TEASER_TEXT:
+            error_message = (
+                'Classroom teaser_text should be at most %d characters, '
+                'received %s.' % (
+                    constants.MAX_CHARS_IN_CLASSROOM_TEASER_TEXT,
+                    teaser_text
+                )
+            )
+            raise utils.ValidationError(error_message)
+
+    @classmethod
+    def require_valid_topic_list_intro(cls, topic_list_intro: str) -> None:
+        """Checks whether the teaser text of the classroom is a valid one.
+
+        Args:
+            topic_list_intro: str. The topic list intro to validate.
+        """
+        if not isinstance(topic_list_intro, str):
+            raise utils.ValidationError(
+                'Expected topic_list_intro of the classroom to be a string, '
+                'received: %s.' % topic_list_intro)
+
+        if topic_list_intro == '':
+            raise utils.ValidationError(
+                'topic_list_intro field should not be empty')
+
+        if len(
+            topic_list_intro
+        ) > constants.MAX_CHARS_IN_CLASSROOM_TOPIC_LIST_INTRO:
+            error_message = (
+                'Classroom topic_list_intro should be at most %d '
+                'characters, received %s.' % (
+                    constants.MAX_CHARS_IN_CLASSROOM_TOPIC_LIST_INTRO,
+                    topic_list_intro
+                )
+            )
+            raise utils.ValidationError(error_message)
+
+    @classmethod
+    def require_valid_course_details(cls, course_details: str) -> None:
+        """Checks whether the teaser text of the classroom is a valid one.
+
+        Args:
+            course_details: str. The course details to validate.
+        """
+        if not isinstance(course_details, str):
+            raise utils.ValidationError(
+                'Expected course_details of the classroom to be a string, '
+                'received: %s.' % course_details)
+
+        if course_details == '':
+            raise utils.ValidationError(
+                'course_details field should not be empty')
+
+        if len(
+            course_details
+            ) > constants.MAX_CHARS_IN_CLASSROOM_COURSE_DETAILS:
+            error_message = (
+                'Classroom course_details should be at most %d characters, '
+                'received %s.' % (
+                    constants.MAX_CHARS_IN_CLASSROOM_COURSE_DETAILS,
+                        course_details
+                )
+            )
+            raise utils.ValidationError(error_message)
+
+    @classmethod
     def require_valid_url_fragment(cls, url_fragment: str) -> None:
         """Checks whether the url fragment of the classroom is a valid one.
 
@@ -152,46 +281,102 @@ class Classroom:
 
         if url_fragment == '':
             raise utils.ValidationError(
-                'Url fragment field should not be empty')
+                'Url fragment field should not be empty'
+            )
 
         utils.require_valid_url_fragment(
             url_fragment, 'Classroom URL Fragment',
-            constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT)
+            constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+        )
 
-    def validate(self) -> None:
-        """Validates various properties of the Classroom."""
+    @classmethod
+    def require_valid_thumbnail(
+        cls, thumbnail_filename: str, thumbnail_bg_color: str
+                            ) -> None:
+        """Check classroom thumbnail filename and background color validity.
 
-        if not isinstance(self.classroom_id, str):
+        Args:
+            thumbnail_filename: str. The thumbnail filename to validate.
+            thumbnail_bg_color: str. The bg color to validate.
+        """
+        if thumbnail_filename == '':
             raise utils.ValidationError(
-                'Expected ID of the classroom to be a string, received: %s.'
-                % self.classroom_id)
+                'thumbnail_filename field should not be empty')
 
-        self.require_valid_name(self.name)
+        utils.require_valid_thumbnail_filename(thumbnail_filename)
 
-        self.require_valid_url_fragment(self.url_fragment)
-
-        if not isinstance(self.course_details, str):
+        if not isinstance(thumbnail_bg_color, str):
             raise utils.ValidationError(
-                'Expected course_details of the classroom to be a string, '
-                'received: %s.' % self.course_details)
+                'Expected thumbnail_bg_color of the classroom to be a string, '
+                'received: %s.' % thumbnail_bg_color)
 
-        if not isinstance(self.topic_list_intro, str):
+        if thumbnail_bg_color == '':
             raise utils.ValidationError(
-                'Expected topic list intro of the classroom to be a string, '
-                'received: %s.' % self.topic_list_intro)
+                'thumbnail_bg_color field should not be empty')
 
-        if not isinstance(self.topic_id_to_prerequisite_topic_ids, dict):
+        if (
+            thumbnail_bg_color not in (
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['classroom']
+            )):
+            raise utils.ValidationError(
+                'Classroom thumbnail background color %s is '
+                'not supported.' % thumbnail_bg_color
+            )
+
+    @classmethod
+    def require_valid_banner(
+        cls, banner_filename: str, banner_bg_color: str
+                            ) -> None:
+        """Whether the banner filename and bg color of the classroom is valid.
+
+        Args:
+            banner_filename: str. The banner filename to validate.
+            banner_bg_color: str. The bg color to validate.
+        """
+        if banner_filename == '':
+            raise utils.ValidationError(
+                'banner_filename field should not be empty')
+
+        utils.require_valid_image_filename(banner_filename)
+
+        if not isinstance(banner_bg_color, str):
+            raise utils.ValidationError(
+                'Expected banner_bg_color of the classroom to be a string, '
+                'received: %s.' % banner_bg_color)
+
+        if banner_bg_color == '':
+            raise utils.ValidationError(
+                'banner_bg_color field should not be empty')
+
+        if (
+            banner_bg_color not in (
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['classroom'])):
+            raise utils.ValidationError(
+                'Classroom banner background color %s is not supported.' 
+                % banner_bg_color)
+
+    @classmethod
+    def check_for_cycles_in_topic_id_to_prerequisite_topic_ids(
+        cls, topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]
+        ) -> None:
+        """Checks for loop in topic_id_to_prerequisite_topic_ids.
+
+        Args:
+            topic_id_to_prerequisite_topic_ids: 
+                Dict[str, List[str]]. The topic ID to prerequisite ID mapping.
+        """
+        if not isinstance(topic_id_to_prerequisite_topic_ids, dict):
             raise utils.ValidationError(
                 'Expected topic ID to prerequisite topic IDs of the classroom '
                 'to be a string, received: %s.' % (
-                    self.topic_id_to_prerequisite_topic_ids))
-
+                    topic_id_to_prerequisite_topic_ids))
         cyclic_check_error = (
-            'The topic ID to prerequisite topic IDs graph should not contain '
-            'any cycles.')
-        for topic_id in self.topic_id_to_prerequisite_topic_ids:
+            'The topic ID to prerequisite topic IDs graph '
+            'should not contain any cycles.'
+        )
+        for topic_id in topic_id_to_prerequisite_topic_ids:
             ancestors = copy.deepcopy(
-                self.topic_id_to_prerequisite_topic_ids[topic_id])
+                topic_id_to_prerequisite_topic_ids[topic_id])
             visited_topic_ids_for_current_node = []
             while len(ancestors) > 0:
                 if topic_id in ancestors:
@@ -203,7 +388,34 @@ class Classroom:
                     continue
 
                 ancestors.extend(
-                    self.topic_id_to_prerequisite_topic_ids[
-                        ancestor_topic_id]
+                    topic_id_to_prerequisite_topic_ids.get(
+                        ancestor_topic_id, []
+                    )
                 )
                 visited_topic_ids_for_current_node.append(ancestor_topic_id)
+
+    def validate(self) -> None:
+        """Validates various properties of the Classroom."""
+
+        if not isinstance(self.classroom_id, str):
+            raise utils.ValidationError(
+                'Expected ID of the classroom to be a string, received: %s.'
+                % self.classroom_id)
+
+        self.require_valid_name(self.name)
+        self.require_valid_teaser_text(self.teaser_text)
+        self.require_valid_topic_list_intro(self.topic_list_intro)
+        self.require_valid_course_details(self.course_details)
+        self.require_valid_url_fragment(self.url_fragment)
+        self.require_valid_thumbnail(
+            self.thumbnail_filename, self.thumbnail_bg_color)
+        self.require_valid_banner(
+            self.banner_filename, self.banner_bg_color
+        )
+        self.check_for_cycles_in_topic_id_to_prerequisite_topic_ids(
+            self.topic_id_to_prerequisite_topic_ids)
+
+        if not isinstance(self.is_published, bool):
+            raise utils.ValidationError(
+                'Expected is_published of the classroom to be a boolean, '
+                'received: %s.' % self.is_published)

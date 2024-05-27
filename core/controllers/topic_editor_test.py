@@ -96,16 +96,22 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         classroom = classroom_config_domain.Classroom(
-            classroom_id=classroom_config_services.get_new_classroom_id(),
+            classroom_id='math_classroom_id',
             name='math',
             url_fragment='math',
-            course_details='',
-            topic_list_intro='',
-            topic_id_to_prerequisite_topic_ids={
-                self.topic_id: []
-            }
+            course_details='Course details for classroom.',
+            teaser_text='Teaser text for math classroom',
+            topic_list_intro='Topics covered for classroom',
+            topic_id_to_prerequisite_topic_ids={self.topic_id: []},
+            is_published=True,
+            thumbnail_filename='thumbnail.svg',
+            thumbnail_bg_color='transparent',
+            thumbnail_size_in_bytes=1000,
+            banner_filename='banner.png',
+            banner_bg_color='transparent',
+            banner_size_in_bytes=1000
         )
-        classroom_config_services.update_or_create_classroom_model(classroom)
+        classroom_config_services.create_new_classroom(classroom)
         self.logout()
 
 

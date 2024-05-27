@@ -84,8 +84,16 @@ def get_classroom_from_classroom_model(
         classroom_model.name,
         classroom_model.url_fragment,
         classroom_model.course_details,
+        classroom_model.teaser_text,
         classroom_model.topic_list_intro,
-        classroom_model.topic_id_to_prerequisite_topic_ids
+        classroom_model.topic_id_to_prerequisite_topic_ids,
+        classroom_model.is_published,
+        classroom_model.thumbnail_filename,
+        classroom_model.thumbnail_bg_color,
+        classroom_model.thumbnail_size_in_bytes,
+        classroom_model.banner_filename,
+        classroom_model.banner_bg_color,
+        classroom_model.banner_size_in_bytes
     )
 
 
@@ -175,23 +183,35 @@ def get_new_classroom_id() -> str:
 
 
 def update_classroom(
-    classroom: classroom_config_domain.Classroom,
-    classroom_model: classroom_models.ClassroomModel
+    classroom: classroom_config_domain.Classroom
 ) -> None:
     """Saves a Clasroom domain object to the datastore.
 
     Args:
         classroom: Classroom. The classroom domain object for the given
             classroom.
-        classroom_model: ClassroomModel. The classroom model instance.
     """
     classroom.validate()
+    classroom_model = classroom_models.ClassroomModel.get(
+        classroom.classroom_id, strict=False)
+
+    if not classroom_model:
+        return
+
     classroom_model.name = classroom.name
     classroom_model.url_fragment = classroom.url_fragment
     classroom_model.course_details = classroom.course_details
     classroom_model.topic_list_intro = classroom.topic_list_intro
     classroom_model.topic_id_to_prerequisite_topic_ids = (
         classroom.topic_id_to_prerequisite_topic_ids)
+    classroom_model.teaser_text = classroom.teaser_text
+    classroom_model.is_published = classroom.is_published
+    classroom_model.thumbnail_filename = classroom.thumbnail_filename
+    classroom_model.thumbnail_bg_color = classroom.thumbnail_bg_color
+    classroom_model.thumbnail_size_in_bytes = classroom.thumbnail_size_in_bytes
+    classroom_model.banner_filename = classroom.banner_filename
+    classroom_model.banner_bg_color = classroom.banner_bg_color
+    classroom_model.banner_size_in_bytes = classroom.banner_size_in_bytes
 
     classroom_model.update_timestamps()
     classroom_model.put()
@@ -212,24 +232,17 @@ def create_new_classroom(
         classroom.name,
         classroom.url_fragment,
         classroom.course_details,
+        classroom.teaser_text,
         classroom.topic_list_intro,
-        classroom.topic_id_to_prerequisite_topic_ids
+        classroom.topic_id_to_prerequisite_topic_ids,
+        classroom.is_published,
+        classroom.thumbnail_filename,
+        classroom.thumbnail_bg_color,
+        classroom.thumbnail_size_in_bytes,
+        classroom.banner_filename,
+        classroom.banner_bg_color,
+        classroom.banner_size_in_bytes
     )
-
-
-def update_or_create_classroom_model(
-    classroom: classroom_config_domain.Classroom
-) -> None:
-    """Updates the properties of an existing classroom model or creates a new
-    classroom model.
-    """
-    model = classroom_models.ClassroomModel.get(
-        classroom.classroom_id, strict=False)
-
-    if model is None:
-        create_new_classroom(classroom)
-    else:
-        update_classroom(classroom, model)
 
 
 def delete_classroom(classroom_id: str) -> None:
