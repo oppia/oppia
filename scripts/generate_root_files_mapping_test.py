@@ -53,7 +53,7 @@ class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
         def mock_subprocess_popen(
             cmd: list[str],
             stdout: int, stderr: int # pylint: disable=unused-argument
-        ) -> subprocess.Popen:
+        ) -> subprocess.Popen[bytes]:
             self.assertEqual(cmd, [
                 common.NODE_BIN_PATH,
                 generate_root_files_mapping.ROOT_FILES_MAPPING_GENERATOR_FILEPATH # pylint: disable=line-too-long
@@ -79,7 +79,7 @@ class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
         def mock_subprocess_popen(
             cmd: list[str],
             stdout: int, stderr: int # pylint: disable=unused-argument
-        ) -> subprocess.Popen:
+        ) -> subprocess.Popen[bytes]:
             self.assertEqual(cmd, [
                 common.NODE_BIN_PATH,
                 generate_root_files_mapping.ROOT_FILES_MAPPING_GENERATOR_FILEPATH # pylint: disable=line-too-long

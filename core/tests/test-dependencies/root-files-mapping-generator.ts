@@ -331,6 +331,9 @@ const getAngularDependenciesFromHtmlFile = (
   const content = fs.readFileSync(file, 'utf-8');
   const $ = cheerio.load(content);
 
+  // Here we remove all square brackets and parentheses from the attributes
+  // that come from Angular binding and convert them to normal attributes so
+  // that we can check if the directive's attribute is present in the element.
   $('*')
     .children()
     .each((_, element) => {
@@ -442,10 +445,13 @@ const getDependenciesFromTypeScriptOrJavaScriptFile = (
 ): string[] => {
   const sourceFile = project.addSourceFileAtPath(file);
   const dependencies: string[] = [];
+
   dependencies.push(...getModuleImportsFromSourceFile(sourceFile));
 
   const angularInformations = fileToAngularInformations[file];
   angularInformations.forEach(angularInformation => {
+    // If the file is a component and has a template file path, we add the
+    // template file path as a dependency.
     if (
       angularInformation.type === 'component' &&
       angularInformation.templateFilePath
@@ -454,6 +460,9 @@ const getDependenciesFromTypeScriptOrJavaScriptFile = (
     }
   });
 
+  // If the file ends with '.import.ts', we check if there is a mainpage file
+  // that corresponds to it and add it as a dependency since Webpack loads
+  // these.
   if (file.endsWith('.import.ts')) {
     const mainPageFilePath = file.replace('.import.ts', '.mainpage.html');
     if (fs.existsSync(path.join(ROOT_DIRECTORY, mainPageFilePath))) {
