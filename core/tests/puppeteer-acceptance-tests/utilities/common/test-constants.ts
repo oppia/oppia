@@ -86,14 +86,14 @@ export default {
   ViewportWidthBreakpoints: {
     MOBILE_PX: 768,
   },
-  images: {
+  data: {
     blogPostThumbnailImage: path.resolve(
       __dirname,
-      '../images/blog-post-thumbnail.svg'
+      '../data/blog-post-thumbnail.svg'
     ),
     curriculumAdminThumbnailImage: path.resolve(
       __dirname,
-      '../images/curriculum-admin-thumbnail.svg'
+      '../data/curriculum-admin-thumbnail.svg'
     ),
   },
   DEFAULT_SPEC_TIMEOUT_MSECS: 300000,

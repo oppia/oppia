@@ -21,7 +21,7 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const curriculumAdminThumbnailImage =
-  testConstants.images.curriculumAdminThumbnailImage;
+  testConstants.data.curriculumAdminThumbnailImage;
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const baseURL = testConstants.URLs.BaseURL;
 
