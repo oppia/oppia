@@ -23,6 +23,8 @@ from scripts import common
 from scripts import run_typescript_checks
 
 TEST_DEPENDENCIES_TSCONFIG_FILEPATH = 'tsconfig.test-dependencies.json'
+ROOT_FILES_MAPPING_GENERATOR_FILEPATH = os.path.join(
+    'core', 'tests', 'test-dependencies', 'root-files-mapping-generator.js')
 
 
 def main() -> None:
@@ -30,11 +32,9 @@ def main() -> None:
 
     run_typescript_checks.compile_and_check_typescript(
         TEST_DEPENDENCIES_TSCONFIG_FILEPATH)
-        
+
     print('Generating root files mapping...')
-    root_files_mapping_generator_path = os.path.join(
-        'core', 'tests', 'test-dependencies', 'root-files-mapping-generator.js')
-    cmd = [common.NODE_BIN_PATH, root_files_mapping_generator_path]
+    cmd = [common.NODE_BIN_PATH, ROOT_FILES_MAPPING_GENERATOR_FILEPATH]
     proc = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 

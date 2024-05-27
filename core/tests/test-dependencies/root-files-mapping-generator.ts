@@ -295,17 +295,20 @@ const getAngularInformationsFromSourceFile = (
 const getFileToAngularInformationsFromFiles = (
   files: string[]
 ): Record<string, AngularInformation[]> => {
-  return files.reduce((acc, file) => {
-    if (file.endsWith('.spec.ts')) {
-      acc[file] = [];
+  return files.reduce(
+    (acc: Record<string, AngularInformation[]>, file: string) => {
+      if (file.endsWith('.spec.ts')) {
+        acc[file] = [];
+        return acc;
+      }
+      const sourceFile = project.addSourceFileAtPath(file);
+      const angularInformations =
+        getAngularInformationsFromSourceFile(sourceFile);
+      acc[file] = angularInformations;
       return acc;
-    }
-    const sourceFile = project.addSourceFileAtPath(file);
-    const angularInformations =
-      getAngularInformationsFromSourceFile(sourceFile);
-    acc[file] = angularInformations;
-    return acc;
-  }, {});
+    },
+    {}
+  );
 };
 
 /**
@@ -468,7 +471,7 @@ const getDependencyMappingFromFiles = (
   files: string[],
   fileToAngularInformations: Record<string, AngularInformation[]>
 ): Record<string, string[]> => {
-  return files.reduce((acc, file) => {
+  return files.reduce((acc: Record<string, string[]>, file: string) => {
     acc[file] = MANUALLY_MAPPED_DEPENDENCIES[file] || [];
     if (file.endsWith('.ts') || file.endsWith('.js')) {
       const dependencies = getDependenciesFromTypeScriptOrJavaScriptFile(
