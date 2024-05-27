@@ -26,9 +26,9 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import html_cleaner
 from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
+from core.domain import platform_parameter_list as param_list
 from core.domain import platform_parameter_registry
-from core.domain import platform_parameter_services
+from core.domain import platform_parameter_services as param_services
 from core.domain import question_domain
 from core.domain import rights_domain
 from core.domain import story_domain
@@ -67,21 +67,25 @@ class FailedMLTest(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+        self.admin_email_address = (
+            param_services.get_platform_parameter_value(
+                param_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+        assert isinstance(self.admin_email_address, str)
         self.signup(
-            feconf.ADMIN_EMAIL_ADDRESS, self.ADMIN_USERNAME, True)
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+            self.admin_email_address, self.ADMIN_USERNAME, True)
 
     def test_send_failed_ml_email(self) -> None:
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             # Make sure there are no emails already sent.
-            messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
+            assert isinstance(self.admin_email_address, str)
+            messages = self._get_sent_email_messages(self.admin_email_address)
             self.assertEqual(len(messages), 0)
 
             # Send job failure email with mock Job ID.
             email_manager.send_job_failure_email('123ABC')
 
             # Make sure emails are sent.
-            messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(self.admin_email_address)
             expected_subject = 'Failed ML Job'
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, expected_subject)
@@ -96,25 +100,35 @@ class EmailToAdminTest(test_utils.EmailTestBase):
         dummy_admin_address = 'admin@system.com'
 
         send_email_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        system_name_ctx = self.swap(
-            feconf, 'SYSTEM_EMAIL_NAME', dummy_system_name)
-        system_email_ctx = self.swap(
-            feconf, 'SYSTEM_EMAIL_ADDRESS', dummy_system_address)
-        admin_email_ctx = self.swap(
-            feconf, 'ADMIN_EMAIL_ADDRESS', dummy_admin_address)
 
-        with send_email_ctx, system_name_ctx, system_email_ctx, admin_email_ctx:
+        def mock_get_platform_parameter_value_function(
+                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            if param_name == param_list.ParamName.SYSTEM_EMAIL_NAME.value:
+                return dummy_system_name
+            elif param_name == param_list.ParamName.SYSTEM_EMAIL_ADDRESS.value:
+                return dummy_system_address
+            elif param_name == param_list.ParamName.ADMIN_EMAIL_ADDRESS.value:
+                return dummy_admin_address
+            return ''
+        swap_get_platform_parameter_value = self.swap(
+            param_services, 'get_platform_parameter_value',
+            mock_get_platform_parameter_value_function
+        )
+
+        with send_email_ctx, swap_get_platform_parameter_value:
             # Make sure there are no emails already sent.
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
+            admin_email_address = (
+                param_services.get_platform_parameter_value(
+                    param_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+            assert isinstance(admin_email_address, str)
+            messages = self._get_sent_email_messages(admin_email_address)
             self.assertEqual(len(messages), 0)
 
             # Send an email to admin.
             email_manager.send_mail_to_admin('Dummy Subject', 'Dummy Body')
 
             # Make sure emails are sent.
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(admin_email_address)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].sender, 'DUMMY_SYSTEM_NAME <dummy@system.com>')
@@ -132,17 +146,24 @@ class DummyMailTest(test_utils.EmailTestBase):
         dummy_receiver_address = 'admin@system.com'
 
         send_email_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        system_name_ctx = self.swap(
-            feconf, 'SYSTEM_EMAIL_NAME', dummy_system_name)
-        system_email_ctx = self.swap(
-            feconf, 'SYSTEM_EMAIL_ADDRESS', dummy_system_address)
-        admin_email_ctx = self.swap(
-            feconf, 'ADMIN_EMAIL_ADDRESS', dummy_receiver_address)
 
-        with send_email_ctx, system_name_ctx, system_email_ctx, admin_email_ctx:
+        def mock_get_platform_parameter_value_function(
+                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            if param_name == param_list.ParamName.SYSTEM_EMAIL_NAME.value:
+                return dummy_system_name
+            elif param_name == param_list.ParamName.SYSTEM_EMAIL_ADDRESS.value:
+                return dummy_system_address
+            elif param_name == param_list.ParamName.ADMIN_EMAIL_ADDRESS.value:
+                return dummy_receiver_address
+            return ''
+        swap_get_platform_parameter_value = self.swap(
+            param_services, 'get_platform_parameter_value',
+            mock_get_platform_parameter_value_function
+        )
+
+        with send_email_ctx, swap_get_platform_parameter_value:
             # Make sure there are no emails already sent.
-            messages = self._get_sent_email_messages(
-                dummy_receiver_address)
+            messages = self._get_sent_email_messages(dummy_receiver_address)
             self.assertEqual(len(messages), 0)
 
             # Send an email.
@@ -320,7 +341,9 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model.sender_email,
                 '%s <%s>' % (
-                    self.EDITOR_USERNAME, feconf.NOREPLY_EMAIL_ADDRESS))
+                    self.EDITOR_USERNAME,
+                    param_services.get_platform_parameter_value(
+                        param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value)))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION)
@@ -632,10 +655,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_config_does_not_permit_it(self) -> None:
         swap_get_platform_parameter_value_return_email_footer = (
             self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                self.new_footer
-            )
+                param_services, 'get_platform_parameter_value', self.new_footer)
         )
         with swap_get_platform_parameter_value_return_email_footer, self.swap(
             feconf, 'CAN_SEND_EMAILS', False
@@ -879,7 +899,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
             self.assertEqual(
                 messages[0].sender,
-                'Email Sender <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Email Sender <%s>' % (
+                    param_services.get_platform_parameter_value(
+                        param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value)))
             self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
             self.assertEqual(messages[0].subject, 'Welcome!')
             self.assertEqual(messages[0].body, self.expected_text_email_content)
@@ -892,10 +914,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     ) -> None:
         swap_get_platform_parameter_value_return_email_footer = (
             self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                self.new_footer
-            )
+                param_services, 'get_platform_parameter_value', self.new_footer)
         )
         with swap_get_platform_parameter_value_return_email_footer, self.swap(
             feconf, 'CAN_SEND_EMAILS', True
@@ -946,10 +965,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     def test_email_only_sent_if_signup_was_successful(self) -> None:
         swap_get_platform_parameter_value_return_email_footer = (
             self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                self.new_footer
-            )
+                param_services, 'get_platform_parameter_value', self.new_footer)
         )
         with swap_get_platform_parameter_value_return_email_footer, self.swap(
             feconf, 'CAN_SEND_EMAILS', True
@@ -1083,7 +1099,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Email Sender <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Email Sender <%s>' % (
+                    param_services.get_platform_parameter_value(
+                        param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value)))
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_SIGNUP)
             self.assertEqual(sent_email_model.subject, 'Welcome!')
@@ -1114,6 +1132,9 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             self.NEW_USER_USERNAME,
             'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.',
             self.new_footer)
+        self.system_email_address = (
+            param_services.get_platform_parameter_value(
+                param_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
 
         def _generate_hash_for_tests(
             unused_cls: Type[test_utils.TestBase],
@@ -1153,9 +1174,10 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                         '<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
                 cleaned_plaintext_body = html_cleaner.strip_html_tags(
                     raw_plaintext_body)
+                assert isinstance(self.system_email_address, str)
                 email_models.SentEmailModel.create(
                     self.new_user_id, self.NEW_USER_EMAIL,
-                    feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                    feconf.SYSTEM_COMMITTER_ID, self.system_email_address,
                     feconf.EMAIL_INTENT_SIGNUP, self.new_email_subject,
                     cleaned_plaintext_body, datetime.datetime.utcnow())
 
@@ -1192,10 +1214,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             logging, 'error', log_new_error_counter)
 
         swap_get_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            'Email Sender'
-        )
+            param_services, 'get_platform_parameter_value', 'Email Sender')
 
         with swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR
@@ -1206,10 +1225,11 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 ] = email_models.SentEmailModel.get_all().fetch()
                 self.assertEqual(len(all_models), 0)
 
+                assert isinstance(self.system_email_address, str)
                 email_manager._send_email(  # pylint: disable=protected-access
                     self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
                     feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
-                    feconf.SYSTEM_EMAIL_ADDRESS)
+                    self.system_email_address)
 
                 # Check that a new email was sent.
                 messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
@@ -1226,7 +1246,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 email_manager._send_email(  # pylint: disable=protected-access
                     self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
                     feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
-                    feconf.SYSTEM_EMAIL_ADDRESS)
+                    self.system_email_address)
 
                 # An error should be recorded in the logs.
                 self.assertEqual(log_new_error_counter.times_called, 1)
@@ -1255,9 +1275,10 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             ] = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
+            assert isinstance(self.system_email_address, str)
             email_models.SentEmailModel.create(
                 'recipient_id', self.NEW_USER_EMAIL,
-                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                feconf.SYSTEM_COMMITTER_ID, self.system_email_address,
                 feconf.EMAIL_INTENT_SIGNUP, self.new_email_subject,
                 self.new_email_html_body, datetime.datetime.utcnow())
 
@@ -1305,9 +1326,10 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             ] = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
+            assert isinstance(self.system_email_address, str)
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
-                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                feconf.SYSTEM_COMMITTER_ID, self.system_email_address,
                 feconf.EMAIL_INTENT_SIGNUP, '%s%s' % (
                     self.new_email_subject, 1), self.new_email_html_body,
                 datetime.datetime.utcnow())
@@ -1356,9 +1378,10 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             ] = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
+            assert isinstance(self.system_email_address, str)
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
-                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                feconf.SYSTEM_COMMITTER_ID, self.system_email_address,
                 feconf.EMAIL_INTENT_SIGNUP, self.new_email_subject,
                 '%s%s' % (self.new_email_html_body, 1),
                 datetime.datetime.utcnow())
@@ -1411,9 +1434,10 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             email_sent_time = (
                 datetime.datetime.utcnow() - datetime.timedelta(minutes=4))
 
+            assert isinstance(self.system_email_address, str)
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
-                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                feconf.SYSTEM_COMMITTER_ID, self.system_email_address,
                 feconf.EMAIL_INTENT_SIGNUP, self.new_email_subject,
                 self.new_email_html_body, email_sent_time)
 
@@ -1425,9 +1449,10 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             email_sent_time = (
                 datetime.datetime.utcnow() - datetime.timedelta(minutes=2))
 
+            assert isinstance(self.system_email_address, str)
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
-                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                feconf.SYSTEM_COMMITTER_ID, self.system_email_address,
                 feconf.EMAIL_INTENT_SIGNUP, self.new_email_subject,
                 self.new_email_html_body, email_sent_time)
 
@@ -1591,7 +1616,8 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION)
@@ -1701,7 +1727,8 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION)
@@ -1802,7 +1829,8 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION)
@@ -1910,7 +1938,8 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION)
@@ -2018,7 +2047,8 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
             sent_email_model = next(
@@ -2030,7 +2060,8 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
 
@@ -2106,7 +2137,8 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_ONBOARD_CD_USER)
@@ -2175,7 +2207,8 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS)
@@ -2271,7 +2304,8 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
@@ -2318,7 +2352,8 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
@@ -2365,7 +2400,8 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
@@ -2412,7 +2448,8 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
@@ -2459,7 +2496,8 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
@@ -2506,7 +2544,8 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
@@ -2649,7 +2688,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
         self.assertEqual(
             sent_email_model.sender_email,
-            'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
         self.assertEqual(
             sent_email_model.intent,
             feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
@@ -2666,17 +2706,13 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             PlatformDataTypes. The defined data type of the platform parameter.
         """
         if param_name == (
-            platform_parameter_list.ParamName.
+            param_list.ParamName.
             CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
             return True
-        elif param_name == (
-            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
-        ):
+        elif param_name == param_list.ParamName.EMAIL_SENDER_NAME.value:
             return email_manager.EMAIL_SENDER_NAME.default_value
-        elif param_name == (
-            platform_parameter_list.ParamName.EMAIL_FOOTER.value
-        ):
+        elif param_name == param_list.ParamName.EMAIL_FOOTER.value:
             return email_manager.EMAIL_FOOTER.default_value
         return ''
 
@@ -2721,7 +2757,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
         self.swap_get_platform_parameter_value = self.swap(
-            platform_parameter_services,
+            param_services,
             'get_platform_parameter_value',
             self._swap_get_platform_parameter_value_function
         )
@@ -4235,7 +4271,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
         self.assertEqual(
             sent_email_model.sender_email,
-            'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
         self.assertEqual(
             sent_email_model.intent,
             feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
@@ -4252,13 +4289,11 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             PlatformDataTypes. The defined data type of the platform parameter.
         """
         if param_name == (
-            platform_parameter_list.ParamName.
+            param_list.ParamName.
             ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
         ):
             return True
-        elif param_name == (
-            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
-        ):
+        elif param_name == param_list.ParamName.EMAIL_SENDER_NAME.value:
             return email_manager.EMAIL_SENDER_NAME.default_value
         return ''
 
@@ -4303,7 +4338,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
         self.swap_get_platform_parameter_value = self.swap(
-            platform_parameter_services,
+            param_services,
             'get_platform_parameter_value',
             self._swap_get_platform_parameter_value_function
         )
@@ -4817,7 +4852,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
         self.assertEqual(
             sent_email_model.sender_email,
-            'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
         self.assertEqual(
             sent_email_model.intent,
             feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
@@ -4979,7 +5015,7 @@ class NotifyReviewersNewSuggestionsTests(
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         self.swap_get_platform_parameter_value = self.swap(
-            platform_parameter_services,
+            param_services,
             'get_platform_parameter_value',
             self._swap_get_platform_parameter_value_function
         )
@@ -5030,7 +5066,8 @@ class NotifyReviewersNewSuggestionsTests(
             sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
         self.assertEqual(
             sent_email_model.sender_email,
-            'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
         self.assertEqual(
             sent_email_model.intent,
             feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
@@ -5047,17 +5084,13 @@ class NotifyReviewersNewSuggestionsTests(
             PlatformDataTypes. The defined data type of the platform parameter.
         """
         if param_name == (
-            platform_parameter_list.ParamName.
+            param_list.ParamName.
             CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
             return True
-        elif param_name == (
-            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
-        ):
+        elif param_name == param_list.ParamName.EMAIL_SENDER_NAME.value:
             return email_manager.EMAIL_SENDER_NAME.default_value
-        elif param_name == (
-            platform_parameter_list.ParamName.EMAIL_FOOTER.value
-        ):
+        elif param_name == param_list.ParamName.EMAIL_FOOTER.value:
             return email_manager.EMAIL_FOOTER.default_value
         return ''
 
@@ -5296,7 +5329,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
         self.assertEqual(
             sent_email_model.sender_email,
-            'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
         self.assertEqual(
             sent_email_model.intent,
             feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS)
@@ -5319,13 +5353,11 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             PlatformDataTypes. The defined data type of the platform parameter.
         """
         if param_name == (
-            platform_parameter_list.ParamName.
+            param_list.ParamName.
             ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
         ):
             return True
-        elif param_name == (
-            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
-        ):
+        elif param_name == param_list.ParamName.EMAIL_SENDER_NAME.value:
             return email_manager.EMAIL_SENDER_NAME.default_value
         return ''
 
@@ -5361,7 +5393,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         }
 
         self.swap_get_platform_parameter_value = self.swap(
-            platform_parameter_services,
+            param_services,
             'get_platform_parameter_value',
             self._swap_get_platform_parameter_value_function
         )
@@ -5897,7 +5929,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
         self.assertEqual(
             sent_email_model.sender_email,
-            'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
         self.assertEqual(
             sent_email_model.intent,
             feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS)
@@ -5992,7 +6025,8 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION)
@@ -6064,14 +6098,18 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION)
 
             # Make sure that correct email is sent to admin.
-            admin_messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
+            system_email_address = (
+                param_services.get_platform_parameter_value(
+                    param_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
+            assert isinstance(system_email_address, str)
+            admin_messages = self._get_sent_email_messages(system_email_address)
             self.assertEqual(len(admin_messages), 1)
             self.assertEqual(
                 admin_messages[0].body, expected_admin_email_text_body)
@@ -6138,13 +6176,19 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
     def test_account_deletion_failed_email_is_sent_correctly(self) -> None:
         dummy_admin_address = 'admin@system.com'
 
-        admin_email_ctx = self.swap(
-            feconf, 'ADMIN_EMAIL_ADDRESS', dummy_admin_address)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            param_services,
+            'get_platform_parameter_value',
+            dummy_admin_address
+        )
 
-        with self.can_send_emails_ctx, admin_email_ctx:
+        with self.can_send_emails_ctx, swap_platform_parameter_value:
             # Make sure there are no emails already sent.
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
+            admin_email_address = (
+                param_services.get_platform_parameter_value(
+                    param_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+            assert isinstance(admin_email_address, str)
+            messages = self._get_sent_email_messages(admin_email_address)
             self.assertEqual(messages, [])
 
             # Send an account deletion failed email to admin.
@@ -6153,8 +6197,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
             )
 
             # Make sure emails are sent.
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(admin_email_address)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].to, ['admin@system.com'])
             self.assertEqual(
@@ -6199,7 +6242,8 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_ACCOUNT_DELETED)
 
@@ -6614,7 +6658,8 @@ class CDUserEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_ONBOARD_CD_USER)
@@ -6661,7 +6706,8 @@ class CDUserEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_ONBOARD_CD_USER)
@@ -6708,7 +6754,8 @@ class CDUserEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_ONBOARD_CD_USER)
@@ -6793,7 +6840,8 @@ class CDUserEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CD_USER)
 
@@ -6838,7 +6886,8 @@ class CDUserEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CD_USER)
 
@@ -6883,7 +6932,8 @@ class CDUserEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                'Site Admin <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CD_USER)
 
@@ -6896,14 +6946,20 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.admin_email_ctx = self.swap(
-            feconf, 'ADMIN_EMAIL_ADDRESS', self.dummy_admin_address)
+        self.swap_platform_parameter_value = self.swap_to_always_return(
+            param_services,
+            'get_platform_parameter_value',
+            self.dummy_admin_address
+        )
 
     def test_not_mergeable_change_list_email_is_sent_correctly(self) -> None:
-        with self.can_send_emails_ctx, self.admin_email_ctx:
+        with self.can_send_emails_ctx, self.swap_platform_parameter_value:
             # Make sure there are no emails already sent.
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
+            admin_email_address = (
+                param_services.get_platform_parameter_value(
+                    param_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+            assert isinstance(admin_email_address, str)
+            messages = self._get_sent_email_messages(admin_email_address)
             self.assertEqual(messages, [])
 
             # Send an account deletion failed email to admin.
@@ -6912,8 +6968,7 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
             )
 
             # Make sure emails are sent.
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(admin_email_address)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].to, ['admin@system.com'])
             self.assertEqual(
@@ -7068,7 +7123,8 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                '. <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                '. <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS)
@@ -7122,7 +7178,8 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
-                '. <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+                '. <%s>' % param_services.get_platform_parameter_value(
+                    param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS)

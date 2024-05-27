@@ -32,6 +32,8 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import suggestion_services
@@ -568,7 +570,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert admin_settings is not None
         self.assertEqual(admin_settings.user_id, user_id)
-        self.assertEqual(admin_settings.email, feconf.SYSTEM_EMAIL_ADDRESS)
+        self.assertEqual(
+            admin_settings.email,
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
         self.assertEqual(admin_settings.roles, roles)
         self.assertFalse(admin_settings.banned)
         self.assertEqual(admin_settings.username, 'admin')

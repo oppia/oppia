@@ -35,6 +35,7 @@ from core.domain import fs_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
+from core.domain import platform_parameter_services
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -2620,10 +2621,17 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
             self.assertEqual(
                 messages[0].sender,
-                'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
+                'Site Admin <%s>' % (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.
+                        SYSTEM_EMAIL_ADDRESS.value)))
             self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
             self.assertFalse(hasattr(messages[0], 'cc'))
-            self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(
+                messages[0].bcc,
+                platform_parameter_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value)
+            )
             self.assertEqual(
                 messages[0].subject,
                 'Your Oppia exploration "My Exploration" has been unpublished')

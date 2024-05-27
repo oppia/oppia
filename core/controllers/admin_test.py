@@ -34,6 +34,7 @@ from core.domain import opportunity_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
+from core.domain import platform_parameter_services
 from core.domain import question_fetchers
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -85,7 +86,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         """Complete the signup process for self.CURRICULUM_ADMIN_EMAIL."""
         super().setUp()
-        self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
+        self.admin_email_address = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+        assert isinstance(self.admin_email_address, str)
+        self.signup(self.admin_email_address, 'testsuper')
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -1093,7 +1098,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_grant_super_admin_privileges(self) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        assert isinstance(self.admin_email_address, str)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         grant_super_admin_privileges_stub = self.swap_with_call_counter(
             firebase_auth_services, 'grant_super_admin_privileges')
@@ -1129,7 +1135,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'Only the default system admin can manage super admins')
 
     def test_grant_super_admin_privileges_fails_without_username(self) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        assert isinstance(self.admin_email_address, str)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         response = self.put_json(
             '/adminsuperadminhandler', {}, csrf_token=self.get_new_csrf_token(),
@@ -1145,14 +1152,16 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_grant_super_admin_privileges_fails_with_invalid_username(
         self
     ) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        assert isinstance(self.admin_email_address, str)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         self.put_json(
             '/adminsuperadminhandler', {'username': 'fakeusername'},
             csrf_token=self.get_new_csrf_token(), expected_status_int=404)
 
     def test_revoke_super_admin_privileges(self) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        assert isinstance(self.admin_email_address, str)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         revoke_super_admin_privileges_stub = self.swap_with_call_counter(
             firebase_auth_services, 'revoke_super_admin_privileges')
@@ -1186,7 +1195,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'Only the default system admin can manage super admins')
 
     def test_revoke_super_admin_privileges_fails_without_username(self) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        assert isinstance(self.admin_email_address, str)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         response = self.delete_json(
             '/adminsuperadminhandler', params={}, expected_status_int=400)
@@ -1201,7 +1211,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_revoke_super_admin_privileges_fails_with_invalid_username(
         self
     ) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        assert isinstance(self.admin_email_address, str)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         self.delete_json(
             '/adminsuperadminhandler',
@@ -1210,7 +1221,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_revoke_super_admin_privileges_fails_for_default_admin(
         self
     ) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        assert isinstance(self.admin_email_address, str)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         response = self.delete_json(
             '/adminsuperadminhandler', params={'username': 'testsuper'},
@@ -2739,10 +2751,14 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+        system_email_address = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
+        assert isinstance(system_email_address, str)
+        self.signup(system_email_address, self.CURRICULUM_ADMIN_USERNAME)
+        self.login(system_email_address, is_super_admin=True)
         self.admin_user_id = self.get_user_id_from_email(
-            feconf.SYSTEM_EMAIL_ADDRESS)
+            system_email_address)
 
     def test_delete_without_user_id_raises_error(self) -> None:
         self.delete_json(
@@ -2797,9 +2813,13 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
+        assert isinstance(self.system_email_address, str)
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_user_id = self.get_user_id_from_email(
-            feconf.SYSTEM_EMAIL_ADDRESS)
+            self.system_email_address)
         self.signup(
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.add_user_role(
@@ -2819,7 +2839,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         model.update_timestamps()
         model.put()
 
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+        self.login(self.system_email_address, is_super_admin=True)
 
     def test_update_blog_post_without_blog_post_id_raises_error(self) -> None:
         csrf_token = self.get_new_csrf_token()
@@ -2879,7 +2899,8 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+        assert isinstance(self.system_email_address, str)
+        self.login(self.system_email_address, is_super_admin=True)
 
         self.put_json(
             '/updateblogpostdatahandler',
@@ -2912,7 +2933,8 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+        assert isinstance(self.system_email_address, str)
+        self.login(self.system_email_address, is_super_admin=True)
 
         response = self.put_json(
             '/updateblogpostdatahandler',
@@ -2934,7 +2956,8 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+        assert isinstance(self.system_email_address, str)
+        self.login(self.system_email_address, is_super_admin=True)
 
         self.put_json(
             '/updateblogpostdatahandler',
@@ -3040,14 +3063,19 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         """Complete the signup process for self.ADMIN_EMAIL."""
         super().setUp()
-        self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
+        self.admin_email_address = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+        assert isinstance(self.admin_email_address, str)
+        self.signup(self.admin_email_address, 'testsuper')
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.exploration1 = self.save_new_valid_exploration(
             self.EXP_ID_1, self.editor_id, end_state_name='End')
 
     def test_interactions_by_exploration_id_handler(self) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        assert isinstance(self.admin_email_address, str)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         payload = {
             'exp_id': self.EXP_ID_1
@@ -3060,7 +3088,8 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             sorted(interaction_ids), ['EndExploration', 'TextInput'])
 
     def test_handler_with_invalid_exploration_id_raise_error(self) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        assert isinstance(self.admin_email_address, str)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         payload = {
             'exp_id': 'invalid'
@@ -3071,7 +3100,8 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             expected_status_int=404)
 
     def test_handler_with_without_exploration_id_in_payload_raise_error(self) -> None: # pylint: disable=line-too-long
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        assert isinstance(self.admin_email_address, str)
+        self.login(self.admin_email_address, is_super_admin=True)
         response = self.get_json(
             '/interactions', params={},
             expected_status_int=400)

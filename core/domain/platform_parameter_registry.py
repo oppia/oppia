@@ -448,26 +448,30 @@ Registry.create_platform_parameter(
     ParamName.SYSTEM_EMAIL_ADDRESS,
     'Email address used for system issued actions',
     platform_parameter_domain.DataTypes.STRING,
-    default='system@example.com'
+    # TODO(ankita240796): Update post the first trial release of these params.
+    default=feconf.SYSTEM_EMAIL_ADDRESS
 )
 
 Registry.create_platform_parameter(
     ParamName.SYSTEM_EMAIL_NAME,
     'Email name for system issued actions',
     platform_parameter_domain.DataTypes.STRING,
-    default=''
+    # TODO(ankita240796): Update post the first trial release of these params.
+    default=feconf.SYSTEM_EMAIL_NAME
 )
 
 Registry.create_platform_parameter(
     ParamName.ADMIN_EMAIL_ADDRESS,
     'Email address used for admin issued actions',
     platform_parameter_domain.DataTypes.STRING,
-    default='testadmin@example.com'
+    # TODO(ankita240796): Update post the first trial release of these params.
+    default=feconf.ADMIN_EMAIL_ADDRESS
 )
 
 Registry.create_platform_parameter(
     ParamName.NOREPLY_EMAIL_ADDRESS,
     'Email address used for mails sent by Oppia',
     platform_parameter_domain.DataTypes.STRING,
-    default='noreply@example.com'
+    # TODO(ankita240796): Update post the first trial release of these params.
+    default=feconf.NOREPLY_EMAIL_ADDRESS
 )
