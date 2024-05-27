@@ -65,10 +65,6 @@ module.exports = {
     },
   },
   entry: {
-    collection_player:
-      commonPrefix +
-      '/pages/collection-player-page/' +
-      'collection-player-page.import.ts',
     console_errors: commonPrefix + '/tests/console_errors.import.ts',
     creator_dashboard:
       commonPrefix +
