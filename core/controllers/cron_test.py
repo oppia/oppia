@@ -360,8 +360,8 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, False], # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, False), # pylint: disable=line-too-long
         ]
     )
     def test_email_not_sent_if_sending_reviewer_emails_is_not_enabled(
@@ -384,9 +384,9 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False],
-            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, False], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, False] # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, False), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, False) # pylint: disable=line-too-long
         ]
     )
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
@@ -406,7 +406,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self.logout()
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(
         self
@@ -435,7 +435,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             self.expected_reviewable_suggestion_email_info)
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_email_not_sent_if_reviewer_ids_is_empty(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -514,6 +514,12 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             self.author_id, add_translation_change_dict,
             'test description')
 
+    @test_utils.use_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, False) # pylint: disable=line-too-long
+        ]
+    )
     def test_email_not_sent_if_sending_reviewer_emails_is_not_enabled(self) -> None: # pylint: disable=line-too-long
         # Here we use object because we need to spy on
         # send_reviewer_notifications method and assert
@@ -524,13 +530,8 @@ class CronMailReviewerNewSuggestionsHandlerTests(
         ) as mock_send:
             self.login(
                 self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-            swap_platform_parameter_value = self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                False
-            )
 
-            with self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
+            with self.testapp_swap:
                 self.get_json(
                     '/cron/mail/reviewers/new_cont' +
                     'ributor_dashboard_suggestions')
@@ -569,9 +570,9 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False],
-            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, False], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, False] # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, False), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, False) # pylint: disable=line-too-long
         ]
     )
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
@@ -594,7 +595,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             self.logout()
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(self) -> None: # pylint: disable=line-too-long
         # Here we use object because we need to spy on
@@ -624,7 +625,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             self.logout()
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_email_not_sent_if_reviewer_ids_is_empty(self) -> None:
         # Here we use object because we need to spy on
@@ -658,7 +659,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             self.logout()
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_email_sent_to_reviewers_successfully(self) -> None:
         # Here we use object because we need to spy on
@@ -852,9 +853,9 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False],
-            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True] # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True) # pylint: disable=line-too-long
         ]
     )
     def test_email_not_sent_if_sending_emails_is_disabled(self) -> None:
@@ -882,9 +883,9 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, False], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, False] # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, False), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, False) # pylint: disable=line-too-long
         ]
     )
     def test_email_not_sent_if_notifying_admins_reviewers_needed_is_disabled(
@@ -907,9 +908,9 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, False], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, False] # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, False), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, False) # pylint: disable=line-too-long
         ]
     )
     def test_email_not_sent_if_notifying_admins_about_suggestions_is_disabled(
@@ -931,7 +932,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.logout()
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_email_sent_to_admin_if_sending_admin_need_reviewers_emails_enabled(
         self
@@ -959,11 +960,11 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin'],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, 'dummy_footer'],
-            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True] # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, 'dummy_footer'),
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True) # pylint: disable=line-too-long
         ]
     )
     def test_email_sent_to_admin_if_notifying_admins_about_suggestions_enabled(
@@ -1134,7 +1135,7 @@ class CronMailChapterPublicationsNotificationsHandlerTests(
         self.logout()
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_email_sent_if_sending_emails_is_enabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)

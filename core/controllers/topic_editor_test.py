@@ -574,7 +574,7 @@ class TopicEditorTests(
         self.logout()
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_editable_topic_handler_get(self) -> None:
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
@@ -681,7 +681,7 @@ class TopicEditorTests(
         self.assertEqual(json_response['error'], 'Name should be a string.')
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_editable_topic_handler_put(self) -> None:
         # Check that admins can edit a topic.
@@ -1046,7 +1046,7 @@ class TopicPublishSendMailHandlerTests(
         BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_send_mail(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)

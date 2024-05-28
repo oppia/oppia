@@ -897,7 +897,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_pop_feedback_message_references(self) -> None:
         with self.can_send_feedback_email_ctx:
@@ -929,7 +929,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertIsNone(model)
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_update_feedback_message_references(self) -> None:
         with self.can_send_feedback_email_ctx:
@@ -968,7 +968,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 thread_id)
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_update_feedback_email_retries(self) -> None:
         with self.can_send_feedback_email_ctx:
@@ -991,7 +991,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(model.retries, 1)
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_send_feedback_message_email(self) -> None:
         with self.can_send_feedback_email_ctx:
@@ -1026,7 +1026,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(model.retries, 0)
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_add_new_feedback_message(self) -> None:
         with self.can_send_feedback_email_ctx:
@@ -1074,7 +1074,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(model.retries, 0)
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_email_is_not_sent_recipient_has_muted_emails_globally(
         self
@@ -1092,7 +1092,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_email_is_not_sent_recipient_has_muted_this_exploration(
         self
@@ -1111,7 +1111,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_that_emails_are_not_sent_for_anonymous_user(self) -> None:
         with self.can_send_feedback_email_ctx:
@@ -1125,9 +1125,9 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER]
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
         ]
     )
     def test_that_emails_are_sent_for_registered_user(self) -> None:
@@ -1166,7 +1166,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_that_emails_are_not_sent_for_thread_status_changes(self) -> None:
         with self.can_send_feedback_email_ctx:
@@ -1179,7 +1179,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_that_email_are_not_sent_to_author_himself(self) -> None:
         with self.can_send_feedback_email_ctx:
@@ -1193,9 +1193,9 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER]
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
         ]
     )
     def test_that_email_is_sent_for_reply_on_feedback(self) -> None:
@@ -1224,9 +1224,9 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER]
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
         ]
     )
     def test_that_email_is_sent_for_changing_status_of_thread(self) -> None:
@@ -1259,9 +1259,9 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER]
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
         ]
     )
     def test_that_email_is_sent_for_each_feedback_message(self) -> None:
@@ -1312,9 +1312,9 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER]
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
         ]
     )
     def test_that_emails_are_sent(self) -> None:
@@ -1374,9 +1374,9 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER]
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
         ]
     )
     def test_that_correct_emails_are_sent_for_multiple_feedback(self) -> None:
@@ -1441,7 +1441,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             self.assertEqual(messages[0].body, expected_email_text_body)
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_that_emails_are_not_sent_if_already_seen(self) -> None:
         with self.can_send_feedback_email_ctx:
@@ -1483,9 +1483,9 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER]
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
         ]
     )
     def test_that_emails_are_sent_for_feedback_message(self) -> None:
@@ -1536,9 +1536,9 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER]
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
         ]
     )
     def test_that_emails_are_sent_for_status_change(self) -> None:
@@ -1589,9 +1589,9 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER]
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
         ]
     )
     def test_that_emails_are_sent_for_both_status_change_and_message(
@@ -1672,7 +1672,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             self.assertEqual(messages[1].body, expected_email_text_body_message)
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_that_emails_are_not_sent_to_anonymous_user(self) -> None:
         with self.can_send_feedback_email_ctx:

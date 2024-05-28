@@ -90,12 +90,12 @@ class EmailDraftHandlerTests(test_utils.GenericTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
                 platform_parameter_list.ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,  # pylint: disable=line-too-long
                 'I\'m writing to inform you that '
                 'I have unpublished the above exploration.'
-            ],
+            ),
         ]
     )
     def test_get_draft_email_body(self) -> None:

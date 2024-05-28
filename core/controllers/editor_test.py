@@ -2530,7 +2530,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         )
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
     )
     def test_error_cases_when_can_send_emails_param_is_false(self) -> None:
         # Log in as a moderator.
@@ -2566,9 +2566,9 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'], # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'), # pylint: disable=line-too-long
         ]
     )
     def test_error_cases_when_can_send_emails_param_is_true(self) -> None:
@@ -2595,14 +2595,14 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
                 platform_parameter_list.ParamName.EMAIL_FOOTER,
                 'You can change your email preferences via the '
                 '<a href="http://localhost:8181/preferences">Preferences</a> '
                 'page.'
-            ],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'], # pylint: disable=line-too-long
+            ),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'), # pylint: disable=line-too-long
         ]
     )
     def test_email_is_sent_correctly_when_unpublishing(self) -> None:

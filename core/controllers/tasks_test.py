@@ -65,9 +65,9 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender']
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender')
         ]
     )
     def test_email_sent_when_feedback_in_thread(self) -> None:
@@ -157,9 +157,9 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender']
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender')
         ]
     )
     def test_email_is_sent_when_contributor_achieves_a_new_rank(self) -> None:
@@ -207,9 +207,9 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender']
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender')
         ]
     )
     def test_instant_feedback_reply_email(self) -> None:
@@ -255,9 +255,9 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender']
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender')
         ]
     )
     def test_email_sent_when_status_changed(self) -> None:
@@ -303,9 +303,9 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender']
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender')
         ]
     )
     def test_email_sent_to_moderator_after_flag(self) -> None:

@@ -718,7 +718,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                     'email@example.com', 'Android'))
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'
@@ -806,7 +806,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_subscription_email)
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_get_and_set_user_email_preferences_with_error(self) -> None:
         auth_id = 'someUser'

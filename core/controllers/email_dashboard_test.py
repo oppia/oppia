@@ -228,7 +228,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_email_dashboard_result_post_passes(self) -> None:
         self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
@@ -353,7 +353,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_that_no_emails_are_sent_if_query_is_canceled(self) -> None:
         self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
@@ -429,7 +429,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_that_test_email_for_bulk_emails_is_sent(self) -> None:
         self.login(self.SUBMITTER_EMAIL, is_super_admin=True)

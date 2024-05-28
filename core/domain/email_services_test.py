@@ -42,9 +42,9 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, ''],
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
         ]
     )
     def test_send_mail_data_properly_sent(self) -> None:
@@ -60,9 +60,9 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, ''],
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
         ]
     )
     def test_bcc_admin_flag(self) -> None:
@@ -92,9 +92,9 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, ''],
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
         ]
     )
     def test_send_bulk_mail_data_properly_sent(self) -> None:
@@ -112,9 +112,9 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, ''],
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
         ]
     )
     def test_email_not_sent_if_email_addresses_are_malformed(self) -> None:
@@ -191,9 +191,9 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'],
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, ''],
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
         ]
     )
     def test_unsuccessful_status_codes_raises_exception(self) -> None:

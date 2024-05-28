@@ -457,8 +457,6 @@ def swap_get_platform_parameter_value_function(
             for expected_platform_parameter_name in platform_parameter_names
         ):
             return platform_parameter_name_value_dict[parameter_name]
-        raise platform_parameter_services.PlatformParameterNotFoundException(
-            'Unknown platform parameter: %s.' % parameter_name)
 
     original_get_platform_parameter_value = getattr(
         platform_parameter_services, 'get_platform_parameter_value')

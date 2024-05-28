@@ -33,7 +33,7 @@ class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_send_mail_logs_to_terminal(self) -> None:
         """In DEV Mode, platforms email_service API that sends a singular email
@@ -81,7 +81,7 @@ class EmailTests(test_utils.GenericTestBase):
             [logging_info_email_body, logging_info_notification])
 
     @test_utils.use_platform_parameters(
-        [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_send_mail_to_multiple_recipients_logs_to_terminal(self) -> None:
         """In DEV Mode, platform email_services that sends mail to multiple

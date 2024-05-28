@@ -658,8 +658,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False],
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'], # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'), # pylint: disable=line-too-long
         ]
     )
     def test_send_post_signup_email(self) -> None:
@@ -1085,11 +1085,11 @@ class SignupTests(test_utils.GenericTestBase):
 
     @test_utils.use_platform_parameters(
         [
-            [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, 'body'], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'], # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, 'body'), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'), # pylint: disable=line-too-long
         ]
     )
     def test_user_settings_of_existing_user(self) -> None:
