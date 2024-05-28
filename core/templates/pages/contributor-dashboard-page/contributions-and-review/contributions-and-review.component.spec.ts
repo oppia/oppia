@@ -81,9 +81,7 @@ class MockNgbModal {
 
 class MockPlatformFeatureService {
   status = {
-    ContributorDashboardAccomplishments: {
-      isEnabled: false,
-    },
+    // other properties might go here
   };
 }
 
@@ -567,9 +565,6 @@ describe('Contributions and review component', () => {
         more: false,
       })
     );
-    mockPlatformFeatureService.status.ContributorDashboardAccomplishments.isEnabled =
-      true;
-
     fixture.detectChanges();
   }));
 

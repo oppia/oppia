@@ -161,7 +161,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   };
 
   opportunities: ExplorationOpportunitySummary[] = [];
-  accomplishmentsTabIsEnabled: boolean = false;
   defaultContributionType: string = 'translationContribution';
   SUGGESTION_LABELS = {
     review: {
