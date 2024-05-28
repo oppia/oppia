@@ -23,7 +23,7 @@ module.exports = {
     collect: {
       numberOfRuns: baseConfig['numberOfRuns'],
       puppeteerScript: baseConfig['puppeteerScript'],
-      url: baseConfig['urlShards'][1],
+      url: baseConfig['urls'],
     },
     assert: {
       assertMatrix: [

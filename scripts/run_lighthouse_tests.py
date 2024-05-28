@@ -19,7 +19,9 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import json
 import os
+import re
 import subprocess
 import sys
 
@@ -53,6 +55,8 @@ APP_YAML_FILENAMES: Final = {
     SERVER_MODE_PROD: 'app.yaml',
     SERVER_MODE_DEV: 'app_dev.yaml'
 }
+LIGHTHOUSE_PAGES_JSON_FILEPATH = os.path.join(
+    'core', 'tests', 'lighthouse-pages.json')
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
@@ -71,6 +75,9 @@ _PARSER.add_argument(
     required=True, choices=['1', '2'])
 
 _PARSER.add_argument(
+    '--pages', help='Sets the pages to run the lighthouse tests on')
+
+_PARSER.add_argument(
     '--skip_build', help='Sets whether to skip webpack build',
     action='store_true')
 
@@ -79,13 +86,16 @@ _PARSER.add_argument(
     action='store_true')
 
 
-def run_lighthouse_puppeteer_script(record: bool = False) -> None:
+def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
     """Runs puppeteer script to collect dynamic urls.
 
     Args:
         record: bool. Set to True to record the LHCI puppeteer script
             via puppeteer-screen-recorder and False to not. Note that
             puppeteer-screen-recorder must be separately installed to record.
+
+    Returns:
+        dict(str, str). The entities and their IDs that were collected.
     """
     puppeteer_path = (
         os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
@@ -106,13 +116,18 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> None:
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         print(stdout)
+        entities: dict[str, str] = {}
         for line in stdout.split(b'\n'):
             # Standard output is in bytes, we need to decode the line to
             # print it.
-            export_url(line.decode('utf-8'))
+            entity = get_entity(line.decode('utf-8'))
+            if entity is not None:
+                entity_name, entity_id = entity
+                entities[entity_name] = entity_id
         print('Puppeteer script completed successfully.')
         if record:
             print('Resulting puppeteer video saved at %s' % video_path)
+        return entities
     else:
         print('Return code: %s' % process.returncode)
         print('OUTPUT:')
@@ -147,25 +162,28 @@ def run_webpack_compilation() -> None:
         sys.exit(1)
 
 
-def export_url(line: str) -> None:
-    """Exports the entity ID in the given line to an environment variable, if
-    the line is a URL.
+def get_entity(line: str) -> tuple[str, str] | None:
+    """Gets the entity in the given line if the line is a URL.
 
     Args:
-        line: str. The line to parse and extract the entity ID from. If no
-            recognizable URL is present, nothing is exported to the
-            environment.
+        line: str. The line to parse and extract the entity name and ID from. 
+            If no recognizable URL is present, nothing is returned.
+
+    Returns:
+        tuple(str, str) | None. The entity name and ID if the line is a URL.
     """
     url_parts = line.split('/')
-    print('Parsing and exporting entity ID in line: %s' % line)
+    print('Parsing entity ID in line: %s' % line)
     if 'create' in line:
-        os.environ['exploration_id'] = url_parts[4]
+        return 'exploration_id', url_parts[4]
     elif 'topic_editor' in line:
-        os.environ['topic_id'] = url_parts[4]
+        return 'topic_editor', url_parts[4]
     elif 'story_editor' in line:
-        os.environ['story_id'] = url_parts[4]
+        return 'story_editor', url_parts[4]
     elif 'skill_editor' in line:
-        os.environ['skill_id'] = url_parts[4]
+        return 'skill_editor', url_parts[4]
+
+    return None
 
 
 def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
@@ -202,6 +220,73 @@ def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
         print(stderr.decode('utf-8'))
         print('Lighthouse checks failed. More details can be found above.')
         sys.exit(1)
+
+
+def get_lighthouse_pages_for_shard(shard: str) -> dict[str, str]:
+    """Gets the lighthouse pages and their URLs from the config.
+
+    Args:
+        shard: str. The shard to get the lighthouse pages for.
+
+    Returns:
+        dict(str, str). The lighthouse page names and their URLs.
+    """
+    pages: dict[str, str] = {}
+    with open(LIGHTHOUSE_PAGES_JSON_FILEPATH, 'r', encoding='utf-8') as f:
+        config = json.load(f)
+        shard_config = config['shards'][shard]
+        for page in shard_config:
+            pages[page] = shard_config[page]['url']
+
+    return pages
+
+
+def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
+    """Injects any entity IDs that a URL needs into the URL.
+
+    Args:
+        url: str. The URL to inject entity IDs into.
+        entities: dict(str, str). The possible entities to inject into the URL.
+
+    Returns:
+        str. The URL with the entity ID injected into it.
+
+    Raises:
+        ValueError. The entity referenced in the URL is not found in the 
+            entities.
+    """
+    entity_matcher = r'\{\{(.*?)\}\}'
+    injected_url = url
+    for match in re.findall(entity_matcher, url):
+        entity_name = match[1]
+        if entity_name not in entities:
+            raise ValueError('Entity %s not found in entities.' % entity_name)
+        injected_url = url.replace(
+            '{{%s}}' % entity_name, entities[entity_name])
+    return injected_url
+
+
+def get_lighthouse_urls_to_run(
+    pages: List[str],
+    entities: dict[str, str],
+    pages_config: dict[str, str]
+) -> List[str]:
+    """Gets the URLs to run Lighthouse checks on.
+
+    Args:
+        pages: list(str). The pages to run the Lighthouse checks on.
+        entities: dict(str, str). The available entities to inject 
+            into the URLs.
+        pages_config: dict(str, str). The configuration for the pages.
+
+    Returns:
+        list(str). The URLs to run the Lighthouse checks on.
+    """
+    lighthouse_urls_to_run: List[str] = []
+    for page in pages:
+        url = pages_config[page]
+        lighthouse_urls_to_run.append(inject_entities_into_url(url, entities))
+    return lighthouse_urls_to_run
 
 
 def main(args: Optional[List[str]] = None) -> None:
@@ -251,7 +336,25 @@ def main(args: Optional[List[str]] = None) -> None:
             skip_sdk_update_check=True,
             env=env))
 
-        run_lighthouse_puppeteer_script(parsed_args.record_screen)
+        entities = run_lighthouse_puppeteer_script(parsed_args.record_screen)
+        pages_config: dict[str, str] = get_lighthouse_pages_for_shard(
+            parsed_args.shard)
+        os.environ['ALL_LIGHTHOUSE_URLS'] = '.'.join(
+            get_lighthouse_urls_to_run(
+                list(pages_config.keys()),
+                entities,
+                pages_config
+            )
+        )
+        if parsed_args.pages:
+            os.environ['LIGHTHOUSE_URLS_TO_RUN'] = '.'.join(
+                get_lighthouse_urls_to_run(
+                    parsed_args.pages.split(','),
+                    entities,
+                    pages_config
+                )
+            )
+
         run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
 
 
