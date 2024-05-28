@@ -34,7 +34,6 @@ from core.domain import opportunity_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
-from core.domain import platform_parameter_services
 from core.domain import question_fetchers
 from core.domain import recommendations_services
 from core.domain import rights_manager

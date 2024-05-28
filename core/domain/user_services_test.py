@@ -805,7 +805,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_feedback_message_email)
         self.assertFalse(email_preferences.can_receive_subscription_email)
 
-
     @test_utils.use_platform_parameters(
         [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True]]
     )

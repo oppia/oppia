@@ -150,7 +150,8 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             )
             server_can_send_emails = (
                 platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+                    platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS
+                    .value
                 )
             )
             if server_can_send_emails:

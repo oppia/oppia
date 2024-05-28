@@ -46,6 +46,7 @@ FOOTER: Final = (
     '<a href="http://localhost:8181/preferences">Preferences</a> page.'
 )
 
+
 class FeedbackServicesUnitTests(test_utils.EmailTestBase):
     """Test functions in feedback_services."""
 

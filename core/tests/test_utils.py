@@ -415,7 +415,7 @@ def enable_feature_flags(
 def swap_get_platform_parameter_value_function(
     platform_parameter_name_value_tuples: List[
         Tuple[
-            platform_parameter_list.PlatformParameterNames,
+            platform_parameter_list.ParamName,
             platform_parameter_domain.PlatformDataTypes
         ]
     ]
@@ -426,9 +426,9 @@ def swap_get_platform_parameter_value_function(
     platform_parameter_names list.
 
     Args:
-        platform_parameter_name_value_tuples: List[Tuple[PlatformParameterNames,
+        platform_parameter_name_value_tuples: List[Tuple[ParamName,
             PlatformDataTypes]]. The list of the names of the platform
-            parameters and their corresponding values that will be returned.
+            parameters and their corresponding values that will be enabled.
 
     Yields:
         context. The context with function replaced.
@@ -480,7 +480,7 @@ def swap_get_platform_parameter_value_function(
 def use_platform_parameters(
     platform_parameter_name_value_tuples: List[
         Tuple[
-            platform_parameter_list.PlatformParameterNames,
+            platform_parameter_list.ParamName,
             platform_parameter_domain.PlatformDataTypes
         ]
     ]
@@ -492,8 +492,9 @@ def use_platform_parameters(
     scope of the test.
 
     Args:
-        platform_parameter_names: List[platform_parameter_list.PlatformParameterNames].
-            The list of the names of the platform parameters that will be enabled.
+        platform_parameter_name_value_tuples: List[Tuple[ParamName,
+            PlatformDataTypes]]. The list of the names of the platform
+            parameters and their corresponding values that will be enabled.
 
     Returns:
         function. The newly decorated function that enables given platform

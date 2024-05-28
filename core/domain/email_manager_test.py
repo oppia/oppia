@@ -741,7 +741,10 @@ class SignupEmailTests(test_utils.EmailTestBase):
             [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
             [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Name'],
             [platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER],
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, PLACEHOLDER_SUBJECT], # pylint: disable=line-too-long
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                PLACEHOLDER_SUBJECT
+            ],
             [platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, '']
         ]
     )
@@ -790,8 +793,14 @@ class SignupEmailTests(test_utils.EmailTestBase):
             [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
             [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Name'],
             [platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER],
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, ''], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, PLACEHOLDER_HTML_BODY] # pylint: disable=line-too-long
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                ''
+            ],
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+                PLACEHOLDER_HTML_BODY
+            ]
         ]
     )
     def test_email_not_sent_if_content_config_is_partially_modified(
@@ -910,10 +919,19 @@ class SignupEmailTests(test_utils.EmailTestBase):
     @test_utils.use_platform_parameters(
         [
             [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Email Sender'],
+            [
+                platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
+                'Email Sender'
+            ],
             [platform_parameter_list.ParamName.EMAIL_FOOTER, NEW_FOOTER],
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'Welcome!'], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, EMAIL_BODY] # pylint: disable=line-too-long
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                'Welcome!'
+            ],
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+                EMAIL_BODY
+            ]
         ]
     )
     def test_contents_of_signup_email_are_correct(self) -> None:
@@ -992,10 +1010,19 @@ class SignupEmailTests(test_utils.EmailTestBase):
     @test_utils.use_platform_parameters(
         [
             [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Email Sender'],
+            [
+                platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
+                'Email Sender'
+            ],
             [platform_parameter_list.ParamName.EMAIL_FOOTER, NEW_FOOTER],
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'Welcome!'], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, EMAIL_BODY] # pylint: disable=line-too-long
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                'Welcome!'
+            ],
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+                EMAIL_BODY
+            ]
         ]
     )
     def test_email_only_sent_once_for_repeated_signups_by_same_user(
@@ -1047,10 +1074,19 @@ class SignupEmailTests(test_utils.EmailTestBase):
     @test_utils.use_platform_parameters(
         [
             [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Email Sender'],
+            [
+                platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
+                'Email Sender'
+            ],
             [platform_parameter_list.ParamName.EMAIL_FOOTER, NEW_FOOTER],
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'Welcome!'], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, EMAIL_BODY] # pylint: disable=line-too-long
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                'Welcome!'
+            ],
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+                EMAIL_BODY
+            ]
         ]
     )
     def test_email_only_sent_if_signup_was_successful(self) -> None:
@@ -1101,10 +1137,19 @@ class SignupEmailTests(test_utils.EmailTestBase):
     @test_utils.use_platform_parameters(
         [
             [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
-            [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Email Sender'],
+            [
+                platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
+                'Email Sender'
+            ],
             [platform_parameter_list.ParamName.EMAIL_FOOTER, NEW_FOOTER],
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'Welcome!'], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, EMAIL_BODY] # pylint: disable=line-too-long
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                'Welcome!'
+            ],
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+                EMAIL_BODY
+            ]
         ]
     )
     def test_record_of_sent_email_is_written_to_datastore(self) -> None:
@@ -1249,8 +1294,14 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
             [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Name'],
             [platform_parameter_list.ParamName.EMAIL_FOOTER, NEW_FOOTER],
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, NEW_EMAIL_SUBJECT], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, PLACEHOLDER_HTML_BODY] # pylint: disable=line-too-long
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                NEW_EMAIL_SUBJECT
+            ],
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+                PLACEHOLDER_HTML_BODY
+            ]
         ]
     )
     def test_send_email_does_not_resend_if_same_hash_exists(self) -> None:
@@ -1306,8 +1357,14 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
             [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Name'],
             [platform_parameter_list.ParamName.EMAIL_FOOTER, NEW_FOOTER],
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, NEW_EMAIL_SUBJECT], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, PLACEHOLDER_HTML_BODY] # pylint: disable=line-too-long
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                NEW_EMAIL_SUBJECT
+            ],
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+                PLACEHOLDER_HTML_BODY
+            ]
         ]
     )
     def test_send_email_does_not_resend_within_duplicate_interval(self) -> None:
@@ -1366,8 +1423,14 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
             [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Name'],
             [platform_parameter_list.ParamName.EMAIL_FOOTER, NEW_FOOTER],
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, NEW_EMAIL_SUBJECT], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, PLACEHOLDER_HTML_BODY] # pylint: disable=line-too-long
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                NEW_EMAIL_SUBJECT
+            ],
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+                PLACEHOLDER_HTML_BODY
+            ]
         ]
     )
     def test_sending_email_with_different_recipient_but_same_hash(self) -> None:
@@ -1422,8 +1485,14 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
             [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Name'],
             [platform_parameter_list.ParamName.EMAIL_FOOTER, NEW_FOOTER],
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, NEW_EMAIL_SUBJECT], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, PLACEHOLDER_HTML_BODY] # pylint: disable=line-too-long
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                NEW_EMAIL_SUBJECT
+            ],
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+                PLACEHOLDER_HTML_BODY
+            ]
         ]
     )
     def test_sending_email_with_different_subject_but_same_hash(self) -> None:
@@ -1479,8 +1548,14 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
             [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Name'],
             [platform_parameter_list.ParamName.EMAIL_FOOTER, NEW_FOOTER],
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, NEW_EMAIL_SUBJECT], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, PLACEHOLDER_HTML_BODY] # pylint: disable=line-too-long
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                NEW_EMAIL_SUBJECT
+            ],
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+                PLACEHOLDER_HTML_BODY
+            ]
         ]
     )
     def test_sending_email_with_different_body_but_same_hash(self) -> None:
@@ -1536,8 +1611,14 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             [platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True],
             [platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Name'],
             [platform_parameter_list.ParamName.EMAIL_FOOTER, NEW_FOOTER],
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, NEW_EMAIL_SUBJECT], # pylint: disable=line-too-long
-            [platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, PLACEHOLDER_HTML_BODY] # pylint: disable=line-too-long
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                NEW_EMAIL_SUBJECT
+            ],
+            [
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+                PLACEHOLDER_HTML_BODY
+            ]
         ]
     )
     def test_duplicate_emails_are_sent_after_some_time_has_elapsed(
@@ -1776,7 +1857,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
     @test_utils.use_platform_parameters(
         [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False]]
     )
-    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
+    def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
         email_manager.send_suggestion_email(
             self.exploration.title, self.exploration.id, self.new_user_id,
             self.recipient_list)
@@ -1892,7 +1973,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
     @test_utils.use_platform_parameters(
         [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False]]
     )
-    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
+    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         email_manager.send_emails_to_subscribers(
             self.editor_id, self.exploration.id, self.exploration.title)
 
@@ -2124,7 +2205,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
     @test_utils.use_platform_parameters(
         [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False]]
     )
-    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
+    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         email_manager.send_flag_exploration_email(
             self.exploration.title, self.exploration.id, self.new_user_id,
             self.report_text)
@@ -2232,7 +2313,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
     @test_utils.use_platform_parameters(
         [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False]]
     )
-    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
+    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         email_manager.send_mail_to_onboard_new_reviewers(
             self.reviewer_id, 'Algebra')
 
@@ -2314,7 +2395,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
     @test_utils.use_platform_parameters(
         [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False]]
     )
-    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
+    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         email_manager.send_mail_to_notify_users_to_review(
             self.reviewer_id, 'Algebra')
 
@@ -2389,7 +2470,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
     @test_utils.use_platform_parameters(
         [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False]]
     )
-    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
+    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         contributor_ranking_email_info = (
             suggestion_registry.ContributorMilestoneEmailInfo(
                 self.user_id, 'question', 'edit', None,
@@ -6708,7 +6789,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
     @test_utils.use_platform_parameters(
         [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False]]
     )
-    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
+    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         email_manager.send_account_deleted_email(
             self.applicant_id, self.APPLICANT_EMAIL)
 
@@ -7123,7 +7204,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
     @test_utils.use_platform_parameters(
         [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False]]
     )
-    def test_assign_translation_reviewer_email_for_server_can_send_emails_is_false(
+    def test_assign_translation_reviewer_email_for_can_send_emails_is_false(
         self
     ) -> None:
         email_manager.send_email_to_new_cd_user(
@@ -7659,7 +7740,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
     @test_utils.use_platform_parameters(
         [[platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False]]
     )
-    def test_that_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
+    def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         email_manager.send_reminder_mail_to_notify_curriculum_admins(
             [self.CURRICULUM_ADMIN_1_EMAIL, self.CURRICULUM_ADMIN_2_EMAIL],
             [])
