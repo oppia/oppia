@@ -45,21 +45,27 @@ describe('Question Admin', function () {
       await UserFactory.closeBrowserForUser(Tester);
 
       await questionAdmin.navigateToContributorDashboardAdminPage();
-      await questionAdmin.screenshotMatch(
+      await questionAdmin.expectScreenshotToMatch(
         'navigateToContributorDashboardAdminPage'
       );
 
       await questionAdmin.verifyUserCannotReviewQuestions('Tester');
-      await questionAdmin.screenshotMatch('verifyUserCannotReviewQuestions');
+      await questionAdmin.expectScreenshotToMatch(
+        'verifyUserCannotReviewQuestions'
+      );
 
       await questionAdmin.verifyQuestionReviewersExcludeUser('Tester');
-      await questionAdmin.screenshotMatch('verifyQuestionReviewersExcludeUser');
+      await questionAdmin.expectScreenshotToMatch(
+        'verifyQuestionReviewersExcludeUser'
+      );
 
       await questionAdmin.verifyUserCannotSubmitQuestions('Tester');
-      await questionAdmin.screenshotMatch('verifyUserCannotSubmitQuestions');
+      await questionAdmin.expectScreenshotToMatch(
+        'verifyUserCannotSubmitQuestions'
+      );
 
       await questionAdmin.verifyQuestionSubmittersExcludeUser('Tester');
-      await questionAdmin.screenshotMatch(
+      await questionAdmin.expectScreenshotToMatch(
         'verifyQuestionSubmittersExcludeUser'
       );
 
@@ -67,13 +73,19 @@ describe('Question Admin', function () {
       await questionAdmin.addReviewQuestionRights('Tester');
 
       await questionAdmin.verifyUserCanReviewQuestions('Tester');
-      await questionAdmin.screenshotMatch('verifyUserCanReviewQuestions');
+      await questionAdmin.expectScreenshotToMatch(
+        'verifyUserCanReviewQuestions'
+      );
       await questionAdmin.verifyQuestionReviewersIncludeUser('Tester');
-      await questionAdmin.screenshotMatch('verifyQuestionReviewersIncludeUser');
+      await questionAdmin.expectScreenshotToMatch(
+        'verifyQuestionReviewersIncludeUser'
+      );
       await questionAdmin.verifyUserCanSubmitQuestions('Tester');
-      await questionAdmin.screenshotMatch('verifyUserCanSubmitQuestions');
+      await questionAdmin.expectScreenshotToMatch(
+        'verifyUserCanSubmitQuestions'
+      );
       await questionAdmin.verifyQuestionSubmittersIncludeUser('Tester');
-      await questionAdmin.screenshotMatch(
+      await questionAdmin.expectScreenshotToMatch(
         'verifyQuestionSubmittersIncludeUser'
       );
 
@@ -81,13 +93,19 @@ describe('Question Admin', function () {
       await questionAdmin.removeReviewQuestionRights('Tester');
 
       await questionAdmin.verifyUserCannotReviewQuestions('Tester');
-      await questionAdmin.screenshotMatch('verifyUserCannotReviewQuestions');
+      await questionAdmin.expectScreenshotToMatch(
+        'verifyUserCannotReviewQuestions'
+      );
       await questionAdmin.verifyQuestionReviewersExcludeUser('Tester');
-      await questionAdmin.screenshotMatch('verifyQuestionReviewersExcludeUser');
+      await questionAdmin.expectScreenshotToMatch(
+        'verifyQuestionReviewersExcludeUser'
+      );
       await questionAdmin.verifyUserCannotSubmitQuestions('Tester');
-      await questionAdmin.screenshotMatch('verifyUserCannotSubmitQuestions');
+      await questionAdmin.expectScreenshotToMatch(
+        'verifyUserCannotSubmitQuestions'
+      );
       await questionAdmin.verifyQuestionSubmittersExcludeUser('Tester');
-      await questionAdmin.screenshotMatch(
+      await questionAdmin.expectScreenshotToMatch(
         'verifyQuestionSubmittersExcludeUser'
       );
     },

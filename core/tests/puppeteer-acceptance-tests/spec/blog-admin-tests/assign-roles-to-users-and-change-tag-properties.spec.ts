@@ -55,7 +55,7 @@ describe('Blog Admin', function () {
       );
 
       await superAdmin.expectUserNotToHaveRole('guestUsr1', ROLES.BLOG_ADMIN);
-      await superAdmin.screenshotMatch('expectUserNotToHaveRole');
+      await superAdmin.expectScreenshotToMatch('expectUserNotToHaveRole');
 
       await blogAdmin.assignUserToRoleFromBlogAdminPage(
         'guestUsr1',
@@ -63,13 +63,13 @@ describe('Blog Admin', function () {
       );
 
       await superAdmin.expectUserToHaveRole('guestUsr1', ROLES.BLOG_ADMIN);
-      await superAdmin.screenshotMatch('expectUserToHaveRole');
+      await superAdmin.expectScreenshotToMatch('expectUserToHaveRole');
 
       await superAdmin.expectUserNotToHaveRole(
         'guestUsr2',
         ROLES.BLOG_POST_EDITOR
       );
-      await superAdmin.screenshotMatch('expectUserNotToHaveRole');
+      await superAdmin.expectScreenshotToMatch('expectUserNotToHaveRole');
 
       await blogAdmin.assignUserToRoleFromBlogAdminPage(
         'guestUsr2',
@@ -80,7 +80,7 @@ describe('Blog Admin', function () {
         'guestUsr2',
         ROLES.BLOG_POST_EDITOR
       );
-      await superAdmin.screenshotMatch('expectUserToHaveRole');
+      await superAdmin.expectScreenshotToMatch('expectUserToHaveRole');
 
       await blogAdmin.removeBlogEditorRoleFromUsername('guestUsr2');
 
@@ -88,13 +88,13 @@ describe('Blog Admin', function () {
         'guestUsr2',
         ROLES.BLOG_POST_EDITOR
       );
-      await superAdmin.screenshotMatch('expectUserNotToHaveRole');
+      await superAdmin.expectScreenshotToMatch('expectUserNotToHaveRole');
 
       await blogAdmin.expectMaximumTagLimitNotToBe(5);
-      await blogAdmin.screenshotMatch('expectMaximumTagLimitNotToBe5');
+      await blogAdmin.expectScreenshotToMatch('expectMaximumTagLimitNotToBe5');
       await blogAdmin.setMaximumTagLimitTo(5);
       await blogAdmin.expectMaximumTagLimitToBe(5);
-      await blogAdmin.screenshotMatch('expectMaximumTagLimitToBe5');
+      await blogAdmin.expectScreenshotToMatch('expectMaximumTagLimitToBe5');
       await guestUsr1.closeBrowser();
       await guestUsr2.closeBrowser();
     },

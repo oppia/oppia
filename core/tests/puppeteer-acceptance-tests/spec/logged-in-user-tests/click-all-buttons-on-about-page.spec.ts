@@ -41,7 +41,9 @@ describe('Logged-in User in About page', function () {
     'should open Math Classroom page with the Browse Our Lessons button.',
     async function () {
       await testUser.clickBrowseOurLessonsButtonInAboutPage();
-      await testUser.screenshotMatch('clickBrowseOurLessonsButtonInAboutPage');
+      await testUser.expectScreenshotToMatch(
+        'clickBrowseOurLessonsButtonInAboutPage'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -50,7 +52,9 @@ describe('Logged-in User in About page', function () {
     'should open Android page with the Access Android App button.',
     async function () {
       await testUser.clickAccessAndroidAppButtonInAboutPage();
-      await testUser.screenshotMatch('clickAccessAndroidAppButtonInAboutPage');
+      await testUser.expectScreenshotToMatch(
+        'clickAccessAndroidAppButtonInAboutPage'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -59,7 +63,9 @@ describe('Logged-in User in About page', function () {
     'should open Math Classroom page with the Visit Classroom button.',
     async function () {
       await testUser.clickVisitClassroomButtonInAboutPage();
-      await testUser.screenshotMatch('clickVisitClassroomButtonInAboutPage');
+      await testUser.expectScreenshotToMatch(
+        'clickVisitClassroomButtonInAboutPage'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -68,7 +74,9 @@ describe('Logged-in User in About page', function () {
     'should open Community Library page with the Browse Library button.',
     async function () {
       await testUser.clickBrowseLibraryButtonInAboutPage();
-      await testUser.screenshotMatch('clickBrowseLibraryButtonInAboutPage');
+      await testUser.expectScreenshotToMatch(
+        'clickBrowseLibraryButtonInAboutPage'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -78,7 +86,9 @@ describe('Logged-in User in About page', function () {
       'with the Create Lessons button',
     async function () {
       await testUser.clickCreateLessonsButtonInAboutPage();
-      await testUser.screenshotMatch('clickCreateLessonsButtonInAboutPage');
+      await testUser.expectScreenshotToMatch(
+        'clickCreateLessonsButtonInAboutPage'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -87,7 +97,9 @@ describe('Logged-in User in About page', function () {
     'should open Math Classroom page with the Explore Lessons button.',
     async function () {
       await testUser.clickExploreLessonsButtonInAboutPage();
-      await testUser.screenshotMatch('clickExploreLessonsButtonInAboutPage');
+      await testUser.expectScreenshotToMatch(
+        'clickExploreLessonsButtonInAboutPage'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

@@ -41,7 +41,7 @@ describe('Logged-in User', function () {
     await explorationCreator.createAndPublishAMinimalExplorationWithTitle(
       'Test Exploration'
     );
-    await explorationCreator.screenshotMatch(
+    await explorationCreator.expectScreenshotToMatch(
       'createAndPublishAMinimalExplorationWithTitle'
     );
   }, DEFAULT_SPEC_TIMEOUT);
@@ -51,29 +51,31 @@ describe('Logged-in User', function () {
     async function () {
       await explorationCreator.navigateToCreatorDashboardPage();
       await explorationCreator.expectNumberOfSubscribersToBe(0);
-      await explorationCreator.screenshotMatch(
+      await explorationCreator.expectScreenshotToMatch(
         'expectNumberOfSubscribersToBe0'
       );
 
       await testLearner.navigateToProfilePage('explorationCreator');
-      await testLearner.screenshotMatch('navigateToProfilePage');
+      await testLearner.expectScreenshotToMatch('navigateToProfilePage');
       await testLearner.subscribeToCreator('explorationCreator');
-      await testLearner.screenshotMatch('subscribeToCreator');
+      await testLearner.expectScreenshotToMatch('subscribeToCreator');
 
       await explorationCreator.reloadPage();
       await explorationCreator.expectNumberOfSubscribersToBe(1);
-      await explorationCreator.screenshotMatch(
+      await explorationCreator.expectScreenshotToMatch(
         'expectNumberOfSubscribersToBe1'
       );
 
       await explorationCreator.openSubscribersTab();
       await explorationCreator.expectUserToBeASubscriber('testLearner');
-      await explorationCreator.screenshotMatch('expectUserToBeASubscriber');
+      await explorationCreator.expectScreenshotToMatch(
+        'expectUserToBeASubscriber'
+      );
 
       await testLearner.expectExplorationToBePresentInProfilePageWithTitle(
         'Test Exploration'
       );
-      await testLearner.screenshotMatch(
+      await testLearner.expectScreenshotToMatch(
         'expectExplorationToBePresentInProfilePageWithTitle'
       );
     },

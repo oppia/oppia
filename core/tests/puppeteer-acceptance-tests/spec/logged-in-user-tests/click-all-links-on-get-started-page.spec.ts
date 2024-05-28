@@ -38,7 +38,9 @@ describe('Logged-in Users', function () {
     async function () {
       await testUser.navigateToAboutFoundationPage();
       await testUser.navigateToGetStartedPageViaFooter();
-      await testUser.screenshotMatch('navigateToGetStartedPageViaFooter');
+      await testUser.expectScreenshotToMatch(
+        'navigateToGetStartedPageViaFooter'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -51,7 +53,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use the "create one here" link in a new tab',
       async function () {
-        await testUser.screenshotMatch(
+        await testUser.expectScreenshotToMatch(
           'clickCreateOneHereLinkInGetStartedPage2',
           await testUser.clickCreateOneHereLinkInGetStartedPage()
         );
@@ -62,7 +64,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use the "Welcome to Oppia" link in a new tab',
       async function () {
-        await testUser.screenshotMatch(
+        await testUser.expectScreenshotToMatch(
           'clickWelcomeToOppiaLinkInGetStartedPage',
           await testUser.clickWelcomeToOppiaLinkInGetStartedPage()
         );
@@ -73,7 +75,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use the "Get Electrified!" link in a new tab',
       async function () {
-        await testUser.screenshotMatch(
+        await testUser.expectScreenshotToMatch(
           'clickGetElectrifiedLinkInGetStartedPage',
           await testUser.clickGetElectrifiedLinkInGetStartedPage()
         );
@@ -84,7 +86,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use the "Programming with Carla" link in a new tab',
       async function () {
-        await testUser.screenshotMatch(
+        await testUser.expectScreenshotToMatch(
           'clickProgrammingWithCarlaLinkInGetStartedPage',
           await testUser.clickProgrammingWithCarlaLinkInGetStartedPage()
         );
@@ -95,7 +97,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use "in our user documentation" link in a new tab',
       async function () {
-        await testUser.screenshotMatch(
+        await testUser.expectScreenshotToMatch(
           'clickInOurUserDocumentationLinkInGetStartedPage',
           await testUser.clickInOurUserDocumentationLinkInGetStartedPage()
         );
@@ -106,7 +108,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use the "embed it in your own web page" link in a new tab',
       async function () {
-        await testUser.screenshotMatch(
+        await testUser.expectScreenshotToMatch(
           'clickEmbedItInYourOwnWebPageLinkInGetStartedPage',
           await testUser.clickEmbedItInYourOwnWebPageLinkInGetStartedPage()
         );
@@ -118,7 +120,7 @@ describe('Logged-in Users', function () {
       'should be able to use the "discover more ways to get involved" link',
       async function () {
         await testUser.clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage();
-        await testUser.screenshotMatch(
+        await testUser.expectScreenshotToMatch(
           'clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage'
         );
       },

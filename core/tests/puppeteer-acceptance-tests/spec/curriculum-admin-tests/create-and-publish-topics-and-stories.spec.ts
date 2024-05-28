@@ -40,59 +40,65 @@ describe('Curriculum Admin', function () {
     'should create and publish topics, subtopics, skills, stories and chapters.',
     async function () {
       await curriculumAdmin.navigateToCreatorDashboardPage();
-      await curriculumAdmin.screenshotMatch('navigateToCreatorDashboardPage');
+      await curriculumAdmin.expectScreenshotToMatch(
+        'navigateToCreatorDashboardPage'
+      );
       await curriculumAdmin.navigateToExplorationEditorPage();
-      await curriculumAdmin.screenshotMatch('navigateToExplorationEditorPage');
+      await curriculumAdmin.expectScreenshotToMatch(
+        'navigateToExplorationEditorPage'
+      );
       await curriculumAdmin.dismissWelcomeModal();
-      await curriculumAdmin.screenshotMatch('dismissWelcomeModal');
+      await curriculumAdmin.expectScreenshotToMatch('dismissWelcomeModal');
       await curriculumAdmin.createExplorationWithMinimumContent(
         'Test Exploration',
         'End Exploration'
       );
-      await curriculumAdmin.screenshotMatch(
+      await curriculumAdmin.expectScreenshotToMatch(
         'createExplorationWithMinimumContent'
       );
       await curriculumAdmin.saveExplorationDraft();
-      await curriculumAdmin.screenshotMatch('saveExplorationDraft');
+      await curriculumAdmin.expectScreenshotToMatch('saveExplorationDraft');
       explorationId = await curriculumAdmin.publishExplorationWithContent(
         'Test Exploration Title 1',
         'Test Exploration Goal',
         'Algebra'
       );
-      await curriculumAdmin.screenshotMatch('publishExplorationWithContent');
+      await curriculumAdmin.expectScreenshotToMatch(
+        'publishExplorationWithContent'
+      );
       if (!explorationId) {
         throw new Error('Error publishing exploration successfully.');
       }
 
       await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
-      await curriculumAdmin.screenshotMatch('createTopic');
+      await curriculumAdmin.expectScreenshotToMatch('createTopic');
       await curriculumAdmin.createSubtopicForTopic(
         'Test Subtopic 1',
         'test-subtopic-one',
         'Test Topic 1'
       );
-      await curriculumAdmin.screenshotMatch('createSubtopicForTopic');
+      await curriculumAdmin.expectScreenshotToMatch('createSubtopicForTopic');
 
       await curriculumAdmin.createSkillForTopic('Test Skill 1', 'Test Topic 1');
-      await curriculumAdmin.screenshotMatch('createSkillForTopic');
+      await curriculumAdmin.expectScreenshotToMatch('createSkillForTopic');
       await curriculumAdmin.createQuestionsForSkill('Test Skill 1', 3);
-      await curriculumAdmin.screenshotMatch('createQuestionsForSkill');
+      await curriculumAdmin.expectScreenshotToMatch('createQuestionsForSkill');
       await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
         'Test Skill 1',
         'Test Subtopic 1',
         'Test Topic 1'
       );
-      await curriculumAdmin.screenshotMatch(
+      await curriculumAdmin.expectScreenshotToMatch(
         'assignSkillToSubtopicInTopicEditor'
       );
       await curriculumAdmin.addSkillToDiagnosticTest(
         'Test Skill 1',
         'Test Topic 1'
       );
-      await curriculumAdmin.screenshotMatch('addSkillToDiagnosticTest');
+      await curriculumAdmin.expectScreenshotToMatch('addSkillToDiagnosticTest');
 
       await curriculumAdmin.publishDraftTopic('Test Topic 1');
-      await curriculumAdmin.screenshotMatch('publishDraftTopic');
+      await curriculumAdmin.expectScreenshotToMatch('publishDraftTopic');
       await curriculumAdmin.createAndPublishStoryWithChapter(
         'Test Story 1',
         'test-story-one',
@@ -105,7 +111,7 @@ describe('Curriculum Admin', function () {
         1,
         1
       );
-      await curriculumAdmin.screenshotMatch(
+      await curriculumAdmin.expectScreenshotToMatch(
         'expectTopicToBePublishedInTopicsAndSkillsDashboard'
       );
     },

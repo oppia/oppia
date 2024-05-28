@@ -21,6 +21,7 @@ import testConstants from './test-constants';
 import isElementClickable from '../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
 
+import path from 'path';
 import {toMatchImageSnapshot} from 'jest-image-snapshot';
 expect.extend({toMatchImageSnapshot});
 const backgroundBanner = '.oppia-background-image';
@@ -461,25 +462,33 @@ export class BaseUser {
   }
 
   /**
-   * This function takes a screenshot of the page
-   * If there's no parameter for newPage, it check this.page instead of newPage.
-   * If there's no image named as the given string, it stores the screenshot with the given string in the file __image_snapshots__
+   * This function takes a screenshot of the page.
+   * If there's no parameter for newPage, it checks this.page instead of newPage.
+   * If there's no image with the given filename, it stores the screenshot with the given filename in the folder __image_snapshots__
    * Otherwise, it compares the screenshot with the image named as the given string to check if they match.
-   * If they don't match, it generates an image in the file __diff_output__ to show the difference.
+   * If they don't match, it generates an image in the folder __diff_output__ to show the difference.
+   * @param {string} imageName - The name for the image
+   * @param {Page|undefined} newPage - The page to take screenshot from,
    */
-  async screenshotMatch(imageName: string, newPage?: Page): Promise<void> {
+  async expectScreenshotToMatch(
+    imageName: string,
+    newPage?: Page
+  ): Promise<void> {
     if (process.env.MOBILE !== 'true') {
       try {
         const currentPage =
           typeof newPage !== 'undefined' ? newPage : this.page;
         await currentPage.mouse.move(0, 0);
         await currentPage.waitForTimeout(5000);
+
+        //
         expect(await currentPage.screenshot()).toMatchImageSnapshot({
           failureThreshold: (await currentPage.$(backgroundBanner))
             ? 0.03
             : 0.003,
           failureThresholdType: 'percent',
-          customSnapshotIdentifier: imageName,
+          // customSnapshotIdentifier: imageName,
+          customSnapshotsDir: path.resolve(__dirname, 'golden_screenshots'),
         });
         if (typeof newPage !== 'undefined') {
           await newPage.close();

@@ -44,7 +44,9 @@ describe('Logged-in User', function () {
     'should open About Url with About Oppia button in About Menu on navbar',
     async function () {
       await testUser.clickAboutButtonInAboutMenuOnNavbar();
-      await testUser.screenshotMatch('clickAboutButtonInAboutMenuOnNavbar');
+      await testUser.expectScreenshotToMatch(
+        'clickAboutButtonInAboutMenuOnNavbar'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -54,7 +56,7 @@ describe('Logged-in User', function () {
       'in About Menu on navbar',
     async function () {
       await testUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
-      await testUser.screenshotMatch(
+      await testUser.expectScreenshotToMatch(
         'clickAboutFoundationButtonInAboutMenuOnNavbar'
       );
     },
@@ -65,7 +67,9 @@ describe('Logged-in User', function () {
     'should open Blog Url with Blog button in About Menu on navbar',
     async function () {
       await testUser.clickBlogButtonInAboutMenuOnNavbar();
-      await testUser.screenshotMatch('clickBlogButtonInAboutMenuOnNavbar');
+      await testUser.expectScreenshotToMatch(
+        'clickBlogButtonInAboutMenuOnNavbar'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -75,7 +79,7 @@ describe('Logged-in User', function () {
       'in Get Involved menu on navbar',
     async function () {
       await testUser.clickPartnershipsButtonInGetInvolvedMenuOnNavbar();
-      await testUser.screenshotMatch(
+      await testUser.expectScreenshotToMatch(
         'clickPartnershipsButtonInGetInvolvedMenuOnNavbar'
       );
     },
@@ -87,7 +91,7 @@ describe('Logged-in User', function () {
       'on navbar',
     async function () {
       await testUser.clickVolunteerButtonInGetInvolvedMenuOnNavbar();
-      await testUser.screenshotMatch(
+      await testUser.expectScreenshotToMatch(
         'clickVolunteerButtonInGetInvolvedMenuOnNavbar'
       );
     },
@@ -98,7 +102,7 @@ describe('Logged-in User', function () {
     'should open Donate Url with Donate button in Get Involved menu on navbar',
     async function () {
       await testUser.clickDonateButtonInGetInvolvedMenuOnNavbar();
-      await testUser.screenshotMatch(
+      await testUser.expectScreenshotToMatch(
         'clickDonateButtonInGetInvolvedMenuOnNavbar'
       );
     },
@@ -110,7 +114,7 @@ describe('Logged-in User', function () {
       'on navbar',
     async function () {
       await testUser.clickContactUsButtonInGetInvolvedMenuOnNavbar();
-      await testUser.screenshotMatch(
+      await testUser.expectScreenshotToMatch(
         'clickContactUsButtonInGetInvolvedMenuOnNavbar'
       );
     },
@@ -121,7 +125,7 @@ describe('Logged-in User', function () {
     'should open Donate Url with Donate button on navbar',
     async function () {
       await testUser.clickDonateButtonOnNavbar();
-      await testUser.screenshotMatch('clickDonateButtonOnNavbar');
+      await testUser.expectScreenshotToMatch('clickDonateButtonOnNavbar');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

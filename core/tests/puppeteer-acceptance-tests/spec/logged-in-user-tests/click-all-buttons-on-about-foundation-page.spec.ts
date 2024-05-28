@@ -41,7 +41,7 @@ describe('Logged-in User in About Foundation page', function () {
     'should open the page with the 61 million children link.',
     async function () {
       await testUser.click61MillionChildrenLinkInAboutFoundation();
-      await testUser.screenshotMatch(
+      await testUser.expectScreenshotToMatch(
         'click61MillionChildrenLinkInAboutFoundation'
       );
     },
@@ -52,7 +52,7 @@ describe('Logged-in User in About Foundation page', function () {
     'should open the page with the Even Those Who Are In School link.',
     async function () {
       await testUser.clickEvenThoseWhoAreInSchoolLinkInAboutFoundation();
-      await testUser.screenshotMatch(
+      await testUser.expectScreenshotToMatch(
         'clickEvenThoseWhoAreInSchoolLinkInAboutFoundation'
       );
     },
@@ -63,7 +63,9 @@ describe('Logged-in User in About Foundation page', function () {
     'should open the page with the Source: UNESCO link.',
     async function () {
       await testUser.clickSourceUnescoLinkInAboutFoundation();
-      await testUser.screenshotMatch('clickSourceUnescoLinkInAboutFoundation');
+      await testUser.expectScreenshotToMatch(
+        'clickSourceUnescoLinkInAboutFoundation'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -72,7 +74,9 @@ describe('Logged-in User in About Foundation page', function () {
     'should open the page with the 420 Million link.',
     async function () {
       await testUser.click420MillionLinkInAboutFoundation();
-      await testUser.screenshotMatch('click420MillionLinkInAboutFoundation');
+      await testUser.expectScreenshotToMatch(
+        'click420MillionLinkInAboutFoundation'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -81,7 +85,7 @@ describe('Logged-in User in About Foundation page', function () {
     'should open the About page with the Learn More About Oppia button.',
     async function () {
       await testUser.clickLearnMoreAboutOppiaButtonInAboutFoundation();
-      await testUser.screenshotMatch(
+      await testUser.expectScreenshotToMatch(
         'clickLearnMoreAboutOppiaButtonInAboutFoundation'
       );
     },
@@ -92,7 +96,7 @@ describe('Logged-in User in About Foundation page', function () {
     'should open the Volunteer page with the Become A Volunteer button.',
     async function () {
       await testUser.clickBecomeAVolunteerButtonInAboutFoundation();
-      await testUser.screenshotMatch(
+      await testUser.expectScreenshotToMatch(
         'clickBecomeAVolunteerButtonInAboutFoundation'
       );
     },
@@ -104,7 +108,7 @@ describe('Logged-in User in About Foundation page', function () {
       'Partner Today! link.',
     async function () {
       await testUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();
-      await testUser.screenshotMatch(
+      await testUser.expectScreenshotToMatch(
         'clickConsiderBecomingAPartnerTodayLinkInAboutFoundation'
       );
     },
@@ -116,7 +120,7 @@ describe('Logged-in User in About Foundation page', function () {
       'Community link.',
     async function () {
       await testUser.clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation();
-      await testUser.screenshotMatch(
+      await testUser.expectScreenshotToMatch(
         'clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation'
       );
     },
@@ -127,7 +131,9 @@ describe('Logged-in User in About Foundation page', function () {
     'should open the Donate page with the donations link.',
     async function () {
       await testUser.clickDonationsLinkInAboutFoundation();
-      await testUser.screenshotMatch('clickDonationsLinkInAboutFoundation');
+      await testUser.expectScreenshotToMatch(
+        'clickDonationsLinkInAboutFoundation'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

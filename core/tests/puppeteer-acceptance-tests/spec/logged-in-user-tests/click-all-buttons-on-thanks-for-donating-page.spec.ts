@@ -41,7 +41,7 @@ describe('Logged-in User in Thanks for Donating page', function () {
     'should open the right page with the Watch A Video button.',
     async function () {
       await testUser.clickWatchAVideoButtonInThanksForDonatingPage();
-      await testUser.screenshotMatch(
+      await testUser.expectScreenshotToMatch(
         'clickWatchAVideoButtonInThanksForDonatingPage'
       );
     },
@@ -52,7 +52,7 @@ describe('Logged-in User in Thanks for Donating page', function () {
     'should open the Blog page with the Read Our Blog button.',
     async function () {
       await testUser.clickReadOurBlogButtonInThanksForDonatingPage();
-      await testUser.screenshotMatch(
+      await testUser.expectScreenshotToMatch(
         'clickReadOurBlogButtonInThanksForDonatingPage'
       );
     },
@@ -64,7 +64,7 @@ describe('Logged-in User in Thanks for Donating page', function () {
       'with the dismiss button.',
     async function () {
       await testUser.clickDismissButtonInThanksForDonatingPage();
-      await testUser.screenshotMatch(
+      await testUser.expectScreenshotToMatch(
         'clickDismissButtonInThanksForDonatingPage'
       );
     },
