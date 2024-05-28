@@ -25,7 +25,7 @@ import {formatDate} from '@angular/common';
 @Injectable({
   providedIn: 'root',
 })
-export class CustomDatepickerAdapter extends NativeDateAdapter {
+export class ISODatePickerAdapter extends NativeDateAdapter {
   format(date: Date, displayFormat: Object): string {
     if (displayFormat === 'input') {
       return formatDate(date, 'dd-MMM-yyyy', this.locale);
@@ -39,5 +39,5 @@ angular
   .module('oppia')
   .factory(
     'GenerateContentIdService',
-    downgradeInjectable(CustomDatepickerAdapter)
+    downgradeInjectable(ISODatePickerAdapter)
   );

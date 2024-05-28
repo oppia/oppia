@@ -41,7 +41,7 @@ import {UsernameInputModal} from './username-input-modal/username-input-modal.co
 import {CdAdminQuestionRoleEditorModal} from './question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import {CdAdminTranslationRoleEditorModal} from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import isEqual from 'lodash/isEqual';
-import {CustomDatepickerAdapter} from 'services/custom-datepicker-adapter.service';
+import {ISODatePickerAdapter} from 'services/iso-datepicker-adapter.service';
 import {DateAdapter, MAT_DATE_FORMATS} from '@angular/material/core';
 import {AlertsService} from 'services/alerts.service';
 
@@ -85,7 +85,7 @@ export const PICK_FORMATS = {
     ]),
   ],
   providers: [
-    {provide: DateAdapter, useClass: CustomDatepickerAdapter},
+    {provide: DateAdapter, useClass: ISODatePickerAdapter},
     {provide: MAT_DATE_FORMATS, useValue: PICK_FORMATS},
   ],
 })

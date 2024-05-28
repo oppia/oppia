@@ -16,18 +16,18 @@
  * @fileoverview Unit tests for GenerateContentIdService.
  */
 
-import {CustomDatepickerAdapter} from 'services/custom-datepicker-adapter.service';
+import {ISODatePickerAdapter} from 'services/iso-datepicker-adapter.service';
 import {TestBed} from '@angular/core/testing';
 
-describe('CustomDatepickerAdapter', () => {
-  let cda: CustomDatepickerAdapter;
+describe('ISODatePickerAdapter', () => {
+  let cda: ISODatePickerAdapter;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [],
-      providers: [CustomDatepickerAdapter],
+      providers: [ISODatePickerAdapter],
     });
-    cda = TestBed.inject(CustomDatepickerAdapter);
+    cda = TestBed.inject(ISODatePickerAdapter);
   });
 
   it('should format date for input display', () => {

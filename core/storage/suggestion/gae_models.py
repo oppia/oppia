@@ -25,8 +25,8 @@ from core.constants import constants
 from core.platform import models
 
 from typing import (
-    Dict, Final, Generic, List, Literal, Mapping, Optional, Sequence, Tuple,
-    TypedDict, TypeVar, Union)
+    Dict, Final, List, Literal, Mapping, Optional, Sequence, Tuple, TypedDict,
+    Union)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -2387,10 +2387,6 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     after this batch.
         """
 
-        total_contribution_stats_helper = TotalContributionStatsHelper[
-            TranslationSubmitterTotalContributionStatsModel
-        ]()
-
         sort_options_dict = {
             SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
                 -cls.last_contribution_date,
@@ -2433,16 +2429,25 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
         sorted_results: List[
             TranslationSubmitterTotalContributionStatsModel] = []
+        today = datetime.date.today()
 
         if max_days_since_last_activity is not None:
-            (sorted_results, next_offset) = (
-                total_contribution_stats_helper.filter_users_contribution(
-                    offset,
-                    page_size,
-                    sort_query,
-                    sorted_results,
-                    max_days_since_last_activity
-                ))
+            last_date = today - datetime.timedelta(
+                days=max_days_since_last_activity)
+            next_offset = offset
+            while len(sorted_results) < page_size:
+                result_models: Sequence[
+                    TranslationSubmitterTotalContributionStatsModel] = (
+                    sort_query.fetch(
+                        NUM_MODELS_PER_FETCH, offset=next_offset))
+                if not result_models:
+                    break
+                for result_model in result_models:
+                    next_offset += 1
+                    if result_model.last_contribution_date >= last_date:
+                        sorted_results.append(result_model)
+                        if len(sorted_results) == page_size:
+                            break
         else:
             sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)
@@ -2802,10 +2807,6 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                     after this batch.
         """
 
-        total_contribution_stats_helper = TotalContributionStatsHelper[
-            TranslationReviewerTotalContributionStatsModel
-        ]()
-
         sort_options_dict = {
             SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
                 -cls.last_contribution_date,
@@ -2833,16 +2834,25 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         sorted_results: List[
             TranslationReviewerTotalContributionStatsModel] = []
+        today = datetime.date.today()
 
         if max_days_since_last_activity is not None:
-            (sorted_results, next_offset) = (
-                total_contribution_stats_helper.filter_users_contribution(
-                    offset,
-                    page_size,
-                    sort_query,
-                    sorted_results,
-                    max_days_since_last_activity
-                ))
+            last_date = today - datetime.timedelta(
+                days=max_days_since_last_activity)
+            next_offset = offset
+            while len(sorted_results) < page_size:
+                result_models: Sequence[
+                    TranslationReviewerTotalContributionStatsModel] = (
+                    sort_query.fetch(
+                        NUM_MODELS_PER_FETCH, offset=next_offset))
+                if not result_models:
+                    break
+                for result_model in result_models:
+                    next_offset += 1
+                    if result_model.last_contribution_date >= last_date:
+                        sorted_results.append(result_model)
+                        if len(sorted_results) == page_size:
+                            break
         else:
             sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)
@@ -3124,10 +3134,6 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     after this batch.
         """
 
-        total_contribution_stats_helper = TotalContributionStatsHelper[
-            QuestionSubmitterTotalContributionStatsModel
-        ]()
-
         sort_options_dict = {
             SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
                 -cls.last_contribution_date,
@@ -3166,16 +3172,25 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
         sorted_results: List[
             QuestionSubmitterTotalContributionStatsModel] = []
+        today = datetime.date.today()
 
         if max_days_since_last_activity is not None:
-            (sorted_results, next_offset) = (
-                total_contribution_stats_helper.filter_users_contribution(
-                    offset,
-                    page_size,
-                    sort_query,
-                    sorted_results,
-                    max_days_since_last_activity
-                ))
+            last_date = today - datetime.timedelta(
+                days=max_days_since_last_activity)
+            next_offset = offset
+            while len(sorted_results) < page_size:
+                result_models: Sequence[
+                    QuestionSubmitterTotalContributionStatsModel] = (
+                    sort_query.fetch(
+                        NUM_MODELS_PER_FETCH, offset=next_offset))
+                if not result_models:
+                    break
+                for result_model in result_models:
+                    next_offset += 1
+                    if result_model.last_contribution_date >= last_date:
+                        sorted_results.append(result_model)
+                        if len(sorted_results) == page_size:
+                            break
         else:
             sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)
@@ -3416,10 +3431,6 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                     after this batch.
         """
 
-        total_contribution_stats_helper = TotalContributionStatsHelper[
-            QuestionReviewerTotalContributionStatsModel
-        ]()
-
         sort_options_dict = {
             SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
                 -cls.last_contribution_date,
@@ -3444,16 +3455,25 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         sorted_results: List[
             QuestionReviewerTotalContributionStatsModel] = []
+        today = datetime.date.today()
 
         if max_days_since_last_activity is not None:
-            (sorted_results, next_offset) = (
-                total_contribution_stats_helper.filter_users_contribution(
-                    offset,
-                    page_size,
-                    sort_query,
-                    sorted_results,
-                    max_days_since_last_activity
-                ))
+            last_date = today - datetime.timedelta(
+                days=max_days_since_last_activity)
+            next_offset = offset
+            while len(sorted_results) < page_size:
+                result_models: Sequence[
+                    QuestionReviewerTotalContributionStatsModel] = (
+                    sort_query.fetch(
+                        NUM_MODELS_PER_FETCH, offset=next_offset))
+                if not result_models:
+                    break
+                for result_model in result_models:
+                    next_offset += 1
+                    if result_model.last_contribution_date >= last_date:
+                        sorted_results.append(result_model)
+                        if len(sorted_results) == page_size:
+                            break
         else:
             sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)
@@ -3550,69 +3570,6 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                     model.last_contribution_date.isoformat())
             }
         return user_data
-
-
-TotalContributionStatsModelType = TypeVar(
-    'TotalContributionStatsModelType',
-    TranslationSubmitterTotalContributionStatsModel,
-    TranslationReviewerTotalContributionStatsModel,
-    QuestionSubmitterTotalContributionStatsModel,
-    QuestionReviewerTotalContributionStatsModel
-)
-
-
-class TotalContributionStatsHelper(Generic[TotalContributionStatsModelType]):
-    """Helper class for total contribution stats models
-    """
-
-    @classmethod
-    def filter_users_contribution(
-        cls,
-        offset: int,
-        page_size: int,
-        sort_query: datastore_services.Query,
-        sorted_results: List[TotalContributionStatsModelType],
-        max_days_since_last_activity: int
-    ) -> Tuple[List[TotalContributionStatsModelType], int]:
-        """Returns the models according to values specified.
-
-        Args:
-            offset: int. Number of results to skip from the beginning of all
-                results matching the query.
-            page_size: int. Number of models to fetch.
-            sort_query: Query. A query object to fetch to models.
-            sorted_results: List. A list to store filtered results.
-            max_days_since_last_activity: Optional[int]. The number of days
-                before today from which to start considering users'
-                contributions, to filter users.
-
-        Returns:
-            2-tuple(sorted_results, next_offset). where:
-                sorted_results: list.
-                    The list of models which match the supplied 
-                    max_days_since_last_activity filter, returned in the
-                    order specified by sort_query.
-                next_offset: int. Number of results to skip in next batch.
-        """
-
-        today = datetime.date.today()
-        last_date = today - datetime.timedelta(
-                days=max_days_since_last_activity)
-        next_offset = offset
-        while len(sorted_results) < page_size:
-            result_models: Sequence[TotalContributionStatsModelType] = (
-                sort_query.fetch(
-                    NUM_MODELS_PER_FETCH, offset=next_offset))
-            if not result_models:
-                break
-            for result_model in result_models:
-                next_offset += 1
-                if result_model.last_contribution_date >= last_date:
-                    sorted_results.append(result_model)
-                    if len(sorted_results) == page_size:
-                        break
-
-        return (sorted_results, next_offset)
 
 
 class TranslationCoordinatorsModel(base_models.BaseModel):

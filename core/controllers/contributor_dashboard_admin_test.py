@@ -1223,7 +1223,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with last_date filter and pagination.
+        # Test with max_days_since_last_activity filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/submission', {
                 'page_size': 4,
@@ -1321,7 +1321,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with last_date filter and pagination.
+        # Test with max_days_since_last_activity filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/review', {
                 'page_size': 4,
@@ -1450,7 +1450,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with last_date filter and pagination.
+        # Test with max_days_since_last_activity filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 4,
@@ -1545,7 +1545,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with last_date filter and pagination.
+        # Test with max_days_since_last_activity filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 4,
