@@ -43,7 +43,7 @@ if MYPY:  # pragma: no cover
 
 FOOTER: Final = (
     'You can change your email preferences via the '
-    '<a href=""http://localhost:8181/preferences">Preferences</a> page.'
+    '<a href="http://localhost:8181/preferences">Preferences</a> page.'
 )
 
 class FeedbackServicesUnitTests(test_utils.EmailTestBase):
