@@ -290,6 +290,15 @@ const getAngularInformationsFromSourceFile = (
 };
 
 /**
+ * Checks if a file is a frontend test file.
+ */
+const isFrontendTestFile = (file: string): boolean => {
+  return (
+    file.endsWith('.spec.ts') && !file.includes('puppeteer-acceptance-tests')
+  );
+};
+
+/**
  * Gets the Angular informations from the given files.
  */
 const getFileToAngularInformationsFromFiles = (
@@ -297,7 +306,7 @@ const getFileToAngularInformationsFromFiles = (
 ): Record<string, AngularInformation[]> => {
   return files.reduce(
     (acc: Record<string, AngularInformation[]>, file: string) => {
-      if (file.endsWith('.spec.ts')) {
+      if (isFrontendTestFile(file)) {
         acc[file] = [];
         return acc;
       }
@@ -530,16 +539,7 @@ class RootFilesMappingGenerator {
     );
   }
 
-  /**
-   * Checks if a file is a frontend test file.
-   */
-  private isFrontendTestFile(file: string): boolean {
-    return (
-      file.endsWith('.spec.ts') && !file.includes('puppeteer-acceptance-tests')
-    );
-  }
-
-  /**
+ /**
    * Gets the files that depend on the given dependency.
    */
   private getFilesWithDependency(
@@ -552,7 +552,7 @@ class RootFilesMappingGenerator {
       references = this.referenceCache[dependency];
     } else {
       references = Object.keys(this.dependencyMapping).filter(file => {
-        if (this.isFrontendTestFile(file)) {
+        if (isFrontendTestFile(file)) {
           return false;
         }
 
@@ -648,7 +648,7 @@ class RootFilesMappingGenerator {
     );
     const validRootFiles = this.getValidRootFiles();
     const invalidRootFiles = rootFiles.filter((rootFile: string) => {
-      if (this.isFrontendTestFile(rootFile)) {
+      if (isFrontendTestFile(rootFile)) {
         return false;
       }
       return !validRootFiles.includes(rootFile);
