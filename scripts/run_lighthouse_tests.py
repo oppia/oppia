@@ -177,11 +177,11 @@ def get_entity(line: str) -> tuple[str, str] | None:
     if 'create' in line:
         return 'exploration_id', url_parts[4]
     elif 'topic_editor' in line:
-        return 'topic_editor', url_parts[4]
+        return 'topic_id', url_parts[4]
     elif 'story_editor' in line:
-        return 'story_editor', url_parts[4]
+        return 'story_id', url_parts[4]
     elif 'skill_editor' in line:
-        return 'skill_editor', url_parts[4]
+        return 'skill_id', url_parts[4]
 
     return None
 
