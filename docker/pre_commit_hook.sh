@@ -95,9 +95,6 @@ if [ "$is_container_running" != "0" ]; then
     make start-devserver
 fi
 
-# Add oppia as safe directory to git config
-$DOCKER_EXEC_COMMAND git config --global --add safe.directory /app/oppia
-
 # Run hook in container
 CMD="$DOCKER_EXEC_COMMAND python3 ./$PYTHON_PRE_COMMIT_SYMLINK $@"
 echo "Running $CMD"
