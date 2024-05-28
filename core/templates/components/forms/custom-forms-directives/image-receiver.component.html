@@ -10,7 +10,7 @@
   <span class="image-receiver-license-warning" tabindex="0">
     Before uploading, please ensure that your image:<br>
     <ul class="image-upload-instructions">
-      <li>{{ allowedImageFormatsString }}</li>
+      <li>{{ getAllowedImageFormatsString() }}</li>
       <li>Has a size smaller than {{ maxImageSizeInKB }} KB</li>
       <li>Has no watermarks and is compatible with the <a tabindex="0" class="license-term-link" href="/license" [smartRouterLink]="'/' + licenseUrl" target="_blank" rel="noopener">license terms</a> of the site</li>
     </ul>

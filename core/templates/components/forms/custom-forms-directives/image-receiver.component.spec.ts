@@ -275,7 +275,7 @@ describe('ImageReceiverComponent', () => {
   it('should not upload image if the size is more than 100KB', () => {
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
-    component.maxAllowedImageSizeInBytes = 100 * 1024;
+    component.maxImageSizeInKB = 100;
 
     let dataTransfer = new DataTransfer();
     let fileWithLargeSize = new File([''], 'image.jpg', {type: 'image/jpg'});
@@ -304,7 +304,7 @@ describe('ImageReceiverComponent', () => {
   it('should not upload image if the size is more than 1MB for blog post', () => {
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
-    component.maxAllowedImageSizeInBytes = 1024 * 1024;
+    component.maxImageSizeInKB = 1024;
 
     let dataTransfer = new DataTransfer();
     let fileWithLargeSize = new File([''], 'image.jpg', {type: 'image/jpg'});

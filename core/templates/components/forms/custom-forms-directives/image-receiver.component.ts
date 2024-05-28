@@ -55,8 +55,6 @@ export class ImageReceiverComponent {
   errorMessage!: string | null;
   backgroundWhileUploading: boolean = false;
   licenseUrl = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE;
-  allowedImageFormatsString!: string;
-  maxAllowedImageSizeInBytes!: number;
 
   constructor(
     public blogDashboardPageService: BlogDashboardPageService,
@@ -69,11 +67,6 @@ export class ImageReceiverComponent {
     // others in the DOM.
     this.fileInputClassName =
       'image-uploader-file-input' + this.idGenerationService.generateNewId();
-
-    this.allowedImageFormatsString = this.getAllowedImageFormatsString(
-      this.allowedImageFormats
-    );
-    this.maxAllowedImageSizeInBytes = this.maxImageSizeInKB * 1024;
   }
 
   ngAfterViewInit(): void {
@@ -122,17 +115,6 @@ export class ImageReceiverComponent {
     this.backgroundWhileUploading = false;
   }
 
-  getAllowedImageFormatsString(allowedImageFormats: string[]): string {
-    if (!allowedImageFormats) {
-      return '';
-    }
-    if (allowedImageFormats.length === 1) {
-      return `Is in .${allowedImageFormats[0]} format`;
-    }
-    const formats = allowedImageFormats.map(f => `.${f}`);
-    return `Is in ${formats.slice(0, -1).join(', ')} or ${formats[formats.length - 1]} format`;
-  }
-
   handleFile(): void {
     let file: File = this.imageInputRef.nativeElement.files[0];
     let filename: string = this.imageInputRef.nativeElement.value
@@ -147,6 +129,21 @@ export class ImageReceiverComponent {
     // to allow reupload of the same file after modification (e.g. manually
     // fixing validation errors).
     this.imageInputRef.nativeElement.value = '';
+  }
+
+  private _getMaxAllowedImageSizeInBytes(): number {
+    return this.maxImageSizeInKB * 1024;
+  }
+
+  getAllowedImageFormatsString(): string {
+    if (!this.allowedImageFormats) {
+      return '';
+    }
+    if (this.allowedImageFormats.length === 1) {
+      return `Is in .${this.allowedImageFormats[0]} format`;
+    }
+    const formats = this.allowedImageFormats.map(f => `.${f}`);
+    return `Is in ${formats.slice(0, -1).join(', ')} or ${formats[formats.length - 1]} format`;
   }
 
   validateUploadedFile(file: File, filename: string): string | null {
@@ -196,19 +193,19 @@ export class ImageReceiverComponent {
       return 'This image format is not supported';
     }
 
-    if (file.size > this.maxAllowedImageSizeInBytes) {
+    if (file.size > this._getMaxAllowedImageSizeInBytes()) {
       const ONE_KB_IN_BYTES = 1024;
       const ONE_MB_IN_BYTES = 1024 * 1024;
       let currentFileSizeUnit = 'KB';
       let currentFileSize = file.size / ONE_KB_IN_BYTES;
 
-      if (this.maxAllowedImageSizeInBytes >= ONE_MB_IN_BYTES) {
+      if (this._getMaxAllowedImageSizeInBytes() >= ONE_MB_IN_BYTES) {
         currentFileSizeUnit = 'MB';
         currentFileSize = file.size / ONE_MB_IN_BYTES;
       }
 
       return (
-        `The maximum allowed file size is ${this.maxAllowedImageSizeInBytes / ONE_KB_IN_BYTES}` +
+        `The maximum allowed file size is ${this._getMaxAllowedImageSizeInBytes() / ONE_KB_IN_BYTES}` +
         ` KB (${currentFileSize.toFixed(1)} ${currentFileSizeUnit} given).`
       );
     }
