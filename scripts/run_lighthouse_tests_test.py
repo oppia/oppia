@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import builtins
+import json
 import os
 import subprocess
 import sys
@@ -112,6 +113,59 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 'skip_sdk_update_check': True,
                 'env': env
             }])
+        with open('dummy-lighthouse-pages.json', 'w', encoding='utf-8') as f:
+            f.write(
+                json.dumps({
+                    'shards': {
+                        '1': {
+                            'splash': {
+                                'url': 'http://localhost:8181/'
+                            },
+                            'about': {
+                                'url': 'http://localhost:8181/about'
+                            },
+                            'contact': {
+                                'url': 'http://localhost:8181/contact'
+                            }
+                        }
+                    }
+                })
+            )
+        self.lighthouse_pages_json_filepath_swap = self.swap(
+            run_lighthouse_tests, 'LIGHTHOUSE_PAGES_JSON_FILEPATH',
+            'dummy-lighthouse-pages.json')
+
+    def tearDown(self) -> None:
+        super().tearDown()
+        os.remove('dummy-lighthouse-pages.json')
+
+    def test_inject_entities_into_url_with_valid_entity(self) -> None:
+        entities = {'topic_id': '4'}
+        url = 'http://localhost:8181/topic_editor/{{topic_id}}'
+        expected_injected_url = 'http://localhost:8181/topic_editor/4'
+        self.assertEqual(
+            run_lighthouse_tests.inject_entities_into_url(url, entities),
+            expected_injected_url)
+
+    def test_inject_entities_into_url_with_invalid_entity(self) -> None:
+        entities = {'topic_id': '4'}
+        url = 'http://localhost:8181/topic_editor/{{skill_id}}'
+        with self.assertRaisesRegex(
+            ValueError, 'Entity skill_id not found in entities.'
+        ):
+            run_lighthouse_tests.inject_entities_into_url(url, entities)
+
+    def test_get_lighthouse_pages_for_shard(self) -> None:
+        with self.lighthouse_pages_json_filepath_swap:
+            pages = run_lighthouse_tests.get_lighthouse_pages_for_shard('1')
+            self.assertEqual(
+                pages,
+                {
+                    'splash': 'http://localhost:8181/',
+                    'about': 'http://localhost:8181/about',
+                    'contact': 'http://localhost:8181/contact'
+                }
+            )
 
     def test_run_lighthouse_puppeteer_script_successfully(self) -> None:
         class MockTask:
@@ -350,8 +404,18 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_ng_build, swap_emulator_mode, self.print_swap:
                     with self.swap_redis_server, swap_run_lighthouse_tests:
-                        run_lighthouse_tests.main(
-                            args=['--mode', 'accessibility', '--shard', '1'])
+                        with self.lighthouse_pages_json_filepath_swap:
+                            run_lighthouse_tests.main(
+                                args=['--mode', 'accessibility',
+                                      '--shard', '1'])
+                            expected_all_lighthouse_urls = ','.join([
+                                'http://localhost:8181/',
+                                'http://localhost:8181/about',
+                                'http://localhost:8181/contact'
+                            ])
+                            self.assertEqual(
+                                os.environ['ALL_LIGHTHOUSE_URLS'],
+                                expected_all_lighthouse_urls)
 
         self.assertIn(
             'Puppeteer script completed successfully.', self.print_arr)
@@ -382,8 +446,69 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 with self.swap_redis_server, self.swap_cloud_datastore_emulator:
                     with self.swap_firebase_auth_emulator, swap_build:
                         with swap_popen, swap_run_lighthouse_tests:
-                            run_lighthouse_tests.main(
-                                args=['--mode', 'performance', '--shard', '1'])
+                            with self.lighthouse_pages_json_filepath_swap:
+                                run_lighthouse_tests.main(
+                                    args=['--mode', 'performance',
+                                          '--shard', '1'])
+                                expected_all_lighthouse_urls = ','.join([
+                                    'http://localhost:8181/',
+                                    'http://localhost:8181/about',
+                                    'http://localhost:8181/contact'
+                                ])
+                                self.assertEqual(
+                                    os.environ['ALL_LIGHTHOUSE_URLS'],
+                                    expected_all_lighthouse_urls)
+
+        self.assertIn('Building files in production mode.', self.print_arr)
+        self.assertIn(
+            'Puppeteer script completed successfully.', self.print_arr)
+
+    def test_run_lighthouse_tests_with_specific_pages(self) -> None:
+        class MockTask:
+            returncode = 0
+            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+                return (
+                    b'Task output',
+                    b'No error.')
+
+        swap_run_lighthouse_tests = self.swap_with_checks(
+            run_lighthouse_tests, 'run_lighthouse_checks',
+            lambda *unused_args: None, expected_args=(('performance', '1'),))
+        def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
+            return MockTask()
+        swap_popen = self.swap(
+            subprocess, 'Popen', mock_popen)
+        swap_isdir = self.swap(
+            os.path, 'isdir', lambda _: True)
+        swap_build = self.swap_with_checks(
+            build, 'main', lambda args: None,
+            expected_kwargs=[{'args': ['--prod_env']}])
+
+        with self.print_swap, self.swap_webpack_compiler, swap_isdir:
+            with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
+                with self.swap_redis_server, self.swap_cloud_datastore_emulator:
+                    with self.swap_firebase_auth_emulator, swap_build:
+                        with swap_popen, swap_run_lighthouse_tests:
+                            with self.lighthouse_pages_json_filepath_swap:
+                                run_lighthouse_tests.main(
+                                    args=['--mode', 'performance',
+                                          '--shard', '1',
+                                          '--pages', 'splash, about'])
+                                expected_all_lighthouse_urls = ','.join([
+                                    'http://localhost:8181/',
+                                    'http://localhost:8181/about',
+                                    'http://localhost:8181/contact'
+                                ])
+                                expected_lighthouse_urls_to_run = ','.join([
+                                    'http://localhost:8181/',
+                                    'http://localhost:8181/about'
+                                ])
+                                self.assertEqual(
+                                    os.environ['ALL_LIGHTHOUSE_URLS'],
+                                    expected_all_lighthouse_urls)
+                                self.assertEqual(
+                                    os.environ['LIGHTHOUSE_URLS_TO_RUN'],
+                                    expected_lighthouse_urls_to_run)
 
         self.assertIn('Building files in production mode.', self.print_arr)
         self.assertIn(
@@ -419,7 +544,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     with self.swap_redis_server, swap_run_lighthouse_tests:
                         run_lighthouse_tests.main(
                             args=['--mode', 'performance',
-                                '--shard', '1', '--skip_build'])
+                                '--shard', '1', '--skip_build',
+                                '--pages', 'splash'])
 
         self.assertIn(
             'Building files in production mode skipping webpack build.',

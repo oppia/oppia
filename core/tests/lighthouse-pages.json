@@ -2,7 +2,7 @@
   "shards": {
     "1": {
       "splash": {
-        "url": "http://localhost:8181",
+        "url": "http://localhost:8181/",
         "page_module": "core/templates/pages/splash-page/splash-page.module.ts"
       },
       "about": {
@@ -80,7 +80,7 @@
         "page_module": "core/templates/pages/privacy-page/privacy-page.module.ts"
       },
       "profile": {
-        "url": "http://localhost:8181/profile",
+        "url": "http://localhost:8181/profile/username1",
         "page_module": "core/templates/pages/profile-page/profile-page.module.ts"
       },
       "signup": {

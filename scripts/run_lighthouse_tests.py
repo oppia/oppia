@@ -349,7 +349,7 @@ def main(args: Optional[List[str]] = None) -> None:
         if parsed_args.pages:
             os.environ['LIGHTHOUSE_URLS_TO_RUN'] = ','.join(
                 get_lighthouse_urls_to_run(
-                    parsed_args.pages.split(','),
+                    [page.strip() for page in parsed_args.pages.split(',')],
                     entities,
                     pages_config
                 )
