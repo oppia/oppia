@@ -73,6 +73,7 @@ class FailedMLTest(test_utils.EmailTestBase):
         assert isinstance(self.admin_email_address, str)
         self.signup(
             self.admin_email_address, self.ADMIN_USERNAME, True)
+        self.login(self.admin_email_address, is_super_admin=True)
 
     def test_send_failed_ml_email(self) -> None:
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -6105,11 +6106,11 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION)
 
             # Make sure that correct email is sent to admin.
-            system_email_address = (
+            admin_email_address = (
                 param_services.get_platform_parameter_value(
-                    param_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
-            assert isinstance(system_email_address, str)
-            admin_messages = self._get_sent_email_messages(system_email_address)
+                    param_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+            assert isinstance(admin_email_address, str)
+            admin_messages = self._get_sent_email_messages(admin_email_address)
             self.assertEqual(len(admin_messages), 1)
             self.assertEqual(
                 admin_messages[0].body, expected_admin_email_text_body)

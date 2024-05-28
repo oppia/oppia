@@ -594,7 +594,7 @@ def _create_auth_claims(
     email = firebase_claims.get('email')
     role_is_super_admin = (
         email == platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value) or
+            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value) or
         firebase_claims.get('role') == feconf.FIREBASE_ROLE_SUPER_ADMIN)
     return auth_domain.AuthClaims(
         auth_id, email, role_is_super_admin=role_is_super_admin)

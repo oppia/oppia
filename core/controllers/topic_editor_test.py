@@ -1057,11 +1057,11 @@ class TopicPublishSendMailHandlerTests(
                 '%s/%s' % (
                     feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),
                 {'topic_name': 'Topic Name'}, csrf_token=csrf_token)
-        system_email_address = (
+        admin_email_address = (
             platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
-        assert isinstance(system_email_address, str)
-        messages = self._get_sent_email_messages(system_email_address)
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+        assert isinstance(admin_email_address, str)
+        messages = self._get_sent_email_messages(admin_email_address)
         expected_email_html_body = (
             'wants to publish topic: Topic Name at URL %s, please review'
             ' and publish if it looks good.'

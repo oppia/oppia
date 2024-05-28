@@ -1715,7 +1715,7 @@ class AdminSuperAdminPrivilegesHandler(
         """
         assert self.normalized_request is not None
         admin_email_address = parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value)
+            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value)
         if self.email != admin_email_address:
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
