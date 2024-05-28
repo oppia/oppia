@@ -53,6 +53,7 @@ class FeatureNames(enum.Enum):
     CD_ALLOW_UNDOING_TRANSLATION_REVIEW = 'cd_allow_undoing_translation_review'
     ENABLE_VOICEOVER_CONTRIBUTION = 'enable_voiceover_contribution'
     AUTO_UPDATE_EXP_VOICE_ARTIST_LINK = 'auto_update_exp_voice_artist_link'
+    ENABLE_MULTIPLE_CLASSROOMS = 'enable_multiple_classrooms'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -80,6 +81,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
+    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -230,6 +232,13 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'The flag allows auto-updating of the exploration voice artists '
             'link model after an exploration update.',
             feature_flag_domain.ServerMode.TEST
+        )
+    ),
+    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value: (
+        (
+            'The flag enables flow for multiple classrooms '
+            'and makes the classrooms page available to learners.',
+            feature_flag_domain.ServerMode.DEV
         )
     )
 }
