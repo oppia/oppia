@@ -44,9 +44,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
     score_category: str = (
         '%s%s%s' % (
-        suggestion_models.SCORE_TYPE_TRANSLATION,
-        suggestion_models.SCORE_CATEGORY_DELIMITER, 'English')
-    )
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER, 'English'))
 
     topic_name = 'topic'
     target_id = 'exp1'
