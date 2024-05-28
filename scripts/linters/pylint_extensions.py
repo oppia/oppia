@@ -2919,14 +2919,14 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
                 self.add_message('disallowed-text-import', node=node)
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because of the incomplete typing
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
 # (Class cannot subclass 'BaseChecker' (has type 'Any')),
 # we added an ignore here.
 class PreventStringConcatenationChecker(checkers.BaseChecker): # type: ignore[misc]
-    """Checks for string concactenation and encourage string interpolation."""
+    """Checks for string concactenation and encourages string interpolation."""
 
     __implements__ = interfaces.IAstroidChecker
 
@@ -2947,25 +2947,26 @@ class PreventStringConcatenationChecker(checkers.BaseChecker): # type: ignore[mi
         Args: node: astroid.BinOp The binary operation node to check.
         """
 
-        if isinstance(node, astroid.BinOp) and node.op == '+':
-            try:
-                left_inferred = next(node.left.infer())
-                right_inferred = next(node.right.infer())
-            except astroid.exceptions.InferenceError:
-                return
+        if not isinstance(node, astroid.BinOp) or node.op != '+':
+            return
+        try:
+            left_inferred = next(node.left.infer())
+            right_inferred = next(node.right.infer())
+        except astroid.exceptions.InferenceError:
+            return
 
-            if any(isinstance(inferred, (astroid.Instance, astroid.Const)) and
-                    isinstance(inferred.pytype(), str) and
-                    'datetime.datetime' in inferred.pytype() 
-                    for inferred in [left_inferred, right_inferred]):
-                return
-            if (
-                isinstance(left_inferred, astroid.Const) and
-                isinstance(right_inferred, astroid.Const) and
-                isinstance(left_inferred.value, str) and
-                isinstance(right_inferred.value, str)
-            ):
-                self.add_message('use-string-interpolation', node=node)
+        if any(isinstance(inferred, (astroid.Instance, astroid.Const)) and
+                isinstance(inferred.pytype(), str) and
+                'datetime.datetime' in inferred.pytype() 
+                for inferred in [left_inferred, right_inferred]):
+            return
+        if (
+            isinstance(left_inferred, astroid.Const) and
+            isinstance(right_inferred, astroid.Const) and
+            isinstance(left_inferred.value, str) and
+            isinstance(right_inferred.value, str)
+        ):
+            self.add_message('use-string-interpolation', node=node)
 
 
 def register(linter: lint.PyLinter) -> None:
