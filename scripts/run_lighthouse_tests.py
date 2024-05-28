@@ -258,7 +258,7 @@ def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
     entity_matcher = r'\{\{(.*?)\}\}'
     injected_url = url
     for match in re.findall(entity_matcher, url):
-        entity_name = match[1]
+        entity_name = match
         if entity_name not in entities:
             raise ValueError('Entity %s not found in entities.' % entity_name)
         injected_url = url.replace(
@@ -339,7 +339,7 @@ def main(args: Optional[List[str]] = None) -> None:
         entities = run_lighthouse_puppeteer_script(parsed_args.record_screen)
         pages_config: dict[str, str] = get_lighthouse_pages_for_shard(
             parsed_args.shard)
-        os.environ['ALL_LIGHTHOUSE_URLS'] = '.'.join(
+        os.environ['ALL_LIGHTHOUSE_URLS'] = ','.join(
             get_lighthouse_urls_to_run(
                 list(pages_config.keys()),
                 entities,
@@ -347,7 +347,7 @@ def main(args: Optional[List[str]] = None) -> None:
             )
         )
         if parsed_args.pages:
-            os.environ['LIGHTHOUSE_URLS_TO_RUN'] = '.'.join(
+            os.environ['LIGHTHOUSE_URLS_TO_RUN'] = ','.join(
                 get_lighthouse_urls_to_run(
                     parsed_args.pages.split(','),
                     entities,

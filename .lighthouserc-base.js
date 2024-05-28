@@ -16,10 +16,10 @@
  * @fileoverview Configuration for lighthouse-ci.
  */
 
-
 const ALL_LIGHTHOUSE_URLS = process.env.ALL_LIGHTHOUSE_URLS.split(',');
-const LIGHTHOUSE_URLS_TO_RUN = process.env.LIGHTHOUSE_URLS_TO_RUN ?
-  process.env.LIGHTHOUSE_URLS_TO_RUN.split(',') : ALL_LIGHTHOUSE_URLS;
+const LIGHTHOUSE_URLS_TO_RUN = process.env.LIGHTHOUSE_URLS_TO_RUN
+  ? process.env.LIGHTHOUSE_URLS_TO_RUN.split(',')
+  : ALL_LIGHTHOUSE_URLS;
 
 module.exports = {
   numberOfRuns: 3,
