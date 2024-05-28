@@ -116,6 +116,12 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         print(stdout)
+        # The entities are collected from the standard output of the
+        # puppeteer script. Each entity is a dictionary with the entity
+        # name as the key and the entity ID as the value. An entity
+        # represents a database object like an exploration, topic, story,
+        # or skill. The entity ID is the unique identifier for the entity
+        # that will be used to inject into the URLs for the Lighthouse checks.
         entities: dict[str, str] = {}
         for line in stdout.split(b'\n'):
             # Standard output is in bytes, we need to decode the line to
@@ -206,14 +212,15 @@ def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
     process = subprocess.Popen(
         bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
+
+    print('OUTPUT:')
+    # Standard output is in bytes, we need to decode the line to
+    # print it.
+    print(stdout.decode('utf-8'))
     if process.returncode == 0:
         print('Lighthouse checks completed successfully.')
     else:
         print('Return code: %s' % process.returncode)
-        print('OUTPUT:')
-        # Standard output is in bytes, we need to decode the line to
-        # print it.
-        print(stdout.decode('utf-8'))
         print('ERROR:')
         # Error output is in bytes, we need to decode the line to
         # print it.
