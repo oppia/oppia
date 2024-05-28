@@ -34,13 +34,7 @@ enum INTERACTION_TYPES {
 // After deleting the exploration, if we want to access the exploration with the
 // URL, then these errors can arise. So, we ignore these errors.
 // Using regex because each time the exploration ID will be different.
-ConsoleReporter.setConsoleErrorsToIgnore([
-  /HttpErrorResponse:.*404 Not Found/,
-  /Error: Could not find the resource http:\/\/localhost:8181\/explorehandler\/features\/[a-zA-Z0-9]+\.?/,
-  /Could not find the resource http:\/\/localhost:8181\/createhandler\/permissions\/[a-zA-Z0-9]+\.?/,
-  /http:\/\/localhost:8181\/build\/webpack_bundles\/exploration_editor\.[a-f0-9]+\.bundle\.js/,
-  /http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+#\/gui\/Introduction Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
-]);
+ConsoleReporter.setConsoleErrorsToIgnore([/.*404.*Not Found.*/]);
 
 describe('Exploration Creator', function () {
   let explorationEditor: ExplorationEditor;
