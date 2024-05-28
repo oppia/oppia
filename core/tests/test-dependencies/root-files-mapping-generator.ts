@@ -104,8 +104,8 @@ const MANUALLY_MAPPED_DEPENDENCIES: Record<string, string[]> = {
     'puppeteer-login-script.js',
     'core/tests/puppeteer/lighthouse_setup.js',
   ],
-  'core/tests/puppeteer-acceptance-tests/puppeteer-testing-utilities/puppeteer-utils.ts':
-    ['core/tests/puppeteer-acceptance-tests/spec/helpers/reporter.ts'],
+  'core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts':
+    ['core/tests/puppeteer-acceptance-tests/specs/helpers/reporter.ts'],
   'core/templates/pages/header_css_libs.html': [
     'core/templates/css/oppia.css',
     'core/templates/css/oppia-material.css',
