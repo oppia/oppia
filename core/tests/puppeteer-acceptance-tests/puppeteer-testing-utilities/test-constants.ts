@@ -130,7 +130,7 @@ export default {
       Id: 'oppia.global',
     },
     Twitter: {
-      Domain: 'twitter.com',
+      Domain: 'x.com',
       Id: 'oppiaorg',
     },
     Github: {
