@@ -89,11 +89,11 @@ export default {
   data: {
     blogPostThumbnailImage: path.resolve(
       __dirname,
-      '../data/blog-post-thumbnail.svg'
+      '../../data/blog-post-thumbnail.svg'
     ),
     curriculumAdminThumbnailImage: path.resolve(
       __dirname,
-      '../data/curriculum-admin-thumbnail.svg'
+      '../../data/curriculum-admin-thumbnail.svg'
     ),
   },
   DEFAULT_SPEC_TIMEOUT_MSECS: 300000,
