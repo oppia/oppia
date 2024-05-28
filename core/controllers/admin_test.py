@@ -779,11 +779,17 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_get_handler_includes_all_platform_params(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         param = self._create_dummy_param()
+
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_parameter_services,
+            'get_platform_parameter_value',
+            'system@example.com'
+        )
         with self.swap(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1]
-        ):
+        ), swap_platform_parameter_value:
             response_dict = self.get_json('/adminhandler')
         self.assertEqual(
             response_dict['platform_params_dicts'], [param.to_dict()])
@@ -809,11 +815,16 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_parameter_services,
+            'get_platform_parameter_value',
+            'system@example.com'
+        )
         with self.swap(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1]
-        ):
+        ), swap_platform_parameter_value:
             self.post_json(
                 '/adminhandler', {
                     'action': 'update_platform_parameter_rules',
@@ -840,7 +851,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        platform_parameter_registry.Registry.parameter_registry.clear()
         param = self._create_dummy_param()
         new_rule_dicts = [
             {
@@ -854,11 +864,16 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_parameter_services,
+            'get_platform_parameter_value',
+            'system@example.com'
+        )
         with self.swap(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1]
-        ):
+        ), swap_platform_parameter_value:
             response_dict = self.get_json('/adminhandler')
             self.assertEqual(
                 response_dict['platform_params_dicts'], [param.to_dict()])
@@ -898,11 +913,16 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_parameter_services,
+            'get_platform_parameter_value',
+            'system@example.com'
+        )
         with self.swap(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1]
-        ):
+        ), swap_platform_parameter_value:
             response = self.post_json(
                 '/adminhandler', {
                     'action': 'update_platform_parameter_rules',
@@ -926,7 +946,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        platform_parameter_registry.Registry.parameter_registry.clear()
         param = self._create_dummy_param()
         new_rule_dicts = [
             {
@@ -1161,6 +1180,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_revoke_super_admin_privileges(self) -> None:
         assert isinstance(self.admin_email_address, str)
+
         self.login(self.admin_email_address, is_super_admin=True)
 
         revoke_super_admin_privileges_stub = self.swap_with_call_counter(
