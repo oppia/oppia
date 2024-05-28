@@ -393,11 +393,9 @@ def create_messages(
     )
     if (
         server_can_send_emails and
-        (
-            feconf.CAN_SEND_TRANSACTIONAL_EMAILS and
-            author_id is not None and
-            user_services.is_user_registered(author_id)
-        ) and
+        feconf.CAN_SEND_TRANSACTIONAL_EMAILS and
+        author_id is not None and
+        user_services.is_user_registered(author_id) and
         message_changed and
         should_send_email
     ):

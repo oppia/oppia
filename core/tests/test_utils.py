@@ -451,12 +451,7 @@ def swap_get_platform_parameter_value_function(
         platform_parameter_name_value_dict = dict(
             (x.value, y) for x, y in platform_parameter_name_value_tuples
         )
-        platform_parameter_names = platform_parameter_name_value_dict.keys()
-        if any(
-            expected_platform_parameter_name == parameter_name
-            for expected_platform_parameter_name in platform_parameter_names
-        ):
-            return platform_parameter_name_value_dict[parameter_name]
+        return platform_parameter_name_value_dict[parameter_name]
 
     original_get_platform_parameter_value = getattr(
         platform_parameter_services, 'get_platform_parameter_value')
@@ -482,8 +477,8 @@ def use_platform_parameters(
             platform_parameter_domain.PlatformDataTypes
         ]
     ]
-) -> Callable[[Callable[
-        ..., _GenericHandlerFunctionReturnType]],
+) -> Callable[
+        [Callable[..., _GenericHandlerFunctionReturnType]],
         Callable[..., _GenericHandlerFunctionReturnType]
 ]:
     """This method guarantees to enable the given platform parameters for the
@@ -507,7 +502,8 @@ def use_platform_parameters(
             *args: Any, **kwargs: Any
         ) -> _GenericHandlerFunctionReturnType:
             with swap_get_platform_parameter_value_function(
-                platform_parameter_name_value_tuples):
+                platform_parameter_name_value_tuples
+            ):
                 return func(*args, **kwargs)
         return wrapper
     return decorator
