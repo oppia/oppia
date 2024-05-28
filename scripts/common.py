@@ -212,23 +212,22 @@ CHROME_PATHS = [
 ]
 
 ACCEPTANCE_TESTS_SUITE_NAMES = [
-    'blog-admin-tests/assign-roles-to-users-and-change-tag-properties',
-    'blog-editor-tests/try-to-publish-a-duplicate-blog-post-and-get-blocked',
-    'curriculum-admin-tests/create-and-publish-topics-and-stories',
-    'exploration-editor-tests/create-exploration-and-change-basic-settings',
-    'exploration-editor-tests/load-complete-and-restart-exploration-preview',
-    'logged-in-user-tests/click-all-buttons-on-about-page',
-    'logged-in-user-tests/click-all-buttons-on-about-foundation-page',
-    'logged-in-user-tests/click-all-buttons-on-thanks-for-donating-page',
-    'logged-in-user-tests/click-all-buttons-on-navbar',
-    'logged-in-user-tests/click-all-links-in-about-oppia-footer',
-    'logged-in-user-tests/click-all-links-on-get-started-page',
-    'logged-in-user-tests/subscribe-to-creator-and-view-all-explorations-' +
+    'blog-admin/assign-roles-to-users-and-change-tag-properties',
+    'blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked',
+    'curriculum-admin/create-and-publish-topics-and-stories',
+    'exploration-editor/create-exploration-and-change-basic-settings',
+    'exploration-editor/load-complete-and-restart-exploration-preview',
+    'logged-out-user/click-all-buttons-on-about-page',
+    'logged-out-user/click-all-buttons-on-about-foundation-page',
+    'logged-out-user/click-all-buttons-on-donation-thanks-page',
+    'logged-out-user/click-all-buttons-on-navbar',
+    'logged-out-user/click-all-links-in-about-oppia-footer',
+    'logged-out-user/click-all-links-on-get-started-page',
+    'logged-in-user/subscribe-to-creator-and-view-all-explorations-' +
         'by-that-creator',
-    'practice-question-admin-tests/add-and-remove-contribution-rights',
-    'translation-admin-tests/add-translation-rights',
-    'translation-admin-tests/remove-translation-rights',
-    'voiceover-admin-tests/add-voiceover-artist-to-an-exploration'
+    'practice-question-admin/add-and-remove-contribution-rights',
+    'translation-admin/add-and-remove-translation-rights',
+    'voiceover-admin/add-voiceover-artist-to-an-exploration'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181
