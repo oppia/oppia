@@ -400,9 +400,9 @@ const getAngularDependenciesFromHtmlFile = (
 };
 
 /**
- * Gets the load dependencies from a HTML file.
+ * Gets the content dependencies from a HTML file.
  */
-const getLoadDependenciesFromHtmlFile = (file: string): string[] => {
+const getContentDependenciesFromHtmlFile = (file: string): string[] => {
   const content = fs.readFileSync(file, 'utf-8');
   const $ = cheerio.load(content);
   const dependencies: string[] = [];
@@ -410,6 +410,18 @@ const getLoadDependenciesFromHtmlFile = (file: string): string[] => {
   $('*')
     .children()
     .each((_, element) => {
+      if (element.tagName === 'script' || element.tagName === 'style') {
+        const module = $(element).attr('src') || $(element).attr('href');
+        if (module) {
+          // Only add the dependency if it is resolvable since some scripts or
+          // styles might be external.
+          try {
+            const modulePath = resolveModuleRelativeToRoot(module, file);
+            dependencies.push(modulePath);
+          } catch (e) {}
+        }
+      }
+
       const text = $(element).text();
       if (text.includes('@load')) {
         const loaders = text.split('\n').filter(line => line.includes('@load'));
@@ -440,7 +452,7 @@ const getDependenciesFromHtmlFile = (
   return Array.from(
     new Set([
       ...getAngularDependenciesFromHtmlFile(file, fileToAngularInformations),
-      ...getLoadDependenciesFromHtmlFile(file),
+      ...getContentDependenciesFromHtmlFile(file),
     ])
   );
 };
@@ -539,7 +551,7 @@ class RootFilesMappingGenerator {
     );
   }
 
- /**
+  /**
    * Gets the files that depend on the given dependency.
    */
   private getFilesWithDependency(
