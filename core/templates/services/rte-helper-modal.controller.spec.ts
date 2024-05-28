@@ -310,4 +310,70 @@ describe('RteHelperModalComponent', () => {
       flush();
     }));
   });
+
+  describe('when there are validation errors in tabs form control', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'tab_contents',
+        default_value: [
+          {
+            title: 'Tab 1',
+            content: 'Content for Tab 1',
+          },
+          {
+            title: 'Tab 2',
+            content: 'Content for Tab 2',
+          },
+        ],
+      },
+    ];
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(RteHelperModalComponent);
+      component = fixture.componentInstance;
+      (component.componentId = 'tabs'),
+        (component.attrsCustomizationArgsDict = {
+          tabs_contents: [
+            {
+              title: 'Tab 1',
+              content: 'Content for Tab 1',
+            },
+            {
+              title: 'Tab 2',
+              content: 'Content for Tab 2',
+            },
+          ],
+        });
+      component.customizationArgSpecs = customizationArgSpecs;
+    });
+
+    it('should disable save button and display error message', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0][0].title = '';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      expect(component.errorMessage).toBe(
+        'Please ensure that the title of tab 1 is filled.'
+      );
+      flush();
+    }));
+
+    it('should disable save button and display error message', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0][0].title = 'Tab 1';
+      component.customizationArgsForm.value[0][1].content = '';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      expect(component.errorMessage).toBe(
+        'Please ensure that the content of tab 2 is filled.'
+      );
+      flush();
+    }));
+  });
 });

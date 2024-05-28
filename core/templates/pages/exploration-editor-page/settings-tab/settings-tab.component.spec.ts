@@ -601,6 +601,9 @@ describe('Settings Tab Component', () => {
         result: Promise.resolve(),
       } as NgbModalRef;
     });
+    spyOn(explorationRightsService, 'removeRoleAsync').and.returnValue(
+      Promise.resolve()
+    );
 
     component.removeRole('username', 'editor');
     tick();
