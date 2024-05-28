@@ -7612,7 +7612,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         self
     ) -> None:
         certificate_data = (
-                suggestion_services.generate_contributor_certificate_data(
+            suggestion_services.generate_contributor_certificate_data(
                 self.username,
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 'hi',
