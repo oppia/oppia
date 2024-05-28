@@ -23,7 +23,7 @@
   </p>
 </ng-template>
 
-<mat-card class="oppia-editor-card-with-avatar" [ngClass]="{'oppia-editor-card-with-avatar-sticky': stateContentShouldStayVisibleOnScroll}">
+<mat-card class="oppia-editor-card-with-avatar">
   <div class="state-content-header-container" (click)="toggleConceptCard()">
     <div class="state-content-header oppia-mobile-collapsible-card-header">
       <h3 class="oppia-exp-content-card-header">Content</h3>
@@ -92,12 +92,6 @@
 </div>
 
 <style>
-  .oppia-editor-card-with-avatar-sticky {
-    position: sticky;
-    top: 82px;
-    z-index: 1;
-  }
-
   .state-content-header-container {
     display: none;
     padding: 0 30px;

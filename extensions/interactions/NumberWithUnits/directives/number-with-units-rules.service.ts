@@ -47,17 +47,28 @@ export class NumberWithUnitsRulesService {
     // Returns true only if input is exactly equal to answer.
     var answerObject = this.unitsObjectFactory.fromDict(answer);
     var inputsObject = this.unitsObjectFactory.fromDict(inputs.f);
+    let numericalValuesAreEqual: boolean;
 
-    var answerString = answerObject.toMathjsCompatibleString();
-    var inputsString = inputsObject.toMathjsCompatibleString();
+    if (answerObject.type !== inputsObject.type) {
+      return false;
+    }
 
-    var answerList = this.unitsObjectFactory
-      .fromRawInputString(answerString)
-      .toDict();
-    var inputsList = this.unitsObjectFactory
-      .fromRawInputString(inputsString)
-      .toDict();
-    return this.utilsService.isEquivalent(answerList, inputsList);
+    if (answerObject.type === 'real') {
+      numericalValuesAreEqual = answerObject.real === inputsObject.real;
+    } else {
+      numericalValuesAreEqual = this.utilsService.isEquivalent(
+        answerObject.fraction,
+        inputsObject.fraction
+      );
+    }
+
+    return (
+      numericalValuesAreEqual &&
+      this.utilsService.isEquivalent(
+        answerObject.getCanonicalRepresentationOfUnits(),
+        inputsObject.getCanonicalRepresentationOfUnits()
+      )
+    );
   }
 
   IsEquivalentTo(
@@ -76,6 +87,7 @@ export class NumberWithUnitsRulesService {
     }
     var answerString = answerObject.toMathjsCompatibleString();
     var inputsString = inputsObject.toMathjsCompatibleString();
+
     return unit(answerString).equals(unit(inputsString));
   }
 }
