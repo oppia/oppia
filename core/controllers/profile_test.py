@@ -136,13 +136,13 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
             original_preferences['preferred_translation_language_code'])
         self.put_json(feconf.PREFERENCES_DATA_URL, {
             'updates': [{
-                'update_type': 'preferred_site_language_code', 
+                'update_type': 'preferred_site_language_code',
                 'data': 'en'
             }]
         }, csrf_token=csrf_token)
         self.put_json(feconf.PREFERENCES_DATA_URL, {
             'updates': [{
-                'update_type': 'preferred_audio_language_code', 
+                'update_type': 'preferred_audio_language_code',
                 'data': 'hi-en'
             }]
         }, csrf_token=csrf_token)
@@ -610,6 +610,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response['error'],
+            'At \'http://localhost/signuphandler/data\' '
+            'these errors are happening:\n'
             'Missing key in handler args: can_receive_email_updates.'
         )
 
@@ -1240,6 +1242,8 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
             )
         self.assertEqual(
             response['error'],
+            'At \'http://localhost/bulk_email_webhook_endpoint/secret\' '
+            'these errors are happening:\n'
             'Missing key in handler args: data[email].'
         )
 
@@ -1649,7 +1653,11 @@ class UrlHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '/url_handler', expected_status_int=400)
         error = {
-            'error': 'Missing key in handler args: current_url.',
+            'error': (
+                'At \'http://localhost/url_handler\' '
+                'these errors are happening:\n'
+                'Missing key in handler args: current_url.'
+            ),
             'status_code': 400
         }
         self.assertEqual(response, error)
