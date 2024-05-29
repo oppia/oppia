@@ -99,7 +99,7 @@
         "url": "http://localhost:8181/terms",
         "page_module": "core/templates/pages/terms-page/terms-page.module.ts"
       },
-            "thanks": {
+      "thanks": {
         "url": "http://localhost:8181/thanks",
         "page_module": "core/templates/pages/thanks-page/thanks-page.module.ts"
       },
