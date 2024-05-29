@@ -159,9 +159,9 @@ describe('ResponseGraphInput', () => {
       ],
       isLabeled: false,
     });
-    expect(component.VERTEX_RADIUS).toBe(6);
-    expect(component.EDGE_WIDTH).toBe(3);
-    expect(component.MIN_MARGIN).toBe(10);
+    expect(component.VERTEX_RADIUS_PX).toBe(6);
+    expect(component.EDGE_WIDTH_PX).toBe(3);
+    expect(component.MIN_MARGIN_PX).toBe(10);
     expect(component.minX).toBe(10);
     expect(component.minY).toBe(10);
   });
@@ -228,9 +228,9 @@ describe('ResponseGraphInput', () => {
       ],
       isLabeled: true,
     });
-    expect(component.VERTEX_RADIUS).toBe(6);
-    expect(component.EDGE_WIDTH).toBe(3);
-    expect(component.MIN_MARGIN).toBe(15);
+    expect(component.VERTEX_RADIUS_PX).toBe(6);
+    expect(component.EDGE_WIDTH_PX).toBe(3);
+    expect(component.MIN_MARGIN_PX).toBe(15);
     expect(component.minX).toBe(10);
     expect(component.minY).toBe(10);
   });

@@ -42,9 +42,9 @@ export class ResponseGraphInput {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() answer!: string;
   graph!: GraphAnswer;
-  VERTEX_RADIUS!: number;
-  EDGE_WIDTH!: number;
-  MIN_MARGIN!: number;
+  VERTEX_RADIUS_PX!: number;
+  EDGE_WIDTH_PX!: number;
+  MIN_MARGIN_PX!: number;
   minX!: number;
   minY!: number;
   WIDTH: number = 250;
@@ -62,10 +62,10 @@ export class ResponseGraphInput {
     this.graph = this.htmlEscaperService.escapedJsonToObj(
       this.answer
     ) as GraphAnswer;
-    this.VERTEX_RADIUS = this.graphDetailService.VERTEX_RADIUS;
-    this.EDGE_WIDTH = this.graphDetailService.EDGE_WIDTH;
+    this.VERTEX_RADIUS_PX = this.graphDetailService.VERTEX_RADIUS_PX;
+    this.EDGE_WIDTH_PX = this.graphDetailService.EDGE_WIDTH_PX;
 
-    this.MIN_MARGIN = this.graphDetailService.getMinMargin(this.graph);
+    this.MIN_MARGIN_PX = this.graphDetailService.getMinMargin(this.graph);
     this.minX = this.graphDetailService.getMinX(this.graph);
     this.minY = this.graphDetailService.getMinY(this.graph);
 
@@ -73,11 +73,11 @@ export class ResponseGraphInput {
   }
 
   removeWhiteSpace(): void {
-    // The first vertex should be at (MIN_MARGIN, MIN_MARGIN).
+    // The first vertex should be at (MIN_MARGIN_PX, MIN_MARGIN_PX).
     this.graph.vertices = this.graph.vertices.map(vertex => {
       return {
-        x: vertex.x - this.minX + this.MIN_MARGIN,
-        y: vertex.y - this.minY + this.MIN_MARGIN,
+        x: vertex.x - this.minX + this.MIN_MARGIN_PX,
+        y: vertex.y - this.minY + this.MIN_MARGIN_PX,
         label: vertex.label,
       };
     });
@@ -109,20 +109,20 @@ export class ResponseGraphInput {
     return Math.max(...this.graph.vertices.map(vertex => vertex.y));
   }
 
-  // This function calculates the scale factor required to fit the graph.
+  // This function calculates the scale factor required to fit the graph within the display area.
   getScale(): number {
     var scale = 1;
 
     var maxY = this.getMaxY();
     if (this.HEIGHT < maxY) {
       // Only apply the scale if the graph is larger than the display area.
-      scale = this.HEIGHT / (maxY + this.MIN_MARGIN);
+      scale = this.HEIGHT / (maxY + this.MIN_MARGIN_PX);
     }
 
     var maxX = this.getMaxX();
     if (this.WIDTH < maxX) {
       // Only apply the scale if the graph is larger than the display area.
-      var scaleX = this.WIDTH / (maxX + this.MIN_MARGIN);
+      var scaleX = this.WIDTH / (maxX + this.MIN_MARGIN_PX);
       if (scaleX < scale) {
         // If the graph is larger than the display area in both dimensions,
         // we need to scale it down uniformly by the smaller scale factor.
