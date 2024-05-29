@@ -654,11 +654,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
         )
 
     def test_email_not_sent_if_config_does_not_permit_it(self) -> None:
-        swap_get_platform_parameter_value_return_email_footer = (
-            self.swap_to_always_return(
-                param_services, 'get_platform_parameter_value', self.new_footer)
+        def mock_get_platform_parameter_value_function(
+                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            if param_name == param_list.ParamName.EMAIL_FOOTER.value:
+                return self.new_footer
+            return 'test@example.com'
+        swap_get_platform_parameter_value = (
+            self.swap(
+                param_services, 'get_platform_parameter_value',
+                mock_get_platform_parameter_value_function)
         )
-        with swap_get_platform_parameter_value_return_email_footer, self.swap(
+        with swap_get_platform_parameter_value, self.swap(
             feconf, 'CAN_SEND_EMAILS', False
         ):
             self._set_signup_email_content_platform_parameter(
@@ -913,11 +919,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
     def test_email_only_sent_once_for_repeated_signups_by_same_user(
         self
     ) -> None:
-        swap_get_platform_parameter_value_return_email_footer = (
-            self.swap_to_always_return(
-                param_services, 'get_platform_parameter_value', self.new_footer)
+        def mock_get_platform_parameter_value_function(
+                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            if param_name == param_list.ParamName.EMAIL_FOOTER.value:
+                return self.new_footer
+            return 'test@example.com'
+        swap_get_platform_parameter_value = (
+            self.swap(
+                param_services, 'get_platform_parameter_value',
+                mock_get_platform_parameter_value_function)
         )
-        with swap_get_platform_parameter_value_return_email_footer, self.swap(
+        with swap_get_platform_parameter_value, self.swap(
             feconf, 'CAN_SEND_EMAILS', True
         ):
             self._set_signup_email_content_platform_parameter(
@@ -964,11 +976,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self._reset_signup_email_content_platform_parameters()
 
     def test_email_only_sent_if_signup_was_successful(self) -> None:
-        swap_get_platform_parameter_value_return_email_footer = (
-            self.swap_to_always_return(
-                param_services, 'get_platform_parameter_value', self.new_footer)
+        def mock_get_platform_parameter_value_function(
+                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            if param_name == param_list.ParamName.EMAIL_FOOTER.value:
+                return self.new_footer
+            return 'test@example.com'
+        swap_get_platform_parameter_value = (
+            self.swap(
+                param_services, 'get_platform_parameter_value',
+                mock_get_platform_parameter_value_function)
         )
-        with swap_get_platform_parameter_value_return_email_footer, self.swap(
+        with swap_get_platform_parameter_value, self.swap(
             feconf, 'CAN_SEND_EMAILS', True
         ):
             self._set_signup_email_content_platform_parameter(
@@ -2715,7 +2733,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             return email_manager.EMAIL_SENDER_NAME.default_value
         elif param_name == param_list.ParamName.EMAIL_FOOTER.value:
             return email_manager.EMAIL_FOOTER.default_value
-        return ''
+        elif param_name == param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value:
+            return 'noreply@example.com'
+        return 'test@example.com'
 
     def _mock_logging_info(self, msg: str, *args: str) -> None:
         """Mocks logging.info() by appending the log message to the logged info
@@ -4296,7 +4316,9 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             return True
         elif param_name == param_list.ParamName.EMAIL_SENDER_NAME.value:
             return email_manager.EMAIL_SENDER_NAME.default_value
-        return ''
+        elif param_name == param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value:
+            return 'noreply@example.com'
+        return 'test@example.com'
 
     def _mock_logging_info(self, msg: str, *args: str) -> None:
         """Mocks logging.info() by appending the log message to the logged info
@@ -5093,7 +5115,9 @@ class NotifyReviewersNewSuggestionsTests(
             return email_manager.EMAIL_SENDER_NAME.default_value
         elif param_name == param_list.ParamName.EMAIL_FOOTER.value:
             return email_manager.EMAIL_FOOTER.default_value
-        return ''
+        elif param_name == param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value:
+            return 'noreply@example.com'
+        return 'test@example.com'
 
     def _mock_logging_info(self, msg: str, *args: str) -> None:
         """Mocks logging.info() by appending the log message to the logged info
@@ -5360,7 +5384,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             return True
         elif param_name == param_list.ParamName.EMAIL_SENDER_NAME.value:
             return email_manager.EMAIL_SENDER_NAME.default_value
-        return ''
+        elif param_name == param_list.ParamName.NOREPLY_EMAIL_ADDRESS.value:
+            return 'noreply@example.com'
+        return 'test@example.com'
 
     def setUp(self) -> None:
         super().setUp()
