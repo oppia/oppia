@@ -17,25 +17,25 @@
  * can open links by clicking all buttons in teach page
  */
 
-import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
-import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
-import testConstants from '../../puppeteer-testing-utilities/test-constants';
+import {UserFactory} from '../../utilities/common/user-factory';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import testConstants from '../../utilities/common/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 const now = new Date();
-const i =
+const tempId =
   now.getHours().toString() +
   now.getMinutes().toString() +
   now.getSeconds().toString();
 
 describe('Partner in Partnerships page', function () {
-  let testUser: LoggedInUser;
+  let testUser: LoggedOutUser;
 
   beforeAll(async function () {
     testUser = await UserFactory.createNewUser(
-      `partner${i}`,
-      `partner${i}@example.com`
+      `partner${tempId}`,
+      `partner${tempId}@example.com`
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 

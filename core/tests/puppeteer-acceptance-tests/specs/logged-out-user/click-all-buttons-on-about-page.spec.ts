@@ -28,8 +28,8 @@ describe('Logged-in User in About page', function () {
 
   beforeAll(async function () {
     testUser = await UserFactory.createNewUser(
-      'testuser2',
-      'testuser2@example.com'
+      'testuser',
+      'testuser@example.com'
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
