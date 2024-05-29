@@ -32,6 +32,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
     """Tests for email_services functions."""
 
     def setUp(self) -> None:
+        super().setUp()
         self.admin_email_address = (
             platform_parameter_services.get_platform_parameter_value(
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
