@@ -1621,5 +1621,10 @@
     "I18N_WARNING_MODAL_DESCRIPTION": "This will show the full solution. Are you sure?",
     "I18N_WARNING_MODAL_TITLE": "Warning!",
     "I18N_WORKED_EXAMPLE": "Worked Example",
-    "I18N_YES": "Yes"
+    "I18N_YES": "Yes",
+    "I18N_IMAGE_UPLOAD_ERROR": "Error: Could not read image file.",
+    "I18N_IMAGE_UPLOADER_MODAL_DRAG": "Drag to crop and resize:",
+    "I18N_IMAGE_UPLOADER_MODAL_ADD_BUTTON": "Add <[imageName]>",
+    "I18N_IMAGE_UPLOADER_MODAL_CANCEL_BUTTON": "Cancel",
+    "I18N_IMAGE_UPLOADER_MODAL_UPLOAD_HEADING": "Upload <[imageName]>"
 }
