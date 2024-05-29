@@ -28,6 +28,9 @@ from core.controllers import improvements
 from core.domain import exp_services
 from core.domain import improvements_domain
 from core.domain import improvements_services
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_registry
 from core.domain import platform_parameter_services
 from core.platform import models
 from core.tests import test_utils
@@ -702,11 +705,19 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         self.assertTrue(json_response['is_improvements_tab_enabled'])
 
     def test_custom_high_bounce_rate_creation_threshold(self) -> None:
-        swap_get_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            0.35
+        def mock_get_platform_parameter_value_function(
+            param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            if param_name == (
+                platform_parameter_list.ParamName.
+                HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD.value
+            ):
+                return 0.35
+            return ''
+        swap_get_platform_parameter_value = self.swap(
+            platform_parameter_services, 'get_platform_parameter_value',
+            mock_get_platform_parameter_value_function
         )
+
         with swap_get_platform_parameter_value, self.login_context(
             self.OWNER_EMAIL
         ):
@@ -718,10 +729,18 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
             0.35)
 
     def test_custom_high_bounce_rate_obsoletion_threshold(self) -> None:
-        swap_get_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            0.05
+        def mock_get_platform_parameter_value_function(
+            param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            if param_name == (
+                platform_parameter_list.ParamName.
+                HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD.
+                value
+            ):
+                return 0.05
+            return ''
+        swap_get_platform_parameter_value = self.swap(
+            platform_parameter_services, 'get_platform_parameter_value',
+            mock_get_platform_parameter_value_function
         )
 
         with swap_get_platform_parameter_value, self.login_context(
@@ -737,10 +756,18 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
     def test_custom_high_bounce_rate_task_minimum_exploration_starts(
         self
     ) -> None:
-        swap_get_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            20
+        def mock_get_platform_parameter_value_function(
+            param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            if param_name == (
+                platform_parameter_list.ParamName.
+                HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS.
+                value
+            ):
+                return 20
+            return ''
+        swap_get_platform_parameter_value = self.swap(
+            platform_parameter_services, 'get_platform_parameter_value',
+            mock_get_platform_parameter_value_function
         )
 
         with swap_get_platform_parameter_value, self.login_context(
