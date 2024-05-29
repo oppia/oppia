@@ -827,6 +827,9 @@ URLS = [
         r'%s/<entity_type>/<entity_id>' %
         feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
         editor.LearnerAnswerInfoHandler),
+    get_redirect_route(
+        r'/entity_translations_bulk_handler/<entity_type>/<entity_id>/<version>',
+        editor.EntityTranslationsBulkHandler),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,

@@ -53,9 +53,10 @@ if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import stats_models
     from mypy_imports import user_models
+    from mypy_imports import translation_models
 
-(exp_models, user_models, stats_models) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.USER, models.Names.STATISTICS])
+(exp_models, user_models, stats_models, translation_models) = models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.USER, models.Names.STATISTICS, models.Names.TRANSLATION])
 
 
 class BaseEditorControllerTests(test_utils.GenericTestBase):
@@ -3727,4 +3728,32 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertTrue(fs.isfile(filepath))
 
+        self.logout()
+
+
+class EntityTranslationsBulkHandlerTest(test_utils.GenericTestBase):
+
+    def test_fetching_entity_translations_in_bulk(self) -> None:
+        """Test fetching all available translations."""
+        translations_mapping: Dict[str, feconf.TranslatedContentDict] = {
+            'content_0': {
+                'content_value': 'Translated content',
+                'content_format': 'html',
+                'needs_update': False
+            }
+        }
+        language_codes = ['hi', 'bn']
+        for language_code in language_codes:
+            translation_models.EntityTranslationsModel.create_new(
+                'exploration', 'exp1', 5, language_code, translations_mapping
+            ).put()
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        self.login(self.VIEWER_EMAIL)
+        url = '/entity_translations_handler/exploration/exp1/5/hi'
+        entity_translation_dict = self.get_json(url)
+
+        self.assertEqual(
+            entity_translation_dict['translations'], translations_mapping)
         self.logout()

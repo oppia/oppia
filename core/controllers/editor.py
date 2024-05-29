@@ -40,6 +40,7 @@ from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
+from core.domain import translation_fetchers
 
 from typing import Dict, List, Optional, TypedDict
 
@@ -310,6 +311,64 @@ class ExplorationHandler(
             self.roles, self.user_id, exploration_id)
         logging.info(log_info_string)
         self.render_json(self.values)
+
+
+class EntityTranslationsBulkHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handles fetching all available translations for a given entity."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'entity_type': {
+            'schema': {
+                'type': 'basestring',
+                'choices': [
+                    feconf.ENTITY_TYPE_EXPLORATION,
+                    feconf.ENTITY_TYPE_QUESTION
+                ]
+            }
+        },
+        'entity_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        },
+        'entity_version': {
+            'schema': {
+                'type': 'int',
+                'validators': [{
+                    'id': 'is_at_least',
+                    # Version must be greater than zero.
+                    'min_value': 1
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(
+        self,
+        entity_type: str,
+        entity_id: str,
+        entity_version: int,
+    ) -> None:
+        translations = {}
+        entity_translations = translation_fetchers.get_all_entity_translations_for_entity(
+            feconf.TranslatableEntityType(entity_type), entity_id,
+            entity_version)
+        
+        for translation in entity_translations:
+            translations[translation.language_code] = translation.to_dict()
+
+        self.render_json(translations)
 
 
 class UserExplorationPermissionsHandler(
