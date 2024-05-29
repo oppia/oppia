@@ -173,7 +173,7 @@ def compute_translation_related_change(
     updated_exploration: exp_domain.Exploration,
     translation_changes: List[exp_domain.ExplorationChange]
 ) -> Tuple[List[translation_models.EntityTranslationsModel], Dict[str, int]]:
-    """Cretase new EntityTranslation models corresponding to translation related
+    """Create new EntityTranslation models corresponding to translation related
     changes.
 
     Args:
@@ -234,11 +234,11 @@ def compute_translation_related_change(
     return new_translation_models, translation_counts
 
 
-def compute_translation_related_change_upon_revert(
+def compute_translation_related_changes_upon_revert(
     exploration_id: str,
     revert_to_version: int
 ) -> Tuple[List[translation_models.EntityTranslationsModel], Dict[str, int]]:
-    """Cretase new EntityTranslation models corresponding to translation related
+    """Create new EntityTranslation models corresponding to translation related
     changes upon exploration revert.
 
     Args:

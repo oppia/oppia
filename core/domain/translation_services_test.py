@@ -409,7 +409,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             'ar' in [et.language_code for et in entity_translation_models]
         )
 
-    def test_compute_translation_related_change_upon_revert(
+    def test_compute_translation_related_changes_upon_revert(
         self
     ) -> None:
         translation_services.add_new_translation(
@@ -464,8 +464,9 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         self.assertEqual(len(
             entity_translation_models[1].translations), 3)
 
+        ts - translate_services
         entity_translation_models, _ = (
-            translation_services.compute_translation_related_change_upon_revert(
+            ts.compute_translation_related_changes_upon_revert(
                 self.EXP_ID, 5
             )
         )

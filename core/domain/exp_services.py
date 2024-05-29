@@ -2557,7 +2557,7 @@ def revert_exploration(
     ] = []
 
     new_translation_models, translation_counts = (
-        translation_services.compute_translation_related_change_upon_revert(
+        translation_services.compute_translation_related_changes_upon_revert(
             exploration_id, revert_to_version))
 
     models_to_put.extend(new_translation_models)
