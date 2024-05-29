@@ -142,7 +142,9 @@ describe('GraphVizComponent', () => {
     // Only the basic values are initialised in ngOnInit() function. The rest
     // of the values are initialised in ngAfterViewInit(), .i.e, after the
     // initialisation of the components view is completed.
-    expect(component.VERTEX_RADIUS_PX).toBe(graphDetailService.VERTEX_RADIUS_PX);
+    expect(component.VERTEX_RADIUS_PX).toBe(
+      graphDetailService.VERTEX_RADIUS_PX
+    );
     expect(component.EDGE_WIDTH_PX).toBe(graphDetailService.EDGE_WIDTH_PX);
     expect(component.selectedEdgeWeightValue).toBe(0);
     expect(component.shouldShowWrongWeightWarning).toBe(false);
