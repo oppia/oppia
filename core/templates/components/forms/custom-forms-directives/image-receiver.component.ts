@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import {
 import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
-import {ContextService} from 'services/context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {IdGenerationService} from 'services/id-generation.service';
 
@@ -39,16 +38,16 @@ interface ImageTypeMapping {
 }
 
 @Component({
-  selector: 'oppia-image-uploader',
-  templateUrl: './image-uploader.component.html',
+  selector: 'oppia-image-receiver',
+  templateUrl: './image-receiver.component.html',
 })
-export class ImageUploaderComponent {
+export class ImageReceiverComponent {
   @Output() fileChanged: EventEmitter<File> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() allowedImageFormats!: string[];
-  @Input() isBlogPostThumbnailUploader!: boolean;
+  @Input() maxImageSizeInKB!: number;
   @ViewChild('dropArea') dropAreaRef!: ElementRef;
   @ViewChild('imageInput') imageInputRef!: ElementRef;
   fileInputClassName!: string;
@@ -60,8 +59,7 @@ export class ImageUploaderComponent {
   constructor(
     public blogDashboardPageService: BlogDashboardPageService,
     private idGenerationService: IdGenerationService,
-    private windowRef: WindowRef,
-    private contextService: ContextService
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
@@ -133,6 +131,21 @@ export class ImageUploaderComponent {
     this.imageInputRef.nativeElement.value = '';
   }
 
+  private _getMaxAllowedImageSizeInBytes(): number {
+    return this.maxImageSizeInKB * 1024;
+  }
+
+  getAllowedImageFormatsString(): string {
+    if (!this.allowedImageFormats) {
+      return '';
+    }
+    if (this.allowedImageFormats.length === 1) {
+      return `Is in .${this.allowedImageFormats[0]} format`;
+    }
+    const formats = this.allowedImageFormats.map(f => `.${f}`);
+    return `Is in ${formats.slice(0, -1).join(', ')} or ${formats[formats.length - 1]} format`;
+  }
+
   validateUploadedFile(file: File, filename: string): string | null {
     if (!file || !file.size || !file.type.match('image.*')) {
       return 'This file is not recognized as an image';
@@ -180,27 +193,20 @@ export class ImageUploaderComponent {
       return 'This image format is not supported';
     }
 
-    let maxAllowedFileSize: number;
-    let fileSizeUnit: string;
-    if (
-      this.contextService.getEntityType() === AppConstants.ENTITY_TYPE.BLOG_POST
-    ) {
-      const ONE_MB_IN_BYTES: number = 1 * 1024 * 1024;
-      maxAllowedFileSize = ONE_MB_IN_BYTES;
-      fileSizeUnit = 'MB';
-    } else {
-      const HUNDRED_KB_IN_BYTES: number = 100 * 1024;
-      maxAllowedFileSize = HUNDRED_KB_IN_BYTES;
-      fileSizeUnit = 'KB';
-    }
-    if (file.size > maxAllowedFileSize) {
-      let currentSize: string = (
-        (file.size * 100) /
-        maxAllowedFileSize
-      ).toFixed(1);
+    if (file.size > this._getMaxAllowedImageSizeInBytes()) {
+      const ONE_KB_IN_BYTES = 1024;
+      const ONE_MB_IN_BYTES = 1024 * 1024;
+      let currentFileSizeUnit = 'KB';
+      let currentFileSize = file.size / ONE_KB_IN_BYTES;
+
+      if (this._getMaxAllowedImageSizeInBytes() >= ONE_MB_IN_BYTES) {
+        currentFileSizeUnit = 'MB';
+        currentFileSize = file.size / ONE_MB_IN_BYTES;
+      }
+
       return (
-        `The maximum allowed file size is ${maxAllowedFileSize / 1024}` +
-        ` KB (${currentSize} ${fileSizeUnit} given).`
+        `The maximum allowed file size is ${this._getMaxAllowedImageSizeInBytes() / ONE_KB_IN_BYTES}` +
+        ` KB (${currentFileSize.toFixed(1)} ${currentFileSizeUnit} given).`
       );
     }
     return null;
@@ -210,6 +216,6 @@ export class ImageUploaderComponent {
 angular
   .module('oppia')
   .directive(
-    'oppiaImageUploader',
-    downgradeComponent({component: ImageUploaderComponent})
+    'oppiaImageReceiver',
+    downgradeComponent({component: ImageReceiverComponent})
   );
