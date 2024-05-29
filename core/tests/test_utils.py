@@ -453,10 +453,18 @@ def swap_get_platform_parameter_value_function(
         Returns:
             PlatformDataTypes. The value of the platform parameter if the
             parameter is present in the platform_parameter_names list.
+
+        Raises:
+            Exception. If the parameter_name is not present in the
+                platform_parameter_names list.
         """
         platform_parameter_name_value_dict = dict(
             (x.value, y) for x, y in platform_parameter_name_value_tuples
         )
+        if parameter_name not in platform_parameter_name_value_dict:
+            raise Exception(
+                'Unknown platform parameter name: %s' % parameter_name
+            )
         return platform_parameter_name_value_dict[parameter_name]
 
     original_get_platform_parameter_value = getattr(
@@ -476,7 +484,7 @@ def swap_get_platform_parameter_value_function(
         )
 
 
-def use_platform_parameters(
+def set_platform_parameters(
     platform_parameter_name_value_tuples: List[
         Tuple[
             platform_parameter_list.ParamName,

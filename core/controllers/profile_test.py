@@ -658,7 +658,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 email_preferences.can_receive_subscription_email,
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
             (platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'), # pylint: disable=line-too-long
@@ -1085,7 +1085,7 @@ class SignupTests(test_utils.GenericTestBase):
         self.assertDictEqual(values_dict, response)
         self.logout()
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'), # pylint: disable=line-too-long

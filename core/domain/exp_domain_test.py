@@ -17870,7 +17870,7 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 3, change_list)
         self.assertEqual(changes_are_not_mergeable, False)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_email_is_sent_to_admin_in_case_of_adding_deleting_state_changes(
@@ -18207,7 +18207,7 @@ class ExplorationChangesMergeabilityUnitTests(
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].html, expected_email_html_body)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_email_is_sent_to_admin_in_case_of_state_renames_changes_conflict(

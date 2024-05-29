@@ -63,7 +63,7 @@ class TasksTests(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
         self.THREAD_ID = 'exploration.exp1.thread_1'
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
@@ -155,7 +155,7 @@ class TasksTests(test_utils.EmailTestBase):
             # Check that there are three messages.
             self.assertEqual(len(mock_email_messages), 3)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
@@ -205,7 +205,7 @@ class TasksTests(test_utils.EmailTestBase):
         self.assertEqual(messages[0].html, expected_email_html_body)
         self.assertEqual(messages[0].subject, expected_email_subject)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
@@ -253,7 +253,7 @@ class TasksTests(test_utils.EmailTestBase):
                 ' via the Preferences page.')
             self.assertEqual(mock_email_messages[0].body, expected_message)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
@@ -301,7 +301,7 @@ class TasksTests(test_utils.EmailTestBase):
             status_change_email = messages[0]
             self.assertEqual(status_change_email.body, expected_message)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),

@@ -65,7 +65,7 @@ class InformSubscribersTest(test_utils.EmailTestBase):
         self.can_send_subscription_email_ctx = self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, 'EMAIL_FOOTER'),

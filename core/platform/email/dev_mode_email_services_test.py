@@ -32,7 +32,7 @@ from typing import Dict, Union
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_send_mail_logs_to_terminal(self) -> None:
@@ -80,7 +80,7 @@ class EmailTests(test_utils.GenericTestBase):
             observed_log_messages,
             [logging_info_email_body, logging_info_notification])
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_send_mail_to_multiple_recipients_logs_to_terminal(self) -> None:

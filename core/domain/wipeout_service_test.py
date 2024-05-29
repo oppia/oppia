@@ -681,7 +681,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         self.assertIsNotNone(
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_run_user_deletion_completion_with_user_properly_deleted(
@@ -721,7 +721,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             auth_services.verify_external_auth_associations_are_deleted(
                 self.user_1_id))
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_run_user_deletion_completion_user_wrongly_deleted_emails_enabled(
@@ -5652,7 +5652,7 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_repeated_deletion_is_successful_when_emails_enabled(
@@ -5682,7 +5682,7 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_no_email_is_sent_when_there_are_no_users_pending_deletion(
@@ -5699,7 +5699,7 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_regular_deletion_is_successful(self) -> None:
@@ -5768,7 +5768,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_verification_when_user_is_not_deleted_emails_enabled(
@@ -5793,7 +5793,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
             wipeout_service.check_completion_of_user_deletion()
         self.assertEqual(len(self.email_bodies), 0)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'senderName')
@@ -5815,7 +5815,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.user_1_id))
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_verification_when_user_is_wrongly_deleted_fails(self) -> None:

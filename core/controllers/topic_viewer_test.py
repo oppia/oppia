@@ -177,7 +177,7 @@ class TopicPageDataHandlerTests(
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_get_with_user_logged_in(self) -> None:

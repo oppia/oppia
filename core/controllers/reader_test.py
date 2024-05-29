@@ -1235,7 +1235,7 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         self.logout()
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),

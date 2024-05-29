@@ -40,7 +40,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
@@ -58,7 +58,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         self.assertEqual(messages[0].body, 'body')
         self.assertEqual(messages[0].html, 'html')
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
@@ -90,7 +90,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
                 'subject', 'body', 'html')
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
@@ -110,7 +110,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].to, recipients)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
@@ -189,7 +189,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 'sender@example.com', malformed_recipient_emails,
                 'subject', 'body', 'html')
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),

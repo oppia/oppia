@@ -2539,7 +2539,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             'exploration.'
         )
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
     )
     def test_error_cases_when_can_send_emails_param_is_false(self) -> None:
@@ -2574,7 +2574,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         # Log out.
         self.logout()
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'),
@@ -2603,7 +2603,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         # Log out.
         self.logout()
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (

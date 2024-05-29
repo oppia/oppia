@@ -187,7 +187,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             classifier_training_job.status,
             feconf.TRAINING_JOB_STATUS_COMPLETE)
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_email_sent_on_failed_job(self) -> None:

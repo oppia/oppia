@@ -574,7 +574,7 @@ class TopicEditorTests(
             '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
         self.logout()
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_editable_topic_handler_get(self) -> None:
@@ -682,7 +682,7 @@ class TopicEditorTests(
 
         self.assertEqual(json_response['error'], 'Name should be a string.')
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_editable_topic_handler_put(self) -> None:
@@ -1048,7 +1048,7 @@ class TopicEditorTests(
 class TopicPublishSendMailHandlerTests(
         BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
-    @test_utils.use_platform_parameters(
+    @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_send_mail(self) -> None:
