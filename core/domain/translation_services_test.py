@@ -464,7 +464,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         self.assertEqual(len(
             entity_translation_models[1].translations), 3)
 
-        ts - translate_services
+        ts = translation_services
         entity_translation_models, _ = (
             ts.compute_translation_related_changes_upon_revert(
                 self.EXP_ID, 5
