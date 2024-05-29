@@ -43,6 +43,7 @@ export enum FeatureNames {
   AutoUpdateExpVoiceArtistLink = 'auto_update_exp_voice_artist_link',
   ExplorationEditorCanModifyTranslations = 'exploration_editor_can_modify_translations',
   ExplorationEditorCanTagMisconceptions = 'exploration_editor_can_tag_misconceptions',
+  EnableMultipleClassrooms = 'enable_multiple_classrooms',
 }
 
 export interface FeatureStatusSummaryBackendDict {

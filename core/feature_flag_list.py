@@ -57,6 +57,7 @@ class FeatureNames(enum.Enum):
         'exploration_editor_can_modify_translations')
     EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS = (
         'exploration_editor_can_tag_misconceptions')
+    ENABLE_MULTIPLE_CLASSROOMS = 'enable_multiple_classrooms'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -85,7 +86,8 @@ DEV_FEATURES_LIST = [
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
-    FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS
+    FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
+    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -254,4 +256,11 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.DEV
         )
     ),
+    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value: (
+        (
+            'The flag enables flow for multiple classrooms '
+            'and makes the classrooms page available to learners.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    )
 }
