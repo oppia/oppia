@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import copy
 import enum
 
 from core import feconf
@@ -45,7 +46,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.original_param_registry = registry.Registry.parameter_registry
+        self.original_param_registry = copy.deepcopy(
+            registry.Registry.parameter_registry)
         registry.Registry.parameter_registry.clear()
 
         # Parameter names that might be used in following tests.
