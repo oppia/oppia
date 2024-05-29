@@ -62,7 +62,7 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
         # parameters are accessed in user services to retrieve system email
         # address and hence cached.
         self.assertEqual(
-            response['total_keys_stored'], 
+            response['total_keys_stored'],
             len(platform_parameter_list.ALL_PLATFORM_PARAMS_LIST) + 1)
 
     def test_flush_memory_cache(self) -> None:
@@ -73,7 +73,7 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
         # parameters are accessed in user services to retrieve system email
         # address and hence cached.
         self.assertEqual(
-            response['total_keys_stored'], 
+            response['total_keys_stored'],
             len(platform_parameter_list.ALL_PLATFORM_PARAMS_LIST) + 1)
 
         self.delete_json('/memorycachehandler')
@@ -83,7 +83,7 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
         # are accessed in call to get json and platform parameters are again
         # cached.
         self.assertEqual(
-            response['total_keys_stored'], 
+            response['total_keys_stored'],
             len(platform_parameter_list.ALL_PLATFORM_PARAMS_LIST))
 
 
