@@ -82,6 +82,8 @@ from core.controllers import voice_artist
 from core.controllers import voiceover
 from core.platform import models
 from core.platform.auth import firebase_auth_services
+from core.controllers.blog_admin import BlogAdminGetHandler
+from core.controllers.blog_admin import BlogAdminSavePlatformParametersHandler
 
 import google.cloud.logging
 from typing import Dict, Optional, Type, TypeVar
@@ -219,6 +221,8 @@ URLS = [
         '/<firebase_path:__/auth(?:/.*)?>',
         firebase.FirebaseProxyPage
     ),
+    get_redirect_route(r'/blogadmin/get', BlogAdminGetHandler),
+    get_redirect_route(r'/blogadmin/save_platform_parameters', BlogAdminSavePlatformParametersHandler),
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(r'/splash', SplashRedirectPage),
     get_redirect_route(

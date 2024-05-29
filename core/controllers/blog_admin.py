@@ -45,36 +45,17 @@ class BlogAdminHandlerNormalizedPayloadDict(TypedDict):
     new_platform_parameter_values: Optional[Dict[str, int]]
 
 
-class BlogAdminHandler(
+class BlogAdminGetHandler(
     base.BaseHandler[
         BlogAdminHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
-    """Handler for the blog admin page."""
+    """Handler for the blog admin GET requests."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
-        'POST': {
-            'action': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': [
-                        'save_platform_parameters'
-                    ]
-                }
-            },
-            'new_platform_parameter_values': {
-                'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        validation_method.
-                        validate_platform_params_values_for_blog_admin),
-                },
-                'default_value': None
-            }
-        }
+        'GET': {}
     }
 
     @acl_decorators.can_access_blog_admin_page
@@ -111,6 +92,37 @@ class BlogAdminHandler(
                 BLOG_ADMIN: role_services.HUMAN_READABLE_ROLES[BLOG_ADMIN]
             }
         })
+
+class BlogAdminSavePlatformParametersHandler(
+    base.BaseHandler[
+        BlogAdminHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
+    """Handler for saving platform parameters in the blog admin page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'action': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        'save_platform_parameters'
+                    ]
+                }
+            },
+            'new_platform_parameter_values': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        validation_method.
+                        validate_platform_params_values_for_blog_admin),
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_access_blog_admin_page
     def post(self) -> None:
