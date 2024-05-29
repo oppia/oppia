@@ -90,8 +90,7 @@ jasmine.getEnv().addReporter({
 const context = require.context(
   '../../',
   true,
-  /graph-viz\.component\.spec\.ts$/
-  // /((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(component|controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)(?<!puppeteer-acceptance-tests.*\.spec\.ts)(?<!@nodelib.*\.spec\.ts)(?<!openapi3-ts.*\.spec\.ts)(?<!(valid|invalid)[_-][\w\d.\-]*\.ts)/
+  /((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(component|controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)(?<!puppeteer-acceptance-tests.*\.spec\.ts)(?<!@nodelib.*\.spec\.ts)(?<!openapi3-ts.*\.spec\.ts)(?<!(valid|invalid)[_-][\w\d.\-]*\.ts)/
 );
 
 // And load the modules.
