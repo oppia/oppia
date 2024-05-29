@@ -146,7 +146,6 @@
 	"I18N_BLOG_POST_PAGE_TITLE": "<[blogPostTitle]> | Blogi | Oppia",
 	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_EXTENSIONS_PREFIX": "Sallitut tiedostopäätteet:",
 	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_MAX_FILE_SIZE": "Suurin sallittu kuvakoko on <[imageSize]> kt. Huomaa, että joskus rajaus saattaa suurentaa kuvan kokoa.",
-	"I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG": "Valitse tiedosto tai vedä se tähän",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "Virhe: Pienoiskuvaa ei voitu lukea.",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD": "Lisää pienoiskuva",
 	"I18N_BLOG_POST_UNTITLED_HEADING": "Nimetön",

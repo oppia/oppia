@@ -107,7 +107,6 @@
 	"I18N_BLOG_POST_EDITOR_TAGS_LIMIT_SPECIFICATION_SUFFIX": "más etiquetas todavía pueden ser añadidas.",
 	"I18N_BLOG_POST_EDITOR_THUMBNAIL_HEADING": "Miniatura",
 	"I18N_BLOG_POST_EDITOR_TITLE_HEADING": "Título",
-	"I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG": "Escoger un archivo o arrastrarlo aquí",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "Error: no se pudo leer el archivo de imagen.",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD": "Añadir una miniatura",
 	"I18N_BLOG_POST_UNTITLED_HEADING": "Sin título",

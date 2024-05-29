@@ -2,10 +2,11 @@
   <div class="modal-body" [ngClass]="{'narrow-image-uploader': windowIsNarrow}">
     <div class="blog-post-thumbnail-image-uploader">
       <div *ngIf="!uploadedImage" [ngClass]="{'d-flex': windowIsNarrow}">
-        <oppia-image-uploader (fileChanged)="onFileChanged($event)"
+        <oppia-image-receiver (fileChanged)="onFileChanged($event)"
                               [allowedImageFormats]="allowedImageFormats"
-                              [isBlogPostThumbnailUploader]="true">
-        </oppia-image-uploader>
+                              [maxImageSizeInKB]="1024"
+                              >
+        </oppia-image-receiver>
       </div>
       <div class="oppia-form-error oppia-form-error-text"
            *ngIf="invalidImageWarningIsShown">

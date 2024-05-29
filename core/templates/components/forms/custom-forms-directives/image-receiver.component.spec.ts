@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for audio-file-uploader component.
+ * @fileoverview Tests for image-receiver component.
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
@@ -25,17 +25,15 @@ import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {IdGenerationService} from 'services/id-generation.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {ImageUploaderComponent} from './image-uploader.component';
+import {ImageReceiverComponent} from './image-receiver.component';
 import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {ContextService} from 'services/context.service';
 
-describe('ImageUploaderComponent', () => {
-  let component: ImageUploaderComponent;
-  let fixture: ComponentFixture<ImageUploaderComponent>;
+describe('ImageReceiverComponent', () => {
+  let component: ImageReceiverComponent;
+  let fixture: ComponentFixture<ImageReceiverComponent>;
   let igs: IdGenerationService;
   let windowRef: WindowRef;
-  let contextService: ContextService;
 
   let dropAreaRefSpy = jasmine.createSpy('dropAreaRefSpy');
   let windowRefSpy = jasmine.createSpy('windowRefSpy');
@@ -61,7 +59,7 @@ describe('ImageUploaderComponent', () => {
         HttpClientTestingModule,
         RouterModule.forRoot([]),
       ],
-      declarations: [ImageUploaderComponent, MockTranslatePipe],
+      declarations: [ImageReceiverComponent, MockTranslatePipe],
       providers: [
         BlogDashboardPageService,
         {provide: WindowRef, useValue: windowRef},
@@ -71,10 +69,9 @@ describe('ImageUploaderComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ImageUploaderComponent);
+    fixture = TestBed.createComponent(ImageReceiverComponent);
     component = fixture.componentInstance;
     igs = TestBed.inject(IdGenerationService);
-    contextService = TestBed.inject(ContextService);
     fixture.detectChanges();
 
     dropAreaRefSpy = spyOn(
@@ -97,7 +94,6 @@ describe('ImageUploaderComponent', () => {
   });
 
   it('should register drag and drop event listener', () => {
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     component.ngAfterViewInit();
 
     expect(dropAreaRefSpy.calls.allArgs()).toEqual([
@@ -113,7 +109,6 @@ describe('ImageUploaderComponent', () => {
   });
 
   it('should upload image on drop', () => {
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
 
@@ -133,7 +128,6 @@ describe('ImageUploaderComponent', () => {
   });
 
   it('should not upload image on drop if the event is empty', () => {
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     spyOn(component.fileChanged, 'emit');
     component.ngAfterViewInit();
 
@@ -150,7 +144,6 @@ describe('ImageUploaderComponent', () => {
   it(
     'should not upload image on drop if the image' + ' format is not allowed',
     () => {
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
       component.ngAfterViewInit();
       component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png'];
 
@@ -175,7 +168,6 @@ describe('ImageUploaderComponent', () => {
     'should not upload image on drop if the image filename extension' +
       ' does not match the image format',
     () => {
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
       component.ngAfterViewInit();
       component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
 
@@ -200,11 +192,33 @@ describe('ImageUploaderComponent', () => {
     }
   );
 
+  it('should return correct format string when there is one allowed image format', () => {
+    component.allowedImageFormats = ['jpeg'];
+    const formatString = component.getAllowedImageFormatsString(
+      component.allowedImageFormats
+    );
+    expect(formatString).toBe('Is in .jpeg format');
+  });
+
+  it('should emit fileChanged event if validation passes', () => {
+    const validFile = new File(['image'], 'image.jpg', {type: 'image/jpg'});
+    component.imageInputRef.nativeElement = {
+      files: [validFile],
+      value: 'image.jpg',
+    };
+    component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
+    spyOn(component.fileChanged, 'emit');
+    spyOn(component, 'validateUploadedFile').and.returnValue(null);
+
+    component.handleFile();
+
+    expect(component.fileChanged.emit).toHaveBeenCalledWith(validFile);
+  });
+
   it(
     'should not upload image on drop if the allowed image formats list' +
       ' contains non allowed file formats',
     () => {
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
       component.ngAfterViewInit();
       component.allowedImageFormats = [
         'jpeg',
@@ -235,7 +249,6 @@ describe('ImageUploaderComponent', () => {
   );
 
   it('should not upload file on drop if the file is not an image', () => {
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
 
@@ -260,9 +273,9 @@ describe('ImageUploaderComponent', () => {
   });
 
   it('should not upload image if the size is more than 100KB', () => {
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
+    component.maxImageSizeInKB = 100;
 
     let dataTransfer = new DataTransfer();
     let fileWithLargeSize = new File([''], 'image.jpg', {type: 'image/jpg'});
@@ -289,13 +302,13 @@ describe('ImageUploaderComponent', () => {
   });
 
   it('should not upload image if the size is more than 1MB for blog post', () => {
-    spyOn(contextService, 'getEntityType').and.returnValue('blog_post');
     component.ngAfterViewInit();
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
+    component.maxImageSizeInKB = 1024;
 
     let dataTransfer = new DataTransfer();
     let fileWithLargeSize = new File([''], 'image.jpg', {type: 'image/jpg'});
-    let sizeOfLargeFileInBytes = 1024 * 1024 + 100;
+    let sizeOfLargeFileInBytes = 1024 * 1024 * 100;
 
     Object.defineProperty(fileWithLargeSize, 'size', {
       value: sizeOfLargeFileInBytes,
@@ -328,7 +341,6 @@ describe('ImageUploaderComponent', () => {
 
       expect(component.backgroundWhileUploading).toBe(false);
 
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
       component.ngAfterViewInit();
       component.dropAreaRef.nativeElement.dispatchEvent(dragoverEvent);
 
@@ -358,7 +370,6 @@ describe('ImageUploaderComponent', () => {
       spyOn(dropEvent, 'preventDefault');
       spyOn(dragoverEvent, 'preventDefault');
 
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
       component.ngAfterViewInit();
 
       document.dispatchEvent(dropEvent);

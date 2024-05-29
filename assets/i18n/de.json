@@ -101,7 +101,6 @@
 	"I18N_BLOG_POST_EDITOR_THUMBNAIL_HEADING": "Vorschaubild",
 	"I18N_BLOG_POST_EDITOR_TITLE_HEADING": "Titel",
 	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_EXTENSIONS_PREFIX": "Erlaubte Bilddateiendungen:",
-	"I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG": "Wähle eine Datei aus oder ziehe sie hierher",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "Fehler: Die Bilddatei konnte nicht gelesen werden.",
 	"I18N_BLOG_POST_UNTITLED_HEADING": "Ohne Titel",
 	"I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "Diese Karte ist ziemlich lang. Studenten könnten die Interesse verlieren. Ziehe in Erwägung, sie zu kürzen oder in zwei Karten aufzuteilen.",

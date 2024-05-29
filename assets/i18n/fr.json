@@ -177,7 +177,6 @@
 	"I18N_BLOG_POST_PAGE_TITLE": "<[blogPostTitle]> | Blogue | Oppia",
 	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_EXTENSIONS_PREFIX": "Extensions d’image autorisées :",
 	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_MAX_FILE_SIZE": "La taille maximale d’image autorisée est de <[imageSize]> Kio. Notez que, parfois, le recadrage peut augmenter la taille de l’image.",
-	"I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG": "Choisir un fichier ou le tirer ici",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "Erreur : impossible de lire le fichier image.",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD": "Ajouter une vignette",
 	"I18N_BLOG_POST_UNTITLED_HEADING": "Sans titre",

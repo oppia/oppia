@@ -22,10 +22,11 @@
         Note: The uploaded svg may not be rendered exactly.
       </div>
       <div *ngIf="!isFileUploaded()">
-        <oppia-image-uploader (fileChanged)="onFileChanged($event)"
+        <oppia-image-receiver (fileChanged)="onFileChanged($event)"
                               [allowedImageFormats]="allowedImageFormats"
-                              [isBlogPostThumbnailUploader]="false">
-        </oppia-image-uploader>
+                              [maxImageSizeInKB]="100"
+                              >
+        </oppia-image-receiver>
       </div>
       <div *ngIf="isFileUploaded()">
         <img [src]="uploadedSvgDataUrl.safeUrl" class="uploaded-svg-image">

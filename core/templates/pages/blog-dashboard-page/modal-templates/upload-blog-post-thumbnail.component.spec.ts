@@ -22,7 +22,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {UploadBlogPostThumbnailComponent} from './upload-blog-post-thumbnail.component';
-import {ImageUploaderComponent} from 'components/forms/custom-forms-directives/image-uploader.component';
+import {ImageReceiverComponent} from 'components/forms/custom-forms-directives/image-receiver.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {of} from 'rxjs';
 
@@ -41,7 +41,7 @@ describe('Upload Blog Post Thumbnail Component', () => {
       imports: [HttpClientTestingModule],
       declarations: [
         UploadBlogPostThumbnailComponent,
-        ImageUploaderComponent,
+        ImageReceiverComponent,
         MockTranslatePipe,
       ],
       providers: [

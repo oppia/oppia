@@ -170,7 +170,6 @@
 	"I18N_BLOG_POST_PAGE_TITLE": "<[blogPostTitle]> | Tori | Oppia",
 	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_EXTENSIONS_PREFIX": "Picture extensions wey dey allowed:",
 	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_MAX_FILE_SIZE": "Di maximum size of image wey dey allowed na <[imageSize]> KB. Note sey, sometimes, wen you crop image di size fit increase.",
-	"I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG": "Choose wan file or drag am hia",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "Error: E no fit read di image file",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD": "Add a thumbnail",
 	"I18N_BLOG_POST_UNTITLED_HEADING": "Name no dey",

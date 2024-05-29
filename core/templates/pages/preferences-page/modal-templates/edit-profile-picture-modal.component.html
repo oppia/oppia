@@ -6,10 +6,11 @@
   <div class="modal-body oppia-profile-image-uploader-container">
     <div class="oppia-profile-image-uploader">
       <div *ngIf="!uploadedImage">
-        <oppia-image-uploader (fileChanged)="onFileChanged($event)"
+        <oppia-image-receiver (fileChanged)="onFileChanged($event)"
                               [allowedImageFormats]="allowedImageFormats"
-                              [isBlogPostThumbnailUploader]="false">
-        </oppia-image-uploader>
+                              [maxImageSizeInKB]="100"
+                              >
+        </oppia-image-receiver>
       </div>
 
       <div class="oppia-form-error oppia-form-error-text"

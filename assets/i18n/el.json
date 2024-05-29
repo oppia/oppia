@@ -181,7 +181,6 @@
 	"I18N_BLOG_POST_PAGE_TITLE": "<[blogPostTitle]> | Ιστολόγιο | Oppia",
 	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_EXTENSIONS_PREFIX": "Επιτρεπόμενες επεκτάσεις εικόνας:",
 	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_MAX_FILE_SIZE": "Το μέγιστο επιτρεπόμενο μέγεθος εικόνας είναι τα <[imageSize]> KB. Σημειώστε ότι, μερικές φορές, η περικοπή της εικόνας μπορεί να αυξήσει το μέγεθος της.",
-	"I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG": "Επιλέξτε ένα αρχείο ή σύρετέ το εδώ",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "Σφάλμα: Δεν ήταν δυνατή η ανάγνωση του αρχείου εικόνας.",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD": "Προσθέστε ένα εικονίδιο",
 	"I18N_BLOG_POST_UNTITLED_HEADING": "Χωρίς τίτλο",
