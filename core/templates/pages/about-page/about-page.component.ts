@@ -62,6 +62,17 @@ export class AboutPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  getImageSet(imageName: string, imageExt: string): string {
+    return (
+      this.getStaticImageUrl(imageName + '1x.' + imageExt) +
+      ' 1x, ' +
+      this.getStaticImageUrl(imageName + '15x.' + imageExt) +
+      ' 1.5x, ' +
+      this.getStaticImageUrl(imageName + '2x.' + imageExt) +
+      ' 2x'
+    );
+  }
+
   onClickVisitClassroomButton(): void {
     this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
   }
