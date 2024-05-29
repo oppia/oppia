@@ -1078,7 +1078,7 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_acceptance_test_server_with_explicit_args(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         test_file_path = (
-            'blog-admin-tests/assign-roles-to-users-and-change-tag-properties')
+            'blog-admin/assign-roles-to-users-and-change-tag-properties')
 
         self.exit_stack.enter_context(servers.managed_acceptance_tests_server(
             suite_name=test_file_path,
@@ -1103,7 +1103,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_managed_acceptance_test_server_headless(self) -> None:
         suite_name = (
-            'blog-admin-tests/assign-roles-to-users-and-change-tag-properties')
+            'blog-admin/assign-roles-to-users-and-change-tag-properties')
 
         with self.exit_stack.enter_context(
             servers.managed_acceptance_tests_server(
@@ -1114,7 +1114,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_managed_acceptance_test_server_mobile(self) -> None:
         suite_name = (
-            'blog-admin-tests/assign-roles-to-users-and-change-tag-properties')
+            'blog-admin/assign-roles-to-users-and-change-tag-properties')
 
         with self.exit_stack.enter_context(
             servers.managed_acceptance_tests_server(
