@@ -86,29 +86,32 @@ for arg in "$@"; do
     fi
 done
 
-# Check if dev-server is running and is healthy
-$(docker ps -a --format '{{json .}}' | grep $DEV_CONTAINER | jq .Status | grep -q healthy)
-is_container_running=$?
+# # Check if dev-server is running and is healthy
+# $(docker ps -a --format '{{json .}}' | grep $DEV_CONTAINER | jq .Status | grep -q healthy)
+# is_container_running=$?
 
-if [ "$is_container_running" != "0" ]; then
-    # Start containers and run pre-commit hook
-    make start-devserver
-fi
+# if [ "$is_container_running" != "0" ]; then
+#     # Start containers and run pre-commit hook
+#     make start-devserver
+# fi
 
-# Run hook in container
-CMD="$DOCKER_EXEC_COMMAND python3 ./$PYTHON_PRE_COMMIT_SYMLINK $@"
-echo "Running $CMD"
+# # Run hook in container
+# CMD="$DOCKER_EXEC_COMMAND python3 ./$PYTHON_PRE_COMMIT_SYMLINK $@"
+# echo "Running $CMD"
 
-$CMD
+# $CMD
 
-# Save exit code from the docker command, so we can later use it to exit this pre-commit hook at end.
-exitcode=$?
-echo "Python script exited with code $exitcode"
+# # Save exit code from the docker command, so we can later use it to exit this pre-commit hook at end.
+# exitcode=$?
+# echo "Python script exited with code $exitcode"
 
-# Shut down containers if they were not running before pre-commit hook execution.
-if [ "$is_container_running" != "0" ]; then
-    make stop
-fi
+# # Shut down containers if they were not running before pre-commit hook execution.
+# if [ "$is_container_running" != "0" ]; then
+#     make stop
+# fi
 
-# Exit with exit code from container
-exit $exitcode
+# # Exit with exit code from container
+# exit $exitcode
+
+docker compose run -T --no-deps --entrypoint "git config user.name $(git config user.name) && git config user.email $(git config user.email) && python3 ./$PYTHON_PRE_COMMIT_SYMLINK $@" dev-server
+
