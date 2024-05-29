@@ -107,7 +107,7 @@ export class ValidatorsService {
   isNonempty(input: string, showWarnings: boolean): boolean {
     if (!input) {
       if (showWarnings) {
-        // TODO(sll): Allow this warning to be more specific in terms of
+        // TODO(#20336): Allow this warning to be more specific in terms of
         // what needs to be entered.
         this.alerts.addWarning('Please enter a non-empty value.');
       }
