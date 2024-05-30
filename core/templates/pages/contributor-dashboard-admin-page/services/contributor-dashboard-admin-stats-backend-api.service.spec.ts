@@ -109,7 +109,6 @@ describe('Contribution Admin dashboard stats service', () => {
     rejected_translations_count: 2,
     rejected_translation_word_count: 2,
     first_contribution_date: 'firstcontributiondate',
-    first_contributed_in_days: 1,
     last_contributed_in_days: 2,
   };
   const translationReviewerStat = {
@@ -122,7 +121,6 @@ describe('Contribution Admin dashboard stats service', () => {
     accepted_translation_word_count: 2,
     rejected_translations_count: 2,
     first_contribution_date: 'firstcontributiondate',
-    first_contributed_in_days: 1,
     last_contributed_in_days: 2,
   };
   const questionSubmitterStat = {
@@ -135,7 +133,6 @@ describe('Contribution Admin dashboard stats service', () => {
     accepted_questions_without_reviewer_edits_count: 2,
     rejected_questions_count: 2,
     first_contribution_date: 'firstcontributiondate',
-    first_contributed_in_days: 1,
     last_contributed_in_days: 2,
   };
   const questionReviewerStat = {
@@ -146,7 +143,6 @@ describe('Contribution Admin dashboard stats service', () => {
     accepted_questions_with_reviewer_edits_count: 2,
     rejected_questions_count: 2,
     first_contribution_date: 'firstcontributiondate',
-    first_contributed_in_days: 1,
     last_contributed_in_days: 2,
   };
 

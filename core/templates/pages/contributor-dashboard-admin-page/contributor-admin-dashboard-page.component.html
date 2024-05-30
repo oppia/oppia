@@ -86,8 +86,8 @@
         <div class="filter-sub-container">
           <div class="date-selector-container">
             <div class="date-selector-inner-container">
-              <b *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER || activeTab === TAB_NAME_QUESTION_SUBMITTER" class="filter-label">Filter by Last Contributed after:</b>
-              <b *ngIf="activeTab === TAB_NAME_TRANSLATION_REVIEWER || activeTab === TAB_NAME_QUESTION_REVIEWER" class="filter-label">Filter by Last Reviewed after:</b>
+              <b *ngIf="isSubmitterTab()" class="filter-label">Filter by Last Contributed after:</b>
+              <b *ngIf="isReviewerTab()" class="filter-label">Filter by Last Reviewed after:</b>
               <mat-form-field>
                 <input matInput class="e2e-test-last-date-picker-input" [matDatepicker]="lastDatepicker" (dateChange)="changeLastDate($event.value)" [(ngModel)]="lastDateToFilterUsersActivity" [max]="today">
                 <mat-datepicker-toggle matSuffix class="e2e-test-last-date-picker-toggle" [for]="lastDatepicker"></mat-datepicker-toggle>
@@ -149,8 +149,8 @@
         </div>
         <div class="date-selector-container">
           <div class="date-selector-inner-container">
-            <b *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER || activeTab === TAB_NAME_QUESTION_SUBMITTER" class="filter-label">Filter by Last Contributed after:</b>
-            <b *ngIf="activeTab === TAB_NAME_TRANSLATION_REVIEWER || activeTab === TAB_NAME_QUESTION_REVIEWER" class="filter-label">Filter by Last Reviewed after:</b>
+            <b *ngIf="isSubmitterTab()" class="filter-label">Filter by Last Contributed after:</b>
+            <b *ngIf="isReviewerTab()" class="filter-label">Filter by Last Reviewed after:</b>
             <mat-form-field>
               <input matInput class="e2e-test-mobile-last-date-picker-input" [matDatepicker]="lastDatepicker" (dateChange)="changeLastDate($event.value)" [(ngModel)]="lastDateToFilterUsersActivity" [max]="today">
               <mat-datepicker-toggle matSuffix class="e2e-test-mobile-last-date-picker-toggle" [for]="lastDatepicker"></mat-datepicker-toggle>

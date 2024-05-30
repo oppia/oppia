@@ -39,7 +39,6 @@ describe('Translation Submitter Stats Model', () => {
       rejected_translations_count: 2,
       rejected_translation_word_count: 2,
       first_contribution_date: 'firstcontributiondate',
-      first_contributed_in_days: 1,
       last_contributed_in_days: 2,
     };
 
@@ -79,7 +78,6 @@ describe('Translation Reviewer Stats Model', () => {
       accepted_translation_word_count: 2,
       rejected_translations_count: 2,
       first_contribution_date: 'firstcontributiondate',
-      first_contributed_in_days: 1,
       last_contributed_in_days: 2,
     };
 
@@ -114,7 +112,6 @@ describe('Question Submitter Stats Model', () => {
       accepted_questions_without_reviewer_edits_count: 2,
       rejected_questions_count: 2,
       first_contribution_date: 'firstcontributiondate',
-      first_contributed_in_days: 1,
       last_contributed_in_days: 2,
     };
 
@@ -146,7 +143,6 @@ describe('Question Reviewer Stats Model', () => {
       accepted_questions_with_reviewer_edits_count: 2,
       rejected_questions_count: 2,
       first_contribution_date: 'firstcontributiondate',
-      first_contributed_in_days: 1,
       last_contributed_in_days: 2,
     };
 

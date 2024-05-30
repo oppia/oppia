@@ -117,9 +117,4 @@ describe('datetimeformatter', () => {
     expect(df.getRelativeTimeFromNow(timeAnHourAgo)).toBe('an hour ago');
     expect(df.getRelativeTimeFromNow(timeADayAgo)).toBe('a day ago');
   });
-
-  it('should provide modified local date string', () => {
-    let date = new Date('March 25, 2022');
-    expect(df.getModifiedLocalDateString(date)).toBe('2022-03-25');
-  });
 });

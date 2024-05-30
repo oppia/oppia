@@ -222,6 +222,20 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       );
   }
 
+  isSubmitterTab(): boolean {
+    return (
+      this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER ||
+      this.activeTab === this.TAB_NAME_QUESTION_SUBMITTER
+    );
+  }
+
+  isReviewerTab(): boolean {
+    return (
+      this.activeTab === this.TAB_NAME_QUESTION_REVIEWER ||
+      this.activeTab === this.TAB_NAME_QUESTION_REVIEWER
+    );
+  }
+
   filterTopicChoices(topic: TopicChoice[]): TopicChoice[] {
     let filteredTopic: TopicChoice[] = [];
 

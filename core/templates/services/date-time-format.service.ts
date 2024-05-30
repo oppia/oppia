@@ -113,24 +113,6 @@ export class DateTimeFormatService {
     let date = new Date(millisSinceEpoch);
     return dayjs(date).fromNow();
   }
-
-  /**
-   * This function converts a date object to a date in the format
-   * 'yyyy-MM-dd', using locale conventions.
-   * @param {Date} date - date object to be formated
-   * @returns {string} a date string in the format 'yyyy-MM-dd'
-   */
-  getModifiedLocalDateString(date: Date): string {
-    const inputDate = date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
-
-    const [month, day, year] = inputDate.split('/');
-    const formatedDate: string = `${year}-${month}-${day}`;
-    return formatedDate;
-  }
 }
 
 angular

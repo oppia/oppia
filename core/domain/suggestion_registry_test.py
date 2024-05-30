@@ -4052,9 +4052,6 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
-            'first_contributed_in_days': (
-                utils.get_number_of_days_since_date(
-                    self.FIRST_CONTRIBUTION_DATE)),
             'last_contributed_in_days': (
                 utils.get_number_of_days_since_date(
                     self.LAST_CONTRIBUTION_DATE))
@@ -4144,9 +4141,6 @@ class TranslationReviewerTotalContributionStatsUnitTests(
                 self.REJECTED_TRANSLATIONS_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
-            'first_contributed_in_days': (
-                utils.get_number_of_days_since_date(
-                    self.FIRST_CONTRIBUTION_DATE)),
             'last_contributed_in_days': (
                 utils.get_number_of_days_since_date(
                     self.LAST_CONTRIBUTION_DATE))
@@ -4235,9 +4229,6 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
                 self.REJECTED_QUESTIONS_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
-            'first_contributed_in_days': (
-                utils.get_number_of_days_since_date(
-                    self.FIRST_CONTRIBUTION_DATE)),
             'last_contributed_in_days': (
                 utils.get_number_of_days_since_date(
                     self.LAST_CONTRIBUTION_DATE))
@@ -4318,9 +4309,6 @@ class QuestionReviewerTotalContributionStatsUnitTests(
                 self.REJECTED_QUESTIONS_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
-            'first_contributed_in_days': (
-                utils.get_number_of_days_since_date(
-                self.FIRST_CONTRIBUTION_DATE)),
             'last_contributed_in_days': (
                 utils.get_number_of_days_since_date(
                 self.LAST_CONTRIBUTION_DATE))
