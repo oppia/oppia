@@ -265,7 +265,7 @@ export class CurriculumAdmin extends BaseUser {
    */
   async createTopic(name: string, urlFragment: string): Promise<void> {
     await this.navigateToTopicAndSkillsDashboardPage();
-    await this.clickOn(addTopicButton);
+    await this.clickOn('Create New Topic');
     await this.type(topicNameField, name);
     await this.type(topicUrlFragmentField, urlFragment);
     await this.type(topicWebFragmentField, name);
@@ -806,6 +806,60 @@ export class CurriculumAdmin extends BaseUser {
    */
   async openExplorationControlDropdown(): Promise<void> {
     await this.clickOn(explorationControlsSettingsDropdown);
+  }
+
+  async unpublishTopic(topicName: string): Promise<void> {
+    await this.openTopicEditor(topicName);
+    await this.clickOn(' Unpublish Topic ');
+  }
+
+  async deleteTopic(topicName: string): Promise<void> {
+    await this.goto(testConstants.URLs.TopicAndSkillsDashboard);
+    await this.clickOn('.e2e-test-topic-edit-box');
+    await this.clickOn('Delete');
+  }
+
+  async deleteSkill(skillName: string): Promise<void> {
+    await this.goto(testConstants.URLs.TopicAndSkillsDashboard);
+    await this.clickOn('.e2e-test-skills-tab');
+
+    await this.clickOn('.e2e-test-skill-edit-box');
+    await this.clickOn('Delete');
+  }
+
+  async expectTopicNotInTopicsAndSkillDashboard(
+    topicName: string
+  ): Promise<void> {
+    await this.goto(testConstants.URLs.TopicAndSkillsDashboard);
+
+    const isTopicPresent = await this.isTextPresentOnPage(topicName);
+    if (isTopicPresent) {
+      throw new Error(
+        `Expected topic "${topicName}" not to be present on the page, but it was.`
+      );
+    } else {
+      showMessage(
+        `Topic "${topicName}" is not present on the page as expected.`
+      );
+    }
+  }
+
+  async expectSkillNotInTopicsAndSkillsDashboard(
+    skillName: string
+  ): Promise<void> {
+    await this.goto(testConstants.URLs.TopicAndSkillsDashboard);
+    await this.clickOn('.e2e-test-skills-tab');
+
+    const isTopicPresent = await this.isTextPresentOnPage(skillName);
+    if (isTopicPresent) {
+      throw new Error(
+        `Expected topic "${skillName}" not to be present on the page, but it was.`
+      );
+    } else {
+      showMessage(
+        `Topic "${skillName}" is not present on the page as expected.`
+      );
+    }
   }
 }
 
