@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users
+ * @fileoverview Acceptance Test for checking if logged-out users
  * can open links by clicking all buttons in thanks for donating page
  */
 
@@ -23,24 +23,21 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-in User in Thanks for Donating page', function () {
-  let testUser: LoggedOutUser;
+describe('Logged-out User in Thanks for Donating page', function () {
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com'
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await testUser.navigateToThanksForDonatingPage();
+    await loggedOutUser.navigateToThanksForDonatingPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open the right page with the Watch A Video button.',
     async function () {
-      await testUser.clickWatchAVideoButtonInThanksForDonatingPage();
+      await loggedOutUser.clickWatchAVideoButtonInThanksForDonatingPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -48,7 +45,7 @@ describe('Logged-in User in Thanks for Donating page', function () {
   it(
     'should open the Blog page with the Read Our Blog button.',
     async function () {
-      await testUser.clickReadOurBlogButtonInThanksForDonatingPage();
+      await loggedOutUser.clickReadOurBlogButtonInThanksForDonatingPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -57,7 +54,7 @@ describe('Logged-in User in Thanks for Donating page', function () {
     'should close the thanks for donating popup and show the Donate Page ' +
       'with the dismiss button.',
     async function () {
-      await testUser.clickDismissButtonInThanksForDonatingPage();
+      await loggedOutUser.clickDismissButtonInThanksForDonatingPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

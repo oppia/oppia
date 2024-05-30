@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users
+ * @fileoverview Acceptance Test for checking if logged-out users
  * can open links by clicking all buttons in about foundation page
  */
 
@@ -23,24 +23,21 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-in User in About page', function () {
-  let testUser: LoggedOutUser;
+describe('Logged-out User in About page', function () {
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com'
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await testUser.navigateToAboutPage();
+    await loggedOutUser.navigateToAboutPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open Math Classroom page with the Browse Our Lessons button.',
     async function () {
-      await testUser.clickBrowseOurLessonsButtonInAboutPage();
+      await loggedOutUser.clickBrowseOurLessonsButtonInAboutPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -48,7 +45,7 @@ describe('Logged-in User in About page', function () {
   it(
     'should open Android page with the Access Android App button.',
     async function () {
-      await testUser.clickAccessAndroidAppButtonInAboutPage();
+      await loggedOutUser.clickAccessAndroidAppButtonInAboutPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -56,7 +53,7 @@ describe('Logged-in User in About page', function () {
   it(
     'should open Math Classroom page with the Visit Classroom button.',
     async function () {
-      await testUser.clickVisitClassroomButtonInAboutPage();
+      await loggedOutUser.clickVisitClassroomButtonInAboutPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -64,7 +61,7 @@ describe('Logged-in User in About page', function () {
   it(
     'should open Community Library page with the Browse Library button.',
     async function () {
-      await testUser.clickBrowseLibraryButtonInAboutPage();
+      await loggedOutUser.clickBrowseLibraryButtonInAboutPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -73,7 +70,7 @@ describe('Logged-in User in About page', function () {
     'should open Creator Dashboard page and Exploration Editor ' +
       'with the Create Lessons button',
     async function () {
-      await testUser.clickCreateLessonsButtonInAboutPage();
+      await loggedOutUser.clickCreateLessonsButtonInAboutPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -81,7 +78,7 @@ describe('Logged-in User in About page', function () {
   it(
     'should open Math Classroom page with the Explore Lessons button.',
     async function () {
-      await testUser.clickExploreLessonsButtonInAboutPage();
+      await loggedOutUser.clickExploreLessonsButtonInAboutPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

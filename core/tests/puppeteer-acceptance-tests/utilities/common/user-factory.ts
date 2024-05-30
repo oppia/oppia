@@ -184,6 +184,17 @@ export class UserFactory {
   };
 
   /**
+   * This function creates a new instance of a LoggedOutUser, opens a browser for that user,
+   * adds the user to the activeUsers array, and returns the user.
+   */
+  static createLoggedOutUser = async function (): Promise<LoggedOutUser> {
+    let user = new LoggedOutUser();
+    await user.openBrowser();
+    activeUsers.push(user);
+    return user;
+  };
+
+  /**
    * This function closes all the browsers opened by different users.
    */
   static closeAllBrowsers = async function (): Promise<void> {
