@@ -771,8 +771,8 @@ def managed_acceptance_tests_server(
         common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
     puppeteer_build_dir_path = os.path.join(
         puppeteer_acceptance_tests_dir_path, 'build')
-    spec_dir_path = os.path.join(
-        puppeteer_build_dir_path, 'spec')
+    specs_dir_path = os.path.join(
+        puppeteer_build_dir_path, 'specs')
     jasmine_config_file_path = os.path.join(
         puppeteer_acceptance_tests_dir_path, 'jasmine.json')
 
@@ -781,7 +781,7 @@ def managed_acceptance_tests_server(
     acceptance_tests_args = [
         nodemodules_jasmine_bin_path,
         '--config="%s"' % jasmine_config_file_path,
-        '%s' % os.path.join(spec_dir_path, suite_name_with_extension)
+        '%s' % os.path.join(specs_dir_path, suite_name_with_extension)
     ]
 
     # OK to use shell=True here because we are passing string literals,
