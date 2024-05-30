@@ -181,6 +181,13 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
     }
   }
 
+  areInvalidTagsOrAttrsPresent(): boolean {
+    return (
+      this.invalidTagsAndAttributes.tags.length > 0 ||
+      this.invalidTagsAndAttributes.attrs.length > 0
+    );
+  }
+
   confirm(): void {
     if (this.isThumbnail()) {
       this.croppedImageDataUrl = this.thumbnailImageDataUrl;
