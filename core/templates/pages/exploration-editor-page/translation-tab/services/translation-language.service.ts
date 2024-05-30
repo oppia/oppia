@@ -80,11 +80,7 @@ export class TranslationLanguageService {
     );
   }
 
-  // Function returns null when active language accent code is not set.
-  getActiveLanguageAccentCode(): string | null {
-    if (!this.activeLanguageAccentCode) {
-      return null;
-    }
+  getActiveLanguageAccentCode(): string {
     return this.activeLanguageAccentCode;
   }
 
