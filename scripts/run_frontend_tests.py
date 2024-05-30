@@ -140,7 +140,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 spec = spec.replace('.ts', '.spec.ts')
             if spec.endswith('.js') and not spec.endswith('.spec.js'):
                 spec = spec.replace('.js', '.spec.js')
-            specs_to_run.append(spec)
+            if os.path.exists(spec):
+                specs_to_run.append(spec)
 
     cmd = [
             common.NODE_BIN_PATH, '--max-old-space-size=4096',

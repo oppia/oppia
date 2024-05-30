@@ -617,7 +617,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 js_or_ts_files = get_js_or_ts_files_from_diff(files_to_lint)
                 frontend_test_cmds = FRONTEND_TEST_CMDS.copy()
                 frontend_test_cmds.append(
-                    '--specs_to_run %s' % ','.join(js_or_ts_files))
+                    '--specs_to_run=%s' % ','.join(js_or_ts_files))
                 frontend_status = run_script_and_get_returncode(
                     frontend_test_cmds)
             if frontend_status != 0:
