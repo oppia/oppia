@@ -4,7 +4,7 @@
   </div>
 
   <div class="modal-body oppia-image-uploader-container">
-    <div *ngIf="(imageName==='Thumbnail' && !uploadedImage && !thumbnailImageDataUrl)">
+    <div *ngIf="(isThumbnail() && imageNotUploaded())">
       <strong tabindex="0">Please upload an SVG image.</strong>
       <div class="alert alert-warning" tabindex="0">
         <span>Here are some guidelines to follow:</span>
@@ -14,7 +14,7 @@
       </div>
     </div>
     <div class="oppia-image-uploader">
-      <div *ngIf="(!uploadedImage && !thumbnailImageDataUrl)">
+      <div *ngIf="imageNotUploaded()">
         <oppia-image-receiver (fileChanged)="onFileChanged($event)" [allowedImageFormats]="allowedImageFormats"
           [maxImageSizeInKB]="maxImageSizeInKB">
         </oppia-image-receiver>
@@ -22,7 +22,7 @@
       <div class="oppia-form-error oppia-form-error-text" *ngIf="invalidImageWarningIsShown">
         {{ 'I18N_IMAGE_UPLOAD_ERROR' | translate }}
       </div>
-      <div *ngIf="((imageName === 'Thumbnail') && thumbnailImageDataUrl)">
+      <div *ngIf="(isThumbnail() && thumbnailImageDataUrl)">
         <div [hidden]="!allowedBgColors">
           <div [hidden]="!(allowedBgColors.length > 1)">Choose background color:</div>
           <div [hidden]="!(allowedBgColors.length > 1)" class="oppia-thumbnail-colour-select">
@@ -61,7 +61,7 @@
         </div>
       </div>
 
-      <div *ngIf="((imageName !== 'Thumbnail') && uploadedImage)">
+      <div *ngIf="(!isThumbnail() && uploadedImage)">
         <span>{{ 'I18N_IMAGE_UPLOADER_MODAL_DRAG' | translate }}</span>
         <div class="oppia-image-uploader-modal-crop-area e2e-test-photo-crop">
           <button class="btn btn-secondary oppia-image-uploader-modal-reset-button" aria-label="close"

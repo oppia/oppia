@@ -85,22 +85,31 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
     );
   }
 
+  isThumbnail(): boolean {
+    return this.imageName === 'Thumbnail';
+  }
+
+  imageNotUploaded(): boolean {
+    return !this.uploadedImage && !this.thumbnailImageDataUrl;
+  }
+
   initializeCropper(): void {
-    if (this.croppableImageRef) {
-      let imageElement = this.croppableImageRef.nativeElement;
-      if (!this.windowIsNarrow) {
-        this.cropper = new Cropper(imageElement, {
-          minContainerWidth: 500,
-          minContainerHeight: 350,
-          aspectRatio: this._getAspectRatio(),
-        });
-      } else {
-        this.cropper = new Cropper(imageElement, {
-          minContainerWidth: 200,
-          minContainerHeight: 200,
-          aspectRatio: this._getAspectRatio(),
-        });
-      }
+    if (!this.croppableImageRef) {
+      return;
+    }
+    let imageElement = this.croppableImageRef.nativeElement;
+    if (this.windowIsNarrow) {
+      this.cropper = new Cropper(imageElement, {
+        minContainerWidth: 200,
+        minContainerHeight: 200,
+        aspectRatio: this._getAspectRatio(),
+      });
+    } else {
+      this.cropper = new Cropper(imageElement, {
+        minContainerWidth: 500,
+        minContainerHeight: 350,
+        aspectRatio: this._getAspectRatio(),
+      });
     }
   }
 
@@ -173,8 +182,10 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   }
 
   confirm(): void {
-    if (this.imageName !== 'Thumbnail') {
-      if (this.cropper === undefined) {
+    if (this.isThumbnail()) {
+      this.croppedImageDataUrl = this.thumbnailImageDataUrl;
+    } else {
+      if (!this.cropper) {
         throw new Error('Cropper has not been initialized');
       }
       this.croppedImageDataUrl = this.cropper
@@ -183,8 +194,6 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
           width: this.dimensions.width,
         })
         .toDataURL(this.imageType);
-    } else {
-      this.croppedImageDataUrl = this.thumbnailImageDataUrl;
     }
 
     super.confirm({
