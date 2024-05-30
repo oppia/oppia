@@ -72,7 +72,7 @@ def read_from_node(node: astroid.scoped_nodes.Module) -> List[str]:
     return [line.decode('utf-8') for line in node.stream().readlines()]
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -184,7 +184,7 @@ class HangingIndentChecker(checkers.BaseChecker):  # type: ignore[misc]
 
 # The following class was derived from
 # https://github.com/PyCQA/pylint/blob/377cc42f9e3116ff97cddd4567d53e9a3e24ebf9/pylint/extensions/docparams.py#L26
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -1263,7 +1263,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             node=node)
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -1295,7 +1295,7 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):  # type: ignore[misc]
         'typing_extensions'
     ]
 
-    # TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+    # TODO(#16567): Here we use MyPy ignore because the incomplete typing of
     # pylint library and absences of stubs in pylint, forces MyPy to
     # assume that checker_utils.check_messages function
     # is untyped. Thus to avoid MyPy's error
@@ -1331,7 +1331,7 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):  # type: ignore[misc]
                 )
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -1369,7 +1369,7 @@ class BackslashContinuationChecker(checkers.BaseChecker):  # type: ignore[misc]
                     'backslash-continuation', line=line_num + 1)
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -1412,7 +1412,7 @@ class FunctionArgsOrderChecker(checkers.BaseChecker): # type: ignore[misc]
             self.add_message('function-args-order-cls', node=node)
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -1587,7 +1587,7 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
                         node, module_name, forbidden_import_names)
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -1626,7 +1626,7 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):  # type: ignore[mi
             self.add_message('newline-at-eof', line=file_length)
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -1795,7 +1795,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
             self._check_punctuation(*comments[-1])
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -1857,7 +1857,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):  # type: ignore[m
                 'only-a-single-empty-line-should-be-provided', node=node)
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -1907,7 +1907,7 @@ class SingleLinePragmaChecker(checkers.BaseChecker):  # type: ignore[misc]
                         'single-line-pragma', line=line_num)
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -2070,7 +2070,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
                 'redundant-type-comment', line=comment_line_number, node=node)
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -2138,7 +2138,7 @@ class TypeStatusDict(TypedDict):
     func_def_start_line: int
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -2543,7 +2543,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
             )
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -2584,7 +2584,7 @@ class InequalityWithNoneChecker(checkers.BaseChecker):  # type: ignore[misc]
                 self.add_message('inequality-with-none', node=node)
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -2626,7 +2626,7 @@ class NonTestFilesFunctionNameChecker(checkers.BaseChecker):  # type: ignore[mis
                 'non-test-files-function-name-checker', node=node)
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -2765,7 +2765,7 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):  # type: ignore[misc]
                     break
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -2883,7 +2883,7 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):  # type: ignore[misc]
                 node=node, args=node.name)
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
@@ -2919,7 +2919,7 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
                 self.add_message('disallowed-text-import', node=node)
 
 
-# TODO(#16567): Here we use MyPy ignore because of the incomplete typing
+# TODO(#16567): Here we use MyPy ignore because the incomplete typing of
 # pylint library and absences of stubs in pylint, forces MyPy to
 # assume that BaseChecker class has attributes of type Any.
 # Thus to avoid MyPy's error
