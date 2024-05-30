@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-from typing import Dict, Final, Optional
+from typing import Dict, Final, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover

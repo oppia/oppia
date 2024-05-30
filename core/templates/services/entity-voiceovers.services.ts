@@ -100,7 +100,7 @@ export class EntityVoiceoversService {
     return this.languageAccentCodeToEntityVoiceovers[languageAccentCode];
   }
 
-  getActiveEntityVoiceovers() {
+  getActiveEntityVoiceovers(): EntityVoiceovers {
     if (this.activeLanguageAccentCode === undefined) {
       this.activeLanguageAccentCode = this.getLanguageAccentCodes()[0];
     }
@@ -129,7 +129,9 @@ export class EntityVoiceoversService {
     return languageAccentCodes;
   }
 
-  getAllContentIdsToEntityVoiceovers() {
+  getAllContentIdsToEntityVoiceovers(): {
+    [contentId: string]: EntityVoiceovers[];
+  } {
     let contentIdToEntityVoiceovers = {};
     let allEntityVoiceovers = Object.values(
       this.languageAccentCodeToEntityVoiceovers

@@ -62,7 +62,7 @@ export class AnswerGroup extends BaseTranslatableObject {
     return [this.outcome, ...this.rules];
   }
 
-  getContentIdToHtml() {
+  getContentIdToHtml(): {[contentId: string]: string} {
     return this.outcome.getContentIdToHtml();
   }
 
