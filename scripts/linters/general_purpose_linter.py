@@ -96,7 +96,6 @@ GENERATED_FILE_PATHS: Final = (
 CONFIG_FILE_PATHS: Final = (
     'core/tests/.browserstack.env.example',
     'core/tests/wdio.conf.js',
-    'core/tests/karma.conf.ts',
     'core/templates/mathjaxConfig.ts',
     'assets/constants.ts',
     'assets/rich_text_components_definitions.ts',

@@ -174,9 +174,21 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertEqual(len(self.cmd_token_list), 1)
 
     def test_frontend_tests_with_specs_to_run(self) -> None:
+        original_os_path_exists = os.path.exists
+        def mock_os_path_exists(path: str) -> bool:
+            if path == 'home-page.component.spec.ts':
+                return True
+            if path == 'about-page.component.spec.ts':
+                return True
+            if path == 'test-module.spec.js':
+                return True
+            return original_os_path_exists(path)
+        os_path_exists_swap = self.swap(
+            os.path, 'exists', mock_os_path_exists)
+
         with self.swap_success_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
-                with self.swap_check_frontend_coverage:
+                with self.swap_check_frontend_coverage, os_path_exists_swap:
                     run_frontend_tests.main(
                         args=['--specs_to_run',
                               'home-page.component.spec.ts,'

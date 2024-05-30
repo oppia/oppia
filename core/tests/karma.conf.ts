@@ -14,8 +14,20 @@ if (argv.specs_to_run) {
   specsToRun = argv.specs_to_run.split(',');
 }
 
-const SPECS_PATTERN =
-  /((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(component|controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)(?<!puppeteer-acceptance-tests.*\.spec\.ts)(?<!@nodelib.*\.spec\.ts)(?<!openapi3-ts.*\.spec\.ts)(?<!(valid|invalid)[_-][\w\d.\-]*\.ts)/;
+const SPEC_PATTERNS = [
+  /((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(component|controller|directive|service|Factory)\.ts$)/,
+  /(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)/,
+  /(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)/,
+  /(?<!puppeteer-acceptance-tests.*\.spec\.ts)/,
+  /(?<!@nodelib.*\.spec\.ts)/,
+  /(?<!openapi3-ts.*\.spec\.ts)/,
+  /(?<!(valid|invalid)[_-][\w\d.\-]*\.ts)/,
+];
+
+const SPECS_PATTERN = new RegExp(
+  SPEC_PATTERNS.map(pattern => pattern.source).join('')
+);
+
 let context = SPECS_PATTERN;
 if (specsToRun.length > 0) {
   context = specsToRun.reduce((context, file) => {
