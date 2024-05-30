@@ -182,6 +182,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return True
             if path == 'test-module.spec.js':
                 return True
+            if path == 'AppSpec.ts':
+                return True
             return original_os_path_exists(path)
         os_path_exists_swap = self.swap(
             os.path, 'exists', mock_os_path_exists)
@@ -193,7 +195,10 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                         args=['--specs_to_run',
                               'home-page.component.spec.ts,'
                               'about-page.component.ts,'
-                              'test-module.js'])
+                              'test-module.js,'
+                              'App.ts,'
+                              'test.html,'
+                              'invalid.ts'])
 
         cmd = [
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
@@ -201,8 +206,20 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
             '--specs_to_run=home-page.component.spec.ts,'
             'about-page.component.spec.ts,'
-            'test-module.spec.js']
+            'test-module.spec.js,'
+            'AppSpec.ts']
         self.assertIn(cmd, self.cmd_token_list)
+
+    def test_frontend_tests_with_specs_to_run_no_specs_found(self) -> None:
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage:
+                    with self.assertRaisesRegex(
+                        SystemExit,
+                        'No valid specs found to run.'
+                    ):
+                        run_frontend_tests.main(
+                            args=['--specs_to_run', 'invalid.ts'])
 
     def test_frontend_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:

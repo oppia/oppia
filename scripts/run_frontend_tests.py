@@ -112,6 +112,34 @@ def run_dtslint_type_tests() -> None:
         sys.exit('The dtslint (type tests) failed.')
 
 
+def get_file_spec(file_path: str) -> str | None:
+    """Returns the spec file path for a given file path.
+
+    Args:
+        file_path: str. The path of the file.
+
+    Returns:
+        str | None. The path of the spec file if it exists, otherwise None.
+    """
+    if file_path.endswith(
+        ('.spec.ts', '.spec.js', 'Spec.ts', 'Spec.js')
+    ) and os.path.exists(file_path):
+        return file_path
+
+    if file_path.endswith(('.ts', '.js')):
+        spec_file_path = file_path.replace('.ts', '.spec.ts').replace(
+            '.js', '.spec.js')
+        if os.path.exists(spec_file_path):
+            return spec_file_path
+
+        spec_file_path = file_path.replace('.ts', 'Spec.ts').replace(
+            '.js', 'Spec.js')
+        if os.path.exists(spec_file_path):
+            return spec_file_path
+
+    return None
+
+
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -141,12 +169,9 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     specs_to_run = []
     if parsed_args.specs_to_run:
         for spec in parsed_args.specs_to_run.split(','):
-            if spec.endswith('.ts') and not spec.endswith('.spec.ts'):
-                spec = spec.replace('.ts', '.spec.ts')
-            if spec.endswith('.js') and not spec.endswith('.spec.js'):
-                spec = spec.replace('.js', '.spec.js')
-            if os.path.exists(spec):
-                specs_to_run.append(spec)
+            spec_file = get_file_spec(spec)
+            if spec_file:
+                specs_to_run.append(spec_file)
         if len(specs_to_run) == 0:
             sys.exit('No valid specs found to run.')
         else:
