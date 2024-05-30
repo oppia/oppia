@@ -22,12 +22,16 @@ import {TestBed, fakeAsync, flushMicrotasks, tick} from '@angular/core/testing';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {EntityVoiceoversService} from './entity-voiceovers.services';
-import {VoiceoverBackendDict} from '../domain/exploration/voiceover.model';
+import {
+  Voiceover,
+  VoiceoverBackendDict,
+} from '../domain/exploration/voiceover.model';
 
 describe('Entity voiceovers service', () => {
   let entityVoiceoversService: EntityVoiceoversService;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
   let entityVoiceovers: EntityVoiceovers;
+  let manualVoiceover: VoiceoverBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -37,7 +41,7 @@ describe('Entity voiceovers service', () => {
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
 
-    let manualVoiceover: VoiceoverBackendDict = {
+    manualVoiceover = {
       filename: 'a.mp3',
       file_size_bytes: 200000,
       needs_update: false,
@@ -126,5 +130,56 @@ describe('Entity voiceovers service', () => {
     expect(
       entityVoiceoversService.getEntityVoiceoversByLanguageAccentCode('en-US')
     ).toBeUndefined();
+  });
+
+  it('should get all language accent codes', () => {
+    let retrievedLanguageAccentCodes =
+      entityVoiceoversService.getLanguageAccentCodes();
+
+    expect(retrievedLanguageAccentCodes).toEqual([]);
+
+    entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
+
+    retrievedLanguageAccentCodes =
+      entityVoiceoversService.getLanguageAccentCodes();
+
+    expect(retrievedLanguageAccentCodes).toEqual(['en-US']);
+  });
+
+  it('should be able to get all content ID to voiceovers mapping', () => {
+    let manualVoiceover2: VoiceoverBackendDict = {
+      filename: 'b.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
+    let contentIdToVoiceoversMapping = {
+      content0: {
+        manual: manualVoiceover2,
+      },
+    };
+    let entityVoiceoversBackendDict = {
+      entity_id: 'exp_1',
+      entity_type: 'exploration',
+      entity_version: 1,
+      language_accent_code: 'en-IN',
+      voiceovers_mapping: contentIdToVoiceoversMapping,
+    };
+    let entityVoiceovers2 = EntityVoiceovers.createFromBackendDict(
+      entityVoiceoversBackendDict
+    );
+
+    entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
+    entityVoiceoversService.addEntityVoiceovers('en-IN', entityVoiceovers2);
+
+    let retrievedContentIdToEntityVoiceovers =
+      entityVoiceoversService.getAllContentIdsToEntityVoiceovers();
+
+    let voiceover1 = Voiceover.createFromBackendDict(manualVoiceover);
+    let voiceover2 = Voiceover.createFromBackendDict(manualVoiceover2);
+
+    expect(retrievedContentIdToEntityVoiceovers).toEqual({
+      content0: [voiceover1, voiceover2],
+    });
   });
 });

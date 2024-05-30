@@ -39,7 +39,6 @@ import {AudioTranslationManagerService} from '../services/audio-translation-mana
 import {PlayerPositionService} from '../services/player-position.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 
@@ -76,7 +75,6 @@ export class AudioBarComponent {
     private I18nLanguageCodeService: I18nLanguageCodeService,
     private siteAnalyticsService: SiteAnalyticsService,
     private entityVoiceoversService: EntityVoiceoversService,
-    private voiceoverBackendApiService: VoiceoverBackendApiService,
     private platformFeatureService: PlatformFeatureService,
     private voiceoverPlayerService: VoiceoverPlayerService
   ) {
@@ -149,6 +147,9 @@ export class AudioBarComponent {
   }
 
   isAudioBarAvailable(): boolean {
+    if (this.isVoiceoverContributionWithAccentEnabled()) {
+      return this.languageAccentDecriptions.length > 0;
+    }
     return this.languagesInExploration.length > 0;
   }
 
@@ -262,7 +263,7 @@ export class AudioBarComponent {
     this.audioPlayerService.forward(5);
   }
 
-  updateDisplayableLanguageAccentDescription() {
+  updateDisplayableLanguageAccentDescription(): void {
     this.languageAccentDecriptions =
       this.voiceoverPlayerService.getLanguageAccentDescriptions();
 
@@ -273,7 +274,7 @@ export class AudioBarComponent {
     }
   }
 
-  updateSelectedLanguageAccent() {
+  updateSelectedLanguageAccent(): void {
     let languageAccentCode =
       this.voiceoverPlayerService.languageAccentDescriptionsToCodes[
         this.selectedLanguageAccentDescription

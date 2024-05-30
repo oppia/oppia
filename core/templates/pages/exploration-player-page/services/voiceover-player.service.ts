@@ -29,11 +29,11 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 export class VoiceoverPlayerService {
   public activeContentId: string;
   public activeContentHtml: string;
+  public activeComponentName: string;
   public activeVoiceover: Voiceover;
   public languageAccentMasterList;
   public languageCodesMapping;
-  public languageAccentCodesAreLoading = false;
-  public languageAccentDescriptions = [];
+  public languageAccentDescriptions: string[] = [];
   public languageAccentDescriptionsToCodes = {};
   private _translationLanguageChangedEventEmitter = new EventEmitter<void>();
   private _activeVoiceoverChangedEventEmitter = new EventEmitter<void>();
@@ -41,34 +41,36 @@ export class VoiceoverPlayerService {
 
   setActiveVoiceover(contentId: string): void {
     this.activeContentId = contentId;
-    let activeEntityVoiceover =
-      this.entityVoiceoversService.getActiveEntityVoiceovers();
 
-    if (activeEntityVoiceover === undefined) {
-      return;
+    try {
+      let activeEntityVoiceover =
+        this.entityVoiceoversService.getActiveEntityVoiceovers();
+      let voiceoverTypeToVoiceovers =
+        activeEntityVoiceover.voiceoversMapping[contentId];
+      this.activeVoiceover = voiceoverTypeToVoiceovers.manual;
+    } catch (e: unknown) {
+      this.activeVoiceover = undefined;
     }
 
-    let contentIdToVoiceovers =
-      activeEntityVoiceover.voiceoversMapping[contentId];
-
-    if (contentIdToVoiceovers === undefined) {
-      return;
-    }
-
-    let manualVoiceover = contentIdToVoiceovers.manual;
-
-    if (manualVoiceover === undefined) {
-      return;
-    }
-    this.activeVoiceover = manualVoiceover;
     this._activeVoiceoverChangedEventEmitter.emit();
   }
 
-  getActiveVoiceover() {
+  setActiveComponentName(componentName: string): void {
+    this.activeComponentName = componentName;
+  }
+
+  getActiveComponentName(): string {
+    return this.activeComponentName;
+  }
+
+  getActiveVoiceover(): Voiceover {
     return this.activeVoiceover;
   }
 
-  setLanguageAccentCodesDescriptions(languageCode, languageAccentCodes) {
+  setLanguageAccentCodesDescriptions(
+    languageCode: string,
+    languageAccentCodes: string[]
+  ): void {
     let retrievedLanguageAccentCodes =
       this.languageAccentMasterList[languageCode];
     let languageAccentDescriptions = [];
@@ -97,7 +99,7 @@ export class VoiceoverPlayerService {
     return this._activeVoiceoverChangedEventEmitter;
   }
 
-  getLanguageAccentDescriptions() {
+  getLanguageAccentDescriptions(): string[] {
     return this.languageAccentDescriptions;
   }
 }

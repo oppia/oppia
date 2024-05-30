@@ -1366,13 +1366,10 @@ export class ConversationSkinComponent {
 
         setTimeout(() => {
           this.explorationPlayerStateService.onOppiaFeedbackAvailable.emit();
-          let feedbackContentId = this.displayedCard
-            .getInteraction()
-            .getContentIdForMatchingHtml(feedbackHtml);
-
-          if (feedbackContentId) {
-            this.voiceoverPlayerService.setActiveVoiceover(feedbackContentId);
-          }
+          this.setActiveVoiceover(feedbackHtml);
+          this.voiceoverPlayerService.setActiveComponentName(
+            AppConstants.COMPONENT_NAME_FEEDBACK
+          );
 
           this.audioPlayerService.onAutoplayAudio.emit({
             audioTranslations: feedbackAudioTranslations,
@@ -1394,6 +1391,17 @@ export class ConversationSkinComponent {
         }, millisecsLeftToWait);
       }
     );
+  }
+
+  setActiveVoiceover(feedbackHtml: string): void {
+    let interaction = this.displayedCard.getInteraction();
+
+    let feedbackContentId =
+      interaction.getContentIdForMatchingHtml(feedbackHtml);
+
+    if (feedbackContentId) {
+      this.voiceoverPlayerService.setActiveVoiceover(feedbackContentId);
+    }
   }
 
   private giveFeedbackAndStayOnCurrentCard(

@@ -36,6 +36,11 @@ import {AudioPreloaderService} from 'pages/exploration-player-page/services/audi
 import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {ContextService} from 'services/context.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {
+  Voiceover,
+  VoiceoverBackendDict,
+} from 'domain/exploration/voiceover.model';
 
 class MockPlatformFeatureService {
   get status(): object {
@@ -74,6 +79,7 @@ describe('Audio preloader service', () => {
   let audioPreloaderService: AudioPreloaderService;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let explorationObjectFactory: ExplorationObjectFactory;
+  let entityVoiceoversService: EntityVoiceoversService;
   let contextService: ContextService;
 
   const audioBlob = new Blob(['audio data'], {type: 'audiotype'});
@@ -363,6 +369,7 @@ describe('Audio preloader service', () => {
     );
     explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
     contextService = TestBed.inject(ContextService);
+    entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     spyOn(contextService, 'getExplorationId').and.returnValue('1');
   });
 
@@ -406,6 +413,48 @@ describe('Audio preloader service', () => {
     ).toEqual(['en-4.mp3']);
 
     httpTestingController.expectOne(requestUrl4).flush(audioBlob);
+    flushMicrotasks();
+
+    expect(
+      audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading()
+    ).toEqual([]);
+  }));
+
+  it('should maintain the correct number of download requests in queue for accent feature enabled', fakeAsync(() => {
+    const exploration =
+      explorationObjectFactory.createFromBackendDict(explorationDict);
+    audioPreloaderService.init(exploration);
+    audioTranslationLanguageService.init(['en'], 'en', 'en', false);
+
+    let manualVoiceoverBackendDict: VoiceoverBackendDict = {
+      filename: 'a.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
+
+    let manualVoiceover = Voiceover.createFromBackendDict(
+      manualVoiceoverBackendDict
+    );
+    spyOn(
+      entityVoiceoversService,
+      'getAllContentIdsToEntityVoiceovers'
+    ).and.returnValue({content: [manualVoiceover]});
+    spyOn(
+      audioPreloaderService,
+      'isVoiceoverContributionWithAccentEnabled'
+    ).and.returnValue(true);
+
+    audioPreloaderService.kickOffAudioPreloader(
+      exploration.getInitialState().name as string
+    );
+    expect(
+      audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading()
+    ).toEqual(['a.mp3']);
+
+    let requestUrl = '/assetsdevhandler/exploration/1/assets/audio/a.mp3';
+
+    httpTestingController.expectOne(requestUrl).flush(audioBlob);
     flushMicrotasks();
 
     expect(

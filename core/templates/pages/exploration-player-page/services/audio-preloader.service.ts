@@ -140,7 +140,10 @@ export class AudioPreloaderService {
           }
 
           for (let voiceover of voiceovers) {
-            audioFilenamesInBfsOrder.push(voiceover.filename);
+            let filename = voiceover.filename;
+            if (audioFilenamesInBfsOrder.indexOf(filename) === -1) {
+              audioFilenamesInBfsOrder.push(voiceover.filename);
+            }
           }
         }
       } else {
@@ -156,7 +159,7 @@ export class AudioPreloaderService {
     return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
   }
 
-  getAllContentIdsFromState(stateName: string) {
+  getAllContentIdsFromState(stateName: string): string[] | undefined {
     let state = this.exploration.states.getState(stateName);
     if (state !== undefined) {
       return state.getAllContentIds();

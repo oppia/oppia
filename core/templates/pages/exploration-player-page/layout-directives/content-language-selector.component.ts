@@ -95,8 +95,6 @@ export class ContentLanguageSelectorComponent implements OnInit {
     }
 
     if (this.isVoiceoverContributionWithAccentEnabled()) {
-      this.voiceoverPlayerService.languageAccentCodesAreLoading = false;
-
       this.voiceoverBackendApiService
         .fetchVoiceoverAdminDataAsync()
         .then(response => {
@@ -104,7 +102,6 @@ export class ContentLanguageSelectorComponent implements OnInit {
             response.languageAccentMasterList;
           this.voiceoverPlayerService.languageCodesMapping =
             response.languageCodesMapping;
-          this.voiceoverPlayerService.languageAccentCodesAreLoading = false;
 
           this.audioTranslationLanguageService.setCurrentAudioLanguageCode(
             this.selectedLanguageCode
@@ -129,25 +126,13 @@ export class ContentLanguageSelectorComponent implements OnInit {
   onSelectLanguage(newLanguageCode: string): void {
     if (this.isVoiceoverContributionWithAccentEnabled()) {
       this.entityVoiceoversService.setLanguageCode(newLanguageCode);
-      this.voiceoverPlayerService.languageAccentCodesAreLoading = true;
 
       this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
-        this.voiceoverBackendApiService
-          .fetchVoiceoverAdminDataAsync()
-          .then(response => {
-            this.voiceoverPlayerService.languageAccentMasterList =
-              response.languageAccentMasterList;
-            this.voiceoverPlayerService.languageCodesMapping =
-              response.languageCodesMapping;
-            this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
-              newLanguageCode,
-              this.entityVoiceoversService.getLanguageAccentCodes()
-            );
-            this.voiceoverPlayerService.languageAccentCodesAreLoading = false;
-          });
+        this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
+          newLanguageCode,
+          this.entityVoiceoversService.getLanguageAccentCodes()
+        );
       });
-      // Fetch all the voiceovers from asset backend API service and store them
-      // in cache.
     }
 
     if (this.shouldPromptForRefresh()) {

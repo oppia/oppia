@@ -300,7 +300,6 @@ export class TranslatorOverviewComponent implements OnInit {
         this.languageAccentMasterList =
           voiceoverLanguages.languageAccentMasterList;
         this.languageCodesMapping = voiceoverLanguages.languageCodesMapping;
-
         this.updateLanguageAccentCodesDropdownOptions();
       });
   }
@@ -338,7 +337,11 @@ export class TranslatorOverviewComponent implements OnInit {
 
     let lastSelectedLanguageAccentCode =
       this.localStorageService.getLastSelectedLanguageAccentCode();
-    if (lastSelectedLanguageAccentCode !== 'undefined') {
+
+    if (
+      lastSelectedLanguageAccentCode !== 'undefined' &&
+      lastSelectedLanguageAccentCode !== ''
+    ) {
       this.selectedLanguageAccentCode = lastSelectedLanguageAccentCode;
     } else {
       this.selectedLanguageAccentCode = firstLanguageAccentCode;

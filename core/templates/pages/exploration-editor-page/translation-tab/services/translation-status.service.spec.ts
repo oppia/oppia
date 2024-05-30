@@ -478,6 +478,12 @@ describe('Translation status service', () => {
     tss.refresh();
     expect(tss.getExplorationContentNotAvailableCount()).toEqual(6);
 
+    let color = tss.getActiveStateContentIdStatusColor('content_0');
+    expect(tss.ALL_ASSETS_AVAILABLE_COLOR).toEqual(color);
+
+    color = tss.getActiveStateContentIdStatusColor('content_1');
+    expect(tss.NO_ASSETS_AVAILABLE_COLOR).toEqual(color);
+
     entityVoiceoversService.setActiveLanguageAccentCode('en-IN');
     tss.refresh();
     expect(tss.getExplorationContentNotAvailableCount()).toEqual(8);

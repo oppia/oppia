@@ -20,11 +20,12 @@ import {
   ComponentFixture,
   fakeAsync,
   flush,
+  tick,
   TestBed,
   discardPeriodicTasks,
   waitForAsync,
 } from '@angular/core/testing';
-import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, EventEmitter} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {AudioPlayerService} from 'services/audio-player.service';
 import {ContextService} from 'services/context.service';
@@ -80,6 +81,7 @@ describe('Voiceover card component', () => {
           provide: NgbModal,
           useClass: MockNgbModal,
         },
+        TranslationLanguageService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -99,6 +101,19 @@ describe('Voiceover card component', () => {
     localStorageService = TestBed.inject(LocalStorageService);
     changeListService = TestBed.inject(ChangeListService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
+
+    spyOn(
+      translationLanguageService,
+      'onActiveLanguageChanged'
+    ).and.returnValue(new EventEmitter<void>());
+    spyOn(
+      translationTabActiveContentIdService,
+      'onActiveContentIdChanged'
+    ).and.returnValue(new EventEmitter<string>());
+    spyOn(
+      translationLanguageService,
+      'onActiveLanguageAccentChanged'
+    ).and.returnValue(new EventEmitter<void>());
   });
 
   it('should be able to initialize the voiceover card component', fakeAsync(() => {
@@ -109,15 +124,57 @@ describe('Voiceover card component', () => {
     spyOn(component, 'updateLanguageCode');
     spyOn(component, 'updateActiveContent');
     spyOn(component, 'updateLanguageAccentCode');
-    spyOn(component.directiveSubscriptions, 'add');
+    let questionSummariesInitializedEmitter = new EventEmitter();
+    spyOn(
+      translationLanguageService,
+      'onActiveLanguageChanged'
+    ).and.returnValue(questionSummariesInitializedEmitter);
 
+    spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(true);
+    spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
+    spyOn(audioPlayerService, 'getCurrentTime').and.returnValue(10);
+
+    component.manualVoiceoverDuration = 10;
+    component.voiceoverProgress = 0;
     component.pageIsLoaded = false;
 
     component.ngOnInit();
+    translationLanguageService.onActiveLanguageAccentChanged.emit();
+    translationLanguageService.onActiveLanguageChanged.emit();
+    translationTabActiveContentIdService.onActiveContentIdChanged.emit();
+
     flush();
+    tick(5000);
+    tick();
     discardPeriodicTasks();
 
     expect(component.pageIsLoaded).toBeTrue();
+
+    expect(component.voiceoverProgress).toEqual(100);
+  }));
+
+  it('should be able to initialize the voiceover card component when audio is not loaded', fakeAsync(() => {
+    spyOn(
+      localStorageService,
+      'getLastSelectedLanguageAccentCode'
+    ).and.returnValue('en-US');
+    spyOn(component, 'updateLanguageCode');
+    spyOn(component, 'updateActiveContent');
+    spyOn(component, 'updateLanguageAccentCode');
+
+    spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(false);
+
+    component.pageIsLoaded = false;
+    component.voiceoverProgress = 80;
+
+    component.ngOnInit();
+    flush();
+    tick(5000);
+    tick();
+    discardPeriodicTasks();
+
+    expect(component.pageIsLoaded).toBeTrue();
+    expect(component.voiceoverProgress).toEqual(0);
   }));
 
   it('should be able to update voiceover with the active change list', fakeAsync(() => {
@@ -241,8 +298,13 @@ describe('Voiceover card component', () => {
     entityVoiceoversService.init(entityId, entityType, entityVersion, 'en');
     entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
     component.languageAccentCode = 'en-US';
-    component.activeContentId = 'content0';
+    component.activeContentId = 'content1';
 
+    component.setActiveContentManualVoiceover();
+    flush();
+    discardPeriodicTasks();
+
+    component.activeContentId = 'content0';
     component.setActiveContentManualVoiceover();
     flush();
     discardPeriodicTasks();
@@ -279,6 +341,17 @@ describe('Voiceover card component', () => {
     flush();
     discardPeriodicTasks();
     expect(audioPlayerService.loadAsync).toHaveBeenCalled();
+  }));
+
+  it('should be able to play loaded voiceover', fakeAsync(() => {
+    audioPlayerService.pause();
+    spyOn(audioPlayerService, 'play');
+
+    spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
+    spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(true);
+    component.playAndPauseVoiceover('a.mp3');
+
+    expect(audioPlayerService.play).toHaveBeenCalled();
   }));
 
   it('should be able to play and pause loaded voiceover', fakeAsync(() => {

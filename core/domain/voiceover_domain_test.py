@@ -269,3 +269,29 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             manual_voiceover.to_dict(),
             self.dummy_manual_voiceover_dict)
+
+    def test_is_both_voiceovers_empty_should_return_successfully(self) -> None:
+        entity_voiceovers_object = (
+            voiceover_domain.EntityVoiceovers.create_empty(
+                'exp_id', 'exploration', 1, 'en-US'))
+        dummy_new_voiceover_dict: state_domain.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 4000,
+            'needs_update': False,
+            'duration_secs': 6.0
+        }
+        new_voiceover_object = state_domain.Voiceover.from_dict(
+            dummy_new_voiceover_dict)
+        entity_voiceovers_object.add_new_content_id_without_voiceovers(
+            'content_0')
+
+        self.assertTrue(
+            entity_voiceovers_object.is_both_voiceovers_empty('content_0'))
+
+        entity_voiceovers_object.add_voiceover(
+            content_id='content_0',
+            voiceover_type=feconf.VoiceoverType.MANUAL,
+            voiceovers_mapping=new_voiceover_object)
+
+        self.assertFalse(
+            entity_voiceovers_object.is_both_voiceovers_empty('content_0'))

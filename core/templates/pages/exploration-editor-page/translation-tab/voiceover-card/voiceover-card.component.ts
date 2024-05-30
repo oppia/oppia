@@ -134,6 +134,7 @@ export class VoiceoverCardComponent implements OnInit {
         this.currentVoiceoverDuration = 0;
       }
     }, 1000);
+    this.updateActiveContent();
   }
 
   updateVoiceoverWithChangeList(): void {
