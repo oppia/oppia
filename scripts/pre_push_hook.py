@@ -457,6 +457,22 @@ def does_diff_include_js_or_ts_files(diff_files: List[bytes]) -> bool:
     return False
 
 
+def get_js_or_ts_files_from_diff(diff_files: List[bytes]) -> List[str]:
+    """Returns the list of JavaScript or TypeScript files from the diff.
+
+    Args:
+        diff_files: list(bytes). List of files changed.
+
+    Returns:
+        list(str). List of JavaScript or TypeScript files.
+    """
+    js_or_ts_files = []
+    for file_path in diff_files:
+        if file_path.endswith(b'.ts') or file_path.endswith(b'.js'):
+            js_or_ts_files.append(file_path.decode())
+    return js_or_ts_files
+
+
 def does_diff_include_ts_files(diff_files: List[bytes]) -> bool:
     """Returns true if diff includes TypeScript files.
 
@@ -598,8 +614,12 @@ def main(args: Optional[List[str]] = None) -> None:
             frontend_status = 0
             ci_check_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
+                js_or_ts_files = get_js_or_ts_files_from_diff(files_to_lint)
+                frontend_test_cmds = FRONTEND_TEST_CMDS.copy()
+                frontend_test_cmds.append(
+                    '--specs_to_run %s' % ','.join(js_or_ts_files))
                 frontend_status = run_script_and_get_returncode(
-                    FRONTEND_TEST_CMDS)
+                    frontend_test_cmds)
             if frontend_status != 0:
                 print('Push aborted due to failing frontend tests.')
                 sys.exit(1)

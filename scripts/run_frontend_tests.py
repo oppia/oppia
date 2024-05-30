@@ -77,6 +77,10 @@ _PARSER.add_argument(
     help='optional; if specifided, downloads the combined frontend file',
     action='store_true'
 )
+_PARSER.add_argument(
+    '--specs_to_run',
+    help='optional; if specified, runs the specified test specs'
+)
 
 
 def run_dtslint_type_tests() -> None:
@@ -129,10 +133,22 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         'on your filesystem.',
         'Running test in development environment'])
 
+    specs_to_run = []
+    if parsed_args.specs_to_run:
+        for spec in parsed_args.specs_to_run.split(','):
+            if spec.endswith('.ts') and not spec.endswith('.spec.ts'):
+                spec = spec.replace('.ts', '.spec.ts')
+            if spec.endswith('.js') and not spec.endswith('.spec.js'):
+                spec = spec.replace('.js', '.spec.js')
+            specs_to_run.append(spec)
+
     cmd = [
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts')]
+    if len(specs_to_run) > 0:
+        cmd.append('--specs_to_run=%s' % ','.join(specs_to_run))
+
     if parsed_args.run_minified_tests:
         print('Running test in production environment')
 
