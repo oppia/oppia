@@ -32,7 +32,10 @@ import {
   getDecorationNodeText,
   getValueFromLiteralStringOrBinaryExpression,
 } from './typescript-ast-utilities';
-import {getPageModules} from './route-to-module-mapping-generator';
+import {
+  getPageModules,
+  getPageModulesCoveredByRouteMapping,
+} from './route-to-module-mapping-generator';
 
 interface BaseAngularInformation {
   className: string;
@@ -529,6 +532,7 @@ class RootFilesMappingGenerator {
   dependencyMapping: Record<string, string[]>;
   fileToAngularInformations: Record<string, AngularInformation[]>;
   pageModules: string[];
+  pageModulesCoveredByRouteMapping: string[];
   referenceCache: Record<string, string[]> = {};
 
   constructor(files: string[]) {
@@ -540,6 +544,8 @@ class RootFilesMappingGenerator {
       this.fileToAngularInformations
     );
     this.pageModules = getPageModules();
+    this.pageModulesCoveredByRouteMapping =
+      getPageModulesCoveredByRouteMapping();
   }
 
   /**
@@ -639,7 +645,7 @@ class RootFilesMappingGenerator {
    */
   private getValidRootFiles(): string[] {
     const validRootFiles: string[] = [
-      ...this.pageModules,
+      ...this.pageModulesCoveredByRouteMapping,
       ...this.getTestSuiteModules(),
     ];
     const rootFilesConfig = JSON.parse(

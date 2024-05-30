@@ -125,6 +125,7 @@
     "core/tests/data",
     "core/tests/release_sources",
     "core/tests/services_sources",
-    "core/tests/puppeteer-acceptance-tests/build"
+    "core/tests/puppeteer-acceptance-tests/build",
+    "core/tests/test-dependencies/*.js"
   ]
 }

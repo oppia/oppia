@@ -386,9 +386,18 @@ export const getRouteToModuleMapping = (): Map<Route, string> => {
 };
 
 /**
+ * Gets all of the page modules covered by the route mapping.
+ */
+export const getPageModulesCoveredByRouteMapping = (): string[] => {
+  const routeToModuleMapping = getRouteToModuleMapping();
+  return [...routeToModuleMapping.values()];
+};
+
+/**
  * Gets all of the page modules in the codebase.
  */
 export const getPageModules = (): string[] => {
-  const routeToModuleMapping = getRouteToModuleMapping();
-  return [...routeToModuleMapping.values(), ...MANUAL_PAGE_MODULES];
+  const pageModulesCoveredByRouteMapping =
+    getPageModulesCoveredByRouteMapping();
+  return [...pageModulesCoveredByRouteMapping, ...MANUAL_PAGE_MODULES];
 };

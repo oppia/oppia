@@ -118,6 +118,10 @@
     "core/templates/AppSpec.ts",
     "extensions/value_generators/valueGeneratorsRequires.ts",
     "extensions/objects/objectComponentsRequires.ts",
-    "extensions/objects/objectComponentsRequiresForPlayers.ts"
+    "extensions/objects/objectComponentsRequiresForPlayers.ts",
+    "core/templates/pages/email-dashboard-pages/email-dashboard-result.import.ts",
+    "core/templates/pages/error-pages/error-page.import.ts",
+    "core/templates/pages/error-pages/error-iframed-page/error-iframed-page.import.ts",
+    "core/templates/pages/maintenance-page/maintenance-page.import.ts"
   ]
 }
