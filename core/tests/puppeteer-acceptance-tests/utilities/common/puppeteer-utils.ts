@@ -20,6 +20,7 @@ import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
+import {load} from 'js-yaml';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
@@ -304,6 +305,87 @@ export class BaseUser {
       await this.page.click(selector);
     }
   }
+
+  /**
+   * The function clicks the element using the text on the button
+   * and wait until the new page is fully loaded.
+   */
+  async clickAndWaitForNavigation(selector: string): Promise<void> {
+    /** Normalize-space is used to remove the extra spaces in the text.
+     * Check the documentation for the normalize-space function here :
+     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
+    const [button] = await this.page.$x(
+      `\/\/*[contains(text(), normalize-space('${selector}'))]`
+    );
+    // If we fail to find the element by its XPATH, then the button is undefined and
+    // we try to find it by its CSS selector.
+    if (button !== undefined) {
+      await this.waitForElementToBeClickable(button);
+      await Promise.all([
+        this.page.waitForNavigation({
+          waitUntil: ['networkidle2', 'load'],
+        }),
+        button.click(),
+      ]);
+    } else {
+      await this.waitForElementToBeClickable(selector);
+      await Promise.all([
+        this.page.waitForNavigation({
+          waitUntil: ['networkidle2', 'load'],
+        }),
+        this.page.click(selector),
+      ]);
+    }
+  }
+
+  /**
+   * This function retrieves the text content of a specified element.
+   */
+  async getElementText(selector: string): Promise<string> {
+    await this.page.waitForSelector(selector);
+    const element = await this.page.$(selector);
+    if (element === null) {
+      throw new Error(`No element found for the selector: ${selector}`);
+    }
+    const textContent = await this.page.evaluate(el => el.textContent, element);
+    return textContent ?? '';
+  }
+
+  /**
+   * This function is to click on an element that contains the specific text especially when multiple elements have the same text.
+   * It takes two parameters: parentText and childText.
+   * The function first locates an element that contains the parentText.
+   * Once the parent element is identified, the function then searches within this parent element for a child element that contains the childText.
+   * Upon finding the child element, the function simulates a click event on this child element.
+   */
+  async clickChildElement(
+    parentText: string,
+    childText: string
+  ): Promise<void> {
+    const parentElement = await this.page.$x(
+      `//*[contains(normalize-space(text()), '${parentText.trim()}')]`
+    );
+    if (parentElement.length === 0) {
+      throw new Error(`No parent element found with the text: ${parentText}`);
+    }
+    const childElement = await parentElement[0].$x(
+      `.//*[contains(normalize-space(text()), '${childText.trim()}')]`
+    );
+    if (childElement.length === 0) {
+      throw new Error(`No child element found with the text: ${childText}`);
+    }
+    await childElement[0].click();
+  }
+
+  /**
+   * This function checks if a particular text exists on the current page.
+   * @param {string} text - The text to check for.
+   */
+  async isTextPresentOnPage(text: string): Promise<boolean> {
+    const pageContent = await this.page.content();
+    return pageContent.includes(text);
+  }
+
   /**
    * The function selects all text content and delete it.
    */
@@ -334,7 +416,8 @@ export class BaseUser {
    * This function navigates to the given URL.
    */
   async goto(url: string): Promise<void> {
-    await this.page.goto(url, {waitUntil: 'networkidle0'});
+    await this.page.goto(url);
+    await this.page.waitForNavigation({waitUntil: ['networkidle2', 'load']});
   }
 
   /**

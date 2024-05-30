@@ -19,14 +19,14 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Curriculum Admin', function () {
-  let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
-  let explorationId: string | null;
+  let curriculumAdmin: CurriculumAdmin;
+  let guestUser: LoggedInUser;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -34,28 +34,16 @@ describe('Curriculum Admin', function () {
       'curriculum_admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
+
+    guestUser = await UserFactory.createNewUser(
+      'guestUser1',
+      'guest_user1@example.com'
+    );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should create and publish topics, subtopics, skills, stories and chapters.',
     async function () {
-      await curriculumAdmin.navigateToCreatorDashboardPage();
-      await curriculumAdmin.navigateToExplorationEditorPage();
-      await curriculumAdmin.dismissWelcomeModal();
-      await curriculumAdmin.createExplorationWithMinimumContent(
-        'Test Exploration',
-        'End Exploration'
-      );
-      await curriculumAdmin.saveExplorationDraft();
-      explorationId = await curriculumAdmin.publishExplorationWithContent(
-        'Test Exploration Title 1',
-        'Test Exploration Goal',
-        'Algebra'
-      );
-      if (!explorationId) {
-        throw new Error('Error publishing exploration successfully.');
-      }
-
       await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
       await curriculumAdmin.createSubtopicForTopic(
         'Test Subtopic 1',
@@ -65,6 +53,7 @@ describe('Curriculum Admin', function () {
 
       await curriculumAdmin.createSkillForTopic('Test Skill 1', 'Test Topic 1');
       await curriculumAdmin.createQuestionsForSkill('Test Skill 1', 3);
+
       await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
         'Test Skill 1',
         'Test Subtopic 1',
@@ -76,19 +65,25 @@ describe('Curriculum Admin', function () {
       );
 
       await curriculumAdmin.publishDraftTopic('Test Topic 1');
-      await curriculumAdmin.createAndPublishStoryWithChapter(
-        'Test Story 1',
-        'test-story-one',
-        explorationId,
-        'Test Topic 1'
-      );
       await curriculumAdmin.expectTopicToBePublishedInTopicsAndSkillsDashboard(
         'Test Topic 1',
         1,
         1,
         1
       );
+      await curriculumAdmin.unpublishTopic('Test Topic 1');
+      await guestUser.expectTopicLinkReturns404('Test Topic 1');
+      await curriculumAdmin.deleteTopic('Test Topic 1');
+      await curriculumAdmin.expectTopicNotInTopicsAndSkillDashboard(
+        'Test Topic 1'
+      );
+
+      await curriculumAdmin.deleteSkill('Test Skill 1');
+      await curriculumAdmin.expectSkillNotInTopicsAndSkillsDashboard(
+        'Test Skill 1'
+      );
     },
+
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
