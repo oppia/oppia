@@ -10,7 +10,7 @@ if (argv.prodEnv) {
 }
 
 var specsToRun = [];
-if (argv.specs_to_run) {
+if (argv.specs_to_run !== undefined) {
   specsToRun = argv.specs_to_run.split(',');
 }
 
@@ -29,7 +29,7 @@ const SPECS_PATTERN = new RegExp(
 );
 
 let context = SPECS_PATTERN;
-if (specsToRun.length > 0) {
+if (argv.specs_to_run !== undefined) {
   context = specsToRun.reduce((context, file) => {
     if (!SPECS_PATTERN.test(file)) {
       return context;
@@ -41,7 +41,7 @@ if (specsToRun.length > 0) {
 }
 
 const webpackPlugins = [];
-if (specsToRun.length > 0) {
+if (argv.specs_to_run !== undefined) {
   webpackPlugins.push(
     new webpack.ContextReplacementPlugin(
       /(:?)/,

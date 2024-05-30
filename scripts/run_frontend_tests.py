@@ -133,6 +133,11 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         'on your filesystem.',
         'Running test in development environment'])
 
+    cmd = [
+        common.NODE_BIN_PATH, '--max-old-space-size=4096',
+        os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+        'start', os.path.join('core', 'tests', 'karma.conf.ts')]
+
     specs_to_run = []
     if parsed_args.specs_to_run:
         for spec in parsed_args.specs_to_run.split(','):
@@ -142,13 +147,11 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 spec = spec.replace('.js', '.spec.js')
             if os.path.exists(spec):
                 specs_to_run.append(spec)
-
-    cmd = [
-            common.NODE_BIN_PATH, '--max-old-space-size=4096',
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start', os.path.join('core', 'tests', 'karma.conf.ts')]
-    if len(specs_to_run) > 0:
-        cmd.append('--specs_to_run=%s' % ','.join(specs_to_run))
+        if len(specs_to_run) == 0:
+            sys.exit('No valid specs found to run.')
+        else:
+            print('Running the following specs:', specs_to_run)
+            cmd.append('--specs_to_run=%s' % ','.join(specs_to_run))
 
     if parsed_args.run_minified_tests:
         print('Running test in production environment')
