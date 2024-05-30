@@ -43,7 +43,7 @@ export class ConceptCardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadingMessage = 'Loading';
+    this.loadingMessage = 'Loading..';
     this.conceptCardBackendApiService.loadConceptCardsAsync(this.skillIds).then(
       conceptCardObjects => {
         conceptCardObjects.forEach(conceptCardObject => {
