@@ -173,6 +173,25 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn('Done!', self.print_arr)
         self.assertEqual(len(self.cmd_token_list), 1)
 
+    def test_frontend_tests_with_specs_to_run(self) -> None:
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage:
+                    run_frontend_tests.main(
+                        args=['--specs_to_run',
+                              'home-page.component.spec.ts,'
+                              'about-page.component.ts,'
+                              'test-module.js'])
+
+        cmd = [
+            common.NODE_BIN_PATH, '--max-old-space-size=4096',
+            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+            'start', os.path.join('core', 'tests', 'karma.conf.ts'),
+            '--specs_to_run=home-page.component.spec.ts,'
+            'about-page.component.spec.ts,'
+            'test-module.spec.js']
+        self.assertIn(cmd, self.cmd_token_list)
+
     def test_frontend_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
