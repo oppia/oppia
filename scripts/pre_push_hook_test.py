@@ -81,7 +81,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             return self.does_diff_include_js_or_ts_files
         def mock_get_js_or_ts_files_from_diff(
             unused_diff_files: List[pre_push_hook.FileDiff]
-        ) -> List[bytes]:
+        ) -> List[str]:
             if self.does_diff_include_js_or_ts_files:
                 return ['file1.js', 'file2.ts']
             return []

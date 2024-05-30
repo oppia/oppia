@@ -111,8 +111,7 @@
   "files": [
     "assets/constants.ts",
     "assets/rich_text_components_definitions.ts",
-    "src/main.ts",
-    "core/tests/karma.conf.ts"
+    "src/main.ts"
   ],
   "include": [
     "core",
@@ -125,6 +124,7 @@
     "core/tests/data",
     "core/tests/release_sources",
     "core/tests/services_sources",
-    "core/tests/puppeteer-acceptance-tests/build"
+    "core/tests/puppeteer-acceptance-tests/build",
+    "core/tests/karma.conf.ts"
   ]
 }
