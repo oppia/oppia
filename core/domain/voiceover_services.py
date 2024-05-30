@@ -32,7 +32,7 @@ from core.domain import user_services
 from core.domain import voiceover_domain
 from core.platform import models
 
-from typing import Dict, List, Sequence
+from typing import Dict, List, Sequence, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -205,30 +205,37 @@ def compute_voiceover_related_change(
         entity_voiceovers_id = generate_id_method(
             entity_voiceovers.entity_type,
             entity_voiceovers.entity_id,
-            str(entity_voiceovers.entity_version),
+            entity_voiceovers.entity_version,
             entity_voiceovers.language_accent_code
         )
         entity_voiceover_id_to_entity_voiceovers[entity_voiceovers_id] = (
             entity_voiceovers)
 
     for change in voiceover_changes:
-        content_id = change.content_id
-        language_accent_code = change.language_accent_code
+        # Here we use cast because this forces change to have type
+        # VoiceoversChangesCmd.
+        voiceover_change = cast(exp_domain.VoiceoversChangesCmd, change)
+        content_id = voiceover_change.content_id
+        language_accent_code = voiceover_change.language_accent_code
+        manual_voiceover_dict: state_domain.VoiceoverDict = (
+            voiceover_change.voiceovers['manual'])
+        manual_voiceover = state_domain.Voiceover.from_dict(
+            manual_voiceover_dict)
 
         entity_voiceover_id = generate_id_method(
             entity_type, entity_id, entity_version, language_accent_code)
 
-        if entity_voiceover_id in entity_voiceover_id_to_entity_voiceovers:
-            entity_voiceovers = (
-                entity_voiceover_id_to_entity_voiceovers.get(
-                    entity_voiceover_id)
-            )
-        else:
-            entity_voiceovers = voiceover_domain.EntityVoiceovers.create_empty(
+        empty_entity_voiceovers = (
+            voiceover_domain.EntityVoiceovers.create_empty(
                 entity_id, entity_type, entity_version, language_accent_code)
+        )
+
+        entity_voiceovers = (
+            entity_voiceover_id_to_entity_voiceovers.get(
+                entity_voiceover_id, empty_entity_voiceovers)
+        )
+
         if content_id not in entity_voiceovers.voiceovers_mapping:
-            manual_voiceover = state_domain.Voiceover.from_dict(
-                change.voiceovers['manual'])
             entity_voiceovers.add_new_content_id_without_voiceovers(content_id)
             entity_voiceovers.add_voiceover(
                 content_id,
@@ -236,14 +243,12 @@ def compute_voiceover_related_change(
                 manual_voiceover
             )
         else:
-            if 'manual' not in change.voiceovers:
+            if 'manual' not in voiceover_change.voiceovers:
                 entity_voiceovers.remove_voiceover(
                     content_id,
                     feconf.VoiceoverType.MANUAL
                 )
             else:
-                manual_voiceover = state_domain.Voiceover.from_dict(
-                    change.voiceovers['manual'])
                 entity_voiceovers.voiceovers_mapping[content_id][
                     feconf.VoiceoverType.MANUAL] = manual_voiceover
 

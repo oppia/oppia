@@ -19,6 +19,7 @@
 
 import {Injectable} from '@angular/core';
 import {downgradeInjectable} from '@angular/upgrade/static';
+import {Voiceover} from 'domain/exploration/voiceover.model';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 
@@ -130,7 +131,7 @@ export class EntityVoiceoversService {
   }
 
   getAllContentIdsToEntityVoiceovers(): {
-    [contentId: string]: EntityVoiceovers[];
+    [contentId: string]: Voiceover[];
   } {
     let contentIdToEntityVoiceovers = {};
     let allEntityVoiceovers = Object.values(

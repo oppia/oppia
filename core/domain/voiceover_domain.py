@@ -246,7 +246,7 @@ class EntityVoiceovers:
         if self.is_both_voiceovers_empty(content_id):
             del self.voiceovers_mapping[content_id]
 
-    def is_both_voiceovers_empty(self, content_id) -> bool:
+    def is_both_voiceovers_empty(self, content_id: str) -> bool:
         """Verifies if both the manual and automatic voiceovers for the
         specified content ID is empty or not.
 

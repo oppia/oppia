@@ -43,7 +43,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import voiceover_models
 
 
-(voiceover_models) = models.Registry.import_models([
+(voiceover_models,) = models.Registry.import_models([
     models.Names.VOICEOVER])
 
 
