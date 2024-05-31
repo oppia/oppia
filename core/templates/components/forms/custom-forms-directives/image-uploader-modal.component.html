@@ -22,15 +22,17 @@
       <div class="oppia-form-error oppia-form-error-text" *ngIf="invalidImageWarningIsShown">
         {{ 'I18N_IMAGE_UPLOAD_ERROR' | translate }}
       </div>
-      <div *ngIf="(isThumbnail() && thumbnailImageDataUrl)">
-        <div [hidden]="!allowedBgColors">
-          <div [hidden]="!(allowedBgColors.length > 1)">Choose background color:</div>
-          <div [hidden]="!(allowedBgColors.length > 1)" class="oppia-thumbnail-colour-select">
-            <div *ngFor="let color of allowedBgColors" [ngStyle]="{'background': color}"
-                 (click)="updateBackgroundColor(color)">
+      <div *ngIf="(isThumbnail() && uploadedImage)">
+        <div *ngIf="allowedBgColors.length >= 1">
+          <div *ngIf="hasMoreThanOneBgColor()">
+            <div>Choose background color:</div>
+            <div class="oppia-thumbnail-colour-select">
+              <div *ngFor="let color of allowedBgColors" [ngStyle]="{'background': color}"
+                   (click)="updateBackgroundColor(color)">
+              </div>
             </div>
           </div>
-          <div [hidden]="!(allowedBgColors.length === 1)" class="alert alert-warning">
+          <div *ngIf="allowedBgColors.length === 1" class="alert alert-warning">
             <span>
               Please check that the {{imageName.toLowerCase()}} below has the following background color:
               <i class="fa fa-square" [ngStyle]="{'color': allowedBgColors[0]}"></i>.
@@ -38,15 +40,15 @@
             </span>
           </div>
         </div>
-        <div class="oppia-thumbnail-container e2e-test-thumbnail-container" *ngIf="thumbnailImageDataUrl"
+        <div class="oppia-thumbnail-container e2e-test-thumbnail-container" *ngIf="uploadedImage"
           [ngStyle]="{'background': previewDescriptionBgColor, 'color': previewDescriptionBgColor ? '#FFFFFF' : '', 'width': aspectRatio === '4:3' ? '248px' : '320px' }">
           <button class="btn btn-secondary oppia-thumbnail-reset-button e2e-thumbnail-reset-button e2e-test-thumbnail-reset-button"
                   (click)="reset()">
             <i class="fas fa-times oppia-vcenter"></i>
           </button>
           <div>
-            <oppia-thumbnail-display *ngIf="thumbnailImageDataUrl" [classes]="['oppia-thumbnail-image']"
-              [imgSrc]="thumbnailImageDataUrl" [aspectRatio]="'16:9'" [background]="bgColor">
+            <oppia-thumbnail-display *ngIf="uploadedImage" [classes]="['oppia-thumbnail-image']"
+              [imgSrc]="uploadedImage" [aspectRatio]="'16:9'" [background]="bgColor">
             </oppia-thumbnail-display>
             <div class="oppia-thumbnail-preview-title">
               {{ previewTitle }}
@@ -70,14 +72,15 @@
           </button>
           <img id="croppable-image" [src]="uploadedImage" #croppableImage>
         </div>
-        <div [hidden]="!(allowedBgColors.length > 1)" class="bg-color-text">
-          Choose background color:
-          <div class="oppia-bg-color-container" [ngStyle]="{'background': bgColor}">
+        <div *ngIf="hasMoreThanOneBgColor()">
+          <div class="bg-color-text">
+            Choose background color:
+            <div class="oppia-bg-color-container" [ngStyle]="{'background': bgColor}"></div>
           </div>
-        </div>
-        <div [hidden]="!(allowedBgColors.length > 1)" class="oppia-thumbnail-colour-select">
-          <div *ngFor="let color of allowedBgColors" [ngStyle]="{'background': color}"
-               (click)="updateBackgroundColor(color)">
+          <div class="oppia-thumbnail-colour-select">
+            <div *ngFor="let color of allowedBgColors" [ngStyle]="{'background': color}"
+                 (click)="updateBackgroundColor(color)">
+            </div>
           </div>
         </div>
         <div *ngIf="areInvalidTagsOrAttrsPresent()"

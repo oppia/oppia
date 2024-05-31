@@ -49,11 +49,10 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   @Input() aspectRatio!: string;
   @Input() maxImageSizeInKB!: number;
   @Input() previewImageUrl!: string;
+  @Input() allowedBgColors!: string[];
 
   // 'uploadedImage' will be null if the uploaded svg is invalid or not trusted.
-  uploadedImage: SafeResourceUrl | null = null;
-  thumbnailImageDataUrl: string | null = null;
-  croppedImageDataUrl: string | SafeResourceUrl | null = null;
+  uploadedImage: SafeResourceUrl | string | null = null;
   invalidImageWarningIsShown: boolean = false;
   windowIsNarrow: boolean = false;
   invalidTagsAndAttributes: {tags: string[]; attrs: string[]} = {
@@ -62,6 +61,7 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   };
   dimensions = {height: 0, width: 0};
   imageType!: string;
+  croppedImageDataUrl!: string;
 
   // 'cropper' is initialized before it is to be used, hence we need to do
   // non-null assertion, for more information see
@@ -90,7 +90,18 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   }
 
   imageNotUploaded(): boolean {
-    return !this.uploadedImage && !this.thumbnailImageDataUrl;
+    return !this.uploadedImage;
+  }
+
+  areInvalidTagsOrAttrsPresent(): boolean {
+    return (
+      this.invalidTagsAndAttributes.tags.length > 0 ||
+      this.invalidTagsAndAttributes.attrs.length > 0
+    );
+  }
+
+  hasMoreThanOneBgColor(): boolean {
+    return this.allowedBgColors.length > 1;
   }
 
   initializeCropper(): void {
@@ -127,10 +138,15 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
           this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
             imageData
           );
-        this.thumbnailImageDataUrl =
-          this.svgSanitizerService.removeAllInvalidTagsAndAttributes(imageData);
-        this.uploadedImage =
-          this.svgSanitizerService.getTrustedSvgResourceUrl(imageData);
+        if (this.isThumbnail()) {
+          this.uploadedImage =
+            this.svgSanitizerService.removeAllInvalidTagsAndAttributes(
+              imageData
+            );
+        } else {
+          this.uploadedImage =
+            this.svgSanitizerService.getTrustedSvgResourceUrl(imageData);
+        }
       }
       if (!this.uploadedImage) {
         this.uploadedImage = decodeURIComponent(
@@ -150,12 +166,15 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
           //   Attempt to use a destroyed view: detectChanges thrown.
           // No further action is needed.
         }
-        if (this.imageName !== 'Thumbnail') {
+        if (!this.isThumbnail()) {
           this.initializeCropper();
         }
       };
       img.src = imageData;
       this.imageType = file.type;
+    };
+    reader.onerror = () => {
+      this.onInvalidImageLoaded();
     };
     reader.readAsDataURL(file);
   }
@@ -166,8 +185,6 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
       attrs: [],
     };
     this.uploadedImage = null;
-    this.croppedImageDataUrl = null;
-    this.thumbnailImageDataUrl = null;
   }
 
   onInvalidImageLoaded(): void {
@@ -181,16 +198,9 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
     }
   }
 
-  areInvalidTagsOrAttrsPresent(): boolean {
-    return (
-      this.invalidTagsAndAttributes.tags.length > 0 ||
-      this.invalidTagsAndAttributes.attrs.length > 0
-    );
-  }
-
   confirm(): void {
     if (this.isThumbnail()) {
-      this.croppedImageDataUrl = this.thumbnailImageDataUrl;
+      this.croppedImageDataUrl = this.uploadedImage as string;
     } else {
       if (!this.cropper) {
         throw new Error('Cropper has not been initialized');
@@ -212,7 +222,7 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
 
   ngOnInit(): void {
     if (this.previewImageUrl) {
-      this.thumbnailImageDataUrl = this.previewImageUrl;
+      this.uploadedImage = this.previewImageUrl;
     }
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
