@@ -169,7 +169,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     specs_to_run = []
     if parsed_args.specs_to_run:
         for spec in parsed_args.specs_to_run.split(','):
-            spec_file = get_file_spec(spec)
+            spec_file = get_file_spec(spec.strip())
             if spec_file:
                 specs_to_run.append(spec_file)
         if len(specs_to_run) == 0:
@@ -263,7 +263,14 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 'The frontend tests failed. Please fix it before running the'
                 ' test coverage check.')
         else:
-            check_frontend_test_coverage.main()
+            check_frontend_test_coverage_args = []
+            if parsed_args.specs_to_run:
+                check_frontend_test_coverage_args.append(
+                    '--files_to_check=%s' % ','.join(specs_to_run)
+                )
+            check_frontend_test_coverage.main(
+                check_frontend_test_coverage_args
+            )
     elif task.returncode:
         sys.exit(task.returncode)
 

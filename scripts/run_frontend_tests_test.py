@@ -121,8 +121,10 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             self.build_args.append(args)
 
         self.frontend_coverage_checks_called = False
-        def mock_check_frontend_coverage() -> None:
+        self.frontend_coverage_checks_args: list[list[str]] = []
+        def mock_check_frontend_coverage(args: list[str]) -> None:
             self.frontend_coverage_checks_called = True
+            self.frontend_coverage_checks_args.append(args)
 
         self.swap_success_Popen = self.swap(
             subprocess, 'Popen', mock_success_check_call)
@@ -192,7 +194,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage, os_path_exists_swap:
                     run_frontend_tests.main(
-                        args=['--specs_to_run',
+                        args=['--check_coverage', '--specs_to_run='
                               'home-page.component.spec.ts,'
                               'about-page.component.ts,'
                               'test-module.js,'
@@ -209,6 +211,13 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'test-module.spec.js,'
             'AppSpec.ts']
         self.assertIn(cmd, self.cmd_token_list)
+        self.assertTrue(self.frontend_coverage_checks_called)
+        self.assertEqual(self.frontend_coverage_checks_args, [[
+            '--files_to_check=home-page.component.spec.ts,'
+            'about-page.component.spec.ts,'
+            'test-module.spec.js,'
+            'AppSpec.ts'
+        ]])
 
     def test_frontend_tests_with_specs_to_run_no_specs_found(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
@@ -238,6 +247,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'Frontend-unit-tests-guide#how-to-handle-common-errors'
             ' for details on how to fix it.', self.print_arr)
         self.assertTrue(self.frontend_coverage_checks_called)
+        self.assertEqual(self.frontend_coverage_checks_args, [[]])
         self.assertEqual(len(self.sys_exit_message), 0)
 
     def test_frontend_tests_rerun(self) -> None:
@@ -264,6 +274,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         )
         self.assertIn('Attempt 2 of 2', self.print_arr)
         self.assertTrue(self.frontend_coverage_checks_called)
+        self.assertEqual(self.frontend_coverage_checks_args, [[]])
         self.assertEqual(len(self.sys_exit_message), 0)
 
     def test_frontend_tests_rerun_twice(self) -> None:
@@ -292,6 +303,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         )
         self.assertIn('Attempt 2 of 2', self.print_arr)
         self.assertTrue(self.frontend_coverage_checks_called)
+        self.assertEqual(self.frontend_coverage_checks_args, [[]])
         self.assertEqual(len(self.sys_exit_message), 0)
 
     def test_frontend_tests_failed(self) -> None:
