@@ -19,7 +19,7 @@ import {Component, ElementRef, Input, ViewChild} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
-  selector: 'card-display',
+  selector: 'oppia-card-display',
   templateUrl: './card-display.component.html',
 })
 export class CardDisplayComponent {
