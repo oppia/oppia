@@ -402,7 +402,7 @@ describe('Voiceover card component', () => {
     flush();
     discardPeriodicTasks();
 
-    expect(component.manualVoiceover).toBeNull();
+    expect(component.manualVoiceover).toBeUndefined();
   }));
 
   it('should not be able to delete manual voiceover for rejection handler', fakeAsync(() => {
@@ -487,7 +487,7 @@ describe('Voiceover card component', () => {
       result: Promise.resolve(result),
     } as NgbModalRef);
 
-    expect(component.manualVoiceover).toBeNull();
+    expect(component.manualVoiceover).toBeUndefined();
 
     component.addManualVoiceover();
     flush();
@@ -506,12 +506,12 @@ describe('Voiceover card component', () => {
       result: Promise.reject(),
     } as NgbModalRef);
 
-    expect(component.manualVoiceover).toBeNull();
+    expect(component.manualVoiceover).toBeUndefined();
 
     component.addManualVoiceover();
     flush();
     discardPeriodicTasks();
 
-    expect(component.manualVoiceover).toBeNull();
+    expect(component.manualVoiceover).toBeUndefined();
   }));
 });

@@ -127,10 +127,10 @@ export class AudioPreloaderService {
     const audioFilenamesInBfsOrder = [];
     for (const stateName of bfsTraversalOfStates) {
       if (this.isVoiceoverContributionWithAccentEnabled()) {
-        let contentIds = this.getAllContentIdsFromState(stateName);
+        let contentIds = this.getAllContentIdsFromState(stateName) as string[];
 
         let contentIdsToVoiceovers =
-          this.entityVoiceoversService.getAllContentIdsToEntityVoiceovers();
+          this.entityVoiceoversService.getAllContentIdsToVoiceovers();
 
         for (let contentId of contentIds) {
           let voiceovers = contentIdsToVoiceovers[contentId];

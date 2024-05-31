@@ -173,7 +173,7 @@ describe('Entity voiceovers service', () => {
     entityVoiceoversService.addEntityVoiceovers('en-IN', entityVoiceovers2);
 
     let retrievedContentIdToEntityVoiceovers =
-      entityVoiceoversService.getAllContentIdsToEntityVoiceovers();
+      entityVoiceoversService.getAllContentIdsToVoiceovers();
 
     let voiceover1 = Voiceover.createFromBackendDict(manualVoiceover);
     let voiceover2 = Voiceover.createFromBackendDict(manualVoiceover2);

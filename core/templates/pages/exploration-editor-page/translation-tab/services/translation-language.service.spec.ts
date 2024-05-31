@@ -96,7 +96,7 @@ describe('Translation language service', () => {
       let languageAccentCode =
         translationLanguageService.getActiveLanguageAccentCode();
 
-      expect(languageAccentCode).toBeNull();
+      expect(languageAccentCode).toBeUndefined();
 
       translationLanguageService.setActiveLanguageAccentCode('en-US');
       languageAccentCode =

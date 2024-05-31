@@ -272,7 +272,7 @@ export class TranslationStatusService implements OnInit {
         let activeEntityVoiceovers =
           this.entityVoiceoversService.getActiveEntityVoiceovers();
 
-        let voiceoverContentIds = [];
+        let voiceoverContentIds: string[] = [];
         if (activeEntityVoiceovers) {
           voiceoverContentIds = Object.keys(
             activeEntityVoiceovers.voiceoversMapping

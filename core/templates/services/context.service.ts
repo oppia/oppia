@@ -176,7 +176,7 @@ export class ContextService {
     this.explorationVersion = explorationVersion;
   }
 
-  getExplorationVersion(): number {
+  getExplorationVersion(): number | null {
     return this.explorationVersion;
   }
 

@@ -41,6 +41,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {VoiceoverPlayerService} from '../services/voiceover-player.service';
+import {LanguageAccentToDescription} from 'domain/voiceover/voiceover-backend-api.service';
 
 @Component({
   selector: 'oppia-audio-bar',
@@ -57,10 +58,10 @@ export class AudioBarComponent {
   explorationPlayerModeIsActive: boolean;
   // Value may be null if the language is not available.
   selectedLanguage: {value: string | null};
-  languageAccentCodesToDescriptions;
-  languageAccentDecriptions = [];
-  selectedLanguageAccentDescription;
-  voiceoverToBePlayed;
+  languageAccentCodesToDescriptions!: LanguageAccentToDescription;
+  languageAccentDecriptions: string[] = [];
+  selectedLanguageAccentDescription!: string;
+  voiceoverToBePlayed!: Voiceover;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -97,7 +98,7 @@ export class AudioBarComponent {
     this.directiveSubscriptions.add(
       this.voiceoverPlayerService.onActiveVoiceoverChanged.subscribe(() => {
         this.voiceoverToBePlayed =
-          this.voiceoverPlayerService.getActiveVoiceover();
+          this.voiceoverPlayerService.getActiveVoiceover() as Voiceover;
       })
     );
 
@@ -277,7 +278,7 @@ export class AudioBarComponent {
   updateSelectedLanguageAccent(): void {
     let languageAccentCode =
       this.voiceoverPlayerService.languageAccentDescriptionsToCodes[
-        this.selectedLanguageAccentDescription
+        this.selectedLanguageAccentDescription as string
       ];
     this.entityVoiceoversService.setActiveLanguageAccentCode(
       languageAccentCode
@@ -287,7 +288,9 @@ export class AudioBarComponent {
 
     let contentId = this.voiceoverPlayerService.activeContentId;
 
-    this.voiceoverToBePlayed = entityVoiceover.getManualVoiceover(contentId);
+    this.voiceoverToBePlayed = entityVoiceover.getManualVoiceover(
+      contentId
+    ) as Voiceover;
 
     this.audioPreloaderService.restartAudioPreloader(
       this.playerPositionService.getCurrentStateName()

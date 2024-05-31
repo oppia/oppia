@@ -438,7 +438,7 @@ describe('Audio preloader service', () => {
     );
     spyOn(
       entityVoiceoversService,
-      'getAllContentIdsToEntityVoiceovers'
+      'getAllContentIdsToVoiceovers'
     ).and.returnValue({content: [manualVoiceover]});
     spyOn(
       audioPreloaderService,

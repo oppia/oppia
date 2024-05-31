@@ -130,30 +130,28 @@ export class EntityVoiceoversService {
     return languageAccentCodes;
   }
 
-  getAllContentIdsToEntityVoiceovers(): {
+  getAllContentIdsToVoiceovers(): {
     [contentId: string]: Voiceover[];
   } {
-    let contentIdToEntityVoiceovers = {};
+    let contentIdToVoiceovers: {[contentId: string]: Voiceover[]} = {};
     let allEntityVoiceovers = Object.values(
       this.languageAccentCodeToEntityVoiceovers
     );
     for (let entityVoiceovers of allEntityVoiceovers) {
       for (let contentId in entityVoiceovers.voiceoversMapping) {
-        if (
-          Object.keys(contentIdToEntityVoiceovers).indexOf(contentId) !== -1
-        ) {
-          contentIdToEntityVoiceovers[contentId].push(
-            entityVoiceovers.getManualVoiceover(contentId)
+        if (Object.keys(contentIdToVoiceovers).indexOf(contentId) !== -1) {
+          contentIdToVoiceovers[contentId].push(
+            entityVoiceovers.getManualVoiceover(contentId) as Voiceover
           );
         } else {
-          contentIdToEntityVoiceovers[contentId] = [
-            entityVoiceovers.getManualVoiceover(contentId),
+          contentIdToVoiceovers[contentId] = [
+            entityVoiceovers.getManualVoiceover(contentId) as Voiceover,
           ];
         }
       }
     }
 
-    return contentIdToEntityVoiceovers;
+    return contentIdToVoiceovers;
   }
 }
 

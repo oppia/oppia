@@ -45,7 +45,9 @@ import {
 } from 'domain/exploration/exploration-draft.model';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {
+  LanguageAccentMasterList,
   LanguageAccentToDescription,
+  LanguageCodesMapping,
   VoiceoverBackendApiService,
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {LocalStorageService} from 'services/local-storage.service';
@@ -70,8 +72,8 @@ export class TranslatorOverviewComponent implements OnInit {
   allAudioLanguageCodes!: string[];
   LAST_SELECTED_TRANSLATION_LANGUAGE!: string;
   languageCodesAndDescriptions!: {id: string; description: string}[];
-  languageAccentMasterList;
-  languageCodesMapping = {};
+  languageAccentMasterList!: LanguageAccentMasterList;
+  languageCodesMapping: LanguageCodesMapping = {};
   availableLanguageAccentCodesToDescriptions: LanguageAccentToDescription = {};
   supportedLanguageAccentCodesToDescriptions: LanguageAccentToDescription = {};
   supportedLanguageAccentCodesLength: number = 0;
@@ -196,7 +198,7 @@ export class TranslatorOverviewComponent implements OnInit {
         this.loaderService.hideLoadingScreen();
       });
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
-    this.localStorageService.setLastSelectedLanguageAccentCode(undefined);
+    this.localStorageService.setLastSelectedLanguageAccentCode('');
     this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
       this.updateLanguageAccentCodesDropdownOptions();
     });
@@ -336,7 +338,7 @@ export class TranslatorOverviewComponent implements OnInit {
     )[0];
 
     let lastSelectedLanguageAccentCode =
-      this.localStorageService.getLastSelectedLanguageAccentCode();
+      this.localStorageService.getLastSelectedLanguageAccentCode() as string;
 
     if (
       lastSelectedLanguageAccentCode !== 'undefined' &&

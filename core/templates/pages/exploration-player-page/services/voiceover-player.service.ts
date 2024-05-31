@@ -21,20 +21,26 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {Voiceover} from 'domain/exploration/voiceover.model';
+import {
+  LanguageAccentMasterList,
+  LanguageCodesMapping,
+} from 'domain/voiceover/voiceover-backend-api.service';
+import {LanguageAccentDescriptionToCode} from 'pages/voiceover-admin-page/voiceover-admin-page.component';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
 @Injectable({
   providedIn: 'root',
 })
 export class VoiceoverPlayerService {
-  public activeContentId: string;
-  public activeContentHtml: string;
-  public activeComponentName: string;
-  public activeVoiceover: Voiceover;
-  public languageAccentMasterList;
-  public languageCodesMapping;
+  public activeContentId!: string;
+  public activeContentHtml!: string;
+  public activeComponentName!: string;
+  public activeVoiceover!: Voiceover | undefined;
+  public languageAccentMasterList!: LanguageAccentMasterList;
+  public languageCodesMapping!: LanguageCodesMapping;
   public languageAccentDescriptions: string[] = [];
-  public languageAccentDescriptionsToCodes = {};
+  public languageAccentDescriptionsToCodes: LanguageAccentDescriptionToCode =
+    {};
   private _translationLanguageChangedEventEmitter = new EventEmitter<void>();
   private _activeVoiceoverChangedEventEmitter = new EventEmitter<void>();
   constructor(private entityVoiceoversService: EntityVoiceoversService) {}
@@ -63,7 +69,7 @@ export class VoiceoverPlayerService {
     return this.activeComponentName;
   }
 
-  getActiveVoiceover(): Voiceover {
+  getActiveVoiceover(): Voiceover | undefined {
     return this.activeVoiceover;
   }
 

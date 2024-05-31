@@ -70,7 +70,7 @@ export class EntityVoiceovers {
   static createFromBackendDict(
     entityVoiceoversBackendDict: EntityVoiceoversBackendDict
   ): EntityVoiceovers {
-    let contentIdToVoiceoversMapping = {};
+    let contentIdToVoiceoversMapping: ContentIdToVoiceoversMapping = {};
     for (let contentId in entityVoiceoversBackendDict.voiceovers_mapping) {
       let voiceoverTypeToVoiceovers =
         entityVoiceoversBackendDict.voiceovers_mapping[contentId];
