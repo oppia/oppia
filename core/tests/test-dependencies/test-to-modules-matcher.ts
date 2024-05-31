@@ -37,7 +37,7 @@ const COMMON_MODULES_TO_EXCLUDE: Record<string, string[]> = {
     [],
 };
 
-const LOCALHOST_URL = 'http://localhost:8181';
+const LOCALHOST_URL = 'http://localhost:8181/';
 
 const matchUrl = (url: string, route: Route): boolean => {
   if (route.path === url) {
