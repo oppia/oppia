@@ -223,10 +223,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         with self.swap_success_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage:
-                    with self.assertRaisesRegex(
-                        SystemExit,
-                        'No valid specs found to run.'
-                    ):
+                    with self.assertRaisesRegex(SystemExit, '0'):
                         run_frontend_tests.main(
                             args=['--specs_to_run', 'invalid.ts'])
 

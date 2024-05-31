@@ -173,7 +173,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             if spec_file:
                 specs_to_run.append(spec_file)
         if len(specs_to_run) == 0:
-            sys.exit('No valid specs found to run.')
+            print('No valid specs found to run.')
+            sys.exit(0)
         else:
             print('Running the following specs:', specs_to_run)
             cmd.append('--specs_to_run=%s' % ','.join(specs_to_run))
