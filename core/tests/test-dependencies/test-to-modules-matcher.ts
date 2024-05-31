@@ -113,16 +113,16 @@ export class TestToModulesMatcher {
       if (!matchUrl(path, route)) {
         continue;
       }
+      matched = true;
       if (this.collectedModules.includes(module)) {
-        continue;
+        break;
       }
       if (
         COMMON_MODULES_TO_EXCLUDE[module] &&
         !COMMON_MODULES_TO_EXCLUDE[module].includes(this.goldenFilePath)
       ) {
-        continue;
+        break;
       }
-      matched = true;
       this.collectedModules.push(module);
       break;
     }
