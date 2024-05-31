@@ -2671,35 +2671,39 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.EMAIL_FOOTER,
+                'You can change your email preferences via the '
+                '<a href="http://localhost:8181/preferences">Preferences</a> '
+                'page.'
+            ),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'), # pylint: disable=line-too-long
+        ]
+    )
     def test_email_functionality_cannot_be_used_by_non_moderators(self) -> None:
-        allow_emailing = (
-                self.swap_to_always_return(
-                    platform_parameter_services,
-                    'get_platform_parameter_value',
-                    True
-                )
-            )
-        with allow_emailing:
-            # Log in as a non-moderator.
-            self.login(self.EDITOR_EMAIL)
+        # Log in as a non-moderator.
+        self.login(self.EDITOR_EMAIL)
 
-            # Go to the exploration editor page.
-            csrf_token = self.get_new_csrf_token()
+        # Go to the exploration editor page.
+        csrf_token = self.get_new_csrf_token()
 
-            new_email_body = 'Your exploration is unpublished :('
+        new_email_body = 'Your exploration is unpublished :('
 
-            valid_payload = {
-                'email_body': new_email_body,
-                'version': 1,
-            }
+        valid_payload = {
+            'email_body': new_email_body,
+            'version': 1,
+        }
 
-            # The user should receive an 'unauthorized user' error.
-            self.put_json(
-                '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                valid_payload, csrf_token=csrf_token,
-                expected_status_int=401)
+        # The user should receive an 'unauthorized user' error.
+        self.put_json(
+            '/createhandler/moderatorrights/%s' % self.EXP_ID,
+            valid_payload, csrf_token=csrf_token,
+            expected_status_int=401)
 
-            self.logout()
+        self.logout()
 
 
 class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):

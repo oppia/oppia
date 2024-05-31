@@ -68,21 +68,21 @@ class FailedMLTest(test_utils.EmailTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.ADMIN_USERNAME = 'admusername'
-        self.server_can_send_emails_ctx = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
         self.signup(
             feconf.ADMIN_EMAIL_ADDRESS, self.ADMIN_USERNAME, True)
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER)
+        ]
+    )
     def test_send_failed_ml_email(self) -> None:
-        with self.server_can_send_emails_ctx, self.can_send_feedback_email_ctx:
+        with self.can_send_feedback_email_ctx:
             # Make sure there are no emails already sent.
             messages = self._get_sent_email_messages(feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
@@ -100,18 +100,18 @@ class FailedMLTest(test_utils.EmailTestBase):
 class EmailToAdminTest(test_utils.EmailTestBase):
     """Test that emails are correctly sent to the admin."""
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER)
+        ]
+    )
     def test_email_to_admin_is_sent_correctly(self) -> None:
         dummy_system_name = 'DUMMY_SYSTEM_NAME'
         dummy_system_address = 'dummy@system.com'
         dummy_admin_address = 'admin@system.com'
 
-        send_email_ctx = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
         system_name_ctx = self.swap(
             feconf, 'SYSTEM_EMAIL_NAME', dummy_system_name)
         system_email_ctx = self.swap(
@@ -119,7 +119,7 @@ class EmailToAdminTest(test_utils.EmailTestBase):
         admin_email_ctx = self.swap(
             feconf, 'ADMIN_EMAIL_ADDRESS', dummy_admin_address)
 
-        with send_email_ctx, system_name_ctx, system_email_ctx, admin_email_ctx:
+        with system_name_ctx, system_email_ctx, admin_email_ctx:
             # Make sure there are no emails already sent.
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
@@ -142,18 +142,18 @@ class EmailToAdminTest(test_utils.EmailTestBase):
 class DummyMailTest(test_utils.EmailTestBase):
     """Test that emails are correctly sent to the testing email id."""
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER)
+        ]
+    )
     def test_sending_emails(self) -> None:
         dummy_system_name = 'DUMMY_SYSTEM_NAME'
         dummy_system_address = 'dummy@system.com'
         dummy_receiver_address = 'admin@system.com'
 
-        send_email_ctx = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
         system_name_ctx = self.swap(
             feconf, 'SYSTEM_EMAIL_NAME', dummy_system_name)
         system_email_ctx = self.swap(
@@ -161,7 +161,7 @@ class DummyMailTest(test_utils.EmailTestBase):
         admin_email_ctx = self.swap(
             feconf, 'ADMIN_EMAIL_ADDRESS', dummy_receiver_address)
 
-        with send_email_ctx, system_name_ctx, system_email_ctx, admin_email_ctx:
+        with system_name_ctx, system_email_ctx, admin_email_ctx:
             # Make sure there are no emails already sent.
             messages = self._get_sent_email_messages(
                 dummy_receiver_address)
@@ -2973,32 +2973,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             sent_email_model.intent,
             feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
 
-    def _swap_get_platform_parameter_value_function(
-        self, param_name: str
-    ) -> platform_parameter_domain.PlatformDataTypes:
-        """Swap function for get_platform_parameter_value.
-
-        Args:
-            param_name: str. The name of the platform parameter.
-
-        Returns:
-            PlatformDataTypes. The defined data type of the platform parameter.
-        """
-        if param_name == (
-            platform_parameter_list.ParamName.
-            CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
-        ):
-            return True
-        elif param_name == (
-            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
-        ):
-            return email_manager.EMAIL_SENDER_NAME.default_value
-        elif param_name == (
-            platform_parameter_list.ParamName.EMAIL_FOOTER.value
-        ):
-            return email_manager.EMAIL_FOOTER.default_value
-        return ''
-
     def _mock_logging_info(self, msg: str, *args: str) -> None:
         """Mocks logging.info() by appending the log message to the logged info
         list.
@@ -3036,17 +3010,12 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
-        self.swap_get_platform_parameter_value = self.swap(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            self._swap_get_platform_parameter_value_function
-        )
 
     @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        with self.swap_get_platform_parameter_value, self.capture_logging(
+        with self.capture_logging(
             min_level=logging.ERROR) as logs:
             with self.log_new_error_ctx:
                 email_manager.send_mail_to_notify_contributor_dashboard_reviewers(  # pylint: disable=line-too-long
@@ -4723,28 +4692,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             sent_email_model.intent,
             feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
 
-    def _swap_get_platform_parameter_value_function(
-        self, param_name: str
-    ) -> platform_parameter_domain.PlatformDataTypes:
-        """Swap function for get_platform_parameter_value.
-
-        Args:
-            param_name: str. The name of the platform parameter.
-
-        Returns:
-            PlatformDataTypes. The defined data type of the platform parameter.
-        """
-        if param_name == (
-            platform_parameter_list.ParamName.
-            ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
-        ):
-            return True
-        elif param_name == (
-            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
-        ):
-            return email_manager.EMAIL_SENDER_NAME.default_value
-        return ''
-
     def _mock_logging_info(self, msg: str, *args: str) -> None:
         """Mocks logging.info() by appending the log message to the logged info
         list.
@@ -4782,11 +4729,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
-        self.swap_get_platform_parameter_value = self.swap(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            self._swap_get_platform_parameter_value_function
-        )
 
     @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
@@ -5532,11 +5474,6 @@ class NotifyReviewersNewSuggestionsTests(
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
-        self.swap_get_platform_parameter_value = self.swap(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            self._swap_get_platform_parameter_value_function
-        )
 
     def _create_reviewable_suggestion_email_infos_from_suggestions(
             self,
@@ -5588,32 +5525,6 @@ class NotifyReviewersNewSuggestionsTests(
         self.assertEqual(
             sent_email_model.intent,
             feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
-
-    def _swap_get_platform_parameter_value_function(
-        self, param_name: str
-    ) -> platform_parameter_domain.PlatformDataTypes:
-        """Swap function for get_platform_parameter_value.
-
-        Args:
-            param_name: str. The name of the platform parameter.
-
-        Returns:
-            PlatformDataTypes. The defined data type of the platform parameter.
-        """
-        if param_name == (
-            platform_parameter_list.ParamName.
-            CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
-        ):
-            return True
-        elif param_name == (
-            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
-        ):
-            return email_manager.EMAIL_SENDER_NAME.default_value
-        elif param_name == (
-            platform_parameter_list.ParamName.EMAIL_FOOTER.value
-        ):
-            return email_manager.EMAIL_FOOTER.default_value
-        return ''
 
     def _mock_logging_info(self, msg: str, *args: str) -> None:
         """Mocks logging.info() by appending the log message to the logged info
@@ -5879,28 +5790,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         """
         self.logged_info.append(msg % args)
 
-    def _swap_get_platform_parameter_value_function(
-        self, param_name: str
-    ) -> platform_parameter_domain.PlatformDataTypes:
-        """Swap function for get_platform_parameter_value.
-
-        Args:
-            param_name: str. The name of the platform parameter.
-
-        Returns:
-            PlatformDataTypes. The defined data type of the platform parameter.
-        """
-        if param_name == (
-            platform_parameter_list.ParamName.
-            ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
-        ):
-            return True
-        elif param_name == (
-            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
-        ):
-            return email_manager.EMAIL_SENDER_NAME.default_value
-        return ''
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
@@ -5928,12 +5817,6 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.suggestion_types_needing_reviewers: Dict[str, Set[str]] = {
             feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
         }
-
-        self.swap_get_platform_parameter_value = self.swap(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            self._swap_get_platform_parameter_value_function
-        )
 
     @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
@@ -7642,18 +7525,18 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.server_can_send_emails_ctx = (
-            self.swap_to_always_return(
-                platform_parameter_services,
-                'get_platform_parameter_value',
-                True
-            )
-        )
         self.admin_email_ctx = self.swap(
             feconf, 'ADMIN_EMAIL_ADDRESS', self.dummy_admin_address)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER)
+        ]
+    )
     def test_not_mergeable_change_list_email_is_sent_correctly(self) -> None:
-        with self.server_can_send_emails_ctx, self.admin_email_ctx:
+        with self.admin_email_ctx:
             # Make sure there are no emails already sent.
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
