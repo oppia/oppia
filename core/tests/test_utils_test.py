@@ -96,7 +96,10 @@ class SetPlatformParametersTests(test_utils.GenericTestBase):
         """Tests if invalid platform parameter raises an error."""
         with self.assertRaisesRegex(
             Exception,
-            'Unknown platform parameter name: dummy_parameter'
+            'The value for the platform parameter dummy_parameter was '
+            'needed in this test, but not specified in the '
+            'set_platform_parameters decorator. Please this information in '
+            'the decorator.'
         ):
             platform_parameter_services.get_platform_parameter_value(
                 'dummy_parameter'

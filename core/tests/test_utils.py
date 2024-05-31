@@ -455,7 +455,7 @@ def swap_get_platform_parameter_value_function(
             parameter is present in the platform_parameter_names list.
 
         Raises:
-            Exception. If the parameter_name is not present in the
+            Exception. The parameter_name is not present in the
                 platform_parameter_names list.
         """
         platform_parameter_name_value_dict = dict(
@@ -463,7 +463,10 @@ def swap_get_platform_parameter_value_function(
         )
         if parameter_name not in platform_parameter_name_value_dict:
             raise Exception(
-                'Unknown platform parameter name: %s' % parameter_name
+                'The value for the platform parameter %s was needed in this '
+                'test, but not specified in the set_platform_parameters '
+                'decorator. Please this information in the decorator.'
+                % parameter_name
             )
         return platform_parameter_name_value_dict[parameter_name]
 
