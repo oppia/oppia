@@ -122,7 +122,9 @@ export class TestToModulesMatcher {
       ) {
         continue;
       }
+      matched = true;
       this.collectedModules.push(module);
+      break;
     }
 
     if (!matched) {
