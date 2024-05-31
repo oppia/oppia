@@ -110,7 +110,7 @@
         <!--TODO(#18384): Styling: https://shorturl.at/oAUY5 (links to Figma frame) -->
         <card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_RECOMMEND_SECTION'" [numCards]="incompleteExplorationsList.length" [tabType]="'home'">
           <ng-container *ngFor="let lesson of incompleteExplorationsList; last as last">
-            <lesson-card [story]="lesson" [last]="last"></lesson-card>
+            <lesson-card [story]="lesson" [lastCard]="last"></lesson-card>
           </ng-container>
         </card-display>
       </div>
@@ -122,7 +122,7 @@
       <ng-container *ngFor="let item of untrackedTopics | keyvalue">
         <card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_CLASSROOM_SECTION'" [numCards]="item.value.length" [tabType]="'homeFull'" [cardWidth]="226">
           <ng-container *ngFor="let topicSummaryTile of item.value; last as last">
-            <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [redesignFeatureFlag]="redesignFeatureFlag" [last]="last">
+            <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [redesignFeatureFlag]="redesignFeatureFlag" [lastCard]="last">
             </oppia-learner-topic-summary-tile>
           </ng-container>
         </card-display>
@@ -135,7 +135,7 @@
        <!--TODO(#18384): Replace with saved lessons data (placeholder with explorations); affects numCards and ng-content-->
       <card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION'" [tabType]="'homeFull'" [numCards]="incompleteExplorationsList.length">
         <ng-container *ngFor="let lesson of incompleteExplorationsList; last as last">
-          <lesson-card [story]="lesson" [last]="last"></lesson-card>
+          <lesson-card [story]="lesson" [lastCard]="last"></lesson-card>
         </ng-container>
       </card-display>
     </div>
