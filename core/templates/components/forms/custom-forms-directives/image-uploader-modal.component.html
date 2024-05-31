@@ -50,10 +50,10 @@
             <oppia-thumbnail-display *ngIf="uploadedImage" [classes]="['oppia-thumbnail-image']"
               [imgSrc]="uploadedImage" [aspectRatio]="'16:9'" [background]="bgColor">
             </oppia-thumbnail-display>
-            <div class="oppia-thumbnail-preview-title">
+            <div *ngIf="previewTitle" class="oppia-thumbnail-preview-title">
               {{ previewTitle }}
             </div>
-            <div class="oppia-thumbnail-preview-description">
+            <div *ngIf="previewDescription" class="oppia-thumbnail-preview-description">
               {{ previewDescription }}
             </div>
             <div *ngIf="previewFooter" class="oppia-thumbnail-preview-footer">
