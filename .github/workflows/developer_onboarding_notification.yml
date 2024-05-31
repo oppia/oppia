@@ -35,8 +35,8 @@ jobs:
           script: |
             const prCount = ${{ steps.count-prs.outputs.pr_count }};
             const author = ${{ steps.count-prs.outputs.author }};
-            const mention_1 = '@HardikGoyal2003'; // Add mention for HardikGoyal2003 developer onboarding leads.
-            const mention_2 = '@AFZL210'; // Add mention for Afzal Khan developer onboarding leads.
+            const mention_1 = '@HardikGoyal2003'; // Add mention of Hardik Goyal as one of the developer onboarding leads.
+            const mention_2 = '@AFZL210'; // Add mention of Afzal Khan as one of the developer onboarding leads.
             let message;
             if (prCount == 1) {
               message = `Congratulations @${author}, You have merged 1 PR successfully! ${mention_1}`;
