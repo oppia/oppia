@@ -163,8 +163,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
               return;
             }
             this.today = new Date();
-            this.lastDateToFilterUsersActivity =
-              this.getDateThatIsDaysBeforeToday(90);
+            this.lastDateToFilterUsersActivity = this.getDateNDaysAgo(90);
             this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
             this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
 
@@ -231,7 +230,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
   isReviewerTab(): boolean {
     return (
-      this.activeTab === this.TAB_NAME_QUESTION_REVIEWER ||
+      this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER ||
       this.activeTab === this.TAB_NAME_QUESTION_REVIEWER
     );
   }
@@ -270,14 +269,14 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.languageDropdownShown = !this.languageDropdownShown;
   }
 
-  getDateThatIsDaysBeforeToday(numberOfDaysBeforeToday: number): Date {
+  getDateNDaysAgo(numberOfDaysBeforeToday: number): Date {
     const today = new Date();
     return new Date(
       today.getTime() - this.ONE_DAY_IN_MILLIS * numberOfDaysBeforeToday
     );
   }
 
-  getNumberOfDaysForDateBeforeToday(date: Date): number {
+  getDaysSince(date: Date): number {
     const today = new Date();
     return Math.floor(
       (today.getTime() - new Date(date).getTime()) / this.ONE_DAY_IN_MILLIS
@@ -294,7 +293,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
-      this.getNumberOfDaysForDateBeforeToday(this.lastDateToFilterUsersActivity)
+      this.getDaysSince(this.lastDateToFilterUsersActivity)
     );
 
     if (this.filter === undefined || !isEqual(tempFilter, this.filter)) {

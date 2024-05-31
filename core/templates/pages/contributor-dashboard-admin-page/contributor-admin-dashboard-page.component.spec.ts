@@ -414,26 +414,16 @@ describe('Contributor dashboard Admin page', () => {
       expect(component.selectedLanguage.id).toBe(nonDefaultLanguage.id);
     }));
 
-    it(
-      'should initially filters users by whether their last activity occurred ' +
-        'within the last 90 days',
-      fakeAsync(() => {
-        component.ngOnInit();
-        tick();
-        fixture.detectChanges();
-
-        expect(component.filter.maxDaysSinceLastActivity).toEqual(90);
-      })
-    );
-
-    it("should changes filter by users' last activity when end date changes", fakeAsync(() => {
+    it("should change filter by users' last activity when end date changes", fakeAsync(() => {
       const numberOfDaysSinceLastDate = 30;
       component.ngOnInit();
       tick();
       fixture.detectChanges();
 
+      expect(component.filter.maxDaysSinceLastActivity).toEqual(90);
+
       component.changeLastDate(
-        component.getDateThatIsDaysBeforeToday(numberOfDaysSinceLastDate)
+        component.getDateNDaysAgo(numberOfDaysSinceLastDate)
       );
 
       expect(component.filter.maxDaysSinceLastActivity).toEqual(
@@ -452,7 +442,7 @@ describe('Contributor dashboard Admin page', () => {
         const initialValue = component.filter.maxDaysSinceLastActivity;
 
         component.changeLastDate(
-          component.getDateThatIsDaysBeforeToday(numberOfDaysSinceLastDate)
+          component.getDateNDaysAgo(numberOfDaysSinceLastDate)
         );
 
         expect(component.filter.maxDaysSinceLastActivity).toEqual(initialValue);

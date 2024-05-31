@@ -89,9 +89,9 @@
               <b *ngIf="isSubmitterTab()" class="filter-label">Filter by Last Contributed after:</b>
               <b *ngIf="isReviewerTab()" class="filter-label">Filter by Last Reviewed after:</b>
               <mat-form-field>
-                <input matInput class="e2e-test-last-date-picker-input" [matDatepicker]="lastDatepicker" (dateChange)="changeLastDate($event.value)" [(ngModel)]="lastDateToFilterUsersActivity" [max]="today">
-                <mat-datepicker-toggle matSuffix class="e2e-test-last-date-picker-toggle" [for]="lastDatepicker"></mat-datepicker-toggle>
-                <mat-datepicker #lastDatepicker></mat-datepicker>
+                <input matInput class="e2e-test-last-date-picker-input" [matDatepicker]="lastDatePicker" (dateChange)="changeLastDate($event.value)" [(ngModel)]="lastDateToFilterUsersActivity" [max]="today">
+                <mat-datepicker-toggle matSuffix class="e2e-test-last-date-picker-toggle" [for]="lastDatePicker"></mat-datepicker-toggle>
+                <mat-datepicker #lastDatePicker></mat-datepicker>
               </mat-form-field>
             </div>
           </div>
@@ -152,9 +152,9 @@
             <b *ngIf="isSubmitterTab()" class="filter-label">Filter by Last Contributed after:</b>
             <b *ngIf="isReviewerTab()" class="filter-label">Filter by Last Reviewed after:</b>
             <mat-form-field>
-              <input matInput class="e2e-test-mobile-last-date-picker-input" [matDatepicker]="lastDatepicker" (dateChange)="changeLastDate($event.value)" [(ngModel)]="lastDateToFilterUsersActivity" [max]="today">
-              <mat-datepicker-toggle matSuffix class="e2e-test-mobile-last-date-picker-toggle" [for]="lastDatepicker"></mat-datepicker-toggle>
-              <mat-datepicker #lastDatepicker></mat-datepicker>
+              <input matInput class="e2e-test-mobile-last-date-picker-input" [matDatepicker]="lastDatePicker" (dateChange)="changeLastDate($event.value)" [(ngModel)]="lastDateToFilterUsersActivity" [max]="today">
+              <mat-datepicker-toggle matSuffix class="e2e-test-mobile-last-date-picker-toggle" [for]="lastDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #lastDatePicker></mat-datepicker>
             </mat-form-field>
           </div>
         </div>
