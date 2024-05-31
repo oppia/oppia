@@ -1,0 +1,51 @@
+name: PR Merge Comment
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  check-prs:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - uses: ./.github/actions/merge
+      - name: Count merged PRs
+        id: count-prs
+        run: |
+          AUTHOR=$(jq -r '.pull_request.user.login' "$GITHUB_EVENT_PATH")
+          REPO=${{ github.repository }}
+          TOKEN=${{ secrets.GITHUB_TOKEN }}
+          PR_COUNT=$(curl -s -H "Authorization: token $TOKEN" "https://api.github.com/repos/$REPO/pulls?state=closed" | jq "[.[] | select(.merged_at != null and .user.login == \"$AUTHOR\")] | length")
+          echo "::set-output name=pr_count::$PR_COUNT"
+          echo "::set-output name=author::$AUTHOR"
+
+      - name: Comment on the PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prCount = ${{ steps.count-prs.outputs.pr_count }};
+            const author = ${{ steps.count-prs.outputs.author }};
+            const mention_1 = '@HardikGoyal2003'; // Add mention for HardikGoyal2003 developer onboarding leads.
+            const mention_2 = '@AFZL210'; // Add mention for Afzal Khan developer onboarding leads.
+            let message;
+            if (prCount == 1) {
+              message = `Congratulations @${author}, You have merged 1 PR successfully! ${mention_1}`;
+            } else if (prCount == 2) {
+                message = `Congratulations @${author}, You have merged 2 PRs successfully! ${mention_2}`;
+            }
+            github.rest.issues.createComment({
+              issue_number: context.payload.pull_request.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });
