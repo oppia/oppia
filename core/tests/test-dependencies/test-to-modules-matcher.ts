@@ -169,7 +169,8 @@ export class TestToModulesMatcher {
     }
     const goldenFileModules = goldenFileContent
       .split('\n')
-      .filter(line => line);
+      .map((module) => module.trim())
+      .filter((module) => module !== '');
     const missingGoldenFileModules = this.collectedModules.filter(
       module => !goldenFileModules.includes(module)
     );

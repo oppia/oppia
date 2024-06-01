@@ -78,7 +78,10 @@ def compile_test_ts_files() -> None:
     puppeteer_acceptance_tests_dir_path = os.path.join(
         common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
     build_dir_path = os.path.join(
-        puppeteer_acceptance_tests_dir_path, 'build', 'puppeteer-acceptance-tests')
+        puppeteer_acceptance_tests_dir_path,
+        'build',
+        'puppeteer-acceptance-tests'
+    )
 
     if os.path.exists(build_dir_path):
         shutil.rmtree(build_dir_path)
