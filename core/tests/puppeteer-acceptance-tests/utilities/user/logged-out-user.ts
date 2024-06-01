@@ -169,7 +169,10 @@ export class LoggedOutUser extends BaseUser {
     expectedDestinationPageUrl: string,
     expectedDestinationPageName: string
   ): Promise<void> {
-    await Promise.all([this.page.waitForNavigation(), this.clickOn(button)]);
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
+      this.clickOn(button),
+    ]);
 
     expect(this.page.url())
       .withContext(
