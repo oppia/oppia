@@ -2168,8 +2168,8 @@ def send_reminder_mail_to_notify_curriculum_admins(
         story_link = ('%s%s/%s' % (
             str(feconf.OPPIA_SITE_URL),
             str(feconf.STORY_EDITOR_URL_PREFIX),
-            overdue_story.id)
-            )
+            overdue_story.id
+            ))
         story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
             overdue_story.story_name, overdue_story.topic_name,
             story_link)
@@ -2190,8 +2190,8 @@ def send_reminder_mail_to_notify_curriculum_admins(
         story_link = ('%s%s/%s' % (
             str(feconf.OPPIA_SITE_URL),
             str(feconf.STORY_EDITOR_URL_PREFIX),
-            upcoming_story.id)
-        )
+            upcoming_story.id
+        ))
         story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
             upcoming_story.story_name, upcoming_story.topic_name,
             story_link)
