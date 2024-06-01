@@ -736,7 +736,7 @@
 /core/templates/services/platform-feature*.ts @oppia/core-reviewers
 
 # Acceptance Tests.
-/golden_screenshots @oppia/acceptance-test-reviewers
+/golden_screenshots/ @oppia/acceptance-test-reviewers
 /core/tests/puppeteer-acceptance-tests/ @oppia/acceptance-test-reviewers
 /core/tests/puppeteer/ @oppia/acceptance-test-reviewers
 /scripts/run_acceptance_tests_test.py @oppia/acceptance-test-reviewers
