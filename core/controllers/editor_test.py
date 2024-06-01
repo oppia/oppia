@@ -45,6 +45,7 @@ from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
+from core import feature_flag_list
 
 from typing import Dict, Final, List, Optional, Union
 
@@ -3733,6 +3734,8 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
 
 class EntityTranslationsBulkHandlerTest(test_utils.GenericTestBase):
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS])
     def test_fetching_entity_translations_in_bulk(self) -> None:
         """Test fetching all available translations."""
         translations_mapping: Dict[str, feconf.TranslatedContentDict] = {
@@ -3758,3 +3761,7 @@ class EntityTranslationsBulkHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 entity_translations_bulk_dict[language]['translations'], translations_mapping)
         self.logout()
+
+    def test_fetching_translations_with_feature_flag_disabled(self) -> None:
+        url = '/entity_translations_bulk_handler/exploration/exp1/5'
+        self.get_json(url, expected_status_int=404)
