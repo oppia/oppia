@@ -25,7 +25,7 @@ import {LanguageCodeToEntityTranslations} from 'services/entity-translations.ser
 @Injectable({
   providedIn: 'root',
 })
-export class EntityBulkTranslationBackendApiService {
+export class EntityBulkTranslationsBackendApiService {
   ENTITY_TRANSLATIONS_BULK_HANDLER_URL_TEMPLATE: string =
     '/entity_translations_bulk_handler/<entity_type>/<entity_id>/<entity_version>';
 
@@ -45,7 +45,7 @@ export class EntityBulkTranslationBackendApiService {
     );
   }
 
-  async fetchEntityBulkTranslationAsync(
+  async fetchEntityBulkTranslationsAsync(
     entityId: string,
     entityType: string,
     entityVersion: number
@@ -71,6 +71,6 @@ export class EntityBulkTranslationBackendApiService {
 angular
   .module('oppia')
   .factory(
-    'EntityTranslationBackendApiService',
-    downgradeInjectable(EntityBulkTranslationBackendApiService)
+    'EntityBulkTranslationsBackendApiService',
+    downgradeInjectable(EntityBulkTranslationsBackendApiService)
   );

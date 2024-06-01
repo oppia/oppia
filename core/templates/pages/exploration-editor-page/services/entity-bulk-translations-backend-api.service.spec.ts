@@ -21,10 +21,10 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import {fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
-import {EntityBulkTranslationBackendApiService} from './entity-bulk-translations-backend-api.service';
+import {EntityBulkTranslationsBackendApiService} from './entity-bulk-translations-backend-api.service';
 
 fdescribe('Entity Bulk Translations Backend Api Service', () => {
-  let translationApiService: EntityBulkTranslationBackendApiService;
+  let translationApiService: EntityBulkTranslationsBackendApiService;
   let httpTestingController: HttpTestingController;
   let successHandler = jasmine.createSpy('success');
   let failHandler = jasmine.createSpy('fail');
@@ -35,7 +35,7 @@ fdescribe('Entity Bulk Translations Backend Api Service', () => {
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     translationApiService = TestBed.inject(
-      EntityBulkTranslationBackendApiService
+      EntityBulkTranslationsBackendApiService
     );
   });
 
@@ -48,7 +48,7 @@ fdescribe('Entity Bulk Translations Backend Api Service', () => {
     let entityType: string = 'exploration';
     let entityVersion: number = 5;
     translationApiService
-      .fetchEntityBulkTranslationAsync(entityId, entityType, entityVersion)
+      .fetchEntityBulkTranslationsAsync(entityId, entityType, entityVersion)
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne(
       '/entity_translations_bulk_handler/exploration/entity1/5'
@@ -86,7 +86,7 @@ fdescribe('Entity Bulk Translations Backend Api Service', () => {
     let entityType: string = 'exploration';
     let entityVersion: number = 5;
     translationApiService
-      .fetchEntityBulkTranslationAsync(entityId, entityType, entityVersion)
+      .fetchEntityBulkTranslationsAsync(entityId, entityType, entityVersion)
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne(
       '/entity_translations_bulk_handler/exploration/entity1/5'
