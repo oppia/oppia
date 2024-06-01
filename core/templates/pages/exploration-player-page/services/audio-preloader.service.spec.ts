@@ -420,7 +420,7 @@ describe('Audio preloader service', () => {
     ).toEqual([]);
   }));
 
-  it('should maintain the correct number of download requests in queue for accent feature enabled', fakeAsync(() => {
+  it('should maintain the correct number of download requests in queue with accent feature enabled', fakeAsync(() => {
     const exploration =
       explorationObjectFactory.createFromBackendDict(explorationDict);
     audioPreloaderService.init(exploration);

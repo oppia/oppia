@@ -158,7 +158,7 @@ describe('Interaction object factory', () => {
     });
   });
 
-  it('should be able to get contentID to html of an interaction', () => {
+  it('should be able to get contentId to html of an interaction', () => {
     defaultOutcomeDict = {
       dest: 'dest_default',
       dest_if_really_stuck: null,

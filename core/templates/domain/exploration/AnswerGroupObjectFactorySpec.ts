@@ -33,7 +33,7 @@ describe('Outcome object factory', () => {
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
   });
 
-  it('should be able to get contentID to html of an answer group', () => {
+  it('should be able to get contentId to html of an answer group', () => {
     const testAnswerGroup = answerGroupObjectFactory.createNew(
       [],
       outcomeObjectFactory.createNew('Hola', 'feedback_1', 'Feedback text', []),

@@ -91,7 +91,7 @@ describe('Outcome object factory', () => {
     });
   });
 
-  it('should be able to get contentID to html of an outcome', () => {
+  it('should be able to get contentId to html of an outcome', () => {
     const testOutcome = oof.createNew('A', 'feedback_1', 'feedback', []);
     let contentIdToHtml = testOutcome.getContentIdToHtml();
 

@@ -223,7 +223,7 @@ describe('Audio Bar Component', () => {
     expect(result).toBe(false);
   });
 
-  it('should check if the audio bar is available for enabled accent', () => {
+  it('should check if the audio bar is available with enabled accent', () => {
     component.languageAccentDecriptions = ['English (India)', 'English (US)'];
     spyOn(
       component,
