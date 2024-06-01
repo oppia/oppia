@@ -3751,9 +3751,10 @@ class EntityTranslationsBulkHandlerTest(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
         self.login(self.VIEWER_EMAIL)
-        url = '/entity_translations_handler/exploration/exp1/5/hi'
-        entity_translation_dict = self.get_json(url)
+        url = '/entity_translations_bulk_handler/exploration/exp1/5'
+        entity_translations_bulk_dict = self.get_json(url)
 
-        self.assertEqual(
-            entity_translation_dict['translations'], translations_mapping)
+        for language in language_codes:
+            self.assertEqual(
+                entity_translations_bulk_dict[language]['translations'], translations_mapping)
         self.logout()
