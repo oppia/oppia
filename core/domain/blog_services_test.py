@@ -110,7 +110,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(expected_summary, summary)
 
         content = '<p>abc</p><strong>QWERTY</strong>' * 150
-        expected_summary = '{}...'.format('abc' * 99)
+        expected_summary = '%s...' % ('abc' * 99)
         summary = blog_services.generate_summary_of_blog_post(content)
         self.assertEqual(expected_summary, summary)
 
