@@ -653,7 +653,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             change_dict: blog_services.BlogPostChangeDict = {
                 'title': all_blog_post_titles[i],
                 'thumbnail_filename': all_blog_post_thumbnails[i],
-                'content': f'<p>Hello Blog Post +</p>{i}',
+                'content': '<p>Hello Blog Post +</p>%s' % i,
                 'tags': [all_blog_post_tags[i]]
             }
             blog_services.update_blog_post(
