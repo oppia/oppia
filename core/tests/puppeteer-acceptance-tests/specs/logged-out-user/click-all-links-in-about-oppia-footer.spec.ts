@@ -23,7 +23,7 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-out User', function () {
+describe('Logged-out Users', function () {
   let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {

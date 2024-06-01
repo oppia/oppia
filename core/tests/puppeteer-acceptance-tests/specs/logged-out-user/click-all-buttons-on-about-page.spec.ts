@@ -67,9 +67,10 @@ describe('Logged-out User in About page', function () {
   );
 
   it(
-    'should open Creator Dashboard page and Exploration Editor ' +
-      'with the Create Lessons button',
+    'should open the Sign-in page when the Create Lessons button is clicked by a logged-out user',
     async function () {
+      // The Contributor Dashboard is not accessible to logged-out users.
+      // Therefore, clicking the Create Lessons button will redirect the user to the Sign-in page.
       await loggedOutUser.clickCreateLessonsButtonInAboutPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

@@ -114,6 +114,8 @@ const mobileSidevbarGetInvolvedMenuDonateButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
 const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
+const cookieBannerAcceptButton =
+  'button.e2e-test-oppia-cookie-banner-accept-button';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -182,6 +184,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickAboutButtonInAboutMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(cookieBannerAcceptButton);
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarAboutButton,
@@ -253,33 +256,26 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Browse Our Lessons button in the About page
-   * and check if it opens the Creator Dashboard page in Create Mode.
+   * Function to click the Create Lessons button in the About page
+   * and check if it opens the Sign-in page with a return URL to the Creator Dashboard in create mode.
    */
   async clickCreateLessonsButtonInAboutPage(): Promise<void> {
     await this.clickOn(createLessonsButton);
-    if (this.page.url() !== creatorDashboardCreateModeUrl) {
-      throw new Error(
-        'The Create Lessons button does not open the Creator Dashboard ' +
-          'in Create Mode!'
-      );
-    } else {
-      showMessage(
-        'The Create Lessons button opens the Creator Dashboard ' +
-          'in Create Mode.'
-      );
-    }
     await this.page.waitForNavigation();
-    const urlRegex =
-      /http:\/\/localhost:8181\/create\/\w*(\/gui\/Introduction)?/;
-    if (this.page.url().match(urlRegex) === null) {
+
+    const expectedSignInPageUrl =
+      testConstants.URLs.Login +
+      '?return_url=http:%2F%2Flocalhost:8181%2Fcreator-dashboard%3Fmode%3Dcreate';
+
+    if (this.page.url() !== expectedSignInPageUrl) {
       throw new Error(
-        'The Create Lessons button does not display ' +
-          'the Exploration Editor page!'
+        'The Create Lessons button does not open the Sign-in page ' +
+          'with a return URL to the Creator Dashboard in create mode!'
       );
     } else {
       showMessage(
-        'The Create Lessons button displays the Exploration Editor page.'
+        'The Create Lessons button opens the Sign-in page ' +
+          'with a return URL to the Creator Dashboard in create mode.'
       );
     }
   }
@@ -671,6 +667,7 @@ export class LoggedOutUser extends BaseUser {
    * in the Thanks for Donating page and check if it opens the right page.
    */
   async clickWatchAVideoButtonInThanksForDonatingPage(): Promise<void> {
+    await this.clickOn(cookieBannerAcceptButton);
     await this.page.waitForSelector(watchAVideoButton);
     const buttonText = await this.page.$eval(
       watchAVideoButton,

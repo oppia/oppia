@@ -20,8 +20,14 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /Error while trying to use the following icon from the Manifest: https:\/\/static\.xx\.fbcdn\.net\/rsrc\.php\/v3\/y0\/r\/eFZD1KABzRA\.png \(Download error or resource isn't a valid image\)/,
+  /Occurred at http:\/\/localhost:8181\/donate\?thanks=/,
+]);
 
 describe('Logged-out User in Thanks for Donating page', function () {
   let loggedOutUser: LoggedOutUser;
