@@ -828,7 +828,7 @@ URLS = [
         feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
         editor.LearnerAnswerInfoHandler),
     get_redirect_route(
-        r'/entity_translations_bulk_handler/<entity_type>/<entity_id>/<entity_version>',
+        r'/entity_translations_bulk_handler/<entity_type>/<entity_id>/<entity_version>', # pylint: disable=line-too-long
         editor.EntityTranslationsBulkHandler),
 
     get_redirect_route(

@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import logging
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -31,6 +32,7 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import feature_flag_services
 from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import question_services
@@ -39,10 +41,8 @@ from core.domain import search_services
 from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
-from core.domain import user_services
 from core.domain import translation_fetchers
-from core import feature_flag_list
-from core.domain import feature_flag_services
+from core.domain import user_services
 
 from typing import Dict, List, Optional, TypedDict
 
@@ -368,11 +368,12 @@ class EntityTranslationsBulkHandler(
                 EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value,
                 self.user_id))
 
-        if exploration_editor_can_modify_translations: 
+        if exploration_editor_can_modify_translations:
             translations = {}
-            entity_translations = translation_fetchers.get_all_entity_translations_for_entity(
-                feconf.TranslatableEntityType(entity_type), entity_id,
-                entity_version)
+            entity_translations = (
+                translation_fetchers.get_all_entity_translations_for_entity(
+                    feconf.TranslatableEntityType(entity_type), entity_id,
+                    entity_version))
 
             for translation in entity_translations:
                 translations[translation.language_code] = translation.to_dict()

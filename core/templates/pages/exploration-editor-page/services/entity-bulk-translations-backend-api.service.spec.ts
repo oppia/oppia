@@ -23,7 +23,7 @@ import {
 import {fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {EntityBulkTranslationsBackendApiService} from './entity-bulk-translations-backend-api.service';
 
-fdescribe('Entity Bulk Translations Backend Api Service', () => {
+describe('Entity Bulk Translations Backend Api Service', () => {
   let translationApiService: EntityBulkTranslationsBackendApiService;
   let httpTestingController: HttpTestingController;
   let successHandler = jasmine.createSpy('success');

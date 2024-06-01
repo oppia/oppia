@@ -24,6 +24,7 @@ import logging
 import os
 import zipfile
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -45,7 +46,6 @@ from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
-from core import feature_flag_list
 
 from typing import Dict, Final, List, Optional, Union
 
@@ -53,11 +53,13 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import stats_models
-    from mypy_imports import user_models
     from mypy_imports import translation_models
+    from mypy_imports import user_models
 
-(exp_models, user_models, stats_models, translation_models) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.USER, models.Names.STATISTICS, models.Names.TRANSLATION])
+(exp_models, stats_models, translation_models, user_models) = (
+    models.Registry.import_models([
+        models.Names.EXPLORATION, models.Names.STATISTICS,
+        models.Names.TRANSLATION, models.Names.USER]))
 
 
 class BaseEditorControllerTests(test_utils.GenericTestBase):
@@ -3733,11 +3735,15 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
 
 
 class EntityTranslationsBulkHandlerTest(test_utils.GenericTestBase):
+    """Test fetching all translations of a given entity in bulk."""
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS])
+        [feature_flag_list.FeatureNames
+         .EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS])
     def test_fetching_entity_translations_in_bulk(self) -> None:
-        """Test fetching all available translations."""
+        """Test fetching all available translations with the
+        appropriate feature flag being enabled.
+        """
         translations_mapping: Dict[str, feconf.TranslatedContentDict] = {
             'content_0': {
                 'content_value': 'Translated content',
@@ -3759,7 +3765,8 @@ class EntityTranslationsBulkHandlerTest(test_utils.GenericTestBase):
 
         for language in language_codes:
             self.assertEqual(
-                entity_translations_bulk_dict[language]['translations'], translations_mapping)
+                entity_translations_bulk_dict[language]['translations'],
+                translations_mapping)
         self.logout()
 
     def test_fetching_translations_with_feature_flag_disabled(self) -> None:
