@@ -898,7 +898,7 @@ class Collection:
             # this key MyPy throw an error.
             skill_names.update(node['prerequisite_skills']) # type: ignore[misc]
         skill_names_to_ids = {
-            name: '{}{}'.format(_SKILL_ID_PREFIX, index)
+            name: '%s%s' % (_SKILL_ID_PREFIX, index)
             for index, name in enumerate(sorted(skill_names))
         }
         # Here we use MyPy ignore because collection_contents['nodes']
