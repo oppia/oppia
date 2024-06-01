@@ -100,7 +100,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
         ):
             self.login(self.EDITOR_EMAIL)
             self.get_html_response(
-                '{}{}'.format(feconf.SIGNUP_URL, '?return_url=/'),
+                '%s?return_url=/' % feconf.SIGNUP_URL,
                 expected_status_int=302
             )
             csrf_token = self.get_new_csrf_token()
