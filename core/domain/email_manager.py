@@ -249,7 +249,7 @@ CURRICULUM_ADMIN_CHAPTER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
         'on or before the planned date or adjust the planned publication date.'
         '<br><br>'
         '<ol>%s</ol>'
-    ).format(str(constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS)),
+    ).format(constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS),
     'email_subject': 'Chapter Publication Notifications'
 }
 
