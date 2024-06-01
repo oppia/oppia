@@ -217,10 +217,6 @@ def compute_voiceover_related_change(
         voiceover_change = cast(exp_domain.VoiceoversChangesCmd, change)
         content_id = voiceover_change.content_id
         language_accent_code = voiceover_change.language_accent_code
-        manual_voiceover_dict: state_domain.VoiceoverDict = (
-            voiceover_change.voiceovers['manual'])
-        manual_voiceover = state_domain.Voiceover.from_dict(
-            manual_voiceover_dict)
 
         entity_voiceover_id = generate_id_method(
             entity_type, entity_id, entity_version, language_accent_code)
@@ -236,6 +232,11 @@ def compute_voiceover_related_change(
         )
 
         if content_id not in entity_voiceovers.voiceovers_mapping:
+            manual_voiceover_dict: state_domain.VoiceoverDict = (
+                voiceover_change.voiceovers['manual'])
+            manual_voiceover = state_domain.Voiceover.from_dict(
+                manual_voiceover_dict)
+
             entity_voiceovers.add_new_content_id_without_voiceovers(content_id)
             entity_voiceovers.add_voiceover(
                 content_id,
@@ -249,6 +250,11 @@ def compute_voiceover_related_change(
                     feconf.VoiceoverType.MANUAL
                 )
             else:
+                manual_voiceover_dict: state_domain.VoiceoverDict = (
+                    voiceover_change.voiceovers['manual'])
+                manual_voiceover = state_domain.Voiceover.from_dict(
+                    manual_voiceover_dict)
+
                 entity_voiceovers.voiceovers_mapping[content_id][
                     feconf.VoiceoverType.MANUAL] = manual_voiceover
 

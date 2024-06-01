@@ -133,6 +133,10 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             self.entity_voiceovers_instance.validate()
 
     def test_validate_datatype_of_voiceover_type(self) -> None:
+        self.entity_voiceovers_instance.voiceovers_mapping[
+            'content_id_0'][feconf.VoiceoverType.MANUAL] = None
+        self.entity_voiceovers_instance.validate()
+
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
@@ -219,6 +223,9 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         self.assertIsNotNone(
             self.entity_voiceovers_instance.voiceovers_mapping[
                 'content_id_0'][feconf.VoiceoverType.MANUAL])
+        self.assertIsNotNone(
+            self.entity_voiceovers_instance.voiceovers_mapping[
+                'content_id_0'][feconf.VoiceoverType.AUTO])
 
         self.entity_voiceovers_instance.remove_voiceover(
             content_id='content_id_0',
@@ -228,6 +235,15 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             self.entity_voiceovers_instance.voiceovers_mapping[
                 'content_id_0'][feconf.VoiceoverType.MANUAL])
+
+        self.entity_voiceovers_instance.remove_voiceover(
+            content_id='content_id_0',
+            voiceover_type=feconf.VoiceoverType.AUTO
+        )
+
+        self.assertFalse(
+            'content_id_0' in
+            self.entity_voiceovers_instance.voiceovers_mapping)
 
     def test_create_empty_entity_voiceovers(self) -> None:
         empty_entity_voiceovers = (
