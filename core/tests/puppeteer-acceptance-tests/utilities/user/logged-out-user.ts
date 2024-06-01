@@ -26,8 +26,6 @@ const aboutUrl = testConstants.URLs.About;
 const mathClassroomUrl = testConstants.URLs.MathClassroom;
 const androidUrl = testConstants.URLs.Android;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
-const creatorDashboardCreateModeUrl =
-  testConstants.URLs.CreatorDashboardCreateMode;
 const aboutFoundationUrl = testConstants.URLs.AboutFoundation;
 const blogUrl = testConstants.URLs.Blog;
 const partnershipsUrl = testConstants.URLs.Partnerships;
@@ -114,8 +112,6 @@ const mobileSidevbarGetInvolvedMenuDonateButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
 const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
-const cookieBannerAcceptButton =
-  'button.e2e-test-oppia-cookie-banner-accept-button';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -187,7 +183,6 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickAboutButtonInAboutMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(cookieBannerAcceptButton);
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarAboutButton,
@@ -670,7 +665,6 @@ export class LoggedOutUser extends BaseUser {
    * in the Thanks for Donating page and check if it opens the right page.
    */
   async clickWatchAVideoButtonInThanksForDonatingPage(): Promise<void> {
-    await this.clickOn(cookieBannerAcceptButton);
     await this.page.waitForSelector(watchAVideoButton);
     const buttonText = await this.page.$eval(
       watchAVideoButton,

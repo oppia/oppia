@@ -33,7 +33,7 @@ describe('Logged-out Users', function () {
   beforeEach(async function () {
     // Navigate to a page that has the oppia footer.
     await loggedOutUser.goto(testConstants.URLs.Volunteer);
-  });
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open About page via the footer',
