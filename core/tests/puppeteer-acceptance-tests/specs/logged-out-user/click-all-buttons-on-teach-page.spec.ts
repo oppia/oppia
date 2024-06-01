@@ -23,16 +23,15 @@ import testConstants from '../../utilities/common/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-const now = new Date();
-const tempId =
-  now.getHours().toString() +
-  now.getMinutes().toString() +
-  now.getSeconds().toString();
-
-describe('Parent in Parents and Teachers page', function () {
+describe('Parent/Teacher in Parents and Teachers page', function () {
   let testUser: LoggedOutUser;
 
   beforeAll(async function () {
+    const now = new Date();
+    const tempId =
+      now.getHours().toString() +
+      now.getMinutes().toString() +
+      now.getSeconds().toString();
     testUser = await UserFactory.createNewUser(
       `parent${tempId}`,
       `parent${tempId}@example.com`
@@ -44,7 +43,7 @@ describe('Parent in Parents and Teachers page', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should open Math Classroom page with the Browse Our Lessons button.',
+    'should open the Math Classroom page when "Browse Our Lessons" button is clicked',
     async function () {
       await testUser.clickBrowseOurLessonsButtonInTeachPage();
     },
@@ -52,7 +51,7 @@ describe('Parent in Parents and Teachers page', function () {
   );
 
   it(
-    'should open Android page with the Access Android App button.',
+    'should open the Android page when "Access Android App" button is clicked',
     async function () {
       await testUser.clickAccessAndroidAppButtonInTeachPage();
     },
@@ -60,7 +59,7 @@ describe('Parent in Parents and Teachers page', function () {
   );
 
   it(
-    'should open Math Classroom page with the Visit Classroom button.',
+    'should open the Math Classroom page when "Visit Classroom" button is clicked',
     async function () {
       await testUser.clickVisitClassroomButtonInTeachPage();
     },
@@ -68,7 +67,7 @@ describe('Parent in Parents and Teachers page', function () {
   );
 
   it(
-    'should open Community Library page with the Browse Library button.',
+    'should open the Community Library page when "Browse Library" button is clicked',
     async function () {
       await testUser.clickBrowseLibraryButtonInTeachPage();
     },
@@ -76,7 +75,7 @@ describe('Parent in Parents and Teachers page', function () {
   );
 
   it(
-    'should open Math Classroom page with the Explore Lessons button.',
+    'should open the Math Classroom page when "Explore Lessons" button is clicked',
     async function () {
       await testUser.clickExploreLessonsButtonInTeachPage();
     },

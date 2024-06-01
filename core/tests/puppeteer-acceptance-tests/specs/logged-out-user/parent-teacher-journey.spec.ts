@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if Volunteer
- * can open links by clicking all buttons in volunteer page
+ * @fileoverview Acceptance Test for Parent/Teacher
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -23,7 +22,7 @@ import testConstants from '../../utilities/common/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Volunteer in Volunteer page', function () {
+describe('Parent/Teacher', function () {
   let testUser: LoggedOutUser;
 
   beforeAll(async function () {
@@ -33,29 +32,19 @@ describe('Volunteer in Volunteer page', function () {
       now.getMinutes().toString() +
       now.getSeconds().toString();
     testUser = await UserFactory.createNewUser(
-      `volunteer${tempId}`,
-      `volunteer${tempId}@example.com`
+      `parent${tempId}`,
+      `parent${tempId}@example.com`
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  beforeEach(async function () {
-    await testUser.navigateToVolunteerPage();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
-
   it(
-    'should open the Volunteer form when the "Apply to Volunteer" button' +
-      'at the top is clicked.',
+    'should be able to navigate to "For Parent/Teacher page" when started from home page' +
+      'and click on "Explore Lessons" button',
     async function () {
-      await testUser.clickApplyToVolunteerAtTheTopOfVolunteerPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open the Volunteer form when the "Apply to Volunteer" button' +
-      'at the bottom is clicked.',
-    async function () {
-      await testUser.clickApplyToVolunteerAtTheBottomOfVolunteerPage();
+      // Navigating to a page which has a footer.
+      await testUser.navigateToAboutPage();
+      await testUser.navigateToTeachPageViaFooter();
+      await testUser.clickExploreLessonsButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

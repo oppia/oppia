@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if Partner
- * can open links by clicking all buttons in the partnerships page
+ * @fileoverview Acceptance Test for Partner
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -23,7 +22,7 @@ import testConstants from '../../utilities/common/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Partner in Partnerships page', function () {
+describe('Partner', function () {
   let testUser: LoggedOutUser;
 
   beforeAll(async function () {
@@ -38,48 +37,24 @@ describe('Partner in Partnerships page', function () {
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  beforeEach(async function () {
-    await testUser.navigateToPartnershipsPage();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
-
   it(
-    'should open the Blog page when the "Read More Stories" button is clicked.',
+    'should be able to navigate to partnerships page when started from home page ' +
+      'and open the partnerships form in partnerships page.',
     async function () {
-      await testUser.clickReadMoreStoriesButtonInPartnershipsPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+      await testUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
+      // Navigating to a page which has a footer.
+      await testUser.navigateToAboutPage();
+      await testUser.navigateToAboutFoundationPageViaFooter();
 
-  it(
-    'should open the Partnerships form when the "Partner with us" button is clicked at the top.',
-    async function () {
+      // Navigating to partnerships page by clicking on "Consider becoming a partner today" link.
+      await testUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();
+
+      // Opening the partnerships form by clicking the "Partner with us" button at the top of the partnerships page.
       await testUser.clickPartnerWithUsButtonInPartnershipsPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open the Partnerships form when the "Partner with us" button is clicked at the bottom.',
-    async function () {
+      await testUser.navigateToPartnershipsPage();
       await testUser.clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
         'pt-br'
       );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open the Partnerships Brochure when the "Download Brochure" button is clicked.',
-    async function () {
-      await testUser.clickDownloadBrochureButtonInPartnershipsPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open the correct Blog Post when the "Read Blog Post" button is clicked.',
-    async function () {
-      await testUser.clickReadBlogPostLinkInPartnershipsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

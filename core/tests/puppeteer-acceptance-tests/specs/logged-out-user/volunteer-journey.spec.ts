@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if Volunteer
- * can open links by clicking all buttons in volunteer page
+ * @fileoverview Acceptance Tests for Logged-out User with the roles Volunteer, Donor, Partner and Parent/Teacher
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -23,7 +22,7 @@ import testConstants from '../../utilities/common/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Volunteer in Volunteer page', function () {
+describe('Volunteer', function () {
   let testUser: LoggedOutUser;
 
   beforeAll(async function () {
@@ -38,23 +37,27 @@ describe('Volunteer in Volunteer page', function () {
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  beforeEach(async function () {
-    await testUser.navigateToVolunteerPage();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
-
   it(
-    'should open the Volunteer form when the "Apply to Volunteer" button' +
-      'at the top is clicked.',
+    'should be able to navigate to volunteer page when started from the home page ' +
+      'and open the volunteer form when the "Apply to Volunteer" button is clicked',
     async function () {
+      await testUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
+      // Navigating to a page which has a footer.
+      await testUser.navigateToAboutPage();
+      await testUser.navigateToAboutFoundationPageViaFooter();
+
+      // Navigating to the Volunteer page by clicking on the "Become a Volunteer" button.
+      await testUser.clickBecomeAVolunteerButtonInAboutFoundation();
+
+      await testUser.navigateToAboutFoundationPage();
+      // Navigating to the Volunteer page by clicking on the "Join our large volunteer community" link.
+      await testUser.clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation();
+
+      // Opening the Volunteer form by clicking the "Apply to Volunteer" button at the top of the Volunteer page.
       await testUser.clickApplyToVolunteerAtTheTopOfVolunteerPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
 
-  it(
-    'should open the Volunteer form when the "Apply to Volunteer" button' +
-      'at the bottom is clicked.',
-    async function () {
+      // Going back to Volunteer page and opening the Volunteer form by clicking the "Apply to Volunteer" button at the bottom of the Volunteer page.
+      await testUser.navigateToVolunteerPage();
       await testUser.clickApplyToVolunteerAtTheBottomOfVolunteerPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

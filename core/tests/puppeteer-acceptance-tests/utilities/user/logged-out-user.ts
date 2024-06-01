@@ -57,6 +57,9 @@ const partnershipsFormInPortugueseUrl =
 const partnershipsBrochureUrl = testConstants.URLs.PartnershipsBrochure;
 const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 
+const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
+const navbarLearnTabBasicMathematicsButton =
+  'a.e2e-test-basic-mathematics-link';
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
 const navbarAboutTabAboutFoundationButton =
@@ -78,6 +81,7 @@ const footerAboutFoundationLink = 'a.e2e-test-footer-about-foundation-link';
 const footerBlogLink = 'a.e2e-test-footer-blog-link';
 const footerForumlink = 'a.e2e-test-footer-forum-link';
 const footerGetStartedLink = 'a.e2e-test-get-started-link';
+const footerTeachPageLink = 'a.e2e-test-teach-link';
 
 const browseOurLessonsButton = '.e2e-test-about-page-browse-our-lessons-button';
 const accessAndroidAppButton = '.e2e-test-about-page-access-android-app-button';
@@ -109,6 +113,8 @@ const thanksForDonatingClass = '.modal-open';
 const donatePage = '.donate-content-container';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
+const mobileSidebarBasicMathematicsButton =
+  'a.e2e-mobile-test-mathematics-link';
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
 const mobileSidebarAboutFoundationButton =
   'a.e2e-mobile-test-sidebar-about-foundation-button';
@@ -146,6 +152,7 @@ const applyToVolunteerButtonAtTheTopOfVolunteerPage =
   '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-top';
 const applyToVolunteerButtonAtTheBottomOfVolunteerPage =
   '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-bottom';
+const donorBoxIframe = '.e2e-test-donate-page-iframe';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -156,7 +163,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the home page.
    */
   async navigateToHome(): Promise<void> {
-    await this.goto(homeUrl);
+    await Promise.all([this.page.waitForNavigation(), this.page.goto(homeUrl)]);
   }
 
   /**
@@ -170,7 +177,10 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the about foundation page.
    */
   async navigateToAboutFoundationPage(): Promise<void> {
-    await this.goto(aboutFoundationUrl);
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.page.goto(aboutFoundationUrl),
+    ]);
   }
 
   /**
@@ -194,24 +204,40 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the Parents and Teachers page.
    */
   async navigateToTeachPage(): Promise<void> {
-    await this.goto(teachUrl);
-    this.page.waitForNavigation();
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.page.goto(teachUrl),
+    ]);
   }
 
   /**
    * Function to navigate to the Partnerships page.
    */
   async navigateToPartnershipsPage(): Promise<void> {
-    await this.goto(partnershipsUrl);
-    this.page.waitForNavigation();
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.page.goto(partnershipsUrl),
+    ]);
   }
 
   /**
    * Function to navigate to the Volunteer page.
    */
   async navigateToVolunteerPage(): Promise<void> {
-    await this.goto(volunteerUrl);
-    this.page.waitForNavigation();
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.page.goto(volunteerUrl),
+    ]);
+  }
+
+  /**
+   * Function to navigate to the Donate page.
+   */
+  async navigateToDonatePage(): Promise<void> {
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.page.goto(donateUrl),
+    ]);
   }
 
   /**
@@ -230,6 +256,30 @@ export class LoggedOutUser extends BaseUser {
         `${buttonName} should open the ${expectedDestinationPageName} page`
       )
       .toBe(expectedDestinationPageUrl);
+  }
+
+  /**
+   * Function to click the Basic Mathematics button in the Learn Menu on navbar
+   * and check if it opens the Math Classroom page.
+   */
+  async clickBasicMathematicsButtonInLearnMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarBasicMathematicsButton,
+        'Basic Mathematics button in the Learn Menu on navbar',
+        mathClassroomUrl,
+        'Math Classroom'
+      );
+    } else {
+      await this.clickOn(navbarLearnTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarLearnTabBasicMathematicsButton,
+        'Basic Mathematics button in the Learn Menu on navbar',
+        mathClassroomUrl,
+        'Math Classroom'
+      );
+    }
   }
 
   /**
@@ -904,9 +954,21 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerGetStartedLink);
     await this.clickButtonToNavigateToNewPage(
       footerGetStartedLink,
-      'About Oppia button in the About Menu on navbar',
+      'Get Started link in the About Oppia section in the footer',
       getStartedUrl,
       'Get Started'
+    );
+  }
+
+  /**
+   * Navigates to the Teach page using the oppia website footer.
+   */
+  async navigateToTeachPageViaFooter(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      footerTeachPageLink,
+      '"For Parents/Teachers" link in the Teach/Learn section in the footer',
+      teachUrl,
+      'For Parents/Teachers'
     );
   }
 
@@ -1097,7 +1159,6 @@ export class LoggedOutUser extends BaseUser {
     const languageOption = `.e2e-test-i18n-language-${langCode} a`;
     await this.clickOn(languageDropdown);
     await this.clickOn(languageOption);
-    await this.page.waitForTimeout(2000);
   }
 
   /**
@@ -1109,6 +1170,7 @@ export class LoggedOutUser extends BaseUser {
     langCode: string
   ): Promise<void> {
     await this._changeSiteLanguage(langCode);
+    await this.navigateToPartnershipsPage();
 
     await this.clickButtonToNavigateToNewPage(
       partnerWithUsButtonAtTheBottomOfPartnershipsPage,
@@ -1130,7 +1192,7 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the first Read blog post  in the Partnerships page
+   * Function to click the first "Read blog post" link in the Partnerships page
    * and check if it opens the blog page.
    */
   async clickReadBlogPostLinkInPartnershipsPage(): Promise<void> {
@@ -1161,21 +1223,12 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Volunteer form.
    */
   async clickApplyToVolunteerAtTheTopOfVolunteerPage(): Promise<void> {
-    await this.page.waitForSelector(
-      applyToVolunteerButtonAtTheTopOfVolunteerPage
+    await this.clickButtonToNavigateToNewPage(
+      applyToVolunteerButtonAtTheTopOfVolunteerPage,
+      'Apply To Volunteer at the top of the Volunteer page',
+      volunteerFormUrl,
+      'Volunteer Form'
     );
-    await this.page.click(applyToVolunteerButtonAtTheTopOfVolunteerPage);
-
-    await this.page.waitForTimeout(100);
-    const pages = await this.page.browser().pages();
-    const newTab = pages[pages.length - 1];
-    await newTab.waitForNavigation();
-
-    if (this.page.url() !== volunteerFormUrl) {
-      throw new Error(
-        'The volunteer button did not navigate to the expected URL.'
-      );
-    }
   }
 
   /**
@@ -1183,20 +1236,25 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Volunteer form.
    */
   async clickApplyToVolunteerAtTheBottomOfVolunteerPage(): Promise<void> {
-    await this.page.waitForSelector(
-      applyToVolunteerButtonAtTheBottomOfVolunteerPage
+    await this.clickButtonToNavigateToNewPage(
+      applyToVolunteerButtonAtTheBottomOfVolunteerPage,
+      'Apply To Volunteer at the bottom of the Volunteer page',
+      volunteerFormUrl,
+      'Volunteer Form'
     );
-    await this.page.click(applyToVolunteerButtonAtTheBottomOfVolunteerPage);
+  }
 
-    await this.page.waitForTimeout(100);
-    const pages = await this.page.browser().pages();
-    const newTab = pages[pages.length - 1];
-    await newTab.waitForNavigation();
-
-    if (this.page.url() !== volunteerFormUrl) {
-      throw new Error(
-        'The volunteer button did not navigate to the expected URL.'
-      );
+  /**
+   * Function to check if the donor box is visible on the donate page.
+   * Here we don't test the functionality of the donor box, just its visibility.
+   * because the donor box is an iframe and a third-party service.
+   */
+  async isDonorBoxVisbleOnDonatePage(): Promise<void> {
+    const donorBox = await this.page.waitForSelector(donorBoxIframe);
+    if (!donorBox) {
+      throw new Error('The donor box is not visible on the donate page.');
+    } else {
+      showMessage('The donor box is visible on the donate page.');
     }
   }
 }

@@ -62,7 +62,7 @@ export default {
     PartnershipsBrochure:
       'https://drive.google.com/file/d/1RZ1mWDA2XWXTh1GlWFf5AWWuV2iGBBa2/view?usp=sharing',
     PartnershipsForm:
-      'https://docs.google.com/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform',
+      'https://docs.google.com/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?usp=send_form',
     PartnershipsFormInPortuguese:
       'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp',
     Teach: 'http://localhost:8181/teach',
@@ -71,7 +71,7 @@ export default {
     ProgrammingWithCarla: 'https://www.oppia.org/collection/inDXV0w8-p1C',
     Volunteer: 'http://localhost:8181/volunteer',
     VolunteerForm:
-      'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
+      'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform?usp=send_form',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
     ProfilePagePrefix: 'http://localhost:8181/profile',
   },
