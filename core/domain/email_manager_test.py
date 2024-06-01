@@ -7090,7 +7090,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             'planned publication date.'
             '<br><br>'
             '<ol>'
-            '<li>Story (Topic) - <a href="%s">Link</a><ul>'
+            '<li>Story (Topic) - <a href="%s%s/story_1">Link</a><ul>'
             '<li>Chapter 1</li>'
             '<li>Chapter 2</li>'
             '</ul></li>'
@@ -7098,9 +7098,8 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             'Regards,<br> Oppia Foundation'
         ) % (
             str(constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS),
-            '%s%s/story_1' % (
-                feconf.OPPIA_SITE_URL,
-                feconf.STORY_EDITOR_URL_PREFIX)
+            feconf.OPPIA_SITE_URL,
+            feconf.STORY_EDITOR_URL_PREFIX
         )
         expected_email_subject = 'Chapter Publication Notifications'
 
