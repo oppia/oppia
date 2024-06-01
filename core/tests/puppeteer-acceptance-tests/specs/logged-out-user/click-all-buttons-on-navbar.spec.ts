@@ -45,7 +45,8 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.clickAboutButtonInAboutMenuOnNavbar();
       await testUser.expectScreenshotToMatch(
-        'clickAboutButtonInAboutMenuOnNavbar'
+        'clickAboutButtonInAboutMenuOnNavbar',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -57,7 +58,8 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
       await testUser.expectScreenshotToMatch(
-        'clickAboutFoundationButtonInAboutMenuOnNavbar'
+        'clickAboutFoundationButtonInAboutMenuOnNavbar',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -68,7 +70,8 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.clickBlogButtonInAboutMenuOnNavbar();
       await testUser.expectScreenshotToMatch(
-        'clickBlogButtonInAboutMenuOnNavbar'
+        'clickBlogButtonInAboutMenuOnNavbar',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -80,7 +83,8 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.clickPartnershipsButtonInGetInvolvedMenuOnNavbar();
       await testUser.expectScreenshotToMatch(
-        'clickPartnershipsButtonInGetInvolvedMenuOnNavbar'
+        'clickPartnershipsButtonInGetInvolvedMenuOnNavbar',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -92,7 +96,8 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.clickVolunteerButtonInGetInvolvedMenuOnNavbar();
       await testUser.expectScreenshotToMatch(
-        'clickVolunteerButtonInGetInvolvedMenuOnNavbar'
+        'clickVolunteerButtonInGetInvolvedMenuOnNavbar',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -103,7 +108,8 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.clickDonateButtonInGetInvolvedMenuOnNavbar();
       await testUser.expectScreenshotToMatch(
-        'clickDonateButtonInGetInvolvedMenuOnNavbar'
+        'clickDonateButtonInGetInvolvedMenuOnNavbar',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -115,7 +121,8 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.clickContactUsButtonInGetInvolvedMenuOnNavbar();
       await testUser.expectScreenshotToMatch(
-        'clickContactUsButtonInGetInvolvedMenuOnNavbar'
+        'clickContactUsButtonInGetInvolvedMenuOnNavbar',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -125,7 +132,10 @@ describe('Logged-in User', function () {
     'should open Donate Url with Donate button on navbar',
     async function () {
       await testUser.clickDonateButtonOnNavbar();
-      await testUser.expectScreenshotToMatch('clickDonateButtonOnNavbar');
+      await testUser.expectScreenshotToMatch(
+        'clickDonateButtonOnNavbar',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

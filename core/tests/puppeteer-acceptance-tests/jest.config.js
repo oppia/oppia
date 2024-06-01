@@ -22,12 +22,11 @@ module.exports = {
       tsconfig: './tsconfig.puppeteer-acceptance-tests.json',
     },
   },
-  rootDir: './spec',
+  rootDir: './specs',
   testMatch: ['**/?(*.)+(spec).[t]s'],
   transform: {'^.+\\.ts?$': 'ts-jest'},
   preset: 'ts-jest',
   testEnvironment: 'node',
   testTimeout: 300000,
-  setupFilesAfterEnv: ['./setupSnapshot.js'],
   bail: 0,
 };

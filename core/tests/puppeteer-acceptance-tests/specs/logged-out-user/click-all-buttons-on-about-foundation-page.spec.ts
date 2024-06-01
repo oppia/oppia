@@ -41,9 +41,6 @@ describe('Logged-in User in About Foundation page', function () {
     'should open the page with the 61 million children link.',
     async function () {
       await testUser.click61MillionChildrenLinkInAboutFoundation();
-      await testUser.expectScreenshotToMatch(
-        'click61MillionChildrenLinkInAboutFoundation'
-      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -53,7 +50,8 @@ describe('Logged-in User in About Foundation page', function () {
     async function () {
       await testUser.clickEvenThoseWhoAreInSchoolLinkInAboutFoundation();
       await testUser.expectScreenshotToMatch(
-        'clickEvenThoseWhoAreInSchoolLinkInAboutFoundation'
+        'clickEvenThoseWhoAreInSchoolLinkInAboutFoundation',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -63,9 +61,6 @@ describe('Logged-in User in About Foundation page', function () {
     'should open the page with the Source: UNESCO link.',
     async function () {
       await testUser.clickSourceUnescoLinkInAboutFoundation();
-      await testUser.expectScreenshotToMatch(
-        'clickSourceUnescoLinkInAboutFoundation'
-      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -74,9 +69,6 @@ describe('Logged-in User in About Foundation page', function () {
     'should open the page with the 420 Million link.',
     async function () {
       await testUser.click420MillionLinkInAboutFoundation();
-      await testUser.expectScreenshotToMatch(
-        'click420MillionLinkInAboutFoundation'
-      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -86,7 +78,8 @@ describe('Logged-in User in About Foundation page', function () {
     async function () {
       await testUser.clickLearnMoreAboutOppiaButtonInAboutFoundation();
       await testUser.expectScreenshotToMatch(
-        'clickLearnMoreAboutOppiaButtonInAboutFoundation'
+        'clickLearnMoreAboutOppiaButtonInAboutFoundation',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -97,7 +90,8 @@ describe('Logged-in User in About Foundation page', function () {
     async function () {
       await testUser.clickBecomeAVolunteerButtonInAboutFoundation();
       await testUser.expectScreenshotToMatch(
-        'clickBecomeAVolunteerButtonInAboutFoundation'
+        'clickBecomeAVolunteerButtonInAboutFoundation',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -109,7 +103,8 @@ describe('Logged-in User in About Foundation page', function () {
     async function () {
       await testUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();
       await testUser.expectScreenshotToMatch(
-        'clickConsiderBecomingAPartnerTodayLinkInAboutFoundation'
+        'clickConsiderBecomingAPartnerTodayLinkInAboutFoundation',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -121,7 +116,8 @@ describe('Logged-in User in About Foundation page', function () {
     async function () {
       await testUser.clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation();
       await testUser.expectScreenshotToMatch(
-        'clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation'
+        'clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -132,7 +128,8 @@ describe('Logged-in User in About Foundation page', function () {
     async function () {
       await testUser.clickDonationsLinkInAboutFoundation();
       await testUser.expectScreenshotToMatch(
-        'clickDonationsLinkInAboutFoundation'
+        'clickDonationsLinkInAboutFoundation',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

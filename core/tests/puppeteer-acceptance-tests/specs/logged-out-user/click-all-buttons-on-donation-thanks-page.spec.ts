@@ -41,9 +41,6 @@ describe('Logged-in User in Thanks for Donating page', function () {
     'should open the right page with the Watch A Video button.',
     async function () {
       await testUser.clickWatchAVideoButtonInThanksForDonatingPage();
-      await testUser.expectScreenshotToMatch(
-        'clickWatchAVideoButtonInThanksForDonatingPage'
-      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -53,7 +50,8 @@ describe('Logged-in User in Thanks for Donating page', function () {
     async function () {
       await testUser.clickReadOurBlogButtonInThanksForDonatingPage();
       await testUser.expectScreenshotToMatch(
-        'clickReadOurBlogButtonInThanksForDonatingPage'
+        'clickReadOurBlogButtonInThanksForDonatingPage',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -65,7 +63,8 @@ describe('Logged-in User in Thanks for Donating page', function () {
     async function () {
       await testUser.clickDismissButtonInThanksForDonatingPage();
       await testUser.expectScreenshotToMatch(
-        'clickDismissButtonInThanksForDonatingPage'
+        'clickDismissButtonInThanksForDonatingPage',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

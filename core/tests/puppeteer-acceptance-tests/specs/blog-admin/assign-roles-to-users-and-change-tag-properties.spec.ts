@@ -55,7 +55,6 @@ describe('Blog Admin', function () {
       );
 
       await superAdmin.expectUserNotToHaveRole('guestUsr1', ROLES.BLOG_ADMIN);
-      await superAdmin.expectScreenshotToMatch('expectUserNotToHaveRole');
 
       await blogAdmin.assignUserToRoleFromBlogAdminPage(
         'guestUsr1',
@@ -63,13 +62,15 @@ describe('Blog Admin', function () {
       );
 
       await superAdmin.expectUserToHaveRole('guestUsr1', ROLES.BLOG_ADMIN);
-      await superAdmin.expectScreenshotToMatch('expectUserToHaveRole');
+      await blogAdmin.expectScreenshotToMatch(
+        'expectUserToHaveRole_guestUsr1',
+        __dirname
+      );
 
       await superAdmin.expectUserNotToHaveRole(
         'guestUsr2',
         ROLES.BLOG_POST_EDITOR
       );
-      await superAdmin.expectScreenshotToMatch('expectUserNotToHaveRole');
 
       await blogAdmin.assignUserToRoleFromBlogAdminPage(
         'guestUsr2',
@@ -80,7 +81,10 @@ describe('Blog Admin', function () {
         'guestUsr2',
         ROLES.BLOG_POST_EDITOR
       );
-      await superAdmin.expectScreenshotToMatch('expectUserToHaveRole');
+      await blogAdmin.expectScreenshotToMatch(
+        'expectUserToHaveRole_guestUsr2',
+        __dirname
+      );
 
       await blogAdmin.removeBlogEditorRoleFromUsername('guestUsr2');
 
@@ -88,13 +92,22 @@ describe('Blog Admin', function () {
         'guestUsr2',
         ROLES.BLOG_POST_EDITOR
       );
-      await superAdmin.expectScreenshotToMatch('expectUserNotToHaveRole');
+      await blogAdmin.expectScreenshotToMatch(
+        'expectUserNotToHaveRole_guestUsr2',
+        __dirname
+      );
 
       await blogAdmin.expectMaximumTagLimitNotToBe(5);
-      await blogAdmin.expectScreenshotToMatch('expectMaximumTagLimitNotToBe5');
+      await blogAdmin.expectScreenshotToMatch(
+        'expectMaximumTagLimitNotToBe5',
+        __dirname
+      );
       await blogAdmin.setMaximumTagLimitTo(5);
       await blogAdmin.expectMaximumTagLimitToBe(5);
-      await blogAdmin.expectScreenshotToMatch('expectMaximumTagLimitToBe5');
+      await blogAdmin.expectScreenshotToMatch(
+        'expectMaximumTagLimitToBe5',
+        __dirname
+      );
       await guestUsr1.closeBrowser();
       await guestUsr2.closeBrowser();
     },

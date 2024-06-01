@@ -20,8 +20,8 @@ import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
+var path = require('path');
 
-import path from 'path';
 import {toMatchImageSnapshot} from 'jest-image-snapshot';
 expect.extend({toMatchImageSnapshot});
 const backgroundBanner = '.oppia-background-image';
@@ -230,7 +230,7 @@ export class BaseUser {
    * Function to reload the current page.
    */
   async reloadPage(): Promise<void> {
-    await this.page.reload({waitUntil: ['networkidle0', 'domcontentloaded']});
+    await this.page.reload({waitUntil: ['networkidle0', 'load']});
   }
 
   /**
@@ -327,12 +327,7 @@ export class BaseUser {
       await this.waitForElementToBeClickable(button);
       await Promise.all([
         this.page.waitForNavigation({
-          waitUntil: [
-            'domcontentloaded',
-            'networkidle2',
-            'networkidle0',
-            'load',
-          ],
+          waitUntil: ['networkidle0', 'load'],
         }),
         button.click(),
       ]);
@@ -340,12 +335,7 @@ export class BaseUser {
       await this.waitForElementToBeClickable(selector);
       await Promise.all([
         this.page.waitForNavigation({
-          waitUntil: [
-            'domcontentloaded',
-            'networkidle2',
-            'networkidle0',
-            'load',
-          ],
+          waitUntil: ['networkidle0', 'load'],
         }),
         this.page.click(selector),
       ]);
@@ -383,7 +373,7 @@ export class BaseUser {
    */
   async goto(url: string): Promise<void> {
     await this.page.goto(url, {
-      waitUntil: ['networkidle0', 'networkidle2', 'domcontentloaded', 'load'],
+      waitUntil: ['networkidle0', 'load'],
     });
   }
 
@@ -472,6 +462,7 @@ export class BaseUser {
    */
   async expectScreenshotToMatch(
     imageName: string,
+    testPath: string,
     newPage?: Page
   ): Promise<void> {
     if (process.env.MOBILE !== 'true') {
@@ -479,16 +470,21 @@ export class BaseUser {
         const currentPage =
           typeof newPage !== 'undefined' ? newPage : this.page;
         await currentPage.mouse.move(0, 0);
+        // To wait for all images to load and the page to be stable.
         await currentPage.waitForTimeout(5000);
 
-        //
+        /* If currentPage includes a background banner, which are randomly selected from a set of four,
+         * then the percentage to trigger a failure is 0.03 (3%) for the randomness of the banner.
+         * Otherwise, the percentage is 0.003 (0.3%) for the randomness of the page that are small enough to be ignored
+         */
         expect(await currentPage.screenshot()).toMatchImageSnapshot({
           failureThreshold: (await currentPage.$(backgroundBanner))
             ? 0.03
             : 0.003,
           failureThresholdType: 'percent',
-          // customSnapshotIdentifier: imageName,
-          customSnapshotsDir: path.resolve(__dirname, 'golden_screenshots'),
+          customSnapshotIdentifier: imageName,
+          customSnapshotsDir: path.join(testPath, '/golden_screenshots'),
+          storeReceivedOnFailure: true,
         });
         if (typeof newPage !== 'undefined') {
           await newPage.close();

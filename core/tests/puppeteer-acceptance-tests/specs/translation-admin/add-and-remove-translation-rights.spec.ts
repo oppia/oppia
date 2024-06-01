@@ -45,7 +45,8 @@ describe('Translation Admin', function () {
       await UserFactory.closeBrowserForUser(translatorSpanish);
       await translationAdmin.navigateToContributorDashboardAdminPage();
       await translationAdmin.expectScreenshotToMatch(
-        'navigateToContributorDashboardAdminPage'
+        'navigateToContributorDashboardAdminPage',
+        __dirname
       );
       await translationAdmin.addTranslationLanguageReviewRights(
         'translatorSpanish',
@@ -55,7 +56,16 @@ describe('Translation Admin', function () {
       await translationAdmin.viewContributionRightsForUser('translatorSpanish');
       await translationAdmin.expectDisplayedLanguagesToContain('Spanish');
       await translationAdmin.expectScreenshotToMatch(
-        'expectDisplayedLanguagesToContain'
+        'expectDisplayedLanguagesToContain',
+        __dirname
+      );
+      await translationAdmin.viewContributorTranslationRightsByLanguageCode(
+        'es'
+      );
+      await translationAdmin.expectUserToBeDisplayed('translatorSpanish');
+      await translationAdmin.expectScreenshotToMatch(
+        'expectUserToBeDisplayed',
+        __dirname
       );
 
       await translationAdmin.removeTranslationLanguageReviewRights(
@@ -68,7 +78,8 @@ describe('Translation Admin', function () {
       );
       await translationAdmin.expectUserToNotBeDisplayed('translatorSpanish');
       await translationAdmin.expectScreenshotToMatch(
-        'expectUserToNotBeDisplayed'
+        'expectUserToNotBeDisplayed',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

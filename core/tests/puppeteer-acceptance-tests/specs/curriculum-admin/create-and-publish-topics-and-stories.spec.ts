@@ -41,64 +41,90 @@ describe('Curriculum Admin', function () {
     async function () {
       await curriculumAdmin.navigateToCreatorDashboardPage();
       await curriculumAdmin.expectScreenshotToMatch(
-        'navigateToCreatorDashboardPage'
+        'navigateToCreatorDashboardPage',
+        __dirname
       );
       await curriculumAdmin.navigateToExplorationEditorPage();
       await curriculumAdmin.expectScreenshotToMatch(
-        'navigateToExplorationEditorPage'
+        'navigateToExplorationEditorPage',
+        __dirname
       );
       await curriculumAdmin.dismissWelcomeModal();
-      await curriculumAdmin.expectScreenshotToMatch('dismissWelcomeModal');
+      await curriculumAdmin.expectScreenshotToMatch(
+        'dismissWelcomeModal',
+        __dirname
+      );
       await curriculumAdmin.createExplorationWithMinimumContent(
         'Test Exploration',
         'End Exploration'
       );
       await curriculumAdmin.expectScreenshotToMatch(
-        'createExplorationWithMinimumContent'
+        'createExplorationWithMinimumContent',
+        __dirname
       );
       await curriculumAdmin.saveExplorationDraft();
-      await curriculumAdmin.expectScreenshotToMatch('saveExplorationDraft');
+      await curriculumAdmin.expectScreenshotToMatch(
+        'saveExplorationDraft',
+        __dirname
+      );
       explorationId = await curriculumAdmin.publishExplorationWithContent(
         'Test Exploration Title 1',
         'Test Exploration Goal',
         'Algebra'
       );
       await curriculumAdmin.expectScreenshotToMatch(
-        'publishExplorationWithContent'
+        'publishExplorationWithContent',
+        __dirname
       );
       if (!explorationId) {
         throw new Error('Error publishing exploration successfully.');
       }
 
       await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
-      await curriculumAdmin.expectScreenshotToMatch('createTopic');
+      await curriculumAdmin.expectScreenshotToMatch('createTopic', __dirname);
       await curriculumAdmin.createSubtopicForTopic(
         'Test Subtopic 1',
         'test-subtopic-one',
         'Test Topic 1'
       );
-      await curriculumAdmin.expectScreenshotToMatch('createSubtopicForTopic');
+      await curriculumAdmin.expectScreenshotToMatch(
+        'createSubtopicForTopic',
+        __dirname
+      );
 
       await curriculumAdmin.createSkillForTopic('Test Skill 1', 'Test Topic 1');
-      await curriculumAdmin.expectScreenshotToMatch('createSkillForTopic');
+      await curriculumAdmin.expectScreenshotToMatch(
+        'createSkillForTopic',
+        __dirname
+      );
       await curriculumAdmin.createQuestionsForSkill('Test Skill 1', 3);
-      await curriculumAdmin.expectScreenshotToMatch('createQuestionsForSkill');
+      await curriculumAdmin.expectScreenshotToMatch(
+        'createQuestionsForSkill',
+        __dirname
+      );
       await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
         'Test Skill 1',
         'Test Subtopic 1',
         'Test Topic 1'
       );
       await curriculumAdmin.expectScreenshotToMatch(
-        'assignSkillToSubtopicInTopicEditor'
+        'assignSkillToSubtopicInTopicEditor',
+        __dirname
       );
       await curriculumAdmin.addSkillToDiagnosticTest(
         'Test Skill 1',
         'Test Topic 1'
       );
-      await curriculumAdmin.expectScreenshotToMatch('addSkillToDiagnosticTest');
+      await curriculumAdmin.expectScreenshotToMatch(
+        'addSkillToDiagnosticTest',
+        __dirname
+      );
 
       await curriculumAdmin.publishDraftTopic('Test Topic 1');
-      await curriculumAdmin.expectScreenshotToMatch('publishDraftTopic');
+      await curriculumAdmin.expectScreenshotToMatch(
+        'publishDraftTopic',
+        __dirname
+      );
       await curriculumAdmin.createAndPublishStoryWithChapter(
         'Test Story 1',
         'test-story-one',
@@ -112,7 +138,8 @@ describe('Curriculum Admin', function () {
         1
       );
       await curriculumAdmin.expectScreenshotToMatch(
-        'expectTopicToBePublishedInTopicsAndSkillsDashboard'
+        'expectTopicToBePublishedInTopicsAndSkillsDashboard',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

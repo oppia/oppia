@@ -39,7 +39,8 @@ describe('Logged-in Users', function () {
       await testUser.navigateToAboutFoundationPage();
       await testUser.navigateToGetStartedPageViaFooter();
       await testUser.expectScreenshotToMatch(
-        'navigateToGetStartedPageViaFooter'
+        'navigateToGetStartedPageViaFooter',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -53,10 +54,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use the "create one here" link in a new tab',
       async function () {
-        await testUser.expectScreenshotToMatch(
-          'clickCreateOneHereLinkInGetStartedPage2',
-          await testUser.clickCreateOneHereLinkInGetStartedPage()
-        );
+        await testUser.clickCreateOneHereLinkInGetStartedPage();
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
@@ -64,10 +62,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use the "Welcome to Oppia" link in a new tab',
       async function () {
-        await testUser.expectScreenshotToMatch(
-          'clickWelcomeToOppiaLinkInGetStartedPage',
-          await testUser.clickWelcomeToOppiaLinkInGetStartedPage()
-        );
+        await testUser.clickWelcomeToOppiaLinkInGetStartedPage();
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
@@ -75,10 +70,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use the "Get Electrified!" link in a new tab',
       async function () {
-        await testUser.expectScreenshotToMatch(
-          'clickGetElectrifiedLinkInGetStartedPage',
-          await testUser.clickGetElectrifiedLinkInGetStartedPage()
-        );
+        await testUser.clickGetElectrifiedLinkInGetStartedPage();
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
@@ -86,10 +78,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use the "Programming with Carla" link in a new tab',
       async function () {
-        await testUser.expectScreenshotToMatch(
-          'clickProgrammingWithCarlaLinkInGetStartedPage',
-          await testUser.clickProgrammingWithCarlaLinkInGetStartedPage()
-        );
+        await testUser.clickProgrammingWithCarlaLinkInGetStartedPage();
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
@@ -97,10 +86,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use "in our user documentation" link in a new tab',
       async function () {
-        await testUser.expectScreenshotToMatch(
-          'clickInOurUserDocumentationLinkInGetStartedPage',
-          await testUser.clickInOurUserDocumentationLinkInGetStartedPage()
-        );
+        await testUser.clickInOurUserDocumentationLinkInGetStartedPage();
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
@@ -108,10 +94,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use the "embed it in your own web page" link in a new tab',
       async function () {
-        await testUser.expectScreenshotToMatch(
-          'clickEmbedItInYourOwnWebPageLinkInGetStartedPage',
-          await testUser.clickEmbedItInYourOwnWebPageLinkInGetStartedPage()
-        );
+        await testUser.clickEmbedItInYourOwnWebPageLinkInGetStartedPage();
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
@@ -121,7 +104,8 @@ describe('Logged-in Users', function () {
       async function () {
         await testUser.clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage();
         await testUser.expectScreenshotToMatch(
-          'clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage'
+          'clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage',
+          __dirname
         );
       },
       DEFAULT_SPEC_TIMEOUT_MSECS

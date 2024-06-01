@@ -94,17 +94,20 @@ describe('Exploration Creator', function () {
     async function () {
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.expectScreenshotToMatch(
-        'explorationEditornavigateToCreatorDashboardPage'
+        'explorationEditornavigateToCreatorDashboardPage',
+        __dirname
       );
 
       await explorationEditor.navigateToExplorationEditorPage();
       await explorationEditor.expectScreenshotToMatch(
-        'navigateToExplorationEditorPage'
+        'navigateToExplorationEditorPage',
+        __dirname
       );
 
       await explorationEditor.dismissWelcomeModal();
       await explorationEditor.expectScreenshotToMatch(
-        'explorationEditordismissWelcomeModal'
+        'explorationEditordismissWelcomeModal',
+        __dirname
       );
 
       await explorationEditor.createExplorationWithMinimumContent(
@@ -112,11 +115,15 @@ describe('Exploration Creator', function () {
         INTERACTION_TYPES.END_EXPLORATION
       );
       await explorationEditor.expectScreenshotToMatch(
-        'createExplorationWithMinimumContent'
+        'createExplorationWithMinimumContent',
+        __dirname
       );
 
       await explorationEditor.navigateToSettingsTab();
-      await explorationEditor.expectScreenshotToMatch('navigateToSettingsTab');
+      await explorationEditor.expectScreenshotToMatch(
+        'navigateToSettingsTab',
+        __dirname
+      );
 
       await explorationEditor.updateTitleTo(
         'This title is too long and will be truncated'
@@ -129,67 +136,87 @@ describe('Exploration Creator', function () {
         'This title is too long and will be t'
       );
       await explorationEditor.expectScreenshotToMatch(
-        'expectTitleToBe_This title is too long and will be t'
+        'expectTitleToBe_This title is too long and will be t',
+        __dirname
       );
 
       await explorationEditor.updateGoalTo('OppiaAcceptanceTestsCheck');
       await explorationEditor.expectGoalToBe('OppiaAcceptanceTestsCheck');
       await explorationEditor.expectScreenshotToMatch(
-        'expectGoalToBeOppiaAcceptanceTestsCheck'
+        'expectGoalToBeOppiaAcceptanceTestsCheck',
+        __dirname
       );
 
       await explorationEditor.selectCategory('Algebra');
       await explorationEditor.expectSelectedCategoryToBe('Algebra');
       await explorationEditor.expectScreenshotToMatch(
-        'expectSelectedCategoryToBeAlgebra'
+        'expectSelectedCategoryToBeAlgebra',
+        __dirname
       );
 
       await explorationEditor.selectLanguage('Arabic');
       await explorationEditor.expectSelectedLanguageToBe('Arabic');
       await explorationEditor.expectScreenshotToMatch(
-        'explorationEditorexpectSelectedLanguageToBeArabic'
+        'explorationEditorexpectSelectedLanguageToBeArabic',
+        __dirname
       );
 
       await explorationEditor.addTags(['TagA', 'TagB', 'TagC']);
       await explorationEditor.expectTagsToMatch(['TagA', 'TagB', 'TagC']);
-      await explorationEditor.expectScreenshotToMatch('expectTagsToMatch');
+      await explorationEditor.expectScreenshotToMatch(
+        'expectTagsToMatch',
+        __dirname
+      );
 
       await explorationEditor.previewSummary();
 
       await explorationEditor.enableAutomaticTextToSpeech();
       await explorationEditor.expectScreenshotToMatch(
-        'enableAutomaticTextToSpeech'
+        'enableAutomaticTextToSpeech',
+        __dirname
       );
 
       await explorationEditor.assignUserToCollaboratorRole('guestUser1');
       await explorationEditor.expectScreenshotToMatch(
-        'assignUserToCollaboratorRole'
+        'assignUserToCollaboratorRole',
+        __dirname
       );
       await explorationEditor.assignUserToPlaytesterRole('guestUser2');
       await explorationEditor.expectScreenshotToMatch(
-        'assignUserToPlaytesterRole'
+        'assignUserToPlaytesterRole',
+        __dirname
       );
 
       await explorationEditor.saveExplorationDraft();
-      await explorationEditor.expectScreenshotToMatch('saveExplorationDraft');
+      await explorationEditor.expectScreenshotToMatch(
+        'saveExplorationDraft',
+        __dirname
+      );
       explorationId = await explorationEditor.publishExploration();
-      await explorationEditor.expectScreenshotToMatch('publishExploration');
+      await explorationEditor.expectScreenshotToMatch(
+        'publishExploration',
+        __dirname
+      );
       await explorationEditor.optInToEmailNotifications();
       await explorationEditor.expectScreenshotToMatch(
-        'optInToEmailNotifications'
+        'optInToEmailNotifications',
+        __dirname
       );
 
       await voiceoverAdmin.navigateToExplorationEditor(explorationId);
       await voiceoverAdmin.expectScreenshotToMatch(
-        'voiceoverAdminnavigateToExplorationEditor'
+        'voiceoverAdminnavigateToExplorationEditor',
+        __dirname
       );
       await voiceoverAdmin.dismissWelcomeModal();
       await voiceoverAdmin.expectScreenshotToMatch(
-        'voiceoverAdmindismissWelcomeModal'
+        'voiceoverAdmindismissWelcomeModal',
+        __dirname
       );
       await voiceoverAdmin.navigateToExplorationSettingsTab();
       await voiceoverAdmin.expectScreenshotToMatch(
-        'voiceoverAdminnavigateToExplorationSettingsTab'
+        'voiceoverAdminnavigateToExplorationSettingsTab',
+        __dirname
       );
       await voiceoverAdmin.openvoiceArtistDropdown();
       await voiceoverAdmin.addVoiceoverArtistsToExploration([
@@ -198,35 +225,42 @@ describe('Exploration Creator', function () {
         'guestUser3',
       ]);
       await voiceoverAdmin.expectScreenshotToMatch(
-        'addVoiceoverArtistsToExploration'
+        'addVoiceoverArtistsToExploration',
+        __dirname
       );
 
       await curriculumAdmin.navigateToExplorationEditor(explorationId);
       await curriculumAdmin.expectScreenshotToMatch(
-        'curriculumAdminnavigateToExplorationEditor'
+        'curriculumAdminnavigateToExplorationEditor',
+        __dirname
       );
       await curriculumAdmin.dismissWelcomeModal();
       await curriculumAdmin.expectScreenshotToMatch(
-        'curriculumAdmindismissWelcomeModal'
+        'curriculumAdmindismissWelcomeModal',
+        __dirname
       );
       await curriculumAdmin.navigateToExplorationSettingsTab();
       await curriculumAdmin.expectScreenshotToMatch(
-        'curriculumAdminnavigateToExplorationSettingsTab'
+        'curriculumAdminnavigateToExplorationSettingsTab',
+        __dirname
       );
       await curriculumAdmin.openExplorationControlDropdown();
       await curriculumAdmin.expectScreenshotToMatch(
-        'openExplorationControlDropdown'
+        'openExplorationControlDropdown',
+        __dirname
       );
       await curriculumAdmin.deleteExplorationPermanently();
       await curriculumAdmin.expectScreenshotToMatch(
-        'deleteExplorationPermanently'
+        'deleteExplorationPermanently',
+        __dirname
       );
 
       await explorationEditor.expectExplorationToBeNotAccessibleByUrl(
         explorationId
       );
       await explorationEditor.expectScreenshotToMatch(
-        'expectExplorationToBeNotAccessibleByUrl'
+        'expectExplorationToBeNotAccessibleByUrl',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

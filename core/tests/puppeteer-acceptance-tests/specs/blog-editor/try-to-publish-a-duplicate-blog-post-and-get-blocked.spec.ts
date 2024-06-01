@@ -50,11 +50,13 @@ describe('Blog Editor', function () {
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
       await blogPostEditor.expectScreenshotToMatch(
-        'expectNumberOfBlogPostsToBe0'
+        'expectNumberOfBlogPostsToBe0',
+        __dirname
       );
       await blogPostEditor.publishNewBlogPostWithTitle('Test-Blog');
       await blogPostEditor.expectScreenshotToMatch(
-        'publishNewBlogPostWithTitle'
+        'publishNewBlogPostWithTitle',
+        __dirname
       );
 
       await blogPostEditor.navigateToPublishTab();
@@ -63,12 +65,14 @@ describe('Blog Editor', function () {
         'Test-Blog'
       );
       await blogPostEditor.expectScreenshotToMatch(
-        'expectPublishedBlogPostWithTitleToBePresent'
+        'expectPublishedBlogPostWithTitleToBePresent',
+        __dirname
       );
 
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.expectScreenshotToMatch(
-        'navigateToBlogDashboardPage'
+        'navigateToBlogDashboardPage',
+        __dirname
       );
       await blogPostEditor.createNewBlogPostWithTitle('Test-Blog');
 
@@ -76,7 +80,8 @@ describe('Blog Editor', function () {
         duplicateBlogPostWarning
       );
       await blogPostEditor.expectScreenshotToMatch(
-        'expectUserUnableToPublishBlogPost'
+        'expectUserUnableToPublishBlogPost',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

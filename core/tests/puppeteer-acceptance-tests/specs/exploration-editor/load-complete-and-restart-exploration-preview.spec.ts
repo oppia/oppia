@@ -45,47 +45,61 @@ describe('Exploration Editor', function () {
     // Navigate to the creator dashboard and create a new exploration.
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.expectScreenshotToMatch(
-      'explorationEditornavigateToCreatorDashboardPage'
+      'explorationEditornavigateToCreatorDashboardPage',
+      __dirname
     );
 
     await explorationEditor.navigateToExplorationEditorPage();
     await explorationEditor.expectScreenshotToMatch(
-      'navigateToExplorationEditorPage'
+      'navigateToExplorationEditorPage',
+      __dirname
     );
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.expectScreenshotToMatch(
-      'explorationEditordismissWelcomeModal'
+      'explorationEditordismissWelcomeModal',
+      __dirname
     );
     await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
     await explorationEditor.expectScreenshotToMatch(
-      'updateCardContent' + INTRODUCTION_CARD_CONTENT
+      'updateCardContent' + INTRODUCTION_CARD_CONTENT,
+      __dirname
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
     await explorationEditor.expectScreenshotToMatch(
-      'addInteraction_CONTINUE_BUTTON'
+      'addInteraction_CONTINUE_BUTTON',
+      __dirname
     );
 
     // Add a new card with a question.
     await explorationEditor.viewOppiaResponses();
-    await explorationEditor.expectScreenshotToMatch('viewOppiaResponses');
+    await explorationEditor.expectScreenshotToMatch(
+      'viewOppiaResponses',
+      __dirname
+    );
     await explorationEditor.directLearnersToNewCard('Test Question');
-    await explorationEditor.expectScreenshotToMatch('directLearnersToNewCard');
+    await explorationEditor.expectScreenshotToMatch(
+      'directLearnersToNewCard',
+      __dirname
+    );
     await explorationEditor.saveExplorationDraft();
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION);
     await explorationEditor.expectScreenshotToMatch(
-      'navigateToCard_TEST_QUESTION'
+      'navigateToCard_TEST_QUESTION',
+      __dirname
     );
     await explorationEditor.updateCardContent(
       'Enter a negative number greater than -100.'
     );
     await explorationEditor.expectScreenshotToMatch(
-      'updateCardContent_Enter a negative number greater than -100.'
+      'updateCardContent_Enter a negative number greater than -100.',
+      __dirname
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
     await explorationEditor.expectScreenshotToMatch(
-      'addInteraction_NUMERIC_INPUT'
+      'addInteraction_NUMERIC_INPUT',
+      __dirname
     );
     await explorationEditor.addResponseToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
@@ -95,30 +109,35 @@ describe('Exploration Editor', function () {
       true
     );
     await explorationEditor.expectScreenshotToMatch(
-      'addResponseToTheInteraction'
+      'addResponseToTheInteraction',
+      __dirname
     );
     await explorationEditor.saveExplorationDraft();
 
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.expectScreenshotToMatch(
-      'navigateToCard_FINAL_CARD'
+      'navigateToCard_FINAL_CARD',
+      __dirname
     );
     await explorationEditor.updateCardContent(
       'We have practiced negative numbers.'
     );
     await explorationEditor.expectScreenshotToMatch(
-      'updateCardContent_We have practiced negative numbers.'
+      'updateCardContent_We have practiced negative numbers.',
+      __dirname
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await explorationEditor.expectScreenshotToMatch(
-      'addInteraction_END_EXPLORATION'
+      'addInteraction_END_EXPLORATION',
+      __dirname
     );
 
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.expectScreenshotToMatch(
-      'navigateToCard_INTRODUCTION'
+      'navigateToCard_INTRODUCTION',
+      __dirname
     );
     await explorationEditor.saveExplorationDraft();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
@@ -133,13 +152,17 @@ describe('Exploration Editor', function () {
         INTRODUCTION_CARD_CONTENT
       );
       await explorationEditor.expectScreenshotToMatch(
-        'expectPreviewCardContentToBe'
+        'expectPreviewCardContentToBe',
+        __dirname
       );
 
       // Continue to the next card, enter an answer, and submit it.
       await explorationEditor.continueToNextCard();
       await explorationEditor.submitAnswer('-40');
-      await explorationEditor.expectScreenshotToMatch('submitAnswer');
+      await explorationEditor.expectScreenshotToMatch(
+        'submitAnswer',
+        __dirname
+      );
       await explorationEditor.continueToNextCard();
 
       // Check the completion message and restart the exploration.
@@ -147,7 +170,8 @@ describe('Exploration Editor', function () {
         'Congratulations for completing this lesson!'
       );
       await explorationEditor.expectScreenshotToMatch(
-        'expectPreviewCompletionToastMessage'
+        'expectPreviewCompletionToastMessage',
+        __dirname
       );
       await explorationEditor.restartPreview();
       await explorationEditor.expectPreviewCardContentToBe(
@@ -155,7 +179,8 @@ describe('Exploration Editor', function () {
         INTRODUCTION_CARD_CONTENT
       );
       await explorationEditor.expectScreenshotToMatch(
-        'expectPreviewCardContentToBe'
+        'expectPreviewCardContentToBe',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

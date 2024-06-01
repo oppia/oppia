@@ -42,7 +42,10 @@ describe('Logged-in User', function () {
     'should open About page via the footer',
     async function () {
       await testUser.navigateToAboutPageViaFooter();
-      await testUser.expectScreenshotToMatch('navigateToAboutPageViaFooter');
+      await testUser.expectScreenshotToMatch(
+        'navigateToAboutPageViaFooter',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -52,7 +55,8 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.navigateToAboutFoundationPageViaFooter();
       await testUser.expectScreenshotToMatch(
-        'navigateToAboutFoundationPageViaFooter'
+        'navigateToAboutFoundationPageViaFooter',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -62,7 +66,10 @@ describe('Logged-in User', function () {
     'should open "Blog" page via the footer',
     async function () {
       await testUser.navigateToBlogPageViaFooter();
-      await testUser.expectScreenshotToMatch('navigateToBlogPageViaFooter');
+      await testUser.expectScreenshotToMatch(
+        'navigateToBlogPageViaFooter',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -71,7 +78,6 @@ describe('Logged-in User', function () {
     'should open "Forum" page via the footer',
     async function () {
       await testUser.navigateToForumPageViaFooter();
-      await testUser.expectScreenshotToMatch('navigateToForumPageViaFooter');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

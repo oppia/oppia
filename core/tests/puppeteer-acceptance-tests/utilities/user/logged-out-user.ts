@@ -15,7 +15,6 @@
 /**
  * @fileoverview Logged-out users utility file.
  */
-import {Page} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -268,7 +267,7 @@ export class LoggedOutUser extends BaseUser {
       );
     }
     await this.page.waitForNavigation({
-      waitUntil: ['networkidle0', 'networkidle2', 'domcontentloaded', 'load'],
+      waitUntil: ['networkidle0', 'load'],
     });
     const urlRegex =
       /http:\/\/localhost:8181\/create\/\w*(\/gui\/Introduction)?/;
@@ -347,7 +346,7 @@ export class LoggedOutUser extends BaseUser {
     }
     await Promise.all([
       this.page.waitForNavigation({
-        waitUntil: ['domcontentloaded', 'networkidle2', 'networkidle0', 'load'],
+        waitUntil: ['networkidle0', 'load'],
       }),
       this.page.$eval(millionsOfContentId, element =>
         element.getElementsByTagName('a')[0].click()
@@ -412,7 +411,7 @@ export class LoggedOutUser extends BaseUser {
     }
     await Promise.all([
       this.page.waitForNavigation({
-        waitUntil: ['domcontentloaded', 'networkidle2', 'networkidle0', 'load'],
+        waitUntil: ['networkidle0', 'load'],
       }),
       this.page.$eval(weCannotContentId, element =>
         element.getElementsByTagName('a')[0].click()
@@ -468,7 +467,7 @@ export class LoggedOutUser extends BaseUser {
     }
     await Promise.all([
       this.page.waitForNavigation({
-        waitUntil: ['domcontentloaded', 'networkidle2', 'networkidle0', 'load'],
+        waitUntil: ['networkidle0', 'load'],
       }),
       this.page.$eval(sectionSixPart1, element =>
         element.getElementsByTagName('a')[0].click()
@@ -504,7 +503,7 @@ export class LoggedOutUser extends BaseUser {
     }
     await Promise.all([
       this.page.waitForNavigation({
-        waitUntil: ['domcontentloaded', 'networkidle2', 'networkidle0', 'load'],
+        waitUntil: ['networkidle0', 'load'],
       }),
       this.page.$eval(sectionSixPart2, element =>
         element.getElementsByTagName('a')[0].click()
@@ -538,7 +537,7 @@ export class LoggedOutUser extends BaseUser {
     }
     await Promise.all([
       this.page.waitForNavigation({
-        waitUntil: ['domcontentloaded', 'networkidle2', 'networkidle0', 'load'],
+        waitUntil: ['networkidle0', 'load'],
       }),
       this.page.$eval(sectionSixPart3, element =>
         element.getElementsByTagName('a')[0].click()
@@ -869,7 +868,7 @@ export class LoggedOutUser extends BaseUser {
   private async clickLinkAnchorToNewTab(
     anchorInnerText: string,
     expectedDestinationPageUrl: string
-  ): Promise<Page> {
+  ): Promise<void> {
     await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
     const pageTarget = this.page.target();
     await this.clickOn(anchorInnerText);
@@ -882,16 +881,13 @@ export class LoggedOutUser extends BaseUser {
       throw new Error(`The ${anchorInnerText} link did not open a new tab`);
     }
     expect(newTabPage.url()).toBe(expectedDestinationPageUrl);
-    await newTabPage.reload({
-      waitUntil: ['domcontentloaded', 'networkidle2', 'networkidle0', 'load'],
-    });
-    return newTabPage;
+    await newTabPage.close();
   }
 
   /**
    * Clicks the link with the text "create on here" on the Get Stated page.
    */
-  async clickCreateOneHereLinkInGetStartedPage(): Promise<Page> {
+  async clickCreateOneHereLinkInGetStartedPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"create one here")]');
     const pageTarget = this.page.target();
     await this.clickOn('create one here');
@@ -905,37 +901,28 @@ export class LoggedOutUser extends BaseUser {
     expect(newTabPage.url()).toContain(
       'https://accounts.google.com/lifecycle/steps/signup/name'
     );
-    await newTabPage.reload({
-      waitUntil: ['networkidle0', 'networkidle2', 'domcontentloaded', 'load'],
-    });
-    return newTabPage;
+    await newTabPage.close();
   }
 
   /**
    * Clicks the link with the text "Welcome to Oppia" on the Get Stated page.
    */
-  async clickWelcomeToOppiaLinkInGetStartedPage(): Promise<Page> {
-    return await this.clickLinkAnchorToNewTab(
-      'Welcome to Oppia',
-      welcomeToOppiaUrl
-    );
+  async clickWelcomeToOppiaLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab('Welcome to Oppia', welcomeToOppiaUrl);
   }
 
   /**
    * Clicks the link with the text "Get Electrified!" on the Get Stated page.
    */
-  async clickGetElectrifiedLinkInGetStartedPage(): Promise<Page> {
-    return await this.clickLinkAnchorToNewTab(
-      'Get Electrified!',
-      electromagnetismUrl
-    );
+  async clickGetElectrifiedLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab('Get Electrified!', electromagnetismUrl);
   }
 
   /**
    * Clicks the link with the text "Programming with Carla" on the Get Stated page.
    */
-  async clickProgrammingWithCarlaLinkInGetStartedPage(): Promise<Page> {
-    return await this.clickLinkAnchorToNewTab(
+  async clickProgrammingWithCarlaLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab(
       'Programming with Carla',
       programmingWithCarlaUrl
     );
@@ -944,8 +931,8 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Clicks the link with the text "in our user documentation" on the Get Stated page.
    */
-  async clickInOurUserDocumentationLinkInGetStartedPage(): Promise<Page> {
-    return await this.clickLinkAnchorToNewTab(
+  async clickInOurUserDocumentationLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab(
       'in our user documentation',
       creatingAnExplorationUrl
     );
@@ -954,8 +941,8 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Clicks the link with the text "embed it in your own web page" on the Get Stated page.
    */
-  async clickEmbedItInYourOwnWebPageLinkInGetStartedPage(): Promise<Page> {
-    return await this.clickLinkAnchorToNewTab(
+  async clickEmbedItInYourOwnWebPageLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab(
       'embed it in your own web page',
       embeddingAnExplorationUrl
     );

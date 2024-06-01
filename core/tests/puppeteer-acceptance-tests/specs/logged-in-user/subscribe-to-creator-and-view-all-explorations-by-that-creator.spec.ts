@@ -42,7 +42,8 @@ describe('Logged-in User', function () {
       'Test Exploration'
     );
     await explorationEditor.expectScreenshotToMatch(
-      'createAndPublishAMinimalExplorationWithTitle'
+      'createAndPublishAMinimalExplorationWithTitle',
+      __dirname
     );
   }, DEFAULT_SPEC_TIMEOUT);
 
@@ -52,31 +53,41 @@ describe('Logged-in User', function () {
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.expectNumberOfSubscribersToBe(0);
       await explorationEditor.expectScreenshotToMatch(
-        'expectNumberOfSubscribersToBe0'
+        'expectNumberOfSubscribersToBe0',
+        __dirname
       );
 
-      await testLearner.navigateToProfilePage('explorationCreator');
-      await testLearner.expectScreenshotToMatch('navigateToProfilePage');
-      await testLearner.subscribeToCreator('explorationCreator');
-      await testLearner.expectScreenshotToMatch('subscribeToCreator');
+      await testLearner.navigateToProfilePage('explorationEditor');
+      await testLearner.expectScreenshotToMatch(
+        'navigateToProfilePage',
+        __dirname
+      );
+      await testLearner.subscribeToCreator('explorationEditor');
+      await testLearner.expectScreenshotToMatch(
+        'subscribeToCreator',
+        __dirname
+      );
 
       await explorationEditor.reloadPage();
       await explorationEditor.expectNumberOfSubscribersToBe(1);
       await explorationEditor.expectScreenshotToMatch(
-        'expectNumberOfSubscribersToBe1'
+        'expectNumberOfSubscribersToBe1',
+        __dirname
       );
 
       await explorationEditor.openSubscribersTab();
       await explorationEditor.expectUserToBeASubscriber('testLearner');
       await explorationEditor.expectScreenshotToMatch(
-        'expectUserToBeASubscriber'
+        'expectUserToBeASubscriber',
+        __dirname
       );
 
       await testLearner.expectExplorationToBePresentInProfilePageWithTitle(
         'Test Exploration'
       );
       await testLearner.expectScreenshotToMatch(
-        'expectExplorationToBePresentInProfilePageWithTitle'
+        'expectExplorationToBePresentInProfilePageWithTitle',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT

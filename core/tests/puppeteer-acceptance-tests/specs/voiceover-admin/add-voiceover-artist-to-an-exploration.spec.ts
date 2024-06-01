@@ -66,7 +66,8 @@ describe('Voiceover Admin', function () {
       await explorationEditor.navigateToExplorationEditorPage();
       await explorationEditor.dismissWelcomeModal();
       await explorationEditor.expectScreenshotToMatch(
-        'explorationEditordismissWelcomeModal'
+        'explorationEditordismissWelcomeModal',
+        __dirname
       );
 
       await explorationEditor.createExplorationWithMinimumContent(
@@ -74,12 +75,14 @@ describe('Voiceover Admin', function () {
         INTERACTION_TYPES.END_EXPLORATION
       );
       await explorationEditor.expectScreenshotToMatch(
-        'createExplorationWithMinimumContent_ExplorationOne'
+        'createExplorationWithMinimumContent_ExplorationOne',
+        __dirname
       );
 
       await explorationEditor.saveExplorationDraft();
       await explorationEditor.expectScreenshotToMatch(
-        'saveExplorationDraft_ExplorationOne'
+        'saveExplorationDraft_ExplorationOne',
+        __dirname
       );
       explorationId = await explorationEditor.publishExplorationWithContent(
         'Exploration one',
@@ -87,13 +90,15 @@ describe('Voiceover Admin', function () {
         'Algebra'
       );
       await explorationEditor.expectScreenshotToMatch(
-        'publishExplorationWithContent'
+        'publishExplorationWithContent',
+        __dirname
       );
 
       await voiceoverAdmin.navigateToExplorationEditor(explorationId);
       await voiceoverAdmin.dismissWelcomeModal();
       await voiceoverAdmin.expectScreenshotToMatch(
-        'voiceoverAdmindismissWelcomeModal'
+        'voiceoverAdmindismissWelcomeModal',
+        __dirname
       );
 
       await voiceoverAdmin.navigateToExplorationSettingsTab();
@@ -102,7 +107,8 @@ describe('Voiceover Admin', function () {
         'invalidUserId'
       );
       await voiceoverAdmin.expectScreenshotToMatch(
-        'expectVoiceoverArtistsListDoesNotContain'
+        'expectVoiceoverArtistsListDoesNotContain',
+        __dirname
       );
 
       await voiceoverAdmin.addVoiceoverArtistsToExploration(['invalidUserId']);
@@ -111,13 +117,15 @@ describe('Voiceover Admin', function () {
         invalidIdErrorToastMessage
       );
       await voiceoverAdmin.expectScreenshotToMatch(
-        'expectToSeeErrorToastMessage'
+        'expectToSeeErrorToastMessage',
+        __dirname
       );
       await voiceoverAdmin.closeToastMessage();
 
       await voiceoverAdmin.verifyVoiceoverArtistStillOmitted('invalidUserId');
       await voiceoverAdmin.expectScreenshotToMatch(
-        'verifyVoiceoverArtistStillOmitted'
+        'verifyVoiceoverArtistStillOmitted',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -138,11 +146,13 @@ describe('Voiceover Admin', function () {
         INTERACTION_TYPES.END_EXPLORATION
       );
       await explorationEditor.expectScreenshotToMatch(
-        'createExplorationWithMinimumContent_ExplorationTwo'
+        'createExplorationWithMinimumContent_ExplorationTwo',
+        __dirname
       );
       await explorationEditor.saveExplorationDraft();
       await explorationEditor.expectScreenshotToMatch(
-        'saveExplorationDraft_ExplorationTwo'
+        'saveExplorationDraft_ExplorationTwo',
+        __dirname
       );
       explorationId = await explorationEditor.publishExplorationWithContent(
         'Exploration one',
@@ -150,7 +160,8 @@ describe('Voiceover Admin', function () {
         'Algebra'
       );
       await explorationEditor.expectScreenshotToMatch(
-        'publishExplorationWithContent'
+        'publishExplorationWithContent',
+        __dirname
       );
       await voiceoverAdmin.navigateToExplorationEditor(explorationId);
       await voiceoverAdmin.navigateToExplorationSettingsTab();
@@ -159,7 +170,8 @@ describe('Voiceover Admin', function () {
         'voiceoverartist'
       );
       await voiceoverAdmin.expectScreenshotToMatch(
-        'expectVoiceoverArtistsListDoesNotContain'
+        'expectVoiceoverArtistsListDoesNotContain',
+        __dirname
       );
       await voiceoverAdmin.addVoiceoverArtistsToExploration([
         'voiceoverartist',
@@ -169,7 +181,8 @@ describe('Voiceover Admin', function () {
         'voiceoverartist'
       );
       await voiceoverAdmin.expectScreenshotToMatch(
-        'expectVoiceoverArtistsListContains'
+        'expectVoiceoverArtistsListContains',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

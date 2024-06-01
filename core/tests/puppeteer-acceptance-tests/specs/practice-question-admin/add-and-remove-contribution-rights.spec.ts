@@ -46,27 +46,32 @@ describe('Question Admin', function () {
 
       await questionAdmin.navigateToContributorDashboardAdminPage();
       await questionAdmin.expectScreenshotToMatch(
-        'navigateToContributorDashboardAdminPage'
+        'navigateToContributorDashboardAdminPage',
+        __dirname
       );
 
       await questionAdmin.verifyUserCannotReviewQuestions('Tester');
       await questionAdmin.expectScreenshotToMatch(
-        'verifyUserCannotReviewQuestions'
+        'verifyUserCannotReviewQuestions',
+        __dirname
       );
 
       await questionAdmin.verifyQuestionReviewersExcludeUser('Tester');
       await questionAdmin.expectScreenshotToMatch(
-        'verifyQuestionReviewersExcludeUser'
+        'verifyQuestionReviewersExcludeUser',
+        __dirname
       );
 
       await questionAdmin.verifyUserCannotSubmitQuestions('Tester');
       await questionAdmin.expectScreenshotToMatch(
-        'verifyUserCannotSubmitQuestions'
+        'verifyUserCannotSubmitQuestions',
+        __dirname
       );
 
       await questionAdmin.verifyQuestionSubmittersExcludeUser('Tester');
       await questionAdmin.expectScreenshotToMatch(
-        'verifyQuestionSubmittersExcludeUser'
+        'verifyQuestionSubmittersExcludeUser',
+        __dirname
       );
 
       await questionAdmin.addSubmitQuestionRights('Tester');
@@ -74,19 +79,23 @@ describe('Question Admin', function () {
 
       await questionAdmin.verifyUserCanReviewQuestions('Tester');
       await questionAdmin.expectScreenshotToMatch(
-        'verifyUserCanReviewQuestions'
+        'verifyUserCanReviewQuestions',
+        __dirname
       );
       await questionAdmin.verifyQuestionReviewersIncludeUser('Tester');
       await questionAdmin.expectScreenshotToMatch(
-        'verifyQuestionReviewersIncludeUser'
+        'verifyQuestionReviewersIncludeUser',
+        __dirname
       );
       await questionAdmin.verifyUserCanSubmitQuestions('Tester');
       await questionAdmin.expectScreenshotToMatch(
-        'verifyUserCanSubmitQuestions'
+        'verifyUserCanSubmitQuestions',
+        __dirname
       );
       await questionAdmin.verifyQuestionSubmittersIncludeUser('Tester');
       await questionAdmin.expectScreenshotToMatch(
-        'verifyQuestionSubmittersIncludeUser'
+        'verifyQuestionSubmittersIncludeUser',
+        __dirname
       );
 
       await questionAdmin.removeSubmitQuestionRights('Tester');
@@ -94,19 +103,23 @@ describe('Question Admin', function () {
 
       await questionAdmin.verifyUserCannotReviewQuestions('Tester');
       await questionAdmin.expectScreenshotToMatch(
-        'verifyUserCannotReviewQuestions'
+        'verifyUserCannotReviewQuestions',
+        __dirname
       );
       await questionAdmin.verifyQuestionReviewersExcludeUser('Tester');
       await questionAdmin.expectScreenshotToMatch(
-        'verifyQuestionReviewersExcludeUser'
+        'verifyQuestionReviewersExcludeUser',
+        __dirname
       );
       await questionAdmin.verifyUserCannotSubmitQuestions('Tester');
       await questionAdmin.expectScreenshotToMatch(
-        'verifyUserCannotSubmitQuestions'
+        'verifyUserCannotSubmitQuestions',
+        __dirname
       );
       await questionAdmin.verifyQuestionSubmittersExcludeUser('Tester');
       await questionAdmin.expectScreenshotToMatch(
-        'verifyQuestionSubmittersExcludeUser'
+        'verifyQuestionSubmittersExcludeUser',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

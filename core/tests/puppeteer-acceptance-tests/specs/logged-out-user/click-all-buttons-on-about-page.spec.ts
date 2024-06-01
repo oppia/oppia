@@ -42,7 +42,8 @@ describe('Logged-in User in About page', function () {
     async function () {
       await testUser.clickBrowseOurLessonsButtonInAboutPage();
       await testUser.expectScreenshotToMatch(
-        'clickBrowseOurLessonsButtonInAboutPage'
+        'clickBrowseOurLessonsButtonInAboutPage',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -53,7 +54,8 @@ describe('Logged-in User in About page', function () {
     async function () {
       await testUser.clickAccessAndroidAppButtonInAboutPage();
       await testUser.expectScreenshotToMatch(
-        'clickAccessAndroidAppButtonInAboutPage'
+        'clickAccessAndroidAppButtonInAboutPage',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -64,7 +66,8 @@ describe('Logged-in User in About page', function () {
     async function () {
       await testUser.clickVisitClassroomButtonInAboutPage();
       await testUser.expectScreenshotToMatch(
-        'clickVisitClassroomButtonInAboutPage'
+        'clickVisitClassroomButtonInAboutPage',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -75,7 +78,8 @@ describe('Logged-in User in About page', function () {
     async function () {
       await testUser.clickBrowseLibraryButtonInAboutPage();
       await testUser.expectScreenshotToMatch(
-        'clickBrowseLibraryButtonInAboutPage'
+        'clickBrowseLibraryButtonInAboutPage',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -87,7 +91,8 @@ describe('Logged-in User in About page', function () {
     async function () {
       await testUser.clickCreateLessonsButtonInAboutPage();
       await testUser.expectScreenshotToMatch(
-        'clickCreateLessonsButtonInAboutPage'
+        'clickCreateLessonsButtonInAboutPage',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -98,7 +103,8 @@ describe('Logged-in User in About page', function () {
     async function () {
       await testUser.clickExploreLessonsButtonInAboutPage();
       await testUser.expectScreenshotToMatch(
-        'clickExploreLessonsButtonInAboutPage'
+        'clickExploreLessonsButtonInAboutPage',
+        __dirname
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
