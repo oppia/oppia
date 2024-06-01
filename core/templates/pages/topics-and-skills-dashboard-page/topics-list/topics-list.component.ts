@@ -137,7 +137,7 @@ export class TopicsListComponent {
   deleteTopic(topicId: string, topicName: string): void {
     const topicSummary = this.getTopicSummaryForTopicId(topicId);
 
-    if (topicSummary) {
+    if (topicSummary && topicSummary.classroom) {
       const errorMessage =
         `The topic is assigned to the ${topicSummary.classroom} classroom.` +
         ' Contact the curriculum admins to remove it from the classroom first.';
