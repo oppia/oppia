@@ -34,6 +34,8 @@ import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
+const cookieBannerAcceptButton =
+  'button.e2e-test-oppia-cookie-banner-accept-button';
 
 /**
  * Mapping of user roles to their respective function class.
@@ -71,6 +73,8 @@ let superAdminInstance: (SuperAdmin & BlogAdmin) | null = null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
+  userHasAcceptedCookies: boolean = false;
+
   /**
    * This function creates a composition of the user and the role
    * through object prototypes and returns the instance of that user.
@@ -191,10 +195,13 @@ export class UserFactory {
     let user = new LoggedOutUser();
     await user.openBrowser();
     await user.page.goto(testConstants.URLs.Home);
+    if (!this.userHasAcceptedCookies) {
+      await user.clickOn(cookieBannerAcceptButton);
+      this.userHasAcceptedCookies = true;
+    }
     activeUsers.push(user);
     return user;
   };
-
   /**
    * This function closes all the browsers opened by different users.
    */
