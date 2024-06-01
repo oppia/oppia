@@ -118,7 +118,6 @@
 	"I18N_BLOG_POST_EDITOR_TITLE_HEADING": "Titel",
 	"I18N_BLOG_POST_EDITOR_TITLE_INVALID_CHARACTERS_ERROR": "Titelveld bevat ongeldige tekens. Alleen woorden (a-zA-Z0-9) gescheiden door spaties, koppeltekens (-), het en-teken (&) en de dubbele punt (:) zijn toegestaan.",
 	"I18N_BLOG_POST_EDITOR_TITLE_IS_DUPLICATE_ERROR": "Er bestaat al een blogbericht met de opgegeven titel. Geef een andere titel op.",
-	"I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG": "Kies een bestand of sleep het hier heen",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "Fout: het afbeeldingsbestand wordt niet herkend.",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD": "Miniatuurafbeelding toevoegen",
 	"I18N_BLOG_POST_UNTITLED_HEADING": "Zonder titel",

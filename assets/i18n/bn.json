@@ -115,7 +115,6 @@
 	"I18N_BLOG_POST_PAGE_TITLE": "<[blogPostTitle]> | ব্লগ | ওপিয়া",
 	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_EXTENSIONS_PREFIX": "অনুমোদিত চিত্র এক্সটেনশন:",
 	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_MAX_FILE_SIZE": "চিত্রের অনুমোদিত সর্বাধিক আকার হলো <[imageSize]> কেবি। মনে রাখবেন, কখনও কখনও, ক্রপ করলেও ছবির আকার বাড়তে পারে।",
-	"I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG": "একটি ফাইল চয়ন করুন বা সেটি এখানে টেনে আনুন৷",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "ত্রুটি: চিত্রের ফাইল পড়া যায়নি।",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD": "একটি সংক্ষেপচিত্র যোগ করুন",
 	"I18N_BLOG_POST_UNTITLED_HEADING": "শিরোনামহীন",
