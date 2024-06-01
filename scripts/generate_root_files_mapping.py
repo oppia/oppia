@@ -38,8 +38,8 @@ def main() -> None:
     proc = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    encoded_stdout, encoded_sterr = proc.communicate()
-    stderr = encoded_sterr.decode('utf-8')
+    encoded_stdout, encoded_stderr = proc.communicate()
+    stderr = encoded_stderr.decode('utf-8')
 
     if stderr:
         raise Exception(stderr)

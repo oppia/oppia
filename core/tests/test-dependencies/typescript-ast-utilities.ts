@@ -173,7 +173,7 @@ export const resolveModuleRelativeToRoot = (
 /**
  * Gets the text of a decoration node.
  */
-export const getDecorationNodeText = (decorator: Decorator): string => {
+export const getDecoratorNodeText = (decorator: Decorator): string => {
   const callExpression = decorator.getCallExpression();
   if (callExpression === undefined) {
     return decorator.getFullText();
@@ -184,14 +184,14 @@ export const getDecorationNodeText = (decorator: Decorator): string => {
 /**
  * Gets all decoration nodes by text from a source file.
  */
-export const getDecorationNodesByTextFromSourceFile = (
+export const getDecoratorNodesByTextFromSourceFile = (
   sourceFile: SourceFile,
   text: string
 ): Decorator[] => {
   return sourceFile
     .getDescendantsOfKind(ts.SyntaxKind.Decorator)
     .filter(decorator => {
-      const decorationText = getDecorationNodeText(decorator);
+      const decorationText = getDecoratorNodeText(decorator);
       return decorationText === text;
     });
 };

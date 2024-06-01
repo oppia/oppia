@@ -27,9 +27,9 @@ import {
   AngularDecorators,
   getRelativePathToRootDirectory,
   isNodeModule,
-  getDecorationNodesByTextFromSourceFile,
+  getDecoratorNodesByTextFromSourceFile,
   resolveModuleRelativeToRoot,
-  getDecorationNodeText,
+  getDecoratorNodeText,
   getValueFromLiteralStringOrBinaryExpression,
 } from './typescript-ast-utilities';
 import {
@@ -66,7 +66,7 @@ const GIT_IGNORED_EXCLUSIONS = fs
   .split('\n')
   .filter(line => line.trim() && !line.startsWith('#'));
 
-const FILE_EXCLUSIONS = [
+const FILE_EXCLUSIONS_FOR_SEARCH = [
   ...GIT_IGNORED_EXCLUSIONS,
   'types',
   'typings',
@@ -82,16 +82,11 @@ const FILE_EXCLUSIONS = [
   'core/templates/services/UpgradedServices.ts',
   'core/templates/services/angular-services.index.ts',
   'core/templates/utility/hashes.ts',
-  'webpack.common.config.ts',
-  'webpack.common.macros.ts',
-  'webpack.dev.config.ts',
-  'webpack.dev.sourcemap.config.ts',
-  'webpack.prod.config.ts',
-  'webpack.prod.sourcemap.config.ts',
+  'webpack.*.ts',
   'angular-template-style-url-replacer.webpack-loader.js',
 ];
 
-const FILE_EXTENSIONS = [
+const FILE_EXTENSIONS_FOR_SEARCH = [
   '.ts',
   '.js',
   '.html',
@@ -157,7 +152,7 @@ const getCallExpressionModuleImportsFromSourceFile = (
     if (!moduleSpecifier) {
       throw new Error(
         'No module specifier found in require or import call in ' +
-          `${sourceFile.getFilePath()} with ${callExpression.getText()}`
+          `${sourceFile.getFilePath()} with ${callExpression.getText()}.`
       );
     }
     const moduleSpecifierValue =
@@ -165,7 +160,7 @@ const getCallExpressionModuleImportsFromSourceFile = (
     if (!moduleSpecifierValue) {
       throw new Error(
         'The module specifier could not be evaluated in the require or import call in' +
-          `${callExpression.getText()} at ${sourceFile.getFilePath()}`
+          `${callExpression.getText()} at ${sourceFile.getFilePath()}.`
       );
     }
     return resolveModuleRelativeToRoot(
@@ -196,6 +191,24 @@ const getModuleImportsFromSourceFile = (sourceFile: SourceFile): string[] => {
 };
 
 /**
+ * Gets the Angular decorator type from the given decorator text.
+ */
+const getAngularDecoratorTypeFromDecoratorText = (
+  decoratorText: string
+): AngularInformation['type'] => {
+  if (decoratorText === AngularDecorators.Module) {
+    return 'module';
+  }
+  if (decoratorText === AngularDecorators.Component) {
+    return 'component';
+  }
+  if (decoratorText === AngularDecorators.Directive) {
+    return 'directive';
+  }
+  return 'pipe';
+};
+
+/**
  * Gets the Angular informations from the given source file.
  */
 const getAngularInformationsFromSourceFile = (
@@ -204,25 +217,17 @@ const getAngularInformationsFromSourceFile = (
   const decorationNodes: Decorator[] = [];
   for (const decorator of Object.values(AngularDecorators)) {
     decorationNodes.push(
-      ...getDecorationNodesByTextFromSourceFile(sourceFile, decorator)
+      ...getDecoratorNodesByTextFromSourceFile(sourceFile, decorator)
     );
   }
 
   return decorationNodes.map(decorationNode => {
-    const decorationText = getDecorationNodeText(decorationNode);
+    const decorationText = getDecoratorNodeText(decorationNode);
     const className = decorationNode
       .getParent()
       .asKindOrThrow(ts.SyntaxKind.ClassDeclaration)
       .getNameOrThrow();
-    const type =
-      decorationText === AngularDecorators.Module
-        ? 'module'
-        : decorationText === AngularDecorators.Component
-          ? 'component'
-          : decorationText === AngularDecorators.Directive
-            ? 'directive'
-            : 'pipe';
-
+    const type = getAngularDecoratorTypeFromDecoratorText(decorationText);
     if (type === 'module') {
       return {
         type,
@@ -675,7 +680,10 @@ class RootFilesMappingGenerator {
     if (invalidRootFiles.length > 0) {
       throw new Error(
         'The following invalid root files were found when generating ' +
-          `the root files mapping:\n${invalidRootFiles.join('\n')}`
+          `the root files mapping:\n${invalidRootFiles.join('\n')}.\n` +
+          'Please add them to the VALID_ROOT_FILES or RUN_ALL_TESTS_ROOT_FILES ' +
+          'in the root files config at core/tests/root-files-config.json or ' +
+          'ensure that they are a valid test suite module or page module.'
       );
     }
   }
@@ -708,7 +716,12 @@ class RootFilesMappingGenerator {
 }
 
 const files = ts.sys
-  .readDirectory(ROOT_DIRECTORY, FILE_EXTENSIONS, FILE_EXCLUSIONS, [])
+  .readDirectory(
+    ROOT_DIRECTORY,
+    FILE_EXTENSIONS_FOR_SEARCH,
+    FILE_EXCLUSIONS_FOR_SEARCH,
+    []
+  )
   .reduce((acc: string[], filePath: string) => {
     acc.push(getRelativePathToRootDirectory(filePath));
     return acc;

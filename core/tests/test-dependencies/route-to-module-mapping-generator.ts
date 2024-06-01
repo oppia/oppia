@@ -17,6 +17,7 @@
  */
 
 import path from 'path';
+import fs from 'fs';
 import {Route} from '@angular/router';
 import {
   CallExpression,
@@ -27,7 +28,7 @@ import {
 import {
   project,
   ROOT_DIRECTORY,
-  getDecorationNodesByTextFromSourceFile,
+  getDecoratorNodesByTextFromSourceFile,
   resolveModuleRelativeToRoot,
   AngularDecorators,
   getValueFromLiteralStringOrBinaryExpression,
@@ -45,7 +46,10 @@ const ROUTING_MODULE_FILE_PATHS = [
   ),
 ];
 
-// List of routes that are not defined in routing modules.
+// List of routes that are not defined in routing modules. These routes are
+// manually mapped to their corresponding modules. These routes are currently not
+// covered by the routing module scraping logic since they are loaded by webpack and
+// not definied in the above routing modules.
 const MANUAL_ROUTE_TO_MODULE_MAPPING: Map<Route, string> = new Map([
   [
     {
@@ -63,7 +67,7 @@ const MANUAL_ROUTE_TO_MODULE_MAPPING: Map<Route, string> = new Map([
     {
       path: 'emaildashboardresult/:query_id',
     },
-    'core/templates/pages/email-dashboard-pages/email-dashboard-result-page.import.ts',
+    'core/templates/pages/email-dashboard-pages/email-dashboard-result.import.ts',
   ],
   [
     {
@@ -121,11 +125,12 @@ const MANUAL_ROUTE_TO_MODULE_MAPPING: Map<Route, string> = new Map([
   ],
 ]);
 
-// List of page modules which aren't scraped from routing modules.
+// List of page modules which aren't scraped from routing modules. These page modules are manually
+// added to the list of page modules. These modules are not covered by the routing module scraping
+// or the manual route to module mapping since they don't have any concrete path associated with them.
 const MANUAL_PAGE_MODULES = [
   'core/templates/pages/error-pages/error-page.import.ts',
   'core/templates/pages/maintenance-page/maintenance-page.import.ts',
-  'core/templates/pages/email-dashboard-pages/email-dashboard-result.import.ts',
   'core/templates/pages/error-pages/error-iframed-page/error-iframed-page.import.ts',
 ];
 
@@ -281,7 +286,7 @@ const convertRouteNodeToMap = (
 const getRouteNodesFromRoutingModuleSourceFile = (
   routingModuleSourceFile: SourceFile
 ): ObjectLiteralExpression[] | undefined => {
-  const angularModuleDecorationNode = getDecorationNodesByTextFromSourceFile(
+  const angularModuleDecorationNode = getDecoratorNodesByTextFromSourceFile(
     routingModuleSourceFile,
     AngularDecorators.Module
   );
@@ -366,6 +371,24 @@ const getRouteToModuleMappingFromRoutingModule = (
 };
 
 /**
+ * Validates the route to module mapping by checking that all
+ * modules defined exist in the codebase.
+ */
+const validateRouteToModuleMapping = (
+  routeToModuleMapping: Map<Route, string>
+): void => {
+  for (const module of routeToModuleMapping.values()) {
+    if (!fs.existsSync(path.resolve(ROOT_DIRECTORY, module))) {
+      throw new Error(
+        `The module: ${module} defined in the manual route to module mapping ` +
+          'does not exist in the codebase. Please remove it from the manual ' +
+          'route to module mapping.'
+      );
+    }
+  }
+};
+
+/**
  * Gets the full codebase's route to module mapping.
  */
 export const getRouteToModuleMapping = (): Map<Route, string> => {
@@ -381,6 +404,7 @@ export const getRouteToModuleMapping = (): Map<Route, string> => {
       routingModuleRouteToModuleMapping
     );
   }
+  validateRouteToModuleMapping(routeToModuleMapping);
 
   return routeToModuleMapping;
 };
