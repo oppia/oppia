@@ -250,7 +250,7 @@ def compute_voiceover_related_change(
                     feconf.VoiceoverType.MANUAL
                 )
             else:
-                manual_voiceover_dict: state_domain.VoiceoverDict = (
+                manual_voiceover_dict = (
                     voiceover_change.voiceovers['manual'])
                 manual_voiceover = state_domain.Voiceover.from_dict(
                     manual_voiceover_dict)

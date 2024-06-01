@@ -42,7 +42,6 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import voiceover_models
 
-datastore_services = models.Registry.import_datastore_services()
 (voiceover_models,) = models.Registry.import_models([
     models.Names.VOICEOVER])
 
@@ -319,7 +318,11 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
             )
         )
 
-        datastore_services.put_multi(entity_voiceovers_models)
+        voiceover_models.EntityVoiceoversModel.update_timestamps_multi(
+            entity_voiceovers_models)
+        voiceover_models.EntityVoiceoversModel.put_multi(
+            entity_voiceovers_models)
+
         exploration.version += 1
 
         self.assertEqual(len(entity_voiceovers_models), 1)
