@@ -185,15 +185,15 @@ EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE: Dict[str, str] = {
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_manage'],
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'],
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play'])
-        ),
+    ),
     EXPLORATION_ROLE_EDITOR: ('%s%s' % (
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'],
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play'])
-        ),
+    ),
     EXPLORATION_ROLE_VOICE_ARTIST: ('%s%s' % (
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_voiceover'],
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play'])
-        ),
+    ),
     EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
 }
 
