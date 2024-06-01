@@ -21,7 +21,6 @@ local_compiled_js_for_test/*
 core/templates/prod/*
 webpack_bundles/*
 core/tests/.browserstack.env
-golden_screenshots/
 core/tests/puppeteer-acceptance-tests/build
 core/tests/puppeteer-acceptance-tests/specs/*/golden_screenshots/__diff_output__
 node_modules/*
