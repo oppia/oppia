@@ -2943,9 +2943,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_models.STATUS_ACCEPTED)
 
     def test_contructor_updates_state_shema_in_change_cmd(self) -> None:
-        score_category = '%s%s%s' % (
+        score_category = '%s%sskill_id' % (
             suggestion_models.SCORE_TYPE_QUESTION,
-            suggestion_models.SCORE_CATEGORY_DELIMITER, 'skill_id')
+            suggestion_models.SCORE_CATEGORY_DELIMITER)
         change: TestChangeDictType = {
             'cmd': (
                 question_domain
@@ -2979,9 +2979,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     def test_contructor_raise_exception_for_invalid_state_shema_version(
         self
     ) -> None:
-        score_category = '%s%s%s' % (
+        score_category = '%s%sskill_id' % (
             suggestion_models.SCORE_TYPE_QUESTION,
-            suggestion_models.SCORE_CATEGORY_DELIMITER, 'skill_id')
+            suggestion_models.SCORE_CATEGORY_DELIMITER)
         change: TestChangeDictType = {
             'cmd': (
                 question_domain
