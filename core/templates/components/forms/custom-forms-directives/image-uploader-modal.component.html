@@ -23,7 +23,7 @@
         {{ 'I18N_IMAGE_UPLOAD_ERROR' | translate }}
       </div>
       <div *ngIf="(isThumbnail() && uploadedImage)">
-        <div *ngIf="allowedBgColors.length >= 1">
+        <div>
           <div *ngIf="hasMoreThanOneBgColor()">
             <div>Choose background color:</div>
             <div class="oppia-thumbnail-colour-select">
