@@ -970,8 +970,10 @@ URLS = [
         skill_mastery.SubtopicMasteryDataHandler),
 
     get_redirect_route(
-        r'%s/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
-        story_editor.StoryEditorPage),
+        r'%s/can_access_collection_editor_page/<story_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.access_validators.py
+    ),
     get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_EDITOR_DATA_URL_PREFIX,
         story_editor.EditableStoryDataHandler),
