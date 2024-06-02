@@ -1367,7 +1367,8 @@ def can_delete_any_user(
 
         email = user_services.get_email_from_user_id(self.user_id)
         if email != platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value):
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        ):
             raise self.UnauthorizedUserException(
                 '%s cannot delete any user.' % self.user_id)
 

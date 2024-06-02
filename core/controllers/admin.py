@@ -1690,7 +1690,8 @@ class AdminSuperAdminPrivilegesHandler(
         """
         assert self.normalized_payload is not None
         if self.email != parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value):
+            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+        ):
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
         username = self.normalized_payload['username']

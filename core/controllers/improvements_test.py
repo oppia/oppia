@@ -705,7 +705,8 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
     def test_custom_high_bounce_rate_creation_threshold(self) -> None:
         def mock_get_platform_parameter_value_function(
-            param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == (
                 platform_parameter_list.ParamName.
                 HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD.value
@@ -729,7 +730,8 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
     def test_custom_high_bounce_rate_obsoletion_threshold(self) -> None:
         def mock_get_platform_parameter_value_function(
-            param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == (
                 platform_parameter_list.ParamName.
                 HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD.
@@ -756,7 +758,8 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         self
     ) -> None:
         def mock_get_platform_parameter_value_function(
-            param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == (
                 platform_parameter_list.ParamName.
                 HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS.

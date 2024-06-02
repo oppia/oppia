@@ -103,7 +103,8 @@ class EmailToAdminTest(test_utils.EmailTestBase):
         send_email_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
         def mock_get_platform_parameter_value_function(
-                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == param_list.ParamName.SYSTEM_EMAIL_NAME.value:
                 return dummy_system_name
             elif param_name == param_list.ParamName.SYSTEM_EMAIL_ADDRESS.value:
@@ -120,7 +121,9 @@ class EmailToAdminTest(test_utils.EmailTestBase):
             # Make sure there are no emails already sent.
             admin_email_address = (
                 param_services.get_platform_parameter_value(
-                    param_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+                    param_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+                )
+            )
             assert isinstance(admin_email_address, str)
             messages = self._get_sent_email_messages(admin_email_address)
             self.assertEqual(len(messages), 0)
@@ -149,7 +152,8 @@ class DummyMailTest(test_utils.EmailTestBase):
         send_email_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
         def mock_get_platform_parameter_value_function(
-                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == param_list.ParamName.SYSTEM_EMAIL_NAME.value:
                 return dummy_system_name
             elif param_name == param_list.ParamName.SYSTEM_EMAIL_ADDRESS.value:
@@ -655,7 +659,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     def test_email_not_sent_if_config_does_not_permit_it(self) -> None:
         def mock_get_platform_parameter_value_function(
-                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == param_list.ParamName.EMAIL_FOOTER.value:
                 return self.new_footer
             return 'test@example.com'
@@ -920,7 +925,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
         self
     ) -> None:
         def mock_get_platform_parameter_value_function(
-                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == param_list.ParamName.EMAIL_FOOTER.value:
                 return self.new_footer
             return 'test@example.com'
@@ -977,7 +983,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
     def test_email_only_sent_if_signup_was_successful(self) -> None:
         def mock_get_platform_parameter_value_function(
-                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == param_list.ParamName.EMAIL_FOOTER.value:
                 return self.new_footer
             return 'test@example.com'
@@ -6134,7 +6141,9 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
             # Make sure that correct email is sent to admin.
             admin_email_address = (
                 param_services.get_platform_parameter_value(
-                    param_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+                    param_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+                )
+            )
             assert isinstance(admin_email_address, str)
             admin_messages = self._get_sent_email_messages(admin_email_address)
             self.assertEqual(len(admin_messages), 1)
@@ -6213,7 +6222,9 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
             # Make sure there are no emails already sent.
             admin_email_address = (
                 param_services.get_platform_parameter_value(
-                    param_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+                    param_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+                )
+            )
             assert isinstance(admin_email_address, str)
             messages = self._get_sent_email_messages(admin_email_address)
             self.assertEqual(messages, [])
@@ -6984,7 +6995,9 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
             # Make sure there are no emails already sent.
             admin_email_address = (
                 param_services.get_platform_parameter_value(
-                    param_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+                    param_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+                )
+            )
             assert isinstance(admin_email_address, str)
             messages = self._get_sent_email_messages(admin_email_address)
             self.assertEqual(messages, [])

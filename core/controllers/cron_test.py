@@ -381,7 +381,8 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         def mock_get_platform_parameter_value_function(
-                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == (
                 platform_parameter_list.ParamName.
                 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
@@ -410,8 +411,10 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
         def mock_get_platform_parameter_value_function(
-                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == (
                 platform_parameter_list.ParamName.
                 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
@@ -442,7 +445,8 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
     def test_email_not_sent_if_reviewer_ids_is_empty(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         def mock_get_platform_parameter_value_function(
-                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == (
                 platform_parameter_list.ParamName.
                 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
@@ -525,7 +529,8 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
     def test_email_not_sent_if_sending_reviewer_emails_is_not_enabled(self) -> None: # pylint: disable=line-too-long
         def mock_get_platform_parameter_value_function(
-                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == (
                 platform_parameter_list.ParamName.
                 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
@@ -587,7 +592,8 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
         def mock_get_platform_parameter_value_function(
-                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == (
                 platform_parameter_list.ParamName.
                 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
@@ -618,7 +624,8 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
     def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(self) -> None: # pylint: disable=line-too-long
         def mock_get_platform_parameter_value_function(
-                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == (
                 platform_parameter_list.ParamName.
                 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
@@ -652,7 +659,8 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
     def test_email_not_sent_if_reviewer_ids_is_empty(self) -> None:
         def mock_get_platform_parameter_value_function(
-                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == (
                 platform_parameter_list.ParamName.
                 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
@@ -691,7 +699,8 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
     def test_email_sent_to_reviewers_successfully(self) -> None:
         def mock_get_platform_parameter_value_function(
-                param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == (
                 platform_parameter_list.ParamName.
                 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
@@ -892,7 +901,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
     def test_email_not_sent_if_sending_emails_is_disabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         def mock_get_platform_parameter_value_function(
-            param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == (
                 platform_parameter_list.ParamName.
                 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
@@ -964,8 +974,10 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
         def mock_get_platform_parameter_value_function(
-            param_name: str) -> platform_parameter_domain.PlatformDataTypes:
+            param_name: str
+        ) -> platform_parameter_domain.PlatformDataTypes:
             if param_name == (
                 platform_parameter_list.ParamName.
                 ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value

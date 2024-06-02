@@ -185,7 +185,8 @@ class TopicPageDataHandlerTests(
             admin_email_address = (
                 platform_parameter_services.get_platform_parameter_value(
                     platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
-                ))
+                )
+            )
             assert isinstance(admin_email_address, str)
             messages = self._get_sent_email_messages(
                 admin_email_address)
