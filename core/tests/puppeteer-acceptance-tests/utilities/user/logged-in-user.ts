@@ -76,6 +76,53 @@ export class LoggedInUser extends BaseUser {
       throw new Error(`Exploration with title ${title} is not present.`);
     }
   }
+
+  /**
+   * Navigates to the community library page.
+   */
+  async navigateToCommunitylibrary(): Promise<void> {
+      await this.page.goto(testConstants.URLs.CommunityLibrary, {
+        waitUntil: 'load',
+      });
+  }
+
+  /**
+   * Views all featured activities on the community library page.
+   */
+  async viewAllFeaturedActivities(): Promise<Array<object>> {
+      await this.page.waitForSelector('.oppia-library-group');
+
+      const featuredActivities = await this.page.$$eval(
+        '.oppia-library-group',
+        groups => {
+          const featuredGroup = groups.find(group =>
+            group
+              .querySelector('h2')
+              ?.textContent?.includes('Featured Activities')
+          );
+
+          const activities = Array.from(
+            featuredGroup?.querySelectorAll(
+              'oppia-collection-summary-tile, oppia-exploration-summary-tile'
+            ) ?? []
+          );
+
+          return activities.map(activity => ({
+            id:
+              activity.getAttribute('explorationId') ||
+              activity.getAttribute('getCollectionId'),
+            title:
+              activity.getAttribute('explorationTitle') ||
+              activity.getAttribute('getCollectionTitle'),
+            type: activity.tagName.toLowerCase().includes('collection')
+              ? 'collection'
+              : 'exploration',
+          }));
+        }
+      );
+
+      return featuredActivities;
+  }
 }
 
 export let LoggedInUserFactory = (): LoggedInUser => new LoggedInUser();

@@ -13,14 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if a moderator can view recent commits
- * and feedback messages
+ * @fileoverview Acceptance tests for the functionality of editing the
+ * featured activities list by a moderator.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {Moderator} from '../../utilities/user/moderator';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS: number =
   testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
@@ -29,6 +30,7 @@ const ROLES = testConstants.Roles;
 describe('Moderator', function () {
   let moderator: Moderator;
   let explorationEditor: ExplorationEditor;
+  let loggedInUser: LoggedInUser;
   let explorationId: string | null;
 
   beforeAll(async function () {
@@ -37,9 +39,15 @@ describe('Moderator', function () {
       'moderator@example.com',
       [ROLES.MODERATOR]
     );
+
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com'
+    );
+
+    loggedInUser = await UserFactory.createNewUser(
+      'testLearner',
+      'test_user@example.com'
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -50,6 +58,7 @@ describe('Moderator', function () {
       'End Exploration'
     );
     await explorationEditor.saveExplorationDraft();
+
     explorationId = await explorationEditor.publishExplorationWithContent(
       'Test Exploration Title',
       'Test Exploration Goal',
@@ -58,10 +67,34 @@ describe('Moderator', function () {
     if (!explorationId) {
       throw new Error('Error publishing exploration successfully.');
     }
-
-    await explorationEditor.playExploration(explorationId);
-    await explorationEditor.giveFeedback('It was good');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
+  it(
+    'should be able to feature and unfeature activities',
+    async function () {
+      // The logged in user navigates to the community library
+      await loggedInUser.navigateToCommunitylibrary();
+
+      // The logged in user views all featured activities
+      let featuredActivities = await loggedInUser.viewAllFeaturedActivities();
+      expect(featuredActivities).toEqual([]);
+
+      // The moderator features an activity
+      await moderator.featureActivity(explorationId as string);
+
+      // The logged in user views all featured activities again
+      featuredActivities = await loggedInUser.viewAllFeaturedActivities();
+      expect(featuredActivities).toContain({explorationId: explorationId});
+
+      // The moderator unfeatures the activity
+      await moderator.unfeatureActivity();
+
+      // The logged in user views all featured activities again
+      featuredActivities = await loggedInUser.viewAllFeaturedActivities();
+      expect(featuredActivities).toEqual([]);
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

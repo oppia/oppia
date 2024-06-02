@@ -21,10 +21,16 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 export class Moderator extends BaseUser {
+  /**
+   * Function to navigate to the moderator page.
+   */
   async navigateToModeratorPage(): Promise<void> {
     await this.page.goto(testConstants.URLs.ModeratorPage, {waitUntil: 'load'});
   }
 
+  /**
+   * Function to view all recent commits.
+   */
   async viewAllRecentCommits(): Promise<Array<object>> {
     const commitRows = await this.page.$$('.commit-row');
     const allCommits: Array<{
@@ -69,19 +75,23 @@ export class Moderator extends BaseUser {
     return allCommits;
   }
 
-  async viewRecentCommit(commitNumber: number): Promise<object> {
+  /**
+   * Function to view a specific recent commit.
+   * @param {number} commitIndex - The index of the commit to view.
+   */
+  async viewRecentCommit(commitIndex: number): Promise<object> {
     const commitRows = await this.page.$$('.commit-row');
     if (commitRows.length === 0) {
       throw new Error('No recent commits found');
     }
 
-    commitNumber -= 1;
+    commitIndex -= 1;
 
-    if (commitNumber < 0 || commitNumber >= commitRows.length) {
+    if (commitIndex < 0 || commitIndex >= commitRows.length) {
       throw new Error('Invalid commit number');
     }
 
-    const row = commitRows[commitNumber];
+    const row = commitRows[commitIndex];
     const timestamp = await row.$eval('td:nth-child(1)', el => el.textContent);
     const exploration = await row.$eval(
       'td:nth-child(2) a',
@@ -108,31 +118,46 @@ export class Moderator extends BaseUser {
     };
   }
 
+  /**
+   * Function to open the exploration editor from a title link.
+   * @param {string} title - The title of the exploration.
+   */
   async openExplorationEditorFromTitleLink(title: string): Promise<void> {
     await this.clickAndWaitForNavigation(title);
   }
 
+  /**
+   * Function to check if the user is on the feedback tab of the exploration editor.
+   */
   async isOnFeedbackTabOfExplorationEditor(): Promise<boolean> {
     return await this.isTextPresentOnPage('Start new thread');
   }
 
+  /**
+   * Function to open the exploration editor from an ID link.
+   * @param {string | null} explorationID - The ID of the exploration.
+   */
   async openExplorationEditorFromIdLink(
     explorationID: string | null
   ): Promise<void> {
     await this.clickAndWaitForNavigation(explorationID as string);
   }
 
+  /**
+   * Function to navigate to recent feedback messages.
+   */
   async goToRecentFeedbackMessages(): Promise<void> {
     await this.clickAndWaitForNavigation('Recent Feedback Messages');
   }
 
+  /**
+   * Function to view all recent feedback messages.
+   */
   async viewAllRecentFeedbackMessages(): Promise<object[]> {
-    await this.page.waitForSelector('.oppia-padded-table');
-
     const feedbackMessages = await this.page.$$eval(
-      '.oppia-padded-table tr',
+      '.protractor-test-message-table-row',
       rows => {
-        return Array.from(rows, row => {
+        return rows.map(row => {
           const columns = row.querySelectorAll('td');
           return {
             timestamp: columns[0]?.textContent?.trim(),
@@ -146,6 +171,43 @@ export class Moderator extends BaseUser {
     feedbackMessages.shift();
 
     return feedbackMessages;
+  }
+
+  /**
+   * Function to feature an activity.
+   * @param {string} explorationId - The ID of the exploration to feature.
+   */
+  async featureActivity(explorationId: string): Promise<void> {
+    await this.clickOn(' Add element ');
+    await this.page.waitForSelector('input[aria-label="text input"]');
+    await this.page.type('input[aria-label="text input"]', explorationId);
+    await this.page.keyboard.press('Enter');
+    await this.clickOn(' Save Featured Activities ');
+
+    // Check if the text "Featured Activities Saved." appears on the screen
+    const isSaved = await this.isTextPresentOnPage(
+      'Featured activities saved.'
+    );
+    if (!isSaved) {
+      throw new Error('Failed to save the featured activities');
+    }
+    showMessage('Activity featured successfully.');
+  }
+
+  /**
+   * Function to unfeature an activity.
+   */
+  async unfeatureActivity(): Promise<void> {
+    await this.clickOn('.e2e-test-delete-list-entry');
+    await this.clickOn(' Save Featured Activities ');
+
+    const isSaved = await this.isTextPresentOnPage(
+      'Featured activities saved.'
+    );
+    if (!isSaved) {
+      throw new Error('Failed to unfeature the activity');
+    }
+    showMessage('Activity unfeatured successfully.');
   }
 }
 
