@@ -16,7 +16,7 @@
                 <th>Commit message</th>
                 <th>Community-owned?</th>
               </tr>
-              <tr *ngFor="let commit of allCommits">
+              <tr *ngFor="let commit of allCommits" class="e2e-test-commit-row">
                 <td>{{ getDatetimeAsString(commit.last_updated) }}</td>
                 <td>
                   <a [href]="getExplorationCreateUrl(commit.exploration_id)">
