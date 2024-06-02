@@ -20,7 +20,6 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
 import {StoryEditorNavigationService} from '../services/story-editor-navigation.service';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {StoryUpdateService} from 'domain/story/story-update.service';
 import {Story} from 'domain/story/story.model';
 import {StoryContents} from 'domain/story/story-contents-object.model';
@@ -91,9 +90,3 @@ export class ChapterEditorTabComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaChapterEditorTab',
-  downgradeComponent({
-    component: ChapterEditorTabComponent,
-  })
-);
