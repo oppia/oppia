@@ -534,7 +534,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread_3.update_timestamps()
         thread_3.put()
         feedback_services.create_message(
-            f'exploration.{self.EXP_ID_3}.{self.THREAD_ID}',
+            'exploration.%s.%s' % (self.EXP_ID_3, self.THREAD_ID), 
             self.user_id, None, None, 'not used here')
 
         thread_ids = subscription_services.get_all_threads_subscribed_to(
