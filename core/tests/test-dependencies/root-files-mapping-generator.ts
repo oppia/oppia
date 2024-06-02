@@ -114,7 +114,7 @@ const MANUALLY_MAPPED_DEPENDENCIES: Record<string, string[]> = {
   ],
   'core/templates/pages/lightweight-oppia-root/index.ts': [
     'core/templates/pages/lightweight-oppia-root/lightweight-oppia-root.mainpage.html',
-  ]
+  ],
 };
 
 const CI_TEST_SUITE_CONFIGS_DIRECTORY = path.resolve(
