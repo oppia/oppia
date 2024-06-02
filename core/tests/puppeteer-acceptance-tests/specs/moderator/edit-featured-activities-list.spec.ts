@@ -13,28 +13,57 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if a moderator can edit the
- *  featured activities list
+ * @fileoverview Acceptance Test for checking if a moderator can view recent commits
+ * and feedback messages
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
-import { Moderator } from '../../utilities/user/moderator';
+import {Moderator} from '../../utilities/user/moderator';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
-const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const DEFAULT_SPEC_TIMEOUT_MSECS: number =
+  testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-let moderator: Moderator;
+describe('Moderator', function () {
+  let moderator: Moderator;
+  let explorationEditor: ExplorationEditor;
+  let explorationId: string | null;
 
-beforeAll(async function () {
+  beforeAll(async function () {
     moderator = await UserFactory.createNewUser(
-        'Moderator',
-        'moderator@example.com',
-        [ROLES.MODERATOR]
+      'Moderator',
+      'moderator@example.com',
+      [ROLES.MODERATOR]
     );
-}, DEFAULT_SPEC_TIMEOUT);
+    explorationEditor = await UserFactory.createNewUser(
+      'explorationEditor',
+      'exploration_editor@example.com'
+    );
 
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.createExplorationWithMinimumContent(
+      'Test Exploration',
+      'End Exploration'
+    );
+    await explorationEditor.saveExplorationDraft();
+    explorationId = await explorationEditor.publishExplorationWithContent(
+      'Test Exploration Title',
+      'Test Exploration Goal',
+      'Algebra'
+    );
+    if (!explorationId) {
+      throw new Error('Error publishing exploration successfully.');
+    }
 
-afterAll(async function () {
+    await explorationEditor.playExploration(explorationId);
+    await explorationEditor.giveFeedback('It was good');
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
+  afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
+});

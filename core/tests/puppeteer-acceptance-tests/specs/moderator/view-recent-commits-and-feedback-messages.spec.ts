@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if a moderator can view recent commits 
+ * @fileoverview Acceptance Test for checking if a moderator can view recent commits
  * and feedback messages
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
-import { Moderator } from '../../utilities/user/moderator';
-import { ExplorationEditor } from '../../utilities/user/exploration-editor';
+import {Moderator} from '../../utilities/user/moderator';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS: number =
   testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
@@ -31,12 +31,11 @@ describe('Moderator', function () {
   let explorationEditor: ExplorationEditor;
   let explorationId: string | null;
 
-
   beforeAll(async function () {
     moderator = await UserFactory.createNewUser(
-        'Moderator',
-        'moderator@example.com',
-        [ROLES.MODERATOR]
+      'Moderator',
+      'moderator@example.com',
+      [ROLES.MODERATOR]
     );
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
@@ -62,38 +61,39 @@ describe('Moderator', function () {
 
     await explorationEditor.playExploration(explorationId);
     await explorationEditor.giveFeedback('It was good');
-}, DEFAULT_SPEC_TIMEOUT_MSECS);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
- it('should be able to view recent commits and feedback messages', async function () {
-  // Access the moderator page and ensure that the page data loads correctly.
-  await moderator.navigateToModeratorPage();
-  const recentCommits = await moderator.viewAllRecentCommits();
-  expect(recentCommits.length).toBeGreaterThan(0);
+  it(
+    'should be able to view recent commits and feedback messages',
+    async function () {
+      await moderator.navigateToModeratorPage();
+      const recentCommits = await moderator.viewAllRecentCommits();
+      expect(recentCommits.length).toBeGreaterThan(0);
 
-  // Check properties of a recent commit.
-  const recentCommit = await moderator.viewRecentCommit();
-  expect(recentCommit).toHaveProperty('timestamp');
-  expect(recentCommit).toHaveProperty('exploration');
-  expect(recentCommit).toHaveProperty('category');
-  expect(recentCommit).toHaveProperty('username');
-  expect(recentCommit).toHaveProperty('commitMessage');
-  expect(recentCommit).toHaveProperty('isCommunityOwned');
+      // Check properties of a recent commit.
+      const recentCommit = await moderator.viewRecentCommit();
+      expect(recentCommit).toHave('timestamp');
+      expect(recentCommit).toHaveProperty('exploration');
+      expect(recentCommit).toHaveProperty('category');
+      expect(recentCommit).toHaveProperty('username');
+      expect(recentCommit).toHaveProperty('commitMessage');
+      expect(recentCommit).toHaveProperty('isCommunityOwned');
 
-  // Open the respective exploration in the exploration editor by clicking the links attached to the corresponding exploration titles.
-  await moderator.openExplorationFromCommitLink();
-  expect(await moderator.isInExplorationEditor()).toBe(true);
+      expect(await moderator.isInExplorationEditor()).toBe(true);
 
-  // View recent feedback messages.
-  const recentFeedbackMessages = await moderator.viewRecentFeedbackMessages();
-  expect(recentFeedbackMessages.length).toBeGreaterThan(0);
+      // View recent feedback messages.
+      const recentFeedbackMessages =
+        await moderator.viewRecentFeedbackMessages();
+      expect(recentFeedbackMessages.length).toBeGreaterThan(0);
 
-  // Open the respective exploration in the exploration editor by clicking the links attached to the corresponding exploration in recent feedback messages.
-  await moderator.openExplorationFromFeedbackLink();
-  expect(await moderator.isOnFeedbackTabOfExplorationEditor()).toBe(true);
-}, DEFAULT_SPEC_TIMEOUT_MSECS);
+      // Open the respective exploration in the exploration editor by clicking the links attached to the corresponding exploration in recent feedback messages.
+      await moderator.openExplorationFromFeedbackLink();
+      expect(await moderator.isOnFeedbackTabOfExplorationEditor()).toBe(true);
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-afterAll(async function () {
-  await UserFactory.closeAllBrowsers();
-});
-
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });

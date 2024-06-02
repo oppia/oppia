@@ -410,7 +410,7 @@ export class BaseUser {
   getCurrentUrlWithoutParameters(): string {
     return this.page.url().split('?')[0];
   }
-   
+
   /**
    * The function clicks the element using the text on the button
    * and wait until the new page is fully loaded.

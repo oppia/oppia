@@ -966,18 +966,19 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForNavigation({waitUntil: ['load']});
   }
 
- async giveFeedback(feedback: string): Promise<void> {
-  await this.clickOn('.e2e-test-exploration-feedback-popup-link')
-  await this.page.waitForSelector('.e2e-test-exploration-feedback-textarea')
-  await this.type('.e2e-test-exploration-feedback-textarea', feedback);
-  await this.clickOn('Submit');
+  async giveFeedback(feedback: string): Promise<void> {
+    await this.clickOn('.e2e-test-exploration-feedback-popup-link');
+    await this.page.waitForSelector('.e2e-test-exploration-feedback-textarea');
+    await this.type('.e2e-test-exploration-feedback-textarea', feedback);
+    await this.clickOn('Submit');
 
-  const isMessagePresent = await this.isTextPresentOnPage('Thank you for the feedback');
-  if (!isMessagePresent) {
-    throw new Error('Feedback was not successfully submitted');
+    const isMessagePresent = await this.isTextPresentOnPage(
+      'Thank you for the feedback'
+    );
+    if (!isMessagePresent) {
+      throw new Error('Feedback was not successfully submitted');
+    }
   }
-}
-
 }
 
 export let ExplorationEditorFactory = (): ExplorationEditor =>

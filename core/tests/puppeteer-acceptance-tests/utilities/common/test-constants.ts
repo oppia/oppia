@@ -17,7 +17,7 @@
  */
 
 import path from 'path';
-import { Moderator } from '../user/moderator';
+import {Moderator} from '../user/moderator';
 
 export default {
   URLs: {
@@ -80,7 +80,7 @@ export default {
     CURRICULUM_ADMIN: 'curriculum admin',
     QUESTION_ADMIN: 'question admin',
     VOICEOVER_ADMIN: 'voiceover admin',
-    MODERATOR:'moderator',
+    MODERATOR: 'moderator',
   } as const,
   BlogRights: {
     BLOG_ADMIN: 'BLOG_ADMIN',

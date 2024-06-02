@@ -30,7 +30,7 @@ import {
 } from '../user/exploration-editor';
 import {CurriculumAdminFactory} from '../user/curriculum-admin';
 import {LoggedInUserFactory, LoggedInUser} from '../user/logged-in-user';
-import { ModeratorFactory } from '../user/moderator';
+import {ModeratorFactory} from '../user/moderator';
 import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
