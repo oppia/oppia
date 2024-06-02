@@ -71,6 +71,10 @@ export class AccessValidationBackendApiService {
     '/access_validation_handler/' +
     'can_access_collection_editor_page/<collection_id>';
 
+  STORY_EDITOR_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/' +
+    'can_access_story_editor_page/<story_id>';    
+
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
@@ -210,6 +214,17 @@ export class AccessValidationBackendApiService {
       this.COLLECTION_EDITOR_PAGE_ACCESS_VALIDATOR,
       {
         collection_id: collectionId,
+      }
+    );
+
+    return this.http.get<void>(url).toPromise();
+  }
+
+  validateAccessStoryEditorPage(storyId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.STORY_EDITOR_PAGE_ACCESS_VALIDATOR,
+      {
+        story_id: storyId,
       }
     );
 
