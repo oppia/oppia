@@ -124,4 +124,5 @@ class ColorMessagePrintTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self.log,
-            f'{green_color_message_prefix}{message}{escape_sequence}')
+            '%s%s%s' % (green_color_message_prefix, message, escape_sequence)
+        )
