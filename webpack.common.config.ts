@@ -185,7 +185,7 @@ module.exports = {
       template:
         commonPrefix +
         '/pages/error-pages/error-iframed-page/' +
-        'error-iframed.mainpage.html',
+        'error-iframed-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
     }),

@@ -227,6 +227,28 @@ const getChildrenFromRouteObjectNode = (
 };
 
 /**
+ * Extends the route to module mapping with a list of route nodes.
+ */
+const extendRouteToModuleMappingWithRouteNodes = (
+  routeToModuleMapping: Map<Route, string> = new Map(),
+  routeNodes: ObjectLiteralExpression[] = [],
+  parentRoutePath?: string,
+  parentRoutingModuleFilePath?: string
+): Map<Route, string> => {
+  for (const routeNode of routeNodes) {
+    routeToModuleMapping = extendMap(
+      routeToModuleMapping,
+      convertRouteNodeToMap(
+        routeNode,
+        parentRoutePath,
+        parentRoutingModuleFilePath
+      )
+    );
+  }
+  return routeToModuleMapping;
+};
+
+/**
  * Converts a route object AST node to a map element.
  */
 const convertRouteNodeToMap = (
@@ -242,20 +264,16 @@ const convertRouteNodeToMap = (
 
   const module = getModuleFromRouteObjectNode(routeNode);
   const pathMatch = getPathMatchFromRouteObjectNode(routeNode);
-  const children = getChildrenFromRouteObjectNode(routeNode);
+  const childrenRouteNodes = getChildrenFromRouteObjectNode(routeNode);
   const routePath = parentRoutePath ? `${parentRoutePath}/${path}` : path;
 
-  if (children) {
-    for (const child of children) {
-      routeToModuleMapping = extendMap(
-        routeToModuleMapping,
-        convertRouteNodeToMap(
-          child,
-          routePath,
-          parentRoutingModuleFilePath || module
-        )
-      );
-    }
+  if (childrenRouteNodes) {
+    routeToModuleMapping = extendRouteToModuleMappingWithRouteNodes(
+      routeToModuleMapping,
+      childrenRouteNodes,
+      routePath,
+      parentRoutingModuleFilePath
+    );
   }
   if (module) {
     const containingFile = routeNode.getSourceFile().getFilePath();
@@ -356,16 +374,12 @@ const getRouteToModuleMappingFromRoutingModule = (
     return routeToModuleMapping;
   }
 
-  for (const routeNode of routingModuleRouteNodes) {
-    routeToModuleMapping = extendMap(
-      routeToModuleMapping,
-      convertRouteNodeToMap(
-        routeNode,
-        parentRoutePath,
-        parentRoutingModuleFilePath
-      )
-    );
-  }
+  routeToModuleMapping = extendRouteToModuleMappingWithRouteNodes(
+    routeToModuleMapping,
+    routingModuleRouteNodes,
+    parentRoutePath,
+    parentRoutingModuleFilePath
+  );
 
   return routeToModuleMapping;
 };
@@ -380,9 +394,10 @@ const validateRouteToModuleMapping = (
   for (const module of routeToModuleMapping.values()) {
     if (!fs.existsSync(path.resolve(ROOT_DIRECTORY, module))) {
       throw new Error(
-        `The module: ${module} defined in the manual route to module mapping ` +
-          'does not exist in the codebase. Please remove it from the manual ' +
-          'route to module mapping.'
+        `The module: ${module} defined in the route to module mapping does ` +
+          'not exist in the codebase. Please ensure that it exists or remove it ' +
+          'from the route to module mapping by removing it from the manual route to ' +
+          'module mapping or the routing module file.'
       );
     }
   }
@@ -405,7 +420,6 @@ export const getRouteToModuleMapping = (): Map<Route, string> => {
     );
   }
   validateRouteToModuleMapping(routeToModuleMapping);
-
   return routeToModuleMapping;
 };
 

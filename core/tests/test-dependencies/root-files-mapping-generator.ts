@@ -114,11 +114,7 @@ const MANUALLY_MAPPED_DEPENDENCIES: Record<string, string[]> = {
   ],
   'core/templates/pages/lightweight-oppia-root/index.ts': [
     'core/templates/pages/lightweight-oppia-root/lightweight-oppia-root.mainpage.html',
-  ],
-  'core/templates/pages/error-pages/error-iframed-page/error-iframed-page.import.ts':
-    [
-      'core/templates/pages/error-pages/error-iframed-page/error-iframed.mainpage.html',
-    ],
+  ]
 };
 
 const CI_TEST_SUITE_CONFIGS_DIRECTORY = path.resolve(
