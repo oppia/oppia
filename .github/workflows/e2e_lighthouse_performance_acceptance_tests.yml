@@ -326,6 +326,7 @@ jobs:
             - translation-admin/add-and-remove-translation-rights
             - voiceover-admin/add-voiceover-artist-to-an-exploration
             - moderator/view-recent-commits-and-feedback-messages
+            - moderator/edit-featured-activities-list
       steps:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v3
