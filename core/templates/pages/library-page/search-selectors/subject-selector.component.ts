@@ -43,7 +43,7 @@ export class SubjectSelectorComponent implements OnInit {
   ) {}
 
   isMobileViewActive(): boolean {
-    return this.windowDimensionsService.getWidth() <= 766;
+    return this.windowDimensionsService.getWidth() <= 900;
   }
 
   // Update the description, numSelections and summary fields of the

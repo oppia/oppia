@@ -67,3 +67,31 @@
 .filter-box .custom-link:hover {
   color: #00645c;
 }
+
+@media (max-width: 1720px) {
+  .filter-box mat-checkbox {
+    width: 100%;
+  }
+
+}
+
+@media (max-width: 1720px) {
+  .filter-box mat-checkbox {
+    max-width: 200px;
+  }
+
+}
+
+@media (max-width: 1126px) {
+  .filter-box mat-checkbox {
+    max-width: 180px;
+  }
+
+}
+
+@media (max-width: 727px) {
+  .filter-box mat-checkbox {
+    max-width: 180px;
+  }
+    
+}

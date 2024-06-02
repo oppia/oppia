@@ -5,7 +5,7 @@
       <hr class="custom-divider">
     </mat-card-content>
     <mat-card-content>
-      <div class="checkbox-container">
+      <div class="checkbox-container" *ngIf="!isMobileViewActive()">
         <mat-checkbox class="oppia-checkbox"
                       *ngFor="let option of selectionDetails.languageCodes.masterList | slice:0:5"
                       [ngModel]="selectionDetails.languageCodes.selections[option.id]"
@@ -75,4 +75,54 @@
   .custom-link:hover {
     color: #00645c;
   }
+
+  @media (max-width: 1720px) {
+  .filter-box {
+    max-width: 220px;
+  }
+
+}
+
+@media (max-width: 1600px) {
+  .filter-box {
+    max-width: 200px;
+  }
+
+}
+
+@media (max-width: 1440px) {
+  .filter-box {
+    max-width: 170px;
+  }
+
+}
+
+@media (max-width: 1300px) {
+  .filter-box {
+    max-width: 140px;
+  }
+
+  .oppia-checkbox {
+    font-size: 14px;
+  }
+
+}
+
+@media (max-width: 1126px) {
+  .filter-box {
+    max-width: 110px;
+  }
+
+  .oppia-checkbox {
+    font-size: 11px;
+  }
+
+}
+
+@media (max-width: 727px) {
+  .filter-box {
+    max-width: 100px;
+  }
+
+}
 </style>

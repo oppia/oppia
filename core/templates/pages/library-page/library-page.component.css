@@ -221,7 +221,7 @@ oppia-library-page .oppia-search-bar-container {
   gap: 20px;
   left: 200px;
   position: absolute;
-  top: 100px;
+  top: 140px;
   width: 250px;
   z-index: 10;
 }
@@ -249,24 +249,36 @@ oppia-library-page .oppia-search-bar-container {
     font-size: 1.05em;
   }
 }
-@media (max-width: 1720px) {
+
+@media (max-width: 1800px) {
   .oppia-checkbox-filter-container {
-    left: 0;
+    left: 150px;
     margin-bottom: 20px;
     max-width: 300px;
-    position: relative;
-    top: 0;
-    width: 100%;
   }
 }
+
+@media (max-width: 1720px) {
+  .oppia-checkbox-filter-container {
+    left: 110px;
+    margin-bottom: 20px;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 1600px) {
+  .oppia-checkbox-filter-container {
+    left: 85px;
+    margin-bottom: 20px;
+    max-width: 300px;
+  }
+}
+
 @media (max-width: 1440px) {
   .oppia-checkbox-filter-container {
     left: 0;
     margin-bottom: 20px;
-    max-width: 300px;
-    position: relative;
-    top: 0;
-    width: 100%;
+    max-width: 200px;
   }
 }
 @media (max-width: 1126px) {
@@ -276,10 +288,7 @@ oppia-library-page .oppia-search-bar-container {
   .oppia-checkbox-filter-container {
     left: 0;
     margin-bottom: 20px;
-    max-width: 300px;
-    position: relative;
-    top: 0;
-    width: 100%;
+    max-width: 180px;
   }
 }
 @media (max-width: 900px) {
@@ -300,10 +309,7 @@ oppia-library-page .oppia-search-bar-container {
   .oppia-checkbox-filter-container {
     left: 0;
     margin-bottom: 20px;
-    max-width: 300px;
-    position: relative;
-    top: 0;
-    width: 100%;
+    max-width: 180px;
   }
 }
 @media (max-width: 727px) {
@@ -328,10 +334,7 @@ oppia-library-page .oppia-search-bar-container {
   .oppia-checkbox-filter-container {
     left: 0;
     margin-bottom: 20px;
-    max-width: 300px;
-    position: relative;
-    top: 0;
-    width: 100%;
+    max-width: 140px;
   }
 }
 @media (max-width: 536px) {
