@@ -84,10 +84,10 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             author_id=author_id,
             final_reviewer_id=final_reviewer_id,
             change_cmd={},
-            score_category=('%s%s%s' % (
+            score_category=('%s%sEnglish' % (
                 suggestion_models.SCORE_TYPE_TRANSLATION,
-                suggestion_models.SCORE_CATEGORY_DELIMITER, 'English')
-            ),
+                suggestion_models.SCORE_CATEGORY_DELIMITER
+            )),
             language_code=language_code
         )
 
@@ -206,10 +206,10 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             author_id=author_id,
             final_reviewer_id=final_reviewer_id,
             change_cmd={},
-            score_category=('%s%s%s' % (
+            score_category=('%s%sEnglish' % (
                 suggestion_models.SCORE_TYPE_TRANSLATION,
-                suggestion_models.SCORE_CATEGORY_DELIMITER, 'English')
-            ),
+                suggestion_models.SCORE_CATEGORY_DELIMITER
+            )),
             language_code=language_code
         )
 
