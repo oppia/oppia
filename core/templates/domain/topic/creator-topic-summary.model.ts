@@ -41,7 +41,7 @@ export interface CreatorTopicSummaryBackendDict {
   url_fragment: string;
   // This property is optional because it is only present in the
   // topic summary dict of topic dashboard page.
-  classroom?: string;
+  classroom?: string | null;
 }
 
 export class CreatorTopicSummary {
