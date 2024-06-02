@@ -37,7 +37,7 @@ RELEASE_TEST_DIR: Final = os.path.join('core', 'tests', 'release_sources', '')
 MOCK_TMP_UNTAR_PATH: Final = os.path.join(RELEASE_TEST_DIR, 'tmp_unzip.tar.gz')
 TEST_DATA_DIR: Final = os.path.join('core', 'tests', 'data', '')
 MOCK_YARN_PATH: Final = os.path.join(
-    TEST_DATA_DIR, f'yarn-v{common.YARN_VERSION}'
+    TEST_DATA_DIR, 'yarn-v%s' % common.YARN_VERSION
 )
 
 
