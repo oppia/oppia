@@ -27,26 +27,33 @@ export class Moderator extends BaseUser {
     }
     
     async viewAllRecentCommits(): Promise<Array<object>> {
-    const commitRows = await this.page.$$('.commit-row');
-  const allCommits = [];
+        const commitRows = await this.page.$$('.commit-row');
+    const allCommits: Array<{
+        timestamp: string | null;
+        exploration: string | null;
+        category: string | null;
+        username: string | null;
+        commitMessage: string | null;
+        isCommunityOwned: string | null;
+    }> = [];
 
-  for (const row of commitRows) {
-    const timestamp = await row.$eval('td:nth-child(1)', el => el.textContent);
-    const exploration = await row.$eval('td:nth-child(2) a', el => el.textContent);
-    const category = await row.$eval('td:nth-child(3)', el => el.textContent);
-    const username = await row.$eval('td:nth-child(4)', el => el.textContent);
-    const commitMessage = await row.$eval('td:nth-child(5)', el => el.textContent);
-    const isCommunityOwned = await row.$eval('td:nth-child(6)', el => el.textContent);
+    for (const row of commitRows) {
+        const timestamp = await row.$eval('td:nth-child(1)', el => el.textContent);
+        const exploration = await row.$eval('td:nth-child(2) a', el => el.textContent);
+        const category = await row.$eval('td:nth-child(3)', el => el.textContent);
+        const username = await row.$eval('td:nth-child(4)', el => el.textContent);
+        const commitMessage = await row.$eval('td:nth-child(5)', el => el.textContent);
+        const isCommunityOwned = await row.$eval('td:nth-child(6)', el => el.textContent);
 
-    allCommits.push({
-      timestamp,
-      exploration,
-      category,
-      username,
-      commitMessage,
-      isCommunityOwned
-    });
-  }
+        allCommits.push({
+            timestamp,
+            exploration,
+            category,
+            username,
+            commitMessage,
+            isCommunityOwned
+        });
+    }
 
   return allCommits;
 }
