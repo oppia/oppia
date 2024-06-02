@@ -119,7 +119,8 @@ describe('Partnerships page', () => {
 
   it('should set the correct form link for English language', () => {
     translateService.currentLang = 'en';
-    const formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+    const formLink =
+      'https://docs.google.com/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform';
     component.setFormLink();
 
     expect(component.formLink).toBe(formLink);
@@ -147,7 +148,8 @@ describe('Partnerships page', () => {
     'should set english link for languages not supported by' + ' google forms',
     () => {
       translateService.currentLang = 'pcm';
-      const formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+      const formLink =
+        'https://docs.google.com/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform';
       component.setFormLink();
 
       expect(component.formLink).toBe(formLink);
