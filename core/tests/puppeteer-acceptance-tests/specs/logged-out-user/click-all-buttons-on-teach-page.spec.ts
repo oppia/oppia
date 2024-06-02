@@ -23,7 +23,7 @@ import testConstants from '../../utilities/common/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Parent/Teacher in Parents and Teachers page', function () {
+describe('Parent/Teacher in Teach page', function () {
   let testUser: LoggedOutUser;
 
   beforeAll(async function () {
