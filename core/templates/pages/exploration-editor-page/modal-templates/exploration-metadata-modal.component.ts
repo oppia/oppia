@@ -166,7 +166,7 @@ export class ExplorationMetadataModalComponent
     this.explorationLanguageCodeService.saveDisplayedValue();
     this.explorationTagsService.saveDisplayedValue();
 
-    // TODO(sll): Get rid of the $timeout here.
+    // TODO(#20338): Get rid of the $timeout here.
     // It's currently used because there is a race condition: the
     // saveDisplayedValue() calls above result in autosave calls.
     // These race with the discardDraft() call that

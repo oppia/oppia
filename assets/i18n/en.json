@@ -181,7 +181,6 @@
     "I18N_BLOG_POST_PAGE_TITLE": "<[blogPostTitle]> | Blog | Oppia",
     "I18N_BLOG_POST_THUMBNAIL_ALLOWED_EXTENSIONS_PREFIX": "Allowed image extensions: ",
     "I18N_BLOG_POST_THUMBNAIL_ALLOWED_MAX_FILE_SIZE": "The maximum allowed image size is <[imageSize]> KB. Note that, sometimes, cropping might increase the image size.",
-    "I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG": "Choose a file or drag it here",
     "I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "Error: Could not read image file.",
     "I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD": "Add a thumbnail",
     "I18N_BLOG_POST_UNTITLED_HEADING": "Untitled",

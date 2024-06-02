@@ -176,7 +176,6 @@
 	"I18N_BLOG_POST_PAGE_TITLE": "<[blogPostTitle]> | Blogu | Opia",
 	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_EXTENSIONS_PREFIX": "Viendelezi vya picha vinavyoruhusiwa",
 	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_MAX_FILE_SIZE": "Ukubwa wa juu unaoruhusiwa wa picha ni <[imageSize]> KB. Kumbuka kuwa, wakati mwingine, upunguzaji unaweza kuongeza saizi ya picha.",
-	"I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG": "Chagua faili au iburute hapa",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "Hitilafu: Haikuweza kusoma faili ya picha.",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD": "Ongeza picha ndogo",
 	"I18N_BLOG_POST_UNTITLED_HEADING": "Haina jina",
