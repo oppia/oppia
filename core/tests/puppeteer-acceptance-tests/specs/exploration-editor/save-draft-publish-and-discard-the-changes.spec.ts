@@ -16,11 +16,11 @@
  * @fileoverview Acceptance Test for saving drafts, publishing, and discarding changes.
  */
 
-import {showMessage} from '../../puppeteer-testing-utilities/show-message-utils';
-import testConstants from '../../puppeteer-testing-utilities/test-constants';
-import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
-import {ExplorationEditor} from '../../user-utilities/exploration-editor-utils';
-import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
+import {showMessage} from '../../utilities/common/show-message';
+import testConstants from '../../utilities/common/test-constants';
+import {UserFactory} from '../../utilities/common/user-factory';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 enum INTERACTION_TYPES {
