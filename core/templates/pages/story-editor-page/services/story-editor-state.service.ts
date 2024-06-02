@@ -19,7 +19,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {StoryChange} from 'domain/editor/undo_redo/change.model';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
@@ -408,10 +407,3 @@ export class StoryEditorStateService {
       );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StoryEditorStateService',
-    downgradeInjectable(StoryEditorStateService)
-  );
