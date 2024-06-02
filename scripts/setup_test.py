@@ -272,7 +272,9 @@ class SetupTests(test_utils.GenericTestBase):
         # Creates a dummy yarn folder and then checks if `v` was removed
         # upon function call.
         os.mkdir(MOCK_YARN_PATH)
-        setup.rename_yarn_folder('yarn-v%s' % common.YARN_VERSION, TEST_DATA_DIR)
+        setup.rename_yarn_folder(
+            'yarn-v%s' % common.YARN_VERSION, TEST_DATA_DIR
+        )
         target = os.path.join(
             TEST_DATA_DIR, 'yarn-%s' % common.YARN_VERSION)
         self.assertTrue(os.path.exists(target))
