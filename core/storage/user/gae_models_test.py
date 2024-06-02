@@ -1170,8 +1170,8 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         for creator_id in self.CREATOR_IDS:
             user_models.UserSettingsModel(
                 id=creator_id,
-                username=f'username{creator_id}',
-                email=f'{creator_id}@example.com'
+                username='username%s' % creator_id,
+                email='%s@example.com' % creator_id
             ).put()
             user_models.UserSubscriptionsModel(id=creator_id).put()
 
