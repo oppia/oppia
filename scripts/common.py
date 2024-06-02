@@ -217,7 +217,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'curriculum-admin/create-and-publish-topics-and-stories',
     'exploration-editor/create-exploration-and-change-basic-settings',
     'exploration-editor/load-complete-and-restart-exploration-preview',
-    'exploration-editor-tests/save-draft-publish-and-discard-the-changes',
+    'exploration-editor/save-draft-publish-and-discard-the-changes',
     'logged-out-user/click-all-buttons-on-about-page',
     'logged-out-user/click-all-buttons-on-about-foundation-page',
     'logged-out-user/click-all-buttons-on-donation-thanks-page',
