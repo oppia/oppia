@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
@@ -31,9 +30,3 @@ export class DeleteChapterModalComponent extends ConfirmOrCancelModal {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaDeleteChapterModal',
-  downgradeComponent({
-    component: DeleteChapterModalComponent,
-  }) as angular.IDirectiveFactory
-);
