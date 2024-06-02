@@ -43,7 +43,7 @@ describe('Volunteer in Volunteer page', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should open the Volunteer form when the "Apply to Volunteer" button' +
+    'should open the Volunteer form when the "Apply to Volunteer" button ' +
       'at the top is clicked.',
     async function () {
       await testUser.clickApplyToVolunteerAtTheTopOfVolunteerPage();
@@ -52,7 +52,7 @@ describe('Volunteer in Volunteer page', function () {
   );
 
   it(
-    'should open the Volunteer form when the "Apply to Volunteer" button' +
+    'should open the Volunteer form when the "Apply to Volunteer" button ' +
       'at the bottom is clicked.',
     async function () {
       await testUser.clickApplyToVolunteerAtTheBottomOfVolunteerPage();

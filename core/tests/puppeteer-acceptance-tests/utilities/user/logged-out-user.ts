@@ -147,12 +147,14 @@ const brochureButtonInPartnershipsPage =
 const readMoreStoriesButtonInPartnershipsPage =
   '.e2e-test-partnerships-page-partner-stories-button';
 const readBlogPostButtonInPartnershipsPage =
-  '.e2e-test-partnerships-page-blog-post-button';
+  'a.e2e-test-partnerships-page-blog-post-button';
 const applyToVolunteerButtonAtTheTopOfVolunteerPage =
   '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-top';
 const applyToVolunteerButtonAtTheBottomOfVolunteerPage =
   '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-bottom';
 const donorBoxIframe = '.e2e-test-donate-page-iframe';
+const blogPostTitleInPartnershipsPage =
+  '.e2e-test-blog-post-page-title-container';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -205,7 +207,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToTeachPage(): Promise<void> {
     await Promise.all([
-      this.page.waitForNavigation(),
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
       this.page.goto(teachUrl),
     ]);
   }
@@ -215,7 +217,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToPartnershipsPage(): Promise<void> {
     await Promise.all([
-      this.page.waitForNavigation(),
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
       this.page.goto(partnershipsUrl),
     ]);
   }
@@ -225,7 +227,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToVolunteerPage(): Promise<void> {
     await Promise.all([
-      this.page.waitForNavigation(),
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
       this.page.goto(volunteerUrl),
     ]);
   }
@@ -235,7 +237,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToDonatePage(): Promise<void> {
     await Promise.all([
-      this.page.waitForNavigation(),
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
       this.page.goto(donateUrl),
     ]);
   }
@@ -1203,6 +1205,7 @@ export class LoggedOutUser extends BaseUser {
       blogPostUrlinPartnershipsPage,
       'Blog Post'
     );
+    await this.page.waitForSelector(blogPostTitleInPartnershipsPage);
   }
 
   /**
