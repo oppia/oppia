@@ -495,3 +495,26 @@ class CollectionEditorAccessValidationPage(
     def get(self, _: str) -> None:
         """Handles GET requests."""
         pass
+
+class StoryEditorPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to story editor page."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'story_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length',
+                    'value': constants.STORY_ID_LENGTH
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_edit_story
+    def get(self, _: str) -> None:
+        """Handles GET requests."""
+        pass
