@@ -23,6 +23,10 @@ export interface VoiceoverBackendDict {
   needs_update: boolean;
 }
 
+export interface VoiceoverTypeToVoiceoversBackendDict {
+  [manual: string]: VoiceoverBackendDict;
+}
+
 export class Voiceover {
   filename: string;
   fileSizeBytes: number;
