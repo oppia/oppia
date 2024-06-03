@@ -182,6 +182,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     if parsed_args.run_on_changed_files:
         remote = git_changes_utils.get_remote_name()
+        if not remote:
+            sys.exit('Error: No remote repository found.')
         refs = git_changes_utils.get_refs()
         collected_files = git_changes_utils.get_changed_files(
             refs, remote.decode('utf-8'))

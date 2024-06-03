@@ -395,6 +395,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         def mock_start_subprocess_for_result(
             unused_cmd_tokens: List[str]
         ):
+            """Mock function for start_subprocess_for_result."""
             return (b'local_sha1 local_ref\nremote_sha1 remote_ref', b'')
         get_branch_swap = self.swap(
             common, 'get_current_branch_name', mock_get_branch)
@@ -418,6 +419,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         def mock_start_subprocess_for_result(
             unused_cmd_tokens: List[str]
         ):
+            """Mock error in start_subprocess_for_result."""
             return (b'', b'Error')
         get_branch_swap = self.swap(
             common, 'get_current_branch_name', mock_get_branch)

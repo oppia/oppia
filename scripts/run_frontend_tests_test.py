@@ -23,7 +23,7 @@ import sys
 
 from core.tests import test_utils
 
-from typing import List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from . import build
 from . import check_frontend_test_coverage
@@ -233,20 +233,24 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
     def test_frontend_tests_with_run_on_changed_files(self) -> None:
         git_refs = [git_changes_utils.GitRef(
             'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1')]
-        def mock_get_remote_name() -> str:
+        def mock_get_remote_name() -> bytes:
             return b'remote'
         def mock_get_refs() -> List[git_changes_utils.GitRef]:
             return git_refs
         def mock_get_changed_files(
             unused_refs: List[git_changes_utils.GitRef],
             unused_remote_name: str
-        ) -> List[git_changes_utils.FileDiff]:
+        ) -> Dict[str, Tuple[List[git_changes_utils.FileDiff], List[bytes]]]:
             return {
                 'branch1': (
                     [git_changes_utils.FileDiff('M', b'file1.js'),
                      git_changes_utils.FileDiff('M', b'file2.ts'),
                      git_changes_utils.FileDiff('M', b'file3.py')],
                     [b'file1.js', b'file2.ts', b'file3.py']
+                ),
+                'branch2': (
+                    [],
+                    []
                 )
             }
         def mock_get_file_spec(file_path: str) -> Optional[str]:
@@ -279,6 +283,22 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
             '--specs_to_run=file1.js,file2.ts']
         self.assertIn(cmd, self.cmd_token_list)
+
+    def test_frontend_tests_with_run_on_changed_files_no_remote(self) -> None:
+        def mock_get_remote_name() -> bytes:
+            return b''
+        get_remote_name_swap = self.swap(
+            git_changes_utils, 'get_remote_name', mock_get_remote_name)
+
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage, get_remote_name_swap:
+                    with self.assertRaisesRegex(
+                        SystemExit,
+                        'Error: No remote repository found.'
+                    ):
+                        run_frontend_tests.main(
+                            args=['--run_on_changed_files'])
 
     def test_frontend_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
