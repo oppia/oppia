@@ -25,8 +25,9 @@ import sys
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
 from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
+from scripts import git_changes_utils # isort:skip pylint: disable=wrong-import-position, unused-import
 
-from typing import Optional, Sequence  # isort:skip
+from typing import List, Optional, Sequence  # isort:skip
 
 from . import build  # isort:skip
 from . import check_frontend_test_coverage  # isort:skip
@@ -74,7 +75,13 @@ _PARSER.add_argument(
 )
 _PARSER.add_argument(
     '--download_combined_frontend_spec_file',
-    help='optional; if specifided, downloads the combined frontend file',
+    help='optional; if specified, downloads the combined frontend file',
+    action='store_true'
+)
+_PARSER.add_argument(
+    '--run_on_changed_files',
+    help='optional; if specified, runs the frontend karma tests on the '
+    'files that were changed in the current branch.',
     action='store_true'
 )
 _PARSER.add_argument(
@@ -140,6 +147,22 @@ def get_file_spec(file_path: str) -> str | None:
     return None
 
 
+def get_js_or_ts_files_from_diff(diff_files: List[bytes]) -> List[str]:
+    """Returns the list of JavaScript or TypeScript files from the diff.
+
+    Args:
+        diff_files: list(bytes). List of files changed.
+
+    Returns:
+        list(str). List of JavaScript or TypeScript files.
+    """
+    js_or_ts_files = []
+    for file_path in diff_files:
+        if file_path.endswith(b'.ts') or file_path.endswith(b'.js'):
+            js_or_ts_files.append(file_path.decode())
+    return js_or_ts_files
+
+
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -172,6 +195,23 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             spec_file = get_file_spec(spec.strip())
             if spec_file:
                 specs_to_run.append(spec_file)
+
+    if parsed_args.run_on_changed_files:
+        remote = git_changes_utils.get_remote_name()
+        refs = git_changes_utils.get_refs()
+        collected_files = git_changes_utils.get_changed_files(
+            refs, remote.decode('utf-8'))
+        for _, (_, files_to_lint) in collected_files.items():
+            if not files_to_lint:
+                continue
+
+            js_or_ts_files = get_js_or_ts_files_from_diff(files_to_lint)
+            for file_path in js_or_ts_files:
+                spec_file = get_file_spec(file_path)
+                if spec_file:
+                    specs_to_run.append(spec_file)
+
+    if parsed_args.specs_to_run or parsed_args.run_on_changed_files:
         if len(specs_to_run) == 0:
             print('No valid specs found to run.')
             sys.exit(0)
@@ -265,7 +305,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 ' test coverage check.')
         else:
             check_frontend_test_coverage_args = []
-            if parsed_args.specs_to_run:
+            if len(specs_to_run) > 0:
                 check_frontend_test_coverage_args.append(
                     '--files_to_check=%s' % ','.join(specs_to_run)
                 )

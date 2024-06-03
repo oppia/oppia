@@ -23,9 +23,12 @@ import sys
 
 from core.tests import test_utils
 
+from typing import List, Optional
+
 from . import build
 from . import check_frontend_test_coverage
 from . import common
+from . import git_changes_utils
 from . import install_third_party_libs
 from . import run_frontend_tests
 
@@ -125,6 +128,10 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         def mock_check_frontend_coverage(args: list[str]) -> None:
             self.frontend_coverage_checks_called = True
             self.frontend_coverage_checks_args.append(args)
+        def mock_get_js_or_ts_files_from_diff(
+            unused_diff_files: List[git_changes_utils.FileDiff]
+        ) -> List[str]:
+            return ['file1.js', 'file2.ts']
 
         self.swap_success_Popen = self.swap(
             subprocess, 'Popen', mock_success_check_call)
@@ -142,6 +149,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             install_third_party_libs, 'main', lambda: None)
         self.swap_check_frontend_coverage = self.swap(
             check_frontend_test_coverage, 'main', mock_check_frontend_coverage)
+        self.swap_get_js_or_ts_files_from_diff = self.swap(
+            git_changes_utils, 'get_js_or_ts_files_from_diff',
+            mock_get_js_or_ts_files_from_diff)
 
     def test_run_dtslint_type_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap:
@@ -174,6 +184,18 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn('Running dtslint type tests.', self.print_arr)
         self.assertIn('Done!', self.print_arr)
         self.assertEqual(len(self.cmd_token_list), 1)
+
+    def test_get_js_or_ts_files_from_diff_with_js_file(self) -> None:
+        self.assertEqual(
+            run_frontend_tests.get_js_or_ts_files_from_diff(
+                [b'file1.js', b'file2.ts', b'file3.py']),
+            ['file1.js', 'file2.ts'])
+
+    def test_get_js_or_ts_files_from_diff_with_no_file(self) -> None:
+        self.assertEqual(
+            run_frontend_tests.get_js_or_ts_files_from_diff(
+                [b'file1.html', b'file2.py', b'file3.py']),
+            [])
 
     def test_frontend_tests_with_specs_to_run(self) -> None:
         original_os_path_exists = os.path.exists
@@ -226,6 +248,56 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                     with self.assertRaisesRegex(SystemExit, '0'):
                         run_frontend_tests.main(
                             args=['--specs_to_run', 'invalid.ts'])
+
+    def test_frontend_tests_with_run_on_changed_files(self) -> None:
+        git_refs = [git_changes_utils.GitRef(
+            'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1')]
+        def mock_get_remote_name() -> str:
+            return b'remote'
+        def mock_get_refs() -> List[git_changes_utils.GitRef]:
+            return git_refs
+        def mock_get_changed_files(
+            unused_refs: List[git_changes_utils.GitRef],
+            unused_remote_name: str
+        ) -> List[git_changes_utils.FileDiff]:
+            return {
+                'branch1': (
+                    [git_changes_utils.FileDiff('M', b'file1.js'),
+                     git_changes_utils.FileDiff('M', b'file2.ts'),
+                     git_changes_utils.FileDiff('M', b'file3.py')],
+                    [b'file1.js', b'file2.ts', b'file3.py']
+                )
+            }
+        def mock_get_file_spec(file_path: str) -> Optional[str]:
+            if file_path == 'file1.js':
+                return 'file1.js'
+            if file_path == 'file2.ts':
+                return 'file2.ts'
+            return None
+        get_remote_name_swap = self.swap(
+            git_changes_utils, 'get_remote_name', mock_get_remote_name)
+        get_refs_swap = self.swap(
+            git_changes_utils, 'get_refs', mock_get_refs)
+        get_changed_files_swap = self.swap_with_checks(
+            git_changes_utils, 'get_changed_files', mock_get_changed_files,
+            expected_args=[(git_refs, 'remote')])
+        get_file_spec_swap = self.swap(
+            run_frontend_tests, 'get_file_spec', mock_get_file_spec)
+
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage, get_remote_name_swap:
+                    with get_refs_swap, get_changed_files_swap:
+                        with get_file_spec_swap:
+                            run_frontend_tests.main(
+                                args=['--run_on_changed_files'])
+
+        cmd = [
+            common.NODE_BIN_PATH, '--max-old-space-size=4096',
+            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+            'start', os.path.join('core', 'tests', 'karma.conf.ts'),
+            '--specs_to_run=file1.js,file2.ts']
+        self.assertIn(cmd, self.cmd_token_list)
 
     def test_frontend_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
