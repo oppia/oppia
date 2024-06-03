@@ -38,10 +38,6 @@ const closeSaveModalButton = '.e2e-test-close-save-modal-button';
 const photoBoxButton = 'div.e2e-test-photo-button';
 const subtopicPhotoBoxButton =
   '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
-const storyPhotoBoxButton =
-  'oppia-create-new-story-modal .e2e-test-photo-button';
-const chapterPhotoBoxButton =
-  '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 const photoUploadModal = 'edit-thumbnail-modal';
 
@@ -71,7 +67,6 @@ const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 
 const topicsTab = 'a.e2e-test-topics-tab';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
-const addTopicButton = 'button.e2e-test-create-topic-button';
 const topicNameField = 'input.e2e-test-new-topic-name-field';
 const topicUrlFragmentField = 'input.e2e-test-new-topic-url-fragment-field';
 const topicWebFragmentField = 'input.e2e-test-new-page-title-fragm-field';
@@ -107,23 +102,7 @@ const addDiagnosticTestSkillButton =
   'button.e2e-test-add-diagnostic-test-skill';
 const diagnosticTestSkillSelector =
   'select.e2e-test-diagnostic-test-skill-selector';
-
 const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
-
-const addStoryButton = 'button.e2e-test-create-story-button';
-const storyTitleField = 'input.e2e-test-new-story-title-field';
-const storyDescriptionField = 'textarea.e2e-test-new-story-description-field';
-const storyUrlFragmentField = 'input.e2e-test-new-story-url-fragment-field';
-const createStoryButton = 'button.e2e-test-confirm-story-creation-button';
-const saveStoryButton = 'button.e2e-test-save-story-button';
-const publishStoryButton = 'button.e2e-test-publish-story-button';
-const storyMetaTagInput = '.e2e-test-story-meta-tag-content-field';
-const unpublishStoryButton = 'button.e2e-test-unpublish-story-button';
-
-const addChapterButton = 'button.e2e-test-add-chapter-button';
-const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
-const chapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
-const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 
 const explorationSettingsTab = '.e2e-test-settings-tab';
 const deleteExplorationButton = 'button.e2e-test-delete-exploration-button';
@@ -140,14 +119,6 @@ const mobileSaveTopicButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
 const mobilePublishTopicButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-topic-button';
-const mobileStoryDropdown = '.e2e-test-story-dropdown';
-const mobileSaveStoryChangesDropdown =
-  'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
-const mobileSaveStoryChangesButton =
-  'div.navbar-mobile-options .e2e-test-mobile-save-changes';
-const mobilePublishStoryButton =
-  'div.navbar-mobile-options .e2e-test-mobile-publish-button';
-const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
 
 const mobileNavToggelbutton = '.e2e-test-mobile-options';
 const mobileOptionsDropdown = '.e2e-test-mobile-options-dropdown';
@@ -264,8 +235,7 @@ export class CurriculumAdmin extends BaseUser {
    * Create a topic in the topics-and-skills dashboard.
    */
   async createTopic(name: string, urlFragment: string): Promise<void> {
-    await this.navigateToTopicAndSkillsDashboardPage();
-    await this.clickOn('Create New Topic');
+    await this.clickOn('Create Topic');
     await this.type(topicNameField, name);
     await this.type(topicUrlFragmentField, urlFragment);
     await this.type(topicWebFragmentField, name);
@@ -555,105 +525,15 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Create a story, execute chapter creation for
-   * the story, and then publish the story.
-   */
-  async createAndPublishStoryWithChapter(
-    storyTitle: string,
-    storyUrlFragment: string,
-    explorationId: string,
-    topicName: string
-  ): Promise<void> {
-    await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileStoryDropdown);
-    }
-    await this.clickOn(addStoryButton);
-    await this.type(storyTitleField, storyTitle);
-    await this.type(storyUrlFragmentField, storyUrlFragment);
-    await this.type(
-      storyDescriptionField,
-      `Story creation description for ${storyTitle}.`
-    );
-
-    await this.clickOn(storyPhotoBoxButton);
-    await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadPhotoButton);
-
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickOn(createStoryButton);
-
-    await this.page.waitForSelector(storyMetaTagInput);
-    await this.page.focus(storyMetaTagInput);
-    await this.page.type(storyMetaTagInput, 'meta');
-    await this.page.keyboard.press('Tab');
-
-    await this.createChapter(explorationId);
-    await this.saveStoryDraft();
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileSaveStoryChangesDropdown);
-      await this.page.waitForSelector(mobilePublishStoryButton);
-      await this.clickOn(mobilePublishStoryButton);
-    } else {
-      await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
-      await this.clickOn(publishStoryButton);
-      await this.page.waitForSelector(unpublishStoryButton, {visible: true});
-    }
-  }
-
-  /**
-   * Create a chapter for a certain story.
-   */
-  async createChapter(explorationId: string): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileAddChapterDropdown);
-    }
-    await this.clickOn(addChapterButton);
-    await this.type(chapterTitleField, 'Test Chapter 1');
-    await this.type(chapterExplorationIdField, explorationId);
-
-    await this.clickOn(chapterPhotoBoxButton);
-    await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadPhotoButton);
-
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickOn(createChapterButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
-  }
-
-  /**
-   * Save a story as a curriculum admin.
-   */
-  async saveStoryDraft(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileOptionsSelector);
-      await this.clickOn(mobileSaveStoryChangesButton);
-    } else {
-      await this.clickOn(saveStoryButton);
-    }
-    await this.type(
-      saveChangesMessageInput,
-      'Test saving story as curriculum admin.'
-    );
-    await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
-    await this.clickOn(closeSaveModalButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
-  }
-
-  /**
    * Check if the topic has been published successfully, by verifying
    * the status and the counts in the topics and skills dashboard.
    */
   async expectTopicToBePublishedInTopicsAndSkillsDashboard(
     topicName: string,
-    expectedPublishedStoryCount: number,
     expectedSubtopicCount: number,
     expectedSkillsCount: number
   ): Promise<void> {
     let topicDetails: {
-      publishedStoryCount: string | null;
       subtopicCount: string | null;
       skillsCount: string | null;
       topicStatus: string | null;
@@ -703,7 +583,6 @@ export class CurriculumAdmin extends BaseUser {
         }
 
         return {
-          publishedStoryCount: tds[0].innerText,
           subtopicCount: tds[1].innerText,
           skillsCount: tds[2].innerText,
           topicStatus: tds[3].innerText,
@@ -726,7 +605,6 @@ export class CurriculumAdmin extends BaseUser {
         }
 
         return {
-          publishedStoryCount: tds[2].innerText,
           subtopicCount: tds[3].innerText,
           skillsCount: tds[4].innerText,
           topicStatus: tds[5].innerText,
@@ -735,9 +613,6 @@ export class CurriculumAdmin extends BaseUser {
     }
 
     expect(topicDetails.topicStatus).toEqual('Published');
-    expect(topicDetails.publishedStoryCount).toEqual(
-      expectedPublishedStoryCount.toString()
-    );
     expect(topicDetails.subtopicCount).toEqual(
       expectedSubtopicCount.toString()
     );
@@ -808,56 +683,77 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(explorationControlsSettingsDropdown);
   }
 
+  /**
+   * Function to unpublish a topic.
+   * @param {string} topicName - The name of the topic to unpublish.
+   */
   async unpublishTopic(topicName: string): Promise<void> {
     await this.openTopicEditor(topicName);
     await this.clickOn(' Unpublish Topic ');
   }
 
+  /**
+   * Function to delete a topic.
+   * @param {string} topicName - The name of the topic to delete.
+   */
   async deleteTopic(topicName: string): Promise<void> {
     await this.goto(testConstants.URLs.TopicAndSkillsDashboard);
     await this.clickOn('.e2e-test-topic-edit-box');
     await this.clickOn('Delete');
   }
 
+  /**
+   * Function to delete a skill.
+   * @param {string} skillName - The name of the skill to delete.
+   */
   async deleteSkill(skillName: string): Promise<void> {
     await this.goto(testConstants.URLs.TopicAndSkillsDashboard);
     await this.clickOn('.e2e-test-skills-tab');
-
     await this.clickOn('.e2e-test-skill-edit-box');
     await this.clickOn('Delete');
   }
 
+  /**
+   * Function to check if a topic is not present in the Topics and Skills Dashboard.
+   * @param {string} topicName - The name of the topic to check.
+   */
   async expectTopicNotInTopicsAndSkillDashboard(
     topicName: string
   ): Promise<void> {
     await this.goto(testConstants.URLs.TopicAndSkillsDashboard);
-
     const isTopicPresent = await this.isTextPresentOnPage(topicName);
     if (isTopicPresent) {
       throw new Error(
-        `Expected topic "${topicName}" not to be present on the page, but it was.`
+        `Topic "${topicName}" was found.
+          It was expected to be absent from Topics and Skills Dashboard.`
       );
     } else {
       showMessage(
-        `Topic "${topicName}" is not present on the page as expected.`
+        `The topic "${topicName}" is not present on the Topics and Skills
+         Dashboard as expected.`
       );
     }
   }
 
+  /**
+   * Function to check if a skill is not present in the Topics and Skills Dashboard.
+   * @param {string} skillName - The name of the skill to check.
+   */
   async expectSkillNotInTopicsAndSkillsDashboard(
     skillName: string
   ): Promise<void> {
     await this.goto(testConstants.URLs.TopicAndSkillsDashboard);
     await this.clickOn('.e2e-test-skills-tab');
-
-    const isTopicPresent = await this.isTextPresentOnPage(skillName);
-    if (isTopicPresent) {
+    const isSkillPresent = await this.isTextPresentOnPage(skillName);
+    if (isSkillPresent) {
       throw new Error(
-        `Expected topic "${skillName}" not to be present on the page, but it was.`
+        `Skill "${skillName}" was found.
+          It was expected to be absent from Topics and Skills Dashboard.`
       );
     } else {
       showMessage(
-        `Topic "${skillName}" is not present on the page as expected.`
+        `The skill "${skillName}" is not present on the Topics and Skills
+         Dashboard as expected.`
       );
     }
   }
