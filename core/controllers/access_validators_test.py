@@ -753,3 +753,58 @@ class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
             ACCESS_VALIDATION_HANDLER_PREFIX,
             ), expected_status_int=404
         )
+
+class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
+    """Test for story editor page access validation"""
+
+    STORY_ID: Final = '0'
+    
+    def setUp(self) -> None:
+        super().setUp()
+        self.story_editor_username = 'storyEditor'
+        self.story_editor_email = 'storyEditor@example.com'
+        self.guest_username = 'guest'
+        self.guest_email = 'guest@example.com'
+
+        self.signup(self.story_editor_email, self.story_editor_username)
+        self.signup(self.guest_email, self.guest_username)
+        self.add_user_role(
+            self.story_editor_username, feconf.ROLE_ID_CURRICULUM_ADMIN)
+        self.user_id = self.get_user_id_from_email(self.story_editor_email)
+        self.user = user_services.get_user_actions_info(self.user_id)
+        self.save_new_story(self.STORY_ID, self.user_id,)
+
+    def test_for_logged_in_user_with_rights(self) -> None:
+        self.login(self.story_editor_email)
+        self.get_html_response(
+            '%s/can_access_story_editor_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.STORY_ID
+            ), expected_status_int=200
+        )
+        self.logout()
+
+    def test_for_logged_in_user_without_rights(self) -> None:
+        self.login(self.guest_email)
+        self.get_html_response(
+            '%s/can_access_story_editor_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.STORY_ID
+            ), expected_status_int=401
+        )
+        self.logout()
+
+    def test_validation_returns_false_if_given_story_id_non_existent(
+        self) -> None:
+        self.login(self.guest_email)
+        self.get_html_response(
+            '%s/can_access_story_editor_page/invalid_storyId' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX,
+            ), expected_status_int=404
+        )
+        self.logout()
+
+    def test_should_not_access_for_logged_out_user(self) -> None:
+        self.get_html_response(
+            '%s/can_access_story_editor_page/' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX,
+            ), expected_status_int=404
+        )
