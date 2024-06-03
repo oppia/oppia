@@ -392,11 +392,11 @@ jobs:
           run: python -m scripts.build --prod_env
         - name: Run Desktop Acceptance Test ${{ matrix.suite }}
           run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env
-        - name: Display Desktop Test Output
+        - name: Display Desktop Acceptance Test Output
           run: cat test_output.log
         - name: Run Mobile Acceptance Test ${{ matrix.suite }}
           run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env --mobile
-        - name: Display Mobile Test Output
+        - name: Display Mobile Acceptance Test Output
           run: cat test_output.log
         - name: Uploading webpack bundles as an artifact
           if: ${{ failure() }}
