@@ -376,7 +376,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 frontend_test_cmds.append(
                     '--specs_to_run=%s' % ','.join(js_or_ts_files))
                 frontend_status = run_script_and_get_returncode(
-                    FRONTEND_TEST_CMDS)
+                    frontend_test_cmds)
             if frontend_status != 0:
                 print('Push aborted due to failing frontend tests.')
                 sys.exit(1)
