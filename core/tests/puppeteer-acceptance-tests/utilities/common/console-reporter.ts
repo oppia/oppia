@@ -70,10 +70,10 @@ const CONSOLE_ERRORS_TO_IGNORE = [
   // Error occurs due to ExpressionChangedAfterItHasBeenCheckedError.
   // This can be removed after solving the issue #20189.
   new RegExp('ERROR CONTEXT JSHandle@object.*'),
-  // Error due to the Google translation API used in the Partnerships page for the
-  // Partnerships Google form translation according to the user's site language.
-  escapeRegExp(
-    'https://content.googleapis.com/drive/v2internal/viewerimpressions?key=AIzaSyC1eQ1xj69IdTMeii5r7brs3R90eck-m7k&alt=json Failed to load resource: the server responded with a status of 403 ()'
+  // Error related to Google Docs Viewer since it's from an external service
+  // and cannot be controlled by us. (https://stackoverflow.com/q/50909239)
+  new RegExp(
+    /https:\/\/content\.googleapis\.com\/drive\/v2internal\/viewerimpressions\?key=[^&]+&alt=json/
   ),
 ];
 

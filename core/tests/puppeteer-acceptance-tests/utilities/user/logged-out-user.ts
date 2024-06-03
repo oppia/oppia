@@ -1242,7 +1242,6 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the blog page.
    */
   async clickReadBlogPostLinkInPartnershipsPage(): Promise<void> {
-    await this.page.waitForXPath('//a[contains(text(),"Read blog post")]');
     const readBlogPostButtonInPartnershipsPage = this.isViewportAtMobileWidth()
       ? readBlogPostMobileButtonInPartnershipsPage
       : readBlogPostDesktopButtonInPartnershipsPage;
