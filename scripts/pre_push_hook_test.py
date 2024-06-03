@@ -469,20 +469,30 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_frontend_test_failure(self) -> None:
         self.does_diff_include_js_or_ts_files = True
         def mock_run_script_and_get_returncode(script: List[str]) -> int:
+            frontend_test_cmds = pre_push_hook.FRONTEND_TEST_CMDS.copy()
+            frontend_test_cmds.append('--specs_to_run=files1.js,file2.ts')
             if script == pre_push_hook.FRONTEND_TEST_CMDS:
                 return 1
             return 0
+        def mock_get_js_or_ts_files_from_diff(
+            unused_diff_files: List[git_changes_utils.FileDiff]
+        ) -> List[str]:
+            return ['files1.js', 'file2.ts']
         run_script_and_get_returncode_swap = self.swap(
             pre_push_hook, 'run_script_and_get_returncode',
             mock_run_script_and_get_returncode)
+        get_js_or_ts_files_from_diff_swap = self.swap(
+            git_changes_utils, 'get_js_or_ts_files_from_diff',
+            mock_get_js_or_ts_files_from_diff)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.get_changed_files_swap, self.uncommitted_files_swap:
-                with self.check_output_swap, self.start_linter_swap:
-                    with self.js_or_ts_swap, run_script_and_get_returncode_swap:
+                with self.check_output_swap, get_js_or_ts_files_from_diff_swap:
+                    with self.js_or_ts_swap, self.start_linter_swap:
                         with self.execute_mypy_checks_swap:
-                            with self.assertRaisesRegex(SystemExit, '1'):
-                                with self.swap_check_backend_python_libs:
-                                    pre_push_hook.main(args=[])
+                            with run_script_and_get_returncode_swap:
+                                with self.assertRaisesRegex(SystemExit, '1'):
+                                    with self.swap_check_backend_python_libs:
+                                        pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing frontend tests.' in self.print_arr)
 

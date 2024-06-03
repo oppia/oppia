@@ -27,7 +27,7 @@ import sys
 from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
 from scripts import git_changes_utils # isort:skip pylint: disable=wrong-import-position, unused-import
 
-from typing import List, Optional, Sequence  # isort:skip
+from typing import Optional, Sequence  # isort:skip
 
 from . import build  # isort:skip
 from . import check_frontend_test_coverage  # isort:skip
@@ -147,22 +147,6 @@ def get_file_spec(file_path: str) -> str | None:
     return None
 
 
-def get_js_or_ts_files_from_diff(diff_files: List[bytes]) -> List[str]:
-    """Returns the list of JavaScript or TypeScript files from the diff.
-
-    Args:
-        diff_files: list(bytes). List of files changed.
-
-    Returns:
-        list(str). List of JavaScript or TypeScript files.
-    """
-    js_or_ts_files = []
-    for file_path in diff_files:
-        if file_path.endswith(b'.ts') or file_path.endswith(b'.js'):
-            js_or_ts_files.append(file_path.decode())
-    return js_or_ts_files
-
-
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -205,8 +189,9 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             if not files_to_lint:
                 continue
 
-            js_or_ts_files = get_js_or_ts_files_from_diff(files_to_lint)
-            for file_path in js_or_ts_files:
+            files_to_run = git_changes_utils.get_js_or_ts_files_from_diff(
+                files_to_lint)
+            for file_path in files_to_run:
                 spec_file = get_file_spec(file_path)
                 if spec_file:
                     specs_to_run.append(spec_file)

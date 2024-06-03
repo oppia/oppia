@@ -48,6 +48,13 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
         self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        def mock_get_js_or_ts_files_from_diff(
+            unused_diff_files: List[git_changes_utils.FileDiff]
+        ) -> List[str]:
+            return ['file1.js', 'file2.ts']
+        self.get_js_or_ts_files_from_diff_swap = self.swap(
+            git_changes_utils, 'get_js_or_ts_files_from_diff',
+            mock_get_js_or_ts_files_from_diff)
 
     def test_start_subprocess_for_result(self) -> None:
         with self.popen_swap:
@@ -422,3 +429,15 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         with get_branch_swap, start_subprocess_for_result_swap:
             with self.assertRaisesRegex(ValueError, 'Error'):
                 git_changes_utils.get_refs()
+
+    def test_get_js_or_ts_files_from_diff_with_js_file(self) -> None:
+        self.assertEqual(
+            git_changes_utils.get_js_or_ts_files_from_diff(
+                [b'file1.js', b'file2.ts', b'file3.py']),
+            ['file1.js', 'file2.ts'])
+
+    def test_get_js_or_ts_files_from_diff_with_no_file(self) -> None:
+        self.assertEqual(
+            git_changes_utils.get_js_or_ts_files_from_diff(
+                [b'file1.html', b'file2.py', b'file3.py']),
+            [])

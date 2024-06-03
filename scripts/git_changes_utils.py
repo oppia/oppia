@@ -226,6 +226,9 @@ def get_refs() -> List[GitRef]:
         local_sha, local_ref = local_ref_line.split()
         remote_sha, remote_ref = remote_ref_line.split()
         ref_list.append(GitRef(local_ref, local_sha, remote_ref, remote_sha))
+    if len(ref_list) > 0:
+        print('Ref list:')
+        pprint.pprint(ref_list)
     return ref_list
 
 
@@ -270,3 +273,19 @@ def get_changed_files(
             pprint.pprint(files_to_lint)
             print('\n')
     return collected_files
+
+
+def get_js_or_ts_files_from_diff(diff_files: List[bytes]) -> List[str]:
+    """Returns the list of JavaScript or TypeScript files from the diff.
+
+    Args:
+        diff_files: list(bytes). List of files changed.
+
+    Returns:
+        list(str). List of JavaScript or TypeScript files.
+    """
+    js_or_ts_files = []
+    for file_path in diff_files:
+        if file_path.endswith(b'.ts') or file_path.endswith(b'.js'):
+            js_or_ts_files.append(file_path.decode())
+    return js_or_ts_files

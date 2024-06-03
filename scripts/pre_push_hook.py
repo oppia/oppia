@@ -65,8 +65,7 @@ OPPIA_PARENT_DIR: Final = os.path.join(
     FILE_DIR, os.pardir, os.pardir, os.pardir
 )
 FRONTEND_TEST_CMDS: Final = [
-    PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage',
-    '--run_on_changed_files']
+    PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
 BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD: Final = [
     PYTHON_CMD, '-m', 'scripts.check_backend_associated_test_file']
 CI_PROTRACTOR_CHECK_CMDS: Final = [
@@ -371,6 +370,11 @@ def main(args: Optional[List[str]] = None) -> None:
             frontend_status = 0
             ci_check_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
+                js_or_ts_files = git_changes_utils.get_js_or_ts_files_from_diff(
+                    files_to_lint)
+                frontend_test_cmds = FRONTEND_TEST_CMDS.copy()
+                frontend_test_cmds.append(
+                    '--specs_to_run=%s' % ','.join(js_or_ts_files))
                 frontend_status = run_script_and_get_returncode(
                     FRONTEND_TEST_CMDS)
             if frontend_status != 0:

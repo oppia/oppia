@@ -128,10 +128,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         def mock_check_frontend_coverage(args: list[str]) -> None:
             self.frontend_coverage_checks_called = True
             self.frontend_coverage_checks_args.append(args)
-        def mock_get_js_or_ts_files_from_diff(
-            unused_diff_files: List[git_changes_utils.FileDiff]
-        ) -> List[str]:
-            return ['file1.js', 'file2.ts']
 
         self.swap_success_Popen = self.swap(
             subprocess, 'Popen', mock_success_check_call)
@@ -149,9 +145,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             install_third_party_libs, 'main', lambda: None)
         self.swap_check_frontend_coverage = self.swap(
             check_frontend_test_coverage, 'main', mock_check_frontend_coverage)
-        self.swap_get_js_or_ts_files_from_diff = self.swap(
-            git_changes_utils, 'get_js_or_ts_files_from_diff',
-            mock_get_js_or_ts_files_from_diff)
 
     def test_run_dtslint_type_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap:
@@ -184,18 +177,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn('Running dtslint type tests.', self.print_arr)
         self.assertIn('Done!', self.print_arr)
         self.assertEqual(len(self.cmd_token_list), 1)
-
-    def test_get_js_or_ts_files_from_diff_with_js_file(self) -> None:
-        self.assertEqual(
-            run_frontend_tests.get_js_or_ts_files_from_diff(
-                [b'file1.js', b'file2.ts', b'file3.py']),
-            ['file1.js', 'file2.ts'])
-
-    def test_get_js_or_ts_files_from_diff_with_no_file(self) -> None:
-        self.assertEqual(
-            run_frontend_tests.get_js_or_ts_files_from_diff(
-                [b'file1.html', b'file2.py', b'file3.py']),
-            [])
 
     def test_frontend_tests_with_specs_to_run(self) -> None:
         original_os_path_exists = os.path.exists
