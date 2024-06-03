@@ -23,7 +23,6 @@ import os
 
 from core import feconf
 from core.domain import android_services
-from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -51,23 +50,9 @@ class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         classroom_id = classroom_config_services.get_new_classroom_id()
-        classroom = classroom_config_domain.Classroom(
-            classroom_id=classroom_id,
-            name='math',
-            url_fragment='math',
-            course_details='Course details for classroom.',
-            teaser_text='Teaser text for math classroom',
-            topic_list_intro='Topics covered for classroom',
-            topic_id_to_prerequisite_topic_ids={},
-            is_published=True,
-            thumbnail_filename='thumbnail.svg',
-            thumbnail_bg_color='transparent',
-            thumbnail_size_in_bytes=1000,
-            banner_filename='banner.png',
-            banner_bg_color='transparent',
-            banner_size_in_bytes=1000
+        self.save_new_valid_classroom(
+            classroom_id=classroom_id
         )
-        classroom_config_services.create_new_classroom(classroom)
 
     def test_initialize_topic_is_published(self) -> None:
         android_services.initialize_android_test_data()

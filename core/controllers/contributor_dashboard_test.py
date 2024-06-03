@@ -21,7 +21,6 @@ import unittest.mock
 
 from core import feconf
 from core.constants import constants
-from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -116,20 +115,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         # Add skill opportunity topic to a classroom.
         self.classroom_id = classroom_config_services.get_new_classroom_id()
-        classroom = classroom_config_domain.Classroom(
+        self.save_new_valid_classroom(
             classroom_id=self.classroom_id,
-            name='math',
-            url_fragment='math',
-            course_details='Course details for classroom.',
-            teaser_text='Teaser text for math classroom',
-            topic_list_intro='Topics covered for classroom',
-            topic_id_to_prerequisite_topic_ids={self.topic_id: []},
-            is_published=True, thumbnail_filename='thumbnail.svg',
-            thumbnail_bg_color='transparent', thumbnail_size_in_bytes=1000,
-            banner_filename='banner.png', banner_bg_color='transparent',
-            banner_size_in_bytes=1000
+            topic_id_to_prerequisite_topic_ids={
+                self.topic_id: []
+            }
         )
-        classroom_config_services.create_new_classroom(classroom)
 
         self.expected_skill_opportunity_dict_0 = {
             'id': self.skill_id_0,
@@ -289,19 +280,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             topic, [skill_id_3, skill_id_4, skill_id_5])
 
         # Add new topic to a classroom.
-        classroom = classroom_config_domain.Classroom(
+        self.save_new_valid_classroom(
             classroom_id=self.classroom_id,
-            name='math', url_fragment='math',
-            course_details='Course details for classroom.',
-            teaser_text='Teaser text for math classroom',
-            topic_list_intro='Topics covered for classroom',
-            topic_id_to_prerequisite_topic_ids={topic_id: []},
-            is_published=True, thumbnail_filename='thumbnail.svg',
-            thumbnail_bg_color='transparent', thumbnail_size_in_bytes=1000,
-            banner_filename='banner.png', banner_bg_color='transparent',
-            banner_size_in_bytes=1000
+            topic_id_to_prerequisite_topic_ids={
+                topic_id: []
+            }
         )
-        classroom_config_services.create_new_classroom(classroom)
 
         # Opportunities with IDs skill_id_0, skill_id_1, skill_id_2 will be
         # fetched first. Since skill_id_0, skill_id_1, skill_id_2 are not linked

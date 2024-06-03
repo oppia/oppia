@@ -82,25 +82,13 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         public_topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(admin_id, public_topic)
         topic_services.publish_topic(topic_id_2, admin_id)
-
-        math_classroom = classroom_config_domain.Classroom(
-            classroom_id='math_classroom_id',
-            name='math',
-            url_fragment='math',
-            course_details='Course details for classroom.',
-            teaser_text='Teaser text for math classroom',
-            topic_list_intro='Topics covered for classroom',
+        self.save_new_valid_classroom(
             topic_id_to_prerequisite_topic_ids={
-                topic_id_1: [],
-                topic_id_2: [],
-                topic_id_3: []
-            },
-            is_published=True, thumbnail_filename='thumbnail.svg',
-            thumbnail_bg_color='transparent', thumbnail_size_in_bytes=1000,
-            banner_filename='banner.png', banner_bg_color='transparent',
-            banner_size_in_bytes=1000
+                        topic_id_1: [],
+                        topic_id_2: [],
+                        topic_id_3: []
+            }
         )
-        classroom_config_services.create_new_classroom(math_classroom)
         self.logout()
 
         json_response = self.get_json(

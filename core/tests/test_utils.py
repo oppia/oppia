@@ -46,6 +46,8 @@ from core.domain import auth_domain
 from core.domain import blog_services
 from core.domain import caching_domain
 from core.domain import classifier_domain
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -4104,6 +4106,72 @@ version: 1
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
         return state
+
+    def save_new_valid_classroom(
+        self,
+        classroom_id: str = 'math_classroom_id',
+        name: str = 'math',
+        url_fragment: str = 'math',
+        course_details: str = 'Course Details',
+        teaser_text: str = 'Teaser Text',
+        topic_list_intro: str = 'Topic list intro',
+        topic_id_to_prerequisite_topic_ids: Optional[
+            Dict[str, List[str]]] = None,
+        is_published: bool = True,
+        thumbnail_filename: str = 'thumbnail.svg',
+        thumbnail_bg_color: str = 'transparent',
+        thumbnail_size_in_bytes: int = 1000,
+        banner_filename: str = 'banner.png',
+        banner_bg_color: str = 'transparent',
+        banner_size_in_bytes: int = 1000
+    ) -> classroom_config_domain.Classroom:
+        """Saves a new strictly-validated classroom.
+
+        Args:
+            classroom_id: str. Classroom ID of the newly-created classroom.
+            name: str. The name of the classroom.
+            url_fragment: str. The url fragment of the classroom.
+            course_details: str. A text to provide course details present in
+                the classroom.
+            teaser_text: str. A text to provide a summary of the classroom.
+            topic_list_intro: str. A text to provide an introduction for all
+                the topics in the classroom.
+            topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]. A dict
+                with topic ID as key and list of topic IDs as value.
+            is_published: bool. Whether this classroom is published or not.
+            thumbnail_filename: str. Classroom's thumbnail filename.
+            thumbnail_bg_color: str. Classroom's thumbnail background color.
+            thumbnail_size_in_bytes: int. The thumbnail size in bytes.
+            banner_filename: str. Classroom's banner filename.
+            banner_bg_color: str. Classroom's banner background color.
+            banner_size_in_bytes: int. The banner size in bytes.
+
+        Returns:
+            Classroom. The classroom domain object.
+        """
+        classroom = classroom_config_domain.Classroom(
+            classroom_id=classroom_id,
+            name=name,
+            url_fragment=url_fragment,
+            teaser_text=teaser_text,
+            course_details=course_details,
+            topic_list_intro=topic_list_intro,
+            topic_id_to_prerequisite_topic_ids=(
+                topic_id_to_prerequisite_topic_ids
+                if topic_id_to_prerequisite_topic_ids is not None
+                else {}
+            ),
+            is_published=is_published,
+            thumbnail_filename=thumbnail_filename,
+            thumbnail_bg_color=thumbnail_bg_color,
+            thumbnail_size_in_bytes=thumbnail_size_in_bytes,
+            banner_filename=banner_filename,
+            banner_bg_color=banner_bg_color,
+            banner_size_in_bytes=banner_size_in_bytes
+        )
+
+        classroom_config_services.create_new_classroom(classroom)
+        return classroom
 
 
 class LinterTestBase(GenericTestBase):
