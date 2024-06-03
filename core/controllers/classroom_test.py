@@ -87,7 +87,9 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
                         topic_id_1: [],
                         topic_id_2: [],
                         topic_id_3: []
-            }
+            },
+            course_details='Course details for classroom.',
+            topic_list_intro='Topics covered for classroom'
         )
         self.logout()
 
