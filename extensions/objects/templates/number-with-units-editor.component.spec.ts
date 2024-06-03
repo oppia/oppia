@@ -115,4 +115,14 @@ describe('NumberWithUnitsEditorComponent', () => {
 
     expect(component.errorMessageI18nKey).toBe('Unit "kf" not found.');
   });
+
+  it('should display error message when user enters duplicated units', () => {
+    component.updateValue('2 kg kg');
+
+    expect(component.problematicUnit).toBe('kg');
+    expect(component.errorMessageI18nKey).toBe(
+      'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS'
+    );
+    expect(component.hasDuplicatedUnit()).toBeTrue();
+  });
 });

@@ -333,7 +333,16 @@ describe('NumberWithUnitsObjectFactory', () => {
         'In "kg / m^(2)", "^" must be followed by a floating-point number'
       );
     });
-      
+
+    it('should throw errors for duplicated units', () => {
+      expect(() => {
+        nwuof.fromRawInputString('2 km km');
+      }).toThrowError(errors.INVALID_DOUBLE_UNIT + ' ' + 'km');
+      expect(() => {
+        nwuof.fromRawInputString('2 kg/kg^4*K*mol');
+      }).toThrowError(errors.INVALID_DOUBLE_UNIT + ' ' + 'kg');
+    });
+
     it('should create currency units', () => {
       const createCurrencyUnitsSpy = spyOn(nwuof, 'createCurrencyUnits');
       nwuof.createCurrencyUnits();

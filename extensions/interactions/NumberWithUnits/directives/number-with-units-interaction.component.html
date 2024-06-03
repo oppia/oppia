@@ -6,7 +6,6 @@
          (ngModelChange)="answerValueChanged()"
          class="form-control"
          [oppiaFocusOn]="labelForFocusTarget">
-  
   <div *ngIf="hasDuplicatedUnit()" class="oppia-form-error oppia-units-input-error">
     <span [innerHTML]="'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS' | translate: {
       duppedunit: problematicUnit,
@@ -26,8 +25,8 @@
 <style>
   .oppia-units-input-error {
     font-size: 0.90em;
-    margin-top: 5px;
     margin-bottom: 5px;
+    margin-top: 5px;
   }
 
   .ng-invalid {

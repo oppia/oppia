@@ -271,4 +271,39 @@ describe('Number with units interaction component', () => {
     expect(component.componentSubscriptions.unsubscribe).toHaveBeenCalled();
     expect(component.componentSubscriptions.closed).toBeTrue();
   });
+
+  it('should show error when user submits answer contains dupplicated units', fakeAsync(() => {
+    spyOn(currentInteractionService, 'updateCurrentAnswer');
+
+    // PreChecks.
+    expect(component.errorMessageI18nKey).toBe('');
+    expect(component.isValid).toBeTrue();
+
+    // Test: Incorrect answer.
+    component.answer = '24 km km';
+
+    component.answerValueChanged();
+    tick(150);
+
+    // PostChecks: Error message as the Unit is incorrect.
+    expect(component.problematicUnit).toBe('km');
+    expect(component.errorMessageI18nKey).toBe(
+      'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS'
+    );
+    expect(component.isValid).toBeFalse();
+    expect(
+      currentInteractionService.updateCurrentAnswer
+    ).toHaveBeenCalledOnceWith('24 km km');
+
+    // Test: Submit similar incorrect answer.
+    component.answer = '24 kg kg';
+
+    component.submitAnswer();
+
+    expect(component.problematicUnit).toBe('kg');
+    expect(component.errorMessageI18nKey).toBe(
+      'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS'
+    );
+    expect(component.hasDuplicatedUnit()).toBeTrue();
+  }));
 });

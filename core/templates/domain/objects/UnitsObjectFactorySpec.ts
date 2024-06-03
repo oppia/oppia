@@ -307,4 +307,10 @@ describe('UnitsObjectFactory', () => {
       units.fromRawInputString('cent %mol$');
     }).toThrowError('Unit "dollarcent" not found.');
   });
+
+  it('should return the dupplicated unit in a input string or an empty string', () => {
+    expect(units.duplicatedUnit('2 km km')).toEqual('km');
+    expect(units.duplicatedUnit('2 kg/kg^4*K*mol')).toEqual('kg');
+    expect(units.duplicatedUnit('2 kg/km^4*K*mol')).toEqual('');
+  });
 });

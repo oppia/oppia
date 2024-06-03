@@ -47,7 +47,7 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
   componentSubscriptions: Subscription = new Subscription();
   FORM_ERROR_TYPE: string = 'NUMBER_WITH_UNITS_FORMAT_ERROR';
   errorMessageI18nKey: string = '';
-  problematicUnit: string = ''
+  problematicUnit: string = '';
   answer: string = '';
   isValid: boolean = true;
   answerChanged: Subject<string> = new Subject<string>();
@@ -81,10 +81,13 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
             if (parsingError instanceof Error) {
               var errorMessageSplit = parsingError.message.split(' ');
               var message = parsingError.message;
-              if(errorMessageSplit[0] == "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS"){
+              if (
+                errorMessageSplit[0] ===
+                'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS'
+              ) {
                 message = errorMessageSplit[0];
                 this.problematicUnit = errorMessageSplit[1];
-              }else{
+              } else {
                 this.problematicUnit = '';
               }
               this.errorMessageI18nKey = message;
@@ -143,10 +146,13 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
       if (parsingError instanceof Error) {
         var errorMessageSplit = parsingError.message.split(' ');
         var message = parsingError.message;
-        if(errorMessageSplit[0] == "I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS"){
+        if (
+          errorMessageSplit[0] ===
+          'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_DOUBLE_UNITS'
+        ) {
           message = errorMessageSplit[0];
           this.problematicUnit = errorMessageSplit[1];
-        }else{
+        } else {
           this.problematicUnit = '';
         }
         this.errorMessageI18nKey = message;
@@ -173,8 +179,8 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
       );
   }
 
-  hasDuplicatedUnit():boolean {
-    return this.problematicUnit != '';
+  hasDuplicatedUnit(): boolean {
+    return this.problematicUnit !== '';
   }
 
   isAnswerValid(): boolean {
