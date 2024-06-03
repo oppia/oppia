@@ -253,11 +253,15 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                     []
                 )
             }
+        def mock_get_staged_files() -> List[bytes]:
+            return [b'file1.js', b'file2.ts', b'file3.ts']
         def mock_get_file_spec(file_path: str) -> Optional[str]:
             if file_path == 'file1.js':
                 return 'file1.js'
             if file_path == 'file2.ts':
                 return 'file2.ts'
+            if file_path == 'file3.ts':
+                return 'file3.ts'
             return None
         get_remote_name_swap = self.swap(
             git_changes_utils, 'get_remote_name', mock_get_remote_name)
@@ -266,6 +270,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         get_changed_files_swap = self.swap_with_checks(
             git_changes_utils, 'get_changed_files', mock_get_changed_files,
             expected_args=[(git_refs, 'remote')])
+        get_staged_files_swap = self.swap(
+            git_changes_utils, 'get_staged_files', mock_get_staged_files)
         get_file_spec_swap = self.swap(
             run_frontend_tests, 'get_file_spec', mock_get_file_spec)
 
@@ -273,7 +279,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage, get_remote_name_swap:
                     with get_refs_swap, get_changed_files_swap:
-                        with get_file_spec_swap:
+                        with get_file_spec_swap, get_staged_files_swap:
                             run_frontend_tests.main(
                                 args=['--run_on_changed_files'])
 
@@ -281,7 +287,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
-            '--specs_to_run=file1.js,file2.ts']
+            '--specs_to_run=file1.js,file2.ts,file3.ts']
         self.assertIn(cmd, self.cmd_token_list)
 
     def test_frontend_tests_with_run_on_changed_files_no_remote(self) -> None:

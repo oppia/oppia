@@ -197,6 +197,13 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 spec_file = get_file_spec(file_path)
                 if spec_file:
                     specs_to_run.append(spec_file)
+        staged_files = git_changes_utils.get_staged_files()
+        staged_files_to_run = git_changes_utils.get_js_or_ts_files_from_diff(
+            staged_files)
+        for file_path in staged_files_to_run:
+            spec_file = get_file_spec(file_path)
+            if spec_file and spec_file not in specs_to_run:
+                specs_to_run.append(spec_file)
 
     if parsed_args.specs_to_run or parsed_args.run_on_changed_files:
         if len(specs_to_run) == 0:

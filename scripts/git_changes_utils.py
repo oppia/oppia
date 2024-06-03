@@ -93,7 +93,8 @@ def get_remote_name() -> Optional[bytes]:
 
 
 def git_diff_name_status(
-    left: str, right: str, diff_filter: str = ''
+    left: str = '', right: str = '',
+    diff_filter: str = ''
 ) -> List[FileDiff]:
     """Compare two branches/commits with git.
 
@@ -111,10 +112,11 @@ def git_diff_name_status(
     git_cmd = ['git', 'diff', '--name-status']
     if diff_filter:
         git_cmd.append('--diff-filter={}'.format(diff_filter))
-    git_cmd.extend([left, right])
-    # Append -- to avoid conflicts between branch and directory name.
-    # More here: https://stackoverflow.com/questions/26349191
-    git_cmd.append('--')
+    if left and right:
+        git_cmd.extend([left, right])
+        # Append -- to avoid conflicts between branch and directory name.
+        # More here: https://stackoverflow.com/questions/26349191
+        git_cmd.append('--')
     out, err = start_subprocess_for_result(git_cmd)
     if not err:
         file_list = []
@@ -200,11 +202,11 @@ def get_parent_branch_name_for_diff() -> str:
     return 'develop'
 
 
-def extract_acmrt_files_from_diffs(file_diffs: List[FileDiff]) -> List[bytes]:
+def extract_acmrt_files_from_diff(diff_files: List[FileDiff]) -> List[bytes]:
     """Grab only files out of a list of FileDiffs that have a ACMRT status."""
-    if not file_diffs:
+    if not diff_files:
         return []
-    acmrt_files = [f.name for f in file_diffs if f.status in b'ACMRT']
+    acmrt_files = [f.name for f in diff_files if f.status in b'ACMRT']
     return acmrt_files
 
 
@@ -262,7 +264,7 @@ def get_changed_files(
         # Get the difference to remote/develop.
         modified_files = compare_to_remote(
             remote, branch, remote_branch=get_parent_branch_name_for_diff())
-        acmrt_files = extract_acmrt_files_from_diffs(modified_files)
+        acmrt_files = extract_acmrt_files_from_diff(modified_files)
         collected_files[branch] = (modified_files, acmrt_files)
 
     for branch, (modified_files, acmrt_files) in collected_files.items():
@@ -273,6 +275,19 @@ def get_changed_files(
             pprint.pprint(acmrt_files)
             print('\n')
     return collected_files
+
+
+def get_staged_files() -> List[bytes]:
+    """Returns the list of staged files."""
+    staged_files = git_diff_name_status()
+    acmrt_staged_files = extract_acmrt_files_from_diff(staged_files)
+    if staged_files:
+        print('\nStaged files:')
+        pprint.pprint(staged_files)
+        print('\nFiles with ACMRT in staged files:')
+        pprint.pprint(acmrt_staged_files)
+        print('\n')
+    return acmrt_staged_files
 
 
 def get_js_or_ts_files_from_diff(diff_files: List[bytes]) -> List[str]:
