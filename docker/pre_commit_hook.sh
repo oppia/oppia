@@ -86,10 +86,14 @@ for arg in "$@"; do
     fi
 done
 
-# Run hook in container
+# Get git username and email from git config
 GIT_USERNAME=$(git config user.name)
 GIT_USEREMAIL=$(git config user.email)
 
+# Run pre-commit hook script inside docker container
+# We need to pass git username and email to the container, so that it can
+# configure git user.name and user.email for the commit which is checked in 
+# pre-commit hook.
 docker compose run -T --no-deps --entrypoint "/bin/sh -c 'git config user.name $GIT_USERNAME && git config user.email $GIT_USEREMAIL && python3 ./.git/hooks/pre-commit-python $@'" dev-server
 
 # Save exit code from the docker command, so we can later use it to exit this pre-commit hook at end.
