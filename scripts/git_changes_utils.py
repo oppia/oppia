@@ -200,12 +200,12 @@ def get_parent_branch_name_for_diff() -> str:
     return 'develop'
 
 
-def extract_files_to_lint(file_diffs: List[FileDiff]) -> List[bytes]:
+def extract_acmrt_files_from_diffs(file_diffs: List[FileDiff]) -> List[bytes]:
     """Grab only files out of a list of FileDiffs that have a ACMRT status."""
     if not file_diffs:
         return []
-    lint_files = [f.name for f in file_diffs if f.status in b'ACMRT']
-    return lint_files
+    acmrt_files = [f.name for f in file_diffs if f.status in b'ACMRT']
+    return acmrt_files
 
 
 def get_refs() -> List[GitRef]:
@@ -235,7 +235,7 @@ def get_refs() -> List[GitRef]:
 def get_changed_files(
     ref_list: List[GitRef], remote: str
 ) -> Dict[str, Tuple[List[FileDiff], List[bytes]]]:
-    """Collect modified files and filter those that need linting.
+    """Collect modified files and ACMRT files for each branch in ref_list.
 
     Parameter:
         ref_list: list of references to parse (provided by git in stdin)
@@ -243,7 +243,7 @@ def get_changed_files(
 
     Returns:
         dict. Dict mapping branch names to 2-tuples of the form (list of
-        changed files, list of files to lint).
+        changed files, list of ACMRT files).
     """
     if not ref_list:
         return {}
@@ -262,15 +262,15 @@ def get_changed_files(
         # Get the difference to remote/develop.
         modified_files = compare_to_remote(
             remote, branch, remote_branch=get_parent_branch_name_for_diff())
-        files_to_lint = extract_files_to_lint(modified_files)
-        collected_files[branch] = (modified_files, files_to_lint)
+        acmrt_files = extract_acmrt_files_from_diffs(modified_files)
+        collected_files[branch] = (modified_files, acmrt_files)
 
-    for branch, (modified_files, files_to_lint) in collected_files.items():
+    for branch, (modified_files, acmrt_files) in collected_files.items():
         if modified_files:
             print('\nModified files in %s:' % branch)
             pprint.pprint(modified_files)
-            print('\nFiles to lint in %s:' % branch)
-            pprint.pprint(files_to_lint)
+            print('\nFiles with ACMRT in %s:' % branch)
+            pprint.pprint(acmrt_files)
             print('\n')
     return collected_files
 

@@ -291,12 +291,13 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_extract_files_to_lint_with_empty_file_diffs(self) -> None:
-        self.assertEqual(git_changes_utils.extract_files_to_lint([]), [])
-
-    def test_extract_files_to_lint_with_non_empty_file_diffs(self) -> None:
+    def test_extract_acmrt_files_with_empty_file_diffs(self) -> None:
         self.assertEqual(
-            git_changes_utils.extract_files_to_lint([
+            git_changes_utils.extract_acmrt_files_from_diffs([]), [])
+
+    def test_extract_acmrt_files_with_non_empty_file_diffs(self) -> None:
+        self.assertEqual(
+            git_changes_utils.extract_acmrt_files_from_diffs([
                 git_changes_utils.FileDiff(status=b'M', name=b'file1'),
                 git_changes_utils.FileDiff(status=b'A', name=b'file2'),
                 git_changes_utils.FileDiff(status=b'W', name=b'file3')]),
@@ -350,7 +351,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             remote_branch: Optional[str] = None  # pylint: disable=unused-argument
         ) -> List[str]:
             return ['A:file1', 'M:file2']
-        def mock_extract_files_to_lint(
+        def mock_extract_acmrt_files_from_diffs(
             unused_file_diffs: List[git_changes_utils.FileDiff]
         ) -> List[str]:
             return ['file1', 'file2']
@@ -360,8 +361,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         compare_to_remote_swap = self.swap(
             git_changes_utils, 'compare_to_remote', mock_compare_to_remote)
         extract_files_swap = self.swap(
-            git_changes_utils, 'extract_files_to_lint',
-            mock_extract_files_to_lint)
+            git_changes_utils, 'extract_acmrt_files_from_diffs',
+            mock_extract_acmrt_files_from_diffs)
 
         with compare_to_remote_swap, extract_files_swap, get_branch_swap:
             self.assertEqual(
