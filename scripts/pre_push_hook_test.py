@@ -471,7 +471,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_run_script_and_get_returncode(script: List[str]) -> int:
             frontend_test_cmds = pre_push_hook.FRONTEND_TEST_CMDS.copy()
             frontend_test_cmds.append('--specs_to_run=files1.js,file2.ts')
-            if script == pre_push_hook.FRONTEND_TEST_CMDS:
+            if script == frontend_test_cmds:
                 return 1
             return 0
         def mock_get_js_or_ts_files_from_diff(
