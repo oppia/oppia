@@ -54,8 +54,10 @@ const blogPostUrlinPartnershipsPage =
 const partnershipsFormUrl = testConstants.URLs.PartnershipsForm;
 const partnershipsFormInPortugueseUrl =
   testConstants.URLs.PartnershipsFormInPortuguese;
+const partnershipsFormShortUrl = testConstants.URLs.PartnershipsFormShortUrl;
 const partnershipsBrochureUrl = testConstants.URLs.PartnershipsBrochure;
 const volunteerFormUrl = testConstants.URLs.VolunteerForm;
+const volunteerFormShortUrl = testConstants.URLs.VolunteerFormShortUrl;
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const navbarLearnTabBasicMathematicsButton =
@@ -128,16 +130,26 @@ const mobileSidevbarGetInvolvedMenuDonateButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
 const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
-const browseOurLessonsButtonInTeachPage =
-  '.e2e-test-teach-page-browse-our-lessons-button';
-const accessAndroidAppButtonInTeachPage =
-  '.e2e-test-teach-page-access-android-app-button';
-const visitClassroomButtonInTeachPage =
-  '.e2e-test-teach-page-visit-classroom-button';
-const exploreLessonsButtonInTeachPage =
-  '.e2e-test-teach-page-explore-lessons-button';
-const browseLibraryButtonInTeachPage =
-  '.e2e-test-teach-page-browse-library-button';
+const browseOurLessonsDesktopButtonInTeachPage =
+  '.e2e-test-teach-page-browse-our-lessons-desktop-button';
+const browseOurLessonsMobileButtonInTeachPage =
+  '.e2e-test-teach-page-browse-our-lessons-mobile-button';
+const accessAndroidAppDesktopButtonInTeachPage =
+  '.e2e-test-teach-page-access-android-app-desktop-button';
+const accessAndroidAppMobileButtonInTeachPage =
+  '.e2e-test-teach-page-access-android-app-mobile-button';
+const visitClassroomDesktopButtonInTeachPage =
+  '.e2e-test-teach-page-visit-classroom-desktop-button';
+const visitClassroomMobileButtonInTeachPage =
+  '.e2e-test-teach-page-visit-classroom-mobile-button';
+const exploreLessonsDesktopButtonInTeachPage =
+  '.e2e-test-teach-page-explore-lessons-desktop-button';
+const exploreLessonsMobileButtonInTeachPage =
+  '.e2e-test-teach-page-explore-lessons-mobile-button';
+const browseLibraryDesktopButtonInTeachPage =
+  '.e2e-test-teach-page-browse-library-desktop-button';
+const browseLibraryMobileButtonInTeachPage =
+  '.e2e-test-teach-page-browse-library-mobile-button';
 const partnerWithUsButtonAtTheTopOfPartnershipsPage =
   '.e2e-test-partnerships-page-partner-with-us-button-at-the-top';
 const partnerWithUsButtonAtTheBottomOfPartnershipsPage =
@@ -146,8 +158,10 @@ const brochureButtonInPartnershipsPage =
   '.e2e-test-partnerships-page-brochure-button';
 const readMoreStoriesButtonInPartnershipsPage =
   '.e2e-test-partnerships-page-partner-stories-button';
-const readBlogPostButtonInPartnershipsPage =
-  'a.e2e-test-partnerships-page-blog-post-button';
+const readBlogPostDesktopButtonInPartnershipsPage =
+  '.e2e-test-partnerships-page-blog-post-desktop-button';
+const readBlogPostMobileButtonInPartnershipsPage =
+  '.e2e-test-partnerships-page-blog-post-mobile-button';
 const applyToVolunteerButtonAtTheTopOfVolunteerPage =
   '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-top';
 const applyToVolunteerButtonAtTheBottomOfVolunteerPage =
@@ -1077,6 +1091,9 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Math Classroom page.
    */
   async clickBrowseOurLessonsButtonInTeachPage(): Promise<void> {
+    const browseOurLessonsButtonInTeachPage = this.isViewportAtMobileWidth()
+      ? browseOurLessonsMobileButtonInTeachPage
+      : browseOurLessonsDesktopButtonInTeachPage;
     await this.clickButtonToNavigateToNewPage(
       browseOurLessonsButtonInTeachPage,
       'Browse Our Lessons button',
@@ -1090,6 +1107,9 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Android page.
    */
   async clickAccessAndroidAppButtonInTeachPage(): Promise<void> {
+    const accessAndroidAppButtonInTeachPage = this.isViewportAtMobileWidth()
+      ? accessAndroidAppMobileButtonInTeachPage
+      : accessAndroidAppDesktopButtonInTeachPage;
     await this.clickButtonToNavigateToNewPage(
       accessAndroidAppButtonInTeachPage,
       'Access the Android App button',
@@ -1103,7 +1123,9 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Math Classroom page.
    */
   async clickVisitClassroomButtonInTeachPage(): Promise<void> {
-    await this.page.waitForSelector(visitClassroomButtonInTeachPage);
+    const visitClassroomButtonInTeachPage = this.isViewportAtMobileWidth()
+      ? visitClassroomMobileButtonInTeachPage
+      : visitClassroomDesktopButtonInTeachPage;
     await this.clickButtonToNavigateToNewPage(
       visitClassroomButtonInTeachPage,
       'Visit Classroom button',
@@ -1117,6 +1139,9 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Community Library page.
    */
   async clickBrowseLibraryButtonInTeachPage(): Promise<void> {
+    const browseLibraryButtonInTeachPage = this.isViewportAtMobileWidth()
+      ? browseLibraryMobileButtonInTeachPage
+      : browseLibraryDesktopButtonInTeachPage;
     await this.clickButtonToNavigateToNewPage(
       browseLibraryButtonInTeachPage,
       'Browse Library button',
@@ -1130,6 +1155,9 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Math Classroom page.
    */
   async clickExploreLessonsButtonInTeachPage(): Promise<void> {
+    const exploreLessonsButtonInTeachPage = this.isViewportAtMobileWidth()
+      ? exploreLessonsMobileButtonInTeachPage
+      : exploreLessonsDesktopButtonInTeachPage;
     await this.clickButtonToNavigateToNewPage(
       exploreLessonsButtonInTeachPage,
       'Explore Lessons button',
@@ -1144,12 +1172,26 @@ export class LoggedOutUser extends BaseUser {
    * The button is in the first section of the page.
    */
   async clickPartnerWithUsButtonInPartnershipsPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      partnerWithUsButtonAtTheTopOfPartnershipsPage,
-      'Partner With Us button at the top of the Partnerships page',
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.clickOn(partnerWithUsButtonAtTheTopOfPartnershipsPage),
+    ]);
+
+    const allowedUrls = [
+      partnershipsFormShortUrl,
       partnershipsFormUrl,
-      'Partnerships Google Form'
-    );
+      `${partnershipsFormUrl}?usp=send_form`,
+    ];
+
+    // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
+    // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
+    // control.So we need to check for all the 3 URLs as all of them are valid.
+    expect(allowedUrls)
+      .withContext(
+        'Partner With Us button at the top of the Partnerships page should open' +
+          'the Partnerships Google Form page'
+      )
+      .toContain(this.page.url());
   }
 
   /**
@@ -1172,8 +1214,12 @@ export class LoggedOutUser extends BaseUser {
     langCode: string
   ): Promise<void> {
     await this._changeSiteLanguage(langCode);
+    // Here we need to reload the page again to confirm the language change.
     await this.navigateToPartnershipsPage();
 
+    // Here we are not verifying the 3 URLs as we did in the English version
+    // because we have put the direct translated Google Form URL in the page itself.
+    // Refer core/templates/pages/partnerships-page/partnerships-page.component.ts to see how it's done.
     await this.clickButtonToNavigateToNewPage(
       partnerWithUsButtonAtTheBottomOfPartnershipsPage,
       'Partner With Us button at the bottom of the Partnerships page',
@@ -1199,13 +1245,16 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickReadBlogPostLinkInPartnershipsPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"Read blog post")]');
+    const readBlogPostButtonInPartnershipsPage = this.isViewportAtMobileWidth()
+      ? readBlogPostMobileButtonInPartnershipsPage
+      : readBlogPostDesktopButtonInPartnershipsPage;
+
     await this.clickButtonToNavigateToNewPage(
       readBlogPostButtonInPartnershipsPage,
       'Read blog post button',
       blogPostUrlinPartnershipsPage,
       'Blog Post'
     );
-    await this.page.waitForSelector(blogPostTitleInPartnershipsPage);
   }
 
   /**
@@ -1226,12 +1275,26 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Volunteer form.
    */
   async clickApplyToVolunteerAtTheTopOfVolunteerPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      applyToVolunteerButtonAtTheTopOfVolunteerPage,
-      'Apply To Volunteer at the top of the Volunteer page',
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.clickOn(applyToVolunteerButtonAtTheTopOfVolunteerPage),
+    ]);
+
+    const allowedUrls = [
+      volunteerFormShortUrl,
       volunteerFormUrl,
-      'Volunteer Form'
-    );
+      `${volunteerFormUrl}?usp=send_form`,
+    ];
+
+    // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
+    // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
+    // control.So we need to check for all the 3 URLs as all of them are valid.
+    expect(allowedUrls)
+      .withContext(
+        'Apply To Volunteer at the top of the Volunteer page should open' +
+          'the Volunteer Form page'
+      )
+      .toContain(this.page.url());
   }
 
   /**
@@ -1239,12 +1302,26 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Volunteer form.
    */
   async clickApplyToVolunteerAtTheBottomOfVolunteerPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      applyToVolunteerButtonAtTheBottomOfVolunteerPage,
-      'Apply To Volunteer at the bottom of the Volunteer page',
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.clickOn(applyToVolunteerButtonAtTheBottomOfVolunteerPage),
+    ]);
+
+    const allowedUrls = [
       volunteerFormUrl,
-      'Volunteer Form'
-    );
+      `${volunteerFormUrl}?usp=send_form`,
+      volunteerFormShortUrl,
+    ];
+
+    // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
+    // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
+    // control.So we need to check for all the 3 URLs as all of them are valid.
+    expect(allowedUrls)
+      .withContext(
+        'Apply To Volunteer at the top of the Volunteer page should open' +
+          'the Volunteer Form page'
+      )
+      .toContain(this.page.url());
   }
 
   /**
