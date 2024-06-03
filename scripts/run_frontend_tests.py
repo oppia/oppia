@@ -187,12 +187,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         refs = git_changes_utils.get_refs()
         collected_files = git_changes_utils.get_changed_files(
             refs, remote.decode('utf-8'))
-        for _, (_, files_to_lint) in collected_files.items():
-            if not files_to_lint:
+        for _, (_, acmrt_files) in collected_files.items():
+            if not acmrt_files:
                 continue
 
             files_to_run = git_changes_utils.get_js_or_ts_files_from_diff(
-                files_to_lint)
+                acmrt_files)
             for file_path in files_to_run:
                 spec_file = get_file_spec(file_path)
                 if spec_file:
