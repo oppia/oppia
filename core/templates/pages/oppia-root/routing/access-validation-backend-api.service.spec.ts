@@ -274,6 +274,22 @@ describe('Access validation backend api service', () => {
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
+  it('should validate access to story editor page', fakeAsync(() => {
+    let storyId = 'story_id';
+
+    avbas.validateAccessToLearnerGroupEditorPage(storyId)
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      'can_access_story_editor_page/story_id');
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
   it('should validate access to blog home page with valid access', fakeAsync(() => {
     avbas.validateAccessToBlogHomePage().then(successSpy, failSpy);
 
