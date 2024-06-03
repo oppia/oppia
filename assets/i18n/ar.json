@@ -105,7 +105,21 @@
 	"I18N_ANDROID_PAGE_NAME_FIELD_LABEL": "الاسم (اختياري)",
 	"I18N_ANDROID_PAGE_REVIEWS_REVIEWER_1": "حسن",
 	"I18N_ANDROID_PAGE_REVIEWS_REVIEWER_2": "تينينيا",
+	"I18N_ANDROID_PAGE_REVIEWS_REVIEWER_3": "كاتلن",
 	"I18N_ANDROID_PAGE_REVIEWS_REVIEW_1": "حرفياا هاذ التطبيق يساعدك على تتعلم الرياضيات بسهوله او احلى شي انو هو مجاني يساعدك كيف تتعلم القيمه المكانيه القسمه يعلمك كلشي بأختصار جميل جدا جدا جدا يستاهل خمس نجو",
+	"I18N_ANDROID_PAGE_REVIEWS_REVIEW_2": "التطبيق جيد حقا😘 أحببته",
+	"I18N_ANDROID_PAGE_REVIEWS_REVIEW_3": "مفيد جدا للتعلم، بشرح واضح مع تمارين.",
+	"I18N_ANDROID_PAGE_REVIEWS_SECTION_HEADER": "ماذا يقول طلابنا",
+	"I18N_ANDROID_PAGE_SUPPORT_TEXT": "نحن ندعم جميع إصدارات Android بدءا من Lollipop (Android 5).",
+	"I18N_ANDROID_PAGE_TITLE": "Oppia |(أندرويد)Android",
+	"I18N_ANDROID_PAGE_UPDATES_MAIN_TEXT": "اشترك لتلقي التحديثات حول تطبيق Oppia على Android (أندرويد)",
+	"I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT": "اشترك",
+	"I18N_ANDROID_PAGE_UPDATES_SUBTEXT": "نحن نعد بعدم إرسال رسائل غير مرغوب فيها، وستتلقى رسائل البريد الإلكتروني فقط في بعض الأحيان. يمكنك إلغاء الاشتراك في أي وقت.",
+	"I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_0": "أنت تسير في الاتجاه الصحيح، ولكنك بحاجة إلى بعض التدقيق الإملائي.",
+	"I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_1": "لقد اقتربت من الإجابة الصحيحة. هل يمكنك تصحيح الإملاء فضلا؟",
+	"I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_2": "يرجى التدقيق في الإملاء.",
+	"I18N_ASSIGNED_STORIES_AND_SKILLS": "القصص والمهارات التي تم تخصيصها",
+	"I18N_ASSIGNED_STORIES_AND_SKILLS_EMPTY_MESSAGE": "لم يتم تخصيص أي قصص أو مهارات للمتعلمين في هذه المجموعة.",
 	"I18N_ATTRIBUTION_HTML_STEP_ONE": "انسخ و الصق الHTML",
 	"I18N_ATTRIBUTION_HTML_STEP_TWO": "تأكد من ظهور الرابط كـ \"<[linkText]>\"",
 	"I18N_ATTRIBUTION_HTML_TITLE": "الرِّيَاضِيَّات لأوبيا ، لِمُحَاوَلَة الْحِلّ .",
@@ -113,15 +127,35 @@
 	"I18N_ATTRIBUTION_PRINT_STEP_TWO": "إرفاق نسخة من \"<[link]>\"",
 	"I18N_ATTRIBUTION_PRINT_TITLE": "السمة في الطباعة",
 	"I18N_ATTRIBUTION_TITLE": "كيف تنسب هذا الدرس للمشاركة أو إعادة الاستخدام",
+	"I18N_BLOG_AUTHOR_PROFILE_PAGE_BREADCRUMB": "الملف الشخصي للمؤلف",
+	"I18N_BLOG_AUTHOR_PROFILE_PAGE_TITLE": "المدونة | الناشر | Oppia",
+	"I18N_BLOG_AUTHOR_PROFILE_PAGE_TOTAL_POSTS_DISPLAY": "منشورات <[totalNumber]>",
 	"I18N_BLOG_CARD_PREVIEW_CONTEXT": "هذه هي الطريقة التي ستظهر بها بطاقة المدونة على الصفحة الرئيسية للمدونة <[link]> وعلى صفحة ملف تعريف المؤلف الخاصة بك.",
 	"I18N_BLOG_CARD_PREVIEW_HEADING": "معاينة بطاقة المدونة",
+	"I18N_BLOG_DASHBOARD_AUTHOR_BIO_EXPLAIN_TEXT": "أضف وصفا قصيرا عنك. لاحظ أن أي شيء تكتبه هنا سيظهر للجميع.",
+	"I18N_BLOG_DASHBOARD_AUTHOR_BIO_HEADING": "السيرة الذاتية",
+	"I18N_BLOG_DASHBOARD_AUTHOR_DETAILS_EDITOR_DESCRIPTION": "قبل أن تتمكن من نشر أي منشورات في المدونة، يرجى إضافة اسم خاص بك وسيرة ذاتية مختصرة. ستعرض هذه في صفحتك الشخصية في المدونة وسيظهر الاسم الخاص بك  مع المنشورات التي تشاركها.",
+	"I18N_BLOG_DASHBOARD_AUTHOR_DETAILS_EDITOR_HEADING": "أضف اسم خاص بك كـناشر وسيرة ذاتية",
+	"I18N_BLOG_DASHBOARD_AUTHOR_NAME_HEADING": "الاسم",
 	"I18N_BLOG_DASHBOARD_CREATE_NEW_BLOG_POST_BUTTON": "إنشاء منشور مدونة جديد",
 	"I18N_BLOG_DASHBOARD_INTRO_MESSAGE": "يبدوا أنك لم تنشأ أي قصة بعد !",
 	"I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON": "منشور جديد",
+	"I18N_BLOG_DASHBOARD_PAGE_SAVE_BUTTON": "حفظ",
 	"I18N_BLOG_DASHBOARD_TAB_DRAFTS": "المسودات",
 	"I18N_BLOG_DASHBOARD_TAB_PUBLISHED": "تم النشر",
 	"I18N_BLOG_HOME_PAGE_BREADCRUMB": "مدونة",
+	"I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND": "عذرا، لا توجد أي منشورات في المدونة تتوافق مع هذا السؤال.",
+	"I18N_BLOG_HOME_PAGE_OPPIA_DESCRIPTION": "بناء مجتمع لتوفير تعليم عالي الجودة لأولئك الذين لا يستطيعون الوصول إليه.",
+	"I18N_BLOG_HOME_PAGE_POSTS_HEADING": "آخر المنشورات",
+	"I18N_BLOG_HOME_PAGE_POSTS_NUMBER_DISPLAY": "عرض <[startingNumber]> - <[endingNumber]> من <[totalNumber]> منشورات",
+	"I18N_BLOG_HOME_PAGE_QUERY_SEARCH_HEADING": "مصطلحات رئيسية",
 	"I18N_BLOG_HOME_PAGE_TAGS_SEARCH_HEADING": "وسوم",
+	"I18N_BLOG_HOME_PAGE_TAG_FILTER_HOLDER_TEXT": "حدد خيارا",
+	"I18N_BLOG_HOME_PAGE_TITLE": "Oppia | مدونة Oppia",
+	"I18N_BLOG_HOME_PAGE_WELCOME_HEADING": "مرحبا بكم في مدونة Oppia!",
+	"I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING": "عرض نتائج البحث",
+	"I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY": "عرض <[startingNumber]> - <[endingNumber]> من إجمالي نتائج البحث.",
+	"I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY": "عرض <[startingNumber]> - <[endingNumber]> من <[totalNumber]> منشورات",
 	"I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT": "اضف صورة للواجهة",
 	"I18N_BLOG_POST_EDITOR_BODY_HEADING": "جسم",
 	"I18N_BLOG_POST_EDITOR_CANCEL_BUTTON_TEXT": "إلغاء",
@@ -138,7 +172,15 @@
 	"I18N_BLOG_POST_EDITOR_TAGS_LIMIT_SPECIFICATION_SUFFIX": "لا يزال من الممكن إضافة المزيد من الوسوم.",
 	"I18N_BLOG_POST_EDITOR_THUMBNAIL_HEADING": "صورة الواجهة",
 	"I18N_BLOG_POST_EDITOR_TITLE_HEADING": "عنوان",
+	"I18N_BLOG_POST_EDITOR_TITLE_INVALID_CHARACTERS_ERROR": "يحتوي حقل العنوان على مدخلات غير صالحة. لا يسمح إلا بالكلمات (a-zA-Z0-9) المفصولة بواسطة مسافة وعلامة الشرطة (-) وإشارة العطف (&) وعلامة الشارحة(:).",
+	"I18N_BLOG_POST_EDITOR_TITLE_IS_DUPLICATE_ERROR": "هناك منشور مدونة يحمل نفس العنوان. يرجى استعمال عنوان مختلف.",
+	"I18N_BLOG_POST_EDITOR_TITLE_MAX_LENGTH_ERROR": "عنوان منشور المدونة يجب أن يحتوي على <[maxChars]> مدخل كحد أقصى.",
+	"I18N_BLOG_POST_EDITOR_TITLE_MIN_LENGTH_ERROR": "يجب أن يحتوي عنوان منشور المدونة على <[minChars]> مدخل على الأقل.",
+	"I18N_BLOG_POST_PAGE_RECOMMENDATION_SECTON_HEADING": "مقترحات لك.",
 	"I18N_BLOG_POST_PAGE_TAGS_HEADING": "الوسوم",
+	"I18N_BLOG_POST_PAGE_TITLE": "<[blogPostTitle]> | مدونة | Oppia",
+	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_EXTENSIONS_PREFIX": "امتدادات الصور المسموح بها:",
+	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_MAX_FILE_SIZE": "أقصى حجم مسموح به للصورة هو  <[imageSize]> KB. يرجى ملاحظةأن القص قد يؤدي إلى زيادة حجم الصورة في بعض الأحيان.",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "خطأ: لا يمكن قراءة ملف الصورة.",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD": "إضافة صورة للواجهة",
 	"I18N_BLOG_POST_UNTITLED_HEADING": "غير مسمى",
@@ -150,28 +192,77 @@
 	"I18N_CLASSROOM_CALLOUT_HEADING_2": "تقديم: غرفة دراسة Oppia",
 	"I18N_CLASSROOM_CALLOUT_PARAGRAPH_1": "تحقق من الدورة الأولى في صفوف أوبيا الجديدة  تماما! خطط دروس مثبتة، تم إنشاؤها من قبل المعلمين، حتى تتمكن من إتقان المواد الأكاديمية الهامة.",
 	"I18N_CLASSROOM_MATH_TITLE": "رياضيات",
+	"I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_HEADING": "تعرف بعض الرياضيات بالفعل؟",
+	"I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_TEXT": "قم بإجراء اختبار يتكون من 10 إلى 15 سؤالاً لتعرف من أين تبدأ.",
+	"I18N_CLASSROOM_PAGE_BEGIN_WITH_FIRST_TOPIC_BUTTON": "ابدأ <[firstTopic]>",
 	"I18N_CLASSROOM_PAGE_COMING_SOON": "قريباً",
 	"I18N_CLASSROOM_PAGE_COURSE_DETAILS": "تفاصيل المساق",
 	"I18N_CLASSROOM_PAGE_HEADING": "صفحة الفصول الدراسية في أوبيا",
+	"I18N_CLASSROOM_PAGE_NEW_TO_MATH_HEADING": "لم تدرس رياضيات من قبل؟",
+	"I18N_CLASSROOM_PAGE_NEW_TO_MATH_TEXT": "ابدأ من الأساسيات مع موضوعنا الأول، <[firstTopic]>.",
 	"I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING": "استكشف المزيد من الدروس التي أعدها المجتمع",
 	"I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING": "التصفح من خلال مكتبتنا العامة",
+	"I18N_CLASSROOM_PAGE_TAKE_A_TEST_BUTTON": "اخضع لاختبار",
+	"I18N_CLASSROOM_PAGE_TITLE": "تعلم <[classroomName]> مع Oppia | Oppia",
 	"I18N_CLASSROOM_PAGE_TOPICS_COVERED": "المواضيع المغطاة",
+	"I18N_COLLECTION_EDITOR_PAGE_TITLE": "<[collectionTitle]> - Oppia محرر",
+	"I18N_COLLECTION_EDITOR_UNTITLED_COLLECTION_PAGE_TITLE": "بدون عنوان - محرر Oppia",
 	"I18N_COLLECTION_PLAYER_PAGE_BEGIN": "بدأ",
 	"I18N_COLLECTION_PLAYER_PAGE_CONTINUE": "التالي",
 	"I18N_COLLECTION_PLAYER_PAGE_FINISHED": "لقد أكملت هذه المجموعة! لا تتردد بإعادة أي من البحوث أسفله.",
 	"I18N_COLLECTION_PLAYER_PAGE_HOVER_MESSAGE": "حم فوق الرمز لعرض الاستكشاف.",
 	"I18N_COLLECTION_PLAYER_PAGE_NO_EXPLORATION": "لم تتم إضافة أي استكشاف إلى هذه المجموعة.",
+	"I18N_COLLECTION_PLAYER_PAGE_TITLE": "<[collectionTitle]> - Oppia",
 	"I18N_COMING_SOON": " قريبا!",
 	"I18N_COMMUNITY_LIBRARY_PAGE_COLLECTION": "مجموعة",
 	"I18N_COMPLETED_STORY": "<[story]> كاملة.",
 	"I18N_COMPLETE_CHAPTER": "أكمل فصلاً في <[topicName]>",
+	"I18N_CONCEPT_CARD_NEED_HELP": "تحتاج المساعدة؟ ألق نظرة على بطاقة المفاهيم.",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_FIRST_1": "لقد أنهيت للتو أول تقييم! بداية جيدة!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_FIRST_2": "عمل رائع انهيت التقييم الأول! استمر في ذلك!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_FIRST_3": "بداية ممتازة! استمر على هذا!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_GENERIC_1": "لقد أنهيت هذا التقييم! أحسنت!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_GENERIC_2": "رائع، لقد أنهيت هذا التقييم! استمر في التقدم!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_GENERIC_3": "عمل جيد! لقد أنهيت الآن هذا التقييم!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_MIDWAY_1": "لقد قطعت نصف الطريق، وخلال وقت قصير ستكون أكملت!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_MIDWAY_2": "لقد وصلت إلى منتصف الطريق، عمل جيد!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_MIDWAY_3": "رائع! لقد وصلت بالفعل إلى منتصف الدرس! عمل مذهل!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_ONE_REMAINING_1": "لم يتبقى سوى تقييم واحد فقط، مرحى!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_ONE_REMAINING_2": "لنبدأ!فقط تقييم واحد بعد!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_ONE_REMAINING_3": "أنت تقوم بعمل رائع، فقط تقييم واحد بعد!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_SECOND_1": "أنت تحرز تقدما جيدا! استمر!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_SECOND_2": "مذهل! لقد أكملت للتو التقييم الثاني!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_SECOND_3": "أكملت تقييما آخر، أنت تقوم بعمل رائع!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_TWO_REMAINING_1": "قاربت على الانتهاء! استمر!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_TWO_REMAINING_2": "لقد أوشكت على الوصول للنهاية! استمر على هذا!",
+	"I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_TWO_REMAINING_3": "عمل جيد! أنت على وشك الوصول إلى خط النهاية!",
+	"I18N_CONGRATULATORY_CHECKPOINT_TITLE_1": "مرحى!",
+	"I18N_CONGRATULATORY_CHECKPOINT_TITLE_2": "مذهل!",
+	"I18N_CONGRATULATORY_CHECKPOINT_TITLE_3": "تقييم!",
+	"I18N_CONGRATULATORY_CHECKPOINT_TITLE_4": "أحسنت!",
+	"I18N_CONGRATULATORY_CHECKPOINT_TITLE_5": "عمل رائع!",
+	"I18N_CONGRATULATORY_CHECKPOINT_TITLE_6": "أحسنت!",
+	"I18N_CONTACT_PAGE_BECOME_A_PARTNER_BUTTON": "كن شريكا",
+	"I18N_CONTACT_PAGE_BECOME_A_VOLUNTEER_BUTTON": "كن متطوعا",
 	"I18N_CONTACT_PAGE_BREADCRUMB": "اتصل",
-	"I18N_CONTACT_PAGE_HEADING": "شارك!",
+	"I18N_CONTACT_PAGE_DONATE_HEADING": "تبرع",
+	"I18N_CONTACT_PAGE_DONATE_PARAGRAPH": "ستذهب تبرعاتك إلى المبادرات التي تدعم المتعلمين في جميع أنحاء العالم.",
+	"I18N_CONTACT_PAGE_DONATE_TODAY_BUTTON": "تبرع اليوم",
+	"I18N_CONTACT_PAGE_GREETING_HEADING": "نتطلع إلى الاستماع إليك!",
+	"I18N_CONTACT_PAGE_HEADING": "اتصل بنا",
+	"I18N_CONTACT_PAGE_OTHER_INQUIRIES_HEADING": "استفسارات أخرى",
+	"I18N_CONTACT_PAGE_OTHER_INQUIRIES_PARAGRAPH_1": "للأسئلة العامة، يرجى التواصل معنا على <a class=\"oppia-contact-mail\" href=\"mailto:admin@oppia.org\"></a>",
+	"I18N_CONTACT_PAGE_OTHER_INQUIRIES_PARAGRAPH_2": "إذا كان لديك استفسار إعلامي، يرجى إرساله إلى <a class=\"oppia-contact-mail\" href=\"mailto:press@oppia.org\"></a>",
+	"I18N_CONTACT_PAGE_PARTNER_HEADING": "شريك",
+	"I18N_CONTACT_PAGE_PARTNER_PARAGRAPH": "كن شريكا لتحصل على الدعم التعليمي لمؤسستك أو مجتمعك.",
 	"I18N_CONTACT_PAGE_TITLE": "الاتصال | أوبيا",
+	"I18N_CONTACT_PAGE_VOLUNTEER_HEADING": "متطوع",
+	"I18N_CONTACT_PAGE_VOLUNTEER_PARAGRAPH": "نرحب بصانعي الدروس والمصممين والمطورين ومديري المنتج والفنانين.",
 	"I18N_CONTINUE_REGISTRATION": "متابعة التسجيل",
 	"I18N_COOKIE_BANNER_ACKNOWLEDGE": "موافق",
 	"I18N_COOKIE_BANNER_EXPLANATION": "يستخدم هذا الموقع ملفات تعريف الارتباط والتقنيات المماثلة لدعم الوظائف الأساسية والحفاظ على أمان الموقع وتحليل حركة المرور على موقعنا. تعرف على مزيد من المعلومات في <a href=\"/privacy-policy\"></a>.",
 	"I18N_CORRECT_FEEDBACK": "صحيح!",
+	"I18N_CREATED_LEARNER_GROUP_LINK_MESSAGE": "رابط مجموعتك",
 	"I18N_CREATE_ACCOUNT": "أنشئ حسابًا",
 	"I18N_CREATE_ACTIVITY_QUESTION": "ماذا تريد أن تنشئ؟",
 	"I18N_CREATE_ACTIVITY_TITLE": "إنشاء نشاط",
@@ -181,6 +272,8 @@
 	"I18N_CREATE_EXPLORATION_QUESTION": "هل تريد إنشاء تنقيب؟",
 	"I18N_CREATE_EXPLORATION_TITLE": "إنشاء استكشاف",
 	"I18N_CREATE_EXPLORATION_UPLOAD": "رفع",
+	"I18N_CREATE_LEARNER_GROUP": "إنشاء مجموعة",
+	"I18N_CREATE_LEARNER_GROUP_PAGE_TITLE": "إنشاء مجموعة متعلمين | Oppia",
 	"I18N_CREATE_NO_THANKS": "لا، شكرا",
 	"I18N_CREATE_YES_PLEASE": "نعم من فضلك!",
 	"I18N_CREATOR_IMPACT": "التأثير",
@@ -233,9 +326,46 @@
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_5": "لو كانت لديك أي أسئلة بخصوص عملية إزالة الحسابات، فمن فضلك أرسل بريدا إلكترونيا إلى <strong>privacy@oppia.org</strong>.",
 	"I18N_DELETE_ACCOUNT_PAGE_REDIRECT_INFO": "هذا سوف يأخذك الى الصفحة التي يمكنك من خلالها حذف حساب أوبيا",
 	"I18N_DELETE_ACCOUNT_PAGE_TITLE": "حذف الحساب | أوبيا",
+	"I18N_DELETE_LEARNER_GROUP": "حذف المجموعة",
+	"I18N_DELETE_LEARNER_GROUP_MODAL_BODY_TEXT": "هل أنت متأكد من أنك تريد حذف مجموعة المتعلمين <b><[groupName]></b> ؟",
+	"I18N_DEST_IF_STUCK_INFO_TOOLTIP": "يمكنك الآن تحديد بطاقة جديدة والتي تستطيع من خلالها شرح المفاهيم التي تم استخدامها في السؤال، إذا واجه المتعلمين صعوبة حقا!",
+	"I18N_DIAGNOSTIC_TEST_CURRENT_PROGRESS": "التقدم الحالي: <[progressPercentage]> %",
+	"I18N_DIAGNOSTIC_TEST_EXIT_TEST": "الخروج من الاختبار",
+	"I18N_DIAGNOSTIC_TEST_HEADING": "اختبار تقييم المتعلم",
+	"I18N_DIAGNOSTIC_TEST_INTRO_TEXT_1": "أجب عن بعض الأسئلة لمساعدتنا في ترشيح بضعة مواضيع لك لكي تبدأ دروس الرياضيات.",
+	"I18N_DIAGNOSTIC_TEST_INTRO_TEXT_2": "يرجى ملاحظة أنه لن يكون باستطاعتك تغيير إجابتك بعد الانتقال إلى السؤال التالي.",
+	"I18N_DIAGNOSTIC_TEST_RESULT_GO_TO_CLASSROOM_BUTTON_TEXT": "انتقل إلى الفصل الدراسي",
+	"I18N_DIAGNOSTIC_TEST_RESULT_HEADER_TEXT": "انتهى الاختبار. أحسنت!",
+	"I18N_DIAGNOSTIC_TEST_RESULT_START_TOPIC": "ابدأ <[topicName]>",
+	"I18N_DIAGNOSTIC_TEST_RESULT_TEXT_1_FOR_NO_TOPIC": "عمل رائع! يبدو أنك تتمتع بالفعل  بفهم جيد لمواضيع مادة الرياضيات.",
+	"I18N_DIAGNOSTIC_TEST_RESULT_TEXT_2_FOR_NO_TOPIC": "لا تتردد في الاطلاع على أي من الدروس لمراجعةأو تحسين ما تعرفه. نحن نعمل باستمرار على تحديث الفصل الدراسي بدروس جديدة، لذا قم بالإطلاع مجددا مرة أخرى.",
+	"I18N_DIAGNOSTIC_TEST_RESULT_TEXT_FOR_ONE_TOPIC": "بناء على إجاباتك، نوصي بأن تبدأ بهذا الموضوع.",
+	"I18N_DIAGNOSTIC_TEST_RESULT_TEXT_FOR_TWO_TOPICS": "بناء على إجاباتك، نوصي بأن تبدأ بأي من هذه المواضيع.",
+	"I18N_DIAGNOSTIC_TEST_START_BUTTON": "ابدأ الاختبار",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "سحب صورة إلى هذه المنطقة",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "رفع ملف",
 	"I18N_DONATE_PAGE_BREADCRUMB": "تبرع",
+	"I18N_DONATE_PAGE_BROWSER_TAB_TITLE": "تبرع | اصنع تأثيرا إيجابيا | Oppia",
+	"I18N_DONATE_PAGE_CONTENT_DONATE_NOW_CONTENT_1": "انضم إلى رسالتنا في توفير الوصول إلى تعليم جيد على مستوى العالم. كل مساهمة تساعد. تبرع الآن وساعدنا على تمكين المتعلمين في جميع أنحاء العالم.",
+	"I18N_DONATE_PAGE_CONTENT_DONATE_NOW_CONTENT_2": "إذا كنت ترغب في معرفة المزيد حول ما نقوم به في Oppia أو كيف يمكن لمساهمتك أن تحدث تأثيرا خاصا، تواصل معنا على contact@oppia.org.",
+	"I18N_DONATE_PAGE_CONTENT_DONATE_NOW_HEADING_1": "هل أنت مستعد لإحداث تأثير؟",
+	"I18N_DONATE_PAGE_CONTENT_DONATE_NOW_HEADING_2": "تبرع اليوم!",
+	"I18N_DONATE_PAGE_CONTENT_DONATION_AMOUNT": "تبرعك بقيمة $<[amount]>",
+	"I18N_DONATE_PAGE_CONTENT_DONATION_DESCRIPTION_1": "يمكن أن يوفر الأموال اللازمة لتعليم 25 طفلاً على منصتنا.",
+	"I18N_DONATE_PAGE_CONTENT_DONATION_DESCRIPTION_2": "يمكن أن يساهم في برنامج تعليم 20 طفلاً من خلال منظمة شريكة لمدة يوم واحد.",
+	"I18N_DONATE_PAGE_CONTENT_DONATION_DESCRIPTION_3": "يمكن أن يشتري هاتفا لطفل في نيجيريا، مما يتيح الوصول إلى التعليم دون الاتصال بالانترنت.",
+	"I18N_DONATE_PAGE_CONTENT_HEADING_1": "توفر Oppia إمكانية الوصول إلى تعليم جيد على مستوى العالم.",
+	"I18N_DONATE_PAGE_CONTENT_HEADING_2": "التأثير الذي نحدثه",
+	"I18N_DONATE_PAGE_CONTENT_HEADING_3": "شبكتنا",
+	"I18N_DONATE_PAGE_CONTENT_HEADING_4": "المتعلمون معنا",
+	"I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS": "العناوين العريضة",
+	"I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_CONTENT_1": "توفر هذه الشراكة دروس ما بعد المدرسة في أويو، وأكوا إيبوم، وجنوب جنوب-نيجيريا. يستخدم هذا البرنامج موارد Oppia لمساعدة \n تلاميذ المدارس الابتدائية والثانوية.",
+	"I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_CONTENT_2": "بدأت شراكتنا في عام 2022 لتقديم دروس رياضيات مجانية للمتعلمين الصغار عبر مجتمعين في لاغوس، نيجيريا. ساعدتنا هذه الشراكة في الوصول إلى أكثر من 100 طالب من خلال دروس الرياضيات التي تقدمها Oppia.",
+	"I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_TITLE_1": "مركز دراسات الشباب",
+	"I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_TITLE_2": "مؤسسة الشباب الخاصة",
+	"I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_1": "نيجيريا",
+	"I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_2": "غانا",
+	"I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_3": "الهند",
 	"I18N_DONATE_PAGE_READ_BLOG_BUTTON_TEXT": "اقرأ مدونتنا",
 	"I18N_EMPTY_FEEDBACK_UPDATES_THREADS": "ليس لديك أي سلاسل ملاحظات نشطة حتى الآن. تساعد ملاحظاتك في تحسين جودة دروسنا. يمكنك القيام بذلك عن طريق بدء أي من دروسنا وإرسال ملاحظاتك القيمة!",
 	"I18N_ERROR_DISABLED_EXPLORATION": "تعطيل الاستكشاف",
@@ -439,6 +569,7 @@
 	"I18N_FOOTER_FORUM": "المنتدى",
 	"I18N_FOOTER_GET_INVOLVED": "شارك",
 	"I18N_FOOTER_GET_STARTED": "ابدأ",
+	"I18N_FOOTER_NEWSLETTER_EMAIL": "عنوان البريد الإلكتروني",
 	"I18N_FOOTER_OPPIA_FOUNDATION": "مؤسسة أوبيا",
 	"I18N_FOOTER_PRIVACY_POLICY": "سياسة الخصوصية",
 	"I18N_FOOTER_TEACH": "التعليم مع أوبيا",
