@@ -167,8 +167,6 @@ const applyToVolunteerButtonAtTheTopOfVolunteerPage =
 const applyToVolunteerButtonAtTheBottomOfVolunteerPage =
   '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-bottom';
 const donorBoxIframe = '.e2e-test-donate-page-iframe';
-const blogPostTitleInPartnershipsPage =
-  '.e2e-test-blog-post-page-title-container';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
