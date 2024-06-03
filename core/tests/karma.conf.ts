@@ -3,11 +3,55 @@ var argv = require('yargs').positional('terminalEnabled', {
   default: false,
 }).argv;
 var path = require('path');
+var webpack = require('webpack');
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (argv.prodEnv) {
   generatedJs = 'third_party/generated/js/third_party.min.js';
 }
 
+var specsToRun = [];
+if (argv.specs_to_run !== undefined) {
+  specsToRun = argv.specs_to_run.split(',');
+}
+
+const SPEC_PATTERNS = [
+  /((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(component|controller|directive|service|Factory)\.ts$)/,
+  /(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)/,
+  /(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)/,
+  /(?<!puppeteer-acceptance-tests.*\.spec\.ts)/,
+  /(?<!@nodelib.*\.spec\.ts)/,
+  /(?<!openapi3-ts.*\.spec\.ts)/,
+  /(?<!(valid|invalid)[_-][\w\d.\-]*\.ts)/,
+];
+
+const SPECS_PATTERN = new RegExp(
+  SPEC_PATTERNS.map(pattern => pattern.source).join('')
+);
+
+let context = SPECS_PATTERN;
+if (argv.specs_to_run !== undefined) {
+  context = specsToRun.reduce((context, file) => {
+    if (!SPECS_PATTERN.test(file)) {
+      return context;
+    }
+    const relativeFile = `./${file}`;
+    context[relativeFile] = relativeFile;
+    return context;
+  }, {});
+}
+
+const webpackPlugins = [];
+if (argv.specs_to_run !== undefined) {
+  webpackPlugins.push(
+    new webpack.ContextReplacementPlugin(
+      /(:?)/,
+      path.resolve(__dirname, '..', '..'),
+      context
+    )
+  );
+} else {
+  webpackPlugins.push(new webpack.ContextReplacementPlugin(/(:?)/, context));
+}
 // Generate a random number between 0 and 999 to use as the seed for the
 // frontend test execution order.
 let jasmineSeed = Math.floor(Math.random() * 1000);
@@ -237,6 +281,7 @@ module.exports = function (config) {
           },
         ],
       },
+      plugins: webpackPlugins,
     },
   });
 };

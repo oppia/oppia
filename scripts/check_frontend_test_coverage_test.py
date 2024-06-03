@@ -354,6 +354,69 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                     ],
                 )
 
+    def test_check_if_file_should_be_checked(self) -> None:
+        self.assertTrue(
+            check_frontend_test_coverage.check_if_file_should_be_checked(
+                'file.ts', ['file.ts']
+            )
+        )
+        self.assertTrue(
+            check_frontend_test_coverage.check_if_file_should_be_checked(
+                'file.ts', ['/path/to/file.ts']
+            )
+        )
+        self.assertFalse(
+            check_frontend_test_coverage.check_if_file_should_be_checked(
+                'file.ts', ['anotherfile.ts']
+            )
+        )
+        self.assertFalse(
+            check_frontend_test_coverage.check_if_file_should_be_checked(
+                'file.ts', ['/path/to/anotherfile.ts']
+            )
+        )
+        self.assertFalse(
+            check_frontend_test_coverage.check_if_file_should_be_checked(
+                '/path/to/file.ts', ['anotherfile.ts']
+            )
+        )
+
+    def test_check_frontend_test_coverage_with_files_to_check(self) -> None:
+        self.lcov_items_list = (
+            'SF:/opensource/oppia/file.ts\n'
+            'LF:10\n'
+            'LH:9\n'
+            'end_of_record\n'
+            'SF:/opensource/oppia/file2.ts\n'
+            'LF:10\n'
+            'LH:10\n'
+            'end_of_record\n'
+            'SF:/opensource/oppia/file3.ts\n'
+            'LF:10\n'
+            'LH:9\n'
+            'end_of_record\n'
+        )
+        not_fully_covered_files_swap = self.swap(
+            check_frontend_test_coverage,
+            'NOT_FULLY_COVERED_FILENAMES',
+            ['file.ts', 'file2.ts'],
+        )
+
+        with self.check_call_swap, self.exists_swap, self.open_file_swap:
+            with not_fully_covered_files_swap, self.capture_logging() as logs:
+                with self.assertRaisesRegex(SystemExit, '1'):
+                    check_frontend_test_coverage.main([
+                        '--files_to_check=/opensource/oppia/file.ts,'
+                        '/opensource/oppia/file3.ts'
+                    ])
+                self.assertEqual(
+                    logs,
+                    [
+                        '\x1b[1mfile3.ts\x1b[0m seems to be not completely '
+                        'tested. Make sure it\'s fully covered.'
+                    ]
+                )
+
     def test_function_calls(self) -> None:
         self.lcov_items_list = (
             'SF:/opensource/oppia/file.ts\n'
@@ -368,7 +431,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         )
         with self.check_call_swap, self.exists_swap, self.open_file_swap:
             with not_fully_covered_files_swap:
-                check_frontend_test_coverage.main()
+                check_frontend_test_coverage.main([])
             self.assertEqual(
                 self.check_function_calls, self.expected_check_function_calls
             )

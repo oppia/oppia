@@ -111,8 +111,7 @@
   "files": [
     "assets/constants.ts",
     "assets/rich_text_components_definitions.ts",
-    "src/main.ts",
-    "core/tests/karma.conf.ts"
+    "src/main.ts"
   ],
   "include": [
     "core",

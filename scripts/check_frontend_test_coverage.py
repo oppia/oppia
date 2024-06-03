@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import argparse
 import fnmatch
 import logging
 import os
@@ -24,7 +25,17 @@ import sys
 
 from core import utils
 
-from typing import List
+from typing import List, Optional
+
+_PARSER = argparse.ArgumentParser(
+    description="""
+Checks the frontend test coverage.
+""")
+
+_PARSER.add_argument(
+    '--files_to_check',
+    type=str
+)
 
 LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
 RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
@@ -150,11 +161,42 @@ def check_not_fully_covered_filenames_list_is_sorted() -> None:
         sys.exit(1)
 
 
-def check_coverage_changes() -> None:
+def check_if_file_should_be_checked(
+    file_path: str,
+    files_to_check: Optional[List[str]] = None
+) -> bool:
+    """Check if the file should be checked for coverage changes.
+
+    Args:
+        file_path: str. The path of the file to check.
+        files_to_check: list(str)|None. The list of files to check for
+            coverage changes.
+
+    Returns:
+        bool. Whether the file should be checked for coverage changes.
+    """
+    if files_to_check is None:
+        return True
+
+    for file_to_check in files_to_check:
+        file_to_check_name = os.path.split(file_to_check)[1]
+        if file_path in (file_to_check, file_to_check_name):
+            return True
+
+    return False
+
+
+def check_coverage_changes(
+    files_to_check: Optional[List[str]] = None
+) -> None:
     """Checks if the denylist for not fully covered files needs to be changed
     by:
     - File renaming
     - File deletion
+
+    Args:
+        files_to_check: list(str)|None. The list of files to check for
+            coverage changes.
 
     Raises:
         Exception. LCOV_FILE_PATH doesn't exist.
@@ -170,6 +212,8 @@ def check_coverage_changes() -> None:
 
     for stanza in stanzas:
         file_name = stanza.file_name
+        if not check_if_file_should_be_checked(file_name, files_to_check):
+            continue
         total_lines = stanza.total_lines
         covered_lines = stanza.covered_lines
         if any(fnmatch.fnmatch(
@@ -196,6 +240,8 @@ def check_coverage_changes() -> None:
 
     if remaining_denylisted_files:
         for test_name in remaining_denylisted_files:
+            if not check_if_file_should_be_checked(test_name, files_to_check):
+                continue
             errors += (
                 '\033[1m{}\033[0m is in the frontend test coverage'
                 ' denylist but it doesn\'t exist anymore. If you have'
@@ -218,11 +264,18 @@ def check_coverage_changes() -> None:
     check_not_fully_covered_filenames_list_is_sorted()
 
 
-def main() -> None:
+def main(args: Optional[List[str]] = None) -> None:
     """Runs all the steps for checking if there is any decrease of 100% covered
     files in the frontend.
     """
-    check_coverage_changes()
+    parsed_args = _PARSER.parse_args(args=args)
+    files_to_check = None
+    if parsed_args.files_to_check:
+        files_to_check = [
+            file_name.strip() for file_name in
+                parsed_args.files_to_check.split(',')
+        ]
+    check_coverage_changes(files_to_check)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
