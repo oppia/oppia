@@ -2152,7 +2152,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
     score_category: str = ('%s%s%s' % (
         suggestion_models.SCORE_TYPE_CONTENT,
         suggestion_models.SCORE_CATEGORY_DELIMITER, 'Algebra')
-        )
+    )
 
     THREAD_ID: Final = 'exploration.exp1.thread_1'
 
@@ -7425,7 +7425,8 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
     ) -> None:
         score_category: str = '%s%sEnglish' % (
             suggestion_models.SCORE_TYPE_TRANSLATION,
-            suggestion_models.SCORE_CATEGORY_DELIMITER)
+            suggestion_models.SCORE_CATEGORY_DELIMITER
+        )
 
         change_cmd = self._get_change_with_normalized_string()
         suggestion_models.GeneralSuggestionModel.create(
