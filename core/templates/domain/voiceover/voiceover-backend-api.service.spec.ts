@@ -24,6 +24,8 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {VoiceoverBackendApiService} from '../../domain/voiceover/voiceover-backend-api.service';
 import {VoiceoverDomainConstants} from './voiceover-domain.constants';
+import {EntityVoiceovers} from './entity-voiceovers.model';
+import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
 
 describe('Voiceover backend API service', function () {
   let voiceoverBackendApiService: VoiceoverBackendApiService;
@@ -333,6 +335,78 @@ describe('Voiceover backend API service', function () {
     let req = httpTestingController.expectOne(
       '/get_sample_voiceovers/voiceArtistId/languageCode'
     );
+    expect(req.request.method).toEqual('GET');
+
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
+
+  it('should be able to get entity voiceovers by language code', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    voiceoverBackendApiService
+      .fetchEntityVoiceoversByLanguageCodeAsync('exploration', 'exp_1', 1, 'en')
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/entity_voiceovers_bulk_handler/exploration/exp_1/1/en'
+    );
+
+    expect(req.request.method).toEqual('GET');
+
+    let manualVoiceover: VoiceoverBackendDict = {
+      filename: 'a.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
+    let contentIdToVoiceoversMapping = {
+      content0: {
+        manual: manualVoiceover,
+      },
+    };
+    let entityVoiceoversDict = {
+      entity_id: 'exp_1',
+      entity_type: 'exploration',
+      entity_version: 1,
+      language_accent_code: 'en-US',
+      voiceovers_mapping: contentIdToVoiceoversMapping,
+    };
+
+    let entityVoiceoversList = [entityVoiceoversDict];
+
+    req.flush({
+      entity_voiceovers_list: entityVoiceoversList,
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith([
+      EntityVoiceovers.createFromBackendDict(entityVoiceoversDict),
+    ]);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should able to handle error callback while getting entity voiceovers', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    voiceoverBackendApiService
+      .fetchEntityVoiceoversByLanguageCodeAsync('exploration', 'exp_1', 1, 'en')
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/entity_voiceovers_bulk_handler/exploration/exp_1/1/en'
+    );
+
     expect(req.request.method).toEqual('GET');
 
     req.flush('Invalid request', {

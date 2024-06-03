@@ -494,7 +494,7 @@ XSSI_PREFIX = b')]}\'\n'
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
 # A regular expression for language accent code.
-LANGUAGE_ACCENT_CODE_REGEX = r'^(([a-z]+)-)+([A-Z]+)$'
+LANGUAGE_ACCENT_CODE_REGEX = r'^(([a-zA-Z]+)-)+([a-zA-Z]+)$'
 
 # These are here rather than in rating_services.py to avoid import
 # circularities with exp_services.
