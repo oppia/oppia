@@ -47,3 +47,10 @@ angular
     'VOICEOVER_LANGUAGE_CODES_MAPPING_URL',
     VoiceoverDomainConstants.VOICEOVER_LANGUAGE_CODES_MAPPING_URL
   );
+
+angular
+  .module('oppia')
+  .constant(
+    'GET_ENTITY_VOICEOVERS_BULK',
+    VoiceoverDomainConstants.GET_ENTITY_VOICEOVERS_BULK
+  );

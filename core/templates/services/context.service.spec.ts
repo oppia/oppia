@@ -189,6 +189,13 @@ describe('Context service', () => {
       expect(ecs.getEditorContext()).toBe('topic_editor');
     });
 
+    it('should correctly set and retrieve the exp version', () => {
+      ecs.setExplorationVersion(5);
+      expect(ecs.getExplorationVersion()).toEqual(5);
+      ecs.setExplorationVersion(6);
+      expect(ecs.getExplorationVersion()).toEqual(6);
+    });
+
     it('should correctly set and retrieve the topic id', () => {
       expect(ecs.getEntityId()).toBe('undefined');
 

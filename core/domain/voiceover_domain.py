@@ -241,7 +241,29 @@ class EntityVoiceovers:
             voiceover_type: VoiceoverType. The voiceover type of the given
                 voiceover.
         """
-        del self.voiceovers_mapping[content_id][voiceover_type]
+        self.voiceovers_mapping[content_id][voiceover_type] = None
+
+        if self.is_both_voiceovers_empty(content_id):
+            del self.voiceovers_mapping[content_id]
+
+    def is_both_voiceovers_empty(self, content_id: str) -> bool:
+        """Verifies if both the manual and automatic voiceovers for the
+        specified content ID is empty or not.
+
+        Args:
+            content_id: str. The ID of the content for which the voiceover is
+                being checked.
+
+        Returns:
+            bool. A boolean value specifying whether both the manual and
+            automatic voiceovers are empty or not.
+        """
+        return (
+            self.voiceovers_mapping[content_id][
+                feconf.VoiceoverType.MANUAL] is None and
+            self.voiceovers_mapping[content_id][
+                feconf.VoiceoverType.AUTO] is None
+        )
 
     @classmethod
     def create_empty(

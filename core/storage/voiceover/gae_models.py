@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-from typing import Dict, Final, Optional
+from typing import Dict, Final, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -173,6 +173,31 @@ class EntityVoiceoversModel(base_models.BaseModel):
             language_accent_code=language_accent_code,
             voiceovers_mapping=voiceovers_mapping
         )
+
+    @classmethod
+    def get_entity_voiceovers_for_given_exploration(
+        cls, entity_id: str, entity_type: str, entity_version: int
+    ) -> Sequence[EntityVoiceoversModel]:
+        """Retrieves voiceovers models for the specified exploration data.
+
+        Args:
+            entity_id: str. The entity ID for which entity voiceovers need to be
+                fetched.
+            entity_type: str. The entity type for which entity voiceovers need
+                to be fetched.
+            entity_version: int. The entity version of the given exploration for
+                which entity voiceovers need to be fetched.
+
+        Returns:
+            list(EntityVoiceovers|None). Returns a list of entity voiceover
+            models for the specified exploration and version.
+        """
+
+        return cls.query(
+            cls.entity_type == entity_type,
+            cls.entity_id == entity_id,
+            cls.entity_version == entity_version
+        ).fetch()
 
 
 class VoiceoverAutogenerationPolicyModel(base_models.BaseModel):

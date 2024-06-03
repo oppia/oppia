@@ -51,6 +51,8 @@ export class ContextService {
   pageContext: string | null = null;
   // Null ExplorationId implies that no exploration has been created.
   explorationId: string | null = null;
+  // Null ExplorationVersion implies that no exploration has been created.
+  explorationVersion: number | null = null;
   explorationIsLinkedToStory: boolean = false;
   questionPlayerIsManuallySet: boolean = false;
   // Context of the editor is null until initialized by init fuctions
@@ -168,6 +170,14 @@ export class ContextService {
 
   setExplorationIsLinkedToStory(): void {
     this.explorationIsLinkedToStory = true;
+  }
+
+  setExplorationVersion(explorationVersion: number): void {
+    this.explorationVersion = explorationVersion;
+  }
+
+  getExplorationVersion(): number | null {
+    return this.explorationVersion;
   }
 
   isExplorationLinkedToStory(): boolean {

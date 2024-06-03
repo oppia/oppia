@@ -268,6 +268,7 @@ describe('Exploration editor page component', () => {
               return explorationId;
             },
             setExplorationIsLinkedToStory: () => {},
+            setExplorationVersion: expVersion => {},
           },
         },
         EditabilityService,

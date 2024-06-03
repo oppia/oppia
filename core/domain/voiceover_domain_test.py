@@ -133,6 +133,10 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             self.entity_voiceovers_instance.validate()
 
     def test_validate_datatype_of_voiceover_type(self) -> None:
+        self.entity_voiceovers_instance.voiceovers_mapping[
+            'content_id_0'][feconf.VoiceoverType.MANUAL] = None
+        self.entity_voiceovers_instance.validate()
+
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
@@ -167,7 +171,7 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             self.entity_voiceovers_instance.validate()
 
         with self.assertRaisesRegex(utils.ValidationError, expected_error_msg):
-            self.entity_voiceovers_instance.language_accent_code = 'en-us'
+            self.entity_voiceovers_instance.language_accent_code = 'en-'
             self.entity_voiceovers_instance.validate()
 
         with self.assertRaisesRegex(utils.ValidationError, expected_error_msg):
@@ -216,20 +220,30 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         )
 
     def test_removes_voiceover_correctly(self) -> None:
-        self.assertIn(
-            feconf.VoiceoverType.MANUAL,
+        self.assertIsNotNone(
             self.entity_voiceovers_instance.voiceovers_mapping[
-                'content_id_0'].keys())
+                'content_id_0'][feconf.VoiceoverType.MANUAL])
+        self.assertIsNotNone(
+            self.entity_voiceovers_instance.voiceovers_mapping[
+                'content_id_0'][feconf.VoiceoverType.AUTO])
 
         self.entity_voiceovers_instance.remove_voiceover(
             content_id='content_id_0',
             voiceover_type=feconf.VoiceoverType.MANUAL
         )
 
-        self.assertNotIn(
-            feconf.VoiceoverType.MANUAL,
+        self.assertIsNone(
             self.entity_voiceovers_instance.voiceovers_mapping[
-                'content_id_0'].keys())
+                'content_id_0'][feconf.VoiceoverType.MANUAL])
+
+        self.entity_voiceovers_instance.remove_voiceover(
+            content_id='content_id_0',
+            voiceover_type=feconf.VoiceoverType.AUTO
+        )
+
+        self.assertFalse(
+            'content_id_0' in
+            self.entity_voiceovers_instance.voiceovers_mapping)
 
     def test_create_empty_entity_voiceovers(self) -> None:
         empty_entity_voiceovers = (
@@ -271,3 +285,29 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             manual_voiceover.to_dict(),
             self.dummy_manual_voiceover_dict)
+
+    def test_is_both_voiceovers_empty_should_return_successfully(self) -> None:
+        entity_voiceovers_object = (
+            voiceover_domain.EntityVoiceovers.create_empty(
+                'exp_id', 'exploration', 1, 'en-US'))
+        dummy_new_voiceover_dict: state_domain.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 4000,
+            'needs_update': False,
+            'duration_secs': 6.0
+        }
+        new_voiceover_object = state_domain.Voiceover.from_dict(
+            dummy_new_voiceover_dict)
+        entity_voiceovers_object.add_new_content_id_without_voiceovers(
+            'content_0')
+
+        self.assertTrue(
+            entity_voiceovers_object.is_both_voiceovers_empty('content_0'))
+
+        entity_voiceovers_object.add_voiceover(
+            content_id='content_0',
+            voiceover_type=feconf.VoiceoverType.MANUAL,
+            voiceovers_mapping=new_voiceover_object)
+
+        self.assertFalse(
+            entity_voiceovers_object.is_both_voiceovers_empty('content_0'))

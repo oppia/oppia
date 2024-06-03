@@ -136,6 +136,30 @@ describe('LocalStorageService', () => {
       );
     });
 
+    it('should correctly save language accent code', () => {
+      localStorageService.setLastSelectedLanguageAccentCode('en-US');
+
+      expect(localStorageService.getLastSelectedLanguageAccentCode()).toEqual(
+        'en-US'
+      );
+
+      localStorageService.setLastSelectedLanguageAccentCode('en-IN');
+
+      expect(localStorageService.getLastSelectedLanguageAccentCode()).toBe(
+        'en-IN'
+      );
+    });
+
+    it('should not save a language accent code when storage is not available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
+      localStorageService.setLastSelectedLanguageAccentCode('en-IN');
+
+      expect(
+        localStorageService.getLastSelectedLanguageAccentCode()
+      ).toBeNull();
+    });
+
     it('should not save a language code when storage is not available', () => {
       spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
 

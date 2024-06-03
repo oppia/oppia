@@ -2088,6 +2088,18 @@ def compute_models_to_put_when_saving_new_exp_version(
         old_content_id_set - new_content_id_set
     )
 
+    voiceover_changes = []
+    for change in change_list:
+        if change.cmd == exp_domain.CMD_UPDATE_VOICEOVERS:
+            voiceover_changes.append(change)
+
+    new_voiceover_models = voiceover_services.compute_voiceover_related_change(
+        updated_exploration,
+        voiceover_changes
+    )
+
+    models_to_put.extend(new_voiceover_models)
+
     translation_changes = []
     for change in change_list:
         if not change.cmd in [

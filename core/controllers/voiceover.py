@@ -33,7 +33,7 @@ class VoiceoverAdminDataHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_access_voiceover_admin_page
+    @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves relevant data for the voiceover admin page."""
 
@@ -216,5 +216,60 @@ class GetSampleVoiceoversForGivenVoiceArtistHandler(
 
         self.values.update({
             'exploration_id_to_filenames': exploration_id_to_filenames,
+        })
+        self.render_json(self.values)
+
+
+class EntityVoiceoversBulkHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler class to get entity voiceovers data for a given language code
+    of an exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'entity_type': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'entity_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'entity_version': {
+            'schema': {
+                'type': 'int'
+            }
+        },
+        'language_code': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(
+        self,
+        entity_type: str,
+        entity_id: str,
+        entity_version: int,
+        language_code: str,
+    ) -> None:
+        entity_voiceovers_objects = (
+            voiceover_services.fetch_entity_voiceovers_by_language_code(
+                entity_id, entity_type, entity_version, language_code)
+        )
+        entity_voiceovers_dicts = []
+
+        for entity_voiceovers in entity_voiceovers_objects:
+            entity_voiceovers_dicts.append(entity_voiceovers.to_dict())
+
+        self.values.update({
+            'entity_voiceovers_list': entity_voiceovers_dicts
         })
         self.render_json(self.values)
