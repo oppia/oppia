@@ -37,9 +37,6 @@ require('cropperjs/dist/cropper.min.css');
   templateUrl: './image-uploader-modal.component.html',
 })
 export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() imageUploaderParameters!: ImageUploaderParameters;
 
   // 'uploadedImage' will be null if the uploaded svg is invalid or not trusted.
@@ -96,7 +93,7 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   }
 
   initializeCropper(): void {
-    let imageElement = this.croppableImageRef.nativeElement;
+    const imageElement = this.croppableImageRef.nativeElement;
     if (this.windowIsNarrow) {
       this.cropper = new Cropper(imageElement, {
         minContainerWidth: 200,
@@ -114,13 +111,13 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
 
   onFileChanged(file: Blob): void {
     this.invalidImageWarningIsShown = false;
-    let reader = new FileReader();
+    const reader = new FileReader();
     reader.onload = e => {
       this.invalidTagsAndAttributes = {
         tags: [],
         attrs: [],
       };
-      let imageData = (e.target as FileReader).result as string;
+      const imageData = (e.target as FileReader).result as string;
       if (this.svgSanitizerService.isBase64Svg(imageData)) {
         this.invalidTagsAndAttributes =
           this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(

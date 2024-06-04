@@ -50,9 +50,7 @@ export class ImageUploaderComponent implements OnInit {
   @Output() updateBgColor: EventEmitter<string> = new EventEmitter();
   @Output() updateFilename: EventEmitter<string> = new EventEmitter();
   @Output() imageSave: EventEmitter<Blob> = new EventEmitter();
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+
   @Input() imageUploaderParameters!: ImageUploaderParameters;
 
   uploadedImage!: string;
@@ -79,8 +77,7 @@ export class ImageUploaderComponent implements OnInit {
 
     if (this.imageUploaderParameters.filename) {
       this.hidePlaceholder = false;
-      this.imageIsLoading = true;
-      let entityType = this.contextService.getEntityType();
+      const entityType = this.contextService.getEntityType();
       if (entityType === undefined) {
         throw new Error('No image present for preview');
       }
