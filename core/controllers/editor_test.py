@@ -24,6 +24,7 @@ import logging
 import os
 import zipfile
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -52,10 +53,13 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import stats_models
+    from mypy_imports import translation_models
     from mypy_imports import user_models
 
-(exp_models, user_models, stats_models) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.USER, models.Names.STATISTICS])
+(exp_models, stats_models, translation_models, user_models) = (
+    models.Registry.import_models([
+        models.Names.EXPLORATION, models.Names.STATISTICS,
+        models.Names.TRANSLATION, models.Names.USER]))
 
 
 class BaseEditorControllerTests(test_utils.GenericTestBase):
@@ -3728,3 +3732,43 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         self.assertTrue(fs.isfile(filepath))
 
         self.logout()
+
+
+class EntityTranslationsBulkHandlerTest(test_utils.GenericTestBase):
+    """Test fetching all translations of a given entity in bulk."""
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames
+         .EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS])
+    def test_fetching_entity_translations_in_bulk(self) -> None:
+        """Test fetching all available translations with the
+        appropriate feature flag being enabled.
+        """
+        translations_mapping: Dict[str, feconf.TranslatedContentDict] = {
+            'content_0': {
+                'content_value': 'Translated content',
+                'content_format': 'html',
+                'needs_update': False
+            }
+        }
+        language_codes = ['hi', 'bn']
+        for language_code in language_codes:
+            translation_models.EntityTranslationsModel.create_new(
+                'exploration', 'exp1', 5, language_code, translations_mapping
+            ).put()
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        self.login(self.VIEWER_EMAIL)
+        url = '/entity_translations_bulk_handler/exploration/exp1/5'
+        entity_translations_bulk_dict = self.get_json(url)
+
+        for language in language_codes:
+            self.assertEqual(
+                entity_translations_bulk_dict[language]['translations'],
+                translations_mapping)
+        self.logout()
+
+    def test_fetching_translations_with_feature_flag_disabled(self) -> None:
+        url = '/entity_translations_bulk_handler/exploration/exp1/5'
+        self.get_json(url, expected_status_int=404)
