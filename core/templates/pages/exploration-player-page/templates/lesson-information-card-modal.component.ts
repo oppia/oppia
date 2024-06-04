@@ -284,6 +284,8 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     if (cardIndex !== undefined) {
       this.playerPositionService.setDisplayedCardIndex(cardIndex);
       this.playerPositionService.onActiveCardChanged.emit();
+      // Close modal.
+      this.ngbActiveModal.close();
     } else {
       console.error('No card index associated with this checkpoint.');
     }

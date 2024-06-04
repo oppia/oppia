@@ -142,6 +142,7 @@ describe('Lesson Information card modal component', () => {
   let localStorageService: LocalStorageService;
   let checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService;
   let playerPositionService: PlayerPositionService;
+  let ngbActiveModal: NgbActiveModal;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
@@ -192,6 +193,7 @@ describe('Lesson Information card modal component', () => {
     fixture = TestBed.createComponent(LessonInformationCardModalComponent);
     playerPositionService = TestBed.inject(PlayerPositionService);
     componentInstance = fixture.componentInstance;
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
 
     componentInstance.expInfo = {
       category: expCategory,
@@ -552,6 +554,7 @@ describe('Lesson Information card modal component', () => {
     componentInstance.checkpointCardsIndex = [1, 2, 5, 10];
     spyOn(playerPositionService, 'setDisplayedCardIndex').and.callThrough();
     spyOn(playerPositionService.onActiveCardChanged, 'emit');
+    const closeSpy = spyOn(ngbActiveModal, 'close');
 
     // Return to each checkpoint and verify that the correct card index is set.
     for (let i = 0; i < componentInstance.checkpointCardsIndex.length; i++) {
@@ -562,6 +565,7 @@ describe('Lesson Information card modal component', () => {
       );
       expect(playerPositionService.onActiveCardChanged.emit).toHaveBeenCalled();
       expect(playerPositionService.getDisplayedCardIndex()).toEqual(cardIndex);
+      expect(closeSpy).toHaveBeenCalled();
     }
   });
 
@@ -571,25 +575,23 @@ describe('Lesson Information card modal component', () => {
       'setDisplayedCardIndex'
     ).and.callThrough();
     const emitSpy = spyOn(playerPositionService.onActiveCardChanged, 'emit');
+    const closeSpy = spyOn(ngbActiveModal, 'close');
 
     componentInstance.checkpointCardsIndex = [1, 2, 5, 10];
 
     // The checkpoint is in the Introduction card.
-    const checkpointIndex = 5;
-
-    // Mock the returnToCheckpoint method to correctly call setDisplayedCardIndex and trigger emit.
-    componentInstance.returnToCheckpoint = index => {
-      playerPositionService.setDisplayedCardIndex(index);
-      playerPositionService.onActiveCardChanged.emit();
-    };
+    const checkpointIndex = 2;
 
     componentInstance.returnToCheckpoint(checkpointIndex);
 
-    expect(setDisplayedCardIndexSpy).toHaveBeenCalledWith(checkpointIndex);
+    expect(setDisplayedCardIndexSpy).toHaveBeenCalledWith(
+      componentInstance.checkpointCardsIndex[checkpointIndex]
+    );
     expect(emitSpy).toHaveBeenCalled();
     expect(playerPositionService.getDisplayedCardIndex()).toEqual(
-      checkpointIndex
+      componentInstance.checkpointCardsIndex[checkpointIndex]
     );
+    expect(closeSpy).toHaveBeenCalled();
   });
 
   it('should be able to return to a checkpoint more than once', () => {
@@ -598,35 +600,33 @@ describe('Lesson Information card modal component', () => {
       'setDisplayedCardIndex'
     ).and.callThrough();
     const emitSpy = spyOn(playerPositionService.onActiveCardChanged, 'emit');
+    const closeSpy = spyOn(ngbActiveModal, 'close');
 
     componentInstance.checkpointCardsIndex = [1, 2, 5, 10];
 
-    // The checkpoint is in the Introduction card.
-    const checkpointIndex = 10;
-
-    // Mock the returnToCheckpoint method to correctly call setDisplayedCardIndex and trigger emit.
-    componentInstance.returnToCheckpoint = index => {
-      playerPositionService.setDisplayedCardIndex(index);
-      playerPositionService.onActiveCardChanged.emit();
-    };
+    const checkpointIndex = 3;
 
     componentInstance.returnToCheckpoint(checkpointIndex);
 
-    expect(setDisplayedCardIndexSpy).toHaveBeenCalledWith(checkpointIndex);
+    expect(setDisplayedCardIndexSpy).toHaveBeenCalledWith(
+      componentInstance.checkpointCardsIndex[checkpointIndex]
+    );
     expect(emitSpy).toHaveBeenCalled();
     expect(playerPositionService.getDisplayedCardIndex()).toEqual(
-      checkpointIndex
+      componentInstance.checkpointCardsIndex[checkpointIndex]
     );
+    expect(closeSpy).toHaveBeenCalled();
 
     componentInstance.returnToCheckpoint(checkpointIndex);
 
     expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(
-      checkpointIndex
+      componentInstance.checkpointCardsIndex[checkpointIndex]
     );
     expect(playerPositionService.onActiveCardChanged.emit).toHaveBeenCalled();
     expect(playerPositionService.getDisplayedCardIndex()).toEqual(
-      checkpointIndex
+      componentInstance.checkpointCardsIndex[checkpointIndex]
     );
+    expect(closeSpy).toHaveBeenCalled();
   });
 
   it('should log an error if there is no card index associated with the checkpoint', () => {
@@ -642,16 +642,47 @@ describe('Lesson Information card modal component', () => {
     );
   });
 
-  it('should log an error if there is the card exists, but is not a checkpoint', () => {
+  it('should be able to return to checkpoint after raising error', () => {
+    const setDisplayedCardIndexSpy = spyOn(
+      playerPositionService,
+      'setDisplayedCardIndex'
+    ).and.callThrough();
+    const emitSpy = spyOn(playerPositionService.onActiveCardChanged, 'emit');
+    const closeSpy = spyOn(ngbActiveModal, 'close');
     spyOn(console, 'error');
 
-    componentInstance.checkpointCardsIndex = [0, 1, 5];
-    const invalidCheckpointIndex = 4; // Index that doesn't exist.
+    componentInstance.checkpointCardsIndex = [1, 2, 5, 10];
+
+    const invalidCheckpointIndex = 5; // Index that doesn't exist.
+
+    const checkpointIndex = 3;
 
     componentInstance.returnToCheckpoint(invalidCheckpointIndex);
 
     expect(console.error).toHaveBeenCalledWith(
       'No card index associated with this checkpoint.'
     );
+
+    componentInstance.returnToCheckpoint(checkpointIndex);
+
+    expect(setDisplayedCardIndexSpy).toHaveBeenCalledWith(
+      componentInstance.checkpointCardsIndex[checkpointIndex]
+    );
+    expect(emitSpy).toHaveBeenCalled();
+    expect(playerPositionService.getDisplayedCardIndex()).toEqual(
+      componentInstance.checkpointCardsIndex[checkpointIndex]
+    );
+    expect(closeSpy).toHaveBeenCalled();
+
+    componentInstance.returnToCheckpoint(checkpointIndex);
+
+    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(
+      componentInstance.checkpointCardsIndex[checkpointIndex]
+    );
+    expect(playerPositionService.onActiveCardChanged.emit).toHaveBeenCalled();
+    expect(playerPositionService.getDisplayedCardIndex()).toEqual(
+      componentInstance.checkpointCardsIndex[checkpointIndex]
+    );
+    expect(closeSpy).toHaveBeenCalled();
   });
 });
