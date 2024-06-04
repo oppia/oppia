@@ -37,7 +37,10 @@ import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text
 import {CertificateDownloadModalComponent} from './certificate-download-modal.component';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 import {AlertsService} from 'services/alerts.service';
-import {ContributorCertificateResponse} from '../services/contribution-and-review-backend-api.service';
+import {
+  ContributorCertificateResponse,
+  ContributorCertificateInfo,
+} from '../services/contribution-and-review-backend-api.service';
 import {HttpErrorResponse} from '@angular/common/http';
 
 class MockChangeDetectorRef {
@@ -52,12 +55,18 @@ describe('Contributor Certificate Download Modal Component', () => {
   let changeDetectorRef: MockChangeDetectorRef = new MockChangeDetectorRef();
   let contributionAndReviewService: ContributionAndReviewService;
   let alertsService: AlertsService;
-  const certificateDataResponse: ContributorCertificateResponse = {
+  const certificateData: ContributorCertificateInfo = {
     from_date: '1 Jan 2022',
     to_date: '31 Oct 2022',
     team_lead: 'Test User',
     contribution_hours: 1.0,
     language: 'Hindi',
+  };
+  const certificateDataResponse: ContributorCertificateResponse = {
+    certificate_data: certificateData,
+  };
+  const emptyCertificateDataResponse: ContributorCertificateResponse = {
+    certificate_data: null,
   };
 
   beforeEach(waitForAsync(() => {
@@ -160,6 +169,25 @@ describe('Contributor Certificate Download Modal Component', () => {
     );
   });
 
+  it('should show error for no contributions found', fakeAsync(() => {
+    component.fromDate = '2020/01/01';
+    component.toDate = '2020/01/31';
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync'
+    ).and.returnValue(Promise.resolve(emptyCertificateDataResponse));
+    spyOn(alertsService, 'addInfoMessage').and.stub();
+
+    component.downloadCertificate();
+
+    flushMicrotasks();
+
+    expect(component.errorsFound).toBeTrue();
+    expect(component.errorMessage).toEqual(
+      'There are no contributions for the given date range.'
+    );
+  }));
+
   it('should show error for invalid date ranges', () => {
     const today = new Date();
     let tomorrow = new Date();
@@ -222,7 +250,7 @@ describe('Contributor Certificate Download Modal Component', () => {
     );
 
     expect(() => {
-      component.createCertificate(certificateDataResponse);
+      component.createCertificate(certificateData);
       tick();
     }).toThrowError();
   });

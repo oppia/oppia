@@ -1052,6 +1052,16 @@ class ContributorStatsSummariesHandler(
         self.render_json(self.values)
 
 
+class CertificateDataResponse(TypedDict):
+    """Dict holding a ContributorCertificateInfoDict, or None to represent
+    no contributor certificate information.
+    """
+
+    certificate_data: Optional[
+        suggestion_registry.ContributorCertificateInfoDict
+    ]
+
+
 class ContributorCertificateHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -1133,9 +1143,14 @@ class ContributorCertificateHandler(
             raise self.InvalidInputException(
                 'To date should not be a future date.')
 
-        response = suggestion_services.generate_contributor_certificate_data(
-            username, suggestion_type, language, from_datetime,
-            to_datetime)
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                username, suggestion_type, language, from_datetime,
+                to_datetime))
+
+        response: CertificateDataResponse = {
+            'certificate_data': certificate_data
+        }
 
         self.render_json(response)
 
