@@ -48,7 +48,7 @@ import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {FormsModule} from '@angular/forms';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {UploadBlogPostThumbnailComponent} from '../modal-templates/upload-blog-post-thumbnail.component';
-import {ImageUploaderComponent} from 'components/forms/custom-forms-directives/image-uploader.component';
+import {ImageReceiverComponent} from 'components/forms/custom-forms-directives/image-receiver.component';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserService} from 'services/user.service';
@@ -108,7 +108,7 @@ describe('Blog Post Editor Component', () => {
       declarations: [
         BlogPostEditorComponent,
         UploadBlogPostThumbnailComponent,
-        ImageUploaderComponent,
+        ImageReceiverComponent,
         MockTranslatePipe,
       ],
       providers: [
