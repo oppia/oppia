@@ -171,8 +171,7 @@ export class LoggedOutUser extends BaseUser {
 
     expect(this.page.url())
       .withContext(
-        `${buttonName} should open the ${expectedDestinationPageName} page,
-          but it opens ${this.page.url()} instead.`
+        `${buttonName} should open the ${expectedDestinationPageName} page`
       )
       .toBe(expectedDestinationPageUrl);
   }
@@ -261,8 +260,8 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(createLessonsButton);
     if (this.page.url() !== creatorDashboardCreateModeUrl) {
       throw new Error(
-        'The Create Lessons button does not open the Creator Dashboard ' +
-          'in Create Mode!'
+        `The Create Lessons button does not open the Creator Dashboard
+        in Create Mode! It opens ${this.page.url()} instead.`
       );
     } else {
       showMessage(
@@ -275,8 +274,8 @@ export class LoggedOutUser extends BaseUser {
       /http:\/\/localhost:8181\/create\/\w*(\/gui\/Introduction)?/;
     if (this.page.url().match(urlRegex) === null) {
       throw new Error(
-        'The Create Lessons button does not display ' +
-          'the Exploration Editor page!'
+        `The Create Lessons button does not display the Exploration Editor page!
+         It opens ${this.page.url()} instead.`
       );
     } else {
       showMessage(
@@ -320,9 +319,9 @@ export class LoggedOutUser extends BaseUser {
       displayedH1 !== 'THE OPPIA FOUNDATION'
     ) {
       throw new Error(
-        'The Oppia Foundation button in About Menu on navbar ' +
-          'should open the About Foundation page, ' +
-          'but it opens ${this.page.url()} instead.'
+        `The Oppia Foundation button in About Menu on navbar
+          should open the About Foundation page,
+          but it opens ${this.page.url()} instead.`
       );
     } else {
       showMessage(
@@ -407,10 +406,13 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== '420 million') {
       throw new Error('The 420 Million link does not exist!');
     }
-    await this.page.$eval(weCannotContentId, element =>
-      element.getElementsByTagName('a')[0].click()
-    );
-    await this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']});
+
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
+      this.page.$eval(weCannotContentId, element =>
+        element.getElementsByTagName('a')[0].click()
+      ),
+    ]);
 
     if (this.page.url() !== _420MillionUrl) {
       throw new Error(
