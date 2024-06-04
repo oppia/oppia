@@ -232,14 +232,26 @@ run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests f
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 	$(MAKE) start-devserver
+	@echo '-----------------------------------------------------------------------'
+	@echo '  Starting Lighthouse Accessibility tests -- shard number: $(shard)'
+	@echo '-----------------------------------------------------------------------'
 	$(SHELL_PREFIX) dev-server sh -c "python -m scripts.run_lighthouse_tests --mode accessibility --shard $(shard) $(PYTHON_ARGS)"
+	@echo '-----------------------------------------------------------------------'
+	@echo '  Lighthouse tests has been executed successfully....'
+	@echo '-----------------------------------------------------------------------'
 	$(MAKE) stop
 
 run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for the parsed shard
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 	$(MAKE) start-devserver
+	@echo '-----------------------------------------------------------------------'
+	@echo '  Starting Lighthouse Performance tests -- shard number: $(shard)'
+	@echo '-----------------------------------------------------------------------'
 	$(SHELL_PREFIX) dev-server sh -c "python -m scripts.run_lighthouse_tests --mode performance --shard $(shard) $(PYTHON_ARGS)""
+	@echo '-----------------------------------------------------------------------'
+	@echo '  Lighthouse tests has been executed successfully....'
+	@echo '-----------------------------------------------------------------------'
 	$(MAKE) stop
 
 install_node: ## Installs node-16.13.0 in the oppia_tools directory
