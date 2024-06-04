@@ -17,14 +17,14 @@
  * follow links in the oppia footer not covered by other tests.
  */
 
-import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
-import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
-import testConstants from '../../puppeteer-testing-utilities/test-constants';
+import {UserFactory} from '../../utilities/common/user-factory';
+import testConstants from '../../utilities/common/test-constants';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-in User', function () {
-  let testUser: LoggedInUser;
+describe('Logged-out User', function () {
+  let testUser: LoggedOutUser;
 
   beforeAll(async function () {
     testUser = await UserFactory.createNewUser(

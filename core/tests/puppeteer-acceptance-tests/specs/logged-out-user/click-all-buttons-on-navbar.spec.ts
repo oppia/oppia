@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users
+ * @fileoverview Acceptance Test for checking if logged-out users
  * can open link by clicking all buttons on navbar
  */
 
@@ -30,7 +30,7 @@ ConsoleReporter.setConsoleErrorsToIgnore([
   /https:\/\/content\.googleapis\.com\/drive\/v2internal\/viewerimpressions\?key=[^&]+&alt=json/,
 ]);
 
-describe('Logged-in User', function () {
+describe('Logged-out User', function () {
   let testUser: LoggedOutUser;
 
   beforeAll(async function () {

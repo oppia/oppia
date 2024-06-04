@@ -13,18 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users
+ * @fileoverview Acceptance Test for checking if logged-out users
  * can open all the links on the "Creator Guidelines" page.
  */
 
-import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
-import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
-import testConstants from '../../puppeteer-testing-utilities/test-constants';
+import {UserFactory} from '../../utilities/common/user-factory';
+import testConstants from '../../utilities/common/test-constants';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-in Users', function () {
-  let testUser: LoggedInUser;
+describe('Logged-out Users', function () {
+  let testUser: LoggedOutUser;
 
   beforeAll(async function () {
     testUser = await UserFactory.createNewUser(

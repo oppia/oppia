@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users
+ * @fileoverview Acceptance Test for checking if logged-out users
  * can open links by clicking all buttons in about foundation page
  */
 
@@ -23,7 +23,7 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-in User in About page', function () {
+describe('Logged-out User in About page', function () {
   let testUser: LoggedOutUser;
 
   beforeAll(async function () {
