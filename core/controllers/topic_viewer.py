@@ -24,6 +24,8 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
@@ -146,7 +148,13 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'The deleted skills: %s are still present in topic with id %s'
                 % (deleted_skills_string, topic.id)
             )
-            if feconf.CAN_SEND_EMAILS:
+            server_can_send_emails = (
+                platform_parameter_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS
+                    .value
+                )
+            )
+            if server_can_send_emails:
                 email_manager.send_mail_to_admin(
                     'Deleted skills present in topic',
                     'The deleted skills: %s are still present in topic with '

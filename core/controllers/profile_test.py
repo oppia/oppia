@@ -29,6 +29,7 @@ from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_services
+from core.domain import platform_parameter_list
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -657,29 +658,34 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 email_preferences.can_receive_subscription_email,
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'), # pylint: disable=line-too-long
+        ]
+    )
     def test_send_post_signup_email(self) -> None:
         self.login(self.EDITOR_EMAIL)
         self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            with self.swap_to_always_return(
-                user_services, 'has_ever_registered', False
-            ):
-                json_response = self.post_json(
-                    feconf.SIGNUP_DATA_URL,
-                    {
-                        'username': self.EDITOR_USERNAME,
-                        'agreed_to_terms': True,
-                        'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
-                        'can_receive_email_updates': (
-                            feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
-                        )
-                    },
-                    csrf_token=csrf_token
-                )
-                self.assertFalse(
-                    json_response['bulk_email_signup_message_should_be_shown']
-                )
+        with self.swap_to_always_return(
+            user_services, 'has_ever_registered', False
+        ):
+            json_response = self.post_json(
+                feconf.SIGNUP_DATA_URL,
+                {
+                    'username': self.EDITOR_USERNAME,
+                    'agreed_to_terms': True,
+                    'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
+                    'can_receive_email_updates': (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    )
+                },
+                csrf_token=csrf_token
+            )
+            self.assertFalse(
+                json_response['bulk_email_signup_message_should_be_shown']
+            )
 
     def test_user_cannot_be_added_to_bulk_email_mailing_list(self) -> None:
         self.login(self.EDITOR_EMAIL)
@@ -1069,7 +1075,7 @@ class SignupTests(test_utils.GenericTestBase):
         self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
 
         values_dict = {
-            'can_send_emails': False,
+            'server_can_send_emails': False,
             'has_agreed_to_latest_terms': False,
             'has_ever_registered': False,
             'username': None,
@@ -1079,18 +1085,27 @@ class SignupTests(test_utils.GenericTestBase):
         self.assertDictEqual(values_dict, response)
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, 'body'), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'), # pylint: disable=line-too-long
+        ]
+    )
     def test_user_settings_of_existing_user(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.login(self.OWNER_EMAIL)
         values_dict = {
-            'can_send_emails': True,
+            'server_can_send_emails': True,
             'has_agreed_to_latest_terms': True,
             'has_ever_registered': True,
             'username': 'owner',
         }
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            response = self.get_json(feconf.SIGNUP_DATA_URL)
-            self.assertDictEqual(values_dict, response)
+
+        response = self.get_json(feconf.SIGNUP_DATA_URL)
+        self.assertDictEqual(values_dict, response)
 
         self.logout()
 
@@ -1266,6 +1281,13 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
 
     def test_post(self) -> None:
         with self.swap_secret, self.swap_audience_id:
+            user_services.update_email_preferences(
+                self.editor_id,
+                False,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
+            )
             email_preferences = user_services.get_email_preferences(
                 self.editor_id)
             self.assertEqual(email_preferences.can_receive_email_updates, False)

@@ -730,27 +730,24 @@ class ExplorationModeratorRightsHandler(
         version = self.normalized_payload['version']
         _require_valid_version(version, exploration.version)
 
-        # If moderator emails can be sent, check that all the prerequisites are
-        # satisfied, otherwise do nothing.
-        if feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
-            if not email_body:
-                raise self.InvalidInputException(
-                    'Moderator actions should include an email to the '
-                    'recipient.')
-            email_manager.require_moderator_email_prereqs_are_satisfied()
+        # Check that all the prerequisites are satisfied, otherwise do nothing.
+        if not email_body:
+            raise self.InvalidInputException(
+                'Moderator actions should include an email to the '
+                'recipient.')
+        email_manager.require_moderator_email_prereqs_are_satisfied()
 
         # Unpublish exploration.
         rights_manager.unpublish_exploration(self.user, exploration_id)
         search_services.delete_explorations_from_search_index([exploration_id])
         exp_rights = rights_manager.get_exploration_rights(exploration_id)
 
-        # If moderator emails can be sent, send an email to the all owners of
-        # the exploration notifying them of the change.
-        if feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
-            for owner_id in exp_rights.owner_ids:
-                email_manager.send_moderator_action_email(
-                    self.user_id, owner_id, 'unpublish_exploration',
-                    exploration.title, email_body)
+        # Send an email to the all owners of the exploration notifying them
+        # of the change.
+        for owner_id in exp_rights.owner_ids:
+            email_manager.send_moderator_action_email(
+                self.user_id, owner_id, 'unpublish_exploration',
+                exploration.title, email_body)
 
         self.render_json({
             'rights': exp_rights.to_dict(),

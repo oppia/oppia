@@ -57,6 +57,9 @@ from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import object_registry
 from core.domain import param_domain
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
@@ -409,6 +412,115 @@ def enable_feature_flags(
             *args: Any, **kwargs: Any
         ) -> _GenericHandlerFunctionReturnType:
             with swap_is_feature_flag_enabled_function(feature_flag_names):
+                return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+@contextlib.contextmanager
+def swap_get_platform_parameter_value_function(
+    platform_parameter_name_value_tuples: List[
+        Tuple[
+            platform_parameter_list.ParamName,
+            platform_parameter_domain.PlatformDataTypes
+        ]
+    ]
+) -> Iterator[None]:
+    """Mocks get_platform_parameter_value function within the context of a
+    'with' statement. get_platform_parameter_value will return the value of
+    the platform parameter if the parameter is present in the
+    platform_parameter_names list.
+
+    Args:
+        platform_parameter_name_value_tuples: List[Tuple[ParamName,
+            PlatformDataTypes]]. The list of the names of the platform
+            parameters and their corresponding values that will be enabled.
+
+    Yields:
+        context. The context with function replaced.
+    """
+    def mock_get_platform_parameter_value(
+        parameter_name: str
+    ) -> platform_parameter_domain.PlatformDataTypes:
+        """Mocks get_platform_parameter_value function to return the value of
+        the platform parameter if the parameter is present in the
+        platform_parameter_names list.
+
+        Args:
+            parameter_name: str. The name of the platform parameter whose
+                value is required.
+
+        Returns:
+            PlatformDataTypes. The value of the platform parameter if the
+            parameter is present in the platform_parameter_names list.
+
+        Raises:
+            Exception. The parameter_name is not present in the
+                platform_parameter_names list.
+        """
+        platform_parameter_name_value_dict = dict(
+            (x.value, y) for x, y in platform_parameter_name_value_tuples
+        )
+        if parameter_name not in platform_parameter_name_value_dict:
+            raise Exception(
+                'The value for the platform parameter %s was needed in this '
+                'test, but not specified in the set_platform_parameters '
+                'decorator. Please this information in the decorator.'
+                % parameter_name
+            )
+        return platform_parameter_name_value_dict[parameter_name]
+
+    original_get_platform_parameter_value = getattr(
+        platform_parameter_services, 'get_platform_parameter_value')
+    setattr(
+        platform_parameter_services,
+        'get_platform_parameter_value',
+        mock_get_platform_parameter_value
+    )
+    try:
+        yield
+    finally:
+        setattr(
+            platform_parameter_services,
+            'get_platform_parameter_value',
+            original_get_platform_parameter_value
+        )
+
+
+def set_platform_parameters(
+    platform_parameter_name_value_tuples: List[
+        Tuple[
+            platform_parameter_list.ParamName,
+            platform_parameter_domain.PlatformDataTypes
+        ]
+    ]
+) -> Callable[
+        [Callable[..., _GenericHandlerFunctionReturnType]],
+        Callable[..., _GenericHandlerFunctionReturnType]
+]:
+    """This method guarantees to enable the given platform parameters for the
+    scope of the test.
+
+    Args:
+        platform_parameter_name_value_tuples: List[Tuple[ParamName,
+            PlatformDataTypes]]. The list of the names of the platform
+            parameters and their corresponding values that will be enabled.
+
+    Returns:
+        function. The newly decorated function that enables given platform
+        parameters for the scope of the test.
+    """
+    def decorator(
+        func: Callable[..., _GenericHandlerFunctionReturnType]
+    ) -> Callable[..., _GenericHandlerFunctionReturnType]:
+        # Here we use type Any because this method can accept arbitrary number
+        # of arguments with different types.
+        def wrapper(
+            *args: Any, **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
+            with swap_get_platform_parameter_value_function(
+                platform_parameter_name_value_tuples
+            ):
                 return func(*args, **kwargs)
         return wrapper
     return decorator

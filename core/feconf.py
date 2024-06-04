@@ -583,19 +583,7 @@ SYSTEM_EMAIL_ADDRESS = 'system@example.com'
 SYSTEM_EMAIL_NAME = '.'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
 NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
-# Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both valid and
-# correspond to owners of the app before setting this to True. If
-# SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
-# address cannot be sent. If True then emails can be sent to any user.
-CAN_SEND_EMAILS = False
-# If you want to turn on this facility please check the email templates in the
-# send_role_notification_email() function in email_manager.py and modify them
-# accordingly.
-CAN_SEND_EDITOR_ROLE_EMAILS = False
-# If enabled then emails will be sent to creators for feedback messages.
-CAN_SEND_FEEDBACK_MESSAGE_EMAILS = False
-# If enabled subscription emails will be sent to that user.
-CAN_SEND_SUBSCRIPTION_EMAILS = False
+CAN_SEND_TRANSACTIONAL_EMAILS = True
 # Time to wait before sending feedback message emails (currently set to 1
 # hour).
 DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
@@ -612,12 +600,10 @@ DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE = False
 # when the user has not specified a preference.
 DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE = False
 # Whether to send email updates to a user who has not specified a preference.
-DEFAULT_EMAIL_UPDATES_PREFERENCE = False
+DEFAULT_EMAIL_UPDATES_PREFERENCE = True
 # Whether to send an invitation email when the user is granted
 # new role permissions in an exploration.
 DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE = True
-# Whether to require an email to be sent, following a moderator action.
-REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
 # Timespan in minutes before allowing duplicate emails.
 DUPLICATE_EMAIL_INTERVAL_MINS = 2
 # Number of digits after decimal to which the average ratings value in the
