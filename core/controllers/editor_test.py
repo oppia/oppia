@@ -35,7 +35,6 @@ from core.domain import fs_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
-from core.domain import platform_parameter_services
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager

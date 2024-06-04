@@ -28,7 +28,6 @@ from core.domain import html_cleaner
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
-from core.domain import platform_parameter_services
 from core.domain import question_domain
 from core.domain import rights_domain
 from core.domain import story_domain

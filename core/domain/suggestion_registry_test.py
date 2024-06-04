@@ -27,7 +27,6 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import html_validation_service
-from core.domain import platform_parameter_services
 from core.domain import platform_parameter_list
 from core.domain import question_domain
 from core.domain import question_services
