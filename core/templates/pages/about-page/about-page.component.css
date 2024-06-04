@@ -117,7 +117,7 @@
   margin: 0;
 }
 
-.about-page .oppia-about-foundation-section-subtext {
+.about-page .oppia-about-section-subtext-new {
   color: #333;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 18px;
@@ -222,10 +222,6 @@
   width: 100%;
 }
 
-.about-page .oppia-about-chart-web-image {
-  width: 50%;
-}
-
 .about-page .oppia-impact-section-grey-bg-text, 
 .about-page .oppia-impact-section-yellow-bg-text {
   font-weight: 700;
@@ -242,6 +238,121 @@
 
 .about-page .oppia-mobile-portrait-content {
   display: none;
+}
+
+.about-page .oppia-about-impact-section-charts-container {
+  display: flex;
+  flex-direction: column;
+  row-gap: 48px;
+}
+
+.about-page .oppia-about-impact-chart-container {
+  width: 50%;
+}
+
+.about-page .oppia-about-impact-bar-chart-container {
+  width: 100%;
+}
+
+.about-page .oppia-bar-chart th {
+  padding: 0 30px 0 0;
+  width: 40%;
+}
+
+.about-page .charts-css.bar {
+  --labels-size: 220px;
+}
+
+.about-page .charts-css.bar tbody tr td {
+  min-height: 24px;
+}
+
+.about-page .charts-css.bar tr {
+  padding: 0;
+}
+
+.about-page .charts-css .data {
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-right: 24px;
+}
+
+.about-page .oppia-bar-chart-annotation-white-text {
+  color: #fff;
+}
+
+.about-page .oppia-bar-chart th span {
+  border-radius: 2px;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 21.6px;
+  padding: 0 8px;
+  text-align: end;
+  width: 100%;
+}
+
+.about-page #oppiaWebsiteChart th span {
+  border: 2px solid #00645c4d;
+}
+
+.about-page #oppiaAndroidChart th span {
+  border: 2px solid #97a4062e;
+}
+
+.about-page #oppiaWebsiteChart .bar {
+  --color: #00645c;
+}
+
+.about-page #oppiaAndroidChart .bar {
+  --color: #d2ac61;
+}
+
+.about-page #oppiaWebsiteChart .bar td, 
+.about-page #oppiaAndroidChart .bar td {
+  border-radius: 2px;
+}
+
+.about-page .oppia-scale-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.about-page .oppia-scale-number {
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  line-height: 21.6px;
+  margin-bottom: 0;
+  margin-left: -4px;
+}
+
+.about-page .oppia-scale-line {
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 0;
+}
+
+.about-page .oppia-website-scale-type-1 {
+  height: 100%;
+  width: 21%;
+}
+
+.about-page .oppia-website-scale-type-2 {
+  height: 100%;
+  width: 16%;
+}
+
+.about-page .oppia-android-scale-type-1 {
+  height: 100%;
+  width: 30.7%;
+}
+
+.about-page .oppia-android-scale-type-2 {
+  height: 100%;
+  width: 8%;
 }
 
 @media only screen and (max-width: 769px) {
@@ -297,7 +408,7 @@
     width: 33%;
   }
 
-  .about-page .oppia-about-foundation-section-subtext {
+  .about-page .oppia-about-section-subtext-new {
     font-size: 16px;
     line-height: 19.2px;
   }
@@ -333,8 +444,18 @@
     width: 100%;
   }
 
-  .about-page .oppia-about-chart-web-image {
+  .about-page .oppia-about-impact-chart-container {
     width: 100%;
+  }
+
+  .about-page .oppia-about-impact-bar-chart-container {
+    width: 80%;
+  }
+
+  .about-page .oppia-bar-chart th span,
+  .about-page .charts-css .data,
+  .about-page .oppia-scale-number {
+    font-size: 16px;
   }
 }
 
@@ -384,14 +505,13 @@
     padding: 0 16px;
     row-gap: 48px;
   }
+
+  .about-page .oppia-about-impact-bar-chart-container {
+    width: 98%;
+  }
 }
 
 @media only screen and (max-width: 361px) {
-
-  .about-page .oppia-non-mobile-portrait-content {
-    display: none;
-  }
-
   .about-page .oppia-mobile-portrait-content {
     display: block;
   }
@@ -476,6 +596,46 @@
     margin: 32px 0;
     padding: 0;
     row-gap: 28px;
+  }
+
+  .about-page .oppia-about-impact-bar-chart-container {
+    width: 100%;
+  }
+
+  .about-page .oppia-bar-chart th {
+    padding: 0 15px 0 0;
+  }
+
+  .about-page .charts-css.bar {
+    --labels-size: 150px;
+  }
+
+  .about-page .oppia-bar-chart th span,
+  .about-page .charts-css .data,
+  .about-page .oppia-scale-number {
+    font-size: 13px;
+  }
+
+  .about-page .charts-css .data {
+    margin-right: 8px;
+  }
+
+  .about-page .charts-css.bar tbody tr td {
+    min-height: 16px;
+  }
+
+  .about-page .oppia-scale-number {
+    font-size: 13px;
+    line-height: normal;
+  }
+
+  .about-page .oppia-scale-line {
+    font-size: 8px;
+    line-height: normal;
+  }
+
+  .about-page .oppia-android-scale-type-2 {
+    width: 8%;
   }
 
 }
