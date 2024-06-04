@@ -41,6 +41,7 @@ export enum FeatureNames {
   CdAllowUndoingTranslationReview = 'cd_allow_undoing_translation_review',
   EnableVoiceoverContribution = 'enable_voiceover_contribution',
   AutoUpdateExpVoiceArtistLink = 'auto_update_exp_voice_artist_link',
+  EnableMultipleClassrooms = 'enable_multiple_classrooms',
 }
 
 export interface FeatureStatusSummaryBackendDict {
