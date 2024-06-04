@@ -494,7 +494,7 @@ XSSI_PREFIX = b')]}\'\n'
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
 # A regular expression for language accent code.
-LANGUAGE_ACCENT_CODE_REGEX = r'^(([a-z]+)-)+([A-Z]+)$'
+LANGUAGE_ACCENT_CODE_REGEX = r'^(([a-zA-Z]+)-)+([a-zA-Z]+)$'
 
 # These are here rather than in rating_services.py to avoid import
 # circularities with exp_services.
@@ -572,7 +572,7 @@ ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.3.8'
+OPPIA_VERSION = '3.3.9'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
