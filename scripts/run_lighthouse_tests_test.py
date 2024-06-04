@@ -22,6 +22,7 @@ import os
 import subprocess
 import sys
 
+from core import feconf
 from core.constants import constants
 from core.tests import test_utils
 from scripts import build
@@ -134,6 +135,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.lighthouse_pages_json_filepath_swap = self.swap(
             run_lighthouse_tests, 'LIGHTHOUSE_PAGES_JSON_FILEPATH',
             'dummy-lighthouse-pages.json')
+        self.oppia_is_dockerized_swap = self.swap(
+            feconf, 'OPPIA_IS_DOCKERIZED', False)
 
     def tearDown(self) -> None:
         super().tearDown()
@@ -405,17 +408,18 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 with self.swap_ng_build, swap_emulator_mode, self.print_swap:
                     with self.swap_redis_server, swap_run_lighthouse_tests:
                         with self.lighthouse_pages_json_filepath_swap:
-                            run_lighthouse_tests.main(
-                                args=['--mode', 'accessibility',
-                                      '--shard', '1'])
-                            expected_all_lighthouse_urls = ','.join([
-                                'http://localhost:8181/',
-                                'http://localhost:8181/about',
-                                'http://localhost:8181/contact'
-                            ])
-                            self.assertEqual(
-                                os.environ['ALL_LIGHTHOUSE_URLS'],
-                                expected_all_lighthouse_urls)
+                            with self.oppia_is_dockerized_swap:
+                                run_lighthouse_tests.main(
+                                    args=['--mode', 'accessibility',
+                                        '--shard', '1'])
+                                expected_all_lighthouse_urls = ','.join([
+                                    'http://localhost:8181/',
+                                    'http://localhost:8181/about',
+                                    'http://localhost:8181/contact'
+                                ])
+                                self.assertEqual(
+                                    os.environ['ALL_LIGHTHOUSE_URLS'],
+                                    expected_all_lighthouse_urls)
 
         self.assertIn(
             'Puppeteer script completed successfully.', self.print_arr)
@@ -447,17 +451,18 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     with self.swap_firebase_auth_emulator, swap_build:
                         with swap_popen, swap_run_lighthouse_tests:
                             with self.lighthouse_pages_json_filepath_swap:
-                                run_lighthouse_tests.main(
-                                    args=['--mode', 'performance',
-                                          '--shard', '1'])
-                                expected_all_lighthouse_urls = ','.join([
-                                    'http://localhost:8181/',
-                                    'http://localhost:8181/about',
-                                    'http://localhost:8181/contact'
-                                ])
-                                self.assertEqual(
-                                    os.environ['ALL_LIGHTHOUSE_URLS'],
-                                    expected_all_lighthouse_urls)
+                                with self.oppia_is_dockerized_swap:
+                                    run_lighthouse_tests.main(
+                                        args=['--mode', 'performance',
+                                            '--shard', '1'])
+                                    expected_all_lighthouse_urls = ','.join([
+                                        'http://localhost:8181/',
+                                        'http://localhost:8181/about',
+                                        'http://localhost:8181/contact'
+                                    ])
+                                    self.assertEqual(
+                                        os.environ['ALL_LIGHTHOUSE_URLS'],
+                                        expected_all_lighthouse_urls)
 
         self.assertIn('Building files in production mode.', self.print_arr)
         self.assertIn(
@@ -490,25 +495,26 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     with self.swap_firebase_auth_emulator, swap_build:
                         with swap_popen, swap_run_lighthouse_tests:
                             with self.lighthouse_pages_json_filepath_swap:
-                                run_lighthouse_tests.main(
-                                    args=['--mode', 'performance',
-                                          '--shard', '1',
-                                          '--pages', 'splash, about'])
-                                expected_all_lighthouse_urls = ','.join([
-                                    'http://localhost:8181/',
-                                    'http://localhost:8181/about',
-                                    'http://localhost:8181/contact'
-                                ])
-                                expected_lighthouse_urls_to_run = ','.join([
-                                    'http://localhost:8181/',
-                                    'http://localhost:8181/about'
-                                ])
-                                self.assertEqual(
-                                    os.environ['ALL_LIGHTHOUSE_URLS'],
-                                    expected_all_lighthouse_urls)
-                                self.assertEqual(
-                                    os.environ['LIGHTHOUSE_URLS_TO_RUN'],
-                                    expected_lighthouse_urls_to_run)
+                                with self.oppia_is_dockerized_swap:
+                                    run_lighthouse_tests.main(
+                                        args=['--mode', 'performance',
+                                            '--shard', '1',
+                                            '--pages', 'splash, about'])
+                                    expected_all_lighthouse_urls = ','.join([
+                                        'http://localhost:8181/',
+                                        'http://localhost:8181/about',
+                                        'http://localhost:8181/contact'
+                                    ])
+                                    expected_lighthouse_urls_to_run = ','.join([
+                                        'http://localhost:8181/',
+                                        'http://localhost:8181/about'
+                                    ])
+                                    self.assertEqual(
+                                        os.environ['ALL_LIGHTHOUSE_URLS'],
+                                        expected_all_lighthouse_urls)
+                                    self.assertEqual(
+                                        os.environ['LIGHTHOUSE_URLS_TO_RUN'],
+                                        expected_lighthouse_urls_to_run)
 
         self.assertIn('Building files in production mode.', self.print_arr)
         self.assertIn(
@@ -542,10 +548,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_ng_build, swap_emulator_mode, self.print_swap:
                     with self.swap_redis_server, swap_run_lighthouse_tests:
-                        run_lighthouse_tests.main(
-                            args=['--mode', 'performance',
-                                '--shard', '1', '--skip_build',
-                                '--pages', 'splash'])
+                        with self.oppia_is_dockerized_swap:
+                            run_lighthouse_tests.main(
+                                args=['--mode', 'performance',
+                                    '--shard', '1', '--skip_build',
+                                    '--pages', 'splash'])
 
         self.assertIn(
             'Building files in production mode skipping webpack build.',
@@ -603,7 +610,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 with self.swap_ng_build, swap_emulator_mode, self.print_swap:
                     with self.swap_redis_server, swap_run_lighthouse_tests:
                         with swap_run_puppeteer_script:
-                            run_lighthouse_tests.main(
-                                args=[
-                                    '--mode', 'performance', '--skip_build',
-                                    '--shard', '1', '--record_screen'])
+                            with self.oppia_is_dockerized_swap:
+                                run_lighthouse_tests.main(
+                                    args=[
+                                        '--mode', 'performance', '--skip_build',
+                                        '--shard', '1', '--record_screen'])

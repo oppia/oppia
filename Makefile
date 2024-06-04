@@ -229,59 +229,17 @@ run_tests.check_e2e_tests_are_captured_in_ci: ## Runs the check to ensure that a
 	$(MAKE) stop
 
 run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests for the parsed shard
-## Flag for Lighthouse test
-## shard: The shard number to run the lighthouse tests
-## RECORD_SCREEN: Record the lighthouse test
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
-# Adding node to the path.
-	@if [ "$(OS_NAME)" = "Windows" ]; then \
-		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
-	else \
-		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
-	fi
-# Starting the development server for the lighthouse tests.
 	$(MAKE) start-devserver
-	@echo '-----------------------------------------------------------------------'
-	@echo '  Starting Lighthouse Accessibility tests -- shard number: $(shard)'
-	@echo '-----------------------------------------------------------------------'
-	@if [ "$(RECORD_SCREEN)" = "true" ]; then \
-		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js ../lhci-puppeteer-video/video.mp4; \
-	else \
-		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js; \
-	fi
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-accessibility-${shard}.js --max-old-space-size=4096 || $(MAKE) stop
-	@echo '-----------------------------------------------------------------------'
-	@echo '  Lighthouse tests has been executed successfully....'
-	@echo '-----------------------------------------------------------------------'
+	$(SHELL_PREFIX) dev-server sh -c "python -m scripts.run_lighthouse_tests --mode accessibility --shard $(shard) $(PYTHON_ARGS)"
 	$(MAKE) stop
 
 run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for the parsed shard
-## Flag for Lighthouse test
-## shard: The shard number to run the lighthouse tests
-## RECORD_SCREEN: Record the lighthouse test
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
-# Adding node to the path.
-	@if [ "$(OS_NAME)" = "Windows" ]; then \
-		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
-	else \
-		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
-	fi
-# Starting the development server for the lighthouse tests.
 	$(MAKE) start-devserver
-	@echo '-----------------------------------------------------------------------'
-	@echo '  Starting Lighthouse Performance tests -- shard number: $(shard)'
-	@echo '-----------------------------------------------------------------------'
-	@if [ "$(RECORD_SCREEN)" = "true" ]; then \
-		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js ../lhci-puppeteer-video/video.mp4; \
-	else \
-		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js; \
-	fi
-	../oppia_tools/node-16.13.0/bin/node node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-${shard}.js --max-old-space-size=4096 || $(MAKE) stop
-	@echo '-----------------------------------------------------------------------'
-	@echo '  Lighthouse tests has been executed successfully....'
-	@echo '-----------------------------------------------------------------------'
+	$(SHELL_PREFIX) dev-server sh -c "python -m scripts.run_lighthouse_tests --mode performance --shard $(shard) $(PYTHON_ARGS)""
 	$(MAKE) stop
 
 install_node: ## Installs node-16.13.0 in the oppia_tools directory

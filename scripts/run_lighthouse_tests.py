@@ -32,6 +32,7 @@ from typing import Final, List, Optional
 # we migrate to Python 3.8.
 from scripts import common  # isort:skip pylint: disable=wrong-import-position
 
+from core import feconf # isort:skip
 from core.constants import constants  # isort:skip
 from scripts import build  # isort:skip
 from scripts import servers  # isort:skip
@@ -309,39 +310,42 @@ def main(args: Optional[List[str]] = None) -> None:
     else:
         lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
         server_mode = SERVER_MODE_PROD
-    if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
-        if not parsed_args.skip_build:
-            # Builds webpack.
-            print('Building files in production mode.')
-            build.main(args=['--prod_env'])
+    if not feconf.OPPIA_IS_DOCKERIZED:
+        if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
+            if not parsed_args.skip_build:
+                # Builds webpack.
+                print('Building files in production mode.')
+                build.main(args=['--prod_env'])
+            else:
+                # Skip webpack build if skip_build flag is passed.
+                print(
+                    'Building files in production mode skipping webpack build.')
+                build.main(args=[])
+                common.run_ng_compilation()
+                run_webpack_compilation()
         else:
-            # Skip webpack build if skip_build flag is passed.
-            print('Building files in production mode skipping webpack build.')
+            # Accessibility mode skip webpack build.
             build.main(args=[])
             common.run_ng_compilation()
             run_webpack_compilation()
-    else:
-        # Accessibility mode skip webpack build.
-        build.main(args=[])
-        common.run_ng_compilation()
-        run_webpack_compilation()
 
     with contextlib.ExitStack() as stack:
-        stack.enter_context(servers.managed_redis_server())
-        stack.enter_context(servers.managed_elasticsearch_dev_server())
+        if not feconf.OPPIA_IS_DOCKERIZED:
+            stack.enter_context(servers.managed_redis_server())
+            stack.enter_context(servers.managed_elasticsearch_dev_server())
 
-        if constants.EMULATOR_MODE:
-            stack.enter_context(servers.managed_firebase_auth_emulator())
-            stack.enter_context(servers.managed_cloud_datastore_emulator())
+            if constants.EMULATOR_MODE:
+                stack.enter_context(servers.managed_firebase_auth_emulator())
+                stack.enter_context(servers.managed_cloud_datastore_emulator())
 
-        env = os.environ.copy()
-        env['PIP_NO_DEPS'] = 'True'
-        stack.enter_context(servers.managed_dev_appserver(
-            APP_YAML_FILENAMES[server_mode],
-            port=GOOGLE_APP_ENGINE_PORT,
-            log_level='critical',
-            skip_sdk_update_check=True,
-            env=env))
+            env = os.environ.copy()
+            env['PIP_NO_DEPS'] = 'True'
+            stack.enter_context(servers.managed_dev_appserver(
+                APP_YAML_FILENAMES[server_mode],
+                port=GOOGLE_APP_ENGINE_PORT,
+                log_level='critical',
+                skip_sdk_update_check=True,
+                env=env))
 
         entities = run_lighthouse_puppeteer_script(parsed_args.record_screen)
         pages_config: dict[str, str] = get_lighthouse_pages_for_shard(
