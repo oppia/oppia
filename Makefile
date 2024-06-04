@@ -229,8 +229,11 @@ run_tests.check_e2e_tests_are_captured_in_ci: ## Runs the check to ensure that a
 	$(MAKE) stop
 
 run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests for the parsed shard
+## Flag for Lighthouse test
+## shard: The shard number to run the lighthouse tests
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
+# Starting the development server for the lighthouse tests.
 	$(MAKE) start-devserver
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Starting Lighthouse Accessibility tests -- shard number: $(shard)'
@@ -242,8 +245,11 @@ run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests f
 	$(MAKE) stop
 
 run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for the parsed shard
+## Flag for Lighthouse test
+## shard: The shard number to run the lighthouse tests
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
+# Starting the development server for the lighthouse tests.
 	$(MAKE) start-devserver
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Starting Lighthouse Performance tests -- shard number: $(shard)'
