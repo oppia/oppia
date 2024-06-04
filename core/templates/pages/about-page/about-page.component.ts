@@ -53,24 +53,91 @@ export class AboutPageComponent {
     },
   ];
 
+  oppiaWebsiteRawBarChartData = [
+    {
+      country: 'United States',
+      userCount: 2400.0,
+    },
+    {country: 'India', userCount: 1100.0},
+    {country: 'United Kingdom', userCount: 930.0},
+    {country: 'Brazil', userCount: 650.0},
+    {country: 'Canada', userCount: 420.0},
+    {country: 'Nigeria', userCount: 250.0},
+    {country: 'Netherlands', userCount: 250.0},
+    {country: 'Egypt', userCount: 225.0},
+    {country: 'Turkey', userCount: 225.0},
+    {country: 'Belgium', userCount: 200.0},
+  ];
+
+  oppiaAndroidRawBarChartData = [
+    {country: 'Brazil', userCount: 3250.0},
+    {country: 'Pakistan', userCount: 1500.0},
+    {country: 'Angola', userCount: 1270.0},
+    {country: 'Kenya', userCount: 870.0},
+    {country: 'Cameroon', userCount: 570.0},
+    {country: 'Mozambique', userCount: 320.0},
+    {country: 'India', userCount: 320.0},
+    {country: 'Nigeria', userCount: 300.0},
+    {country: 'Indonesia', userCount: 300.0},
+    {country: 'Tanzania', userCount: 260.0},
+  ];
+
+  oppiaWebsiteBarChartData!: {
+    country: string;
+    userCount: number;
+  }[];
+  oppiaAndroidBarChartData!: {
+    country: string;
+    userCount: number;
+  }[];
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private siteAnalyticsService: SiteAnalyticsService
-  ) {}
+  ) {
+    this.displayNormalizedUserCount();
+  }
+
+  displayNormalizedUserCount(): void {
+    const maxWebsiteUserCount = Math.max(
+      ...this.oppiaWebsiteRawBarChartData.map(dataPoint => dataPoint.userCount)
+    );
+
+    this.oppiaWebsiteBarChartData = this.oppiaWebsiteRawBarChartData.map(
+      dataPoint => {
+        const normalizedUserCount = (
+          dataPoint.userCount / maxWebsiteUserCount
+        ).toFixed(2);
+        return {
+          ...dataPoint,
+          userCount: parseFloat(normalizedUserCount),
+        };
+      }
+    );
+
+    // Console.log(this.oppiaWebsiteBarChartData);
+
+    const maxAndroidUserCount = Math.max(
+      ...this.oppiaAndroidRawBarChartData.map(dataPoint => dataPoint.userCount)
+    );
+
+    this.oppiaAndroidBarChartData = this.oppiaAndroidRawBarChartData.map(
+      dataPoint => {
+        const normalizedUserCount = (
+          dataPoint.userCount / maxAndroidUserCount
+        ).toFixed(2);
+        return {
+          ...dataPoint,
+          userCount: parseFloat(normalizedUserCount),
+        };
+      }
+    );
+
+    // Console.log(this.oppiaAndroidBarChartData);
+  }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  getImageSet(imageName: string, imageExt: string): string {
-    return (
-      this.getStaticImageUrl(imageName + '1x.' + imageExt) +
-      ' 1x, ' +
-      this.getStaticImageUrl(imageName + '15x.' + imageExt) +
-      ' 1.5x, ' +
-      this.getStaticImageUrl(imageName + '2x.' + imageExt) +
-      ' 2x'
-    );
   }
 
   onClickVisitClassroomButton(): void {

@@ -82,6 +82,7 @@ EXCLUDED_PATHS: Final = (
     'core/tests/release_sources/tmp_unzip.tar.gz',
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
+    'core/templates/css/charts.min.css',
     'core/templates/google-analytics.initializer.ts',
     'extensions/classifiers/proto/*',
     'core/tests/puppeteer-acceptance-tests/build/*',
@@ -214,7 +215,8 @@ BAD_LINE_PATTERNS_HTML_REGEXP: List[BadPatternRegexpDict] = [
     {
         'regexp': re.compile(r'\s+style\s*=\s*'),
         'message': 'Please do not use inline styling.',
-        'excluded_files': (),
+        'excluded_files': (
+            'core/templates/pages/about-page/about-page.component.html',),
         'excluded_dirs': ()
     }
 ]
