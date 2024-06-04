@@ -78,7 +78,7 @@ describe('Curriculum Admin', function () {
       await curriculumAdmin.expectTopicToBePublishedInTopicsAndSkillsDashboard(
         'Test Topic 1',
         1,
-        1,
+        1
       );
 
       await curriculumAdmin.unpublishTopic('Test Topic 1');
@@ -89,6 +89,8 @@ describe('Curriculum Admin', function () {
         'Test Topic 1'
       );
 
+      // User must delete all questions in the skill before deleting it.
+      await curriculumAdmin.removeAllQuestionsFromTheSkill('Test Skill 1');
       await curriculumAdmin.deleteSkill('Test Skill 1');
       await curriculumAdmin.expectSkillNotInTopicsAndSkillsDashboard(
         'Test Skill 1'

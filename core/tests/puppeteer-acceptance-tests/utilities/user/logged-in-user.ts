@@ -79,8 +79,7 @@ export class LoggedInUser extends BaseUser {
 
   async expectTopicLinkReturns404(topicUrlFragment: string): Promise<void> {
     await this.goto(`http://localhost:8181/learn/staging/${topicUrlFragment}`);
-    await this.page.waitForTimeout(1000);
-    const isError404Present = await this.isTextPresentOnPage('Error 400');
+    const isError404Present = await this.isTextPresentOnPage('Error 404');
     if (!isError404Present) {
       throw new Error(
         'Expected "Error 404" to be present on the page, but it was not.'
