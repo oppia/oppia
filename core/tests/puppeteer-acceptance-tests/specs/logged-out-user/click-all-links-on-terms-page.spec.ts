@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users
+ * @fileoverview Acceptance Test for checking if logged-out users
  * can open all the links on the "Terms of Use" page.
  */
 

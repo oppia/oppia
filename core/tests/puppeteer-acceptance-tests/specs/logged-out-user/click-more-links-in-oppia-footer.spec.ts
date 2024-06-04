@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users can
+ * @fileoverview Acceptance Test for checking if logged-out users can
  * follow links in the oppia footer not covered by other tests.
  */
 
