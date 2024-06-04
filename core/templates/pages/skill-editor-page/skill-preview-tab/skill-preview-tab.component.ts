@@ -31,7 +31,6 @@ import {ExplorationPlayerStateService} from 'pages/exploration-player-page/servi
 import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
 import {Subscription} from 'rxjs';
 import {ContextService} from 'services/context.service';
-import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 
@@ -41,7 +40,6 @@ import {SkillEditorStateService} from '../services/skill-editor-state.service';
 })
 export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   constructor(
-    private urlService: UrlService,
     private skillEditorStateService: SkillEditorStateService,
     private questionBackendApiService: QuestionBackendApiService,
     private contextService: ContextService,
@@ -79,8 +77,6 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const that = this;
-    this.skillId = this.urlService.getSkillIdFromUrl();
-    this.skillEditorStateService.loadSkill(this.skillId);
     this.questionTextFilter = '';
     this.interactionFilter = this.INTERACTION_TYPES.ALL;
     this.questionsFetched = false;
