@@ -1866,7 +1866,13 @@ class SendDummyMailToAdminHandler(
         """
         username = self.username
         assert username is not None
-        if feconf.CAN_SEND_EMAILS:
+        server_can_send_emails = (
+            parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.
+                SERVER_CAN_SEND_EMAILS.value
+            )
+        )
+        if server_can_send_emails:
             email_manager.send_dummy_mail_to_admin(username)
             self.render_json({})
         else:
