@@ -77,11 +77,7 @@ export class ImageUploaderComponent implements OnInit {
         : '/icons/story-image-icon-landscape.png'
     );
 
-    if (
-      this.imageUploaderParameters.filename !== null &&
-      this.imageUploaderParameters.filename !== undefined &&
-      this.imageUploaderParameters.filename !== ''
-    ) {
+    if (this.imageUploaderParameters.filename) {
       this.hidePlaceholder = false;
       this.imageIsLoading = true;
       let entityType = this.contextService.getEntityType();
