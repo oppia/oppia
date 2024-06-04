@@ -37,6 +37,22 @@ describe('ImageUploaderComponent', () => {
   let contextService: ContextService;
   let imageUploadHelperService: ImageUploadHelperService;
   let ngbModal: NgbModal;
+  let imageUploaderParameters = {
+    disabled: false,
+    allowedBgColors: [],
+    aspectRatio: '4:3',
+    allowedImageFormats: ['png', 'svg', 'jpeg'],
+    bgColor: '',
+    imageName: 'Image',
+    maxImageSizeInKB: 1000,
+    orientation: 'portrait',
+    filename: '',
+    previewDescription: '',
+    previewDescriptionBgColor: '',
+    previewFooter: '',
+    previewImageUrl: '',
+    previewTitle: '',
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -57,12 +73,13 @@ describe('ImageUploaderComponent', () => {
     contextService = TestBed.inject(ContextService);
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     ngbModal = TestBed.inject(NgbModal);
+    component.imageUploaderParameters = imageUploaderParameters;
   });
 
   it('should set uploaded and editable thumbnail on initialization', () => {
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     spyOn(contextService, 'getEntityId').and.returnValue('expId');
-    component.filename = 'thumbnail-1';
+    component.imageUploaderParameters.filename = 'thumbnail-1';
 
     expect(component.imageIsLoading).toBeTrue();
 
@@ -82,7 +99,7 @@ describe('ImageUploaderComponent', () => {
       ' changed',
     () => {
       spyOn(contextService, 'getEntityType').and.returnValue(undefined);
-      component.filename = 'thumbnail-1';
+      component.imageUploaderParameters.filename = 'thumbnail-1';
 
       expect(() => {
         component.ngOnInit();
@@ -91,7 +108,7 @@ describe('ImageUploaderComponent', () => {
   );
 
   it('should display placeholder image when filename is null', () => {
-    component.filename = '';
+    component.imageUploaderParameters.filename = '';
 
     expect(component.hidePlaceholder).toBeTrue();
 
@@ -107,16 +124,11 @@ describe('ImageUploaderComponent', () => {
     () => {
       spyOn(contextService, 'getEntityType').and.returnValue('exploration');
       spyOn(contextService, 'getEntityId').and.returnValue('expId');
-      component.disabled = true;
+      component.imageUploaderParameters.disabled = true;
       spyOn(ngbModal, 'open');
-
-      expect(component.openInUploadMode).toBe(false);
 
       component.showImageUploaderModal();
 
-      // Here, openInUpload mode is not set as which means, showImageUploaderModal
-      // returned as soon as the first check was executed.
-      expect(component.openInUploadMode).toBe(false);
       expect(ngbModal.open).not.toHaveBeenCalled();
     }
   );
@@ -127,36 +139,22 @@ describe('ImageUploaderComponent', () => {
     fakeAsync(() => {
       spyOn(contextService, 'getEntityType').and.returnValue('exploration');
       spyOn(contextService, 'getEntityId').and.returnValue('expId');
-      // Modal is not opened in upload mode.
       class MockNgbModalRef {
         result = Promise.resolve({
           dimensions: {
             height: 50,
             width: 50,
           },
-          openInUploadMode: false,
           newThumbnailDataUrl: 'data:image/png;base64,xyz',
           newBgColor: '#newcol',
         });
 
-        componentInstance = {
-          bgColor: null,
-          allowedBgColors: [],
-          aspectRatio: null,
-          dimensions: null,
-          previewDescription: null,
-          previewDescriptionBgColor: null,
-          previewFooter: null,
-          previewTitle: null,
-          uploadedImage: null,
-          uploadedImageMimeType: null,
-          tempBgColor: null,
-        };
+        componentInstance = imageUploadHelperService;
       }
       let ngbModalRef = new MockNgbModalRef();
 
-      component.disabled = false;
-      component.bgColor = '#ff9933';
+      component.imageUploaderParameters.disabled = false;
+      component.imageUploaderParameters.bgColor = '#ff9933';
 
       spyOn(ngbModal, 'open').and.returnValue(ngbModalRef as NgbModalRef);
       spyOn(
@@ -182,14 +180,15 @@ describe('ImageUploaderComponent', () => {
   );
 
   it('should show correct placeholder image according to orientation', fakeAsync(() => {
-    component.orientation = 'portrait';
+    component.imageUploaderParameters.filename = '';
+    component.imageUploaderParameters.orientation = 'portrait';
     expect(component.isImageInPortraitMode()).toBeTrue();
     component.ngOnInit();
     expect(component.placeholderImageUrl).toContain(
       '/icons/story-image-icon.png'
     );
 
-    component.orientation = 'landscape';
+    component.imageUploaderParameters.orientation = 'landscape';
     expect(component.isImageInPortraitMode()).toBeFalse();
     component.ngOnInit();
     expect(component.placeholderImageUrl).toContain(
@@ -203,24 +202,12 @@ describe('ImageUploaderComponent', () => {
       spyOn(contextService, 'getEntityType').and.returnValue('exploration');
       spyOn(contextService, 'getEntityId').and.returnValue('expId');
       class MockNgbModalRef {
-        componentInstance = {
-          bgColor: null,
-          allowedBgColors: null,
-          aspectRatio: null,
-          dimensions: null,
-          previewDescription: null,
-          previewDescriptionBgColor: null,
-          previewFooter: null,
-          previewTitle: null,
-          uploadedImage: null,
-          uploadedImageMimeType: null,
-          tempBgColor: null,
-        };
+        componentInstance = imageUploadHelperService;
       }
       let ngbModalRef = new MockNgbModalRef();
 
-      component.disabled = false;
-      component.allowedBgColors = ['#ff9933'];
+      component.imageUploaderParameters.disabled = false;
+      component.imageUploaderParameters.allowedBgColors = ['#ff9933'];
 
       spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return {
@@ -236,4 +223,36 @@ describe('ImageUploaderComponent', () => {
       });
     })
   );
+
+  it('should return early if imageBlobData is null', fakeAsync(() => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(contextService, 'getEntityId').and.returnValue('expId');
+    class MockNgbModalRef {
+      result = Promise.resolve({
+        newImageDataUrl: 'data:image/png;base64,xyz',
+        newBgColor: '#newcol',
+      });
+      componentInstance = imageUploadHelperService;
+    }
+    let ngbModalRef = new MockNgbModalRef();
+
+    component.imageUploaderParameters.disabled = false;
+
+    spyOn(ngbModal, 'open').and.returnValue(ngbModalRef as NgbModalRef);
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(null);
+
+    const imageSaveSpy = spyOn(component.imageSave, 'emit');
+    const updateBgColorSpy = spyOn(component.updateBgColor, 'emit');
+    const updateFilenameSpy = spyOn(component.updateFilename, 'emit');
+
+    component.showImageUploaderModal();
+    tick();
+
+    expect(imageSaveSpy).not.toHaveBeenCalled();
+    expect(updateBgColorSpy).not.toHaveBeenCalled();
+    expect(updateFilenameSpy).not.toHaveBeenCalled();
+  }));
 });

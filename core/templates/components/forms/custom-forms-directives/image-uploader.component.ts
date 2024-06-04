@@ -25,6 +25,23 @@ import {ContextService} from 'services/context.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {ImageUploaderModalComponent} from './image-uploader-modal.component';
 
+export interface ImageUploaderParameters {
+  disabled: boolean;
+  maxImageSizeInKB: number;
+  imageName: string;
+  orientation: string;
+  bgColor: string;
+  allowedBgColors: string[];
+  allowedImageFormats: string[];
+  aspectRatio: string;
+  filename?: string;
+  previewTitle?: string;
+  previewDescription?: string;
+  previewDescriptionBgColor?: string;
+  previewFooter?: string;
+  previewImageUrl?: string;
+}
+
 @Component({
   selector: 'oppia-image-uploader',
   templateUrl: './image-uploader.component.html',
@@ -36,24 +53,11 @@ export class ImageUploaderComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() disabled!: boolean;
-  @Input() allowedBgColors!: string[];
-  @Input() aspectRatio!: string;
-  @Input() bgColor!: string;
-  @Input() filename!: string;
-  @Input() previewDescription!: string;
-  @Input() previewDescriptionBgColor!: string;
-  @Input() previewFooter!: string;
-  @Input() previewTitle!: string;
-  @Input() allowedImageFormats!: string[];
-  @Input() imageName!: string;
-  @Input() orientation!: string;
-  @Input() maxImageSizeInKB!: number;
+  @Input() imageUploaderParameters!: ImageUploaderParameters;
 
   uploadedImage!: string;
   dimensions!: {height: number; width: number};
   editableImageDataUrl!: string;
-  openInUploadMode: boolean = false;
   hidePlaceholder: boolean = true;
   imageIsLoading: boolean = true;
   imageBgColor!: string;
@@ -74,9 +78,9 @@ export class ImageUploaderComponent implements OnInit {
     );
 
     if (
-      this.filename !== null &&
-      this.filename !== undefined &&
-      this.filename !== ''
+      this.imageUploaderParameters.filename !== null &&
+      this.imageUploaderParameters.filename !== undefined &&
+      this.imageUploaderParameters.filename !== ''
     ) {
       this.hidePlaceholder = false;
       this.imageIsLoading = true;
@@ -86,27 +90,26 @@ export class ImageUploaderComponent implements OnInit {
       }
       this.editableImageDataUrl =
         this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
-          this.filename,
+          this.imageUploaderParameters.filename,
           entityType,
           this.contextService.getEntityId()
         );
-      this.imageBgColor = this.bgColor;
+      this.imageBgColor = this.imageUploaderParameters.bgColor;
       this.uploadedImage = this.editableImageDataUrl;
       this.imageIsLoading = false;
+      this.imageUploaderParameters.previewImageUrl = this.editableImageDataUrl;
     }
   }
 
   isImageInPortraitMode(): boolean {
-    return this.orientation === 'portrait';
+    return this.imageUploaderParameters.orientation === 'portrait';
   }
 
   showImageUploaderModal(): void {
-    if (this.disabled) {
+    if (this.imageUploaderParameters.disabled) {
       return;
     }
-    if (!this.uploadedImage) {
-      this.openInUploadMode = true;
-    }
+
     this.dimensions = {
       height: 0,
       width: 0,
@@ -114,18 +117,8 @@ export class ImageUploaderComponent implements OnInit {
     const modalRef = this.ngbModal.open(ImageUploaderModalComponent, {
       backdrop: 'static',
     });
-    modalRef.componentInstance.allowedImageFormats = this.allowedImageFormats;
-    modalRef.componentInstance.allowedBgColors = this.allowedBgColors;
-    modalRef.componentInstance.bgColor =
-      this.bgColor || this.allowedBgColors[0];
-    modalRef.componentInstance.previewDescriptionBgColor =
-      this.previewDescriptionBgColor;
-    modalRef.componentInstance.previewTitle = this.previewTitle;
-    modalRef.componentInstance.previewDescription = this.previewDescription;
-    modalRef.componentInstance.imageName = this.imageName;
-    modalRef.componentInstance.aspectRatio = this.aspectRatio;
-    modalRef.componentInstance.maxImageSizeInKB = this.maxImageSizeInKB;
-    modalRef.componentInstance.previewImageUrl = this.uploadedImage;
+    modalRef.componentInstance.imageUploaderParameters =
+      this.imageUploaderParameters;
 
     modalRef.result.then(
       data => {
@@ -136,22 +129,24 @@ export class ImageUploaderComponent implements OnInit {
             data.newImageDataUrl
           );
 
-        if (imageBlobData) {
-          const imageFilename =
-            this.imageUploadHelperService.generateImageFilename(
-              this.dimensions.height,
-              this.dimensions.width,
-              imageBlobData?.type?.split('/')[1]
-            );
-
-          this.hidePlaceholder = false;
-          this.imageIsLoading = false;
-          this.imageBgColor = data.newBgColor;
-
-          this.imageSave.emit(imageBlobData);
-          this.updateBgColor.emit(data.newBgColor);
-          this.updateFilename.emit(imageFilename);
+        if (!imageBlobData) {
+          return;
         }
+
+        const imageFilename =
+          this.imageUploadHelperService.generateImageFilename(
+            this.dimensions.height,
+            this.dimensions.width,
+            imageBlobData?.type?.split('/')[1]
+          );
+
+        this.hidePlaceholder = false;
+        this.imageIsLoading = false;
+        this.imageBgColor = data.newBgColor;
+
+        this.imageSave.emit(imageBlobData);
+        this.updateBgColor.emit(data.newBgColor);
+        this.updateFilename.emit(imageFilename);
       },
       () => {
         // Note to developers:

@@ -23,6 +23,7 @@ import {
   Input,
   ViewChild,
 } from '@angular/core';
+import {ImageUploaderParameters} from './image-uploader.component';
 import {SafeResourceUrl} from '@angular/platform-browser';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -39,17 +40,7 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() allowedImageFormats!: string[];
-  @Input() bgColor!: string;
-  @Input() previewFooter!: string;
-  @Input() previewDescription!: string;
-  @Input() previewTitle!: string;
-  @Input() previewDescriptionBgColor!: string;
-  @Input() imageName!: string;
-  @Input() aspectRatio!: string;
-  @Input() maxImageSizeInKB!: number;
-  @Input() previewImageUrl!: string;
-  @Input() allowedBgColors!: string[];
+  @Input() imageUploaderParameters!: ImageUploaderParameters;
 
   // 'uploadedImage' will be null if the uploaded svg is invalid or not trusted.
   uploadedImage: SafeResourceUrl | string | null = null;
@@ -80,13 +71,13 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
 
   private _getAspectRatio(): number {
     return (
-      parseInt(this.aspectRatio.split(':')[0]) /
-      parseInt(this.aspectRatio.split(':')[1])
+      parseInt(this.imageUploaderParameters.aspectRatio.split(':')[0]) /
+      parseInt(this.imageUploaderParameters.aspectRatio.split(':')[1])
     );
   }
 
   isThumbnail(): boolean {
-    return this.imageName === 'Thumbnail';
+    return this.imageUploaderParameters.imageName === 'Thumbnail';
   }
 
   imageNotUploaded(): boolean {
@@ -101,13 +92,10 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   }
 
   hasMoreThanOneBgColor(): boolean {
-    return this.allowedBgColors.length > 1;
+    return this.imageUploaderParameters.allowedBgColors.length > 1;
   }
 
   initializeCropper(): void {
-    if (!this.croppableImageRef) {
-      return;
-    }
     let imageElement = this.croppableImageRef.nativeElement;
     if (this.windowIsNarrow) {
       this.cropper = new Cropper(imageElement, {
@@ -166,7 +154,7 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
           //   Attempt to use a destroyed view: detectChanges thrown.
           // No further action is needed.
         }
-        if (!this.isThumbnail()) {
+        if (!this.isThumbnail() && this.croppableImageRef) {
           this.initializeCropper();
         }
       };
@@ -193,8 +181,8 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   }
 
   updateBackgroundColor(color: string): void {
-    if (color !== this.bgColor) {
-      this.bgColor = color;
+    if (color !== this.imageUploaderParameters.bgColor) {
+      this.imageUploaderParameters.bgColor = color;
     }
   }
 
@@ -216,13 +204,13 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
     super.confirm({
       newImageDataUrl: this.croppedImageDataUrl,
       dimensions: this.dimensions,
-      newBgColor: this.bgColor,
+      newBgColor: this.imageUploaderParameters.bgColor,
     });
   }
 
   ngOnInit(): void {
-    if (this.previewImageUrl) {
-      this.uploadedImage = this.previewImageUrl;
+    if (this.imageUploaderParameters.previewImageUrl) {
+      this.uploadedImage = this.imageUploaderParameters.previewImageUrl;
     }
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
