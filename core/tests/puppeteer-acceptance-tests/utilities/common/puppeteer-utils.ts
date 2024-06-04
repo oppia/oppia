@@ -20,7 +20,6 @@ import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
-import {load} from 'js-yaml';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
@@ -110,7 +109,7 @@ export class BaseUser {
               'Mobile/15A372 Safari/604.1'
           );
         } else {
-          this.page.setViewport({width: 1920, height: 1080});
+          this.page.setViewport({width: 1280, height: 800});
         }
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
@@ -289,9 +288,6 @@ export class BaseUser {
    * The function clicks the element using the text on the button.
    */
   async clickOn(selector: string): Promise<void> {
-    /** Normalize-space is used to remove the extra spaces in the text.
-     * Check the documentation for the normalize-space function here :
-     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
     const [button] = await this.page.$x(
       `\/\/*[contains(text(), normalize-space('${selector}'))]`
     );
@@ -352,11 +348,8 @@ export class BaseUser {
   }
 
   /**
-   * This function is to click on an element that contains the specific text especially when multiple elements have the same text.
-   * It takes two parameters: parentText and childText.
-   * The function first locates an element that contains the parentText.
-   * Once the parent element is identified, the function then searches within this parent element for a child element that contains the childText.
-   * Upon finding the child element, the function simulates a click event on this child element.
+   * This function clicks on a child element within a parent element, both identified by their text.
+   * Throws an error if either element is not found.
    */
   async clickChildElement(
     parentText: string,
@@ -374,6 +367,7 @@ export class BaseUser {
     if (childElement.length === 0) {
       throw new Error(`No child element found with the text: ${childText}`);
     }
+    await this.waitForElementToBeClickable(childElement[0]);
     await childElement[0].click();
   }
 
@@ -416,8 +410,7 @@ export class BaseUser {
    * This function navigates to the given URL.
    */
   async goto(url: string): Promise<void> {
-    await this.page.goto(url);
-    await this.page.waitForNavigation({waitUntil: ['networkidle2', 'load']});
+    await this.page.goto(url, {waitUntil: ['networkidle0', 'load']});
   }
 
   /**
