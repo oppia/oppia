@@ -36,12 +36,8 @@ class ClassroomDict(TypedDict):
     topic_list_intro: str
     topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]
     is_published: bool
-    thumbnail_filename: str
-    thumbnail_bg_color: str
-    thumbnail_size_in_bytes: int
-    banner_filename: str
-    banner_bg_color: str
-    banner_size_in_bytes: int
+    thumbnail: Dict[str, str|int]
+    banner: Dict[str, str|int]
 
 # TODO(#17246): Currently, the classroom data is stored in the config model and
 # we are planning to migrate the storage into a new Classroom model. After the
@@ -63,12 +59,8 @@ class Classroom:
         topic_list_intro: str,
         topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
         is_published: bool,
-        thumbnail_filename: str,
-        thumbnail_bg_color: str,
-        thumbnail_size_in_bytes: int,
-        banner_filename: str,
-        banner_bg_color: str,
-        banner_size_in_bytes: int
+        thumbnail: Dict[str, str|int],
+        banner: Dict[str, str|int]
     ) -> None:
         """Constructs a Classroom domain object.
 
@@ -83,12 +75,8 @@ class Classroom:
                 with topic ID as key and a list of prerequisite topic IDs as
                 value.
             is_published: bool. Whether this classroom is published or not.
-            thumbnail_filename: str. Classroom's thumbnail filename.
-            thumbnail_bg_color: str. Classroom's thumbnail background color.
-            thumbnail_size_in_bytes: int. The thumbnail size in bytes.
-            banner_filename: str. Classroom's banner filename.
-            banner_bg_color: str. Classroom's banner background color.
-            banner_size_in_bytes: int. The banner size in bytes.
+            thumbnail: Dict[str, str|int]. Image object for classroom thumbnail.
+            banner: Dict[str, str|int]. Image object for classroom banner.
         """
         self.classroom_id = classroom_id
         self.name = name
@@ -99,12 +87,8 @@ class Classroom:
         self.topic_id_to_prerequisite_topic_ids = (
             topic_id_to_prerequisite_topic_ids)
         self.is_published = is_published
-        self.thumbnail_filename = thumbnail_filename
-        self.thumbnail_bg_color = thumbnail_bg_color
-        self.thumbnail_size_in_bytes = thumbnail_size_in_bytes
-        self.banner_filename = banner_filename
-        self.banner_bg_color = banner_bg_color
-        self.banner_size_in_bytes = banner_size_in_bytes
+        self.thumbnail = thumbnail
+        self.banner = banner
 
     @classmethod
     def from_dict(cls, classroom_dict: ClassroomDict) -> Classroom:
@@ -126,12 +110,8 @@ class Classroom:
             classroom_dict['topic_list_intro'],
             classroom_dict['topic_id_to_prerequisite_topic_ids'],
             classroom_dict['is_published'],
-            classroom_dict['thumbnail_filename'],
-            classroom_dict['thumbnail_bg_color'],
-            classroom_dict['thumbnail_size_in_bytes'],
-            classroom_dict['banner_filename'],
-            classroom_dict['banner_bg_color'],
-            classroom_dict['banner_size_in_bytes']
+            classroom_dict['thumbnail'],
+            classroom_dict['banner']
         )
 
     def to_dict(self) -> ClassroomDict:
@@ -150,12 +130,8 @@ class Classroom:
             'topic_id_to_prerequisite_topic_ids': (
                 self.topic_id_to_prerequisite_topic_ids),
             'is_published': self.is_published,
-            'thumbnail_filename': self.thumbnail_filename,
-            'thumbnail_bg_color': self.thumbnail_bg_color,
-            'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
-            'banner_filename': self.banner_filename,
-            'banner_bg_color': self.banner_bg_color,
-            'banner_size_in_bytes': self.banner_size_in_bytes
+            'thumbnail': self.thumbnail,
+            'banner': self.banner
         }
 
     def get_topic_ids(self) -> List[str]:
@@ -408,9 +384,9 @@ class Classroom:
         self.require_valid_course_details(self.course_details)
         self.require_valid_url_fragment(self.url_fragment)
         self.require_valid_thumbnail(
-            self.thumbnail_filename, self.thumbnail_bg_color)
+            str(self.thumbnail['filename']), str(self.thumbnail['bg_color']))
         self.require_valid_banner(
-            self.banner_filename, self.banner_bg_color
+            str(self.banner['filename']), str(self.banner['bg_color'])
         )
         self.check_for_cycles_in_topic_id_to_prerequisite_topic_ids(
             self.topic_id_to_prerequisite_topic_ids)

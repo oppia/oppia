@@ -29,11 +29,23 @@ from core.constants import constants
 from core.domain import classroom_config_domain
 from core.tests import test_utils
 
+from typing import Dict
+
 
 class ClassroomDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
+        self.dummy_thumbnail: Dict[str, str|int] = {
+                'filename': 'thumbnail.svg',
+                'bg_color': 'transparent',
+                'size_in_bytes': 1000
+        }
+        self.dummy_banner: Dict[str, str|int] = {
+                'filename': 'banner.png',
+                'bg_color': 'transparent',
+                'size_in_bytes': 1000
+        }
         self.classroom = classroom_config_domain.Classroom(
             'classroom_id', 'math', 'math',
             'Curated math foundations course.',
@@ -43,8 +55,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
                 'topic_id_1': ['topic_id_2', 'topic_id_3'],
                 'topic_id_2': [],
                 'topic_id_3': []
-            }, True, 'thumbnail.svg', 'transparent', 1000,
-            'banner.svg', '#AED2E9', 1000
+            }, True, self.dummy_thumbnail, self.dummy_banner
         )
         self.classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': 'classroom_id',
@@ -58,13 +69,8 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
                 'topic_id_2': [],
                 'topic_id_3': []
             },
-            'is_published': True,
-            'thumbnail_filename': 'thumbnail.svg',
-            'thumbnail_bg_color': 'transparent',
-            'thumbnail_size_in_bytes': 1000,
-            'banner_filename': 'banner.svg',
-            'banner_bg_color': '#AED2E9',
-            'banner_size_in_bytes': 1000
+            'is_published': True, 'thumbnail': self.dummy_thumbnail,
+            'banner': self.dummy_banner
         }
 
     def test_that_domain_object_is_created_correctly(self) -> None:
@@ -96,12 +102,8 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             ['topic_id_1', 'topic_id_2', 'topic_id_3']
         )
         self.assertTrue(self.classroom.is_published)
-        self.assertEqual(self.classroom.thumbnail_filename, 'thumbnail.svg')
-        self.assertEqual(self.classroom.thumbnail_bg_color, 'transparent')
-        self.assertEqual(self.classroom.thumbnail_size_in_bytes, 1000)
-        self.assertEqual(self.classroom.banner_filename, 'banner.svg')
-        self.assertEqual(self.classroom.banner_bg_color, '#AED2E9')
-        self.assertEqual(self.classroom.banner_size_in_bytes, 1000)
+        self.assertEqual(self.classroom.thumbnail, self.dummy_thumbnail)
+        self.assertEqual(self.classroom.banner, self.dummy_banner)
         self.classroom.validate()
 
     def test_from_dict_method(self) -> None:
@@ -132,12 +134,8 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             }
         )
         self.assertTrue(classroom.is_published)
-        self.assertEqual(classroom.thumbnail_filename, 'thumbnail.svg')
-        self.assertEqual(classroom.thumbnail_bg_color, 'transparent')
-        self.assertEqual(classroom.thumbnail_size_in_bytes, 1000)
-        self.assertEqual(classroom.banner_filename, 'banner.svg')
-        self.assertEqual(classroom.banner_bg_color, '#AED2E9')
-        self.assertEqual(classroom.banner_size_in_bytes, 1000)
+        self.assertEqual(self.classroom.thumbnail, self.dummy_thumbnail)
+        self.assertEqual(self.classroom.banner, self.dummy_banner)
 
     def test_to_dict_method(self) -> None:
         self.assertEqual(self.classroom.to_dict(), self.classroom_dict)
@@ -304,26 +302,23 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally
-    # test wrong inputs that we can normally catch by typing.
     def test_invalid_thumbnail_filename_should_raise_exception(self) -> None:
         error_msg = (
             'Expected thumbnail filename to be a string, received 123'
         )
-        self.classroom.thumbnail_filename = 123 # type: ignore[assignment]
-        self.classroom.thumbnail_bg_color = '#FFFF'
+        self.classroom.thumbnail['filename'] = 123
+        self.classroom.thumbnail['bg_color'] = '#FFFF'
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
         error_msg = 'thumbnail_filename field should not be empty'
-        self.classroom.thumbnail_filename = ''
+        self.classroom.thumbnail['filename'] = ''
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
-        self.classroom.thumbnail_filename = 'invalid_thumbnail.png'
+        self.classroom.thumbnail['filename'] = 'invalid_thumbnail.png'
         error_msg = (
             'Expected a filename ending in svg, received ' +
             'invalid_thumbnail.png'
@@ -332,11 +327,8 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally
-    # test wrong inputs that we can normally catch by typing.
     def test_invalid_thumbnail_bg_color_should_raise_exception(self) -> None:
-        self.classroom.thumbnail_bg_color = 123 # type: ignore[assignment]
+        self.classroom.thumbnail['bg_color'] = 123
         error_msg = (
             'Expected thumbnail_bg_color of the classroom to be a string, ' +
             'received: 123.'
@@ -346,17 +338,14 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             self.classroom.validate()
 
         error_msg = 'thumbnail_bg_color field should not be empty'
-        self.classroom.thumbnail_bg_color = ''
+        self.classroom.thumbnail['bg_color'] = ''
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally
-    # test wrong inputs that we can normally catch by typing.
     def test_invalid_banner_filename_should_raise_exception(self) -> None:
-        self.classroom.banner_filename = 123 # type: ignore[assignment]
-        self.classroom.banner_bg_color = '#FFFF'
+        self.classroom.banner['filename'] = 123
+        self.classroom.banner['bg_color'] = '#FFFF'
         error_msg = (
             'Expected image filename to be a string, received 123'
         )
@@ -365,27 +354,24 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             self.classroom.validate()
 
         error_msg = 'banner_filename field should not be empty'
-        self.classroom.banner_filename = ''
+        self.classroom.banner['filename'] = ''
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally
-    # test wrong inputs that we can normally catch by typing.
     def test_invalid_banner_bg_color_should_raise_exception(self) -> None:
         error_msg = (
             'Expected banner_bg_color of the classroom to be a string, ' +
             'received: 123.'
         )
-        self.classroom.banner_bg_color = 123 # type: ignore[assignment]
-        self.classroom.banner_filename = 'valid_banner.png'
+        self.classroom.banner['bg_color'] = 123
+        self.classroom.banner['filename'] = 'valid_banner.png'
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
         error_msg = 'banner_bg_color field should not be empty'
-        self.classroom.banner_bg_color = ''
+        self.classroom.banner['bg_color'] = ''
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()

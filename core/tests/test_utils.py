@@ -4230,12 +4230,10 @@ version: 1
         topic_id_to_prerequisite_topic_ids: Optional[
             Dict[str, List[str]]] = None,
         is_published: bool = True,
-        thumbnail_filename: str = 'thumbnail.svg',
-        thumbnail_bg_color: str = 'transparent',
-        thumbnail_size_in_bytes: int = 1000,
-        banner_filename: str = 'banner.png',
-        banner_bg_color: str = 'transparent',
-        banner_size_in_bytes: int = 1000
+        thumbnail: Optional[
+            Dict[str, str|int]] = None,
+        banner: Optional[
+            Dict[str, str|int]] = None
     ) -> classroom_config_domain.Classroom:
         """Saves a new strictly-validated classroom.
 
@@ -4251,16 +4249,22 @@ version: 1
             topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]. A dict
                 with topic ID as key and list of topic IDs as value.
             is_published: bool. Whether this classroom is published or not.
-            thumbnail_filename: str. Classroom's thumbnail filename.
-            thumbnail_bg_color: str. Classroom's thumbnail background color.
-            thumbnail_size_in_bytes: int. The thumbnail size in bytes.
-            banner_filename: str. Classroom's banner filename.
-            banner_bg_color: str. Classroom's banner background color.
-            banner_size_in_bytes: int. The banner size in bytes.
+            thumbnail: Optional[Dict[str, str|int]]. Image object for thumbnail.
+            banner: Optional[Dict[str, str|int]]. Image object for banner.
 
         Returns:
             Classroom. The classroom domain object.
         """
+        dummy_thumbnail: Dict[str, str|int] = {
+                'filename': 'thumbnail.svg',
+                'bg_color': 'transparent',
+                'size_in_bytes': 1000
+        }
+        dummy_banner: Dict[str, str|int] = {
+                'filename': 'banner.png',
+                'bg_color': 'transparent',
+                'size_in_bytes': 1000
+        }
         classroom = classroom_config_domain.Classroom(
             classroom_id=classroom_id,
             name=name,
@@ -4274,12 +4278,16 @@ version: 1
                 else {}
             ),
             is_published=is_published,
-            thumbnail_filename=thumbnail_filename,
-            thumbnail_bg_color=thumbnail_bg_color,
-            thumbnail_size_in_bytes=thumbnail_size_in_bytes,
-            banner_filename=banner_filename,
-            banner_bg_color=banner_bg_color,
-            banner_size_in_bytes=banner_size_in_bytes
+            thumbnail=(
+                thumbnail
+                if thumbnail is not None
+                else dummy_thumbnail
+            ),
+            banner=(
+                banner
+                if banner is not None
+                else dummy_banner
+            )
         )
 
         classroom_config_services.create_new_classroom(classroom)

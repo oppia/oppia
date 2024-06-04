@@ -25,6 +25,19 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
 
+from typing import Dict
+
+dummy_thumbnail: Dict[str, str|int] = {
+    'filename': 'thumbnail.svg',
+    'bg_color': 'transparent',
+    'size_in_bytes': 1000
+}
+dummy_banner: Dict[str, str|int] = {
+    'filename': 'banner.png',
+    'bg_color': 'transparent',
+    'size_in_bytes': 1000
+}
+
 
 class BaseClassroomControllerTests(test_utils.GenericTestBase):
 
@@ -199,13 +212,8 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
                 'topic_id_2': [],
                 'topic_id_3': []
             },
-            'is_published': True,
-            'thumbnail_filename': 'thumbnail.svg',
-            'thumbnail_bg_color': 'transparent',
-            'thumbnail_size_in_bytes': 1000,
-            'banner_filename': 'banner.png',
-            'banner_bg_color': 'transparent',
-            'banner_size_in_bytes': 1000
+            'is_published': True, 'thumbnail': dummy_thumbnail,
+            'banner': dummy_banner
         }
         self.physics_classroom = classroom_config_domain.Classroom.from_dict(
             self.physics_classroom_dict)
@@ -226,13 +234,8 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
                 'topic_id_2': [],
                 'topic_id_3': []
             },
-            'is_published': True,
-            'thumbnail_filename': 'thumbnail.svg',
-            'thumbnail_bg_color': 'transparent',
-            'thumbnail_size_in_bytes': 1000,
-            'banner_filename': 'banner.png',
-            'banner_bg_color': 'transparent',
-            'banner_size_in_bytes': 1000
+            'is_published': True, 'thumbnail': dummy_thumbnail,
+            'banner': dummy_banner
         }
         self.math_classroom = classroom_config_domain.Classroom.from_dict(
             self.math_classroom_dict)
@@ -394,13 +397,8 @@ class UnusedTopicsHandlerTests(test_utils.GenericTestBase):
                 'topic_id_3': [],
                 'used_topic_1': []
             },
-            'is_published': True,
-            'thumbnail_filename': 'thumbnail.svg',
-            'thumbnail_bg_color': 'transparent',
-            'thumbnail_size_in_bytes': 1000,
-            'banner_filename': 'banner.png',
-            'banner_bg_color': 'transparent',
-            'banner_size_in_bytes': 1000
+            'is_published': True, 'thumbnail': dummy_thumbnail,
+            'banner': dummy_banner
         }
         self.physics_classroom = classroom_config_domain.Classroom.from_dict(
             self.physics_classroom_dict)
