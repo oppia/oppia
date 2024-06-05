@@ -245,11 +245,11 @@ CURRICULUM_ADMIN_CHAPTER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
     ),
     'upcoming_chapters_template': (
         'The following stories have unpublished chapters which are due for '
-        'publication in the next {} days. Please ensure they are published '
+        'publication in the next %s days. Please ensure they are published '
         'on or before the planned date or adjust the planned publication date.'
         '<br><br>'
-        '<ol>%s</ol>'
-    ).format(constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS),
+        '<ol>%%s</ol>'
+    ) % constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS,
     'email_subject': 'Chapter Publication Notifications'
 }
 
