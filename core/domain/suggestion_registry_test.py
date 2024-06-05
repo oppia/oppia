@@ -27,7 +27,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import html_validation_service
-from core.domain import platform_parameter_services
+from core.domain import platform_parameter_list
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_services
@@ -3287,6 +3287,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             stats.are_translation_reviewers_needed_for_lang_code(
                 self.sample_language_code))
 
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1) # pylint: disable=line-too-long
+    ])
     def test_translation_reviewers_are_needed_if_num_suggestions_past_max(
         self
     ) -> None:
@@ -3295,19 +3298,16 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 2)
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 1)
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            1
-        )
 
-        with swap_platform_parameter_value:
-            reviewers_are_needed = (
-                stats.are_translation_reviewers_needed_for_lang_code(
-                    self.sample_language_code))
+        reviewers_are_needed = (
+            stats.are_translation_reviewers_needed_for_lang_code(
+                self.sample_language_code))
 
         self.assertTrue(reviewers_are_needed)
 
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1) # pylint: disable=line-too-long
+    ])
     def test_translation_reviewers_not_needed_if_num_suggestions_eqs_max(
         self
     ) -> None:
@@ -3316,19 +3316,16 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 2)
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 2)
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            1
-        )
 
-        with swap_platform_parameter_value:
-            reviewers_are_needed = (
-                stats.are_translation_reviewers_needed_for_lang_code(
-                    self.sample_language_code))
+        reviewers_are_needed = (
+            stats.are_translation_reviewers_needed_for_lang_code(
+                self.sample_language_code))
 
         self.assertFalse(reviewers_are_needed)
 
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1) # pylint: disable=line-too-long
+    ])
     def test_translation_reviewers_not_needed_if_num_suggestions_less_max(
         self
     ) -> None:
@@ -3337,16 +3334,10 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 1)
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 2)
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            1
-        )
 
-        with swap_platform_parameter_value:
-            reviewers_are_needed = (
-                stats.are_translation_reviewers_needed_for_lang_code(
-                    self.sample_language_code))
+        reviewers_are_needed = (
+            stats.are_translation_reviewers_needed_for_lang_code(
+                self.sample_language_code))
 
         self.assertFalse(reviewers_are_needed)
 
@@ -3379,54 +3370,45 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(stats.are_question_reviewers_needed())
 
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1) # pylint: disable=line-too-long
+    ])
     def test_question_reviewers_are_needed_if_num_suggestions_past_max(
         self
     ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 2
         stats.question_reviewer_count = 1
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            1
-        )
 
-        with swap_platform_parameter_value:
-            reviewers_are_needed = stats.are_question_reviewers_needed()
+        reviewers_are_needed = stats.are_question_reviewers_needed()
 
         self.assertTrue(reviewers_are_needed)
 
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1) # pylint: disable=line-too-long
+    ])
     def test_question_reviewers_not_needed_if_num_suggestions_eqs_max(
         self
     ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 2
         stats.question_reviewer_count = 2
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            1
-        )
 
-        with swap_platform_parameter_value:
-            reviewers_are_needed = stats.are_question_reviewers_needed()
+        reviewers_are_needed = stats.are_question_reviewers_needed()
 
         self.assertFalse(reviewers_are_needed)
 
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1) # pylint: disable=line-too-long
+    ])
     def test_question_reviewers_not_needed_if_num_suggestions_less_max(
         self
     ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 1
         stats.question_reviewer_count = 2
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            1
-        )
 
-        with swap_platform_parameter_value:
-            reviewers_are_needed = stats.are_question_reviewers_needed()
+        reviewers_are_needed = stats.are_question_reviewers_needed()
 
         self.assertFalse(reviewers_are_needed)
 
