@@ -134,6 +134,10 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       .isEnabled;
   }
 
+  isVoiceoverContributionWithAccentEnabled(): boolean {
+    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
+  }
+
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return subtitledHtml.html;
@@ -728,9 +732,9 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         'Translation needs update ' +
         'to match text. Please re-translate the content.';
     }
-    this.isDisabled(this.activeTab) || !this.activeTab
+    this.isDisabled(this.activatedTabId) || !this.activatedTabId
       ? this.onTabClick(this.TAB_ID_CONTENT)
-      : this.onTabClick(this.activeTab);
+      : this.onTabClick(this.activatedTabId);
 
     this.updateTranslatedContent();
   }

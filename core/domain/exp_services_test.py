@@ -69,6 +69,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
     from mypy_imports import suggestion_models
     from mypy_imports import user_models
+    from mypy_imports import voiceover_models
 
 (
     feedback_models,
@@ -78,7 +79,8 @@ if MYPY:  # pragma: no cover
     translation_models,
     stats_models,
     suggestion_models,
-    user_models
+    user_models,
+    voiceover_models,
 ) = models.Registry.import_models([
     models.Names.FEEDBACK,
     models.Names.EXPLORATION,
@@ -87,7 +89,8 @@ if MYPY:  # pragma: no cover
     models.Names.TRANSLATION,
     models.Names.STATISTICS,
     models.Names.SUGGESTION,
-    models.Names.USER
+    models.Names.USER,
+    models.Names.VOICEOVER
 ])
 
 search_services = models.Registry.import_search_services()
@@ -2123,7 +2126,7 @@ title: Title
         author_notes: ''
         auto_tts_enabled: true
         blurb: ''
-        category: Category    
+        category: Category
         edits_allowed: true
         init_state_name: Introduction
         language_code: en
@@ -9833,4 +9836,80 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
                     'state_name=\'END\')',
                 ], 8, 5
             )
+        )
+
+
+class ComputeVoiceoversModelFromExplorationChangeTest(
+    ExplorationServicesUnitTests
+):
+    """Tests entity voiceovers model creation from exploration change dict."""
+
+    def test_should_be_able_to_create_entity_voiceovers_models(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'test_exp_id', title='some title', category='Algebra',
+            language_code=constants.DEFAULT_LANGUAGE_CODE
+        )
+        exploration.objective = 'An objective'
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'NumericInput',
+            content_id_generator
+        )
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        manual_voiceover_1: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        manual_voiceover_2: state_domain.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+
+        voiceover_changes = [
+            exp_domain.ExplorationChange({
+                'cmd': 'update_voiceovers',
+                'language_accent_code': 'en-US',
+                'content_id': 'content_0',
+                'voiceovers': {
+                    'manual': manual_voiceover_1
+                }
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'update_voiceovers',
+                'language_accent_code': 'en-US',
+                'content_id': 'default_outcome_1',
+                'voiceovers': {
+                    'manual': manual_voiceover_2
+                }
+            })
+        ]
+
+        models_to_put = (
+            exp_services.compute_models_to_put_when_saving_new_exp_version(
+                self.owner_id, 'test_exp_id', voiceover_changes,
+                'Added voiceover', False
+            )
+        )
+        entity_voiceovers_models = []
+        for model_instance in models_to_put:
+            if isinstance(
+                    model_instance, voiceover_models.EntityVoiceoversModel
+            ):
+                entity_voiceovers_models.append(model_instance)
+
+        self.assertEqual(len(entity_voiceovers_models), 1)
+        self.assertDictEqual(
+            entity_voiceovers_models[0].voiceovers_mapping[
+                'content_0']['manual'], manual_voiceover_1
+        )
+        self.assertDictEqual(
+            entity_voiceovers_models[0].voiceovers_mapping[
+                'default_outcome_1']['manual'], manual_voiceover_2
         )
