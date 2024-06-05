@@ -667,7 +667,9 @@ class RootFilesMappingGenerator {
           `the root files mapping:\n${invalidRootFiles.join('\n')}.\n` +
           'Please add them to the VALID_ROOT_FILES or RUN_ALL_TESTS_ROOT_FILES ' +
           'in the root files config at core/tests/root-files-config.json or ' +
-          'ensure that they are a valid test suite module or page module.'
+          'ensure that they are a valid test suite module or page module. Please ' +
+          'take a look at this wiki page if you need further clarification: ' +
+          'https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure.'
       );
     }
   }
