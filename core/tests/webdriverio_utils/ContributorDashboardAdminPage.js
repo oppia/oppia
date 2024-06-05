@@ -58,6 +58,8 @@ var ContributorDashboardAdminPage = function () {
   var translationSubmitterTab = $('.e2e-test-translation-submitters-tab');
   var translationReviewerTab = $('.e2e-test-translation-reviewers-tab');
   var languageSelector = $('.e2e-test-language-selector');
+  var lastDatePickerInput = $('.e2e-test-last-date-picker-input');
+  var lastDatePickerToggle = $('.e2e-test-last-date-picker-toggle');
   var noDataMessage = $('.e2e-test-no-data-message');
   var loadingMessage = $('.e2e-test-loading-message');
   var languageDropdown = $('.e2e-test-language-selector-dropdown');
@@ -232,7 +234,160 @@ var ContributorDashboardAdminPage = function () {
       `.e2e-test-language-selector-option=${language}`
     );
     await action.click(`${language} option selector`, selectorOption);
-    await action.click('Language Selector', languageSelector);
+  };
+
+  this.waitForMonthToAppear = async function (monthCode) {
+    /**
+    We need to use element selector classes without the "e2e-" prefix
+    because the mat-datepicker that we use here does not contain any
+    such classes. Since the datepicker is a third-party dependency,
+    we cannot edit it to add "e2e-" classes. We cannot use an ancestor
+    element with the "e2e-" class because the datepicker's ancestor is
+    the body tag.
+    **/
+    var monthCodeContainer = $('.mat-calendar-content')
+      .$('.mat-calendar-table')
+      .$('.mat-calendar-body')
+      .$('tr')
+      .$(`td=${monthCode}`);
+
+    await waitFor.visibilityOf(
+      monthCodeContainer,
+      'Month code container is not visible'
+    );
+  };
+
+  this.navigateThroughMonths = async function (numberOfMonths) {
+    /**
+    We need to use element selector classes without the "e2e-" prefix
+    because the mat-datepicker that we use here does not contain any
+    such classes. Since the datepicker is a third-party dependency,
+    we cannot edit it to add "e2e-" classes. We cannot use an ancestor
+    element with the "e2e-" class because the datepicker's ancestor is
+    the body tag.
+    **/
+    var nextMonthButton = $('.mat-calendar-next-button');
+    var prevMonthButton = $('.mat-calendar-previous-button');
+    var calenderBody = $('.mat-calendar-content')
+      .$('.mat-calendar-table')
+      .$('.mat-calendar-body')
+      .$('tr')
+      .$('td');
+
+    var monthCodes = [
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC',
+    ];
+
+    var monthCode = await calenderBody.getText();
+    var monthIndex;
+    for (let i = 0; i < 12; i++) {
+      if (monthCodes[i] === monthCode) {
+        monthIndex = i;
+      }
+    }
+
+    if (numberOfMonths > 0) {
+      for (let i = 0; i < numberOfMonths; i++) {
+        await action.click('Next Month Button', nextMonthButton);
+        if (monthIndex === 11) {
+          monthIndex = 0;
+        } else {
+          monthIndex++;
+        }
+        await this.waitForMonthToAppear(monthCodes[monthIndex]);
+      }
+    } else if (numberOfMonths < 0) {
+      for (let i = 0; i < Math.abs(numberOfMonths); i++) {
+        await action.click('Previous Month Button', prevMonthButton);
+        if (monthIndex === 0) {
+          monthIndex = 11;
+        } else {
+          monthIndex--;
+        }
+        await this.waitForMonthToAppear(monthCodes[monthIndex]);
+      }
+    }
+  };
+
+  this.selectDate = async function (
+    datePickerToggle,
+    datePickerInput,
+    selectedDate
+  ) {
+    var initialValueOfDatePicker = await action.getValue(
+      'Date Picker Input',
+      datePickerInput
+    );
+
+    await action.click('Date Picker Toggle', datePickerToggle);
+
+    // Here selectedDate is a Date object that is to be selected by date picker.
+    var day = selectedDate.getDate();
+    var month = selectedDate.getMonth() + 1;
+    var year = selectedDate.getFullYear();
+
+    if (year) {
+      var yearsToNavigate =
+        year - new Date(initialValueOfDatePicker).getFullYear();
+
+      await this.navigateThroughMonths(yearsToNavigate * 12);
+    }
+
+    if (month) {
+      var currentMonth = new Date(initialValueOfDatePicker).getMonth() + 1;
+      var monthsToNavigate = month - currentMonth;
+
+      await this.navigateThroughMonths(monthsToNavigate);
+    }
+
+    if (day) {
+      /**
+      We need to use element selector classes without the "e2e-" prefix
+      because the mat-datepicker that we use here does not contain any
+      such classes. Since the datepicker is a third-party dependency,
+      we cannot edit it to add "e2e-" classes. We cannot use an ancestor
+      element with the "e2e-" class because the datepicker's ancestor is
+      the body tag.
+      **/
+      var daySelector = $('.mat-calendar-content')
+        .$('.mat-calendar-table')
+        .$('.mat-calendar-body')
+        .$(`aria/${day}`);
+      await waitFor.visibilityOf(daySelector, 'Date to select is not visible');
+      await action.click('Day Selector', daySelector);
+    }
+
+    var formattedInputDate = `${new Date(selectedDate).toLocaleString('en-US', {
+      day: '2-digit',
+    })}-${new Date(selectedDate).toLocaleString('en-US', {
+      month: 'short',
+    })}-${new Date(selectedDate).toLocaleString('en-US', {year: 'numeric'})}`;
+
+    var finalValueOfDatePicker = await action.getValue(
+      'Date Picker Input',
+      datePickerInput
+    );
+
+    expect(finalValueOfDatePicker).toBe(formattedInputDate);
+  };
+
+  this.setLastDatePickerValue = async function (selectedDate) {
+    await this.selectDate(
+      lastDatePickerToggle,
+      lastDatePickerInput,
+      selectedDate
+    );
   };
 
   this.expectUserToBeTranslationReviewer = async function (

@@ -697,6 +697,19 @@ def get_human_readable_time_string(time_msec: float) -> str:
         '%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
 
 
+def get_number_of_days_since_date(date: datetime.date) -> int:
+    """Returns the number of days past since a given date.
+
+    Args:
+        date: datetime.date. Date since when the number of days is to
+            calculated.
+
+    Returns:
+        int. The number of days past since a given date.
+    """
+    return int((datetime.date.today() - date).days)
+
+
 def create_string_from_largest_unit_in_timedelta(
         timedelta_obj: datetime.timedelta
 ) -> str:

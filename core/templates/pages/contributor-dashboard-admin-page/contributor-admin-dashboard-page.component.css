@@ -71,9 +71,6 @@
 .oppia-dashboard-container {
   max-width: 960px;
 }
-.mat-form-field-wrapper {
-  padding-bottom: 0;
-}
 .filter-sub-container {
   display: flex;
   flex-direction: row;
@@ -100,7 +97,7 @@
   background: #fff;
   border: 1px solid #fff;
   border-radius: 4px;
-  padding-bottom: 5px;
+  padding-bottom: 0;
   padding-left: 1em;
   padding-top: 0;
 }
@@ -136,10 +133,37 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   vertical-align: top;
   width: 40%;
 }
-.last-activity-selector-container {
+.date-selector-container {
   display: inline-block;
   vertical-align: top;
-  width: 40%;
+  width: 60%;
+}
+.date-selector-inner-container {
+  align-items: center;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  margin: 10px;
+  padding: 16px 20px;
+  position: relative;
+  vertical-align: top;
+}
+.date-selector-inner-container .mat-form-field-wrapper {
+  padding-bottom: 0;
+}
+.date-selector-inner-container .filter-label {
+  margin: 2px;
+}
+.date-selector-inner-container mat-form-field .mat-form-field-infix {
+  border-top: 0;
+  padding-left: 4px;
+  width: 100px;
+}
+.date-selector-inner-container mat-form-field .mat-form-field-wrapper .mat-form-field-flex {
+  margin: 0 2px 0 2px;
 }
 @media (max-width: 815px) {
   .oppia-dashboard-container {
@@ -226,7 +250,7 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   color: #00645c;
 }
 .topic-selector-container {
-  width: 50%;
+  width: 38%;
 }
 .dashboard-tabs .dashboard-tabs-text:hover,
 .dashboard-tabs .dashboard-tabs-text:focus {
@@ -270,18 +294,26 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   vertical-align: top;
 }
 .oppia-topic-filter-selector-container {
+  align-items: center;
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
   cursor: pointer;
+  display: flex;
   justify-content: space-between;
   margin: 10px;
   min-height: 60px;
+  padding: 14px 10px;
   position: relative;
 }
-.mat-form-field-appearance-fill .mat-form-field-infix {
+.oppia-topic-filter-selector-container .mat-form-field-appearance-fill .mat-form-field-wrapper {
+  padding-bottom: 0;
+}
+.oppia-topic-filter-selector-container .mat-form-field-appearance-fill .mat-form-field-infix {
+  border-top: 0;
+  padding-bottom: 0.45em;
   padding-top: 0.45em;
-  vertical-align: top;
+  vertical-align: middle;
 }
 .oppia-filter-selector-inner-container {
   display: flex;
@@ -339,8 +371,14 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   .language-selector-container {
     width: auto;
   }
-  .last-activity-selector-container {
+  .date-selector-container {
     width: auto;
+  }
+  .date-selector-inner-container {
+    padding: 0 5px;
+  }
+  .filter-label {
+    margin: 1px;
   }
   .topic-selector-container {
     width: auto;
