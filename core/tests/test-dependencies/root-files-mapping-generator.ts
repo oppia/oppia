@@ -20,7 +20,7 @@
 import path from 'path';
 import fs from 'fs';
 import {Decorator, SourceFile, ts} from 'ts-morph';
-import * as cheerio from 'cheerio';
+import {parseHTML} from 'linkedom';
 import {
   project,
   ROOT_DIRECTORY,
@@ -343,24 +343,22 @@ const getAngularDependenciesFromHtmlFile = (
   fileToAngularInformations: Record<string, AngularInformation[]>
 ): string[] => {
   const content = fs.readFileSync(file, 'utf-8');
-  const $ = cheerio.load(content);
+  const {document} = parseHTML(content);
 
   // Here we remove all square brackets and parentheses from the attributes
   // that come from Angular binding and convert them to normal attributes so
   // that we can check if the directive's attribute is present in the element.
-  $('*')
-    .children()
-    .each((_, element) => {
-      Object.entries(element.attribs).forEach(([attribute, value]) => {
-        if (
-          (attribute.startsWith('[') && attribute.endsWith(']')) ||
-          (attribute.startsWith('(') && attribute.endsWith(')'))
-        ) {
-          $(element).removeAttr(attribute);
-          $(element).attr(attribute.slice(1, -1), value);
-        }
-      });
+  document.querySelectorAll('*').forEach(element => {
+    Object.entries(element.attributes).forEach(([name, attribute]) => {
+      if (
+        (name.startsWith('[') && name.endsWith(']')) ||
+        (name.startsWith('(') && name.endsWith(')'))
+      ) {
+        element.removeAttribute(name);
+        element.setAttribute(name.slice(1, -1), attribute.value);
+      }
     });
+  });
 
   const dependencies: string[] = [];
   for (const [dependencyFile, dependencyAngularInformations] of Object.entries(
@@ -376,25 +374,20 @@ const getAngularDependenciesFromHtmlFile = (
 
       const {selector, type} = dependencyAngularInformation;
       if (type === 'pipe') {
-        $('*')
-          .children()
-          .each((_, element) => {
-            const text = $(element).text();
-            if (isPipeSelectorPresentInText(text, selector)) {
+        document.querySelectorAll('*').forEach(element => {
+          const text = element.textContent || '';
+          if (isPipeSelectorPresentInText(text, selector)) {
+            dependencies.push(dependencyFile);
+          }
+          for (const attribute of Object.values(element.attributes)) {
+            if (isPipeSelectorPresentInText(attribute.value || '', selector)) {
               dependencies.push(dependencyFile);
-              return false;
             }
-            for (const value of Object.values(element.attribs)) {
-              if (isPipeSelectorPresentInText(value, selector)) {
-                dependencies.push(dependencyFile);
-                return false;
-              }
-            }
-            return true;
-          });
+          }
+        });
       } else if (
         (type === 'component' || type === 'directive') &&
-        $(selector).length > 0
+        document.querySelector(selector)
       ) {
         dependencies.push(dependencyFile);
       }
@@ -409,40 +402,35 @@ const getAngularDependenciesFromHtmlFile = (
  */
 const getContentDependenciesFromHtmlFile = (file: string): string[] => {
   const content = fs.readFileSync(file, 'utf-8');
-  const $ = cheerio.load(content);
+  const {document} = parseHTML(content);
   const dependencies: string[] = [];
 
-  $('*')
-    .children()
-    .each((_, element) => {
-      if (element.tagName === 'script' || element.tagName === 'style') {
-        const module = $(element).attr('src') || $(element).attr('href');
-        if (module) {
-          // Only add the dependency if it is resolvable since some scripts or
-          // styles might be external.
-          try {
-            const modulePath = resolveModuleRelativeToRoot(module, file);
-            dependencies.push(modulePath);
-          } catch (e) {}
-        }
-      }
+  for (const line of content.split('\n')) {
+    if (!line.includes('@load')) {
+      continue;
+    }
+    const loaderModule = line
+      .substring(line.indexOf('(') + 1, line.indexOf(')'))
+      .split(',')[0]
+      .slice(1, -1);
+    const loaderModulePath = resolveModuleRelativeToRoot(loaderModule, file);
+    dependencies.push(loaderModulePath);
+  }
 
-      const text = $(element).text();
-      if (text.includes('@load')) {
-        const loaders = text.split('\n').filter(line => line.includes('@load'));
-        for (const loader of loaders) {
-          const loaderModule = loader
-            .substring(loader.indexOf('(') + 1, loader.indexOf(')'))
-            .split(',')[0]
-            .slice(1, -1);
-          const loaderModulePath = resolveModuleRelativeToRoot(
-            loaderModule,
-            file
-          );
-          dependencies.push(loaderModulePath);
-        }
+  document.querySelectorAll('[src], [href]').forEach(element => {
+    if (element.tagName === 'script' || element.tagName === 'style') {
+      const module =
+        element.getAttribute('src') || element.getAttribute('href');
+      if (module) {
+        // Only add the dependency if it is resolvable since some scripts or
+        // styles might be external.
+        try {
+          const modulePath = resolveModuleRelativeToRoot(module, file);
+          dependencies.push(modulePath);
+        } catch (e) {}
       }
-    });
+    }
+  });
 
   return dependencies;
 };
