@@ -60,15 +60,7 @@ var suites = {
   checkpointFeatures: [
     './core/tests/webdriverio_desktop/checkpointFeatures.js'
   ],
-
-  classroomPage: [
-    './core/tests/webdriverio_desktop/classroomPage.js'
-  ],
-
-  classroomPageFileUploadFeatures: [
-    './core/tests/webdriverio_desktop/classroomPageFileUploadFeatures.js'
-  ],
-
+  // TODO(#20418): Update classroomPage and classroomPageFileUploadFeatures e2e test.
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
   ],

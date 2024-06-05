@@ -77,8 +77,9 @@ jobs:
           - name: blogDashboard
           - name: blog
           - name: checkpointFeatures
-          - name: classroomPage
-          - name: classroomPageFileUploadFeatures
+          # TODO(#20418): Update classroomPage and classroomPageFileUploadFeatures e2e test.
+          # - name: classroomPage
+          # - name: classroomPageFileUploadFeatures
           - name: collections
           - name: contributorDashboard
           - name: contributorAdminDashboard

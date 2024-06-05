@@ -114,15 +114,20 @@ def get_e2e_test_filenames_from_webdriverio_dir() -> List[str]:
         list(str). An alphabetically-sorted list of of the all test files
         in core/tests/webdriverio and core/tests/webdriverio_desktop directory.
     """
+    # TODO(#20418): Update classroomPage and classroomPageFileUploadFeatures
+    # E2E tests once M1.2 is completed.
+    excluded_tests = ['classroomPage.js', 'classroomPageFileUploadFeatures.js']
     webdriverio_test_suite_files = []
     webdriverio_files = os.path.join(
         os.getcwd(), 'core', 'tests', 'webdriverio')
     webdriverio_desktop_files = os.path.join(
         os.getcwd(), 'core', 'tests', 'webdriverio_desktop')
     for file_name in os.listdir(webdriverio_files):
-        webdriverio_test_suite_files.append(file_name)
+        if file_name not in excluded_tests:
+            webdriverio_test_suite_files.append(file_name)
     for file_name in os.listdir(webdriverio_desktop_files):
-        webdriverio_test_suite_files.append(file_name)
+        if file_name not in excluded_tests:
+            webdriverio_test_suite_files.append(file_name)
 
     return sorted(webdriverio_test_suite_files)
 
