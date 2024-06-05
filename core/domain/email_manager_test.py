@@ -980,9 +980,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
         self._set_signup_email_content_platform_parameter(
             self.new_email_subject_content, self.new_email_body_content)
 
-            self.login(self.EDITOR_EMAIL)
-            self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
-            csrf_token = self.get_new_csrf_token()
+        self.login(self.EDITOR_EMAIL)
+        self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
+        csrf_token = self.get_new_csrf_token()
 
         self.post_json(
             feconf.SIGNUP_DATA_URL,
@@ -1035,9 +1035,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
         self._set_signup_email_content_platform_parameter(
             self.new_email_subject_content, self.new_email_body_content)
 
-            self.login(self.EDITOR_EMAIL)
-            self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
-            csrf_token = self.get_new_csrf_token()
+        self.login(self.EDITOR_EMAIL)
+        self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
+        csrf_token = self.get_new_csrf_token()
 
         self.post_json(
             feconf.SIGNUP_DATA_URL,
@@ -1097,9 +1097,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
         self._set_signup_email_content_platform_parameter(
             self.new_email_subject_content, self.new_email_body_content)
 
-            self.login(self.EDITOR_EMAIL)
-            self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
-            csrf_token = self.get_new_csrf_token()
+        self.login(self.EDITOR_EMAIL)
+        self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
+        csrf_token = self.get_new_csrf_token()
 
         self.post_json(
             feconf.SIGNUP_DATA_URL,
@@ -1203,9 +1203,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
         ] = email_models.SentEmailModel.get_all().fetch()
         self.assertEqual(len(all_models), 0)
 
-            self.login(self.EDITOR_EMAIL)
-            self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
-            csrf_token = self.get_new_csrf_token()
+        self.login(self.EDITOR_EMAIL)
+        self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
+        csrf_token = self.get_new_csrf_token()
 
         self.post_json(
             feconf.SIGNUP_DATA_URL, {
