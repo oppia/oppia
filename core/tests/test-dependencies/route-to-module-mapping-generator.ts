@@ -310,7 +310,8 @@ const getRouteNodesFromRoutingModuleSourceFile = (
   );
   if (angularModuleDecorationNode.length === 0) {
     throw new Error(
-      `No Angular Module decoration was found in the file: ${routingModuleSourceFile.getFilePath()}.`
+      'No Angular Module decoration was found in the file: ' +
+        routingModuleSourceFile.getFilePath()
     );
   }
   const angularModuleObjectArgument =
@@ -319,7 +320,8 @@ const getRouteNodesFromRoutingModuleSourceFile = (
     !angularModuleObjectArgument.isKind(ts.SyntaxKind.ObjectLiteralExpression)
   ) {
     throw new Error(
-      `The Angular Module decoration in the file: ${routingModuleSourceFile.getFilePath()} does not have an object argument.`
+      'The Angular Module decoration in the file: ' +
+        `${routingModuleSourceFile.getFilePath()} does not have an object argument.`
     );
   }
   const importsProperty =

@@ -118,7 +118,8 @@
     "core",
     "extensions",
     "typings",
-    "core/tests/puppeteer-acceptance-tests"
+    "core/tests/puppeteer-acceptance-tests",
+    "core/tests/test-dependencies"
   ],
   "exclude": [
     "core/tests/build_sources",
