@@ -53,8 +53,7 @@ export class ImageUploaderComponent implements OnInit {
 
   @Input() imageUploaderParameters!: ImageUploaderParameters;
 
-  dimensions!: {height: number; width: number};
-  editableImageDataUrl!: string;
+  editableImageDataUrl: string | null = null;
   hidePlaceholder: boolean = false;
   imageBgColor!: string;
   placeholderImageUrl!: string;
@@ -99,10 +98,6 @@ export class ImageUploaderComponent implements OnInit {
       return;
     }
 
-    this.dimensions = {
-      height: 0,
-      width: 0,
-    };
     const modalRef = this.ngbModal.open(ImageUploaderModalComponent, {
       backdrop: 'static',
     });
@@ -122,14 +117,13 @@ export class ImageUploaderComponent implements OnInit {
         }
         const imageFilename =
           this.imageUploadHelperService.generateImageFilename(
-            this.dimensions.height,
-            this.dimensions.width,
+            data.dimensions.height,
+            data.dimensions.width,
             imageBlobData?.type?.split('/')[1]
           );
 
         this.hidePlaceholder = true;
         this.imageBgColor = data.newBgColor;
-
         this.imageSave.emit(imageBlobData);
         this.updateBgColor.emit(data.newBgColor);
         this.updateFilename.emit(imageFilename);
