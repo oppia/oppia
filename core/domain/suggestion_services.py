@@ -191,8 +191,8 @@ def create_suggestion(
     if suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
         score_category = ('%s%s%s' % (
             suggestion_models.SCORE_TYPE_CONTENT,
-            suggestion_models.SCORE_CATEGORY_DELIMITER, exploration.category)
-            )
+            suggestion_models.SCORE_CATEGORY_DELIMITER, exploration.category
+            ))
         # Suggestions of this type do not have an associated language code,
         # since they are not queryable by language.
         language_code = None
