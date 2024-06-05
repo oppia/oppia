@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import utils
 from core.platform import models
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -30,6 +30,15 @@ if MYPY: # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
+
+
+class ImageDict(TypedDict, total=False):
+    """Dict type for thumbnail and banner image"""
+
+    filename: str
+    bg_color: str
+    size_in_bytes: Optional[int]
+    image_data: Optional[bytes]
 
 
 class ClassroomModel(base_models.BaseModel):
@@ -121,8 +130,8 @@ class ClassroomModel(base_models.BaseModel):
         cls, classroom_id: str, name: str, url_fragment: str,
         course_details: str, teaser_text: str, topic_list_intro: str,
         topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
-        is_published: bool, thumbnail: Dict[str, str | int],
-        banner: Dict[str, str | int]
+        is_published: bool, thumbnail: ImageDict,
+        banner: ImageDict
     ) -> ClassroomModel:
         """Creates a new ClassroomModel entry.
 
@@ -138,8 +147,8 @@ class ClassroomModel(base_models.BaseModel):
             topic_id_to_prerequisite_topic_ids: dict(str, list(str)). A dict
                 with topic ID as key and list of topic IDs as value.
             is_published: bool. Whether this classroom is published or not.
-            thumbnail: Dict[str, str|int]. The thumbnail data of the classroom.
-            banner: Dict[str, str|int]. The banner data of the classroom.
+            thumbnail: ImageDict. The thumbnail data of the classroom.
+            banner: ImageDict. The banner data of the classroom.
 
         Returns:
             ClassroomModel. The newly created ClassroomModel instance.

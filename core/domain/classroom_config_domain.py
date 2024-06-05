@@ -22,7 +22,7 @@ import copy
 from core import utils
 from core.constants import constants
 
-from typing import Dict, List, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 
 class ClassroomDict(TypedDict):
@@ -36,8 +36,8 @@ class ClassroomDict(TypedDict):
     topic_list_intro: str
     topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]
     is_published: bool
-    thumbnail: Dict[str, str|int]
-    banner: Dict[str, str|int]
+    thumbnail: ImageDict
+    banner: ImageDict
 
 # TODO(#17246): Currently, the classroom data is stored in the config model and
 # we are planning to migrate the storage into a new Classroom model. After the
@@ -59,8 +59,8 @@ class Classroom:
         topic_list_intro: str,
         topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
         is_published: bool,
-        thumbnail: Dict[str, str|int],
-        banner: Dict[str, str|int]
+        thumbnail: ImageDict,
+        banner: ImageDict
     ) -> None:
         """Constructs a Classroom domain object.
 
@@ -75,8 +75,8 @@ class Classroom:
                 with topic ID as key and a list of prerequisite topic IDs as
                 value.
             is_published: bool. Whether this classroom is published or not.
-            thumbnail: Dict[str, str|int]. Image object for classroom thumbnail.
-            banner: Dict[str, str|int]. Image object for classroom banner.
+            thumbnail: ImageDict. Image object for classroom thumbnail.
+            banner: ImageDict. Image object for classroom banner.
         """
         self.classroom_id = classroom_id
         self.name = name
@@ -275,16 +275,15 @@ class Classroom:
             thumbnail_filename: str. The thumbnail filename to validate.
             thumbnail_bg_color: str. The bg color to validate.
         """
+        if not isinstance(thumbnail_bg_color, str):
+            raise utils.ValidationError(
+                'Expected thumbnail_bg_color of the classroom to be a string, '
+                'received: %s.' % thumbnail_bg_color)
         if thumbnail_filename == '':
             raise utils.ValidationError(
                 'thumbnail_filename field should not be empty')
 
         utils.require_valid_thumbnail_filename(thumbnail_filename)
-
-        if not isinstance(thumbnail_bg_color, str):
-            raise utils.ValidationError(
-                'Expected thumbnail_bg_color of the classroom to be a string, '
-                'received: %s.' % thumbnail_bg_color)
 
         if thumbnail_bg_color == '':
             raise utils.ValidationError(
@@ -309,16 +308,15 @@ class Classroom:
             banner_filename: str. The banner filename to validate.
             banner_bg_color: str. The bg color to validate.
         """
+        if not isinstance(banner_bg_color, str):
+            raise utils.ValidationError(
+                'Expected banner_bg_color of the classroom to be a string, '
+                'received: %s.' % banner_bg_color)
         if banner_filename == '':
             raise utils.ValidationError(
                 'banner_filename field should not be empty')
 
         utils.require_valid_image_filename(banner_filename)
-
-        if not isinstance(banner_bg_color, str):
-            raise utils.ValidationError(
-                'Expected banner_bg_color of the classroom to be a string, '
-                'received: %s.' % banner_bg_color)
 
         if banner_bg_color == '':
             raise utils.ValidationError(
@@ -384,9 +382,9 @@ class Classroom:
         self.require_valid_course_details(self.course_details)
         self.require_valid_url_fragment(self.url_fragment)
         self.require_valid_thumbnail(
-            str(self.thumbnail['filename']), str(self.thumbnail['bg_color']))
+            self.thumbnail['filename'], self.thumbnail['bg_color'])
         self.require_valid_banner(
-            str(self.banner['filename']), str(self.banner['bg_color'])
+            self.banner['filename'], self.banner['bg_color']
         )
         self.check_for_cycles_in_topic_id_to_prerequisite_topic_ids(
             self.topic_id_to_prerequisite_topic_ids)
@@ -395,3 +393,12 @@ class Classroom:
             raise utils.ValidationError(
                 'Expected is_published of the classroom to be a boolean, '
                 'received: %s.' % self.is_published)
+
+
+class ImageDict(TypedDict, total=False):
+    """Dict type for thumbnail and banner image"""
+
+    filename: str
+    bg_color: str
+    size_in_bytes: Optional[int]
+    image_data: Optional[bytes]

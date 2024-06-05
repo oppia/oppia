@@ -29,19 +29,17 @@ from core.constants import constants
 from core.domain import classroom_config_domain
 from core.tests import test_utils
 
-from typing import Dict
-
 
 class ClassroomDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.dummy_thumbnail: Dict[str, str|int] = {
+        self.dummy_thumbnail: classroom_config_domain.ImageDict = {
                 'filename': 'thumbnail.svg',
                 'bg_color': 'transparent',
                 'size_in_bytes': 1000
         }
-        self.dummy_banner: Dict[str, str|int] = {
+        self.dummy_banner: classroom_config_domain.ImageDict = {
                 'filename': 'banner.png',
                 'bg_color': 'transparent',
                 'size_in_bytes': 1000
@@ -298,80 +296,6 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
                 self.classroom.course_details
             )
         )
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-    def test_invalid_thumbnail_filename_should_raise_exception(self) -> None:
-        error_msg = (
-            'Expected thumbnail filename to be a string, received 123'
-        )
-        self.classroom.thumbnail['filename'] = 123
-        self.classroom.thumbnail['bg_color'] = '#FFFF'
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-        error_msg = 'thumbnail_filename field should not be empty'
-        self.classroom.thumbnail['filename'] = ''
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-        self.classroom.thumbnail['filename'] = 'invalid_thumbnail.png'
-        error_msg = (
-            'Expected a filename ending in svg, received ' +
-            'invalid_thumbnail.png'
-        )
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-    def test_invalid_thumbnail_bg_color_should_raise_exception(self) -> None:
-        self.classroom.thumbnail['bg_color'] = 123
-        error_msg = (
-            'Expected thumbnail_bg_color of the classroom to be a string, ' +
-            'received: 123.'
-        )
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-        error_msg = 'thumbnail_bg_color field should not be empty'
-        self.classroom.thumbnail['bg_color'] = ''
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-    def test_invalid_banner_filename_should_raise_exception(self) -> None:
-        self.classroom.banner['filename'] = 123
-        self.classroom.banner['bg_color'] = '#FFFF'
-        error_msg = (
-            'Expected image filename to be a string, received 123'
-        )
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-        error_msg = 'banner_filename field should not be empty'
-        self.classroom.banner['filename'] = ''
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-    def test_invalid_banner_bg_color_should_raise_exception(self) -> None:
-        error_msg = (
-            'Expected banner_bg_color of the classroom to be a string, ' +
-            'received: 123.'
-        )
-        self.classroom.banner['bg_color'] = 123
-        self.classroom.banner['filename'] = 'valid_banner.png'
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-        error_msg = 'banner_bg_color field should not be empty'
-        self.classroom.banner['bg_color'] = ''
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()

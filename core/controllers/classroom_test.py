@@ -25,14 +25,13 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
 
-from typing import Dict
 
-dummy_thumbnail: Dict[str, str|int] = {
+dummy_thumbnail: classroom_config_domain.ImageDict = {
     'filename': 'thumbnail.svg',
     'bg_color': 'transparent',
     'size_in_bytes': 1000
 }
-dummy_banner: Dict[str, str|int] = {
+dummy_banner: classroom_config_domain.ImageDict = {
     'filename': 'banner.png',
     'bg_color': 'transparent',
     'size_in_bytes': 1000

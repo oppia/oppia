@@ -20,9 +20,9 @@ from __future__ import annotations
 
 import types
 
+from core.domain import classroom_config_domain
 from core.platform import models
 from core.tests import test_utils
-from typing import Dict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -39,12 +39,12 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.dummy_thumbnail: Dict[str, str|int] = {
+        self.dummy_thumbnail: classroom_config_domain.ImageDict = {
                 'filename': 'thumbnail.svg',
                 'bg_color': 'transparent',
                 'size_in_bytes': 1000
         }
-        self.dummy_banner: Dict[str, str|int] = {
+        self.dummy_banner: classroom_config_domain.ImageDict = {
                 'filename': 'banner.png',
                 'bg_color': 'transparent',
                 'size_in_bytes': 1000
