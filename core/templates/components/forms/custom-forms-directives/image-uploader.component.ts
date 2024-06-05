@@ -53,11 +53,9 @@ export class ImageUploaderComponent implements OnInit {
 
   @Input() imageUploaderParameters!: ImageUploaderParameters;
 
-  uploadedImage!: string;
   dimensions!: {height: number; width: number};
   editableImageDataUrl!: string;
-  hidePlaceholder: boolean = true;
-  imageIsLoading: boolean = true;
+  hidePlaceholder: boolean = false;
   imageBgColor!: string;
   placeholderImageUrl!: string;
 
@@ -76,7 +74,6 @@ export class ImageUploaderComponent implements OnInit {
     );
 
     if (this.imageUploaderParameters.filename) {
-      this.hidePlaceholder = false;
       const entityType = this.contextService.getEntityType();
       if (entityType === undefined) {
         throw new Error('No image present for preview');
@@ -88,9 +85,8 @@ export class ImageUploaderComponent implements OnInit {
           this.contextService.getEntityId()
         );
       this.imageBgColor = this.imageUploaderParameters.bgColor;
-      this.uploadedImage = this.editableImageDataUrl;
-      this.imageIsLoading = false;
       this.imageUploaderParameters.previewImageUrl = this.editableImageDataUrl;
+      this.hidePlaceholder = true;
     }
   }
 
@@ -115,7 +111,6 @@ export class ImageUploaderComponent implements OnInit {
 
     modalRef.result.then(
       data => {
-        this.imageIsLoading = true;
         this.editableImageDataUrl = data.newImageDataUrl;
         const imageBlobData =
           this.imageUploadHelperService.convertImageDataToImageFile(
@@ -125,7 +120,6 @@ export class ImageUploaderComponent implements OnInit {
         if (!imageBlobData) {
           return;
         }
-
         const imageFilename =
           this.imageUploadHelperService.generateImageFilename(
             this.dimensions.height,
@@ -133,8 +127,7 @@ export class ImageUploaderComponent implements OnInit {
             imageBlobData?.type?.split('/')[1]
           );
 
-        this.hidePlaceholder = false;
-        this.imageIsLoading = false;
+        this.hidePlaceholder = true;
         this.imageBgColor = data.newBgColor;
 
         this.imageSave.emit(imageBlobData);

@@ -8,10 +8,10 @@
       <i class="fas fa-pen oppia-editor-edit-icon oppia-pencil-icon" [hidden]="imageUploaderParameters.disabled"
         [ngStyle]="{'right.px': !isImageInPortraitMode() ? -20 : 8}" (click)="showImageUploaderModal()">
       </i>
-      <img [hidden]="!hidePlaceholder" [src]="placeholderImageUrl" align="center" alt=""
+      <img [hidden]="hidePlaceholder" [src]="placeholderImageUrl" align="center" alt=""
         [ngClass]="{'oppia-image-placeholder-landscape': !isImageInPortraitMode(), 'oppia-image-placeholder-portrait': isImageInPortraitMode()}">
 
-      <oppia-thumbnail-display *ngIf="editableImageDataUrl" [hidden]="imageIsLoading" [imgSrc]="editableImageDataUrl"
+      <oppia-thumbnail-display *ngIf="editableImageDataUrl" [imgSrc]="editableImageDataUrl"
         [aspectRatio]="imageUploaderParameters.aspectRatio" [classes]="['img-thumbnail', 'e2e-test-custom-photo']" [background]="imageBgColor">
       </oppia-thumbnail-display>
     </div>

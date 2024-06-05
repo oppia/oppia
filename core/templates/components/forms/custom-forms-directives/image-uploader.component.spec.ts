@@ -81,17 +81,11 @@ describe('ImageUploaderComponent', () => {
     spyOn(contextService, 'getEntityId').and.returnValue('expId');
     component.imageUploaderParameters.filename = 'thumbnail-1';
 
-    expect(component.imageIsLoading).toBeTrue();
-
     component.ngOnInit();
 
     expect(component.editableImageDataUrl).toBe(
       '/assetsdevhandler/exploration/expId/assets/thumbnail/thumbnail-1'
     );
-    expect(component.uploadedImage).toBe(
-      '/assetsdevhandler/exploration/expId/assets/thumbnail/thumbnail-1'
-    );
-    expect(component.imageIsLoading).toBeFalse();
   });
 
   it(
@@ -109,14 +103,8 @@ describe('ImageUploaderComponent', () => {
 
   it('should display placeholder image when filename is null', () => {
     component.imageUploaderParameters.filename = '';
-
-    expect(component.hidePlaceholder).toBeTrue();
-
     component.ngOnInit();
-
-    // Since a image is unavailable a placeholder will be used. Hence,
-    // the value of hidePlaceholder should not change.
-    expect(component.hidePlaceholder).toBeTrue();
+    expect(component.hidePlaceholder).toBeFalse();
   });
 
   it(
@@ -165,15 +153,12 @@ describe('ImageUploaderComponent', () => {
       const updateFilenameSpy = spyOn(component.updateFilename, 'emit');
       const updateBgColorSpy = spyOn(component.updateBgColor, 'emit');
 
-      expect(component.imageIsLoading).toBe(true);
-
       component.showImageUploaderModal();
       tick();
 
       expect(ngbModal.open).toHaveBeenCalledWith(ImageUploaderModalComponent, {
         backdrop: 'static',
       });
-      expect(component.imageIsLoading).toBe(false);
       expect(updateFilenameSpy).toHaveBeenCalled();
       expect(updateBgColorSpy).toHaveBeenCalledWith('#newcol');
     })
