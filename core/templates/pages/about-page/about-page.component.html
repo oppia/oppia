@@ -105,39 +105,9 @@
       </div>
     </div>
   </div>
-  <div class="oppia-about-page-section-six oppia-about-section">
-    <div class="oppia-section-six oppia-about-fixed-section">
-      <h2 class="oppia-about-outcome-title-mobile oppia-about-section-title-mobile" [innerHTML]="'I18N_ABOUT_PAGE_EASILY_CREATE_LESSON' | translate"></h2>
-      <div class="oppia-about-section-six-image-left">
-        <picture class="oppia-about-book-image">
-          <source type="image/webp" [srcset]="getStaticImageUrl('/about/books_dsk.webp')">
-          <source type="image/png" [srcset]="getStaticImageUrl('/about/books_dsk.png')">
-          <img [src]="getStaticImageUrl('/about/books_dsk.png')" alt="book image">
-        </picture>
-      </div>
-      <div class="oppia-about-section-six-right">
-        <h2 class="oppia-about-outcome-title oppia-about-section-title oppia-about-title-mobile-display-none" [innerHTML]="'I18N_ABOUT_PAGE_EASILY_CREATE_LESSON' | translate"></h2>
-        <p class="oppia-about-outcome-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_CREATE_LESSON_CONTENT' | translate"></p>
-        <div class="oppia-about-classroom-button-container">
-          <oppia-primary-button class="e2e-test-about-page-create-lessons-button"
-                  buttonHref="/creator-dashboard?mode=create"
-                  (onClickPrimaryButton)="onClickCreateLessonButton()"
-                  [customClasses]="['oppia-about-button', 'oppia-about-button-browse']"
-                  buttonText="{{ 'I18N_ACTION_CREATE_LESSON_BUTTON' | translate }}">
-          </oppia-primary-button>
-        </div>
-      </div>
-    </div>
+
+  <div class="oppia-">
+
   </div>
-  <div class="oppia-about-page-section-seven oppia-about-section">
-    <h2 class="oppia-get-started-title oppia-about-section-title" [innerHTML]="'I18N_ABOUT_PAGE_SECTION_SEVEN_TITLE' | translate"></h2>
-    <div class="oppia-about-classroom-button-container-one">
-      <oppia-primary-button class="e2e-test-about-page-explore-lessons-button"
-              buttonHref="/learn/math"
-              (onClickPrimaryButton)="onClickVisitClassroomButton()"
-              [customClasses]="['oppia-about-button', 'oppia-about-button-browse']"
-              buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate}} ">
-      </oppia-primary-button>
-    </div>
-  </div>
+
 </div>

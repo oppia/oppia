@@ -26,8 +26,6 @@ const aboutUrl = testConstants.URLs.About;
 const mathClassroomUrl = testConstants.URLs.MathClassroom;
 const androidUrl = testConstants.URLs.Android;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
-const creatorDashboardCreateModeUrl =
-  testConstants.URLs.CreatorDashboardCreateMode;
 const aboutFoundationUrl = testConstants.URLs.AboutFoundation;
 const blogUrl = testConstants.URLs.Blog;
 const partnershipsUrl = testConstants.URLs.Partnerships;
@@ -75,8 +73,6 @@ const browseOurLessonsButton = '.e2e-test-about-page-browse-our-lessons-button';
 const accessAndroidAppButton = '.e2e-test-about-page-access-android-app-button';
 const visitClassroomButton = '.e2e-test-about-page-visit-classroom-button';
 const browseLibraryButton = '.e2e-test-about-page-browse-library-button';
-const createLessonsButton = '.e2e-test-about-page-create-lessons-button';
-const exploreLessonsButton = '.e2e-test-about-page-explore-lessons-button';
 
 const aboutFoundationClass = '.oppia-about-foundation-hero-content h1';
 const millionsOfContentId =
@@ -249,51 +245,6 @@ export class LoggedOutUser extends BaseUser {
       'Browse Library button',
       communityLibraryUrl,
       'Community Library'
-    );
-  }
-
-  /**
-   * Function to click the Browse Our Lessons button in the About page
-   * and check if it opens the Creator Dashboard page in Create Mode.
-   */
-  async clickCreateLessonsButtonInAboutPage(): Promise<void> {
-    await this.clickOn(createLessonsButton);
-    if (this.page.url() !== creatorDashboardCreateModeUrl) {
-      throw new Error(
-        'The Create Lessons button does not open the Creator Dashboard ' +
-          'in Create Mode!'
-      );
-    } else {
-      showMessage(
-        'The Create Lessons button opens the Creator Dashboard ' +
-          'in Create Mode.'
-      );
-    }
-    await this.page.waitForNavigation();
-    const urlRegex =
-      /http:\/\/localhost:8181\/create\/\w*(\/gui\/Introduction)?/;
-    if (this.page.url().match(urlRegex) === null) {
-      throw new Error(
-        'The Create Lessons button does not display ' +
-          'the Exploration Editor page!'
-      );
-    } else {
-      showMessage(
-        'The Create Lessons button displays the Exploration Editor page.'
-      );
-    }
-  }
-
-  /**
-   * Function to click the Browse Our Lessons button in the About page
-   * and check if it opens the Math Classroom page.
-   */
-  async clickExploreLessonsButtonInAboutPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      exploreLessonsButton,
-      'Explore Lessons button',
-      mathClassroomUrl,
-      'Math Classroom'
     );
   }
 

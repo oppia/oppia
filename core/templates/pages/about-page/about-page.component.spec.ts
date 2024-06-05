@@ -83,34 +83,6 @@ describe('About Page', () => {
     );
   });
 
-  it(
-    'should redirect guest user to the login page when they click' +
-      'create lesson button',
-    () => {
-      spyOn(
-        siteAnalyticsService,
-        'registerCreateLessonButtonEvent'
-      ).and.callThrough();
-      component.onClickCreateLessonButton();
-
-      expect(
-        siteAnalyticsService.registerCreateLessonButtonEvent
-      ).toHaveBeenCalledWith();
-    }
-  );
-
-  it('should register correct event on calling onClickVisitClassroomButton', () => {
-    spyOn(
-      siteAnalyticsService,
-      'registerClickVisitClassroomButtonEvent'
-    ).and.callThrough();
-    component.onClickVisitClassroomButton();
-
-    expect(
-      siteAnalyticsService.registerClickVisitClassroomButtonEvent
-    ).toHaveBeenCalledWith();
-  });
-
   it('should register correct event on calling onClickBrowseLibraryButton', () => {
     spyOn(
       siteAnalyticsService,

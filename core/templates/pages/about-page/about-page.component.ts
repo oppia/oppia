@@ -62,16 +62,8 @@ export class AboutPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  onClickVisitClassroomButton(): void {
-    this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
-  }
-
   onClickBrowseLibraryButton(): void {
     this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
-  }
-
-  onClickCreateLessonButton(): void {
-    this.siteAnalyticsService.registerCreateLessonButtonEvent();
   }
 }
 angular

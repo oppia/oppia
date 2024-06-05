@@ -69,23 +69,6 @@ describe('Logged-in User in About page', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it(
-    'should open Creator Dashboard page and Exploration Editor ' +
-      'with the Create Lessons button',
-    async function () {
-      await testUser.clickCreateLessonsButtonInAboutPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open Math Classroom page with the Explore Lessons button.',
-    async function () {
-      await testUser.clickExploreLessonsButtonInAboutPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
