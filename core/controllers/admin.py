@@ -175,7 +175,7 @@ SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict({
                 'id': 'EndExploration',
                 'customization_args': {
                     'recommendedExplorationIds': {
-                        'value': []
+                        'value': [] # type: ignore[dict-item]
                     }
                 },
                 'answer_groups': [],
