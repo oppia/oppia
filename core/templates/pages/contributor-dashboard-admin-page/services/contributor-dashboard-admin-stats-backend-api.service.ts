@@ -222,9 +222,9 @@ export class ContributorDashboardAdminStatsBackendApiService {
       language_code: filter.languageCode
         ? filter.languageCode
         : PageConstants.DEFAULT_LANGUAGE_FILTER,
-      ...(filter.lastActivity
+      ...(filter.maxDaysSinceLastActivity
         ? {
-            max_days_since_last_activity: filter.lastActivity,
+            max_days_since_last_activity: filter.maxDaysSinceLastActivity,
           }
         : {}),
     };

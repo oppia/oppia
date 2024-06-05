@@ -663,3 +663,12 @@ indexes:
   - name: is_root_pipeline
   - name: start_time
     direction: desc
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: suggestion_type
+  - name: author_id
+  - name: target_id
