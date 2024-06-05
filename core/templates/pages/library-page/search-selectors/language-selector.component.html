@@ -1,7 +1,7 @@
 <div class="filter-container">
   <mat-card class="filter-box">
     <mat-card-content>
-      <h3>Filter by language</h3>
+      <h3>{{'I18N_LIBRARY_SELECT_LANGUAGE' | translate}}</h3>
       <hr class="custom-divider">
     </mat-card-content>
     <mat-card-content>
@@ -34,7 +34,7 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 16px;
-    width: 250px;
+    width: 220px;
   }
   .filter-box h3 {
     color: #333;
@@ -108,19 +108,20 @@
 
 }
 
-@media (max-width: 1126px) {
+@media (max-width: 1162px) {
   .filter-box {
-    max-width: 110px;
+    max-width: 140px;
   }
 
   .oppia-checkbox {
-    font-size: 11px;
+    font-size: 14px;
   }
 
 }
 
-@media (max-width: 727px) {
+@media (max-width: 766px) {
   .filter-box {
+    max-height: 150px;
     max-width: 100px;
   }
 

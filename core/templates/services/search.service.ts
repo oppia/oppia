@@ -18,7 +18,7 @@
 
 import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable, EventEmitter} from '@angular/core';
-import {Subject} from 'rxjs';
+import {Subject, BehaviorSubject, Observable} from 'rxjs';
 
 import {
   SearchBackendApiService,
@@ -65,9 +65,10 @@ export class SearchService {
   private _initialSearchResultsLoadedEventEmitter = new EventEmitter<
     ExplorationSummaryDict[]
   >();
+  private selectionDetailsObs: BehaviorSubject<unknown> =
+    new BehaviorSubject<unknown>(null);
 
   public numSearchesInProgress = 0;
-
   public selectionDetails: SelectionDetails = {
     categories: {
       description: '',
@@ -86,6 +87,15 @@ export class SearchService {
       summary: '',
     },
   };
+
+  getSelectionDetailsObs(): Observable<unknown> {
+    return this.selectionDetailsObs.asObservable();
+  }
+
+  setSelectionDetails(value: SelectionDetails): void {
+    this.selectionDetails = value;
+    this.selectionDetailsObs.next(value);
+  }
 
   private searchTrigger = new Subject<void>();
 

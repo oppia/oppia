@@ -19,7 +19,7 @@
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {LanguageSelectorModalComponent} from './language-selector-modal.component';
 import {Subscription} from 'rxjs';
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, ChangeDetectorRef} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SearchService, SelectionDetails} from 'services/search.service';
@@ -36,6 +36,7 @@ export class LanguageSelectorComponent implements OnInit, OnDestroy {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   directiveSubscriptions: Subscription = new Subscription();
+  private selecDetailsSubscription: Subscription = new Subscription();
   translationData: Record<string, number> = {};
 
   constructor(
@@ -43,7 +44,8 @@ export class LanguageSelectorComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
     private searchService: SearchService,
     private translateService: TranslateService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private cdr: ChangeDetectorRef
   ) {}
 
   isMobileViewActive(): boolean {
@@ -112,6 +114,12 @@ export class LanguageSelectorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.selecDetailsSubscription = this.searchService
+      .getSelectionDetailsObs()
+      .subscribe(_ => {
+        this.cdr.detectChanges();
+      });
+
     let selectionDetails = this.selectionDetails;
 
     // Non-translatable parts of the html strings, like numbers or user
@@ -147,6 +155,7 @@ export class LanguageSelectorComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+    this.selecDetailsSubscription.unsubscribe();
   }
 }
 

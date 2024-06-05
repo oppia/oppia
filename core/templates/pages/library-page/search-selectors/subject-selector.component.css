@@ -91,7 +91,7 @@
 
 @media (max-width: 727px) {
   .filter-box mat-checkbox {
-    max-width: 180px;
+    max-width: 100px;
   }
     
 }

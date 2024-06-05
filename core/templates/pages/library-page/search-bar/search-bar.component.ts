@@ -279,7 +279,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.ACTION_CLOSE = this.navigationService.ACTION_CLOSE;
     this.SUPPORTED_CONTENT_LANGUAGES =
       this.languageUtilService.getLanguageIdsAndTexts();
-    this.searchService.selectionDetails = {
+    this.searchService.setSelectionDetails({
       categories: {
         description: '',
         itemsName: 'categories',
@@ -296,7 +296,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
         selections: {},
         summary: '',
       },
-    };
+    });
 
     let selectionDetails = this.selectionDetails;
 

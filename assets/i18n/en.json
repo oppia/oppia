@@ -979,6 +979,8 @@
     "I18N_LIBRARY_PAGE_TITLE": "Community Library Lessons | Oppia",
     "I18N_LIBRARY_RATINGS_TOOLTIP": "Ratings",
     "I18N_LIBRARY_SEARCH_PLACEHOLDER": "What are you curious about?",
+    "I18N_LIBRARY_SELECT_CATEGORIES": "Filter by subject",
+    "I18N_LIBRARY_SELECT_LANGUAGE": "Filter by language",
     "I18N_LIBRARY_SUB_HEADER": "Browse the full set of lessons created by the community",
     "I18N_LIBRARY_VIEWS_TOOLTIP": "Views",
     "I18N_LIBRARY_VIEW_ALL": "View all",

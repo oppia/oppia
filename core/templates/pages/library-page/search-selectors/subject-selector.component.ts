@@ -18,32 +18,35 @@
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {SubjectSelectorModalComponent} from './subject-selector-modal.component';
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnDestroy, ChangeDetectorRef} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {SearchService, SelectionDetails} from 'services/search.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'oppia-subject-selector',
   templateUrl: './subject-selector.component.html',
   styleUrls: ['./subject-selector.component.css'],
 })
-export class SubjectSelectorComponent implements OnInit {
+export class SubjectSelectorComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   translationData: Record<string, number> = {};
+  private selecDetailsSubscription: Subscription = new Subscription();
 
   constructor(
     private windowDimensionsService: WindowDimensionsService,
     private searchService: SearchService,
     private translateService: TranslateService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private cdr: ChangeDetectorRef
   ) {}
 
   isMobileViewActive(): boolean {
-    return this.windowDimensionsService.getWidth() <= 900;
+    return this.windowDimensionsService.getWidth() <= 766;
   }
 
   // Update the description, numSelections and summary fields of the
@@ -108,6 +111,12 @@ export class SubjectSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.selecDetailsSubscription = this.searchService
+      .getSelectionDetailsObs()
+      .subscribe(_ => {
+        this.cdr.detectChanges();
+      });
+
     let selectionDetails = this.selectionDetails;
 
     // Non-translatable parts of the html strings, like numbers or user
@@ -116,6 +125,12 @@ export class SubjectSelectorComponent implements OnInit {
     // Initialize the selection descriptions and summaries.
     for (let itemsType in selectionDetails) {
       this.updateSelectionDetails(itemsType);
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.selecDetailsSubscription) {
+      this.selecDetailsSubscription.unsubscribe();
     }
   }
 }

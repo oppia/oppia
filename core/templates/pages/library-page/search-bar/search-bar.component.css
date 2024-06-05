@@ -180,6 +180,7 @@ oppia-search-bar .oppia-input-group {
     border-top-right-radius: 10px;
     padding: 8px 11px 9px 9px;
   }
+  .input-group oppia-input-group
   .oppia-input-group.classroom-page-input-group {
     width: 17em;
   }
