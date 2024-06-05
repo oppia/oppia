@@ -167,6 +167,7 @@ run_tests.check_backend_associated_tests: ## Runs the backend associate tests
 run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 ## Flag for Acceptance tests
 ## suite: The suite to run the acceptance tests
+## MOBILE: Run acceptance test in mobile viewport.
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 # Adding node to the path.
