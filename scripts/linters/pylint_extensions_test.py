@@ -4845,7 +4845,7 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_binop(node)
 
-    def test_does_not_encourage_string_interpolation_with_datetime_concatenation(self) -> None: # pylint: disable=line-too-long
+    def test_does_not_encourage_string_interpolation_with_datetime_addition(self) -> None: # pylint: disable=line-too-long
         node = astroid.extract_node(
         """
         from datetime import datetime, timedelta
