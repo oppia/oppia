@@ -660,6 +660,7 @@
 	"I18N_HEADING_VOLUNTEER": "Bénévole",
 	"I18N_HINT_NEED_HELP": "Besoin d’aide ? Afficher un conseil pour ce problème !",
 	"I18N_HINT_TITLE": "Conseil",
+	"I18N_IMAGE_UPLOADER_MODAL_CANCEL_BUTTON": "Annuler",
 	"I18N_INTERACTIONS_ALGEBRAIC_EXPR_INSTRUCTION": "Taper une expression ici.",
 	"I18N_INTERACTIONS_CODE_REPL_INSTRUCTION": "Taper le code dans l’éditeur",
 	"I18N_INTERACTIONS_CODE_REPL_NARROW_INSTRUCTION": "Aller à l’éditeur de code",
