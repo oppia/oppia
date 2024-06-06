@@ -2953,11 +2953,13 @@ class PreventStringConcatenationChecker(checkers.BaseChecker): # type: ignore[mi
                 right_inferred = next(node.right.infer())
             except astroid.exceptions.InferenceError:
                 return
-
-            if any(isinstance(inferred, (astroid.Instance, astroid.Const)) and
-                    isinstance(inferred.pytype(), str) and
-                    'datetime.datetime' in inferred.pytype() 
-                    for inferred in [left_inferred, right_inferred]):
+            # Ignore operation if either side is inferred to be a datetime obj.
+            if any(
+                isinstance(inferred, (astroid.Instance, astroid.Const)) and
+                isinstance(inferred.pytype(), str) and
+                'datetime.datetime' in inferred.pytype()
+                for inferred in [left_inferred, right_inferred]
+            ):
                 return
             if (
                 isinstance(left_inferred, astroid.Const) and
