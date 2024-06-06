@@ -44,7 +44,7 @@ describe('Admin backend api service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
     const resp = {
-      can_send_emails: true,
+      server_can_send_emails: true,
       has_agreed_to_latest_terms: true,
       has_ever_registered: true,
       username: 'test_user',
