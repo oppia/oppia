@@ -35,6 +35,8 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {PlayerTranscriptService} from '../services/player-transcript.service';
+import {ExplorationEngineService} from '../services/exploration-engine.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 
 interface ExplorationTagSummary {
@@ -87,7 +89,6 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   userIsLoggedIn: boolean = false;
   lessonAuthorsSubmenuIsShown: boolean = false;
   saveProgressMenuIsShown: boolean = false;
-  checkpointCardsIndex!: number[];
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -99,6 +100,8 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private urlService: UrlService,
     private userService: UserService,
     private windowRef: WindowRef,
+    private explorationEngineService: ExplorationEngineService,
+    private playerTranscriptService: PlayerTranscriptService,
     private localStorageService: LocalStorageService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService,
@@ -279,15 +282,30 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     });
   }
 
+  getCheckpointsCardIndexs(): number[] {
+    let checkpointCardIndexs: number[] = [];
+    let numberOfCards = this.playerTranscriptService.getNumCards();
+
+    for (let i = 0; i < numberOfCards; i++) {
+      let stateName = this.playerTranscriptService.getCard(i).getStateName();
+      let correspondingState =
+        this.explorationEngineService.getStateFromStateName(stateName);
+      if (correspondingState.cardIsCheckpoint) {
+        checkpointCardIndexs.push(i);
+      }
+    }
+    return checkpointCardIndexs;
+  }
+
   returnToCheckpoint(index: number): void {
-    const cardIndex = this.checkpointCardsIndex[index];
-    if (cardIndex !== undefined) {
+    const checkpointCardsIndex = this.getCheckpointsCardIndexs();
+    const cardIndex = checkpointCardsIndex[index];
+    if (cardIndex === undefined) {
+      console.error('No card index associated with this checkpoint.');
+    } else {
       this.playerPositionService.setDisplayedCardIndex(cardIndex);
       this.playerPositionService.onActiveCardChanged.emit();
-      // Close modal.
       this.ngbActiveModal.close();
-    } else {
-      console.error('No card index associated with this checkpoint.');
     }
   }
 

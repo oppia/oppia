@@ -46,6 +46,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 import {PlayerPositionService} from '../services/player-position.service';
+import {StateCard} from 'domain/state_card/state-card.model';
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {
@@ -84,7 +85,6 @@ class MockCheckpointCelebrationUtilityService {
     return this.isOnCheckpointedState;
   }
 }
-
 class MockPlayerPositionService {
   onActiveCardChanged = new EventEmitter<void>();
 
@@ -143,6 +143,8 @@ describe('Lesson Information card modal component', () => {
   let checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService;
   let playerPositionService: PlayerPositionService;
   let ngbActiveModal: NgbActiveModal;
+  let playerTranscriptService: PlayerTranscriptService;
+  let explorationEngineService: ExplorationEngineService;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
@@ -164,6 +166,7 @@ describe('Lesson Information card modal component', () => {
       providers: [
         NgbActiveModal,
         PlayerTranscriptService,
+        PlayerPositionService,
         ExplorationEngineService,
         DateTimeFormatService,
         RatingComputationService,
@@ -191,7 +194,6 @@ describe('Lesson Information card modal component', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LessonInformationCardModalComponent);
-    playerPositionService = TestBed.inject(PlayerPositionService);
     componentInstance = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
 
@@ -228,6 +230,9 @@ describe('Lesson Information card modal component', () => {
     urlService = TestBed.inject(UrlService);
     userService = TestBed.inject(UserService);
     localStorageService = TestBed.inject(LocalStorageService);
+    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
+    playerPositionService = TestBed.inject(PlayerPositionService);
+    explorationEngineService = TestBed.inject(ExplorationEngineService);
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService
     );
@@ -550,16 +555,46 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.getProgressPercentage()).toEqual('28');
   });
 
+  it('should get checkpoints card indexes', () => {
+    const numCards = 5;
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(numCards);
+
+    let cards: StateCard[] = [];
+    for (let i = 0; i < numCards; i++) {
+      cards.push({
+        getStateName: jasmine.createSpy('getStateName').and.returnValue(i),
+      });
+    }
+
+    spyOn(playerTranscriptService, 'getCard').and.callFake((index: number) => {
+      return cards[index];
+    });
+
+    spyOn(explorationEngineService, 'getStateFromStateName').and.callFake(
+      (stateName: string) => {
+        return {cardIsCheckpoint: parseInt(stateName) % 2 === 0};
+      }
+    );
+
+    const result = componentInstance.getCheckpointsCardIndexs();
+    expect(result).toEqual([0, 2, 4]);
+  });
+
   it('should be able to return to all checkpoints', () => {
-    componentInstance.checkpointCardsIndex = [1, 2, 5, 10];
     spyOn(playerPositionService, 'setDisplayedCardIndex').and.callThrough();
     spyOn(playerPositionService.onActiveCardChanged, 'emit');
     const closeSpy = spyOn(ngbActiveModal, 'close');
 
-    // Return to each checkpoint and verify that the correct card index is set.
-    for (let i = 0; i < componentInstance.checkpointCardsIndex.length; i++) {
-      const cardIndex = componentInstance.checkpointCardsIndex[i];
+    const checkpointsCardsIndexs = [1, 2, 5, 10];
+    const getCheckpointsCardIndexsSpy = spyOn(
+      componentInstance,
+      'getCheckpointsCardIndexs'
+    ).and.returnValue(checkpointsCardsIndexs);
+
+    for (let i = 0; i < checkpointsCardsIndexs.length; i++) {
+      const cardIndex = checkpointsCardsIndexs[i];
       componentInstance.returnToCheckpoint(i);
+      expect(getCheckpointsCardIndexsSpy).toHaveBeenCalled();
       expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(
         cardIndex
       );
@@ -577,19 +612,23 @@ describe('Lesson Information card modal component', () => {
     const emitSpy = spyOn(playerPositionService.onActiveCardChanged, 'emit');
     const closeSpy = spyOn(ngbActiveModal, 'close');
 
-    componentInstance.checkpointCardsIndex = [1, 2, 5, 10];
+    const checkpointsCardIndexs = [1, 2, 5, 10];
+    const getCheckpointsCardIndexsSpy = spyOn(
+      componentInstance,
+      'getCheckpointsCardIndexs'
+    ).and.returnValue(checkpointsCardIndexs);
 
-    // The checkpoint is in the Introduction card.
     const checkpointIndex = 2;
 
     componentInstance.returnToCheckpoint(checkpointIndex);
 
+    expect(getCheckpointsCardIndexsSpy).toHaveBeenCalled();
     expect(setDisplayedCardIndexSpy).toHaveBeenCalledWith(
-      componentInstance.checkpointCardsIndex[checkpointIndex]
+      checkpointsCardIndexs[checkpointIndex]
     );
     expect(emitSpy).toHaveBeenCalled();
     expect(playerPositionService.getDisplayedCardIndex()).toEqual(
-      componentInstance.checkpointCardsIndex[checkpointIndex]
+      checkpointsCardIndexs[checkpointIndex]
     );
     expect(closeSpy).toHaveBeenCalled();
   });
@@ -602,29 +641,35 @@ describe('Lesson Information card modal component', () => {
     const emitSpy = spyOn(playerPositionService.onActiveCardChanged, 'emit');
     const closeSpy = spyOn(ngbActiveModal, 'close');
 
-    componentInstance.checkpointCardsIndex = [1, 2, 5, 10];
+    const checkpointsCardIndexs = [1, 2, 5, 10];
+    const getCheckpointsCardIndexsSpy = spyOn(
+      componentInstance,
+      'getCheckpointsCardIndexs'
+    ).and.returnValue(checkpointsCardIndexs);
 
     const checkpointIndex = 3;
 
     componentInstance.returnToCheckpoint(checkpointIndex);
 
+    expect(getCheckpointsCardIndexsSpy).toHaveBeenCalled();
     expect(setDisplayedCardIndexSpy).toHaveBeenCalledWith(
-      componentInstance.checkpointCardsIndex[checkpointIndex]
+      checkpointsCardIndexs[checkpointIndex]
     );
     expect(emitSpy).toHaveBeenCalled();
     expect(playerPositionService.getDisplayedCardIndex()).toEqual(
-      componentInstance.checkpointCardsIndex[checkpointIndex]
+      checkpointsCardIndexs[checkpointIndex]
     );
     expect(closeSpy).toHaveBeenCalled();
 
     componentInstance.returnToCheckpoint(checkpointIndex);
 
+    expect(getCheckpointsCardIndexsSpy).toHaveBeenCalled();
     expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(
-      componentInstance.checkpointCardsIndex[checkpointIndex]
+      checkpointsCardIndexs[checkpointIndex]
     );
     expect(playerPositionService.onActiveCardChanged.emit).toHaveBeenCalled();
     expect(playerPositionService.getDisplayedCardIndex()).toEqual(
-      componentInstance.checkpointCardsIndex[checkpointIndex]
+      checkpointsCardIndexs[checkpointIndex]
     );
     expect(closeSpy).toHaveBeenCalled();
   });
@@ -632,8 +677,7 @@ describe('Lesson Information card modal component', () => {
   it('should log an error if there is no card index associated with the checkpoint', () => {
     spyOn(console, 'error');
 
-    componentInstance.checkpointCardsIndex = [0, 1, 2];
-    const invalidCheckpointIndex = 3; // Index that doesn't exist.
+    const invalidCheckpointIndex = 5;
 
     componentInstance.returnToCheckpoint(invalidCheckpointIndex);
 
@@ -651,11 +695,15 @@ describe('Lesson Information card modal component', () => {
     const closeSpy = spyOn(ngbActiveModal, 'close');
     spyOn(console, 'error');
 
-    componentInstance.checkpointCardsIndex = [1, 2, 5, 10];
+    const checkpointsCardIndexs = [1, 2, 5, 10];
+    const getCheckpointsCardIndexsSpy = spyOn(
+      componentInstance,
+      'getCheckpointsCardIndexs'
+    ).and.returnValue(checkpointsCardIndexs);
 
-    const invalidCheckpointIndex = 5; // Index that doesn't exist.
+    const invalidCheckpointIndex = 5;
 
-    const checkpointIndex = 3;
+    const validCheckpointIndex = 3;
 
     componentInstance.returnToCheckpoint(invalidCheckpointIndex);
 
@@ -663,25 +711,15 @@ describe('Lesson Information card modal component', () => {
       'No card index associated with this checkpoint.'
     );
 
-    componentInstance.returnToCheckpoint(checkpointIndex);
+    componentInstance.returnToCheckpoint(validCheckpointIndex);
 
+    expect(getCheckpointsCardIndexsSpy).toHaveBeenCalled();
     expect(setDisplayedCardIndexSpy).toHaveBeenCalledWith(
-      componentInstance.checkpointCardsIndex[checkpointIndex]
+      checkpointsCardIndexs[validCheckpointIndex]
     );
     expect(emitSpy).toHaveBeenCalled();
     expect(playerPositionService.getDisplayedCardIndex()).toEqual(
-      componentInstance.checkpointCardsIndex[checkpointIndex]
-    );
-    expect(closeSpy).toHaveBeenCalled();
-
-    componentInstance.returnToCheckpoint(checkpointIndex);
-
-    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(
-      componentInstance.checkpointCardsIndex[checkpointIndex]
-    );
-    expect(playerPositionService.onActiveCardChanged.emit).toHaveBeenCalled();
-    expect(playerPositionService.getDisplayedCardIndex()).toEqual(
-      componentInstance.checkpointCardsIndex[checkpointIndex]
+      checkpointsCardIndexs[validCheckpointIndex]
     );
     expect(closeSpy).toHaveBeenCalled();
   });
