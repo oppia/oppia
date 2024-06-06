@@ -55,7 +55,7 @@ export class ImageUploaderComponent implements OnInit {
 
   editableImageDataUrl: string | null = null;
   hidePlaceholder: boolean = false;
-  imageBgColor!: string;
+  imageBgColor: string | null = null;
   placeholderImageUrl!: string;
 
   constructor(
