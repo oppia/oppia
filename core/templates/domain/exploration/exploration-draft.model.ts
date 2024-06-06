@@ -25,12 +25,14 @@ import {SubtitledHtmlBackendDict} from './subtitled-html.model';
 import {RecordedVoiceOverBackendDict} from './recorded-voiceovers.model';
 import {InteractionCustomizationArgsBackendDict} from 'interactions/customization-args-defs';
 import {TranslatedContentBackendDict} from './TranslatedContentObjectFactory';
+import {VoiceoverTypeToVoiceoversBackendDict} from './voiceover.model';
 
 export type ExplorationChange =
   | ExplorationChangeAddState
   | ExplorationChangeAddWrittenTranslation
   | ExplorationChangeMarkTranslationsNeedsUpdate
   | ExplorationChangeEditTranslation
+  | ExplorationChangeEditVoiceovers
   | ExplorationChangeRemoveTranslations
   | ExplorationChangeRenameState
   | ExplorationChangeDeleteState
@@ -135,6 +137,13 @@ export interface ExplorationChangeEditTranslation {
   content_id: string;
   language_code: string;
   translation: TranslatedContentBackendDict;
+}
+
+export interface ExplorationChangeEditVoiceovers {
+  cmd: 'update_voiceovers';
+  content_id: string;
+  language_accent_code: string;
+  voiceovers: VoiceoverTypeToVoiceoversBackendDict;
 }
 
 export interface ExplorationChangeRemoveTranslations {
