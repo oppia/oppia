@@ -548,6 +548,7 @@ describe('Topic editor state service', () => {
     expect(topicEditorStateService.onTopicInitialized).toBeDefined();
     expect(topicEditorStateService.onTopicReinitialized).toBeDefined();
     expect(topicEditorStateService.getClassroomUrlFragment()).toBeDefined();
+    expect(topicEditorStateService.getClassroomName()).toBeDefined();
     expect(topicEditorStateService.getCurriculumAdminUsernames()).toBeDefined();
   });
 
