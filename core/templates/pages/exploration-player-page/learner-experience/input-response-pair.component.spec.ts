@@ -77,8 +77,8 @@ describe('InputResponsePairComponent', () => {
           provide: PlatformFeatureService,
           useClass: MockPlatformFeatureService,
         },
+        NgbPopover,
       ],
-      NgbPopover
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
