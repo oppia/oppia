@@ -5347,9 +5347,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                topic_ids=[
-                    'non_existent_topic'
-                ],
+                topic_ids=['non_existent_topic'],
                 max_days_since_last_activity=7
             ))
         self.assertEqual(len(sorted_results), 0)

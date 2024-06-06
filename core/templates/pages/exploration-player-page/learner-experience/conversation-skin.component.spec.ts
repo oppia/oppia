@@ -101,6 +101,7 @@ import {AudioTranslationLanguageService} from '../services/audio-translation-lan
 import {ConceptCardManagerService} from '../services/concept-card-manager.service';
 import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
 import {ConversationFlowService} from '../services/conversation-flow.service';
+import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -179,6 +180,7 @@ describe('Conversation skin component', () => {
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let conceptCardManagerService: ConceptCardManagerService;
   let solutionObjectFactory: SolutionObjectFactory;
+  let voiceoverPlayerService: VoiceoverPlayerService;
 
   let displayedCard = new StateCard(
     null,
@@ -593,6 +595,7 @@ describe('Conversation skin component', () => {
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService
     );
+    voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
   }));
 
   it('should create && adjust page height on resize of window', fakeAsync(() => {
@@ -2709,6 +2712,55 @@ describe('Conversation skin component', () => {
 
     componentInstance.submitAnswer('', null);
     tick(2000);
+  }));
+
+  it('should be able to set active voiceover content ID', fakeAsync(() => {
+    spyOn(voiceoverPlayerService, 'setActiveVoiceover');
+    let interaction = interactionObjectFactory.createFromBackendDict({
+      id: 'TextInput',
+      answer_groups: [],
+      default_outcome: {
+        missing_prerequisite_skill_id: null,
+        refresher_exploration_id: null,
+        labelled_as_correct: false,
+        feedback: {
+          content_id: 'default_outcome',
+          html: 'Wrong answer',
+        },
+        param_changes: [],
+        dest_if_really_stuck: null,
+        dest: 'Start',
+      },
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        rows: {
+          value: true,
+        },
+        placeholder: {
+          value: 1,
+        },
+      },
+      hints: [],
+      solution: null,
+    });
+
+    let displayedCard = new StateCard(
+      null,
+      null,
+      null,
+      interaction,
+      [],
+      null,
+      '',
+      null
+    );
+
+    componentInstance.displayedCard = displayedCard;
+
+    componentInstance.setActiveVoiceover('Wrong answer');
+    expect(voiceoverPlayerService.setActiveVoiceover).toHaveBeenCalledWith(
+      'default_outcome'
+    );
   }));
 
   it('should get recommended summaries when exploration in story chapter mode', fakeAsync(() => {

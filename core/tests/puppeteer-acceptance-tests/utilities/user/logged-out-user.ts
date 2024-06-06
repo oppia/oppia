@@ -267,8 +267,8 @@ export class LoggedOutUser extends BaseUser {
 
     if (this.page.url() !== expectedSignInPageUrl) {
       throw new Error(
-        'The Create Lessons button does not open the Sign-in page ' +
-          'with a return URL to the Creator Dashboard in create mode!'
+        `The Create Lessons button does not open the Sign-in page with a return URL to the Creator Dashboard in create mode!
+         It opens ${this.page.url()} instead.`
       );
     } else {
       showMessage(
@@ -313,8 +313,9 @@ export class LoggedOutUser extends BaseUser {
       displayedH1 !== 'THE OPPIA FOUNDATION'
     ) {
       throw new Error(
-        'The Oppia Foundation button in About Menu on navbar ' +
-          'does not open the About Foundation page!'
+        `The Oppia Foundation button in About Menu on navbar
+          should open the About Foundation page,
+          but it opens ${this.page.url()} instead.`
       );
     } else {
       showMessage(
@@ -343,7 +344,8 @@ export class LoggedOutUser extends BaseUser {
     );
     if (this.page.url() !== _61MillionChildrenUrl) {
       throw new Error(
-        'The 61 Million Children link does not open the right page!'
+        `The 61 Million Children link should open the right page,
+          but it opens ${this.page.url()} instead.`
       );
     } else {
       showMessage('The 61 Million Children link opens the right page.');
@@ -398,11 +400,19 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== '420 million') {
       throw new Error('The 420 Million link does not exist!');
     }
-    await this.page.$eval(weCannotContentId, element =>
-      element.getElementsByTagName('a')[0].click()
-    );
+
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
+      this.page.$eval(weCannotContentId, element =>
+        element.getElementsByTagName('a')[0].click()
+      ),
+    ]);
+
     if (this.page.url() !== _420MillionUrl) {
-      throw new Error('The 420 Million link does not open the right page!');
+      throw new Error(
+        `The 420 Million link does not open the right page!
+          It opens ${this.page.url()} instead.`
+      );
     } else {
       showMessage('The 420 Million link opens the right page.');
     }
@@ -419,7 +429,8 @@ export class LoggedOutUser extends BaseUser {
     );
     if (newTab.url() !== aboutUrl) {
       throw new Error(
-        'The Learn More About Oppia button does not open the About page!'
+        `The Learn More About Oppia button does not open the About page!
+           It opens ${newTab.url()} instead.`
       );
     } else {
       showMessage('The Learn More About Oppia button opens the About page.');
@@ -437,7 +448,8 @@ export class LoggedOutUser extends BaseUser {
     );
     if (newTab.url() !== volunteerUrl) {
       throw new Error(
-        'The Become A Volunteer button does not open the Volunteer page!'
+        `The Become A Volunteer button does not open the Volunteer page!
+          It opens ${newTab.url()} instead.`
       );
     } else {
       showMessage('The Become A Volunteer button opens the Volunteer page.');
@@ -464,8 +476,8 @@ export class LoggedOutUser extends BaseUser {
     );
     if (this.page.url() !== partnershipsUrl) {
       throw new Error(
-        'The Consider becoming a partner today! link does not open ' +
-          'the Partnerships page!'
+        `The Consider becoming a partner today! link does not open
+          the Partnerships page! It opens ${this.page.url()} instead.`
       );
     } else {
       showMessage(
@@ -495,8 +507,8 @@ export class LoggedOutUser extends BaseUser {
     );
     if (this.page.url() !== volunteerUrl) {
       throw new Error(
-        'The Join our large volunteer community! link does not open ' +
-          'the Volunteer page!'
+        `The Join our large volunteer community! link does not open
+          the Volunteer page! It opens ${this.page.url()} instead.`
       );
     } else {
       showMessage(
@@ -523,7 +535,10 @@ export class LoggedOutUser extends BaseUser {
       element.getElementsByTagName('a')[0].click()
     );
     if (this.page.url() !== donateUrl) {
-      throw new Error('The donations link does not open the Donate page!');
+      throw new Error(
+        `The donations link does not open the Donate page!
+          It opens ${this.page.url()} instead.`
+      );
     } else {
       showMessage('The donations link opens the Donate page.');
     }
@@ -683,7 +698,10 @@ export class LoggedOutUser extends BaseUser {
       ? mobileWatchAVideoUrl
       : desktopWatchAVideoUrl;
     if (url !== expectedWatchAVideoUrl) {
-      throw new Error('The Watch A Video button does not open the right page!');
+      throw new Error(
+        `The Watch A Video button should open the right page,
+          but it opens ${url} instead.`
+      );
     }
     showMessage('The Watch A Video button opens the right page.');
   }
@@ -706,7 +724,10 @@ export class LoggedOutUser extends BaseUser {
       this.clickOn(readOurBlogButton),
     ]);
     if (this.page.url() !== blogUrl) {
-      throw new Error('The Read Our Blog button does not open the Blog page!');
+      throw new Error(
+        `The Read Our Blog button should open the Blog page,
+          but it opens ${this.page.url()} instead.`
+      );
     } else {
       showMessage('The Read Our Blog button opens the Blog page.');
     }
@@ -780,11 +801,14 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(donatePage);
     const donatePageShowed = await this.page.$(donatePage);
     if (donatePageShowed === null) {
-      throw new Error('The dismiss button does not show the Donate page!');
+      throw new Error(
+        `The dismiss button should show the Donate page,
+          but it opens ${this.page.url()} instead.`
+      );
     } else {
       showMessage(
         'The dismiss button closes the Thanks for Donating popup ' +
-          'and if the Donate page is shown.'
+          'and shows the Donate page.'
       );
     }
   }

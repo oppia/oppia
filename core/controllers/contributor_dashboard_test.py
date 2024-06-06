@@ -2039,7 +2039,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         )
 
         self.assertEqual(
-            response,
+            response['certificate_data'],
             {
                 'from_date': from_date.strftime('%d %b %Y'),
                 'to_date': to_date.strftime('%d %b %Y'),

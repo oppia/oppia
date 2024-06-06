@@ -80,7 +80,6 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const that = this;
     this.skillId = this.urlService.getSkillIdFromUrl();
-    this.skillEditorStateService.loadSkill(this.skillId);
     this.questionTextFilter = '';
     this.interactionFilter = this.INTERACTION_TYPES.ALL;
     this.questionsFetched = false;
