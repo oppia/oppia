@@ -1,6 +1,6 @@
 <div class="oppia-image-uploader-modal-container">
   <div class="modal-header">
-    <h3>{{ 'I18N_IMAGE_UPLOADER_MODAL_UPLOAD_HEADING' | translate:{ imageName: imageName } }}</h3>
+    <h3>{{ 'I18N_IMAGE_UPLOADER_MODAL_UPLOAD_HEADING' | translate:{ imageName: imageUploaderParameters.imageName } }}</h3>
   </div>
 
   <div class="modal-body oppia-image-uploader-container">
@@ -15,8 +15,8 @@
     </div>
     <div class="oppia-image-uploader">
       <div *ngIf="imageNotUploaded()">
-        <oppia-image-receiver (fileChanged)="onFileChanged($event)" [allowedImageFormats]="allowedImageFormats"
-          [maxImageSizeInKB]="maxImageSizeInKB">
+        <oppia-image-receiver (fileChanged)="onFileChanged($event)" [allowedImageFormats]="imageUploaderParameters.allowedImageFormats"
+          [maxImageSizeInKB]="imageUploaderParameters.maxImageSizeInKB">
         </oppia-image-receiver>
       </div>
       <div class="oppia-form-error oppia-form-error-text" *ngIf="invalidImageWarningIsShown">
@@ -27,21 +27,21 @@
           <div *ngIf="hasMoreThanOneBgColor()">
             <div>Choose background color:</div>
             <div class="oppia-thumbnail-colour-select">
-              <div *ngFor="let color of allowedBgColors" [ngStyle]="{'background': color}"
+              <div *ngFor="let color of imageUploaderParameters.allowedBgColors" [ngStyle]="{'background': color}"
                    (click)="updateBackgroundColor(color)">
               </div>
             </div>
           </div>
-          <div *ngIf="allowedBgColors.length === 1" class="alert alert-warning">
+          <div *ngIf="imageUploaderParameters.allowedBgColors.length === 1" class="alert alert-warning">
             <span>
-              Please check that the {{imageName.toLowerCase()}} below has the following background color:
-              <i class="fa fa-square" [ngStyle]="{'color': allowedBgColors[0]}"></i>.
+              Please check that the {{imageUploaderParameters.imageName.toLowerCase()}} below has the following background color:
+              <i class="fa fa-square" [ngStyle]="{'color': imageUploaderParameters.allowedBgColors[0]}"></i>.
               If not, please ensure that you are uploading an image with transparent background. Thanks!
             </span>
           </div>
         </div>
         <div class="oppia-thumbnail-container e2e-test-thumbnail-container" *ngIf="uploadedImage"
-          [ngStyle]="{'background': previewDescriptionBgColor, 'color': previewDescriptionBgColor ? '#FFFFFF' : '', 'width': aspectRatio === '4:3' ? '248px' : '320px' }">
+          [ngStyle]="{'background': imageUploaderParameters.previewDescriptionBgColor, 'color': imageUploaderParameters.previewDescriptionBgColor ? '#FFFFFF' : '', 'width': imageUploaderParameters.aspectRatio === '4:3' ? '248px' : '320px' }">
           <button class="btn btn-secondary oppia-thumbnail-reset-button e2e-thumbnail-reset-button e2e-test-thumbnail-reset-button"
                   (click)="reset()">
             <i class="fas fa-times oppia-vcenter"></i>
@@ -51,13 +51,13 @@
               [imgSrc]="uploadedImage" [aspectRatio]="'16:9'" [background]="bgColor">
             </oppia-thumbnail-display>
             <div *ngIf="previewTitle" class="oppia-thumbnail-preview-title">
-              {{ previewTitle }}
+              {{ imageUploaderParameters.previewTitle }}
             </div>
             <div *ngIf="previewDescription" class="oppia-thumbnail-preview-description">
-              {{ previewDescription }}
+              {{ imageUploaderParameters.previewDescription }}
             </div>
             <div *ngIf="previewFooter" class="oppia-thumbnail-preview-footer">
-              {{ previewFooter }}
+              {{ imageUploaderParameters.previewFooter }}
             </div>
           </div>
         </div>
@@ -78,7 +78,7 @@
             <div class="oppia-bg-color-container" [ngStyle]="{'background': bgColor}"></div>
           </div>
           <div class="oppia-thumbnail-colour-select">
-            <div *ngFor="let color of allowedBgColors" [ngStyle]="{'background': color}"
+            <div *ngFor="let color of imageUploaderParameters.allowedBgColors" [ngStyle]="{'background': color}"
                  (click)="updateBackgroundColor(color)">
             </div>
           </div>
@@ -96,7 +96,7 @@
       {{ 'I18N_IMAGE_UPLOADER_MODAL_CANCEL_BUTTON' | translate }}
     </button>
     <button class="btn btn-success e2e-test-photo-upload-submit" (click)="confirm()" [disabled]="!uploadedImage">
-      {{ 'I18N_IMAGE_UPLOADER_MODAL_ADD_BUTTON' | translate:{ imageName: imageName } }}
+      {{ 'I18N_IMAGE_UPLOADER_MODAL_ADD_BUTTON' | translate:{ imageName: imageUploaderParameters.imageName } }}
     </button>
   </div>
 </div>
