@@ -89,7 +89,7 @@ describe('Curriculum Admin', function () {
         'Test Topic 1'
       );
 
-      // User must delete all questions in the skill before deleting it.
+      // User must remove all questions from the skill before deleting it.
       await curriculumAdmin.removeAllQuestionsFromTheSkill('Test Skill 1');
       await curriculumAdmin.deleteSkill('Test Skill 1');
       await curriculumAdmin.expectSkillNotInTopicsAndSkillsDashboard(
