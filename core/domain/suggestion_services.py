@@ -3916,7 +3916,7 @@ def generate_contributor_certificate_data(
     language_code: Optional[str],
     from_date: datetime.datetime,
     to_date: datetime.datetime
-) -> suggestion_registry.ContributorCertificateInfoDict:
+) -> Optional[suggestion_registry.ContributorCertificateInfoDict]:
     """Returns data to generate the certificate.
 
     Args:
@@ -3931,7 +3931,8 @@ def generate_contributor_certificate_data(
             contributions were created.
 
     Returns:
-        ContributorCertificateInfoDict. Data to generate the certificate.
+        ContributorCertificateInfoDict|None. Data to generate the certificate,
+        or None if no data is found.
 
     Raises:
         Exception. The suggestion type is invalid.
@@ -3955,7 +3956,7 @@ def generate_contributor_certificate_data(
     else:
         raise Exception('The suggestion type is invalid.')
 
-    return data.to_dict()
+    return data.to_dict() if data is not None else None
 
 
 def _generate_translation_contributor_certificate_data(
@@ -3963,7 +3964,7 @@ def _generate_translation_contributor_certificate_data(
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     user_id: str
-) -> suggestion_registry.ContributorCertificateInfo:
+) -> Optional[suggestion_registry.ContributorCertificateInfo]:
     """Returns data to generate translation submitter certificate.
 
     Args:
@@ -3976,8 +3977,8 @@ def _generate_translation_contributor_certificate_data(
         user_id: str. The user ID of the contributor.
 
     Returns:
-        ContributorCertificateInfo. Data to generate translation submitter
-        certificate.
+        ContributorCertificateInfo|None. Data to generate translation submitter
+        certificate, or None if no data is found.
 
     Raises:
         Exception. The language is invalid.
@@ -4045,8 +4046,7 @@ def _generate_translation_contributor_certificate_data(
     hours_contributed = round(words_count / 300, 2)
 
     if words_count == 0:
-        raise Exception(
-            'There are no contributions for the given time range.')
+        return None
 
     return suggestion_registry.ContributorCertificateInfo(
         from_date.strftime('%d %b %Y'), to_date.strftime('%d %b %Y'),
@@ -4058,7 +4058,7 @@ def _generate_question_contributor_certificate_data(
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     user_id: str
-) -> suggestion_registry.ContributorCertificateInfo:
+) -> Optional[suggestion_registry.ContributorCertificateInfo]:
     """Returns data to generate question submitter certificate.
 
     Args:
@@ -4069,8 +4069,8 @@ def _generate_question_contributor_certificate_data(
         user_id: str. The user ID of the contributor.
 
     Returns:
-        ContributorCertificateInfo. Data to generate question submitter
-        certificate.
+        ContributorCertificateInfo|None. Data to generate question submitter
+        certificate, or None if no data is found.
 
     Raises:
         Exception. The suggestion type given to generate the certificate is
@@ -4110,8 +4110,7 @@ def _generate_question_contributor_certificate_data(
     hours_contributed = round(minutes_contributed / 60, 2)
 
     if minutes_contributed == 0:
-        raise Exception(
-            'There are no contributions for the given time range.')
+        return None
 
     return suggestion_registry.ContributorCertificateInfo(
         from_date.strftime('%d %b %Y'), to_date.strftime('%d %b %Y'),
