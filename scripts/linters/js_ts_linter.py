@@ -526,7 +526,7 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
             else:
                 error_message = line
             trimmed_error_messages.append(error_message)
-        return '\n%s\n' % trimmed_error_messages
+        return '%s\n' % '\n'.join(trimmed_error_messages)
 
     def _lint_js_and_ts_files(self) -> concurrent_task_utils.TaskResult:
         """Prints a list of lint errors in the given list of JavaScript files.
