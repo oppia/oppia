@@ -195,10 +195,10 @@ export class UserFactory {
     let user = new LoggedOutUser();
     await user.openBrowser();
     await user.page.goto(testConstants.URLs.Home);
-    // if (!this.userHasAcceptedCookies) {
-    //   await user.clickOn(cookieBannerAcceptButton);
-    //   this.userHasAcceptedCookies = true;
-    // }
+    if (!this.userHasAcceptedCookies) {
+      await user.clickOn(cookieBannerAcceptButton);
+      this.userHasAcceptedCookies = true;
+    }
     activeUsers.push(user);
     return user;
   };
