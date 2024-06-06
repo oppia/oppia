@@ -97,6 +97,10 @@ class TopicsAndSkillsDashboardPageDataHandler(
                         topic_services.check_can_edit_topic(
                             self.user, topic_rights)
                     )
+                    topic_summary['can_edit_question'] = (
+                        topic_services.check_can_edit_question(
+                            self.user, topic_rights)
+                    )
 
         classrooms = classroom_config_services.get_all_classrooms()
         all_classroom_names = [

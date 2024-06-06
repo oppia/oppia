@@ -80,7 +80,7 @@ export class TopicQuestionsTabComponent
         this.getSkillsCategorizedByTopics = response.categorizedSkillsDict;
         this.getUntriagedSkillSummaries = response.untriagedSkillSummaries;
       });
-    this.canEditQuestion = this.topicRights.canEditTopic();
+    this.canEditQuestion = this.topicRights.canEditQuestion();
   }
 
   reinitializeQuestionsList(skillId: string): void {

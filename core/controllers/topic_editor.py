@@ -672,12 +672,15 @@ class TopicRightsHandler(
         user_actions_info = user_services.get_user_actions_info(self.user_id)
         can_edit_topic = topic_services.check_can_edit_topic(
             user_actions_info, topic_rights)
+        can_edit_question = topic_services.check_can_edit_question(
+            user_actions_info, topic_rights)
 
         can_publish_topic = (
             role_services.ACTION_CHANGE_TOPIC_STATUS in
             user_actions_info.actions)
 
         self.values.update({
+            'can_edit_question': can_edit_question,
             'can_edit_topic': can_edit_topic,
             'published': topic_rights.topic_is_published,
             'can_publish_topic': can_publish_topic

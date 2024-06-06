@@ -1341,6 +1341,27 @@ def check_can_edit_topic(
 
     return False
 
+def check_can_edit_question(
+    user: user_domain.UserActionsInfo,
+    topic_rights: Optional[topic_domain.TopicRights]
+) -> bool:
+    """Checks whether the user can edit the questions.
+
+    Args:
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        topic_rights: TopicRights or None. Rights object for the given topic.
+
+    Returns:
+        bool. Whether the given user can edit the question.
+    """
+    if topic_rights is None:
+        return False
+    if role_services.ACTION_EDIT_ANY_QUESTION in user.actions:
+        return True
+
+    return False
+
 
 def deassign_user_from_all_topics(
     committer: user_domain.UserActionsInfo, user_id: str

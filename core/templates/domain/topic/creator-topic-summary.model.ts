@@ -33,6 +33,7 @@ export interface CreatorTopicSummaryBackendDict {
   topic_model_created_on: number;
   topic_model_last_updated: number;
   can_edit_topic: boolean;
+  can_edit_question: boolean;
   is_published: boolean;
   total_upcoming_chapters_count: number;
   total_overdue_chapters_count: number;
@@ -60,6 +61,7 @@ export class CreatorTopicSummary {
     public topicModelCreatedOn: number,
     public topicModelLastUpdated: number,
     public canEditTopic: boolean,
+    public canEditQuestion: boolean,
     public isPublished: boolean,
     public classroom: string | undefined,
     public thumbnailFilename: string,
@@ -89,6 +91,7 @@ export class CreatorTopicSummary {
       topicSummaryBackendDict.topic_model_created_on,
       topicSummaryBackendDict.topic_model_last_updated,
       topicSummaryBackendDict.can_edit_topic,
+      topicSummaryBackendDict.can_edit_question,
       topicSummaryBackendDict.is_published,
       topicSummaryBackendDict.classroom,
       topicSummaryBackendDict.thumbnail_filename,
