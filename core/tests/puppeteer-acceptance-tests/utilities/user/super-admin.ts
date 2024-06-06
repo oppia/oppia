@@ -16,9 +16,9 @@
  * @fileoverview Super Admin users utility file.
  */
 
-import {BaseUser} from '../common/puppeteer-utils';
+import { BaseUser } from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
-import {showMessage} from '../common/show-message';
+import { showMessage } from '../common/show-message';
 
 const AdminPageRolesTab = testConstants.URLs.AdminPageRolesTab;
 const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
@@ -151,11 +151,19 @@ export class SuperAdmin extends BaseUser {
     }
   }
 
+  /**
+   * Function to Navigate to the page of the specified role and opens the list of assigned users.
+   * @param {string} role - The name of the role to view.
+   */
   async viewUsersAssignedToRole(role: string) {
     await this.clickOn(role);
     await this.clickOn(' Assigned users ');
   }
 
+  /**
+   * Checks if the specified users are assigned to the current role.
+   * @param {string[]} users - An array of usernames to check.
+   */
   async expectRoleToHaveAssignedUsers(users: string[]): Promise<void> {
     for (const user of users) {
       const isActionPresent = await this.isTextPresentOnPage(user);

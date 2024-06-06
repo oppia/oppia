@@ -35,32 +35,42 @@ describe('Super Admin', function () {
       'curriculum_admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
+    const guestUser1 = await UserFactory.createNewUser(
+      'guestUser1',
+      'guest_user1@example.com'
+    );
+    await guestUser1.closeBrowser();
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to assign and unasing ',
+    'should be able to assign, unassign role and be able to see the' +
+    'allocated actions and assigned users to a role ',
     async function () {
       await superAdmin.navigateToAdminPage();
       await superAdmin.navigateToRolesTab();
 
       await superAdmin.expectUserNotToHaveRole(
-        'username1',
+        'guestUser1',
         ROLES.TOPIC_MANAGER
       );
-      await superAdmin.assignRoleToUser('username1', ROLES.TOPIC_MANAGER);
-      await superAdmin.expectUserToHaveRole('username1', ROLES.TOPIC_MANAGER);
+      await superAdmin.assignRoleToUser('guestUser1', ROLES.TOPIC_MANAGER);
+      await superAdmin.expectUserToHaveRole('guestUser1', ROLES.TOPIC_MANAGER);
 
       await superAdmin.selectRole(ROLES.TOPIC_MANAGER);
-      await superAdmin.expectRoleToHaveAllocatedActions(['action1', 'action2']);
+      await superAdmin.expectRoleToHaveAllocatedActions([
+        'Edit owned story', 
+        'Edit skill', 
+        'manage question skill status'
+      ]);
       await superAdmin.viewUsersAssignedToRole(ROLES.TOPIC_MANAGER);
-      await superAdmin.expectRoleToHaveAssignedUsers(['user1']);
+      await superAdmin.expectRoleToHaveAssignedUsers(['guestUser1']);
 
-      await superAdmin.unassignRoleFromUser('username1', ROLES.TOPIC_MANAGER);
+      await superAdmin.unassignRoleFromUser('guestUser1', ROLES.TOPIC_MANAGER);
       await superAdmin.expectUserNotToHaveRole(
-        'username1',
+        'guestUser1',
         ROLES.TOPIC_MANAGER
       );
     },
