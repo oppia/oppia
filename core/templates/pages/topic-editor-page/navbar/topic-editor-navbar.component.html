@@ -65,7 +65,7 @@
     <button type="button"
             (click)="unpublishTopic()"
             *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
-            class="btn btn-light"
+            class="btn btn-light e2e-test-unpublish-topic-button"
             [disabled]="isTopicSaveable()">
       Unpublish Topic
     </button>

@@ -77,7 +77,15 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  /**
+   * This function navigates to the given topic URL and checks if the page displays
+   * an 'Error 404' message.
+   * @param {string} topicUrlFragment - The URL fragment of the topic to check.
+   */
   async expectTopicLinkReturns404(topicUrlFragment: string): Promise<void> {
+    // Reloading the page to ensure the latest state is reflected,
+    // particularly useful if a topic was recently unpublished.
+    this.page.reload();
     await this.goto(`http://localhost:8181/learn/staging/${topicUrlFragment}`);
     const isError404Present = await this.isTextPresentOnPage('Error 404');
     if (!isError404Present) {
