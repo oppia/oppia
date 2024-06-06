@@ -27,6 +27,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import param_domain
+from core.domain import platform_parameter_list
 from core.domain import question_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -1203,6 +1204,10 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
 
     EXP_ID: Final = '0'
     REPORT_TEXT: Final = 'AD'
+    EMAIL_FOOTER = (
+        'You can change your email preferences via the '
+        '<a href="http://localhost:8181/preferences">Preferences</a> page.'
+    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -1227,11 +1232,16 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             title='Welcome to Oppia!',
             category='This is just a spam category',
             objective='Test a spam exploration.')
-        self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin')
+        ]
+    )
     def test_that_emails_are_sent(self) -> None:
         """Check that emails are sent to moderaters when a logged-in
         user reports.
@@ -1278,14 +1288,13 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx:
-            self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_tasks()
 
-            messages = self._get_sent_email_messages(
-                self.MODERATOR_EMAIL)
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].html, expected_email_html_body)
-            self.assertEqual(messages[0].body, expected_email_text_body)
+        messages = self._get_sent_email_messages(
+            self.MODERATOR_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].html, expected_email_html_body)
+        self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_non_logged_in_users_cannot_report(self) -> None:
         """Check that non-logged in users cannot report."""

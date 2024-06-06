@@ -125,6 +125,7 @@ CMD_MARK_TRANSLATIONS_NEEDS_UPDATE: Final = 'mark_translations_needs_update'
 CMD_EDIT_TRANSLATION: Final = 'edit_translation'
 # This takes additional 'content_id' parameters.
 CMD_REMOVE_TRANSLATIONS: Final = 'remove_translations'
+CMD_UPDATE_VOICEOVERS: Final = 'update_voiceovers'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY: Final = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -410,6 +411,14 @@ class ExplorationChange(change_domain.BaseChange):
     }, {
         'name': CMD_REMOVE_TRANSLATIONS,
         'required_attribute_names': ['content_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_UPDATE_VOICEOVERS,
+        'required_attribute_names': [
+            'content_id', 'language_accent_code', 'voiceovers'],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
         'allowed_values': {},
@@ -895,6 +904,15 @@ class EditTranslationsChangesCmd(ExplorationChange):
     language_code: str
     content_id: str
     translation: feconf.TranslatedContentDict
+
+
+class VoiceoversChangesCmd(ExplorationChange):
+    """Class representing the ExplorationChange's CMD_UPDATE_VOICEOVERS command.
+    """
+
+    content_id: str
+    language_accent_code: str
+    voiceovers: Dict[str, state_domain.VoiceoverDict]
 
 
 class TransientCheckpointUrl:
