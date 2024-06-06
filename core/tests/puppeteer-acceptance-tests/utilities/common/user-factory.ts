@@ -73,8 +73,6 @@ let superAdminInstance: (SuperAdmin & BlogAdmin) | null = null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
-  userHasAcceptedCookies: boolean = false;
-
   /**
    * This function creates a composition of the user and the role
    * through object prototypes and returns the instance of that user.
@@ -195,10 +193,7 @@ export class UserFactory {
     let user = new LoggedOutUser();
     await user.openBrowser();
     await user.page.goto(testConstants.URLs.Home);
-    if (!this.userHasAcceptedCookies) {
-      await user.clickOn(cookieBannerAcceptButton);
-      this.userHasAcceptedCookies = true;
-    }
+    await user.clickOn(cookieBannerAcceptButton);
     activeUsers.push(user);
     return user;
   };
