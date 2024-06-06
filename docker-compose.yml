@@ -86,6 +86,8 @@ services:
       context: .
       dockerfile: ./docker/Dockerfile.backend
     container_name: oppia-cloud-datastore
+    ports:
+      - "8080:8080"
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - DATASTORE_HOST=datastore

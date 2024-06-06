@@ -880,6 +880,14 @@ class UtilsTests(test_utils.GenericTestBase):
             AssertionError, 'Time cannot be negative'):
             utils.get_human_readable_time_string(-1.42)
 
+    def test_get_number_of_days_since_date(self) -> None:
+        self.assertEqual(
+            90,
+            utils.get_number_of_days_since_date(
+                datetime.date.today() - datetime.timedelta(days=90)
+            )
+        )
+
     def test_generate_new_session_id(self) -> None:
         test_string = utils.generate_new_session_id()
         self.assertEqual(24, len(test_string))
