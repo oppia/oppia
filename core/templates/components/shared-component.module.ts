@@ -87,6 +87,8 @@ import {ProgressNavComponent} from 'pages/exploration-player-page/layout-directi
 import {QuestionDifficultySelectorComponent} from './question-difficulty-selector/question-difficulty-selector.component';
 import {PreviewThumbnailComponent} from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import {InputResponsePairComponent} from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
+import {ImageUploaderComponent} from './forms/custom-forms-directives/image-uploader.component';
+import {ImageUploaderModalComponent} from './forms/custom-forms-directives/image-uploader-modal.component';
 import {StorySummaryTileComponent} from './summary-tile/story-summary-tile.component';
 import {ExplorationFooterComponent} from 'pages/exploration-player-page/layout-directives/exploration-footer.component';
 import {DisplaySolutionModalComponent} from 'pages/exploration-player-page/modals/display-solution-modal.component';
@@ -266,6 +268,8 @@ import {DirectivesModule} from 'directives/directives.module';
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
+    ImageUploaderComponent,
+    ImageUploaderModalComponent,
     KeyboardShortcutHelpModalComponent,
     LearnerAnswerInfoCard,
     LazyLoadingComponent,
@@ -415,6 +419,8 @@ import {DirectivesModule} from 'directives/directives.module';
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
+    ImageUploaderComponent,
+    ImageUploaderModalComponent,
     KeyboardShortcutHelpModalComponent,
     ProgressNavComponent,
     PreviewThumbnailComponent,
@@ -545,6 +551,8 @@ import {DirectivesModule} from 'directives/directives.module';
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
+    ImageUploaderComponent,
+    ImageUploaderModalComponent,
     LazyLoadingComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,

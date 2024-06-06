@@ -1852,6 +1852,72 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         expected_language_code_list: List[str] = []
         self.assertEqual(actual_language_code_list, expected_language_code_list)
 
+    def test_get_target_ids_of_reviewable_translation_suggestions_for_user(
+        self
+    ) -> None:
+        language_code = 'hi'
+        fetched_target_id_1, fetched_target_id_2 = ('exp1', 'exp2')
+        self._create_translation_suggestion(language_code, fetched_target_id_1)
+        self._create_translation_suggestion(language_code, fetched_target_id_2)
+        self._create_translation_suggestion(language_code, fetched_target_id_2)
+        self._create_translation_suggestion('bn', 'exp3')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'hi'
+        )
+
+        target_ids = (
+            suggestion_services.
+            get_reviewable_translation_suggestion_target_ids(
+                self.reviewer_id_1, language_code
+            )
+        )
+
+        self.assertCountEqual(
+            target_ids, [fetched_target_id_1, fetched_target_id_2]
+        )
+
+    def test_get_target_ids_of_translations_in_user_reviewable_languages_when_not_filtering_by_language( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        fetched_target_id_1, fetched_target_id_2 = ('exp1', 'exp2')
+        self._create_translation_suggestion('hi', fetched_target_id_1)
+        self._create_translation_suggestion('fr', fetched_target_id_2)
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'hi'
+        )
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'fr'
+        )
+        language_code = None
+
+        target_ids = (
+            suggestion_services.
+            get_reviewable_translation_suggestion_target_ids(
+                self.reviewer_id_1, language_code
+            )
+        )
+
+        self.assertCountEqual(
+            target_ids, [fetched_target_id_1, fetched_target_id_2]
+        )
+
+    def test_get_no_translation_target_ids_when_user_cannot_review_in_given_language( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        language_code = 'cs'
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'hi'
+        )
+
+        target_ids = (
+            suggestion_services.
+            get_reviewable_translation_suggestion_target_ids(
+                self.reviewer_id_1, language_code
+            )
+        )
+
+        self.assertCountEqual(target_ids, [])
+
     def test_get_reviewable_question_suggestions(self) -> None:
         # Add a few translation suggestions in different languages.
         self._create_translation_suggestion_with_language_code('hi')
@@ -4459,22 +4525,22 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestions[0].status, suggestion_models.STATUS_REJECTED)
 
-    def test_remove_exp_from_story_rejects_translation_suggestion(self) -> None:
+    def test_swap_exp_from_story_rejects_translation_suggestion(self) -> None:
         self.create_translation_suggestion_associated_with_exp(
             self.EXP_ID, self.author_id)
         self.assert_created_suggestion_is_valid(self.EXP_ID, self.author_id)
 
-        # Removes the exploration from the story.
+        # Swaps the exploration from the story.
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
                 'cmd': 'update_story_node_property',
                 'property_name': 'exploration_id',
                 'node_id': 'node_1',
                 'old_value': self.EXP_ID,
-                'new_value': None
-            })], 'Removed exploration.')
+                'new_value': 'another_exp_id'
+            })], 'Changed exploration.')
 
-        # Suggestion should be rejected after exploration is removed from the
+        # Suggestion should be rejected after exploration is swapped in the
         # story.
         suggestions = suggestion_services.query_suggestions(
             [('author_id', self.author_id), ('target_id', self.EXP_ID)])
@@ -7335,20 +7401,23 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'reviewer_1', change_cmd, score_category,
             'exploration.exp1.thread_6', 'hi')
 
-        response = suggestion_services.generate_contributor_certificate_data(
-            self.username,
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            'hi',
-            self.from_date,
-            self.to_date,
-        )
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi',
+                self.from_date,
+                self.to_date,
+            ))
 
-        self.assertIsNotNone(response)
+        # Ruling out the possibility of None for mypy type checking.
+        assert certificate_data is not None
+
         self.assertEqual(
-            response['contribution_hours'],
+            certificate_data['contribution_hours'],
             self._calculate_translation_contribution_hours(3)
         )
-        self.assertEqual(response['language'], 'Hindi')
+        self.assertEqual(certificate_data['language'], 'Hindi')
 
     def test_create_translation_contributor_certificate_for_rule_translation(
         self
@@ -7364,20 +7433,23 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'reviewer_1', change_cmd, score_category,
             'exploration.exp1.thread_6', 'hi')
 
-        response = suggestion_services.generate_contributor_certificate_data(
-            self.username,
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            'hi',
-            self.from_date,
-            self.to_date,
-        )
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi',
+                self.from_date,
+                self.to_date,
+            ))
 
-        self.assertIsNotNone(response)
+        # Ruling out the possibility of None for mypy type checking.
+        assert certificate_data is not None
+
         self.assertEqual(
-            response['contribution_hours'],
+            certificate_data['contribution_hours'],
             self._calculate_translation_contribution_hours(4)
         )
-        self.assertEqual(response['language'], 'Hindi')
+        self.assertEqual(certificate_data['language'], 'Hindi')
 
     def test_create_translation_contributor_certificate_for_english(
         self
@@ -7401,20 +7473,23 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'reviewer_1', change_cmd, score_category,
             'exploration.exp1.thread_6', 'en')
 
-        response = suggestion_services.generate_contributor_certificate_data(
-            self.username,
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            'en',
-            self.from_date,
-            self.to_date,
-        )
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'en',
+                self.from_date,
+                self.to_date,
+            ))
 
-        self.assertIsNotNone(response)
+        # Ruling out the possibility of None for mypy type checking.
+        assert certificate_data is not None
+
         self.assertEqual(
-            response['contribution_hours'],
+            certificate_data['contribution_hours'],
             self._calculate_translation_contribution_hours(3)
         )
-        self.assertEqual(response['language'], 'English')
+        self.assertEqual(certificate_data['language'], 'English')
 
     def test_create_question_contributor_certificate(self) -> None:
         content_id_generator = translation_domain.ContentIdGenerator()
@@ -7456,17 +7531,20 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'reviewer_2', suggestion_change, 'category1',
             'thread_1', 'en')
 
-        response = suggestion_services.generate_contributor_certificate_data(
-            self.username,
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            None,
-            self.from_date,
-            self.to_date,
-        )
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                None,
+                self.from_date,
+                self.to_date,
+            ))
 
-        self.assertIsNotNone(response)
+        # Ruling out the possibility of None for mypy type checking.
+        assert certificate_data is not None
+
         self.assertEqual(
-            response['contribution_hours'],
+            certificate_data['contribution_hours'],
             self._calculate_question_contribution_hours(False)
         )
 
@@ -7513,49 +7591,50 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'reviewer_2', suggestion_change, 'category1',
             'thread_1', 'en')
 
-        response = suggestion_services.generate_contributor_certificate_data(
-            self.username,
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            None,
-            self.from_date,
-            self.to_date,
-        )
-
-        self.assertIsNotNone(response)
-        self.assertEqual(
-            response['contribution_hours'],
-            self._calculate_question_contribution_hours(True)
-        )
-
-    def test_create_contributor_certificate_raises_exception_for_no_suggestions(
-        self
-    ) -> None:
-        with self.assertRaisesRegex(
-            Exception,
-            'There are no contributions for the given time range.'
-        ):
-            suggestion_services.generate_contributor_certificate_data(
-                self.username,
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                'hi',
-                self.from_date,
-                self.to_date,
-            )
-
-    def test_create_certificate_raises_exception_for_no_question_suggestions(
-        self
-    ) -> None:
-        with self.assertRaisesRegex(
-            Exception,
-            'There are no contributions for the given time range.'
-        ):
+        certificate_data = (
             suggestion_services.generate_contributor_certificate_data(
                 self.username,
                 feconf.SUGGESTION_TYPE_ADD_QUESTION,
                 None,
                 self.from_date,
                 self.to_date,
-            )
+            ))
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert certificate_data is not None
+
+        self.assertEqual(
+            certificate_data['contribution_hours'],
+            self._calculate_question_contribution_hours(True)
+        )
+
+    def test_create_certificate_returns_none_for_no_translation_suggestions(
+        self
+    ) -> None:
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi',
+                self.from_date,
+                self.to_date,
+            ))
+
+        self.assertIsNone(certificate_data)
+
+    def test_create_certificate_returns_none_for_no_question_suggestions(
+        self
+    ) -> None:
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                None,
+                self.from_date,
+                self.to_date,
+            ))
+
+        self.assertIsNone(certificate_data)
 
     def test_create_contributor_certificate_raises_exception_for_wrong_language(
         self

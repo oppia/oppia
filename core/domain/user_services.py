@@ -32,6 +32,8 @@ from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import exp_fetchers
 from core.domain import fs_services
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import role_services
 from core.domain import state_domain
 from core.domain import user_domain
@@ -1642,8 +1644,7 @@ def update_email_preferences(
             to the bulk email provider's database initiated the update here.
 
     Returns:
-        bool. Whether to send a mail to the user to complete bulk email service
-        signup.
+        bool. Whether updating the user's bulk email preferences failed.
     """
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
         user_id, strict=False)
@@ -1660,7 +1661,12 @@ def update_email_preferences(
     email = get_email_from_user_id(user_id)
     # Mailchimp database should not be updated in servers where sending
     # emails is not allowed.
-    if not bulk_email_db_already_updated and feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not bulk_email_db_already_updated and server_can_send_emails:
         user_creation_successful = (
             bulk_email_services.add_or_update_user_status(
                 email, {}, 'Account',

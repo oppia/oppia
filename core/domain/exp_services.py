@@ -65,6 +65,7 @@ from core.domain import taskqueue_services
 from core.domain import translation_services
 from core.domain import user_domain
 from core.domain import user_services
+from core.domain import voiceover_services
 from core.platform import models
 from extensions import domain
 
@@ -2079,10 +2080,25 @@ def compute_models_to_put_when_saving_new_exp_version(
         )
     )
 
+    voiceover_services.update_exploration_voice_artist_link_model(
+        committer_id, change_list, old_exploration, updated_exploration)
+
     new_content_id_set = set(updated_exploration.get_translatable_content_ids())
     content_ids_corresponding_translations_to_remove = (
         old_content_id_set - new_content_id_set
     )
+
+    voiceover_changes = []
+    for change in change_list:
+        if change.cmd == exp_domain.CMD_UPDATE_VOICEOVERS:
+            voiceover_changes.append(change)
+
+    new_voiceover_models = voiceover_services.compute_voiceover_related_change(
+        updated_exploration,
+        voiceover_changes
+    )
+
+    models_to_put.extend(new_voiceover_models)
 
     translation_changes = []
     for change in change_list:

@@ -39,6 +39,7 @@ build.%: ## Builds the given docker service. Example: make build.datastore
 
 build: ## Builds the all docker setup.
 	$(MAKE) install_node
+	$(MAKE) install_hooks
 	docker compose build
 
 run-devserver: ## Runs the dev-server
@@ -71,10 +72,9 @@ start-devserver: ## Starts the development server
 	@echo 'Check dev-server logs using "make logs.dev-server"'
 	@echo 'Stop the development server using "make stop"'
 
-init: install-hooks build run-devserver ## Initializes the build and runs dev-server.
-
-install-hooks:  ## Install required hooks
+install_hooks:  ## Install required hooks
 	bash ./docker/pre_push_hook.sh --install
+	bash ./docker/pre_commit_hook.sh --install
 
 clean: ## Cleans the docker containers and volumes.
 	docker compose down --rmi all --volumes
@@ -184,7 +184,7 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 		rm -rf ./core/tests/puppeteer-acceptance-tests/build; \
 	fi
 	../oppia_tools/node-16.13.0/bin/node ./node_modules/typescript/bin/tsc -p ./tsconfig.puppeteer-acceptance-tests.json
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/build/spec/$(suite).spec.js
+	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/build/specs/$(suite).spec.js
 	@echo '------------------------------------------------------'
 	@echo '  Acceptance test has been executed successfully....'
 	@echo '------------------------------------------------------'
