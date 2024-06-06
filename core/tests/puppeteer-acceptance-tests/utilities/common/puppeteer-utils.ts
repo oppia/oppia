@@ -410,6 +410,15 @@ export class BaseUser {
   getCurrentUrlWithoutParameters(): string {
     return this.page.url().split('?')[0];
   }
+
+  /**
+   * This function checks if a particular text exists on the current page.
+   * @param {string} text - The text to check for.
+   */
+  async isTextPresentOnPage(text: string): Promise<boolean> {
+    const pageContent = await this.page.content();
+    return pageContent.includes(text);
+  }
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();

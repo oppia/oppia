@@ -325,6 +325,7 @@ jobs:
             - practice-question-admin/add-and-remove-contribution-rights
             - translation-admin/add-and-remove-translation-rights
             - voiceover-admin/add-voiceover-artist-to-an-exploration
+            - super-admin/edit-user-roles
       steps:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v3
