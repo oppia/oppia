@@ -20,7 +20,7 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import { ConsoleReporter } from '../../utilities/common/console-reporter';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
@@ -28,7 +28,7 @@ ConsoleReporter.setConsoleErrorsToIgnore([
   /http:\/\/localhost:8181\/access_validation_handler\/can_access_classroom_page\?/,
   /classroom_url_fragment=math Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
   /webpack:\/\/\/\.\/core\/templates\/services\/contextual\/logger\.service\.ts\?/,
-  /The requested path \/learn\/math is not found\./
+  /The requested path \/learn\/math is not found\./,
 ]);
 
 describe('Logged-out User in About page', function () {
