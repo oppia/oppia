@@ -268,7 +268,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE.value: (
         (
             'This flag activates the redesigned topic viewer page'
-            'and making it accessible to learners.',
+            'and makes it accessible to learners.',
             feature_flag_domain.ServerMode.DEV
         )
     )
