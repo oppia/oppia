@@ -4066,6 +4066,10 @@ div.oppia-issues-learner-action {
   }
 }
 
+.oppia-modify-translations-modal {
+  align-content: center;
+}
+
 .oppia-typeahead-form .dropdown-item.active {
   color: #212529;
 }

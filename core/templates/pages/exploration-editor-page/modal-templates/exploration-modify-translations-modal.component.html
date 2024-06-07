@@ -1,0 +1,91 @@
+<div class="modal-header">
+  <h4 class="modal-title">Modify Existing Translations</h4>
+</div>
+<div class="modal-body">
+  <p>
+    *Please update any translations below which are easy to update, and tick the ones you're
+    confident about. Those translations will be saved and shown directly to learners as soon
+    as you save the pending changes to the exploration.
+  </p>
+  <p>Any translations that don't have a check mark will be sent for re-translation.</p>
+  <div *ngIf="contentTranslations && (contentTranslations | keyvalue).length > 0" class="content-translations-container">
+    <div *ngFor="let item of contentTranslations | keyvalue" class="content-translation-block">
+      <div class="content-translation-language">
+        <span>
+          <input type="checkbox" name="" id="">
+          <p>{{ item.key }}</p>
+        </span>
+        <i class="fas fa-pencil-alt"></i>
+      </div>
+      <div class="content-translation-value" [innerHTML]="item.value"></div>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" (click)="cancel()" class="btn btn-secondary">Cancel</button>
+  <button type="button" (click)="confirm()" class="btn btn-success e2e-test-confirm-discard-changes">Done</button>
+</div>
+
+<style>
+  .modal-header {
+    justify-content: center;
+  }
+
+  .modal-title {
+    color: #00645C;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    height: 25px;
+  }
+
+  .modal-body p {
+    font-size: 15px;
+  }
+
+  .modal-body .content-translations-container {
+    border-top: 1px solid rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+    padding-top: 14px;
+  }
+
+  .modal-body .content-translation-block {
+    margin-bottom: 12px;
+    padding-bottom: 11px;
+  }
+
+  .modal-body .content-translation-block:not(:last-child) {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-body .content-translation-language {
+    display: flex;
+    font-size: 18px;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .content-translation-language span {
+    display: flex;
+  }
+
+  .content-translation-language p {
+    font-size: 18px;
+  }
+
+  .content-translation-language input[type=checkbox] {
+    margin-right: 8px;
+    width: 18px;
+  }
+
+  .content-translation-value {
+    border: 1px solid #ccc;
+    max-height: 115px;
+    overflow-y: scroll;
+    padding: 20px;
+  }
+
+  .content-translation-value p {
+    font-size: 14px;
+  }
+</style>
