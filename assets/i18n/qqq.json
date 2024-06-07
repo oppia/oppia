@@ -100,8 +100,6 @@
 	"I18N_ABOUT_PAGE_IMPACT_SECTION_SUBTEXT2": "Text displayed below the title of the impact section in Oppia's About page telling about the impact of Oppia.",
 	"I18N_ABOUT_PAGE_IMPACT_SECTION_TITLE": "Title of the impact section in Oppia's About page.",
 	"I18N_ABOUT_PAGE_IMPACT_SECTION_TOP_10_COUNTRIES_TEXT": "Text displayed in the impact section of Oppia's About page telling about the top 10 countries using Oppia.",
-	"I18N_ABOUT_PAGE_IMPACT_SECTION_UPDATES_BUTTON_SUBTEXT": "Text displayed below the 'View updates' button in the impact section of Oppia's About page that encourages users to read the updates report.",
-	"I18N_ABOUT_PAGE_IMPACT_SECTION_UPDATES_BUTTON_TEXT": "Text displayed in a button in the impact section of Oppia's About page. - When the user clicks the button they are taken to the Oppia Foundation's updates report",
 	"I18N_ABOUT_PAGE_LANGUAGE_FEATURE": "Text below fifth icon in second section of Oppia's About page telling about the feature of translation in local dialects.",
 	"I18N_ABOUT_PAGE_LEARN_BUTTON": "Text displayed inside a button at the bottom of Oppia's About page. - This button is a call-to-action for users who want to learn.",
 	"I18N_ABOUT_PAGE_LEARN_FROM": "Title in fourth section in Oppia's About page telling about Oppia's curated lessons.",

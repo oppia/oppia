@@ -115,8 +115,6 @@ export class AboutPageComponent {
       }
     );
 
-    // Console.log(this.oppiaWebsiteBarChartData);
-
     const maxAndroidUserCount = Math.max(
       ...this.oppiaAndroidRawBarChartData.map(dataPoint => dataPoint.userCount)
     );
@@ -132,8 +130,6 @@ export class AboutPageComponent {
         };
       }
     );
-
-    // Console.log(this.oppiaAndroidBarChartData);
   }
 
   getStaticImageUrl(imagePath: string): string {

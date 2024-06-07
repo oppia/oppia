@@ -177,12 +177,6 @@
   margin: 8px 0 0 16px;
 }
 
-.about-page .oppia-about-impact-section-buttons {
-  column-gap: 16px;
-  display: flex;
-  flex-direction: row;
-}
-
 .about-page .oppia-about-impact-section-button-container {
   align-items: center;
   background-color: #eee;
@@ -192,7 +186,7 @@
   justify-content: center;
   padding: 24px 32px;
   row-gap: 8px;
-  width: 50%;
+  width: 100%;
 }
 
 .about-page .oppia-about-impact-buttons-content {
@@ -355,6 +349,43 @@
   width: 8%;
 }
 
+@media only screen and (max-width: 1110px) {
+  .about-page .oppia-scale-number {
+    font-size: 14px;
+  }
+
+  .about-page .charts-css .data {
+    font-size: 16px;
+    margin-right: 4px;
+  }
+}
+
+@media only screen and (max-width: 976px) {
+  .about-page .oppia-about-impact-charts-container {
+    flex-direction: column;
+    margin: 32px 0 56px;
+    padding: 0;
+    row-gap: 56px;
+    width: 100%;
+  }
+
+  .about-page .oppia-about-impact-chart-container {
+    width: 100%;
+  }
+
+  .about-page .oppia-about-impact-bar-chart-container {
+    width: 80%;
+  }
+
+  .about-page .oppia-scale-number {
+    font-size: 16px;
+  }
+
+  .about-page .charts-css .data {
+    margin-right: 24px;
+  }
+}
+
 @media only screen and (max-width: 769px) {
 
   .about-page .oppia-about-foundation-section {
@@ -436,22 +467,6 @@
     line-height: 22.4px;
   }
 
-  .about-page .oppia-about-impact-charts-container {
-    flex-direction: column;
-    margin: 32px 0 56px;
-    padding: 0;
-    row-gap: 56px;
-    width: 100%;
-  }
-
-  .about-page .oppia-about-impact-chart-container {
-    width: 100%;
-  }
-
-  .about-page .oppia-about-impact-bar-chart-container {
-    width: 80%;
-  }
-
   .about-page .oppia-bar-chart th span,
   .about-page .charts-css .data,
   .about-page .oppia-scale-number {
@@ -491,15 +506,6 @@
     padding: 0 24px 64px;
   }
 
-  .about-page .oppia-about-impact-section-button-container {
-    width: 100%;
-  }
-
-  .about-page .oppia-about-impact-section-buttons {
-    flex-direction: column;
-    row-gap: 16px;
-  }
-
   .about-page .oppia-about-impact-charts-container {
     margin: 16px 0 48px;
     padding: 0 16px;
@@ -508,6 +514,54 @@
 
   .about-page .oppia-about-impact-bar-chart-container {
     width: 98%;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .about-page .oppia-about-impact-charts-container {
+    margin: 32px 0;
+    padding: 0;
+    row-gap: 28px;
+  }
+
+  .about-page .oppia-about-impact-bar-chart-container {
+    width: 100%;
+  }
+
+  .about-page .oppia-bar-chart th {
+    padding: 0 15px 0 0;
+  }
+
+  .about-page .charts-css.bar {
+    --labels-size: 150px;
+  }
+
+  .about-page .oppia-bar-chart th span,
+  .about-page .charts-css .data,
+  .about-page .oppia-scale-number {
+    font-size: 13px;
+  }
+
+  .about-page .charts-css .data {
+    margin-right: 8px;
+  }
+
+  .about-page .charts-css.bar tbody tr td {
+    min-height: 16px;
+  }
+
+  .about-page .oppia-scale-number {
+    font-size: 13px;
+    line-height: normal;
+  }
+
+  .about-page .oppia-scale-line {
+    font-size: 8px;
+    line-height: normal;
+  }
+
+  .about-page .oppia-android-scale-type-2 {
+    width: 8%;
   }
 }
 
@@ -586,56 +640,6 @@
   .about-page .stat-subtext {
     font-size: 1.3rem;
     margin: 8px 0 0 7px;
-  }
-
-  .about-page .oppia-about-impact-section-buttons {
-    row-gap: 8px;
-  }
-
-  .about-page .oppia-about-impact-charts-container {
-    margin: 32px 0;
-    padding: 0;
-    row-gap: 28px;
-  }
-
-  .about-page .oppia-about-impact-bar-chart-container {
-    width: 100%;
-  }
-
-  .about-page .oppia-bar-chart th {
-    padding: 0 15px 0 0;
-  }
-
-  .about-page .charts-css.bar {
-    --labels-size: 150px;
-  }
-
-  .about-page .oppia-bar-chart th span,
-  .about-page .charts-css .data,
-  .about-page .oppia-scale-number {
-    font-size: 13px;
-  }
-
-  .about-page .charts-css .data {
-    margin-right: 8px;
-  }
-
-  .about-page .charts-css.bar tbody tr td {
-    min-height: 16px;
-  }
-
-  .about-page .oppia-scale-number {
-    font-size: 13px;
-    line-height: normal;
-  }
-
-  .about-page .oppia-scale-line {
-    font-size: 8px;
-    line-height: normal;
-  }
-
-  .about-page .oppia-android-scale-type-2 {
-    width: 8%;
   }
 
 }
