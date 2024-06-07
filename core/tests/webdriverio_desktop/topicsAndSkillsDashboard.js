@@ -71,8 +71,8 @@ describe('Topics and skills dashboard functionality', function () {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_NAME,
-      'alpha-tasd',
-      'Alpha description',
+      'topic-tasd-one',
+      'Topic 1 description',
       false
     );
 
