@@ -550,14 +550,16 @@ class EditableTopicDataHandler(
         self.values.update({
             'classroom_url_fragment': (
                 None if (
+                    classroom_url_fragment
+                    ==
                     str(constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)
-                    == classroom_url_fragment
                 ) else classroom_url_fragment
             ),
             'classroom_name': (
                 None if (
+                    classroom_name
+                    ==
                     str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)
-                    == classroom_name
                 ) else classroom_name
             ),
             'topic_dict': topic.to_dict(),

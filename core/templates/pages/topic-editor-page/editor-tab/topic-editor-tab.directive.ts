@@ -240,10 +240,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   isAssignedToAClassroom(): boolean {
-    if (this.classroomUrlFragment && this.classroomName) {
-      return true;
-    }
-    return false;
+    return Boolean(this.classroomUrlFragment && this.classroomName);
   }
 
   _initStorySummaries(): void {
