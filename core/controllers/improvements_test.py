@@ -28,9 +28,6 @@ from core.controllers import improvements
 from core.domain import exp_services
 from core.domain import improvements_domain
 from core.domain import improvements_services
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
 from core.domain import platform_parameter_list
 from core.platform import models
 from core.tests import test_utils

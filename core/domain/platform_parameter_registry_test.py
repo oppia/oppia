@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import copy
 import enum
 
 from core import feconf

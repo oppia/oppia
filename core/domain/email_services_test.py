@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core.constants import constants
 from core.domain import email_services
 from core.domain import platform_parameter_list
@@ -59,7 +58,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS, 
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com'
             )
         ]
@@ -83,7 +82,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS, 
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com'
             )
         ]
@@ -225,7 +224,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS, 
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com'
             )
         ]

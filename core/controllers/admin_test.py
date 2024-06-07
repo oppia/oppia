@@ -793,7 +793,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
             'system@example.com'
         )]
     )
@@ -816,7 +816,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
             'system@example.com'
         )]
     )
@@ -864,7 +864,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
             'system@example.com'
         )]
     )
@@ -915,7 +915,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [(
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
             'system@example.com'
         )]
     )

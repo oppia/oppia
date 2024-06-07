@@ -21,7 +21,6 @@ from __future__ import annotations
 import logging
 import textwrap
 
-from core import feconf
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_services
 from core.platform.email import dev_mode_email_services
@@ -142,6 +141,7 @@ class EmailTests(test_utils.GenericTestBase):
             ' environment.')
 
         with self.swap(logging, 'info', _mock_logging_function):
+            assert isinstance(self.system_email_address, str)
             dev_mode_email_services.send_email_to_recipients(
                 self.system_email_address,
                 ['a@a.com', 'b@b.com', 'c@c.com', 'd@d.com'],

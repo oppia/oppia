@@ -17878,11 +17878,11 @@ class ExplorationChangesMergeabilityUnitTests(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS, 
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com'
             ),
             (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
             ),
             (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.')
@@ -17892,6 +17892,7 @@ class ExplorationChangesMergeabilityUnitTests(
         self
     ) -> None:
         self.login(self.OWNER_EMAIL)
+        assert isinstance(self.admin_email_address, str)
         messages = self._get_sent_email_messages(self.admin_email_address)
         self.assertEqual(len(messages), 0)
         self.save_new_valid_exploration(
@@ -18216,6 +18217,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'Backend Version: %s<br><br>'
             'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 1, 3)
         )
+        assert isinstance(self.admin_email_address, str)
         messages = self._get_sent_email_messages(self.admin_email_address)
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].html, expected_email_html_body)
@@ -18224,7 +18226,7 @@ class ExplorationChangesMergeabilityUnitTests(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS, 
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com'
             ),
             (
@@ -18238,6 +18240,7 @@ class ExplorationChangesMergeabilityUnitTests(
         self
     ) -> None:
         self.login(self.OWNER_EMAIL)
+        assert isinstance(self.admin_email_address, str)
         messages = self._get_sent_email_messages(self.admin_email_address)
         self.assertEqual(len(messages), 0)
         self.save_new_valid_exploration(
@@ -18307,6 +18310,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'Backend Version: %s<br><br>'
             'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 2, 3)
         )
+        assert isinstance(self.admin_email_address, str)
         messages = self._get_sent_email_messages(self.admin_email_address)
         self.assertEqual(len(messages), 1)
         self.assertEqual(expected_email_html_body, messages[0].html)
