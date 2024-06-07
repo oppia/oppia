@@ -25,6 +25,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import blog_services
+from core.domain import caching_services
 from core.domain import classroom_config_services
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -86,15 +87,29 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         """Complete the signup process for self.CURRICULUM_ADMIN_EMAIL."""
         super().setUp()
+
         self.admin_email_address = (
             platform_parameter_services.get_platform_parameter_value(
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
         assert isinstance(self.admin_email_address, str)
+
+        self.original_parameter_registry = (
+            platform_parameter_registry.Registry.parameter_registry.copy())
+        platform_parameter_registry.Registry.parameter_registry.clear()
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
+            ['test_param_1'])
+
         self.signup(self.admin_email_address, 'testsuper')
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+
+    def tearDown(self) -> None:
+        super().tearDown()
+        platform_parameter_registry.Registry.parameter_registry = (
+            self.original_parameter_registry)
 
     def test_admin_get(self) -> None:
         """Test `/admin` returns a 200 response."""
@@ -776,20 +791,21 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 
+            'system@example.com'
+        )]
+    )
     def test_get_handler_includes_all_platform_params(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         param = self._create_dummy_param()
 
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            'system@example.com'
-        )
         with self.swap(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1]
-        ), swap_platform_parameter_value:
+        ):
             response_dict = self.get_json('/adminhandler')
         self.assertEqual(
             response_dict['platform_params_dicts'], [param.to_dict()])
@@ -798,6 +814,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             param.name)
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 
+            'system@example.com'
+        )]
+    )
     def test_post_with_rules_changes_updates_platform_params(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -815,16 +837,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            'system@example.com'
-        )
         with self.swap(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1]
-        ), swap_platform_parameter_value:
+        ):
             self.post_json(
                 '/adminhandler', {
                     'action': 'update_platform_parameter_rules',
@@ -845,6 +862,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             param.name)
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 
+            'system@example.com'
+        )]
+    )
     def test_post_rules_changes_correctly_updates_params_returned_by_getter(
         self
     ) -> None:
@@ -864,16 +887,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            'system@example.com'
-        )
         with self.swap(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1]
-        ), swap_platform_parameter_value:
+        ):
             response_dict = self.get_json('/adminhandler')
             self.assertEqual(
                 response_dict['platform_params_dicts'], [param.to_dict()])
@@ -895,6 +913,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             param.name)
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 
+            'system@example.com'
+        )]
+    )
     def test_update_parameter_rules_with_unknown_param_name_raises_error(
         self
     ) -> None:
@@ -913,16 +937,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            'system@example.com'
-        )
         with self.swap(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1]
-        ), swap_platform_parameter_value:
+        ):
             response = self.post_json(
                 '/adminhandler', {
                     'action': 'update_platform_parameter_rules',
@@ -2489,22 +2508,36 @@ class SendDummyMailTest(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-    def test_send_dummy_mail(self) -> None:
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.')
+        ]
+    )
+    def test_can_send_dummy_mail(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
+        generated_response = self.post_json(
+            '/senddummymailtoadminhandler', {},
+            csrf_token=csrf_token, expected_status_int=200)
+        self.assertEqual(generated_response, {})
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            generated_response = self.post_json(
-                '/senddummymailtoadminhandler', {},
-                csrf_token=csrf_token, expected_status_int=200)
-            self.assertEqual(generated_response, {})
-
-        with self.swap(feconf, 'CAN_SEND_EMAILS', False):
-            generated_response = self.post_json(
-                '/senddummymailtoadminhandler', {},
-                csrf_token=csrf_token, expected_status_int=400)
-            self.assertEqual(
-                generated_response['error'], 'This app cannot send emails.')
+    def test_cannot_send_dummy_mail(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        generated_response = self.post_json(
+            '/senddummymailtoadminhandler', {},
+            csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            generated_response['error'], 'This app cannot send emails.')
 
 
 class UpdateUsernameHandlerTest(test_utils.GenericTestBase):

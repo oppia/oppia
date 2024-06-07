@@ -42,6 +42,9 @@ class EmailTests(test_utils.GenericTestBase):
             platform_parameter_services.get_platform_parameter_value(
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+    )
     def test_send_mail_logs_to_terminal(self) -> None:
         """In DEV Mode, platforms email_service API that sends a singular email
         logs the correct email info to terminal.
@@ -78,11 +81,9 @@ class EmailTests(test_utils.GenericTestBase):
             'dev environment. Emails are sent out in the production' +
             ' environment.')
 
-        allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         assert isinstance(self.admin_email_address, str)
         assert isinstance(self.system_email_address, str)
-        with allow_emailing, (
-            self.swap(logging, 'info', _mock_logging_function)):
+        with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_email_services.send_email_to_recipients(
                 self.system_email_address, [self.admin_email_address],
                 'subject', 'body', 'html')
@@ -91,6 +92,9 @@ class EmailTests(test_utils.GenericTestBase):
             observed_log_messages,
             [logging_info_email_body, logging_info_notification])
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+    )
     def test_send_mail_to_multiple_recipients_logs_to_terminal(self) -> None:
         """In DEV Mode, platform email_services that sends mail to multiple
         recipients logs the correct info to terminal.
@@ -137,10 +141,7 @@ class EmailTests(test_utils.GenericTestBase):
             'dev environment. Emails are sent out in the production' +
             ' environment.')
 
-        allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        assert isinstance(self.system_email_address, str)
-        with allow_emailing, (
-            self.swap(logging, 'info', _mock_logging_function)):
+        with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_email_services.send_email_to_recipients(
                 self.system_email_address,
                 ['a@a.com', 'b@b.com', 'c@c.com', 'd@d.com'],

@@ -46,8 +46,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.original_param_registry = copy.deepcopy(
-            registry.Registry.parameter_registry)
+        self.original_parameter_registry = (
+            registry.Registry.parameter_registry.copy())
         registry.Registry.parameter_registry.clear()
 
         # Parameter names that might be used in following tests.
@@ -59,7 +59,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def tearDown(self) -> None:
         super().tearDown()
 
-        registry.Registry.parameter_registry = self.original_param_registry
+        registry.Registry.parameter_registry = self.original_parameter_registry
 
     def _create_example_parameter_with_name(self, name: str) -> None:
         """Creates and returns an example parameter with the given name."""

@@ -192,6 +192,20 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             classifier_training_job.status,
             feconf.TRAINING_JOB_STATUS_COMPLETE)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.')
+        ]
+    )
     def test_email_sent_on_failed_job(self) -> None:
 
         class FakeTrainingJob:
@@ -203,17 +217,15 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         def mock_get_classifier_training_job_by_id(_: str) -> FakeTrainingJob:
             return FakeTrainingJob()
 
-        can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
         can_send_feedback_email_ctx = self.swap(
-            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
         fail_training_job = self.swap(
             classifier_services,
             'get_classifier_training_job_by_id',
             mock_get_classifier_training_job_by_id)
 
         assert isinstance(self.admin_email_address, str)
-        with can_send_emails_ctx, can_send_feedback_email_ctx:
+        with can_send_feedback_email_ctx:
             with fail_training_job:
                 # Check that there are no sent emails to the
                 # email address before posting json.

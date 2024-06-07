@@ -31,6 +31,7 @@ from core.domain import improvements_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_services
+from core.domain import platform_parameter_list
 from core.platform import models
 from core.tests import test_utils
 
@@ -703,24 +704,16 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
         self.assertTrue(json_response['is_improvements_tab_enabled'])
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD, 0.35),  # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD, 0),  # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 0), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com') # pylint: disable=line-too-long
+        ]
+    )
     def test_custom_high_bounce_rate_creation_threshold(self) -> None:
-        def mock_get_platform_parameter_value_function(
-            param_name: str
-        ) -> platform_parameter_domain.PlatformDataTypes:
-            if param_name == (
-                platform_parameter_list.ParamName.
-                HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD.value
-            ):
-                return 0.35
-            return ''
-        swap_get_platform_parameter_value = self.swap(
-            platform_parameter_services, 'get_platform_parameter_value',
-            mock_get_platform_parameter_value_function
-        )
-
-        with swap_get_platform_parameter_value, self.login_context(
-            self.OWNER_EMAIL
-        ):
+        with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url())
 
         self.assertAlmostEqual(
@@ -728,25 +721,16 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
                 'high_bounce_rate_task_state_bounce_rate_creation_threshold'],
             0.35)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD, 0),  # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD, 0.05),  # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 0), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com') # pylint: disable=line-too-long
+        ]
+    )
     def test_custom_high_bounce_rate_obsoletion_threshold(self) -> None:
-        def mock_get_platform_parameter_value_function(
-            param_name: str
-        ) -> platform_parameter_domain.PlatformDataTypes:
-            if param_name == (
-                platform_parameter_list.ParamName.
-                HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD.
-                value
-            ):
-                return 0.05
-            return ''
-        swap_get_platform_parameter_value = self.swap(
-            platform_parameter_services, 'get_platform_parameter_value',
-            mock_get_platform_parameter_value_function
-        )
-
-        with swap_get_platform_parameter_value, self.login_context(
-            self.OWNER_EMAIL
-        ):
+        with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url())
 
         self.assertAlmostEqual(
@@ -754,27 +738,18 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
                 'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold'],
             0.05)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD, 0),  # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD, 0),  # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 20), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com') # pylint: disable=line-too-long
+        ]
+    )
     def test_custom_high_bounce_rate_task_minimum_exploration_starts(
         self
     ) -> None:
-        def mock_get_platform_parameter_value_function(
-            param_name: str
-        ) -> platform_parameter_domain.PlatformDataTypes:
-            if param_name == (
-                platform_parameter_list.ParamName.
-                HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS.
-                value
-            ):
-                return 20
-            return ''
-        swap_get_platform_parameter_value = self.swap(
-            platform_parameter_services, 'get_platform_parameter_value',
-            mock_get_platform_parameter_value_function
-        )
-
-        with swap_get_platform_parameter_value, self.login_context(
-            self.OWNER_EMAIL
-        ):
+        with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url())
 
         self.assertAlmostEqual(

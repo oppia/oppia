@@ -158,6 +158,94 @@ describe('Interaction object factory', () => {
     });
   });
 
+  it('should be able to get contentId to html of an interaction', () => {
+    defaultOutcomeDict = {
+      dest: 'dest_default',
+      dest_if_really_stuck: null,
+      feedback: {
+        content_id: 'default_outcome',
+        html: 'Wrong answer',
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null,
+    };
+    answerGroupsDict = [
+      {
+        rule_specs: [],
+        outcome: {
+          dest: 'dest_1',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'outcome_1',
+            html: 'Good answer',
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        },
+        training_data: ['training_data'],
+        tagged_skill_misconception_id: 'skill_id-1',
+      },
+    ];
+    hintsDict = [
+      {
+        hint_content: {
+          html: '<p>First Hint</p>',
+          content_id: 'content_id1',
+        },
+      },
+      {
+        hint_content: {
+          html: '<p>Second Hint</p>',
+          content_id: 'content_id2',
+        },
+      },
+    ];
+
+    solutionDict = {
+      answer_is_exclusive: false,
+      correct_answer: 'This is a correct answer!',
+      explanation: {
+        content_id: 'solution',
+        html: 'This is the explanation to the answer',
+      },
+    };
+
+    interactionDict = {
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        placeholder: {
+          value: {
+            content_id: 'ca_placeholder_0',
+            unicode_str: 'Enter text',
+          },
+        },
+        rows: {value: 1},
+        catchMisspellings: {
+          value: false,
+        },
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'TextInput',
+      solution: solutionDict,
+    };
+    const testInteraction = iof.createFromBackendDict(interactionDict);
+
+    let contentIdToHtml = testInteraction.getContentIdToHtml();
+    expect(contentIdToHtml).toEqual({
+      outcome_1: 'Good answer',
+      default_outcome: 'Wrong answer',
+    });
+
+    let contentId = testInteraction.getContentIdForMatchingHtml('Good answer');
+    expect(contentId).toEqual('outcome_1');
+  });
+
   it(
     'should correctly set customization arguments for ' +
       'AlgebraicExpressionInput',

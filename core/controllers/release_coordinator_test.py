@@ -58,7 +58,7 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
             response['total_allocation'], 0)
         self.assertEqual(
             response['peak_allocation'], 0)
-        # Cache contains csrf secrets and all platform parameters. Platform
+        # Cache contains csrf secret and all platform parameters. Platform
         # parameters are accessed in user services to retrieve system email
         # address and hence cached.
         self.assertEqual(
@@ -69,7 +69,7 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
 
         response = self.get_json('/memorycachehandler')
-        # Cache contains csrf secrets and all platform parameters. Platform
+        # Cache contains csrf secret and all platform parameters. Platform
         # parameters are accessed in user services to retrieve system email
         # address and hence cached.
         self.assertEqual(
