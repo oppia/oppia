@@ -329,6 +329,16 @@ describe('Classroom backend API service', function () {
       course_details: 'Curated math foundations course.',
       topic_list_intro: 'Start from the basics with our first topic.',
       topic_id_to_prerequisite_topic_ids: {},
+      teaser_text: 'Teaser text of the classroom',
+      is_published: true,
+      thumbnail: {
+        filename: 'thumbnail.svg',
+        bg_color: 'transparent',
+      },
+      banner: {
+        filename: 'banner.svg',
+        bg_color: 'transparent',
+      },
     };
     let payload = {
       classroom_dict: classroomBackendDict,
@@ -361,6 +371,16 @@ describe('Classroom backend API service', function () {
       course_details: 'Curated math foundations course.',
       topic_list_intro: 'Start from the basics with our first topic.',
       topic_id_to_prerequisite_topic_ids: {},
+      teaser_text: 'Teaser text of the classroom',
+      is_published: true,
+      thumbnail: {
+        filename: 'thumbnail.svg',
+        bg_color: 'transparent',
+      },
+      banner: {
+        filename: 'banner.svg',
+        bg_color: 'transparent',
+      },
     };
     let payload = {
       classroom_dict: classroomBackendDict,
