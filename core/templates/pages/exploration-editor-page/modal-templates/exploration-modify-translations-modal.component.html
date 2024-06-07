@@ -17,7 +17,10 @@
         </span>
         <i class="fas fa-pencil-alt"></i>
       </div>
-      <div class="content-translation-value" [innerHTML]="item.value"></div>
+      <div class="content-translation-value">
+        <oppia-rte-output-display [rteString]="item.value" class="translations-rte-output-display">
+        </oppia-rte-output-display>
+      </div>
     </div>
   </div>
 </div>
@@ -39,6 +42,10 @@
     height: 25px;
   }
 
+  .modal-body {
+    padding: 24px;
+  }
+
   .modal-body p {
     font-size: 15px;
   }
@@ -46,12 +53,35 @@
   .modal-body .content-translations-container {
     border-top: 1px solid rgba(0, 0, 0, 0.5);
     border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+    max-height: 330px;
+    overflow-y: scroll;
+    padding-right: 8px;
     padding-top: 14px;
+  }
+
+  .content-translations-container::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .content-translations-container::-webkit-scrollbar-track {
+    background: #e7e7e7;
+    border-radius: 5px;
+  }
+
+  .content-translations-container::-webkit-scrollbar-thumb {
+    background: #808080;
+    border-radius: 5px;
+    transition: background 0.5s ease;
+  }
+
+  .content-translations-container::-webkit-scrollbar-thumb:hover {
+    background: rgb(102, 102, 102);
   }
 
   .modal-body .content-translation-block {
     margin-bottom: 12px;
     padding-bottom: 11px;
+    padding-top: 4px;
   }
 
   .modal-body .content-translation-block:not(:last-child) {
@@ -85,7 +115,7 @@
     padding: 20px;
   }
 
-  .content-translation-value p {
+  ::ng-deep .translations-rte-output-display p {
     font-size: 14px;
   }
 </style>
