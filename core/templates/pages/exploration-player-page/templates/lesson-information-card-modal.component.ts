@@ -283,12 +283,12 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   }
 
   getCheckpointsCardIndexs(): number[] {
-    let checkpointCardIndexs: number[] = [];
-    let numberOfCards = this.playerTranscriptService.getNumCards();
+    const checkpointCardIndexs: number[] = [];
+    const numberOfCards = this.playerTranscriptService.getNumCards();
 
     for (let i = 0; i < numberOfCards; i++) {
-      let stateName = this.playerTranscriptService.getCard(i).getStateName();
-      let correspondingState =
+      const stateName = this.playerTranscriptService.getCard(i).getStateName();
+      const correspondingState =
         this.explorationEngineService.getStateFromStateName(stateName);
       if (correspondingState.cardIsCheckpoint) {
         checkpointCardIndexs.push(i);
@@ -297,11 +297,16 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     return checkpointCardIndexs;
   }
 
-  returnToCheckpoint(index: number): void {
+  returnToCheckpointIfCompleted(index: number): void {
     const checkpointCardsIndex = this.getCheckpointsCardIndexs();
     const cardIndex = checkpointCardsIndex[index];
+
     if (cardIndex === undefined) {
       console.error('No card index associated with this checkpoint.');
+    }
+    if (this.checkpointStatusArray[index] !== CHECKPOINT_STATUS_COMPLETED) {
+      console.error('Cannot return to an incomplete checkpoint.');
+      return;
     } else {
       this.playerPositionService.setDisplayedCardIndex(cardIndex);
       this.playerPositionService.onActiveCardChanged.emit();
