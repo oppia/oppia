@@ -167,6 +167,7 @@ run_tests.check_backend_associated_tests: ## Runs the backend associate tests
 run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 ## Flag for Acceptance tests
 ## suite: The suite to run the acceptance tests
+## MOBILE: Run acceptance test in mobile viewport.
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 # Adding node to the path.
@@ -175,6 +176,8 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	else \
 		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
 	fi
+# Adding env variable for mobile view
+	@export MOBILE=${MOBILE:-false}
 # Starting the development server for the acceptance tests.
 	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
@@ -184,6 +187,7 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 		rm -rf ./core/tests/puppeteer-acceptance-tests/build; \
 	fi
 	../oppia_tools/node-16.13.0/bin/node ./node_modules/typescript/bin/tsc -p ./tsconfig.puppeteer-acceptance-tests.json
+	cp -r ./core/tests/puppeteer-acceptance-tests/data ./core/tests/puppeteer-acceptance-tests/build/
 	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/build/specs/$(suite).spec.js
 	@echo '------------------------------------------------------'
 	@echo '  Acceptance test has been executed successfully....'
