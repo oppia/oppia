@@ -589,7 +589,6 @@ describe('Lesson Information card modal component', () => {
 
     componentInstance.ngOnInit();
 
-
     const checkpointsCardsIndexs = [1, 2, 5, 10];
     const getCheckpointsCardIndexsSpy = spyOn(
       componentInstance,
