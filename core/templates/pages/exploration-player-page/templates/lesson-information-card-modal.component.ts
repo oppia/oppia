@@ -305,7 +305,6 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       console.error('No card index associated with this checkpoint.');
     }
     if (this.checkpointStatusArray[index] !== CHECKPOINT_STATUS_COMPLETED) {
-      console.error('Cannot return to an incomplete checkpoint.');
       return;
     } else {
       this.playerPositionService.setDisplayedCardIndex(cardIndex);

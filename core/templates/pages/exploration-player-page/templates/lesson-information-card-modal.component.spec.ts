@@ -670,21 +670,35 @@ describe('Lesson Information card modal component', () => {
     );
   });
 
-  it('should log an error if there is checkpoint is not completed yet', () => {
-    spyOn(console, 'error');
+  it('should do nothing if the checkpoint is not completed yet', () => {
+    const setDisplayedCardIndexSpy = spyOn(
+      playerPositionService,
+      'setDisplayedCardIndex'
+    ).and.callThrough();
+    const emitSpy = spyOn(playerPositionService.onActiveCardChanged, 'emit');
+    const closeSpy = spyOn(ngbActiveModal, 'close');
 
     componentInstance.checkpointCount = 4;
     componentInstance.completedCheckpointsCount = 2;
 
     componentInstance.ngOnInit();
 
+    const checkpointsCardIndexs = [1, 2, 5, 10];
+    const getCheckpointsCardIndexsSpy = spyOn(
+      componentInstance,
+      'getCheckpointsCardIndexs'
+    ).and.returnValue(checkpointsCardIndexs);
+
+    componentInstance.ngOnInit();
+
     const incompleteCheckpointIndex = 3;
 
     componentInstance.returnToCheckpointIfCompleted(incompleteCheckpointIndex);
+    expect(getCheckpointsCardIndexsSpy).toHaveBeenCalled();
 
-    expect(console.error).toHaveBeenCalledWith(
-      'Cannot return to an incomplete checkpoint.'
-    );
+    expect(setDisplayedCardIndexSpy).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
+    expect(closeSpy).not.toHaveBeenCalled();
   });
 
   it('should be able to return to checkpoint after raising no card index error', () => {
@@ -730,7 +744,7 @@ describe('Lesson Information card modal component', () => {
     expect(closeSpy).toHaveBeenCalled();
   });
 
-  it('should be able to return to checkpoint after raising incomplete checkpoint error', () => {
+  it('should be able to return to checkpoint after trying to click incomplete checkpoint', () => {
     const setDisplayedCardIndexSpy = spyOn(
       playerPositionService,
       'setDisplayedCardIndex'
@@ -756,9 +770,11 @@ describe('Lesson Information card modal component', () => {
 
     componentInstance.returnToCheckpointIfCompleted(incompleteCheckpointIndex);
 
-    expect(console.error).toHaveBeenCalledWith(
-      'Cannot return to an incomplete checkpoint.'
-    );
+    expect(getCheckpointsCardIndexsSpy).toHaveBeenCalled();
+
+    expect(setDisplayedCardIndexSpy).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
+    expect(closeSpy).not.toHaveBeenCalled();
 
     componentInstance.returnToCheckpointIfCompleted(validCheckpointIndex);
 
