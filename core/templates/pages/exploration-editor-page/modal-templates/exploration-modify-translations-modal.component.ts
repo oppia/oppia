@@ -22,6 +22,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {ContextService} from 'services/context.service';
 import {EntityBulkTranslationsBackendApiService} from '../services/entity-bulk-translations-backend-api.service';
 import {LanguageCodeToEntityTranslations} from 'services/entity-translations.services';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
 
 @Component({
   selector: 'oppia-exploration-modify-translations-modal',
@@ -36,7 +37,8 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private contextService: ContextService,
-    private entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService
+    private entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService,
+    private languageUtilService: LanguageUtilService
   ) {
     super(ngbActiveModal);
   }
@@ -61,5 +63,9 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
           }
         }
       });
+  }
+
+  getLanguageName(languageCode: string): string {
+    return this.languageUtilService.getContentLanguageDescription(languageCode);
   }
 }
