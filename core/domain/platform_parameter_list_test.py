@@ -54,7 +54,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'promo_bar_enabled',
                             'promo_bar_message',
                             'record_playthrough_probability',
-                            'server_can_send_emails'
+                            'server_can_send_emails',
                             'signup_email_body_content',
                             'signup_email_subject_content',
                             'system_email_address',
