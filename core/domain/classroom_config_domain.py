@@ -266,68 +266,31 @@ class Classroom:
         )
 
     @classmethod
-    def require_valid_thumbnail(
-        cls, thumbnail_filename: str, thumbnail_bg_color: str
-                            ) -> None:
-        """Check classroom thumbnail filename and background color validity.
+    def require_valid_bg_color(
+        cls, bg_color: str, is_thumbnail: bool) -> None:
+        """Checks whether the image bg_color of the classroom is valid.
 
         Args:
-            thumbnail_filename: str. The thumbnail filename to validate.
-            thumbnail_bg_color: str. The bg color to validate.
+            bg_color: str. The background color of the image.
+            is_thumbnail: bool. Whether the image is thumbnail or not.
         """
-        if not isinstance(thumbnail_bg_color, str):
-            raise utils.ValidationError(
-                'Expected thumbnail_bg_color of the classroom to be a string, '
-                'received: %s.' % thumbnail_bg_color)
-        if thumbnail_filename == '':
-            raise utils.ValidationError(
-                'thumbnail_filename field should not be empty')
+        image_type = 'thumbnail' if is_thumbnail else 'banner'
 
-        utils.require_valid_thumbnail_filename(thumbnail_filename)
-
-        if thumbnail_bg_color == '':
+        if not isinstance(bg_color, str):
             raise utils.ValidationError(
-                'thumbnail_bg_color field should not be empty')
+                f'Expected {image_type}_bg_color of the classroom to '
+                f'be a string, received: {bg_color}.')
+
+        if bg_color == '':
+            raise utils.ValidationError(
+                f'{image_type}_bg_color field should not be empty')
 
         if (
-            thumbnail_bg_color not in (
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['classroom']
-            )):
-            raise utils.ValidationError(
-                'Classroom thumbnail background color %s is '
-                'not supported.' % thumbnail_bg_color
-            )
-
-    @classmethod
-    def require_valid_banner(
-        cls, banner_filename: str, banner_bg_color: str
-                            ) -> None:
-        """Whether the banner filename and bg color of the classroom is valid.
-
-        Args:
-            banner_filename: str. The banner filename to validate.
-            banner_bg_color: str. The bg color to validate.
-        """
-        if not isinstance(banner_bg_color, str):
-            raise utils.ValidationError(
-                'Expected banner_bg_color of the classroom to be a string, '
-                'received: %s.' % banner_bg_color)
-        if banner_filename == '':
-            raise utils.ValidationError(
-                'banner_filename field should not be empty')
-
-        utils.require_valid_image_filename(banner_filename)
-
-        if banner_bg_color == '':
-            raise utils.ValidationError(
-                'banner_bg_color field should not be empty')
-
-        if (
-            banner_bg_color not in (
+            bg_color not in (
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['classroom'])):
             raise utils.ValidationError(
-                'Classroom banner background color %s is not supported.' 
-                % banner_bg_color)
+                f'Classroom {image_type} background color '
+                f'{bg_color} is not supported.')
 
     @classmethod
     def check_for_cycles_in_topic_id_to_prerequisite_topic_ids(
@@ -375,24 +338,36 @@ class Classroom:
             raise utils.ValidationError(
                 'Expected ID of the classroom to be a string, received: %s.'
                 % self.classroom_id)
+        if not isinstance(self.thumbnail['filename'], str):
+            raise utils.ValidationError(
+                'Expected thumbnail_filename of the classroom to '
+                'be a string, received: %s.' % self.thumbnail['filename'])
+        if not isinstance(self.banner['filename'], str):
+            raise utils.ValidationError(
+                'Expected banner_filename of the classroom to '
+                'be a string, received: %s.' % self.banner['filename'])
+        if self.thumbnail['filename'] == '':
+            raise utils.ValidationError(
+                'thumbnail_filename field should not be empty')
+        if self.banner['filename'] == '':
+            raise utils.ValidationError(
+                'banner_filename field should not be empty')
 
         self.require_valid_name(self.name)
         self.require_valid_teaser_text(self.teaser_text)
         self.require_valid_topic_list_intro(self.topic_list_intro)
         self.require_valid_course_details(self.course_details)
         self.require_valid_url_fragment(self.url_fragment)
-        self.require_valid_thumbnail(
-            self.thumbnail['filename'], self.thumbnail['bg_color'])
-        self.require_valid_banner(
-            self.banner['filename'], self.banner['bg_color']
-        )
         self.check_for_cycles_in_topic_id_to_prerequisite_topic_ids(
             self.topic_id_to_prerequisite_topic_ids)
-
         if not isinstance(self.is_published, bool):
             raise utils.ValidationError(
                 'Expected is_published of the classroom to be a boolean, '
                 'received: %s.' % self.is_published)
+        self.require_valid_bg_color(self.thumbnail['bg_color'], True)
+        self.require_valid_bg_color(self.banner['bg_color'], False)
+        utils.require_valid_image_filename(self.banner['filename'])
+        utils.require_valid_thumbnail_filename(self.thumbnail['filename'])
 
 
 class ImageDict(TypedDict, total=False):
