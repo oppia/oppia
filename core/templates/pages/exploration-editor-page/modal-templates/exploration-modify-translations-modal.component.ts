@@ -21,8 +21,13 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ContextService} from 'services/context.service';
 import {EntityBulkTranslationsBackendApiService} from '../services/entity-bulk-translations-backend-api.service';
-import {LanguageCodeToEntityTranslations} from 'services/entity-translations.services';
+import {EntityTranslationsService} from 'services/entity-translations.services';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {TranslatedContentBackendDict} from 'domain/exploration/TranslatedContentObjectFactory';
+
+interface LanguageCodeToContentTranslations {
+  [language_code: string]: TranslatedContentBackendDict;
+}
 
 @Component({
   selector: 'oppia-exploration-modify-translations-modal',
@@ -32,13 +37,14 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   @Input() contentId!: string;
   explorationId!: string;
   explorationVersion!: number;
-  contentTranslations: LanguageCodeToEntityTranslations = {};
+  contentTranslations: LanguageCodeToContentTranslations = {};
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private contextService: ContextService,
     private entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService,
-    private languageUtilService: LanguageUtilService
+    private languageUtilService: LanguageUtilService,
+    private entityTranslationsService: EntityTranslationsService
   ) {
     super(ngbActiveModal);
   }
@@ -46,6 +52,17 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   ngOnInit(): void {
     this.explorationId = this.contextService.getExplorationId();
     this.explorationVersion = this.contextService.getExplorationVersion();
+
+    for (let language in this.entityTranslationsService
+      .languageCodeToEntityTranslations) {
+      let translationContent =
+        this.entityTranslationsService.languageCodeToEntityTranslations[
+          language
+        ].getWrittenTranslation(this.contentId);
+      if (translationContent) {
+        this.contentTranslations[language] = translationContent.toBackendDict();
+      }
+    }
 
     this.entityBulkTranslationsBackendApiService
       .fetchEntityBulkTranslationsAsync(
@@ -56,10 +73,12 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
       .then(response => {
         for (let language in response) {
           let language_translations = response[language]['translations'];
-
-          if (language_translations[this.contentId]) {
+          if (
+            this.contentId in language_translations &&
+            !this.contentTranslations[language]
+          ) {
             this.contentTranslations[language] =
-              language_translations[this.contentId]['content_value'];
+              language_translations[this.contentId];
           }
         }
       });

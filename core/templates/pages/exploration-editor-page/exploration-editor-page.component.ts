@@ -75,6 +75,8 @@ import {VersionHistoryService} from './services/version-history.service';
 import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 
 interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: boolean;
@@ -351,6 +353,34 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         this.changeListService.loadAutosavedChangeList(
           explorationData.draft_changes
         );
+
+        for (let i in explorationData.draft_changes) {
+          let changeDict = explorationData.draft_changes[i];
+
+          if (changeDict.cmd === 'edit_translation') {
+            if (
+              !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+                changeDict.language_code
+              )
+            ) {
+              this.entityTranslationsService.languageCodeToEntityTranslations[
+                changeDict.language_code
+              ] = EntityTranslation.createFromBackendDict({
+                entity_id: this.explorationId,
+                entity_type: 'exploration',
+                entity_version: explorationData.version,
+                language_code: changeDict.language_code,
+                translations: {},
+              });
+            }
+            this.entityTranslationsService.languageCodeToEntityTranslations[
+              changeDict.language_code
+            ].updateTranslation(
+              changeDict.content_id,
+              TranslatedContent.createFromBackendDict(changeDict.translation)
+            );
+          }
+        }
       }
 
       if (
