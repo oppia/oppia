@@ -25,8 +25,8 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button type="button" (click)="cancel()" class="btn btn-secondary">Cancel</button>
-  <button type="button" (click)="confirm()" class="btn btn-success e2e-test-confirm-discard-changes">Done</button>
+  <button type="button" (click)="cancel()" class="btn modify-translations-cancel-button">Cancel</button>
+  <button type="button" (click)="confirm()" class="btn modify-translations-done-button">Done</button>
 </div>
 
 <style>
@@ -104,6 +104,7 @@
   }
 
   .content-translation-language input[type=checkbox] {
+    accent-color: #333;
     margin-right: 8px;
     width: 18px;
   }
@@ -117,5 +118,30 @@
 
   ::ng-deep .translations-rte-output-display p {
     font-size: 14px;
+  }
+
+  .modal-footer button {
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 18px;
+    height: 44px;
+    line-height: 120%;
+    width: 90px;
+  }
+
+  .modal-footer .modify-translations-cancel-button {
+    background: #fff;
+    border: 1px solid #00645C;
+    color: #00645C;
+  }
+
+  .modal-footer .modify-translations-done-button {
+    background: #00645C;
+    color: #fff;
+  }
+
+  .modal-footer .modify-translations-done-button:hover,
+  .modal-footer .modify-translations-done-button:focus {
+    background-color: #3d9991;
   }
 </style>
