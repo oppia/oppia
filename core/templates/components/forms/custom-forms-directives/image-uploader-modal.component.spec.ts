@@ -73,7 +73,22 @@ describe('Image Uploader Modal', () => {
     fixture = TestBed.createComponent(ImageUploaderModalComponent);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     componentInstance = fixture.componentInstance;
-    componentInstance.aspectRatio = '4:3';
+    componentInstance.imageUploaderParameters = {
+      disabled: false,
+      allowedBgColors: [],
+      aspectRatio: '4:3',
+      allowedImageFormats: ['png', 'svg', 'jpeg'],
+      bgColor: '',
+      imageName: 'Image',
+      maxImageSizeInKB: 1000,
+      orientation: 'portrait',
+      filename: '',
+      previewDescription: '',
+      previewDescriptionBgColor: '',
+      previewFooter: '',
+      previewImageUrl: '',
+      previewTitle: '',
+    };
   });
 
   it('should create', () => {
@@ -162,7 +177,7 @@ describe('Image Uploader Modal', () => {
     'should confirm and set croppedImageDataUrl same as uploadedImage ' +
       'in case of Thumbnail',
     () => {
-      componentInstance.imageName = 'Thumbnail';
+      componentInstance.imageUploaderParameters.imageName = 'Thumbnail';
       componentInstance.ngOnInit();
       let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
       componentInstance.invalidImageWarningIsShown = false;
@@ -196,9 +211,9 @@ describe('Image Uploader Modal', () => {
     'should update background color if the new color is different' +
       ' from the current color',
     () => {
-      componentInstance.bgColor = 'red';
+      componentInstance.imageUploaderParameters.bgColor = 'red';
       componentInstance.updateBackgroundColor('blue');
-      expect(componentInstance.bgColor).toBe('blue');
+      expect(componentInstance.imageUploaderParameters.bgColor).toBe('blue');
     }
   );
 
@@ -206,15 +221,15 @@ describe('Image Uploader Modal', () => {
     'should not update background color if the new color is the same' +
       'as the current color',
     () => {
-      componentInstance.bgColor = 'red';
+      componentInstance.imageUploaderParameters.bgColor = 'red';
       componentInstance.updateBackgroundColor('red');
-      expect(componentInstance.bgColor).toBe('red');
+      expect(componentInstance.imageUploaderParameters.bgColor).toBe('red');
     }
   );
 
   it('should set uploadedImage if previewImageUrl is provided', () => {
-    componentInstance.imageName = 'Thumbnail';
-    componentInstance.previewImageUrl = 'test_url';
+    componentInstance.imageUploaderParameters.imageName = 'Thumbnail';
+    componentInstance.imageUploaderParameters.previewImageUrl = 'test_url';
     componentInstance.ngOnInit();
 
     expect(componentInstance.uploadedImage).toBe('test_url');
@@ -225,6 +240,20 @@ describe('Image Uploader Modal', () => {
     componentInstance.onInvalidImageLoaded();
     expect(componentInstance.reset).toHaveBeenCalled();
     expect(componentInstance.invalidImageWarningIsShown).toBeTrue();
+  });
+
+  it('should not initialize cropper if croppableImageRef is null', () => {
+    spyOn(componentInstance, 'initializeCropper');
+    const mockCroppableImageRef = {nativeElement: {}} as ElementRef;
+    componentInstance.croppableImageRef = mockCroppableImageRef;
+    componentInstance.imageUploaderParameters.imageName = 'Image';
+    componentInstance.ngOnInit();
+    let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
+    componentInstance.invalidImageWarningIsShown = false;
+
+    componentInstance.onFileChanged(file);
+
+    expect(componentInstance.initializeCropper).not.toHaveBeenCalled();
   });
 
   it('should throw error if cropper is not initialized', () => {
