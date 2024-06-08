@@ -1,7 +1,6 @@
 <style>
   .oppia-graph-response-container {
     background-color: white;
-    border: 1px solid black;
     cursor: default;
   }
   .unselectable-text {
@@ -17,27 +16,28 @@
 </style>
 
 <div class="oppia-graph-response-container">
-  <svg width="100%" height="250">
+  <svg [attr.height]="HEIGHT" [attr.width]="WIDTH">
+    <rect x="0" y="0" width="100%" height="100%" fill="none" stroke="black" stroke-width="2"/>
     <g *ngFor="let edge of graph.edges; let idx = index">
-      <line [attr.x1]="graph.vertices[edge.src].x - GRAPH_INPUT_LEFT_MARGIN"
+      <line [attr.x1]="graph.vertices[edge.src].x"
             [attr.y1]="graph.vertices[edge.src].y"
-            [attr.x2]="graph.vertices[edge.dst].x - GRAPH_INPUT_LEFT_MARGIN"
+            [attr.x2]="graph.vertices[edge.dst].x"
             [attr.y2]="graph.vertices[edge.dst].y"
-            [style.stroke]="'black'" [style.strokeWidth]="EDGE_WIDTH">
+            [style.stroke]="'black'" [style.strokeWidth]="EDGE_WIDTH_PX">
       </line>
       <polygon *ngIf="graph.isDirected"
                [attr.points]="getDirectedEdgeArrowPoints(idx)"
                [style.fill]="'black'">
       </polygon>
       <text *ngIf="graph.isWeighted"
-            [attr.x]="getEdgeCentre(idx).x - GRAPH_INPUT_LEFT_MARGIN"
+            [attr.x]="getEdgeCentre(idx).x"
             [attr.y]="getEdgeCentre(idx).y - 12"
             class="unselectable-text">
         {{edge.weight}}
       </text>
     </g>
     <g *ngFor="let vertex of graph.vertices"
-       attr.transform="translate({{vertex.x - GRAPH_INPUT_LEFT_MARGIN}}, {{vertex.y}})">
+       attr.transform="translate({{vertex.x}}, {{vertex.y}})">
       <text *ngIf="graph.isLabeled"
             x="0"
             y="-10"
@@ -46,7 +46,7 @@
       </text>
       <circle cx="0"
               cy="0"
-              [attr.r]="VERTEX_RADIUS">
+              [attr.r]="VERTEX_RADIUS_PX">
       </circle>
     </g>
   </svg>

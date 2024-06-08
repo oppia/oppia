@@ -96,7 +96,7 @@
             [attr.y1]="graph?.vertices[state.addEdgeVertex].y"
             [attr.x2]="state.mouseX"
             [attr.y2]="state.mouseY"
-            [ngStyle]="{'stroke': 'black', 'stroke-width': EDGE_WIDTH}">
+            [ngStyle]="{'stroke': 'black', 'stroke-width': EDGE_WIDTH_PX}">
       </line>
       <g *ngFor="let edge of graph?.edges; let idx = index" tabindex="0">
         <line class="e2e-test-graph-edge"
@@ -107,7 +107,7 @@
               attr.y1="{{graph.vertices[edge.src].y}}"
               attr.x2="{{graph.vertices[edge.dst].x}}"
               attr.y2="{{graph.vertices[edge.dst].y}}"
-              attr.style="{{'stroke:' + getEdgeColor(idx) + '; stroke-width:' + EDGE_WIDTH}}">
+              attr.style="{{'stroke:' + getEdgeColor(idx) + '; stroke-width:' + EDGE_WIDTH_PX}}">
         </line>
         <polygon *ngIf="graph?.isDirected"
                  (mouseenter)="state.hoveredEdge = idx"
@@ -147,7 +147,7 @@
                 attr.style="{{'fill: ' + getVertexColor(idx)}}"
                 cx="0"
                 cy="0"
-                [attr.r]="VERTEX_RADIUS">
+                [attr.r]="VERTEX_RADIUS_PX">
         </circle>
       </g>
     </svg>
