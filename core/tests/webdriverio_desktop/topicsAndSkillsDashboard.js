@@ -59,13 +59,13 @@ describe('Topics and skills dashboard functionality', function () {
 
   it('should assign, unassign, create and delete a skill', async function () {
     let TOPIC_NAME = 'Topic1 TASD';
-    let TOPIC_WITHOUT_CLASSROOM = 'Beta TASD';
+    let TOPIC_WITHOUT_CLASSROOM = 'No classroom TASD';
     let SKILL_NAME = 'skill1 TASD';
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_WITHOUT_CLASSROOM,
-      'beta-tasd',
-      'Beta description',
+      'no-classroom-tasd',
+      'No classroom description',
       true
     );
     await topicsAndSkillsDashboardPage.get();
