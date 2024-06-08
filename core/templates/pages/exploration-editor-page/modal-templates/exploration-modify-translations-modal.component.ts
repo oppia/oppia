@@ -53,6 +53,8 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     this.explorationId = this.contextService.getExplorationId();
     this.explorationVersion = this.contextService.getExplorationVersion();
 
+    // Populate the content translations via latest draft changes first,
+    // in order to get the most recently updated translations.
     for (let language in this.entityTranslationsService
       .languageCodeToEntityTranslations) {
       let translationContent =
@@ -64,6 +66,9 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
       }
     }
 
+    // Populate the content translations via published translations from the backend.
+    // These translations are used for a language when the published translations are
+    // the latest translations available.
     this.entityBulkTranslationsBackendApiService
       .fetchEntityBulkTranslationsAsync(
         this.explorationId,

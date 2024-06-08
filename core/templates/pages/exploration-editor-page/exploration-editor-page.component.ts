@@ -348,7 +348,9 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         }
       }
 
-      // Initialize changeList by draft changes if they exist.
+      // Initialize changeList by draft changes if they exist,
+      // and initialize the entity translations by draft changes
+      // if they exist.
       if (explorationData.draft_changes !== null) {
         this.changeListService.loadAutosavedChangeList(
           explorationData.draft_changes
@@ -358,6 +360,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           let changeDict = explorationData.draft_changes[i];
 
           if (changeDict.cmd === 'edit_translation') {
+            // Create the entity translation objects first if they don't exist.
             if (
               !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
                 changeDict.language_code
@@ -373,6 +376,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
                 translations: {},
               });
             }
+
+            // Update the translations appropriately, via latest draft changes.
             this.entityTranslationsService.languageCodeToEntityTranslations[
               changeDict.language_code
             ].updateTranslation(
