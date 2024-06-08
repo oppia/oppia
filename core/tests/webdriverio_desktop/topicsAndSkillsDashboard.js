@@ -59,28 +59,14 @@ describe('Topics and skills dashboard functionality', function () {
 
   it('should assign, unassign, create and delete a skill', async function () {
     let TOPIC_NAME = 'Topic1 TASD';
-    let TOPIC_WITHOUT_CLASSROOM = 'No classroom TASD';
     let SKILL_NAME = 'skill1 TASD';
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
-    await topicsAndSkillsDashboardPage.createTopic(
-      TOPIC_WITHOUT_CLASSROOM,
-      'no-classroom-tasd',
-      'No classroom description',
-      true
-    );
-    await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_NAME,
       'topic-tasd-one',
       'Topic 1 description',
       false
     );
-
-    var url = await browser.getUrl();
-    var topicId = url.split('/')[4].slice(0, -1);
-    await browser.url('/classroom-admin/');
-    await waitFor.pageToFullyLoad();
-    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_NAME);
@@ -130,14 +116,12 @@ describe('Topics and skills dashboard functionality', function () {
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_NAME);
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
-    await topicsAndSkillsDashboardPage.deleteTopicWithName(
-      TOPIC_WITHOUT_CLASSROOM
-    );
+    await topicsAndSkillsDashboardPage.deleteTopicWithName(TOPIC_NAME);
     let topicsTableIsPresent =
       await topicsAndSkillsDashboardPage.isTopicTablePresent();
     if (topicsTableIsPresent) {
       await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_NAME);
-      await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+      await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     }
   });
 
