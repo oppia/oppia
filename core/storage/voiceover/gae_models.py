@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-from typing import Dict, Final
+from typing import Dict, Final, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -62,7 +62,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
     # A dict representing content IDs as keys and nested dicts as values.
     # Each nested dict contains 'manual' and 'auto' as keys and VoiceoverDict
     # as values.
-    voiceovers = datastore_services.JsonProperty(required=True)
+    voiceovers_mapping = datastore_services.JsonProperty(required=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -83,11 +83,11 @@ class EntityVoiceoversModel(base_models.BaseModel):
             'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_accent_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'voiceovers': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'voiceovers_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         })
 
     @staticmethod
-    def _generate_id(
+    def generate_id(
         entity_type: str,
         entity_id: str,
         entity_version: int,
@@ -135,7 +135,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
             corresponding to the given inputs, if such a voiceover
             exists, or None if no voiceover is found.
         """
-        model_id = cls._generate_id(
+        model_id = cls.generate_id(
             entity_type, entity_id, entity_version, language_accent_code)
         return cls.get_by_id(model_id)
 
@@ -146,7 +146,8 @@ class EntityVoiceoversModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int,
         language_accent_code: str,
-        voiceovers: Dict[str, Dict[str, state_domain.VoiceoverDict]]
+        voiceovers_mapping: Dict[str, Dict[
+            feconf.VoiceoverType.value, Optional[state_domain.VoiceoverDict]]]
     ) -> EntityVoiceoversModel:
         """Creates and returns a new EntityVoiceoversModel instance.
 
@@ -155,23 +156,48 @@ class EntityVoiceoversModel(base_models.BaseModel):
             entity_id: str. The ID of the entity.
             entity_version: int. The version of the entity.
             language_accent_code: str. The language code for the entity.
-            voiceovers: dict(str, dict(str, VoiceoverDict)). A dict
-                containing content IDs as keys and nested dicts as values.
-                Each nested dict contains str as keys and
-                VoiceoverDict as values.
+            voiceovers_mapping:
+                dict(str, dict(VoiceoverType.value, VoiceoverDict)). A dict
+                containing content IDs as keys and nested dicts as values. Each
+                nested dict contains str as keys and VoiceoverDict as values.
 
         Returns:
             EntityVoiceoversModel. Returns a new EntityVoiceoversModel.
         """
         return cls(
-            id=cls._generate_id(
+            id=cls.generate_id(
                 entity_type, entity_id, entity_version, language_accent_code),
             entity_type=entity_type,
             entity_id=entity_id,
             entity_version=entity_version,
             language_accent_code=language_accent_code,
-            voiceovers=voiceovers
+            voiceovers_mapping=voiceovers_mapping
         )
+
+    @classmethod
+    def get_entity_voiceovers_for_given_exploration(
+        cls, entity_id: str, entity_type: str, entity_version: int
+    ) -> Sequence[EntityVoiceoversModel]:
+        """Retrieves voiceovers models for the specified exploration data.
+
+        Args:
+            entity_id: str. The entity ID for which entity voiceovers need to be
+                fetched.
+            entity_type: str. The entity type for which entity voiceovers need
+                to be fetched.
+            entity_version: int. The entity version of the given exploration for
+                which entity voiceovers need to be fetched.
+
+        Returns:
+            list(EntityVoiceovers|None). Returns a list of entity voiceover
+            models for the specified exploration and version.
+        """
+
+        return cls.query(
+            cls.entity_type == entity_type,
+            cls.entity_id == entity_id,
+            cls.entity_version == entity_version
+        ).fetch()
 
 
 class VoiceoverAutogenerationPolicyModel(base_models.BaseModel):

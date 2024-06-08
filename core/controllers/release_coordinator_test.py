@@ -57,13 +57,15 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
             response['total_allocation'], 0)
         self.assertEqual(
             response['peak_allocation'], 0)
-        self.assertEqual(response['total_keys_stored'], 1)
+        # Includes Platform Parameters.
+        self.assertEqual(response['total_keys_stored'], 20)
 
     def test_flush_memory_cache(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
 
         response = self.get_json('/memorycachehandler')
-        self.assertEqual(response['total_keys_stored'], 1)
+        # Includes Platform Parameters.
+        self.assertEqual(response['total_keys_stored'], 20)
 
         self.delete_json('/memorycachehandler')
 
@@ -262,6 +264,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 )
         self.assertEqual(
             response['error'],
+            'At \'http://localhost/feature_flags\' '
+            'these errors are happening:\n'
             'Schema validation for \'rollout_percentage\' failed: '
             'Validation failed: is_at_most ({\'max_value\': 100}) '
             'for object 200')

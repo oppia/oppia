@@ -32,6 +32,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import platform_parameter_list
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import suggestion_services
@@ -716,6 +717,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 user_services.add_user_to_mailing_list(
                     'email@example.com', 'Android'))
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+    )
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'
         username = 'username'
@@ -742,8 +746,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'info', _mock_logging_function)
-        send_mail_swap = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        with logging_swap, send_mail_swap:
+        with logging_swap:
             user_services.update_email_preferences(
                 user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
                 feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
@@ -753,7 +756,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             observed_log_messages,
             ['Updated status of email ID %s\'s bulk email '
-             'preference in the service provider\'s db to False. Cannot access '
+             'preference in the service provider\'s db to True. Cannot access '
              'API, since this is a dev environment.' % user_email])
 
         def _mock_add_or_update_user_status(
@@ -766,11 +769,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             """Mocks bulk_email_services.add_or_update_user_status()."""
             return not can_receive_email_updates
 
-        send_mail_swap = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         bulk_email_swap = self.swap(
             bulk_email_services, 'add_or_update_user_status',
             _mock_add_or_update_user_status)
-        with send_mail_swap, bulk_email_swap:
+        with bulk_email_swap:
             bulk_email_signup_message_should_be_shown = (
                 user_services.update_email_preferences(
                     user_id, True, feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
@@ -803,6 +805,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_feedback_message_email)
         self.assertFalse(email_preferences.can_receive_subscription_email)
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+    )
     def test_get_and_set_user_email_preferences_with_error(self) -> None:
         auth_id = 'someUser'
         username = 'username'
@@ -810,13 +815,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
         user_services.set_username(user_id, username)
-        user_services.update_email_preferences(
-            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
-            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
-        email_preferences = user_services.get_email_preferences(user_id)
-        self.assertFalse(email_preferences.can_receive_email_updates)
 
         def _mock_add_or_update_user_status(
             _email: str, _can_receive_updates: bool
@@ -833,15 +831,15 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             _mock_add_or_update_user_status):
             try:
                 user_services.update_email_preferences(
-                    user_id, True,
+                    user_id, False,
                     feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
                     feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
                     feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
             except Exception:
                 email_preferences = user_services.get_email_preferences(user_id)
                 # 'can_receive_email_updates' should not be updated in this
-                # case.
-                self.assertFalse(email_preferences.can_receive_email_updates)
+                # case. Note that the default value is True.
+                self.assertTrue(email_preferences.can_receive_email_updates)
 
         user_services.update_email_preferences(
             user_id, True,
