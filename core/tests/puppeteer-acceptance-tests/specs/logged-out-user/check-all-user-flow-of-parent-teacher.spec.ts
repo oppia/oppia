@@ -13,16 +13,24 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for Logged-out User as a Partner
+ * @fileoverview Acceptance Test for checking the user flow of Parent/Teachers
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import testConstants from '../../utilities/common/test-constants';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Partner', function () {
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /http:\/\/localhost:8181\/access_validation_handler\/can_access_classroom_page\?/,
+  /classroom_url_fragment=math Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+  /webpack:\/\/\/\.\/core\/templates\/services\/contextual\/logger\.service\.ts\?/,
+  /The requested path \/learn\/math is not found\./,
+]);
+
+describe('Parent/Teacher', function () {
   let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
@@ -30,22 +38,11 @@ describe('Partner', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to navigate to partnerships page when started from home page ' +
-      'and open the partnerships form in partnerships page.',
+    'should be able to navigate to "For Parent/Teacher page" via footer' +
+      'and click on "Explore Lessons" button',
     async function () {
-      await loggedOutUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
-      await loggedOutUser.navigateToHome();
-      await loggedOutUser.navigateToAboutFoundationPageViaFooter();
-
-      // Navigating to partnerships page by clicking on "Consider becoming a partner today" link.
-      await loggedOutUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();
-
-      // Opening the partnerships form by clicking the "Partner with us" button at the top of the partnerships page.
-      await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPage();
-      await loggedOutUser.navigateToPartnershipsPage();
-      await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
-        'pt-br'
-      );
+      await loggedOutUser.navigateToTeachPageViaFooter();
+      await loggedOutUser.clickExploreLessonsButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

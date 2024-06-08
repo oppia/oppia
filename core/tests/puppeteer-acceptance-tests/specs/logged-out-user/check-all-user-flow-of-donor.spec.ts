@@ -13,24 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for Logged-out User as a Parent/Teacher
+ * @fileoverview Acceptance Test for checking the user flow of Donors
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import testConstants from '../../utilities/common/test-constants';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-ConsoleReporter.setConsoleErrorsToIgnore([
-  /http:\/\/localhost:8181\/access_validation_handler\/can_access_classroom_page\?/,
-  /classroom_url_fragment=math Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
-  /webpack:\/\/\/\.\/core\/templates\/services\/contextual\/logger\.service\.ts\?/,
-  /The requested path \/learn\/math is not found\./,
-]);
-
-describe('Parent/Teacher', function () {
+describe('Donor', function () {
   let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
@@ -38,11 +30,19 @@ describe('Parent/Teacher', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to navigate to "For Parent/Teacher page" when started from home page' +
-      'and click on "Explore Lessons" button',
+    'should be able to navigate to donate page when started from home page' +
+      'and see the donorbox form in donate page.',
     async function () {
-      await loggedOutUser.navigateToTeachPageViaFooter();
-      await loggedOutUser.clickExploreLessonsButtonInTeachPage();
+      await loggedOutUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
+      await loggedOutUser.navigateToHome();
+      await loggedOutUser.navigateToAboutFoundationPageViaFooter();
+
+      // Navigating to donate page by clicking on the "donations" link.
+      await loggedOutUser.clickDonationsLinkInAboutFoundation();
+      await loggedOutUser.isDonorBoxVisbleOnDonatePage();
+
+      await loggedOutUser.navigateToThanksForDonatingPage();
+      await loggedOutUser.clickDismissButtonInThanksForDonatingPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
