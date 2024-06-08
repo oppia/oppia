@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if Partner
+ * @fileoverview Acceptance Test for checking if logged-out users
  * can open links by clicking all buttons in the partnerships page
  */
 
@@ -23,29 +23,21 @@ import testConstants from '../../utilities/common/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Partner in Partnerships page', function () {
-  let testUser: LoggedOutUser;
+describe('Logged-out User in Partnerships page', function () {
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    const now = new Date();
-    const tempId =
-      now.getHours().toString() +
-      now.getMinutes().toString() +
-      now.getSeconds().toString();
-    testUser = await UserFactory.createNewUser(
-      `partner${tempId}`,
-      `partner${tempId}@example.com`
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await testUser.navigateToPartnershipsPage();
+    await loggedOutUser.navigateToPartnershipsPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open the Blog page when the "Read More Stories" button is clicked.',
     async function () {
-      await testUser.clickReadMoreStoriesButtonInPartnershipsPage();
+      await loggedOutUser.clickReadMoreStoriesButtonInPartnershipsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -53,7 +45,7 @@ describe('Partner in Partnerships page', function () {
   it(
     'should open the Partnerships form when the "Partner with us" button is clicked at the top.',
     async function () {
-      await testUser.clickPartnerWithUsButtonInPartnershipsPage();
+      await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -61,7 +53,7 @@ describe('Partner in Partnerships page', function () {
   it(
     'should open the Partnerships form when the "Partner with us" button is clicked at the bottom.',
     async function () {
-      await testUser.clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
+      await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
         'pt-br'
       );
     },
@@ -71,7 +63,7 @@ describe('Partner in Partnerships page', function () {
   it(
     'should open the Partnerships Brochure when the "Download Brochure" button is clicked.',
     async function () {
-      await testUser.clickDownloadBrochureButtonInPartnershipsPage();
+      await loggedOutUser.clickDownloadBrochureButtonInPartnershipsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -79,7 +71,7 @@ describe('Partner in Partnerships page', function () {
   it(
     'should open the correct Blog Post when the "Read Blog Post" button is clicked.',
     async function () {
-      await testUser.clickReadBlogPostLinkInPartnershipsPage();
+      await loggedOutUser.clickReadBlogPostLinkInPartnershipsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

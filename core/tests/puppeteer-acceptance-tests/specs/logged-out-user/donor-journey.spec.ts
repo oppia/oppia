@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for Donor
+ * @fileoverview Acceptance Test for Logged-out User as a Donor
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -23,35 +23,26 @@ import testConstants from '../../utilities/common/test-constants';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Donor', function () {
-  let testUser: LoggedOutUser;
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    const now = new Date();
-    const tempId =
-      now.getHours().toString() +
-      now.getMinutes().toString() +
-      now.getSeconds().toString();
-    testUser = await UserFactory.createNewUser(
-      `donor${tempId}`,
-      `donor${tempId}@example.com`
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to navigate to donate page when started from home page' +
       'and see the donorbox form in donate page.',
     async function () {
-      await testUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
-      // Navigating to a page which has a footer.
-      await testUser.navigateToAboutPage();
-      await testUser.navigateToAboutFoundationPageViaFooter();
+      await loggedOutUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
+      await loggedOutUser.navigateToHome();
+      await loggedOutUser.navigateToAboutFoundationPageViaFooter();
 
       // Navigating to donate page by clicking on the "donations" link.
-      await testUser.clickDonationsLinkInAboutFoundation();
-      await testUser.isDonorBoxVisbleOnDonatePage();
+      await loggedOutUser.clickDonationsLinkInAboutFoundation();
+      await loggedOutUser.isDonorBoxVisbleOnDonatePage();
 
-      await testUser.navigateToThanksForDonatingPage();
-      await testUser.clickDismissButtonInThanksForDonatingPage();
+      await loggedOutUser.navigateToThanksForDonatingPage();
+      await loggedOutUser.clickDismissButtonInThanksForDonatingPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

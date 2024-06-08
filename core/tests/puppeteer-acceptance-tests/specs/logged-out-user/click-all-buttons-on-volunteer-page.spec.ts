@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if Volunteer
+ * @fileoverview Acceptance Test for checking if logged-out users
  * can open links by clicking all buttons in volunteer page
  */
 
@@ -23,30 +23,22 @@ import testConstants from '../../utilities/common/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Volunteer in Volunteer page', function () {
-  let testUser: LoggedOutUser;
+describe('Logged-out User in Volunteer page', function () {
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    const now = new Date();
-    const tempId =
-      now.getHours().toString() +
-      now.getMinutes().toString() +
-      now.getSeconds().toString();
-    testUser = await UserFactory.createNewUser(
-      `volunteer${tempId}`,
-      `volunteer${tempId}@example.com`
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await testUser.navigateToVolunteerPage();
+    await loggedOutUser.navigateToVolunteerPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open the Volunteer form when the "Apply to Volunteer" button ' +
       'at the top is clicked.',
     async function () {
-      await testUser.clickApplyToVolunteerAtTheTopOfVolunteerPage();
+      await loggedOutUser.clickApplyToVolunteerAtTheTopOfVolunteerPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -55,7 +47,7 @@ describe('Volunteer in Volunteer page', function () {
     'should open the Volunteer form when the "Apply to Volunteer" button ' +
       'at the bottom is clicked.',
     async function () {
-      await testUser.clickApplyToVolunteerAtTheBottomOfVolunteerPage();
+      await loggedOutUser.clickApplyToVolunteerAtTheBottomOfVolunteerPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

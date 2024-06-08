@@ -56,6 +56,11 @@ const partnershipsFormShortUrl = testConstants.URLs.PartnershipsFormShortUrl;
 const partnershipsBrochureUrl = testConstants.URLs.PartnershipsBrochure;
 const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 const volunteerFormShortUrl = testConstants.URLs.VolunteerFormShortUrl;
+const allowedVolunteerFormUrls = [
+  volunteerFormUrl,
+  `${volunteerFormUrl}?usp=send_form`,
+  volunteerFormShortUrl,
+];
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const navbarLearnTabBasicMathematicsButton =
@@ -165,6 +170,7 @@ const applyToVolunteerButtonAtTheTopOfVolunteerPage =
 const applyToVolunteerButtonAtTheBottomOfVolunteerPage =
   '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-bottom';
 const donorBoxIframe = '.e2e-test-donate-page-iframe';
+const languageDropdown = '.e2e-test-language-dropdown';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -175,7 +181,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the home page.
    */
   async navigateToHome(): Promise<void> {
-    await Promise.all([this.page.waitForNavigation(), this.page.goto(homeUrl)]);
+    await this.goto(homeUrl);
   }
 
   /**
@@ -189,10 +195,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the about foundation page.
    */
   async navigateToAboutFoundationPage(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.page.goto(aboutFoundationUrl),
-    ]);
+    await this.goto(aboutFoundationUrl);
   }
 
   /**
@@ -216,40 +219,28 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the Parents and Teachers page.
    */
   async navigateToTeachPage(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
-      this.page.goto(teachUrl),
-    ]);
+    await this.goto(teachUrl);
   }
 
   /**
    * Function to navigate to the Partnerships page.
    */
   async navigateToPartnershipsPage(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
-      this.page.goto(partnershipsUrl),
-    ]);
+    await this.goto(partnershipsUrl);
   }
 
   /**
    * Function to navigate to the Volunteer page.
    */
   async navigateToVolunteerPage(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
-      this.page.goto(volunteerUrl),
-    ]);
+    await this.goto(volunteerUrl);
   }
 
   /**
    * Function to navigate to the Donate page.
    */
   async navigateToDonatePage(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
-      this.page.goto(donateUrl),
-    ]);
+    await this.goto(donateUrl);
   }
 
   /**
@@ -1183,16 +1174,66 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to click a button and check if it opens the expected destination
+   * in a new tab. Closes the tab afterwards.
+   */
+  private async clickLinkButtonToNewTab(
+    button: string,
+    buttonName: string,
+    expectedDestinationPageUrl: string,
+    expectedDestinationPageName: string
+  ): Promise<void> {
+    const pageTarget = this.page.target();
+    await this.clickOn(button);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url())
+      .withContext(
+        `${buttonName} should open the ${expectedDestinationPageName} page`
+      )
+      .toBe(expectedDestinationPageUrl);
+    await newTabPage?.close();
+  }
+
+  /**
+   * Function to click a button and check if it opens any of the allowedUrls
+   * in a new tab. Closes the tab afterwards. This function is useful when we try to
+   * verify Google Form URLs which changes in a short span of time.
+   */
+  private async clickLinkButtonToNewTabAndVerifyAllowedUrls(
+    button: string,
+    buttonName: string,
+    allowedUrls: string[],
+    expectedDestinationPageName: string
+  ): Promise<void> {
+    const pageTarget = this.page.target();
+    await this.clickOn(button);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+
+    expect(newTabPage).toBeDefined();
+    const newTabPageUrl = newTabPage?.url() as string;
+    if (!allowedUrls.includes(newTabPageUrl)) {
+      throw new Error(
+        `${buttonName} should open ${expectedDestinationPageName} page` +
+          `but it opens ${newTabPageUrl} instead.`
+      );
+    }
+    await newTabPage?.close();
+  }
+
+  /**
    * Function to click the Partner With Us button in the Partnerships page
    * and check if it opens the Partnerships Google form.
    * The button is in the first section of the page.
    */
   async clickPartnerWithUsButtonInPartnershipsPage(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(partnerWithUsButtonAtTheTopOfPartnershipsPage),
-    ]);
-
     const allowedUrls = [
       partnershipsFormShortUrl,
       partnershipsFormUrl,
@@ -1202,20 +1243,19 @@ export class LoggedOutUser extends BaseUser {
     // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
     // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
     // control.So we need to check for all the 3 URLs as all of them are valid.
-    expect(allowedUrls)
-      .withContext(
-        'Partner With Us button at the top of the Partnerships page should open' +
-          'the Partnerships Google Form page'
-      )
-      .toContain(this.page.url());
+    await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage,
+      'Partner With Us button at the bottom of the Partnerships page',
+      allowedUrls,
+      'Partnerships Google Form'
+    );
   }
 
   /**
    * Function to change the site language to the given language code.
    * @param langCode - The language code to change the site language to. Example: 'pt-br', 'en'
    */
-  async _changeSiteLanguage(langCode: string): Promise<void> {
-    const languageDropdown = '.e2e-test-language-dropdown';
+  private async changeSiteLanguage(langCode: string): Promise<void> {
     const languageOption = `.e2e-test-i18n-language-${langCode} a`;
     await this.clickOn(languageDropdown);
     await this.clickOn(languageOption);
@@ -1229,14 +1269,14 @@ export class LoggedOutUser extends BaseUser {
   async clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
     langCode: string
   ): Promise<void> {
-    await this._changeSiteLanguage(langCode);
+    await this.changeSiteLanguage(langCode);
     // Here we need to reload the page again to confirm the language change.
-    await this.navigateToPartnershipsPage();
+    await this.page.reload();
 
     // Here we are not verifying the 3 URLs as we did in the English version
     // because we have put the direct translated Google Form URL in the page itself.
     // Refer core/templates/pages/partnerships-page/partnerships-page.component.ts to see how it's done.
-    await this.clickButtonToNavigateToNewPage(
+    await this.clickLinkButtonToNewTab(
       partnerWithUsButtonAtTheBottomOfPartnershipsPage,
       'Partner With Us button at the bottom of the Partnerships page',
       partnershipsFormInPortugueseUrl,
@@ -1264,7 +1304,7 @@ export class LoggedOutUser extends BaseUser {
       ? readBlogPostMobileButtonInPartnershipsPage
       : readBlogPostDesktopButtonInPartnershipsPage;
 
-    await this.clickButtonToNavigateToNewPage(
+    await this.clickLinkButtonToNewTab(
       readBlogPostButtonInPartnershipsPage,
       'Read blog post button',
       blogPostUrlinPartnershipsPage,
@@ -1290,26 +1330,16 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Volunteer form.
    */
   async clickApplyToVolunteerAtTheTopOfVolunteerPage(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(applyToVolunteerButtonAtTheTopOfVolunteerPage),
-    ]);
-
-    const allowedUrls = [
-      volunteerFormShortUrl,
-      volunteerFormUrl,
-      `${volunteerFormUrl}?usp=send_form`,
-    ];
-
     // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
     // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
-    // control.So we need to check for all the 3 URLs as all of them are valid.
-    expect(allowedUrls)
-      .withContext(
-        'Apply To Volunteer at the top of the Volunteer page should open' +
-          'the Volunteer Form page'
-      )
-      .toContain(this.page.url());
+    // control.So we need to check for all the 3 URLs in the 'allowedVolunteerFormUrls' array
+    // as all of them are valid.
+    await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
+      applyToVolunteerButtonAtTheTopOfVolunteerPage,
+      'Apply To Volunteer at the top of the Volunteer page',
+      allowedVolunteerFormUrls,
+      'Volunteer Form'
+    );
   }
 
   /**
@@ -1317,26 +1347,16 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Volunteer form.
    */
   async clickApplyToVolunteerAtTheBottomOfVolunteerPage(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(applyToVolunteerButtonAtTheBottomOfVolunteerPage),
-    ]);
-
-    const allowedUrls = [
-      volunteerFormUrl,
-      `${volunteerFormUrl}?usp=send_form`,
-      volunteerFormShortUrl,
-    ];
-
     // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
     // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
-    // control.So we need to check for all the 3 URLs as all of them are valid.
-    expect(allowedUrls)
-      .withContext(
-        'Apply To Volunteer at the top of the Volunteer page should open' +
-          'the Volunteer Form page'
-      )
-      .toContain(this.page.url());
+    // control.So we need to check for all the 3 URLs in the 'allowedVolunteerFormUrls' array
+    // as all of them are valid.
+    await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
+      applyToVolunteerButtonAtTheBottomOfVolunteerPage,
+      'Apply To Volunteer at the bottom of the Volunteer page',
+      allowedVolunteerFormUrls,
+      'Volunteer Form'
+    );
   }
 
   /**

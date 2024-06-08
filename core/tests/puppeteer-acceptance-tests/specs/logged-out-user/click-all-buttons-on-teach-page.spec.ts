@@ -13,39 +13,39 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if Parent/Teacher
+ * @fileoverview Acceptance Test for checking if logged-out users
  * can open links by clicking all buttons in teach page
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import testConstants from '../../utilities/common/test-constants';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Parent/Teacher in Teach page', function () {
-  let testUser: LoggedOutUser;
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /http:\/\/localhost:8181\/access_validation_handler\/can_access_classroom_page\?/,
+  /classroom_url_fragment=math Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+  /webpack:\/\/\/\.\/core\/templates\/services\/contextual\/logger\.service\.ts\?/,
+  /The requested path \/learn\/math is not found\./,
+]);
+
+describe('Logged-out User in Teach page', function () {
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    const now = new Date();
-    const tempId =
-      now.getHours().toString() +
-      now.getMinutes().toString() +
-      now.getSeconds().toString();
-    testUser = await UserFactory.createNewUser(
-      `parent${tempId}`,
-      `parent${tempId}@example.com`
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await testUser.navigateToTeachPage();
+    await loggedOutUser.navigateToTeachPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open the Math Classroom page when "Browse Our Lessons" button is clicked',
     async function () {
-      await testUser.clickBrowseOurLessonsButtonInTeachPage();
+      await loggedOutUser.clickBrowseOurLessonsButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -53,7 +53,7 @@ describe('Parent/Teacher in Teach page', function () {
   it(
     'should open the Android page when "Access Android App" button is clicked',
     async function () {
-      await testUser.clickAccessAndroidAppButtonInTeachPage();
+      await loggedOutUser.clickAccessAndroidAppButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -61,7 +61,7 @@ describe('Parent/Teacher in Teach page', function () {
   it(
     'should open the Math Classroom page when "Visit Classroom" button is clicked',
     async function () {
-      await testUser.clickVisitClassroomButtonInTeachPage();
+      await loggedOutUser.clickVisitClassroomButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -69,7 +69,7 @@ describe('Parent/Teacher in Teach page', function () {
   it(
     'should open the Community Library page when "Browse Library" button is clicked',
     async function () {
-      await testUser.clickBrowseLibraryButtonInTeachPage();
+      await loggedOutUser.clickBrowseLibraryButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -77,7 +77,7 @@ describe('Parent/Teacher in Teach page', function () {
   it(
     'should open the Math Classroom page when "Explore Lessons" button is clicked',
     async function () {
-      await testUser.clickExploreLessonsButtonInTeachPage();
+      await loggedOutUser.clickExploreLessonsButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

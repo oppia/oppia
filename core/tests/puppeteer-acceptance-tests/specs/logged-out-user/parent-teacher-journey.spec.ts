@@ -13,38 +13,36 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for Parent/Teacher
+ * @fileoverview Acceptance Test for Logged-out User as a Parent/Teacher
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import testConstants from '../../utilities/common/test-constants';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /http:\/\/localhost:8181\/access_validation_handler\/can_access_classroom_page\?/,
+  /classroom_url_fragment=math Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+  /webpack:\/\/\/\.\/core\/templates\/services\/contextual\/logger\.service\.ts\?/,
+  /The requested path \/learn\/math is not found\./,
+]);
+
 describe('Parent/Teacher', function () {
-  let testUser: LoggedOutUser;
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    const now = new Date();
-    const tempId =
-      now.getHours().toString() +
-      now.getMinutes().toString() +
-      now.getSeconds().toString();
-    testUser = await UserFactory.createNewUser(
-      `parent${tempId}`,
-      `parent${tempId}@example.com`
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to navigate to "For Parent/Teacher page" when started from home page' +
       'and click on "Explore Lessons" button',
     async function () {
-      // Navigating to a page which has a footer.
-      await testUser.navigateToAboutPage();
-      await testUser.navigateToTeachPageViaFooter();
-      await testUser.clickExploreLessonsButtonInTeachPage();
+      await loggedOutUser.navigateToTeachPageViaFooter();
+      await loggedOutUser.clickExploreLessonsButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

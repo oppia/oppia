@@ -93,8 +93,21 @@ export class PrimaryButtonComponent implements OnInit {
     if (!this.componentIsButton) {
       const target = event.target as HTMLAnchorElement;
       const link = target.href; // The actual link to redirect to.
+      const linkTarget = target.target; // '_blank' or '_self'.
 
-      this.windowRef.nativeWindow.location.href = link;
+      if (linkTarget === '_blank') {
+        this.openExternalLink(link);
+      } else {
+        this.windowRef.nativeWindow.location.href = link;
+      }
+    }
+  }
+
+  private openExternalLink(link: string): void {
+    const newTab = window.open();
+    if (newTab) {
+      newTab.opener = null;
+      newTab.location.href = link;
     }
   }
 }

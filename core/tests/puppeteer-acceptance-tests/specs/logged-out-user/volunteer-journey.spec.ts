@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Tests for Logged-out User with the roles Volunteer, Donor, Partner and Parent/Teacher
+ * @fileoverview Acceptance Tests for Logged-out User as a Volunteer
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -23,42 +23,33 @@ import testConstants from '../../utilities/common/test-constants';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Volunteer', function () {
-  let testUser: LoggedOutUser;
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    const now = new Date();
-    const tempId =
-      now.getHours().toString() +
-      now.getMinutes().toString() +
-      now.getSeconds().toString();
-    testUser = await UserFactory.createNewUser(
-      `volunteer${tempId}`,
-      `volunteer${tempId}@example.com`
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to navigate to volunteer page when started from the home page ' +
       'and open the volunteer form when the "Apply to Volunteer" button is clicked',
     async function () {
-      await testUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
-      // Navigating to a page which has a footer.
-      await testUser.navigateToAboutPage();
-      await testUser.navigateToAboutFoundationPageViaFooter();
+      await loggedOutUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
+      await loggedOutUser.navigateToHome();
+      await loggedOutUser.navigateToAboutFoundationPageViaFooter();
 
       // Navigating to the Volunteer page by clicking on the "Become a Volunteer" button.
-      await testUser.clickBecomeAVolunteerButtonInAboutFoundation();
+      await loggedOutUser.clickBecomeAVolunteerButtonInAboutFoundation();
 
-      await testUser.navigateToAboutFoundationPage();
+      await loggedOutUser.navigateToAboutFoundationPage();
       // Navigating to the Volunteer page by clicking on the "Join our large volunteer community" link.
-      await testUser.clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation();
+      await loggedOutUser.clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation();
 
       // Opening the Volunteer form by clicking the "Apply to Volunteer" button at the top of the Volunteer page.
-      await testUser.clickApplyToVolunteerAtTheTopOfVolunteerPage();
+      await loggedOutUser.clickApplyToVolunteerAtTheTopOfVolunteerPage();
 
       // Going back to Volunteer page and opening the Volunteer form by clicking the "Apply to Volunteer" button at the bottom of the Volunteer page.
-      await testUser.navigateToVolunteerPage();
-      await testUser.clickApplyToVolunteerAtTheBottomOfVolunteerPage();
+      await loggedOutUser.navigateToVolunteerPage();
+      await loggedOutUser.clickApplyToVolunteerAtTheBottomOfVolunteerPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

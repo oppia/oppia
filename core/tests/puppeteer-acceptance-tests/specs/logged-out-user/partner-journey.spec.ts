@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for Partner
+ * @fileoverview Acceptance Test for Logged-out User as a Partner
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -23,36 +23,27 @@ import testConstants from '../../utilities/common/test-constants';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Partner', function () {
-  let testUser: LoggedOutUser;
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    const now = new Date();
-    const tempId =
-      now.getHours().toString() +
-      now.getMinutes().toString() +
-      now.getSeconds().toString();
-    testUser = await UserFactory.createNewUser(
-      `partner${tempId}`,
-      `partner${tempId}@example.com`
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to navigate to partnerships page when started from home page ' +
       'and open the partnerships form in partnerships page.',
     async function () {
-      await testUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
-      // Navigating to a page which has a footer.
-      await testUser.navigateToAboutPage();
-      await testUser.navigateToAboutFoundationPageViaFooter();
+      await loggedOutUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
+      await loggedOutUser.navigateToHome();
+      await loggedOutUser.navigateToAboutFoundationPageViaFooter();
 
       // Navigating to partnerships page by clicking on "Consider becoming a partner today" link.
-      await testUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();
+      await loggedOutUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();
 
       // Opening the partnerships form by clicking the "Partner with us" button at the top of the partnerships page.
-      await testUser.clickPartnerWithUsButtonInPartnershipsPage();
-      await testUser.navigateToPartnershipsPage();
-      await testUser.clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
+      await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPage();
+      await loggedOutUser.navigateToPartnershipsPage();
+      await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
         'pt-br'
       );
     },

@@ -95,7 +95,7 @@ describe('PrimaryButtonComponent', () => {
     expect(component.onClickPrimaryButton.emit).toHaveBeenCalled();
   });
 
-  it('should handle button click with a link', () => {
+  it('should handle button click with internal link', () => {
     component.buttonHref = '/about';
     const event = {
       target: {
@@ -113,6 +113,34 @@ describe('PrimaryButtonComponent', () => {
     expect(component.getTarget()).toEqual('_self');
     expect(component.getButtonHref()).toEqual('/about');
     expect(windowRef.nativeWindow.location.href).toBe('/about');
+  });
+
+  it('should handle button click with external link', () => {
+    const externalLink = 'https://github.com';
+    const event = {
+      target: {
+        href: externalLink,
+        target: '_blank',
+      },
+      preventDefault: () => {},
+    } as unknown as MouseEvent;
+
+    const windowOpenSpy = jasmine.createSpyObj('Window', [
+      'location',
+      'opener',
+      'reload',
+    ]);
+    spyOn(window, 'open').and.returnValue(windowOpenSpy);
+    const newTab = window.open('', '_blank') as Window;
+    component.buttonHref = externalLink;
+    fixture.detectChanges();
+    component.handleButtonClick(event);
+
+    expect(component.openInNewTab).toBe(true);
+    expect(component.getTarget()).toEqual('_blank');
+    expect(component.getButtonHref()).toEqual(externalLink);
+    expect(window.open).toHaveBeenCalledWith('', '_blank');
+    expect(newTab.location.href).toBe(externalLink);
   });
 
   it('should set componentIsButton to false when buttonHref is provided', () => {
