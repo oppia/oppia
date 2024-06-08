@@ -24,6 +24,7 @@ import {EntityBulkTranslationsBackendApiService} from '../services/entity-bulk-t
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslatedContentBackendDict} from 'domain/exploration/TranslatedContentObjectFactory';
+import {ChangeListService} from '../services/change-list.service';
 
 interface LanguageCodeToContentTranslations {
   [language_code: string]: TranslatedContentBackendDict;
@@ -38,13 +39,15 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   explorationId!: string;
   explorationVersion!: number;
   contentTranslations: LanguageCodeToContentTranslations = {};
+  allExistingTranslationsHaveBeenRemoved: boolean = false;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private contextService: ContextService,
     private entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService,
     private languageUtilService: LanguageUtilService,
-    private entityTranslationsService: EntityTranslationsService
+    private entityTranslationsService: EntityTranslationsService,
+    private changeListService: ChangeListService
   ) {
     super(ngbActiveModal);
   }
@@ -66,27 +69,38 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
       }
     }
 
+    this.changeListService.getTranslationChangeList().forEach(changeDict => {
+      if (
+        changeDict.cmd === 'remove_translations' &&
+        changeDict.content_id === this.contentId
+      ) {
+        this.allExistingTranslationsHaveBeenRemoved = true;
+      }
+    });
+
     // Populate the content translations via published translations from the backend.
     // These translations are used for a language when the published translations are
     // the latest translations available.
-    this.entityBulkTranslationsBackendApiService
-      .fetchEntityBulkTranslationsAsync(
-        this.explorationId,
-        'exploration',
-        this.explorationVersion
-      )
-      .then(response => {
-        for (let language in response) {
-          let language_translations = response[language]['translations'];
-          if (
-            this.contentId in language_translations &&
-            !this.contentTranslations[language]
-          ) {
-            this.contentTranslations[language] =
-              language_translations[this.contentId];
+    if (!this.allExistingTranslationsHaveBeenRemoved) {
+      this.entityBulkTranslationsBackendApiService
+        .fetchEntityBulkTranslationsAsync(
+          this.explorationId,
+          'exploration',
+          this.explorationVersion
+        )
+        .then(response => {
+          for (let language in response) {
+            let language_translations = response[language]['translations'];
+            if (
+              this.contentId in language_translations &&
+              !this.contentTranslations[language]
+            ) {
+              this.contentTranslations[language] =
+                language_translations[this.contentId];
+            }
           }
-        }
-      });
+        });
+    }
   }
 
   getLanguageName(languageCode: string): string {
