@@ -83,7 +83,6 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
-    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
@@ -98,7 +97,8 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.DIAGNOSTIC_TEST,
     FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
-    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK
+    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
+    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -215,7 +215,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'The flag allows voice artists to add voiceovers in a specific '
             'accent for the given language.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW.value: (
