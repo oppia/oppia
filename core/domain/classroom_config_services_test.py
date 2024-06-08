@@ -42,12 +42,12 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.dummy_thumbnail: classroom_config_domain.ImageDict = {
+        self.dummy_thumbnail_data: classroom_config_domain.ImageDict = {
                 'filename': 'thumbnail.svg',
                 'bg_color': 'transparent',
                 'size_in_bytes': 1000
         }
-        self.dummy_banner: classroom_config_domain.ImageDict = {
+        self.dummy_banner_data: classroom_config_domain.ImageDict = {
                 'filename': 'banner.png',
                 'bg_color': 'transparent',
                 'size_in_bytes': 1000
@@ -65,8 +65,8 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
                 'topic_id_2': [],
                 'topic_id_3': []
             },
-            'is_published': True, 'thumbnail': self.dummy_thumbnail,
-            'banner': self.dummy_banner
+            'is_published': True, 'thumbnail_data': self.dummy_thumbnail_data,
+            'banner_data': self.dummy_banner_data
         }
         self.math_classroom = classroom_config_domain.Classroom.from_dict(
             self.math_classroom_dict)
@@ -78,8 +78,9 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.math_classroom.teaser_text,
             self.math_classroom.topic_list_intro,
             self.math_classroom.topic_id_to_prerequisite_topic_ids,
-            self.math_classroom.is_published, self.math_classroom.thumbnail,
-            self.math_classroom.banner
+            self.math_classroom.is_published,
+            self.math_classroom.thumbnail_data,
+            self.math_classroom.banner_data
         )
 
         self.physics_classroom_dict: classroom_config_domain.ClassroomDict = {
@@ -94,8 +95,8 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
                 'topic_id_2': [],
                 'topic_id_3': []
             },
-            'is_published': True, 'thumbnail': self.dummy_thumbnail,
-            'banner': self.dummy_banner
+            'is_published': True, 'thumbnail_data': self.dummy_thumbnail_data,
+            'banner_data': self.dummy_banner_data
         }
         self.physics_classroom = classroom_config_domain.Classroom.from_dict(
             self.physics_classroom_dict)
@@ -108,8 +109,8 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.physics_classroom.topic_list_intro,
             self.physics_classroom.topic_id_to_prerequisite_topic_ids,
             self.physics_classroom.is_published,
-            self.physics_classroom.thumbnail,
-            self.physics_classroom.banner
+            self.physics_classroom.thumbnail_data,
+            self.physics_classroom.banner_data
         )
 
     def test_get_classroom_by_id(self) -> None:
@@ -142,8 +143,8 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             'teaser_text': 'Teaser test for chemistry classroom',
             'topic_list_intro': 'Start from the basics with our first topic.',
             'topic_id_to_prerequisite_topic_ids': {'topic_id_chem': []},
-            'is_published': True, 'thumbnail': self.dummy_thumbnail,
-            'banner': self.dummy_banner
+            'is_published': True, 'thumbnail_data': self.dummy_thumbnail_data,
+            'banner_data': self.dummy_banner_data
         }
         chemistry_classroom = classroom_config_domain.Classroom.from_dict(
             chemistry_classroom_dict)
@@ -156,7 +157,8 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             chemistry_classroom.topic_list_intro,
             chemistry_classroom.topic_id_to_prerequisite_topic_ids,
             chemistry_classroom.is_published,
-            chemistry_classroom.thumbnail, chemistry_classroom.banner
+            chemistry_classroom.thumbnail_data,
+            chemistry_classroom.banner_data
         )
         classroom_url_fragment = (
             classroom_config_services.
@@ -209,7 +211,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
                 'topic_id_1': ['topic_id_2', 'topic_id_3'],
                 'topic_id_2': [],
                 'topic_id_3': []
-            }, True, self.dummy_thumbnail, self.dummy_banner
+            }, True, self.dummy_thumbnail_data, self.dummy_banner_data
         )
         self.assertIsNone(
             classroom_config_services.get_classroom_by_id(

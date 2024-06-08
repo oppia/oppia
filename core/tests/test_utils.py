@@ -4230,10 +4230,10 @@ version: 1
         topic_id_to_prerequisite_topic_ids: Optional[
             Dict[str, List[str]]] = None,
         is_published: bool = True,
-        thumbnail: Optional[
+        thumbnail_data: Optional[
             classroom_config_domain.ImageDict
         ] = None,
-        banner: Optional[
+        banner_data: Optional[
             classroom_config_domain.ImageDict
         ] = None
     ) -> classroom_config_domain.Classroom:
@@ -4251,18 +4251,18 @@ version: 1
             topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]. A dict
                 with topic ID as key and list of topic IDs as value.
             is_published: bool. Whether this classroom is published or not.
-            thumbnail: Optional[ImageDict]. Image object for thumbnail.
-            banner: Optional[ImageDict]. Image object for banner.
+            thumbnail_data: Optional[ImageDict]. Image object for thumbnail.
+            banner_data: Optional[ImageDict]. Image object for banner.
 
         Returns:
             Classroom. The classroom domain object.
         """
-        dummy_thumbnail: classroom_config_domain.ImageDict = {
+        dummy_thumbnail_data: classroom_config_domain.ImageDict = {
                 'filename': 'thumbnail.svg',
                 'bg_color': 'transparent',
                 'size_in_bytes': 1000
         }
-        dummy_banner: classroom_config_domain.ImageDict = {
+        dummy_banner_data: classroom_config_domain.ImageDict = {
                 'filename': 'banner.png',
                 'bg_color': 'transparent',
                 'size_in_bytes': 1000
@@ -4280,15 +4280,15 @@ version: 1
                 else {}
             ),
             is_published=is_published,
-            thumbnail=(
-                thumbnail
-                if thumbnail is not None
-                else dummy_thumbnail
+            thumbnail_data=(
+                thumbnail_data
+                if thumbnail_data is not None
+                else dummy_thumbnail_data
             ),
-            banner=(
-                banner
-                if banner is not None
-                else dummy_banner
+            banner_data=(
+                banner_data
+                if banner_data is not None
+                else dummy_banner_data
             )
         )
 

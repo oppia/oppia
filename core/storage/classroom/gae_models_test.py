@@ -39,12 +39,12 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.dummy_thumbnail: classroom_config_domain.ImageDict = {
+        self.dummy_thumbnail_data: classroom_config_domain.ImageDict = {
                 'filename': 'thumbnail.svg',
                 'bg_color': 'transparent',
                 'size_in_bytes': 1000
         }
-        self.dummy_banner: classroom_config_domain.ImageDict = {
+        self.dummy_banner_data: classroom_config_domain.ImageDict = {
                 'filename': 'banner.png',
                 'bg_color': 'transparent',
                 'size_in_bytes': 1000
@@ -57,8 +57,8 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
             teaser_text='Learn math through fun stories!',
             topic_list_intro='Start from the basics with our first topic.',
             topic_id_to_prerequisite_topic_ids={},
-            is_published=True, thumbnail=self.dummy_thumbnail,
-            banner=self.dummy_banner
+            is_published=True, thumbnail_data=self.dummy_thumbnail_data,
+            banner_data=self.dummy_banner_data
         )
         self.classroom_model.update_timestamps()
         self.classroom_model.put()
@@ -86,10 +86,10 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
                 'Start from the basic physics.')
         self.assertEqual(classroom_model_instance.is_published, False)
         self.assertEqual(
-            classroom_model_instance.thumbnail, self.dummy_thumbnail
+            classroom_model_instance.thumbnail_data, self.dummy_thumbnail_data
             )
         self.assertEqual(
-            classroom_model_instance.banner, self.dummy_banner
+            classroom_model_instance.banner_data, self.dummy_banner_data
             )
 
     def test_get_export_policy_not_applicable(self) -> None:
@@ -107,8 +107,8 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
                 'topic_id_to_prerequisite_topic_ids': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE),
                 'is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'thumbnail': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'banner': base_models.EXPORT_POLICY.NOT_APPLICABLE
+                'thumbnail_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'banner_data': base_models.EXPORT_POLICY.NOT_APPLICABLE
             }
         )
 
@@ -172,7 +172,7 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
                     'Curated math foundations course.',
                     'Learn math through fun stories!',
                     'Start from the basic math.', {}, True,
-                    self.dummy_thumbnail, self.dummy_banner
+                    self.dummy_thumbnail_data, self.dummy_banner_data
                 )
 
         # Test generate_new_classroom_id method.

@@ -72,9 +72,9 @@ class ClassroomModel(base_models.BaseModel):
     is_published = datastore_services.BooleanProperty(
         indexed=True, required=True, default=False)
     # The thumbnail data of the classroom.
-    thumbnail = datastore_services.JsonProperty(indexed=False)
+    thumbnail_data = datastore_services.JsonProperty(indexed=False)
     # The banner data of the classroom.
-    banner = datastore_services.JsonProperty(indexed=False)
+    banner_data = datastore_services.JsonProperty(indexed=False)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -99,8 +99,8 @@ class ClassroomModel(base_models.BaseModel):
             'topic_id_to_prerequisite_topic_ids': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thumbnail': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'banner': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'thumbnail_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'banner_data': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -130,8 +130,8 @@ class ClassroomModel(base_models.BaseModel):
         cls, classroom_id: str, name: str, url_fragment: str,
         course_details: str, teaser_text: str, topic_list_intro: str,
         topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
-        is_published: bool, thumbnail: ImageDict,
-        banner: ImageDict
+        is_published: bool, thumbnail_data: ImageDict,
+        banner_data: ImageDict
     ) -> ClassroomModel:
         """Creates a new ClassroomModel entry.
 
@@ -147,8 +147,8 @@ class ClassroomModel(base_models.BaseModel):
             topic_id_to_prerequisite_topic_ids: dict(str, list(str)). A dict
                 with topic ID as key and list of topic IDs as value.
             is_published: bool. Whether this classroom is published or not.
-            thumbnail: ImageDict. The thumbnail data of the classroom.
-            banner: ImageDict. The banner data of the classroom.
+            thumbnail_data: ImageDict. The thumbnail data of the classroom.
+            banner_data: ImageDict. The banner data of the classroom.
 
         Returns:
             ClassroomModel. The newly created ClassroomModel instance.
@@ -170,8 +170,8 @@ class ClassroomModel(base_models.BaseModel):
             topic_id_to_prerequisite_topic_ids=(
                 topic_id_to_prerequisite_topic_ids),
             is_published=is_published,
-            thumbnail=thumbnail,
-            banner=banner
+            thumbnail_data=thumbnail_data,
+            banner_data=banner_data
         )
         entity.update_timestamps()
         entity.put()

@@ -88,8 +88,8 @@ def get_classroom_from_classroom_model(
         classroom_model.topic_list_intro,
         classroom_model.topic_id_to_prerequisite_topic_ids,
         classroom_model.is_published,
-        classroom_model.thumbnail,
-        classroom_model.banner
+        classroom_model.thumbnail_data,
+        classroom_model.banner_data
     )
 
 
@@ -202,8 +202,8 @@ def update_classroom(
         classroom.topic_id_to_prerequisite_topic_ids)
     classroom_model.teaser_text = classroom.teaser_text
     classroom_model.is_published = classroom.is_published
-    classroom_model.thumbnail = classroom.thumbnail
-    classroom_model.banner = classroom.banner
+    classroom_model.thumbnail_data = classroom.thumbnail_data
+    classroom_model.banner_data = classroom.banner_data
 
     classroom_model.update_timestamps()
     classroom_model.put()
@@ -228,8 +228,8 @@ def create_new_classroom(
         classroom.topic_list_intro,
         classroom.topic_id_to_prerequisite_topic_ids,
         classroom.is_published,
-        classroom.thumbnail,
-        classroom.banner
+        classroom.thumbnail_data,
+        classroom.banner_data
     )
 
 

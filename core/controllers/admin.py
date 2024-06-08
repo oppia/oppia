@@ -1212,12 +1212,12 @@ class AdminHandler(
                             topic_id_to_prerequisite_topic_ids=(
                                 topic_dependency_for_classroom_1),
                             is_published=True,
-                            thumbnail={
+                            thumbnail_data={
                                 'filename': 'thumbnail.svg',
                                 'bg_color': 'transparent',
                                 'size_in_bytes': 1000
                             },
-                            banner={
+                            banner_data={
                                 'filename': 'banner.png',
                                 'bg_color': 'transparent',
                                 'size_in_bytes': 1000  

@@ -36,8 +36,8 @@ class ClassroomDict(TypedDict):
     topic_list_intro: str
     topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]
     is_published: bool
-    thumbnail: ImageDict
-    banner: ImageDict
+    thumbnail_data: ImageDict
+    banner_data: ImageDict
 
 # TODO(#17246): Currently, the classroom data is stored in the config model and
 # we are planning to migrate the storage into a new Classroom model. After the
@@ -59,8 +59,8 @@ class Classroom:
         topic_list_intro: str,
         topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
         is_published: bool,
-        thumbnail: ImageDict,
-        banner: ImageDict
+        thumbnail_data: ImageDict,
+        banner_data: ImageDict
     ) -> None:
         """Constructs a Classroom domain object.
 
@@ -75,8 +75,8 @@ class Classroom:
                 with topic ID as key and a list of prerequisite topic IDs as
                 value.
             is_published: bool. Whether this classroom is published or not.
-            thumbnail: ImageDict. Image object for classroom thumbnail.
-            banner: ImageDict. Image object for classroom banner.
+            thumbnail_data: ImageDict. Image object for classroom thumbnail.
+            banner_data: ImageDict. Image object for classroom banner.
         """
         self.classroom_id = classroom_id
         self.name = name
@@ -87,8 +87,8 @@ class Classroom:
         self.topic_id_to_prerequisite_topic_ids = (
             topic_id_to_prerequisite_topic_ids)
         self.is_published = is_published
-        self.thumbnail = thumbnail
-        self.banner = banner
+        self.thumbnail_data = thumbnail_data
+        self.banner_data = banner_data
 
     @classmethod
     def from_dict(cls, classroom_dict: ClassroomDict) -> Classroom:
@@ -110,8 +110,8 @@ class Classroom:
             classroom_dict['topic_list_intro'],
             classroom_dict['topic_id_to_prerequisite_topic_ids'],
             classroom_dict['is_published'],
-            classroom_dict['thumbnail'],
-            classroom_dict['banner']
+            classroom_dict['thumbnail_data'],
+            classroom_dict['banner_data']
         )
 
     def to_dict(self) -> ClassroomDict:
@@ -130,8 +130,8 @@ class Classroom:
             'topic_id_to_prerequisite_topic_ids': (
                 self.topic_id_to_prerequisite_topic_ids),
             'is_published': self.is_published,
-            'thumbnail': self.thumbnail,
-            'banner': self.banner
+            'thumbnail_data': self.thumbnail_data,
+            'banner_data': self.banner_data
         }
 
     def get_topic_ids(self) -> List[str]:
@@ -338,18 +338,18 @@ class Classroom:
             raise utils.ValidationError(
                 'Expected ID of the classroom to be a string, received: %s.'
                 % self.classroom_id)
-        if not isinstance(self.thumbnail['filename'], str):
+        if not isinstance(self.thumbnail_data['filename'], str):
             raise utils.ValidationError(
                 'Expected thumbnail_filename of the classroom to '
-                'be a string, received: %s.' % self.thumbnail['filename'])
-        if not isinstance(self.banner['filename'], str):
+                'be a string, received: %s.' % self.thumbnail_data['filename'])
+        if not isinstance(self.banner_data['filename'], str):
             raise utils.ValidationError(
                 'Expected banner_filename of the classroom to '
-                'be a string, received: %s.' % self.banner['filename'])
-        if self.thumbnail['filename'] == '':
+                'be a string, received: %s.' % self.banner_data['filename'])
+        if self.thumbnail_data['filename'] == '':
             raise utils.ValidationError(
                 'thumbnail_filename field should not be empty')
-        if self.banner['filename'] == '':
+        if self.banner_data['filename'] == '':
             raise utils.ValidationError(
                 'banner_filename field should not be empty')
 
@@ -364,10 +364,10 @@ class Classroom:
             raise utils.ValidationError(
                 'Expected is_published of the classroom to be a boolean, '
                 'received: %s.' % self.is_published)
-        self.require_valid_bg_color(self.thumbnail['bg_color'], True)
-        self.require_valid_bg_color(self.banner['bg_color'], False)
-        utils.require_valid_image_filename(self.banner['filename'])
-        utils.require_valid_thumbnail_filename(self.thumbnail['filename'])
+        self.require_valid_bg_color(self.thumbnail_data['bg_color'], True)
+        self.require_valid_bg_color(self.banner_data['bg_color'], False)
+        utils.require_valid_image_filename(self.banner_data['filename'])
+        utils.require_valid_thumbnail_filename(self.thumbnail_data['filename'])
 
 
 class ImageDict(TypedDict, total=False):
