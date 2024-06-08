@@ -26,8 +26,6 @@ const aboutUrl = testConstants.URLs.About;
 const mathClassroomUrl = testConstants.URLs.MathClassroom;
 const androidUrl = testConstants.URLs.Android;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
-const creatorDashboardCreateModeUrl =
-  testConstants.URLs.CreatorDashboardCreateMode;
 const aboutFoundationUrl = testConstants.URLs.AboutFoundation;
 const blogUrl = testConstants.URLs.Blog;
 const partnershipsUrl = testConstants.URLs.Partnerships;
@@ -167,7 +165,10 @@ export class LoggedOutUser extends BaseUser {
     expectedDestinationPageUrl: string,
     expectedDestinationPageName: string
   ): Promise<void> {
-    await Promise.all([this.page.waitForNavigation(), this.clickOn(button)]);
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
+      this.clickOn(button),
+    ]);
 
     expect(this.page.url())
       .withContext(
@@ -253,33 +254,26 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Browse Our Lessons button in the About page
-   * and check if it opens the Creator Dashboard page in Create Mode.
+   * Function to click the Create Lessons button in the About page
+   * and check if it opens the Sign-in page with a return URL to the Creator Dashboard in create mode.
    */
   async clickCreateLessonsButtonInAboutPage(): Promise<void> {
     await this.clickOn(createLessonsButton);
-    if (this.page.url() !== creatorDashboardCreateModeUrl) {
-      throw new Error(
-        `The Create Lessons button does not open the Creator Dashboard
-        in Create Mode! It opens ${this.page.url()} instead.`
-      );
-    } else {
-      showMessage(
-        'The Create Lessons button opens the Creator Dashboard ' +
-          'in Create Mode.'
-      );
-    }
     await this.page.waitForNavigation();
-    const urlRegex =
-      /http:\/\/localhost:8181\/create\/\w*(\/gui\/Introduction)?/;
-    if (this.page.url().match(urlRegex) === null) {
+
+    const expectedSignInPageUrl =
+      testConstants.URLs.Login +
+      '?return_url=http:%2F%2Flocalhost:8181%2Fcreator-dashboard%3Fmode%3Dcreate';
+
+    if (this.page.url() !== expectedSignInPageUrl) {
       throw new Error(
-        `The Create Lessons button does not display the Exploration Editor page!
+        `The Create Lessons button does not open the Sign-in page with a return URL to the Creator Dashboard in create mode!
          It opens ${this.page.url()} instead.`
       );
     } else {
       showMessage(
-        'The Create Lessons button displays the Exploration Editor page.'
+        'The Create Lessons button opens the Sign-in page ' +
+          'with a return URL to the Creator Dashboard in create mode.'
       );
     }
   }
