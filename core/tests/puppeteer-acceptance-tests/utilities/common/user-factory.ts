@@ -34,6 +34,8 @@ import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
+const cookieBannerAcceptButton =
+  'button.e2e-test-oppia-cookie-banner-accept-button';
 
 /**
  * Mapping of user roles to their respective function class.
@@ -183,6 +185,18 @@ export class UserFactory {
     return superAdminInstance;
   };
 
+  /**
+   * This function creates a new instance of a LoggedOutUser, opens a browser for that user,
+   * navigates to the home page, adds the user to the activeUsers array, and returns the user.
+   */
+  static createLoggedOutUser = async function (): Promise<LoggedOutUser> {
+    let user = new LoggedOutUser();
+    await user.openBrowser();
+    await user.page.goto(testConstants.URLs.Home);
+    await user.clickOn(cookieBannerAcceptButton);
+    activeUsers.push(user);
+    return user;
+  };
   /**
    * This function closes all the browsers opened by different users.
    */

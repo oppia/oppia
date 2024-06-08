@@ -52,6 +52,7 @@ export default {
     Electromagnetism: 'https://www.oppia.org/collection/wqCTKpKA0LBe',
     GetStarted: 'http://localhost:8181/get-started',
     Home: 'http://localhost:8181/',
+    Login: 'http://localhost:8181/login',
     Logout: 'http://localhost:8181/logout',
     MathClassroom: 'http://localhost:8181/learn/math',
     MobileExternalLinkWatchAVideo:

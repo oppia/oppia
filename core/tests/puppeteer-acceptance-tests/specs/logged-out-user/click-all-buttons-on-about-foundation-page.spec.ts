@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users
+ * @fileoverview Acceptance Test for checking if logged-out users
  * can open links by clicking all buttons in about foundation page
  */
 
@@ -23,24 +23,21 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-in User in About Foundation page', function () {
-  let testUser: LoggedOutUser;
+describe('Logged-out User in About Foundation page', function () {
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com'
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await testUser.navigateToAboutFoundationPage();
+    await loggedOutUser.navigateToAboutFoundationPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open the page with the 61 million children link.',
     async function () {
-      await testUser.click61MillionChildrenLinkInAboutFoundation();
+      await loggedOutUser.click61MillionChildrenLinkInAboutFoundation();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -48,7 +45,7 @@ describe('Logged-in User in About Foundation page', function () {
   it(
     'should open the page with the Even Those Who Are In School link.',
     async function () {
-      await testUser.clickEvenThoseWhoAreInSchoolLinkInAboutFoundation();
+      await loggedOutUser.clickEvenThoseWhoAreInSchoolLinkInAboutFoundation();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -56,7 +53,7 @@ describe('Logged-in User in About Foundation page', function () {
   it(
     'should open the page with the Source: UNESCO link.',
     async function () {
-      await testUser.clickSourceUnescoLinkInAboutFoundation();
+      await loggedOutUser.clickSourceUnescoLinkInAboutFoundation();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -64,7 +61,7 @@ describe('Logged-in User in About Foundation page', function () {
   it(
     'should open the page with the 420 Million link.',
     async function () {
-      await testUser.click420MillionLinkInAboutFoundation();
+      await loggedOutUser.click420MillionLinkInAboutFoundation();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -72,7 +69,7 @@ describe('Logged-in User in About Foundation page', function () {
   it(
     'should open the About page with the Learn More About Oppia button.',
     async function () {
-      await testUser.clickLearnMoreAboutOppiaButtonInAboutFoundation();
+      await loggedOutUser.clickLearnMoreAboutOppiaButtonInAboutFoundation();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -80,7 +77,7 @@ describe('Logged-in User in About Foundation page', function () {
   it(
     'should open the Volunteer page with the Become A Volunteer button.',
     async function () {
-      await testUser.clickBecomeAVolunteerButtonInAboutFoundation();
+      await loggedOutUser.clickBecomeAVolunteerButtonInAboutFoundation();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -89,7 +86,7 @@ describe('Logged-in User in About Foundation page', function () {
     'should open the Partnerships page with the Consider Becoming A ' +
       'Partner Today! link.',
     async function () {
-      await testUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();
+      await loggedOutUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -98,7 +95,7 @@ describe('Logged-in User in About Foundation page', function () {
     'should open the Volunteer page with the Join Our Large Volunteer ' +
       'Community link.',
     async function () {
-      await testUser.clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation();
+      await loggedOutUser.clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -106,7 +103,7 @@ describe('Logged-in User in About Foundation page', function () {
   it(
     'should open the Donate page with the donations link.',
     async function () {
-      await testUser.clickDonationsLinkInAboutFoundation();
+      await loggedOutUser.clickDonationsLinkInAboutFoundation();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
