@@ -95,7 +95,9 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
     FeatureNames.DIAGNOSTIC_TEST,
+    FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
+    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
 ]
 
@@ -107,9 +109,7 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.CHECKPOINT_CELEBRATION,
     FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
     FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED,
-    FeatureNames.LEARNER_GROUPS_ARE_ENABLED,
-    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
-    FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
+    FeatureNames.LEARNER_GROUPS_ARE_ENABLED
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -230,14 +230,14 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'The flag controls whether voiceover contributions from the '
             'voiceover tab of the exploration editor page is enabled or '
             'disabled during voiceover migration.',
-            feature_flag_domain.ServerMode.PROD
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value: (
         (
             'The flag allows auto-updating of the exploration voice artists '
             'link model after an exploration update.',
-            feature_flag_domain.ServerMode.PROD
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value: (
