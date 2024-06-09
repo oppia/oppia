@@ -22,9 +22,10 @@ import {AboutPageRootComponent} from './about-page-root.component';
 import {AboutPageRoutingModule} from './about-page-routing.module';
 import {CommonModule} from '@angular/common';
 import {SharedComponentsModule} from 'components/shared-component.module';
+import {BarChartComponent} from './charts/bar-chart.component';
 
 @NgModule({
   imports: [CommonModule, SharedComponentsModule, AboutPageRoutingModule],
-  declarations: [AboutPageComponent, AboutPageRootComponent],
+  declarations: [AboutPageComponent, AboutPageRootComponent, BarChartComponent],
 })
 export class AboutPageModule {}

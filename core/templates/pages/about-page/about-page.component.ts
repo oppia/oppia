@@ -21,6 +21,7 @@ import {downgradeComponent} from '@angular/upgrade/static';
 
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {OppiaPlatformStatsData} from '../../oppia-platform-stats';
 
 import './about-page.component.css';
 
@@ -53,84 +54,32 @@ export class AboutPageComponent {
     },
   ];
 
-  oppiaWebsiteRawBarChartData = [
-    {
-      country: 'United States',
-      userCount: 2400.0,
-    },
-    {country: 'India', userCount: 1100.0},
-    {country: 'United Kingdom', userCount: 930.0},
-    {country: 'Brazil', userCount: 650.0},
-    {country: 'Canada', userCount: 420.0},
-    {country: 'Nigeria', userCount: 250.0},
-    {country: 'Netherlands', userCount: 250.0},
-    {country: 'Egypt', userCount: 225.0},
-    {country: 'Turkey', userCount: 225.0},
-    {country: 'Belgium', userCount: 200.0},
-  ];
-
-  oppiaAndroidRawBarChartData = [
-    {country: 'Brazil', userCount: 3250.0},
-    {country: 'Pakistan', userCount: 1500.0},
-    {country: 'Angola', userCount: 1270.0},
-    {country: 'Kenya', userCount: 870.0},
-    {country: 'Cameroon', userCount: 570.0},
-    {country: 'Mozambique', userCount: 320.0},
-    {country: 'India', userCount: 320.0},
-    {country: 'Nigeria', userCount: 300.0},
-    {country: 'Indonesia', userCount: 300.0},
-    {country: 'Tanzania', userCount: 260.0},
-  ];
-
-  oppiaWebsiteBarChartData!: {
+  oppiaWebRawBarChartData: readonly {
     country: string;
     userCount: number;
-  }[];
-  oppiaAndroidBarChartData!: {
+    annotationText?: string;
+  }[] = OppiaPlatformStatsData.OPPIA_WEB_RAW_BAR_CHART_DATA;
+
+  oppiaAndroidRawBarChartData: readonly {
     country: string;
     userCount: number;
-  }[];
+    annotationText?: string;
+  }[] = OppiaPlatformStatsData.OPPIA_ANDROID_RAW_BAR_CHART_DATA;
+
+  oppiaWebBarChartTicks: readonly {
+    value: string;
+    width: string;
+  }[] = OppiaPlatformStatsData.OPPIA_WEB_BAR_CHART_TICKS;
+
+  oppiaAndroidBarChartTicks: readonly {
+    value: string;
+    width: string;
+  }[] = OppiaPlatformStatsData.OPPIA_ANDROID_BAR_CHART_TICKS;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private siteAnalyticsService: SiteAnalyticsService
-  ) {
-    this.displayNormalizedUserCount();
-  }
-
-  displayNormalizedUserCount(): void {
-    const maxWebsiteUserCount = Math.max(
-      ...this.oppiaWebsiteRawBarChartData.map(dataPoint => dataPoint.userCount)
-    );
-
-    this.oppiaWebsiteBarChartData = this.oppiaWebsiteRawBarChartData.map(
-      dataPoint => {
-        const normalizedUserCount = (
-          dataPoint.userCount / maxWebsiteUserCount
-        ).toFixed(2);
-        return {
-          ...dataPoint,
-          userCount: parseFloat(normalizedUserCount),
-        };
-      }
-    );
-
-    const maxAndroidUserCount = Math.max(
-      ...this.oppiaAndroidRawBarChartData.map(dataPoint => dataPoint.userCount)
-    );
-
-    this.oppiaAndroidBarChartData = this.oppiaAndroidRawBarChartData.map(
-      dataPoint => {
-        const normalizedUserCount = (
-          dataPoint.userCount / maxAndroidUserCount
-        ).toFixed(2);
-        return {
-          ...dataPoint,
-          userCount: parseFloat(normalizedUserCount),
-        };
-      }
-    );
-  }
+  ) {}
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
