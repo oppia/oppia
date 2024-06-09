@@ -44,6 +44,7 @@ export enum FeatureNames {
   ExplorationEditorCanModifyTranslations = 'exploration_editor_can_modify_translations',
   ExplorationEditorCanTagMisconceptions = 'exploration_editor_can_tag_misconceptions',
   EnableMultipleClassrooms = 'enable_multiple_classrooms',
+  RedesignedTopicViewerPage = 'redesigned_topic_viewer_page',
 }
 
 export interface FeatureStatusSummaryBackendDict {
