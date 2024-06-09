@@ -2542,144 +2542,171 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             'exploration.'
         )
 
-    def test_error_cases_for_email_sending(self) -> None:
-        with self.swap(
-            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
-            ), self.swap(
-                feconf, 'CAN_SEND_EMAILS', False):
-            # Log in as a moderator.
-            self.login(self.MODERATOR_EMAIL)
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+    )
+    def test_error_cases_when_can_send_emails_param_is_false(self) -> None:
+        # Log in as a moderator.
+        self.login(self.MODERATOR_EMAIL)
 
-            # Get csrf token.
-            csrf_token = self.get_new_csrf_token()
+        # Get csrf token.
+        csrf_token = self.get_new_csrf_token()
 
-            # Try to unpublish the exploration without an email body. This
-            # should cause an error.
-            response_dict = self.put_json(
-                '/createhandler/moderatorrights/%s' % self.EXP_ID, {
-                    'email_body': None,
-                    'version': 1,
-                }, csrf_token=csrf_token, expected_status_int=400)
-            self.assertIn(
-                'Missing key in handler args: email_body.',
-                response_dict['error'])
-
-            response_dict = self.put_json(
-                '/createhandler/moderatorrights/%s' % self.EXP_ID, {
-                    'email_body': '',
-                    'version': 1,
-                }, csrf_token=csrf_token, expected_status_int=400)
-
-            error_msg = (
-                'Moderator actions should include an email to the recipient.'
-            )
-            self.assertIn(error_msg, response_dict['error'])
-
-            # Try to unpublish the exploration even if the relevant feconf
-            # flags are not set. This should cause a system error.
-            valid_payload = {
-                'email_body': 'Your exploration is featured!',
+        # Try to unpublish the exploration without an email body. This
+        # should cause an error.
+        response_dict = self.put_json(
+            '/createhandler/moderatorrights/%s' % self.EXP_ID, {
+                'email_body': None,
                 'version': 1,
-            }
-            self.put_json(
-                '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                valid_payload, csrf_token=csrf_token,
-                expected_status_int=500)
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.assertIn(
+            'Missing key in handler args: email_body.',
+            response_dict['error'])
 
-            with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-                # Now the email gets sent with no error.
-                self.put_json(
-                    '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                    valid_payload, csrf_token=csrf_token)
-
-            # Log out.
-            self.logout()
-
-    def test_email_is_sent_correctly_when_unpublishing(self) -> None:
-        with self.swap(
-            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
-            ), self.swap(
-                feconf, 'CAN_SEND_EMAILS', True):
-            # Log in as a moderator.
-            self.login(self.MODERATOR_EMAIL)
-
-            # Go to the exploration editor page.
-            csrf_token = self.get_new_csrf_token()
-
-            new_email_body = 'Your exploration is unpublished :('
-
-            valid_payload = {
-                'email_body': new_email_body,
+        response_dict = self.put_json(
+            '/createhandler/moderatorrights/%s' % self.EXP_ID, {
+                'email_body': '',
                 'version': 1,
-            }
+            }, csrf_token=csrf_token, expected_status_int=400)
 
-            self.put_json(
-                '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                valid_payload, csrf_token=csrf_token)
+        error_msg = (
+            'Moderator actions should include an email to the recipient.'
+        )
+        self.assertIn(error_msg, response_dict['error'])
 
-            # Check that an email was sent with the correct content.
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
-            self.assertEqual(1, len(messages))
+        # Log out.
+        self.logout()
 
-            self.assertEqual(
-                messages[0].sender,
-                'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
-            self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
-            self.assertFalse(hasattr(messages[0], 'cc'))
-            self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(
-                messages[0].subject,
-                'Your Oppia exploration "My Exploration" has been unpublished')
-            self.assertEqual(messages[0].body, (
-                'Hi %s,\n\n'
-                '%s\n\n'
-                'Thanks!\n'
-                '%s (Oppia moderator)\n\n'
-                'You can change your email preferences via the Preferences '
-                'page.' % (
-                    self.EDITOR_USERNAME,
-                    new_email_body,
-                    self.MODERATOR_USERNAME)))
-            self.assertEqual(messages[0].html, (
-                'Hi %s,<br><br>'
-                '%s<br><br>'
-                'Thanks!<br>'
-                '%s (Oppia moderator)<br><br>'
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'), # pylint: disable=line-too-long
+        ]
+    )
+    def test_error_cases_when_can_send_emails_param_is_true(self) -> None:
+        # Log in as a moderator.
+        self.login(self.MODERATOR_EMAIL)
+
+        # Get csrf token.
+        csrf_token = self.get_new_csrf_token()
+
+        # Try to unpublish the exploration even if the relevant feconf
+        # flags are not set. This should cause a system error.
+        valid_payload = {
+            'email_body': 'Your exploration is featured!',
+            'version': 1,
+        }
+
+        # Now the email gets sent with no error.
+        self.put_json(
+            '/createhandler/moderatorrights/%s' % self.EXP_ID,
+            valid_payload, csrf_token=csrf_token)
+
+        # Log out.
+        self.logout()
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.EMAIL_FOOTER,
                 'You can change your email preferences via the '
                 '<a href="http://localhost:8181/preferences">Preferences</a> '
-                'page.' % (
-                    self.EDITOR_USERNAME,
-                    new_email_body,
-                    self.MODERATOR_USERNAME)))
+                'page.'
+            ),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'), # pylint: disable=line-too-long
+        ]
+    )
+    def test_email_is_sent_correctly_when_unpublishing(self) -> None:
+        # Log in as a moderator.
+        self.login(self.MODERATOR_EMAIL)
 
-            self.logout()
+        # Go to the exploration editor page.
+        csrf_token = self.get_new_csrf_token()
 
+        new_email_body = 'Your exploration is unpublished :('
+
+        valid_payload = {
+            'email_body': new_email_body,
+            'version': 1,
+        }
+
+        self.put_json(
+            '/createhandler/moderatorrights/%s' % self.EXP_ID,
+            valid_payload, csrf_token=csrf_token)
+
+        # Check that an email was sent with the correct content.
+        messages = self._get_sent_email_messages(
+            self.EDITOR_EMAIL)
+        self.assertEqual(1, len(messages))
+
+        self.assertEqual(
+            messages[0].sender,
+            'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
+        self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
+        self.assertFalse(hasattr(messages[0], 'cc'))
+        self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
+        self.assertEqual(
+            messages[0].subject,
+            'Your Oppia exploration "My Exploration" has been unpublished')
+        self.assertEqual(messages[0].body, (
+            'Hi %s,\n\n'
+            '%s\n\n'
+            'Thanks!\n'
+            '%s (Oppia moderator)\n\n'
+            'You can change your email preferences via the Preferences '
+            'page.' % (
+                self.EDITOR_USERNAME,
+                new_email_body,
+                self.MODERATOR_USERNAME)))
+        self.assertEqual(messages[0].html, (
+            'Hi %s,<br><br>'
+            '%s<br><br>'
+            'Thanks!<br>'
+            '%s (Oppia moderator)<br><br>'
+            'You can change your email preferences via the '
+            '<a href="http://localhost:8181/preferences">Preferences</a> '
+            'page.' % (
+                self.EDITOR_USERNAME,
+                new_email_body,
+                self.MODERATOR_USERNAME)))
+
+        self.logout()
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.EMAIL_FOOTER,
+                'You can change your email preferences via the '
+                '<a href="http://localhost:8181/preferences">Preferences</a> '
+                'page.'
+            ),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'), # pylint: disable=line-too-long
+        ]
+    )
     def test_email_functionality_cannot_be_used_by_non_moderators(self) -> None:
-        with self.swap(
-            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
-            ), self.swap(
-                feconf, 'CAN_SEND_EMAILS', True):
-            # Log in as a non-moderator.
-            self.login(self.EDITOR_EMAIL)
+        # Log in as a non-moderator.
+        self.login(self.EDITOR_EMAIL)
 
-            # Go to the exploration editor page.
-            csrf_token = self.get_new_csrf_token()
+        # Go to the exploration editor page.
+        csrf_token = self.get_new_csrf_token()
 
-            new_email_body = 'Your exploration is unpublished :('
+        new_email_body = 'Your exploration is unpublished :('
 
-            valid_payload = {
-                'email_body': new_email_body,
-                'version': 1,
-            }
+        valid_payload = {
+            'email_body': new_email_body,
+            'version': 1,
+        }
 
-            # The user should receive an 'unauthorized user' error.
-            self.put_json(
-                '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                valid_payload, csrf_token=csrf_token,
-                expected_status_int=401)
+        # The user should receive an 'unauthorized user' error.
+        self.put_json(
+            '/createhandler/moderatorrights/%s' % self.EXP_ID,
+            valid_payload, csrf_token=csrf_token,
+            expected_status_int=401)
 
-            self.logout()
+        self.logout()
 
 
 class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):

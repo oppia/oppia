@@ -1,0 +1,57 @@
+<div class="image-editor e2e-test-thumbnail-editor form-group">
+  <div>
+    <div class="oppia-editable-section float-left edit-btn-container" [attr.title]="'Change ' + imageUploaderParameters.imageName"
+      [ngStyle]="{background: imageBgColor}">
+      <div tabindex="0" class="oppia-click-to-start-editing e2e-test-photo-button" (click)="showImageUploaderModal()"
+           role="button" aria-label="upload or edit image" (keydown.enter)="showImageUploaderModal()">
+      </div>
+      <i class="fas fa-pen oppia-editor-edit-icon oppia-pencil-icon" [hidden]="imageUploaderParameters.disabled"
+        [ngStyle]="{'right.px': !isImageInPortraitMode() ? -20 : 8}" (click)="showImageUploaderModal()">
+      </i>
+      <img [hidden]="hidePlaceholder" [src]="placeholderImageUrl" align="center" alt=""
+        [ngClass]="{'oppia-image-placeholder-landscape': !isImageInPortraitMode(), 'oppia-image-placeholder-portrait': isImageInPortraitMode()}">
+
+      <oppia-thumbnail-display *ngIf="editableImageDataUrl" [imgSrc]="editableImageDataUrl"
+        [aspectRatio]="imageUploaderParameters.aspectRatio" [classes]="['img-thumbnail', 'e2e-test-custom-photo']" [background]="imageBgColor">
+      </oppia-thumbnail-display>
+    </div>
+  </div>
+</div>
+
+<style>
+  .oppia-image-placeholder-landscape {
+    max-height: 180px;
+    max-width: 320px;
+  }
+
+  .oppia-image-placeholder-portrait {
+    max-height: 180px;
+    max-width: 180px;
+  }
+
+  .image-editor {
+    height: 200px;
+  }
+
+  .oppia-editable-section {
+    border-radius: 0.25rem;
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .img-image {
+    border: none;
+    max-height: 100%;
+    max-width: 100%;
+  }
+
+  .oppia-pencil-icon {
+    top: 8px;
+  }
+
+  .edit-btn-container {
+    min-height: 2rem;
+    min-width: 2rem;
+  }
+</style>
