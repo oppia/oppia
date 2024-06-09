@@ -6608,6 +6608,25 @@ export default {
         }
       ]
     },
+    "SUBTOPIC_VIEWER": {
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/revision/:subtopic_url_fragment",
+      "TITLE": "Oppia",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
     "COLLECTION_EDITOR": {
       "ROUTE": "collection_editor/create/:collection_id",
       "TITLE": "Collection Editor Page",
