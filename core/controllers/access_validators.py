@@ -526,7 +526,7 @@ class StoryEditorPageAccessValidationHandler(
             Exception. The story with the given ID doesn't exist.
         """
         story_domain.Story.require_valid_story_id(story_id)
-        story = story_fetchers.get_skill_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
         if story is None:
             raise self.NotFoundException(
                 'The story with the given id doesn\'t exist.')
