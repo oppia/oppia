@@ -16,6 +16,15 @@
  * @fileoverview Acceptance Test for checking the user flow of Partners
  */
 
+/*
+  This is the user-journey of Partners:
+  1.Go to About- Foundation page via footer or navbar from the home(splash) page
+  2.Go to the parnerships page from About Foundation Page by clicking on the partnerships link.
+  3.Fill the partnerships form via any one of the 2 buttons, in any language on parnerships page.
+  This is the page flow : home page --> Foundation page --> parnerships - page
+  Testing - Can partners successfully fill the partnerships form if they visit the website for the first time (typically lands on home page) ?
+ */
+
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import testConstants from '../../utilities/common/test-constants';
@@ -33,16 +42,22 @@ describe('Partner', function () {
     'should be able to navigate to partnerships page when started from home page ' +
       'and open the partnerships form in partnerships page.',
     async function () {
+      // Navigating to about foundation page via navbar from home page.
       await loggedOutUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
+      // Navigating back to home page for the next test.
       await loggedOutUser.navigateToHome();
+      // Navigating to about foundation page via footer from home page.
       await loggedOutUser.navigateToAboutFoundationPageViaFooter();
 
-      // Navigating to partnerships page by clicking on "Consider becoming a partner today" link.
+      // Navigating to partnerships page by clicking on "Consider becoming a partner today" link on the about foundation page.
       await loggedOutUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();
 
       // Opening the partnerships form by clicking the "Partner with us" button at the top of the partnerships page.
       await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPage();
+      // Navigating back to partnerships page for the next test.
       await loggedOutUser.navigateToPartnershipsPage();
+      // Opening the partnerships form by clicking the "Partner with us" button at the bottom
+      // of the partnerships page after changing the language to Portuguese.
       await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
         'pt-br'
       );

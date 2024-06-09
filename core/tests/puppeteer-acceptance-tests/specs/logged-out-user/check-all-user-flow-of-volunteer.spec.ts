@@ -16,6 +16,17 @@
  * @fileoverview Acceptance Tests for checking the user flow of Volunteers
  */
 
+/*
+  This is the user journey of a volunteer:
+
+  1. Navigate to the About Foundation page via the footer or navbar from the home (splash) page.
+  2. Navigate to the volunteer page from the About Foundation Page by clicking on the volunteer link or button.
+  3. Fill out the volunteer form via either of the two buttons on the volunteer page.
+
+  This is the page flow: home page --> Foundation page --> volunteer page.
+  Testing: Can volunteers successfully fill out the volunteer form if
+  they visit the website for the first time (typically landing on the home page)?
+ */
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import testConstants from '../../utilities/common/test-constants';
@@ -33,13 +44,16 @@ describe('Volunteer', function () {
     'should be able to navigate to volunteer page when started from the home page ' +
       'and open the volunteer form when the "Apply to Volunteer" button is clicked',
     async function () {
+      // Navigating to about foundation page via navbar from home page.
       await loggedOutUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
+      // Navigating back to home page for the next test.
       await loggedOutUser.navigateToHome();
+      // Navigating to about foundation page via footer from home page.
       await loggedOutUser.navigateToAboutFoundationPageViaFooter();
 
       // Navigating to the Volunteer page by clicking on the "Become a Volunteer" button.
       await loggedOutUser.clickBecomeAVolunteerButtonInAboutFoundation();
-
+      // Navigating back to about foundation page for the next test.
       await loggedOutUser.navigateToAboutFoundationPage();
       // Navigating to the Volunteer page by clicking on the "Join our large volunteer community" link.
       await loggedOutUser.clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation();
@@ -47,8 +61,9 @@ describe('Volunteer', function () {
       // Opening the Volunteer form by clicking the "Apply to Volunteer" button at the top of the Volunteer page.
       await loggedOutUser.clickApplyToVolunteerAtTheTopOfVolunteerPage();
 
-      // Going back to Volunteer page and opening the Volunteer form by clicking the "Apply to Volunteer" button at the bottom of the Volunteer page.
+      // Navigating back to about foundation page for the next test.
       await loggedOutUser.navigateToVolunteerPage();
+      // Opening the Volunteer form by clicking the "Apply to Volunteer" button at the bottom of the Volunteer page.
       await loggedOutUser.clickApplyToVolunteerAtTheBottomOfVolunteerPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

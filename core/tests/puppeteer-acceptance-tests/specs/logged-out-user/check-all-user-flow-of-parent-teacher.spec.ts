@@ -16,6 +16,13 @@
  * @fileoverview Acceptance Test for checking the user flow of Parent/Teachers
  */
 
+/*
+  This is the user-journey of parent/teacher:
+  1.Go to Teach page via footer from the home(splash) page
+  2.Go to the lessons page from teach page by clicking on the explore lessons button.
+  Testing -Can parent/teacher navigate to the teach page from home page and then to the lessons page from the teach page?
+ */
+
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import testConstants from '../../utilities/common/test-constants';
@@ -41,7 +48,10 @@ describe('Parent/Teacher', function () {
     'should be able to navigate to "For Parent/Teacher page" via footer' +
       'and click on "Explore Lessons" button',
     async function () {
+      // Navigating to "For Parent/Teacher page" via footer from home page.
       await loggedOutUser.navigateToTeachPageViaFooter();
+      // Navigating to lessons/classroom page by clicking on the
+      // "Explore Lessons" button on the "For Parent/Teacher" page.
       await loggedOutUser.clickExploreLessonsButtonInTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
