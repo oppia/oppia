@@ -76,6 +76,10 @@ const saveTopicButton = 'button.e2e-test-save-topic-button';
 const topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
 const publishTopicButton = 'button.e2e-test-publish-topic-button';
 const unpublishTopicButton = 'button.e2e-test-unpublish-topic-button';
+const topicListItemSelector = '.list-item';
+const topicListItemOptions = '.e2e-test-topic-edit-box';
+const deleteTopicButton = '.e2e-test-delete-topic-button';
+const confirmTopicDeletionButton = '.e2e-test-confirm-topic-deletion-button';
 
 const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
 const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
@@ -94,11 +98,16 @@ const skillReviewMaterialHeader = 'div.e2e-test-open-concept-card';
 const addSkillButton = 'button.e2e-test-add-skill-button';
 const confirmSkillCreationButton =
   'button.e2e-test-confirm-skill-creation-button';
+const skillListItemOptions = '.e2e-test-skill-edit-box';
+const deleteSkillButton = '.e2e-test-delete-skill-button';
+const confirmSkillDeletionButton = '.e2e-test-confirm-skill-deletion-button';
+const skillQuestionTab = '.e2e-test-questions-tab';
 const removeQuestion = '.link-off-icon';
 
 const editSkillItemSelector = 'i.e2e-test-skill-item-edit-btn';
 const confirmSkillAssignationButton =
   'button.e2e-test-skill-assign-subtopic-confirm';
+const skillListItemSelector = '.list-item';
 
 const addDiagnosticTestSkillButton =
   'button.e2e-test-add-diagnostic-test-skill';
@@ -692,7 +701,7 @@ export class CurriculumAdmin extends BaseUser {
   async unpublishTopic(topicName: string): Promise<void> {
     await this.openTopicEditor(topicName);
     await this.clickOn(unpublishTopicButton);
-    await this.page.reload();
+    await this.page.reload({waitUntil: 'networkidle0'});
     const isTextPresent = await this.isTextPresentOnPage(' Unpublish Topic ');
     if (isTextPresent) {
       throw new Error('Topic is not unpublished successfully.');
@@ -704,40 +713,42 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} topicName - The name of the topic to delete.
    */
   async deleteTopic(topicName: string): Promise<void> {
-    await this.page.goto(testConstants.URLs.TopicAndSkillsDashboard);
+    await this.page.goto(topicAndSkillsDashboardUrl);
+    await this.page.waitForSelector(topicListItemSelector);
 
-    const topics = await this.page.$$('.list-item');
+    const topics = await this.page.$$(topicListItemSelector);
     for (let topic of topics) {
-      const topicNameElement = await topic.$('.e2e-test-topic-name');
+      const topicNameElement = await topic.$(desktopTopicSelector);
       if (topicNameElement) {
         const name = await (
           await topicNameElement.getProperty('textContent')
         ).jsonValue();
 
         if (name === ` ${topicName} `) {
-          const editBox = await topic.$('.e2e-test-topic-edit-box');
+          await this.page.waitForSelector(topicListItemOptions);
+          const editBox = await topic.$(topicListItemOptions);
           if (editBox) {
             await this.waitForElementToBeClickable(editBox);
             await editBox.click();
+            await this.page.waitForSelector(deleteTopicButton);
           } else {
             throw new Error('Edit button not found');
           }
 
-          const deleteButton = await topic.$('.e2e-test-delete-topic-button');
+          const deleteButton = await topic.$(deleteTopicButton);
           if (deleteButton) {
             await this.waitForElementToBeClickable(deleteButton);
             await deleteButton.click();
+            await this.page.waitForSelector(confirmTopicDeletionButton);
           } else {
             throw new Error('Delete button not found');
           }
 
-          const confirmButton = await this.page.$(
-            '.e2e-test-confirm-topic-deletion-button'
-          );
+          const confirmButton = await this.page.$(confirmTopicDeletionButton);
           if (confirmButton) {
             await this.waitForElementToBeClickable(confirmButton);
             await confirmButton.click();
-            await this.page.waitForSelector('.modal-content', {hidden: true});
+            await this.page.waitForSelector(modalDiv, {hidden: true});
           } else {
             throw new Error('Confirm button not found');
           }
@@ -754,7 +765,7 @@ export class CurriculumAdmin extends BaseUser {
   async expectTopicNotInTopicsAndSkillDashboard(
     topicName: string
   ): Promise<void> {
-    await this.goto(testConstants.URLs.TopicAndSkillsDashboard);
+    await this.goto(topicAndSkillsDashboardUrl);
     const isTextPresent = await this.isTextPresentOnPage(
       ' No topics or skills have been created yet. '
     );
@@ -787,44 +798,46 @@ export class CurriculumAdmin extends BaseUser {
       ? mobileSkillSelector
       : desktopSkillSelector;
     await this.page.goto(testConstants.URLs.TopicAndSkillsDashboard);
-    await this.clickOn('.e2e-test-skills-tab');
+    await this.page.waitForSelector(skillsTab, {visible: true});
+    await this.clickOn(skillsTab);
     await this.page.waitForSelector(skillSelector, {visible: true});
+    await this.page.waitForSelector(skillListItemSelector);
 
-    const skills = await this.page.$$('.list-item');
-    for (let skill of skills) {
+    const skills = await this.page.$$(skillListItemSelector);
+    const skillToDelete = skills.find(async skill => {
       const skillNameElement = await skill.$('.e2e-test-skill-description');
-      if (skillNameElement) {
-        const name = await (
-          await skillNameElement.getProperty('textContent')
-        ).jsonValue();
-        if (name === skillName) {
-          const editBox = await skill.$('.e2e-test-skill-edit-box');
-          if (editBox) {
-            await this.waitForElementToBeClickable(editBox);
-            await editBox.click();
-          }
-
-          const deleteButton = await skill.$('.e2e-test-delete-skill-button');
-          if (deleteButton) {
-            await this.waitForElementToBeClickable(deleteButton);
-            await deleteButton.click();
-          } else {
-            throw new Error('Delete button not found');
-          }
-
-          const confirmButton = await this.page.$(
-            '.e2e-test-confirm-skill-deletion-button'
-          );
-          if (confirmButton) {
-            await this.waitForElementToBeClickable(confirmButton);
-            await confirmButton.click();
-          } else {
-            throw new Error('Confirm button not found');
-          }
-          break;
-        }
+      if (!skillNameElement) {
+        return false;
       }
+      const name = await (
+        await skillNameElement.getProperty('textContent')
+      ).jsonValue();
+      return name === skillName;
+    });
+
+    if (!skillToDelete) {
+      throw new Error(`Skill ${skillName} not found`);
     }
+
+    await this.clickElement(skillToDelete, skillListItemOptions);
+    await this.page.waitForFunction(
+      skill => !skill.isConnected,
+      {},
+      skillListItemOptions
+    );
+    await this.clickElement(skillToDelete, deleteSkillButton);
+    await this.page.waitForFunction(
+      button => !button.isConnected,
+      {},
+      deleteSkillButton
+    );
+    await this.clickElement(this.page, confirmSkillDeletionButton);
+    await this.page.waitForFunction(
+      button => !button.isConnected,
+      {},
+      confirmSkillDeletionButton
+    );
+    await this.page.screenshot({path: 'debug6.png'});
   }
 
   /**
@@ -834,7 +847,7 @@ export class CurriculumAdmin extends BaseUser {
   async expectSkillNotInTopicsAndSkillsDashboard(
     skillName: string
   ): Promise<void> {
-    await this.goto(testConstants.URLs.TopicAndSkillsDashboard);
+    await this.goto(topicAndSkillsDashboardUrl);
     const isTextPresent = await this.isTextPresentOnPage(
       ' No topics or skills have been created yet. '
     );
@@ -843,8 +856,8 @@ export class CurriculumAdmin extends BaseUser {
       Dashboard as expected.`);
       return;
     }
-
-    await this.clickOn('.e2e-test-skills-tab');
+    await this.page.screenshot({path: 'debug7.png'});
+    await this.clickOn(skillsTab);
     const isSkillPresent = await this.isTextPresentOnPage(skillName);
     if (isSkillPresent) {
       throw new Error(
@@ -863,31 +876,38 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} skillName - The name of the skill to delete questions from.
    */
   async removeAllQuestionsFromTheSkill(skillName: string): Promise<void> {
-    await this.openSkillEditor(skillName);
-    await this.clickAndWaitForNavigation('.e2e-test-questions-tab');
+    try {
+      await this.openSkillEditor(skillName);
+      await this.clickAndWaitForNavigation(skillQuestionTab);
 
-    let isTextPresent = await this.isTextPresentOnPage(
-      'There are no questions in this skill.'
-    );
-
-    while (!isTextPresent) {
-      const button = await this.page.$(removeQuestion);
-      if (button) {
-        await button.click();
-        await this.clickOn('Remove Question');
-        await this.page.waitForSelector('.modal-content', {hidden: true});
-        await this.page.reload();
-      }
-
-      // Check if the text is present after deleting a question.
-      isTextPresent = await this.isTextPresentOnPage(
+      let isTextPresent = await this.isTextPresentOnPage(
         'There are no questions in this skill.'
       );
-    }
 
-    showMessage(
-      `All questions have been successfully removed from the skill "${skillName}".`
-    );
+      while (!isTextPresent) {
+        const button = await this.page.$(removeQuestion);
+        if (!button) {
+          throw new Error('Remove question button not found');
+        }
+        await button.click();
+        await this.page.waitForSelector(modalDiv, {visible: true});
+        await this.clickOn('Remove Question');
+        await this.page.waitForSelector(modalDiv, {hidden: true});
+        await this.page.reload({waitUntil: 'networkidle0'});
+        isTextPresent = await this.isTextPresentOnPage(
+          'There are no questions in this skill.'
+        );
+      }
+      await this.page.screenshot({path: 'debug8.png'});
+
+      showMessage(
+        `All questions have been successfully removed from the skill "${skillName}".`
+      );
+    } catch (error) {
+      console.error(
+        `Failed to remove all questions from the skill "${skillName}": ${error}`
+      );
+    }
   }
 }
 

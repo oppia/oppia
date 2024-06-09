@@ -16,7 +16,13 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
+import puppeteer, {
+  Page,
+  Frame,
+  Browser,
+  Viewport,
+  ElementHandle,
+} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
@@ -335,6 +341,28 @@ export class BaseUser {
   }
 
   /**
+   * Clicks an element on the page.
+   * @param {Page | Frame | ElementHandle} context - The Puppeteer context, usually a Page or Frame.
+   * @param {string} selector - The CSS selector of the element to click.
+   */
+  async clickElement(
+    context: Page | Frame | ElementHandle,
+    selector: string
+  ): Promise<void> {
+    const element = await context.$(selector);
+    if (!element) {
+      throw new Error(`Element ${selector} not found`);
+    }
+    await this.waitForElementToBeClickable(element);
+
+    try {
+      await element.click();
+    } catch (error) {
+      throw new Error(`Failed to click on element ${selector}`);
+    }
+  }
+
+  /**
    * This function retrieves the text content of a specified element.
    */
   async getElementText(selector: string): Promise<string> {
@@ -345,30 +373,6 @@ export class BaseUser {
     }
     const textContent = await this.page.evaluate(el => el.textContent, element);
     return textContent ?? '';
-  }
-
-  /**
-   * This function clicks on a child element within a parent element, both identified by their text.
-   * Throws an error if either element is not found.
-   */
-  async clickChildElement(
-    parentText: string,
-    childText: string
-  ): Promise<void> {
-    const parentElement = await this.page.$x(
-      `//*[contains(normalize-space(text()), '${parentText.trim()}')]`
-    );
-    if (parentElement.length === 0) {
-      throw new Error(`No parent element found with the text: ${parentText}`);
-    }
-    const childElement = await parentElement[0].$x(
-      `.//*[contains(normalize-space(text()), '${childText.trim()}')]`
-    );
-    if (childElement.length === 0) {
-      throw new Error(`No child element found with the text: ${childText}`);
-    }
-    await this.waitForElementToBeClickable(childElement[0]);
-    await childElement[0].click();
   }
 
   /**
