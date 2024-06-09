@@ -30,6 +30,8 @@ from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain import topic_fetchers
+from core.domain import skill_services
 from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils
@@ -760,22 +762,30 @@ class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     STORY_ID: Final = '0'
     
     def setUp(self) -> None:
-        super().setUp()
-        self.story_editor_username = 'storyEditor'
-        self.story_editor_email = 'storyEditor@example.com'
-        self.guest_username = 'guest'
-        self.guest_email = 'guest@example.com'
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.signup(self.story_editor_email, self.story_editor_username)
-        self.signup(self.guest_email, self.guest_username)
-        self.add_user_role(
-            self.story_editor_username, feconf.ROLE_ID_CURRICULUM_ADMIN)
-        self.user_id = self.get_user_id_from_email(self.story_editor_email)
-        self.user = user_services.get_user_actions_info(self.user_id)
-        self.save_new_story(self.STORY_ID, self.user_id,)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        
+        self.skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+        self.skill_id, self.admin_id, description='Skill Description')
+        self.skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+        self.skill_id_2, self.admin_id, description='Skill Description 2')
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='topic-one', url_fragment='topic-one',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        
+        self.save_new_story(self.STORY_ID, self.admin_id, self.topic_id)
 
     def test_for_logged_in_user_with_rights(self) -> None:
-        self.login(self.story_editor_email)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
             '%s/can_access_story_editor_page/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX, self.STORY_ID
@@ -784,7 +794,7 @@ class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_for_logged_in_user_without_rights(self) -> None:
-        self.login(self.guest_email)
+        self.login(self.VIEWER_EMAIL)
         self.get_html_response(
             '%s/can_access_story_editor_page/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX, self.STORY_ID
@@ -794,7 +804,7 @@ class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
     def test_validation_returns_false_if_given_story_id_non_existent(
         self) -> None:
-        self.login(self.guest_email)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
             '%s/can_access_story_editor_page/invalid_storyId' % (
             ACCESS_VALIDATION_HANDLER_PREFIX,
