@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import types
 
-from core.domain import classroom_config_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -39,16 +38,6 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.dummy_thumbnail_data: classroom_config_domain.ImageDict = {
-                'filename': 'thumbnail.svg',
-                'bg_color': 'transparent',
-                'size_in_bytes': 1000
-        }
-        self.dummy_banner_data: classroom_config_domain.ImageDict = {
-                'filename': 'banner.png',
-                'bg_color': 'transparent',
-                'size_in_bytes': 1000
-        }
         self.classroom_model = classroom_models.ClassroomModel(
             id='id',
             name='math',
@@ -57,8 +46,10 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
             teaser_text='Learn math through fun stories!',
             topic_list_intro='Start from the basics with our first topic.',
             topic_id_to_prerequisite_topic_ids={},
-            is_published=True, thumbnail_data=self.dummy_thumbnail_data,
-            banner_data=self.dummy_banner_data
+            is_published=True, thumbnail_filename='thumbnail.svg',
+            thumbnail_bg_color='transparent', thumbnail_size_in_bytes=1000,
+            banner_filename='banner.png', banner_bg_color='transparent',
+            banner_size_in_bytes=1000
         )
         self.classroom_model.update_timestamps()
         self.classroom_model.put()
@@ -70,9 +61,8 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
             classroom_id, 'physics', 'physics', 'Curated physics course.',
             'Learn physics through fun stories!', 
             'Start from the basic physics.', {}, False,
-            {'filename': 'thumbnail.svg', 'bg_color': 'transparent',
-             'size_in_bytes': 1000}, {'filename': 'banner.png',
-            'bg_color': 'transparent', 'size_in_bytes': 1000}))
+            'thumbnail.svg', 'transparent', 1000, 'banner.png',
+            'transparent', 1000))
 
         self.assertEqual(classroom_model_instance.name, 'physics')
         self.assertEqual(classroom_model_instance.url_fragment, 'physics')
@@ -86,11 +76,17 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
                 'Start from the basic physics.')
         self.assertEqual(classroom_model_instance.is_published, False)
         self.assertEqual(
-            classroom_model_instance.thumbnail_data, self.dummy_thumbnail_data
-            )
+            classroom_model_instance.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(
-            classroom_model_instance.banner_data, self.dummy_banner_data
-            )
+            classroom_model_instance.thumbnail_bg_color, 'transparent')
+        self.assertEqual(
+            classroom_model_instance.thumbnail_size_in_bytes, 1000)
+        self.assertEqual(
+            classroom_model_instance.banner_filename, 'banner.png')
+        self.assertEqual(
+            classroom_model_instance.banner_bg_color, 'transparent')
+        self.assertEqual(
+            classroom_model_instance.banner_size_in_bytes, 1000)
 
     def test_get_export_policy_not_applicable(self) -> None:
         self.assertEqual(
@@ -107,8 +103,14 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
                 'topic_id_to_prerequisite_topic_ids': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE),
                 'is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'thumbnail_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'banner_data': base_models.EXPORT_POLICY.NOT_APPLICABLE
+                'thumbnail_filename': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'thumbnail_size_in_bytes': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                'banner_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'banner_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'banner_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE
             }
         )
 
@@ -172,7 +174,8 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
                     'Curated math foundations course.',
                     'Learn math through fun stories!',
                     'Start from the basic math.', {}, True,
-                    self.dummy_thumbnail_data, self.dummy_banner_data
+                    'thumbnail.svg', 'transparent', 1000, 'banner.png',
+                    'transparent', 1000
                 )
 
         # Test generate_new_classroom_id method.

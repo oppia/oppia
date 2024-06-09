@@ -79,8 +79,12 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.math_classroom.topic_list_intro,
             self.math_classroom.topic_id_to_prerequisite_topic_ids,
             self.math_classroom.is_published,
-            self.math_classroom.thumbnail_data,
-            self.math_classroom.banner_data
+            self.math_classroom.thumbnail_data['filename'],
+            self.math_classroom.thumbnail_data['bg_color'],
+            self.math_classroom.thumbnail_data['size_in_bytes'],
+            self.math_classroom.banner_data['filename'],
+            self.math_classroom.banner_data['bg_color'],
+            self.math_classroom.banner_data['size_in_bytes'],
         )
 
         self.physics_classroom_dict: classroom_config_domain.ClassroomDict = {
@@ -109,8 +113,12 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.physics_classroom.topic_list_intro,
             self.physics_classroom.topic_id_to_prerequisite_topic_ids,
             self.physics_classroom.is_published,
-            self.physics_classroom.thumbnail_data,
-            self.physics_classroom.banner_data
+            self.physics_classroom.thumbnail_data['filename'],
+            self.physics_classroom.thumbnail_data['bg_color'],
+            self.physics_classroom.thumbnail_data['size_in_bytes'],
+            self.physics_classroom.banner_data['filename'],
+            self.physics_classroom.banner_data['bg_color'],
+            self.physics_classroom.banner_data['size_in_bytes']
         )
 
     def test_get_classroom_by_id(self) -> None:
@@ -157,8 +165,12 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             chemistry_classroom.topic_list_intro,
             chemistry_classroom.topic_id_to_prerequisite_topic_ids,
             chemistry_classroom.is_published,
-            chemistry_classroom.thumbnail_data,
-            chemistry_classroom.banner_data
+            chemistry_classroom.thumbnail_data['filename'],
+            chemistry_classroom.thumbnail_data['bg_color'],
+            chemistry_classroom.thumbnail_data['size_in_bytes'],
+            chemistry_classroom.banner_data['filename'],
+            chemistry_classroom.banner_data['bg_color'],
+            chemistry_classroom.banner_data['size_in_bytes']
         )
         classroom_url_fragment = (
             classroom_config_services.

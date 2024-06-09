@@ -375,5 +375,5 @@ class ImageDict(TypedDict, total=False):
 
     filename: str
     bg_color: str
-    size_in_bytes: Optional[int]
+    size_in_bytes: int
     image_data: Optional[bytes]

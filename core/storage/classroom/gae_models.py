@@ -71,10 +71,18 @@ class ClassroomModel(base_models.BaseModel):
     # False if classroom is hidden, True if published.
     is_published = datastore_services.BooleanProperty(
         indexed=True, required=True, default=False)
-    # The thumbnail data of the classroom.
-    thumbnail_data = datastore_services.JsonProperty(indexed=False)
-    # The banner data of the classroom.
-    banner_data = datastore_services.JsonProperty(indexed=False)
+    # The thumbnail filename of the classroom.
+    thumbnail_filename = datastore_services.StringProperty(indexed=True)
+    # The thumbnail background color of the classroom.
+    thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
+    # The thumbnail size in bytes of the classroom.
+    thumbnail_size_in_bytes = datastore_services.IntegerProperty(indexed=False)
+    # The banner filename of the classroom.
+    banner_filename = datastore_services.StringProperty(indexed=True)
+    # The banner background color of the classroom.
+    banner_bg_color = datastore_services.StringProperty(indexed=True)
+    # The banner size in bytes of the classroom.
+    banner_size_in_bytes = datastore_services.IntegerProperty(indexed=False)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -99,8 +107,12 @@ class ClassroomModel(base_models.BaseModel):
             'topic_id_to_prerequisite_topic_ids': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thumbnail_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'banner_data': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'banner_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'banner_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'banner_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -130,8 +142,9 @@ class ClassroomModel(base_models.BaseModel):
         cls, classroom_id: str, name: str, url_fragment: str,
         course_details: str, teaser_text: str, topic_list_intro: str,
         topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
-        is_published: bool, thumbnail_data: ImageDict,
-        banner_data: ImageDict
+        is_published: bool, thumbnail_filename: str, thumbnail_bg_color: str,
+        thumbnail_size_in_bytes: int, banner_filename: str,
+        banner_bg_color: str, banner_size_in_bytes: int
     ) -> ClassroomModel:
         """Creates a new ClassroomModel entry.
 
@@ -147,8 +160,12 @@ class ClassroomModel(base_models.BaseModel):
             topic_id_to_prerequisite_topic_ids: dict(str, list(str)). A dict
                 with topic ID as key and list of topic IDs as value.
             is_published: bool. Whether this classroom is published or not.
-            thumbnail_data: ImageDict. The thumbnail data of the classroom.
-            banner_data: ImageDict. The banner data of the classroom.
+            thumbnail_filename: str. Classroom's thumbnail filename.
+            thumbnail_bg_color: str. Classroom's thumbnail background color.
+            thumbnail_size_in_bytes: int. The thumbnail size in bytes.
+            banner_filename: str. Classroom's banner filename.
+            banner_bg_color: str. Classroom's banner background color.
+            banner_size_in_bytes: int. The banner size in bytes.
 
         Returns:
             ClassroomModel. The newly created ClassroomModel instance.
@@ -170,8 +187,12 @@ class ClassroomModel(base_models.BaseModel):
             topic_id_to_prerequisite_topic_ids=(
                 topic_id_to_prerequisite_topic_ids),
             is_published=is_published,
-            thumbnail_data=thumbnail_data,
-            banner_data=banner_data
+            thumbnail_filename=thumbnail_filename,
+            thumbnail_bg_color=thumbnail_bg_color,
+            thumbnail_size_in_bytes=thumbnail_size_in_bytes,
+            banner_filename=banner_filename,
+            banner_bg_color=banner_bg_color,
+            banner_size_in_bytes=banner_size_in_bytes
         )
         entity.update_timestamps()
         entity.put()
