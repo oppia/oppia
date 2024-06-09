@@ -76,9 +76,12 @@ const saveTopicButton = 'button.e2e-test-save-topic-button';
 const topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
 const publishTopicButton = 'button.e2e-test-publish-topic-button';
 const unpublishTopicButton = 'button.e2e-test-unpublish-topic-button';
-const topicListItemSelector = '.list-item';
-const topicListItemOptions = '.e2e-test-topic-edit-box';
-const deleteTopicButton = '.e2e-test-delete-topic-button';
+const desktopTopicListItemSelector = '.list-item';
+const mobileTopicListItemSelector = '.topic-item';
+const desktopTopicListItemOptions = '.e2e-test-topic-edit-box';
+const mobileTopicListItemOptions = '.e2e-test-mobile-topic-edit-box';
+const desktopDeleteTopicButton = '.e2e-test-delete-topic-button';
+const mobileDeleteTopicButton = '.e2e-test-mobile-delete-topic-button';
 const confirmTopicDeletionButton = '.e2e-test-confirm-topic-deletion-button';
 
 const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
@@ -98,16 +101,20 @@ const skillReviewMaterialHeader = 'div.e2e-test-open-concept-card';
 const addSkillButton = 'button.e2e-test-add-skill-button';
 const confirmSkillCreationButton =
   'button.e2e-test-confirm-skill-creation-button';
-const skillListItemOptions = '.e2e-test-skill-edit-box';
-const deleteSkillButton = '.e2e-test-delete-skill-button';
+const desktopSkillListItemOptions = '.e2e-test-skill-edit-box';
+const desktopDeleteSkillButton = '.e2e-test-delete-skill-button';
 const confirmSkillDeletionButton = '.e2e-test-confirm-skill-deletion-button';
-const skillQuestionTab = '.e2e-test-questions-tab';
+const desktopSkillQuestionTab = '.e2e-test-questions-tab';
+const mobileSkillQuestionTab = '.e2e-test-mobile-questions-tab';
 const removeQuestion = '.link-off-icon';
 
 const editSkillItemSelector = 'i.e2e-test-skill-item-edit-btn';
 const confirmSkillAssignationButton =
   'button.e2e-test-skill-assign-subtopic-confirm';
-const skillListItemSelector = '.list-item';
+const desktopSkillListItemSelector = '.list-item';
+const mobileSkillListItemSelector = '.skill-item';
+const mobileSkillListItemOptions = '.e2e-test-mobile-skills-option';
+const mobileDeleteSkillButton = '.e2e-test-mobile-delete-skill-button';
 
 const addDiagnosticTestSkillButton =
   'button.e2e-test-add-diagnostic-test-skill';
@@ -700,8 +707,26 @@ export class CurriculumAdmin extends BaseUser {
    */
   async unpublishTopic(topicName: string): Promise<void> {
     await this.openTopicEditor(topicName);
-    await this.clickOn(unpublishTopicButton);
-    await this.page.reload({waitUntil: 'networkidle0'});
+
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    if (isMobileWidth) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileSaveTopicDropdown);
+      await this.page.waitForSelector(
+        '.oppia-topic-nav-topic-nav-dropdown-options'
+      );
+      await this.clickOn('.e2e-test-mobile-unpublish-topic-button');
+      await this.page.reload({waitUntil: 'networkidle0'});
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileSaveTopicDropdown);
+      await this.page.waitForSelector(
+        '.oppia-topic-nav-topic-nav-dropdown-options'
+      );
+    } else {
+      await this.clickOn(unpublishTopicButton);
+      await this.page.reload({waitUntil: 'networkidle0'});
+    }
+
     const isTextPresent = await this.isTextPresentOnPage(' Unpublish Topic ');
     if (isTextPresent) {
       throw new Error('Topic is not unpublished successfully.');
@@ -714,11 +739,26 @@ export class CurriculumAdmin extends BaseUser {
    */
   async deleteTopic(topicName: string): Promise<void> {
     await this.page.goto(topicAndSkillsDashboardUrl);
+
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const topicListItemSelector = isMobileWidth
+      ? mobileTopicListItemSelector
+      : desktopTopicListItemSelector;
+    const topicSelector = isMobileWidth
+      ? mobileTopicSelector
+      : desktopTopicSelector;
+    const topicListItemOptions = isMobileWidth
+      ? mobileTopicListItemOptions
+      : desktopTopicListItemOptions;
+    const deleteTopicButton = isMobileWidth
+      ? mobileDeleteTopicButton
+      : desktopDeleteTopicButton;
+
     await this.page.waitForSelector(topicListItemSelector);
 
     const topics = await this.page.$$(topicListItemSelector);
     for (let topic of topics) {
-      const topicNameElement = await topic.$(desktopTopicSelector);
+      const topicNameElement = await topic.$(topicSelector);
       if (topicNameElement) {
         const name = await (
           await topicNameElement.getProperty('textContent')
@@ -794,9 +834,23 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} skillName - The name of the skill to delete.
    */
   async deleteSkill(skillName: string): Promise<void> {
-    const skillSelector = this.isViewportAtMobileWidth()
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const skillSelector = isMobileWidth
       ? mobileSkillSelector
       : desktopSkillSelector;
+    const skillListItemSelector = isMobileWidth
+      ? mobileSkillListItemSelector
+      : desktopSkillListItemSelector;
+    const skillNameSelector = isMobileWidth
+      ? mobileSkillSelector
+      : desktopSkillSelector;
+    const skillListItemOptions = isMobileWidth
+      ? mobileSkillListItemOptions
+      : desktopSkillListItemOptions;
+    const deleteSkillButton = isMobileWidth
+      ? mobileDeleteSkillButton
+      : desktopDeleteSkillButton;
+
     await this.page.goto(testConstants.URLs.TopicAndSkillsDashboard);
     await this.page.waitForSelector(skillsTab, {visible: true});
     await this.clickOn(skillsTab);
@@ -805,7 +859,7 @@ export class CurriculumAdmin extends BaseUser {
 
     const skills = await this.page.$$(skillListItemSelector);
     const skillToDelete = skills.find(async skill => {
-      const skillNameElement = await skill.$('.e2e-test-skill-description');
+      const skillNameElement = await skill.$(skillNameSelector);
       if (!skillNameElement) {
         return false;
       }
@@ -837,7 +891,6 @@ export class CurriculumAdmin extends BaseUser {
       {},
       confirmSkillDeletionButton
     );
-    await this.page.screenshot({path: 'debug6.png'});
   }
 
   /**
@@ -856,7 +909,6 @@ export class CurriculumAdmin extends BaseUser {
       Dashboard as expected.`);
       return;
     }
-    await this.page.screenshot({path: 'debug7.png'});
     await this.clickOn(skillsTab);
     const isSkillPresent = await this.isTextPresentOnPage(skillName);
     if (isSkillPresent) {
@@ -876,38 +928,41 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} skillName - The name of the skill to delete questions from.
    */
   async removeAllQuestionsFromTheSkill(skillName: string): Promise<void> {
-    try {
-      await this.openSkillEditor(skillName);
-      await this.clickAndWaitForNavigation(skillQuestionTab);
+    await this.openSkillEditor(skillName);
 
-      let isTextPresent = await this.isTextPresentOnPage(
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const skillQuestionTab = isMobileWidth
+      ? mobileSkillQuestionTab
+      : desktopSkillQuestionTab;
+
+    if (isMobileWidth) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn('.skill-nav-skill-nav-dropdown-options');
+    }
+    await this.clickAndWaitForNavigation(skillQuestionTab);
+
+    let isTextPresent = await this.isTextPresentOnPage(
+      'There are no questions in this skill.'
+    );
+
+    while (!isTextPresent) {
+      const button = await this.page.$(removeQuestion);
+      if (!button) {
+        throw new Error('Remove question button not found');
+      }
+      await button.click();
+      await this.page.waitForSelector(modalDiv, {visible: true});
+      await this.clickOn('Remove Question');
+      await this.page.waitForSelector(modalDiv, {hidden: true});
+      await this.page.reload({waitUntil: 'networkidle0'});
+      isTextPresent = await this.isTextPresentOnPage(
         'There are no questions in this skill.'
       );
-
-      while (!isTextPresent) {
-        const button = await this.page.$(removeQuestion);
-        if (!button) {
-          throw new Error('Remove question button not found');
-        }
-        await button.click();
-        await this.page.waitForSelector(modalDiv, {visible: true});
-        await this.clickOn('Remove Question');
-        await this.page.waitForSelector(modalDiv, {hidden: true});
-        await this.page.reload({waitUntil: 'networkidle0'});
-        isTextPresent = await this.isTextPresentOnPage(
-          'There are no questions in this skill.'
-        );
-      }
-      await this.page.screenshot({path: 'debug8.png'});
-
-      showMessage(
-        `All questions have been successfully removed from the skill "${skillName}".`
-      );
-    } catch (error) {
-      console.error(
-        `Failed to remove all questions from the skill "${skillName}": ${error}`
-      );
     }
+
+    showMessage(
+      `All questions have been successfully removed from the skill "${skillName}".`
+    );
   }
 }
 
