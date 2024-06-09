@@ -76,6 +76,9 @@ const saveTopicButton = 'button.e2e-test-save-topic-button';
 const topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
 const publishTopicButton = 'button.e2e-test-publish-topic-button';
 const unpublishTopicButton = 'button.e2e-test-unpublish-topic-button';
+const mobileUnpublishTopicButton = '.e2e-test-mobile-unpublish-topic-button';
+const mobileNavbarDropdownOptions =
+  '.oppia-topic-nav-topic-nav-dropdown-options';
 const desktopTopicListItemSelector = '.list-item';
 const mobileTopicListItemSelector = '.topic-item';
 const desktopTopicListItemOptions = '.e2e-test-topic-edit-box';
@@ -712,16 +715,12 @@ export class CurriculumAdmin extends BaseUser {
     if (isMobileWidth) {
       await this.clickOn(mobileOptionsSelector);
       await this.clickOn(mobileSaveTopicDropdown);
-      await this.page.waitForSelector(
-        '.oppia-topic-nav-topic-nav-dropdown-options'
-      );
-      await this.clickOn('.e2e-test-mobile-unpublish-topic-button');
+      await this.page.waitForSelector(mobileNavbarDropdownOptions);
+      await this.clickOn(mobileUnpublishTopicButton);
       await this.page.reload({waitUntil: 'networkidle0'});
       await this.clickOn(mobileOptionsSelector);
       await this.clickOn(mobileSaveTopicDropdown);
-      await this.page.waitForSelector(
-        '.oppia-topic-nav-topic-nav-dropdown-options'
-      );
+      await this.page.waitForSelector(mobileNavbarDropdownOptions);
     } else {
       await this.clickOn(unpublishTopicButton);
       await this.page.reload({waitUntil: 'networkidle0'});
@@ -937,7 +936,8 @@ export class CurriculumAdmin extends BaseUser {
 
     if (isMobileWidth) {
       await this.clickOn(mobileOptionsSelector);
-      await this.clickOn('.skill-nav-skill-nav-dropdown-options');
+      await this.page.screenshot({path: 'debug1.png'});
+      await this.clickOn('.e2e-test-mobile-skill-nav-dropdown-icon');
     }
     await this.clickAndWaitForNavigation(skillQuestionTab);
 
