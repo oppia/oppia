@@ -874,19 +874,19 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.clickElement(skillToDelete, skillListItemOptions);
     await this.page.waitForFunction(
-      skill => !skill.isConnected,
+      (skill: Element) => !skill.isConnected,
       {},
       skillListItemOptions
     );
     await this.clickElement(skillToDelete, deleteSkillButton);
     await this.page.waitForFunction(
-      button => !button.isConnected,
+      (button: Element) => !button.isConnected,
       {},
       deleteSkillButton
     );
     await this.clickElement(this.page, confirmSkillDeletionButton);
     await this.page.waitForFunction(
-      button => !button.isConnected,
+      (button: Element) => !button.isConnected,
       {},
       confirmSkillDeletionButton
     );
@@ -937,6 +937,10 @@ export class CurriculumAdmin extends BaseUser {
     if (isMobileWidth) {
       await this.clickOn(mobileOptionsSelector);
       await this.page.screenshot({path: 'debug1.png'});
+      await this.page.waitForSelector(
+        '.e2e-test-mobile-skill-nav-dropdown-icon',
+        {visible: true}
+      );
       await this.clickOn('.e2e-test-mobile-skill-nav-dropdown-icon');
     }
     await this.clickAndWaitForNavigation(skillQuestionTab);
@@ -950,9 +954,12 @@ export class CurriculumAdmin extends BaseUser {
       if (!button) {
         throw new Error('Remove question button not found');
       }
+      await this.waitForElementToBeClickable(button);
       await button.click();
       await this.page.waitForSelector(modalDiv, {visible: true});
+      await this.page.screenshot({path: 'debug1.5.png'});
       await this.clickOn('Remove Question');
+      await this.page.screenshot({path: 'debug2.png'});
       await this.page.waitForSelector(modalDiv, {hidden: true});
       await this.page.reload({waitUntil: 'networkidle0'});
       isTextPresent = await this.isTextPresentOnPage(

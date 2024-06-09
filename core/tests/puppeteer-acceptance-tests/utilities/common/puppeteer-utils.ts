@@ -294,6 +294,9 @@ export class BaseUser {
    * The function clicks the element using the text on the button.
    */
   async clickOn(selector: string): Promise<void> {
+    /** Normalize-space is used to remove the extra spaces in the text.
+     * Check the documentation for the normalize-space function here :
+     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
     const [button] = await this.page.$x(
       `\/\/*[contains(text(), normalize-space('${selector}'))]`
     );
