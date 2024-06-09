@@ -54,7 +54,7 @@ import {NgModule} from '@angular/core';
 
   ],
   declarations: [    
-    StoryEditorPageRootComponent,//***i do not know  CollectionEditorPageRootComponent,
+    StoryEditorPageRootComponent,
     StoryEditorNavbarBreadcrumbComponent,
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
