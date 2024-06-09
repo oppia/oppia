@@ -26,6 +26,8 @@ from core.domain import classroom_config_services
 from core.domain import feature_flag_services
 from core.domain import learner_group_services
 from core.domain import user_services
+from core.domain import story_domain
+from core.domain import story_fetchers
 
 from typing import Dict, TypedDict
 
@@ -496,6 +498,7 @@ class CollectionEditorAccessValidationPage(
         """Handles GET requests."""
         pass
 
+
 class StoryEditorPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -515,6 +518,15 @@ class StoryEditorPageAccessValidationHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_story
-    def get(self, _: str) -> None:
-        """Handles GET requests."""
-        pass
+    def get(self, story_id: str) -> None:
+        """Renders story editor page.
+        Args:
+            story_id: str. The story ID.
+        Raises:
+            Exception. The story with the given ID doesn't exist.
+        """
+        story_domain.Story.require_valid_story_id(story_id)
+        story = story_fetchers.get_skill_by_id(story_id, strict=False)
+        if story is None:
+            raise self.NotFoundException(
+                'The story with the given id doesn\'t exist.')
