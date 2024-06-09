@@ -462,6 +462,8 @@ const main = async function () {
   // Change headless to false to see the puppeteer actions.
   const browser = await puppeteer.launch({
     headless: true,
+    // We need to disable sandbox to run puppeteer in docker, as it uses
+    // the root user.
     args: ['--no-sandbox'],
   });
   const page = await browser.newPage();
