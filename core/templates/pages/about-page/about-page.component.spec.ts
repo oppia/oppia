@@ -25,6 +25,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PrimaryButtonComponent} from '../../components/button-directives/primary-button.component';
+import {BarChartComponent} from './charts/bar-chart.component';
 
 class MockWindowRef {
   nativeWindow = {
@@ -52,6 +53,7 @@ describe('About Page', () => {
         AboutPageComponent,
         MockTranslatePipe,
         PrimaryButtonComponent,
+        BarChartComponent,
       ],
       providers: [
         SiteAnalyticsService,
