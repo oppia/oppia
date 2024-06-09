@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for CollectionEditorPageAuthGuard
+ * @fileoverview Tests for StroyEditorPageAuthGuard
  */
 import {Location} from '@angular/common';
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
