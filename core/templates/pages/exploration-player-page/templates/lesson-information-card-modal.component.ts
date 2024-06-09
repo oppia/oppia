@@ -315,7 +315,10 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     if (cardIndex === undefined) {
       console.error('No card index associated with this checkpoint.');
     }
-    if (this.checkpointStatusArray[checkpointNumber] !== CHECKPOINT_STATUS_COMPLETED) {
+    if (
+      this.checkpointStatusArray[checkpointNumber] !==
+      CHECKPOINT_STATUS_COMPLETED
+    ) {
       return;
     } else {
       this.playerPositionService.setDisplayedCardIndex(cardIndex);
