@@ -6646,7 +6646,7 @@ export default {
       ]
     },
     "STORY_EDITOR": {
-      "ROUTE": "story-editor",
+      "ROUTE": "story_editor/:story_id",
       "TITLE": "Story Editor Page",
       "META": [
         {
