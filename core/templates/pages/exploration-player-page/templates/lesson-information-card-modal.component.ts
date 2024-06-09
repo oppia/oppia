@@ -282,8 +282,13 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     });
   }
 
-  getCheckpointsCardIndexs(): number[] {
-    const checkpointCardIndexs: number[] = [];
+  /**
+   * Retrieves the indexes of cards that are marked as checkpoints.
+   *
+   * @returns {number[]} An array of indexes of cards. Each index corresponds to a card that is a checkpoint.
+   */
+  getCheckpointCardIndexes(): number[] {
+    const checkpointCardIndexes: number[] = [];
     const numberOfCards = this.playerTranscriptService.getNumCards();
 
     for (let i = 0; i < numberOfCards; i++) {
@@ -291,20 +296,26 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       const correspondingState =
         this.explorationEngineService.getStateFromStateName(stateName);
       if (correspondingState.cardIsCheckpoint) {
-        checkpointCardIndexs.push(i);
+        checkpointCardIndexes.push(i);
       }
     }
-    return checkpointCardIndexs;
+    return checkpointCardIndexes;
   }
 
-  returnToCheckpointIfCompleted(index: number): void {
-    const checkpointCardsIndex = this.getCheckpointsCardIndexs();
-    const cardIndex = checkpointCardsIndex[index];
+  /**
+   * If the checkpoint is completed, this function returns the user to the checkpoint.
+   *
+   * @param {number} checkpointNumber - The number of the checkpoint to return to.
+   * @returns {void} This function does not return a value. It changes the displayed card if the checkpoint is completed.
+   */
+  returnToCheckpointIfCompleted(checkpointNumber: number): void {
+    const checkpointCardIndexes = this.getCheckpointCardIndexes();
+    const cardIndex = checkpointCardIndexes[checkpointNumber];
 
     if (cardIndex === undefined) {
       console.error('No card index associated with this checkpoint.');
     }
-    if (this.checkpointStatusArray[index] !== CHECKPOINT_STATUS_COMPLETED) {
+    if (this.checkpointStatusArray[checkpointNumber] !== CHECKPOINT_STATUS_COMPLETED) {
       return;
     } else {
       this.playerPositionService.setDisplayedCardIndex(cardIndex);

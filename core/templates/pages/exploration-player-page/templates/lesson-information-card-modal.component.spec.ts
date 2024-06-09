@@ -575,7 +575,7 @@ describe('Lesson Information card modal component', () => {
       }
     );
 
-    const result = componentInstance.getCheckpointsCardIndexs();
+    const result = componentInstance.getCheckpointCardIndexes();
     expect(result).toEqual([0, 2, 4]);
   });
 
@@ -590,15 +590,15 @@ describe('Lesson Information card modal component', () => {
     componentInstance.ngOnInit();
 
     const checkpointsCardsIndexs = [1, 2, 5, 10];
-    const getCheckpointsCardIndexsSpy = spyOn(
+    const getCheckpointCardIndexesSpy = spyOn(
       componentInstance,
-      'getCheckpointsCardIndexs'
+      'getCheckpointCardIndexes'
     ).and.returnValue(checkpointsCardsIndexs);
 
     for (let i = 0; i < checkpointsCardsIndexs.length; i++) {
       const cardIndex = checkpointsCardsIndexs[i];
       componentInstance.returnToCheckpointIfCompleted(i);
-      expect(getCheckpointsCardIndexsSpy).toHaveBeenCalled();
+      expect(getCheckpointCardIndexesSpy).toHaveBeenCalled();
       expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(
         cardIndex
       );
@@ -622,16 +622,16 @@ describe('Lesson Information card modal component', () => {
     componentInstance.ngOnInit();
 
     const checkpointsCardIndexs = [1, 2, 5, 10];
-    const getCheckpointsCardIndexsSpy = spyOn(
+    const getCheckpointCardIndexesSpy = spyOn(
       componentInstance,
-      'getCheckpointsCardIndexs'
+      'getCheckpointCardIndexes'
     ).and.returnValue(checkpointsCardIndexs);
 
     const checkpointIndex = 1;
 
     componentInstance.returnToCheckpointIfCompleted(checkpointIndex);
 
-    expect(getCheckpointsCardIndexsSpy).toHaveBeenCalled();
+    expect(getCheckpointCardIndexesSpy).toHaveBeenCalled();
     expect(setDisplayedCardIndexSpy).toHaveBeenCalledWith(
       checkpointsCardIndexs[checkpointIndex]
     );
@@ -643,7 +643,7 @@ describe('Lesson Information card modal component', () => {
 
     componentInstance.returnToCheckpointIfCompleted(checkpointIndex);
 
-    expect(getCheckpointsCardIndexsSpy).toHaveBeenCalled();
+    expect(getCheckpointCardIndexesSpy).toHaveBeenCalled();
     expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(
       checkpointsCardIndexs[checkpointIndex]
     );
@@ -684,9 +684,9 @@ describe('Lesson Information card modal component', () => {
     componentInstance.ngOnInit();
 
     const checkpointsCardIndexs = [1, 2, 5, 10];
-    const getCheckpointsCardIndexsSpy = spyOn(
+    const getCheckpointCardIndexesSpy = spyOn(
       componentInstance,
-      'getCheckpointsCardIndexs'
+      'getCheckpointCardIndexes'
     ).and.returnValue(checkpointsCardIndexs);
 
     componentInstance.ngOnInit();
@@ -694,7 +694,7 @@ describe('Lesson Information card modal component', () => {
     const incompleteCheckpointIndex = 3;
 
     componentInstance.returnToCheckpointIfCompleted(incompleteCheckpointIndex);
-    expect(getCheckpointsCardIndexsSpy).toHaveBeenCalled();
+    expect(getCheckpointCardIndexesSpy).toHaveBeenCalled();
 
     expect(setDisplayedCardIndexSpy).not.toHaveBeenCalled();
     expect(emitSpy).not.toHaveBeenCalled();
@@ -716,9 +716,9 @@ describe('Lesson Information card modal component', () => {
     componentInstance.ngOnInit();
 
     const checkpointsCardIndexs = [1, 2, 5, 10];
-    const getCheckpointsCardIndexsSpy = spyOn(
+    const getCheckpointCardIndexesSpy = spyOn(
       componentInstance,
-      'getCheckpointsCardIndexs'
+      'getCheckpointCardIndexes'
     ).and.returnValue(checkpointsCardIndexs);
 
     const invalidCheckpointIndex = 6;
@@ -733,7 +733,7 @@ describe('Lesson Information card modal component', () => {
 
     componentInstance.returnToCheckpointIfCompleted(validCheckpointIndex);
 
-    expect(getCheckpointsCardIndexsSpy).toHaveBeenCalled();
+    expect(getCheckpointCardIndexesSpy).toHaveBeenCalled();
     expect(setDisplayedCardIndexSpy).toHaveBeenCalledWith(
       checkpointsCardIndexs[validCheckpointIndex]
     );
@@ -759,9 +759,9 @@ describe('Lesson Information card modal component', () => {
     componentInstance.ngOnInit();
 
     const checkpointsCardIndexs = [1, 2, 5, 10];
-    const getCheckpointsCardIndexsSpy = spyOn(
+    const getCheckpointCardIndexesSpy = spyOn(
       componentInstance,
-      'getCheckpointsCardIndexs'
+      'getCheckpointCardIndexes'
     ).and.returnValue(checkpointsCardIndexs);
 
     const incompleteCheckpointIndex = 3;
@@ -770,7 +770,7 @@ describe('Lesson Information card modal component', () => {
 
     componentInstance.returnToCheckpointIfCompleted(incompleteCheckpointIndex);
 
-    expect(getCheckpointsCardIndexsSpy).toHaveBeenCalled();
+    expect(getCheckpointCardIndexesSpy).toHaveBeenCalled();
 
     expect(setDisplayedCardIndexSpy).not.toHaveBeenCalled();
     expect(emitSpy).not.toHaveBeenCalled();
@@ -778,7 +778,7 @@ describe('Lesson Information card modal component', () => {
 
     componentInstance.returnToCheckpointIfCompleted(validCheckpointIndex);
 
-    expect(getCheckpointsCardIndexsSpy).toHaveBeenCalled();
+    expect(getCheckpointCardIndexesSpy).toHaveBeenCalled();
     expect(setDisplayedCardIndexSpy).toHaveBeenCalledWith(
       checkpointsCardIndexs[validCheckpointIndex]
     );
