@@ -200,32 +200,34 @@ def update_classroom(
     classroom_model = classroom_models.ClassroomModel.get(
         classroom.classroom_id, strict=False)
 
-    if classroom_model:
-        classroom_model.name = classroom.name
-        classroom_model.url_fragment = classroom.url_fragment
-        classroom_model.course_details = classroom.course_details
-        classroom_model.topic_list_intro = classroom.topic_list_intro
-        classroom_model.topic_id_to_prerequisite_topic_ids = (
-            classroom.topic_id_to_prerequisite_topic_ids)
-        classroom_model.teaser_text = classroom.teaser_text
-        classroom_model.is_published = classroom.is_published
-        classroom_model.thumbnail_filename = (
-            classroom.thumbnail_data['filename']
-        )
-        classroom_model.thumbnail_bg_color = (
-            classroom.thumbnail_data['bg_color']
-        )
-        classroom_model.thumbnail_size_in_bytes = (
-            classroom.thumbnail_data['size_in_bytes']
-        )
-        classroom_model.banner_filename = classroom.banner_data['filename']
-        classroom_model.banner_bg_color = classroom.banner_data['bg_color']
-        classroom_model.banner_size_in_bytes = (
-            classroom.banner_data['size_in_bytes']
-        )
+    if not classroom_model:
+        return
 
-        classroom_model.update_timestamps()
-        classroom_model.put()
+    classroom_model.name = classroom.name
+    classroom_model.url_fragment = classroom.url_fragment
+    classroom_model.course_details = classroom.course_details
+    classroom_model.topic_list_intro = classroom.topic_list_intro
+    classroom_model.topic_id_to_prerequisite_topic_ids = (
+        classroom.topic_id_to_prerequisite_topic_ids)
+    classroom_model.teaser_text = classroom.teaser_text
+    classroom_model.is_published = classroom.is_published
+    classroom_model.thumbnail_filename = (
+        classroom.thumbnail_data['filename']
+    )
+    classroom_model.thumbnail_bg_color = (
+        classroom.thumbnail_data['bg_color']
+    )
+    classroom_model.thumbnail_size_in_bytes = (
+        classroom.thumbnail_data['size_in_bytes']
+    )
+    classroom_model.banner_filename = classroom.banner_data['filename']
+    classroom_model.banner_bg_color = classroom.banner_data['bg_color']
+    classroom_model.banner_size_in_bytes = (
+        classroom.banner_data['size_in_bytes']
+    )
+
+    classroom_model.update_timestamps()
+    classroom_model.put()
 
 
 def create_new_classroom(

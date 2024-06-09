@@ -451,6 +451,21 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
+    def test_invalid_is_published_should_raise_exception(
+        self
+    ) -> None:
+        self.classroom.is_published = 1 # type: ignore[assignment]
+        error_msg = (
+            'Expected is_published of the classroom to be a boolean, '
+            'received: 1.'
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom.validate()
+
     def test_cycle_between_topic_id_and_prerequisites_should_raise_exception(
         self
     ) -> None:

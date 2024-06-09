@@ -255,6 +255,18 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             'Quantum physics'
         )
 
+    def test_do_not_update_invalid_classroom(self) -> None:
+        self.physics_classroom.classroom_id = 'invalid'
+        self.physics_classroom.name = 'Updated physics'
+        classroom_config_services.update_classroom(
+            self.physics_classroom)
+
+        self.assertEqual(
+            classroom_config_services.get_classroom_by_id(
+                'physics_classroom_id').name,
+            'physics'
+        )
+
     def test_delete_classroom_model(self) -> None:
         self.assertIsNotNone(
             classroom_config_services.get_classroom_by_id('math_classroom_id'))
