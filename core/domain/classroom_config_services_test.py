@@ -275,3 +275,21 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
         self.assertIsNone(
             classroom_config_services.get_classroom_by_id(
                 'math_classroom_id', strict=False))
+
+    def test_update_or_create_new_classroom(self) -> None:
+        self.math_classroom.name = 'Updated Math'
+        classroom_config_services.update_or_create_classroom_model(
+            self.math_classroom)
+        math_classroom = classroom_config_services.get_classroom_by_id(
+            self.math_classroom.classroom_id
+        )
+        self.assertEqual(self.math_classroom.name, math_classroom.name)
+
+        self.math_classroom.classroom_id = 'new_classroom'
+        classroom_config_services.update_or_create_classroom_model(
+            self.math_classroom
+        )
+        math_classroom = classroom_config_services.get_classroom_by_id(
+            'new_classroom'
+        )
+        self.assertEqual(self.math_classroom.name, math_classroom.name)

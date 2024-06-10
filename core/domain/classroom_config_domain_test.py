@@ -465,6 +465,14 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()
+        error_msg = (
+            'banner_filename field should not be empty'
+        )
+        self.classroom.banner_data = classroom_config_domain.ImageData(
+            '', 'transparent', 1000)
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom.validate()
 
     def test_invalid_thumbnail_filename_should_raise_exception(self) -> None:
         error_msg = (
@@ -472,6 +480,14 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         )
         self.classroom.thumbnail_data = classroom_config_domain.ImageData(
             'invalid_thumbnail.png', 'transparent', 1000)
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom.validate()
+        error_msg = (
+            'thumbnail_filename field should not be empty'
+        )
+        self.classroom.thumbnail_data = classroom_config_domain.ImageData(
+            '', 'transparent', 1000)
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()
