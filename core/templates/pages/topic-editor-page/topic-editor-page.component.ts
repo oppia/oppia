@@ -32,7 +32,7 @@ import {TopicEditorRoutingService} from './services/topic-editor-routing.service
 import {TopicEditorStateService} from './services/topic-editor-state.service';
 
 @Component({
-  selector: './oppia-topic-editor-page',
+  selector: 'oppia-topic-editor-page',
   templateUrl: './topic-editor-page.component.html',
 })
 export class TopicEditorPageComponent implements OnInit, OnDestroy {

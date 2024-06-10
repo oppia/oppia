@@ -43,7 +43,6 @@ import {SchemaBasedHtmlEditorComponent} from './schema-based-editors/schema-base
 import {OppiaCkEditor4Module} from 'components/ck-editor-helpers/ckeditor4.module';
 import {MarkAudioAsNeedingUpdateModalComponent} from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
 import {SchemaBasedListEditorComponent} from './schema-based-editors/schema-based-list-editor.component';
-import {SchemaBasedExpressionEditorComponent} from './schema-based-editors/schema-based-expression-editor.component';
 import {SchemaBasedUnicodeEditor} from './schema-based-editors/schema-based-unicode-editor.component';
 import {CodeMirrorModule} from 'components/code-mirror/codemirror.module';
 import {MarkTranslationsAsNeedingUpdateModalComponent} from './forms-templates/mark-translations-as-needing-update-modal.component';
@@ -75,7 +74,6 @@ import {MarkTranslationsAsNeedingUpdateModalComponent} from './forms-templates/m
     SchemaBasedEditorComponent,
     MarkAudioAsNeedingUpdateModalComponent,
     MarkTranslationsAsNeedingUpdateModalComponent,
-    SchemaBasedExpressionEditorComponent,
     SchemaBasedFloatEditorComponent,
     SchemaBasedHtmlEditorComponent,
     SchemaBasedIntEditorComponent,
@@ -90,7 +88,6 @@ import {MarkTranslationsAsNeedingUpdateModalComponent} from './forms-templates/m
     SchemaBasedCustomEditorComponent,
     SchemaBasedDictEditorComponent,
     SchemaBasedEditorComponent,
-    SchemaBasedExpressionEditorComponent,
     SchemaBasedFloatEditorComponent,
     SchemaBasedHtmlEditorComponent,
     SchemaBasedIntEditorComponent,
@@ -109,7 +106,6 @@ import {MarkTranslationsAsNeedingUpdateModalComponent} from './forms-templates/m
     SchemaBasedCustomEditorComponent,
     SchemaBasedDictEditorComponent,
     SchemaBasedEditorComponent,
-    SchemaBasedExpressionEditorComponent,
     SchemaBasedFloatEditorComponent,
     SchemaBasedHtmlEditorComponent,
     SchemaBasedIntEditorComponent,

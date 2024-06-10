@@ -263,7 +263,6 @@
 
 # Forms pages.
 /core/templates/components/forms/ @oppia/lace-frontend-reviewers
-/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @oppia/lace-frontend-reviewers
 /core/templates/services/rte-helper-modal.component.html @oppia/lace-frontend-reviewers
 /core/templates/utility/forms.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-default-value.service*.ts @oppia/lace-frontend-reviewers
@@ -320,7 +319,6 @@
 /core/templates/services/id-generation.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/keyboard-shortcut.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/local-storage.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/nested-directives*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/page-title.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/prevent-page-unload-event.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/promo-bar-backend-api.service*.ts @oppia/lace-frontend-reviewers
