@@ -134,8 +134,8 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   private vizContainer: SVGSVGElement[];
   componentSubscriptions: Subscription = new Subscription();
   shouldShowWrongWeightWarning: boolean;
-  VERTEX_RADIUS: number;
-  EDGE_WIDTH: number;
+  VERTEX_RADIUS_PX: number;
+  EDGE_WIDTH_PX: number;
   graphOptions: GraphOption[];
   svgViewBox: string;
   constructor(
@@ -155,8 +155,8 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
         () => (this.state.currentMode = null)
       )
     );
-    this.VERTEX_RADIUS = this.graphDetailService.VERTEX_RADIUS;
-    this.EDGE_WIDTH = this.graphDetailService.EDGE_WIDTH;
+    this.VERTEX_RADIUS_PX = this.graphDetailService.VERTEX_RADIUS_PX;
+    this.EDGE_WIDTH_PX = this.graphDetailService.EDGE_WIDTH_PX;
     this.selectedEdgeWeightValue = 0;
     this.shouldShowWrongWeightWarning = false;
 
