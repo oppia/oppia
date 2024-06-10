@@ -16,20 +16,25 @@
  * @fileoverview Component for the about page.
  */
 
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
+import {ThanksForDonatingModalComponent} from 'pages/donate-page/thanks-for-donating-modal.component';
 
 import './about-page.component.css';
+import {title} from 'process';
 
 @Component({
   selector: 'about-page',
   templateUrl: './about-page.component.html',
   styleUrls: ['./about-page.component.css'],
 })
-export class AboutPageComponent {
+export class AboutPageComponent implements OnInit {
   features = [
     {
       i18nDescription: 'I18N_ABOUT_PAGE_AUDIO_SUBTITLES_FEATURE',
@@ -53,13 +58,102 @@ export class AboutPageComponent {
     },
   ];
 
+  selectedTabIndex = 1;
+  partnershipsFormLink: string = '';
+  volunteerRolesDetails = [
+    {
+      title: 'I18N_ABOUT_PAGE_CTA_GROWTH_TITLE',
+      iconUrl: '/icons/growth-icon',
+      description: 'I18N_ABOUT_PAGE_CTA_GROWTH_DESCRIPTION',
+      listItems: [
+        'I18N_ABOUT_PAGE_CTA_GROWTH_LIST_ITEM1',
+        'I18N_ABOUT_PAGE_CTA_GROWTH_LIST_ITEM2',
+        'I18N_ABOUT_PAGE_CTA_GROWTH_LIST_ITEM3',
+      ],
+    },
+    {
+      title: 'I18N_ABOUT_PAGE_CTA_DEV_TITLE',
+      iconUrl: '/icons/dev-icon',
+      description: 'I18N_ABOUT_PAGE_CTA_DEV_DESCRIPTION',
+      listItems: [
+        'I18N_ABOUT_PAGE_CTA_DEV_LIST_ITEM1',
+        'I18N_ABOUT_PAGE_CTA_DEV_LIST_ITEM2',
+        'I18N_ABOUT_PAGE_CTA_DEV_LIST_ITEM3',
+      ],
+    },
+    {
+      title: 'I18N_ABOUT_PAGE_CTA_ART_TITLE',
+      iconUrl: '/icons/art-icon',
+      description: 'I18N_ABOUT_PAGE_CTA_ART_DESCRIPTION',
+      listItems: [
+        'I18N_ABOUT_PAGE_CTA_ART_LIST_ITEM1',
+        'I18N_ABOUT_PAGE_CTA_ART_LIST_ITEM2',
+      ],
+    },
+    {
+      title: 'I18N_ABOUT_PAGE_CTA_TRANSLATION_TITLE',
+      iconUrl: '/icons/translation-icon',
+      description: 'I18N_ABOUT_PAGE_CTA_TRANSLATION_DESCRIPTION',
+      listItems: [
+        'I18N_ABOUT_PAGE_CTA_TRANSLATION_LIST_ITEM1',
+        'I18N_ABOUT_PAGE_CTA_TRANSLATION_LIST_ITEM2',
+        'I18N_ABOUT_PAGE_CTA_TRANSLATION_LIST_ITEM3',
+      ],
+    },
+    {
+      title: 'I18N_ABOUT_PAGE_CTA_LESSON_TITLE',
+      iconUrl: '/icons/lesson-icon',
+      description: 'I18N_ABOUT_PAGE_CTA_LESSON_DESCRIPTION',
+      listItems: [
+        'I18N_ABOUT_PAGE_CTA_LESSON_LIST_ITEM1',
+        'I18N_ABOUT_PAGE_CTA_LESSON_LIST_ITEM2',
+        'I18N_ABOUT_PAGE_CTA_LESSON_LIST_ITEM3',
+      ],
+    },
+  ];
+  activeVolunteerRolesIndexes: number[] = [0, 1, 2];
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private siteAnalyticsService: SiteAnalyticsService
+    private siteAnalyticsService: SiteAnalyticsService,
+    private windowRef: WindowRef,
+    private ngbModal: NgbModal
   ) {}
+
+  ngOnInit(): void {
+    const searchParams = new URLSearchParams(
+      this.windowRef.nativeWindow.location.search
+    );
+    const params = Object.fromEntries(searchParams.entries());
+    if (params.hasOwnProperty('thanks')) {
+      this.ngbModal.open(ThanksForDonatingModalComponent, {
+        backdrop: 'static',
+        size: 'xl',
+      });
+    }
+  }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  getImageSet(imageName: string, imageExt: string): string {
+    return (
+      this.getStaticImageUrl(imageName + '1x.' + imageExt) +
+      ' 1x, ' +
+      this.getStaticImageUrl(imageName + '15x.' + imageExt) +
+      ' 1.5x, ' +
+      this.getStaticImageUrl(imageName + '2x.' + imageExt) +
+      ' 2x'
+    );
+  }
+
+  openDonationBoxModal(): void {
+    this.ngbModal.open(DonationBoxModalComponent, {
+      backdrop: 'static',
+      size: 'xl',
+      windowClass: 'donation-box-modal',
+    });
   }
 
   onClickBrowseLibraryButton(): void {

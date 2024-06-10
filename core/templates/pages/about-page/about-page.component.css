@@ -152,6 +152,335 @@
   border-radius: 5px;
   width: 100%;
 }
+
+.about-page .oppia-about-cta-button {
+  border-radius: 4px;
+  color: #fff;
+  font-weight: 700;
+  height: 44px;
+  margin: 0;
+  padding: 10px;
+  width: 240px;
+}
+
+.about-page .oppia-about-cta-outline-button {
+  background-color: #fff;
+  border: 1px solid #00645c;
+  color: #00645c;
+}
+
+.about-page .oppia-about-cta-link {
+  color: #333;
+  font-size: 20px;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.about-page .oppia-about-cta-link:hover {
+  color: #00645c;
+}
+
+.about-page .oppia-about-cta-subtext1 {
+  margin: 0 0 8px;
+}
+
+.about-page .oppia-about-cta-subtext2 {
+  margin: 16px 0 32px;
+}
+
+.about-page .oppia-cta-right-arrow-icon {
+  color: #00645c;
+  margin-left: 5px;
+}
+
+.about-page .oppia-about-cta-tabs {
+  background-color: #fff;
+}
+
+.about-page .mat-ink-bar {
+  height: 4px;
+}
+
+.about-page .mat-tab-label {
+  border-bottom: 4px solid #33333333;
+  color: #333;
+  height: 75px;
+  opacity: 0.7;
+}
+
+.about-page .mat-tab-label.mat-tab-label-active {
+  color: #00645c;
+  opacity: 1;
+}
+
+.about-page .oppia-about-cta-section {
+  background-color: #e3f1f1;
+  color: #333;
+  padding: 32px 64px;
+}
+
+.about-page .oppia-about-cta-partner {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding: 64px 32px;
+  width: 100%;
+}
+
+.about-page .oppia-about-cta-partner-boxes-container {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+.about-page .oppia-about-cta-partner-box {
+  align-items: center;
+  border: 2px solid #e3f1f1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 32px;
+  width: 50%;
+}
+
+.about-page .oppia-about-cta-partner-inner-box {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  row-gap: 16px;
+}
+
+.about-page .oppia-about-cta-image-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+  width: 100%;
+}
+
+.about-page h2.oppia-about-cta-title {
+  color: #00645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 30px;
+  margin: 0 0 16px;
+}
+
+.about-page .oppia-about-cta-title-small {
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 20px;
+  line-height: 25px;
+}
+
+.about-page .oppia-about-cta-subtext {
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  line-height: 21.6px;
+}
+
+.about-page .center-aligned-text {
+  text-align: center;
+}
+
+.about-page .oppia-about-cta-partner-box-title {
+  color: #00645c;
+  text-align: center;
+}
+
+.about-page .oppia-about-cta-partner-box p {
+  margin: 0;
+}
+
+.about-page .oppia-about-cta-donor {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 48px 64px;
+}
+
+.about-page .oppia-about-cta-logo-container {
+  margin-bottom: 16px;
+}
+
+.about-page .oppia-about-cta-donor-top-subtext1 {
+  margin: 0 0 8px;
+  max-width: 648px;
+  width: 100%;
+}
+
+.about-page .oppia-about-cta-donor-top-subtext2 {
+  max-width: 812px;
+  width: 100%;
+}
+
+.about-page .oppia-about-cta-donor-impact-statements {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.about-page .oppia-about-statement-type1 {
+  width: calc((60% - 32px) / 2);
+}
+
+.about-page .oppia-about-statement-type2 {
+  width: 40%;
+}
+
+.about-page .oppia-about-cta-donor-statement-box {
+  border: 2px solid #e3f1f1;
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.about-page .oppia-about-cta-donor-statement-heading {
+  color: #00645c;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.about-page .oppia-about-cta-donate-button {
+  background-color: #00645c;
+}
+
+.about-page .oppia-about-cta-volunteer {
+  padding: 48px 32px;
+}
+
+.about-page .oppia-about-cta-volunteer-buttons-container {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.about-page .oppia-about-cta-volunteer-roles {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 22px;
+  width: 100%;
+}
+
+.about-page .oppia-about-cta-role-card {
+  border: 2px solid #e3f1f1;
+  border-radius: 4px;
+  padding: 24px;
+  width: calc((100% - 44px) / 3);
+}
+
+.about-page .oppia-about-cta-role-card-head {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.about-page .oppia-about-cta-role-card-description {
+  margin: 16px 0;
+}
+
+.about-page .oppia-about-cta-role-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 18px;
+}
+
+@media only screen and (max-width: 769px) {
+  .about-page .oppia-about-cta-section {
+    padding: 32px 48px;
+  }
+
+  .about-page .oppia-about-cta-donor {
+    gap: 16px;
+    padding: 48px 32px;
+  }
+
+  .about-page .oppia-about-cta-donate-button {
+    margin-top: 24px;
+  }
+
+  .about-page .oppia-about-statement-type1 {
+    width: calc((100% - 16px) / 2);
+  }
+  
+  .about-page .oppia-about-statement-type2 {
+    width: 100%;
+  }
+
+  .about-page .oppia-about-cta-partner {
+    padding: 64px 16px;
+  }
+
+  .about-page .oppia-about-cta-partner-boxes-container {
+    gap: 8px;
+  }
+
+  .about-page .oppia-about-cta-volunteer {
+    padding: 48px 16px;
+  }
+
+  .about-page .oppia-about-cta-volunteer-roles {
+    gap: 8px;
+  }
+  
+  .about-page .oppia-about-cta-role-card {
+    width: calc((100% - 8px) / 2);
+  }
+
+  .about-page .oppia-about-cta-volunteer-buttons-container {
+    margin-top: 32px;
+  }
+}
+
+@media only screen and (max-width: 641px) {
+  .about-page .oppia-about-cta-subtext {
+    font-size: 16px;
+    line-height: 19.2px;
+  }
+  .about-page .oppia-about-cta-section {
+    padding: 32px 24px;
+  }
+  .about-page .oppia-about-statement-type1 {
+    width: 100%;
+  }
+  .about-page .oppia-about-cta-partner-box {
+    padding: 32px 15px;
+  }
+  .about-page .oppia-about-cta-role-card {
+    padding: 24px 16px;
+  }
+}
+
+@media only screen and (max-width: 361px) {
+  .about-page .oppia-about-cta-section {
+    padding: 32px 20px;
+  }
+  .about-page .oppia-about-cta-donor {
+    padding: 48px 16px;
+  }
+  .about-page .oppia-about-cta-partner {
+    padding: 48px 16px;
+  }
+  .about-page .oppia-about-cta-partner-boxes-container {
+    flex-direction: column;
+  }
+  .about-page .oppia-about-cta-partner-box {
+    width: 100%;
+  }
+  .about-page .oppia-about-cta-volunteer {
+    padding: 32px 16px;
+  }
+  .about-page .oppia-about-cta-role-card {
+    width: 100%;
+  }
+  .about-page .oppia-about-cta-volunteer-buttons-container {
+    align-items: center;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
 @media (max-width: 1440px) and (min-width: 1280px) {
   .oppia-about-page-section-one-left {
     padding-left: 2vw;

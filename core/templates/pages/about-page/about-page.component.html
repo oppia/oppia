@@ -106,8 +106,189 @@
     </div>
   </div>
 
-  <div class="oppia-">
+  <div class="oppia-about-cta-section">
+    <div class="oppia-about-cta-section-content">
+      <h2 class="oppia-about-cta-title"> 
+        Get involved 
+      </h2>
+      <p class="oppia-about-cta-subtext oppia-about-cta-subtext1">
+        Our volunteers, partners, and donors are the backbone of Oppia.
+      </p>
+      <a class="oppia-about-cta-link" href="/blog">
+        Read stories from our community
+        <span class="material-icons oppia-cta-right-arrow-icon">arrow_forward</span>
+      </a>
+      <p class="oppia-about-cta-subtext oppia-about-cta-subtext2">
+        You can become a part of our mission in the following ways:
+      </p>
+    </div>
+    <div class="oppia-about-cta-tabs oppia-non-mobile-portrait-content">
+      <mat-tab-group [(selectedIndex)]="selectedTabIndex" mat-align-tabs="center" mat-stretch-tabs dynamicHeight disablePagination="true">
+        <mat-tab>
+          <ng-template mat-tab-label>
+              <span class="oppia-about-cta-title-small">
+                Donor
+              </span>
+          </ng-template>
+          <div class="oppia-about-cta-donor">
+            <div class="oppia-about-cta-donor-top">
+              <div class="oppia-about-cta-logo-container">
+                <picture class="oppia-about-cta-logo">
+                  <source type="image/webp" [srcset]="getStaticImageUrl('/about/oppia-logo-primary.webp')">
+                  <source type="image/png" [srcset]="getStaticImageUrl('/about/oppia-logo-primary.png')">
+                  <img [src]="getStaticImageUrl('/about/oppia-logo-primary.png')" alt="Oppia logo">
+                </picture>
+              </div>
+              <p class="oppia-about-cta-subtext oppia-about-cta-donor-top-subtext1">
+                Oppia’s mission is to provide a learning platform that meets the unique needs for under resourced communities.
+              </p>
+              <p class="oppia-about-cta-subtext oppia-about-cta-donor-top-subtext2">
+                Join our mission to provide global access to quality education. Every contribution makes a difference. Donate now and help us empower learners worldwide.
+              </p>
+            </div>
+            <div class="oppia-about-cta-donor-impact-statements">
+              <div class="oppia-about-cta-donor-statement-box oppia-about-statement-type1">
+                <p class="oppia-about-cta-subtext oppia-about-cta-donor-statement-heading">Your $10</p>
+                <p class="oppia-about-cta-subtext oppia-about-cta-donor-statement-subtext">
+                  could provide the funds needed to educate 25 children on our platform.
+                </p>
+              </div>
+              <div class="oppia-about-cta-donor-statement-box oppia-about-statement-type1">
+                <p class="oppia-about-cta-subtext oppia-about-cta-donor-statement-heading">Your $25</p>
+                <p class="oppia-about-cta-subtext oppia-about-cta-donor-statement-subtext">
+                  could help educate 20 children through a partner organization for a day.
+                </p>
+              </div>
+              <div class="oppia-about-cta-donor-statement-box oppia-about-statement-type2">
+                <p class="oppia-about-cta-subtext oppia-about-cta-donor-statement-heading">Your $100</p>
+                <p class="oppia-about-cta-subtext oppia-about-cta-donor-statement-subtext">
+                  could buy a phone for a child in Nigeria, helping them access education without the need for a high-speed Internet connection.
+                </p>
+              </div>
+            </div>
+            <!-- <oppia-primary-button
+              buttonHref="/donate"
+              (onClickPrimaryButton)="onClickDonateButton()"
+              [customClasses]="['oppia-about-cta-button','oppia-about-cta-donate-button', 'oppia-about-cta-subtext']"
+              buttonText="Donate">
+            </oppia-primary-button> -->
+            <button class="oppia-about-cta-button oppia-about-cta-donate-button oppia-about-cta-subtext" (click)="openDonationBoxModal()">
+              <img [src]="getStaticImageUrl('/donate/donate-button-heart.svg')" alt="Graphic of a white heart">
+              <span> Donate </span>
+            </button>
+          </div>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+              <span class="oppia-about-cta-title-small">
+                Volunteer
+              </span>
+          </ng-template>
+          <div class="oppia-about-cta-volunteer">
+            <p class="oppia-about-cta-subtext center-aligned-text">
+              This is a community project and all volunteers are welcome!
+            </p>
+            <div class="oppia-about-cta-volunteer-roles">
+              <div class="oppia-about-cta-role-card" *ngFor="let roleIndex of activeVolunteerRolesIndexes">
+                <div class="oppia-about-cta-role-card-head">
+                  <picture class="oppia-about-cta-role-card-icon">
+                    <source type="image/webp" [srcset]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.webp')">
+                    <source type="image/png" [srcset]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.png')">
+                    <img [src]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.png')" alt="Image of a volunteer role" />
+                  </picture>
+                  <p class="oppia-about-cta-title-small oppia-about-cta-role-card-title">
+                    {{volunteerRolesDetails[roleIndex].title | translate}}
+                  </p>
+                </div>
+                <p class="oppia-about-cta-subtext oppia-about-cta-role-card-description">
+                  {{volunteerRolesDetails[roleIndex].description | translate}}
+                </p>
+                <ul class="oppia-about-cta-role-card-list">
+                  <li *ngFor="let item of volunteerRolesDetails[roleIndex].listItems">
+                    <span class="oppia-about-cta-subtext">{{item | translate}}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="oppia-about-cta-volunteer-buttons-container">
+              <oppia-primary-button
+                buttonHref="/volunteer"
+                [customClasses]="['oppia-about-cta-button', 'oppia-about-cta-subtext']"
+                buttonText="Volunteer with Oppia">
+              </oppia-primary-button>
+              <oppia-primary-button
+                buttonHref="/volunteer"
+                [customClasses]="['oppia-about-cta-button', 'oppia-about-cta-outline-button', 'oppia-about-cta-subtext']"
+                buttonText="Learn more">
+              </oppia-primary-button>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="oppia-about-cta-title-small">
+              Partner
+            </span>
+          </ng-template>
+          <div class="oppia-about-cta-partner">
+            <p class="oppia-about-cta-subtext center-aligned-text">
+              Each partnership is coordinated to meet partners’ significant needs.
+            </p>
+            <div class="oppia-about-cta-partner-boxes-container">
+              <div class="oppia-about-cta-partner-box">
+                <div class="oppia-about-cta-partner-inner-box">
+                  <p class="oppia-about-cta-title-small oppia-about-cta-partner-box-title">
+                    Our partners
+                  </p>
+                  <p class="oppia-about-cta-subtext center-aligned-text">
+                    Our global network collaborates with us to make quality education more accessible.
+                  </p>
+                  <div class="oppia-about-cta-image-container">
+                    <picture class="oppia-about-cta-partners-image">
+                      <source type="image/webp" [srcset]="getImageSet('/about/partners', 'webp')">
+                      <source type="image/png" [srcset]="getImageSet('/about/partners', 'png')">
+                      <img [src]="getStaticImageUrl('/about/partners1x.png')"
+                           alt="Images of different organizations partnered with Oppia">
+                    </picture>
+                  </div>
+                </div>
+                <oppia-primary-button
+                  buttonHref="/partnerships"
+                  [customClasses]="['oppia-about-cta-button', 'oppia-about-cta-subtext']"
+                  buttonText="Partner with us">
+                </oppia-primary-button>
+              </div>
+              <div class="oppia-about-cta-partner-box">
+                <div class="oppia-about-cta-partner-inner-box">
+                  <p class="oppia-about-cta-title-small oppia-about-cta-partner-box-title">
+                    Schools & organizations
+                  </p>
+                  <p class="oppia-about-cta-subtext center-aligned-text">
+                    We’re eager to partner with schools and NGOs that want to integrate digital tools to support students' learning.
+                  </p>
+                  <div class="oppia-about-cta-image-container">
+                    <picture class="oppia-about-cta-schools-image">
+                      <source type="image/webp" [srcset]="getImageSet('/about/schools', 'webp')">
+                      <source type="image/png" [srcset]="getImageSet('/about/schools', 'png')">
+                      <img [src]="getStaticImageUrl('/about/schools1x.png')"
+                            alt="Images of activites at different schools partnered with Oppia">
+                    </picture>
+                  </div>
+                </div>
+                <oppia-primary-button
+                  buttonHref="/partnerships"
+                  [customClasses]="['oppia-about-cta-button', 'oppia-about-cta-outline-button', 'oppia-about-cta-subtext']"
+                  buttonText="Learn more">
+                </oppia-primary-button>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+    <div class="oppia-about-cta-tabs oppia-mobile-portrait-content">
 
+    </div>
   </div>
 
 </div>
