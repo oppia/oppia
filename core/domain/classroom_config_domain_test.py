@@ -400,6 +400,83 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         }
         self.classroom.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
+    def test_invalid_thumbnail_data_should_raise_exception(self) -> None:
+        self.classroom.thumbnail_data = 1 # type: ignore[assignment]
+        error_msg = (
+            'Expected thumbnail_data of the classroom to be a string, ' +
+            'received: 1.'
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
+    def test_invalid_banner_data_should_raise_exception(self) -> None:
+        self.classroom.banner_data = 1 # type: ignore[assignment]
+        error_msg = (
+            'Expected banner_data of the classroom to be a string, ' +
+            'received: 1.')
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom.validate()
+
+    def test_invalid_thumbnail_bg_color_should_raise_exception(self) -> None:
+        error_msg = 'thumbnail_bg_color field should not be empty'
+        self.classroom.thumbnail_data = classroom_config_domain.Image(
+            'valid_thumbnail.svg', '', 1000)
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom.validate()
+
+        error_msg = (
+            'Classroom thumbnail background color #FFFF is not supported.'
+        )
+        self.classroom.thumbnail_data.bg_color = '#FFFF'
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom.validate()
+
+    def test_invalid_banner_bg_color_should_raise_exception(self) -> None:
+        error_msg = 'banner_bg_color field should not be empty'
+        self.classroom.banner_data = classroom_config_domain.Image(
+            'valid_banner.png', '', 1000)
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom.validate()
+
+        error_msg = (
+            'Classroom banner background color #FFFF is not supported.'
+        )
+        self.classroom.banner_data.bg_color = '#FFFF'
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom.validate()
+
+    def test_invalid_banner_filename_should_raise_exception(self) -> None:
+        error_msg = (
+            'Image filename should include an extension.'
+        )
+        self.classroom.banner_data = classroom_config_domain.Image(
+            'invalid_banner', 'transparent', 1000)
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom.validate()
+
+    def test_invalid_thumbnail_filename_should_raise_exception(self) -> None:
+        error_msg = (
+            'Expected a filename ending in svg, received invalid_thumbnail.png'
+        )
+        self.classroom.thumbnail_data = classroom_config_domain.Image(
+            'invalid_thumbnail.png', 'transparent', 1000)
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom.validate()
+
 
 class ImageDomainTests(test_utils.GenericTestBase):
 

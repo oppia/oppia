@@ -276,11 +276,6 @@ class Classroom:
         """
         image_type = 'thumbnail' if is_thumbnail else 'banner'
 
-        if not isinstance(bg_color, str):
-            raise utils.ValidationError(
-                f'Expected {image_type}_bg_color of the classroom to '
-                f'be a string, received: {bg_color}.')
-
         if bg_color == '':
             raise utils.ValidationError(
                 f'{image_type}_bg_color field should not be empty')
@@ -338,14 +333,16 @@ class Classroom:
             raise utils.ValidationError(
                 'Expected ID of the classroom to be a string, received: %s.'
                 % self.classroom_id)
-        if not isinstance(self.thumbnail_data.filename, str):
+        if not isinstance(self.thumbnail_data, Image):
             raise utils.ValidationError(
-                'Expected thumbnail_filename of the classroom to '
-                'be a string, received: %s.' % self.thumbnail_data.filename)
-        if not isinstance(self.banner_data.filename, str):
+                'Expected thumbnail_data of the classroom to be a string, ' +
+                'received: %s.' % self.thumbnail_data
+            )
+        if not isinstance(self.banner_data, Image):
             raise utils.ValidationError(
-                'Expected banner_filename of the classroom to '
-                'be a string, received: %s.' % self.banner_data.filename)
+                'Expected banner_data of the classroom to be a string, ' +
+                'received: %s.' % self.banner_data
+            )
         if self.thumbnail_data.filename == '':
             raise utils.ValidationError(
                 'thumbnail_filename field should not be empty')
