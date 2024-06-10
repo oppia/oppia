@@ -13,35 +13,40 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users
+ * @fileoverview Acceptance Test for checking if logged-out users
  * can open links by clicking all buttons in about foundation page
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-in User in About page', function () {
-  let testUser: LoggedOutUser;
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /http:\/\/localhost:8181\/access_validation_handler\/can_access_classroom_page\?/,
+  /classroom_url_fragment=math Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+  /webpack:\/\/\/\.\/core\/templates\/services\/contextual\/logger\.service\.ts\?/,
+  /The requested path \/learn\/math is not found\./,
+]);
+
+describe('Logged-out User in About page', function () {
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com'
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await testUser.navigateToAboutPage();
+    await loggedOutUser.navigateToAboutPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open Math Classroom page with the Browse Our Lessons button.',
     async function () {
-      await testUser.clickBrowseOurLessonsButtonInAboutPage();
-      await testUser.expectScreenshotToMatch(
+      await loggedOutUser.clickBrowseOurLessonsButtonInAboutPage();
+      await loggedOutUser.expectScreenshotToMatch(
         'clickBrowseOurLessonsButtonInAboutPage',
         __dirname
       );
@@ -52,8 +57,8 @@ describe('Logged-in User in About page', function () {
   it(
     'should open Android page with the Access Android App button.',
     async function () {
-      await testUser.clickAccessAndroidAppButtonInAboutPage();
-      await testUser.expectScreenshotToMatch(
+      await loggedOutUser.clickAccessAndroidAppButtonInAboutPage();
+      await loggedOutUser.expectScreenshotToMatch(
         'clickAccessAndroidAppButtonInAboutPage',
         __dirname
       );
@@ -64,8 +69,8 @@ describe('Logged-in User in About page', function () {
   it(
     'should open Math Classroom page with the Visit Classroom button.',
     async function () {
-      await testUser.clickVisitClassroomButtonInAboutPage();
-      await testUser.expectScreenshotToMatch(
+      await loggedOutUser.clickVisitClassroomButtonInAboutPage();
+      await loggedOutUser.expectScreenshotToMatch(
         'clickVisitClassroomButtonInAboutPage',
         __dirname
       );
@@ -76,8 +81,8 @@ describe('Logged-in User in About page', function () {
   it(
     'should open Community Library page with the Browse Library button.',
     async function () {
-      await testUser.clickBrowseLibraryButtonInAboutPage();
-      await testUser.expectScreenshotToMatch(
+      await loggedOutUser.clickBrowseLibraryButtonInAboutPage();
+      await loggedOutUser.expectScreenshotToMatch(
         'clickBrowseLibraryButtonInAboutPage',
         __dirname
       );
@@ -86,11 +91,12 @@ describe('Logged-in User in About page', function () {
   );
 
   it(
-    'should open Creator Dashboard page and Exploration Editor ' +
-      'with the Create Lessons button',
+    'should open the Sign-in page when the Create Lessons button is clicked by a logged-out user',
     async function () {
-      await testUser.clickCreateLessonsButtonInAboutPage();
-      await testUser.expectScreenshotToMatch(
+      // The Contributor Dashboard is not accessible to logged-out users.
+      // Therefore, clicking the Create Lessons button will redirect the user to the Sign-in page.
+      await loggedOutUser.clickCreateLessonsButtonInAboutPage();
+      await loggedOutUser.expectScreenshotToMatch(
         'clickCreateLessonsButtonInAboutPage',
         __dirname
       );
@@ -101,8 +107,8 @@ describe('Logged-in User in About page', function () {
   it(
     'should open Math Classroom page with the Explore Lessons button.',
     async function () {
-      await testUser.clickExploreLessonsButtonInAboutPage();
-      await testUser.expectScreenshotToMatch(
+      await loggedOutUser.clickExploreLessonsButtonInAboutPage();
+      await loggedOutUser.expectScreenshotToMatch(
         'clickExploreLessonsButtonInAboutPage',
         __dirname
       );

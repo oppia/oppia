@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users
+ * @fileoverview Acceptance Test for checking if logged-out users
  * can open all the links on the "Get Started" page.
  */
 
@@ -23,22 +23,19 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-in Users', function () {
-  let testUser: LoggedOutUser;
+describe('Logged-out Users', function () {
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com'
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to navigate to the Get Started page using the footer',
     async function () {
-      await testUser.navigateToAboutFoundationPage();
-      await testUser.navigateToGetStartedPageViaFooter();
-      await testUser.expectScreenshotToMatch(
+      await loggedOutUser.navigateToAboutFoundationPage();
+      await loggedOutUser.navigateToGetStartedPageViaFooter();
+      await loggedOutUser.expectScreenshotToMatch(
         'navigateToGetStartedPageViaFooter',
         __dirname
       );
@@ -48,13 +45,13 @@ describe('Logged-in Users', function () {
 
   describe('on the Get Started page', function () {
     beforeEach(async function () {
-      await testUser.navigateToGetStartedPage();
+      await loggedOutUser.navigateToGetStartedPage();
     }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
     it(
       'should be able to use the "create one here" link in a new tab',
       async function () {
-        await testUser.clickCreateOneHereLinkInGetStartedPage();
+        await loggedOutUser.clickCreateOneHereLinkInGetStartedPage();
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
@@ -62,7 +59,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use the "Welcome to Oppia" link in a new tab',
       async function () {
-        await testUser.clickWelcomeToOppiaLinkInGetStartedPage();
+        await loggedOutUser.clickWelcomeToOppiaLinkInGetStartedPage();
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
@@ -70,7 +67,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use the "Get Electrified!" link in a new tab',
       async function () {
-        await testUser.clickGetElectrifiedLinkInGetStartedPage();
+        await loggedOutUser.clickGetElectrifiedLinkInGetStartedPage();
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
@@ -78,7 +75,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use the "Programming with Carla" link in a new tab',
       async function () {
-        await testUser.clickProgrammingWithCarlaLinkInGetStartedPage();
+        await loggedOutUser.clickProgrammingWithCarlaLinkInGetStartedPage();
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
@@ -86,7 +83,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use "in our user documentation" link in a new tab',
       async function () {
-        await testUser.clickInOurUserDocumentationLinkInGetStartedPage();
+        await loggedOutUser.clickInOurUserDocumentationLinkInGetStartedPage();
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
@@ -94,7 +91,7 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use the "embed it in your own web page" link in a new tab',
       async function () {
-        await testUser.clickEmbedItInYourOwnWebPageLinkInGetStartedPage();
+        await loggedOutUser.clickEmbedItInYourOwnWebPageLinkInGetStartedPage();
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
@@ -102,8 +99,8 @@ describe('Logged-in Users', function () {
     it(
       'should be able to use the "discover more ways to get involved" link',
       async function () {
-        await testUser.clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage();
-        await testUser.expectScreenshotToMatch(
+        await loggedOutUser.clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage();
+        await loggedOutUser.expectScreenshotToMatch(
           'clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage',
           __dirname
         );

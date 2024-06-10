@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users can
+ * @fileoverview Acceptance Test for checking if logged-out users can
  * navigate using all the links under the "About Oppia" footer section.
  */
 
@@ -23,26 +23,23 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-in User', function () {
-  let testUser: LoggedOutUser;
+describe('Logged-out Users', function () {
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com'
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
     // Navigate to a page that has the oppia footer.
-    await testUser.goto(testConstants.URLs.Volunteer);
+    await loggedOutUser.goto(testConstants.URLs.Volunteer);
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open About page via the footer',
     async function () {
-      await testUser.navigateToAboutPageViaFooter();
-      await testUser.expectScreenshotToMatch(
+      await loggedOutUser.navigateToAboutPageViaFooter();
+      await loggedOutUser.expectScreenshotToMatch(
         'navigateToAboutPageViaFooter',
         __dirname
       );
@@ -53,8 +50,8 @@ describe('Logged-in User', function () {
   it(
     'should open "About Foundation" page via the footer',
     async function () {
-      await testUser.navigateToAboutFoundationPageViaFooter();
-      await testUser.expectScreenshotToMatch(
+      await loggedOutUser.navigateToAboutFoundationPageViaFooter();
+      await loggedOutUser.expectScreenshotToMatch(
         'navigateToAboutFoundationPageViaFooter',
         __dirname
       );
@@ -65,8 +62,8 @@ describe('Logged-in User', function () {
   it(
     'should open "Blog" page via the footer',
     async function () {
-      await testUser.navigateToBlogPageViaFooter();
-      await testUser.expectScreenshotToMatch(
+      await loggedOutUser.navigateToBlogPageViaFooter();
+      await loggedOutUser.expectScreenshotToMatch(
         'navigateToBlogPageViaFooter',
         __dirname
       );
@@ -77,7 +74,7 @@ describe('Logged-in User', function () {
   it(
     'should open "Forum" page via the footer',
     async function () {
-      await testUser.navigateToForumPageViaFooter();
+      await loggedOutUser.navigateToForumPageViaFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

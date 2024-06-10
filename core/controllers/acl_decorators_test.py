@@ -5534,7 +5534,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             unused_topic_url_fragment: str,
             unused_subtopic_url_fragment: str
         ) -> None:
-            self.render_template('subtopic-viewer-page.mainpage.html')
+            self.render_template('subtopic-viewer-page-root.component.html')
 
     def setUp(self) -> None:
         super().setUp()
