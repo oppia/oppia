@@ -62,15 +62,8 @@ from core.domain import topic_services
 from core.domain import translation_domain
 from core.domain import user_services
 from core.domain import wipeout_service
-from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, TypedDict, Union, cast
-
-MYPY = False
-if MYPY:
-    from mypy_imports import user_models
-
-(user_models, ) = models.Registry.import_models([models.Names.USER])
+from typing import Dict, List, Optional, TypedDict, Union, cast
 
 # Platform paramters that we plan to show on the the release-coordinator page.
 PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set([
@@ -183,6 +176,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
     exp_id: Optional[str]
     blog_post_title: Optional[str]
+    updated_user_groups: Optional[Dict[str, List[str]]]
     default_value: Dict[str, parameter_domain.PlatformDataTypes]
 
 
@@ -338,12 +332,7 @@ class AdminHandler(
             get_all_platform_parameters_dicts()
         )
 
-        user_group_models: List[user_models.UserGroupModel] = list(
-            user_models.UserGroupModel.get_all())
-        user_group_model_dict: Dict[str, List[str]] = {}
-        for user_group_model in user_group_models:
-            user_group_model_dict[user_group_model.id] = list(
-                user_group_model.users)
+        user_group_models_dict = user_services.get_user_group_models_dict()
 
         # Removes promo-bar related and blog related platform params as
         # they are handled in release-coordinator page and blog admin page
@@ -366,7 +355,7 @@ class AdminHandler(
             'role_to_actions': role_services.get_role_actions(),
             'topic_summaries': topic_summary_dicts,
             'platform_params_dicts': platform_params_dicts,
-            'user_group_model_dict': user_group_model_dict
+            'user_group_models_dict': user_group_models_dict
         })
 
     @acl_decorators.can_access_admin_page
@@ -495,28 +484,10 @@ class AdminHandler(
                     'version': version
                 }
             elif action == 'update_user_groups':
-                updated_user_groups: Dict[str, List[str]] = (
+                updated_user_groups = (
                     self.normalized_payload.get('updated_user_groups'))
-                for user_group_model_name, users in updated_user_groups.items():
-                    user_group_model = user_models.UserGroupModel.get(
-                        user_group_model_name, strict=False)
-                    if user_group_model is None:
-                        user_models.UserGroupModel(
-                            id=user_group_model_name, users=users).put()
-                    else:
-                        user_group_model.users = users
-                        user_group_model.update_timestamps()
-                        user_group_model.put()
-                # Delete UserGroup models.
-                all_exisiting_user_groups: List[
-                    user_models.UserGroupModel] = list(
-                        user_models.UserGroupModel.get_all()
-                    )
-                user_models_to_delete = []
-                for exising_user_group in all_exisiting_user_groups:
-                    if exising_user_group.id not in updated_user_groups.keys():
-                        user_models_to_delete.append(exising_user_group)
-                user_models.UserGroupModel.delete_multi(user_models_to_delete)
+                assert updated_user_groups is not None
+                user_services.update_user_groups(updated_user_groups)
             else:
                 # The handler schema defines the possible values of 'action'.
                 # If 'action' has a value other than those defined in the

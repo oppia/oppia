@@ -1773,6 +1773,44 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         assert user_settings is not None
         self.assertTrue(user_settings.deleted)
 
+    def test_get_all_user_groups_present_in_storage_layer(self) -> None:
+        user_models.UserGroupModel(
+            id='USER_GROUP_1', users=[
+                'user_1_id', 'user_2_id', 'user_3_id']).put()
+        user_models.UserGroupModel(
+            id='USER_GROUP_2', users=[
+                'user_1_id', 'user_2_id']).put()
+
+        user_groups_data_dict = user_services.get_user_group_models_dict()
+        self.assertEqual(user_groups_data_dict, {
+            'USER_GROUP_1': ['user_1_id', 'user_2_id', 'user_3_id'],
+            'USER_GROUP_2': ['user_1_id', 'user_2_id']
+        })
+        user_models.UserGroupModel.delete_multi(
+            [
+                user_models.UserGroupModel.get('USER_GROUP_1'),
+                user_models.UserGroupModel.get('USER_GROUP_2')
+            ]
+        )
+
+    def test_update_user_groups(self) -> None:
+        user_models.UserGroupModel(
+            id='USER_GROUP_1', users=[
+                'user_1_id', 'user_2_id', 'user_3_id']).put()
+        user_models.UserGroupModel(
+            id='USER_GROUP_2', users=[
+                'user_1_id', 'user_2_id']).put()
+
+        updated_user_groups = {
+            'USER_GROUP_1': ['user_1_id', 'user_2_id', 'user_3_id'],
+            'USER_GROUP_3': ['user_5_id', 'user_4_id'],
+            'USER_GROUP_4': ['user_6_id']
+        }
+        user_services.update_user_groups(updated_user_groups)
+
+        self.assertEqual(
+            updated_user_groups, user_services.get_user_group_models_dict())
+
     def test_mark_user_for_deletion_deletes_user_auth_details_entry(
         self
     ) -> None:

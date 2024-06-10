@@ -96,6 +96,11 @@ describe('Admin backend api service', () => {
         default_value: '',
       },
     ],
+    user_group_models_dict: {
+      UserGroup1: ['User1', 'User2', 'User3'],
+      UserGroup2: ['User4', 'User5'],
+      UserGroup3: ['User6', 'User7', 'User8'],
+    },
   };
   let adminDataObject: AdminPageData;
 
@@ -123,6 +128,7 @@ describe('Admin backend api service', () => {
       platformParameters: adminBackendResponse.platform_params_dicts.map(dict =>
         PlatformParameter.createFromBackendDict(dict)
       ),
+      userGroups: adminBackendResponse.user_group_models_dict,
     };
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
@@ -921,6 +927,62 @@ describe('Admin backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith('Failed to upload data.');
     })
   );
+
+  it('should upload user groups when calling updateUserGroupsAsync', fakeAsync(() => {
+    let action = 'update_user_groups';
+    let data = {
+      UserGroup1: ['User1', 'User2', 'User3'],
+      UserGroup2: ['User4', 'User5'],
+      UserGroup3: ['User6', 'User7', 'User8'],
+    };
+    let payload = {
+      action: action,
+      updated_user_groups: data,
+    };
+
+    abas.updateUserGroupsAsync(data).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fail to upload user groups when calling updateUserGroupsAsync', fakeAsync(() => {
+    let action = 'update_user_groups';
+    let data = {
+      UserGroup1: ['User1', 'User2', 'User3'],
+      UserGroup2: ['User4', 'User5'],
+      UserGroup3: ['User6', 'User7', 'User8'],
+    };
+    let payload = {
+      action: action,
+      updated_user_groups: data,
+    };
+
+    abas.updateUserGroupsAsync(data).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(
+      {
+        error: 'Failed to upload data.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to upload data.');
+  }));
 
   it(
     'should send dummy mail to admin when calling' +

@@ -17,10 +17,16 @@
  */
 
 import {ENTER} from '@angular/cdk/keycodes';
-import {Component, EventEmitter, Output, ViewChild, ElementRef} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Output,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
-import {isEqual} from 'lodash';
+import isEqual from 'lodash/isEqual';
 import {Subscription} from 'rxjs';
 
 import {AppConstants} from 'app.constants';
@@ -78,8 +84,8 @@ export class AdminMiscTabComponent {
   selectable: boolean = true;
   newUser: string = '';
   separatorKeysCodes: number[] = [ENTER];
-  userGroupToUsersMapBackup: Record<string, string[]>;
-  userGroupsToUsers: Record<string, string[]>;
+  userGroupToUsersMapBackup: Record<string, string[]> = {};
+  userGroupsToUsers: Record<string, string[]> = {};
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -127,12 +133,13 @@ export class AdminMiscTabComponent {
     if (!value || value === '') {
       return;
     }
-    console.log(this.userGroupsToUsers[this.selectedUserGroup]);
+
     if (this.userGroupsToUsers[this.selectedUserGroup].includes(value)) {
       this.alertsService.addWarning(
         `The user ${value} already exists in the user ` +
-        `group ${this.selectedUserGroup}.`);
-      return
+          `group ${this.selectedUserGroup}.`
+      );
+      return;
     }
     this.userGroupsToUsers[this.selectedUserGroup].push(value);
     this.userInput.nativeElement.value = '';
@@ -143,10 +150,10 @@ export class AdminMiscTabComponent {
   }
 
   removeUser(username: string): void {
-    let usersOfSelectedUserGroup: string[] = this.userGroupsToUsers[
-      this.selectedUserGroup];
-    this.userGroupsToUsers[this.selectedUserGroup] = (
-      usersOfSelectedUserGroup.filter(obj => obj !== username));
+    let usersOfSelectedUserGroup: string[] =
+      this.userGroupsToUsers[this.selectedUserGroup];
+    this.userGroupsToUsers[this.selectedUserGroup] =
+      usersOfSelectedUserGroup.filter(obj => obj !== username);
   }
 
   removeUserGroup(): void {
@@ -157,8 +164,9 @@ export class AdminMiscTabComponent {
   addUserGroup(): void {
     if (this.newUserGroupName.trim() in this.userGroupsToUsers) {
       this.alertsService.addWarning(
-        `The user group ${this.newUserGroupName} already exists.`);
-      return
+        `The user group ${this.newUserGroupName} already exists.`
+      );
+      return;
     }
 
     if (this.newUserGroupName.trim() !== '') {
@@ -176,7 +184,9 @@ export class AdminMiscTabComponent {
   }
 
   updateUserGroups(): void {
-    if (!this.areUserGroupsUpdated()) return;
+    if (!this.areUserGroupsUpdated()) {
+      return;
+    }
 
     if (
       this.adminTaskManagerService.isTaskRunning() ||
@@ -188,17 +198,19 @@ export class AdminMiscTabComponent {
     this.setStatusMessage.emit('Updating UserGroups...');
 
     this.adminTaskManagerService.startTask();
-    this.adminBackendApiService.updateUserGroups(this.userGroupsToUsers).then(
-      () => {
-        this.setStatusMessage.emit('UserGroups successfully updated.');
-        this.userGroupToUsersMapBackup = cloneDeep(this.userGroupsToUsers);
-        this.adminTaskManagerService.finishTask();
-      },
-      errorResponse => {
-        this.setStatusMessage.emit('Server error: ' + errorResponse);
-        this.adminTaskManagerService.finishTask();
-      }
-    );
+    this.adminBackendApiService
+      .updateUserGroupsAsync(this.userGroupsToUsers)
+      .then(
+        () => {
+          this.setStatusMessage.emit('UserGroups successfully updated.');
+          this.userGroupToUsersMapBackup = cloneDeep(this.userGroupsToUsers);
+          this.adminTaskManagerService.finishTask();
+        },
+        errorResponse => {
+          this.setStatusMessage.emit('Server error: ' + errorResponse);
+          this.adminTaskManagerService.finishTask();
+        }
+      );
   }
 
   clearSearchIndex(): void {

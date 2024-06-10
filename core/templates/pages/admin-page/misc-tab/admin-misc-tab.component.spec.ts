@@ -82,10 +82,10 @@ describe('Admin misc tab component ', () => {
 
   const adminPageData: AdminPageData = {
     userGroups: {
-      'UserGroup1': ['User1', 'User2', 'User3'],
-      'UserGroup2': ['User4', 'User5'],
-      'UserGroup3': ['User6', 'User7', 'User8'],
-      'UserGroup9': ['User12', 'User13'],
+      UserGroup1: ['User1', 'User2', 'User3'],
+      UserGroup2: ['User4', 'User5'],
+      UserGroup3: ['User6', 'User7', 'User8'],
+      UserGroup9: ['User12', 'User13'],
     },
   };
 
@@ -101,7 +101,7 @@ describe('Admin misc tab component ', () => {
           provide: WindowRef,
           useValue: mockWindowRef,
         },
-        AlertsService
+        AlertsService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -881,13 +881,11 @@ describe('Admin misc tab component ', () => {
   });
 
   describe('User groups', () => {
-
     it('should load user groups on init', fakeAsync(() => {
       component.ngOnInit();
       tick();
 
-      expect(Object.keys(
-        component.userGroupsToUsers).length > 0).toBeTrue();
+      expect(Object.keys(component.userGroupsToUsers).length > 0).toBeTrue();
     }));
 
     describe('when clicking on save button to update user groups ', () => {
@@ -898,7 +896,7 @@ describe('Admin misc tab component ', () => {
         confirmSpy.and.returnValue(true);
         let updateUserGroupSpy = spyOn(
           adminBackendApiService,
-          'updateUserGroups'
+          'updateUserGroupsAsync'
         ).and.resolveTo();
 
         component.newUserGroupName = 'UserGroup5';
@@ -922,7 +920,7 @@ describe('Admin misc tab component ', () => {
         spyOn(alertsService, 'addWarning');
         let updateUserGroupSpy = spyOn(
           adminBackendApiService,
-          'updateUserGroups'
+          'updateUserGroupsAsync'
         ).and.rejectWith('Internal Server Error.');
         component.userInput = {
           nativeElement: {
@@ -944,44 +942,40 @@ describe('Admin misc tab component ', () => {
         component.removeUserGroup();
       }));
 
-      it('should not update if a task is still running in the queue',
-        fakeAsync(() => {
-          component.ngOnInit();
-          tick();
-          component.userGroupsToUsers = adminPageData.userGroups;
-          confirmSpy.and.returnValue(true);
-          let updateUserGroupSpy = spyOn(
-            adminBackendApiService,
-            'updateUserGroups'
-          );
+      it('should not update if a task is still running in the queue', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        component.userGroupsToUsers = adminPageData.userGroups;
+        confirmSpy.and.returnValue(true);
+        let updateUserGroupSpy = spyOn(
+          adminBackendApiService,
+          'updateUserGroupsAsync'
+        );
 
-          // Setting task is still running to be true.
-          spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
-  
-          component.updateUserGroups();
-          tick();
-  
-          expect(updateUserGroupSpy).not.toHaveBeenCalled();
-        })
-      );
+        // Setting task is still running to be true.
+        spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
 
-      it('should not update if cancel button is clicked in the alert',
-        fakeAsync(() => {
-          component.ngOnInit();
-          tick();
-          confirmSpy.and.returnValue(false);
-          let updateUserGroupSpy = spyOn(
-            adminBackendApiService,
-            'updateUserGroups'
-          );
-          // Setting cancel button clicked to be true.
+        component.updateUserGroups();
+        tick();
 
-          component.updateUserGroups();
-          tick();
+        expect(updateUserGroupSpy).not.toHaveBeenCalled();
+      }));
 
-          expect(updateUserGroupSpy).not.toHaveBeenCalled();
-        })
-      );
+      it('should not update if cancel button is clicked in the alert', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        confirmSpy.and.returnValue(false);
+        let updateUserGroupSpy = spyOn(
+          adminBackendApiService,
+          'updateUserGroupsAsync'
+        );
+        // Setting cancel button clicked to be true.
+
+        component.updateUserGroups();
+        tick();
+
+        expect(updateUserGroupSpy).not.toHaveBeenCalled();
+      }));
     });
 
     describe('when getting users for the selected user groups', () => {
@@ -995,27 +989,25 @@ describe('Admin misc tab component ', () => {
         expect(users).toEqual(['User12', 'User13']);
       }));
 
-      it('should return empty array when user group is not present',
-        fakeAsync(() => {
-          component.ngOnInit();
-          tick();
-          component.selectedUserGroup = '';
-          const users = component.getUsersForSelectedUserGroup();
+      it('should return empty array when user group is not present', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        component.selectedUserGroup = '';
+        const users = component.getUsersForSelectedUserGroup();
 
-          expect(users).toEqual([]);
-        })
-      );
+        expect(users).toEqual([]);
+      }));
     });
 
     it('should get the array of all the user groups', fakeAsync(() => {
       component.ngOnInit();
       tick();
-      console.log(component.userGroupsToUsers);
-      const userGroups = component.getUserGroups();
-      console.log(userGroups);
 
-      expect(userGroups.length).toEqual(Object.keys(
-        component.userGroupsToUsers).length);
+      const userGroups = component.getUserGroups();
+
+      expect(userGroups.length).toEqual(
+        Object.keys(component.userGroupsToUsers).length
+      );
     }));
 
     it('should check if any updates are made to user groups', fakeAsync(() => {
@@ -1035,17 +1027,18 @@ describe('Admin misc tab component ', () => {
         tick();
 
         const userGroupsValue = {
-          'UserGroup1': ['User1', 'User2', 'User3'],
-          'UserGroup2': ['User4', 'User5'],
-          'UserGroup3': ['User6', 'User7', 'User8'],
-        }
+          UserGroup1: ['User1', 'User2', 'User3'],
+          UserGroup2: ['User4', 'User5'],
+          UserGroup3: ['User6', 'User7', 'User8'],
+        };
         component.userGroupsToUsers = userGroupsValue;
         component.userGroupToUsersMapBackup = userGroupsValue;
 
         component.resetUserGroups();
 
         expect(component.userGroupsToUsers).toEqual(
-          component.userGroupToUsersMapBackup);
+          component.userGroupToUsersMapBackup
+        );
       }));
 
       it('should reset the changes when requested', fakeAsync(() => {
@@ -1058,7 +1051,8 @@ describe('Admin misc tab component ', () => {
         component.resetUserGroups();
 
         expect(component.userGroupsToUsers).toEqual(
-          component.userGroupToUsersMapBackup);
+          component.userGroupToUsersMapBackup
+        );
       }));
 
       it('should not reset the changes when canceled', fakeAsync(() => {
@@ -1071,8 +1065,7 @@ describe('Admin misc tab component ', () => {
         component.resetUserGroups();
 
         expect(
-          component.userGroupsToUsers !==
-          component.userGroupToUsersMapBackup
+          component.userGroupsToUsers !== component.userGroupToUsersMapBackup
         ).toBeTrue();
       }));
     });
@@ -1085,8 +1078,7 @@ describe('Admin misc tab component ', () => {
         component.selectedUserGroup = 'UserGroup1';
         component.addUser({value: ''});
 
-        expect(
-          component.userGroupsToUsers['UserGroup1'].includes('')).toBeFalse();
+        expect(component.userGroupsToUsers.UserGroup1.includes('')).toBeFalse();
       }));
 
       it('should save the new user', fakeAsync(() => {
@@ -1103,7 +1095,8 @@ describe('Admin misc tab component ', () => {
         component.addUser({value: 'User11'});
 
         expect(
-          component.userGroupsToUsers['UserGroup1'].includes('User11')).toBeTrue();
+          component.userGroupsToUsers.UserGroup1.includes('User11')
+        ).toBeTrue();
         component.removeUser('User9');
       }));
 
@@ -1140,8 +1133,9 @@ describe('Admin misc tab component ', () => {
       component.selectedUserGroup = 'UserGroup2';
       component.removeUser('User5');
 
-      expect(component.userGroupsToUsers['UserGroup2'].includes(
-        'User5')).toBeFalse();
+      expect(
+        component.userGroupsToUsers.UserGroup2.includes('User5')
+      ).toBeFalse();
     }));
 
     describe('when adding a new user group', () => {
@@ -1156,17 +1150,15 @@ describe('Admin misc tab component ', () => {
         expect(alertServiceSpyon).toHaveBeenCalled();
       }));
 
-      it('should not update when the given user group is empty string',
-        fakeAsync(() => {
-          component.ngOnInit();
-          tick();
+      it('should not update when the given user group is empty string', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
 
-          component.newUserGroupName = '';
-          component.addUserGroup();
+        component.newUserGroupName = '';
+        component.addUserGroup();
 
-          expect('' in component.userGroupsToUsers).toBeFalse();
-        })
-      );
+        expect('' in component.userGroupsToUsers).toBeFalse();
+      }));
 
       it('should update the user groups', fakeAsync(() => {
         component.ngOnInit();

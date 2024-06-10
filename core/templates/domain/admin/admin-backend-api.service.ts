@@ -82,7 +82,7 @@ export interface AdminPageDataBackendDict {
   human_readable_roles: HumanReadableRolesBackendResponse;
   topic_summaries: CreatorTopicSummaryBackendDict[];
   platform_params_dicts: PlatformParameterBackendDict[];
-  user_group_model_dict: Record<string, string[]>;
+  user_group_models_dict: Record<string, string[]>;
 }
 
 export interface AdminPageData {
@@ -132,7 +132,7 @@ export class AdminBackendApiService {
               platformParameters: response.platform_params_dicts.map(dict =>
                 PlatformParameter.createFromBackendDict(dict)
               ),
-              userGroups: response.user_group_model_dict
+              userGroups: response.user_group_models_dict,
             });
           },
           errorResponse => {
@@ -406,7 +406,7 @@ export class AdminBackendApiService {
     );
   }
 
-  async updateUserGroups(data: Record<string, string[]>): Promise<void> {
+  async updateUserGroupsAsync(data: Record<string, string[]>): Promise<void> {
     let action = 'update_user_groups';
     let payload = {
       updated_user_groups: data,

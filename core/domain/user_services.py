@@ -493,6 +493,53 @@ def get_user_settings_by_auth_id(
         return None
 
 
+def get_user_group_models_dict() -> Dict[str, List[str]]:
+    """Return the dictionary of user groups data having key as user-group
+    name and value as list of users associated to the user-group.
+
+    Returns:
+        user_group_models_dict: Dict[str, List[str]]. All user groups dictionary
+        with key as user-group name and value as list of users associated to
+        user-group.
+    """
+    user_group_models: List[user_models.UserGroupModel] = list(
+        user_models.UserGroupModel.get_all())
+    user_group_models_dict: Dict[str, List[str]] = {}
+    for user_group_model in user_group_models:
+        user_group_models_dict[user_group_model.id] = list(
+            user_group_model.users)
+    return user_group_models_dict
+
+
+def update_user_groups(updated_user_groups: Dict[str, List[str]]) -> None:
+    """Updates the user groups.
+
+    Args:
+        updated_user_groups: Dict[str, List[str]]. The user-group values that
+            needs to be updated.
+    """
+    for user_group_model_name, users in updated_user_groups.items():
+        user_group_model = user_models.UserGroupModel.get(
+            user_group_model_name, strict=False)
+        if user_group_model is None:
+            user_models.UserGroupModel(
+                id=user_group_model_name, users=users).put()
+        else:
+            user_group_model.users = users
+            user_group_model.update_timestamps()
+            user_group_model.put()
+    # Delete UserGroup models.
+    all_exisiting_user_groups: List[
+        user_models.UserGroupModel] = list(
+            user_models.UserGroupModel.get_all()
+        )
+    user_models_to_delete = []
+    for exising_user_group in all_exisiting_user_groups:
+        if exising_user_group.id not in updated_user_groups.keys():
+            user_models_to_delete.append(exising_user_group)
+    user_models.UserGroupModel.delete_multi(user_models_to_delete)
+
+
 def get_user_roles_from_id(user_id: str) -> List[str]:
     """Returns roles of the user with given user_id.
 
