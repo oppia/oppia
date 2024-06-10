@@ -335,12 +335,12 @@ class Classroom:
                 % self.classroom_id)
         if not isinstance(self.thumbnail_data, Image):
             raise utils.ValidationError(
-                'Expected thumbnail_data of the classroom to be a string, ' +
+                'Expected thumbnail_data of the classroom to be a string, '
                 'received: %s.' % self.thumbnail_data
             )
         if not isinstance(self.banner_data, Image):
             raise utils.ValidationError(
-                'Expected banner_data of the classroom to be a string, ' +
+                'Expected banner_data of the classroom to be a string, '
                 'received: %s.' % self.banner_data
             )
         if self.thumbnail_data.filename == '':

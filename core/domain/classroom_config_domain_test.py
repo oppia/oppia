@@ -244,7 +244,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
     def test_invalid_topic_list_intro_should_raise_exception(self) -> None:
         self.classroom.topic_list_intro = 1 # type: ignore[assignment]
         error_msg = (
-            'Expected topic_list_intro of the classroom to be a string, ' +
+            'Expected topic_list_intro of the classroom to be a string, '
             'received: 1.'
         )
         with self.assertRaisesRegex(
@@ -276,7 +276,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
     def test_invalid_course_details_should_raise_exception(self) -> None:
         self.classroom.course_details = 1 # type: ignore[assignment]
         error_msg = (
-            'Expected course_details of the classroom to be a string, ' +
+            'Expected course_details of the classroom to be a string, '
             'received: 1.'
         )
         with self.assertRaisesRegex(
@@ -406,7 +406,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
     def test_invalid_thumbnail_data_should_raise_exception(self) -> None:
         self.classroom.thumbnail_data = 1 # type: ignore[assignment]
         error_msg = (
-            'Expected thumbnail_data of the classroom to be a string, ' +
+            'Expected thumbnail_data of the classroom to be a string, '
             'received: 1.'
         )
         with self.assertRaisesRegex(
@@ -419,7 +419,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
     def test_invalid_banner_data_should_raise_exception(self) -> None:
         self.classroom.banner_data = 1 # type: ignore[assignment]
         error_msg = (
-            'Expected banner_data of the classroom to be a string, ' +
+            'Expected banner_data of the classroom to be a string, '
             'received: 1.')
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
