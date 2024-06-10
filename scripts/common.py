@@ -230,8 +230,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/check-all-user-flow-of-parent-teacher',
     'logged-out-user/check-all-user-flow-of-partner',
     'logged-out-user/check-all-user-flow-of-volunteer',
-    'logged-in-user/subscribe-to-creator-and-view-all-explorations-' +
-        'by-that-creator',
+    'logged-in-user/subscribe-to-creator-and-view-all-explorations-'
+       'by-that-creator',
     'practice-question-admin/add-and-remove-contribution-rights',
     'translation-admin/add-and-remove-translation-rights',
     'voiceover-admin/add-voiceover-artist-to-an-exploration'
