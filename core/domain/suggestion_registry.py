@@ -2097,8 +2097,8 @@ class TranslationSubmitterTotalContributionStats:
                 self.rejected_translation_word_count),
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
-            'last_contributed_in_days': int(
-                (datetime.date.today() - self.last_contribution_date).days)
+            'last_contributed_in_days': utils.get_number_of_days_since_date(
+                self.last_contribution_date)
         }
 
 
@@ -2178,8 +2178,8 @@ class TranslationReviewerTotalContributionStats:
             'rejected_translations_count': self.rejected_translations_count,
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
-            'last_contributed_in_days': int(
-                (datetime.date.today() - self.last_contribution_date).days)
+            'last_contributed_in_days': utils.get_number_of_days_since_date(
+                self.last_contribution_date)
         }
 
 
@@ -2260,8 +2260,8 @@ class QuestionSubmitterTotalContributionStats:
             'rejected_questions_count': self.rejected_questions_count,
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
-            'last_contributed_in_days': int(
-                (datetime.date.today() - self.last_contribution_date).days)
+            'last_contributed_in_days': utils.get_number_of_days_since_date(
+                self.last_contribution_date)
         }
 
 
@@ -2332,6 +2332,6 @@ class QuestionReviewerTotalContributionStats:
             'rejected_questions_count': self.rejected_questions_count,
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
-            'last_contributed_in_days': int(
-                (datetime.date.today() - self.last_contribution_date).days)
+            'last_contributed_in_days': utils.get_number_of_days_since_date(
+                self.last_contribution_date)
         }
