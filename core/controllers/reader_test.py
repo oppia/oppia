@@ -2312,7 +2312,7 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
             response['error'],
             'At \'http://localhost/explorehandler/answer_submitted_event/6\' '
             'these errors are happening:\n'
-            'Schema validation for \'answer\' failed: ' +
+            'Schema validation for \'answer\' failed: '
             'Type of 1.1 is not present in options'
         )
 
