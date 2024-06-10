@@ -427,15 +427,6 @@ export class LoggedOutUser extends BaseUser {
       aboutUrl,
       'About'
     );
-    
-    if (newTab.url() !== aboutUrl) {
-      throw new Error(
-        `The Learn More About Oppia button does not open the About page!
-           It opens ${newTab.url()} instead.`
-      );
-    } else {
-      showMessage('The Learn More About Oppia button opens the About page.');
-    }
   }
 
   /**
@@ -449,15 +440,6 @@ export class LoggedOutUser extends BaseUser {
       volunteerUrl,
       'Volunteer'
     );
-
-    if (newTab.url() !== volunteerUrl) {
-      throw new Error(
-        `The Become A Volunteer button does not open the Volunteer page!
-          It opens ${newTab.url()} instead.`
-      );
-    } else {
-      showMessage('The Become A Volunteer button opens the Volunteer page.');
-    }
   }
 
   /**
