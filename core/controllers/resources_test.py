@@ -958,6 +958,6 @@ class ValueGeneratorHandlerTests(test_utils.GenericTestBase):
     def test_html_response(self) -> None:
         copier_id = 'Copier'
         response = self.get_html_response(
-            '/value_generator_handler/' + copier_id
+            '/value_generator_handler/%s' % copier_id
         )
         self.assertIn(b'<object-editor [objType]="objType"', response.body)

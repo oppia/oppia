@@ -176,8 +176,10 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 parsed_args.download_combined_frontend_spec_file):
                 download_task = subprocess.Popen(
                     ['wget',
-                    'http://localhost:9876/base/core/templates/' +
-                    'combined-tests.spec.js',
+                    (
+                        'http://localhost:9876/base/core/templates/'
+                        'combined-tests.spec.js'
+                    ),
                     '-P',
                     os.path.join('../karma_coverage_reports')])
                 # Wait for the wget command to download the

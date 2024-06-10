@@ -205,8 +205,8 @@ BAD_LINE_PATTERNS_HTML_REGEXP: List[BadPatternRegexpDict] = [
     },
     {
         'regexp': re.compile(r'\$parent'),
-        'message': 'Please do not access parent properties ' +
-                   'using $parent. Use the scope object ' +
+        'message': 'Please do not access parent properties '
+                   'using $parent. Use the scope object '
                    'for this purpose.',
         'excluded_files': (),
         'excluded_dirs': ()

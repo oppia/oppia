@@ -647,7 +647,7 @@ class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 '[TAKEOUT] User ID found in the JSON generated for user %s'
                 % self.user_id)
             user_data_json_string = (
-                'There was an error while exporting ' +
+                'There was an error while exporting '
                 'data. Please contact %s to export your data.'
                 % feconf.ADMIN_EMAIL_ADDRESS)
             user_images = []

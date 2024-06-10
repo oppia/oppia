@@ -102,7 +102,7 @@ def apply_changes_based_on_config(
         local_lines[local_line_numbers[index]] = config_line
 
     with utils.open_file(local_filepath, 'w') as writable_local_file:
-        writable_local_file.write('\n'.join(local_lines) + '\n')
+        writable_local_file.write('%s\n' % '\n'.join(local_lines))
 
 
 def update_app_yaml(

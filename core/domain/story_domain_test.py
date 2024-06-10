@@ -220,7 +220,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     """Test the story domain object."""
 
     STORY_ID: Final = 'story_id'
-    NODE_ID_1: Final = story_domain.NODE_ID_PREFIX + '1'
+    NODE_ID_1: Final = '%s1' % story_domain.NODE_ID_PREFIX
     NODE_ID_2: Final = 'node_2'
     SKILL_ID_1: Final = 'skill_id_1'
     SKILL_ID_2: Final = 'skill_id_2'

@@ -371,9 +371,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     CHANGE_CMD: Dict[str, str] = {}
     SCORE_CATEGORY_1: Final = 'category_1'
     SCORE_CATEGORY_2: Final = 'category_2'
-    SCORE_CATEGORY: str = (
-        suggestion_models.SCORE_TYPE_TRANSLATION +
-        suggestion_models.SCORE_CATEGORY_DELIMITER + 'English'
+    SCORE_CATEGORY: str = '%s%sEnglish' % (
+        suggestion_models.SCORE_TYPE_TRANSLATION,
+        suggestion_models.SCORE_CATEGORY_DELIMITER
     )
     GENERIC_MODEL_ID: Final = 'model-id-1'
     COMMIT_TYPE: Final = 'create'
@@ -513,8 +513,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         for creator_id in self.CREATOR_IDS:
             user_models.UserSettingsModel(
                 id=creator_id,
-                username='username' + creator_id,
-                email=creator_id + '@example.com'
+                username='username%s' % creator_id,
+                email='%s@example.com' % creator_id
             ).put()
 
         user_models.UserSubscriptionsModel(

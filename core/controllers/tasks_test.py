@@ -127,10 +127,11 @@ class TasksTests(test_utils.EmailTestBase):
             # What is expected in the email body.
             expected_message = (
                 'Hi editor,\n\nYou\'ve received a new message on your Oppia'
-                ' explorations:\n- Title:\n- ' + 'B' * 200 + '...' + '\nYou can'
+                ' explorations:\n- Title:\n- %s...\nYou can'
                 ' view and reply to your messages from your dashboard.\n\nThank'
                 's, and happy teaching!\n\nBest wishes,\nThe Oppia Team\n\nYou'
-                ' can change your email preferences via the Preferences page.')
+                ' can change your email preferences via the Preferences page.'
+                ) % ('B' * 200)
 
             # Check that greater than 200 word message is sent
             # and has correct message.

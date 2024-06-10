@@ -67,8 +67,8 @@ class EmailTests(test_utils.GenericTestBase):
                 'subject', 4, 4))
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (
-            'You are not currently sending out real emails since this is a ' +
-            'dev environment. Emails are sent out in the production' +
+            'You are not currently sending out real emails since this is a '
+            'dev environment. Emails are sent out in the production'
             ' environment.')
 
         with self.swap(logging, 'info', _mock_logging_function):
@@ -125,8 +125,8 @@ class EmailTests(test_utils.GenericTestBase):
                 len(recipient_variables)))
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (
-            'You are not currently sending out real emails since this is a ' +
-            'dev environment. Emails are sent out in the production' +
+            'You are not currently sending out real emails since this is a '
+            'dev environment. Emails are sent out in the production'
             ' environment.')
 
         with self.swap(logging, 'info', _mock_logging_function):

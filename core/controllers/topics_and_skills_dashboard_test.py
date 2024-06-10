@@ -195,7 +195,7 @@ class CategorizedAndUntriagedSkillsDataHandlerTests(
         # Check that logged out users can access the categorized and
         # untriaged skills data.
         json_response = self.get_json(
-            '/topics_and_skills_dashboard/' +
+            '/topics_and_skills_dashboard/'
             'categorized_and_untriaged_skills_data',
             expected_status_int=200)
         self.assertEqual(
@@ -210,7 +210,7 @@ class CategorizedAndUntriagedSkillsDataHandlerTests(
         # untriaged skills data.
         self.login(self.NEW_USER_EMAIL)
         json_response = self.get_json(
-            '/topics_and_skills_dashboard/' +
+            '/topics_and_skills_dashboard/'
             'categorized_and_untriaged_skills_data',
             expected_status_int=200)
         self.assertEqual(

@@ -692,10 +692,10 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertFalse(utils.is_user_id_valid('a' * 36))
 
     def test_is_pseudonymous_id(self) -> None:
-        self.assertTrue(utils.is_pseudonymous_id('pid_' + 'a' * 32))
-        self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 32))
-        self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 31 + 'A'))
-        self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 31))
+        self.assertTrue(utils.is_pseudonymous_id('pid_%s' % ('a' * 32)))
+        self.assertFalse(utils.is_pseudonymous_id('uid_%s' % ('a' * 32)))
+        self.assertFalse(utils.is_pseudonymous_id('uid_%s%s' % ('a' * 31, 'A')))
+        self.assertFalse(utils.is_pseudonymous_id('uid_%s' % ('a' * 31)))
         self.assertFalse(utils.is_pseudonymous_id('a' * 36))
 
     def test_snake_case_to_camel_case(self) -> None:

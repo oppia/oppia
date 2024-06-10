@@ -534,13 +534,15 @@ def validate_prerequisite_skills_in_story_contents(
                         topic_relevant_skill_ids
                     ).issubset(simulated_skill_ids)):
                 raise utils.ValidationError(
-                    'The skills with ids ' +
-                    ' '.join(
-                        set(topic_relevant_skill_ids) -
-                        set(simulated_skill_ids)) +
-                    ' were specified as prerequisites for Chapter %s,'
+                    'The skills with ids %s' 
+                    ' were specified as prerequisites for Chapter %s,' 
                     ' but were not taught in any chapter before it.'
-                    % destination_node.title)
+                    % (' '.join(
+                        set(topic_relevant_skill_ids) -
+                        set(simulated_skill_ids)),
+                        destination_node.title
+                    )
+                )
             nodes_queue.append(node_id)
 
 

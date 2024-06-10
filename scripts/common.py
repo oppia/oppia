@@ -223,8 +223,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/click-all-buttons-on-navbar',
     'logged-out-user/click-all-links-in-about-oppia-footer',
     'logged-out-user/click-all-links-on-get-started-page',
-    'logged-in-user/subscribe-to-creator-and-view-all-explorations-' +
-        'by-that-creator',
+    'logged-in-user/subscribe-to-creator-and-view-all-explorations-'
+       'by-that-creator',
     'practice-question-admin/add-and-remove-contribution-rights',
     'translation-admin/add-and-remove-translation-rights',
     'voiceover-admin/add-voiceover-artist-to-an-exploration'

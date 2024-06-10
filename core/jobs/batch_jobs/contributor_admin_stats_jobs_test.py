@@ -69,7 +69,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
         datetime.date(2023, 4, 2)
     ]
 
-    score_category: str = 'translation' + '.' + 'English'
+    score_category: str = 'translation.English'
 
     topic_name = 'topic'
     target_id = 'exp1'

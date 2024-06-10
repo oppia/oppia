@@ -750,7 +750,7 @@ class TopicPublishSendMailHandler(
             topic_id: str. The ID of the topic.
         """
         assert self.normalized_payload is not None
-        topic_url = feconf.TOPIC_EDITOR_URL_PREFIX + '/' + topic_id
+        topic_url = '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, topic_id)
         server_can_send_emails = (
             platform_parameter_services.get_platform_parameter_value(
                 platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value

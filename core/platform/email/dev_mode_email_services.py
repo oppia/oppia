@@ -114,8 +114,8 @@ def send_email_to_recipients(
     logging.info(
         textwrap.dedent(msg) + textwrap.dedent(optional_msg_description))
     logging.info(
-        'You are not currently sending out real emails since this is a' +
-        ' dev environment. Emails are sent out in the production' +
+        'You are not currently sending out real emails since this is a'
+        ' dev environment. Emails are sent out in the production'
         ' environment.')
     # Returns True signifying that the "send_email_to_recipients" action was
     # successful.

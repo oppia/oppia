@@ -2408,7 +2408,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             len(self.learner_answer_details.learner_answer_info_list), 1)
         for i in range(36):
             learner_answer_info = stats_domain.LearnerAnswerInfo(
-                id_base + str(i), answer, answer_details, created_on)
+                '%s%s' % (id_base, i), answer, answer_details, created_on)
             self.learner_answer_details.add_learner_answer_info(
                 learner_answer_info)
         self.assertEqual(

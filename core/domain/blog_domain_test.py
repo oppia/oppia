@@ -687,7 +687,7 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
             'ABC12&heloo'
         )
         self._assert_valid_displayed_author_name(
-            'This name contains reserved username. Please use some ' +
+            'This name contains reserved username. Please use some '
             'other name', 'name admin')
 
         blog_domain.BlogAuthorDetails.require_valid_displayed_author_name(

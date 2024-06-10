@@ -80,7 +80,7 @@ class QuestionCreationHandler(
                 ('language_code' not in question_dict) or
                 (question_dict['version'] != 0)):
             raise self.InvalidInputException(
-                'Question Data should contain id, state data, language code, ' +
+                'Question Data should contain id, state data, language code, '
                 'and its version should be set as 0')
 
         question_dict['question_state_data_schema_version'] = (

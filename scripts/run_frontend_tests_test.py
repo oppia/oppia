@@ -303,8 +303,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         combined_spec_download_cmd = [
             'wget',
-            'http://localhost:9876/base/core/templates/' +
-            'combined-tests.spec.js',
+            'http://localhost:9876/base/core/templates/combined-tests.spec.js',
             '-P',
             os.path.join('../karma_coverage_reports')]
         self.assertIn(combined_spec_download_cmd, self.cmd_token_list)
@@ -321,8 +320,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         combined_spec_download_cmd = [
             'wget',
-            'http://localhost:9876/base/core/templates/' +
-            'combined-tests.spec.js',
+            'http://localhost:9876/base/core/templates/combined-tests.spec.js',
             '-P',
             os.path.join('../karma_coverage_reports')]
         self.assertIn(combined_spec_download_cmd, self.cmd_token_list)

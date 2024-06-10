@@ -747,7 +747,7 @@ class BlogAuthorDetails:
         for reserved_username in reserved_usernames:
             if reserved_username in author_name.lower().strip():
                 raise utils.ValidationError(
-                    'This name contains reserved username. Please use some ' +
+                    'This name contains reserved username. Please use some '
                     'other name')
 
     def to_dict(self) -> BlogAuthorDetailsDict:

@@ -1416,7 +1416,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             'The ticket name should be a string')
 
     def test_validation_ticket_name_too_long_fails(self) -> None:
-        long_name = 'too long' + 'x' * (
+        long_name = 'too long%s' % 'x' * (
             app_feedback_report_constants.MAXIMUM_TICKET_NAME_LENGTH)
         self.ticket_obj.ticket_name = long_name
         self._assert_validation_error(

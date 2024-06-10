@@ -4770,3 +4770,89 @@ class DisallowedImportsCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_importfrom(
                 node)
+
+
+class PreventStringConcatenationCheckerTests(unittest.TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.PreventStringConcatenationChecker)
+        self.checker_test_object.setup_method()
+
+    def test_encourages_interpolation_when_joining_multiple_strings(self) -> None: # pylint: disable=line-too-long
+        node = astroid.extract_node(
+            """
+            a = 'a' + 'b' #@
+            """)
+
+        expression_node = node.value
+
+        with self.checker_test_object.assertAddsMessages(
+            testutils.MessageTest(
+                msg_id='use-string-interpolation',
+                node=expression_node,
+            ),
+            ignore_position=True,
+        ):
+            self.checker_test_object.checker.visit_binop(expression_node)
+
+    def test_encourages_interpolation_for_string_variable_concatenation(self) -> None: # pylint: disable=line-too-long
+        node = astroid.extract_node(
+            """
+            var1 = 'Super'
+            var2 = 'man'
+            hero = var1 + var2 #@
+            """)
+
+        expression_node = node.value
+
+        with self.checker_test_object.assertAddsMessages(
+            testutils.MessageTest(
+                msg_id='use-string-interpolation',
+                node=expression_node,
+            ),
+            ignore_position=True,
+        ):
+            self.checker_test_object.checker.visit_binop(expression_node)
+
+    def test_does_not_encourage_string_interpolation_for_addition(self) -> None: # pylint: disable=line-too-long
+        node = astroid.extract_node(
+            """
+            total = 5 + 5 #@
+            """)
+
+        expression_node = node.value
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_binop(expression_node)
+
+    def test_does_not_encourage_string_interpolation_for_one_side_string_concatenation(self) -> None: # pylint: disable=line-too-long
+        node = astroid.extract_node(
+            """
+            result = 'super' + 500 #@
+            """)
+
+        expression_node = node.value
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_binop(expression_node)
+
+    def test_does_not_encourage_string_interpolation_with_undefined_variable(self) -> None: # pylint: disable=line-too-long
+        node = astroid.extract_node(
+            """
+            undefined_var + 'somthing here' #@
+            """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_binop(node)
+
+    def test_does_not_encourage_string_interpolation_with_datetime_addition(self) -> None: # pylint: disable=line-too-long
+        node = astroid.extract_node(
+        """
+        from datetime import datetime, timedelta
+        new_date = datetime.today() + timedelta(days=1) #@
+        """)
+
+        expression_node = node.value
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_binop(expression_node)

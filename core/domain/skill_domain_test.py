@@ -456,7 +456,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0],
-                ['<p>' + 'Explanation' * 30 + '</p>']
+                ['<p>%s</p>' % ('Explanation' * 30)]
             )
         ]
         self._assert_validation_error(
