@@ -7578,7 +7578,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
                 '/mock/%s' % 'suggestion-id',
                 expected_status_int=400)
         self.assertEqual(
-            response['error'], 'Invalid format for suggestion_id. ' +
+            response['error'], 'Invalid format for suggestion_id. '
             'It must contain 3 parts separated by \'.\'')
         self.logout()
 
@@ -7586,7 +7586,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.login(self.hi_language_reviewer)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % 'exploration.exp1.' +
+                '/mock/%s' % 'exploration.exp1.'
                 'WzE2MTc4NzExNzExNDEuOTE0XQ==WzQ5NTs',
                 expected_status_int=404)
         self.logout()
