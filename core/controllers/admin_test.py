@@ -2942,7 +2942,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
             expected_status_int=500)
 
         error_msg = (
-            'time data \'05/09/20000, 00:00:00:00\' does not match' +
+            'time data \'05/09/20000, 00:00:00:00\' does not match'
             ' format \'%m/%d/%Y, %H:%M:%S:%f\'')
         self.assertEqual(response['error'], error_msg)
 

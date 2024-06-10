@@ -341,7 +341,7 @@ def compile_temp_strict_tsconfig(
         os.remove(TEMP_STRICT_TSCONFIG_FILEPATH)
 
     if error_messages:
-        print('\n' + '\n'.join(error_messages))
+        print('\n%s' % '\n'.join(error_messages))
         print(
             '%s Errors found during compilation.\n' % (
                 len([x for x in error_messages if x.startswith(PREFIXES)]))
