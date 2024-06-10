@@ -808,17 +808,17 @@ class AdminHandler(
             story_node_dicts = [{
                 'exp_id': '6',
                 'title': 'What are the place values?',
-                'description': 'Jaime learns the place value of each digit ' +
+                'description': 'Jaime learns the place value of each digit '
                                'in a big number.'
             }, {
                 'exp_id': '25',
                 'title': 'Finding the value of a number',
-                'description': 'Jaime understands the value of his ' +
+                'description': 'Jaime understands the value of his '
                                'arcade score.'
             }, {
                 'exp_id': '13',
                 'title': 'Comparing Numbers',
-                'description': 'Jaime learns if a number is smaller or ' +
+                'description': 'Jaime learns if a number is smaller or '
                                'greater than another number.'
             }]
 

@@ -233,7 +233,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         """Test that unsuccessful status codes returned raises an exception."""
 
         email_exception = self.assertRaisesRegex(
-            Exception, 'Bulk email failed to send. Please try again later or' +
+            Exception, 'Bulk email failed to send. Please try again later or'
             ' contact us to report a bug at https://www.oppia.org/contact.')
         swap_send_email_to_recipients = self.swap(
             platform_email_services, 'send_email_to_recipients',
@@ -249,8 +249,8 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
         email_exception = self.assertRaisesRegex(
             Exception, (
-                'Email to %s failed to send. Please try again later or ' +
-                'contact us to report a bug at ' +
+                'Email to %s failed to send. Please try again later or '
+                'contact us to report a bug at '
                 'https://www.oppia.org/contact.') % self.admin_email_address)
         swap_send_email_to_recipients = self.swap(
             platform_email_services, 'send_email_to_recipients',

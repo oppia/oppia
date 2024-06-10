@@ -534,7 +534,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
             with self.testapp_swap:
                 self.get_json(
-                    '/cron/mail/reviewers/new_cont' +
+                    '/cron/mail/reviewers/new_cont'
                     'ributor_dashboard_suggestions')
 
             mock_send.assert_not_called()
@@ -590,7 +590,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
             with self.testapp_swap:
                 self.get_json(
-                    '/cron/mail/reviewers/new_contr' +
+                    '/cron/mail/reviewers/new_contr'
                     'ibutor_dashboard_suggestions')
 
             mock_send.assert_not_called()
@@ -616,7 +616,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
             with self.testapp_swap:
                 self.get_json(
-                    '/cron/mail/reviewers/new_cont' +
+                    '/cron/mail/reviewers/new_cont'
                     'ributor_dashboard_suggestions')
             mock_send.assert_called_once_with(
                 {'en': [self.reviewer_id]},
@@ -650,7 +650,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             )
             with self.testapp_swap:
                 self.get_json(
-                    '/cron/mail/reviewers/new_contr' +
+                    '/cron/mail/reviewers/new_contr'
                     'ibutor_dashboard_suggestions')
             mock_send.assert_called_once_with(
                 {'en': []},
@@ -676,7 +676,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
             with self.testapp_swap:
                 self.get_json(
-                    '/cron/mail/reviewers/new_contr' +
+                    '/cron/mail/reviewers/new_contr'
                     'ibutor_dashboard_suggestions')
 
             mock_send.assert_called_once_with(
