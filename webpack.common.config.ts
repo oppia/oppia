@@ -65,10 +65,6 @@ module.exports = {
     },
   },
   entry: {
-    collection_player:
-      commonPrefix +
-      '/pages/collection-player-page/' +
-      'collection-player-page.import.ts',
     console_errors: commonPrefix + '/tests/console_errors.import.ts',
     creator_dashboard:
       commonPrefix +
@@ -186,7 +182,7 @@ module.exports = {
       template:
         commonPrefix +
         '/pages/error-pages/error-iframed-page/' +
-        'error-iframed.mainpage.html',
+        'error-iframed-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
     }),

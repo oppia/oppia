@@ -47,7 +47,6 @@ import {SchemaBasedChoicesEditorComponent} from '../schema-based-choices-editor.
 import {SchemaBasedCustomEditorComponent} from '../schema-based-custom-editor.component';
 import {SchemaBasedDictEditorComponent} from '../schema-based-dict-editor.component';
 import {SchemaBasedEditorComponent} from '../schema-based-editor.component';
-import {SchemaBasedExpressionEditorComponent} from '../schema-based-expression-editor.component';
 import {SchemaBasedFloatEditorComponent} from '../schema-based-float-editor.component';
 import {SchemaBasedHtmlEditorComponent} from '../schema-based-html-editor.component';
 import {SchemaBasedIntEditorComponent} from '../schema-based-int-editor.component';
@@ -98,7 +97,6 @@ describe('Schema based editor', () => {
         SchemaBasedCustomEditorComponent,
         SchemaBasedDictEditorComponent,
         SchemaBasedEditorComponent,
-        SchemaBasedExpressionEditorComponent,
         SchemaBasedFloatEditorComponent,
         SchemaBasedHtmlEditorComponent,
         SchemaBasedIntEditorComponent,
