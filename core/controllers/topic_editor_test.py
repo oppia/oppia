@@ -66,7 +66,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.save_new_skill(
             self.skill_id_2, self.admin_id, description='Skill Description 2')
         self.topic_id = topic_fetchers.get_new_topic_id()
-        self.topic_id_no_classroom = topic_fetchers.get_new_topic_id()
+        self.topic_id_with_no_classroom = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             abbreviated_name='topic-one', url_fragment='topic-one',
@@ -75,7 +75,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
         self.save_new_topic(
-            self.topic_id_no_classroom, self.admin_id, name='New-Topic',
+            self.topic_id_with_no_classroom, self.admin_id, name='New-Topic',
             abbreviated_name='new-topic', url_fragment='new-topic',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
@@ -102,7 +102,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
         topic_services.update_topic_and_subtopic_pages(
-            self.admin_id, self.topic_id_no_classroom, changelist,
+            self.admin_id, self.topic_id_with_no_classroom, changelist,
             'Added subtopic.'
         )
 
@@ -1034,7 +1034,7 @@ class TopicEditorTests(
         self.delete_json(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
-                self.topic_id_no_classroom
+                self.topic_id_with_no_classroom
             ),
             expected_status_int=200)
         self.logout()
@@ -1043,7 +1043,8 @@ class TopicEditorTests(
         self.login(self.NEW_USER_EMAIL)
         self.delete_json(
             '%s/%s' % (
-                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id_no_classroom
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                self.topic_id_with_no_classroom
             ),
             expected_status_int=401)
         self.logout()
@@ -1149,18 +1150,22 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
         # Test whether admin can publish and unpublish a topic.
         self.put_json(
             '%s/%s' % (
-                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id_no_classroom),
+                feconf.TOPIC_STATUS_URL_PREFIX,
+                self.topic_id_with_no_classroom
+            ),
             {'publish_status': True}, csrf_token=csrf_token)
         topic_rights = topic_fetchers.get_topic_rights(
-            self.topic_id_no_classroom)
+            self.topic_id_with_no_classroom)
         self.assertTrue(topic_rights.topic_is_published)
 
         self.put_json(
             '%s/%s' % (
-                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id_no_classroom),
+                feconf.TOPIC_STATUS_URL_PREFIX,
+                self.topic_id_with_no_classroom
+            ),
             {'publish_status': False}, csrf_token=csrf_token)
         topic_rights = topic_fetchers.get_topic_rights(
-            self.topic_id_no_classroom)
+            self.topic_id_with_no_classroom)
         self.assertFalse(topic_rights.topic_is_published)
         self.logout()
 
@@ -1168,7 +1173,9 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
         # Test that other users cannot access topic rights.
         self.put_json(
             '%s/%s' % (
-                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id_no_classroom),
+                feconf.TOPIC_STATUS_URL_PREFIX,
+                self.topic_id_with_no_classroom
+            ),
             {'publish_status': False}, csrf_token=csrf_token,
             expected_status_int=401)
 
@@ -1209,12 +1216,12 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         topic_rights = topic_fetchers.get_topic_rights(
-            self.topic_id_no_classroom)
+            self.topic_id_with_no_classroom)
         self.assertFalse(topic_rights.topic_is_published)
 
         response = self.put_json(
             '%s/%s' % (
-                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id_no_classroom
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id_with_no_classroom
             ),
             {'publish_status': False}, csrf_token=csrf_token,
             expected_status_int=401)
