@@ -532,7 +532,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         # summaries function should account for this and function
         # flawlessly.
         thread_3 = feedback_models.GeneralFeedbackThreadModel(
-            id='exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID,
+            id='exploration.%s.%s' % (self.EXP_ID_3, self.THREAD_ID),
             entity_type='exploration', entity_id=self.EXP_ID_3,
             original_author_id=self.user_id, subject='Feedback',
             status=feedback_models.STATUS_CHOICES_OPEN, message_count=0,
@@ -540,12 +540,12 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread_3.update_timestamps()
         thread_3.put()
         feedback_services.create_message(
-            'exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID,
+            'exploration.%s.%s' % (self.EXP_ID_3, self.THREAD_ID), 
             self.user_id, None, None, 'not used here')
 
         thread_ids = subscription_services.get_all_threads_subscribed_to(
             self.user_id)
-        thread_ids.append('exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID)
+        thread_ids.append('exploration.%s.%s' % (self.EXP_ID_3, self.THREAD_ID))
         thread_summaries, number_of_unread_threads = (
             feedback_services.get_exp_thread_summaries(
                 self.user_id, thread_ids))
@@ -557,7 +557,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         threads.append(feedback_services.get_thread(thread_ids[0]))
         threads.append(feedback_services.get_thread(thread_ids[1]))
         threads.append(feedback_services.get_thread(
-            'exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID))
+            'exploration.%s.%s' % (self.EXP_ID_3, self.THREAD_ID)))
         # Check if the number of unread messages match.
         self.assertEqual(number_of_unread_threads, 0)
         for summary, thread, exploration_title in zip(
