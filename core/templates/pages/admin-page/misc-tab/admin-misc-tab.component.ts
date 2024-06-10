@@ -16,18 +16,28 @@
  * @fileoverview Component for the miscellaneous tab in the admin panel.
  */
 
-import {Component, EventEmitter, Output} from '@angular/core';
+import {ENTER} from '@angular/cdk/keycodes';
+import {Component, EventEmitter, Output, ViewChild, ElementRef} from '@angular/core';
+
+import cloneDeep from 'lodash/cloneDeep';
+import {isEqual} from 'lodash';
+import {Subscription} from 'rxjs';
+
 import {AppConstants} from 'app.constants';
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
+import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
+import {AlertsService} from 'services/alerts.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminPageConstants} from '../admin-page.constants';
 import {AdminTaskManagerService} from '../services/admin-task-manager.service';
+import {LoaderService} from 'services/loader.service';
 
 @Component({
   selector: 'oppia-admin-misc-tab',
   templateUrl: './admin-misc-tab.component.html',
 })
 export class AdminMiscTabComponent {
+  @ViewChild('userInput') userInput!: ElementRef<HTMLInputElement>;
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
   DATA_EXTRACTION_QUERY_HANDLER_URL: string =
     '/explorationdataextractionhandler';
@@ -60,12 +70,136 @@ export class AdminMiscTabComponent {
   message: string = '';
   expIdToGetInteractionIdsFor!: string;
   explorationInteractionIds: string[] = [];
+  directiveSubscriptions = new Subscription();
+  loadingMessage: string = '';
+  selectedUserGroup: string = '';
+  newUserGroupName: string = '';
+  removable: boolean = true;
+  selectable: boolean = true;
+  newUser: string = '';
+  separatorKeysCodes: number[] = [ENTER];
+  userGroupToUsersMapBackup: Record<string, string[]>;
+  userGroupsToUsers: Record<string, string[]>;
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
+    private adminDataService: AdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
-    private windowRef: WindowRef
+    private alertsService: AlertsService,
+    private windowRef: WindowRef,
+    private loaderService: LoaderService
   ) {}
+
+  async fetchUserGroupData(): Promise<void> {
+    const data = await this.adminDataService.getDataAsync();
+    this.userGroupsToUsers = data.userGroups;
+    this.userGroupToUsersMapBackup = cloneDeep(this.userGroupsToUsers);
+    this.loaderService.hideLoadingScreen();
+  }
+
+  resetUserGroups(): void {
+    if (this.areUserGroupsUpdated()) {
+      if (
+        !this.windowRef.nativeWindow.confirm(
+          'This will revert all changes you made. Are you sure?'
+        )
+      ) {
+        return;
+      }
+      this.userGroupsToUsers = cloneDeep(this.userGroupToUsersMapBackup);
+    }
+  }
+
+  areUserGroupsUpdated(): boolean {
+    return !isEqual(this.userGroupsToUsers, this.userGroupToUsersMapBackup);
+  }
+
+  getUserGroups(): string[] {
+    let userGroups: string[] = [];
+    for (let key in this.userGroupsToUsers) {
+      userGroups.push(key);
+    }
+    return userGroups;
+  }
+
+  addUser(event: {value: string}): void {
+    const value = (event.value || '').trim();
+    if (!value || value === '') {
+      return;
+    }
+    console.log(this.userGroupsToUsers[this.selectedUserGroup]);
+    if (this.userGroupsToUsers[this.selectedUserGroup].includes(value)) {
+      this.alertsService.addWarning(
+        `The user ${value} already exists in the user ` +
+        `group ${this.selectedUserGroup}.`);
+      return
+    }
+    this.userGroupsToUsers[this.selectedUserGroup].push(value);
+    this.userInput.nativeElement.value = '';
+  }
+
+  resetUserInput(): void {
+    this.newUser = '';
+  }
+
+  removeUser(username: string): void {
+    let usersOfSelectedUserGroup: string[] = this.userGroupsToUsers[
+      this.selectedUserGroup];
+    this.userGroupsToUsers[this.selectedUserGroup] = (
+      usersOfSelectedUserGroup.filter(obj => obj !== username));
+  }
+
+  removeUserGroup(): void {
+    delete this.userGroupsToUsers[this.selectedUserGroup];
+    this.selectedUserGroup = '';
+  }
+
+  addUserGroup(): void {
+    if (this.newUserGroupName.trim() in this.userGroupsToUsers) {
+      this.alertsService.addWarning(
+        `The user group ${this.newUserGroupName} already exists.`);
+      return
+    }
+
+    if (this.newUserGroupName.trim() !== '') {
+      this.userGroupsToUsers[this.newUserGroupName.trim()] = [];
+      this.selectedUserGroup = this.newUserGroupName.trim();
+      this.newUserGroupName = '';
+    }
+  }
+
+  getUsersForSelectedUserGroup(): string[] {
+    if (this.selectedUserGroup in this.userGroupsToUsers) {
+      return this.userGroupsToUsers[this.selectedUserGroup];
+    }
+    return [];
+  }
+
+  updateUserGroups(): void {
+    if (!this.areUserGroupsUpdated()) return;
+
+    if (
+      this.adminTaskManagerService.isTaskRunning() ||
+      !this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)
+    ) {
+      return;
+    }
+
+    this.setStatusMessage.emit('Updating UserGroups...');
+
+    this.adminTaskManagerService.startTask();
+    this.adminBackendApiService.updateUserGroups(this.userGroupsToUsers).then(
+      () => {
+        this.setStatusMessage.emit('UserGroups successfully updated.');
+        this.userGroupToUsersMapBackup = cloneDeep(this.userGroupsToUsers);
+        this.adminTaskManagerService.finishTask();
+      },
+      errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+        this.adminTaskManagerService.finishTask();
+      }
+    );
+  }
 
   clearSearchIndex(): void {
     if (
@@ -373,5 +507,15 @@ export class AdminMiscTabComponent {
     this.stateName = '';
     this.numAnswers = 0;
     this.showDataExtractionQueryStatus = false;
+  }
+
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.loaderService.onLoadingMessageChange.subscribe((message: string) => {
+        this.loadingMessage = message;
+      })
+    );
+    this.loaderService.showLoadingScreen('Loading');
+    this.fetchUserGroupData();
   }
 }

@@ -62,8 +62,15 @@ from core.domain import topic_services
 from core.domain import translation_domain
 from core.domain import user_services
 from core.domain import wipeout_service
+from core.platform import models
 
-from typing import Dict, List, Optional, TypedDict, Union, cast
+from typing import Dict, List, Optional, Sequence, TypedDict, Union, cast
+
+MYPY = False
+if MYPY:
+    from mypy_imports import user_models
+
+(user_models, ) = models.Registry.import_models([models.Names.USER])
 
 # Platform paramters that we plan to show on the the release-coordinator page.
 PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set([
@@ -202,13 +209,33 @@ class AdminHandler(
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
                         'update_platform_parameter_rules',
-                        'rollback_exploration_to_safe_state'
+                        'rollback_exploration_to_safe_state',
+                        'update_user_groups'
                     ]
                 },
                 # TODO(#13331): Remove default_value when it is confirmed that,
                 # for clearing the search indices of exploration & collection
                 # 'action' field must be provided in the payload.
                 'default_value': None
+            },
+            'updated_user_groups': {
+                'schema': {
+                    'type': 'variable_keys_dict',
+                        'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'list',
+                            'items': {
+                                'type': 'basestring'
+                            }
+                        }
+                    }
+                },
+                'default_value': {}
             },
             'exploration_id': {
                 'schema': {
@@ -310,6 +337,14 @@ class AdminHandler(
             parameter_services.
             get_all_platform_parameters_dicts()
         )
+
+        user_group_models: List[user_models.UserGroupModel] = list(
+            user_models.UserGroupModel.get_all())
+        user_group_model_dict: Dict[str, List[str]] = {}
+        for user_group_model in user_group_models:
+            user_group_model_dict[user_group_model.id] = list(
+                user_group_model.users)
+
         # Removes promo-bar related and blog related platform params as
         # they are handled in release-coordinator page and blog admin page
         # respectively.
@@ -331,6 +366,7 @@ class AdminHandler(
             'role_to_actions': role_services.get_role_actions(),
             'topic_summaries': topic_summary_dicts,
             'platform_params_dicts': platform_params_dicts,
+            'user_group_model_dict': user_group_model_dict
         })
 
     @acl_decorators.can_access_admin_page
@@ -458,6 +494,29 @@ class AdminHandler(
                 result = {
                     'version': version
                 }
+            elif action == 'update_user_groups':
+                updated_user_groups: Dict[str, List[str]] = (
+                    self.normalized_payload.get('updated_user_groups'))
+                for user_group_model_name, users in updated_user_groups.items():
+                    user_group_model = user_models.UserGroupModel.get(
+                        user_group_model_name, strict=False)
+                    if user_group_model is None:
+                        user_models.UserGroupModel(
+                            id=user_group_model_name, users=users).put()
+                    else:
+                        user_group_model.users = users
+                        user_group_model.update_timestamps()
+                        user_group_model.put()
+                # Delete UserGroup models.
+                all_exisiting_user_groups: List[
+                    user_models.UserGroupModel] = list(
+                        user_models.UserGroupModel.get_all()
+                    )
+                user_models_to_delete = []
+                for exising_user_group in all_exisiting_user_groups:
+                    if exising_user_group.id not in updated_user_groups.keys():
+                        user_models_to_delete.append(exising_user_group)
+                user_models.UserGroupModel.delete_multi(user_models_to_delete)
             else:
                 # The handler schema defines the possible values of 'action'.
                 # If 'action' has a value other than those defined in the

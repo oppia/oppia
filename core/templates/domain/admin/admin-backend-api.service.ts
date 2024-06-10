@@ -82,6 +82,7 @@ export interface AdminPageDataBackendDict {
   human_readable_roles: HumanReadableRolesBackendResponse;
   topic_summaries: CreatorTopicSummaryBackendDict[];
   platform_params_dicts: PlatformParameterBackendDict[];
+  user_group_model_dict: Record<string, string[]>;
 }
 
 export interface AdminPageData {
@@ -94,6 +95,7 @@ export interface AdminPageData {
   humanReadableRoles: HumanReadableRolesBackendResponse;
   topicSummaries: CreatorTopicSummary[];
   platformParameters: PlatformParameter[];
+  userGroups: Record<string, string[]>;
 }
 
 export interface ExplorationInteractionIdsBackendResponse {
@@ -130,6 +132,7 @@ export class AdminBackendApiService {
               platformParameters: response.platform_params_dicts.map(dict =>
                 PlatformParameter.createFromBackendDict(dict)
               ),
+              userGroups: response.user_group_model_dict
             });
           },
           errorResponse => {
@@ -395,6 +398,18 @@ export class AdminBackendApiService {
     let action = 'upload_topic_similarities';
     let payload = {
       data: data,
+    };
+    return this._postRequestAsync(
+      AdminPageConstants.ADMIN_HANDLER_URL,
+      payload,
+      action
+    );
+  }
+
+  async updateUserGroups(data: Record<string, string[]>): Promise<void> {
+    let action = 'update_user_groups';
+    let payload = {
+      updated_user_groups: data,
     };
     return this._postRequestAsync(
       AdminPageConstants.ADMIN_HANDLER_URL,

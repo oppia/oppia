@@ -21,6 +21,7 @@ import {FormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {ToastrModule} from 'ngx-toastr';
+import { MatChipsModule } from '@angular/material/chips';
 
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {TopicManagerRoleEditorModalComponent} from './roles-tab/topic-manager-role-editor-modal.component';
@@ -44,6 +45,7 @@ import {AdminPageComponent} from './admin-page.component';
     FormsModule,
     SharedComponentsModule,
     SharedFormsModule,
+    MatChipsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {

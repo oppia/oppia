@@ -1,3 +1,4 @@
+<oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
 <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
   <h3>Topic Similarities</h3>
   <div class="oppia-topic-similarities-container">
@@ -303,6 +304,66 @@
     <ul>
       <li *ngFor="let interactionId of explorationInteractionIds" [innerHTML]="interactionId"></li>
     </ul>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Update UserGroup model</h3>
+  <div class="row">
+    <div class="col-2">UserGroup:</div>
+    <div class="col-10">
+      <ng-container>
+        <select [(ngModel)]="selectedUserGroup">
+          <ng-container *ngFor="let userGroup of getUserGroups()">
+            <option [value]="userGroup">
+              {{userGroup}}
+            </option>
+          </ng-container>
+        </select>
+      </ng-container>
+      <button (click)="removeUserGroup()">
+        x
+      </button>
+      <input placeholder="Add UserGroup"
+             type="text"
+             [(ngModel)]="newUserGroupName"
+             [ngModelOptions]="{standalone: true}">
+      <button (click)="addUserGroup()">
+        +
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-2">Users:</div>
+    <div class="col-10">
+      <mat-chip-list #chipList aria-label="Users Associated With Selected User Group" tabindex="0">
+        <mat-chip *ngFor="let user of getUsersForSelectedUserGroup()"
+                  [selectable]="selectable"
+                  [removable]="removable"
+                  (removed)="removeUser(user)">
+          <ng-container>
+            <span tabindex="0" [attr.aria-label]="user+', selected'">{{ user }}</span>
+          </ng-container>
+          <button class="oppia-cancel-button" role="button" tabindex="0" matChipRemove aria-label=". Remove" *ngIf="removable">
+            <mat-icon class="oppia-cancel-button-text">cancel</mat-icon>
+          </button>
+        </mat-chip>
+        <input placeholder="Add Username"
+               #userInput
+               [matChipInputFor]="chipList"
+               [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+               (matChipInputTokenEnd)="addUser($event)"
+               [(ngModel)]="newUser" (click)="resetUserInput()">
+      </mat-chip-list>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-1">
+      <button (click)="updateUserGroups()">Save</button>
+    </div>
+    <div class="col-1">
+      <button (click)="resetUserGroups()">Reset</button>
+    </div>
   </div>
 </mat-card>
 

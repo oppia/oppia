@@ -17,7 +17,7 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA, ElementRef} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -26,7 +26,10 @@ import {
 } from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 
+import {AdminPageData} from 'domain/admin/admin-backend-api.service';
+import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminTaskManagerService} from '../services/admin-task-manager.service';
 import {AdminMiscTabComponent} from './admin-misc-tab.component';
@@ -70,10 +73,21 @@ describe('Admin misc tab component ', () => {
 
   let adminBackendApiService: AdminBackendApiService;
   let adminTaskManagerService: AdminTaskManagerService;
+  let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
+  let adminDataService: AdminDataService;
 
   let statusMessageSpy: jasmine.Spy;
   let confirmSpy: jasmine.Spy;
+
+  const adminPageData: AdminPageData = {
+    userGroups: {
+      'UserGroup1': ['User1', 'User2', 'User3'],
+      'UserGroup2': ['User4', 'User5'],
+      'UserGroup3': ['User6', 'User7', 'User8'],
+      'UserGroup9': ['User12', 'User13'],
+    },
+  };
 
   beforeEach(() => {
     mockWindowRef = new MockWindowRef();
@@ -87,6 +101,7 @@ describe('Admin misc tab component ', () => {
           provide: WindowRef,
           useValue: mockWindowRef,
         },
+        AlertsService
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -98,6 +113,8 @@ describe('Admin misc tab component ', () => {
   beforeEach(() => {
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
+    adminDataService = TestBed.get(AdminDataService);
+    alertsService = TestBed.inject(AlertsService);
 
     statusMessageSpy = spyOn(
       component.setStatusMessage,
@@ -105,6 +122,9 @@ describe('Admin misc tab component ', () => {
     ).and.returnValue();
     spyOn(adminTaskManagerService, 'startTask').and.returnValue();
     spyOn(adminTaskManagerService, 'finishTask').and.returnValue();
+    spyOn(adminDataService, 'getDataAsync').and.returnValue(
+      Promise.resolve(adminPageData)
+    );
     confirmSpy = spyOn(mockWindowRef.nativeWindow, 'confirm');
     // This throws "Argument of type 'mockReaderObject' is not assignable to
     // parameter of type 'HTMLImageElement'.". We need to suppress this
@@ -858,5 +878,305 @@ describe('Admin misc tab component ', () => {
       );
       expect(component.explorationInteractionIds).toEqual([]);
     }));
+  });
+
+  describe('User groups', () => {
+
+    it('should load user groups on init', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+
+      expect(Object.keys(
+        component.userGroupsToUsers).length > 0).toBeTrue();
+    }));
+
+    describe('when clicking on save button to update user groups ', () => {
+      it('should update the user groups', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+
+        confirmSpy.and.returnValue(true);
+        let updateUserGroupSpy = spyOn(
+          adminBackendApiService,
+          'updateUserGroups'
+        ).and.resolveTo();
+
+        component.newUserGroupName = 'UserGroup5';
+        component.addUserGroup();
+        component.updateUserGroups();
+        tick();
+
+        expect(updateUserGroupSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'UserGroups successfully updated.'
+        );
+        component.selectedUserGroup = 'UserGroup5';
+        component.removeUserGroup();
+      }));
+
+      it('should not update in case of backend error', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+
+        confirmSpy.and.returnValue(true);
+        spyOn(alertsService, 'addWarning');
+        let updateUserGroupSpy = spyOn(
+          adminBackendApiService,
+          'updateUserGroups'
+        ).and.rejectWith('Internal Server Error.');
+        component.userInput = {
+          nativeElement: {
+            value: '',
+          },
+        } as ElementRef;
+
+        component.newUserGroupName = 'UserGroup5';
+        component.selectedUserGroup = 'UserGroup5';
+        component.addUserGroup();
+        component.addUser({value: 'User'});
+        component.updateUserGroups();
+        tick();
+
+        expect(updateUserGroupSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+        component.removeUserGroup();
+      }));
+
+      it('should not update if a task is still running in the queue',
+        fakeAsync(() => {
+          component.ngOnInit();
+          tick();
+          component.userGroupsToUsers = adminPageData.userGroups;
+          confirmSpy.and.returnValue(true);
+          let updateUserGroupSpy = spyOn(
+            adminBackendApiService,
+            'updateUserGroups'
+          );
+
+          // Setting task is still running to be true.
+          spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
+  
+          component.updateUserGroups();
+          tick();
+  
+          expect(updateUserGroupSpy).not.toHaveBeenCalled();
+        })
+      );
+
+      it('should not update if cancel button is clicked in the alert',
+        fakeAsync(() => {
+          component.ngOnInit();
+          tick();
+          confirmSpy.and.returnValue(false);
+          let updateUserGroupSpy = spyOn(
+            adminBackendApiService,
+            'updateUserGroups'
+          );
+          // Setting cancel button clicked to be true.
+
+          component.updateUserGroups();
+          tick();
+
+          expect(updateUserGroupSpy).not.toHaveBeenCalled();
+        })
+      );
+    });
+
+    describe('when getting users for the selected user groups', () => {
+      it('should return users for the selected user group', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+
+        component.selectedUserGroup = 'UserGroup9';
+        const users = component.getUsersForSelectedUserGroup();
+
+        expect(users).toEqual(['User12', 'User13']);
+      }));
+
+      it('should return empty array when user group is not present',
+        fakeAsync(() => {
+          component.ngOnInit();
+          tick();
+          component.selectedUserGroup = '';
+          const users = component.getUsersForSelectedUserGroup();
+
+          expect(users).toEqual([]);
+        })
+      );
+    });
+
+    it('should get the array of all the user groups', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+      console.log(component.userGroupsToUsers);
+      const userGroups = component.getUserGroups();
+      console.log(userGroups);
+
+      expect(userGroups.length).toEqual(Object.keys(
+        component.userGroupsToUsers).length);
+    }));
+
+    it('should check if any updates are made to user groups', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+      component.newUserGroupName = 'UserGroup4';
+      component.addUserGroup();
+
+      expect(component.areUserGroupsUpdated()).toBeTrue();
+      component.selectedUserGroup = 'UserGroup4';
+      component.removeUserGroup();
+    }));
+
+    describe('when resetting the edited user groups', () => {
+      it('should do nothing when no changes present', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+
+        const userGroupsValue = {
+          'UserGroup1': ['User1', 'User2', 'User3'],
+          'UserGroup2': ['User4', 'User5'],
+          'UserGroup3': ['User6', 'User7', 'User8'],
+        }
+        component.userGroupsToUsers = userGroupsValue;
+        component.userGroupToUsersMapBackup = userGroupsValue;
+
+        component.resetUserGroups();
+
+        expect(component.userGroupsToUsers).toEqual(
+          component.userGroupToUsersMapBackup);
+      }));
+
+      it('should reset the changes when requested', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        confirmSpy.and.returnValue(true);
+
+        component.newUserGroupName = 'UserGroup6';
+        component.addUserGroup();
+        component.resetUserGroups();
+
+        expect(component.userGroupsToUsers).toEqual(
+          component.userGroupToUsersMapBackup);
+      }));
+
+      it('should not reset the changes when canceled', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        confirmSpy.and.returnValue(false);
+
+        component.newUserGroupName = 'UserGroup7';
+        component.addUserGroup();
+        component.resetUserGroups();
+
+        expect(
+          component.userGroupsToUsers !==
+          component.userGroupToUsersMapBackup
+        ).toBeTrue();
+      }));
+    });
+
+    describe('when adding a new user to specified user group', () => {
+      it('should not save when username is empty string', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+
+        component.selectedUserGroup = 'UserGroup1';
+        component.addUser({value: ''});
+
+        expect(
+          component.userGroupsToUsers['UserGroup1'].includes('')).toBeFalse();
+      }));
+
+      it('should save the new user', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        component.userGroupsToUsers = adminPageData.userGroups;
+        component.userInput = {
+          nativeElement: {
+            value: '',
+          },
+        } as ElementRef;
+
+        component.selectedUserGroup = 'UserGroup1';
+        component.addUser({value: 'User11'});
+
+        expect(
+          component.userGroupsToUsers['UserGroup1'].includes('User11')).toBeTrue();
+        component.removeUser('User9');
+      }));
+
+      it('should not add the user if it already exists', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        component.userGroupsToUsers = adminPageData.userGroups;
+        component.userInput = {
+          nativeElement: {
+            value: '',
+          },
+        } as ElementRef;
+        let alertServiceSpyon = spyOn(alertsService, 'addWarning');
+
+        component.selectedUserGroup = 'UserGroup1';
+        component.addUser({value: 'User1'});
+
+        expect(alertServiceSpyon).toHaveBeenCalled();
+      }));
+    });
+
+    it('should remove the selected user group when requested', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+      component.selectedUserGroup = 'UserGroup3';
+      component.removeUserGroup();
+
+      expect('UserGroup3' in component.userGroupsToUsers).toBeFalse();
+    }));
+
+    it('should remove user from user group when requested', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+      component.selectedUserGroup = 'UserGroup2';
+      component.removeUser('User5');
+
+      expect(component.userGroupsToUsers['UserGroup2'].includes(
+        'User5')).toBeFalse();
+    }));
+
+    describe('when adding a new user group', () => {
+      it('should not update when user group already exists', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        let alertServiceSpyon = spyOn(alertsService, 'addWarning');
+
+        component.newUserGroupName = 'UserGroup1';
+        component.addUserGroup();
+
+        expect(alertServiceSpyon).toHaveBeenCalled();
+      }));
+
+      it('should not update when the given user group is empty string',
+        fakeAsync(() => {
+          component.ngOnInit();
+          tick();
+
+          component.newUserGroupName = '';
+          component.addUserGroup();
+
+          expect('' in component.userGroupsToUsers).toBeFalse();
+        })
+      );
+
+      it('should update the user groups', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        component.userGroupsToUsers = adminPageData.userGroups;
+        component.newUserGroupName = 'UserGroup8';
+        component.addUserGroup();
+
+        expect('UserGroup8' in component.userGroupsToUsers).toBeTrue();
+      }));
+    });
   });
 });
