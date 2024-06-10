@@ -49,6 +49,34 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-donation-thanks-page.spec.ts"
     },
     {
+      "name": "logged-out-user/check-all-user-flow-of-donor",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/check-all-user-flow-of-donor.spec.ts"
+    },
+    {
+      "name": "logged-out-user/check-all-user-flow-of-parent-teacher",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/check-all-user-flow-of-parent-teacher.spec.ts"
+    },
+    {
+      "name": "logged-out-user/check-all-user-flow-of-partner",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/check-all-user-flow-of-partner.spec.ts"
+    },
+    {
+      "name": "logged-out-user/check-all-user-flow-of-volunteer",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/check-all-user-flow-of-volunteer.spec.ts"
+    },
+    {
+      "name": "logged-out-user/click-all-buttons-on-partnerships-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-partnerships-page"
+    },
+    {
+      "name": "logged-out-user/click-all-buttons-on-teach-page.spec.ts",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-teach-page.spec.ts"
+    },
+    {
+      "name": "logged-out-user/click-all-buttons-on-volunteer-page.spec.ts",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-volunteer-page.spec.ts"
+    },
+    {
       "name": "logged-in-user/subscribe-to-creator-and-view-all-explorations-by-that-creator",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/subscribe-to-creator-and-view-all-explorations-by-that-creator.spec.ts"
     },
