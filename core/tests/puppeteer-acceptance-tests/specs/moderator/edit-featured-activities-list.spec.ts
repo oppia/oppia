@@ -70,31 +70,19 @@ describe('Moderator', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to feature and unfeature activities',
-    async function () {
-      // The logged in user navigates to the community library
-      await loggedInUser.navigateToCommunitylibrary();
+      'should be able to feature and unfeature activities',
+      async function () {
+        await loggedInUser.navigateToCommunitylibrary();
+        await loggedInUser.expectToViewFeaturedActivities([]);
 
-      // The logged in user views all featured activities
-      let featuredActivities = await loggedInUser.viewAllFeaturedActivities();
-      expect(featuredActivities).toEqual([]);
+        await moderator.featureActivity(explorationId as string);
+        await loggedInUser.expectToViewFeaturedActivities([{explorationId: explorationId}]);
 
-      // The moderator features an activity
-      await moderator.featureActivity(explorationId as string);
-
-      // The logged in user views all featured activities again
-      featuredActivities = await loggedInUser.viewAllFeaturedActivities();
-      expect(featuredActivities).toContain({explorationId: explorationId});
-
-      // The moderator unfeatures the activity
-      await moderator.unfeatureActivity();
-
-      // The logged in user views all featured activities again
-      featuredActivities = await loggedInUser.viewAllFeaturedActivities();
-      expect(featuredActivities).toEqual([]);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+        await moderator.unfeatureActivity();
+        await loggedInUser.expectToViewFeaturedActivities([]);
+      },
+      DEFAULT_SPEC_TIMEOUT_MSECS
+    );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
