@@ -29,6 +29,8 @@ export default {
     Blog: 'http://localhost:8181/blog',
     BlogAdmin: 'http://localhost:8181/blog-admin',
     BlogDashboard: 'http://localhost:8181/blog-dashboard',
+    BlogPostUrlInPartnershipsPage:
+      'https://www.oppia.org/blog/teaching-a-chapter-of-expressions-equations-in-summer-school-0q6r28fzsrwc',
     CommunityLibrary: 'http://localhost:8181/community-library',
     Contact: 'http://localhost:8181/contact',
     ContributorDashboard: 'http://localhost:8181/contributor-dashboard',
@@ -58,10 +60,21 @@ export default {
     MobileExternalLinkWatchAVideo:
       'https://m.facebook.com/oppiaorg/videos/189487953721583/',
     Partnerships: 'http://localhost:8181/partnerships',
+    PartnershipsBrochure:
+      'https://drive.google.com/file/d/1RZ1mWDA2XWXTh1GlWFf5AWWuV2iGBBa2/view?usp=sharing',
+    PartnershipsForm:
+      'https://docs.google.com/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform',
+    PartnershipsFormInPortuguese:
+      'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp',
+    PartnershipsFormShortUrl: 'https://forms.gle/Y71U8FdhQwZpicJj8',
+    Teach: 'http://localhost:8181/teach',
     TopicAndSkillsDashboard:
       'http://localhost:8181/topics-and-skills-dashboard',
     ProgrammingWithCarla: 'https://www.oppia.org/collection/inDXV0w8-p1C',
     Volunteer: 'http://localhost:8181/volunteer',
+    VolunteerForm:
+      'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
+    VolunteerFormShortUrl: 'https://forms.gle/rhFYoLLSFr3JEZHy8',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
     ProfilePagePrefix: 'http://localhost:8181/profile',
   },

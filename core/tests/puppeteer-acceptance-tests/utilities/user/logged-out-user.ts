@@ -46,7 +46,25 @@ const electromagnetismUrl = testConstants.URLs.Electromagnetism;
 const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
 const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
+const teachUrl = testConstants.URLs.Teach;
+const blogPostUrlinPartnershipsPage =
+  testConstants.URLs.BlogPostUrlInPartnershipsPage;
+const partnershipsFormUrl = testConstants.URLs.PartnershipsForm;
+const partnershipsFormInPortugueseUrl =
+  testConstants.URLs.PartnershipsFormInPortuguese;
+const partnershipsFormShortUrl = testConstants.URLs.PartnershipsFormShortUrl;
+const partnershipsBrochureUrl = testConstants.URLs.PartnershipsBrochure;
+const volunteerFormUrl = testConstants.URLs.VolunteerForm;
+const volunteerFormShortUrl = testConstants.URLs.VolunteerFormShortUrl;
+const allowedVolunteerFormUrls = [
+  volunteerFormUrl,
+  `${volunteerFormUrl}?usp=send_form`,
+  volunteerFormShortUrl,
+];
 
+const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
+const navbarLearnTabBasicMathematicsButton =
+  'a.e2e-test-basic-mathematics-link';
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
 const navbarAboutTabAboutFoundationButton =
@@ -68,6 +86,7 @@ const footerAboutFoundationLink = 'a.e2e-test-footer-about-foundation-link';
 const footerBlogLink = 'a.e2e-test-footer-blog-link';
 const footerForumlink = 'a.e2e-test-footer-forum-link';
 const footerGetStartedLink = 'a.e2e-test-get-started-link';
+const footerTeachPageLink = 'a.e2e-test-teach-link';
 
 const browseOurLessonsButton = '.e2e-test-about-page-browse-our-lessons-button';
 const accessAndroidAppButton = '.e2e-test-about-page-access-android-app-button';
@@ -99,6 +118,8 @@ const thanksForDonatingClass = '.modal-open';
 const donatePage = '.donate-content-container';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
+const mobileSidebarBasicMathematicsButton =
+  'a.e2e-mobile-test-mathematics-link';
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
 const mobileSidebarAboutFoundationButton =
   'a.e2e-mobile-test-sidebar-about-foundation-button';
@@ -112,6 +133,44 @@ const mobileSidevbarGetInvolvedMenuDonateButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
 const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
+const browseOurLessonsDesktopButtonInTeachPage =
+  '.e2e-test-teach-page-browse-our-lessons-desktop-button';
+const browseOurLessonsMobileButtonInTeachPage =
+  '.e2e-test-teach-page-browse-our-lessons-mobile-button';
+const accessAndroidAppDesktopButtonInTeachPage =
+  '.e2e-test-teach-page-access-android-app-desktop-button';
+const accessAndroidAppMobileButtonInTeachPage =
+  '.e2e-test-teach-page-access-android-app-mobile-button';
+const visitClassroomDesktopButtonInTeachPage =
+  '.e2e-test-teach-page-visit-classroom-desktop-button';
+const visitClassroomMobileButtonInTeachPage =
+  '.e2e-test-teach-page-visit-classroom-mobile-button';
+const exploreLessonsDesktopButtonInTeachPage =
+  '.e2e-test-teach-page-explore-lessons-desktop-button';
+const exploreLessonsMobileButtonInTeachPage =
+  '.e2e-test-teach-page-explore-lessons-mobile-button';
+const browseLibraryDesktopButtonInTeachPage =
+  '.e2e-test-teach-page-browse-library-desktop-button';
+const browseLibraryMobileButtonInTeachPage =
+  '.e2e-test-teach-page-browse-library-mobile-button';
+const partnerWithUsButtonAtTheTopOfPartnershipsPage =
+  '.e2e-test-partnerships-page-partner-with-us-button-at-the-top';
+const partnerWithUsButtonAtTheBottomOfPartnershipsPage =
+  '.e2e-test-partnerships-page-partner-with-us-button-at-the-bottom';
+const brochureButtonInPartnershipsPage =
+  '.e2e-test-partnerships-page-brochure-button';
+const readMoreStoriesButtonInPartnershipsPage =
+  '.e2e-test-partnerships-page-partner-stories-button';
+const readBlogPostDesktopButtonInPartnershipsPage =
+  '.e2e-test-partnerships-page-blog-post-desktop-button';
+const readBlogPostMobileButtonInPartnershipsPage =
+  '.e2e-test-partnerships-page-blog-post-mobile-button';
+const applyToVolunteerButtonAtTheTopOfVolunteerPage =
+  '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-top';
+const applyToVolunteerButtonAtTheBottomOfVolunteerPage =
+  '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-bottom';
+const donorBoxIframe = '.e2e-test-donate-page-iframe';
+const languageDropdown = '.e2e-test-language-dropdown';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -157,6 +216,34 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to navigate to the Parents and Teachers page.
+   */
+  async navigateToTeachPage(): Promise<void> {
+    await this.goto(teachUrl);
+  }
+
+  /**
+   * Function to navigate to the Partnerships page.
+   */
+  async navigateToPartnershipsPage(): Promise<void> {
+    await this.goto(partnershipsUrl);
+  }
+
+  /**
+   * Function to navigate to the Volunteer page.
+   */
+  async navigateToVolunteerPage(): Promise<void> {
+    await this.goto(volunteerUrl);
+  }
+
+  /**
+   * Function to navigate to the Donate page.
+   */
+  async navigateToDonatePage(): Promise<void> {
+    await this.goto(donateUrl);
+  }
+
+  /**
    * Function to click a button and check if it opens the expected destination.
    */
   async clickButtonToNavigateToNewPage(
@@ -175,6 +262,30 @@ export class LoggedOutUser extends BaseUser {
         `${buttonName} should open the ${expectedDestinationPageName} page`
       )
       .toBe(expectedDestinationPageUrl);
+  }
+
+  /**
+   * Function to click the Basic Mathematics button in the Learn Menu on navbar
+   * and check if it opens the Math Classroom page.
+   */
+  async clickBasicMathematicsButtonInLearnMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarBasicMathematicsButton,
+        'Basic Mathematics button in the Learn Menu on navbar',
+        mathClassroomUrl,
+        'Math Classroom'
+      );
+    } else {
+      await this.clickOn(navbarLearnTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarLearnTabBasicMathematicsButton,
+        'Basic Mathematics button in the Learn Menu on navbar',
+        mathClassroomUrl,
+        'Math Classroom'
+      );
+    }
   }
 
   /**
@@ -866,9 +977,21 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerGetStartedLink);
     await this.clickButtonToNavigateToNewPage(
       footerGetStartedLink,
-      'About Oppia button in the About Menu on navbar',
+      'Get Started link in the About Oppia section in the footer',
       getStartedUrl,
       'Get Started'
+    );
+  }
+
+  /**
+   * Navigates to the Teach page using the oppia website footer.
+   */
+  async navigateToTeachPageViaFooter(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      footerTeachPageLink,
+      '"For Parents/Teachers" link in the Teach/Learn section in the footer',
+      teachUrl,
+      'For Parents/Teachers'
     );
   }
 
@@ -968,6 +1091,286 @@ export class LoggedOutUser extends BaseUser {
     ]);
 
     expect(this.page.url()).toBe(contactUrl);
+  }
+
+  /**
+   * Function to click the Browse Our Lessons button in the Teach page
+   * and check if it opens the Math Classroom page.
+   */
+  async clickBrowseOurLessonsButtonInTeachPage(): Promise<void> {
+    const browseOurLessonsButtonInTeachPage = this.isViewportAtMobileWidth()
+      ? browseOurLessonsMobileButtonInTeachPage
+      : browseOurLessonsDesktopButtonInTeachPage;
+    await this.clickButtonToNavigateToNewPage(
+      browseOurLessonsButtonInTeachPage,
+      'Browse Our Lessons button',
+      mathClassroomUrl,
+      'Math Classroom'
+    );
+  }
+
+  /**
+   * Function to click the Access Android App button in the Teach page
+   * and check if it opens the Android page.
+   */
+  async clickAccessAndroidAppButtonInTeachPage(): Promise<void> {
+    const accessAndroidAppButtonInTeachPage = this.isViewportAtMobileWidth()
+      ? accessAndroidAppMobileButtonInTeachPage
+      : accessAndroidAppDesktopButtonInTeachPage;
+    await this.clickButtonToNavigateToNewPage(
+      accessAndroidAppButtonInTeachPage,
+      'Access the Android App button',
+      androidUrl,
+      'Android'
+    );
+  }
+
+  /**
+   * Function to click the Visit Classroom button in the Teach page
+   * and check if it opens the Math Classroom page.
+   */
+  async clickVisitClassroomButtonInTeachPage(): Promise<void> {
+    const visitClassroomButtonInTeachPage = this.isViewportAtMobileWidth()
+      ? visitClassroomMobileButtonInTeachPage
+      : visitClassroomDesktopButtonInTeachPage;
+    await this.clickButtonToNavigateToNewPage(
+      visitClassroomButtonInTeachPage,
+      'Visit Classroom button',
+      mathClassroomUrl,
+      'Math Classroom'
+    );
+  }
+
+  /**
+   * Function to click the Browse Library button in the Teach page
+   * and check if it opens the Community Library page.
+   */
+  async clickBrowseLibraryButtonInTeachPage(): Promise<void> {
+    const browseLibraryButtonInTeachPage = this.isViewportAtMobileWidth()
+      ? browseLibraryMobileButtonInTeachPage
+      : browseLibraryDesktopButtonInTeachPage;
+    await this.clickButtonToNavigateToNewPage(
+      browseLibraryButtonInTeachPage,
+      'Browse Library button',
+      communityLibraryUrl,
+      'Community Library'
+    );
+  }
+
+  /**
+   * Function to click the Browse Our Lessons button in the Teach page
+   * and check if it opens the Math Classroom page.
+   */
+  async clickExploreLessonsButtonInTeachPage(): Promise<void> {
+    const exploreLessonsButtonInTeachPage = this.isViewportAtMobileWidth()
+      ? exploreLessonsMobileButtonInTeachPage
+      : exploreLessonsDesktopButtonInTeachPage;
+    await this.clickButtonToNavigateToNewPage(
+      exploreLessonsButtonInTeachPage,
+      'Explore Lessons button',
+      mathClassroomUrl,
+      'Math Classroom'
+    );
+  }
+
+  /**
+   * Function to click a button and check if it opens the expected destination
+   * in a new tab. Closes the tab afterwards.
+   */
+  private async clickLinkButtonToNewTab(
+    button: string,
+    buttonName: string,
+    expectedDestinationPageUrl: string,
+    expectedDestinationPageName: string
+  ): Promise<void> {
+    const pageTarget = this.page.target();
+    await this.clickOn(button);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url())
+      .withContext(
+        `${buttonName} should open the ${expectedDestinationPageName} page`
+      )
+      .toBe(expectedDestinationPageUrl);
+    await newTabPage?.close();
+  }
+
+  /**
+   * Function to click a button and check if it opens any of the allowedUrls
+   * in a new tab. Closes the tab afterwards. This function is useful when we try to
+   * verify Google Form URLs which changes in a short span of time.
+   */
+  private async clickLinkButtonToNewTabAndVerifyAllowedUrls(
+    button: string,
+    buttonName: string,
+    allowedUrls: string[],
+    expectedDestinationPageName: string
+  ): Promise<void> {
+    const pageTarget = this.page.target();
+    await this.clickOn(button);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+
+    expect(newTabPage).toBeDefined();
+    const newTabPageUrl = newTabPage?.url() as string;
+    if (!allowedUrls.includes(newTabPageUrl)) {
+      throw new Error(
+        `${buttonName} should open ${expectedDestinationPageName} page` +
+          `but it opens ${newTabPageUrl} instead.`
+      );
+    }
+    await newTabPage?.close();
+  }
+
+  /**
+   * Function to click the Partner With Us button in the Partnerships page
+   * and check if it opens the Partnerships Google form.
+   * The button is in the first section of the page.
+   */
+  async clickPartnerWithUsButtonInPartnershipsPage(): Promise<void> {
+    const allowedUrls = [
+      partnershipsFormShortUrl,
+      partnershipsFormUrl,
+      `${partnershipsFormUrl}?usp=send_form`,
+    ];
+
+    // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
+    // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
+    // control.So we need to check for all the 3 URLs as all of them are valid.
+    await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage,
+      'Partner With Us button at the bottom of the Partnerships page',
+      allowedUrls,
+      'Partnerships Google Form'
+    );
+  }
+
+  /**
+   * Function to change the site language to the given language code.
+   * @param langCode - The language code to change the site language to. Example: 'pt-br', 'en'
+   */
+  private async changeSiteLanguage(langCode: string): Promise<void> {
+    const languageOption = `.e2e-test-i18n-language-${langCode} a`;
+    await this.clickOn(languageDropdown);
+    await this.clickOn(languageOption);
+  }
+
+  /**
+   * Function to click the Partner With Us button in the Partnerships page
+   * and check if it opens the Partnerships Google form in Portuguese.
+   * The button is in the bottom section of the page.
+   */
+  async clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
+    langCode: string
+  ): Promise<void> {
+    await this.changeSiteLanguage(langCode);
+    // Here we need to reload the page again to confirm the language change.
+    await this.page.reload();
+
+    // Here we are not verifying the 3 URLs as we did in the English version
+    // because we have put the direct translated Google Form URL in the page itself.
+    // Refer core/templates/pages/partnerships-page/partnerships-page.component.ts to see how it's done.
+    await this.clickLinkButtonToNewTab(
+      partnerWithUsButtonAtTheBottomOfPartnershipsPage,
+      'Partner With Us button at the bottom of the Partnerships page',
+      partnershipsFormInPortugueseUrl,
+      'Partnerships Google Form'
+    );
+  }
+
+  /**
+   * Function to click the Download Brochure button in the Partnerships page
+   * and check if it opens the Partnerships Brochure.
+   */
+  async clickDownloadBrochureButtonInPartnershipsPage(): Promise<void> {
+    await this.openExternalPdfLink(
+      brochureButtonInPartnershipsPage,
+      partnershipsBrochureUrl
+    );
+  }
+
+  /**
+   * Function to click the first "Read blog post" link in the Partnerships page
+   * and check if it opens the blog page.
+   */
+  async clickReadBlogPostLinkInPartnershipsPage(): Promise<void> {
+    const readBlogPostButtonInPartnershipsPage = this.isViewportAtMobileWidth()
+      ? readBlogPostMobileButtonInPartnershipsPage
+      : readBlogPostDesktopButtonInPartnershipsPage;
+
+    await this.clickLinkButtonToNewTab(
+      readBlogPostButtonInPartnershipsPage,
+      'Read blog post button',
+      blogPostUrlinPartnershipsPage,
+      'Blog Post'
+    );
+  }
+
+  /**
+   * Function to click the Read more stories button in the Partnerships page
+   * and check if it opens the blog page.
+   */
+  async clickReadMoreStoriesButtonInPartnershipsPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      readMoreStoriesButtonInPartnershipsPage,
+      'Read more stories button',
+      blogUrl,
+      'Blog'
+    );
+  }
+
+  /**
+   * Function to click the Apply To Volunteer at the top of the Volunteer page
+   * and check if it opens the Volunteer form.
+   */
+  async clickApplyToVolunteerAtTheTopOfVolunteerPage(): Promise<void> {
+    // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
+    // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
+    // control.So we need to check for all the 3 URLs in the 'allowedVolunteerFormUrls' array
+    // as all of them are valid.
+    await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
+      applyToVolunteerButtonAtTheTopOfVolunteerPage,
+      'Apply To Volunteer at the top of the Volunteer page',
+      allowedVolunteerFormUrls,
+      'Volunteer Form'
+    );
+  }
+
+  /**
+   * Function to click the Apply To Volunteer at the bottom of the Volunteer page
+   * and check if it opens the Volunteer form.
+   */
+  async clickApplyToVolunteerAtTheBottomOfVolunteerPage(): Promise<void> {
+    // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
+    // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
+    // control.So we need to check for all the 3 URLs in the 'allowedVolunteerFormUrls' array
+    // as all of them are valid.
+    await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
+      applyToVolunteerButtonAtTheBottomOfVolunteerPage,
+      'Apply To Volunteer at the bottom of the Volunteer page',
+      allowedVolunteerFormUrls,
+      'Volunteer Form'
+    );
+  }
+
+  /**
+   * Function to check if the donor box is visible on the donate page.
+   * Here we don't test the functionality of the donor box, just its visibility.
+   * because the donor box is an iframe and a third-party service.
+   */
+  async isDonorBoxVisbleOnDonatePage(): Promise<void> {
+    const donorBox = await this.page.waitForSelector(donorBoxIframe);
+    if (!donorBox) {
+      throw new Error('The donor box is not visible on the donate page.');
+    } else {
+      showMessage('The donor box is visible on the donate page.');
+    }
   }
 }
 

@@ -73,7 +73,7 @@
           <a ngbDropdownAnchor
              (click)="learnDropdown.toggle()"
              (keydown.enter)="learnDropdown.toggle()"
-             class="nav-link oppia-navbar-tab dropdown-toggle learn-tab"
+             class="nav-link oppia-navbar-tab dropdown-toggle learn-tab e2e-test-navbar-learn-menu"
              aria-hidden="false"
              aria-label="learn"
              role="button"
@@ -100,7 +100,7 @@
                       <div class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-classroom-link nav-item-top-link">
                         <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
                            (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                           class="nav-item-left-head underline" tabindex="0">
+                           class="nav-item-left-head underline e2e-test-basic-mathematics-link" tabindex="0">
                            {{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
                         </a>
                       </div>
