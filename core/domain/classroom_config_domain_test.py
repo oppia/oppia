@@ -24,7 +24,6 @@
 
 from __future__ import annotations
 
-import os
 from core import utils
 from core.constants import constants
 from core.domain import classroom_config_domain
@@ -35,10 +34,10 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.dummy_thumbnail_data = classroom_config_domain.Image(
+        self.dummy_thumbnail_data = classroom_config_domain.ImageData(
             'thumbnail.svg', 'transparent', 1000
         )
-        self.dummy_banner_data = classroom_config_domain.Image(
+        self.dummy_banner_data = classroom_config_domain.ImageData(
             'banner.png', 'transparent', 1000
         )
         self.classroom = classroom_config_domain.Classroom(
@@ -427,7 +426,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
 
     def test_invalid_thumbnail_bg_color_should_raise_exception(self) -> None:
         error_msg = 'thumbnail_bg_color field should not be empty'
-        self.classroom.thumbnail_data = classroom_config_domain.Image(
+        self.classroom.thumbnail_data = classroom_config_domain.ImageData(
             'valid_thumbnail.svg', '', 1000)
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
@@ -443,7 +442,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
 
     def test_invalid_banner_bg_color_should_raise_exception(self) -> None:
         error_msg = 'banner_bg_color field should not be empty'
-        self.classroom.banner_data = classroom_config_domain.Image(
+        self.classroom.banner_data = classroom_config_domain.ImageData(
             'valid_banner.png', '', 1000)
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
@@ -461,7 +460,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         error_msg = (
             'Image filename should include an extension.'
         )
-        self.classroom.banner_data = classroom_config_domain.Image(
+        self.classroom.banner_data = classroom_config_domain.ImageData(
             'invalid_banner', 'transparent', 1000)
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
@@ -471,7 +470,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         error_msg = (
             'Expected a filename ending in svg, received invalid_thumbnail.png'
         )
-        self.classroom.thumbnail_data = classroom_config_domain.Image(
+        self.classroom.thumbnail_data = classroom_config_domain.ImageData(
             'invalid_thumbnail.png', 'transparent', 1000)
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
@@ -484,36 +483,31 @@ class ImageDomainTests(test_utils.GenericTestBase):
         self.filename = 'test_image.png'
         self.bg_color = '#FFFFFF'
         self.size_in_bytes = 2048
-        self.image_data = os.urandom(10)
 
-        self.image = classroom_config_domain.Image(
+        self.image = classroom_config_domain.ImageData(
             filename=self.filename,
             bg_color=self.bg_color,
-            size_in_bytes=self.size_in_bytes,
-            image_data=self.image_data
+            size_in_bytes=self.size_in_bytes
         )
 
-        self.image_dict: classroom_config_domain.ImageDict = {
+        self.image_dict: classroom_config_domain.ImageDataDict = {
             'filename': self.filename,
             'bg_color': self.bg_color,
-            'size_in_bytes': self.size_in_bytes,
-            'image_data': self.image_data
+            'size_in_bytes': self.size_in_bytes
         }
 
     def test_initialization(self) -> None:
         self.assertEqual(self.image.filename, self.filename)
         self.assertEqual(self.image.bg_color, self.bg_color)
         self.assertEqual(self.image.size_in_bytes, self.size_in_bytes)
-        self.assertEqual(self.image.image_data, self.image_data)
 
     def test_to_dict(self) -> None:
         self.assertEqual(self.image.to_dict(), self.image_dict)
 
     def test_from_dict(self) -> None:
-        image_from_dict = classroom_config_domain.Image.from_dict(
+        image_from_dict = classroom_config_domain.ImageData.from_dict(
             self.image_dict
         )
         self.assertEqual(image_from_dict.filename, self.filename)
         self.assertEqual(image_from_dict.bg_color, self.bg_color)
         self.assertEqual(image_from_dict.size_in_bytes, self.size_in_bytes)
-        self.assertEqual(image_from_dict.image_data, self.image_data)

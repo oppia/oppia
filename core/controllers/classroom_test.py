@@ -26,10 +26,10 @@ from core.domain import topic_services
 from core.tests import test_utils
 
 
-dummy_thumbnail_data = classroom_config_domain.Image(
+dummy_thumbnail_data = classroom_config_domain.ImageData(
     'thumbnail.svg', 'transparent', 1000
 )
-dummy_banner_data = classroom_config_domain.Image(
+dummy_banner_data = classroom_config_domain.ImageData(
     'banner.png', 'transparent', 1000
 )
 

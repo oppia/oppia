@@ -42,10 +42,10 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.dummy_thumbnail_data = classroom_config_domain.Image(
+        self.dummy_thumbnail_data = classroom_config_domain.ImageData(
             'thumbnail.svg', 'transparent', 1000
         )
-        self.dummy_banner_data = classroom_config_domain.Image(
+        self.dummy_banner_data = classroom_config_domain.ImageData(
             'banner.png', 'transparent', 1000
         )
 

@@ -1212,10 +1212,10 @@ class AdminHandler(
                             topic_id_to_prerequisite_topic_ids=(
                                 topic_dependency_for_classroom_1),
                             is_published=True,
-                            thumbnail_data=classroom_config_domain.Image(
+                            thumbnail_data=classroom_config_domain.ImageData(
                                 'thumbnail.svg', 'transparent', 1000
                             ),
-                            banner_data=classroom_config_domain.Image(
+                            banner_data=classroom_config_domain.ImageData(
                                 'banner.png', 'transparent', 1000
                             )
                         )

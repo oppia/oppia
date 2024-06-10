@@ -4231,10 +4231,10 @@ version: 1
             Dict[str, List[str]]] = None,
         is_published: bool = True,
         thumbnail_data: Optional[
-            classroom_config_domain.Image
+            classroom_config_domain.ImageData
         ] = None,
         banner_data: Optional[
-            classroom_config_domain.Image
+            classroom_config_domain.ImageData
         ] = None
     ) -> classroom_config_domain.Classroom:
         """Saves a new strictly-validated classroom.
@@ -4251,16 +4251,17 @@ version: 1
             topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]. A dict
                 with topic ID as key and list of topic IDs as value.
             is_published: bool. Whether this classroom is published or not.
-            thumbnail_data: Optional[Image]. Image object for thumbnail.
-            banner_data: Optional[Image]. Image object for banner.
+            thumbnail_data: Optional[ImageData]. Image data object for
+                thumbnail.
+            banner_data: Optional[ImageData]. Image data object for banner.
 
         Returns:
             Classroom. The classroom domain object.
         """
-        dummy_thumbnail_data = classroom_config_domain.Image(
+        dummy_thumbnail_data = classroom_config_domain.ImageData(
             'thumbnail.svg', 'transparent', 1000
         )
-        dummy_banner_data = classroom_config_domain.Image(
+        dummy_banner_data = classroom_config_domain.ImageData(
             'banner.png', 'transparent', 1000
         )
         classroom = classroom_config_domain.Classroom(

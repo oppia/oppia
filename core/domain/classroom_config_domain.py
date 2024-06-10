@@ -22,7 +22,7 @@ import copy
 from core import utils
 from core.constants import constants
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, TypedDict
 
 
 class ClassroomDict(TypedDict):
@@ -36,8 +36,8 @@ class ClassroomDict(TypedDict):
     topic_list_intro: str
     topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]
     is_published: bool
-    thumbnail_data: ImageDict
-    banner_data: ImageDict
+    thumbnail_data: ImageDataDict
+    banner_data: ImageDataDict
 
 # TODO(#17246): Currently, the classroom data is stored in the config model and
 # we are planning to migrate the storage into a new Classroom model. After the
@@ -59,8 +59,8 @@ class Classroom:
         topic_list_intro: str,
         topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
         is_published: bool,
-        thumbnail_data: Image,
-        banner_data: Image
+        thumbnail_data: ImageData,
+        banner_data: ImageData
     ) -> None:
         """Constructs a Classroom domain object.
 
@@ -75,8 +75,9 @@ class Classroom:
                 with topic ID as key and a list of prerequisite topic IDs as
                 value.
             is_published: bool. Whether this classroom is published or not.
-            thumbnail_data: Image. Image object for classroom thumbnail.
-            banner_data: Image. Image object for classroom banner.
+            thumbnail_data: ImageData. Image data object for classroom
+                thumbnail.
+            banner_data: ImageData. Image data object for classroom banner.
         """
         self.classroom_id = classroom_id
         self.name = name
@@ -110,8 +111,8 @@ class Classroom:
             classroom_dict['topic_list_intro'],
             classroom_dict['topic_id_to_prerequisite_topic_ids'],
             classroom_dict['is_published'],
-            Image.from_dict(classroom_dict['thumbnail_data']),
-            Image.from_dict(classroom_dict['banner_data'])
+            ImageData.from_dict(classroom_dict['thumbnail_data']),
+            ImageData.from_dict(classroom_dict['banner_data'])
         )
 
     def to_dict(self) -> ClassroomDict:
@@ -333,12 +334,12 @@ class Classroom:
             raise utils.ValidationError(
                 'Expected ID of the classroom to be a string, received: %s.'
                 % self.classroom_id)
-        if not isinstance(self.thumbnail_data, Image):
+        if not isinstance(self.thumbnail_data, ImageData):
             raise utils.ValidationError(
                 'Expected thumbnail_data of the classroom to be a string, '
                 'received: %s.' % self.thumbnail_data
             )
-        if not isinstance(self.banner_data, Image):
+        if not isinstance(self.banner_data, ImageData):
             raise utils.ValidationError(
                 'Expected banner_data of the classroom to be a string, '
                 'received: %s.' % self.banner_data
@@ -367,16 +368,15 @@ class Classroom:
         utils.require_valid_thumbnail_filename(self.thumbnail_data.filename)
 
 
-class ImageDict(TypedDict, total=False):
+class ImageDataDict(TypedDict, total=False):
     """Dict type for thumbnail and banner image"""
 
     filename: str
     bg_color: str
     size_in_bytes: int
-    image_data: Optional[bytes]
 
 
-class Image:
+class ImageData:
     """Domain object for a image."""
 
     def __init__(
@@ -384,48 +384,43 @@ class Image:
         filename: str,
         bg_color: str,
         size_in_bytes: int,
-        image_data: Optional[bytes] = None,
     ) -> None:
-        """Constructs a Image domain object.
+        """Constructs a ImageData domain object.
 
         Args:
             filename: str. The filename of the image.
             bg_color: str. The background color of the image.
             size_in_bytes: int. The size of image in bytes.
-            image_data: str. The image blob data.
         """
         self.filename = filename
         self.bg_color = bg_color
         self.size_in_bytes = size_in_bytes
-        self.image_data = image_data
 
     @classmethod
-    def from_dict(cls, image_dict: ImageDict) -> Image:
-        """Returns a image domain object from a dict.
+    def from_dict(cls, image_data_dict: ImageDataDict) -> ImageData:
+        """Returns a image data domain object from a dict.
 
         Args:
-            image_dict: dict. The dict representation of the image
+            image_data_dict: dict. The dict representation of the image
                 object.
 
         Returns:
-            Image. The image object instance.
+            ImageData. The image data object instance.
         """
         return cls(
-            image_dict['filename'],
-            image_dict['bg_color'],
-            image_dict['size_in_bytes'],
-            image_dict.get('image_data', None),
+            image_data_dict['filename'],
+            image_data_dict['bg_color'],
+            image_data_dict['size_in_bytes']
         )
 
-    def to_dict(self) -> ImageDict:
-        """Returns a dict representing a image domain object.
+    def to_dict(self) -> ImageDataDict:
+        """Returns a dict representing a image data domain object.
 
         Returns:
-            dict. A dict, mapping all fields of image instance.
+            dict. A dict, mapping all fields of image data instance.
         """
         return {
             'filename': self.filename,
             'bg_color': self.bg_color,
             'size_in_bytes': self.size_in_bytes,
-            'image_data': self.image_data
         }

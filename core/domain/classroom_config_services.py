@@ -79,12 +79,12 @@ def get_classroom_from_classroom_model(
         Classroom. A classroom domain object corresponding to the given
         classroom model.
     """
-    thumbnail_data = classroom_config_domain.Image(
+    thumbnail_data = classroom_config_domain.ImageData(
         classroom_model.thumbnail_filename,
         classroom_model.thumbnail_bg_color,
         classroom_model.thumbnail_size_in_bytes
     )
-    banner_data = classroom_config_domain.Image(
+    banner_data = classroom_config_domain.ImageData(
         classroom_model.banner_filename,
         classroom_model.banner_bg_color,
         classroom_model.banner_size_in_bytes
