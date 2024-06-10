@@ -19,9 +19,9 @@
 /*
   This is the user-journey of Partners:
   1.Go to About- Foundation page via footer or navbar from the home(splash) page
-  2.Go to the parnerships page from About Foundation Page by clicking on the partnerships link.
-  3.Fill the partnerships form via any one of the 2 buttons, in any language on parnerships page.
-  This is the page flow : home page --> Foundation page --> parnerships - page
+  2.Go to the partnerships page from About Foundation Page by clicking on the partnerships link.
+  3.Fill the partnerships form via any one of the 2 buttons, in any language on partnerships page.
+  This is the page flow : home page --> Foundation page --> partnerships - page
   Testing - Can partners successfully fill the partnerships form if they visit the website for the first time (typically lands on home page) ?
  */
 
