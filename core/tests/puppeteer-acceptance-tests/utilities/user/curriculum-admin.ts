@@ -850,7 +850,7 @@ export class CurriculumAdmin extends BaseUser {
       ? mobileDeleteSkillButton
       : desktopDeleteSkillButton;
 
-    await this.page.goto(testConstants.URLs.TopicAndSkillsDashboard);
+    await this.page.goto(topicAndSkillsDashboardUrl);
     await this.page.waitForSelector(skillsTab, {visible: true});
     await this.clickOn(skillsTab);
     await this.page.waitForSelector(skillSelector, {visible: true});
@@ -935,21 +935,20 @@ export class CurriculumAdmin extends BaseUser {
       : desktopSkillQuestionTab;
 
     if (isMobileWidth) {
-      await this.clickOn(mobileOptionsSelector);
-      await this.page.screenshot({path: 'debug1.png'});
-      await this.page.waitForSelector(
-        '.e2e-test-mobile-skill-nav-dropdown-icon',
-        {visible: true}
-      );
-      await this.clickOn('.e2e-test-mobile-skill-nav-dropdown-icon');
+      const currentUrl = this.page.url();
+      const questionsTabUrl = `${currentUrl}questions`;
+      await this.goto(questionsTabUrl);
+      await this.page.reload({waitUntil: 'networkidle0'});
+    } else {
+      await this.clickAndWaitForNavigation(skillQuestionTab);
     }
-    await this.clickAndWaitForNavigation(skillQuestionTab);
 
     let isTextPresent = await this.isTextPresentOnPage(
       'There are no questions in this skill.'
     );
 
     while (!isTextPresent) {
+      await this.page.waitForSelector(removeQuestion);
       const button = await this.page.$(removeQuestion);
       if (!button) {
         throw new Error('Remove question button not found');
@@ -957,9 +956,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.waitForElementToBeClickable(button);
       await button.click();
       await this.page.waitForSelector(modalDiv, {visible: true});
-      await this.page.screenshot({path: 'debug1.5.png'});
       await this.clickOn('Remove Question');
-      await this.page.screenshot({path: 'debug2.png'});
       await this.page.waitForSelector(modalDiv, {hidden: true});
       await this.page.reload({waitUntil: 'networkidle0'});
       isTextPresent = await this.isTextPresentOnPage(
