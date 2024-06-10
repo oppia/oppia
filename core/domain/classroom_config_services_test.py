@@ -42,16 +42,12 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.dummy_thumbnail_data: classroom_config_domain.ImageDict = {
-                'filename': 'thumbnail.svg',
-                'bg_color': 'transparent',
-                'size_in_bytes': 1000
-        }
-        self.dummy_banner_data: classroom_config_domain.ImageDict = {
-                'filename': 'banner.png',
-                'bg_color': 'transparent',
-                'size_in_bytes': 1000
-        }
+        self.dummy_thumbnail_data = classroom_config_domain.Image(
+            'thumbnail.svg', 'transparent', 1000
+        )
+        self.dummy_banner_data = classroom_config_domain.Image(
+            'banner.png', 'transparent', 1000
+        )
 
         self.math_classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': 'math_classroom_id',
@@ -65,8 +61,9 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
                 'topic_id_2': [],
                 'topic_id_3': []
             },
-            'is_published': True, 'thumbnail_data': self.dummy_thumbnail_data,
-            'banner_data': self.dummy_banner_data
+            'is_published': True,
+            'thumbnail_data': self.dummy_thumbnail_data.to_dict(),
+            'banner_data': self.dummy_banner_data.to_dict()
         }
         self.math_classroom = classroom_config_domain.Classroom.from_dict(
             self.math_classroom_dict)
@@ -79,12 +76,12 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.math_classroom.topic_list_intro,
             self.math_classroom.topic_id_to_prerequisite_topic_ids,
             self.math_classroom.is_published,
-            self.math_classroom.thumbnail_data['filename'],
-            self.math_classroom.thumbnail_data['bg_color'],
-            self.math_classroom.thumbnail_data['size_in_bytes'],
-            self.math_classroom.banner_data['filename'],
-            self.math_classroom.banner_data['bg_color'],
-            self.math_classroom.banner_data['size_in_bytes'],
+            self.math_classroom.thumbnail_data.filename,
+            self.math_classroom.thumbnail_data.bg_color,
+            self.math_classroom.thumbnail_data.size_in_bytes,
+            self.math_classroom.banner_data.filename,
+            self.math_classroom.banner_data.bg_color,
+            self.math_classroom.banner_data.size_in_bytes,
         )
 
         self.physics_classroom_dict: classroom_config_domain.ClassroomDict = {
@@ -99,8 +96,9 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
                 'topic_id_2': [],
                 'topic_id_3': []
             },
-            'is_published': True, 'thumbnail_data': self.dummy_thumbnail_data,
-            'banner_data': self.dummy_banner_data
+            'is_published': True,
+            'thumbnail_data': self.dummy_thumbnail_data.to_dict(),
+            'banner_data': self.dummy_banner_data.to_dict()
         }
         self.physics_classroom = classroom_config_domain.Classroom.from_dict(
             self.physics_classroom_dict)
@@ -113,12 +111,12 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.physics_classroom.topic_list_intro,
             self.physics_classroom.topic_id_to_prerequisite_topic_ids,
             self.physics_classroom.is_published,
-            self.physics_classroom.thumbnail_data['filename'],
-            self.physics_classroom.thumbnail_data['bg_color'],
-            self.physics_classroom.thumbnail_data['size_in_bytes'],
-            self.physics_classroom.banner_data['filename'],
-            self.physics_classroom.banner_data['bg_color'],
-            self.physics_classroom.banner_data['size_in_bytes']
+            self.physics_classroom.thumbnail_data.filename,
+            self.physics_classroom.thumbnail_data.bg_color,
+            self.physics_classroom.thumbnail_data.size_in_bytes,
+            self.physics_classroom.banner_data.filename,
+            self.physics_classroom.banner_data.bg_color,
+            self.physics_classroom.banner_data.size_in_bytes
         )
 
     def test_get_classroom_by_id(self) -> None:
@@ -151,8 +149,9 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             'teaser_text': 'Teaser test for chemistry classroom',
             'topic_list_intro': 'Start from the basics with our first topic.',
             'topic_id_to_prerequisite_topic_ids': {'topic_id_chem': []},
-            'is_published': True, 'thumbnail_data': self.dummy_thumbnail_data,
-            'banner_data': self.dummy_banner_data
+            'is_published': True,
+            'thumbnail_data': self.dummy_thumbnail_data.to_dict(),
+            'banner_data': self.dummy_banner_data.to_dict()
         }
         chemistry_classroom = classroom_config_domain.Classroom.from_dict(
             chemistry_classroom_dict)
@@ -165,12 +164,12 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             chemistry_classroom.topic_list_intro,
             chemistry_classroom.topic_id_to_prerequisite_topic_ids,
             chemistry_classroom.is_published,
-            chemistry_classroom.thumbnail_data['filename'],
-            chemistry_classroom.thumbnail_data['bg_color'],
-            chemistry_classroom.thumbnail_data['size_in_bytes'],
-            chemistry_classroom.banner_data['filename'],
-            chemistry_classroom.banner_data['bg_color'],
-            chemistry_classroom.banner_data['size_in_bytes']
+            chemistry_classroom.thumbnail_data.filename,
+            chemistry_classroom.thumbnail_data.bg_color,
+            chemistry_classroom.thumbnail_data.size_in_bytes,
+            chemistry_classroom.banner_data.filename,
+            chemistry_classroom.banner_data.bg_color,
+            chemistry_classroom.banner_data.size_in_bytes
         )
         classroom_url_fragment = (
             classroom_config_services.

@@ -26,16 +26,12 @@ from core.domain import topic_services
 from core.tests import test_utils
 
 
-dummy_thumbnail_data: classroom_config_domain.ImageDict = {
-    'filename': 'thumbnail.svg',
-    'bg_color': 'transparent',
-    'size_in_bytes': 1000
-}
-dummy_banner_data: classroom_config_domain.ImageDict = {
-    'filename': 'banner.png',
-    'bg_color': 'transparent',
-    'size_in_bytes': 1000
-}
+dummy_thumbnail_data = classroom_config_domain.Image(
+    'thumbnail.svg', 'transparent', 1000
+)
+dummy_banner_data = classroom_config_domain.Image(
+    'banner.png', 'transparent', 1000
+)
 
 
 class BaseClassroomControllerTests(test_utils.GenericTestBase):
@@ -211,8 +207,9 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
                 'topic_id_2': [],
                 'topic_id_3': []
             },
-            'is_published': True, 'thumbnail_data': dummy_thumbnail_data,
-            'banner_data': dummy_banner_data
+            'is_published': True,
+            'thumbnail_data': dummy_thumbnail_data.to_dict(),
+            'banner_data': dummy_banner_data.to_dict()
         }
         self.physics_classroom = classroom_config_domain.Classroom.from_dict(
             self.physics_classroom_dict)
@@ -233,8 +230,9 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
                 'topic_id_2': [],
                 'topic_id_3': []
             },
-            'is_published': True, 'thumbnail_data': dummy_thumbnail_data,
-            'banner_data': dummy_banner_data
+            'is_published': True,
+            'thumbnail_data': dummy_thumbnail_data.to_dict(),
+            'banner_data': dummy_banner_data.to_dict()
         }
         self.math_classroom = classroom_config_domain.Classroom.from_dict(
             self.math_classroom_dict)
@@ -396,8 +394,9 @@ class UnusedTopicsHandlerTests(test_utils.GenericTestBase):
                 'topic_id_3': [],
                 'used_topic_1': []
             },
-            'is_published': True, 'thumbnail_data': dummy_thumbnail_data,
-            'banner_data': dummy_banner_data
+            'is_published': True,
+            'thumbnail_data': dummy_thumbnail_data.to_dict(),
+            'banner_data': dummy_banner_data.to_dict()
         }
         self.physics_classroom = classroom_config_domain.Classroom.from_dict(
             self.physics_classroom_dict)

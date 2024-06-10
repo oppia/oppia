@@ -1670,7 +1670,6 @@ ContentValueType = Union[str, List[str]]
 
 MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 10
 
-# The default classroom publication status.
 DEFAULT_CLASSROOM_PUBLICATION_STATUS = False
 
 

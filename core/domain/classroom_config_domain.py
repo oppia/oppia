@@ -59,8 +59,8 @@ class Classroom:
         topic_list_intro: str,
         topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
         is_published: bool,
-        thumbnail_data: ImageDict,
-        banner_data: ImageDict
+        thumbnail_data: Image,
+        banner_data: Image
     ) -> None:
         """Constructs a Classroom domain object.
 
@@ -75,8 +75,8 @@ class Classroom:
                 with topic ID as key and a list of prerequisite topic IDs as
                 value.
             is_published: bool. Whether this classroom is published or not.
-            thumbnail_data: ImageDict. Image object for classroom thumbnail.
-            banner_data: ImageDict. Image object for classroom banner.
+            thumbnail_data: Image. Image object for classroom thumbnail.
+            banner_data: Image. Image object for classroom banner.
         """
         self.classroom_id = classroom_id
         self.name = name
@@ -110,8 +110,8 @@ class Classroom:
             classroom_dict['topic_list_intro'],
             classroom_dict['topic_id_to_prerequisite_topic_ids'],
             classroom_dict['is_published'],
-            classroom_dict['thumbnail_data'],
-            classroom_dict['banner_data']
+            Image.from_dict(classroom_dict['thumbnail_data']),
+            Image.from_dict(classroom_dict['banner_data'])
         )
 
     def to_dict(self) -> ClassroomDict:
@@ -130,8 +130,8 @@ class Classroom:
             'topic_id_to_prerequisite_topic_ids': (
                 self.topic_id_to_prerequisite_topic_ids),
             'is_published': self.is_published,
-            'thumbnail_data': self.thumbnail_data,
-            'banner_data': self.banner_data
+            'thumbnail_data': self.thumbnail_data.to_dict(),
+            'banner_data': self.banner_data.to_dict()
         }
 
     def get_topic_ids(self) -> List[str]:
@@ -338,18 +338,18 @@ class Classroom:
             raise utils.ValidationError(
                 'Expected ID of the classroom to be a string, received: %s.'
                 % self.classroom_id)
-        if not isinstance(self.thumbnail_data['filename'], str):
+        if not isinstance(self.thumbnail_data.filename, str):
             raise utils.ValidationError(
                 'Expected thumbnail_filename of the classroom to '
-                'be a string, received: %s.' % self.thumbnail_data['filename'])
-        if not isinstance(self.banner_data['filename'], str):
+                'be a string, received: %s.' % self.thumbnail_data.filename)
+        if not isinstance(self.banner_data.filename, str):
             raise utils.ValidationError(
                 'Expected banner_filename of the classroom to '
-                'be a string, received: %s.' % self.banner_data['filename'])
-        if self.thumbnail_data['filename'] == '':
+                'be a string, received: %s.' % self.banner_data.filename)
+        if self.thumbnail_data.filename == '':
             raise utils.ValidationError(
                 'thumbnail_filename field should not be empty')
-        if self.banner_data['filename'] == '':
+        if self.banner_data.filename == '':
             raise utils.ValidationError(
                 'banner_filename field should not be empty')
 
@@ -364,10 +364,10 @@ class Classroom:
             raise utils.ValidationError(
                 'Expected is_published of the classroom to be a boolean, '
                 'received: %s.' % self.is_published)
-        self.require_valid_bg_color(self.thumbnail_data['bg_color'], True)
-        self.require_valid_bg_color(self.banner_data['bg_color'], False)
-        utils.require_valid_image_filename(self.banner_data['filename'])
-        utils.require_valid_thumbnail_filename(self.thumbnail_data['filename'])
+        self.require_valid_bg_color(self.thumbnail_data.bg_color, True)
+        self.require_valid_bg_color(self.banner_data.bg_color, False)
+        utils.require_valid_image_filename(self.banner_data.filename)
+        utils.require_valid_thumbnail_filename(self.thumbnail_data.filename)
 
 
 class ImageDict(TypedDict, total=False):
@@ -377,3 +377,58 @@ class ImageDict(TypedDict, total=False):
     bg_color: str
     size_in_bytes: int
     image_data: Optional[bytes]
+
+
+class Image:
+    """Domain object for a image."""
+
+    def __init__(
+        self,
+        filename: str,
+        bg_color: str,
+        size_in_bytes: int,
+        image_data: Optional[bytes] = None,
+    ) -> None:
+        """Constructs a Image domain object.
+
+        Args:
+            filename: str. The filename of the image.
+            bg_color: str. The background color of the image.
+            size_in_bytes: int. The size of image in bytes.
+            image_data: str. The image blob data.
+        """
+        self.filename = filename
+        self.bg_color = bg_color
+        self.size_in_bytes = size_in_bytes
+        self.image_data = image_data
+
+    @classmethod
+    def from_dict(cls, image_dict: ImageDict) -> Image:
+        """Returns a image domain object from a dict.
+
+        Args:
+            image_dict: dict. The dict representation of the image
+                object.
+
+        Returns:
+            Image. The image object instance.
+        """
+        return cls(
+            image_dict['filename'],
+            image_dict['bg_color'],
+            image_dict['size_in_bytes'],
+            image_dict.get('image_data', None),
+        )
+
+    def to_dict(self) -> ImageDict:
+        """Returns a dict representing a image domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of image instance.
+        """
+        return {
+            'filename': self.filename,
+            'bg_color': self.bg_color,
+            'size_in_bytes': self.size_in_bytes,
+            'image_data': self.image_data
+        }

@@ -24,6 +24,7 @@
 
 from __future__ import annotations
 
+import os
 from core import utils
 from core.constants import constants
 from core.domain import classroom_config_domain
@@ -34,16 +35,12 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.dummy_thumbnail_data: classroom_config_domain.ImageDict = {
-                'filename': 'thumbnail.svg',
-                'bg_color': 'transparent',
-                'size_in_bytes': 1000
-        }
-        self.dummy_banner_data: classroom_config_domain.ImageDict = {
-                'filename': 'banner.png',
-                'bg_color': 'transparent',
-                'size_in_bytes': 1000
-        }
+        self.dummy_thumbnail_data = classroom_config_domain.Image(
+            'thumbnail.svg', 'transparent', 1000
+        )
+        self.dummy_banner_data = classroom_config_domain.Image(
+            'banner.png', 'transparent', 1000
+        )
         self.classroom = classroom_config_domain.Classroom(
             'classroom_id', 'math', 'math',
             'Curated math foundations course.',
@@ -67,8 +64,9 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
                 'topic_id_2': [],
                 'topic_id_3': []
             },
-            'is_published': True, 'thumbnail_data': self.dummy_thumbnail_data,
-            'banner_data': self.dummy_banner_data
+            'is_published': True,
+            'thumbnail_data': self.dummy_thumbnail_data.to_dict(),
+            'banner_data': self.dummy_banner_data.to_dict()
         }
 
     def test_that_domain_object_is_created_correctly(self) -> None:
@@ -319,144 +317,10 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
-    def test_invalid_banner_bg_color_should_raise_exception(self) -> None:
-        error_msg = (
-            'Expected banner_bg_color of the classroom to be a string, ' +
-            'received: 123.'
-        )
-        banner = {'filename': 'valid_banner.png', 'bg_color': 123}
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally
-        # test wrong inputs that we can normally catch by typing.
-        self.classroom.banner_data = banner # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-        error_msg = 'banner_bg_color field should not be empty'
-        banner['bg_color'] = ''
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally
-        # test wrong inputs that we can normally catch by typing.
-        self.classroom.banner_data = banner # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-        error_msg = 'Classroom banner background color #FFFF is not supported.'
-        banner['bg_color'] = '#FFFF'
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally
-        # test wrong inputs that we can normally catch by typing.
-        self.classroom.banner_data = banner # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-    def test_invalid_thumbnail_bg_color_should_raise_exception(self) -> None:
-        error_msg = (
-            'Expected thumbnail_bg_color of the classroom to be a string, ' +
-            'received: 123.'
-        )
-        thumbnail = {'filename': 'valid_thumbnail.svg', 'bg_color': 123}
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally
-        # test wrong inputs that we can normally catch by typing.
-        self.classroom.thumbnail_data = thumbnail # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-        error_msg = 'thumbnail_bg_color field should not be empty'
-        thumbnail['bg_color'] = ''
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally
-        # test wrong inputs that we can normally catch by typing.
-        self.classroom.banner_data = thumbnail # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-        error_msg = (
-            'Classroom thumbnail background color #FFFF is not ' +
-            'supported.'
-                    )
-        thumbnail['bg_color'] = '#FFFF'
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally
-        # test wrong inputs that we can normally catch by typing.
-        self.classroom.banner_data = thumbnail # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-    def test_invalid_thumbnail_filename_should_raise_exception(self) -> None:
-        error_msg = (
-            'Expected thumbnail_filename of the classroom to be a string, ' +
-            'received: 123.'
-        )
-        thumbnail = {'filename': 123, 'bg_color': 'transparent'}
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally
-        # test wrong inputs that we can normally catch by typing.
-        self.classroom.thumbnail_data = thumbnail # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-        error_msg = 'thumbnail_filename field should not be empty'
-        thumbnail['filename'] = ''
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally
-        # test wrong inputs that we can normally catch by typing.
-        self.classroom.thumbnail_data = thumbnail # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-        thumbnail['filename'] = 'invalid_thumbnail.png'
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally
-        # test wrong inputs that we can normally catch by typing.
-        self.classroom.thumbnail_data = thumbnail # type: ignore[assignment]
-        error_msg = (
-            'Expected a filename ending in svg, received ' +
-            'invalid_thumbnail.png'
-        )
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-    def test_invalid_banner_filename_should_raise_exception(self) -> None:
-        banner = {'filename': 123, 'bg_color': 'transparent'}
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally
-        # test wrong inputs that we can normally catch by typing.
-        self.classroom.banner_data = banner # type: ignore[assignment]
-        error_msg = (
-            'Expected banner_filename of the classroom to be a string, ' +
-            'received: 123.'
-        )
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
-        banner['filename'] = ''
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally
-        # test wrong inputs that we can normally catch by typing.
-        self.classroom.banner_data = banner # type: ignore[assignment]
-        error_msg = 'banner_filename field should not be empty'
-        with self.assertRaisesRegex(
-            utils.ValidationError, error_msg):
-            self.classroom.validate()
-
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
     # test wrong inputs that we can normally catch by typing.
-    def test_invalid_is_published_should_raise_exception(
-        self
-    ) -> None:
+    def test_invalid_is_published_should_raise_exception(self) -> None:
         self.classroom.is_published = 1 # type: ignore[assignment]
         error_msg = (
             'Expected is_published of the classroom to be a boolean, '
@@ -535,3 +399,44 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'topic_id_3': ['topic_id_2', 'topic_id_1']
         }
         self.classroom.validate()
+
+
+class ImageDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        self.filename = 'test_image.png'
+        self.bg_color = '#FFFFFF'
+        self.size_in_bytes = 2048
+        self.image_data = os.urandom(10)
+
+        self.image = classroom_config_domain.Image(
+            filename=self.filename,
+            bg_color=self.bg_color,
+            size_in_bytes=self.size_in_bytes,
+            image_data=self.image_data
+        )
+
+        self.image_dict: classroom_config_domain.ImageDict = {
+            'filename': self.filename,
+            'bg_color': self.bg_color,
+            'size_in_bytes': self.size_in_bytes,
+            'image_data': self.image_data
+        }
+
+    def test_initialization(self) -> None:
+        self.assertEqual(self.image.filename, self.filename)
+        self.assertEqual(self.image.bg_color, self.bg_color)
+        self.assertEqual(self.image.size_in_bytes, self.size_in_bytes)
+        self.assertEqual(self.image.image_data, self.image_data)
+
+    def test_to_dict(self) -> None:
+        self.assertEqual(self.image.to_dict(), self.image_dict)
+
+    def test_from_dict(self) -> None:
+        image_from_dict = classroom_config_domain.Image.from_dict(
+            self.image_dict
+        )
+        self.assertEqual(image_from_dict.filename, self.filename)
+        self.assertEqual(image_from_dict.bg_color, self.bg_color)
+        self.assertEqual(image_from_dict.size_in_bytes, self.size_in_bytes)
+        self.assertEqual(image_from_dict.image_data, self.image_data)

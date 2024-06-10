@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import utils
 from core.platform import models
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -30,15 +30,6 @@ if MYPY: # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
-
-
-class ImageDict(TypedDict, total=False):
-    """Dict type for thumbnail and banner image"""
-
-    filename: str
-    bg_color: str
-    size_in_bytes: Optional[int]
-    image_data: Optional[bytes]
 
 
 class ClassroomModel(base_models.BaseModel):

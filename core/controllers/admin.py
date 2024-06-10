@@ -1212,16 +1212,12 @@ class AdminHandler(
                             topic_id_to_prerequisite_topic_ids=(
                                 topic_dependency_for_classroom_1),
                             is_published=True,
-                            thumbnail_data={
-                                'filename': 'thumbnail.svg',
-                                'bg_color': 'transparent',
-                                'size_in_bytes': 1000
-                            },
-                            banner_data={
-                                'filename': 'banner.png',
-                                'bg_color': 'transparent',
-                                'size_in_bytes': 1000  
-                            }
+                            thumbnail_data=classroom_config_domain.Image(
+                                'thumbnail.svg', 'transparent', 1000
+                            ),
+                            banner_data=classroom_config_domain.Image(
+                                'banner.png', 'transparent', 1000
+                            )
                         )
 
             classroom_config_services.create_new_classroom(classroom_1)
