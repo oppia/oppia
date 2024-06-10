@@ -181,16 +181,19 @@ _EDITOR_ROLE_EMAIL_HTML_RIGHTS: Dict[str, str] = {
 # We don't include "can_voiceover" for managers and editors, since this is
 # implied by the email description for "can_edit".
 EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE: Dict[str, str] = {
-    EXPLORATION_ROLE_MANAGER: (
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_manage'] +
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
-    EXPLORATION_ROLE_EDITOR: (
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
-    EXPLORATION_ROLE_VOICE_ARTIST: (
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_voiceover'] +
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
+    EXPLORATION_ROLE_MANAGER: ('%s%s%s' % (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_manage'],
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'],
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play'])
+    ),
+    EXPLORATION_ROLE_EDITOR: ('%s%s' % (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'],
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play'])
+    ),
+    EXPLORATION_ROLE_VOICE_ARTIST: ('%s%s' % (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_voiceover'],
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play'])
+    ),
     EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
 }
 
@@ -242,13 +245,11 @@ CURRICULUM_ADMIN_CHAPTER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
     ),
     'upcoming_chapters_template': (
         'The following stories have unpublished chapters which are due for '
-        'publication in the next ' +
-        str(constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS)
-        + ' days. Please ensure they are published '
+        'publication in the next %s days. Please ensure they are published '
         'on or before the planned date or adjust the planned publication date.'
         '<br><br>'
-        '<ol>%s</ol>'
-    ),
+        '<ol>%%s</ol>'
+    ) % constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS,
     'email_subject': 'Chapter Publication Notifications'
 }
 
@@ -1849,14 +1850,14 @@ def send_reviewer_notifications(
         email_subject = 'Contributor Dashboard New Reviewer Opportunities'
         email_body_template = (
             'Hi %s,<br><br>'
-            'There are new <a href="%s%s">opportunities</a>' +
-            ' to review translations that we think you might be interested' +
-            ' in on the Contributor Dashboard page. Here are some examples' +
-            ' of contributions that are waiting for review:<br><br>' +
-            'The following suggestions are available for review: ' +
-            '<br><br><ul>%s</ul><br>Please take some time to review any ' +
-            'of the above contributions (if they still need a review)' +
-            ' or any other contributions on the dashboard.' +
+            'There are new <a href="%s%s">opportunities</a>'
+            ' to review translations that we think you might be interested'
+            ' in on the Contributor Dashboard page. Here are some examples'
+            ' of contributions that are waiting for review:<br><br>'
+            'The following suggestions are available for review: '
+            '<br><br><ul>%s</ul><br>Please take some time to review any '
+            'of the above contributions (if they still need a review)'
+            ' or any other contributions on the dashboard.'
             ' We appreciate your help!<br><br>Thanks again, '
             'and happy reviewing!<br><br>The Oppia Contributor Dashboard Team'
         )
@@ -2234,10 +2235,11 @@ def send_reminder_mail_to_notify_curriculum_admins(
         if len(overdue_story.overdue_chapters) == 0:
             continue
         chapters_are_overdue = True
-        story_link = (
-            str(feconf.OPPIA_SITE_URL) +
-            str(feconf.STORY_EDITOR_URL_PREFIX) +
-            '/' + overdue_story.id)
+        story_link = ('%s%s/%s' % (
+            str(feconf.OPPIA_SITE_URL),
+            str(feconf.STORY_EDITOR_URL_PREFIX),
+            overdue_story.id
+        ))
         story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
             overdue_story.story_name, overdue_story.topic_name,
             story_link)
@@ -2255,10 +2257,11 @@ def send_reminder_mail_to_notify_curriculum_admins(
         if len(upcoming_story.upcoming_chapters) == 0:
             continue
         chapters_are_upcoming = True
-        story_link = (
-            str(feconf.OPPIA_SITE_URL) +
-            str(feconf.STORY_EDITOR_URL_PREFIX) +
-            '/' + upcoming_story.id)
+        story_link = ('%s%s/%s' % (
+            str(feconf.OPPIA_SITE_URL),
+            str(feconf.STORY_EDITOR_URL_PREFIX),
+            upcoming_story.id
+        ))
         story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
             upcoming_story.story_name, upcoming_story.topic_name,
             story_link)
@@ -2340,14 +2343,14 @@ def send_email_to_new_cd_user(
 
     Args:
         recipient_id: str. The ID of the user.
-        category: str. The category in which user can review or submit 
+        category: str. The category in which user can review or submit
             contributions.
-        language_code: None|str. The language code for a language if 
+        language_code: None|str. The language code for a language if
             the category is 'translation' else None.
 
     Raises:
         Exception. The contribution category is not valid.
-        Exception. The language_code cannot be None if the 
+        Exception. The language_code cannot be None if the
             category is 'translation'.
     """
     if category not in NEW_CD_USER_EMAIL_DATA:
@@ -2443,12 +2446,12 @@ def send_email_to_removed_cd_user(
     category: str,
     language_code: Optional[str] = None
 ) -> None:
-    """Sends an email to user who is removed from a specific 
+    """Sends an email to user who is removed from a specific
         contributor position.
 
     Args:
         user_id: str. The ID of the user.
-        category: str. The category in which user can no longer review or 
+        category: str. The category in which user can no longer review or
             submit contributions.
         language_code: None|str. The language code for a language if the review
             item is translation else None.
