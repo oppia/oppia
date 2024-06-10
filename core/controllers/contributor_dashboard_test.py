@@ -2005,9 +2005,9 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_contributor_certificate(self) -> None:
-        score_category: str = (
-            suggestion_models.SCORE_TYPE_TRANSLATION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        score_category: str = ('%s%sEnglish' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER))
         change_cmd = {
             'cmd': 'add_written_translation',
             'content_id': 'content',
@@ -2062,10 +2062,10 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_json(
-            '/contributorcertificate/%s/%s?language=%s&'
+            '/contributorcertificate/%s/%s?language=hi&'
             'from_date=%s&to_date=%s' % (
                 self.OWNER_USERNAME, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                'hi', from_date_str, to_date_str
+                from_date_str, to_date_str
             ),
             expected_status_int=400
         )

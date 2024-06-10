@@ -189,9 +189,10 @@ def create_suggestion(
     if target_type == feconf.ENTITY_TYPE_EXPLORATION:
         exploration = exp_fetchers.get_exploration_by_id(target_id)
     if suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
-        score_category = (
-            suggestion_models.SCORE_TYPE_CONTENT +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        score_category = ('%s%s%s' % (
+            suggestion_models.SCORE_TYPE_CONTENT,
+            suggestion_models.SCORE_CATEGORY_DELIMITER, exploration.category
+            ))
         # Suggestions of this type do not have an associated language code,
         # since they are not queryable by language.
         language_code = None
@@ -204,9 +205,10 @@ def create_suggestion(
             )
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        score_category = (
-            suggestion_models.SCORE_TYPE_TRANSLATION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        score_category = ('%s%s%s' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER, exploration.category)
+        )
         # The language code of the translation, used for querying purposes.
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(change_cmd['language_code'], str)
@@ -225,9 +227,10 @@ def create_suggestion(
             author_id, None, change_cmd, score_category, language_code, False,
             datetime.datetime.utcnow(), datetime.datetime.utcnow())
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
-        score_category = (
-            suggestion_models.SCORE_TYPE_QUESTION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
+        score_category = ('%s%s%s' % (
+            suggestion_models.SCORE_TYPE_QUESTION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER, target_id)
+        )
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(change_cmd['question_dict'], dict)
         # Here we use cast because we are narrowing down the type from
