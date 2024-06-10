@@ -686,7 +686,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         user_ids_for_which_feature_flag_enabled_for_10_perc = set()
         count_feature_flag_enabled_for_10_perc = 0
         for count in range(1, 1001):
-            user_ids_list.append('userid' + str(count))
+            user_ids_list.append('userid%s' % str(count))
 
         with swap_name_to_description_feature_stage_registry_dict:
             with swap_all_feature_names_set:
