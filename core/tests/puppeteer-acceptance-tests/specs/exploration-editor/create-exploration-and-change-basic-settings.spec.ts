@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for settings tab in exploration editor.
+ * @fileoverview Acceptance Test for creating and modifying an exploration on/via the settings tab.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';

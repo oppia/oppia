@@ -39,6 +39,7 @@ const categoryDropdown = 'mat-select.e2e-test-exploration-category-dropdown';
 const languageUpdateDropdown =
   'mat-select.e2e-test-exploration-language-select';
 const addTagsInputBox = 'input.e2e-test-chip-list-tags';
+const autoSaveIndicator = 'span.e2e-test-autosave-indicator';
 const previewSummaryButton = 'button.e2e-test-open-preview-summary-modal';
 const dismissPreviewButton = 'button.e2e-test-close-preview-summary-modal';
 const textToSpeechToggle = 'label.e2e-test-on-off-switch';
@@ -301,10 +302,10 @@ export class ExplorationEditor extends BaseUser {
    * This function Waits for the autosave indicator to appear and then disappear.
    */
   async waitForAutosaveIndicator(): Promise<void> {
-    await this.page.waitForSelector('span.e2e-test-autosave-indicator', {
+    await this.page.waitForSelector(autoSaveIndicator, {
       visible: true,
     });
-    await this.page.waitForSelector('span.e2e-test-autosave-indicator', {
+    await this.page.waitForSelector(autoSaveIndicator, {
       hidden: true,
     });
   }
