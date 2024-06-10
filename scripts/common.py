@@ -213,6 +213,7 @@ CHROME_PATHS = [
 
 ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-admin/assign-roles-to-users-and-change-tag-properties',
+    'blog-editor/create-and-delete-draft-blog-post',
     'blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked',
     'curriculum-admin/create-and-publish-topics-and-stories',
     'exploration-editor/create-exploration-and-change-basic-settings',
