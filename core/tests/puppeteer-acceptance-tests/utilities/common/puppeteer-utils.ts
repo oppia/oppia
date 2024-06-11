@@ -16,7 +16,13 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
+import puppeteer, {
+  Page,
+  Frame,
+  Browser,
+  Viewport,
+  ElementHandle,
+} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
@@ -304,6 +310,83 @@ export class BaseUser {
       await this.page.click(selector);
     }
   }
+
+  /**
+   * The function clicks the element using the text on the button
+   * and wait until the new page is fully loaded.
+   */
+  async clickAndWaitForNavigation(selector: string): Promise<void> {
+    /** Normalize-space is used to remove the extra spaces in the text.
+     * Check the documentation for the normalize-space function here :
+     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
+    const [button] = await this.page.$x(
+      `\/\/*[contains(text(), normalize-space('${selector}'))]`
+    );
+    // If we fail to find the element by its XPATH, then the button is undefined and
+    // we try to find it by its CSS selector.
+    if (button !== undefined) {
+      await this.waitForElementToBeClickable(button);
+      await Promise.all([
+        this.page.waitForNavigation({
+          waitUntil: ['networkidle2', 'load'],
+        }),
+        button.click(),
+      ]);
+    } else {
+      await this.waitForElementToBeClickable(selector);
+      await Promise.all([
+        this.page.waitForNavigation({
+          waitUntil: ['networkidle2', 'load'],
+        }),
+        this.page.click(selector),
+      ]);
+    }
+  }
+
+  /**
+   * Clicks an element on the page.
+   * @param {Page | Frame | ElementHandle} context - The Puppeteer context, usually a Page or Frame.
+   * @param {string} selector - The CSS selector of the element to click.
+   */
+  async clickElement(
+    context: Page | Frame | ElementHandle,
+    selector: string
+  ): Promise<void> {
+    const element = await context.$(selector);
+    if (!element) {
+      throw new Error(`Element ${selector} not found`);
+    }
+    await this.waitForElementToBeClickable(element);
+
+    try {
+      await element.click();
+    } catch (error) {
+      throw new Error(`Failed to click on element ${selector}`);
+    }
+  }
+
+  /**
+   * This function retrieves the text content of a specified element.
+   */
+  async getElementText(selector: string): Promise<string> {
+    await this.page.waitForSelector(selector);
+    const element = await this.page.$(selector);
+    if (element === null) {
+      throw new Error(`No element found for the selector: ${selector}`);
+    }
+    const textContent = await this.page.evaluate(el => el.textContent, element);
+    return textContent ?? '';
+  }
+
+  /**
+   * This function checks if a particular text exists on the current page.
+   * @param {string} text - The text to check for.
+   */
+  async isTextPresentOnPage(text: string): Promise<boolean> {
+    const pageContent = await this.page.content();
+    return pageContent.includes(text);
+  }
+
   /**
    * The function selects all text content and delete it.
    */
