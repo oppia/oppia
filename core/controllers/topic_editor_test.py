@@ -22,8 +22,6 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
 from core.domain import platform_parameter_list
 from core.domain import skill_services
 from core.domain import story_domain
@@ -96,17 +94,11 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
 
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        classroom = classroom_config_domain.Classroom(
-            classroom_id=classroom_config_services.get_new_classroom_id(),
-            name='math',
-            url_fragment='math',
-            course_details='',
-            topic_list_intro='',
+        self.save_new_valid_classroom(
             topic_id_to_prerequisite_topic_ids={
                 self.topic_id: []
             }
         )
-        classroom_config_services.update_or_create_classroom_model(classroom)
         self.logout()
 
 
