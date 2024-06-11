@@ -334,10 +334,12 @@ describe('Classroom backend API service', function () {
       thumbnail_data: {
         filename: 'thumbnail.svg',
         bg_color: 'transparent',
+        size_in_bytes: 1000,
       },
       banner_data: {
         filename: 'banner.svg',
         bg_color: 'transparent',
+        size_in_bytes: 1000,
       },
     };
     let payload = {
@@ -376,10 +378,12 @@ describe('Classroom backend API service', function () {
       thumbnail_data: {
         filename: 'thumbnail.svg',
         bg_color: 'transparent',
+        size_in_bytes: 1000,
       },
       banner_data: {
         filename: 'banner.svg',
         bg_color: 'transparent',
+        size_in_bytes: 1000,
       },
     };
     let payload = {
