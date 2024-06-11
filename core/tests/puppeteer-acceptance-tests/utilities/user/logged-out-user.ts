@@ -177,7 +177,6 @@ const unsubscribeLabel = '.e2e-test-unsubscribe-label';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
 
 const libraryExplorationsGroupSelector = '.oppia-library-group';
-const explorationSummaryTileTitle = '.e2e-test-exp-summary-tile-title';
 
 export class LoggedOutUser extends BaseUser {
   /**
@@ -1400,13 +1399,13 @@ export class LoggedOutUser extends BaseUser {
 
         const activities = Array.from(
           featuredGroup?.querySelectorAll(
-            'oppia-collection-summary, oppia-exploration-summary-tile'
+            'oppia-collection-summary-tile, oppia-exploration-summary-tile'
           ) ?? []
         );
 
         return activities.map(activity => ({
           title: activity
-            .querySelector(explorationSummaryTileTitle)
+            .querySelector('.e2e-test-exp-summary-tile-title')
             ?.textContent?.trim(),
         }));
       }

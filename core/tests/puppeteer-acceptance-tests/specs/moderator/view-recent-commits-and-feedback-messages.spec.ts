@@ -21,6 +21,11 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {Moderator} from '../../utilities/user/moderator';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
+
+ConsoleReporter.setConsoleErrorsToIgnore([
+  "Failed to execute 'convertToSpecifiedUnits' on 'SVGLength': Could not resolve relative length.",
+]);
 
 const DEFAULT_SPEC_TIMEOUT_MSECS: number =
   testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;

@@ -180,13 +180,8 @@ export class Moderator extends BaseUser {
    * Function to fetch a specific feedback message and return its properties.
    * @param {number} messageIndex - The index of the feedback message to fetch, starting from 1.
    */
-  private async getFeedbackMessage(messageIndex: number): Promise<object> {
-    await this.page.waitForTimeout(10000);
-    // Wait for the feedback messages table to be populated.
-    await this.page.waitForFunction(
-      () => document.querySelectorAll(feedbackMessageRowSelector).length > 0
-    );
-
+  private async fetchFeedbackMessage(messageIndex: number): Promise<object> {
+    await this.page.waitForSelector(feedbackMessageRowSelector);
     const messageRows = await this.page.$$(feedbackMessageRowSelector);
     if (messageRows.length === 0) {
       throw new Error('No feedback messages found');
@@ -224,13 +219,16 @@ export class Moderator extends BaseUser {
     messageIndex: number,
     expectedProperties: string[]
   ): Promise<void> {
-    const message = await this.getFeedbackMessage(messageIndex);
+    const message = await this.fetchFeedbackMessage(messageIndex);
 
     for (const property of expectedProperties) {
       if (!(property in message)) {
         throw new Error(`Feedback message does not have property: ${property}`);
       }
     }
+    showMessage(
+      `Feedback message ${messageIndex} has all expected properties.`
+    );
   }
 
   /**
