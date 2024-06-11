@@ -1,0 +1,12 @@
+{
+  "suites": [
+    {
+      "name": "1",
+      "module": ".lighthouserc-1.js"
+    },
+    {
+      "name": "2",
+      "module": ".lighthouserc-2.js"
+    }
+  ]
+}

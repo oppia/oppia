@@ -1079,7 +1079,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'The new change_cmd content_html must be equal to <p>This is a ' +
+            'The new change_cmd content_html must be equal to <p>This is a '
             'content.</p>'
         ):
             suggestion.pre_update_validate(
@@ -2943,9 +2943,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_models.STATUS_ACCEPTED)
 
     def test_contructor_updates_state_shema_in_change_cmd(self) -> None:
-        score_category = (
-            suggestion_models.SCORE_TYPE_QUESTION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'skill_id')
+        score_category = '%s%sskill_id' % (
+            suggestion_models.SCORE_TYPE_QUESTION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER)
         change: TestChangeDictType = {
             'cmd': (
                 question_domain
@@ -2979,9 +2979,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     def test_contructor_raise_exception_for_invalid_state_shema_version(
         self
     ) -> None:
-        score_category = (
-            suggestion_models.SCORE_TYPE_QUESTION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'skill_id')
+        score_category = '%s%sskill_id' % (
+            suggestion_models.SCORE_TYPE_QUESTION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER)
         change: TestChangeDictType = {
             'cmd': (
                 question_domain

@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,18 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Capitalize filter for Oppia.
+ * @fileoverview Auth guard for Subtopic viewer page.
  */
 
-angular.module('oppia').filter('capitalize', [
-  function () {
-    return function (input: string) {
-      if (!input) {
-        return input;
-      }
+import {Injectable} from '@angular/core';
+import {CanActivate} from '@angular/router';
 
-      var trimmedInput = input.trim();
-      return trimmedInput.charAt(0).toUpperCase() + trimmedInput.slice(1);
-    };
-  },
-]);
+@Injectable({
+  providedIn: 'root',
+})
+export class SubtopicViewerAuthGuard implements CanActivate {
+  async canActivate(): Promise<boolean> {
+    // Return true as all users can access the Subtopic Viewer Page.
+    return true;
+  }
+}
