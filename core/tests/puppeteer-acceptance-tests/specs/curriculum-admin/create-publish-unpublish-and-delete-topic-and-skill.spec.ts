@@ -19,14 +19,24 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
+// To ignore console errors that occur when checking if the
+// topic link returns a 404 status upon unpublishing.
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /HttpErrorResponse:.*404 Not Found/,
+  /Occurred at http:\/\/localhost:8181\/learn\/staging\/test-topic-one \.?/,
+  /http:\/\/localhost:8181\/learn\/staging\/test-topic-one \.?/,
+  /Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+]);
+
 describe('Curriculum Admin', function () {
-  let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
-  let explorationId: string | null;
+  let curriculumAdmin: CurriculumAdmin;
+  let loggedInUser: LoggedInUser;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -34,28 +44,17 @@ describe('Curriculum Admin', function () {
       'curriculum_admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
+
+    loggedInUser = await UserFactory.createNewUser(
+      'loggedInUser',
+      'logged_in_user@example.com'
+    );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should create and publish topics, subtopics, skills, stories and chapters.',
+    'should manage topics and skills: create, assign, publish, unpublish, and delete.',
     async function () {
-      await curriculumAdmin.navigateToCreatorDashboardPage();
-      await curriculumAdmin.navigateToExplorationEditorPage();
-      await curriculumAdmin.dismissWelcomeModal();
-      await curriculumAdmin.createExplorationWithMinimumContent(
-        'Test Exploration',
-        'End Exploration'
-      );
-      await curriculumAdmin.saveExplorationDraft();
-      explorationId = await curriculumAdmin.publishExplorationWithContent(
-        'Test Exploration Title 1',
-        'Test Exploration Goal',
-        'Algebra'
-      );
-      if (!explorationId) {
-        throw new Error('Error publishing exploration successfully.');
-      }
-
+      await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
       await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
       await curriculumAdmin.createSubtopicForTopic(
         'Test Subtopic 1',
@@ -76,19 +75,28 @@ describe('Curriculum Admin', function () {
       );
 
       await curriculumAdmin.publishDraftTopic('Test Topic 1');
-      await curriculumAdmin.createAndPublishStoryWithChapter(
-        'Test Story 1',
-        'test-story-one',
-        explorationId,
-        'Test Topic 1'
-      );
       await curriculumAdmin.expectTopicToBePublishedInTopicsAndSkillsDashboard(
         'Test Topic 1',
         1,
-        1,
         1
       );
+
+      await curriculumAdmin.unpublishTopic('Test Topic 1');
+      await loggedInUser.expectTopicLinkReturns404('test-topic-one');
+
+      await curriculumAdmin.deleteTopic('Test Topic 1');
+      await curriculumAdmin.expectTopicNotInTopicsAndSkillDashboard(
+        'Test Topic 1'
+      );
+
+      // User must remove all questions from the skill before deleting it.
+      await curriculumAdmin.removeAllQuestionsFromTheSkill('Test Skill 1');
+      await curriculumAdmin.deleteSkill('Test Skill 1');
+      await curriculumAdmin.expectSkillNotInTopicsAndSkillsDashboard(
+        'Test Skill 1'
+      );
     },
+
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
