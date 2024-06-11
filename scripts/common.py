@@ -216,6 +216,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked',
     'curriculum-admin/create-and-publish-topics-and-stories',
     'exploration-editor/create-exploration-and-change-basic-settings',
+    'exploration-editor/modify-translations-through-modal',
     'exploration-editor/load-complete-and-restart-exploration-preview',
     'logged-out-user/click-all-buttons-on-about-page',
     'logged-out-user/click-all-buttons-on-about-foundation-page',

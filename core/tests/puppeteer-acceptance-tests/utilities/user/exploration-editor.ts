@@ -50,6 +50,16 @@ const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
 
+const multipleChoiceInteractionButton =
+  'div.e2e-test-interaction-tile-MultipleChoiceInput';
+const addResponseOptionButton = 'button.e2e-test-add-list-entry';
+const multipleChoiceResponseDropdown =
+  'mat-select.e2e-test-main-html-select-selector';
+const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
+const textInputInteractionButton = 'div.e2e-test-interaction-tile-TextInput';
+const textInputInteractionOption =
+  'tr#e2e-test-schema-based-list-editor-table-row';
+
 const saveDraftButton = 'button.e2e-test-save-draft-button';
 const commitMessage = 'textarea.e2e-test-commit-message-input';
 const publishExplorationButton = 'button.e2e-test-publish-exploration';
@@ -82,6 +92,26 @@ const stateResponsesSelector = '.e2e-test-default-response-tab';
 const feedbackEditorSelector = '.e2e-test-open-feedback-editor';
 const responseModalHeaderSelector = '.e2e-test-add-response-modal-header';
 const toastMessage = '.e2e-test-toast-message';
+
+const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
+const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
+const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
+const addHintButton = 'button.e2e-test-oppia-add-hint-button';
+const saveHintButton = 'button.e2e-test-save-hint';
+const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
+const solutionInput =
+  'oppia-add-or-update-solution-modal textarea.e2e-test-description-box';
+const submitSolutionButton = 'button.e2e-test-submit-solution-button';
+
+const dismissTranslationWelcomeModalSelector =
+  'button.e2e-test-translation-tab-dismiss-welcome-modal';
+const translationTabButton = '.e2e-test-translation-tab';
+const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
+const translationLanguageSelector =
+  'select.e2e-test-translation-language-selector';
+const translationModeButton = 'button.e2e-test-translation-mode';
+const editTranslationSelector = 'div.e2e-test-edit-translation';
+const saveTranslationButton = 'button.e2e-test-save-translation';
 
 // For mobile.
 const mobileSettingsBar = 'li.e2e-test-mobile-settings-button';
@@ -231,6 +261,20 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to dismiss translation tab welcome modal.
+   */
+  async dismissTranslationTabWelcomeModal(): Promise<void> {
+    await this.page.waitForSelector(dismissTranslationWelcomeModalSelector, {
+      visible: true,
+    });
+    await this.clickOn(dismissTranslationWelcomeModalSelector);
+    await this.page.waitForSelector(dismissTranslationWelcomeModalSelector, {
+      hidden: true,
+    });
+    showMessage('Translation tutorial pop-up closed successfully.');
+  }
+
+  /**
    * Function to add content to a card.
    * @param {string} content - The content to be added to the card.
    */
@@ -260,6 +304,45 @@ export class ExplorationEditor extends BaseUser {
       hidden: true,
     });
     showMessage(`${interactionToAdd} interaction has been added successfully.`);
+  }
+
+  /**
+   * Function to add a multiple choice interaction to the exploration.
+   * Any number of options can be added to the multiple choice interaction
+   * using the options array.
+   * @param options - Array of multiple choice options.
+   */
+  async addMultipleChoiceInteraction(options: string[]): Promise<void> {
+    await this.clickOn(addInteractionButton);
+    await this.page.waitForSelector(multipleChoiceInteractionButton, {
+      visible: true,
+    });
+    await this.clickOn(multipleChoiceInteractionButton);
+
+    for (let i = 0; i < options.length - 1; i++) {
+      await this.page.waitForSelector(addResponseOptionButton, {visible: true});
+      await this.clickOn(addResponseOptionButton);
+    }
+
+    const responseInputs = await this.page.$$(stateContentInputField);
+    for (let i = 0; i < options.length; i++) {
+      await responseInputs[i].type(`${options[i]}`);
+    }
+
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector('.customize-interaction-body-container', {
+      hidden: true,
+    });
+    showMessage(`Multiple Choice interaction has been added successfully.`);
+  }
+
+  async addTextInputInteraction(): Promise<void> {
+    await this.clickOn(addInteractionButton);
+    await this.page.waitForSelector(textInputInteractionButton, {
+      visible: true,
+    });
+    await this.clickOn(textInputInteractionButton);
+    await this.clickOn(saveInteractionButton);
   }
 
   /**
@@ -737,6 +820,34 @@ export class ExplorationEditor extends BaseUser {
       // case 'otherInteractionType':
       //   await this.type(otherFormInput, answer);
       //   break;
+      case 'Multiple Choice':
+        await this.clickOn(multipleChoiceResponseDropdown);
+        await this.page.waitForSelector(multipleChoiceResponseOption, {
+          visible: true,
+        });
+
+        await this.page.evaluate(
+          (answer, multipleChoiceResponseOption) => {
+            const optionElements = Array.from(
+              document.querySelectorAll(multipleChoiceResponseOption)
+            );
+            const element = optionElements.find(
+              element => element.textContent?.trim() === answer
+            ) as HTMLElement;
+            if (element) {
+              element.click();
+            } else {
+              throw new Error(`Cannot find "${answer}" in options.`);
+            }
+          },
+          answer,
+          multipleChoiceResponseOption
+        );
+        break;
+      case 'Text Input':
+        await this.clickOn(addResponseOptionButton);
+        await this.type(textInputInteractionOption, answer);
+        break;
       default:
         throw new Error(`Unsupported interaction type: ${interactionType}`);
     }
@@ -756,6 +867,49 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to add feedback for default responses of a state interaction.
+   * @param {string} defaultResponseFeedback - The feedback for the default responses.
+   */
+  async addDefaultResponseFeedback(
+    defaultResponseFeedback: string
+  ): Promise<void> {
+    await this.clickOn(defaultFeedbackTab);
+    await this.clickOn(openOutcomeFeedBackEditor);
+    await this.clickOn(stateContentInputField);
+    await this.type(stateContentInputField, `${defaultResponseFeedback}`);
+    await this.clickOn(saveOutcomeFeedbackButton);
+  }
+
+  /**
+   * Function to add a solution for a state interaction.
+   * @param {string} answer - The solution of the current state card.
+   * @param {string} answerExplanation - The explanation for this state card's solution.
+   */
+  async addSolutionToState(
+    answer: string,
+    answerExplanation: string
+  ): Promise<void> {
+    await this.clickOn(addSolutionButton);
+    await this.page.waitForSelector(solutionInput, {visible: true});
+    await this.type(solutionInput, answer);
+    await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
+    await this.clickOn(submitAnswerButton);
+    await this.type(stateContentInputField, answerExplanation);
+    await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
+    await this.clickOn(submitSolutionButton);
+  }
+
+  /**
+   * Function to add a hint for a state card.
+   * @param {string} hint - The hint to be added for the current card.
+   */
+  async addHintToState(hint: string): Promise<void> {
+    await this.clickOn(addHintButton);
+    await this.type(stateContentInputField, hint);
+    await this.clickOn(saveHintButton);
+  }
+
+  /**
    * Function to navigate to the preview tab.
    */
   async navigateToPreviewTab(): Promise<void> {
@@ -767,6 +921,19 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(previewTabButton);
     }
     await this.page.waitForNavigation();
+  }
+
+  /**
+   * Function to navigate to the translations tab.
+   */
+  async navigateToTranslationsTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOn(mobileTranslationTabButton);
+    } else {
+      await this.clickOn(translationTabButton);
+    }
   }
 
   /**
@@ -959,6 +1126,29 @@ export class ExplorationEditor extends BaseUser {
     } else {
       throw new Error(`User ${username} is not a subscriber.`);
     }
+  }
+
+  /**
+   * Function to edit a translation for specific content of any card.
+   * @param {string} languageCode - Code of language for which the translation has to be added.
+   * @param {string} cardName - Name of the card/state for which the translation is being edited.
+   * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
+   * @param {string} translation - The translation which will be added for the content.
+   */
+  async editTranslationOfContent(
+    languageCode: string,
+    cardName: string,
+    contentType: string,
+    translation: string
+  ): Promise<void> {
+    await this.select(translationLanguageSelector, languageCode);
+    await this.page.waitForNavigation();
+    await this.navigateToCard(cardName);
+    await this.clickOn(translationModeButton);
+    await this.clickOn(contentType);
+    await this.clickOn(editTranslationSelector);
+    await this.type(stateContentInputField, translation);
+    await this.clickOn(saveTranslationButton);
   }
 }
 

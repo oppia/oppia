@@ -29,6 +29,7 @@ export default {
     Blog: 'http://localhost:8181/blog',
     BlogAdmin: 'http://localhost:8181/blog-admin',
     BlogDashboard: 'http://localhost:8181/blog-dashboard',
+    ClassroomAdmin: 'http://localhost:8181/classroom-admin',
     CommunityLibrary: 'http://localhost:8181/community-library',
     Contact: 'http://localhost:8181/contact',
     ContributorDashboard: 'http://localhost:8181/contributor-dashboard',
