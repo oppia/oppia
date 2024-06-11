@@ -29,7 +29,7 @@ import {
   ExplorationEditor,
 } from '../user/exploration-editor';
 import {CurriculumAdminFactory} from '../user/curriculum-admin';
-import {TopicManagerFactory} from '../user/topic-manager';
+import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 import {LoggedInUserFactory, LoggedInUser} from '../user/logged-in-user';
 import testConstants from './test-constants';
 
@@ -146,12 +146,14 @@ export class UserFactory {
     LoggedOutUser &
       LoggedInUser &
       ExplorationEditor &
+      TopicManager &
       MultipleRoleIntersection<TRoles>
   > {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
       LoggedOutUserFactory(),
       LoggedInUserFactory(),
       ExplorationEditorFactory(),
+      TopicManagerFactory(),
     ]);
     await user.openBrowser();
     await user.signUpNewUser(username, email);

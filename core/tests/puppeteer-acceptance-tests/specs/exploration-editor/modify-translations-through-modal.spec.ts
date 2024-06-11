@@ -61,8 +61,9 @@ describe('Exploration Editor', function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
-      [ROLES.CURRICULUM_ADMIN, ROLES.TOPIC_MANAGER]
+      [ROLES.CURRICULUM_ADMIN]
     );
+
     // Navigate to the creator dashboard and create a new exploration.
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorPage();
@@ -141,6 +142,7 @@ describe('Exploration Editor', function () {
       throw new Error('Error publishing exploration successfully.');
     }
 
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
     await curriculumAdmin.createSubtopicForTopic(
       'Test Subtopic 1',
