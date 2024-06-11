@@ -294,18 +294,26 @@ module.exports = {
       inject: false,
     }),
     new HtmlWebpackPlugin({
-      chunks: ['story_editor'],
-      filename: 'story-editor-page.mainpage.html',
       chunks: ['subtopic_viewer'],
       filename: 'subtopic-viewer-page.mainpage.html',
       hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix +
-        '/pages/story-editor-page/' +
-        'story-editor-page.mainpage.html',
         '/pages/subtopic-viewer-page/' +
         'subtopic-viewer-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false,
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['story_editor'],
+      filename: 'story-editor-page.mainpage.html',
+      hybrid: true,
+      meta: defaultMeta,
+      template:
+        commonPrefix +
+        '/pages/story-editor-page/' +
+        'story-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
     }),
