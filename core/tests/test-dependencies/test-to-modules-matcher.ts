@@ -211,13 +211,17 @@ export class TestToModulesMatcher {
     if (missingGoldenFileModules.length > 0) {
       throw new Error(
         'The following Angular modules are missing from the golden file ' +
-          `at the path ${this.goldenFilePath}:\n${missingGoldenFileModules.join('\n')}`
+          `at the path ${this.goldenFilePath}:\n${missingGoldenFileModules.join('\n')}.\n` +
+          'Please add them to the golden file or copy and paste the uploaded github artifact ' +
+          'into the golden file location.'
       );
     }
     if (extraGoldenFileModules.length > 0) {
       throw new Error(
         'The following Angular modules are extra in the golden file ' +
-          `at the path ${this.goldenFilePath}:\n${extraGoldenFileModules.join('\n')}`
+          `at the path ${this.goldenFilePath}:\n${extraGoldenFileModules.join('\n')}\n` +
+          'Please remove them from the golden file or copy and paste the uploaded github artifact ' +
+          'into the golden file location.'
       );
     }
   }
