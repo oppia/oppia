@@ -137,16 +137,8 @@ export class TestToModulesMatcher {
       if (COMMON_MODULES_TO_EXCLUDE[module]) {
         let exclude = true;
         for (const globPattern of COMMON_MODULES_TO_EXCLUDE[module]) {
-          const globFiles = glob.sync(globPattern);
-          if (globFiles.length === 0) {
-            continue;
-          }
-          for (const file of globFiles) {
-            if (file === this.goldenFilePath) {
-              exclude = false;
-              break;
-            }
-          }
+          const globMatcher = new glob.GlobSync(globPattern);
+          exclude = globMatcher.minimatch.match(this.goldenFilePath);
           if (!exclude) {
             break;
           }
