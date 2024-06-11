@@ -333,7 +333,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector('.customize-interaction-body-container', {
       hidden: true,
     });
-    showMessage(`Multiple Choice interaction has been added successfully.`);
+    showMessage('Multiple Choice interaction has been added successfully.');
   }
 
   async addTextInputInteraction(): Promise<void> {

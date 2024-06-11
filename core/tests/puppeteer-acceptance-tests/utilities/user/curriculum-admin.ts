@@ -281,7 +281,7 @@ export class CurriculumAdmin extends BaseUser {
       if (element) {
         element.click();
       } else {
-        throw new Error(`Cannot find number input interaction option.`);
+        throw new Error('Cannot find number input interaction option.');
       }
     }, interactionNameDiv);
 

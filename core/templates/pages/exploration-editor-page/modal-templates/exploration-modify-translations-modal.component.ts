@@ -23,11 +23,11 @@ import {ContextService} from 'services/context.service';
 import {EntityBulkTranslationsBackendApiService} from '../services/entity-bulk-translations-backend-api.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
-import {TranslatedContentBackendDict} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {ChangeListService} from '../services/change-list.service';
 
 interface LanguageCodeToContentTranslations {
-  [language_code: string]: TranslatedContentBackendDict;
+  [language_code: string]: TranslatedContent;
 }
 
 @Component({
@@ -65,7 +65,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
           language
         ].getWrittenTranslation(this.contentId);
       if (translationContent) {
-        this.contentTranslations[language] = translationContent.toBackendDict();
+        this.contentTranslations[language] = translationContent;
       }
     }
 
@@ -90,13 +90,13 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
         )
         .then(response => {
           for (let language in response) {
-            let language_translations = response[language]['translations'];
+            let languageTranslations = response[language].translationMapping;
             if (
-              this.contentId in language_translations &&
+              this.contentId in languageTranslations &&
               !this.contentTranslations[language]
             ) {
               this.contentTranslations[language] =
-                language_translations[this.contentId];
+                languageTranslations[this.contentId];
             }
           }
         });
