@@ -30,8 +30,6 @@ from core.controllers import incoming_app_feedback_report
 from core.domain import blog_services
 from core.domain import classifier_domain
 from core.domain import classifier_services
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -979,18 +977,7 @@ class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        math_classroom_dict: classroom_config_domain.ClassroomDict = {
-            'classroom_id': 'math_classroom_id',
-            'name': 'math',
-            'url_fragment': 'math',
-            'course_details': 'Course details for classroom.',
-            'topic_list_intro': 'Topics covered for classroom',
-            'topic_id_to_prerequisite_topic_ids': {}
-        }
-        math_classroom = classroom_config_domain.Classroom.from_dict(
-            math_classroom_dict)
-
-        classroom_config_services.create_new_classroom(math_classroom)
+        self.save_new_valid_classroom()
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
