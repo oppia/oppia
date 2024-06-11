@@ -65,7 +65,7 @@
     <button type="button"
             (click)="unpublishTopic()"
             *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
-            class="btn btn-light"
+            class="btn btn-light e2e-test-unpublish-topic-button"
             [disabled]="isTopicSaveable()">
       Unpublish Topic
     </button>
@@ -138,6 +138,7 @@
           </div>
           <div (click)="unpublishTopic()"
                *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
+               class="e2e-test-mobile-unpublish-topic-button"
                [attr.disabled]="isTopicSaveable()">
             <i class="fas fa-pen"></i>
             <span>Unpublish Topic</span>

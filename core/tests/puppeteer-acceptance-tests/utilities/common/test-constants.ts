@@ -92,6 +92,7 @@ export default {
     CURRICULUM_ADMIN: 'curriculum admin',
     QUESTION_ADMIN: 'question admin',
     VOICEOVER_ADMIN: 'voiceover admin',
+    TOPIC_MANAGER: 'topic manager',
   } as const,
   BlogRights: {
     BLOG_ADMIN: 'BLOG_ADMIN',
