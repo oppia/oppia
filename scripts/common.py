@@ -235,7 +235,6 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'practice-question-admin/add-and-remove-contribution-rights',
     'translation-admin/add-and-remove-translation-rights',
     'voiceover-admin/add-voiceover-artist-to-an-exploration',
-    'moderator/view-recent-commits-and-feedback-messages',
     'moderator/edit-featured-activities-list'
 ]
 
