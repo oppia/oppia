@@ -756,6 +756,7 @@ class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
             ), expected_status_int=404
         )
 
+
 class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Test for story editor page access validation"""
 
