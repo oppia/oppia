@@ -21,7 +21,7 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {Moderator} from '../../utilities/user/moderator';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS: number =
   testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
@@ -30,7 +30,7 @@ const ROLES = testConstants.Roles;
 describe('Moderator', function () {
   let moderator: Moderator;
   let explorationEditor: ExplorationEditor;
-  let loggedInUser: LoggedInUser;
+  let LoggedOutUser: LoggedOutUser;
   let explorationId: string | null;
 
   beforeAll(async function () {
@@ -45,10 +45,7 @@ describe('Moderator', function () {
       'exploration_editor@example.com'
     );
 
-    loggedInUser = await UserFactory.createNewUser(
-      'testLearner',
-      'test_user@example.com'
-    );
+    LoggedOutUser = await UserFactory.createLoggedOutUser();
 
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorPage();
@@ -70,19 +67,29 @@ describe('Moderator', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-      'should be able to feature and unfeature activities',
-      async function () {
-        await loggedInUser.navigateToCommunitylibrary();
-        await loggedInUser.expectToViewFeaturedActivities([]);
+    'should be able to feature and unfeature activities',
+    async function () {
+      await LoggedOutUser.navigateToCommunitylibrary();
 
-        await moderator.featureActivity(explorationId as string);
-        await loggedInUser.expectToViewFeaturedActivities([{explorationId: explorationId}]);
+      // Expect to see no featured activities as nothing is featured yet.
+      await LoggedOutUser.expectToViewFeaturedActivities([]);
 
-        await moderator.unfeatureActivity();
-        await loggedInUser.expectToViewFeaturedActivities([]);
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+      await moderator.navigateToModeratorPage();
+      await moderator.navigateToFeaturedActivitiesTab();
+      await moderator.featureActivity(explorationId as string);
+
+      // Expect to see the newly featured activity in the list of featured activities.
+      await LoggedOutUser.expectToViewFeaturedActivities([
+        'Test Exploration Title',
+      ]);
+
+      await moderator.unfeatureActivity(explorationId as string);
+
+      // Expect to see no featured activities again.
+      await LoggedOutUser.expectToViewFeaturedActivities([]);
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

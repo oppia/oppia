@@ -20,27 +20,36 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
+const moderatorPageUrl = testConstants.URLs.ModeratorPage;
+const featuredActivitiesTab = '.e2e-test-featured-activities-tab-link';
 export class Moderator extends BaseUser {
   /**
    * Function to navigate to the moderator page.
    */
   async navigateToModeratorPage(): Promise<void> {
-    await this.page.goto(testConstants.URLs.ModeratorPage, {waitUntil: 'load'});
+    await this.page.goto(moderatorPageUrl, {waitUntil: 'load'});
+  }
+
+  /**
+   * Function to navigate to the Featured Activities tab.
+   */
+  async navigateToFeaturedActivitiesTab(): Promise<void> {
+    await this.clickOn(featuredActivitiesTab);
   }
 
   /**
    * Function to view all recent commits.
    */
-  async viewAllRecentCommits(): Promise<Array<object>> {
+  async viewAllRecentCommits(): Promise<object[]> {
     const commitRows = await this.page.$$('.commit-row');
-    const allCommits: Array<{
+    const allCommits: {
       timestamp: string | null;
       exploration: string | null;
       category: string | null;
       username: string | null;
       commitMessage: string | null;
       isCommunityOwned: string | null;
-    }> = [];
+    }[] = [];
 
     for (const row of commitRows) {
       const timestamp = await row.$eval(
@@ -180,34 +189,58 @@ export class Moderator extends BaseUser {
   async featureActivity(explorationId: string): Promise<void> {
     await this.clickOn(' Add element ');
     await this.page.waitForSelector('input[aria-label="text input"]');
+    console.log('explorationId:', explorationId);
     await this.page.type('input[aria-label="text input"]', explorationId);
     await this.page.keyboard.press('Enter');
     await this.clickOn(' Save Featured Activities ');
 
-    // Check if the text "Featured Activities Saved." appears on the screen
-    const isSaved = await this.isTextPresentOnPage(
-      'Featured activities saved.'
-    );
-    if (!isSaved) {
+    try {
+      await this.page.waitForFunction(
+        'document.querySelector(".e2e-test-toast-message") !== null',
+        {timeout: 5000}
+      );
+      showMessage('Activity featured successfully.');
+    } catch (error) {
       throw new Error('Failed to save the featured activities');
     }
-    showMessage('Activity featured successfully.');
   }
 
   /**
    * Function to unfeature an activity.
    */
-  async unfeatureActivity(): Promise<void> {
-    await this.clickOn('.e2e-test-delete-list-entry');
+  async unfeatureActivity(explorationId: string): Promise<void> {
+    const rows = await this.page.$$(
+      '#e2e-test-schema-based-list-editor-table-row'
+    );
+    for (const row of rows) {
+      const schemaBasedUnicodeEditor = await row.$(
+        'schema-based-unicode-editor'
+      );
+      const modelValue = await schemaBasedUnicodeEditor?.evaluate(node =>
+        node.getAttribute('ng-reflect-model')
+      );
+      if (modelValue === explorationId) {
+        console.log('reached one');
+        const deleteButton = await row.$('.e2e-test-delete-list-entry');
+        if (deleteButton) {
+          console.log('reached two');
+          await this.waitForElementToBeClickable(deleteButton);
+          await deleteButton.click();
+        }
+        break;
+      }
+    }
     await this.clickOn(' Save Featured Activities ');
 
-    const isSaved = await this.isTextPresentOnPage(
-      'Featured activities saved.'
-    );
-    if (!isSaved) {
-      throw new Error('Failed to unfeature the activity');
+    try {
+      await this.page.waitForFunction(
+        'document.querySelector(".e2e-test-toast-message") !== null',
+        {timeout: 5000}
+      );
+      showMessage('Activity unfeatured successfully.');
+    } catch (error) {
+      throw new Error('Failed to save the unfeatured activities');
     }
-    showMessage('Activity unfeatured successfully.');
   }
 }
 

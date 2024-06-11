@@ -157,6 +157,15 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Navigates to the community library page.
+   */
+  async navigateToCommunitylibrary(): Promise<void> {
+    await this.page.goto(testConstants.URLs.CommunityLibrary, {
+      waitUntil: 'load',
+    });
+  }
+
+  /**
    * Function to click a button and check if it opens the expected destination.
    */
   async clickButtonToNavigateToNewPage(
@@ -968,6 +977,74 @@ export class LoggedOutUser extends BaseUser {
     ]);
 
     expect(this.page.url()).toBe(contactUrl);
+  }
+
+  /**
+   * Views all featured activities on the community library page.
+   */
+  private async viewAllFeaturedActivities(): Promise<object[]> {
+    await this.page.waitForSelector('.oppia-library-group');
+
+    const featuredActivities = await this.page.$$eval(
+      '.oppia-library-group',
+      groups => {
+        const featuredGroup = groups.find(group =>
+          group
+            .querySelector('h2')
+            ?.textContent?.includes('Featured Activities')
+        );
+
+        const activities = Array.from(
+          featuredGroup?.querySelectorAll(
+            'oppia-collection-summary-tile, oppia-exploration-summary-tile'
+          ) ?? []
+        );
+
+        return activities.map(activity => ({
+          title: activity
+            .querySelector('.e2e-test-exp-summary-tile-title')
+            ?.textContent?.trim(),
+        }));
+      }
+    );
+
+    return featuredActivities;
+  }
+
+  /**
+   * Expects to view the specified featured activities on the community library page.
+   * @param {Array<string>} expectedActivityTitles - The titles of the expected featured activities.
+   */
+  async expectToViewFeaturedActivities(
+    expectedActivityTitles: string[] = []
+  ): Promise<void> {
+    // Reloading to ensure the page is updated with the newly added/removed featured activities.
+    await this.page.reload({waitUntil: 'networkidle0'});
+    const featuredActivities: {title: string}[] =
+      (await this.viewAllFeaturedActivities()) as {title: string}[];
+
+    // If no expected activities were provided, check if the featured activities list is empty.
+    if (expectedActivityTitles.length === 0) {
+      if (featuredActivities.length === 0) {
+        showMessage('No featured activities found as expected.');
+        return;
+      }
+      throw new Error('Expected no featured activities, but found some');
+    }
+
+    // Check if each expected activity is in the list of featured activities.
+    for (const expectedActivity of expectedActivityTitles) {
+      const activity = featuredActivities.find(
+        activity => activity.title === expectedActivity
+      );
+
+      if (!activity) {
+        throw new Error(
+          `Expected to find activity with title ${expectedActivity}, but didn't`
+        );
+      }
+      showMessage(`Activity with title ${expectedActivity} found as expected.`);
+    }
   }
 }
 

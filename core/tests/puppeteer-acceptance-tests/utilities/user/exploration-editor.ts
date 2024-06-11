@@ -115,6 +115,8 @@ const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 const subscriberCountLabel = '.e2e-test-oppia-total-subscribers';
 const subscriberTabButton = '.e2e-test-subscription-tab';
 const subscriberCard = '.e2e-test-subscription-card';
+const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
+const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
 
 export class ExplorationEditor extends BaseUser {
   /**
@@ -129,7 +131,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to exploration editor.
    */
   async navigateToExplorationEditorPage(): Promise<void> {
-    await this.clickOn(createExplorationButton);
+    await this.clickAndWaitForNavigation(createExplorationButton);
   }
 
   /**
@@ -961,15 +963,25 @@ export class ExplorationEditor extends BaseUser {
     }
   }
 
-  async playExploration(explorationId): Promise<void> {
-    await this.page.goto(`${baseURL}/explore/${explorationId}`);
-    await this.page.waitForNavigation({waitUntil: ['load']});
+  /**
+   * Navigates to the exploration page and starts playing the exploration.
+   * @param {string} explorationId - The ID of the exploration to play.
+   */
+  async playExploration(explorationId: string): Promise<void> {
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: 'load'}),
+      this.page.goto(`${baseURL}/explore/${explorationId}`),
+    ]);
   }
 
+  /**
+   * Gives feedback on the exploration.
+   * @param {string} feedback - The feedback to give on the exploration.
+   */
   async giveFeedback(feedback: string): Promise<void> {
-    await this.clickOn('.e2e-test-exploration-feedback-popup-link');
-    await this.page.waitForSelector('.e2e-test-exploration-feedback-textarea');
-    await this.type('.e2e-test-exploration-feedback-textarea', feedback);
+    await this.clickOn(feedbackPopupSelector);
+    await this.page.waitForSelector(feedbackTextarea, {visible: true});
+    await this.type(feedbackTextarea, feedback);
     await this.clickOn('Submit');
 
     const isMessagePresent = await this.isTextPresentOnPage(
