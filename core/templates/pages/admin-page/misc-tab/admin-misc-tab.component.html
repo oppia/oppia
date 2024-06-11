@@ -313,7 +313,7 @@
     <div class="col-2">UserGroup:</div>
     <div class="col-10">
       <ng-container>
-        <select [(ngModel)]="selectedUserGroup">
+        <select class="oppia-admin-page-ele-margin" [(ngModel)]="selectedUserGroup">
           <ng-container *ngFor="let userGroup of getUserGroups()">
             <option [value]="userGroup">
               {{userGroup}}
@@ -321,10 +321,10 @@
           </ng-container>
         </select>
       </ng-container>
-      <button (click)="removeUserGroup()">
+      <button class="oppia-admin-page-ele-margin" (click)="removeUserGroup()">
         x
       </button>
-      <input placeholder="Add UserGroup"
+      <input class="oppia-admin-page-ele-margin" placeholder="Add UserGroup"
              type="text"
              [(ngModel)]="newUserGroupName"
              [ngModelOptions]="{standalone: true}">
@@ -352,8 +352,7 @@
                #userInput
                [matChipInputFor]="chipList"
                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-               (matChipInputTokenEnd)="addUser($event)"
-               [(ngModel)]="newUser" (click)="resetUserInput()">
+               (matChipInputTokenEnd)="addUser($event)">
       </mat-chip-list>
     </div>
   </div>
@@ -391,6 +390,10 @@
   }
   .oppia-long-text-card {
     max-width: 700px;
+  }
+  .oppia-admin-page-ele-margin {
+    margin-right: 10px;
+    margin-bottom: 10px;
   }
 
   .oppia-page-card.mat-card {

@@ -82,7 +82,6 @@ export class AdminMiscTabComponent {
   newUserGroupName: string = '';
   removable: boolean = true;
   selectable: boolean = true;
-  newUser: string = '';
   separatorKeysCodes: number[] = [ENTER];
   userGroupToUsersMapBackup: Record<string, string[]> = {};
   userGroupsToUsers: Record<string, string[]> = {};
@@ -143,10 +142,6 @@ export class AdminMiscTabComponent {
     }
     this.userGroupsToUsers[this.selectedUserGroup].push(value);
     this.userInput.nativeElement.value = '';
-  }
-
-  resetUserInput(): void {
-    this.newUser = '';
   }
 
   removeUser(username: string): void {

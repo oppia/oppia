@@ -945,7 +945,7 @@ describe('Admin misc tab component ', () => {
       it('should not update if a task is still running in the queue', fakeAsync(() => {
         component.ngOnInit();
         tick();
-        component.userGroupsToUsers = adminPageData.userGroups;
+
         confirmSpy.and.returnValue(true);
         let updateUserGroupSpy = spyOn(
           adminBackendApiService,
@@ -1084,7 +1084,7 @@ describe('Admin misc tab component ', () => {
       it('should save the new user', fakeAsync(() => {
         component.ngOnInit();
         tick();
-        component.userGroupsToUsers = adminPageData.userGroups;
+
         component.userInput = {
           nativeElement: {
             value: '',
@@ -1103,7 +1103,7 @@ describe('Admin misc tab component ', () => {
       it('should not add the user if it already exists', fakeAsync(() => {
         component.ngOnInit();
         tick();
-        component.userGroupsToUsers = adminPageData.userGroups;
+
         component.userInput = {
           nativeElement: {
             value: '',
@@ -1163,7 +1163,7 @@ describe('Admin misc tab component ', () => {
       it('should update the user groups', fakeAsync(() => {
         component.ngOnInit();
         tick();
-        component.userGroupsToUsers = adminPageData.userGroups;
+
         component.newUserGroupName = 'UserGroup8';
         component.addUserGroup();
 
