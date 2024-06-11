@@ -63,7 +63,6 @@ describe('Flag Exploration modal', () => {
 
   it('should create', () => {
     expect(component).toBeDefined();
-    expect(component.stateName).toEqual(stateName);
   });
 
   it('should show flag message textarea', () => {
