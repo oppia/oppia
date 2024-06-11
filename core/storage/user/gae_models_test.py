@@ -1170,8 +1170,8 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         for creator_id in self.CREATOR_IDS:
             user_models.UserSettingsModel(
                 id=creator_id,
-                username='username' + creator_id,
-                email=creator_id + '@example.com'
+                username='username%s' % creator_id,
+                email='%s@example.com' % creator_id
             ).put()
             user_models.UserSubscriptionsModel(id=creator_id).put()
 
@@ -3676,7 +3676,7 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
 
     def test_create_raises_exception_for_existing_instance(self) -> None:
         with self.assertRaisesRegex(
-            Exception, 'There is already a pinned opportunity' +
+            Exception, 'There is already a pinned opportunity'
             ' with the given id:'):
             user_models.PinnedOpportunityModel.create(
                 user_id=self.user_id,

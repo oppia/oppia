@@ -41,6 +41,10 @@ export enum FeatureNames {
   CdAllowUndoingTranslationReview = 'cd_allow_undoing_translation_review',
   EnableVoiceoverContribution = 'enable_voiceover_contribution',
   AutoUpdateExpVoiceArtistLink = 'auto_update_exp_voice_artist_link',
+  ExplorationEditorCanModifyTranslations = 'exploration_editor_can_modify_translations',
+  ExplorationEditorCanTagMisconceptions = 'exploration_editor_can_tag_misconceptions',
+  EnableMultipleClassrooms = 'enable_multiple_classrooms',
+  RedesignedTopicViewerPage = 'redesigned_topic_viewer_page',
 }
 
 export interface FeatureStatusSummaryBackendDict {
