@@ -181,7 +181,6 @@
 	"I18N_BLOG_POST_PAGE_TITLE": "<[blogPostTitle]> | ब्लॉग | ओपिया",
 	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_EXTENSIONS_PREFIX": "अनुमत छवि एक्सटेंशन:",
 	"I18N_BLOG_POST_THUMBNAIL_ALLOWED_MAX_FILE_SIZE": "अधिकतम अनुमत छवि आकार <[imageSize]> KB है। ध्यान दें कि, कभी-कभी, क्रॉप करने से छवि का आकार बढ़ सकता है।",
-	"I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG": "कोई फ़ाइल चुनें या उसे यहां खींचें",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "त्रुटि: यह पिक्चर अपलोड नहीं की जा सकती है।",
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD": "एक थंबनेल जोड़ें",
 	"I18N_BLOG_POST_UNTITLED_HEADING": "अनामांकित",
