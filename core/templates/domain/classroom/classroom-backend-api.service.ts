@@ -50,6 +50,10 @@ interface ClassroomIdBackendDict {
   classroom_id: string;
 }
 
+export interface NewClassroomBackendDict {
+  new_classroom_id: string;
+}
+
 export interface ClassroomBackendDict {
   classroom_id: string;
   name: string;
@@ -235,6 +239,30 @@ export class ClassroomBackendApiService {
               size_in_bytes: 1000,
             },
           },
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error);
+          }
+        );
+    });
+  }
+
+  async createNewClassroomAsync(
+    name: string,
+    urlFragment: string
+  ): Promise<NewClassroomBackendDict> {
+    return new Promise((resolve, reject) => {
+      let newClassroomUrl = ClassroomDomainConstants.NEW_CLASSROOM_HANDLER_URL;
+
+      this.http
+        .post<NewClassroomBackendDict>(newClassroomUrl, {
+          name,
+          urlFragment,
         })
         .toPromise()
         .then(
