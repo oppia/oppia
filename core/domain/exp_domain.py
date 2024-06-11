@@ -3333,7 +3333,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         else:
             for idx, empty_choice in enumerate(empty_choices):
                 valid_choice = (
-                    '<p>' + 'Choice ' + str(idx + 1) + '</p>'
+                    '<p>Choice %s</p>' % str(idx + 1)
                 )
                 if valid_choice in choices_content:
                     choices_to_remove.append(empty_choice)

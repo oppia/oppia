@@ -43,8 +43,10 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     """Tests for the suggestionModel class."""
 
     score_category: str = (
-        suggestion_models.SCORE_TYPE_TRANSLATION +
-        suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        '%s%sEnglish' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER
+        ))
 
     topic_name = 'topic'
     target_id = 'exp1'
@@ -5347,9 +5349,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 page_size=1,
                 offset=0,
                 sort_by=None,
-                topic_ids=[
-                    'non_existent_topic'
-                ],
+                topic_ids=['non_existent_topic'],
                 max_days_since_last_activity=7
             ))
         self.assertEqual(len(sorted_results), 0)
