@@ -35,7 +35,7 @@ import {glob} from 'glob';
 const COMMON_MODULES_TO_EXCLUDE: Record<string, string[]> = {
   'core/templates/pages/splash-page/splash-page.module.ts': [
     'core/tests/test-modules-mappings/acceptance/logged-in-user/set-language-to-rtl-and-navigate-through-site.txt',
-    'core/tests/test-modules-mappings/acceptance/logged-in-user/*'
+    'core/tests/test-modules-mappings/acceptance/logged-in-user/*',
   ],
   'core/templates/pages/login-page/login-page.module.ts': [
     'core/tests/test-modules-mappings/acceptance/logged-out-user/sign-in-and-save-exploration-progress.txt',
@@ -139,7 +139,7 @@ export class TestToModulesMatcher {
         for (const globPattern of COMMON_MODULES_TO_EXCLUDE[module]) {
           const globFiles = glob.sync(globPattern);
           if (globFiles.length === 0) {
-            break;
+            continue;
           }
           for (const file of globFiles) {
             if (file === this.goldenFilePath) {
