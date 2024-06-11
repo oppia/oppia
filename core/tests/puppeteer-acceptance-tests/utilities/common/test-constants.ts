@@ -17,7 +17,6 @@
  */
 
 import path from 'path';
-import {Moderator} from '../user/moderator';
 
 export default {
   URLs: {

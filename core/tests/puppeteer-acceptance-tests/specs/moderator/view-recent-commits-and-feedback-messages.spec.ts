@@ -77,11 +77,15 @@ describe('Moderator', function () {
         'isCommunityOwned',
       ]);
 
+      // Opens Feedback tab in the exploration editor.
       await moderator.openFeedbackTabFromLinkInExplorationTitle(
         'Test Exploration Title'
       );
       await moderator.expectToBeOnFeedbackTab();
 
+      // Moderator was redirected to the Feedback tab in the previous step.
+      // Therefore, need to navigate back to the Moderator page.
+      await moderator.navigateToModeratorPage();
       await moderator.navigateToRecentFeedbackMessagesTab();
       await moderator.expectNumberOfFeedbackMessages(1);
       await moderator.expectFeedbackMessageToHaveProperties(1, [
@@ -90,6 +94,7 @@ describe('Moderator', function () {
         'username',
       ]);
 
+      // Opens Feedback tab in the exploration editor.
       await moderator.openFeedbackTabFromLinkInExplorationId(explorationId);
       await moderator.expectToBeOnFeedbackTab();
     },

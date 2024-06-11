@@ -22,7 +22,9 @@ import {showMessage} from '../common/show-message';
 
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 
-const commitRowSelector = '.commit-row';
+const commitRowSelector = '.e2e-test-commit-row';
+const feedbackMessagesTab = '.e2e-test-feedback-messages-tab-link';
+const feedbackMessageRowSelector = '.e2e-test-feedback-messages-row';
 const featuredActivitiesTab = '.e2e-test-featured-activities-tab-link';
 const explorationIDField = 'input[aria-label="text input"]';
 const featuredActivityRowSelector =
@@ -71,7 +73,7 @@ export class Moderator extends BaseUser {
       throw new Error('No recent commits found');
     }
 
-    commitIndex -= 1;
+    commitIndex -= 1; // Adjusting to 0-based index.
 
     if (commitIndex < 0 || commitIndex >= commitRows.length) {
       throw new Error('Invalid commit number');
@@ -94,6 +96,17 @@ export class Moderator extends BaseUser {
       el => el.textContent
     );
 
+    if (
+      !timestamp ||
+      !exploration ||
+      !category ||
+      !username ||
+      !commitMessage ||
+      !isCommunityOwned
+    ) {
+      throw new Error('Failed to fetch commit properties');
+    }
+
     return {
       timestamp,
       exploration,
@@ -103,7 +116,6 @@ export class Moderator extends BaseUser {
       isCommunityOwned,
     };
   }
-
   /**
    * Function to check if a specific commit has all the expected properties.
    * @param {number} commitIndex - The index of the commit to check.
@@ -144,6 +156,7 @@ export class Moderator extends BaseUser {
         'User is not on the feedback tab of the exploration editor'
       );
     }
+    showMessage('User is on the feedback tab of the exploration editor.');
   }
 
   /**
@@ -160,14 +173,21 @@ export class Moderator extends BaseUser {
         `Expected ${expectedCount} feedback messages, but found ${actualCount}`
       );
     }
+    showMessage('Feedback messages count matches expected count.');
   }
 
   /**
    * Function to fetch a specific feedback message and return its properties.
    * @param {number} messageIndex - The index of the feedback message to fetch, starting from 1.
    */
-  async getFeedbackMessage(messageIndex: number): Promise<object> {
-    const messageRows = await this.page.$$('.oppia-padded-table tr');
+  private async getFeedbackMessage(messageIndex: number): Promise<object> {
+    await this.page.waitForTimeout(10000);
+    // Wait for the feedback messages table to be populated.
+    await this.page.waitForFunction(
+      () => document.querySelectorAll(feedbackMessageRowSelector).length > 0
+    );
+
+    const messageRows = await this.page.$$(feedbackMessageRowSelector);
     if (messageRows.length === 0) {
       throw new Error('No feedback messages found');
     }
@@ -179,9 +199,10 @@ export class Moderator extends BaseUser {
     }
 
     const row = messageRows[messageIndex];
+
     const timestamp = await row.$eval('td:nth-child(1)', el => el.textContent);
     const explorationId = await row.$eval(
-      'td:nth-child(2)',
+      'td:nth-child(2) a',
       el => el.textContent
     );
     const username = await row.$eval('td:nth-child(3)', el => el.textContent);
@@ -219,14 +240,14 @@ export class Moderator extends BaseUser {
   async openFeedbackTabFromLinkInExplorationId(
     explorationID: string | null
   ): Promise<void> {
-    await this.clickAndWaitForNavigation(explorationID as string);
+    await this.clickAndWaitForNavigation(` ${explorationID} ` as string);
   }
 
   /**
    * Function to navigate to recent feedback messages.
    */
   async navigateToRecentFeedbackMessagesTab(): Promise<void> {
-    await this.clickAndWaitForNavigation('Recent Feedback Messages');
+    await this.clickOn(feedbackMessagesTab);
   }
 
   /**
