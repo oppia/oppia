@@ -173,6 +173,24 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 beam.MapTuple(self.transform_translation_review_stats)
         )
 
+        invalid_question_contribution_stats = (
+            question_contribution_stats
+            | 'Get users with null bio or bio with length greater than 2000' >>
+                beam.Filter(
+                lambda question_contribution_stat:
+                    question_contribution_stat.first_contribution_date == None)
+        )
+
+        invalid_user_usernames_and_bios_report = (
+            invalid_question_contribution_stats
+            | 'Report info on each invalid question contribution stat' >> beam.Map(
+                lambda invalid_question_contribution_stat:
+                    job_run_result.JobRunResult.as_stderr(
+                    'The username of invalid record is "%s"'
+                    % (invalid_question_contribution_stat.contributor_user_id)
+                ))
+        )
+
         question_submitter_total_stats_models = (
             {
                 'question_contribution_stats':
