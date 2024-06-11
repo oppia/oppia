@@ -328,7 +328,9 @@ def generate_random_hexa_str() -> str:
     """
     uppercase = 'ABCDEF'
     lowercase = 'abcdef'
-    return ''.join(random.choices(uppercase + lowercase + string.digits, k=32))
+    characters = '%s%s%s' % (uppercase, lowercase, string.digits)
+
+    return ''.join(random.choices(characters, k=32))
 
 
 @contextlib.contextmanager
@@ -4060,9 +4062,11 @@ version: 1
         the latter approach would result in an question with the *current* state
         data schema version.
         """
-        score_category = (
-            suggestion_models.SCORE_TYPE_QUESTION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + skill_id)
+        score_category = '%s%s%s' % (
+            suggestion_models.SCORE_TYPE_QUESTION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+            skill_id
+        )
         change: Dict[
             str,
             Union[str, float, Dict[str, Union[Optional[Collection[str]], int]]]
