@@ -42,18 +42,28 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
+        self.dummy_thumbnail_data = classroom_config_domain.ImageData(
+            'thumbnail.svg', 'transparent', 1000
+        )
+        self.dummy_banner_data = classroom_config_domain.ImageData(
+            'banner.png', 'transparent', 1000
+        )
 
         self.math_classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': 'math_classroom_id',
             'name': 'math',
             'url_fragment': 'math',
             'course_details': 'Curated math foundations course.',
+            'teaser_text': 'Teaser test for math classroom',
             'topic_list_intro': 'Start from the basics with our first topic.',
             'topic_id_to_prerequisite_topic_ids': {
                 'topic_id_1': ['topic_id_2', 'topic_id_3'],
                 'topic_id_2': [],
                 'topic_id_3': []
-            }
+            },
+            'is_published': True,
+            'thumbnail_data': self.dummy_thumbnail_data.to_dict(),
+            'banner_data': self.dummy_banner_data.to_dict()
         }
         self.math_classroom = classroom_config_domain.Classroom.from_dict(
             self.math_classroom_dict)
@@ -62,8 +72,16 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.math_classroom.name,
             self.math_classroom.url_fragment,
             self.math_classroom.course_details,
+            self.math_classroom.teaser_text,
             self.math_classroom.topic_list_intro,
-            self.math_classroom.topic_id_to_prerequisite_topic_ids
+            self.math_classroom.topic_id_to_prerequisite_topic_ids,
+            self.math_classroom.is_published,
+            self.math_classroom.thumbnail_data.filename,
+            self.math_classroom.thumbnail_data.bg_color,
+            self.math_classroom.thumbnail_data.size_in_bytes,
+            self.math_classroom.banner_data.filename,
+            self.math_classroom.banner_data.bg_color,
+            self.math_classroom.banner_data.size_in_bytes,
         )
 
         self.physics_classroom_dict: classroom_config_domain.ClassroomDict = {
@@ -71,12 +89,16 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             'name': 'physics',
             'url_fragment': 'physics',
             'course_details': 'Curated physics foundations course.',
+            'teaser_text': 'Teaser test for physics classroom',
             'topic_list_intro': 'Start from the basics with our first topic.',
             'topic_id_to_prerequisite_topic_ids': {
                 'topic_id_1': ['topic_id_2', 'topic_id_3'],
                 'topic_id_2': [],
                 'topic_id_3': []
-            }
+            },
+            'is_published': True,
+            'thumbnail_data': self.dummy_thumbnail_data.to_dict(),
+            'banner_data': self.dummy_banner_data.to_dict()
         }
         self.physics_classroom = classroom_config_domain.Classroom.from_dict(
             self.physics_classroom_dict)
@@ -85,8 +107,16 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.physics_classroom.name,
             self.physics_classroom.url_fragment,
             self.physics_classroom.course_details,
+            self.physics_classroom.teaser_text,
             self.physics_classroom.topic_list_intro,
-            self.physics_classroom.topic_id_to_prerequisite_topic_ids
+            self.physics_classroom.topic_id_to_prerequisite_topic_ids,
+            self.physics_classroom.is_published,
+            self.physics_classroom.thumbnail_data.filename,
+            self.physics_classroom.thumbnail_data.bg_color,
+            self.physics_classroom.thumbnail_data.size_in_bytes,
+            self.physics_classroom.banner_data.filename,
+            self.physics_classroom.banner_data.bg_color,
+            self.physics_classroom.banner_data.size_in_bytes
         )
 
     def test_get_classroom_by_id(self) -> None:
@@ -116,8 +146,12 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             'name': 'chem',
             'url_fragment': 'chem',
             'course_details': 'Curated Chemistry foundations course.',
+            'teaser_text': 'Teaser test for chemistry classroom',
             'topic_list_intro': 'Start from the basics with our first topic.',
-            'topic_id_to_prerequisite_topic_ids': {'topic_id_chem': []}
+            'topic_id_to_prerequisite_topic_ids': {'topic_id_chem': []},
+            'is_published': True,
+            'thumbnail_data': self.dummy_thumbnail_data.to_dict(),
+            'banner_data': self.dummy_banner_data.to_dict()
         }
         chemistry_classroom = classroom_config_domain.Classroom.from_dict(
             chemistry_classroom_dict)
@@ -126,8 +160,16 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             chemistry_classroom.name,
             chemistry_classroom.url_fragment,
             chemistry_classroom.course_details,
+            chemistry_classroom.teaser_text,
             chemistry_classroom.topic_list_intro,
-            chemistry_classroom.topic_id_to_prerequisite_topic_ids
+            chemistry_classroom.topic_id_to_prerequisite_topic_ids,
+            chemistry_classroom.is_published,
+            chemistry_classroom.thumbnail_data.filename,
+            chemistry_classroom.thumbnail_data.bg_color,
+            chemistry_classroom.thumbnail_data.size_in_bytes,
+            chemistry_classroom.banner_data.filename,
+            chemistry_classroom.banner_data.bg_color,
+            chemistry_classroom.banner_data.size_in_bytes
         )
         classroom_url_fragment = (
             classroom_config_services.
@@ -174,19 +216,20 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
         chemistry_classroom = classroom_config_domain.Classroom(
             new_classroom_id, 'chemistry', 'chemistry',
             'Curated chemistry foundations course.',
+            'Teaser test for chemistry classroom',
             'Start from the basics with our first topic.',
             {
                 'topic_id_1': ['topic_id_2', 'topic_id_3'],
                 'topic_id_2': [],
                 'topic_id_3': []
-            }
+            }, True, self.dummy_thumbnail_data, self.dummy_banner_data
         )
         self.assertIsNone(
             classroom_config_services.get_classroom_by_id(
                 new_classroom_id, strict=False)
         )
 
-        classroom_config_services.update_or_create_classroom_model(
+        classroom_config_services.create_new_classroom(
             chemistry_classroom)
         self.assertEqual(
             classroom_config_services.get_classroom_by_id(
@@ -202,13 +245,25 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
         )
 
         self.physics_classroom.name = 'Quantum physics'
-        classroom_config_services.update_or_create_classroom_model(
+        classroom_config_services.update_classroom(
             self.physics_classroom)
 
         self.assertEqual(
             classroom_config_services.get_classroom_by_id(
                 'physics_classroom_id').name,
             'Quantum physics'
+        )
+
+    def test_do_not_update_invalid_classroom(self) -> None:
+        self.physics_classroom.classroom_id = 'invalid'
+        self.physics_classroom.name = 'Updated physics'
+        classroom_config_services.update_classroom(
+            self.physics_classroom)
+
+        self.assertEqual(
+            classroom_config_services.get_classroom_by_id(
+                'physics_classroom_id').name,
+            'physics'
         )
 
     def test_delete_classroom_model(self) -> None:
@@ -220,3 +275,37 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
         self.assertIsNone(
             classroom_config_services.get_classroom_by_id(
                 'math_classroom_id', strict=False))
+
+    def test_create_new_default_classroom(self) -> None:
+        classroom_id = classroom_config_services.get_new_classroom_id()
+        history_classroom = (
+            classroom_config_services.create_new_default_classroom(
+            classroom_id, 'history', 'history'
+        ))
+        history_classroom_data = classroom_config_services.get_classroom_by_id(
+            classroom_id
+        )
+
+        self.assertEqual(history_classroom.name, history_classroom_data.name)
+        self.assertEqual(
+            history_classroom.url_fragment, history_classroom_data.url_fragment
+        )
+        self.assertFalse(history_classroom_data.is_published)
+
+    def test_update_or_create_new_classroom(self) -> None:
+        self.math_classroom.name = 'Updated Math'
+        classroom_config_services.update_or_create_classroom_model(
+            self.math_classroom)
+        math_classroom = classroom_config_services.get_classroom_by_id(
+            self.math_classroom.classroom_id
+        )
+        self.assertEqual(self.math_classroom.name, math_classroom.name)
+
+        self.math_classroom.classroom_id = 'new_classroom'
+        classroom_config_services.update_or_create_classroom_model(
+            self.math_classroom
+        )
+        math_classroom = classroom_config_services.get_classroom_by_id(
+            'new_classroom'
+        )
+        self.assertEqual(self.math_classroom.name, math_classroom.name)

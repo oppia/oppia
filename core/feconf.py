@@ -1081,6 +1081,7 @@ CLASSROOM_ID_TO_NAME_HANDLER_URL = '/classroom_id_to_name_handler'
 UNUSED_TOPICS_HANDLER_URL = '/unused_topics'
 NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 CLASSROOM_HANDLER_URL = '/classroom'
+NEW_CLASSROOM_URL = '/classroom_admin/create_new'
 CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
 CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
 VOICEOVER_ADMIN_DATA_HANDLER_URL = '/voiceover_admin_data_handler'
@@ -1668,6 +1669,8 @@ COMPOSITE_ENTITY_ID_TEMPLATE = '%s.%s.%d'
 ContentValueType = Union[str, List[str]]
 
 MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 10
+
+DEFAULT_CLASSROOM_PUBLICATION_STATUS = False
 
 
 class TranslatableEntityType(enum.Enum):

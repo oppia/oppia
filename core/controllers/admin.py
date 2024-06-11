@@ -1195,11 +1195,6 @@ class AdminHandler(
                 self.user_id, question_id_15, skill_id_5, 0.5)
 
             classroom_id_1 = classroom_config_services.get_new_classroom_id()
-
-            classroom_name_1 = 'Math'
-
-            classroom_url_fragment_1 = 'math'
-
             topic_dependency_for_classroom_1: Dict[str, list[str]] = {
                 topic_id_1: [],
                 topic_id_2: [topic_id_1],
@@ -1207,22 +1202,25 @@ class AdminHandler(
                 topic_id_4: [topic_id_2],
                 topic_id_5: [topic_id_2, topic_id_3]
             }
+            classroom_1 = classroom_config_domain.Classroom(
+                            classroom_id=classroom_id_1,
+                            name='math',
+                            url_fragment='math',
+                            course_details='Math course  details',
+                            teaser_text='Math teaser text',
+                            topic_list_intro='Start with our first topic.',
+                            topic_id_to_prerequisite_topic_ids=(
+                                topic_dependency_for_classroom_1),
+                            is_published=True,
+                            thumbnail_data=classroom_config_domain.ImageData(
+                                'thumbnail.svg', 'transparent', 1000
+                            ),
+                            banner_data=classroom_config_domain.ImageData(
+                                'banner.png', 'transparent', 1000
+                            )
+                        )
 
-            classroom_dict_1: classroom_config_domain.ClassroomDict = {
-                'classroom_id': classroom_id_1,
-                'name': classroom_name_1,
-                'url_fragment': classroom_url_fragment_1,
-                'course_details': '',
-                'topic_list_intro': '',
-                'topic_id_to_prerequisite_topic_ids': (
-                    topic_dependency_for_classroom_1)
-            }
-
-            classroom_1 = classroom_config_domain.Classroom.from_dict(
-                classroom_dict_1)
-
-            classroom_config_services.update_or_create_classroom_model(
-                classroom_1)
+            classroom_config_services.create_new_classroom(classroom_1)
         else:
             raise Exception('Cannot generate dummy classroom in production.')
 

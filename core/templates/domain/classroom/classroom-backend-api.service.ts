@@ -211,7 +211,31 @@ export class ClassroomBackendApiService {
       );
 
       this.http
-        .put<void>(classroomUrl, {classroom_dict: classroomDict})
+        // TODO(#20418): Update this once Frontend part of M1.2 is complete.
+        .put<void>(classroomUrl, {
+          classroom_dict: {
+            classroom_id: classroomDict.classroom_id,
+            name: classroomDict.name,
+            url_fragment: classroomDict.url_fragment,
+            course_details: classroomDict.course_details || 'Course details',
+            topic_list_intro:
+              classroomDict.topic_list_intro || 'Topic List intro',
+            topic_id_to_prerequisite_topic_ids:
+              classroomDict.topic_id_to_prerequisite_topic_ids,
+            teaser_text: 'Teaser text of the classroom',
+            is_published: true,
+            thumbnail_data: {
+              filename: 'thumbnail.svg',
+              bg_color: 'transparent',
+              size_in_bytes: 1000,
+            },
+            banner_data: {
+              filename: 'banner.svg',
+              bg_color: 'transparent',
+              size_in_bytes: 1000,
+            },
+          },
+        })
         .toPromise()
         .then(
           response => {
