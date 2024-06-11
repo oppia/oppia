@@ -54,7 +54,8 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
 
   ngOnInit(): void {
     this.explorationId = this.contextService.getExplorationId();
-    this.explorationVersion = this.contextService.getExplorationVersion();
+    this.explorationVersion =
+      this.contextService.getExplorationVersion() as number;
 
     // Populate the content translations via latest draft changes first,
     // in order to get the most recently updated translations.
@@ -104,6 +105,8 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   }
 
   getLanguageName(languageCode: string): string {
-    return this.languageUtilService.getContentLanguageDescription(languageCode);
+    return this.languageUtilService.getContentLanguageDescription(
+      languageCode
+    ) as string;
   }
 }
