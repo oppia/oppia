@@ -294,24 +294,18 @@ module.exports = {
       inject: false,
     }),
     new HtmlWebpackPlugin({
-<<<<<<< HEAD
       chunks: ['story_editor'],
       filename: 'story-editor-page.mainpage.html',
-=======
       chunks: ['subtopic_viewer'],
       filename: 'subtopic-viewer-page.mainpage.html',
->>>>>>> ec52443b5b (Remove Story Editor module from webpack configuration)
       hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix +
-<<<<<<< HEAD
         '/pages/story-editor-page/' +
         'story-editor-page.mainpage.html',
-=======
         '/pages/subtopic-viewer-page/' +
         'subtopic-viewer-page.mainpage.html',
->>>>>>> ec52443b5b (Remove Story Editor module from webpack configuration)
       minify: htmlMinifyConfig,
       inject: false,
     }),
