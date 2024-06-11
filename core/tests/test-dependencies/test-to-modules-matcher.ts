@@ -27,14 +27,31 @@ import {
 } from '@angular/router';
 import {Browser, Frame, Target} from 'puppeteer';
 import {getRouteToModuleMapping} from './route-to-module-mapping-generator';
+import {glob} from 'glob';
 
+// A mapping of common modules that many tests use, so by default we will exclude them
+// from being collected. Each excluded module also has an array of globs where if specified
+// any file under that golden file under that glob will not be excluded.
 const COMMON_MODULES_TO_EXCLUDE: Record<string, string[]> = {
-  'core/templates/pages/splash-page/splash-page.module.ts': [],
-  'core/templates/pages/login-page/login-page.module.ts': [],
-  'core/templates/pages/signup-page/signup-page.module.ts': [],
-  'core/templates/pages/admin-page/admin-page.module.ts': [],
+  'core/templates/pages/splash-page/splash-page.module.ts': [
+    'core/tests/test-modules-mappings/acceptance/logged-in-user/set-language-to-rtl-and-navigate-through-site.txt',
+    'core/tests/test-modules-mappings/acceptance/logged-in-user/*'
+  ],
+  'core/templates/pages/login-page/login-page.module.ts': [
+    'core/tests/test-modules-mappings/acceptance/logged-out-user/sign-in-and-save-exploration-progress.txt',
+  ],
+  'core/templates/pages/signup-page/signup-page.module.ts': [
+    'core/tests/test-modules-mappings/acceptance/logged-out-user/sign-in-and-save-exploration-progress.txt',
+  ],
+  'core/templates/pages/admin-page/admin-page.module.ts': [
+    'core/tests/test-modules-mappings/acceptance/site-admin/*',
+  ],
   'core/templates/pages/learner-dashboard-page/learner-dashboard-page.module.ts':
-    [],
+    [
+      'core/tests/test-modules-mappings/acceptance/logged-in-user/set-language-to-rtl-and-navigate-through-site.txt',
+      'core/tests/test-modules-mappings/acceptance/logged-in-user/save-an-exploration-to-play-later.txt',
+      'core/tests/test-modules-mappings/acceptance/logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard.txt',
+    ],
 };
 
 const LOCALHOST_URL = 'http://localhost:8181/';
@@ -117,11 +134,27 @@ export class TestToModulesMatcher {
       if (this.collectedModules.includes(module)) {
         break;
       }
-      if (
-        COMMON_MODULES_TO_EXCLUDE[module] &&
-        !COMMON_MODULES_TO_EXCLUDE[module].includes(this.goldenFilePath)
-      ) {
-        break;
+      if (COMMON_MODULES_TO_EXCLUDE[module]) {
+        let exclude = true;
+        for (const globPattern of COMMON_MODULES_TO_EXCLUDE[module]) {
+          const globFiles = glob.sync(globPattern);
+          if (globFiles.length === 0) {
+            break;
+          }
+          for (const file of globFiles) {
+            if (file === this.goldenFilePath) {
+              exclude = false;
+              break;
+            }
+          }
+          if (!exclude) {
+            break;
+          }
+        }
+
+        if (exclude) {
+          break;
+        }
       }
       this.collectedModules.push(module);
       break;

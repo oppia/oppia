@@ -95,7 +95,7 @@ export class BaseUser {
         ConsoleReporter.trackConsoleMessagesInBrowser(browser);
         if (!mobile) {
           TestToModulesMatcher.setGoldenFilePath(
-            `core/tests/test-modules-mappings/${specName}.txt`
+            `core/tests/test-modules-mappings/acceptance/${specName}.txt`
           );
           TestToModulesMatcher.registerPuppeteerBrowser(browser);
         }
