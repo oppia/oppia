@@ -969,8 +969,17 @@ describe('Admin misc tab component ', () => {
           adminBackendApiService,
           'updateUserGroupsAsync'
         );
-        // Setting cancel button clicked to be true.
+        component.userInput = {
+          nativeElement: {
+            value: '',
+          },
+        } as ElementRef;
 
+        component.newUserGroupName = 'UserGroup5';
+        component.selectedUserGroup = 'UserGroup5';
+        component.addUserGroup();
+        component.addUser({value: 'User10'});
+        component.addUser({value: 'User12'});
         component.updateUserGroups();
         tick();
 

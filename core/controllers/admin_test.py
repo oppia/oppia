@@ -1106,7 +1106,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             param.name)
         self.logout()
 
-    def test_post_rules_changes_correctly_updates_params_returned_by_getter(
+    def test_user_groups_changes_correctly_updates_returned_by_getter(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -1138,12 +1138,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token)
 
         response_dict = self.get_json('/adminhandler')
-        rules = response_dict['platform_params_dicts'][0]['rules']
         self.assertEqual(response_dict['user_group_models_dict'], {
             'USER_GROUP_1': ['user_1_id', 'user_2_id', 'user_3_id'],
             'USER_GROUP_2': ['user_1_id', 'user_4_id']
         })
-    
+
         self.logout()
 
     def test_grant_super_admin_privileges(self) -> None:
