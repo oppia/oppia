@@ -51,7 +51,7 @@ describe('Moderator', function () {
     );
     await explorationEditor.saveExplorationDraft();
     explorationId = await explorationEditor.publishExplorationWithContent(
-      'Test Exploration Title 1',
+      'Test Exploration Title',
       'Test Exploration Goal',
       'Algebra'
     );
@@ -77,7 +77,9 @@ describe('Moderator', function () {
         'isCommunityOwned',
       ]);
 
-      await moderator.openFeedbackTabFromLinkInCommit(1);
+      await moderator.openFeedbackTabFromLinkInExplorationTitle(
+        'Test Exploration Title'
+      );
       await moderator.expectToBeOnFeedbackTab();
 
       await moderator.navigateToRecentFeedbackMessagesTab();
@@ -88,7 +90,7 @@ describe('Moderator', function () {
         'username',
       ]);
 
-      await moderator.openFeedbackTabFromLinkInFeedbackMessage(1);
+      await moderator.openFeedbackTabFromLinkInExplorationId(explorationId);
       await moderator.expectToBeOnFeedbackTab();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

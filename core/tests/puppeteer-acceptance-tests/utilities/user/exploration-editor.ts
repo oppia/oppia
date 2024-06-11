@@ -987,7 +987,7 @@ export class ExplorationEditor extends BaseUser {
 
     try {
       await this.page.waitForFunction(
-        'document.querySelector(".e2e-test-toast-message") !== null',
+        'document.querySelector(".oppia-feedback-popup-container") !== null',
         {timeout: 5000}
       );
       showMessage('Feedback submitted successfully');

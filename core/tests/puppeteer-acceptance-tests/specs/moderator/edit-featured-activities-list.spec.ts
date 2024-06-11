@@ -76,16 +76,16 @@ describe('Moderator', function () {
 
       await moderator.navigateToModeratorPage();
       await moderator.navigateToFeaturedActivitiesTab();
-      await moderator.featureActivity(explorationId as string);
+      await moderator.featureActivity(explorationId);
 
       // Expect to see the newly featured activity in the list of featured activities.
       await LoggedOutUser.expectToViewFeaturedActivities([
         'Test Exploration Title',
       ]);
 
-      await moderator.unfeatureActivity(explorationId as string);
+      await moderator.unfeatureActivity(explorationId);
 
-      // Expect to see no featured activities again.
+      // Expect to see no featured activity as the newly featured activity is unfeatured.
       await LoggedOutUser.expectToViewFeaturedActivities([]);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

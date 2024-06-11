@@ -176,6 +176,9 @@ const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
 
+const libraryExplorationsGroupSelector = '.oppia-library-group';
+const explorationSummaryTileTitle = '.e2e-test-exp-summary-tile-title';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -1384,10 +1387,10 @@ export class LoggedOutUser extends BaseUser {
    * Views all featured activities on the community library page.
    */
   private async viewAllFeaturedActivities(): Promise<object[]> {
-    await this.page.waitForSelector('.oppia-library-group');
+    await this.page.waitForSelector(libraryExplorationsGroupSelector);
 
     const featuredActivities = await this.page.$$eval(
-      '.oppia-library-group',
+      libraryExplorationsGroupSelector,
       groups => {
         const featuredGroup = groups.find(group =>
           group
@@ -1397,13 +1400,13 @@ export class LoggedOutUser extends BaseUser {
 
         const activities = Array.from(
           featuredGroup?.querySelectorAll(
-            'oppia-collection-summary-tile, oppia-exploration-summary-tile'
+            'oppia-collection-summary, oppia-exploration-summary-tile'
           ) ?? []
         );
 
         return activities.map(activity => ({
           title: activity
-            .querySelector('.e2e-test-exp-summary-tile-title')
+            .querySelector(explorationSummaryTileTitle)
             ?.textContent?.trim(),
         }));
       }

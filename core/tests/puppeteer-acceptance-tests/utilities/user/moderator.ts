@@ -21,7 +21,14 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
+
+const commitRowSelector = '.commit-row';
 const featuredActivitiesTab = '.e2e-test-featured-activities-tab-link';
+const explorationIDField = 'input[aria-label="text input"]';
+const featuredActivityRowSelector =
+  '#e2e-test-schema-based-list-editor-table-row';
+const deleteFeaturedActivityButton = '.e2e-test-delete-list-entry';
+
 export class Moderator extends BaseUser {
   /**
    * Function to navigate to the moderator page.
@@ -38,58 +45,28 @@ export class Moderator extends BaseUser {
   }
 
   /**
-   * Function to view all recent commits.
+   * Function to check the number of recent commits.
+   * @param {number} expectedCount - The expected number of commits.
    */
-  async viewAllRecentCommits(): Promise<object[]> {
-    const commitRows = await this.page.$$('.commit-row');
-    const allCommits: {
-      timestamp: string | null;
-      exploration: string | null;
-      category: string | null;
-      username: string | null;
-      commitMessage: string | null;
-      isCommunityOwned: string | null;
-    }[] = [];
+  async expectNumberOfRecentCommits(expectedCount: number): Promise<void> {
+    await this.page.waitForSelector(commitRowSelector);
+    const commitRows = await this.page.$$(commitRowSelector);
+    const actualCount = commitRows.length;
 
-    for (const row of commitRows) {
-      const timestamp = await row.$eval(
-        'td:nth-child(1)',
-        el => el.textContent
+    if (actualCount !== expectedCount) {
+      throw new Error(
+        `Expected ${expectedCount} commits, but found ${actualCount}`
       );
-      const exploration = await row.$eval(
-        'td:nth-child(2) a',
-        el => el.textContent
-      );
-      const category = await row.$eval('td:nth-child(3)', el => el.textContent);
-      const username = await row.$eval('td:nth-child(4)', el => el.textContent);
-      const commitMessage = await row.$eval(
-        'td:nth-child(5)',
-        el => el.textContent
-      );
-      const isCommunityOwned = await row.$eval(
-        'td:nth-child(6)',
-        el => el.textContent
-      );
-
-      allCommits.push({
-        timestamp,
-        exploration,
-        category,
-        username,
-        commitMessage,
-        isCommunityOwned,
-      });
     }
-
-    return allCommits;
+    showMessage('Recent commits count matches expected count.');
   }
 
   /**
    * Function to view a specific recent commit.
    * @param {number} commitIndex - The index of the commit to view.
    */
-  async viewRecentCommit(commitIndex: number): Promise<object> {
-    const commitRows = await this.page.$$('.commit-row');
+  private async getPropertiesOfCommit(commitIndex: number): Promise<object> {
+    const commitRows = await this.page.$$(commitRowSelector);
     if (commitRows.length === 0) {
       throw new Error('No recent commits found');
     }
@@ -128,25 +105,118 @@ export class Moderator extends BaseUser {
   }
 
   /**
+   * Function to check if a specific commit has all the expected properties.
+   * @param {number} commitIndex - The index of the commit to check.
+   * @param {string[]} expectedProperties - The properties that the commit is expected to have.
+   */
+  async expectCommitToHaveProperties(
+    commitIndex: number,
+    expectedProperties: string[]
+  ): Promise<void> {
+    const commit = await this.getPropertiesOfCommit(commitIndex);
+
+    for (const property of expectedProperties) {
+      if (!(property in commit)) {
+        throw new Error(`Commit does not have property: ${property}`);
+      }
+    }
+    showMessage(`Commit ${commitIndex} has all expected properties.`);
+  }
+
+  /**
    * Function to open the exploration editor from a title link.
    * @param {string} title - The title of the exploration.
    */
-  async openExplorationEditorFromTitleLink(title: string): Promise<void> {
+  async openFeedbackTabFromLinkInExplorationTitle(
+    title: string
+  ): Promise<void> {
     await this.clickAndWaitForNavigation(title);
   }
 
   /**
    * Function to check if the user is on the feedback tab of the exploration editor.
    */
-  async isOnFeedbackTabOfExplorationEditor(): Promise<boolean> {
-    return await this.isTextPresentOnPage('Start new thread');
+  async expectToBeOnFeedbackTab(): Promise<void> {
+    const isOnFeedbackTab = await this.isTextPresentOnPage('Start new thread');
+
+    if (!isOnFeedbackTab) {
+      throw new Error(
+        'User is not on the feedback tab of the exploration editor'
+      );
+    }
+  }
+
+  /**
+   * Function to check the number of feedback messages.
+   * @param {number} expectedCount - The expected number of feedback messages.
+   */
+  async expectNumberOfFeedbackMessages(expectedCount: number): Promise<void> {
+    await this.page.waitForSelector('table');
+    const feedbackRows = await this.page.$$('table tr');
+    const actualCount = feedbackRows.length - 1;
+
+    if (actualCount !== expectedCount) {
+      throw new Error(
+        `Expected ${expectedCount} feedback messages, but found ${actualCount}`
+      );
+    }
+  }
+
+  /**
+   * Function to fetch a specific feedback message and return its properties.
+   * @param {number} messageIndex - The index of the feedback message to fetch, starting from 1.
+   */
+  async getFeedbackMessage(messageIndex: number): Promise<object> {
+    const messageRows = await this.page.$$('.oppia-padded-table tr');
+    if (messageRows.length === 0) {
+      throw new Error('No feedback messages found');
+    }
+
+    messageIndex -= 1; // Adjusting to 0-based index.
+
+    if (messageIndex < 0 || messageIndex >= messageRows.length) {
+      throw new Error('Invalid message number');
+    }
+
+    const row = messageRows[messageIndex];
+    const timestamp = await row.$eval('td:nth-child(1)', el => el.textContent);
+    const explorationId = await row.$eval(
+      'td:nth-child(2)',
+      el => el.textContent
+    );
+    const username = await row.$eval('td:nth-child(3)', el => el.textContent);
+
+    return {
+      timestamp,
+      explorationId,
+      username,
+    };
+  }
+
+  /**
+   * Function to check if a specific feedback message has all the expected properties.
+   * @param {number} messageIndex - The index of the feedback message to check.
+   * @param {string[]} expectedProperties - The properties that the feedback message
+   * is expected to have.
+   */
+  async expectFeedbackMessageToHaveProperties(
+    messageIndex: number,
+    expectedProperties: string[]
+  ): Promise<void> {
+    const message = await this.getFeedbackMessage(messageIndex);
+
+    for (const property of expectedProperties) {
+      if (!(property in message)) {
+        throw new Error(`Feedback message does not have property: ${property}`);
+      }
+    }
   }
 
   /**
    * Function to open the exploration editor from an ID link.
    * @param {string | null} explorationID - The ID of the exploration.
    */
-  async openExplorationEditorFromIdLink(
+  async openFeedbackTabFromLinkInExplorationId(
     explorationID: string | null
   ): Promise<void> {
     await this.clickAndWaitForNavigation(explorationID as string);
@@ -160,37 +230,14 @@ export class Moderator extends BaseUser {
   }
 
   /**
-   * Function to view all recent feedback messages.
-   */
-  async viewAllRecentFeedbackMessages(): Promise<object[]> {
-    const feedbackMessages = await this.page.$$eval(
-      '.protractor-test-message-table-row',
-      rows => {
-        return rows.map(row => {
-          const columns = row.querySelectorAll('td');
-          return {
-            timestamp: columns[0]?.textContent?.trim(),
-            explorationId: columns[1]?.textContent?.trim(),
-            username: columns[2]?.textContent?.trim(),
-          };
-        });
-      }
-    );
-
-    feedbackMessages.shift();
-
-    return feedbackMessages;
-  }
-
-  /**
    * Function to feature an activity.
    * @param {string} explorationId - The ID of the exploration to feature.
    */
-  async featureActivity(explorationId: string): Promise<void> {
+  async featureActivity(explorationId: string | null): Promise<void> {
     await this.clickOn(' Add element ');
 
-    await this.page.waitForSelector('input[aria-label="text input"]');
-    await this.page.type('input[aria-label="text input"]', explorationId);
+    await this.page.waitForSelector(explorationIDField);
+    await this.page.type(explorationIDField, explorationId as string);
     await this.page.keyboard.press('Enter');
     await this.clickOn(' Save Featured Activities ');
 
@@ -208,13 +255,17 @@ export class Moderator extends BaseUser {
   /**
    * Function to unfeature an activity.
    */
-  async unfeatureActivity(explorationId: string): Promise<void> {
-    await this.page.waitForSelector(
-      '#e2e-test-schema-based-list-editor-table-row'
-    );
-    const rows = await this.page.$$(
-      '#e2e-test-schema-based-list-editor-table-row'
-    );
+  async unfeatureActivity(explorationId: string | null): Promise<void> {
+    await this.navigateToFeaturedActivitiesTab();
+    await this.page.waitForSelector(featuredActivityRowSelector);
+    const rows = await this.page.$$(featuredActivityRowSelector);
+
+    if (rows.length === 0) {
+      throw new Error('No featured activities found');
+    }
+
+    let activityUnfeatured = false;
+
     for (const row of rows) {
       await row.waitForSelector('schema-based-unicode-editor');
       const schemaBasedUnicodeEditor = await row.$(
@@ -223,22 +274,34 @@ export class Moderator extends BaseUser {
       const modelValue = await schemaBasedUnicodeEditor?.evaluate(node =>
         node.getAttribute('ng-reflect-model')
       );
-      if (modelValue === explorationId) {
-        await row.waitForSelector('.e2e-test-delete-list-entry');
-        const deleteButton = await row.$('.e2e-test-delete-list-entry');
+
+      if (modelValue === (explorationId as string)) {
+        await row.waitForSelector(deleteFeaturedActivityButton);
+        const deleteButton = await row.$(deleteFeaturedActivityButton);
+
         if (deleteButton) {
           await this.waitForElementToBeClickable(deleteButton);
           await deleteButton.click();
+          activityUnfeatured = true;
+          break;
         }
-        break;
       }
     }
+
+    if (!activityUnfeatured) {
+      throw new Error(
+        `Failed to unfeature the activity with id: ${explorationId}`
+      );
+    }
+
     await this.clickOn(' Save Featured Activities ');
 
     try {
-      await this.page.waitForSelector('.e2e-test-toast-message', {
-        timeout: 5000,
-      });
+      await this.page.waitForFunction(
+        'document.querySelector(".e2e-test-toast-message") !== null',
+        {timeout: 5000}
+      );
+      showMessage('Activity unfeatured successfully.');
     } catch (error) {
       throw new Error('Failed to save the unfeatured activities');
     }
