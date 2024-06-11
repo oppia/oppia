@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.constants import constants
 from core.domain import classroom_config_domain
 from core.platform import models
@@ -255,6 +256,51 @@ def create_new_classroom(
         classroom.banner_data.bg_color,
         classroom.banner_data.size_in_bytes,
     )
+
+
+def create_new_default_classroom(
+        classroom_id: str, name: str, url_fragment: str
+    ) -> classroom_config_domain.Classroom:
+    """Creates a new default classroom model.
+
+    Args:
+        classroom_id: str. The id of new classroom.
+        name: str. The name of the classroom.
+        url_fragment: str. The url fragment of the classroom.
+
+    Returns:
+        Classroom. The domain object representing a classroom.
+    """
+    classroom = classroom_config_domain.Classroom(
+        classroom_id=classroom_id, name=name, url_fragment=url_fragment,
+        teaser_text='', course_details='', topic_list_intro='',
+        topic_id_to_prerequisite_topic_ids={},
+        is_published=feconf.DEFAULT_CLASSROOM_PUBLICATION_STATUS,
+        thumbnail_data=classroom_config_domain.ImageData('', '', 0),
+        banner_data=classroom_config_domain.ImageData('', '', 0)
+    )
+
+    classroom.require_valid_name(name)
+    classroom.require_valid_url_fragment(url_fragment)
+
+    classroom_models.ClassroomModel.create(
+        classroom.classroom_id,
+        classroom.name,
+        classroom.url_fragment,
+        classroom.course_details,
+        classroom.teaser_text,
+        classroom.topic_list_intro,
+        classroom.topic_id_to_prerequisite_topic_ids,
+        classroom.is_published,
+        classroom.thumbnail_data.filename,
+        classroom.thumbnail_data.bg_color,
+        classroom.thumbnail_data.size_in_bytes,
+        classroom.banner_data.filename,
+        classroom.banner_data.bg_color,
+        classroom.banner_data.size_in_bytes,
+    )
+
+    return classroom
 
 
 def update_or_create_classroom_model(

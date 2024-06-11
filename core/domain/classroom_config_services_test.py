@@ -276,6 +276,22 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             classroom_config_services.get_classroom_by_id(
                 'math_classroom_id', strict=False))
 
+    def test_create_new_default_classroom(self) -> None:
+        classroom_id = classroom_config_services.get_new_classroom_id()
+        history_classroom = (
+            classroom_config_services.create_new_default_classroom(
+            classroom_id, 'history', 'history'
+        ))
+        history_classroom_data = classroom_config_services.get_classroom_by_id(
+            classroom_id
+        )
+
+        self.assertEqual(history_classroom.name, history_classroom_data.name)
+        self.assertEqual(
+            history_classroom.url_fragment, history_classroom_data.url_fragment
+        )
+        self.assertFalse(history_classroom_data.is_published)
+
     def test_update_or_create_new_classroom(self) -> None:
         self.math_classroom.name = 'Updated Math'
         classroom_config_services.update_or_create_classroom_model(
