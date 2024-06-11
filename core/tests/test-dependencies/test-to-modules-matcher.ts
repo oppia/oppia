@@ -35,7 +35,6 @@ import {glob} from 'glob';
 const COMMON_MODULES_TO_EXCLUDE: Record<string, string[]> = {
   'core/templates/pages/splash-page/splash-page.module.ts': [
     'core/tests/test-modules-mappings/acceptance/logged-in-user/set-language-to-rtl-and-navigate-through-site.txt',
-    'core/tests/test-modules-mappings/acceptance/logged-in-user/*',
   ],
   'core/templates/pages/login-page/login-page.module.ts': [
     'core/tests/test-modules-mappings/acceptance/logged-out-user/sign-in-and-save-exploration-progress.txt',
