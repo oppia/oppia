@@ -21,6 +21,7 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {showMessage} from '../../utilities/common/show-message';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {TopicManager} from '../../utilities/user/topic-manager';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -48,7 +49,7 @@ ConsoleReporter.setConsoleErrorsToIgnore([
 
 describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
-  let curriculumAdmin: CurriculumAdmin;
+  let curriculumAdmin: CurriculumAdmin & TopicManager;
   let explorationId: string | null;
   let topicId: string | null;
 
@@ -60,7 +61,7 @@ describe('Exploration Editor', function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
-      [ROLES.CURRICULUM_ADMIN]
+      [ROLES.CURRICULUM_ADMIN, ROLES.TOPIC_MANAGER]
     );
     // Navigate to the creator dashboard and create a new exploration.
     await explorationEditor.navigateToCreatorDashboardPage();
