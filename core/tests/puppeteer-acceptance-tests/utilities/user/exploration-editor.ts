@@ -969,7 +969,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async playExploration(explorationId: string): Promise<void> {
     await Promise.all([
-      this.page.waitForNavigation({waitUntil: 'load'}),
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
       this.page.goto(`${baseURL}/explore/${explorationId}`),
     ]);
   }
@@ -979,15 +979,19 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} feedback - The feedback to give on the exploration.
    */
   async giveFeedback(feedback: string): Promise<void> {
+    await this.page.waitForSelector('nav-options', {visible: true});
     await this.clickOn(feedbackPopupSelector);
     await this.page.waitForSelector(feedbackTextarea, {visible: true});
     await this.type(feedbackTextarea, feedback);
     await this.clickOn('Submit');
 
-    const isMessagePresent = await this.isTextPresentOnPage(
-      'Thank you for the feedback'
-    );
-    if (!isMessagePresent) {
+    try {
+      await this.page.waitForFunction(
+        'document.querySelector(".e2e-test-toast-message") !== null',
+        {timeout: 5000}
+      );
+      showMessage('Feedback submitted successfully');
+    } catch (error) {
       throw new Error('Feedback was not successfully submitted');
     }
   }

@@ -27,7 +27,7 @@ export class Moderator extends BaseUser {
    * Function to navigate to the moderator page.
    */
   async navigateToModeratorPage(): Promise<void> {
-    await this.page.goto(moderatorPageUrl, {waitUntil: 'load'});
+    await this.page.goto(moderatorPageUrl);
   }
 
   /**
@@ -155,7 +155,7 @@ export class Moderator extends BaseUser {
   /**
    * Function to navigate to recent feedback messages.
    */
-  async goToRecentFeedbackMessages(): Promise<void> {
+  async navigateToRecentFeedbackMessagesTab(): Promise<void> {
     await this.clickAndWaitForNavigation('Recent Feedback Messages');
   }
 
@@ -188,8 +188,8 @@ export class Moderator extends BaseUser {
    */
   async featureActivity(explorationId: string): Promise<void> {
     await this.clickOn(' Add element ');
+
     await this.page.waitForSelector('input[aria-label="text input"]');
-    console.log('explorationId:', explorationId);
     await this.page.type('input[aria-label="text input"]', explorationId);
     await this.page.keyboard.press('Enter');
     await this.clickOn(' Save Featured Activities ');
@@ -209,10 +209,14 @@ export class Moderator extends BaseUser {
    * Function to unfeature an activity.
    */
   async unfeatureActivity(explorationId: string): Promise<void> {
+    await this.page.waitForSelector(
+      '#e2e-test-schema-based-list-editor-table-row'
+    );
     const rows = await this.page.$$(
       '#e2e-test-schema-based-list-editor-table-row'
     );
     for (const row of rows) {
+      await row.waitForSelector('schema-based-unicode-editor');
       const schemaBasedUnicodeEditor = await row.$(
         'schema-based-unicode-editor'
       );
@@ -220,10 +224,9 @@ export class Moderator extends BaseUser {
         node.getAttribute('ng-reflect-model')
       );
       if (modelValue === explorationId) {
-        console.log('reached one');
+        await row.waitForSelector('.e2e-test-delete-list-entry');
         const deleteButton = await row.$('.e2e-test-delete-list-entry');
         if (deleteButton) {
-          console.log('reached two');
           await this.waitForElementToBeClickable(deleteButton);
           await deleteButton.click();
         }
@@ -233,11 +236,9 @@ export class Moderator extends BaseUser {
     await this.clickOn(' Save Featured Activities ');
 
     try {
-      await this.page.waitForFunction(
-        'document.querySelector(".e2e-test-toast-message") !== null',
-        {timeout: 5000}
-      );
-      showMessage('Activity unfeatured successfully.');
+      await this.page.waitForSelector('.e2e-test-toast-message', {
+        timeout: 5000,
+      });
     } catch (error) {
       throw new Error('Failed to save the unfeatured activities');
     }

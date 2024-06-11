@@ -67,28 +67,29 @@ describe('Moderator', function () {
     'should be able to view recent commits and feedback messages',
     async function () {
       await moderator.navigateToModeratorPage();
-      const recentCommits = await moderator.viewAllRecentCommits();
-      expect(recentCommits.length).toBeGreaterThan(0);
+      await moderator.expectNumberOfRecentCommits(1);
+      await moderator.expectCommitToHaveProperties(1, [
+        'timestamp',
+        'exploration',
+        'category',
+        'username',
+        'commitMessage',
+        'isCommunityOwned',
+      ]);
 
-      // Check properties of a recent commit.
-      const recentCommit = await moderator.viewRecentCommit();
-      expect(recentCommit).toHave('timestamp');
-      expect(recentCommit).toHaveProperty('exploration');
-      expect(recentCommit).toHaveProperty('category');
-      expect(recentCommit).toHaveProperty('username');
-      expect(recentCommit).toHaveProperty('commitMessage');
-      expect(recentCommit).toHaveProperty('isCommunityOwned');
+      await moderator.openFeedbackTabFromLinkInCommit(1);
+      await moderator.expectToBeOnFeedbackTab();
 
-      expect(await moderator.isInExplorationEditor()).toBe(true);
+      await moderator.navigateToRecentFeedbackMessagesTab();
+      await moderator.expectNumberOfFeedbackMessages(1);
+      await moderator.expectFeedbackMessageToHaveProperties(1, [
+        'timestamp',
+        'explorationId',
+        'username',
+      ]);
 
-      // View recent feedback messages.
-      const recentFeedbackMessages =
-        await moderator.viewRecentFeedbackMessages();
-      expect(recentFeedbackMessages.length).toBeGreaterThan(0);
-
-      // Open the respective exploration in the exploration editor by clicking the links attached to the corresponding exploration in recent feedback messages.
-      await moderator.openExplorationFromFeedbackLink();
-      expect(await moderator.isOnFeedbackTabOfExplorationEditor()).toBe(true);
+      await moderator.openFeedbackTabFromLinkInFeedbackMessage(1);
+      await moderator.expectToBeOnFeedbackTab();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
