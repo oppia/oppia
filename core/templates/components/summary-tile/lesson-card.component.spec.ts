@@ -191,7 +191,7 @@ describe('LessonCardComponent', () => {
     expect(component.title).toEqual(sampleExploration.title);
 
     expect(component.progress).toEqual(0);
-    expect(component.lessonTopic).toEqual('Community Lessons');
+    expect(component.lessonTopic).toEqual('Community Lesson');
   });
 
   it('should set story to complete StorySummary and its non-url values to the respective fields', () => {
