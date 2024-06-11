@@ -808,17 +808,17 @@ class AdminHandler(
             story_node_dicts = [{
                 'exp_id': '6',
                 'title': 'What are the place values?',
-                'description': 'Jaime learns the place value of each digit ' +
+                'description': 'Jaime learns the place value of each digit '
                                'in a big number.'
             }, {
                 'exp_id': '25',
                 'title': 'Finding the value of a number',
-                'description': 'Jaime understands the value of his ' +
+                'description': 'Jaime understands the value of his '
                                'arcade score.'
             }, {
                 'exp_id': '13',
                 'title': 'Comparing Numbers',
-                'description': 'Jaime learns if a number is smaller or ' +
+                'description': 'Jaime learns if a number is smaller or '
                                'greater than another number.'
             }]
 
@@ -1866,7 +1866,13 @@ class SendDummyMailToAdminHandler(
         """
         username = self.username
         assert username is not None
-        if feconf.CAN_SEND_EMAILS:
+        server_can_send_emails = (
+            parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.
+                SERVER_CAN_SEND_EMAILS.value
+            )
+        )
+        if server_can_send_emails:
             email_manager.send_dummy_mail_to_admin(username)
             self.render_json({})
         else:
