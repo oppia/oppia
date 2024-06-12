@@ -732,6 +732,39 @@ describe('Topic Editor Navbar', () => {
     expect(componentInstance.topicRights.isPublished()).toBe(false);
   }));
 
+  it('should not unpublish topic if topic is assigned to a classroom', fakeAsync(() => {
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: true,
+      can_publish_topic: true,
+      can_edit_topic: true,
+    });
+    componentInstance.showTopicEditOptions = true;
+
+    spyOn(topicEditorStateService, 'getClassroomName').and.returnValue(
+      'Science'
+    );
+    spyOn(alertsService, 'addWarning');
+    spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and.returnValue(
+      Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>
+    );
+    spyOn(topicEditorStateService, 'setTopicRights');
+
+    const result = componentInstance.unpublishTopic();
+    tick();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'The topic is assigned to the Science classroom. ' +
+        'Contact the curriculum admins to remove it from the classroom first.'
+    );
+
+    expect(componentInstance.showTopicEditOptions).toBeTrue();
+    expect(result).toBe(false);
+    expect(
+      topicRightsBackendApiService.unpublishTopicAsync
+    ).not.toHaveBeenCalled();
+    expect(topicEditorStateService.setTopicRights).not.toHaveBeenCalled();
+  }));
+
   it("should publish topic when user clicks the 'publish' button", fakeAsync(() => {
     spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
       Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>

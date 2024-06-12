@@ -88,7 +88,7 @@ class DisplayableTopicSummaryDict(TypedDict):
     thumbnail_bg_color: Optional[str]
     thumbnail_filename: Optional[str]
     canonical_story_summary_dict: List[topic_fetchers.CannonicalStoryDict]
-    url_fragment: str
+    url_fragment: Optional[str]
     classroom: str
     practice_tab_is_displayed: bool
     degrees_of_mastery: Dict[str, Optional[float]]

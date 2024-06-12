@@ -140,7 +140,8 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             classroom_config_services.get_classroom_by_url_fragment(
                 'incorrect_url_fragment'))
 
-    def test_get_classroom_url_fragment_for_existing_topic(self) -> None:
+    def test_get_classroom_url_fragment_and_name_for_existing_topic(
+            self) -> None:
         chemistry_classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': 'chem_classroom_id',
             'name': 'chem',
@@ -174,18 +175,30 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
         classroom_url_fragment = (
             classroom_config_services.
             get_classroom_url_fragment_for_topic_id('topic_id_chem'))
+        classroom_name = (
+            classroom_config_services.
+            get_classroom_name_for_topic_id('topic_id_chem'))
 
         self.assertEqual(classroom_url_fragment, 'chem')
+        self.assertEqual(classroom_name, 'chem')
 
-    def test_get_classroom_url_fragment_for_non_existing_topic(self) -> None:
+    def test_get_classroom_url_fragment_and_name_for_non_existing_topic(
+            self) -> None:
         classroom_url_fragment = (
             classroom_config_services.
             get_classroom_url_fragment_for_topic_id(
+            'non_existing_topic_id'))
+        classroom_name = (
+            classroom_config_services.
+            get_classroom_name_for_topic_id(
             'non_existing_topic_id'))
 
         self.assertEqual(
             classroom_url_fragment,
             constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)
+        self.assertEqual(
+            classroom_name,
+            constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)
 
     def test_get_all_classrooms(self) -> None:
         classrooms = classroom_config_services.get_all_classrooms()

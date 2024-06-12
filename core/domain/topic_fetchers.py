@@ -692,7 +692,7 @@ class CannonicalStoryDict(TypedDict):
     thumbnail_filename: Optional[str]
     url_fragment: str
     topic_url_fragment: str
-    classroom_url_fragment: str
+    classroom_url_fragment: Optional[str]
     story_is_published: bool
     completed_node_titles: List[str]
     all_node_dicts: List[story_domain.StoryNodeDict]

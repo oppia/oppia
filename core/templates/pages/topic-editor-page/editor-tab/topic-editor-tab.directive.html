@@ -69,7 +69,7 @@
                 <em>
                   The topic URL fragment is used to uniquely access the topic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{ maxCharsInTopicUrlFragment }} characters in total. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
                   This topic can be accessed at the following URL:<br>
-                  {{ hostname }}/learn/{{ getClassroomUrlFragment() }}/{{ editableTopicUrlFragment }}
+                  {{ hostname }}/learn/{{ classroomUrlFragment }}/{{ editableTopicUrlFragment }}
                 </em>
               </span>
               <div *ngIf="topicUrlFragmentExists" class="oppia-input-box-subtitle text-danger">
@@ -160,6 +160,19 @@
                                       previewDescriptionBgColor="#2F6687"
                                       [previewFooter]="topic.getCanonicalStoryIds().length + ' Lessons'">
             </oppia-thumbnail-uploader>
+            <div class="topic-classroom-container">
+              <label>Classroom</label>
+              <span *ngIf="isAssignedToAClassroom()">
+                <a rel="noopener" [href]="'/learn/' + classroomUrlFragment" target="_blank">{{ classroomName }}</a>
+              </span>
+              <em *ngIf="!isAssignedToAClassroom()">No classroom assigned</em>
+              <div *ngIf="isAssignedToAClassroom()" class="oppia-input-box-subtitle">
+                <em>To change the assigned classroom, please contact one of the curriculum admins:</em><br>
+                <em *ngFor="let username of curriculumAdminUsernames; let last = last">
+                  {{ username }}<ng-container *ngIf="!last">, </ng-container>
+                </em>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -887,6 +900,17 @@
     display: flex;
     justify-content: space-between;
     width: -webkit-fill-available;
+  }
+
+  .topic-classroom-container {
+    align-items: start;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .topic-classroom-container label {
+    margin-bottom: 0;
   }
 
   @media screen and (max-width: 1200px) {

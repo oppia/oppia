@@ -64,9 +64,17 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.save_new_skill(
             self.skill_id_2, self.admin_id, description='Skill Description 2')
         self.topic_id = topic_fetchers.get_new_topic_id()
+        self.topic_id_with_no_classroom = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             abbreviated_name='topic-one', url_fragment='topic-one',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        self.save_new_topic(
+            self.topic_id_with_no_classroom, self.admin_id, name='New-Topic',
+            abbreviated_name='new-topic', url_fragment='new-topic',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
@@ -91,6 +99,10 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
+        topic_services.update_topic_and_subtopic_pages(
+            self.admin_id, self.topic_id_with_no_classroom, changelist,
+            'Added subtopic.'
+        )
 
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -606,7 +618,7 @@ class TopicEditorTests(
             'The deleted skills: %s are still'
             ' present in topic with id %s' % (
                 self.skill_id_2, self.topic_id))
-        self.assertEqual(len(messages), 1)
+        self.assertEqual(len(messages), 2)
         self.assertIn(expected_email_html_body, messages[0].html)
 
         self.logout()
@@ -1013,7 +1025,9 @@ class TopicEditorTests(
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.delete_json(
             '%s/%s' % (
-                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                self.topic_id_with_no_classroom
+            ),
             expected_status_int=200)
         self.logout()
 
@@ -1021,7 +1035,9 @@ class TopicEditorTests(
         self.login(self.NEW_USER_EMAIL)
         self.delete_json(
             '%s/%s' % (
-                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                self.topic_id_with_no_classroom
+            ),
             expected_status_int=401)
         self.logout()
 
@@ -1126,16 +1142,22 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
         # Test whether admin can publish and unpublish a topic.
         self.put_json(
             '%s/%s' % (
-                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+                feconf.TOPIC_STATUS_URL_PREFIX,
+                self.topic_id_with_no_classroom
+            ),
             {'publish_status': True}, csrf_token=csrf_token)
-        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
+        topic_rights = topic_fetchers.get_topic_rights(
+            self.topic_id_with_no_classroom)
         self.assertTrue(topic_rights.topic_is_published)
 
         self.put_json(
             '%s/%s' % (
-                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+                feconf.TOPIC_STATUS_URL_PREFIX,
+                self.topic_id_with_no_classroom
+            ),
             {'publish_status': False}, csrf_token=csrf_token)
-        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
+        topic_rights = topic_fetchers.get_topic_rights(
+            self.topic_id_with_no_classroom)
         self.assertFalse(topic_rights.topic_is_published)
         self.logout()
 
@@ -1143,7 +1165,9 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
         # Test that other users cannot access topic rights.
         self.put_json(
             '%s/%s' % (
-                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+                feconf.TOPIC_STATUS_URL_PREFIX,
+                self.topic_id_with_no_classroom
+            ),
             {'publish_status': False}, csrf_token=csrf_token,
             expected_status_int=401)
 
@@ -1183,15 +1207,51 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
     def test_cannot_unpublish_an_unpublished_exploration(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
+        topic_rights = topic_fetchers.get_topic_rights(
+            self.topic_id_with_no_classroom)
         self.assertFalse(topic_rights.topic_is_published)
+
+        response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id_with_no_classroom
+            ),
+            {'publish_status': False}, csrf_token=csrf_token,
+            expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'The topic is already unpublished.'
+        )
+
+    def test_cannot_unpublish_or_delete_topic_which_is_assigned_to_a_classroom(
+            self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id
+            ),
+            {'publish_status': True}, csrf_token=csrf_token
+        )
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
+        self.assertTrue(topic_rights.topic_is_published)
+        error_message = (
+            'The topic is assigned to the math classroom. '
+            'Contact the curriculum admins to remove it from '
+            'the classroom first.'
+        )
 
         response = self.put_json(
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
             {'publish_status': False}, csrf_token=csrf_token,
             expected_status_int=401)
-        self.assertEqual(response['error'], 'The topic is already unpublished.')
+        self.assertEqual(response['error'], error_message)
+
+        response = self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            expected_status_int=500)
+        self.assertEqual(response['error'], error_message)
 
 
 class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):

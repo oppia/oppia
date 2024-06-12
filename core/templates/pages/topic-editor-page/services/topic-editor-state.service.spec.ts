@@ -88,6 +88,8 @@ describe('Topic editor state service', () => {
         skillIdToDescriptionDict: {},
         skillIdToRubricsDict: {},
         classroomUrlFragment: 'url_fragment',
+        classroomName: 'classroom-name',
+        curriculumAdminUsernames: ['admin1', 'admin2'],
       } as unknown as FetchTopicResponse);
     }
 
@@ -546,6 +548,8 @@ describe('Topic editor state service', () => {
     expect(topicEditorStateService.onTopicInitialized).toBeDefined();
     expect(topicEditorStateService.onTopicReinitialized).toBeDefined();
     expect(topicEditorStateService.getClassroomUrlFragment()).toBeDefined();
+    expect(topicEditorStateService.getClassroomName()).toBeDefined();
+    expect(topicEditorStateService.getCurriculumAdminUsernames()).toBeDefined();
   });
 
   it('should update existence of topic name', fakeAsync(() => {

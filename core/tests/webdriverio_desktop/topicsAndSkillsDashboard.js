@@ -68,12 +68,6 @@ describe('Topics and skills dashboard functionality', function () {
       false
     );
 
-    var url = await browser.getUrl();
-    var topicId = url.split('/')[4].slice(0, -1);
-    await browser.url('/classroom-admin/');
-    await waitFor.pageToFullyLoad();
-    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
-
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_NAME);
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
