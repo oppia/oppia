@@ -762,9 +762,6 @@ URLS = [
         question_editor.EditableQuestionDataHandler),
 
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
-        editor.ExplorationPage),
-    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
         editor.ExplorationHandler),
     get_redirect_route(

@@ -424,6 +424,15 @@ const routes: Route[] = [
         m => m.CollectionPlayerPageModule
       ),
   },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_EDITOR.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/exploration-editor-page/exploration-editor-page.module')
+      .then(m => m.ExplorationEditorPageModule)
+  }
 ];
 
 // Register stewards landing pages.
@@ -431,10 +440,9 @@ for (let i = 0; i < AppConstants.STEWARDS_LANDING_PAGE.ROUTES.length; i++) {
   // Redirect old stewards landing pages to volunteer page.
   routes.push({
     path: AppConstants.STEWARDS_LANDING_PAGE.ROUTES[i],
-    loadChildren: () =>
-      import('pages/volunteer-page/volunteer-page.module').then(
-        m => m.VolunteerPageModule
-      ),
+    loadChildren: () => import(
+      'pages/volunteer-page/volunteer-page.module').then(
+        m => m.VolunteerPageModule)
   });
 }
 
@@ -483,4 +491,4 @@ routes.push(
     },
   ],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

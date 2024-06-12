@@ -51,8 +51,10 @@ import {AuthService} from 'services/auth.service';
 // dependency. We can't import it directly.
 // @ts-ignore
 import * as hammer from 'hammerjs';
-import {AppErrorHandlerProvider} from './app-error-handler';
-import {I18nModule} from 'i18n/i18n.module';
+import { AppErrorHandlerProvider } from './app-error-handler';
+import { I18nModule } from 'i18n/i18n.module';
+import { SharedComponentsModule } from 'components/shared-component.module';
+
 
 // Config for ToastrModule (helps in flashing messages and alerts).
 export const toastrConfig = {
@@ -95,6 +97,13 @@ export class MyHammerConfig extends HammerGestureConfig {
     AppRoutingModule,
     I18nModule,
     ToastrModule.forRoot(toastrConfig),
+    SharedComponentsModule
+  ],
+  declarations: [
+    OppiaRootComponent,
+  ],
+  entryComponents: [
+    OppiaRootComponent,
   ],
   declarations: [OppiaRootComponent],
   entryComponents: [OppiaRootComponent],
