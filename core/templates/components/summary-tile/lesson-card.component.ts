@@ -96,7 +96,7 @@ export class LessonCardComponent implements OnInit {
       collectionModel.thumbnailIconUrl
     );
 
-    //TODO(#18384): Get correct progress and state for button text
+    // TODO(#18384): Get correct progress and state for button text.
     this.progress = this.completeCommunity ? 100 : 0;
     this.title = collectionModel.title;
     this.lessonUrl = `/collection/${collectionModel.id}`;
@@ -110,7 +110,7 @@ export class LessonCardComponent implements OnInit {
       explorationModel.thumbnailIconUrl
     );
 
-    //TODO(#18384): Get correct progress and state for button text
+    // TODO(#18384): Get correct progress and state for button text.
     this.progress = this.completeCommunity ? 100 : 0;
     this.title = explorationModel.title;
     this.lessonUrl = `/explore/${explorationModel.id}`;
