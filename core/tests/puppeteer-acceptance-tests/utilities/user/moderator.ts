@@ -301,15 +301,17 @@ export class Moderator extends BaseUser {
         throw new Error('Schema-based Unicode editor not found');
       }
 
-      const modelValue = await schemaBasedUnicodeEditor.evaluate(node =>
-        node.getAttribute('ng-reflect-model')
+      const modelValueHandle = await this.page.waitForFunction(
+        (element: HTMLElement) => {
+          const value = element.getAttribute('ng-reflect-model');
+          return value !== null ? value : false;
+        },
+        {},
+        schemaBasedUnicodeEditor
       );
-      showMessage(
-        'Test: modelValue is ' +
-          modelValue +
-          ' and explorationId is ' +
-          explorationId
-      );
+
+      const modelValue = await modelValueHandle.jsonValue();
+
       if (modelValue === explorationId) {
         await row.waitForSelector(deleteFeaturedActivityButton, {
           visible: true,
