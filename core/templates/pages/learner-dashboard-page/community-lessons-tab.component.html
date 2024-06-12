@@ -419,7 +419,7 @@
       <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate }} </p>
       <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION'" [numCards]="totalCompletedLessonsList.length" [tabType]="'progress'">
         <ng-container *ngFor="let summaryTile of displayCompletedLessonsList; last as last">
-          <lesson-card [story]="summaryTile" [lastCard]="last"> </lesson-card>
+          <lesson-card [story]="summaryTile" [lastCard]="last" [completeCommunity]="true"> </lesson-card>
         </ng-container>
       </oppia-card-display>
     </div>
