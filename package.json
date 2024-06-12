@@ -179,6 +179,7 @@
     "default-passive-events": "^2.0.0",
     "dequeue": "^1.0.5",
     "diff_match_patch": "^0.1.1",
+    "esprima": "^4.0.1",
     "fabric": "^4.1.0",
     "firebase": "^8.10.0",
     "gif-frames": "^1.0.1",
