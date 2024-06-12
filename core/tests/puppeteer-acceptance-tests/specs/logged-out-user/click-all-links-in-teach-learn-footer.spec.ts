@@ -24,13 +24,10 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-out User', function () {
-  let testUser: LoggedOutUser;
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com'
-    );
+    loggedOutUser = await UserFactory.createNewUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {

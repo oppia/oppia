@@ -24,24 +24,21 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-out User', function () {
-  let testUser: LoggedOutUser;
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com'
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
     // Navigate to a page that has the oppia footer.
-    await testUser.navigateToAboutPage();
+    await loggedOutUser.navigateToHome();
   });
 
   it(
     'should open the "Volunteer" page via the footer',
     async function () {
-      await testUser.clickOnVolunteerLinkInFooter();
+      await loggedOutUser.clickOnVolunteerLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -49,7 +46,7 @@ describe('Logged-out User', function () {
   it(
     'should open "Donate" page via the footer',
     async function () {
-      await testUser.clickOnDonateLinkInFooter();
+      await loggedOutUser.clickOnDonateLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -57,7 +54,7 @@ describe('Logged-out User', function () {
   it(
     'should open "Terms" page via the footer',
     async function () {
-      await testUser.clickOnTermsOfServiceLinkInFooter();
+      await loggedOutUser.clickOnTermsOfServiceLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -65,7 +62,7 @@ describe('Logged-out User', function () {
   it(
     'should open "Privacy Policy" page via the footer',
     async function () {
-      await testUser.clickOnPrivacyPolicyLinkInFooter();
+      await loggedOutUser.clickOnPrivacyPolicyLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

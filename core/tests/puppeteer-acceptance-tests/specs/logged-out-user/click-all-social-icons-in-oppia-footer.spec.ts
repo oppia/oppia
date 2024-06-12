@@ -24,23 +24,20 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-out Users', function () {
-  let testUser: LoggedOutUser;
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com'
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await testUser.navigateToAboutFoundationPage();
+    await loggedOutUser.navigateToAboutFoundationPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to visit the Oppia YouTube',
     async function () {
-      await testUser.clickYouTubeIconInFooter();
+      await loggedOutUser.clickYouTubeIconInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -48,7 +45,7 @@ describe('Logged-out Users', function () {
   it(
     'should be able to visit the Oppia Facebook',
     async function () {
-      await testUser.clickFacebookIconInFooter();
+      await loggedOutUser.clickFacebookIconInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -56,7 +53,7 @@ describe('Logged-out Users', function () {
   it(
     'should be able to visit the Oppia Instagram',
     async function () {
-      await testUser.clickInstagramIconInFooter();
+      await loggedOutUser.clickInstagramIconInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -64,7 +61,7 @@ describe('Logged-out Users', function () {
   it(
     'should be able to visit the Oppia Twitter',
     async function () {
-      await testUser.clickTwitterIconInFooter();
+      await loggedOutUser.clickTwitterIconInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -72,7 +69,7 @@ describe('Logged-out Users', function () {
   it(
     'should be able to visit the Oppia Github',
     async function () {
-      await testUser.clickGithubIconInFooter();
+      await loggedOutUser.clickGithubIconInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -80,7 +77,7 @@ describe('Logged-out Users', function () {
   it(
     'should be able to visit the Oppia LinkedIn',
     async function () {
-      await testUser.clickLinkedInIconInFooter();
+      await loggedOutUser.clickLinkedInIconInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -88,7 +85,7 @@ describe('Logged-out Users', function () {
   it(
     'should be able to visit the Oppia Google Play page',
     async function () {
-      await testUser.clickGooglePlayButtonInFooter();
+      await loggedOutUser.clickGooglePlayButtonInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

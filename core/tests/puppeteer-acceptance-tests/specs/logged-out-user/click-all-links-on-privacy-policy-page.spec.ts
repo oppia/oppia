@@ -24,23 +24,20 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-out Users', function () {
-  let testUser: LoggedOutUser;
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com'
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await testUser.navigateToPrivacyPolicyPage();
+    await loggedOutUser.navigateToPrivacyPolicyPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to follow link to home page',
     async function () {
-      await testUser.clickLinkToHomePageOnPrivacyPolicyPage();
+      await loggedOutUser.clickLinkToHomePageOnPrivacyPolicyPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -48,7 +45,7 @@ describe('Logged-out Users', function () {
   it(
     'should be able to follow link to learn about cookies',
     async function () {
-      await testUser.clickLinkAboutCookiesOnPrivacyPolicyPage();
+      await loggedOutUser.clickLinkAboutCookiesOnPrivacyPolicyPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -56,7 +53,7 @@ describe('Logged-out Users', function () {
   it(
     'should be able to follow link to learn about Google Analytics',
     async function () {
-      await testUser.clickLinkAboutGoogleAnalyticsOnPrivacyPolicyPage();
+      await loggedOutUser.clickLinkAboutGoogleAnalyticsOnPrivacyPolicyPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -64,7 +61,7 @@ describe('Logged-out Users', function () {
   it(
     'should be able to follow link to learn how to opt out of Google Analytics',
     async function () {
-      await testUser.clickLinkAboutGoogleAnalyticsOptOutOnPrivacyPolicyPage();
+      await loggedOutUser.clickLinkAboutGoogleAnalyticsOptOutOnPrivacyPolicyPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

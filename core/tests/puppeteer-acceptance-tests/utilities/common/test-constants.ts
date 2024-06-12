@@ -55,6 +55,7 @@ export default {
     GetStarted: 'http://localhost:8181/get-started',
     Home: 'http://localhost:8181/',
     LearnerDashboard: 'http://localhost:8181/learner-dashboard',
+    Login: 'http://localhost:8181/login',
     Logout: 'http://localhost:8181/logout',
     MathClassroom: 'http://localhost:8181/learn/math',
     MobileExternalLinkWatchAVideo:

@@ -23,25 +23,22 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-out User', function () {
-  let testUser: LoggedOutUser;
+describe('Logged-out Users', function () {
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com'
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
     // Navigate to a page that has the oppia footer.
-    await testUser.goto(testConstants.URLs.Volunteer);
-  });
+    await loggedOutUser.goto(testConstants.URLs.Volunteer);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open About page via the footer',
     async function () {
-      await testUser.clickOnAboutLinkInFooter();
+      await loggedOutUser.navigateToAboutPageViaFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -49,7 +46,7 @@ describe('Logged-out User', function () {
   it(
     'should open "About Foundation" page via the footer',
     async function () {
-      await testUser.clickOnTheOppiaFoundationLinkInFooter();
+      await loggedOutUser.navigateToAboutFoundationPageViaFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -57,7 +54,7 @@ describe('Logged-out User', function () {
   it(
     'should open "Blog" page via the footer',
     async function () {
-      await testUser.clickOnBlogLinkInFooter();
+      await loggedOutUser.navigateToBlogPageViaFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -65,7 +62,7 @@ describe('Logged-out User', function () {
   it(
     'should open "Forum" page via the footer',
     async function () {
-      await testUser.clickOnForumLinkInFooter();
+      await loggedOutUser.navigateToForumPageViaFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

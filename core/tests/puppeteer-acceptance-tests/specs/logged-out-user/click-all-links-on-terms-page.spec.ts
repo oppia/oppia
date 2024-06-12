@@ -24,23 +24,20 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-out Users', function () {
-  let testUser: LoggedOutUser;
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com'
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await testUser.navigateToTermsPage();
+    await loggedOutUser.navigateToTermsPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to follow the link to view the Privacy Policy',
     async function () {
-      await testUser.clickLinkToPrivacyPolicyOnTermsPage();
+      await loggedOutUser.clickLinkToPrivacyPolicyOnTermsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -48,7 +45,7 @@ describe('Logged-out Users', function () {
   it(
     'should be able to follow the link about the CC-BY-SA 4.0 license',
     async function () {
-      await testUser.clickLinkToLicenseOnTermsPage();
+      await loggedOutUser.clickLinkToLicenseOnTermsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -56,7 +53,7 @@ describe('Logged-out Users', function () {
   it(
     'should be able to follow the link to the Oppia Annouce google group.',
     async function () {
-      await testUser.clickLinkToGoogleGroupOnTermsPage();
+      await loggedOutUser.clickLinkToGoogleGroupOnTermsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

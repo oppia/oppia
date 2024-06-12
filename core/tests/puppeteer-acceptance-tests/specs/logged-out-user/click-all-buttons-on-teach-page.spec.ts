@@ -24,23 +24,20 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-out Users', function () {
-  let testUser: LoggedOutUser;
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com'
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await testUser.navigateToTeachPage();
+    await loggedOutUser.navigateToTeachPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to use the "Browse our Lessons" button',
     async function () {
-      await testUser.clickBrowseOurLessonsOnTeachPage();
+      await loggedOutUser.clickBrowseOurLessonsOnTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -48,7 +45,7 @@ describe('Logged-out Users', function () {
   it(
     'should be able to use the "Access the Android app" button',
     async function () {
-      await testUser.clickAccessTheAndroidAppOnTeachPage();
+      await loggedOutUser.clickAccessTheAndroidAppOnTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -56,7 +53,7 @@ describe('Logged-out Users', function () {
   it(
     'should be able to use the "VISIT CLASSROOM" button',
     async function () {
-      await testUser.clickVisitClassroomOnTeachPage();
+      await loggedOutUser.clickVisitClassroomOnTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -64,7 +61,7 @@ describe('Logged-out Users', function () {
   it(
     'should be able to use the "BROWSE LIBRARY" button',
     async function () {
-      await testUser.clickBrowseLibraryOnTeachPage();
+      await loggedOutUser.clickBrowseLibraryOnTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -72,7 +69,7 @@ describe('Logged-out Users', function () {
   it(
     'should be able to use the "EXPLORE LESSONS" button',
     async function () {
-      await testUser.clickExploreLessonsOnTeachPage();
+      await loggedOutUser.clickExploreLessonsOnTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
