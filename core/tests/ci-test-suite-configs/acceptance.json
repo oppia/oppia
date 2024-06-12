@@ -10,7 +10,7 @@
     },
     {
       "name": "blog-editor/create-and-delete-draft-blog-post",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/create-and-delete-draft-blog-post"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/create-and-delete-draft-blog-post.spec.ts"
     },
     {
       "name": "curriculum-admin-tests/create-and-publish-topics-and-stories",
