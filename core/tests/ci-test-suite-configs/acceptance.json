@@ -73,11 +73,11 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-partnerships-page"
     },
     {
-      "name": "logged-out-user/click-all-buttons-on-teach-page.spec.ts",
+      "name": "logged-out-user/click-all-buttons-on-teach-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-teach-page.spec.ts"
     },
     {
-      "name": "logged-out-user/click-all-buttons-on-volunteer-page.spec.ts",
+      "name": "logged-out-user/click-all-buttons-on-volunteer-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-volunteer-page.spec.ts"
     },
     {
