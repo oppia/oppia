@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users
+ * @fileoverview Acceptance Test for checking if logged-out users
  * can open link by clicking all buttons on navbar
  */
 
@@ -30,20 +30,17 @@ ConsoleReporter.setConsoleErrorsToIgnore([
   /https:\/\/content\.googleapis\.com\/drive\/v2internal\/viewerimpressions\?key=[^&]+&alt=json/,
 ]);
 
-describe('Logged-in User', function () {
-  let testUser: LoggedOutUser;
+describe('Logged-out User', function () {
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com'
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open About Url with About Oppia button in About Menu on navbar',
     async function () {
-      await testUser.clickAboutButtonInAboutMenuOnNavbar();
+      await loggedOutUser.clickAboutButtonInAboutMenuOnNavbar();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -52,7 +49,7 @@ describe('Logged-in User', function () {
     'should open About Foundation Url with The Oppia Foundation button ' +
       'in About Menu on navbar',
     async function () {
-      await testUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
+      await loggedOutUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -60,7 +57,7 @@ describe('Logged-in User', function () {
   it(
     'should open Blog Url with Blog button in About Menu on navbar',
     async function () {
-      await testUser.clickBlogButtonInAboutMenuOnNavbar();
+      await loggedOutUser.clickBlogButtonInAboutMenuOnNavbar();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -69,7 +66,7 @@ describe('Logged-in User', function () {
     'should open Partnerships Url with School and Organizations button ' +
       'in Get Involved menu on navbar',
     async function () {
-      await testUser.clickPartnershipsButtonInGetInvolvedMenuOnNavbar();
+      await loggedOutUser.clickPartnershipsButtonInGetInvolvedMenuOnNavbar();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -78,7 +75,7 @@ describe('Logged-in User', function () {
     'should open Volunteer Url with Volunteer button in Get Involved menu ' +
       'on navbar',
     async function () {
-      await testUser.clickVolunteerButtonInGetInvolvedMenuOnNavbar();
+      await loggedOutUser.clickVolunteerButtonInGetInvolvedMenuOnNavbar();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -86,7 +83,7 @@ describe('Logged-in User', function () {
   it(
     'should open Donate Url with Donate button in Get Involved menu on navbar',
     async function () {
-      await testUser.clickDonateButtonInGetInvolvedMenuOnNavbar();
+      await loggedOutUser.clickDonateButtonInGetInvolvedMenuOnNavbar();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -95,7 +92,7 @@ describe('Logged-in User', function () {
     'should open Contact Url with Contact Us button in Get Involved menu ' +
       'on navbar',
     async function () {
-      await testUser.clickContactUsButtonInGetInvolvedMenuOnNavbar();
+      await loggedOutUser.clickContactUsButtonInGetInvolvedMenuOnNavbar();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -103,7 +100,7 @@ describe('Logged-in User', function () {
   it(
     'should open Donate Url with Donate button on navbar',
     async function () {
-      await testUser.clickDonateButtonOnNavbar();
+      await loggedOutUser.clickDonateButtonOnNavbar();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
