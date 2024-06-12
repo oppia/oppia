@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import io
 import logging
+import operator
 import random
 
 from core import feconf
@@ -807,17 +808,17 @@ class AdminHandler(
             story_node_dicts = [{
                 'exp_id': '6',
                 'title': 'What are the place values?',
-                'description': 'Jaime learns the place value of each digit ' +
+                'description': 'Jaime learns the place value of each digit '
                                'in a big number.'
             }, {
                 'exp_id': '25',
                 'title': 'Finding the value of a number',
-                'description': 'Jaime understands the value of his ' +
+                'description': 'Jaime understands the value of his '
                                'arcade score.'
             }, {
                 'exp_id': '13',
                 'title': 'Comparing Numbers',
-                'description': 'Jaime learns if a number is smaller or ' +
+                'description': 'Jaime learns if a number is smaller or '
                                'greater than another number.'
             }]
 
@@ -1194,11 +1195,6 @@ class AdminHandler(
                 self.user_id, question_id_15, skill_id_5, 0.5)
 
             classroom_id_1 = classroom_config_services.get_new_classroom_id()
-
-            classroom_name_1 = 'Math'
-
-            classroom_url_fragment_1 = 'math'
-
             topic_dependency_for_classroom_1: Dict[str, list[str]] = {
                 topic_id_1: [],
                 topic_id_2: [topic_id_1],
@@ -1206,22 +1202,25 @@ class AdminHandler(
                 topic_id_4: [topic_id_2],
                 topic_id_5: [topic_id_2, topic_id_3]
             }
+            classroom_1 = classroom_config_domain.Classroom(
+                            classroom_id=classroom_id_1,
+                            name='math',
+                            url_fragment='math',
+                            course_details='Math course  details',
+                            teaser_text='Math teaser text',
+                            topic_list_intro='Start with our first topic.',
+                            topic_id_to_prerequisite_topic_ids=(
+                                topic_dependency_for_classroom_1),
+                            is_published=True,
+                            thumbnail_data=classroom_config_domain.ImageData(
+                                'thumbnail.svg', 'transparent', 1000
+                            ),
+                            banner_data=classroom_config_domain.ImageData(
+                                'banner.png', 'transparent', 1000
+                            )
+                        )
 
-            classroom_dict_1: classroom_config_domain.ClassroomDict = {
-                'classroom_id': classroom_id_1,
-                'name': classroom_name_1,
-                'url_fragment': classroom_url_fragment_1,
-                'course_details': '',
-                'topic_list_intro': '',
-                'topic_id_to_prerequisite_topic_ids': (
-                    topic_dependency_for_classroom_1)
-            }
-
-            classroom_1 = classroom_config_domain.Classroom.from_dict(
-                classroom_dict_1)
-
-            classroom_config_services.update_or_create_classroom_model(
-                classroom_1)
+            classroom_config_services.create_new_classroom(classroom_1)
         else:
             raise Exception('Cannot generate dummy classroom in production.')
 
@@ -1865,7 +1864,13 @@ class SendDummyMailToAdminHandler(
         """
         username = self.username
         assert username is not None
-        if feconf.CAN_SEND_EMAILS:
+        server_can_send_emails = (
+            parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.
+                SERVER_CAN_SEND_EMAILS.value
+            )
+        )
+        if server_can_send_emails:
             email_manager.send_dummy_mail_to_admin(username)
             self.render_json({})
         else:
@@ -2162,6 +2167,30 @@ class UpdateBlogPostHandler(
 
         blog_services.update_blog_models_author_and_published_on_date(
             blog_post_id, author_id, published_on)
+        self.render_json({})
+
+
+class RegenerateTopicSummariesHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler to regenerate the summaries of all topics."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'PUT': {}
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self) -> None:
+        """Regenerates all topic summary models."""
+
+        # Fetched topics are sorted only to make the backend tests pass.
+        topics = sorted(
+            topic_fetchers.get_all_topics(),
+            key=operator.attrgetter('created_on'))
+        for topic in topics:
+            topic_services.generate_topic_summary(topic.id)
+
         self.render_json({})
 
 

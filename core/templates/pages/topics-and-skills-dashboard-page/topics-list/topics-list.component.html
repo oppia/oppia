@@ -36,7 +36,7 @@
             <div>
               <span class="topic-classroom e2e-test-topic-classroom">
                 <span *ngIf="topic.classroom">{{topic.classroom}}</span>
-                <span ngbTooltip="Assign this topic to a classroom from the admin page" placement="bottom" *ngIf="!topic.classroom">No classroom assigned.</span>
+                <span ngbTooltip="Assign this topic to a classroom from the classroom admin page." placement="bottom" *ngIf="!topic.classroom">No classroom assigned.</span>
               </span>
             </div>
             <div><span class="topic-description e2e-test-topic-description">{{topic.description}}</span></div>
@@ -225,14 +225,14 @@
             </div>
           </div>
           <div class="topic-item-options">
-            <button class="fas fa-ellipsis-v topic-edit-box-icon" role="button" aria-label="Edit Options" (click)="changeEditOptions(topic.id)"></button>
+            <button class="fas fa-ellipsis-v topic-edit-box-icon e2e-test-mobile-topic-edit-box" role="button" aria-label="Edit Options" (click)="changeEditOptions(topic.id)"></button>
             <div *ngIf="showEditOptions(topic.id)" class="topic-edit-options">
               <a class="topic-edit-options-edit" [href]="getTopicEditorUrl(topic.id)">
                 <i class="fa fa-pen"></i>
                 <span>Edit</span>
               </a>
               <a *ngIf="userCanDeleteTopic" (click)="deleteTopic(topic.id, topic.name)">
-                <i class="fas fa-trash-alt"></i>
+                <i class="fas fa-trash-alt e2e-test-mobile-delete-topic-button"></i>
                 <span>Delete</span>
               </a>
             </div>
@@ -296,14 +296,14 @@
             </div>
           </div>
           <div class="topic-item-options">
-            <button class="fas fa-ellipsis-v topic-edit-box-icon" role="button" aria-label="Edit Options" (click)="changeEditOptions(topic.id)"></button>
+            <button class="fas fa-ellipsis-v topic-edit-box-icon e2e-test-mobile-topic-edit-box" role="button" aria-label="Edit Options" (click)="changeEditOptions(topic.id)"></button>
             <div *ngIf="showEditOptions(topic.id)" class="topic-edit-options">
               <a class="topic-edit-options-edit" [href]="getTopicEditorUrl(topic.id)">
                 <i class="fa fa-pen"></i>
                 <span>Edit</span>
               </a>
               <a *ngIf="userCanDeleteTopic" (click)="deleteTopic(topic.id, topic.name)">
-                <i class="fas fa-trash-alt"></i>
+                <i class="fas fa-trash-alt e2e-test-mobile-delete-topic-button"></i>
                 <span>Delete</span>
               </a>
             </div>

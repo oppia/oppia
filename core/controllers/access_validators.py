@@ -16,12 +16,14 @@
 
 from __future__ import annotations
 
+from core import feature_flag_list
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_services
 from core.domain import classroom_config_services
+from core.domain import feature_flag_services
 from core.domain import learner_group_services
 from core.domain import topic_fetchers
 from core.domain import user_services
@@ -79,6 +81,36 @@ class ClassroomAccessValidationHandler(
             raise self.NotFoundException
 
 
+class SubtopicViewerPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """ Validates access to the Subtopic Viewer Page """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'subtopic_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_subtopic_viewer_page
+    def get(self, *args: str) -> None:
+        """Handles GET requests."""
+        pass
+
+
 class CollectionViewerPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -99,6 +131,30 @@ class CollectionViewerPageAccessValidationHandler(
     def get(self, _: str) -> None:
         """Handles GET requests."""
         pass
+
+
+class FacilitatorDashboardPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to facilitator dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_learner_groups
+    def get(self) -> None:
+        """Retrieves information about a learner group.
+
+        Raises:
+            PageNotFoundException. The learner groups are not enabled.
+        """
+        assert self.user_id is not None
+        if not learner_group_services.is_learner_group_feature_enabled(
+            self.user_id
+        ):
+            raise self.NotFoundException
 
 
 class ManageOwnAccountValidationHandler(
@@ -151,6 +207,26 @@ class ProfileExistsValidationHandler(
             username)
 
         if not user_settings:
+            raise self.NotFoundException
+
+
+class DiagnosticTestPlayerAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to diagnostic test player page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Handles GET requests."""
+        if not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value,
+            user_id=self.user_id
+        ):
             raise self.NotFoundException
 
 
@@ -438,3 +514,25 @@ class TopicEditorPageAccessValidationHandler(
             raise self.NotFoundException(
                 'The topic with the given id doesn\'t exist.'
             )
+
+
+
+
+class CollectionEditorAccessValidationPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to collection editor page."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'collection_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_edit_collection
+    def get(self, _: str) -> None:
+        """Handles GET requests."""
+        pass

@@ -174,8 +174,8 @@ def get_topic_from_model(
         topic_model.version, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
         topic_model.meta_tag_content, topic_model.practice_tab_is_displayed,
         topic_model.page_title_fragment_for_web,
-        topic_model.skill_ids_for_diagnostic_test, topic_model.created_on,
-        topic_model.last_updated)
+        topic_model.skill_ids_for_diagnostic_test,
+        topic_model.created_on, topic_model.last_updated)
 
 
 @overload
@@ -536,6 +536,7 @@ def get_topic_summary_from_model(
         topic_summary_model.thumbnail_filename,
         topic_summary_model.thumbnail_bg_color,
         topic_summary_model.url_fragment,
+        topic_summary_model.published_story_exploration_mapping,
         topic_summary_model.topic_model_created_on,
         topic_summary_model.topic_model_last_updated
     )
@@ -691,7 +692,7 @@ class CannonicalStoryDict(TypedDict):
     thumbnail_filename: Optional[str]
     url_fragment: str
     topic_url_fragment: str
-    classroom_url_fragment: str
+    classroom_url_fragment: Optional[str]
     story_is_published: bool
     completed_node_titles: List[str]
     all_node_dicts: List[story_domain.StoryNodeDict]

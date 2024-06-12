@@ -523,7 +523,11 @@ class BaseHandler(
             'Use self.normalized_payload instead of self.payload.')
 
         if errors:
-            raise self.InvalidInputException('\n'.join(errors))
+            raise self.InvalidInputException(
+                'At \'%s\' these errors are happening:\n%s' % (
+                    self.request.uri, '\n'.join(errors)
+                )
+            )
 
     @property
     def current_user_is_site_maintainer(self) -> bool:
@@ -713,7 +717,7 @@ class BaseHandler(
             self.values.update(values)
             if self.iframed:
                 self.render_template(
-                    'error-iframed.mainpage.html', iframe_restriction=None)
+                    'error-iframed-page.mainpage.html', iframe_restriction=None)
             elif values['status_code'] == 404:
                 # Only 404 routes can be handled with angular router as it only
                 # has access to the path, not to the status code.

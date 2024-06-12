@@ -18,6 +18,7 @@
 
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {RouterModule} from '@angular/router';
@@ -50,6 +51,8 @@ import {CreateNewSkillModalService} from './services/create-new-skill-modal.serv
 @NgModule({
   imports: [
     InteractionExtensionsModule,
+    FormsModule,
+    ReactiveFormsModule,
     SharedComponentsModule,
     CommonModule,
     TopicPlayerViewerCommonModule,
