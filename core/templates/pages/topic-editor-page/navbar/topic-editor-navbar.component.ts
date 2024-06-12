@@ -193,6 +193,14 @@ export class TopicEditorNavbarComponent
   }
 
   unpublishTopic(): boolean {
+    const classroomName = this.topicEditorStateService.getClassroomName();
+    if (classroomName) {
+      const errorMessage =
+        `The topic is assigned to the ${classroomName} ` +
+        'classroom. Contact the curriculum admins to remove it from the classroom first.';
+      this.alertsService.addWarning(errorMessage);
+      return false;
+    }
     this.showTopicEditOptions = false;
     if (!this.topicRights.canPublishTopic()) {
       return false;
