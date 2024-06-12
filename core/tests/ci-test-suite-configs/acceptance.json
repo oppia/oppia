@@ -9,6 +9,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked.spec.ts"
     },
     {
+      "name": "blog-editor/create-and-delete-draft-blog-post",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/create-and-delete-draft-blog-post"
+    },
+    {
       "name": "curriculum-admin-tests/create-and-publish-topics-and-stories",
       "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-and-publish-topics-and-stories.spec.ts"
     },
