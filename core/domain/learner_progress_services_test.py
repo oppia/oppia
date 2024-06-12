@@ -21,8 +21,6 @@ from __future__ import annotations
 import datetime
 
 from core.constants import constants
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_fetchers
@@ -1598,18 +1596,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_get_all_and_untracked_topic_ids(self) -> None:
         # Add topics to config_domain.
-        classroom = classroom_config_domain.Classroom(
-            classroom_id=classroom_config_services.get_new_classroom_id(),
-            name='math',
-            url_fragment='math-one',
-            course_details='',
-            topic_list_intro='',
+        self.save_new_valid_classroom(
             topic_id_to_prerequisite_topic_ids={
                 self.TOPIC_ID_0: [],
                 self.TOPIC_ID_1: []
             }
         )
-        classroom_config_services.update_or_create_classroom_model(classroom)
 
         self.login(self.USER_EMAIL)
         partially_learnt_topic_ids = (
@@ -2114,17 +2106,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_get_all_activity_progress(self) -> None:
         # Add topics to config_domain.
-        classroom = classroom_config_domain.Classroom(
-            classroom_id=classroom_config_services.get_new_classroom_id(),
-            name='math',
-            url_fragment='math-one',
-            course_details='',
-            topic_list_intro='',
+        self.save_new_valid_classroom(
             topic_id_to_prerequisite_topic_ids={
                 self.TOPIC_ID_3: []
             }
         )
-        classroom_config_services.update_or_create_classroom_model(classroom)
 
         # Add activities to the completed section.
         learner_progress_services.mark_exploration_as_completed(
