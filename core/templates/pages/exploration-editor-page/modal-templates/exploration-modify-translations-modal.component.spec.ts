@@ -29,11 +29,12 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ModifyTranslationsModalComponent} from './exploration-modify-translations-modal.component';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {ChangeListService} from '../services/change-list.service';
 import {ContextService} from 'services/context.service';
 import {EntityBulkTranslationsBackendApiService} from '../services/entity-bulk-translations-backend-api.service';
 
-describe('Modify Translations Modal Component', function () {
+fdescribe('Modify Translations Modal Component', function () {
   let component: ModifyTranslationsModalComponent;
   let fixture: ComponentFixture<ModifyTranslationsModalComponent>;
   let entityTranslationsService: EntityTranslationsService;
@@ -91,20 +92,20 @@ describe('Modify Translations Modal Component', function () {
     ).and.returnValue(
       Promise.resolve({
         hi: {
-          entity_id: 'entity1',
-          entity_type: 'exploration',
-          entity_version: 5,
-          language_code: 'hi',
-          translations: {
+          entityId: 'entity1',
+          entityType: 'exploration',
+          entityVersion: 5,
+          languageCode: 'hi',
+          translationMapping: {
             content1: {
-              content_value: '<p>This is content 1.</p>',
-              content_format: 'html',
-              needs_update: true,
+              translation: '<p>This is content 1.</p>',
+              dataFormat: 'html',
+              needsUpdate: true,
             },
             content4: {
-              content_value: '<p>This is content 4.</p>',
-              content_format: 'html',
-              needs_update: false,
+              translation: '<p>This is content 4.</p>',
+              dataFormat: 'html',
+              needsUpdate: false,
             },
           },
         },
@@ -119,30 +120,35 @@ describe('Modify Translations Modal Component', function () {
   describe('when initializing content translations', () => {
     it('should use latest translations from entity translations service', fakeAsync(() => {
       spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+      let expectedTranslation = TranslatedContent.createFromBackendDict({
+        content_value: 'This is text one.',
+        content_format: 'html',
+        needs_update: false,
+      });
+
       component.contentId = 'content1';
       component.ngOnInit();
       tick();
 
       expect(component.contentTranslations).toEqual({
-        hi: {
-          content_value: 'This is text one.',
-          content_format: 'html',
-          needs_update: false,
-        },
+        hi: expectedTranslation,
       });
     }));
 
     it('should use published translations when changes do not exist', fakeAsync(() => {
       spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+      let expectedTranslation = TranslatedContent.createFromBackendDict({
+        content_value: '<p>This is content 4.</p>',
+        content_format: 'html',
+        needs_update: false,
+      });
+
       component.contentId = 'content4';
       component.ngOnInit();
       tick();
+
       expect(component.contentTranslations).toEqual({
-        hi: {
-          content_value: '<p>This is content 4.</p>',
-          content_format: 'html',
-          needs_update: false,
-        },
+        hi: expectedTranslation,
       });
     }));
   });

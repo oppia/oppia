@@ -96,8 +96,12 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
               this.contentId in languageTranslations &&
               !this.contentTranslations[language]
             ) {
-              this.contentTranslations[language] =
-                languageTranslations[this.contentId];
+              let translationDict = languageTranslations[this.contentId];
+              this.contentTranslations[language] = new TranslatedContent(
+                translationDict.translation,
+                translationDict.dataFormat,
+                translationDict.needsUpdate
+              );
             }
           }
         });

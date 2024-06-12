@@ -111,6 +111,8 @@ const translationLanguageSelector =
   'select.e2e-test-translation-language-selector';
 const translationModeButton = 'button.e2e-test-translation-mode';
 const editTranslationSelector = 'div.e2e-test-edit-translation';
+const stateTranslationEditorSelector =
+  'div.e2e-test-state-translation-editor schema-based-editor';
 const saveTranslationButton = 'button.e2e-test-save-translation';
 
 // For mobile.
@@ -1142,12 +1144,19 @@ export class ExplorationEditor extends BaseUser {
     translation: string
   ): Promise<void> {
     await this.select(translationLanguageSelector, languageCode);
-    await this.page.waitForNavigation();
     await this.navigateToCard(cardName);
     await this.clickOn(translationModeButton);
     await this.clickOn(contentType);
     await this.clickOn(editTranslationSelector);
-    await this.type(stateContentInputField, translation);
+    switch (contentType) {
+      case 'Content':
+        await this.type(stateContentInputField, translation);
+        break;
+      case 'Interaction':
+        await this.type(stateTranslationEditorSelector, translation);
+      default:
+        break;
+    }
     await this.clickOn(saveTranslationButton);
   }
 }
