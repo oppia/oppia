@@ -291,6 +291,7 @@ export class Moderator extends BaseUser {
     }
 
     for (const row of rows) {
+      showMessage('Test: entered the loop');
       await row.waitForSelector('schema-based-unicode-editor', {visible: true});
       const schemaBasedUnicodeEditor = await row.$(
         'schema-based-unicode-editor'
@@ -303,6 +304,12 @@ export class Moderator extends BaseUser {
       const modelValue = await schemaBasedUnicodeEditor.evaluate(node =>
         node.getAttribute('ng-reflect-model')
       );
+      showMessage(
+        'Test: modelValue is ' +
+          modelValue +
+          ' and explorationId is ' +
+          explorationId
+      );
       if (modelValue === explorationId) {
         await row.waitForSelector(deleteFeaturedActivityButton, {
           visible: true,
@@ -312,8 +319,14 @@ export class Moderator extends BaseUser {
         if (!deleteButton) {
           throw new Error('Delete featured activity button not found');
         }
+        const isDeleteButtonVisible =
+          await deleteButton.isIntersectingViewport();
+        if (!isDeleteButtonVisible) {
+          throw new Error('Delete button is not visible');
+        }
         await this.waitForElementToBeClickable(deleteButton);
         await deleteButton.click();
+        console.log('Clicked on delete button');
         break;
       }
     }
