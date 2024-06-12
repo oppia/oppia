@@ -1,3 +1,4 @@
+{
   "suites": [
     {
       "name": "blog-admin/assign-roles-to-users-and-change-tag-properties",
@@ -13,7 +14,7 @@
     },
     {
       "name": "curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-unpublish-publish-and-delete-topic-and-skill.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill.spec.ts"
     },
     {
       "name": "exploration-editor/load-complete-and-restart-exploration-preview",
