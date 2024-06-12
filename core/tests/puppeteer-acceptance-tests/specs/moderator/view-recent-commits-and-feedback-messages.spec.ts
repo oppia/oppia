@@ -69,7 +69,7 @@ describe('Moderator', function () {
       'Algebra'
     );
     if (!explorationId) {
-      throw new Error('Error publishing exploration successfully.');
+      throw new Error('Error in publishing the exploration');
     }
 
     await explorationEditor.playExploration(explorationId);
