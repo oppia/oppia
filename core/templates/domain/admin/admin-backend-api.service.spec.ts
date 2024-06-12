@@ -1262,6 +1262,68 @@ describe('Admin backend api service', () => {
     })
   );
 
+  it('should generate dummy translation opportunities', fakeAsync(() => {
+    let action = 'generate_dummy_translation_opportunities';
+    let numDummyTranslationOpportunitiesToGenerate = 2;
+    let payload = {
+      action: action,
+      num_dummy_translation_opportunities_to_generate:
+        numDummyTranslationOpportunitiesToGenerate,
+    };
+
+    abas
+      .generateDummyTranslationOpportunitiesAsync(
+        numDummyTranslationOpportunitiesToGenerate
+      )
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(
+    'should handle generate dummy translation opportunities ' +
+      'request failure',
+    fakeAsync(() => {
+      let action = 'generate_dummy_translation_opportunities';
+      let numDummyTranslationOpportunitiesToGenerate = 2;
+      let payload = {
+        action: action,
+        num_dummy_translation_opportunities_to_generate:
+          numDummyTranslationOpportunitiesToGenerate,
+      };
+
+      abas
+        .generateDummyTranslationOpportunitiesAsync(
+          numDummyTranslationOpportunitiesToGenerate
+        )
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(payload);
+      req.flush(
+        {
+          error: 'Failed to get data.',
+        },
+        {
+          status: 500,
+          statusText: 'Internal Server Error',
+        }
+      );
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+    })
+  );
+
   it('should generate dummy blogs', fakeAsync(() => {
     let action = 'generate_dummy_blog_post';
     let blogPostTitle = 'Education';

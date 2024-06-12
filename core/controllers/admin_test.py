@@ -1360,6 +1360,138 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.logout()
 
 
+class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
+    """Checks the conditions for generation of dummy translation 
+    opportunities."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+
+    def test_admins_can_generate_dummy_translation_opportunities(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_translation_opportunities',
+                'num_dummy_translation_opportunities_to_generate': 10
+            }, csrf_token=csrf_token)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(10)
+        self.assertEqual(len(generated_exps), 10)
+        self.assertEqual(len(published_exps), 10)
+        self.logout()
+
+    def test_admins_can_generate_dummy_translation_opportunities_multiple_times(self) -> None: # pylint: disable=line-too-long
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        for i in range(1, 4):
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_translation_opportunities',
+                    'num_dummy_translation_opportunities_to_generate': 5
+                }, csrf_token=csrf_token)
+            generated_exps = exp_services.get_all_exploration_summaries()
+            published_exps = (
+                exp_services.get_recently_published_exp_summaries(15))
+            self.assertEqual(len(generated_exps), 5 * i)
+            self.assertEqual(len(published_exps), 5 * i)
+        self.logout()
+
+    def test_handler_raises_error_with_non_int_num_dummy_translation_opportunities_to_generate(self) -> None: # pylint: disable=line-too-long
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_translation_opportunities',
+                'num_dummy_translation_opportunities_to_generate': 
+                    'invalid_type'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
+            'Schema validation for '
+            '\'num_dummy_translation_opportunities_to_generate\' '
+            'failed: Could not convert str to int: invalid_type')
+        self.assertEqual(response['error'], error_msg)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
+        self.logout()
+
+    def test_without_num_dummy_exps_generate_dummy_translation_opportunites_action_is_not_performed(self) -> None: # pylint: disable=line-too-long
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'num_dummy_translation_opportunities_to_generate\' must be '
+            'provided when the action is generate_dummy_translation_'
+            'opportunities.'
+        )
+        with assert_raises_regexp_context_manager:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_translation_opportunities',
+                    'num_dummy_translation_opportunities_to_generate': None
+                }, csrf_token=csrf_token)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
+        self.logout()
+
+    def test_cannot_generate_dummy_translation_opportunities_in_production_mode(
+        self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot load new structures data in production.')
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_translation_opportunities',
+                    'num_dummy_translation_opportunities_to_generate': 5
+                }, csrf_token=csrf_token)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
+        self.logout()
+
+    def test_non_admins_cannot_generate_dummy_translation_opportunities(
+        self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'User does not have enough rights to generate data.')
+        with assert_raises_regexp:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_translation_opportunities',
+                    'num_dummy_translation_opportunities_to_generate': 1
+                }, csrf_token=csrf_token)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
+        self.logout()
+
+
 class AdminRoleHandlerTest(test_utils.GenericTestBase):
     """Checks the user role handling on the admin page."""
 
