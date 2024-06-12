@@ -131,10 +131,11 @@ def send_mail(
     response = email_services.send_email_to_recipients(
         sender_email, [recipient_email], subject,
         plaintext_body, html_body, bcc, '', None)
+
     if not response:
         raise Exception((
-            'Email to %s failed to send. Please try again later or ' +
-            'contact us to report a bug at ' +
+            'Email to %s failed to send. Please try again later or '
+            'contact us to report a bug at '
             'https://www.oppia.org/contact.') % recipient_email)
 
 
@@ -190,7 +191,8 @@ def send_bulk_mail(
 
     response = email_services.send_email_to_recipients(
         sender_email, recipient_emails, subject, plaintext_body, html_body)
+
     if not response:
         raise Exception(
-            'Bulk email failed to send. Please try again later or contact us ' +
+            'Bulk email failed to send. Please try again later or contact us '
             'to report a bug at https://www.oppia.org/contact.')

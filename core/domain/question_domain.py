@@ -1968,7 +1968,7 @@ class Question(translation_domain.BaseTranslatableObject):
 
         if not at_least_one_correct_answer:
             raise utils.ValidationError(
-                'Expected at least one answer group to have a correct ' +
+                'Expected at least one answer group to have a correct '
                 'answer.'
             )
 

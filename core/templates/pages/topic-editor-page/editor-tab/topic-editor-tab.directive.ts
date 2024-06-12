@@ -99,6 +99,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   maxCharsInMetaTagContent!: number;
   minCharsInPageTitleFragmentForWeb!: number;
   skillForDiagnosticTestFormControl = new FormControl(null);
+  classroomUrlFragment: string | null = null;
+  classroomName: string | null = null;
+  curriculumAdminUsernames: string[] = [];
 
   constructor(
     private contextService: ContextService,
@@ -236,8 +239,8 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     );
   }
 
-  getClassroomUrlFragment(): string {
-    return this.topicEditorStateService.getClassroomUrlFragment();
+  isAssignedToAClassroom(): boolean {
+    return Boolean(this.classroomUrlFragment && this.classroomName);
   }
 
   _initStorySummaries(): void {
@@ -631,6 +634,11 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     this.selectedSkillEditOptionsIndex = {};
     this.subtopicsListIsShown = !this.windowDimensionsService.isWindowNarrow();
     this.storiesListIsShown = !this.windowDimensionsService.isWindowNarrow();
+    this.classroomUrlFragment =
+      this.topicEditorStateService.getClassroomUrlFragment();
+    this.classroomName = this.topicEditorStateService.getClassroomName();
+    this.curriculumAdminUsernames =
+      this.topicEditorStateService.getCurriculumAdminUsernames();
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicInitialized.subscribe(() =>
         this.initEditor()
