@@ -275,8 +275,15 @@ export class Moderator extends BaseUser {
    * Function to unfeature an activity.
    */
   async unfeatureActivity(explorationId: string | null): Promise<void> {
+    if (!explorationId) {
+      throw new Error('Invalid exploration ID');
+    }
+
     await this.navigateToFeaturedActivitiesTab();
-    await this.page.waitForSelector(featuredActivityRowSelector);
+    await this.page.waitForSelector(featuredActivityRowSelector, {
+      timeout: 5000,
+    });
+
     const rows = await this.page.$$(featuredActivityRowSelector);
 
     if (rows.length === 0) {
@@ -290,20 +297,27 @@ export class Moderator extends BaseUser {
       const schemaBasedUnicodeEditor = await row.$(
         'schema-based-unicode-editor'
       );
-      const modelValue = await schemaBasedUnicodeEditor?.evaluate(node =>
+
+      if (!schemaBasedUnicodeEditor) {
+        throw new Error('Schema-based Unicode editor not found');
+      }
+
+      const modelValue = await schemaBasedUnicodeEditor.evaluate(node =>
         node.getAttribute('ng-reflect-model')
       );
 
-      if (modelValue === (explorationId as string)) {
+      if (modelValue === explorationId) {
         await row.waitForSelector(deleteFeaturedActivityButton);
         const deleteButton = await row.$(deleteFeaturedActivityButton);
 
-        if (deleteButton) {
-          await this.waitForElementToBeClickable(deleteButton);
-          await deleteButton.click();
-          activityUnfeatured = true;
-          break;
+        if (!deleteButton) {
+          throw new Error('Delete featured activity button not found');
         }
+
+        await this.waitForElementToBeClickable(deleteButton);
+        await deleteButton.click();
+        activityUnfeatured = true;
+        break;
       }
     }
 

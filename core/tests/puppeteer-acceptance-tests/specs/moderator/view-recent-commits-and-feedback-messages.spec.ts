@@ -39,7 +39,7 @@ describe('Moderator', function () {
   beforeAll(async function () {
     // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
     // in mobile viewport which is required for testing the feedback messages tab),
-    // remove this part of skipping the test.
+    // remove this part of skipping the test and make the test to run in mobile viewport as well.
     if (process.env.MOBILE === 'true') {
       showMessage('Test skipped in mobile viewport');
       return;
@@ -81,7 +81,7 @@ describe('Moderator', function () {
     async function () {
       // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
       // in mobile viewport which is required for testing the feedback messages tab),
-      // remove this part of skipping the test.
+      // remove this part of skipping the test and make the test to run in mobile viewport as well.
       if (process.env.MOBILE === 'true') {
         showMessage('Test skipped in mobile viewport');
         return;
