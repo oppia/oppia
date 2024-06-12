@@ -984,6 +984,7 @@ describe('Admin misc tab component ', () => {
         tick();
 
         expect(updateUserGroupSpy).not.toHaveBeenCalled();
+        component.removeUserGroup();
       }));
     });
 
