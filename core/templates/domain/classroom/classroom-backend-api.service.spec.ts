@@ -408,6 +408,55 @@ describe('Classroom backend API service', function () {
     expect(failHandler).toHaveBeenCalled();
   }));
 
+  it('should be able to create a new classroom', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let service = classroomBackendApiService;
+    let classroomId = 'history_classroom_id';
+    let classroomName = 'history';
+    let classroomUrlFragment = 'history';
+    let result = {new_classroom_id: classroomId};
+
+    service
+      .createNewClassroomAsync(classroomName, classroomUrlFragment)
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne('/classroom_admin/create_new');
+    expect(req.request.method).toEqual('POST');
+
+    req.flush(
+      {new_classroom_id: classroomId},
+      {status: 200, statusText: 'Success.'}
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fail to create a new classroom', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let service = classroomBackendApiService;
+    let classroomName = '';
+    let classroomUrlFragment = 'history';
+
+    service
+      .createNewClassroomAsync(classroomName, classroomUrlFragment)
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne('/classroom_admin/create_new');
+    expect(req.request.method).toEqual('POST');
+
+    req.flush(
+      {error: 'name field should not be empty'},
+      {status: 400, statusText: 'Bad Request'}
+    );
+
+    flushMicrotasks();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('name field should not be empty');
+  }));
+
   it('should be able to delete classroom', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
