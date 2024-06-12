@@ -22,13 +22,13 @@ import testConstants from '../../utilities/common/test-constants';
 import {Moderator} from '../../utilities/user/moderator';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {showMessage} from '../../utilities/common/show-message';
 
 ConsoleReporter.setConsoleErrorsToIgnore([
   "Failed to execute 'convertToSpecifiedUnits' on 'SVGLength': Could not resolve relative length.",
 ]);
 
-const DEFAULT_SPEC_TIMEOUT_MSECS: number =
-  testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Moderator', function () {
@@ -37,6 +37,14 @@ describe('Moderator', function () {
   let explorationId: string | null;
 
   beforeAll(async function () {
+    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+    // in mobile viewport which is required for testing the feedback messages tab),
+    // remove this part of skipping the test.
+    if (process.env.MOBILE === 'true') {
+      showMessage('Test skipped in mobile viewport');
+      return;
+    }
+
     moderator = await UserFactory.createNewUser(
       'Moderator',
       'moderator@example.com',
@@ -71,6 +79,14 @@ describe('Moderator', function () {
   it(
     'should be able to view recent commits and feedback messages',
     async function () {
+      // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+      // in mobile viewport which is required for testing the feedback messages tab),
+      // remove this part of skipping the test.
+      if (process.env.MOBILE === 'true') {
+        showMessage('Test skipped in mobile viewport');
+        return;
+      }
+
       await moderator.navigateToModeratorPage();
       await moderator.expectNumberOfRecentCommits(1);
       await moderator.expectCommitToHaveProperties(1, [

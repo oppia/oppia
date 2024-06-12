@@ -23,8 +23,7 @@ import {Moderator} from '../../utilities/user/moderator';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS: number =
-  testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Moderator', function () {
@@ -62,7 +61,7 @@ describe('Moderator', function () {
       'Algebra'
     );
     if (!explorationId) {
-      throw new Error('Error publishing exploration successfully.');
+      throw new Error('Error in publishing the exploration');
     }
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
