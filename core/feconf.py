@@ -494,7 +494,7 @@ XSSI_PREFIX = b')]}\'\n'
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
 # A regular expression for language accent code.
-LANGUAGE_ACCENT_CODE_REGEX = r'^(([a-z]+)-)+([A-Z]+)$'
+LANGUAGE_ACCENT_CODE_REGEX = r'^(([a-zA-Z]+)-)+([a-zA-Z]+)$'
 
 # These are here rather than in rating_services.py to avoid import
 # circularities with exp_services.
@@ -572,7 +572,7 @@ ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.3.8'
+OPPIA_VERSION = '3.3.9'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -583,19 +583,7 @@ SYSTEM_EMAIL_ADDRESS = 'system@example.com'
 SYSTEM_EMAIL_NAME = '.'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
 NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
-# Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both valid and
-# correspond to owners of the app before setting this to True. If
-# SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
-# address cannot be sent. If True then emails can be sent to any user.
-CAN_SEND_EMAILS = False
-# If you want to turn on this facility please check the email templates in the
-# send_role_notification_email() function in email_manager.py and modify them
-# accordingly.
-CAN_SEND_EDITOR_ROLE_EMAILS = False
-# If enabled then emails will be sent to creators for feedback messages.
-CAN_SEND_FEEDBACK_MESSAGE_EMAILS = False
-# If enabled subscription emails will be sent to that user.
-CAN_SEND_SUBSCRIPTION_EMAILS = False
+CAN_SEND_TRANSACTIONAL_EMAILS = True
 # Time to wait before sending feedback message emails (currently set to 1
 # hour).
 DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
@@ -612,12 +600,10 @@ DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE = False
 # when the user has not specified a preference.
 DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE = False
 # Whether to send email updates to a user who has not specified a preference.
-DEFAULT_EMAIL_UPDATES_PREFERENCE = False
+DEFAULT_EMAIL_UPDATES_PREFERENCE = True
 # Whether to send an invitation email when the user is granted
 # new role permissions in an exploration.
 DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE = True
-# Whether to require an email to be sent, following a moderator action.
-REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
 # Timespan in minutes before allowing duplicate emails.
 DUPLICATE_EMAIL_INTERVAL_MINS = 2
 # Number of digits after decimal to which the average ratings value in the
@@ -1094,6 +1080,7 @@ CLASSROOM_ID_TO_NAME_HANDLER_URL = '/classroom_id_to_name_handler'
 UNUSED_TOPICS_HANDLER_URL = '/unused_topics'
 NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 CLASSROOM_HANDLER_URL = '/classroom'
+NEW_CLASSROOM_URL = '/classroom_admin/create_new'
 CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
 CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
 VOICEOVER_ADMIN_DATA_HANDLER_URL = '/voiceover_admin_data_handler'
@@ -1681,6 +1668,8 @@ COMPOSITE_ENTITY_ID_TEMPLATE = '%s.%s.%d'
 ContentValueType = Union[str, List[str]]
 
 MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 10
+
+DEFAULT_CLASSROOM_PUBLICATION_STATUS = False
 
 
 class TranslatableEntityType(enum.Enum):

@@ -248,6 +248,11 @@ URLS = [
         access_validators.BlogHomePageAccessValidationHandler),
 
     get_redirect_route(
+        r'%s/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>' % # pylint: disable=line-too-long
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.SubtopicViewerPageAccessValidationHandler),
+
+    get_redirect_route(
         r'%s/can_access_blog_post_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.BlogPostPageAccessValidationHandler),
@@ -499,6 +504,11 @@ URLS = [
         feconf.GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST,
         voiceover.GetSampleVoiceoversForGivenVoiceArtistHandler
     ),
+    get_redirect_route(
+        r'/entity_voiceovers_bulk_handler/<entity_type>/<entity_id>/'
+        r'<entity_version>/<language_code>',
+        voiceover.EntityVoiceoversBulkHandler
+    ),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
@@ -511,9 +521,6 @@ URLS = [
     get_redirect_route(
         r'%s/revision' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
-    get_redirect_route(
-        r'%s/revision/<subtopic_url_fragment>' %
-        feconf.TOPIC_VIEWER_URL_PREFIX, subtopic_viewer.SubtopicViewerPage),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
@@ -821,6 +828,9 @@ URLS = [
         r'%s/<entity_type>/<entity_id>' %
         feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
         editor.LearnerAnswerInfoHandler),
+    get_redirect_route(
+        r'/entity_translations_bulk_handler/<entity_type>/<entity_id>/<entity_version>', # pylint: disable=line-too-long
+        editor.EntityTranslationsBulkHandler),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
