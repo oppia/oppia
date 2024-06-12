@@ -16,7 +16,7 @@
  * @fileoverview Component for the about page.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 
 import {SiteAnalyticsService} from 'services/site-analytics.service';
@@ -25,16 +25,18 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
 import {ThanksForDonatingModalComponent} from 'pages/donate-page/thanks-for-donating-modal.component';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
 import './about-page.component.css';
-import {title} from 'process';
 
 @Component({
   selector: 'about-page',
   templateUrl: './about-page.component.html',
   styleUrls: ['./about-page.component.css'],
 })
-export class AboutPageComponent implements OnInit {
+export class AboutPageComponent implements OnInit, OnDestroy {
   features = [
     {
       i18nDescription: 'I18N_ABOUT_PAGE_AUDIO_SUBTITLES_FEATURE',
@@ -58,8 +60,10 @@ export class AboutPageComponent implements OnInit {
     },
   ];
 
-  selectedTabIndex = 1;
+  directiveSubscriptions = new Subscription();
   partnershipsFormLink: string = '';
+  // Volunteer CTA is the default tab.
+  selectedTabIndex = 1;
   volunteerRolesDetails = [
     {
       title: 'I18N_ABOUT_PAGE_CTA_GROWTH_TITLE',
@@ -111,13 +115,28 @@ export class AboutPageComponent implements OnInit {
       ],
     },
   ];
-  activeVolunteerRolesIndexes: number[] = [0, 1, 2];
+  volunteerRolesIndices = {
+    desktop: [
+      [0, 1, 2],
+      [2, 3, 4],
+    ],
+    tablet: [
+      [0, 1],
+      [2, 3],
+      [3, 4],
+    ],
+    mobile: [[0], [1], [2], [3], [4]],
+  };
+  screenType: 'desktop' | 'tablet' | 'mobile';
+  showNavigationArrowsForCarousel = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private siteAnalyticsService: SiteAnalyticsService,
     private windowRef: WindowRef,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private windowDimensionsService: WindowDimensionsService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -126,10 +145,43 @@ export class AboutPageComponent implements OnInit {
     );
     const params = Object.fromEntries(searchParams.entries());
     if (params.hasOwnProperty('thanks')) {
-      this.ngbModal.open(ThanksForDonatingModalComponent, {
-        backdrop: 'static',
-        size: 'xl',
-      });
+      this.openThanksForDonatingModal();
+    }
+
+    this.setScreenType();
+    this.setPartnershipsFormLink();
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPartnershipsFormLink();
+      })
+    );
+    this.directiveSubscriptions.add(
+      this.windowDimensionsService.getResizeEvent().subscribe(() => {
+        this.setScreenType();
+      })
+    );
+  }
+
+  setScreenType(): void {
+    const width = this.windowDimensionsService.getWidth();
+    if (width < 376) {
+      this.screenType = 'mobile';
+    } else if (width < 769) {
+      this.screenType = 'tablet';
+    } else {
+      this.screenType = 'desktop';
+    }
+    this.showNavigationArrowsForCarousel = width < 641;
+  }
+
+  setPartnershipsFormLink(): void {
+    const userLang = this.translateService.currentLang;
+
+    if (userLang === 'en' || userLang === 'pcm' || userLang === 'kab') {
+      this.partnershipsFormLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+    } else {
+      let interpolatedLanguage = userLang === 'pt-br' ? 'pt' : userLang;
+      this.partnershipsFormLink = `https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=${interpolatedLanguage}&_x_tr_hl=en-US&_x_tr_pto=wapp`;
     }
   }
 
@@ -156,8 +208,23 @@ export class AboutPageComponent implements OnInit {
     });
   }
 
+  openThanksForDonatingModal(): void {
+    this.ngbModal.open(ThanksForDonatingModalComponent, {
+      backdrop: 'static',
+      size: 'xl',
+    });
+  }
+
+  onClickVisitClassroomButton(): void {
+    this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
+  }
+
   onClickBrowseLibraryButton(): void {
     this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 angular

@@ -25,11 +25,19 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PrimaryButtonComponent} from '../../components/button-directives/primary-button.component';
+import {EventEmitter} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {DonationBoxModalComponent} from '../donate-page/donation-box/donation-box-modal.component';
+import {ThanksForDonatingModalComponent} from '../donate-page/thanks-for-donating-modal.component';
+import {of} from 'rxjs';
 
 class MockWindowRef {
   nativeWindow = {
     location: {
       href: '',
+      search: '',
     },
     sessionStorage: {
       last_uploaded_audio_lang: 'en',
@@ -39,11 +47,19 @@ class MockWindowRef {
   };
 }
 
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+}
+
 describe('About Page', () => {
   let windowRef: MockWindowRef;
   let component: AboutPageComponent;
   let siteAnalyticsService: SiteAnalyticsService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let translateService: TranslateService;
+  let windowDimensionsService: WindowDimensionsService;
+  let ngbModal: NgbModal;
+  let resizeEvent = new Event('resize');
 
   beforeEach(async () => {
     windowRef = new MockWindowRef();
@@ -60,6 +76,17 @@ describe('About Page', () => {
           provide: WindowRef,
           useValue: windowRef,
         },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService,
+        },
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            getResizeEvent: () => of(resizeEvent),
+            getWidth: () => 0,
+          },
+        },
       ],
     }).compileComponents();
     const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
@@ -71,16 +98,133 @@ describe('About Page', () => {
       true
     );
   });
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    translateService = TestBed.inject(TranslateService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    ngbModal = TestBed.inject(NgbModal);
+    spyOn(ngbModal, 'open');
+  });
 
   it('should successfully instantiate the component', () => {
     expect(component).toBeDefined();
   });
 
+  it('should subscribe to translate, windowDimenstions service on init', () => {
+    spyOn(component.directiveSubscriptions, 'add');
+    spyOn(translateService.onLangChange, 'subscribe');
+    spyOn(windowDimensionsService.getResizeEvent(), 'subscribe');
+
+    component.ngOnInit();
+
+    expect(component.directiveSubscriptions.add).toHaveBeenCalled();
+    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
+    expect(
+      windowDimensionsService.getResizeEvent().subscribe
+    ).toHaveBeenCalled();
+  });
+
+  it('should initialize with correct screen type and partnerships form link', () => {
+    spyOn(component, 'setScreenType');
+    spyOn(component, 'setPartnershipsFormLink');
+    component.ngOnInit();
+    expect(component.setScreenType).toHaveBeenCalled();
+    expect(component.setPartnershipsFormLink).toHaveBeenCalled();
+  });
+
+  it('should set screen type to mobile when window width is less than or equal to 361', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(360);
+    component.setScreenType();
+    expect(component.screenType).toEqual('mobile');
+  });
+
+  it('should set screen type to tablet when window width is between 362 and 768', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(500);
+    component.setScreenType();
+    expect(component.screenType).toEqual('tablet');
+  });
+
+  it('should set screen type to desktop when window width is greater than or equal to 769', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(800);
+    component.setScreenType();
+    expect(component.screenType).toEqual('desktop');
+  });
+
+  it('should set showNavigationArrowsForCarousel boolean correctly', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(800);
+    component.setScreenType();
+    expect(component.showNavigationArrowsForCarousel).toBeFalse();
+
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(640);
+    component.setScreenType();
+    expect(component.showNavigationArrowsForCarousel).toBeTrue();
+  });
+
+  it(
+    'should obtain new form link whenever the selected' + 'language changes',
+    () => {
+      component.ngOnInit();
+      spyOn(component, 'setPartnershipsFormLink');
+      translateService.onLangChange.emit();
+
+      expect(component.setPartnershipsFormLink).toHaveBeenCalled();
+    }
+  );
+
+  it('should set the correct form link for English language', () => {
+    translateService.currentLang = 'en';
+    const formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+    component.setPartnershipsFormLink();
+
+    expect(component.partnershipsFormLink).toBe(formLink);
+  });
+
+  it('should set the correct form link for Portuguese language', () => {
+    translateService.currentLang = 'pt-br';
+    const formLink =
+      'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp';
+    component.setPartnershipsFormLink();
+
+    expect(component.partnershipsFormLink).toBe(formLink);
+  });
+
+  it('should set the correct form link for general languages', () => {
+    translateService.currentLang = 'fr';
+    const formLink =
+      'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=fr&_x_tr_hl=en-US&_x_tr_pto=wapp';
+    component.setPartnershipsFormLink();
+
+    expect(component.partnershipsFormLink).toBe(formLink);
+  });
+
+  it(
+    'should set english link for languages not supported by' + ' google forms',
+    () => {
+      translateService.currentLang = 'pcm';
+      const formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+      component.setPartnershipsFormLink();
+
+      expect(component.partnershipsFormLink).toBe(formLink);
+    }
+  );
+
   it('should return correct static image url when calling getStaticImageUrl', () => {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image'
     );
+  });
+
+  it('should return the correct image set', () => {
+    const imageName = '/about/testImageName';
+    const imageExt = 'png';
+
+    const expectedImageSet =
+      '/assets/images//about/testImageName1x.png 1x, ' +
+      '/assets/images//about/testImageName15x.png 1.5x, ' +
+      '/assets/images//about/testImageName2x.png 2x';
+
+    const result = component.getImageSet(imageName, imageExt);
+
+    expect(result).toBe(expectedImageSet);
   });
 
   it('should register correct event on calling onClickBrowseLibraryButton', () => {
@@ -94,5 +238,47 @@ describe('About Page', () => {
     expect(
       siteAnalyticsService.registerClickBrowseLibraryButtonEvent
     ).toHaveBeenCalledWith();
+  });
+
+  it('should show thank you modal on query parameters change', () => {
+    windowRef.nativeWindow.location.search = '';
+    component.ngOnInit();
+    expect(ngbModal.open).not.toHaveBeenCalled();
+
+    windowRef.nativeWindow.location.search = '?random';
+    component.ngOnInit();
+    expect(ngbModal.open).not.toHaveBeenCalled();
+
+    windowRef.nativeWindow.location.search = '?thanks';
+    component.ngOnInit();
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      ThanksForDonatingModalComponent,
+      {
+        backdrop: 'static',
+        size: 'xl',
+      }
+    );
+  });
+
+  it('should open donation box modal', () => {
+    component.openDonationBoxModal();
+
+    expect(ngbModal.open).toHaveBeenCalledWith(DonationBoxModalComponent, {
+      backdrop: 'static',
+      size: 'xl',
+      windowClass: 'donation-box-modal',
+    });
+  });
+
+  it('should unsubscribe on component destruction', () => {
+    component.directiveSubscriptions.add(
+      translateService.onLangChange.subscribe(() => {
+        component.setScreenType();
+      })
+    );
+
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.closed).toBe(true);
   });
 });

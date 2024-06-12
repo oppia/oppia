@@ -67,6 +67,41 @@ describe('Logged-out User in About page', function () {
   );
 
   it(
+    'should open the Partnerships form when the "Partner with us" button is clicked',
+    async function () {
+      await loggedOutUser.clickPartnerWithUsButtonInAboutPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should open the translated Partnerships form when the "Partner with us" button is clicked after the language change',
+    async function () {
+      await loggedOutUser.clickPartnerWithUsButtonInAboutPageInGivenLanguage(
+        'pt-br'
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should open the Volunteer form when the "Volunteer with Oppia" button ' +
+      'is clicked.',
+    async function () {
+      await loggedOutUser.clickVolunteerWithOppiaButtonInAboutPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should open the donorbox when the "Donate" button is clicked',
+    async function () {
+      await loggedOutUser.clickDonateButtonInAboutPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
     'should open Community Library page with the Browse Library button.',
     async function () {
       await loggedOutUser.clickBrowseLibraryButtonInAboutPage();
