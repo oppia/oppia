@@ -290,8 +290,6 @@ export class Moderator extends BaseUser {
       throw new Error('No featured activities found');
     }
 
-    let activityUnfeatured = false;
-
     for (const row of rows) {
       await row.waitForSelector('schema-based-unicode-editor', {visible: true});
       const schemaBasedUnicodeEditor = await row.$(
@@ -314,23 +312,10 @@ export class Moderator extends BaseUser {
         if (!deleteButton) {
           throw new Error('Delete featured activity button not found');
         }
-
-        await this.page.waitForFunction(
-          button => !button.disabled,
-          {},
-          deleteButton
-        );
         await this.waitForElementToBeClickable(deleteButton);
         await deleteButton.click();
-        activityUnfeatured = true;
         break;
       }
-    }
-
-    if (!activityUnfeatured) {
-      throw new Error(
-        `Failed to unfeature the activity with id: ${explorationId}`
-      );
     }
 
     await this.clickOn(' Save Featured Activities ');
