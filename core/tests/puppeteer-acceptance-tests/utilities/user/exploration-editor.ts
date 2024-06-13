@@ -1241,7 +1241,7 @@ export class ExplorationEditor extends BaseUser {
    * Open the "modify existing translations" modal after editing a piece of content that has already been
    * translated, when presented with the choices of what shall be done with the translation.
    */
-  async openModifyExistingTranslationsModal() {
+  async openModifyExistingTranslationsModal(): Promise<void> {
     await this.page.waitForSelector(modifyExistingTranslationsButton, {
       visible: true,
     });
@@ -1257,7 +1257,7 @@ export class ExplorationEditor extends BaseUser {
   async verifyTranslationInModifyTranslationsModal(
     languageCode: string,
     expectedTranslation: string
-  ) {
+  ): Promise<void> {
     await this.page.waitForSelector(
       `div.e2e-test-translation-${languageCode}`,
       {visible: true}

@@ -72,7 +72,7 @@ describe('Exploration Editor', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    // Enable the feature flag
+    // Enable the feature flag.
     await releaseCoordinator.enableFeatureFlag(
       'exploration_editor_can_modify_translations'
     );

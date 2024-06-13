@@ -34,7 +34,7 @@ import {ChangeListService} from '../services/change-list.service';
 import {ContextService} from 'services/context.service';
 import {EntityBulkTranslationsBackendApiService} from '../services/entity-bulk-translations-backend-api.service';
 
-fdescribe('Modify Translations Modal Component', function () {
+describe('Modify Translations Modal Component', function () {
   let component: ModifyTranslationsModalComponent;
   let fixture: ComponentFixture<ModifyTranslationsModalComponent>;
   let entityTranslationsService: EntityTranslationsService;
