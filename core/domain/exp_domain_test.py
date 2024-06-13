@@ -2769,7 +2769,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ):
             self.new_exploration.validate(strict=True)
 
-    # TODO(bhenning): The validation tests below should be split into separate
+    # TODO(#20377): The validation tests below should be split into separate
     # unit tests. Also, all validation errors should be covered in the tests.
     def test_validation(self) -> None:
         """Test validation of explorations."""
