@@ -278,7 +278,6 @@ export class Moderator extends BaseUser {
     if (!explorationId) {
       throw new Error('Invalid exploration ID');
     }
-    await this.page.reload();
     await this.navigateToFeaturedActivitiesTab();
     await this.page.waitForSelector(featuredActivityRowSelector, {
       visible: true,
@@ -299,18 +298,10 @@ export class Moderator extends BaseUser {
         throw new Error('Schema-based Unicode editor not found');
       }
 
-      const modelValueHandle = await this.page.waitForFunction(
-        (element: HTMLElement) => {
-          const value = element.getAttribute('ng-reflect-model');
-          return value !== null ? value : false;
-        },
-        {},
-        schemaBasedEditor
-      );
+      const outerHTMLHandle = await schemaBasedEditor.getProperty('outerHTML');
+      const outerHTML = (await outerHTMLHandle.jsonValue()) as string;
 
-      const modelValue = await modelValueHandle.jsonValue();
-
-      if (modelValue === explorationId) {
+      if (outerHTML.includes(explorationId)) {
         await row.waitForSelector(deleteFeaturedActivityButton, {
           visible: true,
         });
