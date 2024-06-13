@@ -37,7 +37,6 @@ export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   flagMessage!: string;
-  stateName!: string;
   flagMessageTextareaIsShown: boolean = false;
   flag: boolean = false;
 
@@ -47,7 +46,6 @@ export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
     private playerPositionService: PlayerPositionService
   ) {
     super(ngbActiveModal);
-    this.stateName = this.playerPositionService.getCurrentStateName();
   }
 
   showFlagMessageTextarea(value: boolean): void {
@@ -62,7 +60,7 @@ export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
       this.ngbActiveModal.close({
         report_type: this.flag,
         report_text: this.flagMessageTextareaIsShown,
-        state: this.stateName,
+        state: this.playerPositionService.getCurrentStateName(),
       });
     }
   }
