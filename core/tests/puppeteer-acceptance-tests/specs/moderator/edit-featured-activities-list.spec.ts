@@ -49,13 +49,13 @@ describe('Moderator', function () {
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorPage();
     await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.createExplorationWithMinimumContent(
+    await explorationEditor.createMinimalExploration(
       'Test Exploration',
       'End Exploration'
     );
     await explorationEditor.saveExplorationDraft();
 
-    explorationId = await explorationEditor.publishExplorationWithContent(
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
       'Test Exploration Title',
       'Test Exploration Goal',
       'Algebra'
