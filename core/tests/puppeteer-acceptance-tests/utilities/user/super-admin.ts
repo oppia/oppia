@@ -35,7 +35,7 @@ export class SuperAdmin extends BaseUser {
     await this.goto(testConstants.URLs.AdminPage);
   }
 
-  async navigateToRolesTab(): Promise<void> {
+  async navigateToAdminPageRolesTab(): Promise<void> {
     await this.goto(AdminPageRolesTab);
   }
 

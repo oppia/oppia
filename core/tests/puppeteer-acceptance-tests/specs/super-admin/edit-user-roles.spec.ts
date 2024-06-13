@@ -49,8 +49,7 @@ describe('Super Admin', function () {
     'should be able to assign, unassign role and be able to see the' +
       'allocated actions and assigned users to a role ',
     async function () {
-      await superAdmin.navigateToAdminPage();
-      await superAdmin.navigateToRolesTab();
+      await superAdmin.navigateToAdminPageRolesTab();
 
       await superAdmin.expectUserNotToHaveRole(
         'guestUser1',
