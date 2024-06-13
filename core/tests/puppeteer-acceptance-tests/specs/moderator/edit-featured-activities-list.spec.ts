@@ -82,7 +82,7 @@ describe('Moderator', function () {
         'Test Exploration Title',
       ]);
 
-      await moderator.unfeatureActivity(explorationId);
+      await moderator.unfeatureActivityAtIndex(1);
 
       // Expect to see no featured activity as the newly featured activity is unfeatured.
       await LoggedOutUser.expectToViewFeaturedActivities([]);

@@ -271,13 +271,10 @@ export class Moderator extends BaseUser {
     }
   }
 
-  /**
-   * Function to unfeature an activity.
-   */
-  async unfeatureActivity(explorationId: string | null): Promise<void> {
-    if (!explorationId) {
-      throw new Error('Invalid exploration ID');
-    }
+  async unfeatureActivityAtIndex(index: number): Promise<void> {
+    // Subtracting 1 from index to make it 1-based.
+    index -= 1;
+
     await this.navigateToFeaturedActivitiesTab();
     await this.page.waitForSelector(featuredActivityRowSelector, {
       visible: true,
@@ -289,37 +286,25 @@ export class Moderator extends BaseUser {
       throw new Error('No featured activities found');
     }
 
-    for (const row of rows) {
-      showMessage('Test: entered the loop');
-      await row.waitForSelector('schema-based-editor', {visible: true});
-      const schemaBasedEditor = await row.$('schema-based-editor');
-
-      if (!schemaBasedEditor) {
-        throw new Error('Schema-based Unicode editor not found');
-      }
-
-      const outerHTMLHandle = await schemaBasedEditor.getProperty('outerHTML');
-      const outerHTML = (await outerHTMLHandle.jsonValue()) as string;
-
-      if (outerHTML.includes(explorationId)) {
-        await row.waitForSelector(deleteFeaturedActivityButton, {
-          visible: true,
-        });
-        const deleteButton = await row.$(deleteFeaturedActivityButton);
-
-        if (!deleteButton) {
-          throw new Error('Delete featured activity button not found');
-        }
-        const isDeleteButtonVisible =
-          await deleteButton.isIntersectingViewport();
-        if (!isDeleteButtonVisible) {
-          throw new Error('Delete button is not visible');
-        }
-        await this.waitForElementToBeClickable(deleteButton);
-        await deleteButton.click();
-        break;
-      }
+    if (index < 0 || index >= rows.length) {
+      throw new Error('Invalid index');
     }
+
+    const row = rows[index];
+    await row.waitForSelector(deleteFeaturedActivityButton, {
+      visible: true,
+    });
+    const deleteButton = await row.$(deleteFeaturedActivityButton);
+
+    if (!deleteButton) {
+      throw new Error('Delete featured activity button not found');
+    }
+    const isDeleteButtonVisible = await deleteButton.isIntersectingViewport();
+    if (!isDeleteButtonVisible) {
+      throw new Error('Delete button is not visible');
+    }
+    await this.waitForElementToBeClickable(deleteButton);
+    await deleteButton.click();
 
     await this.clickOn(' Save Featured Activities ');
 
