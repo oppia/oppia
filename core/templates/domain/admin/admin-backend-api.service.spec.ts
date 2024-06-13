@@ -30,6 +30,7 @@ import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {PlatformParameterFilterType} from 'domain/platform-parameter/platform-parameter-filter.model';
 import {PlatformParameter} from 'domain/platform-parameter/platform-parameter.model';
 import {CsrfTokenService} from 'services/csrf-token.service';
+import {AdminPageConstants} from 'pages/admin-page/admin-page.constants';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
@@ -379,6 +380,43 @@ describe('Admin backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith(
         'User with given username does not exist'
       );
+    }));
+  });
+
+  describe('regenerateTopicSummariesAsync', () => {
+    it('should make request to regenerate topic summaries', fakeAsync(() => {
+      abas.regenerateTopicSummariesAsync().then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        AdminPageConstants.ADMIN_REGENERATE_TOPIC_SUMMARIES_URL
+      );
+      expect(req.request.method).toEqual('PUT');
+
+      req.flush({status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should call fail handler if the request fails', fakeAsync(() => {
+      const errorMessage = 'Failed to regenerate all topic summaries.';
+
+      abas.regenerateTopicSummariesAsync().then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        AdminPageConstants.ADMIN_REGENERATE_TOPIC_SUMMARIES_URL
+      );
+      expect(req.request.method).toEqual('PUT');
+
+      req.flush(
+        {error: errorMessage},
+        {status: 500, statusText: 'Internal Server Error'}
+      );
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(errorMessage);
     }));
   });
 
@@ -1202,6 +1240,68 @@ describe('Admin backend api service', () => {
         .generateDummyExplorationsAsync(
           numDummyExpsToGenerate,
           numDummyExpsToPublish
+        )
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(payload);
+      req.flush(
+        {
+          error: 'Failed to get data.',
+        },
+        {
+          status: 500,
+          statusText: 'Internal Server Error',
+        }
+      );
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+    })
+  );
+
+  it('should generate dummy translation opportunities', fakeAsync(() => {
+    let action = 'generate_dummy_translation_opportunities';
+    let numDummyTranslationOpportunitiesToGenerate = 2;
+    let payload = {
+      action: action,
+      num_dummy_translation_opportunities_to_generate:
+        numDummyTranslationOpportunitiesToGenerate,
+    };
+
+    abas
+      .generateDummyTranslationOpportunitiesAsync(
+        numDummyTranslationOpportunitiesToGenerate
+      )
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(
+    'should handle generate dummy translation opportunities ' +
+      'request failure',
+    fakeAsync(() => {
+      let action = 'generate_dummy_translation_opportunities';
+      let numDummyTranslationOpportunitiesToGenerate = 2;
+      let payload = {
+        action: action,
+        num_dummy_translation_opportunities_to_generate:
+          numDummyTranslationOpportunitiesToGenerate,
+      };
+
+      abas
+        .generateDummyTranslationOpportunitiesAsync(
+          numDummyTranslationOpportunitiesToGenerate
         )
         .then(successHandler, failHandler);
 

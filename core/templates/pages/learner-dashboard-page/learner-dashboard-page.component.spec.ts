@@ -341,6 +341,10 @@ describe('Learner dashboard page', () => {
             provide: PlatformFeatureService,
             useClass: MockPlatformFeatureService,
           },
+          {
+            provide: PlatformFeatureService,
+            useClass: MockPlatformFeatureService,
+          },
           SuggestionModalForLearnerDashboardService,
           UrlInterpolationService,
           UserService,
@@ -498,6 +502,67 @@ describe('Learner dashboard page', () => {
       spyOn(urlService, 'getUrlParams').and.returnValue({
         active_tab: 'learner-groups',
       });
+
+      spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardCollectionsDataAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          completedCollectionsList:
+            learnerDashboardCollectionsData.completed_collections_list.map(
+              collectionSummary =>
+                CollectionSummary.createFromBackendDict(collectionSummary)
+            ),
+          incompleteCollectionsList:
+            learnerDashboardCollectionsData.incomplete_collections_list.map(
+              collectionSummary =>
+                CollectionSummary.createFromBackendDict(collectionSummary)
+            ),
+          collectionPlaylist:
+            learnerDashboardCollectionsData.collection_playlist.map(
+              collectionSummary =>
+                CollectionSummary.createFromBackendDict(collectionSummary)
+            ),
+          completedToIncompleteCollections:
+            learnerDashboardCollectionsData.completed_to_incomplete_collections,
+          numberOfNonexistentCollections:
+            NonExistentCollections.createFromBackendDict(
+              learnerDashboardCollectionsData.number_of_nonexistent_collections
+            ),
+        })
+      );
+
+      spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardExplorationsDataAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          completedExplorationsList:
+            learnerDashboardExplorationsData.completed_explorations_list.map(
+              expSummary =>
+                LearnerExplorationSummary.createFromBackendDict(expSummary)
+            ),
+          incompleteExplorationsList:
+            learnerDashboardExplorationsData.incomplete_explorations_list.map(
+              expSummary =>
+                LearnerExplorationSummary.createFromBackendDict(expSummary)
+            ),
+          explorationPlaylist:
+            learnerDashboardExplorationsData.exploration_playlist.map(
+              expSummary =>
+                LearnerExplorationSummary.createFromBackendDict(expSummary)
+            ),
+          numberOfNonexistentExplorations:
+            NonExistentExplorations.createFromBackendDict(
+              learnerDashboardExplorationsData.number_of_nonexistent_explorations
+            ),
+          subscriptionList:
+            learnerDashboardExplorationsData.subscription_list.map(
+              profileSummary =>
+                ProfileSummary.createFromCreatorBackendDict(profileSummary)
+            ),
+        })
+      );
 
       component.ngOnInit();
       flush();
@@ -911,7 +976,7 @@ describe('Learner dashboard page', () => {
         expect(fetchCollectionsDataSpy).toHaveBeenCalled();
         flush();
         expect(fetchExplorationsDataSpy).toHaveBeenCalled();
-        expect(component.communtiyLessonsDataLoaded).toEqual(true);
+        expect(component.communityLessonsDataLoaded).toEqual(true);
       })
     );
 
@@ -1038,7 +1103,7 @@ describe('Learner dashboard page', () => {
         expect(fetchCollectionsDataSpy).toHaveBeenCalled();
         flush();
         expect(fetchExplorationsDataSpy).toHaveBeenCalled();
-        expect(component.communtiyLessonsDataLoaded).toEqual(true);
+        expect(component.communityLessonsDataLoaded).toEqual(true);
       })
     );
 

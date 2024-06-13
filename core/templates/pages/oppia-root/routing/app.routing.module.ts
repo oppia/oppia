@@ -27,9 +27,24 @@ import {IsNewLessonPlayerGuard} from 'pages/exploration-player-page/new-lesson-p
 // Otherwise pages will have false 404 status code.
 const routes: Route[] = [
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SUBTOPIC_VIEWER.ROUTE,
+    loadChildren: () =>
+      import('pages/subtopic-viewer-page/subtopic-viewer-page.module').then(
+        m => m.SubtopicViewerPageModule
+      ),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.ROUTE,
     loadChildren: () =>
       import('pages/admin-page/admin-page.module').then(m => m.AdminPageModule),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/collection-editor-page/collection-editor-page.module').then(
+        m => m.CollectionEditorPageModule
+      ),
     canActivate: [IsLoggedInGuard],
   },
   {
@@ -65,6 +80,14 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER
+      .ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/diagnostic-test-player-page/diagnostic-test-player-page.module'
+      ).then(m => m.DiagnosticTestPlayerPageModule),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
@@ -95,6 +118,15 @@ const routes: Route[] = [
       import(
         'pages/learner-group-pages/edit-group/edit-learner-group-page.module'
       ).then(m => m.EditLearnerGroupPageModule),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FACILITATOR_DASHBOARD
+      .ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/facilitator-dashboard-page/facilitator-dashboard-page.module'
+      ).then(m => m.FacilitatorDashboardPageModule),
     canActivate: [IsLoggedInGuard],
   },
   {

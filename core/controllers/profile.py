@@ -28,6 +28,8 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
@@ -516,8 +518,11 @@ class SignupHandler(
         """Handles GET requests."""
         assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
+        server_can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value))
         self.render_json({
-            'can_send_emails': feconf.CAN_SEND_EMAILS,
+            'server_can_send_emails': server_can_send_emails,
             'has_agreed_to_latest_terms': bool(
                 user_settings.last_agreed_to_terms and
                 user_settings.last_agreed_to_terms >=
@@ -539,14 +544,16 @@ class SignupHandler(
             'can_receive_email_updates']
         bulk_email_signup_message_should_be_shown = False
 
-        bulk_email_signup_message_should_be_shown = (
-            user_services.update_email_preferences(
-                self.user_id, can_receive_email_updates,
-                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
-            )
+        config_bulk_email_failed = user_services.update_email_preferences(
+            self.user_id, can_receive_email_updates,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
         )
+        # Only block registration if bulk email configuration failed and the
+        # user requested bulk emails.
+        bulk_email_signup_message_should_be_shown = (
+            can_receive_email_updates and config_bulk_email_failed)
         if bulk_email_signup_message_should_be_shown:
             self.render_json({
                 'bulk_email_signup_message_should_be_shown': (
@@ -576,7 +583,10 @@ class SignupHandler(
 
         # Note that an email is only sent when the user registers for the first
         # time.
-        if feconf.CAN_SEND_EMAILS and not has_ever_registered:
+        server_can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value))
+        if server_can_send_emails and not has_ever_registered:
             email_manager.send_post_signup_email(self.user_id)
 
         user_settings = user_services.get_user_settings(self.user_id)
@@ -637,7 +647,7 @@ class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 '[TAKEOUT] User ID found in the JSON generated for user %s'
                 % self.user_id)
             user_data_json_string = (
-                'There was an error while exporting ' +
+                'There was an error while exporting '
                 'data. Please contact %s to export your data.'
                 % feconf.ADMIN_EMAIL_ADDRESS)
             user_images = []

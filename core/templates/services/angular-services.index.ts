@@ -453,7 +453,9 @@ import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashb
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
 import { MobileMenuService } from 'pages/exploration-player-page/new-lesson-player/new-lesson-player-services/mobile-menu.service';
+import { CollectionEditorPageAuthGuard } from 'pages/collection-editor-page/collection-editor-page-auth.guard';
 import { VoiceoverAdminAuthGuard } from 'pages/voiceover-admin-page/voiceover-admin-page-auth.guard';
+import { SubtopicViewerAuthGuard } from 'pages/subtopic-viewer-page/subtopic-viewer-auth.guard';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -510,6 +512,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CollectionCreationBackendService', CollectionCreationBackendService],
   ['CollectionCreationService', CollectionCreationService],
   ['CollectionEditorRoutingService', CollectionEditorRoutingService],
+  ['CollectionEditorPageAuthGuard', CollectionEditorPageAuthGuard],
   ['CollectionLinearizerService', CollectionLinearizerService],
   ['CollectionPlayerBackendApiService', CollectionPlayerBackendApiService],
   ['CollectionPlayerAuthGuard', CollectionPlayerAuthGuard],
@@ -944,4 +947,5 @@ export const angularServices: [string, Type<{}>][] = [
     ContributorDashboardAdminStatsBackendApiService],
   ['InsertScriptService', InsertScriptService],
   ['VoiceoverAdminAuthGuard', VoiceoverAdminAuthGuard],
+  ['SubtopicViewerAuthGuard', SubtopicViewerAuthGuard]
 ];

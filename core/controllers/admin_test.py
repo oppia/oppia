@@ -20,10 +20,12 @@ import datetime
 import enum
 import logging
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import blog_services
+from core.domain import caching_services
 from core.domain import classroom_config_services
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -84,11 +86,24 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         """Complete the signup process for self.CURRICULUM_ADMIN_EMAIL."""
         super().setUp()
+
+        self.original_parameter_registry = (
+            platform_parameter_registry.Registry.parameter_registry.copy())
+        platform_parameter_registry.Registry.parameter_registry.clear()
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
+            ['test_param_1'])
+
         self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+
+    def tearDown(self) -> None:
+        super().tearDown()
+        platform_parameter_registry.Registry.parameter_registry = (
+            self.original_parameter_registry)
 
     def test_admin_get(self) -> None:
         """Test `/admin` returns a 200 response."""
@@ -541,6 +556,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(classrooms), 1)
         self.logout()
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+    ])
     def test_regenerate_topic_related_opportunities_action(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -572,6 +591,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         story_services.save_new_story(owner_id, story)
         topic_services.add_canonical_story(
             owner_id, topic_id, story_id)
+
         topic_services.publish_story(topic_id, story_id, self.admin_id)
         story_services.update_story(
             owner_id, story_id, [story_domain.StoryChange({
@@ -963,6 +983,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             expected_status_int=400
         )
         error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'platform_param_name\' failed: Expected '
             'string, received 123')
         self.assertEqual(response['error'], error_msg)
@@ -986,6 +1007,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             expected_status_int=400
         )
         error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'commit_message\' failed: Expected '
             'string, received 123')
         self.assertEqual(response['error'], error_msg)
@@ -1009,6 +1031,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             expected_status_int=400
         )
         error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'new_rules\' failed: Expected list, '
             'received {}')
         self.assertEqual(response['error'], error_msg)
@@ -1022,6 +1045,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'new_rules\' failed: \'int\' '
             'object is not subscriptable')
         response = self.post_json(
@@ -1125,7 +1149,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             '/adminsuperadminhandler', {}, csrf_token=self.get_new_csrf_token(),
             expected_status_int=400)
 
-        error_msg = 'Missing key in handler args: username.'
+        error_msg = (
+            'At \'http://localhost/adminsuperadminhandler\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: username.'
+        )
         self.assertEqual(response['error'], error_msg)
 
     def test_grant_super_admin_privileges_fails_with_invalid_username(
@@ -1177,7 +1205,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response = self.delete_json(
             '/adminsuperadminhandler', params={}, expected_status_int=400)
 
-        error_msg = 'Missing key in handler args: username.'
+        error_msg = (
+            'At \'http://localhost/adminsuperadminhandler\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: username.'
+        )
         self.assertEqual(response['error'], error_msg)
 
     def test_revoke_super_admin_privileges_fails_with_invalid_username(
@@ -1268,6 +1300,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'num_dummy_exps_to_generate\' failed: '
             'Could not convert str to int: invalid_type')
         self.assertEqual(response['error'], error_msg)
@@ -1292,6 +1325,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'num_dummy_exps_to_publish\' failed: '
             'Could not convert str to int: invalid_type')
         self.assertEqual(response['error'], error_msg)
@@ -1318,6 +1352,138 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
                     'num_dummy_exps_to_publish': 3
                 }, csrf_token=csrf_token)
 
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
+        self.logout()
+
+
+class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
+    """Checks the conditions for generation of dummy translation 
+    opportunities."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+
+    def test_admins_can_generate_dummy_translation_opportunities(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_translation_opportunities',
+                'num_dummy_translation_opportunities_to_generate': 10
+            }, csrf_token=csrf_token)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(10)
+        self.assertEqual(len(generated_exps), 10)
+        self.assertEqual(len(published_exps), 10)
+        self.logout()
+
+    def test_admins_can_generate_dummy_translation_opportunities_multiple_times(self) -> None: # pylint: disable=line-too-long
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        for i in range(1, 4):
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_translation_opportunities',
+                    'num_dummy_translation_opportunities_to_generate': 5
+                }, csrf_token=csrf_token)
+            generated_exps = exp_services.get_all_exploration_summaries()
+            published_exps = (
+                exp_services.get_recently_published_exp_summaries(15))
+            self.assertEqual(len(generated_exps), 5 * i)
+            self.assertEqual(len(published_exps), 5 * i)
+        self.logout()
+
+    def test_handler_raises_error_with_non_int_num_dummy_translation_opportunities_to_generate(self) -> None: # pylint: disable=line-too-long
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_translation_opportunities',
+                'num_dummy_translation_opportunities_to_generate': 
+                    'invalid_type'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
+            'Schema validation for '
+            '\'num_dummy_translation_opportunities_to_generate\' '
+            'failed: Could not convert str to int: invalid_type')
+        self.assertEqual(response['error'], error_msg)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
+        self.logout()
+
+    def test_without_num_dummy_exps_generate_dummy_translation_opportunites_action_is_not_performed(self) -> None: # pylint: disable=line-too-long
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'num_dummy_translation_opportunities_to_generate\' must be '
+            'provided when the action is generate_dummy_translation_'
+            'opportunities.'
+        )
+        with assert_raises_regexp_context_manager:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_translation_opportunities',
+                    'num_dummy_translation_opportunities_to_generate': None
+                }, csrf_token=csrf_token)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
+        self.logout()
+
+    def test_cannot_generate_dummy_translation_opportunities_in_production_mode(
+        self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot load new structures data in production.')
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_translation_opportunities',
+                    'num_dummy_translation_opportunities_to_generate': 5
+                }, csrf_token=csrf_token)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
+        self.logout()
+
+    def test_non_admins_cannot_generate_dummy_translation_opportunities(
+        self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'User does not have enough rights to generate data.')
+        with assert_raises_regexp:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_translation_opportunities',
+                    'num_dummy_translation_opportunities_to_generate': 1
+                }, csrf_token=csrf_token)
         generated_exps = exp_services.get_all_exploration_summaries()
         published_exps = exp_services.get_recently_published_exp_summaries(5)
         self.assertEqual(generated_exps, {})
@@ -1441,6 +1607,9 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             params={'filter_criterion': 'invalid', 'username': 'user1'},
             expected_status_int=400)
         error_msg = (
+            'At \'http://localhost/adminrolehandler?'
+            'filter_criterion=invalid&username=user1\' '
+            'these errors are happening:\n'
             'Schema validation for \'filter_criterion\' failed: Received '
             'invalid which is not in the allowed range of choices: '
             '[\'role\', \'username\']')
@@ -1620,6 +1789,44 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
                 'managed_topic_ids': [],
                 'coordinated_language_ids': []
             })
+
+
+class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
+    """Tests for RegenerateTopicSummariesHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+
+    def test_regenerate_topic_summaries(self) -> None:
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.admin_id, name='Topic 1',
+            abbreviated_name='T1', url_fragment='url-frag-one',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_2, self.admin_id, name='Topic 2',
+            abbreviated_name='T2', url_fragment='url-frag-two',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        # Order of function calls in expected_args should not
+        # matter for this test.
+        with self.swap_with_checks(
+                topic_services, 'generate_topic_summary',
+                topic_services.generate_topic_summary,
+                expected_args=[(topic_id_1,), (topic_id_2,)]):
+            self.put_json(
+                feconf.REGENERATE_TOPIC_SUMMARIES_URL, {},
+                csrf_token=csrf_token, expected_status_int=200)
 
 
 class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
@@ -2286,6 +2493,9 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         }
 
         error_msg = (
+            'At \'http://localhost/explorationdataextractionhandler?'
+            'exp_id=exp&exp_version=a&state_name=Introduction&num_answers=0\' '
+            'these errors are happening:\n'
             'Schema validation for \'exp_version\' failed: '
             'Could not convert str to int: a')
         response = self.get_json(
@@ -2393,22 +2603,25 @@ class SendDummyMailTest(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-    def test_send_dummy_mail(self) -> None:
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+    )
+    def test_can_send_dummy_mail(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
+        generated_response = self.post_json(
+            '/senddummymailtoadminhandler', {},
+            csrf_token=csrf_token, expected_status_int=200)
+        self.assertEqual(generated_response, {})
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            generated_response = self.post_json(
-                '/senddummymailtoadminhandler', {},
-                csrf_token=csrf_token, expected_status_int=200)
-            self.assertEqual(generated_response, {})
-
-        with self.swap(feconf, 'CAN_SEND_EMAILS', False):
-            generated_response = self.post_json(
-                '/senddummymailtoadminhandler', {},
-                csrf_token=csrf_token, expected_status_int=400)
-            self.assertEqual(
-                generated_response['error'], 'This app cannot send emails.')
+    def test_cannot_send_dummy_mail(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        generated_response = self.post_json(
+            '/senddummymailtoadminhandler', {},
+            csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            generated_response['error'], 'This app cannot send emails.')
 
 
 class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
@@ -2433,7 +2646,11 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': None},
             csrf_token=csrf_token,
             expected_status_int=400)
-        error_msg = 'Missing key in handler args: new_username.'
+        error_msg = (
+            'At \'http://localhost/updateusernamehandler\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: new_username.'
+        )
         self.assertEqual(response['error'], error_msg)
 
     def test_update_username_with_none_old_username(self) -> None:
@@ -2446,7 +2663,11 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token,
             expected_status_int=400)
-        error_msg = 'Missing key in handler args: old_username.'
+        error_msg = (
+            'At \'http://localhost/updateusernamehandler\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: old_username.'
+        )
         self.assertEqual(response['error'], error_msg)
 
     def test_update_username_with_non_string_new_username(self) -> None:
@@ -2460,7 +2681,10 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
-            response['error'], 'Schema validation for \'new_username\' failed:'
+            response['error'],
+            'At \'http://localhost/updateusernamehandler\' '
+            'these errors are happening:\n'
+            'Schema validation for \'new_username\' failed:'
             ' Expected string, received 123')
 
     def test_update_username_with_non_string_old_username(self) -> None:
@@ -2474,6 +2698,8 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
         error_msg = (
+            'At \'http://localhost/updateusernamehandler\' '
+            'these errors are happening:\n'
             'Schema validation for \'old_username\' failed: Expected'
             ' string, received 123')
         self.assertEqual(response['error'], error_msg)
@@ -2490,6 +2716,8 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
         error_msg = (
+            'At \'http://localhost/updateusernamehandler\' '
+            'these errors are happening:\n'
             'Schema validation for \'new_username\' failed: Validation failed'
             ': has_length_at_most ({\'max_value\': %s}) for object %s'
             % (constants.MAX_USERNAME_LENGTH, long_username))
@@ -2846,7 +3074,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
             expected_status_int=500)
 
         error_msg = (
-            'time data \'05/09/20000, 00:00:00:00\' does not match' +
+            'time data \'05/09/20000, 00:00:00:00\' does not match'
             ' format \'%m/%d/%Y, %H:%M:%S:%f\'')
         self.assertEqual(response['error'], error_msg)
 
@@ -2940,6 +3168,7 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'blog_post_title\' failed: Received %s '
             'which is not in the allowed range of choices: [\'Leading The '
             'Arabic Translations Team\', \'Education\', \'Blog with different'
@@ -2996,4 +3225,7 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             '/interactions', params={},
             expected_status_int=400)
         self.assertEqual(
-            response['error'], 'Missing key in handler args: exp_id.')
+            response['error'],
+            'At \'http://localhost/interactions\' these errors are happening:\n'
+            'Missing key in handler args: exp_id.'
+        )

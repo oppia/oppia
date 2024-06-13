@@ -17,6 +17,7 @@
  */
 
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ReactiveFormsModule, FormsModule} from '@angular/forms';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {
   ComponentFixture,
@@ -109,7 +110,7 @@ describe('Topic editor tab directive', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, FormsModule, ReactiveFormsModule],
       declarations: [
         TopicEditorTabComponent,
         RearrangeSkillsInSubtopicsModalComponent,
@@ -335,11 +336,41 @@ describe('Topic editor tab directive', () => {
   });
 
   it('should get the classroom URL fragment', () => {
-    expect(component.getClassroomUrlFragment()).toEqual('staging');
-    spyOn(topicEditorStateService, 'getClassroomUrlFragment').and.returnValue(
-      'classroom-frag'
-    );
-    expect(component.getClassroomUrlFragment()).toEqual('classroom-frag');
+    expect(component.classroomUrlFragment).toBeNull();
+    topicEditorStateService._updateClassroomUrlFragment('classroom-frag');
+    component.ngOnInit();
+    expect(component.classroomUrlFragment).toEqual('classroom-frag');
+  });
+
+  it('should get the classroom name', () => {
+    expect(component.classroomName).toBeNull();
+    topicEditorStateService._updateClassroomName('classroom-name');
+    component.ngOnInit();
+    expect(component.classroomName).toEqual('classroom-name');
+  });
+
+  it('should get the curriculum admin usernames', () => {
+    expect(component.curriculumAdminUsernames).toEqual([]);
+    topicEditorStateService._updateCurriculumAdminUsernames([
+      'admin1',
+      'admin2',
+    ]);
+    component.ngOnInit();
+    expect(component.curriculumAdminUsernames).toEqual(['admin1', 'admin2']);
+  });
+
+  it('should return true in isAssignedToAClassroom if the topic is assigned to a classroom.', () => {
+    component.classroomName = 'classroom-name';
+    component.classroomUrlFragment = 'classroom-frag';
+
+    expect(component.isAssignedToAClassroom()).toBeTrue();
+  });
+
+  it('should return false in isAssignedToAClassroom if the topic is not assigned to a classroom.', () => {
+    component.classroomName = null;
+    component.classroomUrlFragment = null;
+
+    expect(component.isAssignedToAClassroom()).toBeFalse();
   });
 
   it('should open save changes warning modal before creating skill', () => {
@@ -764,7 +795,7 @@ describe('Topic editor tab directive', () => {
         topicUpdateService,
         'updateDiagnosticTestSkills'
       );
-      component.selectedSkillForDiagnosticTest = skillSummary;
+      component.skillForDiagnosticTestFormControl.setValue(skillSummary);
       component.availableSkillSummariesForDiagnosticTest = [skillSummary];
       component.addSkillForDiagnosticTest();
       tick();
