@@ -178,6 +178,22 @@ def get_classroom_url_fragment_for_topic_id(topic_id: str) -> str:
     return str(constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)
 
 
+def get_classroom_name_for_topic_id(topic_id: str) -> str:
+    """Returns the classroom name for the provided topic id.
+
+    Args:
+        topic_id: str. The topic id.
+
+    Returns:
+        str. Returns the classroom name for a topic.
+    """
+    classrooms = get_all_classrooms()
+    for classroom in classrooms:
+        if topic_id in classroom.get_topic_ids():
+            return classroom.name
+    return str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)
+
+
 def get_new_classroom_id() -> str:
     """Returns a new classroom ID.
 

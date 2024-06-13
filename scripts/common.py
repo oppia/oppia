@@ -213,11 +213,13 @@ CHROME_PATHS = [
 
 ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-admin/assign-roles-to-users-and-change-tag-properties',
+    'blog-editor/create-and-delete-draft-blog-post',
     'blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked',
     'curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill',
     'exploration-editor/create-exploration-and-change-basic-settings',
     'exploration-editor/modify-translations-through-modal',
     'exploration-editor/load-complete-and-restart-exploration-preview',
+    'exploration-editor/save-draft-publish-and-discard-the-changes',
     'logged-out-user/click-all-buttons-on-about-page',
     'logged-out-user/click-all-buttons-on-about-foundation-page',
     'logged-out-user/click-all-buttons-on-donation-thanks-page',
