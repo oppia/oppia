@@ -178,12 +178,14 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             | 'Get users with null bio or bio with length greater than 2000' >>
                 beam.Filter(
                 lambda question_contribution_stat:
-                    question_contribution_stat[1].first_contribution_date is None)
+                    question_contribution_stat[1].first_contribution_date
+                    is None
+                )
         )
 
-        invalid_user_usernames_and_bios_report = (
+        (
             invalid_question_contribution_stats
-            | 'Report info on each invalid question contribution stat' >> beam.Map(
+            | 'Report info on each invalid stat' >> beam.Map(
                 lambda invalid_question_contribution_stat:
                     job_run_result.JobRunResult.as_stderr(
                     'The username of invalid record is "%s"'
