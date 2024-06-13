@@ -22,6 +22,7 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {showMessage} from '../../utilities/common/show-message';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
 import {TopicManager} from '../../utilities/user/topic-manager';
+import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -45,11 +46,13 @@ enum CARD_NAME {
 ConsoleReporter.setConsoleErrorsToIgnore([
   /Occurred at http:\/\/localhost:8181\/story_editor\/[a-zA-Z0-9]+\/.*Cannot read properties of undefined \(reading 'getStory'\)/,
   /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Invalid active state name: null/,
+  new RegExp('Invalid active state name: null'),
 ]);
 
 describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
   let curriculumAdmin: CurriculumAdmin & TopicManager;
+  let releaseCoordinator: ReleaseCoordinator;
   let explorationId: string | null;
   let topicId: string | null;
 
@@ -62,6 +65,16 @@ describe('Exploration Editor', function () {
       'curriculumAdm',
       'curriculum_admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
+    );
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'release_coordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
+
+    // Enable the feature flag
+    await releaseCoordinator.enableFeatureFlag(
+      'exploration_editor_can_modify_translations'
     );
 
     // Navigate to the creator dashboard and create a new exploration.
@@ -96,7 +109,7 @@ describe('Exploration Editor', function () {
       CARD_NAME.TEXT_QUESTION,
       true
     );
-    await explorationEditor.addDefaultResponseFeedback('Wrong.');
+    await explorationEditor.editDefaultResponseFeedback('Wrong.');
     await explorationEditor.addHintToState(
       'It is closer to zero but not a positive number.'
     );
@@ -115,7 +128,7 @@ describe('Exploration Editor', function () {
       CARD_NAME.FINAL_CARD,
       true
     );
-    await explorationEditor.addDefaultResponseFeedback('Wrong.');
+    await explorationEditor.editDefaultResponseFeedback('Wrong.');
     await explorationEditor.addSolutionToState(
       'minus',
       'Minus is the opposite of plus.'
@@ -143,7 +156,14 @@ describe('Exploration Editor', function () {
     }
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
+    topicId = await curriculumAdmin.createTopic(
+      'Test Topic 1',
+      'test-topic-one'
+    );
+    if (!topicId) {
+      throw new Error('Error publishing topic successfully.');
+    }
+
     await curriculumAdmin.createSubtopicForTopic(
       'Test Subtopic 1',
       'test-subtopic-one',
@@ -169,14 +189,6 @@ describe('Exploration Editor', function () {
       explorationId,
       'Test Topic 1'
     );
-
-    topicId = await curriculumAdmin.getTopicId('Test Topic 1');
-    if (!topicId) {
-      throw new Error('Error publishing topic successfully.');
-    }
-
-    await curriculumAdmin.createNewClassroom('Test Class', 'test');
-    await curriculumAdmin.addTopicToClassroom('Test Class', topicId);
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -189,10 +201,133 @@ describe('Exploration Editor', function () {
       await explorationEditor.editTranslationOfContent(
         'de',
         CARD_NAME.INTRODUCTION,
-        'Interaction',
-        'Translation'
+        'Content',
+        'Content translation text'
       );
-      showMessage('explorationEditor is signed up successfully.');
+      await explorationEditor.navigateToEditorTab();
+      await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+      await explorationEditor.updateCardContent('Content text.');
+      await explorationEditor.openModifyExistingTranslationsModal();
+      await explorationEditor.verifyTranslationInModifyTranslationsModal(
+        'de',
+        'Content translation text'
+      );
+      showMessage('The content translation has been verified successfully.');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should show translations of interactions in the modal.',
+    async function () {
+      await explorationEditor.page.bringToFront();
+      await explorationEditor.reloadPage();
+      await explorationEditor.navigateToTranslationsTab();
+      await explorationEditor.editTranslationOfContent(
+        'de',
+        CARD_NAME.TEXT_QUESTION,
+        'Interaction',
+        'Interaction translation text'
+      );
+      await explorationEditor.navigateToEditorTab();
+      await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
+      await explorationEditor.updateTextInputInteraction(
+        'Interaction text content.'
+      );
+      await explorationEditor.openModifyExistingTranslationsModal();
+      await explorationEditor.verifyTranslationInModifyTranslationsModal(
+        'de',
+        'Interaction translation text'
+      );
+      showMessage(
+        'The interaction translation has been verified successfully.'
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should show translations of hints in the modal.',
+    async function () {
+      await explorationEditor.page.bringToFront();
+      await explorationEditor.reloadPage();
+      await explorationEditor.navigateToTranslationsTab();
+      await explorationEditor.editTranslationOfContent(
+        'de',
+        CARD_NAME.MULTIPLE_CHOICE_QUESTION,
+        'Hint',
+        'Hint translation text'
+      );
+      await explorationEditor.navigateToEditorTab();
+      await explorationEditor.navigateToCard(
+        CARD_NAME.MULTIPLE_CHOICE_QUESTION
+      );
+      await explorationEditor.updateHint('Hint content.');
+      await explorationEditor.openModifyExistingTranslationsModal();
+      await explorationEditor.verifyTranslationInModifyTranslationsModal(
+        'de',
+        'Hint translation text'
+      );
+      showMessage('The hint translation has been verified successfully.');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should show translations of solution explanations in the modal.',
+    async function () {
+      await explorationEditor.page.bringToFront();
+      await explorationEditor.reloadPage();
+      await explorationEditor.navigateToTranslationsTab();
+      await explorationEditor.editTranslationOfContent(
+        'de',
+        CARD_NAME.TEXT_QUESTION,
+        'Solution',
+        'Solution explanation translation text'
+      );
+      await explorationEditor.navigateToEditorTab();
+      await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
+      await explorationEditor.updateSolutionExplanation(
+        'Solution explanation.'
+      );
+      await explorationEditor.openModifyExistingTranslationsModal();
+      await explorationEditor.verifyTranslationInModifyTranslationsModal(
+        'de',
+        'Solution explanation translation text'
+      );
+      showMessage(
+        'The solution explanation translation has been verified successfully.'
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should show translations of response feedback in the modal.',
+    async function () {
+      await explorationEditor.page.bringToFront();
+      await explorationEditor.reloadPage();
+      await explorationEditor.navigateToTranslationsTab();
+      await explorationEditor.editTranslationOfContent(
+        'de',
+        CARD_NAME.MULTIPLE_CHOICE_QUESTION,
+        'Feedback',
+        'Response feedback translation text',
+        1
+      );
+      await explorationEditor.navigateToEditorTab();
+      await explorationEditor.navigateToCard(
+        CARD_NAME.MULTIPLE_CHOICE_QUESTION
+      );
+      await explorationEditor.editDefaultResponseFeedback('Feedback content.');
+      await explorationEditor.openModifyExistingTranslationsModal();
+      await explorationEditor.verifyTranslationInModifyTranslationsModal(
+        'de',
+        'Response feedback translation text'
+      );
+      showMessage(
+        'The response feedback translation has been verified successfully.'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

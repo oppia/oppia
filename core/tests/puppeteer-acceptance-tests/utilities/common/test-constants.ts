@@ -78,6 +78,7 @@ export default {
     VolunteerFormShortUrl: 'https://forms.gle/rhFYoLLSFr3JEZHy8',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
     ProfilePagePrefix: 'http://localhost:8181/profile',
+    ReleaseCoordinator: 'http://localhost:8181/release-coordinator',
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
@@ -94,6 +95,7 @@ export default {
     QUESTION_ADMIN: 'question admin',
     VOICEOVER_ADMIN: 'voiceover admin',
     TOPIC_MANAGER: 'topic manager',
+    RELEASE_COORDINATOR: 'release coordinator',
   } as const,
   BlogRights: {
     BLOG_ADMIN: 'BLOG_ADMIN',

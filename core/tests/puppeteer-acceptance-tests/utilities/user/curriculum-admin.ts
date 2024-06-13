@@ -23,7 +23,6 @@ import {showMessage} from '../common/show-message';
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
-const classroomAdminUrl = testConstants.URLs.ClassroomAdmin;
 const baseURL = testConstants.URLs.BaseURL;
 
 const richTextAreaField = 'div.e2e-test-rte';
@@ -132,19 +131,6 @@ const deleteExplorationButton = 'button.e2e-test-delete-exploration-button';
 const confirmDeletionButton =
   'button.e2e-test-really-delete-exploration-button';
 
-const addNewClassroomButton = 'button.e2e-test-add-new-classroom-config';
-const newClassroomNameField = 'textarea.e2e-test-new-classroom-name';
-const newClassroomUrlFragmentField =
-  'textarea.e2e-test-new-classroom-url-fragment';
-const createNewClassroomButton = 'button.e2e-test-create-new-classroom';
-const editClassroomButton = 'i.e2e-test-edit-classroom-config-button';
-const addTopicToClassroomButton =
-  'button.e2e-test-add-topic-to-classroom-button';
-const addTopicToClassroomInput = 'input.e2e-test-add-topic-to-classroom-input';
-const submitTopicIdToClassroomButton =
-  'button.e2e-test-submit-topic-id-to-classroom-button';
-const saveClassroomButton = 'button.e2e-test-save-classroom-config-button';
-
 const mobileOptionsSelector = '.e2e-test-mobile-options-base';
 const mobileTopicSelector = 'div.e2e-test-mobile-topic-name a';
 const mobileSkillSelector = 'span.e2e-test-mobile-skill-name';
@@ -170,42 +156,6 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.bringToFront();
     await this.page.waitForNetworkIdle();
     await this.goto(topicAndSkillsDashboardUrl);
-  }
-
-  /**
-   * Navigate to the classroom admin page.
-   */
-  async navigateToClassroomAdminPage(): Promise<void> {
-    await this.page.bringToFront();
-    await this.page.waitForNetworkIdle();
-    await this.goto(classroomAdminUrl);
-  }
-
-  /**
-   * Create a new classroom.
-   */
-  async createNewClassroom(name: string, urlFragment: string): Promise<void> {
-    await this.navigateToClassroomAdminPage();
-    await this.clickOn(addNewClassroomButton);
-    await this.type(newClassroomNameField, name);
-    await this.type(newClassroomUrlFragmentField, urlFragment);
-    await this.clickOn(createNewClassroomButton);
-  }
-
-  /**
-   * Add a topic with a specific ID to a specific classroom.
-   */
-  async addTopicToClassroom(
-    classroomName: string,
-    topicId: string
-  ): Promise<void> {
-    await this.navigateToClassroomAdminPage();
-    await this.clickOn(classroomName);
-    await this.clickOn(editClassroomButton);
-    await this.clickOn(addTopicToClassroomButton);
-    await this.type(addTopicToClassroomInput, topicId);
-    await this.clickOn(submitTopicIdToClassroomButton);
-    await this.clickOn(saveClassroomButton);
   }
 
   /**
@@ -319,7 +269,7 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Create a topic in the topics-and-skills dashboard.
    */
-  async createTopic(name: string, urlFragment: string): Promise<void> {
+  async createTopic(name: string, urlFragment: string): Promise<string> {
     await this.clickOn('Create Topic');
     await this.type(topicNameField, name);
     await this.type(topicUrlFragmentField, urlFragment);
@@ -344,14 +294,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(topicMetaTagInput, 'meta');
     await this.page.keyboard.press('Tab');
     await this.saveTopicDraft(name);
-  }
-
-  /**
-   * Return the ID of a specific topic from the URL.
-   */
-  async getTopicId(name: string): Promise<string> {
-    await this.openTopicEditor(name);
-    const topicUrl = await this.page.url();
+    const topicUrl = this.page.url();
     let topicId = topicUrl
       .replace(/^.*\/topic_editor\//, '')
       .replace(/#\/.*/, '');

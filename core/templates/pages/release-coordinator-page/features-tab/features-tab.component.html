@@ -1,6 +1,6 @@
 <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
-<div *ngFor="let featureFlag of featureFlags;">
-  <div *ngIf="getFeatureValidOnCurrentServer(featureFlag)" class="container oppia-page-card oppia-long-text oppia-features e2e-test-feature-flag">
+<div *ngFor="let featureFlag of featureFlags; index as index">
+  <div *ngIf="getFeatureValidOnCurrentServer(featureFlag)" class="container oppia-page-card oppia-long-text oppia-features e2e-test-feature-flag e2e-test-feature-flag-{{index}}">
     <h2 class="oppia-feature-name e2e-test-feature-name">{{featureFlag.name}}</h2>
     <div class="row oppia-feature-top-margin">
       <div class="col-2"><b>Description:</b></div>

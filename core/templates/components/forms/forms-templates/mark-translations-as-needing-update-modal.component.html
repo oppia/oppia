@@ -46,6 +46,6 @@
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="removeTranslations()">Remove existing translations</button>
   <button *ngIf="!modifyTranslationsFeatureFlagIsEnabled"class="btn btn-secondary" (click)="markNeedsUpdate()">Mark translations as stale</button>
-  <button *ngIf="modifyTranslationsFeatureFlagIsEnabled" class="btn btn-secondary" (click)="openModifyTranslationsModal()">Modify existing translations</button>
+  <button *ngIf="modifyTranslationsFeatureFlagIsEnabled" class="btn btn-secondary e2e-test-modify-translations-button" (click)="openModifyTranslationsModal()">Modify existing translations</button>
   <button class="btn btn-secondary e2e-test-leave-translations-as-is" (click)="cancel()">Leave as is</button>
 </div>

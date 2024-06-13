@@ -50,6 +50,7 @@ const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
 
+const interactionDiv = '.e2e-test-interaction';
 const multipleChoiceInteractionButton =
   'div.e2e-test-interaction-tile-MultipleChoiceInput';
 const addResponseOptionButton = 'button.e2e-test-add-list-entry';
@@ -77,11 +78,15 @@ const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
 
 const previewTabButton = '.e2e-test-preview-tab';
 const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
+const mainTabButton = '.e2e-test-main-tab';
+const mobileMainTabButton = '.e2e-test-mobile-main-tab';
 const stateEditSelector = '.e2e-test-state-edit-content';
 const stateContentInputField = 'div.e2e-test-rte';
 const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
 const addNewResponseButton = '.e2e-test-add-new-response';
 const floatFormInput = '.e2e-test-float-form-input';
+const modifyExistingTranslationsButton = '.e2e-test-modify-translations-button';
+const activeTranslationTab = '.e2e-test-active-translation-tab';
 
 const stateNodeSelector = '.e2e-test-node-label';
 const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
@@ -114,6 +119,15 @@ const editTranslationSelector = 'div.e2e-test-edit-translation';
 const stateTranslationEditorSelector =
   'div.e2e-test-state-translation-editor schema-based-editor';
 const saveTranslationButton = 'button.e2e-test-save-translation';
+
+const stateSolutionTab = '.e2e-test-oppia-solution-tab';
+const editStateSolutionExplanationSelector =
+  '.e2e-test-edit-solution-explanation';
+const saveSolutionEditButton = 'button.e2e-test-save-solution-explanation-edit';
+
+const stateHintTab = '.e2e-test-hint-tab';
+const editStateHintSelector = '.e2e-test-open-hint-editor';
+const saveHintEditButton = 'button.e2e-test-save-hint-edit';
 
 // For mobile.
 const mobileSettingsBar = 'li.e2e-test-mobile-settings-button';
@@ -338,12 +352,26 @@ export class ExplorationEditor extends BaseUser {
     showMessage('Multiple Choice interaction has been added successfully.');
   }
 
+  /**
+   * Add a text input interaction to the card.
+   */
   async addTextInputInteraction(): Promise<void> {
     await this.clickOn(addInteractionButton);
     await this.page.waitForSelector(textInputInteractionButton, {
       visible: true,
     });
     await this.clickOn(textInputInteractionButton);
+    await this.clickOn(saveInteractionButton);
+  }
+
+  /**
+   * Update the optional text input interaction content.
+   * @param content - The text input interaction content.
+   */
+  async updateTextInputInteraction(content: string): Promise<void> {
+    await this.clickOn(interactionDiv);
+    await this.clickOn('.e2e-test-text-input');
+    await this.type('.e2e-test-text-input', content);
     await this.clickOn(saveInteractionButton);
   }
 
@@ -872,7 +900,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to add feedback for default responses of a state interaction.
    * @param {string} defaultResponseFeedback - The feedback for the default responses.
    */
-  async addDefaultResponseFeedback(
+  async editDefaultResponseFeedback(
     defaultResponseFeedback: string
   ): Promise<void> {
     await this.clickOn(defaultFeedbackTab);
@@ -902,6 +930,17 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Update the solution explanation of the current state card.
+   * @param explanation - Updated solution explanation for the state card.
+   */
+  async updateSolutionExplanation(explanation: string): Promise<void> {
+    await this.clickOn(stateSolutionTab);
+    await this.clickOn(editStateSolutionExplanationSelector);
+    await this.type(stateContentInputField, explanation);
+    await this.clickOn(saveSolutionEditButton);
+  }
+
+  /**
    * Function to add a hint for a state card.
    * @param {string} hint - The hint to be added for the current card.
    */
@@ -909,6 +948,17 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(addHintButton);
     await this.type(stateContentInputField, hint);
     await this.clickOn(saveHintButton);
+  }
+
+  /**
+   * Function to edit a hint for a state card.
+   * @param hint - The updated hint content for the current card.
+   */
+  async updateHint(hint: string): Promise<void> {
+    await this.clickOn(stateHintTab);
+    await this.clickOn(editStateHintSelector);
+    await this.type(stateContentInputField, hint);
+    await this.clickOn(saveHintEditButton);
   }
 
   /**
@@ -936,6 +986,20 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(translationTabButton);
     }
+  }
+
+  /**
+   * Function to navigate to the editor tab.
+   */
+  async navigateToEditorTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOn(mobileMainTabButton);
+    } else {
+      await this.clickOn(mainTabButton);
+    }
+    await this.page.waitForNetworkIdle();
   }
 
   /**
@@ -1136,28 +1200,92 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - Name of the card/state for which the translation is being edited.
    * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
    * @param {string} translation - The translation which will be added for the content.
+   * @param {number} feedbackIndex - The index of the feedback to edit, since multiple feedback responses exist.
    */
   async editTranslationOfContent(
     languageCode: string,
     cardName: string,
     contentType: string,
-    translation: string
+    translation: string,
+    feedbackIndex?: number
   ): Promise<void> {
     await this.select(translationLanguageSelector, languageCode);
     await this.navigateToCard(cardName);
     await this.clickOn(translationModeButton);
-    await this.clickOn(contentType);
+    const activeContentType = await this.page.$eval(activeTranslationTab, el =>
+      el.textContent?.trim()
+    );
+    if (!activeContentType?.includes(contentType)) {
+      showMessage(
+        `Switching content type from ${activeContentType} to ${contentType}`
+      );
+      await this.clickOn(contentType);
+    }
     await this.clickOn(editTranslationSelector);
     switch (contentType) {
       case 'Content':
+      case 'Hint':
+      case 'Solution':
+        await this.clickOn(stateContentInputField);
         await this.type(stateContentInputField, translation);
         break;
       case 'Interaction':
+        await this.clickOn(stateTranslationEditorSelector);
         await this.type(stateTranslationEditorSelector, translation);
-      default:
         break;
+      case 'Feedback':
+        await this.clickOn(`.e2e-test-feedback-${feedbackIndex}`);
+        await this.clickOn(editTranslationSelector);
+        await this.clickOn(stateContentInputField);
+        await this.type(stateContentInputField, translation);
+        break;
+      default:
+        throw new Error(`Invalid content type: ${contentType}`);
     }
     await this.clickOn(saveTranslationButton);
+    await this.page.waitForNetworkIdle();
+  }
+
+  /**
+   * Open the "modify existing translations" modal after editing a piece of content that has already been
+   * translated, when presented with the choices of what shall be done with the translation.
+   */
+  async openModifyExistingTranslationsModal() {
+    await this.page.waitForSelector(modifyExistingTranslationsButton, {
+      visible: true,
+    });
+    await this.clickOn(modifyExistingTranslationsButton);
+    await this.page.waitForNetworkIdle();
+  }
+
+  /**
+   * Verify if a particular translation exists in the translation modification modal after opening it.
+   * @param languageCode - The language code of the translation to check.
+   * @param expectedTranslation - The expected translation for the language to check.
+   */
+  async verifyTranslationInModifyTranslationsModal(
+    languageCode: string,
+    expectedTranslation: string
+  ) {
+    await this.page.waitForSelector(
+      `div.e2e-test-translation-${languageCode}`,
+      {visible: true}
+    );
+
+    const translationElementText = await this.page.evaluate(languageCode => {
+      const element = document.querySelector(
+        `div.e2e-test-translation-${languageCode}`
+      );
+      return element ? element.textContent : null;
+    }, languageCode);
+
+    if (translationElementText === expectedTranslation) {
+      showMessage('The expected translation exists in the modal.');
+    } else {
+      throw new Error(
+        `The expected translation does not exist in the modal. Found "${translationElementText}", expected "${expectedTranslation}"`
+      );
+    }
   }
 }
 
