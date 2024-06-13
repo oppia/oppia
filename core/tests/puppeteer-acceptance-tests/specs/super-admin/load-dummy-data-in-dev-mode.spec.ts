@@ -19,14 +19,13 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {SuperAdmin} from '../../utilities/user/super-admin';
-
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Super Admin', function () {
   let superAdmin: SuperAdmin;
 
   beforeAll(async function () {
-    superAdmin = await UserFactory.createNewSuperAdmin('adminUser');
+    superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   describe('When run in development mode, Super Admin', function () {
@@ -36,7 +35,6 @@ describe('Super Admin', function () {
         pending('Running in production mode');
         return;
       }
-      await superAdmin.navigateToAdminPage();
       await superAdmin.navigateToActivitiesTab();
 
       await superAdmin.reloadExplorations('solar system');

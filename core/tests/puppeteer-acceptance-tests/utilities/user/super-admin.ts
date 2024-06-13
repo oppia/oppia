@@ -21,6 +21,7 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const AdminPageRolesTab = testConstants.URLs.AdminPageRolesTab;
+const AdminPageActivitiesTab = testConstants.URLs.AdminPageActivitiesTab;
 const CommunityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
@@ -29,10 +30,11 @@ const rolesSelectDropdown = 'div.mat-select-trigger';
 const addRoleButton = 'button.oppia-add-role-button';
 const reloadExplorationRowsSelector = '.e2e-test-reload-exploration-row';
 const reloadCollectionsRowsSelector = '.e2e-test-reload-collection-row';
+const topicManagerRole = testConstants.Roles.TOPIC_MANAGER;
 
 export class SuperAdmin extends BaseUser {
-  async navigateToAdminPage(): Promise<void> {
-    await this.goto(testConstants.URLs.AdminPage);
+  async navigateToActivitiesTab(): Promise<void> {
+    await this.goto(AdminPageActivitiesTab);
   }
 
   async navigateToAdminPageRolesTab(): Promise<void> {
@@ -45,7 +47,11 @@ export class SuperAdmin extends BaseUser {
   /**
    * The function to assign a role to a user.
    */
-  async assignRoleToUser(username: string, role: string): Promise<void> {
+  async assignRoleToUser(
+    username: string,
+    role: string,
+    topicName?: string
+  ): Promise<void> {
     await this.goto(AdminPageRolesTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
@@ -62,10 +68,66 @@ export class SuperAdmin extends BaseUser {
           (element as HTMLElement).click()
         );
         await this.page.waitForNetworkIdle();
+        if (role === topicManagerRole) {
+          await this.selectTopicForTopicManagerRole(topicName as string);
+        }
         return;
       }
     }
     throw new Error(`Role ${role} does not exists.`);
+  }
+
+  /**
+   * Selects a topic for the Topic Manager role.
+   * @param {string} topicName - The name of the topic to select.
+   */
+  private async selectTopicForTopicManagerRole(
+    topicName: string
+  ): Promise<void> {
+    await this.page.waitForSelector('.e2e-test-select-topic');
+    const selectElement = await this.page.$('.e2e-test-select-topic');
+    if (!selectElement) {
+      throw new Error('Select element not found');
+    }
+
+    await this.page.waitForSelector('.e2e-test-select-topic option');
+    const optionElements = await selectElement.$$('option');
+    if (!optionElements.length) {
+      throw new Error('No options found in the select element');
+    }
+
+    for (const optionElement of optionElements) {
+      const optionText = await this.page.evaluate(
+        el => el.textContent,
+        optionElement
+      );
+      if (!optionText) {
+        throw new Error('Option text not found');
+      }
+
+      if (optionText.trim() === topicName) {
+        const optionValue = await this.page.evaluate(
+          el => el.value,
+          optionElement
+        );
+        if (!optionValue) {
+          throw new Error('Option value not found');
+        }
+
+        await this.page.select('.e2e-test-select-topic', optionValue);
+        await this.page.waitForSelector('.e2e-test-add-topic-button');
+        const button = await this.page.$('.e2e-test-add-topic-button');
+        if (!button) {
+          throw new Error('Button not found');
+        }
+        await this.waitForElementToBeClickable(button);
+        await button.click();
+
+        return;
+      }
+    }
+
+    throw new Error(`Topic "${topicName}" not found in the options`);
   }
 
   /**
@@ -115,34 +177,41 @@ export class SuperAdmin extends BaseUser {
     await this.goto(currentPageUrl);
   }
 
+  /**
+   * Unassigns a role from a user.
+   * @param {string} username - The username of the user.
+   */
   async unassignRoleFromUser(username: string, role: string): Promise<void> {
+    role = role.replace(/ /g, '-');
     await this.goto(AdminPageRolesTab);
+    await this.page.waitForSelector(roleEditorInputField);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.page.waitForSelector('div.justify-content-between');
-    const userRoleElements = await this.page.$$('.oppia-user-role-description');
-    for (let i = 0; i < userRoleElements.length; i++) {
-      const roleText = await this.page.evaluate(
-        (element: HTMLElement) => element.innerText,
-        userRoleElements[i]
-      );
-      if (roleText.toLowerCase() === role) {
-        const unassignButton = await userRoleElements[i].$(
-          '.oppia-unassign-role-button'
-        );
-        if (unassignButton) {
-          await unassignButton.evaluate(element =>
-            (element as HTMLElement).click()
-          );
-          await this.page.waitForNetworkIdle();
-          return;
-        }
-      }
+    await this.page.waitForSelector(
+      `.e2e-test-${role}-remove-button-container`
+    );
+
+    const deleteRoleButton = await this.page.$(
+      `.e2e-test-${role}-remove-button-container`
+    );
+    if (!deleteRoleButton) {
+      throw new Error(`User does not have the ${role} role!`);
     }
-    throw new Error(`User does not have the ${role} role!`);
+
+    await this.waitForElementToBeClickable(deleteRoleButton);
+    await deleteRoleButton.click();
+    showMessage(`Role ${role} has been removed from user ${username}`);
+    return;
   }
 
+  /**
+   * Selects a role.
+   * @param {string} role - The role to select.
+   */
   async selectRole(role: string): Promise<void> {
+    await this.navigateToAdminPageRolesTab();
+    role = role.replace(/\b\w/g, char => char.toUpperCase());
     await this.clickOn(role);
   }
 
@@ -157,15 +226,7 @@ export class SuperAdmin extends BaseUser {
         throw new Error(`Action ${action} is not allocated to the role`);
       }
     }
-  }
-
-  /**
-   * Function to Navigate to the page of the specified role and opens the list of assigned users.
-   * @param {string} role - The name of the role to view.
-   */
-  async viewUsersAssignedToRole(role: string) {
-    await this.clickOn(role);
-    await this.clickOn(' Assigned users ');
+    showMessage(`${actions} is/are allocated to the role`);
   }
 
   /**
@@ -173,21 +234,24 @@ export class SuperAdmin extends BaseUser {
    * @param {string[]} users - An array of usernames to check.
    */
   async expectRoleToHaveAssignedUsers(users: string[]): Promise<void> {
+    await this.clickOn(' Assigned users ');
+    await this.page.waitForTimeout(2000);
     for (const user of users) {
-      const isActionPresent = await this.isTextPresentOnPage(user);
-      if (!isActionPresent) {
+      const isUserPresent = await this.isTextPresentOnPage(user);
+      if (!isUserPresent) {
         throw new Error(`User ${user} is not assigned to the role`);
       }
     }
+    showMessage(`${users} is/are assigned to the role`);
   }
 
+  /**
+   * Checks if the application is in development mode.
+   * @returns {Promise<boolean>} Returns true if the application is in development mode, false otherwise.
+   */
   async isInDevMode(): Promise<boolean> {
     const prodMode = process.env.PROD_MODE;
-    return prodMode === 'true';
-  }
-
-  async navigateToActivitiesTab(): Promise<void> {
-    await this.clickOn(' Activities ');
+    return prodMode !== 'true';
   }
 
   async reloadExplorations(explorationName: string): Promise<void> {
@@ -227,7 +291,7 @@ export class SuperAdmin extends BaseUser {
     }
   }
 
-  async navigateToCommunityLibrary() {
+  async navigateToCommunityLibrary(): Promise<void> {
     await this.clickOn(CommunityLibraryUrl);
   }
 
@@ -301,7 +365,7 @@ export class SuperAdmin extends BaseUser {
 
   async expectControlsNotAvailable(): Promise<void> {
     const areActivitiesPresent = await this.isTextPresentOnPage(
-      ` The 'Activities' tab is not available in the production environment. `
+      " The 'Activities' tab is not available in the production environment. "
     );
     if (areActivitiesPresent) {
       throw new Error(

@@ -382,11 +382,23 @@ export class BaseUser {
 
   /**
    * This function checks if a particular text exists on the current page.
+   * It keeps checking until the text appears or a timeout occurs.
    * @param {string} text - The text to check for.
    */
   async isTextPresentOnPage(text: string): Promise<boolean> {
-    const pageContent = await this.page.content();
-    return pageContent.includes(text);
+    try {
+      await this.page.waitForFunction(
+        (text: string) => document.documentElement.outerHTML.includes(text),
+        {},
+        text
+      );
+      return true;
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        return false;
+      }
+      throw new Error(`Failed to find text on page: ${error.message}`);
+    }
   }
 
   /**
