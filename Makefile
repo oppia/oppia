@@ -150,7 +150,7 @@ run_tests.check_overall_backend_test_coverage: ## Runs the check for overall bac
 	$(MAKE) stop
 
 run_tests.frontend: ## Runs the frontend unit tests
-	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server
+	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server || $(MAKE) stop
 
 run_tests.typescript: ## Runs the typescript checks
 	docker compose run --no-deps --entrypoint "python -m scripts.run_typescript_checks $(PYTHON_ARGS)" dev-server || $(MAKE) stop
@@ -168,6 +168,8 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 ## Flag for Acceptance tests
 ## suite: The suite to run the acceptance tests
 ## MOBILE: Run acceptance test in mobile viewport.
+	@echo 'Shutting down any previously started server.'
+	$(MAKE) stop
 # Adding node to the path.
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
 		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
@@ -177,6 +179,7 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 # Adding env variable for mobile view
 	@export MOBILE=${MOBILE:-false}
 # Starting the development server for the acceptance tests.
+	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
 	@echo '  Starting acceptance test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
@@ -189,6 +192,7 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	@echo '------------------------------------------------------'
 	@echo '  Acceptance test has been executed successfully....'
 	@echo '------------------------------------------------------'
+	$(MAKE) stop
 
 run_tests.e2e: ## Runs the e2e tests for the parsed suite
 ## Flags for the e2e tests

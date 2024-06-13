@@ -386,6 +386,7 @@
 
 .about-page .oppia-about-cta-donate-button {
   background-color: #00645c;
+  border: none;
   display: flex;
   gap: 10px;
   justify-content: center;

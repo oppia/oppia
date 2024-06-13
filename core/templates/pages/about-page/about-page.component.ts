@@ -127,7 +127,7 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     ],
     mobile: [[0], [1], [2], [3], [4]],
   };
-  screenType: 'desktop' | 'tablet' | 'mobile';
+  screenType!: 'desktop' | 'tablet' | 'mobile';
   showNavigationArrowsForCarousel = false;
 
   constructor(

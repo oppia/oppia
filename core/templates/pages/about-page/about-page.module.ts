@@ -23,8 +23,6 @@ import {AboutPageRoutingModule} from './about-page-routing.module';
 import {CommonModule} from '@angular/common';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {DonationBoxComponent} from 'pages/donate-page/donation-box/donation-box.component';
-import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
 
 @NgModule({
   imports: [
@@ -33,16 +31,7 @@ import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation
     AboutPageRoutingModule,
     NgbModule,
   ],
-  entryComponents: [
-    AboutPageComponent,
-    AboutPageRootComponent,
-    DonationBoxModalComponent,
-  ],
-  declarations: [
-    AboutPageComponent,
-    AboutPageRootComponent,
-    DonationBoxComponent,
-    DonationBoxModalComponent,
-  ],
+  entryComponents: [AboutPageComponent, AboutPageRootComponent],
+  declarations: [AboutPageComponent, AboutPageRootComponent],
 })
 export class AboutPageModule {}

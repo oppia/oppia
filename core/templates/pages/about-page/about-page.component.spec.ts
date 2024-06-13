@@ -25,7 +25,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PrimaryButtonComponent} from '../../components/button-directives/primary-button.component';
-import {EventEmitter} from '@angular/core';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -88,6 +88,7 @@ describe('About Page', () => {
           },
         },
       ],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
@@ -109,18 +110,17 @@ describe('About Page', () => {
     expect(component).toBeDefined();
   });
 
-  it('should subscribe to translate, windowDimenstions service on init', () => {
-    spyOn(component.directiveSubscriptions, 'add');
+  it('should subscribe to translateService, windowDimensionsService on init', () => {
     spyOn(translateService.onLangChange, 'subscribe');
-    spyOn(windowDimensionsService.getResizeEvent(), 'subscribe');
+    const getResizeEventSpy = spyOn(
+      windowDimensionsService,
+      'getResizeEvent'
+    ).and.returnValue({subscribe: jasmine.createSpy()});
 
     component.ngOnInit();
 
-    expect(component.directiveSubscriptions.add).toHaveBeenCalled();
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
-    expect(
-      windowDimensionsService.getResizeEvent().subscribe
-    ).toHaveBeenCalled();
+    expect(getResizeEventSpy().subscribe).toHaveBeenCalled();
   });
 
   it('should initialize with correct screen type and partnerships form link', () => {
@@ -143,17 +143,19 @@ describe('About Page', () => {
     expect(component.screenType).toEqual('tablet');
   });
 
-  it('should set screen type to desktop when window width is greater than or equal to 769', () => {
+  it('should set screen type to desktop when window width is greater than 768', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(800);
     component.setScreenType();
     expect(component.screenType).toEqual('desktop');
   });
 
-  it('should set showNavigationArrowsForCarousel boolean correctly', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(800);
+  it('should set showNavigationArrowsForCarousel to "false" if window width is greater than 640', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(641);
     component.setScreenType();
     expect(component.showNavigationArrowsForCarousel).toBeFalse();
+  });
 
+  it('should set showNavigationArrowsForCarousel to "true" if window width is lesser than 641', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(640);
     component.setScreenType();
     expect(component.showNavigationArrowsForCarousel).toBeTrue();
@@ -218,26 +220,13 @@ describe('About Page', () => {
     const imageExt = 'png';
 
     const expectedImageSet =
-      '/assets/images//about/testImageName1x.png 1x, ' +
-      '/assets/images//about/testImageName15x.png 1.5x, ' +
-      '/assets/images//about/testImageName2x.png 2x';
+      '/assets/images/about/testImageName1x.png 1x, ' +
+      '/assets/images/about/testImageName15x.png 1.5x, ' +
+      '/assets/images/about/testImageName2x.png 2x';
 
     const result = component.getImageSet(imageName, imageExt);
 
     expect(result).toBe(expectedImageSet);
-  });
-
-  it('should register correct event on calling onClickBrowseLibraryButton', () => {
-    spyOn(
-      siteAnalyticsService,
-      'registerClickBrowseLibraryButtonEvent'
-    ).and.callThrough();
-
-    component.onClickBrowseLibraryButton();
-
-    expect(
-      siteAnalyticsService.registerClickBrowseLibraryButtonEvent
-    ).toHaveBeenCalledWith();
   });
 
   it('should show thank you modal on query parameters change', () => {
@@ -280,5 +269,30 @@ describe('About Page', () => {
     component.ngOnDestroy();
 
     expect(component.directiveSubscriptions.closed).toBe(true);
+  });
+
+  it('should register correct event on calling onClickBrowseLibraryButton', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickBrowseLibraryButtonEvent'
+    ).and.callThrough();
+
+    component.onClickBrowseLibraryButton();
+
+    expect(
+      siteAnalyticsService.registerClickBrowseLibraryButtonEvent
+    ).toHaveBeenCalledWith();
+  });
+
+  it('should register correct event on calling onClickVisitClassroomButton', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickVisitClassroomButtonEvent'
+    ).and.callThrough();
+    component.onClickVisitClassroomButton();
+
+    expect(
+      siteAnalyticsService.registerClickVisitClassroomButtonEvent
+    ).toHaveBeenCalledWith();
   });
 });
