@@ -898,7 +898,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to click the dismiss button in the Thanks for Donating page,
    * and check if the Thanks for Donating popup disappears
-   * and if the Donate page is shown
+   * and if the Donate page is shown.
    */
   async clickDismissButtonInThanksForDonatingPage(): Promise<void> {
     await this.clickOn(dismissButton);

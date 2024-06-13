@@ -66,12 +66,12 @@ describe('Voiceover Admin', function () {
       await explorationEditor.navigateToExplorationEditorPage();
       await explorationEditor.dismissWelcomeModal();
 
-      await explorationEditor.createExplorationWithMinimumContent(
+      await explorationEditor.createMinimalExploration(
         'Exploration one',
         INTERACTION_TYPES.END_EXPLORATION
       );
       await explorationEditor.saveExplorationDraft();
-      explorationId = await explorationEditor.publishExplorationWithContent(
+      explorationId = await explorationEditor.publishExplorationWithMetadata(
         'Exploration one',
         'Exploration one',
         'Algebra'
@@ -106,12 +106,12 @@ describe('Voiceover Admin', function () {
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.navigateToExplorationEditorPage();
 
-      await explorationEditor.createExplorationWithMinimumContent(
+      await explorationEditor.createMinimalExploration(
         'Exploration two',
         INTERACTION_TYPES.END_EXPLORATION
       );
       await explorationEditor.saveExplorationDraft();
-      explorationId = await explorationEditor.publishExplorationWithContent(
+      explorationId = await explorationEditor.publishExplorationWithMetadata(
         'Exploration one',
         'Exploration one',
         'Algebra'
