@@ -149,6 +149,14 @@
           "js": ["angular-material.js"]
         }
       },
+      "chartscss": {
+        "version": "1.1.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/ChartsCSS/charts.css/archive/refs/tags/1.1.0.zip",
+        "rootDirPrefix": "charts.css-",
+        "targetDirPrefix": "charts.css-",
+        "files": ["dist/charts.min.css"]
+      },
       "fontAwesome": {
         "version": "5.9.0",
         "downloadFormat": "zip",

@@ -47,8 +47,10 @@
       href="/templates/css/oppia.css">
 
 <!-- Importing the charts.min.css of charts.css library for visualizing the bar-charts in about page -->
-<link rel="stylesheet" type="text/css" media="screen"
-      href="/templates/css/charts.min.css">
+<link rel="preload"
+      href="/third_party/static/charts.css-1.1.0/dist/charts.min.css"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'">
 
 <% if (!htmlWebpackPlugin.options.lightweight) { %>
   <link rel="stylesheet" type="text/css" media="screen"
