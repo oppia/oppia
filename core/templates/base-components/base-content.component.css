@@ -14,6 +14,7 @@
   -webkit-transition: -webkit-transform 0.5s;
   transition: transform 0.5s;
 }
+
 .oppia-base-content-pre-logo-container {
   align-items: center;
   display: flex;
@@ -22,30 +23,36 @@
   transform: translateX(50%);
   width: 20px;
 }
-.navbar-mobile-container {
-  bottom: 0;
-  display: block;
-  position: fixed;
-  right: 0;
-  text-align: right;
-  width: 100%;
-  z-index: 999;
+
+@media (max-width: 600px) {
+  .navbar-mobile-container {
+    bottom: 0;
+    display: block;
+    position: fixed;
+    right: 0;
+    text-align: right;
+    width: 100%;
+    z-index: 999;
+  }
+
+  .navbar-mobile-options {
+    background-color: #e6e6e6;
+    border-top: 1px solid #000;
+  }
+
+  .show-mobile-navbar-icon {
+    background-color: #e6e6e6;
+    border-left: 1.5px solid #000;
+    border-radius: 10px 0;
+    border-top: 1.5px solid #000;
+    color: #000;
+    font-size: 25px;
+    padding: 10px;
+  }
 }
-.navbar-mobile-options {
-  background-color: #e6e6e6;
-  border-top: 1px solid #000;
-}
-.show-mobile-navbar-icon {
-  background-color: #e6e6e6;
-  border-left: 1.5px solid #000;
-  border-radius: 10px 0;
-  border-top: 1.5px solid #000;
-  color: #000;
-  font-size: 25px;
-  padding: 10px;
-}
+
 .oppia-cookie-banner-container {
-  background: rgb(0,0,0,0.9);
+  background: rgb(0, 0, 0, 0.9);
   bottom: 0;
   color: #fff;
   font-family: 'Roboto', Arial, sans-serif;
@@ -54,11 +61,13 @@
   width: 100%;
   z-index: 2000;
 }
+
 .oppia-cookie-banner-explanation a {
   color: #fff;
   font-weight: 600;
   text-decoration: underline;
 }
+
 .oppia-cookie-banner-container .oppia-cookie-banner-explanation /deep/ a {
   color: #aed2e9;
 }
@@ -88,6 +97,7 @@
     padding: 15px 24px 0 24px;
     width: 90vw;
   }
+
   .oppia-cookie-banner-container .oppia-cookie-banner-accept-button {
     float: none;
     margin: 0 auto;
