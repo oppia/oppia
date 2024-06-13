@@ -152,7 +152,13 @@ export class TestToModulesMatcher {
     }
 
     if (!matched) {
-      const errorMessage = `No Angular module found for URL: ${url}`;
+      const errorMessage =
+        `No Angular module found for URL: ${url}. Please ensure ` +
+        'that the URL that is being navigated to is a valid Angular route. If it is ' +
+        'a valid Angular route, please ensure that it is being correctly captured by the ' +
+        'core/tests/test-dependencies/route-to-module-mapping-generator.ts script by ensuring ' +
+        'that the URL is in a routing module or is manually mapped. For more information, ' +
+        'please refer to the documentation here: https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure.';
       if (!this.collectedErrors.includes(errorMessage)) {
         this.collectedErrors.push(errorMessage);
       }
