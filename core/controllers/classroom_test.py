@@ -370,29 +370,6 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         json_response = self.get_json(
             non_existent_classroom_url, expected_status_int=404)
 
-    def test_assigning_private_topic_should_raise_an_exception(
-        self
-    ) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        classroom_handler_url = '%s/%s' % (
-            feconf.CLASSROOM_HANDLER_URL, self.math_classroom_id)
-        csrf_token = self.get_new_csrf_token()
-
-        self.math_classroom_dict['topic_id_to_prerequisite_topic_ids'] = {
-            self.private_topic_id: []
-        }
-
-        response = self.put_json(
-            classroom_handler_url, {
-                'classroom_dict': self.math_classroom_dict
-            }, csrf_token=csrf_token, expected_status_int=400)
-
-        self.assertEqual(
-            response['error'],
-            'Cannot assign a private topic to the classroom.'
-        )
-        self.logout()
-
     def test_assigning_topic_to_multiple_classrooms_should_raise_an_exception(
         self
     ) -> None:
@@ -600,7 +577,7 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
         )
 
 
-class AllPublishedTopicsClassroomInfoHandlerTests(BaseClassroomControllerTests):
+class AllTopicsClassroomInfoHandlerTests(BaseClassroomControllerTests):
 
     def setUp(self) -> None:
         super().setUp()
@@ -612,10 +589,10 @@ class AllPublishedTopicsClassroomInfoHandlerTests(BaseClassroomControllerTests):
             topic_id_to_prerequisite_topic_ids={self.public_topic_id_2: []}
         )
 
-    def test_get_all_published_topics_classroom_info(self) -> None:
+    def test_get_all_topics_classroom_info(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         json_response = self.get_json(
-            feconf.ALL_PUBLISHED_TOPICS_CLASSROOM_INFO_HANDLER_URL
+            feconf.ALL_TOPICS_CLASSROOM_INFO_HANDLER_URL
         )
         expected_response = [
             {
@@ -635,16 +612,21 @@ class AllPublishedTopicsClassroomInfoHandlerTests(BaseClassroomControllerTests):
                 'topic_name': 'public_topic_3_name',
                 'classroom_name': None,
                 'classroom_url_fragment': None
+            },
+            {
+                'topic_id': self.private_topic_id,
+                'topic_name': 'private_topic_name',
+                'classroom_name': None,
+                'classroom_url_fragment': None
             }
         ]
 
         sort_key: Callable[
             [Dict[str, Union[str, None]]], str] = lambda item: item[
                 'topic_name'] or ''
-
         self.assertListEqual(
             sorted(
-                json_response['all_published_topics_classroom_info'],
+                json_response['all_topics_classroom_info'],
                 key=sort_key
             ),
             sorted(expected_response, key=sort_key)

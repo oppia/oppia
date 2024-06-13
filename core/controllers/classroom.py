@@ -275,8 +275,6 @@ class ClassroomHandler(
                 match with the ID given in the classroom payload dict.
             InvalidInputException. A topic can only be assigned to one
                 classroom.
-            InvalidInputException. Private topics cannot be assigned to a
-                classroom.
         """
         assert self.normalized_payload is not None
         classroom = self.normalized_payload['classroom_dict']
@@ -287,7 +285,6 @@ class ClassroomHandler(
                 'given in the classroom payload dict.'
             )
 
-        topic_rights_dicts = topic_fetchers.get_all_topic_rights()
         classrooms = classroom_config_services.get_all_classrooms()
         invalid_topic_ids = [
             topic_id for classroom in classrooms
@@ -301,10 +298,6 @@ class ClassroomHandler(
                 raise self.InvalidInputException(
                     'Topic %s is already assigned to a classroom. A topic '
                     'can only be assigned to one classroom.' % topic_name
-                )
-            if not topic_rights_dicts[topic_id].topic_is_published:
-                raise self.InvalidInputException(
-                    'Cannot assign a private topic to the classroom.'
                 )
 
         classroom_config_services.update_classroom(classroom)
@@ -444,10 +437,10 @@ class NewClassroomHandler(
         })
 
 
-class AllPublishedTopicsClassroomInfoHandler(
+class AllTopicsClassroomInfoHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """return a list of all published topics and their
+    """return a list of all topics and their
     relation with classrooms.
     """
 
@@ -460,31 +453,29 @@ class AllPublishedTopicsClassroomInfoHandler(
         topic_dicts = [
             topic.to_dict() for topic in topic_fetchers.get_all_topics()
         ]
-        topic_rights_dicts = topic_fetchers.get_all_topic_rights()
+
         classrooms = classroom_config_services.get_all_classrooms()
-        published_topics_classroom_info_dicts: Dict[
+        topics_classroom_info_dicts: Dict[
             str, Dict[str, str|None]] = {}
 
         for topic_dict in topic_dicts:
-            if (topic_rights_dicts[topic_dict['id']] and
-                topic_rights_dicts[topic_dict['id']].topic_is_published):
-                published_topics_classroom_info_dicts[topic_dict['id']] = {
-                    'topic_id': topic_dict['id'],
-                    'topic_name': topic_dict['name'],
-                    'classroom_name': None,
-                    'classroom_url_fragment': None
-                }
+            topics_classroom_info_dicts[topic_dict['id']] = {
+                'topic_id': topic_dict['id'],
+                'topic_name': topic_dict['name'],
+                'classroom_name': None,
+                'classroom_url_fragment': None
+            }
 
         for classroom in classrooms:
             for topic_id in classroom.get_topic_ids():
-                published_topics_classroom_info_dicts[topic_id].update({
+                topics_classroom_info_dicts[topic_id].update({
                     'classroom_name': classroom.name,
                     'classroom_url_fragment': classroom.url_fragment
                 })
 
         self.render_json({
-            'all_published_topics_classroom_info': list(
-                published_topics_classroom_info_dicts.values())
+            'all_topics_classroom_info': list(
+                topics_classroom_info_dicts.values())
         })
 
 

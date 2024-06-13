@@ -1082,8 +1082,8 @@ CLASSROOM_ID_TO_NAME_HANDLER_URL = '/classroom_id_to_name_handler'
 UNUSED_TOPICS_HANDLER_URL = '/unused_topics'
 NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 NEW_CLASSROOM_HANDLER_URL = '/classroom_admin/create_new'
-ALL_PUBLISHED_TOPICS_CLASSROOM_INFO_HANDLER_URL = (
-    '/all_published_topics_classroom_info_handler'
+ALL_TOPICS_CLASSROOM_INFO_HANDLER_URL = (
+    '/all_topics_classroom_info_handler'
 )
 ALL_CLASSROOMS_SUMMARY_HANDLER_URL = '/all_classrooms_summary_handler'
 CLASSROOM_HANDLER_URL = '/classroom'

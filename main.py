@@ -484,8 +484,8 @@ URLS = [
         r'%s' % feconf.NEW_CLASSROOM_HANDLER_URL,
         classroom.NewClassroomHandler),
     get_redirect_route(
-        r'%s' % feconf.ALL_PUBLISHED_TOPICS_CLASSROOM_INFO_HANDLER_URL,
-        classroom.AllPublishedTopicsClassroomInfoHandler),
+        r'%s' % feconf.ALL_TOPICS_CLASSROOM_INFO_HANDLER_URL,
+        classroom.AllTopicsClassroomInfoHandler),
     get_redirect_route(
         r'%s' % feconf.ALL_CLASSROOMS_SUMMARY_HANDLER_URL,
         classroom.AllClassroomsSummaryHandler),
