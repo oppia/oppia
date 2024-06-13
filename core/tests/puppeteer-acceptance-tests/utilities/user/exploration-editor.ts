@@ -22,6 +22,7 @@ import {showMessage} from '../common/show-message';
 import {error} from 'console';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
+const baseUrl = testConstants.URLs.BaseURL;
 
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
@@ -961,7 +962,7 @@ export class ExplorationEditor extends BaseUser {
   async playExploration(explorationId: string): Promise<void> {
     await Promise.all([
       this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      this.page.goto(`${baseURL}/explore/${explorationId}`),
+      this.page.goto(`${baseUrl}/explore/${explorationId}`),
     ]);
   }
 
