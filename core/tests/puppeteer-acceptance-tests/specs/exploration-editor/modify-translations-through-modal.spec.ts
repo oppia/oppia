@@ -146,7 +146,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
 
-    explorationId = await explorationEditor.publishExplorationWithContent(
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
       'Test Exploration',
       'This is a test exploration.',
       'Algebra'
