@@ -10,11 +10,11 @@
     },
     {
       "name": "blog-editor/create-and-delete-draft-blog-post",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/create-and-delete-draft-blog-post"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/create-and-delete-draft-blog-post.spec.ts"
     },
     {
-      "name": "curriculum-admin-tests/create-and-publish-topics-and-stories",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-and-publish-topics-and-stories.spec.ts"
+      "name": "curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill.spec.ts"
     },
     {
       "name": "exploration-editor/load-complete-and-restart-exploration-preview",
@@ -35,10 +35,6 @@
     {
       "name": "logged-out-user/click-all-buttons-on-about-foundation-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-about-foundation-page.spec.ts"
-    },
-    {
-      "name": "logged-out-user/click-all-buttons-on-thanks-for-donating-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-thanks-for-donating-page.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-navbar",
@@ -74,7 +70,7 @@
     },
     {
       "name": "logged-out-user/click-all-buttons-on-partnerships-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-partnerships-page"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-partnerships-page.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-teach-page",

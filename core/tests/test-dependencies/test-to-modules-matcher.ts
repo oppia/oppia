@@ -31,7 +31,7 @@ import {glob} from 'glob';
 
 // A mapping of common modules that many tests use, so by default we will exclude them
 // from being collected. Each excluded module also has an array of globs where if specified
-// any file under that golden file under that glob will not be excluded.
+// any golden file under that glob will not be excluded from collecting the module.
 const COMMON_MODULES_TO_EXCLUDE: Record<string, string[]> = {
   'core/templates/pages/splash-page/splash-page.module.ts': [
     'core/tests/test-modules-mappings/acceptance/logged-in-user/set-language-to-rtl-and-navigate-through-site.txt',
