@@ -25,6 +25,7 @@ import {
 } from './search-backend-api.service';
 import {ExplorationSummaryDict} from 'domain/summary/exploration-summary-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
+import {Subject, BehaviorSubject, Observable} from 'rxjs';
 
 export interface SelectionList {
   [key: string]: boolean;
@@ -65,9 +66,50 @@ export class SearchService {
     ExplorationSummaryDict[]
   >();
 
+  private selectionDetailsObs: BehaviorSubject<unknown> =
+    new BehaviorSubject<unknown>(null);
+
   public numSearchesInProgress = 0;
 
+  public selectionDetails: SelectionDetails = {
+    categories: {
+      description: '',
+      itemsName: 'categories',
+      masterList: [], // Should be initialized by the component.
+      selections: {},
+      numSelections: 0,
+      summary: '',
+    },
+    languageCodes: {
+      description: '',
+      itemsName: 'languages',
+      masterList: [], // Should be initialized by the component.
+      selections: {},
+      numSelections: 0,
+      summary: '',
+    },
+  };
+
+  getSelectionDetailsObs(): Observable<unknown> {
+    return this.selectionDetailsObs.asObservable();
+  }
+
+  setSelectionDetails(value: SelectionDetails): void {
+    this.selectionDetails = value;
+    this.selectionDetailsObs.next(value);
+  }
+
+  private searchTrigger = new Subject<void>();
+
   constructor(private _searchBackendApiService: SearchBackendApiService) {}
+
+  // Observable for search trigger.
+  searchTriggered$ = this.searchTrigger.asObservable();
+
+  // Method to trigger search.
+  triggerSearch(): void {
+    this.searchTrigger.next();
+  }
 
   private _getSuffixForQuery(
     selectedCategories: SelectionList,

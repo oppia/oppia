@@ -233,7 +233,7 @@ describe('Search bar component', () => {
       expect(component.selectionDetails.languageCodes.description).toEqual(
         'I18N_LIBRARY_ALL_LANGUAGES_SELECTED'
       );
-      component.selectionDetails = selectionDetailsStub;
+      searchService.selectionDetails = selectionDetailsStub;
       spyOn(translateService, 'instant').and.returnValue('English');
       component.updateSelectionDetails('languageCodes');
       expect(component.selectionDetails.languageCodes.description).toEqual(
@@ -242,10 +242,34 @@ describe('Search bar component', () => {
     }
   );
 
+  it('should be triggered by search service to make a search', () => {
+    spyOn(component, 'onSearchQueryChangeExec');
+    searchService.triggerSearch();
+    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+  });
+
   it('should update selection details if there are no selections', () => {
     spyOn(translateService, 'instant').and.returnValue('key');
     component.updateSelectionDetails('categories');
     expect(component.selectionDetails.categories.numSelections).toEqual(0);
+  });
+
+  it('should toggle selection', () => {
+    spyOn(component, 'updateSelectionDetails');
+    spyOn(component, 'refreshSearchBarLabels');
+    component.toggleSelection('categories', 'id_1');
+    component.toggleSelection('categories', 'id_1');
+    expect(component.updateSelectionDetails).toHaveBeenCalled();
+    expect(component.refreshSearchBarLabels).toHaveBeenCalled();
+  });
+
+  it('should deselectAll', () => {
+    spyOn(component, 'updateSelectionDetails');
+    spyOn(component, 'refreshSearchBarLabels');
+    component.deselectAll('categories');
+    expect(component.selectionDetails.categories.selections).toEqual({});
+    expect(component.updateSelectionDetails).toHaveBeenCalled();
+    expect(component.refreshSearchBarLabels).toHaveBeenCalled();
   });
 
   it('should search', () => {
@@ -274,6 +298,13 @@ describe('Search bar component', () => {
     expect(navigationService.openSubmenu).toHaveBeenCalled();
   });
 
+  it('should update selected details', () => {
+    spyOn(component, 'updateSelectionDetails');
+    searchService.selectionDetails.categories.selections.id_1 = true;
+    component.updateSelectionDetails('categories');
+    expect(component.updateSelectionDetails).toHaveBeenCalled();
+  });
+
   it('should handle menu keypress', () => {
     spyOn(navigationService, 'onMenuKeypress');
     let activeMenuName = 'test_menu';
@@ -285,24 +316,6 @@ describe('Search bar component', () => {
     // @ts-ignore
     component.onMenuKeypress(null, null, null);
     expect(component.activeMenuName).toEqual(activeMenuName);
-  });
-
-  it('should toggle selection', () => {
-    spyOn(component, 'updateSelectionDetails');
-    spyOn(component, 'refreshSearchBarLabels');
-    component.toggleSelection('categories', 'id_1');
-    component.toggleSelection('categories', 'id_1');
-    expect(component.updateSelectionDetails).toHaveBeenCalled();
-    expect(component.refreshSearchBarLabels).toHaveBeenCalled();
-  });
-
-  it('should deselectAll', () => {
-    spyOn(component, 'updateSelectionDetails');
-    spyOn(component, 'refreshSearchBarLabels');
-    component.deselectAll('categories');
-    expect(component.selectionDetails.categories.selections).toEqual({});
-    expect(component.updateSelectionDetails).toHaveBeenCalled();
-    expect(component.refreshSearchBarLabels).toHaveBeenCalled();
   });
 
   it('should handle search query change with language param in URL', () => {
