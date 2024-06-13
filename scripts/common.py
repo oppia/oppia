@@ -237,6 +237,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'translation-admin/add-and-remove-translation-rights',
     'voiceover-admin/add-voiceover-artist-to-an-exploration',
     'super-admin/edit-user-roles',
+    'super-admin/load-dummy-data-in-dev-mode',
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181

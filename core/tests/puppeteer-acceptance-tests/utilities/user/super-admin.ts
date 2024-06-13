@@ -16,9 +16,9 @@
  * @fileoverview Super Admin users utility file.
  */
 
-import { BaseUser } from '../common/puppeteer-utils';
+import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
-import { showMessage } from '../common/show-message';
+import {showMessage} from '../common/show-message';
 
 const AdminPageRolesTab = testConstants.URLs.AdminPageRolesTab;
 const CommunityLibraryUrl = testConstants.URLs.CommunityLibrary;
@@ -181,25 +181,36 @@ export class SuperAdmin extends BaseUser {
     }
   }
 
-  async isInDevMode(): Promise<boolean>{
+  async isInDevMode(): Promise<boolean> {
     const prodMode = process.env.PROD_MODE;
     return prodMode === 'true';
   }
 
-  async navigateToActivitiesTab(): Promise<void>{
+  async navigateToActivitiesTab(): Promise<void> {
     await this.clickOn(' Activities ');
   }
 
-  async reloadExplorations(explorationName: string): Promise<void>{
+  async reloadExplorations(explorationName: string): Promise<void> {
     await this.page.waitForSelector(reloadExplorationRowsSelector);
-    const reloadExplorationRows = await this.page.$$(reloadExplorationRowsSelector);
-    for(let i = 0; i < reloadExplorationRows.length; i++){
-      const explorationNameElement = await reloadExplorationRows[i].$('.e2e-test-reload-exploration-title');
-      const name = await this.page.evaluate(element => element.innerText, explorationNameElement);
-      if(name ===` ${explorationName} `){
-        const reloadButton = await reloadExplorationRows[i].$('.e2e-test-reload-exploration-button');
+    const reloadExplorationRows = await this.page.$$(
+      reloadExplorationRowsSelector
+    );
+    for (let i = 0; i < reloadExplorationRows.length; i++) {
+      const explorationNameElement = await reloadExplorationRows[i].$(
+        '.e2e-test-reload-exploration-title'
+      );
+      const name = await this.page.evaluate(
+        element => element.innerText,
+        explorationNameElement
+      );
+      if (name === ` ${explorationName} `) {
+        const reloadButton = await reloadExplorationRows[i].$(
+          '.e2e-test-reload-exploration-button'
+        );
         if (reloadButton) {
-          await reloadButton.evaluate(element => (element as HTMLElement).click());
+          await reloadButton.evaluate(element =>
+            (element as HTMLElement).click()
+          );
           await this.page.waitForNetworkIdle();
           return;
         }
@@ -207,28 +218,40 @@ export class SuperAdmin extends BaseUser {
     }
   }
 
-  async expectExplorationToBePresent(explorationName: string): Promise<void>{
+  async expectExplorationToBePresent(explorationName: string): Promise<void> {
     await this.type('input.e2e-test-search-input', explorationName);
-    const isExplorationPresent = await this.isTextPresentOnPage(explorationName);
-    if(!isExplorationPresent){
+    const isExplorationPresent =
+      await this.isTextPresentOnPage(explorationName);
+    if (!isExplorationPresent) {
       throw new Error(`Exploration ${explorationName} is not present`);
     }
   }
 
-  async navigateToCommunityLibrary(){
+  async navigateToCommunityLibrary() {
     await this.clickOn(CommunityLibraryUrl);
   }
 
-  async reloadCollections(collectionName: string): Promise<void>{
+  async reloadCollections(collectionName: string): Promise<void> {
     await this.page.waitForSelector(reloadCollectionsRowsSelector);
-    const reloadExplorationRows = await this.page.$$(reloadCollectionsRowsSelector);
-    for(let i = 0; i < reloadExplorationRows.length; i++){
-      const explorationNameElement = await reloadExplorationRows[i].$('.e2e-test-reload-collection-title');
-      const name = await this.page.evaluate(element => element.innerText, explorationNameElement);
-      if(name ===` ${collectionName} `){
-        const reloadButton = await reloadExplorationRows[i].$('.e2e-test-reload-collection-button');
+    const reloadExplorationRows = await this.page.$$(
+      reloadCollectionsRowsSelector
+    );
+    for (let i = 0; i < reloadExplorationRows.length; i++) {
+      const explorationNameElement = await reloadExplorationRows[i].$(
+        '.e2e-test-reload-collection-title'
+      );
+      const name = await this.page.evaluate(
+        element => element.innerText,
+        explorationNameElement
+      );
+      if (name === ` ${collectionName} `) {
+        const reloadButton = await reloadExplorationRows[i].$(
+          '.e2e-test-reload-collection-button'
+        );
         if (reloadButton) {
-          await reloadButton.evaluate(element => (element as HTMLElement).click());
+          await reloadButton.evaluate(element =>
+            (element as HTMLElement).click()
+          );
           await this.page.waitForNetworkIdle();
           return;
         }
@@ -236,37 +259,56 @@ export class SuperAdmin extends BaseUser {
     }
   }
 
-  async expectCollectionToBePresent(collectionName: string): Promise<void>{
+  async expectCollectionToBePresent(collectionName: string): Promise<void> {
     await this.type('input.e2e-test-search-input', collectionName);
     const isCollectionPresent = await this.isTextPresentOnPage(collectionName);
-    if(!isCollectionPresent){
+    if (!isCollectionPresent) {
       throw new Error(`Collection ${collectionName} is not present`);
     }
   }
 
-  async generateAndPublishDummyExplorations(noToGenerate: number, noToPublish: number): Promise<void>{
-    await this.type('.label-target-explorations-to-generate', noToGenerate.toString());
-    await this.type('.label-target-explorations-to-publish', noToPublish.toString());
+  async generateAndPublishDummyExplorations(
+    noToGenerate: number,
+    noToPublish: number
+  ): Promise<void> {
+    await this.type(
+      '.label-target-explorations-to-generate',
+      noToGenerate.toString()
+    );
+    await this.type(
+      '.label-target-explorations-to-publish',
+      noToPublish.toString()
+    );
     await this.clickOn(' Generate Explorations ');
-  
   }
 
-  async expectNoOfExplorationToBePresent(): Promise<void>{
-    const noOfExplorations = await this.page.$('.label-target-no-of-explorations');
-    const noOfExplorationsText = await this.page.evaluate(element => element.innerText, noOfExplorations);
-    if(noOfExplorationsText !== '0'){
+  async expectNoOfExplorationToBePresent(): Promise<void> {
+    const noOfExplorations = await this.page.$(
+      '.label-target-no-of-explorations'
+    );
+    const noOfExplorationsText = await this.page.evaluate(
+      element => element.innerText,
+      noOfExplorations
+    );
+    if (noOfExplorationsText !== '0') {
       throw new Error('No explorations are present');
     }
   }
 
-  async loadDummyNewStructuresData(): Promise<void>{
+  async loadDummyNewStructuresData(): Promise<void> {
     await this.clickOn(' Load Data ');
   }
 
-  async expectNewStructuresToBePresent(): Promise<void>{
-    
+  async expectControlsNotAvailable(): Promise<void> {
+    const areActivitiesPresent = await this.isTextPresentOnPage(
+      ` The 'Activities' tab is not available in the production environment. `
+    );
+    if (areActivitiesPresent) {
+      throw new Error(
+        'Activities tab is present in the production environment'
+      );
+    }
   }
-
 }
 
 export let SuperAdminFactory = (): SuperAdmin => new SuperAdmin();

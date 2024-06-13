@@ -47,7 +47,7 @@ describe('Super Admin', function () {
 
   it(
     'should be able to assign, unassign role and be able to see the' +
-    'allocated actions and assigned users to a role ',
+      'allocated actions and assigned users to a role ',
     async function () {
       await superAdmin.navigateToAdminPage();
       await superAdmin.navigateToRolesTab();
@@ -61,9 +61,9 @@ describe('Super Admin', function () {
 
       await superAdmin.selectRole(ROLES.TOPIC_MANAGER);
       await superAdmin.expectRoleToHaveAllocatedActions([
-        'Edit owned story', 
-        'Edit skill', 
-        'manage question skill status'
+        'Edit owned story',
+        'Edit skill',
+        'manage question skill status',
       ]);
       await superAdmin.viewUsersAssignedToRole(ROLES.TOPIC_MANAGER);
       await superAdmin.expectRoleToHaveAssignedUsers(['guestUser1']);

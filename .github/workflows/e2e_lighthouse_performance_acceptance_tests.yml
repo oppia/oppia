@@ -334,6 +334,7 @@ jobs:
             - translation-admin/add-and-remove-translation-rights
             - voiceover-admin/add-voiceover-artist-to-an-exploration
             - super-admin/edit-user-roles
+            - super-admin/load-dummy-data-in-dev-mode
       steps:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v3

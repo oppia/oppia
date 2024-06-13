@@ -23,65 +23,65 @@ import {SuperAdmin} from '../../utilities/user/super-admin';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Super Admin', function () {
-    let superAdmin: SuperAdmin;
+  let superAdmin: SuperAdmin;
 
-    beforeAll(async function () {
-        superAdmin = await UserFactory.createNewSuperAdmin('adminUser');
-    }, DEFAULT_SPEC_TIMEOUT_MSECS)
+  beforeAll(async function () {
+    superAdmin = await UserFactory.createNewSuperAdmin('adminUser');
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-    describe('When run in development mode, Super Admin', function () {
-        it('should be able to load dummy data', async function () {
-            const isInDevMode = await superAdmin.isInDevMode();
-            if (!isInDevMode) {
-                pending('Running in production mode');
-                return;
-            }
-            await superAdmin.navigateToAdminPage();
-            await superAdmin.navigateToActivitiesTab();
+  describe('When run in development mode, Super Admin', function () {
+    it('should be able to load dummy data', async function () {
+      const isInDevMode = await superAdmin.isInDevMode();
+      if (!isInDevMode) {
+        pending('Running in production mode');
+        return;
+      }
+      await superAdmin.navigateToAdminPage();
+      await superAdmin.navigateToActivitiesTab();
 
-            await superAdmin.reloadExplorations('solar system');
-            await superAdmin.navigateToCommunityLibrary();
-            await superAdmin.expectExplorationToBePresent('solar system');
-            
-            await superAdmin.reloadCollections('welcome to collections');
-            await superAdmin.navigateToCommunityLibrary();
-            await superAdmin.expectCollectionToBePresent('Test Collection');
+      await superAdmin.reloadExplorations('solar system');
+      await superAdmin.navigateToCommunityLibrary();
+      await superAdmin.expectExplorationToBePresent('solar system');
 
-            await superAdmin.generateAndPublishDummyExplorations(2,2);
-            await superAdmin.navigateToCommunityLibrary();
-            await superAdmin.expectNoOfExplorationToBePresent(2);
+      await superAdmin.reloadCollections('welcome to collections');
+      await superAdmin.navigateToCommunityLibrary();
+      await superAdmin.expectCollectionToBePresent('Test Collection');
 
-            await superAdmin.loadDummyNewStructuresData();
-            await superAdmin.navigateToTopicsAndSkillsDashboard();
-            await superAdmin.expectTopic();
+      await superAdmin.generateAndPublishDummyExplorations(2, 2);
+      await superAdmin.navigateToCommunityLibrary();
+      await superAdmin.expectNoOfExplorationToBePresent(2);
 
-            await superAdmin.generateDummySkill();
-            await superAdmin.navigateToTopicsAndSkillsDashboard();
-            await superAdmin.expectSkillToBePresent();
+      await superAdmin.loadDummyNewStructuresData();
+      await superAdmin.navigateToTopicsAndSkillsDashboard();
+      await superAdmin.expectTopic();
 
-            await superAdmin.generateMathClassroom();
-            await superAdmin.expectMathClassroomToBePresentAtTheUrl();
+      await superAdmin.generateDummySkill();
+      await superAdmin.navigateToTopicsAndSkillsDashboard();
+      await superAdmin.expectSkillToBePresent();
 
-            await superAdmin.generateBlogPosts();
-            await superAdmin.navigateToBlogDashboard();
-            await superAdmin.expectBlogPostToBePresent();
-        });
+      await superAdmin.generateMathClassroom();
+      await superAdmin.expectMathClassroomToBePresentAtTheUrl();
+
+      await superAdmin.generateBlogPosts();
+      await superAdmin.navigateToBlogDashboard();
+      await superAdmin.expectBlogPostToBePresent();
     });
+  });
 
-    describe('When run in production mode, Super Admin', function () {
-        it('should not be able to load dummy data', async function () {
-            const isInDevMode = await superAdmin.isInDevMode();
-            if (isInDevMode) {
-                pending('Running in development mode');
-                return;
-            }
-            await superAdmin.navigateToAdminPage();
-            await superAdmin.navigateToActivitiesTab();
-            await superAdmin.expectControlsNotAvailable();
-        });
+  describe('When run in production mode, Super Admin', function () {
+    it('should not be able to load dummy data', async function () {
+      const isInDevMode = await superAdmin.isInDevMode();
+      if (isInDevMode) {
+        pending('Running in development mode');
+        return;
+      }
+      await superAdmin.navigateToAdminPage();
+      await superAdmin.navigateToActivitiesTab();
+      await superAdmin.expectControlsNotAvailable();
     });
+  });
 
-    afterAll(async function () {
-        await UserFactory.closeAllBrowsers();
-    });
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });
