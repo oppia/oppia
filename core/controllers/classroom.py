@@ -414,7 +414,7 @@ class NewClassroomHandler(
         }
     }
 
-    @acl_decorators.can_access_classroom_admin_page
+    @acl_decorators.open_access
     def post(self) -> None:
         """Creates a new classroom.
 
@@ -448,7 +448,7 @@ class AllTopicsClassroomInfoHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_access_classroom_admin_page
+    @acl_decorators.open_access
     def get(self) -> None:
         topic_dicts = [
             topic.to_dict() for topic in topic_fetchers.get_all_topics()

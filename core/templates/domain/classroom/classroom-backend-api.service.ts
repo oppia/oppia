@@ -88,6 +88,29 @@ interface DoesClassroomWithUrlFragmentExistBackendResponse {
   classroom_url_fragment_exists: boolean;
 }
 
+export interface TopicClassroomInfoDict {
+  topic_name: string;
+  topic_id: string;
+  classroom_name: string | null;
+  classroom_url_fragment: string | null;
+}
+
+interface AllTopicsClassroomInfoBackendDict {
+  all_topics_classroom_info: TopicClassroomInfoDict[];
+}
+
+export interface ClassroomSummaryDict {
+  name: string;
+  url_fragment: string;
+  teaser_text: string;
+  thumbnail_filename: string;
+  thumbnail_bg_color: string;
+}
+
+interface AllClassroomsSummaryBackendDict {
+  all_classrooms_summary: ClassroomSummaryDict[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -372,6 +395,44 @@ export class ClassroomBackendApiService {
         .then(
           response => {
             resolve(response.classroom_id);
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error);
+          }
+        );
+    });
+  }
+
+  async getAllTopicsClassroomInfoAsync(): Promise<TopicClassroomInfoDict[]> {
+    return new Promise((resolve, reject) => {
+      const topicsClassroomInfoUrl =
+        ClassroomDomainConstants.ALL_TOPICS_CLASSROOM_INFO_HANDLER_URL;
+
+      this.http
+        .get<AllTopicsClassroomInfoBackendDict>(topicsClassroomInfoUrl)
+        .toPromise()
+        .then(
+          response => {
+            resolve(response.all_topics_classroom_info);
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error);
+          }
+        );
+    });
+  }
+
+  async getAllClassroomsSummaryAsync(): Promise<ClassroomSummaryDict[]> {
+    return new Promise((resolve, reject) => {
+      const topicsClassroomInfoUrl =
+        ClassroomDomainConstants.ALL_CLASSROOMS_SUMMARY_HANDLER_URL;
+
+      this.http
+        .get<AllClassroomsSummaryBackendDict>(topicsClassroomInfoUrl)
+        .toPromise()
+        .then(
+          response => {
+            resolve(response.all_classrooms_summary);
           },
           errorResponse => {
             reject(errorResponse?.error?.error);

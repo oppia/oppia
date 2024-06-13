@@ -1087,7 +1087,6 @@ ALL_TOPICS_CLASSROOM_INFO_HANDLER_URL = (
 )
 ALL_CLASSROOMS_SUMMARY_HANDLER_URL = '/all_classrooms_summary_handler'
 CLASSROOM_HANDLER_URL = '/classroom'
-NEW_CLASSROOM_URL = '/classroom_admin/create_new'
 CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
 CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
 VOICEOVER_ADMIN_DATA_HANDLER_URL = '/voiceover_admin_data_handler'

@@ -135,7 +135,8 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.save_new_valid_classroom(
             topic_id_to_prerequisite_topic_ids={
-                        self.public_topic_id_1: []
+                        self.public_topic_id_1: [],
+                        self.private_topic_id: []
             },
             course_details='Course details for classroom.',
             topic_list_intro='Topics covered for classroom'
@@ -179,11 +180,45 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
                 topic_summary_dict['topic_model_last_updated']),
             'is_published': True
         }
-
+        topic_summary_dict = (
+            topic_fetchers.get_topic_summary_by_id(
+                self.private_topic_id
+            ).to_dict()
+        )
+        private_topic_summary_dict = {
+            'id': topic_summary_dict['id'],
+            'name': topic_summary_dict['name'],
+            'url_fragment': topic_summary_dict['url_fragment'],
+            'language_code': topic_summary_dict['language_code'],
+            'description': topic_summary_dict['description'],
+            'version': topic_summary_dict['version'],
+            'canonical_story_count': (
+                topic_summary_dict['canonical_story_count']),
+            'additional_story_count': (
+                topic_summary_dict['additional_story_count']),
+            'uncategorized_skill_count': (
+                topic_summary_dict['uncategorized_skill_count']),
+            'subtopic_count': topic_summary_dict['subtopic_count'],
+            'total_skill_count': (
+                topic_summary_dict['total_skill_count']),
+            'total_published_node_count': (
+                topic_summary_dict['total_published_node_count']),
+            'thumbnail_filename': (
+                topic_summary_dict['thumbnail_filename']),
+            'thumbnail_bg_color': (
+                topic_summary_dict['thumbnail_bg_color']),
+            'published_story_exploration_mapping': (
+                topic_summary_dict['published_story_exploration_mapping']),
+            'topic_model_created_on': (
+                topic_summary_dict['topic_model_created_on']),
+            'topic_model_last_updated': (
+                topic_summary_dict['topic_model_last_updated']),
+            'is_published': False
+        }
         expected_dict = {
             'name': 'math',
             'topic_summary_dicts': [
-                public_topic_1_summary_dict
+                public_topic_1_summary_dict, private_topic_summary_dict
             ],
             'course_details': 'Course details for classroom.',
             'topic_list_intro': 'Topics covered for classroom'
@@ -630,4 +665,45 @@ class AllTopicsClassroomInfoHandlerTests(BaseClassroomControllerTests):
                 key=sort_key
             ),
             sorted(expected_response, key=sort_key)
+        )
+
+
+class NewClassroomHandlerTests(BaseClassroomControllerTests):
+
+    def test_get_all_topics_classroom_info(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        new_classroom_handler = feconf.NEW_CLASSROOM_HANDLER_URL
+        csrf_token = self.get_new_csrf_token()
+
+        self.post_json(
+            new_classroom_handler, {
+                'name': 'geography',
+                'url_fragment': 'geography'
+            }, csrf_token=csrf_token)
+
+        new_classroom = classroom_config_services.get_classroom_by_url_fragment(
+            'geography'
+        )
+        if new_classroom:
+            self.assertEqual(new_classroom.name, 'geography')
+            self.assertEqual(new_classroom.url_fragment, 'geography')
+            self.assertFalse(new_classroom.is_published)
+
+    def test_fail_to_create_new_classroom_if_validation_fails(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        new_classroom_handler = feconf.NEW_CLASSROOM_HANDLER_URL
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            new_classroom_handler, {
+                'name': '',
+                'url_fragment': 'geography'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'At \'http://localhost/classroom_admin/create_new\' '
+            'these errors are happening:\n'
+            'Schema validation for \'name\' failed: '
+            'Validation failed: is_nonempty ({}) for object '
         )
