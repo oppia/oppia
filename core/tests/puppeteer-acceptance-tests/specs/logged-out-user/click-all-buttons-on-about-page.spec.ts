@@ -67,19 +67,9 @@ describe('Logged-out User in About page', function () {
   );
 
   it(
-    'should open the Partnerships form when the "Partner with us" button is clicked',
+    'should open Community Library page with the Browse Library button.',
     async function () {
-      await loggedOutUser.clickPartnerWithUsButtonInAboutPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open the translated Partnerships form when the "Partner with us" button is clicked after the language change',
-    async function () {
-      await loggedOutUser.clickPartnerWithUsButtonInAboutPageInGivenLanguage(
-        'pt-br'
-      );
+      await loggedOutUser.clickBrowseLibraryButtonInAboutPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -102,9 +92,19 @@ describe('Logged-out User in About page', function () {
   );
 
   it(
-    'should open Community Library page with the Browse Library button.',
+    'should open the Partnerships form when the "Partner with us" button is clicked',
     async function () {
-      await loggedOutUser.clickBrowseLibraryButtonInAboutPage();
+      await loggedOutUser.clickPartnerWithUsButtonInAboutPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should open the translated Partnerships form when the "Partner with us" button is clicked after the language change',
+    async function () {
+      await loggedOutUser.clickPartnerWithUsButtonInAboutPageInGivenLanguage(
+        'pt-br'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
