@@ -26,8 +26,10 @@ import puppeteer, {
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
+import {showMessage} from './show-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
+const baseURL = testConstants.URLs.BaseURL;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
@@ -495,29 +497,48 @@ export class BaseUser {
   }
 
   /**
-   * This function is to click on an element that contains the specific text especially when multiple elements have the same text.
-   * It takes two parameters: parentText and childText.
-   * The function first locates an element that contains the parentText.
-   * Once the parent element is identified, the function then searches within this parent element for a child element that contains the childText.
-   * Upon finding the child element, the function simulates a click event on this child element.
+   * This function checks the exploration accessibility by navigating to the
+   * exploration page based on the explorationID.
    */
-  async clickChildElement(
-    parentText: string,
-    childText: string
+  async expectExplorationToBeAccessibleByUrl(
+    explorationId: string | null
   ): Promise<void> {
-    const parentElement = await this.page.$x(
-      `//*[contains(normalize-space(text()), '${parentText.trim()}')]`
-    );
-    if (parentElement.length === 0) {
-      throw new Error(`No parent element found with the text: ${parentText}`);
+    if (!explorationId) {
+      throw new Error('ExplorationId is null');
     }
-    const childElement = await parentElement[0].$x(
-      `.//*[contains(normalize-space(text()), '${childText.trim()}')]`
-    );
-    if (childElement.length === 0) {
-      throw new Error(`No child element found with the text: ${childText}`);
+    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      showMessage('Exploration is accessible with the URL, i.e. published.');
+    } catch (error) {
+      throw new Error('The exploration is not public.');
     }
-    await childElement[0].click();
+  }
+
+  /**
+   * This function checks the exploration inaccessibility by navigating to the
+   * exploration page based on the explorationID.
+   */
+  async expectExplorationToBeNotAccessibleByUrl(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('ExplorationId is null');
+    }
+    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      throw new Error('The exploration is still public.');
+    } catch (error) {
+      showMessage('The exploration is not accessible with the URL.');
+    }
+  }
+
+  /**
+   * Waits for the page to fully load by checking the document's ready state.
+   */
+  async waitForPageToFullyLoad(): Promise<void> {
+    await this.page.waitForFunction('document.readyState === "complete"');
   }
 }
 

@@ -148,6 +148,60 @@ ARABIC_BLOG_POST_CONTENT = """
     </ul>
 """
 
+SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict({
+    'id': '%s',
+    'title': 'Dummy Exploration',
+    'category': 'Algorithms',
+    'author_notes': '',
+    'blurb': '',
+    'states_schema_version': 55,
+    'init_state_name': 'Introduction',
+    'language_code': 'en',
+    'objective': 'Learn the exploration',
+    'param_changes': [],
+    'param_specs': {},
+    'tags': ['exploration'],
+    'auto_tts_enabled': False,
+    'next_content_id_index': 2,
+    'edits_allowed': True,
+    'states': {
+        'Introduction': {
+            'content': {
+                'content_id': 'content_0',
+                'html': 'Congratulations, you have finished!'
+            },
+            'param_changes': [],
+            'interaction': {
+                'id': 'EndExploration',
+                'customization_args': {
+                    'recommendedExplorationIds': {
+                        # Here we use MyPy ignore because the value of 'value'
+                        # is a List[Any] empty list as it is the EndExploration,
+                        # but the type of 'value' is defined as
+                        # Dict[str, UnionOfCustomizationArgsDictValues].
+                        'value': [] # type: ignore[dict-item]
+                    }
+                },
+                'answer_groups': [],
+                'default_outcome': None,
+                'confirmed_unclassified_answers': [],
+                'hints': [],
+                'solution': None
+            },
+            'classifier_model_id': None,
+            'linked_skill_id': None,
+            'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                    'content_0': {}
+                }
+            },
+        'solicit_answer_details': False,
+        'card_is_checkpoint': True,
+        }
+    },
+    'version': 3
+})
+
 
 class ClassroomPageDataDict(TypedDict):
     """Dict representation of classroom page's data dictionary."""
@@ -169,6 +223,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     collection_id: Optional[str]
     num_dummy_exps_to_generate: Optional[int]
     num_dummy_exps_to_publish: Optional[int]
+    num_dummy_translation_opportunities_to_generate: Optional[int]
     data: Optional[str]
     topic_id: Optional[str]
     platform_param_name: Optional[str]
@@ -194,7 +249,9 @@ class AdminHandler(
                     'type': 'basestring',
                     'choices': [
                         'reload_exploration', 'reload_collection',
-                        'generate_dummy_explorations', 'clear_search_index',
+                        'generate_dummy_explorations',
+                        'generate_dummy_translation_opportunities',
+                        'clear_search_index',
                         'generate_dummy_new_structures_data',
                         'generate_dummy_new_skill_data',
                         'generate_dummy_blog_post',
@@ -229,6 +286,12 @@ class AdminHandler(
                 'default_value': None
             },
             'num_dummy_exps_to_publish': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': None
+            },
+            'num_dummy_translation_opportunities_to_generate': {
                 'schema': {
                     'type': 'int'
                 },
@@ -347,6 +410,9 @@ class AdminHandler(
                 the action is generate_dummy_explorations.
             Exception. The num_dummy_exps_to_publish must be provided when
                 the action is generate_dummy_explorations.
+            Exception. The num_dummy_translation_opportunities_to_generate
+                must be provided when the action is 
+                generate_dummy_translation_opportunities.
             InvalidInputException. Generate count cannot be less than publish
                 count.
             Exception. The data must be provided when the action is
@@ -406,8 +472,23 @@ class AdminHandler(
 
                 self._generate_dummy_explorations(
                     num_dummy_exps_to_generate, num_dummy_exps_to_publish)
+            elif action == 'generate_dummy_translation_opportunities':
+                num_dummy_translation_opportunities_to_generate = (
+                    self.normalized_payload.get(
+                        'num_dummy_translation_opportunities_to_generate'))
+                if num_dummy_translation_opportunities_to_generate is None:
+                    raise Exception(
+                        'The '
+                        '\'num_dummy_translation_opportunities_to_generate\' '
+                        'must be provided when the action is '
+                        'generate_dummy_translation_opportunities.'
+                    )
+
+                self._generate_dummy_translation_opportunities(
+                    num_dummy_translation_opportunities_to_generate)
             elif action == 'generate_dummy_blog_post':
-                blog_post_title = self.normalized_payload.get('blog_post_title')
+                blog_post_title = self.normalized_payload.get(
+                    'blog_post_title')
                 if blog_post_title is None:
                     raise Exception(
                         'The \'blog_post_title\' must be provided when the'
@@ -976,6 +1057,242 @@ class AdminHandler(
                 exploration_ids_to_publish)
         else:
             raise Exception('Cannot generate dummy explorations in production.')
+
+    def _generate_dummy_translation_opportunities(
+        self, num_dummy_translation_opportunities_to_generate: int
+    ) -> None:
+        """Loads the database with a topic, a story
+        and a skill in the topic (and skill in a subtopic) and 3 questions
+        attached to the skill. Generates dummy explorations to be added to the
+        story.
+
+        Raises:
+            Exception. Cannot load new structures data in production mode.
+            Exception. User does not have enough rights to generate data.
+        """
+        assert self.user_id is not None
+        if constants.DEV_MODE:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
+                raise Exception(
+                    'User does not have enough rights to generate data.')
+            logging.info(
+                '[ADMIN] %s generated %s number of dummy '
+                'translation opportunities (explorations)' % 
+                (self.user_id, num_dummy_translation_opportunities_to_generate)
+            )
+
+            # Generate a new topic, story, skill and questions id.
+            topic_id = 'dummyTopicId'
+            story_id = 'dummyStoryId'
+            skill_id = 'dummySkillId'
+
+            question_id_1 = 'dummyQuestionId1'
+            question_id_2 = 'dummyQuestionId2'
+            question_id_3 = 'dummyQuestionId3'
+
+            initial_dummy_opportunites_generation = (
+                skill_services.does_skill_with_description_exist(
+                'Dummy Skill 1') is False)
+
+            if initial_dummy_opportunites_generation:
+                skill = self._create_dummy_skill(
+                    skill_id, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>')
+                question_1 = self._create_dummy_question(
+                    question_id_1, 'Question 1', [skill_id])
+                question_2 = self._create_dummy_question(
+                    question_id_2, 'Question 2', [skill_id])
+                question_3 = self._create_dummy_question(
+                    question_id_3, 'Question 3', [skill_id])
+                story = story_domain.Story.create_default_story(
+                    story_id, 'Dummy Story', 'Description',
+                    topic_id, 'dummy-story')
+
+                question_services.add_question(self.user_id, question_1)
+                question_services.add_question(self.user_id, question_2)
+                question_services.add_question(self.user_id, question_3)
+
+                question_services.create_new_question_skill_link(
+                    self.user_id, question_id_1, skill_id, 0.3)
+                question_services.create_new_question_skill_link(
+                    self.user_id, question_id_2, skill_id, 0.3)
+                question_services.create_new_question_skill_link(
+                    self.user_id, question_id_3, skill_id, 0.3)
+                topic = topic_domain.Topic.create_default_topic(
+                    topic_id, 'Dummy Topic 1', 'dummy-topic-one', 'description',
+                    'fragm')
+                topic.update_meta_tag_content('dummy-meta')
+                raw_image = b''
+                with open(
+                    'core/tests/data/thumbnail.svg', 'rt',
+                    encoding='utf-8') as svg_file:
+                    svg_file_content = svg_file.read()
+                    raw_image = svg_file_content.encode('ascii')
+                fs_services.save_original_and_compressed_versions_of_image(
+                    'thumbnail.svg', feconf.ENTITY_TYPE_TOPIC, topic_id,
+                    raw_image, 'thumbnail', False)
+                topic_services.update_thumbnail_filename(
+                    topic, 'thumbnail.svg')
+                topic.update_thumbnail_bg_color('#C6DCDA')
+                topic.add_canonical_story(story_id)
+                topic.add_uncategorized_skill_id(skill_id)
+                topic.update_skill_ids_for_diagnostic_test([skill_id])
+                topic.add_subtopic(1, 'Dummy Subtopic Title', 'dummysubtopic')
+                topic_services.update_subtopic_thumbnail_filename(
+                    topic, 1, 'thumbnail.svg')
+                topic.update_subtopic_thumbnail_bg_color(
+                    1, constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])
+                topic.move_skill_id_to_subtopic(None, 1, skill_id)
+
+                subtopic_page = (
+                    subtopic_page_domain.SubtopicPage
+                    .create_default_subtopic_page(1, topic_id))
+            else:
+                skill = skill_services.skill_fetchers.get_skill_by_id(skill_id)
+                question_1 = question_services.get_question_by_id(question_id_1)
+                question_2 = question_services.get_question_by_id(question_id_2)
+                question_3 = question_services.get_question_by_id(question_id_3)
+                story = story_services.story_fetchers.get_story_by_id(story_id)
+
+            # Generating the explorations to be added to the story.
+            exploration_ids_to_publish = []
+            story_node_dicts = []
+            exp_counter = len(story.story_contents.nodes)
+
+            for i in range(num_dummy_translation_opportunities_to_generate):
+                exp_counter += 1
+                title = 'Dummy Exploration %s' % str(exp_counter)
+                category = 'Astronomy'
+                new_exploration_id = exp_fetchers.get_new_exploration_id()
+                exploration_dict = SAMPLE_EXPLORATION_DICT
+                exploration_dict['id'] = new_exploration_id
+                exploration_dict['title'] = title
+                exploration_dict['category'] = category
+                exploration = exp_domain.Exploration.from_dict(
+                    exploration_dict)
+                exp_services.save_new_exploration(self.user_id, exploration)
+                exploration_ids_to_publish.append(new_exploration_id)
+                rights_manager.publish_exploration(
+                    self.user, new_exploration_id)
+                story_node_dict = {
+                    'exp_id': new_exploration_id,
+                    'title': title,
+                    'description': 'Description'
+                }
+                story_node_dicts.append(story_node_dict)
+            exp_services.index_explorations_given_ids(
+                exploration_ids_to_publish)
+
+            def generate_dummy_story_nodes(
+                node_id: int, stop_update: bool, exp_id: str,
+                title: str, description: str
+            ) -> None:
+                """Generates and connects sequential story nodes.
+
+                Args:
+                    node_id: int. The node id.
+                    exp_id: str. The exploration id.
+                    title: str. The title of the story node.
+                    description: str. The description of the story node.
+                    stop_update: bool. Flag to update the node destination
+                        node id.
+                """
+                assert self.user_id is not None
+                if initial_dummy_opportunites_generation:
+                    story.add_node(
+                        '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                        title)
+                    story.update_node_description(
+                        '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                        description)
+                    story.update_node_exploration_id(
+                        '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
+
+                    if stop_update is False:
+                        story.update_node_destination_node_ids(
+                            '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                            ['%s%d' % (
+                                story_domain.NODE_ID_PREFIX, node_id + 1)])
+                else:
+                    change_list = [
+                        story_domain.StoryChange({
+                            'cmd': 'add_story_node',
+                            'node_id': '%s%d' % (
+                                story_domain.NODE_ID_PREFIX, node_id),
+                            'title': title,
+                        }),
+                        story_domain.StoryChange({
+                            'cmd': 'update_story_node_property',
+                            'node_id': '%s%d' % (
+                                story_domain.NODE_ID_PREFIX, node_id),
+                            'property_name': '%s' % (
+                                story_domain.STORY_NODE_PROPERTY_DESCRIPTION),
+                            'old_value': None,
+                            'new_value': description
+                        }),
+                        story_domain.StoryChange({
+                            'cmd': 'update_story_node_property',
+                            'node_id': '%s%d' % (
+                                story_domain.NODE_ID_PREFIX, node_id),
+                            'property_name': '%s' % (
+                                story_domain
+                                .STORY_NODE_PROPERTY_EXPLORATION_ID),
+                            'old_value': None,
+                            'new_value': exp_id
+                        })
+                    ]
+                    story_services.update_story(
+                        self.user_id, story_id, change_list, 'Added story node'
+                    )
+
+                exp_services.update_exploration(
+                    self.user_id, exp_id, [exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'category',
+                        'new_value': 'Astronomy'
+                    })], 'Change category')
+
+            story_node_index = 0
+            if story.story_contents is not None:
+                story_node_index = int(
+                    story.story_contents.next_node_id[5:]) - 1
+            if story_node_index > 0:
+                story.update_node_destination_node_ids(
+                    '%s%d' % (
+                        story_domain.NODE_ID_PREFIX, story_node_index),
+                    [story.story_contents.next_node_id])
+            for i, story_node_dict in enumerate(story_node_dicts):
+                story_node_index += 1
+                stop_update = i is len(story_node_dicts) - 1
+                generate_dummy_story_nodes(
+                    story_node_index, stop_update, **story_node_dict)
+
+            if initial_dummy_opportunites_generation:
+                skill_services.save_new_skill(self.user_id, skill)
+                story_services.save_new_story(self.user_id, story)
+                topic_services.save_new_topic(self.user_id, topic)
+                subtopic_page_services.save_subtopic_page(
+                    self.user_id, subtopic_page, 'Added subtopic',
+                    [topic_domain.TopicChange({
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': 1,
+                        'title': 'Dummy Subtopic Title',
+                        'url_fragment': 'dummy-subtopic-fragment'
+                    })]
+                )
+
+            # Generates translation opportunities for the
+            # Contributor Dashboard.
+            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
+            exp_ids_in_story = exploration_ids_to_publish
+            opportunity_services.add_new_exploration_opportunities(
+                story_id, exp_ids_in_story)
+
+            topic_services.publish_story(topic_id, story_id, self.user_id)
+
+            if initial_dummy_opportunites_generation:
+                topic_services.publish_topic(topic_id, self.user_id)
+        else:
+            raise Exception('Cannot load new structures data in production.')
 
     def _generate_dummy_classroom(self) -> None:
         """Generate and loads the database with a classroom.
