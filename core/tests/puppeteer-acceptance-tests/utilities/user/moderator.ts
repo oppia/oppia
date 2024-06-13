@@ -278,7 +278,7 @@ export class Moderator extends BaseUser {
     if (!explorationId) {
       throw new Error('Invalid exploration ID');
     }
-
+    await this.page.reload();
     await this.navigateToFeaturedActivitiesTab();
     await this.page.waitForSelector(featuredActivityRowSelector, {
       visible: true,
@@ -292,12 +292,10 @@ export class Moderator extends BaseUser {
 
     for (const row of rows) {
       showMessage('Test: entered the loop');
-      await row.waitForSelector('schema-based-unicode-editor', {visible: true});
-      const schemaBasedUnicodeEditor = await row.$(
-        'schema-based-unicode-editor'
-      );
+      await row.waitForSelector('schema-based-editor', {visible: true});
+      const schemaBasedEditor = await row.$('schema-based-editor');
 
-      if (!schemaBasedUnicodeEditor) {
+      if (!schemaBasedEditor) {
         throw new Error('Schema-based Unicode editor not found');
       }
 
@@ -307,7 +305,7 @@ export class Moderator extends BaseUser {
           return value !== null ? value : false;
         },
         {},
-        schemaBasedUnicodeEditor
+        schemaBasedEditor
       );
 
       const modelValue = await modelValueHandle.jsonValue();
