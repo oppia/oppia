@@ -26,6 +26,8 @@ const aboutUrl = testConstants.URLs.About;
 const mathClassroomUrl = testConstants.URLs.MathClassroom;
 const androidUrl = testConstants.URLs.Android;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
+const creatorDashboardCreateModeUrl =
+  testConstants.URLs.CreatorDashboardCreateMode;
 const aboutFoundationUrl = testConstants.URLs.AboutFoundation;
 const blogUrl = testConstants.URLs.Blog;
 const partnershipsUrl = testConstants.URLs.Partnerships;
