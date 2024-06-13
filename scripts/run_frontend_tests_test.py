@@ -264,7 +264,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return 'file3.ts'
             return None
         get_remote_name_swap = self.swap(
-            git_changes_utils, 'get_remote_name', mock_get_remote_name)
+            git_changes_utils, 'get_local_git_repository_remote_name',
+            mock_get_remote_name)
         get_refs_swap = self.swap(
             git_changes_utils, 'get_refs', mock_get_refs)
         get_changed_files_swap = self.swap_with_checks(
@@ -294,7 +295,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         def mock_get_remote_name() -> bytes:
             return b''
         get_remote_name_swap = self.swap(
-            git_changes_utils, 'get_remote_name', mock_get_remote_name)
+            git_changes_utils, 'get_local_git_repository_remote_name',
+            mock_get_remote_name)
 
         with self.swap_success_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:

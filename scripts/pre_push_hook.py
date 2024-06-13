@@ -307,7 +307,7 @@ def main(args: Optional[List[str]] = None) -> None:
         install_hook()
         return
 
-    remote = git_changes_utils.get_remote_name()
+    remote = git_changes_utils.get_local_git_repository_remote_name()
     remote = remote if remote else parsed_args.remote
     refs = git_changes_utils.get_refs()
     collected_files = git_changes_utils.get_changed_files(

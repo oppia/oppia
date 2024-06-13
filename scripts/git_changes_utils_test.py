@@ -83,7 +83,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 return process_for_remote
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap:
-            self.assertEqual(git_changes_utils.get_remote_name(), b'upstream')
+            self.assertEqual(
+                git_changes_utils.get_local_git_repository_remote_name(),
+                b'upstream'
+            )
 
     def test_get_remote_name_with_error_in_obtaining_remote(self) -> None:
         def mock_communicate() -> Tuple[bytes, bytes]:
@@ -101,7 +104,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
 
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap, self.assertRaisesRegex(ValueError, 'test_oppia_error'):
-            git_changes_utils.get_remote_name()
+            git_changes_utils.get_local_git_repository_remote_name()
 
     def test_get_remote_name_with_error_in_obtaining_remote_url(self) -> None:
         def mock_communicate() -> Tuple[str, str]:
@@ -126,7 +129,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         with communicate_swap:
             with popen_swap:
                 with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
-                    git_changes_utils.get_remote_name()
+                    git_changes_utils.get_local_git_repository_remote_name()
 
     def test_get_remote_name_with_no_remote_set(self) -> None:
         process_for_remote = subprocess.Popen(
@@ -159,7 +162,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             '2b. If upstream is not listed in the command output, then run the '
             'command \'git remote add upstream '
             'https://github.com/oppia/oppia.git\'\n'):
-            git_changes_utils.get_remote_name()
+            git_changes_utils.get_local_git_repository_remote_name()
 
     def test_get_remote_name_with_multiple_remotes_set(self) -> None:
         process_for_remote = subprocess.Popen(
@@ -182,7 +185,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 return process_for_remote
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap, self.print_swap:
-            self.assertIsNone(git_changes_utils.get_remote_name())
+            self.assertIsNone(
+                git_changes_utils.get_local_git_repository_remote_name())
         self.assertTrue(
             'Warning: Please keep only one remote branch for '
             'oppia:develop.\n' in self.print_arr)

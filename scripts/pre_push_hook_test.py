@@ -98,7 +98,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
             mock_check_backend_python_library_for_inconsistencies)
         self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         self.get_remote_name_swap = self.swap(
-            git_changes_utils, 'get_remote_name', mock_get_remote_name)
+            git_changes_utils, 'get_local_git_repository_remote_name',
+            mock_get_remote_name)
         self.get_refs_swap = self.swap(
             git_changes_utils, 'get_refs', mock_get_refs)
         self.get_changed_files_swap = self.swap(

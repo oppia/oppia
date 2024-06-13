@@ -39,7 +39,7 @@ def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
     return out, err
 
 
-def get_remote_name() -> Optional[bytes]:
+def get_local_git_repository_remote_name() -> Optional[bytes]:
     """Get the remote name of the local repository.
 
     Returns:
@@ -93,8 +93,8 @@ def get_remote_name() -> Optional[bytes]:
 
 
 def git_diff_name_status(
-    left: str = '', right: str = '',
-    diff_filter: str = ''
+    left: Optional[str] = None, right: Optional[str] = None,
+    diff_filter: Optional[str] = None
 ) -> List[FileDiff]:
     """Compare two branches/commits with git.
 

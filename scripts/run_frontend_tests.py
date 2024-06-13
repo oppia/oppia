@@ -182,7 +182,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 specs_to_run.append(spec_file)
 
     if parsed_args.run_on_changed_files:
-        remote = git_changes_utils.get_remote_name()
+        remote = git_changes_utils.get_local_git_repository_remote_name()
         if not remote:
             sys.exit('Error: No remote repository found.')
         refs = git_changes_utils.get_refs()
