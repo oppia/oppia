@@ -193,7 +193,6 @@
 /.prettierrc.json @oppia/dev-workflow-reviewers
 /.pylintrc @oppia/dev-workflow-reviewers
 /.stylelintrc @oppia/dev-workflow-reviewers
-/.stylelintignore @oppia/dev-workflow-reviewers
 /.yarnrc @oppia/dev-workflow-reviewers
 /app_dev_docker.yaml @oppia/dev-workflow-reviewers
 /docker-compose.yml @oppia/dev-workflow-reviewers
@@ -339,7 +338,6 @@
 # Global stylesheet.
 /core/templates/css/oppia.css @oppia/lace-frontend-reviewers
 /core/templates/css/oppia-material.css @oppia/lace-frontend-reviewers
-/core/templates/css/charts.min.css @oppia/lace-frontend-reviewers
 
 
 # Interaction project.
