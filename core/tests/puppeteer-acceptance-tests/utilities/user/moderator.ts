@@ -1,7 +1,7 @@
 // Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
+// you may not use this file except in compliance with the Licensep
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -317,7 +317,6 @@ export class Moderator extends BaseUser {
         }
         await this.waitForElementToBeClickable(deleteButton);
         await deleteButton.click();
-        console.log('Clicked on delete button');
         break;
       }
     }
