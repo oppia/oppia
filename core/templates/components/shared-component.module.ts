@@ -96,6 +96,7 @@ import {DisplaySolutionInterstititalModalComponent} from 'pages/exploration-play
 import {DisplayHintModalComponent} from 'pages/exploration-player-page/modals/display-hint-modal.component';
 import {HintAndSolutionButtonsComponent} from './button-directives/hint-and-solution-buttons.component';
 import {SearchBarModule} from 'pages/library-page/search-bar/search-bar.module';
+import {SearchSelectorsModule} from 'pages/library-page/search-selectors/search-selectors.module';
 import {SubtopicSummaryTileComponent} from './summary-tile/subtopic-summary-tile.component';
 import {FilteredChoicesFieldComponent} from './filter-fields/filtered-choices-field/filtered-choices-field.component';
 import {MultiSelectionFieldComponent} from './filter-fields/multi-selection-field/multi-selection-field.component';
@@ -212,6 +213,7 @@ import {DirectivesModule} from 'directives/directives.module';
     OppiaCkEditor4Module,
     RichTextComponentsModule,
     SearchBarModule,
+    SearchSelectorsModule,
     SharedFormsModule,
     JoyrideModule.forRoot(),
     RecommendationsModule,
@@ -513,6 +515,7 @@ import {DirectivesModule} from 'directives/directives.module';
     ObjectComponentsModule,
     OppiaCkEditor4Module,
     SearchBarModule,
+    SearchSelectorsModule,
     SharedFormsModule,
     StringUtilityPipesModule,
     // Components, directives, and pipes.
