@@ -414,7 +414,7 @@ class NewClassroomHandler(
         }
     }
 
-    @acl_decorators.open_access
+    @acl_decorators.can_access_classroom_admin_page
     def post(self) -> None:
         """Creates a new classroom.
 
