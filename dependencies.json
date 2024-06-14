@@ -149,13 +149,6 @@
           "js": ["angular-material.js"]
         }
       },
-      "chartscss": {
-        "version": "1.1.0",
-        "downloadFormat": "files",
-        "url": "https://cdn.jsdelivr.net/npm/charts.css/dist",
-        "targetDirPrefix": "charts.css-",
-        "files": ["charts.min.css"]
-      },
       "fontAwesome": {
         "version": "5.9.0",
         "downloadFormat": "zip",
