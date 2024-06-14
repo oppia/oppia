@@ -17,12 +17,8 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/load-complete-and-restart-exploration-preview.spec.ts"
     },
     {
-      "name": "exploration-editor/modify-translations-through-modal",
-      "module":"core/tests/puppeteer-acceptance-tests/specs/exploration-editor/load-complete-and-restart-exploration-preview.spec.ts"
-    },
-    {
       "name": "exploration-editor/create-exploration-and-change-basic-settings",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/modify-translations-through-modal.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/create-exploration-and-change-basic-settings.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-about-page",
