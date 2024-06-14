@@ -271,6 +271,10 @@ export class Moderator extends BaseUser {
     }
   }
 
+  /**
+   * Function to unfeature an activity.
+   * @param {number} index - The index of the activity to unfeature.
+   */
   async unfeatureActivityAtIndex(index: number): Promise<void> {
     // Subtracting 1 from index to make it 1-based.
     index -= 1;
