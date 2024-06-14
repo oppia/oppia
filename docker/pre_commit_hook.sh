@@ -21,9 +21,6 @@
 # but won't have any effect
 
 
-DEV_CONTAINER="dev-server"
-DOCKER_EXEC_COMMAND="docker compose exec -T $DEV_CONTAINER "
-
 # Location of git hooks directory
 HOOKS_DIR=".git/hooks"
 
@@ -94,9 +91,12 @@ GIT_USEREMAIL=$(git config user.email)
 # We need to pass git username and email to the container, so that it can
 # configure git user.name and user.email for the commit which is checked in 
 # pre-commit hook.
-docker compose run -T --no-deps --entrypoint "/bin/sh -c 'git config user.name $GIT_USERNAME && git config user.email $GIT_USEREMAIL && python3 ./.git/hooks/pre-commit-python $@'" dev-server
+docker compose run -T --no-deps --entrypoint "/bin/sh -c \
+'git config user.name $GIT_USERNAME && git config user.email $GIT_USEREMAIL \
+&& python3 $PYTHON_PRE_COMMIT_SYMLINK $@'" dev-server
 
-# Save exit code from the docker command, so we can later use it to exit this pre-commit hook at end.
+# Save exit code from the docker command, so we can later use it to exit this
+# pre-commit hook at end.
 exitcode=$?
 echo "Python script exited with code $exitcode"
 
