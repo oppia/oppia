@@ -20,12 +20,11 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {SuperAdmin} from '../../utilities/user/super-admin';
 import {showMessage} from '../../utilities/common/show-message';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Super Admin', function () {
-  let superAdmin: SuperAdmin & CurriculumAdmin;
+  let superAdmin: SuperAdmin;
 
   beforeAll(async function () {
     superAdmin = await UserFactory.createNewSuperAdmin('superAdm');

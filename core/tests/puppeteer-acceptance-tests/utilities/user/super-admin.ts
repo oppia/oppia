@@ -244,16 +244,6 @@ export class SuperAdmin extends BaseUser {
     showMessage(`${users} is/are assigned to the role`);
   }
 
-  /**
-   * Checks if the application is in development mode.
-   * @returns {Promise<boolean>} Returns true if the application is in development mode,
-   * false otherwise.
-   */
-  async isInProdMode(): Promise<boolean> {
-    const prodMode = process.env.PROD_ENV === 'true';
-    return prodMode;
-  }
-
   async reloadExplorations(explorationName: string): Promise<void> {
     await this.page.waitForSelector(reloadExplorationRowsSelector);
     const reloadExplorationRows = await this.page.$$(

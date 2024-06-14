@@ -134,6 +134,16 @@ export class BaseUser {
   }
 
   /**
+   * Checks if the application is in development mode.
+   * @returns {Promise<boolean>} Returns true if the application is in development mode,
+   * false otherwise.
+   */
+  async isInProdMode(): Promise<boolean> {
+    const prodMode = process.env.PROD_ENV === 'true';
+    return prodMode;
+  }
+
+  /**
    * Function to setup debug methods for the current page of any acceptance
    * test.
    */
