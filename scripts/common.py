@@ -236,7 +236,9 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
        'by-that-creator',
     'practice-question-admin/add-and-remove-contribution-rights',
     'translation-admin/add-and-remove-translation-rights',
-    'voiceover-admin/add-voiceover-artist-to-an-exploration'
+    'voiceover-admin/add-voiceover-artist-to-an-exploration',
+    'moderator/view-recent-commits-and-feedback-messages',
+    'moderator/edit-featured-activities-list'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181

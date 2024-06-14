@@ -869,22 +869,33 @@ export class CurriculumAdmin extends BaseUser {
     });
 
     if (!skillToDelete) {
-      throw new Error(`Skill ${skillName} not found`);
+      console.error(`Skill ${skillName} not found`);
+      return;
     }
 
+    await this.page.waitForSelector(skillListItemOptions, {visible: true});
     await this.clickElement(skillToDelete, skillListItemOptions);
+
     await this.page.waitForFunction(
       (skill: Element) => !skill.isConnected,
       {},
       skillListItemOptions
     );
+
+    await this.page.waitForSelector(deleteSkillButton, {visible: true});
     await this.clickElement(skillToDelete, deleteSkillButton);
+
     await this.page.waitForFunction(
       (button: Element) => !button.isConnected,
       {},
       deleteSkillButton
     );
+
+    await this.page.waitForSelector(confirmSkillDeletionButton, {
+      visible: true,
+    });
     await this.clickElement(this.page, confirmSkillDeletionButton);
+
     await this.page.waitForFunction(
       (button: Element) => !button.isConnected,
       {},

@@ -176,6 +176,8 @@ const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
 
+const libraryExplorationsGroupSelector = '.oppia-library-group';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -213,6 +215,13 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToGetStartedPage(): Promise<void> {
     await this.goto(getStartedUrl);
+  }
+
+  /**
+   * Navigates to the community library page.
+   */
+  async navigateToCommunitylibrary(): Promise<void> {
+    await this.page.goto(communityLibraryUrl);
   }
 
   /**
@@ -1370,6 +1379,74 @@ export class LoggedOutUser extends BaseUser {
       throw new Error('The donor box is not visible on the donate page.');
     } else {
       showMessage('The donor box is visible on the donate page.');
+    }
+  }
+
+  /**
+   * Views all featured activities on the community library page.
+   */
+  private async viewAllFeaturedActivities(): Promise<object[]> {
+    await this.page.waitForSelector(libraryExplorationsGroupSelector);
+
+    const featuredActivities = await this.page.$$eval(
+      libraryExplorationsGroupSelector,
+      groups => {
+        const featuredGroup = groups.find(group =>
+          group
+            .querySelector('h2')
+            ?.textContent?.includes('Featured Activities')
+        );
+
+        const activities = Array.from(
+          featuredGroup?.querySelectorAll(
+            'oppia-collection-summary-tile, oppia-exploration-summary-tile'
+          ) ?? []
+        );
+
+        return activities.map(activity => ({
+          title: activity
+            .querySelector('.e2e-test-exp-summary-tile-title')
+            ?.textContent?.trim(),
+        }));
+      }
+    );
+
+    return featuredActivities;
+  }
+
+  /**
+   * Expects to view the specified featured activities on the community library page.
+   * @param {Array<string>} expectedActivityTitles - The titles of the expected featured activities.
+   */
+  async expectToViewFeaturedActivities(
+    expectedActivityTitles: string[] = []
+  ): Promise<void> {
+    // Reloading to ensure the page is updated with the newly added/removed featured activities.
+    await this.page.reload({waitUntil: 'networkidle0'});
+    const featuredActivities: {title: string}[] =
+      (await this.viewAllFeaturedActivities()) as {title: string}[];
+
+    // If no expected activities were provided, check if the featured activities list is empty.
+    if (expectedActivityTitles.length === 0) {
+      if (featuredActivities.length === 0) {
+        showMessage('No featured activities found as expected.');
+        return;
+      }
+      throw new Error('Expected no featured activities, but found some');
+    }
+
+    // Check if each expected activity is in the list of featured activities.
+    for (const expectedActivity of expectedActivityTitles) {
+      const activity = featuredActivities.find(
+        activity => activity.title === expectedActivity
+      );
+
+      if (!activity) {
+        throw new Error(
+          `Expected to find activity with title ${expectedActivity}, but didn't`
+        );
+      }
+      showMessage(`Activity with title ${expectedActivity} found as expected.`);
     }
   }
 }

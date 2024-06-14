@@ -59,6 +59,7 @@ export default {
     MathClassroom: 'http://localhost:8181/learn/math',
     MobileExternalLinkWatchAVideo:
       'https://m.facebook.com/oppiaorg/videos/189487953721583/',
+    ModeratorPage: 'http://localhost:8181/moderator',
     Partnerships: 'http://localhost:8181/partnerships',
     PartnershipsBrochure:
       'https://drive.google.com/file/d/1RZ1mWDA2XWXTh1GlWFf5AWWuV2iGBBa2/view?usp=sharing',
@@ -93,6 +94,7 @@ export default {
     QUESTION_ADMIN: 'question admin',
     VOICEOVER_ADMIN: 'voiceover admin',
     TOPIC_MANAGER: 'topic manager',
+    MODERATOR: 'moderator',
   } as const,
   BlogRights: {
     BLOG_ADMIN: 'BLOG_ADMIN',

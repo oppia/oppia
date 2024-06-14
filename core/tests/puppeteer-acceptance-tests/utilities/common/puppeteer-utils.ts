@@ -354,16 +354,17 @@ export class BaseUser {
     context: Page | Frame | ElementHandle,
     selector: string
   ): Promise<void> {
-    const element = await context.$(selector);
-    if (!element) {
-      throw new Error(`Element ${selector} not found`);
-    }
-    await this.waitForElementToBeClickable(element);
-
     try {
+      await context.waitForSelector(selector);
+      const element = await context.$(selector);
+      if (!element) {
+        throw new Error(`Element ${selector} not found`);
+      }
+      await this.waitForElementToBeClickable(element);
       await element.click();
     } catch (error) {
-      throw new Error(`Failed to click on element ${selector}`);
+      error.message = `Failed to click on element ${selector}: ${error.message}`;
+      throw error;
     }
   }
 
