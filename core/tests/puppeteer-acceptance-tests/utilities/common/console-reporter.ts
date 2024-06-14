@@ -70,6 +70,11 @@ const CONSOLE_ERRORS_TO_IGNORE = [
   // Error occurs due to ExpressionChangedAfterItHasBeenCheckedError.
   // This can be removed after solving the issue #20189.
   new RegExp('ERROR CONTEXT JSHandle@object.*'),
+  // Error related to Google Docs Viewer since it's from an external service
+  // and cannot be controlled by us. (https://stackoverflow.com/q/50909239)
+  new RegExp(
+    /https:\/\/content\.googleapis\.com\/drive\/v2internal\/viewerimpressions\?key=[^&]+&alt=json/
+  ),
 ];
 
 const CONSOLE_ERRORS_TO_FIX = [

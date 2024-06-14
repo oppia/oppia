@@ -58,6 +58,7 @@ class FeatureNames(enum.Enum):
     EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS = (
         'exploration_editor_can_tag_misconceptions')
     ENABLE_MULTIPLE_CLASSROOMS = 'enable_multiple_classrooms'
+    REDESIGNED_TOPIC_VIEWER_PAGE = 'redesigned_topic_viewer_page'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -83,10 +84,10 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
-    FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
-    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS
+    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
+    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -97,6 +98,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.DIAGNOSTIC_TEST,
     FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
+    FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
 ]
@@ -222,7 +224,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag allows translation reviewers to undo translation '
             'suggestion review on the contributor dashboard.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION.value: (
@@ -260,6 +262,13 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'The flag enables flow for multiple classrooms '
             'and makes the classrooms page available to learners.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE.value: (
+        (
+            'This flag activates the redesigned topic viewer page'
+            'and makes it accessible to learners.',
             feature_flag_domain.ServerMode.DEV
         )
     )
