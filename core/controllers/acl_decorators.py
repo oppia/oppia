@@ -2919,6 +2919,8 @@ def can_edit_question(
             raise self.NotFoundException
         if role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions:
             return handler(self, question_id, **kwargs)
+        if role_services.ACTION_EDIT_OWNED_QUESTION in self.user.actions:
+            return can_edit_topic(handler)(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this question.')
@@ -3059,6 +3061,9 @@ def can_delete_question(
         if (role_services.ACTION_DELETE_ANY_QUESTION in
                 user_actions_info.actions):
             return handler(self, question_id, **kwargs)
+        if (role_services.ACTION_DELETE_OWNED_QUESTION in
+                user_actions_info.actions):
+            return can_edit_topic(handler)(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to delete the'
