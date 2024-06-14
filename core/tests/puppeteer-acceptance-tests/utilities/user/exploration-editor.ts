@@ -21,7 +21,6 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {error} from 'console';
 
-const baseURL = testConstants.URLs.BaseURL;
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
@@ -34,11 +33,13 @@ const saveChangesButton = 'button.e2e-test-save-changes';
 // Settings Tab elements.
 const settingsTab = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
+const explorationTitleSelector = '.e2e-test-exploration-title-input';
 const addGoalInputBox = '.e2e-test-exploration-objective-input';
 const categoryDropdown = 'mat-select.e2e-test-exploration-category-dropdown';
 const languageUpdateDropdown =
   'mat-select.e2e-test-exploration-language-select';
 const addTagsInputBox = 'input.e2e-test-chip-list-tags';
+const autoSaveIndicator = 'span.e2e-test-autosave-indicator';
 const previewSummaryButton = 'button.e2e-test-open-preview-summary-modal';
 const dismissPreviewButton = 'button.e2e-test-close-preview-summary-modal';
 const textToSpeechToggle = 'label.e2e-test-on-off-switch';
@@ -89,7 +90,7 @@ const mobileChangesDropdown = 'div.e2e-test-mobile-changes-dropdown';
 const mobileSaveChangesButton =
   'button.e2e-test-save-changes-for-small-screens';
 const mobilePublishButton = 'button.e2e-test-mobile-publish-button';
-const mobileDiscardButton = 'div.e2e-test-mobile-exploration-discard-tab';
+const mobileDiscardButton = 'button.e2e-test-mobile-exploration-discard-tab';
 const mobileStateGraphResizeButton = '.e2e-test-mobile-graph-resize-button';
 const mobileNavbarDropdown = 'div.e2e-test-mobile-options-dropdown';
 const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
@@ -139,7 +140,7 @@ export class ExplorationEditor extends BaseUser {
    * @param content - content of the exploration
    * @param interaction - the interaction to be added to the exploration
    */
-  async createExplorationWithMinimumContent(
+  async createMinimalExploration(
     content: string,
     interaction: string
   ): Promise<void> {
@@ -154,8 +155,14 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToSettingsTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileOptionsButton, {visible: true});
-      await this.clickOn(mobileOptionsButton);
+      const element = await this.page.$(mobileNavbarDropdown);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to settings tab appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.page.waitForSelector(mobileOptionsButton, {visible: true});
+        await this.clickOn(mobileOptionsButton);
+      }
       await this.clickOn(mobileNavbarDropdown);
       await this.clickOn(mobileSettingsBar);
 
@@ -180,7 +187,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} goal - The goal of the exploration.
    * @param {string} category - The category of the exploration.
    */
-  async publishExplorationWithContent(
+  async publishExplorationWithMetadata(
     title: string,
     goal: string,
     category: string
@@ -235,7 +242,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
-    await this.page.waitForFunction('document.readyState === "complete"');
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
@@ -269,6 +276,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clearAllTextFrom(addTitleBar);
     await this.type(addTitleBar, title);
     await this.page.keyboard.press('Tab');
+
     showMessage(`Title has been updated to ${title}`);
   }
 
@@ -276,8 +284,8 @@ export class ExplorationEditor extends BaseUser {
    * Matches the expected title with current title.
    */
   async expectTitleToBe(expectedTitle: string): Promise<void> {
-    await this.page.waitForSelector('.e2e-test-exploration-title-input');
-    const titleInput = await this.page.$('.e2e-test-exploration-title-input');
+    await this.page.waitForSelector(explorationTitleSelector);
+    const titleInput = await this.page.$(explorationTitleSelector);
     const currentTitle = await this.page.evaluate(
       input => input.value,
       titleInput
@@ -288,6 +296,18 @@ export class ExplorationEditor extends BaseUser {
     } else {
       throw new Error('Failed to update changes.');
     }
+  }
+
+  /**
+   * This function Waits for the autosave indicator to appear and then disappear.
+   */
+  async waitForAutosaveIndicator(): Promise<void> {
+    await this.page.waitForSelector(autoSaveIndicator, {
+      visible: true,
+    });
+    await this.page.waitForSelector(autoSaveIndicator, {
+      hidden: true,
+    });
   }
 
   /**
@@ -485,7 +505,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(addRoleDropdown);
     await this.clickOn(collaboratorRoleOption);
     await this.clickOn(saveRoleButton);
-    showMessage(`${username} has been added as collaboratorRoleOption.`);
+    showMessage(`${username} has been added as collaboratorRole.`);
   }
 
   /**
@@ -605,36 +625,6 @@ export class ExplorationEditor extends BaseUser {
     return explorationId;
   }
 
-  async expectExplorationToBeAccessibleByUrl(
-    explorationId: string | null
-  ): Promise<void> {
-    if (!explorationId) {
-      throw new Error('ExplorationId is null');
-    }
-    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
-    try {
-      await this.page.goto(explorationUrlAfterPublished);
-      showMessage('Exploration is accessible with the URL, i.e. published.');
-    } catch (error) {
-      throw new Error('The exploration is not public.');
-    }
-  }
-
-  async expectExplorationToBeNotAccessibleByUrl(
-    explorationId: string | null
-  ): Promise<void> {
-    if (!explorationId) {
-      throw new Error('ExplorationId is null');
-    }
-    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
-    try {
-      await this.page.goto(explorationUrlAfterPublished);
-      throw new Error('The exploration is still public.');
-    } catch (error) {
-      showMessage('The exploration is not accessible with the URL.');
-    }
-  }
-
   /**
    * Discards the current changes.
    */
@@ -654,8 +644,9 @@ export class ExplorationEditor extends BaseUser {
     });
     await Promise.all([
       this.clickOn(confirmDiscardButton),
-      this.page.waitForNavigation(),
+      this.page.waitForNavigation({waitUntil: 'networkidle0'}),
     ]);
+    await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsButton);
       await this.clickOn(basicSettingsDropdown);
@@ -886,12 +877,12 @@ export class ExplorationEditor extends BaseUser {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
     await this.dismissWelcomeModal();
-    await this.createExplorationWithMinimumContent(
+    await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
     );
     await this.saveExplorationDraft();
-    return await this.publishExplorationWithContent(
+    return await this.publishExplorationWithMetadata(
       title,
       'This is Goal here.',
       'Algebra'
