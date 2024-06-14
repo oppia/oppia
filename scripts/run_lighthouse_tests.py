@@ -43,14 +43,8 @@ SERVER_MODE_PROD: Final = 'dev'
 SERVER_MODE_DEV: Final = 'prod'
 GOOGLE_APP_ENGINE_PORT: Final = 8181
 LIGHTHOUSE_CONFIG_FILENAMES: Final = {
-    LIGHTHOUSE_MODE_PERFORMANCE: {
-        '1': '.lighthouserc-1.js',
-        '2': '.lighthouserc-2.js'
-    },
-    LIGHTHOUSE_MODE_ACCESSIBILITY: {
-        '1': '.lighthouserc-accessibility-1.js',
-        '2': '.lighthouserc-accessibility-2.js'
-    }
+    LIGHTHOUSE_MODE_PERFORMANCE: '.lighthouserc-performance.js',
+    LIGHTHOUSE_MODE_ACCESSIBILITY: '.lighthouserc-accessibility.js'
 }
 APP_YAML_FILENAMES: Final = {
     SERVER_MODE_PROD: 'app.yaml',
@@ -70,10 +64,6 @@ _PARSER.add_argument(
     '--mode', help='Sets the mode for the lighthouse tests',
     required=True,
     choices=['accessibility', 'performance'])
-
-_PARSER.add_argument(
-    '--shard', help='Sets the shard for the lighthouse tests',
-    required=True, choices=['1', '2'])
 
 _PARSER.add_argument(
     '--pages', help='Sets the pages to run the lighthouse tests on')
@@ -193,20 +183,19 @@ def get_entity(line: str) -> tuple[str, str] | None:
     return None
 
 
-def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
+def run_lighthouse_checks(lighthouse_mode: str) -> None:
     """Runs the Lighthouse checks through the Lighthouse config.
 
     Args:
         lighthouse_mode: str. Represents whether the lighthouse checks are in
             accessibility mode or performance mode.
-        shard: str. Specifies which shard of the tests should be run.
     """
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
     # The max-old-space-size is a quick fix for node running out of heap memory
     # when executing the performance tests: https://stackoverflow.com/a/59572966
     bash_command = [
         common.NODE_BIN_PATH, lhci_path, 'autorun',
-        '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode][shard],
+        '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode],
         '--max-old-space-size=4096'
     ]
 
@@ -230,11 +219,8 @@ def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
         sys.exit(1)
 
 
-def get_lighthouse_pages_for_shard(shard: str) -> dict[str, str]:
+def get_lighthouse_pages_config() -> dict[str, str]:
     """Gets the lighthouse pages and their URLs from the config.
-
-    Args:
-        shard: str. The shard to get the lighthouse pages for.
 
     Returns:
         dict(str, str). The lighthouse page names and their URLs.
@@ -242,9 +228,8 @@ def get_lighthouse_pages_for_shard(shard: str) -> dict[str, str]:
     pages: dict[str, str] = {}
     with open(LIGHTHOUSE_PAGES_JSON_FILEPATH, 'r', encoding='utf-8') as f:
         config = json.load(f)
-        shard_config = config['shards'][shard]
-        for page in shard_config:
-            pages[page] = shard_config[page]['url']
+        for page in config:
+            pages[page] = config[page]['url']
 
     return pages
 
@@ -348,8 +333,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 env=env))
 
         entities = run_lighthouse_puppeteer_script(parsed_args.record_screen)
-        pages_config: dict[str, str] = get_lighthouse_pages_for_shard(
-            parsed_args.shard)
+        pages_config: dict[str, str] = get_lighthouse_pages_config()
         os.environ['ALL_LIGHTHOUSE_URLS'] = ','.join(
             get_lighthouse_urls_to_run(
                 list(pages_config.keys()),
@@ -366,7 +350,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 )
             )
 
-        run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
+        run_lighthouse_checks(lighthouse_mode)
 
 
 if __name__ == '__main__': # pragma: no cover

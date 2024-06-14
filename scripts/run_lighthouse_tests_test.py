@@ -34,14 +34,8 @@ GOOGLE_APP_ENGINE_PORT = 8181
 LIGHTHOUSE_MODE_PERFORMANCE = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY = 'accessibility'
 LIGHTHOUSE_CONFIG_FILENAMES = {
-    LIGHTHOUSE_MODE_PERFORMANCE: {
-        '1': '.lighthouserc-1.js',
-        '2': '.lighthouserc-2.js'
-    },
-    LIGHTHOUSE_MODE_ACCESSIBILITY: {
-        '1': '.lighthouserc-accessibility-1.js',
-        '2': '.lighthouserc-accessibility-2.js'
-    }
+    LIGHTHOUSE_MODE_PERFORMANCE: '.lighthouserc-performance.js',
+    LIGHTHOUSE_MODE_ACCESSIBILITY: '.lighthouserc-accessibility.js'
 }
 
 
@@ -80,7 +74,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.lighthouse_check_bash_command = [
             common.NODE_BIN_PATH, lhci_path, 'autorun',
             '--config=%s' % (
-                LIGHTHOUSE_CONFIG_FILENAMES[LIGHTHOUSE_MODE_PERFORMANCE]['1']),
+                LIGHTHOUSE_CONFIG_FILENAMES[LIGHTHOUSE_MODE_PERFORMANCE]),
             '--max-old-space-size=4096'
         ]
         # Arguments to record in lighthouse_setup.js.
@@ -117,18 +111,14 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         with open('dummy-lighthouse-pages.json', 'w', encoding='utf-8') as f:
             f.write(
                 json.dumps({
-                    'shards': {
-                        '1': {
-                            'splash': {
-                                'url': 'http://localhost:8181/'
-                            },
-                            'about': {
-                                'url': 'http://localhost:8181/about'
-                            },
-                            'contact': {
-                                'url': 'http://localhost:8181/contact'
-                            }
-                        }
+                    'splash': {
+                        'url': 'http://localhost:8181/'
+                    },
+                    'about': {
+                        'url': 'http://localhost:8181/about'
+                    },
+                    'contact': {
+                        'url': 'http://localhost:8181/contact'
                     }
                 })
             )
@@ -158,11 +148,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         ):
             run_lighthouse_tests.inject_entities_into_url(url, entities)
 
-    def test_get_lighthouse_pages_for_shard(self) -> None:
+    def test_get_lighthouse_pages_config(self) -> None:
         with self.lighthouse_pages_json_filepath_swap:
-            pages = run_lighthouse_tests.get_lighthouse_pages_for_shard('1')
+            pages_config = run_lighthouse_tests.get_lighthouse_pages_config()
             self.assertEqual(
-                pages,
+                pages_config,
                 {
                     'splash': 'http://localhost:8181/',
                     'about': 'http://localhost:8181/about',
@@ -352,7 +342,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         with self.print_swap, swap_popen:
             run_lighthouse_tests.run_lighthouse_checks(
-                LIGHTHOUSE_MODE_PERFORMANCE, '1')
+                LIGHTHOUSE_MODE_PERFORMANCE)
 
         self.assertIn(
             'Lighthouse checks completed successfully.', self.print_arr)
@@ -373,7 +363,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         with self.print_swap, self.swap_sys_exit, swap_popen:
             run_lighthouse_tests.run_lighthouse_checks(
-                LIGHTHOUSE_MODE_PERFORMANCE, '1')
+                LIGHTHOUSE_MODE_PERFORMANCE)
 
         self.assertIn('Return code: 1', self.print_arr)
         self.assertIn('ABC error.', self.print_arr)
@@ -395,7 +385,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_popen)
         swap_run_lighthouse_tests = self.swap_with_checks(
             run_lighthouse_tests, 'run_lighthouse_checks',
-            lambda *unused_args: None, expected_args=(('accessibility', '1'),))
+            lambda *unused_args: None, expected_args=[('accessibility',)])
         swap_isdir = self.swap(
             os.path, 'isdir', lambda _: True)
         swap_build = self.swap_with_checks(
@@ -410,8 +400,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                         with self.lighthouse_pages_json_filepath_swap:
                             with self.oppia_is_dockerized_swap:
                                 run_lighthouse_tests.main(
-                                    args=['--mode', 'accessibility',
-                                        '--shard', '1'])
+                                    args=['--mode', 'accessibility'])
                                 expected_all_lighthouse_urls = ','.join([
                                     'http://localhost:8181/',
                                     'http://localhost:8181/about',
@@ -434,7 +423,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         swap_run_lighthouse_tests = self.swap_with_checks(
             run_lighthouse_tests, 'run_lighthouse_checks',
-            lambda *unused_args: None, expected_args=(('performance', '1'),))
+            lambda *unused_args: None, expected_args=[('performance',)])
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
         swap_popen = self.swap(
@@ -453,8 +442,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                             with self.lighthouse_pages_json_filepath_swap:
                                 with self.oppia_is_dockerized_swap:
                                     run_lighthouse_tests.main(
-                                        args=['--mode', 'performance',
-                                            '--shard', '1'])
+                                        args=['--mode', 'performance'])
                                     expected_all_lighthouse_urls = ','.join([
                                         'http://localhost:8181/',
                                         'http://localhost:8181/about',
@@ -478,7 +466,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         swap_run_lighthouse_tests = self.swap_with_checks(
             run_lighthouse_tests, 'run_lighthouse_checks',
-            lambda *unused_args: None, expected_args=(('performance', '1'),))
+            lambda *unused_args: None, expected_args=[('performance',)])
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
         swap_popen = self.swap(
@@ -498,7 +486,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                 with self.oppia_is_dockerized_swap:
                                     run_lighthouse_tests.main(
                                         args=['--mode', 'performance',
-                                            '--shard', '1',
                                             '--pages', 'splash, about'])
                                     expected_all_lighthouse_urls = ','.join([
                                         'http://localhost:8181/',
@@ -528,11 +515,10 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 return (
                     b'Task output',
                     b'No error.')
-
         swap_run_lighthouse_tests = self.swap_with_checks(
             run_lighthouse_tests, 'run_lighthouse_checks',
             lambda *unused_args: None,
-            expected_args=(('performance', '1'),))
+            expected_args=[('performance',)])
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
         swap_popen = self.swap(
@@ -543,16 +529,16 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     build, 'main', lambda args: None,
                     expected_kwargs=[{'args': []}])
         swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
-
         with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_ng_build, swap_emulator_mode, self.print_swap:
                     with self.swap_redis_server, swap_run_lighthouse_tests:
                         with self.oppia_is_dockerized_swap:
-                            run_lighthouse_tests.main(
-                                args=['--mode', 'performance',
-                                    '--shard', '1', '--skip_build',
-                                    '--pages', 'splash'])
+                            with self.lighthouse_pages_json_filepath_swap:
+                                run_lighthouse_tests.main(
+                                    args=['--mode', 'performance',
+                                        '--skip_build',
+                                        '--pages', 'splash'])
 
         self.assertIn(
             'Building files in production mode skipping webpack build.',
@@ -567,6 +553,10 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 return (
                     b'Task output',
                     b'No error.')
+        def mock_run_puppeteer_script(*unused_args: str) -> dict[str, str]:
+            return {
+                'exploration_id': '4',
+            }
         env = os.environ.copy()
         env['PIP_NO_DEPS'] = 'True'
         # Set up pseudo-chrome path env variable.
@@ -585,11 +575,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             }])
         swap_run_puppeteer_script = self.swap_with_checks(
             run_lighthouse_tests, 'run_lighthouse_puppeteer_script',
-            lambda _: None,
+            mock_run_puppeteer_script,
             expected_args=((True,),))
         swap_run_lighthouse_tests = self.swap_with_checks(
             run_lighthouse_tests, 'run_lighthouse_checks',
-            lambda *unused_args: None, expected_args=(('performance', '1'),))
+            lambda *unused_args: None, expected_args=[('performance',)])
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
         swap_popen = self.swap(
@@ -611,7 +601,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     with self.swap_redis_server, swap_run_lighthouse_tests:
                         with swap_run_puppeteer_script:
                             with self.oppia_is_dockerized_swap:
-                                run_lighthouse_tests.main(
-                                    args=[
-                                        '--mode', 'performance', '--skip_build',
-                                        '--shard', '1', '--record_screen'])
+                                with self.lighthouse_pages_json_filepath_swap:
+                                    run_lighthouse_tests.main(
+                                        args=[
+                                            '--mode', 'performance',
+                                            '--skip_build',
+                                            '--record_screen'])
