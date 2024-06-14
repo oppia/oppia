@@ -68,7 +68,7 @@ jobs:
         run: python -m scripts.install_chrome_for_ci
       - name: Run Lighthouse accessibility checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --mode accessibility --shard ${{ matrix.shard.name }} --pages_to_run ${{ matrix.shard.pages_to_run }}
+        run: python -m scripts.run_lighthouse_tests --mode accessibility --pages_to_run ${{ matrix.shard.pages_to_run }}
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
