@@ -22,6 +22,7 @@ import {showMessage} from '../common/show-message';
 
 const releaseCoordinatorUrl = testConstants.URLs.ReleaseCoordinator;
 const featuresTab = '.e2e-test-features-tab';
+const mobileNavBar = '.e2e-test-navbar-dropdown-toggle';
 const featureFlagDiv = '.e2e-test-feature-flag';
 const featureFlagOptionSelector = '.e2e-test-value-selector';
 const featureFlagNameSelector = '.e2e-test-feature-name';
@@ -33,6 +34,9 @@ export class ReleaseCoordinator extends BaseUser {
    */
   async enableFeatureFlag(featureName: string): Promise<void> {
     await this.goto(releaseCoordinatorUrl);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavBar);
+    }
     await this.clickOn(featuresTab);
     await this.page.waitForSelector(featureFlagDiv);
 

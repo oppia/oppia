@@ -189,23 +189,23 @@ describe('Exploration Editor', function () {
       explorationId,
       'Test Topic 1'
     );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+    // We set an increased custom timeout since the setup takes too long unlike other specs.
+  }, 400000);
 
   it(
     'should show translations of main content in the modal.',
     async function () {
       await explorationEditor.page.bringToFront();
       await explorationEditor.reloadPage();
+      await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.dismissTranslationTabWelcomeModal();
       await explorationEditor.editTranslationOfContent(
         'de',
-        CARD_NAME.INTRODUCTION,
         'Content',
         'Content translation text'
       );
       await explorationEditor.navigateToEditorTab();
-      await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
       await explorationEditor.updateCardContent('Content text.');
       await explorationEditor.openModifyExistingTranslationsModal();
       await explorationEditor.verifyTranslationInModifyTranslationsModal(
@@ -222,15 +222,14 @@ describe('Exploration Editor', function () {
     async function () {
       await explorationEditor.page.bringToFront();
       await explorationEditor.reloadPage();
+      await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.editTranslationOfContent(
         'de',
-        CARD_NAME.TEXT_QUESTION,
         'Interaction',
         'Interaction translation text'
       );
       await explorationEditor.navigateToEditorTab();
-      await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
       await explorationEditor.updateTextInputInteraction(
         'Interaction text content.'
       );
@@ -251,17 +250,16 @@ describe('Exploration Editor', function () {
     async function () {
       await explorationEditor.page.bringToFront();
       await explorationEditor.reloadPage();
+      await explorationEditor.navigateToCard(
+        CARD_NAME.MULTIPLE_CHOICE_QUESTION
+      );
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.editTranslationOfContent(
         'de',
-        CARD_NAME.MULTIPLE_CHOICE_QUESTION,
         'Hint',
         'Hint translation text'
       );
       await explorationEditor.navigateToEditorTab();
-      await explorationEditor.navigateToCard(
-        CARD_NAME.MULTIPLE_CHOICE_QUESTION
-      );
       await explorationEditor.updateHint('Hint content.');
       await explorationEditor.openModifyExistingTranslationsModal();
       await explorationEditor.verifyTranslationInModifyTranslationsModal(
@@ -278,15 +276,14 @@ describe('Exploration Editor', function () {
     async function () {
       await explorationEditor.page.bringToFront();
       await explorationEditor.reloadPage();
+      await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.editTranslationOfContent(
         'de',
-        CARD_NAME.TEXT_QUESTION,
         'Solution',
         'Solution explanation translation text'
       );
       await explorationEditor.navigateToEditorTab();
-      await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
       await explorationEditor.updateSolutionExplanation(
         'Solution explanation.'
       );
@@ -307,18 +304,17 @@ describe('Exploration Editor', function () {
     async function () {
       await explorationEditor.page.bringToFront();
       await explorationEditor.reloadPage();
+      await explorationEditor.navigateToCard(
+        CARD_NAME.MULTIPLE_CHOICE_QUESTION
+      );
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.editTranslationOfContent(
         'de',
-        CARD_NAME.MULTIPLE_CHOICE_QUESTION,
         'Feedback',
         'Response feedback translation text',
         1
       );
       await explorationEditor.navigateToEditorTab();
-      await explorationEditor.navigateToCard(
-        CARD_NAME.MULTIPLE_CHOICE_QUESTION
-      );
       await explorationEditor.editDefaultResponseFeedback('Feedback content.');
       await explorationEditor.openModifyExistingTranslationsModal();
       await explorationEditor.verifyTranslationInModifyTranslationsModal(

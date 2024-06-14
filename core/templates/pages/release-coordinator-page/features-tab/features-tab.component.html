@@ -195,6 +195,7 @@
 
   .oppia-features .oppia-feature-name {
     border-bottom: 1px solid #dee2e6;
+    overflow-wrap: break-word;
   }
 
   .oppia-features .oppia-description-content {
@@ -244,5 +245,12 @@
 
   .e2e-test-angular-dummy-feature-indicator {
     bottom: 10px;
+  }
+
+  @media screen and (max-width: 767px) {
+    .col-2 {
+      flex: none;
+      max-width: none;
+    }
   }
 </style>

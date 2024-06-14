@@ -4070,6 +4070,13 @@ div.oppia-issues-learner-action {
   align-content: center;
 }
 
+@media (max-width: 400px) {
+  /* Prevents overlapping with the mobile navbar elements. */
+  oppia-mark-translations-as-needing-update-modal {
+    margin-bottom: 25px;
+  }
+}
+
 .oppia-typeahead-form .dropdown-item.active {
   color: #212529;
 }

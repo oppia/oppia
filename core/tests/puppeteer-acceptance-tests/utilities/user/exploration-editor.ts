@@ -971,6 +971,13 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToTranslationsTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarOptions);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to save changes appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.clickOn(mobileOptionsButton);
+      }
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
       await this.clickOn(mobileTranslationTabButton);
@@ -984,6 +991,13 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToEditorTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarOptions);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to save changes appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.clickOn(mobileOptionsButton);
+      }
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
       await this.clickOn(mobileMainTabButton);
@@ -991,6 +1005,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(mainTabButton);
     }
     await this.page.waitForNetworkIdle();
+    await this.clickOn(mobileOptionsButton);
   }
 
   /**
@@ -1186,22 +1201,19 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to edit a translation for specific content of any card.
+   * Function to edit a translation for specific content of the current card.
    * @param {string} languageCode - Code of language for which the translation has to be added.
-   * @param {string} cardName - Name of the card/state for which the translation is being edited.
    * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
    * @param {string} translation - The translation which will be added for the content.
    * @param {number} feedbackIndex - The index of the feedback to edit, since multiple feedback responses exist.
    */
   async editTranslationOfContent(
     languageCode: string,
-    cardName: string,
     contentType: string,
     translation: string,
     feedbackIndex?: number
   ): Promise<void> {
     await this.select(translationLanguageSelector, languageCode);
-    await this.navigateToCard(cardName);
     await this.clickOn(translationModeButton);
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
