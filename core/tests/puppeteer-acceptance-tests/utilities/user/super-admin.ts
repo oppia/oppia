@@ -250,7 +250,7 @@ export class SuperAdmin extends BaseUser {
    * false otherwise.
    */
   async isInProdMode(): Promise<boolean> {
-    const prodMode = process.env.PROD_MODE === 'true';
+    const prodMode = process.env.PROD_ENV === 'true';
     return prodMode;
   }
 
