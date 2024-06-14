@@ -42,8 +42,7 @@ export class ReleaseCoordinator extends BaseUser {
       await this.clickOn(featuresTab);
     }
 
-    await this.page.waitForSelector(`${featureFlagDiv}-0`);
-    await this.page.waitForNetworkIdle();
+    await this.page.waitForSelector(featureFlagDiv);
     const featureFlagIndex = await this.page.evaluate(
       (featureFlagDiv, featureName, featureFlagNameSelector) => {
         const featureFlagDivs = Array.from(
