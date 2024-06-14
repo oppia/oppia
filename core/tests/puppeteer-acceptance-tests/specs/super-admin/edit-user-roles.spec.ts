@@ -47,7 +47,7 @@ describe('Super Admin', function () {
 
   it(
     'should be able to assign, unassign role and be able to see the' +
-      ' allocated actions and assigned users to a role ',
+      'allocated actions and assigned users to a role',
     async function () {
       await superAdmin.navigateToAdminPageRolesTab();
 

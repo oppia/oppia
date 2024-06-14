@@ -33,7 +33,7 @@ const reloadCollectionsRowsSelector = '.e2e-test-reload-collection-row';
 const topicManagerRole = testConstants.Roles.TOPIC_MANAGER;
 
 export class SuperAdmin extends BaseUser {
-  async navigateToActivitiesTab(): Promise<void> {
+  async navigateToAdminPageActivitiesTab(): Promise<void> {
     await this.goto(AdminPageActivitiesTab);
   }
 
@@ -235,7 +235,6 @@ export class SuperAdmin extends BaseUser {
    */
   async expectRoleToHaveAssignedUsers(users: string[]): Promise<void> {
     await this.clickOn(' Assigned users ');
-    await this.page.waitForTimeout(2000);
     for (const user of users) {
       const isUserPresent = await this.isTextPresentOnPage(user);
       if (!isUserPresent) {
@@ -247,11 +246,12 @@ export class SuperAdmin extends BaseUser {
 
   /**
    * Checks if the application is in development mode.
-   * @returns {Promise<boolean>} Returns true if the application is in development mode, false otherwise.
+   * @returns {Promise<boolean>} Returns true if the application is in development mode,
+   * false otherwise.
    */
-  async isInDevMode(): Promise<boolean> {
+  async isInProdMode(): Promise<boolean> {
     const prodMode = process.env.PROD_MODE;
-    return prodMode !== 'true';
+    return prodMode === 'true';
   }
 
   async reloadExplorations(explorationName: string): Promise<void> {
@@ -292,7 +292,7 @@ export class SuperAdmin extends BaseUser {
   }
 
   async navigateToCommunityLibrary(): Promise<void> {
-    await this.clickOn(CommunityLibraryUrl);
+    await this.goto(CommunityLibraryUrl);
   }
 
   async reloadCollections(collectionName: string): Promise<void> {
@@ -367,11 +367,14 @@ export class SuperAdmin extends BaseUser {
     const areActivitiesPresent = await this.isTextPresentOnPage(
       " The 'Activities' tab is not available in the production environment. "
     );
-    if (areActivitiesPresent) {
+    if (!areActivitiesPresent) {
       throw new Error(
         'Activities tab is present in the production environment'
       );
     }
+    showMessage(
+      'Activities tab is not available in the production environment, as expected.'
+    );
   }
 }
 
