@@ -17,11 +17,14 @@
 from __future__ import annotations
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
+from core.domain import fs_services
+from core.domain import image_validation_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 
@@ -215,9 +218,19 @@ class ClassroomHandlerNormalizedPayloadDict(TypedDict):
     classroom_dict: classroom_config_domain.Classroom
 
 
+class ClassroomHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of NewTopicHandler's
+    normalized_request dictionary.
+    """
+
+    thumbnail_image: bytes
+    banner_image: bytes
+
+
 class ClassroomHandler(
     base.BaseHandler[
-        ClassroomHandlerNormalizedPayloadDict, Dict[str, str]
+        ClassroomHandlerNormalizedPayloadDict,
+        ClassroomHandlerNormalizedRequestDict
     ]
 ):
     """Edits classroom data."""
@@ -235,6 +248,16 @@ class ClassroomHandler(
                 'schema': {
                     'type': 'object_dict',
                     'object_class': classroom_config_domain.Classroom
+                }
+            },
+            'thumbnail_image': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'banner_image': {
+                'schema': {
+                    'type': 'basestring'
                 }
             }
         },
@@ -273,10 +296,9 @@ class ClassroomHandler(
         Raises:
             InvalidInputException. Classroom ID of the URL path argument must
                 match with the ID given in the classroom payload dict.
-            InvalidInputException. A topic can only be assigned to one
-                classroom.
         """
         assert self.normalized_payload is not None
+        assert self.normalized_request is not None
         classroom = self.normalized_payload['classroom_dict']
 
         if classroom_id != classroom.classroom_id:
@@ -285,22 +307,56 @@ class ClassroomHandler(
                 'given in the classroom payload dict.'
             )
 
-        classrooms = classroom_config_services.get_all_classrooms()
-        invalid_topic_ids = [
-            topic_id for classroom in classrooms
-            if classroom.classroom_id != classroom_id
-            for topic_id in classroom.get_topic_ids()
-        ]
+        raw_thumbnail_image = self.normalized_request['thumbnail_image']
+        thumbnail_filename = classroom.thumbnail_data.filename
+        raw_banner_image = self.normalized_request['banner_image']
+        banner_filename = classroom.banner_data.filename
+        existing_classroom = classroom_config_services.get_classroom_by_id(
+            classroom_id
+        )
 
-        for topic_id in classroom.get_topic_ids():
-            if topic_id in invalid_topic_ids:
-                topic_name = topic_fetchers.get_topic_by_id(topic_id).name
-                raise self.InvalidInputException(
-                    'Topic %s is already assigned to a classroom. A topic '
-                    'can only be assigned to one classroom.' % topic_name
+        if thumbnail_filename != existing_classroom.thumbnail_data.filename:
+            try:
+                thumbnail_file_format = (
+                    image_validation_services.validate_image_and_filename(
+                        raw_thumbnail_image, thumbnail_filename
+                    )
                 )
+                thumbnail_is_compressible = (
+                    image_validation_services.is_image_compressible(
+                        thumbnail_file_format)
+                )
+                fs_services.save_original_and_compressed_versions_of_image(
+                    thumbnail_filename, feconf.ENTITY_TYPE_CLASSROOM,
+                    classroom_id, raw_thumbnail_image, 'thumbnail',
+                    thumbnail_is_compressible
+                )
+            except utils.ValidationError as e:
+                raise self.InvalidInputException(e)
 
-        classroom_config_services.update_classroom(classroom)
+        if (
+            banner_filename !=
+            existing_classroom.banner_data.filename
+        ):
+            try:
+                banner_file_format = (
+                    image_validation_services.validate_image_and_filename(
+                    raw_banner_image, banner_filename)
+                )
+                banner_is_compressible = (
+                    image_validation_services.is_image_compressible(
+                        banner_file_format)
+                )
+                fs_services.save_original_and_compressed_versions_of_image(
+                    banner_filename, feconf.ENTITY_TYPE_CLASSROOM,
+                    classroom_id, raw_banner_image, 'image',
+                    banner_is_compressible)
+            except utils.ValidationError as e:
+                raise self.InvalidInputException(e)
+
+        classroom_config_services.update_classroom(
+            classroom, strict=classroom.is_published
+        )
         self.render_json(self.values)
 
     @acl_decorators.can_access_classroom_admin_page

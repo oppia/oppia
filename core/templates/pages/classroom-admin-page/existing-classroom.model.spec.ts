@@ -19,6 +19,18 @@
 import {TestBed} from '@angular/core/testing';
 import {ExistingClassroomData} from './existing-classroom.model';
 
+const dummyThumbnailData = {
+  filename: 'thumbnail.svg',
+  bg_color: 'transparent',
+  size_in_bytes: 1000,
+};
+
+const dummyBannerData = {
+  filename: 'banner.png',
+  bg_color: 'transparent',
+  size_in_bytes: 1000,
+};
+
 describe('Classroom admin model', () => {
   let existingClassroomData: ExistingClassroomData;
   beforeEach(() => {
@@ -32,8 +44,12 @@ describe('Classroom admin model', () => {
       'math',
       'math',
       'Curated math foundations course.',
+      'Learn math through fun stories!',
       'Start from the basics with our first topic.',
-      {}
+      {},
+      true,
+      dummyThumbnailData,
+      dummyBannerData
     );
   });
 
@@ -85,11 +101,15 @@ describe('Classroom admin model', () => {
       name: 'physics',
       urlFragment: 'physics',
       courseDetails: 'Test course details',
+      teaserText: 'Learn physics',
       topicListIntro: 'Test topic intro',
       topicIdToPrerequisiteTopicIds: {
         topic1: [],
         topic2: ['topic1'],
       },
+      isPublished: true,
+      thumbnailData: dummyThumbnailData,
+      bannerData: dummyBannerData,
     };
 
     let classroom: ExistingClassroomData =
@@ -99,11 +119,15 @@ describe('Classroom admin model', () => {
     expect(classroom.getClassroomName()).toEqual('physics');
     expect(classroom.getClassroomUrlFragment()).toEqual('physics');
     expect(classroom.getCourseDetails()).toEqual('Test course details');
+    expect(classroom.getTeaserText()).toEqual('Learn physics');
     expect(classroom.getTopicListIntro()).toEqual('Test topic intro');
     expect(classroom.getTopicIdToPrerequisiteTopicId()).toEqual({
       topic1: [],
       topic2: ['topic1'],
     });
+    expect(classroom.getIsPublished()).toBeTrue();
+    classroom.setIsPublished(false);
+    expect(classroom.getIsPublished()).toBeFalse();
   });
 
   it('should be able to get classroom dict from object', () => {
@@ -112,8 +136,12 @@ describe('Classroom admin model', () => {
       name: 'math',
       urlFragment: 'math',
       courseDetails: 'Curated math foundations course.',
+      teaserText: 'Learn math through fun stories!',
       topicListIntro: 'Start from the basics with our first topic.',
       topicIdToPrerequisiteTopicIds: {},
+      isPublished: true,
+      thumbnailData: dummyThumbnailData,
+      bannerData: dummyBannerData,
     };
 
     expect(existingClassroomData.getClassroomDict()).toEqual(
@@ -177,5 +205,100 @@ describe('Classroom admin model', () => {
     expect(existingClassroomData.getPrerequisiteTopicIds('topic_id_1')).toEqual(
       ['topic_id_2', 'topic_id_3']
     );
+  });
+
+  it('should handle errors in various properties', () => {
+    existingClassroomData.setCourseDetails('');
+    expect(
+      existingClassroomData.getClassroomCourseDetailsValidationErrors()
+    ).toEqual('The classroom course details should not be empty.');
+    existingClassroomData.setCourseDetails('a'.repeat(1001));
+    expect(
+      existingClassroomData.getClassroomCourseDetailsValidationErrors()
+    ).toEqual(
+      'The classroom course details should contain at most 720 characters.'
+    );
+
+    existingClassroomData.setTeaserText('');
+    expect(
+      existingClassroomData.getClassroomTeaserTextValidationErrors()
+    ).toEqual('The classroom teaser text should not be empty.');
+    existingClassroomData.setTeaserText('a'.repeat(1001));
+    expect(
+      existingClassroomData.getClassroomTeaserTextValidationErrors()
+    ).toEqual(
+      'The classroom teaser text should contain at most 68 characters.'
+    );
+
+    existingClassroomData.setTopicListIntro('');
+    expect(
+      existingClassroomData.getClassroomTopicListIntroValidationErrors()
+    ).toEqual('The classroom topic list intro should not be empty.');
+    existingClassroomData.setTopicListIntro('a'.repeat(1001));
+    expect(
+      existingClassroomData.getClassroomTopicListIntroValidationErrors()
+    ).toEqual(
+      'The classroom topic list intro should contain at most 240 characters.'
+    );
+
+    existingClassroomData.setThumbnailData({
+      ...dummyThumbnailData,
+      filename: '',
+    });
+    expect(
+      existingClassroomData.getClassroomThumbnailValidationErrors()
+    ).toEqual('The classroom thumbnail should not be empty');
+
+    existingClassroomData.setBannerData({...dummyBannerData, filename: ''});
+    expect(existingClassroomData.getClassroomBannerValidationErrors()).toEqual(
+      'The classroom banner should not be empty'
+    );
+
+    existingClassroomData._topicsCountInClassroom = 0;
+    expect(
+      existingClassroomData.getClassroomTopicCountValidationError()
+    ).toEqual('A classroom should have at least one topic.');
+  });
+
+  it('should not present errors for valid properties', () => {
+    existingClassroomData.setClassroomName('Discrete maths');
+    expect(existingClassroomData.getClassroomNameValidationErrors()).toEqual(
+      ''
+    );
+
+    existingClassroomData.setUrlFragment('physics-url-fragment');
+    expect(existingClassroomData.getClassroomUrlValidationErrors()).toEqual('');
+
+    existingClassroomData.setCourseDetails('Curated math foundations course.');
+    expect(
+      existingClassroomData.getClassroomCourseDetailsValidationErrors()
+    ).toEqual('');
+
+    existingClassroomData.setTeaserText('Learn math through fun stories!');
+    expect(
+      existingClassroomData.getClassroomTeaserTextValidationErrors()
+    ).toEqual('');
+
+    existingClassroomData.setTopicListIntro(
+      'Start from the basics with our first topic.'
+    );
+    expect(
+      existingClassroomData.getClassroomTopicListIntroValidationErrors()
+    ).toEqual('');
+
+    existingClassroomData.setThumbnailData(dummyThumbnailData);
+    expect(
+      existingClassroomData.getClassroomThumbnailValidationErrors()
+    ).toEqual('');
+
+    existingClassroomData.setBannerData(dummyBannerData);
+    expect(existingClassroomData.getClassroomBannerValidationErrors()).toEqual(
+      ''
+    );
+
+    existingClassroomData._topicsCountInClassroom = 1;
+    expect(
+      existingClassroomData.getClassroomTopicCountValidationError()
+    ).toEqual('');
   });
 });

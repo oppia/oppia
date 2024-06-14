@@ -216,4 +216,8 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
       this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     });
   }
+
+  ngOnDestory(): void {
+    this.reset();
+  }
 }

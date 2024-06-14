@@ -48,7 +48,10 @@ def validate_image_and_filename(
         ValidationError. Image or filename supplied fails one of the
             validation checks.
     """
-    if entity_type == feconf.ENTITY_TYPE_BLOG_POST:
+    if (
+        entity_type == feconf.ENTITY_TYPE_BLOG_POST or
+        feconf.ENTITY_TYPE_CLASSROOM
+    ):
         max_file_size = ONE_MB_IN_BYTES
     else:
         max_file_size = HUNDRED_KB_IN_BYTES
@@ -110,3 +113,15 @@ def validate_image_and_filename(
             (file_format, filename))
 
     return file_format
+
+
+def is_image_compressible(image_format: str) -> bool:
+    """Checks whether image is in compressible format.
+
+    Args:
+        image_format: str. The image file formate.
+
+    Returns:
+        bool. Whether the image is compressible or not.
+    """
+    return image_format in feconf.COMPRESSIBLE_IMAGE_FORMATS

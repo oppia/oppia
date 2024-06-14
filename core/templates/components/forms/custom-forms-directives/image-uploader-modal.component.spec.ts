@@ -126,6 +126,10 @@ describe('Image Uploader Modal', () => {
       tags: [],
       attrs: [],
     });
+
+    componentInstance.uploadedImage = 'thumbnail.svg';
+    componentInstance.ngOnDestory();
+    expect(componentInstance.uploadedImage).toBeNull();
   });
 
   it('should handle image upload and confirm image', () => {
