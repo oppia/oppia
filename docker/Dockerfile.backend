@@ -37,8 +37,8 @@ RUN wget -O /app/vm_deps/gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/cha
 
 # Install DSAdmin
 WORKDIR /app
-RUN curl -o dsadmin.tar.gz -L https://github.com/remko/dsadmin/releases/download/v0.20.0/dsadmin-v0.20.0-linux-amd64.tar.gz
-RUN tar -xvf dsadmin.tar.gz
+RUN curl -L https://github.com/remko/dsadmin/releases/download/v0.20.0/dsadmin-v0.20.0-linux-amd64.tar.gz | tar -xzvf -
+
 
 WORKDIR /app/oppia
 
