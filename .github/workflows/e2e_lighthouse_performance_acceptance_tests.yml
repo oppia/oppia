@@ -294,7 +294,7 @@ jobs:
         run: python -m scripts.install_chrome_for_ci
       - name: Run Lighthouse performance checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages_to_run ${{ matrix.shard.pages_to_run }}
+        run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ matrix.shard.pages_to_run }}
       - name: Uploading puppeteer video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
