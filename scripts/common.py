@@ -221,7 +221,6 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/click-all-buttons-on-about-page',
     'logged-out-user/click-all-buttons-on-donation-thanks-page',
     'logged-out-user/click-all-buttons-on-navbar',
-    'logged-out-user/click-all-buttons-on-teach-page',
     'logged-out-user/click-all-links-in-about-oppia-footer',
     'logged-out-user/click-all-links-in-teach-learn-footer',
     'logged-out-user/click-all-links-on-creator-guidelines-page',

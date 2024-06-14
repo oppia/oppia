@@ -196,13 +196,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to navigate to the Teach page.
-   */
-  async navigateToTeachPage(): Promise<void> {
-    await this.goto(teachUrl);
-  }
-
-  /**
    * Function to navigate to the Terms page.
    */
   async navigateToTermsPage(): Promise<void> {
@@ -1184,66 +1177,6 @@ export class LoggedOutUser extends BaseUser {
     ]);
 
     expect(this.page.url()).toBe(communityLibraryUrl);
-  }
-
-  /**
-   * Clicks the link with the text "Browse out Lessons" on the Teach page.
-   */
-  async clickBrowseOurLessonsOnTeachPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      'Browse our Lessons',
-      'Browse our Lessons link on the teach page',
-      mathClassroomUrl,
-      'The Oppia Classroom - Math'
-    );
-  }
-
-  /**
-   * Clicks the link with the text "Access the Android app" on the Teach page.
-   */
-  async clickAccessTheAndroidAppOnTeachPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      'Access the Android app',
-      'Access the Android app link on the Teach page',
-      androidUrl,
-      'Android'
-    );
-  }
-
-  /**
-   * Clicks the link with the text "VISIT CLASSROOM" on the Teach page.
-   */
-  async clickVisitClassroomOnTeachPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      'VISIT CLASSROOM',
-      'VISIT CLASSROOM link on the Teach page',
-      mathClassroomUrl,
-      'The Oppia Classroom - Math'
-    );
-  }
-
-  /**
-   * Clicks the link with the text "BROWSE LIBRARY" on the Teach page.
-   */
-  async clickBrowseLibraryOnTeachPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      'BROWSE LIBRARY',
-      'BROWSE LIBRARY link on the Teach page',
-      communityLibraryUrl,
-      'Community Library'
-    );
-  }
-
-  /**
-   * Clicks the link with the text "Explore Lessons" on the Teach page.
-   */
-  async clickExploreLessonsOnTeachPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      'Explore lessons',
-      'Explore Lessons link on the Teach page',
-      mathClassroomUrl,
-      'The Oppia Classroom - Math'
-    );
   }
 
   /**
