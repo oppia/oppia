@@ -46,12 +46,15 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTIONN_ADMIN_USERNAME)
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.topic_manager_id = self.get_user_id_from_email(
             self.TOPIC_MANAGER_EMAIL)
         self.new_user_id = self.get_user_id_from_email(
             self.NEW_USER_EMAIL)
+        self.question_admin_id = self.get_user_id_from_email(
+            self.QUESTION_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.linked_skill_id = skill_services.get_new_skill_id()
@@ -112,6 +115,9 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
             json_response['topic_summary_dicts'][0]['can_edit_topic'],
             True)
         self.assertEqual(
+            json_response['topic_summary_dicts'][0]['can_edit_question'],
+            True)
+        self.assertEqual(
             json_response['topic_summary_dicts'][0]['id'], self.topic_id)
         self.assertEqual(
             len(json_response['untriaged_skill_summary_dicts']), 1)
@@ -145,6 +151,49 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(len(json_response['topic_summary_dicts']), 1)
         self.assertEqual(
             json_response['topic_summary_dicts'][0]['can_edit_topic'],
+            False)
+        self.assertEqual(
+            json_response['topic_summary_dicts'][0]['can_edit_question'],
+            True)
+        self.assertEqual(
+            json_response['topic_summary_dicts'][0]['id'], self.topic_id)
+        self.assertEqual(
+            json_response['topic_summary_dicts'][0]['id'], self.topic_id)
+        self.assertEqual(
+            len(json_response['untriaged_skill_summary_dicts']), 1)
+        self.assertEqual(
+            len(json_response['mergeable_skill_summary_dicts']), 2)
+        for skill_dict in json_response['mergeable_skill_summary_dicts']:
+            if skill_dict['description'] == 'Description 3':
+                self.assertEqual(skill_dict['id'], self.linked_skill_id)
+        self.assertEqual(
+            json_response['untriaged_skill_summary_dicts'][0]['id'],
+            skill_id)
+        self.assertEqual(
+            len(json_response['all_classroom_names']), 1)
+        self.assertEqual(
+            json_response['all_classroom_names'], ['math'])
+        self.assertEqual(
+            json_response['can_delete_topic'], False)
+        self.assertEqual(
+            json_response['can_create_topic'], False)
+        self.assertEqual(
+            json_response['can_delete_skill'], False)
+        self.assertEqual(
+            json_response['can_create_skill'], False)
+        self.logout()
+
+        # Check that question admins can access the topics and skills
+        # dashboard but only edit questions. 
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        json_response = self.get_json(
+            feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
+        self.assertEqual(len(json_response['topic_summary_dicts']), 1)
+        self.assertEqual(
+            json_response['topic_summary_dicts'][0]['can_edit_topic'],
+            True)
+        self.assertEqual(
+            json_response['topic_summary_dicts'][0]['can_edit_question'],
             True)
         self.assertEqual(
             json_response['topic_summary_dicts'][0]['id'], self.topic_id)

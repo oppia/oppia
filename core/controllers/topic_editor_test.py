@@ -45,17 +45,20 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTIONN_ADMIN_USERNAME)
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.topic_manager_id = self.get_user_id_from_email(
             self.TOPIC_MANAGER_EMAIL)
         self.new_user_id = self.get_user_id_from_email(
             self.NEW_USER_EMAIL)
+        self.question_admin_id = self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL)
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.topic_manager = user_services.get_user_actions_info(
             self.topic_manager_id)
+        self.question_admin = user_services.get_user_actions_info(self.question_admin_id)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.new_user = user_services.get_user_actions_info(self.new_user_id)
         self.skill_id = skill_services.get_new_skill_id()
@@ -1071,6 +1074,19 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
             '%s/%s' % (
                 feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id))
         self.assertEqual(json_response['published'], False)
+        self.assertEqual(json_response['can_edit_topic'], True)
+        self.assertEqual(json_response['can_edit_question'], True)
+        self.assertEqual(json_response['can_publish_topic'], True)
+        self.logout()
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        # Test whether question admins can access topic rights.
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id))
+        self.assertEqual(json_response['published'], False)
+        self.assertEqual(json_response['can_edit_topic'], False)
+        self.assertEqual(json_response['can_edit_question'], True)
         self.assertEqual(json_response['can_publish_topic'], True)
         self.logout()
 
@@ -1081,6 +1097,7 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
                 feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id),
             expected_status_int=401)
         self.logout()
+        
 
     def test_can_not_get_topic_rights_when_topic_id_has_no_associated_topic(
         self
