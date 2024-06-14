@@ -250,8 +250,8 @@ export class SuperAdmin extends BaseUser {
    * false otherwise.
    */
   async isInProdMode(): Promise<boolean> {
-    const prodMode = process.env.PROD_MODE;
-    return prodMode === 'true';
+    const prodMode = process.env.PROD_MODE === 'true';
+    return prodMode;
   }
 
   async reloadExplorations(explorationName: string): Promise<void> {
@@ -346,15 +346,14 @@ export class SuperAdmin extends BaseUser {
     await this.clickOn(' Generate Explorations ');
   }
 
-  async expectNoOfExplorationToBePresent(): Promise<void> {
-    const noOfExplorations = await this.page.$(
+  async expectNoOfExplorationToBePresent(
+    expectedNumber: number
+  ): Promise<void> {
+    const noOfExplorations = await this.page.$$(
       '.label-target-no-of-explorations'
     );
-    const noOfExplorationsText = await this.page.evaluate(
-      element => element.innerText,
-      noOfExplorations
-    );
-    if (noOfExplorationsText !== '0') {
+
+    if (noOfExplorations.length !== expectedNumber) {
       throw new Error('No explorations are present');
     }
   }

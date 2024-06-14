@@ -20,13 +20,18 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {SuperAdmin} from '../../utilities/user/super-admin';
 import {showMessage} from '../../utilities/common/show-message';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const ROLES = testConstants.Roles;
 
 describe('Super Admin', function () {
-  let superAdmin: SuperAdmin;
+  let superAdmin: SuperAdmin & CurriculumAdmin;
 
   beforeAll(async function () {
     superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
+    superAdmin = await UserFactory.assignRolesToUser(superAdmin, [
+      ROLES.CURRICULUM_ADMIN,
+    ]);
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   describe('When run in development mode, Super Admin', function () {
@@ -59,7 +64,7 @@ describe('Super Admin', function () {
 
         await superAdmin.loadDummyNewStructuresData();
         await superAdmin.navigateToTopicsAndSkillsDashboard();
-        await superAdmin.expectTopic();
+        await superAdmin.expectTopicToBe();
 
         await superAdmin.generateDummySkill();
         await superAdmin.navigateToTopicsAndSkillsDashboard();
