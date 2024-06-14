@@ -17,8 +17,8 @@
  */
 
 export const ClassroomDomainConstants = {
-  ALL_TOPICS_CLASSROOM_INFO_HANDLER_URL: '/all_topics_classroom_info_handler',
-  ALL_CLASSROOMS_SUMMARY_HANDLER_URL: '/all_classrooms_summary_handler',
+  TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL: '/topics_to_classrooms_relation',
+  ALL_CLASSROOMS_SUMMARY_HANDLER_URL: '/all_classrooms_summary',
   CLASSROOOM_DATA_URL_TEMPLATE:
     '/classroom_data_handler/<classroom_url_fragment>',
   TOPIC_VIEWER_URL_TEMPLATE:

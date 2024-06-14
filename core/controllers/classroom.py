@@ -437,7 +437,7 @@ class NewClassroomHandler(
         })
 
 
-class AllTopicsClassroomInfoHandler(
+class TopicsToClassroomsRelationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """return a list of all topics and their
@@ -448,7 +448,7 @@ class AllTopicsClassroomInfoHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.open_access
+    @acl_decorators.can_access_classroom_admin_page
     def get(self) -> None:
         topic_dicts = [
             topic.to_dict() for topic in topic_fetchers.get_all_topics()
@@ -474,7 +474,7 @@ class AllTopicsClassroomInfoHandler(
                 })
 
         self.render_json({
-            'all_topics_classroom_info': list(
+            'topics_to_classrooms_relation': list(
                 topics_classroom_info_dicts.values())
         })
 
@@ -482,7 +482,8 @@ class AllTopicsClassroomInfoHandler(
 class AllClassroomsSummaryHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """return a list of subset of classroom properties.
+    """return a list of properties which are needed
+        to show a classroom card.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

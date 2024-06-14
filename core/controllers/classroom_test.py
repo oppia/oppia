@@ -612,7 +612,7 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
         )
 
 
-class AllTopicsClassroomInfoHandlerTests(BaseClassroomControllerTests):
+class TopicsToClassroomsRelationHandlerTests(BaseClassroomControllerTests):
 
     def setUp(self) -> None:
         super().setUp()
@@ -627,7 +627,7 @@ class AllTopicsClassroomInfoHandlerTests(BaseClassroomControllerTests):
     def test_get_all_topics_classroom_info(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         json_response = self.get_json(
-            feconf.ALL_TOPICS_CLASSROOM_INFO_HANDLER_URL
+            feconf.TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL
         )
         expected_response = [
             {
@@ -661,7 +661,7 @@ class AllTopicsClassroomInfoHandlerTests(BaseClassroomControllerTests):
                 'topic_name'] or ''
         self.assertListEqual(
             sorted(
-                json_response['all_topics_classroom_info'],
+                json_response['topics_to_classrooms_relation'],
                 key=sort_key
             ),
             sorted(expected_response, key=sort_key)

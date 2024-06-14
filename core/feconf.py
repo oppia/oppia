@@ -1082,10 +1082,10 @@ CLASSROOM_ID_TO_NAME_HANDLER_URL = '/classroom_id_to_name_handler'
 UNUSED_TOPICS_HANDLER_URL = '/unused_topics'
 NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 NEW_CLASSROOM_HANDLER_URL = '/classroom_admin/create_new'
-ALL_TOPICS_CLASSROOM_INFO_HANDLER_URL = (
-    '/all_topics_classroom_info_handler'
+TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL = (
+    '/topics_to_classrooms_relation'
 )
-ALL_CLASSROOMS_SUMMARY_HANDLER_URL = '/all_classrooms_summary_handler'
+ALL_CLASSROOMS_SUMMARY_HANDLER_URL = '/all_classrooms_summary'
 CLASSROOM_HANDLER_URL = '/classroom'
 CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
 CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'

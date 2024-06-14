@@ -88,15 +88,15 @@ interface DoesClassroomWithUrlFragmentExistBackendResponse {
   classroom_url_fragment_exists: boolean;
 }
 
-export interface TopicClassroomInfoDict {
+export interface TopicClassroomRelationDict {
   topic_name: string;
   topic_id: string;
   classroom_name: string | null;
   classroom_url_fragment: string | null;
 }
 
-interface AllTopicsClassroomInfoBackendDict {
-  all_topics_classroom_info: TopicClassroomInfoDict[];
+interface TopicsClassroomRelationBackendDict {
+  topics_to_classrooms_relation: TopicClassroomRelationDict[];
 }
 
 export interface ClassroomSummaryDict {
@@ -403,17 +403,19 @@ export class ClassroomBackendApiService {
     });
   }
 
-  async getAllTopicsClassroomInfoAsync(): Promise<TopicClassroomInfoDict[]> {
+  async getAllTopicsClassroomInfoAsync(): Promise<
+    TopicClassroomRelationDict[]
+  > {
     return new Promise((resolve, reject) => {
       const topicsClassroomInfoUrl =
-        ClassroomDomainConstants.ALL_TOPICS_CLASSROOM_INFO_HANDLER_URL;
+        ClassroomDomainConstants.TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL;
 
       this.http
-        .get<AllTopicsClassroomInfoBackendDict>(topicsClassroomInfoUrl)
+        .get<TopicsClassroomRelationBackendDict>(topicsClassroomInfoUrl)
         .toPromise()
         .then(
           response => {
-            resolve(response.all_topics_classroom_info);
+            resolve(response.topics_to_classrooms_relation);
           },
           errorResponse => {
             reject(errorResponse?.error?.error);

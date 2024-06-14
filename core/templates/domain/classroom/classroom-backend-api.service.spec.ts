@@ -579,18 +579,16 @@ describe('Classroom backend API service', function () {
     expect(failHandler).toHaveBeenCalled();
   }));
 
-  it('should be able to get all topics and classroom info', fakeAsync(() => {
+  it('should be able to get topics and classroom relation', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
     let service = classroomBackendApiService;
 
     service.getAllTopicsClassroomInfoAsync().then(successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/all_topics_classroom_info_handler'
-    );
+    let req = httpTestingController.expectOne('/topics_to_classrooms_relation');
     expect(req.request.method).toEqual('GET');
     req.flush({
-      all_topics_classroom_info: [
+      topics_to_classrooms_relation: [
         {
           topic_name: 'topic1',
           topic_id: 'topic1',
@@ -606,15 +604,13 @@ describe('Classroom backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should handle errorcallback while getting all topics and classroom info', fakeAsync(() => {
+  it('should handle errorcallback while getting topics and classroom relation', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
     let service = classroomBackendApiService;
 
     service.getAllTopicsClassroomInfoAsync().then(successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/all_topics_classroom_info_handler'
-    );
+    let req = httpTestingController.expectOne('/topics_to_classrooms_relation');
     expect(req.request.method).toEqual('GET');
     req.flush('Invalid request', {
       status: 400,
@@ -633,9 +629,7 @@ describe('Classroom backend API service', function () {
     let service = classroomBackendApiService;
 
     service.getAllClassroomsSummaryAsync().then(successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/all_classrooms_summary_handler'
-    );
+    let req = httpTestingController.expectOne('/all_classrooms_summary');
     expect(req.request.method).toEqual('GET');
     req.flush({
       all_classrooms_summary: [
@@ -661,9 +655,7 @@ describe('Classroom backend API service', function () {
     let service = classroomBackendApiService;
 
     service.getAllClassroomsSummaryAsync().then(successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/all_classrooms_summary_handler'
-    );
+    let req = httpTestingController.expectOne('/all_classrooms_summary');
     expect(req.request.method).toEqual('GET');
     req.flush('Invalid request', {
       status: 400,
