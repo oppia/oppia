@@ -2088,7 +2088,7 @@ class GenericTestBase(AppEngineTestBase):
     VOICEOVER_ADMIN_EMAIL: Final = 'voiceoveradm@example.com'
     VOICEOVER_ADMIN_USERNAME: Final = 'voiceoveradm'
     QUESTION_ADMIN_EMAIL: Final = 'questionadm@example.com'
-    QUESTIONN_ADMIN_USERNAME: Final = 'questionadm'
+    QUESTION_ADMIN_USERNAME: Final = 'questionadm'
     VIEWER_EMAIL: Final = 'viewer@example.com'
     VIEWER_USERNAME: Final = 'viewer'
     NEW_USER_EMAIL: Final = 'new.user@example.com'
@@ -2647,6 +2647,22 @@ version: 1
                     'action': 'assign',
                     'topic_id': topic_id
                 }, csrf_token=self.get_new_csrf_token())
+                
+    def set_question_admins(
+        self, question_admins_usernames: List[str]
+    ) -> None:
+        """Sets role of given users as QUESTION_ADMIN.
+
+        Args:
+            question_admins_usernames: list(str). List of usernames.
+        """
+        with self.super_admin_context():
+            for username in question_admins_usernames:
+                self.put_json('/questionadminrolehandler', {
+                    'username': username,
+                    'action': 'assign'
+                }, csrf_token=self.get_new_csrf_token())
+
 
     def set_translation_coordinators(
         self, translation_coordinator_usernames: List[str], language_id: str

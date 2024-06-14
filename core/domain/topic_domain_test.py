@@ -737,7 +737,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         user_ids = [self.user_id_a, self.user_id_b]
         assert user_ids[0] is not None
         assert user_ids[1] is not None
-        topic_rights = topic_domain.TopicRights(self.topic_id, user_ids, False, False)
+        topic_rights = topic_domain.TopicRights(self.topic_id, user_ids, False)
         self.assertTrue(topic_rights.is_manager(self.user_id_a))
         self.assertTrue(topic_rights.is_manager(self.user_id_b))
         self.assertFalse(topic_rights.is_manager('fakeuser'))

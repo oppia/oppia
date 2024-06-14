@@ -46,7 +46,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTIONN_ADMIN_USERNAME)
+        self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTION_ADMIN_USERNAME)
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.topic_manager_id = self.get_user_id_from_email(
@@ -76,6 +76,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             subtopics=[subtopic], next_subtopic_id=2)
 
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
+        self.set_question_admins([self.QUESTION_ADMIN_USERNAME])
         math_classroom: classroom_config_domain.Classroom = (
             classroom_config_domain.Classroom(
                 classroom_id='math_classroom_id',
@@ -151,7 +152,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(len(json_response['topic_summary_dicts']), 1)
         self.assertEqual(
             json_response['topic_summary_dicts'][0]['can_edit_topic'],
-            False)
+            True)
         self.assertEqual(
             json_response['topic_summary_dicts'][0]['can_edit_question'],
             True)
@@ -185,13 +186,13 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
 
         # Check that question admins can access the topics and skills
         # dashboard but only edit questions. 
-        self.login(self.TOPIC_MANAGER_EMAIL)
+        self.login(self.QUESTION_ADMIN_EMAIL)
         json_response = self.get_json(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
         self.assertEqual(len(json_response['topic_summary_dicts']), 1)
         self.assertEqual(
             json_response['topic_summary_dicts'][0]['can_edit_topic'],
-            True)
+            False)
         self.assertEqual(
             json_response['topic_summary_dicts'][0]['can_edit_question'],
             True)
