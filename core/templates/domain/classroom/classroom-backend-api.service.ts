@@ -50,6 +50,10 @@ interface ClassroomIdBackendDict {
   classroom_id: string;
 }
 
+export interface NewClassroomBackendDict {
+  new_classroom_id: string;
+}
+
 export interface ClassroomBackendDict {
   classroom_id: string;
   name: string;
@@ -82,6 +86,29 @@ interface ClassroomDataResponse {
 
 interface DoesClassroomWithUrlFragmentExistBackendResponse {
   classroom_url_fragment_exists: boolean;
+}
+
+export interface TopicClassroomRelationDict {
+  topic_name: string;
+  topic_id: string;
+  classroom_name: string | null;
+  classroom_url_fragment: string | null;
+}
+
+interface TopicsClassroomRelationBackendDict {
+  topics_to_classrooms_relation: TopicClassroomRelationDict[];
+}
+
+export interface ClassroomSummaryDict {
+  name: string;
+  url_fragment: string;
+  teaser_text: string;
+  thumbnail_filename: string;
+  thumbnail_bg_color: string;
+}
+
+interface AllClassroomsSummaryBackendDict {
+  all_classrooms_summary: ClassroomSummaryDict[];
 }
 
 @Injectable({
@@ -248,6 +275,30 @@ export class ClassroomBackendApiService {
     });
   }
 
+  async createNewClassroomAsync(
+    name: string,
+    urlFragment: string
+  ): Promise<NewClassroomBackendDict> {
+    return new Promise((resolve, reject) => {
+      let newClassroomUrl = ClassroomDomainConstants.NEW_CLASSROOM_HANDLER_URL;
+
+      this.http
+        .post<NewClassroomBackendDict>(newClassroomUrl, {
+          name,
+          url_fragment: urlFragment,
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error);
+          }
+        );
+    });
+  }
+
   async deleteClassroomAsync(classroomId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       let classroomUrl = this.urlInterpolationService.interpolateUrl(
@@ -344,6 +395,46 @@ export class ClassroomBackendApiService {
         .then(
           response => {
             resolve(response.classroom_id);
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error);
+          }
+        );
+    });
+  }
+
+  async getAllTopicsClassroomInfoAsync(): Promise<
+    TopicClassroomRelationDict[]
+  > {
+    return new Promise((resolve, reject) => {
+      const topicsClassroomInfoUrl =
+        ClassroomDomainConstants.TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL;
+
+      this.http
+        .get<TopicsClassroomRelationBackendDict>(topicsClassroomInfoUrl)
+        .toPromise()
+        .then(
+          response => {
+            resolve(response.topics_to_classrooms_relation);
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error);
+          }
+        );
+    });
+  }
+
+  async getAllClassroomsSummaryAsync(): Promise<ClassroomSummaryDict[]> {
+    return new Promise((resolve, reject) => {
+      const topicsClassroomInfoUrl =
+        ClassroomDomainConstants.ALL_CLASSROOMS_SUMMARY_HANDLER_URL;
+
+      this.http
+        .get<AllClassroomsSummaryBackendDict>(topicsClassroomInfoUrl)
+        .toPromise()
+        .then(
+          response => {
+            resolve(response.all_classrooms_summary);
           },
           errorResponse => {
             reject(errorResponse?.error?.error);

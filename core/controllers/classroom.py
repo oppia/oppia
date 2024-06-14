@@ -273,16 +273,34 @@ class ClassroomHandler(
         Raises:
             InvalidInputException. Classroom ID of the URL path argument must
                 match with the ID given in the classroom payload dict.
+            InvalidInputException. A topic can only be assigned to one
+                classroom.
         """
         assert self.normalized_payload is not None
         classroom = self.normalized_payload['classroom_dict']
+
         if classroom_id != classroom.classroom_id:
             raise self.InvalidInputException(
                 'Classroom ID of the URL path argument must match with the ID '
                 'given in the classroom payload dict.'
             )
 
-        classroom_config_services.update_or_create_classroom_model(classroom)
+        classrooms = classroom_config_services.get_all_classrooms()
+        invalid_topic_ids = [
+            topic_id for classroom in classrooms
+            if classroom.classroom_id != classroom_id
+            for topic_id in classroom.get_topic_ids()
+        ]
+
+        for topic_id in classroom.get_topic_ids():
+            if topic_id in invalid_topic_ids:
+                topic_name = topic_fetchers.get_topic_by_id(topic_id).name
+                raise self.InvalidInputException(
+                    'Topic %s is already assigned to a classroom. A topic '
+                    'can only be assigned to one classroom.' % topic_name
+                )
+
+        classroom_config_services.update_classroom(classroom)
         self.render_json(self.values)
 
     @acl_decorators.can_access_classroom_admin_page
@@ -358,4 +376,138 @@ class ClassroomIdHandler(
 
         self.render_json({
             'classroom_id': classroom.classroom_id
+        })
+
+
+class NewClassroomDataHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of NewClassroomHandler's
+    normalized_payload dictionary.
+    """
+
+    name: str
+    url_fragment: str
+
+
+class NewClassroomHandler(
+    base.BaseHandler[
+        NewClassroomDataHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
+    """Creates a new classroom."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_CHARS_IN_CLASSROOM_NAME
+                    }, {
+                        'id': 'is_nonempty',
+                    }]
+                }
+            },
+            'url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        }
+    }
+
+    @acl_decorators.can_access_classroom_admin_page
+    def post(self) -> None:
+        """Creates a new classroom.
+
+        Raise:
+            InvalidInputException. If there are validation errors
+                with name or url_fragment.
+        """
+        assert self.normalized_payload is not None
+
+        name = self.normalized_payload['name']
+        url_fragment = self.normalized_payload['url_fragment']
+
+        new_classroom_id = classroom_config_services.get_new_classroom_id()
+        classroom_config_services.create_new_default_classroom(
+            new_classroom_id, name, url_fragment
+        )
+
+        self.render_json({
+            'new_classroom_id': new_classroom_id
+        })
+
+
+class TopicsToClassroomsRelationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """return a list of all topics and their
+    relation with classrooms.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_classroom_admin_page
+    def get(self) -> None:
+        topic_dicts = [
+            topic.to_dict() for topic in topic_fetchers.get_all_topics()
+        ]
+
+        classrooms = classroom_config_services.get_all_classrooms()
+        topics_classroom_info_dicts: Dict[
+            str, Dict[str, str|None]] = {}
+
+        for topic_dict in topic_dicts:
+            topics_classroom_info_dicts[topic_dict['id']] = {
+                'topic_id': topic_dict['id'],
+                'topic_name': topic_dict['name'],
+                'classroom_name': None,
+                'classroom_url_fragment': None
+            }
+
+        for classroom in classrooms:
+            for topic_id in classroom.get_topic_ids():
+                topics_classroom_info_dicts[topic_id].update({
+                    'classroom_name': classroom.name,
+                    'classroom_url_fragment': classroom.url_fragment
+                })
+
+        self.render_json({
+            'topics_to_classrooms_relation': list(
+                topics_classroom_info_dicts.values())
+        })
+
+
+class AllClassroomsSummaryHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """return a list of properties which are needed
+        to show a classroom card.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        classrooms = classroom_config_services.get_all_classrooms()
+        all_classrooms_summary_dicts: List[Dict[str, str|bool]] = []
+
+        for classroom in classrooms:
+            classroom_summary_dict: Dict[str, str|bool] = {
+                'name': classroom.name,
+                'url_fragment': classroom.url_fragment,
+                'teaser_text': classroom.teaser_text,
+                'is_published': classroom.is_published,
+                'thumbnail_filename': classroom.thumbnail_data.filename,
+                'thumbnail_bg_color': classroom.banner_data.bg_color
+            }
+            all_classrooms_summary_dicts.append(
+                classroom_summary_dict
+            )
+
+        self.render_json({
+            'all_classrooms_summary': all_classrooms_summary_dicts
         })
