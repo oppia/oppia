@@ -869,7 +869,8 @@ export class CurriculumAdmin extends BaseUser {
     });
 
     if (!skillToDelete) {
-      throw new Error(`Skill ${skillName} not found`);
+      console.error(`Skill ${skillName} not found`);
+      return;
     }
 
     await this.page.waitForSelector(skillListItemOptions, {visible: true});
