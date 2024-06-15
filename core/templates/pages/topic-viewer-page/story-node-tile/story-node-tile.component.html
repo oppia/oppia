@@ -1,0 +1,207 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<mat-card class="story-node-card" *ngIf="nodeDataLoaded">
+  <div class="story-node-image">
+    <img [src]="pathIconParameters[0].thumbnailIconUrl"
+         [style.backgroundColor]="pathIconParameters[0].thumbnailBgColor"
+         alt="Icon"
+         class="image">
+  </div>
+  <div class="story-node-contents">
+    <h3 class="node-title">Lesson: {{node.getTitle()}}</h3>
+    <p class="node-description">{{ node.getDescription() }}</p>
+    <div class="progress-bar-container" [ngClass]="{'single-checkpoint-bar': checkpointCount === 1, 'multiple-checkpoints-bar': checkpointCount > 1}">
+      <div class="progress-bar">
+        <div class="completed-progress-bar" [style.width.%]="getCompletedProgressBarWidth()"></div>
+      </div>
+      <div *ngFor="let checkpointNode of checkpointStatusArray; index as idx"
+                [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}">
+      </div>
+    </div>
+    <button class="node-button" *ngIf="resumeButtonActivate">resume</button>
+    <button class="node-button" *ngIf="!resumeButtonActivate" (click)="clickstart()">start</button>
+  </div>
+</mat-card>
+
+<style>
+  .story-node-card {
+    align-items: center;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    height: 180px;
+    justify-content: center;
+    margin: 20px auto;
+    max-width: 1045px;
+    overflow: hidden;
+    padding: 0;
+  }
+  .story-node-image {
+    display: flex;
+    width: 20%;
+  }
+  .story-node-contents {
+    height: 100%;
+    margin-right: 103px;
+    width: 70%;
+  }
+  .image {
+    height: 180px;
+    width: 100%;
+  }
+  .node-title {
+    font-size: x-large;
+    height: 30px;
+    margin-left: 15px;
+    margin-top: 1px;
+    width: 60%;
+  }
+  .node-description {
+    height: 31px;
+    margin-left: 17px;
+    margin-top: -21px;
+    width: 413px;
+  }
+  .node-button {
+    background-color: #00645c;
+    border-radius: 7px;
+    color: white;
+    margin-left: 513px;
+    margin-top: -3px;
+    position: absolute;
+    right: 59px;
+    transform: translateX(50px);
+    width: 10%;
+  }
+  .story-node-card .progress-bar-container {
+    align-items: center;
+    display: flex;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    margin-left: 20px;
+    position: relative;
+    top: -84px;
+    width: 43%;
+  }
+  .story-node-card .single-checkpoint-bar {
+    justify-content: center;
+  }
+  .story-node-card .multiple-checkpoints-bar {
+    height: 10px;
+    justify-content: space-between;
+    margin-top: 85px;
+  }
+  .story-node-card .progress-bar {
+    background-color: #bbb;
+    border-radius: 5px;
+    display: flex;
+    height: 4px;
+    justify-content: flex-start;
+    margin-left: 12px;
+    position: absolute;
+    width: 95%;
+  }
+  .completed-progress-bar {
+    background-color: #00645c;
+    border-radius: 5px;
+    height: 100%;
+    max-width: 100%;
+  }
+  .completed-checkpoint-node {
+    background-color: #00645c;
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    height: 15px;
+    justify-content: center;
+    text-align: center;
+    width: 15px;
+    z-index: 0;
+  }
+  .in-progress-checkpoint-node {
+    align-items: flex-start;
+    background-color: #fff;
+    border: 3.5px solid #00645c;
+    border-radius: 50%;
+    color: #00645c;
+    display: flex;
+    font-size: 1.1em;
+    height: 20px;
+    justify-content: center;
+    text-align: center;
+    width: 20px;
+    z-index: 0;
+  }
+  .incomplete-checkpoint-node {
+    align-items: flex-end;
+    background-color: #fff;
+    border: 3.5px solid #bbb;
+    border-radius: 50%;
+    color: #bbb;
+    display: flex;
+    font-size: 0.9em;
+    height: 15px;
+    justify-content: center;
+    text-align: center;
+    width: 15px;
+    z-index: 0;
+  }
+  @media only screen and (max-width: 767px) {
+    /* Styles for mobile phones */
+  .story-node-card {
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+    justify-content: center;
+    width: 95%;
+  }
+  .story-node-image {
+    display: grid;
+    flex-direction: column;
+    height: 70%;
+    width: 100%;
+  }
+  .image {
+    height: 200px;
+    margin-top: 0;
+    width: 100%;
+  }
+  .story-node-contents {
+    display: flex;
+    margin-left: -105px;
+    text-wrap: wrap;
+  }
+  .node-title {
+    font-size: large;
+    margin-left: 55px;
+    text-wrap: wrap;
+    width: 653px;
+  }
+  .node-description {
+    margin-left: -384px;
+    margin-right: -200px;
+    margin-top: 30px;
+    width: 500px;
+  }
+  .story-node-card .progress-bar-container {
+    align-items: center;
+    display: flex;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    margin-left: -94px;
+    margin-right: -60px;
+    position: relative;
+    top: -21px;
+    width: 176%;
+  }
+  .node-button {
+    background-color: #00645c;
+    border-radius: 7px;
+    color: white;
+    margin-left: 513px;
+    margin-top: 250px;
+    position: absolute;
+    right: 59px;
+    transform: translateX(50px);
+    width: 22%;
+  }
+  }
+</style>
