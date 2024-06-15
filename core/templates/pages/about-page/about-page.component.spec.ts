@@ -29,6 +29,7 @@ import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
 import {DonationBoxModalComponent} from '../donate-page/donation-box/donation-box-modal.component';
 import {ThanksForDonatingModalComponent} from '../donate-page/thanks-for-donating-modal.component';
 import {of} from 'rxjs';
@@ -64,6 +65,7 @@ describe('About Page', () => {
   beforeEach(async () => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
+      imports: [NgbAccordionModule],
       declarations: [
         AboutPageComponent,
         MockTranslatePipe,
