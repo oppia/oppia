@@ -2920,7 +2920,22 @@ def can_edit_question(
         if role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions:
             return handler(self, question_id, **kwargs)
         if role_services.ACTION_EDIT_OWNED_QUESTION in self.user.actions:
-            return can_edit_topic(handler)(self, question_id, **kwargs)
+            skills = question_services.get_skills_linked_to_question(question_id)
+            if not skills:
+                raise self.UnauthorizedUserException(
+                    'You do not have credentials to edit this question.')
+            skill_ids = [skill.id for skill in skills]
+            all_topics = topic_fetchers.get_all_topics()
+            for topic in all_topics:
+                for skill_id in topic.get_all_skill_ids():
+                    if skill_id in skill_ids:
+                        topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=False)
+                        if topic_rights is None or topic is None:
+                            raise base.UserFacingExceptions.NotFoundException
+                        if topic_services.check_can_edit_topic(self.user, topic_rights):
+                            return handler(self, question_id, **kwargs)
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to edit this question.')
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this question.')
