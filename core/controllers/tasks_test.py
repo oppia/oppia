@@ -71,6 +71,10 @@ class TasksTests(test_utils.EmailTestBase):
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
             )
         ]
     )
@@ -168,6 +172,10 @@ class TasksTests(test_utils.EmailTestBase):
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
             )
         ]
     )
@@ -222,6 +230,10 @@ class TasksTests(test_utils.EmailTestBase):
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
             )
         ]
     )
@@ -274,6 +286,10 @@ class TasksTests(test_utils.EmailTestBase):
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
             )
         ]
     )
@@ -326,6 +342,10 @@ class TasksTests(test_utils.EmailTestBase):
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
             )
         ]
     )
