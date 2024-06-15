@@ -23,40 +23,37 @@ module.exports = {
   meta: {
     type: 'layout',
     docs: {
-      description: (
+      description:
         'Lint check to ensure that all the JS/TS file have' +
-        ' exactly one component'),
+        ' exactly one component',
       category: 'Stylistic Issues',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      multipleComponents: (
-        'Please ensure that there is exactly one component in the file.')
+      multipleComponents:
+        'Please ensure that there is exactly one component in the file.',
     },
   },
 
-  create: function(context) {
-    var numOfDirective,
-      numOfController,
-      numOfFilter,
-      numOfFactory;
-    var selector = (
+  create: function (context) {
+    var numOfDirective, numOfController, numOfFilter, numOfFactory;
+    var selector =
       'MemberExpression' +
       '[property.name=/^(directive|filter|factory|controller)$/]' +
       '[object.callee.property.name=module]' +
-      '[object.callee.object.name=angular]');
+      '[object.callee.object.name=angular]';
 
     return {
-      Program: function(node) {
+      Program: function (node) {
         numOfDirective = 0;
         numOfController = 0;
         numOfFilter = 0;
         numOfFactory = 0;
       },
 
-      [selector]: function(node) {
+      [selector]: function (node) {
         switch (node.property.name) {
           case 'controller':
             numOfController++;
@@ -73,17 +70,17 @@ module.exports = {
         }
       },
 
-      'Program:exit': function(node) {
-        var totalComponent = (
-          numOfDirective + numOfController + numOfFilter + numOfFactory);
+      'Program:exit': function (node) {
+        var totalComponent =
+          numOfDirective + numOfController + numOfFilter + numOfFactory;
         if (totalComponent > 1) {
           context.report({
             node: node,
             loc: node.loc,
-            messageId: 'multipleComponents'
+            messageId: 'multipleComponents',
           });
         }
-      }
+      },
     };
-  }
+  },
 };

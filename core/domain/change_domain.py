@@ -72,6 +72,7 @@ if MYPY: # pragma: no cover
         state_domain.StateDict,
         state_domain.OutcomeDict,
         state_domain.RecordedVoiceoversDict,
+        feconf.TranslatedContentDict,
         question_domain.QuestionSuggestionChangeDict
     ]
 

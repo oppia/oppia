@@ -557,3 +557,31 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 .get_learner_group_syllabus_subtopic_page_summaries(
                     [subtopic_page_id]))
         self.assertEqual(summaries, expected_summaries)
+
+    def test_populate_subtopic_page_model_fields(self) -> None:
+        model = subtopic_models.SubtopicPageModel(
+            id=self.subtopic_id,
+            topic_id=self.TOPIC_ID,
+            page_contents={},
+            page_contents_schema_version=3,
+        )
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            self.TOPIC_ID, self.subtopic_id)
+        populated_model = (
+            subtopic_page_services.populate_subtopic_page_model_fields(
+            model, subtopic_page)
+        )
+
+        self.assertEqual(populated_model.topic_id, subtopic_page.topic_id)
+        self.assertEqual(
+            populated_model.page_contents,
+            subtopic_page.page_contents.to_dict()
+        )
+        self.assertEqual(
+            populated_model.page_contents_schema_version,
+            subtopic_page.page_contents_schema_version
+        )
+        self.assertEqual(
+            populated_model.language_code,
+            subtopic_page.language_code
+        )

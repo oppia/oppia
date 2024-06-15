@@ -16,24 +16,28 @@
  * @fileoverview Component for lesson information card modal.
  */
 
-import { Clipboard } from '@angular/cdk/clipboard';
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { LearnerExplorationSummaryBackendDict } from
-  'domain/summary/learner-exploration-summary.model';
-import { UrlService } from 'services/contextual/url.service';
-import { UserService } from 'services/user.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LocalStorageService } from 'services/local-storage.service';
-import { I18nLanguageCodeService, TranslationKeyType } from
-  'services/i18n-language-code.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
-import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
+import {Clipboard} from '@angular/cdk/clipboard';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
+import {UrlService} from 'services/contextual/url.service';
+import {UserService} from 'services/user.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LocalStorageService} from 'services/local-storage.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {PlayerTranscriptService} from '../services/player-transcript.service';
+import {ExplorationEngineService} from '../services/exploration-engine.service';
+import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 
 interface ExplorationTagSummary {
   tagsToShow: string[];
@@ -47,12 +51,11 @@ const EXPLORATION_STATUS_PRIVATE = 'private';
 
 import './lesson-information-card-modal.component.css';
 
-
- @Component({
-   selector: 'oppia-lesson-information-card-modal',
-   templateUrl: './lesson-information-card-modal.component.html',
-   styleUrls: ['./lesson-information-card-modal.component.css']
- })
+@Component({
+  selector: 'oppia-lesson-information-card-modal',
+  templateUrl: './lesson-information-card-modal.component.html',
+  styleUrls: ['./lesson-information-card-modal.component.css'],
+})
 export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
@@ -97,42 +100,46 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private urlService: UrlService,
     private userService: UserService,
     private windowRef: WindowRef,
+    private explorationEngineService: ExplorationEngineService,
+    private playerTranscriptService: PlayerTranscriptService,
     private localStorageService: LocalStorageService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
-    private checkpointCelebrationUtilityService:
-      CheckpointCelebrationUtilityService,
+    private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService,
+    private playerPositionService: PlayerPositionService
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
     this.averageRating = this.ratingComputationService.computeAverageRating(
-      this.expInfo.ratings);
+      this.expInfo.ratings
+    );
     this.numViews = this.expInfo.num_views;
     this.lastUpdatedString = this.getLastUpdatedString(
-      this.expInfo.last_updated_msec);
-    this.explorationIsPrivate = (
-      this.expInfo.status === EXPLORATION_STATUS_PRIVATE);
+      this.expInfo.last_updated_msec
+    );
+    this.explorationIsPrivate =
+      this.expInfo.status === EXPLORATION_STATUS_PRIVATE;
     this.explorationTags = this.getExplorationTagsSummary(this.expInfo.tags);
     this.explorationId = this.expInfo.id;
     this.expTitle = this.expInfo.title;
     this.expCategory = this.expInfo.category;
     this.expDesc = this.expInfo.objective;
     this.infoCardBackgroundCss = {
-      'background-color': this.expInfo.thumbnail_bg_color
+      'background-color': this.expInfo.thumbnail_bg_color,
     };
     this.infoCardBackgroundImageUrl = this.expInfo.thumbnail_icon_url;
 
-    this.expTitleTranslationKey = (
-      this.i18nLanguageCodeService.
-        getExplorationTranslationKey(
-          this.explorationId, TranslationKeyType.TITLE)
-    );
-    this.expDescTranslationKey = (
-      this.i18nLanguageCodeService.
-        getExplorationTranslationKey(
-          this.explorationId, TranslationKeyType.DESCRIPTION)
-    );
+    this.expTitleTranslationKey =
+      this.i18nLanguageCodeService.getExplorationTranslationKey(
+        this.explorationId,
+        TranslationKeyType.TITLE
+      );
+    this.expDescTranslationKey =
+      this.i18nLanguageCodeService.getExplorationTranslationKey(
+        this.explorationId,
+        TranslationKeyType.DESCRIPTION
+      );
 
     // This array is used to keep track of the status of each checkpoint,
     // i.e. whether it is completed, in-progress, or yet-to-be-completed by the
@@ -145,8 +152,8 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     // If not all checkpoints are completed, then the checkpoint immediately
     // following the last completed checkpoint is labeled 'in-progress'.
     if (this.checkpointCount > this.completedCheckpointsCount) {
-      this.checkpointStatusArray[this.completedCheckpointsCount] = (
-        CHECKPOINT_STATUS_IN_PROGRESS);
+      this.checkpointStatusArray[this.completedCheckpointsCount] =
+        CHECKPOINT_STATUS_IN_PROGRESS;
     }
     for (
       let i = this.completedCheckpointsCount + 1;
@@ -155,17 +162,20 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     ) {
       this.checkpointStatusArray[i] = CHECKPOINT_STATUS_INCOMPLETE;
     }
-    this.loggedOutProgressUniqueUrlId = (
-      this.explorationPlayerStateService.getUniqueProgressUrlId());
+    this.loggedOutProgressUniqueUrlId =
+      this.explorationPlayerStateService.getUniqueProgressUrlId();
     if (this.loggedOutProgressUniqueUrlId) {
-      this.loggedOutProgressUniqueUrl = (
+      this.loggedOutProgressUniqueUrl =
         this.urlService.getOrigin() +
-        '/progress/' + this.loggedOutProgressUniqueUrlId);
+        '/progress/' +
+        this.loggedOutProgressUniqueUrlId;
     }
     if (this.checkpointCelebrationUtilityService.getIsOnCheckpointedState()) {
-      this.translatedCongratulatoryCheckpointMessage = (
+      this.translatedCongratulatoryCheckpointMessage =
         this.checkpointCelebrationUtilityService.getCheckpointMessage(
-          this.completedCheckpointsCount, this.checkpointCount));
+          this.completedCheckpointsCount,
+          this.checkpointCount
+        );
     }
   }
 
@@ -175,8 +185,9 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     }
     const spaceBetweenEachNode = 100 / (this.checkpointCount - 1);
     return (
-      ((this.completedCheckpointsCount - 1) * spaceBetweenEachNode) +
-      (spaceBetweenEachNode / 2));
+      (this.completedCheckpointsCount - 1) * spaceBetweenEachNode +
+      spaceBetweenEachNode / 2
+    );
   }
 
   getProgressPercentage(): string {
@@ -209,13 +220,14 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
     return {
       tagsToShow: tagsToShow,
-      tagsInTooltip: tagsInTooltip
+      tagsInTooltip: tagsInTooltip,
     };
   }
 
   getLastUpdatedString(millisSinceEpoch: number): string {
-    return this.dateTimeFormatService
-      .getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
+    return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+      millisSinceEpoch
+    );
   }
 
   getStaticImageUrl(imageUrl: string): string {
@@ -244,32 +256,75 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
   async saveLoggedOutProgress(): Promise<void> {
     if (!this.loggedOutProgressUniqueUrlId) {
-      this.explorationPlayerStateService
-        .setUniqueProgressUrlId()
-        .then(() => {
-          this.loggedOutProgressUniqueUrlId = (
-            this.explorationPlayerStateService.getUniqueProgressUrlId());
-          this.loggedOutProgressUniqueUrl = (
-            this.urlService.getOrigin() +
-            '/progress/' + this.loggedOutProgressUniqueUrlId);
-        });
+      this.explorationPlayerStateService.setUniqueProgressUrlId().then(() => {
+        this.loggedOutProgressUniqueUrlId =
+          this.explorationPlayerStateService.getUniqueProgressUrlId();
+        this.loggedOutProgressUniqueUrl =
+          this.urlService.getOrigin() +
+          '/progress/' +
+          this.loggedOutProgressUniqueUrlId;
+      });
     }
     this.saveProgressMenuIsShown = true;
   }
 
   onLoginButtonClicked(): void {
-    this.userService.getLoginUrlAsync().then(
-      (loginUrl) => {
-        let urlId = this.loggedOutProgressUniqueUrlId;
-        if (urlId === null) {
-          throw new Error(
-            'User should not be able to login if ' +
-            'loggedOutProgressUniqueUrlId is not null.');
-        }
-        this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(
-          urlId);
-        this.windowRef.nativeWindow.location.href = loginUrl;
-      });
+    this.userService.getLoginUrlAsync().then(loginUrl => {
+      let urlId = this.loggedOutProgressUniqueUrlId;
+      if (urlId === null) {
+        throw new Error(
+          'User should not be able to login if ' +
+            'loggedOutProgressUniqueUrlId is not null.'
+        );
+      }
+      this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(urlId);
+      this.windowRef.nativeWindow.location.href = loginUrl;
+    });
+  }
+
+  /**
+   * Retrieves the indexes of cards that are marked as checkpoints.
+   *
+   * @returns {number[]} An array of indexes of cards. Each index corresponds to a card that is a checkpoint.
+   */
+  getCheckpointCardIndexes(): number[] {
+    const checkpointCardIndexes: number[] = [];
+    const numberOfCards = this.playerTranscriptService.getNumCards();
+
+    for (let i = 0; i < numberOfCards; i++) {
+      const stateName = this.playerTranscriptService.getCard(i).getStateName();
+      const correspondingState =
+        this.explorationEngineService.getStateFromStateName(stateName);
+      if (correspondingState.cardIsCheckpoint) {
+        checkpointCardIndexes.push(i);
+      }
+    }
+    return checkpointCardIndexes;
+  }
+
+  /**
+   * If the checkpoint is completed, this function returns the user to the checkpoint.
+   *
+   * @param {number} checkpointNumber - The number of the checkpoint to return to.
+   * @returns {void} This function does not return a value. It changes the displayed card if the checkpoint is completed.
+   */
+  returnToCheckpointIfCompleted(checkpointNumber: number): void {
+    const checkpointCardIndexes = this.getCheckpointCardIndexes();
+    const cardIndex = checkpointCardIndexes[checkpointNumber];
+
+    if (cardIndex === undefined) {
+      console.error('No card index associated with this checkpoint.');
+    }
+    if (
+      this.checkpointStatusArray[checkpointNumber] !==
+      CHECKPOINT_STATUS_COMPLETED
+    ) {
+      return;
+    } else {
+      this.playerPositionService.setDisplayedCardIndex(cardIndex);
+      this.playerPositionService.onActiveCardChanged.emit();
+      this.ngbActiveModal.close();
+    }
   }
 
   closeSaveProgressMenu(): void {

@@ -16,15 +16,11 @@
  * @fileoverview Backend api service for fetching the admin data;
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-interface ConfigSchema {
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+interface PlatformParameterSchema {
   type: string;
-  items?: {
-      type: string;
-  };
-  validators?: {}[];
 }
 
 interface UserRolesBackendResponse {
@@ -35,107 +31,112 @@ interface RoleToActionsBackendResponse {
   [role: string]: string[];
 }
 
-export interface ConfigPropertiesBackendResponse {
+export interface PlatformParameterBackendResponse {
   [property: string]: {
     description: string;
     value: string[] | number;
-    schema: ConfigSchema;
+    schema: PlatformParameterSchema;
   };
 }
 
-export interface ConfigPropertyValues {
-  'max_number_of_tags_assigned_to_blog_post': number;
+export interface PlatformParameterValues {
+  max_number_of_tags_assigned_to_blog_post: number;
 }
 
 export interface BlogAdminPageDataBackendDict {
-  'config_properties': ConfigPropertiesBackendResponse;
-  'role_to_actions': RoleToActionsBackendResponse;
-  'updatable_roles': UserRolesBackendResponse;
+  platform_parameters: PlatformParameterBackendResponse;
+  role_to_actions: RoleToActionsBackendResponse;
+  updatable_roles: UserRolesBackendResponse;
 }
 
 export interface BlogAdminPageData {
-  configProperties: ConfigPropertiesBackendResponse;
+  platformParameters: PlatformParameterBackendResponse;
   roleToActions: RoleToActionsBackendResponse;
   updatableRoles: UserRolesBackendResponse;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-
 export class BlogAdminBackendApiService {
   constructor(private http: HttpClient) {}
 
   async getDataAsync(): Promise<BlogAdminPageData> {
     return new Promise((resolve, reject) => {
-      this.http.get<BlogAdminPageDataBackendDict>(
-        '/blogadminhandler').toPromise().then(response => {
-        resolve({
-          updatableRoles: response.updatable_roles,
-          roleToActions: response.role_to_actions,
-          configProperties: response.config_properties,
-        });
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.http
+        .get<BlogAdminPageDataBackendDict>('/blogadminhandler')
+        .toPromise()
+        .then(
+          response => {
+            resolve({
+              updatableRoles: response.updatable_roles,
+              roleToActions: response.role_to_actions,
+              platformParameters: response.platform_parameters,
+            });
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   private async _postRequestAsync(
-      handlerUrl: string, payload: Object, action?: string): Promise<void> {
+    handlerUrl: string,
+    payload: Object,
+    action?: string
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
       if (action) {
         payload = {
           ...payload,
-          action: action
+          action: action,
         };
       }
-      this.http.post<void>(
-        handlerUrl, payload).toPromise()
-        .then(response => {
-          resolve(response);
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
+      this.http
+        .post<void>(handlerUrl, payload)
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
-  async saveConfigPropertiesAsync(
-      newConfigPropertyValues: ConfigPropertyValues): Promise<void> {
-    let action = 'save_config_properties';
+  async savePlatformParametersAsync(
+    newPlatformParameterValues: PlatformParameterValues
+  ): Promise<void> {
+    let action = 'save_platform_parameters';
     let payload = {
-      new_config_property_values: newConfigPropertyValues
+      new_platform_parameter_values: newPlatformParameterValues,
     };
     return this._postRequestAsync('/blogadminhandler', payload, action);
   }
 
-  async revertConfigPropertyAsync(configPropertyId: string): Promise<void> {
-    let action = 'revert_config_property';
-    let payload = {
-      config_property_id: configPropertyId
-    };
-    return this._postRequestAsync('/blogadminhandler', payload, action);
-  }
-
-  async updateUserRoleAsync(
-      newRole: string, username: string): Promise<void> {
+  async updateUserRoleAsync(newRole: string, username: string): Promise<void> {
     let payload = {
       role: newRole,
       username: username,
     };
-    return this._postRequestAsync(
-      '/blogadminrolehandler', payload);
+    return this._postRequestAsync('/blogadminrolehandler', payload);
   }
 
   async removeBlogEditorAsync(username: string): Promise<Object> {
-    return this.http.put(
-      '/blogadminrolehandler', {
+    return this.http
+      .put('/blogadminrolehandler', {
         username: username,
-      }
-    ).toPromise();
+      })
+      .toPromise();
   }
 }
 
-angular.module('oppia').factory(
-  'BlogAdminBackendApiService',
-  downgradeInjectable(BlogAdminBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'BlogAdminBackendApiService',
+    downgradeInjectable(BlogAdminBackendApiService)
+  );

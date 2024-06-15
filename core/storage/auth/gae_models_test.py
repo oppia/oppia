@@ -418,3 +418,28 @@ class FirebaseSeedModelTests(test_utils.GenericTestBase):
         self.assertFalse(
             auth_models.FirebaseSeedModel.has_reference_to_user_id(
                 self.USER_ID))
+
+
+class CsrfSecretModelUnitTests(test_utils.GenericTestBase):
+    """Tests the CsrfSecretModel class."""
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            auth_models.CsrfSecretModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            auth_models.CsrfSecretModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'oppia_csrf_secret': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
+        self.assertEqual(
+            auth_models.CsrfSecretModel.get_export_policy(),
+            expected_export_policy_dict)

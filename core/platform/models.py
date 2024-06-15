@@ -114,6 +114,10 @@ class _Gae(Platform):
             elif name == Names.BLOG:
                 from core.storage.blog import gae_models as blog_models
                 returned_models.append(blog_models)
+            elif name == Names.BLOG_STATISTICS:
+                from core.storage.blog_statistics import (
+                    gae_models as blog_stats_models)
+                returned_models.append(blog_stats_models)
             elif name == Names.CLASSIFIER:
                 from core.storage.classifier import (
                     gae_models as classifier_models)
@@ -187,6 +191,10 @@ class _Gae(Platform):
             elif name == Names.USER:
                 from core.storage.user import gae_models as user_models
                 returned_models.append(user_models)
+            elif name == Names.VOICEOVER:
+                from core.storage.voiceover import (
+                    gae_models as voiceover_models)
+                returned_models.append(voiceover_models)
             else:
                 raise Exception('Invalid model name: %s' % name)
 

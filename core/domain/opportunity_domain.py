@@ -39,6 +39,7 @@ class PartialExplorationOpportunitySummaryDict(TypedDict):
     content_count: int
     translation_counts: Dict[str, int]
     translation_in_review_counts: Dict[str, int]
+    is_pinned: bool
 
 
 class ExplorationOpportunitySummaryDict(
@@ -55,6 +56,14 @@ class ExplorationOpportunitySummaryDict(
     incomplete_translation_language_codes: List[str]
     language_codes_needing_voice_artists: List[str]
     language_codes_with_assigned_voice_artists: List[str]
+
+
+class PinnedOpportunityDict(TypedDict):
+    """A dictionary representing a PinnedOpportunity object."""
+
+    language_code: str
+    topic_id: str
+    opportunity_id: str
 
 
 class SkillOpportunityDict(TypedDict):
@@ -83,7 +92,8 @@ class ExplorationOpportunitySummary:
         translation_counts: Dict[str, int],
         language_codes_needing_voice_artists: List[str],
         language_codes_with_assigned_voice_artists: List[str],
-        translation_in_review_counts: Dict[str, int]
+        translation_in_review_counts: Dict[str, int],
+        is_pinned: bool = False
     ) -> None:
         """Constructs a ExplorationOpportunitySummary domain object.
 
@@ -108,6 +118,8 @@ class ExplorationOpportunitySummary:
             translation_in_review_counts: dict. A dict with language code as a
                 key and number of translation in review in that language as the
                 value.
+            is_pinned: bool. Denotes whether the opportunity is pinned or not in
+                contributor dashboard.
         """
         self.id = exp_id
         self.topic_id = topic_id
@@ -124,6 +136,7 @@ class ExplorationOpportunitySummary:
         self.language_codes_with_assigned_voice_artists = (
             language_codes_with_assigned_voice_artists)
         self.translation_in_review_counts = translation_in_review_counts
+        self.is_pinned = is_pinned
         self.validate()
 
     @classmethod
@@ -178,7 +191,8 @@ class ExplorationOpportunitySummary:
             'chapter_title': self.chapter_title,
             'content_count': self.content_count,
             'translation_counts': self.translation_counts,
-            'translation_in_review_counts': self.translation_in_review_counts
+            'translation_in_review_counts': self.translation_in_review_counts,
+            'is_pinned': self.is_pinned
         }
 
     def validate(self) -> None:
@@ -317,4 +331,62 @@ class SkillOpportunity:
             'id': self.id,
             'skill_description': self.skill_description,
             'question_count': self.question_count
+        }
+
+
+class PinnedOpportunity:
+    """The domain object for pinned translation opportunities in
+    the contributor dashboard.
+    """
+
+    def __init__(
+        self,
+        language_code: str,
+        topic_id: str,
+        opportunity_id: str
+    ) -> None:
+        """Constructs a PinnedOpportunity domain object.
+
+        Args:
+            language_code: str. The ISO 639-1 language code for which the
+                opportunity is pinned.
+            topic_id: str. The ID of the topic for which the
+                opportunity is pinned.
+            opportunity_id: str. The ID of the pinned opportunity.
+        """
+        self.language_code = language_code
+        self.topic_id = topic_id
+        self.opportunity_id = opportunity_id
+
+    @classmethod
+    def from_dict(
+        cls,
+        pinned_opportunity_dict: PinnedOpportunityDict,
+    ) -> 'PinnedOpportunity':
+        """Returns a PinnedOpportunity domain object from a dict.
+
+        Args:
+            pinned_opportunity_dict: dict. The dict representation of a
+                PinnedOpportunity object.
+
+        Returns:
+            PinnedOpportunity. The corresponding PinnedOpportunity
+            domain object.
+        """
+        return cls(
+            pinned_opportunity_dict['language_code'],
+            pinned_opportunity_dict['topic_id'],
+            pinned_opportunity_dict['opportunity_id'])
+
+    def to_dict(self) -> PinnedOpportunityDict:
+        """Returns a copy of the object as a dictionary. It includes all
+        necessary information to represent a pinned opportunity.
+
+        Returns:
+            dict. A dict mapping the fields of PinnedOpportunity instance.
+        """
+        return {
+            'language_code': self.language_code,
+            'topic_id': self.topic_id,
+            'opportunity_id': self.opportunity_id
         }

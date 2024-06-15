@@ -22,11 +22,12 @@
     <button class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-position e2e-test-edit-content-pencil-button" title="Edit Card Content"></button>
     <div class="oppia-prevent-selection oppia-state-content-display oppia-transition-200"
          title="Card Content">
-      <span [hidden]="!stateContentService.savedMemento.isEmpty()" class="oppia-placeholder">
+      <span [hidden]="!stateContentService.savedMemento.isEmpty()" tabindex="0" class="oppia-placeholder">
         {{ stateContentPlaceholder }}
       </span>
       <span>
         <oppia-rte-output-display [rteString]="stateContentService.savedMemento.html"
+                                  tabindex="0"
                                   class="oppia-rte-editor e2e-test-state-content-display">
         </oppia-rte-output-display>
       </span>
@@ -38,6 +39,7 @@
   <div *ngIf="!isContentEditable()"
        class="e2e-test-edit-content">
     <div class="oppia-prevent-selection oppia-state-content-display oppia-transition-200"
+         tabindex="0"
          title="Card Content">
       <span [hidden]="!stateContentService.savedMemento.isEmpty()" class="oppia-placeholder">
         {{ stateContentPlaceholder }}
@@ -53,6 +55,7 @@
 
 <div *ngIf="contentEditorIsOpen" class="e2e-test-state-content-editor">
   <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
+  <p class="oppia-rte-keyboard-accessibility-text" tabindex="0">Alt+0 for keyboard accessibility</p>
   <schema-based-editor [schema]="HTML_SCHEMA"
                        [(localValue)]="stateContentService.displayed._html">
   </schema-based-editor>
@@ -119,8 +122,9 @@
      display: block;
     }
   @media screen and (max-width: 700px) {
-    .oppia-editor-edit-icon {
-     display: none;
+    .oppia-editor-edit-icon-position {
+      right: -20px;
+      top: 20px;
     }
   }
 </style>

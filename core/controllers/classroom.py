@@ -22,7 +22,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
-from core.domain import classroom_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 
@@ -68,14 +67,14 @@ class ClassroomDataHandler(
         Args:
             classroom_url_fragment: str. THe classroom URL fragment.
         """
-        classroom = classroom_services.get_classroom_by_url_fragment(
+        classroom = classroom_config_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
 
         # Here we are asserting that classroom can never be none, because
         # in the decorator `does_classroom_exist` we are already handling
         # the None case of classroom.
         assert classroom is not None
-        topic_ids = classroom.topic_ids
+        topic_ids = classroom.get_topic_ids()
         topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
         topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
         topic_summary_dicts: List[ClassroomTopicSummaryDict] = []
@@ -105,6 +104,9 @@ class ClassroomDataHandler(
                         topic_summary_dict['thumbnail_filename']),
                     'thumbnail_bg_color': (
                         topic_summary_dict['thumbnail_bg_color']),
+                    'published_story_exploration_mapping': (
+                        topic_summary_dict[
+                            'published_story_exploration_mapping']),
                     'topic_model_created_on': (
                         topic_summary_dict['topic_model_created_on']),
                     'topic_model_last_updated': (
@@ -138,30 +140,16 @@ class DefaultClassroomRedirectPage(
         self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
 
 
-class ClassroomAdminPage(
+class ClassroomIdToNameHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Renders the classroom admin page."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_classroom_admin_page
-    def get(self) -> None:
-        """Renders the classroom admin page."""
-        self.render_template('classroom-admin-page.mainpage.html')
-
-
-class ClassroomAdminDataHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Fetches relevant data for the classroom admin page."""
+    """Fetches a list of classroom names corresponding to the given ids."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_access_classroom_admin_page
+    @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves a mapping of classroom IDs to classroom names."""
         classroom_id_to_classroom_name = (
@@ -169,6 +157,34 @@ class ClassroomAdminDataHandler(
 
         self.values.update({
             'classroom_id_to_classroom_name': classroom_id_to_classroom_name
+        })
+        self.render_json(self.values)
+
+
+class UnusedTopicsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for fetching topics not associated with any classroom."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_classroom_admin_page
+    def get(self) -> None:
+        """Retrieves topics not associated with any classroom."""
+        all_topics = topic_fetchers.get_all_topics()
+        all_classrooms = classroom_config_services.get_all_classrooms()
+
+        topics_not_in_classroom = [
+            topic.to_dict() for topic in all_topics
+            if not any(
+                topic.id in classroom.topic_id_to_prerequisite_topic_ids
+                for classroom in all_classrooms
+            )
+        ]
+        self.values.update({
+            'unused_topics': topics_not_in_classroom
         })
         self.render_json(self.values)
 
@@ -233,13 +249,13 @@ class ClassroomHandler(
             classroom_id: str. The ID of the classroom.
 
         Raises:
-            PageNotFoundException. The classroom with the given id or
+            NotFoundException. The classroom with the given id or
                 url doesn't exist.
         """
         classroom = classroom_config_services.get_classroom_by_id(
             classroom_id, strict=False)
         if classroom is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'The classroom with the given id or url doesn\'t exist.')
 
         self.values.update({
@@ -257,16 +273,34 @@ class ClassroomHandler(
         Raises:
             InvalidInputException. Classroom ID of the URL path argument must
                 match with the ID given in the classroom payload dict.
+            InvalidInputException. A topic can only be assigned to one
+                classroom.
         """
         assert self.normalized_payload is not None
         classroom = self.normalized_payload['classroom_dict']
+
         if classroom_id != classroom.classroom_id:
             raise self.InvalidInputException(
                 'Classroom ID of the URL path argument must match with the ID '
                 'given in the classroom payload dict.'
             )
 
-        classroom_config_services.update_or_create_classroom_model(classroom)
+        classrooms = classroom_config_services.get_all_classrooms()
+        invalid_topic_ids = [
+            topic_id for classroom in classrooms
+            if classroom.classroom_id != classroom_id
+            for topic_id in classroom.get_topic_ids()
+        ]
+
+        for topic_id in classroom.get_topic_ids():
+            if topic_id in invalid_topic_ids:
+                topic_name = topic_fetchers.get_topic_by_id(topic_id).name
+                raise self.InvalidInputException(
+                    'Topic %s is already assigned to a classroom. A topic '
+                    'can only be assigned to one classroom.' % topic_name
+                )
+
+        classroom_config_services.update_classroom(classroom)
         self.render_json(self.values)
 
     @acl_decorators.can_access_classroom_admin_page
@@ -331,15 +365,149 @@ class ClassroomIdHandler(
             classroom_url_fragment: str. The classroom URL fragment.
 
         Raises:
-            PageNotFoundException. The classroom with the given url doesn't
+            NotFoundException. The classroom with the given url doesn't
                 exist.
         """
         classroom = classroom_config_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
         if classroom is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'The classroom with the given url doesn\'t exist.')
 
         self.render_json({
             'classroom_id': classroom.classroom_id
+        })
+
+
+class NewClassroomDataHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of NewClassroomHandler's
+    normalized_payload dictionary.
+    """
+
+    name: str
+    url_fragment: str
+
+
+class NewClassroomHandler(
+    base.BaseHandler[
+        NewClassroomDataHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
+    """Creates a new classroom."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_CHARS_IN_CLASSROOM_NAME
+                    }, {
+                        'id': 'is_nonempty',
+                    }]
+                }
+            },
+            'url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        }
+    }
+
+    @acl_decorators.can_access_classroom_admin_page
+    def post(self) -> None:
+        """Creates a new classroom.
+
+        Raise:
+            InvalidInputException. If there are validation errors
+                with name or url_fragment.
+        """
+        assert self.normalized_payload is not None
+
+        name = self.normalized_payload['name']
+        url_fragment = self.normalized_payload['url_fragment']
+
+        new_classroom_id = classroom_config_services.get_new_classroom_id()
+        classroom_config_services.create_new_default_classroom(
+            new_classroom_id, name, url_fragment
+        )
+
+        self.render_json({
+            'new_classroom_id': new_classroom_id
+        })
+
+
+class TopicsToClassroomsRelationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """return a list of all topics and their
+    relation with classrooms.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_classroom_admin_page
+    def get(self) -> None:
+        topic_dicts = [
+            topic.to_dict() for topic in topic_fetchers.get_all_topics()
+        ]
+
+        classrooms = classroom_config_services.get_all_classrooms()
+        topics_classroom_info_dicts: Dict[
+            str, Dict[str, str|None]] = {}
+
+        for topic_dict in topic_dicts:
+            topics_classroom_info_dicts[topic_dict['id']] = {
+                'topic_id': topic_dict['id'],
+                'topic_name': topic_dict['name'],
+                'classroom_name': None,
+                'classroom_url_fragment': None
+            }
+
+        for classroom in classrooms:
+            for topic_id in classroom.get_topic_ids():
+                topics_classroom_info_dicts[topic_id].update({
+                    'classroom_name': classroom.name,
+                    'classroom_url_fragment': classroom.url_fragment
+                })
+
+        self.render_json({
+            'topics_to_classrooms_relation': list(
+                topics_classroom_info_dicts.values())
+        })
+
+
+class AllClassroomsSummaryHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """return a list of properties which are needed
+        to show a classroom card.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        classrooms = classroom_config_services.get_all_classrooms()
+        all_classrooms_summary_dicts: List[Dict[str, str|bool]] = []
+
+        for classroom in classrooms:
+            classroom_summary_dict: Dict[str, str|bool] = {
+                'name': classroom.name,
+                'url_fragment': classroom.url_fragment,
+                'teaser_text': classroom.teaser_text,
+                'is_published': classroom.is_published,
+                'thumbnail_filename': classroom.thumbnail_data.filename,
+                'thumbnail_bg_color': classroom.banner_data.bg_color
+            }
+            all_classrooms_summary_dicts.append(
+                classroom_summary_dict
+            )
+
+        self.render_json({
+            'all_classrooms_summary': all_classrooms_summary_dicts
         })

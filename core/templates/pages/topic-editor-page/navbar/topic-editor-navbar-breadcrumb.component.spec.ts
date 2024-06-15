@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for the navbar breadcrumb of the topic editor.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { EventEmitter } from '@angular/core';
-import { Subtopic } from 'domain/topic/subtopic.model';
-import { Topic } from 'domain/topic/topic-object.model';
-import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
-import { TopicEditorStateService } from '../services/topic-editor-state.service';
-import { TopicEditorNavbarBreadcrumbComponent } from './topic-editor-navbar-breadcrumb.component';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {EventEmitter} from '@angular/core';
+import {Subtopic} from 'domain/topic/subtopic.model';
+import {Topic} from 'domain/topic/topic-object.model';
+import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
+import {TopicEditorStateService} from '../services/topic-editor-state.service';
+import {TopicEditorNavbarBreadcrumbComponent} from './topic-editor-navbar-breadcrumb.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('TopicEditorNavbarBreadcrumbComponent', () => {
   let component: TopicEditorNavbarBreadcrumbComponent;
@@ -37,7 +37,7 @@ describe('TopicEditorNavbarBreadcrumbComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [TopicEditorNavbarBreadcrumbComponent]
+      declarations: [TopicEditorNavbarBreadcrumbComponent],
     }).compileComponents();
   }));
 
@@ -47,9 +47,25 @@ describe('TopicEditorNavbarBreadcrumbComponent', () => {
     fixture = TestBed.createComponent(TopicEditorNavbarBreadcrumbComponent);
     component = fixture.componentInstance;
     topic = new Topic(
-      'id', 'Topic name loading', 'Abbrev. name loading',
-      'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+      'id',
+      'Topic name loading',
+      'Abbrev. name loading',
+      'Url Fragment loading',
+      'Topic description loading',
+      'en',
+      [],
+      [],
+      [],
+      1,
+      1,
+      [],
+      'str',
+      '',
+      {},
+      false,
+      '',
+      '',
+      []
     );
   });
 
@@ -72,8 +88,10 @@ describe('TopicEditorNavbarBreadcrumbComponent', () => {
 
   it('should validate topic when topic is initialised', () => {
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
-    spyOnProperty(topicEditorStateService, 'onTopicInitialized').and
-      .returnValue(topicInitializedEventEmitter);
+    spyOnProperty(
+      topicEditorStateService,
+      'onTopicInitialized'
+    ).and.returnValue(topicInitializedEventEmitter);
     component.ngOnInit();
 
     topicInitializedEventEmitter.emit();
@@ -83,8 +101,10 @@ describe('TopicEditorNavbarBreadcrumbComponent', () => {
 
   it('should validate topic when topic is reinitialised', () => {
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
-    spyOnProperty(topicEditorStateService, 'onTopicReinitialized').and
-      .returnValue(topicReinitializedEventEmitter);
+    spyOnProperty(
+      topicEditorStateService,
+      'onTopicReinitialized'
+    ).and.returnValue(topicReinitializedEventEmitter);
     component.ngOnInit();
 
     topicReinitializedEventEmitter.emit();
@@ -92,7 +112,7 @@ describe('TopicEditorNavbarBreadcrumbComponent', () => {
     expect(component.topic).toEqual(topic);
   });
 
-  it('should navigate to main tab when user clicks \'Back to Topic\'', () => {
+  it("should navigate to main tab when user clicks 'Back to Topic'", () => {
     spyOn(topicEditorRoutingService, 'navigateToMainTab');
 
     component.navigateToMainTab();
@@ -102,29 +122,37 @@ describe('TopicEditorNavbarBreadcrumbComponent', () => {
 
   it('should return true when the current tab is in a subtopic', () => {
     spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
-      'subtopic_editor');
+      'subtopic_editor'
+    );
     spyOn(topicEditorRoutingService, 'getLastTabVisited').and.returnValue(
-      'topic_preview');
+      'topic_preview'
+    );
 
     expect(component.canNavigateToTopicEditorPage()).toBeTrue();
   });
 
   it('should return true when the last visited tab is subtopic', () => {
     spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
-      'topic_editor');
+      'topic_editor'
+    );
     spyOn(topicEditorRoutingService, 'getLastTabVisited').and.returnValue(
-      'subtopic');
+      'subtopic'
+    );
 
     expect(component.canNavigateToTopicEditorPage()).toBeTrue();
   });
 
-  it('should return false when user cannot navigate to topic editor ' +
-  'page', () => {
-    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
-      'topic_preview');
-    spyOn(topicEditorRoutingService, 'getLastTabVisited').and.returnValue(
-      'main');
+  it(
+    'should return false when user cannot navigate to topic editor ' + 'page',
+    () => {
+      spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+        'topic_preview'
+      );
+      spyOn(topicEditorRoutingService, 'getLastTabVisited').and.returnValue(
+        'main'
+      );
 
-    expect(component.canNavigateToTopicEditorPage()).toBeFalse();
-  });
+      expect(component.canNavigateToTopicEditorPage()).toBeFalse();
+    }
+  );
 });

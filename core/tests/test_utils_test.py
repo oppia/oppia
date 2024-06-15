@@ -23,9 +23,14 @@ import os
 import re
 from unittest import mock
 
+from core import feature_flag_list
 from core.constants import constants
 from core.domain import auth_domain
+from core.domain import feature_flag_services
 from core.domain import param_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -34,6 +39,71 @@ from typing import Callable, Final, List, OrderedDict, Tuple
 import webapp2
 
 email_services = models.Registry.import_email_services()
+
+
+class EnableFeatureFlagTests(test_utils.GenericTestBase):
+    """Tests for testing test_utils.enable_feature_flags."""
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS])
+    def test_enable_feature_flags_decorator(self) -> None:
+        """Tests if single feature-flag is enabled."""
+        self.assertTrue(feature_flag_services.is_feature_flag_enabled(
+            'dummy_feature_flag_for_e2e_tests', None))
+
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
+        feature_flag_list.FeatureNames.DIAGNOSTIC_TEST
+    ])
+    def test_enable_multiple_feature_flags_decorator(self) -> None:
+        """Tests if multiple feature flags are enabled."""
+        self.assertTrue(feature_flag_services.is_feature_flag_enabled(
+            'dummy_feature_flag_for_e2e_tests', None))
+        self.assertTrue(feature_flag_services.is_feature_flag_enabled(
+            'diagnostic_test', None))
+
+
+class SetPlatformParametersTests(test_utils.GenericTestBase):
+    """Tests for testing test_utils.set_platform_parameters."""
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
+        ]
+    )
+    def test_set_platform_parameters_decorator(self) -> None:
+        """Tests if platform parameters are set."""
+        self.assertEqual(
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            ),
+            True
+        )
+        self.assertEqual(
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
+            ),
+            'admin'
+        )
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)
+        ]
+    )
+    def test_set_platform_parameters_decorator_with_invalid_param(self) -> None:
+        """Tests if invalid platform parameter raises an error."""
+        with self.assertRaisesRegex(
+            Exception,
+            'The value for the platform parameter dummy_parameter was '
+            'needed in this test, but not specified in the '
+            'set_platform_parameters decorator. Please this information in '
+            'the decorator.'
+        ):
+            platform_parameter_services.get_platform_parameter_value(
+                'dummy_parameter'
+            )
 
 
 class FunctionWrapperTests(test_utils.GenericTestBase):
@@ -691,6 +761,28 @@ class TestUtilsTests(test_utils.GenericTestBase):
             AssertionError, 'extra item \'1\''
         ):
             self.assert_matches_regexps(['1'], [])
+
+    def test_set_translation_coordinators(self) -> None:
+        self.signup('c@example.com', 'C')
+        user_id_c = self.get_user_id_from_email('c@example.com')
+
+        self.set_translation_coordinators(['C'], 'en')
+        self.set_translation_coordinators(['C'], 'hi')
+
+        coordinator_rights_model = (
+            user_services.get_translation_rights_with_user(user_id_c))
+        self.assertEqual(
+            2,
+            len(coordinator_rights_model)
+        )
+        self.assertEqual(
+            'en',
+            coordinator_rights_model[0].language_id
+        )
+        self.assertEqual(
+            'hi',
+            coordinator_rights_model[1].language_id
+        )
 
 
 class CheckImagePngOrWebpTests(test_utils.GenericTestBase):

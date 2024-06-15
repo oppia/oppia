@@ -16,9 +16,9 @@
  * @fileoverview Service for handling microphone data and mp3 audio processing.
  */
 
-import { EventEmitter, Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { LoggerService } from 'services/contextual/logger.service';
+import {EventEmitter, Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {LoggerService} from 'services/contextual/logger.service';
 
 declare global {
   interface Window {
@@ -27,7 +27,7 @@ declare global {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class VoiceoverRecordingService {
   // These properties are initialized using init method and we need to do
@@ -43,9 +43,7 @@ export class VoiceoverRecordingService {
   mp3Worker: Worker | null = null;
   defer: EventEmitter<string> = new EventEmitter();
 
-  constructor(
-      private loggerService: LoggerService
-  ) { }
+  constructor(private loggerService: LoggerService) {}
 
   _stopRecord(): void {
     if (this.microphone && this.processor && this.mp3Worker) {
@@ -56,7 +54,7 @@ export class VoiceoverRecordingService {
       // Issue command to retrieve converted audio.
       this.mp3Worker.postMessage({cmd: 'finish'});
       // Stop microphone stream.
-      this.microphoneStream.getTracks().forEach(function(track) {
+      this.microphoneStream.getTracks().forEach(function (track) {
         track.stop();
       });
 
@@ -73,12 +71,12 @@ export class VoiceoverRecordingService {
   }
 
   status(): {
-       isAvailable: boolean;
-       isRecording: boolean;
-       } {
+    isAvailable: boolean;
+    isRecording: boolean;
+  } {
     return {
       isAvailable: this.isAvailable,
-      isRecording: this.isRecording
+      isRecording: this.isRecording,
     };
   }
 
@@ -90,17 +88,21 @@ export class VoiceoverRecordingService {
 
     let navigator = this._startMicrophoneAsync();
 
-    navigator.then((stream) => {
-      this.isRecording = true;
-      // Set microphone stream will be used for stopping track
-      // stream in another function.
-      this.microphoneStream = stream;
-      this._processMicAudio(stream);
-    }, () => {
-      this.loggerService.warn(
-        'Microphone was not started because ofuser denied permission.');
-      this.isRecording = false;
-    });
+    navigator.then(
+      stream => {
+        this.isRecording = true;
+        // Set microphone stream will be used for stopping track
+        // stream in another function.
+        this.microphoneStream = stream;
+        this._processMicAudio(stream);
+      },
+      () => {
+        this.loggerService.warn(
+          'Microphone was not started because ofuser denied permission.'
+        );
+        this.isRecording = false;
+      }
+    );
 
     return navigator;
   }
@@ -125,12 +127,13 @@ export class VoiceoverRecordingService {
       return;
     }
     if (this.mp3Worker === null) {
-      let lameWorkerFileUrl = '/third_party/static/lamejs-1.2.0/' +
-           'worker-example/worker-realtime.js';
+      let lameWorkerFileUrl =
+        '/third_party/static/lamejs-1.2.0/' +
+        'worker-example/worker-realtime.js';
       // Config the mp3 encoding worker.
       let config = {sampleRate: 44100, bitRate: 128};
       this.mp3Worker = new Worker(lameWorkerFileUrl);
-      this.mp3Worker.onmessage = (e) => {
+      this.mp3Worker.onmessage = e => {
         // Async data flow.
         this.defer.emit(e.data.buf);
         return;
@@ -141,12 +144,11 @@ export class VoiceoverRecordingService {
   }
 
   // Convert directly from mic input to mp3.
-  _onAudioProcess(
-      event: {
-         inputBuffer: {
-           getChannelData: (value: number) => Transferable[];
-         };
-       }): void {
+  _onAudioProcess(event: {
+    inputBuffer: {
+      getChannelData: (value: number) => Transferable[];
+    };
+  }): void {
     let array = event.inputBuffer.getChannelData(0);
     this._postMessage(array);
   }
@@ -172,8 +174,8 @@ export class VoiceoverRecordingService {
 
   _initRecorder(): void {
     // Browser agnostic AudioContext API check.
-    this.audioContextAvailable = window.AudioContext ||
-        (window as Window).webkitAudioContext;
+    this.audioContextAvailable =
+      window.AudioContext || (window as Window).webkitAudioContext;
 
     if (this.audioContextAvailable) {
       // Promise required because angular is async with worker.
@@ -206,5 +208,9 @@ export class VoiceoverRecordingService {
   }
 }
 
-angular.module('oppia').factory(
-  'VoiceoverRecordingService', downgradeInjectable(VoiceoverRecordingService));
+angular
+  .module('oppia')
+  .factory(
+    'VoiceoverRecordingService',
+    downgradeInjectable(VoiceoverRecordingService)
+  );

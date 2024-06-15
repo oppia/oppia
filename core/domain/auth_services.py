@@ -18,11 +18,15 @@
 
 from __future__ import annotations
 
+import base64
+import os
+
 from core.domain import auth_domain
+from core.domain import caching_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
-from typing import List, Optional
+from typing import Final, List, Optional
 import webapp2
 
 MYPY = False
@@ -33,6 +37,10 @@ if MYPY: # pragma: no cover
 auth_models, = models.Registry.import_models([models.Names.AUTH])
 
 platform_auth_services = models.Registry.import_auth_services()
+
+# NOTE TO DEVELOPERS: Don't modify this constant since it is used to
+# identify a specific datastore entity in production.
+CSRF_SECRET_INSTANCE_ID: Final = 'csrf_secret'
 
 
 def create_profile_user_auth_details(
@@ -282,3 +290,51 @@ def revoke_super_admin_privileges(user_id: str) -> None:
         user_id: str. The Oppia user ID to revoke privileges from.
     """
     firebase_auth_services.revoke_super_admin_privileges(user_id)
+
+
+def get_csrf_secret_value() -> str:
+    """Returns the CSRF secret value. If this value does not exist,
+    creates a new secret value and returns it.
+
+    Returns:
+        str. Returns the csrf secret value.
+    """
+    memcached_items = caching_services.get_multi(
+        caching_services.CACHE_NAMESPACE_DEFAULT,
+        None,
+        [CSRF_SECRET_INSTANCE_ID]
+    )
+    if CSRF_SECRET_INSTANCE_ID in memcached_items:
+        csrf_value = memcached_items[CSRF_SECRET_INSTANCE_ID]
+        # Ruling out the possibility for csrf_value of being type other
+        # than str in order to avoid mypy error.
+        assert isinstance(csrf_value, str)
+        return csrf_value
+
+    csrf_secret_model = auth_models.CsrfSecretModel.get(
+        CSRF_SECRET_INSTANCE_ID, strict=False)
+
+    if csrf_secret_model is None:
+        csrf_secret_value = base64.urlsafe_b64encode(os.urandom(20)).decode()
+        auth_models.CsrfSecretModel(
+            id=CSRF_SECRET_INSTANCE_ID,
+            oppia_csrf_secret=csrf_secret_value
+        ).put()
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_DEFAULT,
+            None,
+            {
+                CSRF_SECRET_INSTANCE_ID: csrf_secret_value
+            }
+        )
+        csrf_secret_model = auth_models.CsrfSecretModel.get(
+            CSRF_SECRET_INSTANCE_ID, strict=False)
+
+    # Ruling out the possibility of csrf_secret_model being None in
+    # order to avoid mypy error.
+    assert csrf_secret_model is not None
+    csrf_secret_value = csrf_secret_model.oppia_csrf_secret
+    # Ruling out the possibility for csrf_secret_value of being type other
+    # than str in order to avoid mypy error.
+    assert isinstance(csrf_secret_value, str)
+    return csrf_secret_value

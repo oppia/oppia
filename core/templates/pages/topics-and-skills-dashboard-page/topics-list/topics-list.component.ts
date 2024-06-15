@@ -16,22 +16,22 @@
  * @fileoverview Component for the topics list viewer.
  */
 
-import { Component, Input, EventEmitter, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Subscription } from 'rxjs';
-import { AlertsService } from 'services/alerts.service';
-import { DeleteTopicModalComponent } from '../modals/delete-topic-modal.component';
-import { PlatformFeatureService } from 'services/platform-feature.service';
+import {Component, Input, EventEmitter, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
+import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {Subscription} from 'rxjs';
+import {AlertsService} from 'services/alerts.service';
+import {DeleteTopicModalComponent} from '../modals/delete-topic-modal.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import constants from 'assets/constants';
 
 @Component({
   selector: 'oppia-topics-list',
-  templateUrl: './topics-list.component.html'
+  templateUrl: './topics-list.component.html',
 })
 export class TopicsListComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -42,8 +42,7 @@ export class TopicsListComponent {
   @Input() itemsPerPage!: number;
   @Input() userCanDeleteTopic!: boolean;
   @Input() selectedTopicIds!: string;
-  @Output() selectedTopicIdsChange: EventEmitter<string> = (
-    new EventEmitter());
+  @Output() selectedTopicIdsChange: EventEmitter<string> = new EventEmitter();
 
   directiveSubscriptions: Subscription = new Subscription();
   // Selected topic index is set to null when the delete topic modal is closed.
@@ -55,16 +54,19 @@ export class TopicsListComponent {
   publishedChaptersInPartiallyPublishedStories: number[] = [];
   totalChaptersInPartiallyPublishedStories: number[] = [];
   TOPIC_HEADINGS: string[] = [
-    'index', 'name', 'canonical_story_count', 'subtopic_count',
-    'skill_count', 'topic_status'
+    'index',
+    'name',
+    'canonical_story_count',
+    'subtopic_count',
+    'skill_count',
+    'topic_status',
   ];
 
   constructor(
     private ngbModal: NgbModal,
     private alertsService: AlertsService,
     private editableTopicBackendApiService: EditableTopicBackendApiService,
-    private topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService,
+    private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private platformFeatureService: PlatformFeatureService
   ) {}
@@ -77,9 +79,11 @@ export class TopicsListComponent {
   getTopicEditorUrl(topicId: string): string {
     const TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>#/';
     return this.urlInterpolationService.interpolateUrl(
-      TOPIC_EDITOR_URL_TEMPLATE, {
-        topic_id: topicId
-      });
+      TOPIC_EDITOR_URL_TEMPLATE,
+      {
+        topic_id: topicId,
+      }
+    );
   }
 
   /**
@@ -100,15 +104,30 @@ export class TopicsListComponent {
 
   /**
    ** @param {Number} topicIndex - Index of the topic in
-    * the topicSummaries.
-    * @returns {Number} The calculated serial number
-    * of the topic taking into consideration the current page
-    * number and the items being displayed per page.
-    */
+   * the topicSummaries.
+   * @returns {Number} The calculated serial number
+   * of the topic taking into consideration the current page
+   * number and the items being displayed per page.
+   */
   getSerialNumberForTopic(topicIndex: number): number {
-    let topicSerialNumber: number = (
-      topicIndex + (this.pageNumber * this.itemsPerPage));
-    return (topicSerialNumber + 1);
+    let topicSerialNumber: number =
+      topicIndex + this.pageNumber * this.itemsPerPage;
+    return topicSerialNumber + 1;
+  }
+
+  /**
+   ** @param {Number} topicId - ID of the topic.
+   * @returns {CreatorTopicSummary} The topic summary of the topic
+   * of the topic with given topicId.
+   */
+  getTopicSummaryForTopicId(topicId: string): CreatorTopicSummary | undefined {
+    const topicSummary = this.topicSummaries.find(
+      (topicSummary: CreatorTopicSummary) => {
+        return topicSummary.id === topicId;
+      }
+    );
+
+    return topicSummary;
   }
 
   /**
@@ -116,24 +135,37 @@ export class TopicsListComponent {
    * @param {String} topicName - Name of the topic.
    */
   deleteTopic(topicId: string, topicName: string): void {
+    const topicSummary = this.getTopicSummaryForTopicId(topicId);
+
+    if (topicSummary?.classroom) {
+      const errorMessage =
+        `The topic is assigned to the ${topicSummary.classroom} classroom.` +
+        ' Contact the curriculum admins to remove it from the classroom first.';
+      this.alertsService.addWarning(errorMessage);
+      return;
+    }
+
     this.selectedIndex = null;
     let modalRef: NgbModalRef = this.ngbModal.open(DeleteTopicModalComponent, {
       backdrop: true,
-      windowClass: 'delete-topic-modal'
+      windowClass: 'delete-topic-modal',
     });
     modalRef.componentInstance.topicName = topicName;
-    modalRef.result.then(() => {
-      this.editableTopicBackendApiService.deleteTopicAsync(topicId).then(
-        (status: number) => {
-          this.topicsAndSkillsDashboardBackendApiService.
-            onTopicsAndSkillsDashboardReinitialized.emit();
-        },
-        (error: string) => {
-          this.alertsService.addWarning(
-            error || 'There was an error when deleting the topic.');
-        }
-      );
-    }, () => {});
+    modalRef.result.then(
+      () => {
+        this.editableTopicBackendApiService.deleteTopicAsync(topicId).then(
+          (status: number) => {
+            this.topicsAndSkillsDashboardBackendApiService.onTopicsAndSkillsDashboardReinitialized.emit();
+          },
+          (error: string) => {
+            this.alertsService.addWarning(
+              error || 'There was an error when deleting the topic.'
+            );
+          }
+        );
+      },
+      () => {}
+    );
   }
 
   /**
@@ -141,8 +173,8 @@ export class TopicsListComponent {
    * flag is enabled.
    */
   isSerialChapterLaunchFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.
-      SerialChapterLaunchCurriculumAdminView.isEnabled;
+    return this.platformFeatureService.status
+      .SerialChapterLaunchCurriculumAdminView.isEnabled;
   }
 
   /**
@@ -152,14 +184,15 @@ export class TopicsListComponent {
    * HTML template.
    */
   getUpcomingChapterNotificationsText(topic: CreatorTopicSummary): string {
-    let upcomingChapterNotificationsText = (
-      topic.getTotalUpcomingChaptersCount() + ' upcoming launch');
+    let upcomingChapterNotificationsText =
+      topic.getTotalUpcomingChaptersCount() + ' upcoming launch';
     if (topic.getTotalUpcomingChaptersCount() > 1) {
       upcomingChapterNotificationsText += 'es';
     }
-    upcomingChapterNotificationsText += (
+    upcomingChapterNotificationsText +=
       ' in the next ' +
-      constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS + ' days');
+      constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS +
+      ' days';
     return upcomingChapterNotificationsText;
   }
 
@@ -170,8 +203,8 @@ export class TopicsListComponent {
    * HTML template.
    */
   getOverdueChapterNotificationsText(topic: CreatorTopicSummary): string {
-    let overdueChapterNotificationsText = (
-      topic.getTotalOverdueChaptersCount() + ' launch');
+    let overdueChapterNotificationsText =
+      topic.getTotalOverdueChaptersCount() + ' launch';
     if (topic.getTotalOverdueChaptersCount() > 1) {
       overdueChapterNotificationsText += 'es';
     }
@@ -187,11 +220,14 @@ export class TopicsListComponent {
    * published.
    */
   areTopicChaptersFullyPublished(
-      topic: CreatorTopicSummary, idx: number): boolean {
+    topic: CreatorTopicSummary,
+    idx: number
+  ): boolean {
     if (
       topic.getTotalChaptersCounts().length &&
       topic.getTotalChaptersCounts().length ===
-      this.fullyPublishedStoriesCounts[idx]) {
+        this.fullyPublishedStoriesCounts[idx]
+    ) {
       return true;
     } else {
       return false;
@@ -201,12 +237,23 @@ export class TopicsListComponent {
   ngOnInit(): void {
     if (this.isSerialChapterLaunchFeatureEnabled()) {
       this.TOPIC_HEADINGS = [
-        'index', 'name', 'added_stories_count', 'published_stories_count',
-        'notifications', 'subtopic_count', 'skill_count', 'topic_status'];
+        'index',
+        'name',
+        'added_stories_count',
+        'published_stories_count',
+        'notifications',
+        'subtopic_count',
+        'skill_count',
+        'topic_status',
+      ];
     } else {
       this.TOPIC_HEADINGS = [
-        'index', 'name', 'canonical_story_count', 'subtopic_count',
-        'skill_count', 'topic_status'
+        'index',
+        'name',
+        'canonical_story_count',
+        'subtopic_count',
+        'skill_count',
+        'topic_status',
       ];
     }
   }
@@ -226,15 +273,17 @@ export class TopicsListComponent {
       let totalStories = this.topicSummaries[i].getTotalChaptersCounts().length;
 
       for (let j = 0; this.topicSummaries[i] && j < totalStories; j++) {
-        if (this.topicSummaries[i].getTotalChaptersCounts()[j] ===
-          this.topicSummaries[i].getPublishedChaptersCounts()[j]) {
+        if (
+          this.topicSummaries[i].getTotalChaptersCounts()[j] ===
+          this.topicSummaries[i].getPublishedChaptersCounts()[j]
+        ) {
           this.fullyPublishedStoriesCounts[i]++;
         } else {
           this.partiallyPublishedStoriesCounts[i]++;
           this.totalChaptersInPartiallyPublishedStories[i] +=
-              this.topicSummaries[i].getTotalChaptersCounts()[j];
+            this.topicSummaries[i].getTotalChaptersCounts()[j];
           this.publishedChaptersInPartiallyPublishedStories[i] +=
-              this.topicSummaries[i].getPublishedChaptersCounts()[j];
+            this.topicSummaries[i].getPublishedChaptersCounts()[j];
         }
       }
     }
@@ -245,5 +294,9 @@ export class TopicsListComponent {
   }
 }
 
-angular.module('oppia').directive('oppiaTopicsList',
-  downgradeComponent({ component: TopicsListComponent }));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaTopicsList',
+    downgradeComponent({component: TopicsListComponent})
+  );

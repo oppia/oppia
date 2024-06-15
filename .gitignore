@@ -21,6 +21,8 @@ local_compiled_js_for_test/*
 core/templates/prod/*
 webpack_bundles/*
 core/tests/.browserstack.env
+core/tests/puppeteer-acceptance-tests/build
+core/tests/test-dependencies/*.js
 node_modules/*
 # .angular is temp folder used by angular to put logs and other artefacts.
 .angular/*
@@ -69,3 +71,5 @@ dump.rdb
 ui-debug.log
 firebase-debug.log
 debug.log
+# development logs and status entries
+.dev

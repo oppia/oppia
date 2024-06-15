@@ -57,7 +57,7 @@
       <div class="navbar-header e2e-test-navbar-header float-left">
         <a class="oppia-navbar-brand-name oppia-transition-200 float-left"
            href="/community-library"
-           [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE">
+           [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE">
           <picture>
             <source type="image/webp" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.webp')">
             <source type="image/png" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.png')">
@@ -108,16 +108,6 @@
                    container="body"
                    placement="bottom">
                   Activities
-                </a>
-              </li>
-              <li class="nav-item oppia-clickable-navbar-element float-right">
-                <a class="nav-link oppia-navbar-tab e2e-test-admin-config-tab"
-                   [href]="ADMIN_TAB_URLS.CONFIG"
-                   [ngClass]="{'active': isConfigTabOpen()}"
-                   ngbTooltip="Config"
-                   placement="bottom"
-                   container="body">
-                  Config
                 </a>
               </li>
               <li class="nav-item oppia-clickable-navbar-element float-right">
@@ -201,7 +191,7 @@
                   </li>
                   <li>
                     <a href="/preferences"
-                       [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
+                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
                        class="dropdown-item oppia-dropdown-item-text">
                       Preferences
                     </a>
@@ -225,7 +215,7 @@
                   <hr class="oppia-top-right-menu-item-separator">
                   <li>
                     <a [href]="logoutUrl"
-                       [smartRouterLink]="logoutUrl"
+                       [routerLink]="logoutUrl"
                        class="dropdown-item oppia-dropdown-item-text">
                       Logout
                     </a>

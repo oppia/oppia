@@ -333,21 +333,19 @@ def _minify_and_create_sourcemap(
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
     # TODO(#18260): Change this when we permanently move to
     # the Dockerized Setup.
-    cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
-        common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
-        source_map_properties, target_file_path)
     if feconf.OPPIA_IS_DOCKERIZED:
-        cmd = ' '.join([
-            'bash', '-c',
+        subprocess.check_call(
             'node /app/oppia/node_modules/uglify-js/bin/uglifyjs'
             ' /app/oppia/third_party/generated/js/third_party.js'
-            ' -c -m --source-map %s -o /app/oppia/third_party/'
-            'generated/js/third_party.min.js' % (
-                source_map_properties
-            )
-        ])
-
-    subprocess.check_call(cmd, shell=True)
+            ' -c -m --source-map includeSources,url=\'third_party.min.js.map\''
+            ' -o /app/oppia/third_party/generated/js/third_party.min.js',
+            shell=True
+        )
+    else:
+        cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
+            common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
+            source_map_properties, target_file_path)
+        subprocess.check_call(cmd, shell=True)
 
 
 def _generate_copy_tasks_for_fonts(

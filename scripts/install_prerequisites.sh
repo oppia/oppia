@@ -34,7 +34,6 @@ sudo apt-get install python3-dev
 sudo apt-get install python3-pip
 sudo apt-get install unzip
 sudo apt-get install python3-yaml
-sudo apt-get install python-matplotlib
 sudo apt-get install python3-matplotlib
 pip install --upgrade pip==21.2.3
 

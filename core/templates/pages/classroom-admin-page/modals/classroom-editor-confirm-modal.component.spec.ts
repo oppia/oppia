@@ -16,10 +16,9 @@
  * @fileoverview Tests for classroom editor confirmation modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ClassroomEditorConfirmModalComponent } from './classroom-editor-confirm-modal.component';
-
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ClassroomEditorConfirmModalComponent} from './classroom-editor-confirm-modal.component';
 
 describe('Classroom Editor Close Confirmation Modal', () => {
   let fixture: ComponentFixture<ClassroomEditorConfirmModalComponent>;
@@ -29,12 +28,8 @@ describe('Classroom Editor Close Confirmation Modal', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ClassroomEditorConfirmModalComponent
-      ],
-      providers: [
-        NgbActiveModal,
-      ]
+      declarations: [ClassroomEditorConfirmModalComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 

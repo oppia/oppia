@@ -31,7 +31,7 @@ from .. import concurrent_task_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from scripts.linters import pre_commit_linter
+    from scripts.linters import run_lint_checks
 
 
 class TagMismatchException(Exception):
@@ -289,7 +289,7 @@ class HTMLLintChecksManager(linter_utils.BaseLinter):
     """Manages all the HTML linting functions."""
 
     def __init__(
-        self, files_to_lint: List[str], file_cache: pre_commit_linter.FileCache
+        self, files_to_lint: List[str], file_cache: run_lint_checks.FileCache
     ) -> None:
         """Constructs a HTMLLintChecksManager object.
 
@@ -410,7 +410,7 @@ class ThirdPartyHTMLLintChecksManager(linter_utils.BaseLinter):
 
         for line in html_output_lines:
             trimmed_error_messages.append(line)
-        return '\n'.join(trimmed_error_messages) + '\n'
+        return '%s\n' % '\n'.join(trimmed_error_messages)
 
     def lint_html_files(self) -> concurrent_task_utils.TaskResult:
         """This function is used to check HTML files for linting errors.
@@ -468,7 +468,7 @@ class ThirdPartyHTMLLintChecksManager(linter_utils.BaseLinter):
 
 
 def get_linters(
-    files_to_lint: List[str], file_cache: pre_commit_linter.FileCache
+    files_to_lint: List[str], file_cache: run_lint_checks.FileCache
 ) -> Tuple[HTMLLintChecksManager, ThirdPartyHTMLLintChecksManager]:
     """Creates HTMLLintChecksManager and ThirdPartyHTMLLintChecksManager
         objects and returns them.

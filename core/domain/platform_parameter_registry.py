@@ -18,11 +18,10 @@
 
 from __future__ import annotations
 
-import enum
-
 from core import feconf
 from core.domain import caching_services
 from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
 from core.platform import models
 
 from typing import Dict, List, Optional, Union
@@ -30,9 +29,12 @@ from typing import Dict, List, Optional, Union
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import config_models
+    from mypy_imports import suggestion_models
 
-(config_models,) = models.Registry.import_models(
-    [models.Names.CONFIG])
+(config_models, suggestion_models) = models.Registry.import_models(
+    [models.Names.CONFIG, models.Names.SUGGESTION])
+
+ParamName = platform_parameter_list.ParamName
 
 
 class Registry:
@@ -57,12 +59,10 @@ class Registry:
     @classmethod
     def create_platform_parameter(
         cls,
-        name: enum.Enum,
+        name: ParamName,
         description: str,
         data_type: platform_parameter_domain.DataTypes,
-        default: Optional[Union[bool, int, str, float]] = None,
-        is_feature: bool = False,
-        feature_stage: Optional[platform_parameter_domain.FeatureStages] = None
+        default: Optional[Union[bool, int, str, float]] = None
     ) -> platform_parameter_domain.PlatformParameter:
         """Creates, registers and returns a platform parameter.
 
@@ -73,9 +73,6 @@ class Registry:
                 parameter, must be one of the following: bool, number, string.
             default: Optional[Union[bool, int, str, float]]. The default value
                 for the platform parameter.
-            is_feature: bool. True if the platform parameter is a feature flag.
-            feature_stage: Enum(FeatureStages)|None. The stage of the feature,
-                required if 'is_feature' is True.
 
         Returns:
             PlatformParameter. The created platform parameter.
@@ -102,33 +99,9 @@ class Registry:
             'rules': [],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': default,
-            'is_feature': is_feature,
-            'feature_stage': feature_stage.value if feature_stage else None,
+            'default_value': default
         }
         return cls.init_platform_parameter_from_dict(param_dict)
-
-    @classmethod
-    def create_feature_flag(
-        cls,
-        name: enum.Enum,
-        description: str,
-        stage: platform_parameter_domain.FeatureStages
-    ) -> platform_parameter_domain.PlatformParameter:
-        """Creates, registers and returns a platform parameter that is also a
-        feature flag.
-
-        Args:
-            name: Enum(PARAMS). The name of the platform parameter.
-            description: str. The description of the platform parameter.
-            stage: Enum(FeatureStages). The stage of the feature.
-
-        Returns:
-            PlatformParameter. The created feature flag.
-        """
-        return cls.create_platform_parameter(
-            name, description, platform_parameter_domain.DataTypes.BOOL,
-            is_feature=True, feature_stage=stage)
 
     @classmethod
     def init_platform_parameter(
@@ -320,9 +293,7 @@ class Registry:
                 'data_type': param_with_init_settings.data_type,
                 'rules': parameter_model.rules,
                 'rule_schema_version': parameter_model.rule_schema_version,
-                'default_value': default_value,
-                'is_feature': param_with_init_settings.is_feature,
-                'feature_stage': param_with_init_settings.feature_stage,
+                'default_value': default_value
             })
         else:
             return None
@@ -369,3 +340,121 @@ class Registry:
                 default_value=param.default_value
             )
         return model_instance
+
+
+# Platform parameters should all be defined below.
+Registry.create_platform_parameter(
+    ParamName.DUMMY_PARAMETER,
+    'This is a dummy platform parameter.',
+    platform_parameter_domain.DataTypes.STRING
+)
+
+Registry.create_platform_parameter(
+    ParamName.PROMO_BAR_ENABLED,
+    'Whether the promo bar should be enabled for all users',
+    platform_parameter_domain.DataTypes.BOOL
+)
+
+Registry.create_platform_parameter(
+    ParamName.PROMO_BAR_MESSAGE,
+    'The message to show to all users if the promo bar is enabled',
+    platform_parameter_domain.DataTypes.STRING
+)
+
+Registry.create_platform_parameter(
+    ParamName.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
+    'Always ask learners for answer details. For testing -- do not use',
+    platform_parameter_domain.DataTypes.BOOL
+)
+
+Registry.create_platform_parameter(
+    ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST,
+    'The maximum number of tags that can be selected to categorize the blog '
+    'post',
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=10
+)
+
+Registry.create_platform_parameter(
+    ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD,
+    'The bounce-rate a state must exceed to create a new improvements task.',
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=0.20
+)
+
+Registry.create_platform_parameter(
+    ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD,
+    'The bounce-rate a state must fall under to discard its improvement task.',
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=0.20
+)
+
+Registry.create_platform_parameter(
+    ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS,
+    'The minimum number of times an exploration is started before it can '
+    'generate high bounce-rate improvements tasks.',
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=100
+)
+
+Registry.create_platform_parameter(
+    ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
+    'Enable sending Contributor Dashboard reviewers email notifications '
+    'about suggestions that need review. The default value is false.',
+    platform_parameter_domain.DataTypes.BOOL
+)
+
+Registry.create_platform_parameter(
+    ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
+    (
+        'Enable sending admins email notifications if there are Contributor '
+        'Dashboard suggestions that have been waiting for a review for more '
+        'than %s days. The default value is false.' % (
+            suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS)
+    ),
+    platform_parameter_domain.DataTypes.BOOL
+)
+
+Registry.create_platform_parameter(
+    ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
+    (
+        'Enable sending admins email notifications if Contributor Dashboard '
+        'reviewers are needed in specific suggestion types. The default value '
+        'is false.'
+    ),
+    platform_parameter_domain.DataTypes.BOOL
+)
+
+Registry.create_platform_parameter(
+    ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
+    (
+        'The maximum number of Contributor Dashboard suggestions per reviewer.'
+        'If the number of suggestions per reviewer surpasses this maximum, '
+        'for any given suggestion type on the dashboard, the admins are '
+        'notified by email.'
+    ),
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=5
+)
+
+Registry.create_platform_parameter(
+    ParamName.RECORD_PLAYTHROUGH_PROBABILITY,
+    'The probability of recording playthroughs',
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=0.2
+)
+
+# Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both valid and
+# correspond to owners of the app before setting this to True. If
+# SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
+# address cannot be sent. If True then emails can be sent to any user.
+Registry.create_platform_parameter(
+    ParamName.SERVER_CAN_SEND_EMAILS,
+    (
+        'Whether the application can send emails.'
+        'Change this value to True for production environments using the '
+        'platform parameter dashboard.'
+    ),
+    platform_parameter_domain.DataTypes.BOOL,
+    default=False
+)

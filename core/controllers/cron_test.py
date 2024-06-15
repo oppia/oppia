@@ -17,14 +17,17 @@
 from __future__ import annotations
 
 import datetime
+from unittest import mock
 
 from core import feconf
 from core.constants import constants
 from core.domain import beam_job_services
-from core.domain import config_services
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_registry
 from core.domain import question_domain
 from core.domain import story_domain
 from core.domain import story_services
@@ -39,6 +42,7 @@ from core.jobs.batch_jobs import exp_search_indexing_jobs
 from core.jobs.batch_jobs import user_stats_computation_jobs
 from core.platform import models
 from core.tests import test_utils
+
 import main
 
 from typing import Dict, Final, List, Set, Union
@@ -347,23 +351,24 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
 
-        self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
         self.reviewers_suggestion_email_infos = []
         self.reviewer_ids = []
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, False), # pylint: disable=line-too-long
+        ]
+    )
     def test_email_not_sent_if_sending_reviewer_emails_is_not_enabled(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', False)
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
@@ -376,13 +381,17 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, False), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, False) # pylint: disable=line-too-long
+        ]
+    )
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
 
-        with self.cannot_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
@@ -395,15 +404,18 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True) # pylint: disable=line-too-long
+        ]
+    )
     def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
@@ -419,15 +431,19 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             self.reviewers_suggestion_email_infos[0][0],
             self.expected_reviewable_suggestion_email_info)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True) # pylint: disable=line-too-long
+        ]
+    )
     def test_email_not_sent_if_reviewer_ids_is_empty(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'contributor_dashboard_reviewer_emails_is_enabled', True)
+
         user_services.remove_translation_review_rights_in_language(
             self.reviewer_id, self.language_code)
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
@@ -439,6 +455,226 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self.assertEqual(len(self.reviewers_suggestion_email_infos), 0)
 
         self.logout()
+
+
+class CronMailReviewerNewSuggestionsHandlerTests(
+        test_utils.GenericTestBase):
+
+    target_id = 'exp1'
+    language_code = 'en'
+    default_translation_html = '<p>Sample translation</p>'
+    AUTHOR_USERNAME: Final = 'author'
+    AUTHOR_EMAIL: Final = 'author@example.com'
+    REVIEWER_USERNAME: Final = 'reviewer'
+    REVIEWER_EMAIL: Final = 'reviewer@community.org'
+
+    def _create_translation_suggestion_for_en_language(
+        self
+    ) -> suggestion_registry.BaseSuggestion:
+        """Creates a translation suggestion."""
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'content_id': 'content_0',
+            'language_code': self.language_code,
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': self.default_translation_html,
+            'data_format': 'html'
+        }
+
+        return suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, add_translation_change_dict,
+            'test description')
+
+    def _create_translation_suggestion_for_hi_language(
+        self
+    ) -> suggestion_registry.BaseSuggestion:
+        """Creates a translation suggestion."""
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': self.default_translation_html,
+            'data_format': 'html'
+        }
+
+        return suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, add_translation_change_dict,
+            'test description')
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, False) # pylint: disable=line-too-long
+        ]
+    )
+    def test_email_not_sent_if_sending_reviewer_emails_is_not_enabled(self) -> None: # pylint: disable=line-too-long
+        # Here we use object because we need to spy on
+        # send_reviewer_notifications method and assert
+        # if it's being called.
+        with mock.patch.object(
+            email_manager, 'send_reviewer_notifications',
+            new_callable=mock.Mock
+        ) as mock_send:
+            self.login(
+                self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+            with self.testapp_swap:
+                self.get_json(
+                    '/cron/mail/reviewers/new_cont'
+                    'ributor_dashboard_suggestions')
+
+            mock_send.assert_not_called()
+            self.logout()
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        user_services.update_email_preferences(
+            self.reviewer_id, True, False, False, False)
+        self.save_new_valid_exploration(self.target_id, self.author_id)
+        # Give reviewer rights to review translations in the given language
+        # code.
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id, self.language_code)
+        # Create a translation suggestion so that the reviewer has something
+        # to be notified about.
+        translation_suggestion = (
+            self._create_translation_suggestion_for_en_language())
+
+        self.expected_reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion))
+
+        self.testapp_swap = self.swap(
+            self, 'testapp', webtest.TestApp(main.app_without_context))
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, False), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, False) # pylint: disable=line-too-long
+        ]
+    )
+    def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
+        # Here we use object because we need to spy on
+        # send_reviewer_notifications method and assert
+        # if it's being called.
+        with mock.patch.object(
+            email_manager, 'send_reviewer_notifications',
+            new_callable=mock.Mock
+        ) as mock_send:
+            self.login(
+                self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+            with self.testapp_swap:
+                self.get_json(
+                    '/cron/mail/reviewers/new_contr'
+                    'ibutor_dashboard_suggestions')
+
+            mock_send.assert_not_called()
+            self.logout()
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True) # pylint: disable=line-too-long
+        ]
+    )
+    def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(self) -> None: # pylint: disable=line-too-long
+        # Here we use object because we need to spy on
+        # send_reviewer_notifications method and assert
+        # if it's being called.
+        with mock.patch.object(
+            email_manager, 'send_reviewer_notifications',
+            new_callable=mock.Mock
+        ) as mock_send:
+            self.login(
+                self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+            with self.testapp_swap:
+                self.get_json(
+                    '/cron/mail/reviewers/new_cont'
+                    'ributor_dashboard_suggestions')
+            mock_send.assert_called_once_with(
+                {'en': [self.reviewer_id]},
+                {'en': [mock.ANY]}
+            )
+
+            self.logout()
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True) # pylint: disable=line-too-long
+        ]
+    )
+    def test_email_not_sent_if_reviewer_ids_is_empty(self) -> None:
+        # Here we use object because we need to spy on
+        # send_reviewer_notifications method and assert
+        # if it's being called.
+        with mock.patch.object(
+            email_manager, 'send_reviewer_notifications',
+            new_callable=mock.Mock
+        ) as mock_send:
+            self.login(
+                self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+            user_services.remove_translation_review_rights_in_language(
+                self.reviewer_id, self.language_code)
+            user_services.remove_translation_review_rights_in_language(
+                self.reviewer_id, 'hi'
+            )
+            with self.testapp_swap:
+                self.get_json(
+                    '/cron/mail/reviewers/new_contr'
+                    'ibutor_dashboard_suggestions')
+            mock_send.assert_called_once_with(
+                {'en': []},
+                mock.ANY
+            )
+            self.logout()
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED, True) # pylint: disable=line-too-long
+        ]
+    )
+    def test_email_sent_to_reviewers_successfully(self) -> None:
+        # Here we use object because we need to spy on
+        # send_reviewer_notifications method and assert
+        # if it's being called.
+        with mock.patch.object(
+            email_manager, 'send_reviewer_notifications',
+            new_callable=mock.Mock) as mock_send:
+            self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+            with self.testapp_swap:
+                self.get_json(
+                    '/cron/mail/reviewers/new_contr'
+                    'ibutor_dashboard_suggestions')
+
+            mock_send.assert_called_once_with(
+                {'en': [self.reviewer_id]},
+                {'en': [mock.ANY]}
+            )
+            self.logout()
 
 
 class CronMailAdminContributorDashboardBottlenecksHandlerTests(
@@ -596,8 +832,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
         }
 
-        self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
@@ -607,16 +841,17 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.translation_admin_ids = []
         self.question_admin_ids = []
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True) # pylint: disable=line-too-long
+        ]
+    )
     def test_email_not_sent_if_sending_emails_is_disabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
 
-        with self.cannot_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
@@ -636,15 +871,19 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.assertEqual(len(self.reviewable_suggestion_email_infos), 0)
         self.assertDictEqual(self.suggestion_types_needing_reviewers, {})
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, False), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, False) # pylint: disable=line-too-long
+        ]
+    )
     def test_email_not_sent_if_notifying_admins_reviewers_needed_is_disabled(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', False)
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
@@ -657,15 +896,19 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, False), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, False) # pylint: disable=line-too-long
+        ]
+    )
     def test_email_not_sent_if_notifying_admins_about_suggestions_is_disabled(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', False)
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
@@ -678,15 +921,19 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True) # pylint: disable=line-too-long
+        ]
+    )
     def test_email_sent_to_admin_if_sending_admin_need_reviewers_emails_enabled(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'enable_admin_notifications_for_reviewer_shortage', True)
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
@@ -700,18 +947,47 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             self.suggestion_types_needing_reviewers,
             self.expected_suggestion_types_needing_reviewers)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, 'dummy_footer'),
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE, True), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW, True) # pylint: disable=line-too-long
+        ]
+    )
     def test_email_sent_to_admin_if_notifying_admins_about_suggestions_enabled(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        config_services.set_property(
-            'committer_id',
-            'notify_admins_suggestions_waiting_too_long_is_enabled', True)
+        platform_parameter_registry.Registry.update_platform_parameter(
+            (
+                platform_parameter_list.ParamName.
+                ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
+            ),
+            self.admin_id,
+            'Updating value.',
+            [
+                platform_parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [
+                        {
+                            'type': 'platform_type',
+                            'conditions': [
+                                ['=', 'Web']
+                            ],
+                        }
+                    ],
+                    'value_when_matched': True
+                })
+            ],
+            False
+        )
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 suggestion_models,
-                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
+                'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
+            ):
                 with self.swap(
                     email_manager,
                     'send_mail_to_notify_admins_suggestions_waiting_long',
@@ -798,8 +1074,6 @@ class CronMailChapterPublicationsNotificationsHandlerTests(
             story_domain.StoryPublicationTimeliness(
             'story_2', 'Story 2', 'Topic', ['Chapter 3'], ['Chapter 4']))
 
-        self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
@@ -835,7 +1109,7 @@ class CronMailChapterPublicationsNotificationsHandlerTests(
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        with self.cannot_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_reminder_mail_to_notify_curriculum_admins',
@@ -849,10 +1123,13 @@ class CronMailChapterPublicationsNotificationsHandlerTests(
 
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+    )
     def test_email_sent_if_sending_emails_is_enabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        with self.can_send_emails, self.testapp_swap:
+        with self.testapp_swap:
             with self.swap(
                 email_manager,
                 'send_reminder_mail_to_notify_curriculum_admins',

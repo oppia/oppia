@@ -728,8 +728,8 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         """Returns the search query derived from terms and categories."""
         query = ' '.join(terms)
         if categories:
-            query += ' category=(' + ' OR '.join([
-                '"%s"' % category for category in categories]) + ')'
+            query += '%s)' % 'category=( OR '.join([
+                '"%s"' % category for category in categories])
         return query
 
     def test_get_collection_summaries_matching_ids(self) -> None:
@@ -2077,13 +2077,6 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         self._check_contributors_summary(
             self.COLLECTION_0_ID,
             {self.albert_id: 2, self.bob_id: 2})
-
-        # TODO(madiyar): Uncomment after revert_collection implementation
-        # Have Albert revert to version 3. Version 5
-        # collection_services.revert_collection(albert_id,
-        #       self.COLLECTION_ID, 4, 3)
-        # self._check_contributors_summary(self.COLLECTION_ID,
-        #                                 {albert_id: 1, bob_id: 2})
 
     def test_create_collection_summary_with_contributor_to_remove(self) -> None:
         self.save_new_valid_collection(

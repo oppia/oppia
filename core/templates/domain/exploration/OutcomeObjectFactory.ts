@@ -17,25 +17,24 @@
  * domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {
   SubtitledHtmlBackendDict,
-  SubtitledHtml
+  SubtitledHtml,
 } from 'domain/exploration/subtitled-html.model';
-import { ParamChangeBackendDict } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
+import {ParamChangeBackendDict} from 'domain/exploration/ParamChangeObjectFactory';
+import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 
 export interface OutcomeBackendDict {
-  'dest': string;
-  'dest_if_really_stuck': string | null;
-  'feedback': SubtitledHtmlBackendDict;
-  'labelled_as_correct': boolean;
-  'param_changes': readonly ParamChangeBackendDict[];
-  'refresher_exploration_id': string | null;
-  'missing_prerequisite_skill_id': string | null;
+  dest: string;
+  dest_if_really_stuck: string | null;
+  feedback: SubtitledHtmlBackendDict;
+  labelled_as_correct: boolean;
+  param_changes: readonly ParamChangeBackendDict[];
+  refresher_exploration_id: string | null;
+  missing_prerequisite_skill_id: string | null;
 }
 
 export class Outcome extends BaseTranslatableObject {
@@ -47,11 +46,14 @@ export class Outcome extends BaseTranslatableObject {
   refresherExplorationId: string | null;
   missingPrerequisiteSkillId: string | null;
   constructor(
-      dest: string, destIfReallyStuck: string | null, feedback: SubtitledHtml,
-      labelledAsCorrect: boolean,
-      paramChanges: readonly ParamChangeBackendDict[],
-      refresherExplorationId: string | null,
-      missingPrerequisiteSkillId: string | null) {
+    dest: string,
+    destIfReallyStuck: string | null,
+    feedback: SubtitledHtml,
+    labelledAsCorrect: boolean,
+    paramChanges: readonly ParamChangeBackendDict[],
+    refresherExplorationId: string | null,
+    missingPrerequisiteSkillId: string | null
+  ) {
     super();
 
     this.dest = dest;
@@ -67,6 +69,14 @@ export class Outcome extends BaseTranslatableObject {
     return [this.feedback];
   }
 
+  getContentIdToHtml(): {[contentId: string]: string} {
+    let outcomeContentIdToHtml: {[contentId: string]: string} = {};
+
+    outcomeContentIdToHtml[this.feedback.contentId as string] =
+      this.feedback.html;
+    return outcomeContentIdToHtml;
+  }
+
   setDestination(newValue: string): void {
     this.dest = newValue;
   }
@@ -79,7 +89,7 @@ export class Outcome extends BaseTranslatableObject {
       labelled_as_correct: this.labelledAsCorrect,
       param_changes: this.paramChanges,
       refresher_exploration_id: this.refresherExplorationId,
-      missing_prerequisite_skill_id: this.missingPrerequisiteSkillId
+      missing_prerequisite_skill_id: this.missingPrerequisiteSkillId,
     };
   }
 
@@ -101,38 +111,41 @@ export class Outcome extends BaseTranslatableObject {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class OutcomeObjectFactory {
   constructor() {}
 
   createNew(
-      dest: string, feedbackTextId: string, feedbackText: string,
-      paramChanges: readonly ParamChangeBackendDict[]
+    dest: string,
+    feedbackTextId: string,
+    feedbackText: string,
+    paramChanges: readonly ParamChangeBackendDict[]
   ): Outcome {
     return new Outcome(
       dest,
       null,
-      SubtitledHtml.createDefault(
-        feedbackText, feedbackTextId),
+      SubtitledHtml.createDefault(feedbackText, feedbackTextId),
       false,
       paramChanges,
       null,
-      null);
+      null
+    );
   }
 
   createFromBackendDict(outcomeDict: OutcomeBackendDict): Outcome {
     return new Outcome(
       outcomeDict.dest,
       outcomeDict.dest_if_really_stuck,
-      SubtitledHtml.createFromBackendDict(
-        outcomeDict.feedback),
+      SubtitledHtml.createFromBackendDict(outcomeDict.feedback),
       outcomeDict.labelled_as_correct,
       outcomeDict.param_changes,
       outcomeDict.refresher_exploration_id,
-      outcomeDict.missing_prerequisite_skill_id);
+      outcomeDict.missing_prerequisite_skill_id
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'OutcomeObjectFactory', downgradeInjectable(OutcomeObjectFactory));
+angular
+  .module('oppia')
+  .factory('OutcomeObjectFactory', downgradeInjectable(OutcomeObjectFactory));

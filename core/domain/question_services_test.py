@@ -1182,6 +1182,113 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             expected_inapplicable_skill_misconception_ids)
         self.assertEqual(actual_misconception_ids, expected_misconception_ids)
 
+    def test_populate_question_model_fields(self) -> None:
+        model = question_models.QuestionModel(
+            id=self.question_id,
+            question_state_data={},
+            language_code='en',
+            linked_skill_ids=['skill_id'],
+            question_state_data_schema_version=(
+                feconf.CURRENT_STATE_SCHEMA_VERSION)
+        )
+        question = question_services.get_question_by_id(self.question_id)
+        populated_model = question_services.populate_question_model_fields(
+            model, question)
+
+        self.assertEqual(
+            populated_model.question_state_data,
+            question.question_state_data.to_dict())
+
+        self.assertEqual(
+            populated_model.question_state_data_schema_version,
+            question.question_state_data_schema_version
+        )
+        self.assertEqual(
+            populated_model.next_content_id_index,
+            question.next_content_id_index
+        )
+        self.assertEqual(populated_model.language_code, question.language_code)
+        self.assertEqual(
+            populated_model.linked_skill_ids,
+            question.linked_skill_ids
+        )
+        self.assertEqual(
+            populated_model.inapplicable_skill_misconception_ids,
+            question.inapplicable_skill_misconception_ids
+        )
+
+    def test_populate_question_summary_model_fields(self) -> None:
+        question = question_services.get_question_by_id(self.question_id)
+        question_summary = question_services.compute_summary_of_question(
+            question
+        )
+        question_services.save_question_summary(question_summary)
+        summary_model = question_models.QuestionSummaryModel.get(
+            self.question_id
+        )
+        populated_model = (
+            question_services.populate_question_summary_model_fields(
+            summary_model, question_summary)
+        )
+        self.assertEqual(
+            populated_model.question_model_last_updated,
+            question_summary.last_updated
+        )
+        self.assertEqual(
+            populated_model.question_model_created_on,
+            question_summary.created_on
+        )
+        self.assertEqual(
+            populated_model.question_content,
+            question_summary.question_content
+        )
+        self.assertEqual(populated_model.version, question_summary.version)
+        self.assertEqual(
+            populated_model.interaction_id,
+            question_summary.interaction_id
+        )
+        self.assertEqual(
+            populated_model.misconception_ids,
+            question_summary.misconception_ids
+        )
+
+    def test_populate_question_summary_model_fields_with_no_input_model(
+        self
+    ) -> None:
+        question = question_services.get_question_by_id(self.question_id)
+        question_summary = question_services.compute_summary_of_question(
+            question
+        )
+        question_services.save_question_summary(question_summary)
+        # Here we use MyPy ignore because we need to test
+        # populate_question_summary_model_fields when the there is no
+        # input QuestionSummaryModel.
+        populated_model = (
+            question_services.populate_question_summary_model_fields(
+            None, question_summary)  # type: ignore[arg-type]
+        )
+        self.assertEqual(
+            populated_model.question_model_last_updated,
+            question_summary.last_updated
+        )
+        self.assertEqual(
+            populated_model.question_model_created_on,
+            question_summary.created_on
+        )
+        self.assertEqual(
+            populated_model.question_content,
+            question_summary.question_content
+        )
+        self.assertEqual(populated_model.version, question_summary.version)
+        self.assertEqual(
+            populated_model.interaction_id,
+            question_summary.interaction_id
+        )
+        self.assertEqual(
+            populated_model.misconception_ids,
+            question_summary.misconception_ids
+        )
+
 
 class QuestionMigrationTests(test_utils.GenericTestBase):
 

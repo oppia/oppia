@@ -17,15 +17,14 @@
  *   editor page.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
-import { BlogPostPageService } from 'pages/blog-post-page/services/blog-post-page.service';
+import {ContextService} from 'services/context.service';
+import {UrlService} from 'services/contextual/url.service';
+import {BlogPostPageService} from 'pages/blog-post-page/services/blog-post-page.service';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 class MockWindowRef {
   _window = {
@@ -43,8 +42,8 @@ class MockWindowRef {
       },
       set href(val) {
         this._href = val;
-      }
-    }
+      },
+    },
   };
 
   get nativeWindow() {
@@ -110,7 +109,8 @@ describe('Context service', () => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue(
-        '/embed/exploration/123');
+        '/embed/exploration/123'
+      );
       spyOn(urlService, 'getHash').and.returnValue('');
       ecs.removeCustomEntityContext();
     });
@@ -172,15 +172,14 @@ describe('Context service', () => {
       expect(ecs.getEntityType()).toBe('exploration');
     });
 
-    it('should correctly check that page allows editing of RTE components',
-      () => {
-        expect(ecs.canAddOrEditComponents()).toBe(true);
-      });
+    it('should correctly check that page allows editing of RTE components', () => {
+      expect(ecs.canAddOrEditComponents()).toBe(true);
+    });
   });
 
   describe('behavior in the topic editor view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.inject(ContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });
@@ -188,6 +187,13 @@ describe('Context service', () => {
     it('should correctly set editor context to topic editor', () => {
       ecs.init('topic_editor');
       expect(ecs.getEditorContext()).toBe('topic_editor');
+    });
+
+    it('should correctly set and retrieve the exp version', () => {
+      ecs.setExplorationVersion(5);
+      expect(ecs.getExplorationVersion()).toEqual(5);
+      ecs.setExplorationVersion(6);
+      expect(ecs.getExplorationVersion()).toEqual(6);
     });
 
     it('should correctly set and retrieve the topic id', () => {
@@ -212,19 +218,21 @@ describe('Context service', () => {
       expect(ecs.getPageContext()).toBe('topic_editor');
     });
 
-    it('should correctly check that page allows editing of RTE components',
-      () => {
-        expect(ecs.canAddOrEditComponents()).toBe(false);
-        spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
-        expect(ecs.canAddOrEditComponents()).toBe(true);
-      });
-
-    it('should not report exploration context when the context' +
-      ' is not related to editor or player', ()=> {
-      expect(ecs.getPageContext()).toBe('other');
+    it('should correctly check that page allows editing of RTE components', () => {
+      expect(ecs.canAddOrEditComponents()).toBe(false);
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
-      expect(ecs.isInExplorationContext()).toBe(false);
+      expect(ecs.canAddOrEditComponents()).toBe(true);
     });
+
+    it(
+      'should not report exploration context when the context' +
+        ' is not related to editor or player',
+      () => {
+        expect(ecs.getPageContext()).toBe('other');
+        spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
+        expect(ecs.isInExplorationContext()).toBe(false);
+      }
+    );
   });
 
   describe('behavior in question editor modal', () => {
@@ -250,24 +258,22 @@ describe('Context service', () => {
       expect(ecs.getEntityId()).toBe('questionId');
     });
 
-    it('should affirm the exploration context for exploration player',
-      ()=> {
-        expect(ecs.isInExplorationContext()).toBe(false);
-        spyOn(urlService, 'getPathname').and.returnValue('/explore/123');
-        expect(ecs.isInExplorationContext()).toBe(true);
-      });
+    it('should affirm the exploration context for exploration player', () => {
+      expect(ecs.isInExplorationContext()).toBe(false);
+      spyOn(urlService, 'getPathname').and.returnValue('/explore/123');
+      expect(ecs.isInExplorationContext()).toBe(true);
+    });
 
-    it('should affirm the exploration context for exploration editor',
-      ()=> {
-        expect(ecs.isInExplorationContext()).toBe(false);
-        spyOn(urlService, 'getPathname').and.returnValue('/create/123');
-        expect(ecs.isInExplorationContext()).toBe(true);
-      });
+    it('should affirm the exploration context for exploration editor', () => {
+      expect(ecs.isInExplorationContext()).toBe(false);
+      spyOn(urlService, 'getPathname').and.returnValue('/create/123');
+      expect(ecs.isInExplorationContext()).toBe(true);
+    });
   });
 
   describe('behavior in the story editor view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.inject(ContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });
@@ -298,17 +304,16 @@ describe('Context service', () => {
       expect(ecs.getPageContext()).toBe('story_editor');
     });
 
-    it('should correctly check that page allows editing of RTE components',
-      () => {
-        expect(ecs.canAddOrEditComponents()).toBe(false);
-        spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
-        expect(ecs.canAddOrEditComponents()).toBe(true);
-      });
+    it('should correctly check that page allows editing of RTE components', () => {
+      expect(ecs.canAddOrEditComponents()).toBe(false);
+      spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
+      expect(ecs.canAddOrEditComponents()).toBe(true);
+    });
   });
 
   describe('behavior in the skill editor view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.inject(ContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });
@@ -340,17 +345,16 @@ describe('Context service', () => {
       expect(ecs.getPageContext()).toBe('skill_editor');
     });
 
-    it('should correctly check that page allows editing of RTE components',
-      () => {
-        expect(ecs.canAddOrEditComponents()).toBe(false);
-        spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
-        expect(ecs.canAddOrEditComponents()).toBe(true);
-      });
+    it('should correctly check that page allows editing of RTE components', () => {
+      expect(ecs.canAddOrEditComponents()).toBe(false);
+      spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
+      expect(ecs.canAddOrEditComponents()).toBe(true);
+    });
   });
 
   describe('behavior in the blog dashboard page', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.inject(ContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });
@@ -358,11 +362,9 @@ describe('Context service', () => {
     it('should correctly retrieve the blog post id', () => {
       expect(ecs.getEntityId()).toBe('undefined');
 
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/blog-dashboard');
+      spyOn(urlService, 'getPathname').and.returnValue('/blog-dashboard');
       spyOn(urlService, 'getHash').and.returnValue('');
-      spyOn(urlService, 'getBlogPostIdFromUrl').and.returnValue(
-        'sample123456');
+      spyOn(urlService, 'getBlogPostIdFromUrl').and.returnValue('sample123456');
 
       expect(ecs.getEntityId()).toBe('sample123456');
     });
@@ -370,8 +372,7 @@ describe('Context service', () => {
     it('should correctly retrieve the entity type', () => {
       expect(ecs.getEntityType()).toBeUndefined();
 
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/blog-dashboard');
+      spyOn(urlService, 'getPathname').and.returnValue('/blog-dashboard');
 
       expect(ecs.getEntityType()).toBe('blog_post');
     });
@@ -379,27 +380,23 @@ describe('Context service', () => {
     it('should correctly retrieve the page context', () => {
       expect(ecs.getPageContext()).toBe('other');
 
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/blog-dashboard');
+      spyOn(urlService, 'getPathname').and.returnValue('/blog-dashboard');
 
       expect(ecs.getPageContext()).toBe('blog_dashboard');
     });
 
-    it('should correctly check that page allows editing of RTE components',
-      () => {
-        expect(ecs.canAddOrEditComponents()).toBe(false);
+    it('should correctly check that page allows editing of RTE components', () => {
+      expect(ecs.canAddOrEditComponents()).toBe(false);
 
-        spyOn(urlService, 'getPathname').and.returnValue(
-          '/blog-dashboard');
+      spyOn(urlService, 'getPathname').and.returnValue('/blog-dashboard');
 
-        expect(ecs.canAddOrEditComponents()).toBe(true);
-      });
+      expect(ecs.canAddOrEditComponents()).toBe(true);
+    });
 
     it('should check if rte is in blog post editor', () => {
       expect(ecs.isInBlogPostEditorPage()).toBe(false);
 
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/blog-dashboard');
+      spyOn(urlService, 'getPathname').and.returnValue('/blog-dashboard');
 
       expect(ecs.isInBlogPostEditorPage()).toBe(true);
     });
@@ -407,7 +404,7 @@ describe('Context service', () => {
 
   describe('behavior in the blog home pages', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.inject(ContextService);
       urlService = TestBed.get(UrlService);
       blogPostPageService = TestBed.get(BlogPostPageService);
       ecs.removeCustomEntityContext();
@@ -416,8 +413,7 @@ describe('Context service', () => {
     it('should correctly retrieve the entity type', () => {
       expect(ecs.getEntityType()).toBeUndefined();
 
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/blog');
+      spyOn(urlService, 'getPathname').and.returnValue('/blog');
 
       expect(ecs.getEntityType()).toBe('blog_post');
     });
@@ -425,8 +421,7 @@ describe('Context service', () => {
     it('should correctly retrieve the blog post id', () => {
       expect(ecs.getEntityId()).toBe('undefined');
 
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/blog');
+      spyOn(urlService, 'getPathname').and.returnValue('/blog');
       spyOn(urlService, 'getHash').and.returnValue('');
       blogPostPageService.blogPostId = 'sample123456';
 
@@ -440,7 +435,7 @@ describe('Context service', () => {
       TestBed.configureTestingModule({
         providers: [
           UrlInterpolationService,
-          { provide: WindowRef, useValue: windowRef },
+          {provide: WindowRef, useValue: windowRef},
         ],
       });
       ecs = TestBed.get(ContextService);
@@ -450,13 +445,15 @@ describe('Context service', () => {
 
     it('should correctly retrieve the learner group id', () => {
       spyOn(urlService, 'getPathname').and.returnValue(
-        '/edit-learner-group/groupId');
+        '/edit-learner-group/groupId'
+      );
       expect(ecs.getLearnerGroupId()).toBe('groupId');
     });
 
     it('should correctly retrieve the page context', () => {
       spyOn(urlService, 'getPathname').and.returnValue(
-        '/edit-learner-group/groupId');
+        '/edit-learner-group/groupId'
+      );
       expect(ecs.getPageContext()).toBe('learner_group_editor');
     });
 
@@ -473,7 +470,8 @@ describe('Context service', () => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue(
-        '/learner-group/groupId');
+        '/learner-group/groupId'
+      );
       ecs.removeCustomEntityContext();
     });
 
@@ -501,59 +499,60 @@ describe('Context service', () => {
       expect(ecs.getPageContext()).toBe('question_player');
     });
 
-    it('should correctly retrieve the page context as collection editor',
-      () => {
-        expect(ecs.getPageContext()).toBe('other');
-        spyOn(urlService, 'getPathname').and.returnValue(
-          '/collection_editor/123');
-        expect(ecs.getPageContext()).toBe('collection_editor');
-      });
-
-    it('should correctly retrieve the page context as ' +
-      'topics and skills dashboard', () => {
+    it('should correctly retrieve the page context as collection editor', () => {
       expect(ecs.getPageContext()).toBe('other');
       spyOn(urlService, 'getPathname').and.returnValue(
-        '/topics-and-skills-dashboard/123');
-      expect(ecs.getPageContext()).toBe('topics_and_skills_dashboard');
+        '/collection_editor/123'
+      );
+      expect(ecs.getPageContext()).toBe('collection_editor');
     });
 
-    it('should correctly retrieve the page context as contributor dashboard',
+    it(
+      'should correctly retrieve the page context as ' +
+        'topics and skills dashboard',
       () => {
         expect(ecs.getPageContext()).toBe('other');
         spyOn(urlService, 'getPathname').and.returnValue(
-          '/contributor-dashboard/123');
-        expect(ecs.getPageContext()).toBe('contributor_dashboard');
-      });
+          '/topics-and-skills-dashboard/123'
+        );
+        expect(ecs.getPageContext()).toBe('topics_and_skills_dashboard');
+      }
+    );
+
+    it('should correctly retrieve the page context as contributor dashboard', () => {
+      expect(ecs.getPageContext()).toBe('other');
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/contributor-dashboard/123'
+      );
+      expect(ecs.getPageContext()).toBe('contributor_dashboard');
+    });
   });
 
   describe('behavior in other pages', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.inject(ContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/about');
       ecs.removeCustomEntityContext();
     });
 
-    it('should throw an error when trying to retrieve the exploration id',
-      () => {
-        expect(() => ecs.getExplorationId()).toThrowError(
-          'ContextService should not be used outside the ' +
-          'context of an exploration or a question.');
-      }
-    );
+    it('should throw an error when trying to retrieve the exploration id', () => {
+      expect(() => ecs.getExplorationId()).toThrowError(
+        'ContextService should not be used outside the ' +
+          'context of an exploration or a question.'
+      );
+    });
 
-    it('should throw an error when trying to retrieve the learner group id',
-      () => {
-        expect(() => ecs.getLearnerGroupId()).toThrowError(
-          'ContextService should not be used outside the ' +
-          'context of a learner group.');
-      }
-    );
+    it('should throw an error when trying to retrieve the learner group id', () => {
+      expect(() => ecs.getLearnerGroupId()).toThrowError(
+        'ContextService should not be used outside the ' +
+          'context of a learner group.'
+      );
+    });
 
     it('should retrieve other as page context', () => {
       expect(ecs.getPageContext()).toBe('other');
-    }
-    );
+    });
 
     it('should detect editor tab context is preview', () => {
       let urlServiceGetHash = spyOn(urlService, 'getHash');
@@ -587,7 +586,7 @@ describe('Context service', () => {
       TestBed.configureTestingModule({
         providers: [
           UrlInterpolationService,
-          { provide: WindowRef, useValue: windowRef },
+          {provide: WindowRef, useValue: windowRef},
         ],
       });
       ecs = TestBed.get(ContextService);

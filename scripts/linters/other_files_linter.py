@@ -33,7 +33,7 @@ from .. import concurrent_task_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from scripts.linters import pre_commit_linter
+    from scripts.linters import run_lint_checks
 
 
 class ThirdPartyLibDict(TypedDict):
@@ -107,7 +107,7 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
 class CustomLintChecksManager(linter_utils.BaseLinter):
     """Manages other files lint checks."""
 
-    def __init__(self, file_cache: pre_commit_linter.FileCache) -> None:
+    def __init__(self, file_cache: run_lint_checks.FileCache) -> None:
         """Constructs a CustomLintChecksManager object.
 
         Args:
@@ -354,7 +354,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
 
 
 def get_linters(
-    file_cache: pre_commit_linter.FileCache
+    file_cache: run_lint_checks.FileCache
 ) -> Tuple[CustomLintChecksManager, None]:
     """Creates CustomLintChecksManager and returns it.
 

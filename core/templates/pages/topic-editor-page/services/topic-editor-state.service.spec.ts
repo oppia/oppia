@@ -16,18 +16,28 @@
  * @fileoverview Unit tests for TopicEditorStateService.
  */
 
-import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
-import { StorySummaryBackendDict } from 'domain/story/story-summary.model';
-import { EditableTopicBackendApiService, FetchTopicResponse, UpdateTopicResponse } from 'domain/topic/editable-topic-backend-api.service';
-import { SubtopicPage, SubtopicPageBackendDict } from 'domain/topic/subtopic-page.model';
-import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
-import { TopicRights, TopicRightsBackendDict } from 'domain/topic/topic-rights.model';
-import { TopicBackendDict, Topic } from 'domain/topic/topic-object.model';
-import { AlertsService } from 'services/alerts.service';
-import { TopicEditorStateService } from './topic-editor-state.service';
+import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
+import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {EditableStoryBackendApiService} from 'domain/story/editable-story-backend-api.service';
+import {StorySummaryBackendDict} from 'domain/story/story-summary.model';
+import {
+  EditableTopicBackendApiService,
+  FetchTopicResponse,
+  UpdateTopicResponse,
+} from 'domain/topic/editable-topic-backend-api.service';
+import {
+  SubtopicPage,
+  SubtopicPageBackendDict,
+} from 'domain/topic/subtopic-page.model';
+import {TopicRightsBackendApiService} from 'domain/topic/topic-rights-backend-api.service';
+import {
+  TopicRights,
+  TopicRightsBackendDict,
+} from 'domain/topic/topic-rights.model';
+import {TopicBackendDict, Topic} from 'domain/topic/topic-object.model';
+import {AlertsService} from 'services/alerts.service';
+import {TopicEditorStateService} from './topic-editor-state.service';
 
 describe('Topic editor state service', () => {
   let topicEditorStateService: TopicEditorStateService;
@@ -39,26 +49,30 @@ describe('Topic editor state service', () => {
   let skillCreationIsAllowed: boolean = true;
   let skillQuestionCountDict = {};
   let groupedSkillSummaries = {
-    topic_name: [{
-      id: 'skillId1',
-      description: 'description1',
-      language_code: 'en',
-      version: 1,
-      misconception_count: 3,
-      worked_examples_count: 3,
-      skill_model_created_on: 1593138898626.193,
-      skill_model_last_updated: 1593138898626.193
-    }],
-    others: [{
-      id: 'skillId2',
-      description: 'description2',
-      language_code: 'en',
-      version: 1,
-      misconception_count: 3,
-      worked_examples_count: 3,
-      skill_model_created_on: 1593138898626.193,
-      skill_model_last_updated: 1593138898626.193
-    }]
+    topic_name: [
+      {
+        id: 'skillId1',
+        description: 'description1',
+        language_code: 'en',
+        version: 1,
+        misconception_count: 3,
+        worked_examples_count: 3,
+        skill_model_created_on: 1593138898626.193,
+        skill_model_last_updated: 1593138898626.193,
+      },
+    ],
+    others: [
+      {
+        id: 'skillId2',
+        description: 'description2',
+        language_code: 'en',
+        version: 1,
+        misconception_count: 3,
+        worked_examples_count: 3,
+        skill_model_created_on: 1593138898626.193,
+        skill_model_last_updated: 1593138898626.193,
+      },
+    ],
   };
   let topicDict: TopicBackendDict;
   let storySummaryBackendDict: StorySummaryBackendDict;
@@ -73,7 +87,9 @@ describe('Topic editor state service', () => {
         topicDict: topicDict,
         skillIdToDescriptionDict: {},
         skillIdToRubricsDict: {},
-        classroomUrlFragment: 'url_fragment'
+        classroomUrlFragment: 'url_fragment',
+        classroomName: 'classroom-name',
+        curriculumAdminUsernames: ['admin1', 'admin2'],
       } as unknown as FetchTopicResponse);
     }
 
@@ -82,45 +98,41 @@ describe('Topic editor state service', () => {
     }
 
     fetchSubtopicPageAsync(
-        topicId: number, subtopicId: number): Promise<SubtopicPageBackendDict> {
+      topicId: number,
+      subtopicId: number
+    ): Promise<SubtopicPageBackendDict> {
       return Promise.resolve(subtopicPage);
     }
 
     updateTopicAsync(
-        topicId: string,
-        version: number,
-        commitMessage: string,
-        changeList: BackendChangeObject[]):
-        Promise<UpdateTopicResponse> {
+      topicId: string,
+      version: number,
+      commitMessage: string,
+      changeList: BackendChangeObject[]
+    ): Promise<UpdateTopicResponse> {
       return Promise.resolve({
         topicDict: topicDict,
         skillIdToRubricsDict: {
           skill_id_1: [
             {
               difficulty: 'Easy',
-              explanations: [
-                'Explanation 1'
-              ]
+              explanations: ['Explanation 1'],
             },
             {
               difficulty: 'Medium',
-              explanations: [
-                'Explanation 2'
-              ]
+              explanations: ['Explanation 2'],
             },
             {
               difficulty: 'Hard',
-              explanations: [
-                'Explanation 3'
-              ]
-            }
+              explanations: ['Explanation 3'],
+            },
           ],
-          skill_id_2: []
+          skill_id_2: [],
         },
         skillIdToDescriptionDict: {
           skill_id_1: 'Description 1',
-          skill_id_2: ''
-        }
+          skill_id_2: '',
+        },
       });
     }
 
@@ -138,7 +150,7 @@ describe('Topic editor state service', () => {
       return Promise.resolve({
         published: true,
         can_publish_topic: true,
-        can_edit_topic: true
+        can_edit_topic: true,
       });
     }
   }
@@ -155,18 +167,18 @@ describe('Topic editor state service', () => {
         AlertsService,
         {
           provide: EditableStoryBackendApiService,
-          useClass: MockEditableStoryBackendApiService
+          useClass: MockEditableStoryBackendApiService,
         },
         {
           provide: EditableTopicBackendApiService,
-          useClass: MockEditableTopicBackendApiService
+          useClass: MockEditableTopicBackendApiService,
         },
         {
           provide: TopicRightsBackendApiService,
-          useClass: MockTopicRightsBackendApiService
+          useClass: MockTopicRightsBackendApiService,
         },
-        UndoRedoService
-      ]
+        UndoRedoService,
+      ],
     }).compileComponents();
   }));
 
@@ -178,13 +190,15 @@ describe('Topic editor state service', () => {
     // the need to test validations. This is because the backend api service
     // returns an unknown type.
     // @ts-ignore
-    mockEditableTopicBackendApiService = (TestBed.inject(
-      EditableTopicBackendApiService)) as
-      jasmine.SpyObj<MockEditableTopicBackendApiService>;
-    editableStoryBackendApiService =
-      TestBed.inject(EditableStoryBackendApiService);
-    alertsService = (TestBed.inject(AlertsService) as unknown) as
-      jasmine.SpyObj<AlertsService>;
+    mockEditableTopicBackendApiService = TestBed.inject(
+      EditableTopicBackendApiService
+    ) as jasmine.SpyObj<MockEditableTopicBackendApiService>;
+    editableStoryBackendApiService = TestBed.inject(
+      EditableStoryBackendApiService
+    );
+    alertsService = TestBed.inject(
+      AlertsService
+    ) as unknown as jasmine.SpyObj<AlertsService>;
 
     topicDict = {
       id: 'topic_id',
@@ -204,7 +218,7 @@ describe('Topic editor state service', () => {
       practice_tab_is_displayed: true,
       meta_tag_content: 'content',
       page_title_fragment_for_web: 'title_fragment',
-      skill_ids_for_diagnostic_test: []
+      skill_ids_for_diagnostic_test: [],
     };
     storySummaryBackendDict = {
       id: 'id',
@@ -216,7 +230,7 @@ describe('Topic editor state service', () => {
       story_is_published: true,
       completed_node_titles: [],
       url_fragment: 'story_fragment',
-      all_node_dicts: []
+      all_node_dicts: [],
     };
     subtopicPage = {
       id: 'subtopic_id',
@@ -224,13 +238,13 @@ describe('Topic editor state service', () => {
       page_contents: {
         subtitled_html: {
           content_id: 'content_id',
-          html: 'html'
+          html: 'html',
         },
         recorded_voiceovers: {
-          voiceovers_mapping: {}
-        }
+          voiceovers_mapping: {},
+        },
       },
-      language_code: 'en'
+      language_code: 'en',
     };
   });
 
@@ -241,8 +255,9 @@ describe('Topic editor state service', () => {
   it('should load topic', fakeAsync(() => {
     topicEditorStateService.loadTopic('test_id');
     tick();
-    expect(topicEditorStateService.isSkillCreationAllowed())
-      .toEqual(skillCreationIsAllowed);
+    expect(topicEditorStateService.isSkillCreationAllowed()).toEqual(
+      skillCreationIsAllowed
+    );
     expect(topicEditorStateService.isLoadingTopic()).toEqual(false);
     expect(topicEditorStateService.hasLoadedTopic()).toBeTrue();
     expect(topicEditorStateService.getGroupedSkillSummaries()).toBeDefined();
@@ -252,8 +267,10 @@ describe('Topic editor state service', () => {
 
   it('should display error message when topic fails to load', fakeAsync(() => {
     let errorMsg: string = 'Error Message';
-    spyOn(mockEditableTopicBackendApiService, 'fetchTopicAsync').and
-      .returnValue(Promise.reject(errorMsg));
+    spyOn(
+      mockEditableTopicBackendApiService,
+      'fetchTopicAsync'
+    ).and.returnValue(Promise.reject(errorMsg));
     spyOn(alertsService, 'addWarning');
 
     topicEditorStateService.loadTopic('test_id');
@@ -261,32 +278,38 @@ describe('Topic editor state service', () => {
     expect(alertsService.addWarning).toHaveBeenCalledWith(errorMsg);
   }));
 
-  it('should display default error message when topic fails to load',
-    fakeAsync(() => {
-      spyOn(mockEditableTopicBackendApiService, 'fetchTopicAsync').and
-        .returnValue(Promise.reject());
-      spyOn(alertsService, 'addWarning');
+  it('should display default error message when topic fails to load', fakeAsync(() => {
+    spyOn(
+      mockEditableTopicBackendApiService,
+      'fetchTopicAsync'
+    ).and.returnValue(Promise.reject());
+    spyOn(alertsService, 'addWarning');
 
-      topicEditorStateService.loadTopic('test_id');
-      tick();
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'There was an error when loading the topic editor.');
-    }));
+    topicEditorStateService.loadTopic('test_id');
+    tick();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'There was an error when loading the topic editor.'
+    );
+  }));
 
   it('should load subtopic page', fakeAsync(() => {
     topicEditorStateService.loadSubtopicPage('1', 2);
     tick();
     expect(topicEditorStateService.getSubtopicPage()).toEqual(
-      SubtopicPage.createFromBackendDict(subtopicPage));
+      SubtopicPage.createFromBackendDict(subtopicPage)
+    );
     expect(topicEditorStateService.getCachedSubtopicPages()).toHaveSize(1);
     topicEditorStateService.loadSubtopicPage('1', 2);
     expect(topicEditorStateService.getSubtopicPage()).toEqual(
-      SubtopicPage.createFromBackendDict(subtopicPage));
+      SubtopicPage.createFromBackendDict(subtopicPage)
+    );
   }));
 
   it('should show error when loading subtopic page fails', fakeAsync(() => {
-    spyOn(mockEditableTopicBackendApiService, 'fetchSubtopicPageAsync')
-      .and.returnValue(Promise.reject());
+    spyOn(
+      mockEditableTopicBackendApiService,
+      'fetchSubtopicPageAsync'
+    ).and.returnValue(Promise.reject());
     spyOn(alertsService, 'addWarning');
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'string'" We need to suppress this error because of the need to test
@@ -296,42 +319,53 @@ describe('Topic editor state service', () => {
     topicEditorStateService.loadSubtopicPage(null, null);
     tick();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'There was an error when loading the topic.');
+      'There was an error when loading the topic.'
+    );
   }));
 
   it('should show error when loading subtopic page fails', fakeAsync(() => {
-    spyOn(mockEditableTopicBackendApiService, 'fetchSubtopicPageAsync')
-      .and.returnValue(Promise.reject());
+    spyOn(
+      mockEditableTopicBackendApiService,
+      'fetchSubtopicPageAsync'
+    ).and.returnValue(Promise.reject());
     spyOn(alertsService, 'addWarning');
     topicEditorStateService.loadSubtopicPage('1', 2);
     tick();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'There was an error when loading the topic.');
+      'There was an error when loading the topic.'
+    );
   }));
 
   it('should show error when invalid topic id is provided', fakeAsync(() => {
-    spyOn(mockEditableTopicBackendApiService, 'fetchSubtopicPageAsync')
-      .and.returnValue(Promise.reject());
+    spyOn(
+      mockEditableTopicBackendApiService,
+      'fetchSubtopicPageAsync'
+    ).and.returnValue(Promise.reject());
     spyOn(alertsService, 'addWarning');
     topicEditorStateService.loadSubtopicPage('', 2);
     tick();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'There was an error when loading the topic.');
+      'There was an error when loading the topic.'
+    );
   }));
 
   it('should set subtopic page', fakeAsync(() => {
     subtopicPage.id = 'topic_id1234-0';
     topicEditorStateService.setSubtopicPage(
-      SubtopicPage.createFromBackendDict(subtopicPage));
+      SubtopicPage.createFromBackendDict(subtopicPage)
+    );
     expect(topicEditorStateService.getSubtopicPage()).toEqual(
-      SubtopicPage.createFromBackendDict(subtopicPage));
+      SubtopicPage.createFromBackendDict(subtopicPage)
+    );
 
     topicEditorStateService.loadSubtopicPage('topic_id1234', 0);
     tick();
     topicEditorStateService.setSubtopicPage(
-      SubtopicPage.createFromBackendDict(subtopicPage));
+      SubtopicPage.createFromBackendDict(subtopicPage)
+    );
     expect(topicEditorStateService.getSubtopicPage()).toEqual(
-      SubtopicPage.createFromBackendDict(subtopicPage));
+      SubtopicPage.createFromBackendDict(subtopicPage)
+    );
   }));
 
   it('should set topic', () => {
@@ -346,15 +380,18 @@ describe('Topic editor state service', () => {
     topicEditorStateService.setTopic(topic);
     subtopicPage.id = 'topic_id1234-0';
     topicEditorStateService.setSubtopicPage(
-      SubtopicPage.createFromBackendDict(subtopicPage));
+      SubtopicPage.createFromBackendDict(subtopicPage)
+    );
     tick();
     subtopicPage.id = 'topic_id1234-1';
     topicEditorStateService.setSubtopicPage(
-      SubtopicPage.createFromBackendDict(subtopicPage));
+      SubtopicPage.createFromBackendDict(subtopicPage)
+    );
     tick();
     subtopicPage.id = 'topic_id1234-2';
     topicEditorStateService.setSubtopicPage(
-      SubtopicPage.createFromBackendDict(subtopicPage));
+      SubtopicPage.createFromBackendDict(subtopicPage)
+    );
     tick();
 
     topicEditorStateService.deleteSubtopicPage('topic_id1234', 1);
@@ -364,21 +401,25 @@ describe('Topic editor state service', () => {
     subtopicPage.id = 'topic_id1234-1';
     let subtopic1 = SubtopicPage.createFromBackendDict(subtopicPage);
     expect(topicEditorStateService.getCachedSubtopicPages()).toEqual([
-      subtopic0, subtopic1
+      subtopic0,
+      subtopic1,
     ]);
   }));
 
   it('should save topic when user saves a topic', fakeAsync(() => {
     spyOn(undoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(undoRedoService, 'clearChanges');
-    spyOn(undoRedoService, 'getCommittableChangeList').and.returnValue([{
-      cmd: 'delete_canonical_story',
-      story_id: 'story_id'
-    }]);
-    spyOn(mockEditableTopicBackendApiService, 'updateTopicAsync').and
-      .callThrough();
-    spyOn(editableStoryBackendApiService, 'deleteStoryAsync').and
-      .callThrough();
+    spyOn(undoRedoService, 'getCommittableChangeList').and.returnValue([
+      {
+        cmd: 'delete_canonical_story',
+        story_id: 'story_id',
+      },
+    ]);
+    spyOn(
+      mockEditableTopicBackendApiService,
+      'updateTopicAsync'
+    ).and.callThrough();
+    spyOn(editableStoryBackendApiService, 'deleteStoryAsync').and.callThrough();
     var successCallback = jasmine.createSpy('successCallback');
     let topic = Topic.create(topicDict, {});
     topicEditorStateService.setTopic(topic);
@@ -386,52 +427,53 @@ describe('Topic editor state service', () => {
     topicEditorStateService.saveTopic('Commit Message', successCallback);
     tick();
 
-    expect(mockEditableTopicBackendApiService.updateTopicAsync)
-      .toHaveBeenCalledWith(
-        'topic_id', 1, 'Commit Message', [
-          {
-            cmd: 'delete_canonical_story',
-            story_id: 'story_id'
-          }
-        ]
-      );
+    expect(
+      mockEditableTopicBackendApiService.updateTopicAsync
+    ).toHaveBeenCalledWith('topic_id', 1, 'Commit Message', [
+      {
+        cmd: 'delete_canonical_story',
+        story_id: 'story_id',
+      },
+    ]);
     expect(successCallback).toHaveBeenCalled();
     expect(undoRedoService.getCommittableChangeList).toHaveBeenCalled();
-    expect(editableStoryBackendApiService.deleteStoryAsync)
-      .toHaveBeenCalled();
+    expect(editableStoryBackendApiService.deleteStoryAsync).toHaveBeenCalled();
     expect(undoRedoService.clearChanges).toHaveBeenCalled();
   }));
 
-  it('should warn user when there is an error saving the topic',
-    fakeAsync(() => {
-      spyOn(undoRedoService, 'hasChanges').and.returnValue(true);
-      spyOn(undoRedoService, 'getCommittableChangeList').and.returnValue([{
+  it('should warn user when there is an error saving the topic', fakeAsync(() => {
+    spyOn(undoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(undoRedoService, 'getCommittableChangeList').and.returnValue([
+      {
         cmd: 'delete_canonical_story',
-        story_id: 'story_id'
-      }]);
-      spyOn(mockEditableTopicBackendApiService, 'updateTopicAsync').and
-        .returnValue(Promise.reject());
-      spyOn(alertsService, 'addWarning');
-      var successCallback = jasmine.createSpy('successCallback');
-      let topic = Topic.create(topicDict, {});
-      topicEditorStateService.setTopic(topic);
+        story_id: 'story_id',
+      },
+    ]);
+    spyOn(
+      mockEditableTopicBackendApiService,
+      'updateTopicAsync'
+    ).and.returnValue(Promise.reject());
+    spyOn(alertsService, 'addWarning');
+    var successCallback = jasmine.createSpy('successCallback');
+    let topic = Topic.create(topicDict, {});
+    topicEditorStateService.setTopic(topic);
 
-      topicEditorStateService.saveTopic('Commit Message', successCallback);
-      tick();
+    topicEditorStateService.saveTopic('Commit Message', successCallback);
+    tick();
 
-      expect(mockEditableTopicBackendApiService.updateTopicAsync)
-        .toHaveBeenCalledWith(
-          'topic_id', 1, 'Commit Message', [
-            {
-              cmd: 'delete_canonical_story',
-              story_id: 'story_id'
-            }
-          ]
-        );
-      expect(successCallback).not.toHaveBeenCalled();
-      expect(alertsService.addWarning)
-        .toHaveBeenCalledWith('There was an error when saving the topic.');
-    }));
+    expect(
+      mockEditableTopicBackendApiService.updateTopicAsync
+    ).toHaveBeenCalledWith('topic_id', 1, 'Commit Message', [
+      {
+        cmd: 'delete_canonical_story',
+        story_id: 'story_id',
+      },
+    ]);
+    expect(successCallback).not.toHaveBeenCalled();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'There was an error when saving the topic.'
+    );
+  }));
 
   it('should not save topic when there are no changes', fakeAsync(() => {
     spyOn(undoRedoService, 'hasChanges').and.returnValue(false);
@@ -443,8 +485,9 @@ describe('Topic editor state service', () => {
     topicEditorStateService.saveTopic('Commit Message', () => {});
     tick();
 
-    expect(mockEditableTopicBackendApiService.updateTopicAsync).not
-      .toHaveBeenCalled();
+    expect(
+      mockEditableTopicBackendApiService.updateTopicAsync
+    ).not.toHaveBeenCalled();
   }));
 
   it('should not save topic when topicis not initialised', fakeAsync(() => {
@@ -457,8 +500,9 @@ describe('Topic editor state service', () => {
     expect(alertsService.fatalWarning).toHaveBeenCalledWith(
       'Cannot save a topic before one is loaded.'
     );
-    expect(mockEditableTopicBackendApiService.updateTopicAsync).not
-      .toHaveBeenCalled();
+    expect(
+      mockEditableTopicBackendApiService.updateTopicAsync
+    ).not.toHaveBeenCalled();
   }));
 
   it('should set topic rights when called', () => {
@@ -468,21 +512,25 @@ describe('Topic editor state service', () => {
       TopicRights.createFromBackendDict({
         published: false,
         can_publish_topic: false,
-        can_edit_topic: false
-      }));
+        can_edit_topic: false,
+      })
+    );
 
-    topicEditorStateService.setTopicRights(TopicRights.createFromBackendDict({
-      published: true,
-      can_publish_topic: true,
-      can_edit_topic: true
-    }));
+    topicEditorStateService.setTopicRights(
+      TopicRights.createFromBackendDict({
+        published: true,
+        can_publish_topic: true,
+        can_edit_topic: true,
+      })
+    );
 
     expect(topicEditorStateService.getTopicRights()).toEqual(
       TopicRights.createFromBackendDict({
         published: true,
         can_publish_topic: true,
-        can_edit_topic: true
-      }));
+        can_edit_topic: true,
+      })
+    );
   });
 
   it('should delete subtopic page', fakeAsync(() => {
@@ -500,6 +548,8 @@ describe('Topic editor state service', () => {
     expect(topicEditorStateService.onTopicInitialized).toBeDefined();
     expect(topicEditorStateService.onTopicReinitialized).toBeDefined();
     expect(topicEditorStateService.getClassroomUrlFragment()).toBeDefined();
+    expect(topicEditorStateService.getClassroomName()).toBeDefined();
+    expect(topicEditorStateService.getCurriculumAdminUsernames()).toBeDefined();
   });
 
   it('should update existence of topic name', fakeAsync(() => {
@@ -510,8 +560,10 @@ describe('Topic editor state service', () => {
 
   it('should show error when updation of topic name', fakeAsync(() => {
     spyOn(alertsService, 'addWarning');
-    spyOn(mockEditableTopicBackendApiService, 'doesTopicWithNameExistAsync')
-      .and.returnValue(Promise.reject());
+    spyOn(
+      mockEditableTopicBackendApiService,
+      'doesTopicWithNameExistAsync'
+    ).and.returnValue(Promise.reject());
 
     topicEditorStateService.updateExistenceOfTopicName('test_topic', () => {});
     tick();
@@ -523,70 +575,89 @@ describe('Topic editor state service', () => {
 
   it('should update existence of topic url fragment', fakeAsync(() => {
     topicEditorStateService.updateExistenceOfTopicUrlFragment(
-      'test_topic', () => {}, () => {});
+      'test_topic',
+      () => {},
+      () => {}
+    );
     tick();
     expect(topicEditorStateService.getTopicWithUrlFragmentExists()).toBeTrue();
   }));
 
-  it('should not show error when updation of topic url fragment failed' +
-     'with 400 status code', fakeAsync(() => {
-    let errorResponse = {
-      headers: {
-        normalizedNames: {},
-        lazyUpdate: null
-      },
-      status: 400,
-      statusText: 'Bad Request',
-      url: '',
-      ok: false,
-      name: 'HttpErrorResponse',
-      message: 'Http failure response for test url: 400 Bad Request',
-      error: {
-        error: 'Error: Bad request to server',
-        status_code: 400
-      }
-    };
+  it(
+    'should not show error when updation of topic url fragment failed' +
+      'with 400 status code',
+    fakeAsync(() => {
+      let errorResponse = {
+        headers: {
+          normalizedNames: {},
+          lazyUpdate: null,
+        },
+        status: 400,
+        statusText: 'Bad Request',
+        url: '',
+        ok: false,
+        name: 'HttpErrorResponse',
+        message: 'Http failure response for test url: 400 Bad Request',
+        error: {
+          error: 'Error: Bad request to server',
+          status_code: 400,
+        },
+      };
 
-    spyOn(alertsService, 'addWarning');
-    spyOn(
-      mockEditableTopicBackendApiService, 'doesTopicWithUrlFragmentExistAsync')
-      .and.returnValue(Promise.reject(errorResponse));
+      spyOn(alertsService, 'addWarning');
+      spyOn(
+        mockEditableTopicBackendApiService,
+        'doesTopicWithUrlFragmentExistAsync'
+      ).and.returnValue(Promise.reject(errorResponse));
 
-    topicEditorStateService.updateExistenceOfTopicUrlFragment(
-      'test_topic', () => {}, () => {});
-    tick();
-    expect(alertsService.addWarning).not.toHaveBeenCalled();
-  }));
+      topicEditorStateService.updateExistenceOfTopicUrlFragment(
+        'test_topic',
+        () => {},
+        () => {}
+      );
+      tick();
+      expect(alertsService.addWarning).not.toHaveBeenCalled();
+    })
+  );
 
-  it('should not show error when updation of topic url fragment failed' +
-     'with 400 status code', fakeAsync(() => {
-    let errorResponse = {
-      headers: {
-        normalizedNames: {},
-        lazyUpdate: null
-      },
-      status: 500,
-      statusText: 'Error: Failed to check topic url fragment.',
-      url: '',
-      ok: false,
-      name: 'HttpErrorResponse',
-      message: 'Http failure response for test url: 500' +
-               'Error: Failed to check topic url fragment.',
-      error: {
-        error: 'Error: Failed to check topic url fragment.',
-        status_code: 500
-      }
-    };
+  it(
+    'should not show error when updation of topic url fragment failed' +
+      'with 400 status code',
+    fakeAsync(() => {
+      let errorResponse = {
+        headers: {
+          normalizedNames: {},
+          lazyUpdate: null,
+        },
+        status: 500,
+        statusText: 'Error: Failed to check topic url fragment.',
+        url: '',
+        ok: false,
+        name: 'HttpErrorResponse',
+        message:
+          'Http failure response for test url: 500' +
+          'Error: Failed to check topic url fragment.',
+        error: {
+          error: 'Error: Failed to check topic url fragment.',
+          status_code: 500,
+        },
+      };
 
-    spyOn(alertsService, 'addWarning');
-    spyOn(
-      mockEditableTopicBackendApiService, 'doesTopicWithUrlFragmentExistAsync')
-      .and.returnValue(Promise.reject(errorResponse));
+      spyOn(alertsService, 'addWarning');
+      spyOn(
+        mockEditableTopicBackendApiService,
+        'doesTopicWithUrlFragmentExistAsync'
+      ).and.returnValue(Promise.reject(errorResponse));
 
-    topicEditorStateService.updateExistenceOfTopicUrlFragment(
-      'test_topic', () => {}, () => {});
-    tick();
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      errorResponse.message);
-  }));
+      topicEditorStateService.updateExistenceOfTopicUrlFragment(
+        'test_topic',
+        () => {},
+        () => {}
+      );
+      tick();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        errorResponse.message
+      );
+    })
+  );
 });

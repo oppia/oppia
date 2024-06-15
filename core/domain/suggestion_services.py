@@ -37,6 +37,7 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import taskqueue_services
+from core.domain import translation_domain
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
@@ -77,11 +78,11 @@ MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER: Final = 5
 
 SUGGESTION_TRANSLATE_CONTENT_HTML: Callable[
     [suggestion_registry.SuggestionTranslateContent], str
-] = lambda suggestion: suggestion.change.translation_html
+] = lambda suggestion: suggestion.change_cmd.translation_html
 
 SUGGESTION_ADD_QUESTION_HTML: Callable[
     [suggestion_registry.SuggestionAddQuestion], str
-] = lambda suggestion: suggestion.change.question_dict[
+] = lambda suggestion: suggestion.change_cmd.question_dict[
     'question_state_data']['content']['html']
 
 # A dictionary that maps the suggestion type to a lambda function, which is
@@ -106,7 +107,7 @@ def create_suggestion(
     target_id: str,
     target_version_at_submission: int,
     author_id: str,
-    change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+    change_cmd: Mapping[str, change_domain.AcceptableChangeDictTypes],
     description: Optional[str]
 ) -> suggestion_registry.SuggestionAddQuestion: ...
 
@@ -118,7 +119,7 @@ def create_suggestion(
     target_id: str,
     target_version_at_submission: int,
     author_id: str,
-    change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+    change_cmd: Mapping[str, change_domain.AcceptableChangeDictTypes],
     description: Optional[str]
 ) -> suggestion_registry.SuggestionTranslateContent: ...
 
@@ -130,7 +131,7 @@ def create_suggestion(
     target_id: str,
     target_version_at_submission: int,
     author_id: str,
-    change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+    change_cmd: Mapping[str, change_domain.AcceptableChangeDictTypes],
     description: Optional[str]
 ) -> suggestion_registry.SuggestionEditStateContent: ...
 
@@ -142,7 +143,7 @@ def create_suggestion(
     target_id: str,
     target_version_at_submission: int,
     author_id: str,
-    change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+    change_cmd: Mapping[str, change_domain.AcceptableChangeDictTypes],
     description: Optional[str]
 ) -> suggestion_registry.BaseSuggestion: ...
 
@@ -153,7 +154,7 @@ def create_suggestion(
     target_id: str,
     target_version_at_submission: int,
     author_id: str,
-    change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+    change_cmd: Mapping[str, change_domain.AcceptableChangeDictTypes],
     description: Optional[str]
 ) -> suggestion_registry.BaseSuggestion:
     """Creates a new SuggestionModel and the corresponding FeedbackThread.
@@ -167,7 +168,7 @@ def create_suggestion(
         target_version_at_submission: int. The version number of the target
             entity at the time of creation of the suggestion.
         author_id: str. The ID of the user who submitted the suggestion.
-        change: dict. The details of the suggestion.
+        change_cmd: dict. The details of the suggestion.
         description: str|None. The description of the changes provided by the
             author or None, if no description is provided.
 
@@ -188,51 +189,56 @@ def create_suggestion(
     if target_type == feconf.ENTITY_TYPE_EXPLORATION:
         exploration = exp_fetchers.get_exploration_by_id(target_id)
     if suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
-        score_category = (
-            suggestion_models.SCORE_TYPE_CONTENT +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        score_category = ('%s%s%s' % (
+            suggestion_models.SCORE_TYPE_CONTENT,
+            suggestion_models.SCORE_CATEGORY_DELIMITER, exploration.category
+            ))
         # Suggestions of this type do not have an associated language code,
         # since they are not queryable by language.
         language_code = None
         suggestion: AllowedSuggestionClasses = (
             suggestion_registry.SuggestionEditStateContent(
                 thread_id, target_id, target_version_at_submission, status,
-                author_id, None, change, score_category, language_code, False
+                author_id, None, change_cmd, score_category, language_code,
+                False, datetime.datetime.utcnow(),
+                datetime.datetime.utcnow()
             )
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        score_category = (
-            suggestion_models.SCORE_TYPE_TRANSLATION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        score_category = ('%s%s%s' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER, exploration.category)
+        )
         # The language code of the translation, used for querying purposes.
         # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(change['language_code'], str)
-        language_code = change['language_code']
+        assert isinstance(change_cmd['language_code'], str)
+        language_code = change_cmd['language_code']
         # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(change['state_name'], str)
-        assert isinstance(change['content_id'], str)
+        assert isinstance(change_cmd['state_name'], str)
+        assert isinstance(change_cmd['content_id'], str)
         content_html = exploration.get_content_html(
-            change['state_name'], change['content_id'])
-        if content_html != change['content_html']:
+            change_cmd['state_name'], change_cmd['content_id'])
+        if content_html != change_cmd['content_html']:
             raise Exception(
                 'The Exploration content has changed since this translation '
                 'was submitted.')
         suggestion = suggestion_registry.SuggestionTranslateContent(
             thread_id, target_id, target_version_at_submission, status,
-            author_id, None, change, score_category, language_code, False
-        )
+            author_id, None, change_cmd, score_category, language_code, False,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow())
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
-        score_category = (
-            suggestion_models.SCORE_TYPE_QUESTION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
+        score_category = ('%s%s%s' % (
+            suggestion_models.SCORE_TYPE_QUESTION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER, target_id)
+        )
         # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(change['question_dict'], dict)
+        assert isinstance(change_cmd['question_dict'], dict)
         # Here we use cast because we are narrowing down the type from
         # various Dict types that are present in AcceptableChangeDictTypes
         # to QuestionDict type.
         question_dict = cast(
             question_domain.QuestionDict,
-            change['question_dict']
+            change_cmd['question_dict']
         )
         question_dict['language_code'] = (
             constants.DEFAULT_LANGUAGE_CODE)
@@ -242,8 +248,9 @@ def create_suggestion(
         add_question_language_code = constants.DEFAULT_LANGUAGE_CODE
         suggestion = suggestion_registry.SuggestionAddQuestion(
             thread_id, target_id, target_version_at_submission, status,
-            author_id, None, change, score_category, add_question_language_code,
-            False
+            author_id, None, change_cmd, score_category,
+            add_question_language_code, False,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow()
         )
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
@@ -252,7 +259,7 @@ def create_suggestion(
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
-        None, change, score_category, thread_id, suggestion.language_code)
+        None, change_cmd, score_category, thread_id, suggestion.language_code)
 
     # Update the community contribution stats so that the number of suggestions
     # of this type that are in review increases by one.
@@ -671,7 +678,7 @@ def _update_suggestions(
         suggestion_models_to_update.append(suggestion_model)
         suggestion_model.status = suggestion.status
         suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
-        suggestion_model.change_cmd = suggestion.change.to_dict()
+        suggestion_model.change_cmd = suggestion.change_cmd.to_dict()
         suggestion_model.score_category = suggestion.score_category
         suggestion_model.language_code = suggestion.language_code
         suggestion_model.edited_by_reviewer = suggestion.edited_by_reviewer
@@ -920,9 +927,9 @@ def auto_reject_translation_suggestions_for_content_ids(
     content_ids: Set[str]
 ) -> None:
     """Rejects all translation suggestions with target ID matching the supplied
-    exploration ID and change content ID matching one of the supplied content
-    IDs. These suggestions are being rejected because their corresponding
-    exploration content was deleted. Reviewer ID is set to
+    exploration ID and change_cmd content ID matching one of the supplied
+    content IDs. These suggestions are being rejected because their
+    corresponding exploration content was deleted. Reviewer ID is set to
     SUGGESTION_BOT_USER_ID.
 
     Args:
@@ -932,7 +939,7 @@ def auto_reject_translation_suggestions_for_content_ids(
     obsolete_suggestion_ids = [
         suggestion.suggestion_id
         for suggestion in get_translation_suggestions_in_review(exp_id)
-        if suggestion.change.content_id in content_ids]
+        if suggestion.change_cmd.content_id in content_ids]
     reject_suggestions(
         obsolete_suggestion_ids, feconf.SUGGESTION_BOT_USER_ID,
         constants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG)
@@ -942,7 +949,7 @@ def resubmit_rejected_suggestion(
     suggestion_id: str,
     summary_message: str,
     author_id: str,
-    change: change_domain.BaseChange
+    change_cmd: change_domain.BaseChange
 ) -> None:
     """Resubmit a rejected suggestion with the given suggestion_id.
 
@@ -951,7 +958,7 @@ def resubmit_rejected_suggestion(
         summary_message: str. The message provided by the author to
             summarize new suggestion.
         author_id: str. The ID of the author creating the suggestion.
-        change: BaseChange. The new change to apply to the suggestion.
+        change_cmd: BaseChange. The new change to apply to the suggestion.
 
     Raises:
         Exception. The summary message is empty.
@@ -971,8 +978,8 @@ def resubmit_rejected_suggestion(
             'Only rejected suggestions can be resubmitted.' % (suggestion_id)
         )
 
-    suggestion.pre_update_validate(change)
-    suggestion.change = change
+    suggestion.pre_update_validate(change_cmd)
+    suggestion.change_cmd = change_cmd
     suggestion.set_suggestion_status_to_in_review()
     _update_suggestion(suggestion)
 
@@ -1099,6 +1106,50 @@ def get_reviewable_translation_suggestions_by_offset(
     return translation_suggestions, next_offset
 
 
+def get_reviewable_translation_suggestion_target_ids(
+    user_id: str,
+    language_code: Optional[str] = None
+) -> List[str]:
+    """Returns a list of translation suggestions matching the
+    passed opportunity IDs which the user can review.
+
+    Args:
+        user_id: str. The ID of the user.
+        language_code: str|None. ISO 639-1 language code for which to filter.
+            If it is None, all available languages will be returned.
+
+    Returns:
+        list(str). A list of translation suggestion target ids
+        which the supplied user is permitted to review.
+    """
+    contribution_rights = user_services.get_user_contribution_rights(
+        user_id
+    )
+    allowed_language_codes_for_review = (
+        contribution_rights.can_review_translation_for_language_codes
+    )
+
+    filtering_by_language_code = language_code is not None
+    language_codes = (
+        allowed_language_codes_for_review if not filtering_by_language_code
+        else [language_code]
+        if language_code in allowed_language_codes_for_review
+        else []
+    )
+
+    user_can_review_translations = len(language_codes) != 0
+    if not user_can_review_translations:
+        return []
+
+    return (
+        suggestion_models.GeneralSuggestionModel
+        .get_in_review_translation_suggestion_target_ids(
+            user_id,
+            language_codes
+        )
+    )
+
+
 def get_reviewable_translation_suggestions_for_single_exp(
     user_id: str,
     opportunity_summary_exp_id: str,
@@ -1157,7 +1208,8 @@ def get_reviewable_question_suggestions_by_offset(
     user_id: str,
     limit: int,
     offset: int,
-    sort_key: Optional[str]
+    sort_key: Optional[str],
+    skill_ids: Optional[List[str]],
 ) -> Tuple[List[suggestion_registry.SuggestionAddQuestion], int]:
     """Returns a list of question suggestions which the user
        can review.
@@ -1168,6 +1220,8 @@ def get_reviewable_question_suggestions_by_offset(
         offset: int. The number of results to skip from the beginning of all
             results matching the query.
         sort_key: str|None. The key to sort the suggestions by.
+        skill_ids: List[str]|None. The skills for which to return question
+            suggestions. None for returning all suggestions.
 
     Returns:
         Tuple of (results, next_offset). Where:
@@ -1179,7 +1233,7 @@ def get_reviewable_question_suggestions_by_offset(
     suggestions, next_offset = (
         suggestion_models.GeneralSuggestionModel
         .get_in_review_question_suggestions_by_offset(
-            limit, offset, user_id, sort_key))
+            limit, offset, user_id, sort_key, skill_ids))
 
     question_suggestions = []
     for suggestion_model in suggestions:
@@ -1700,6 +1754,33 @@ def get_info_about_suggestions_waiting_too_long_for_review() -> List[
     ]
 
 
+def get_new_suggestions_for_reviewer_notifications() -> List[
+    suggestion_registry.ReviewableSuggestionEmailInfo
+]:
+    """Retrieves and organizes new suggestions for reviewer email notifications.
+
+    Returns:
+        list[ReviewableSuggestionEmailInfo]. A list of email content info
+        objects for new suggestions.
+    """
+    new_suggestions = [
+        get_suggestion_from_model(suggestion_model) for suggestion_model in (
+            suggestion_models.GeneralSuggestionModel
+            .get_new_suggestions_waiting_for_review()
+        )
+    ]
+
+    email_content_info = []
+
+    for suggestion in new_suggestions:
+        suggestion_info = (
+            create_reviewable_suggestion_email_info_from_suggestion(
+                suggestion
+        ))
+        email_content_info.append(suggestion_info)
+    return email_content_info
+
+
 def get_user_proficiency_from_model(
     user_proficiency_model: user_models.UserContributionProficiencyModel
 ) -> user_domain.UserContributionProficiency:
@@ -1964,7 +2045,7 @@ def get_suggestion_types_that_need_reviewers() -> Dict[str, Set[str]]:
     """Uses the community contribution stats to determine which suggestion
     types need more reviewers. Suggestion types need more reviewers if the
     number of suggestions in that type divided by the number of reviewers is
-    greater than config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+    greater than ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
     Returns:
         dict. A dictionary that uses the presence of its keys to indicate which
@@ -2083,13 +2164,13 @@ def update_translation_suggestion(
             'Expected SuggestionTranslateContent suggestion but found: %s.'
             % type(suggestion).__name__
         )
-    suggestion.change.translation_html = (
+    suggestion.change_cmd.translation_html = (
         html_cleaner.clean(translation_html)
         if isinstance(translation_html, str)
         else translation_html
     )
     suggestion.edited_by_reviewer = True
-    suggestion.pre_update_validate(suggestion.change)
+    suggestion.pre_update_validate(suggestion.change_cmd)
     _update_suggestion(suggestion)
 
 
@@ -2125,11 +2206,11 @@ def update_question_suggestion(
             'Expected SuggestionAddQuestion suggestion but found: %s.'
             % type(suggestion).__name__
         )
-    question_dict = suggestion.change.question_dict
+    question_dict = suggestion.change_cmd.question_dict
     new_change_obj = (
         question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(
             {
-                'cmd': suggestion.change.cmd,
+                'cmd': suggestion.change_cmd.cmd,
                 'question_dict': {
                     'question_state_data': question_state_data,
                     'language_code': question_dict['language_code'],
@@ -2138,18 +2219,18 @@ def update_question_suggestion(
                             'question_state_data_schema_version']),
                     'linked_skill_ids': question_dict['linked_skill_ids'],
                     'inapplicable_skill_misconception_ids': (
-                        suggestion.change.question_dict[
+                        suggestion.change_cmd.question_dict[
                             'inapplicable_skill_misconception_ids']),
                     'next_content_id_index': next_content_id_index
                 },
-                'skill_id': suggestion.change.skill_id,
+                'skill_id': suggestion.change_cmd.skill_id,
                 'skill_difficulty': skill_difficulty
             }
         )
     )
     suggestion.pre_update_validate(new_change_obj)
     suggestion.edited_by_reviewer = True
-    suggestion.change = new_change_obj
+    suggestion.change_cmd = new_change_obj
 
     _update_suggestion(suggestion)
 
@@ -2388,7 +2469,7 @@ def _update_translation_contribution_stats_models(
             stat.rejected_translations_count)
         stats_model.rejected_translation_word_count = (
             stat.rejected_translation_word_count)
-        stats_model.contribution_dates = stat.contribution_dates
+        stats_model.contribution_dates = sorted(stat.contribution_dates)
         stats_models_to_update.append(stats_model)
 
     suggestion_models.TranslationContributionStatsModel.update_timestamps_multi(
@@ -2737,29 +2818,29 @@ def update_translation_contribution_stats_at_submission(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    if isinstance(suggestion.change.translation_html, list):
-        for content in suggestion.change.translation_html:
+    if isinstance(suggestion.change_cmd.translation_html, list):
+        for content in suggestion.change_cmd.translation_html:
             content_plain_text = html_cleaner.strip_html_tags(content)
             content_word_count += len(content_plain_text.split())
     else:
         content_plain_text = html_cleaner.strip_html_tags(
-            suggestion.change.translation_html)
+            suggestion.change_cmd.translation_html)
         content_word_count = len(content_plain_text.split())
 
     translation_contribution_stat_model = (
         suggestion_models.TranslationContributionStatsModel.get(
-            suggestion.change.language_code, suggestion.author_id, topic_id
+            suggestion.change_cmd.language_code, suggestion.author_id, topic_id
         ))
 
     translation_submitter_total_stat_model = (
         suggestion_models.TranslationSubmitterTotalContributionStatsModel.get(
-            suggestion.change.language_code, suggestion.author_id
+            suggestion.change_cmd.language_code, suggestion.author_id
         )
     )
 
     if translation_submitter_total_stat_model is None:
         suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
-            language_code=suggestion.change.language_code,
+            language_code=suggestion.change_cmd.language_code,
             contributor_id=suggestion.author_id,
             topic_ids_with_translation_submissions=[topic_id],
             recent_review_outcomes=[],
@@ -2800,7 +2881,7 @@ def update_translation_contribution_stats_at_submission(
 
     if translation_contribution_stat_model is None:
         suggestion_models.TranslationContributionStatsModel.create(
-            language_code=suggestion.change.language_code,
+            language_code=suggestion.change_cmd.language_code,
             contributor_user_id=suggestion.author_id,
             topic_id=topic_id,
             submitted_translations_count=1,
@@ -2905,13 +2986,13 @@ def update_translation_contribution_stats_at_review(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    if isinstance(suggestion.change.translation_html, list):
-        for content in suggestion.change.translation_html:
+    if isinstance(suggestion.change_cmd.translation_html, list):
+        for content in suggestion.change_cmd.translation_html:
             content_plain_text = html_cleaner.strip_html_tags(content)
             content_word_count += len(content_plain_text.split())
     else:
         content_plain_text = html_cleaner.strip_html_tags(
-            suggestion.change.translation_html)
+            suggestion.change_cmd.translation_html)
         content_word_count = len(content_plain_text.split())
 
     suggestion_is_accepted = (
@@ -2920,12 +3001,12 @@ def update_translation_contribution_stats_at_review(
 
     translation_contribution_stat_model = (
         suggestion_models.TranslationContributionStatsModel.get(
-            suggestion.change.language_code, suggestion.author_id, topic_id
+            suggestion.change_cmd.language_code, suggestion.author_id, topic_id
         ))
 
     translation_submitter_total_stat_model = (
         suggestion_models.TranslationSubmitterTotalContributionStatsModel.get(
-            suggestion.change.language_code, suggestion.author_id
+            suggestion.change_cmd.language_code, suggestion.author_id
         ))
 
     if translation_submitter_total_stat_model is None:
@@ -2943,7 +3024,7 @@ def update_translation_contribution_stats_at_review(
             suggestion.edited_by_reviewer,
             content_word_count)
         suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
-            language_code=suggestion.change.language_code,
+            language_code=suggestion.change_cmd.language_code,
             contributor_id=suggestion.author_id,
             topic_ids_with_translation_submissions=[topic_id],
             recent_review_outcomes=recent_review_outcomes,
@@ -2995,7 +3076,7 @@ def update_translation_contribution_stats_at_review(
             suggestion.edited_by_reviewer,
             content_word_count)
         suggestion_models.TranslationContributionStatsModel.create(
-            language_code=suggestion.change.language_code,
+            language_code=suggestion.change_cmd.language_code,
             contributor_user_id=suggestion.author_id,
             topic_id=topic_id,
             submitted_translations_count=1,
@@ -3051,13 +3132,13 @@ def update_translation_review_stats(
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
 
-    if isinstance(suggestion.change.translation_html, list):
-        for content in suggestion.change.translation_html:
+    if isinstance(suggestion.change_cmd.translation_html, list):
+        for content in suggestion.change_cmd.translation_html:
             content_plain_text = html_cleaner.strip_html_tags(content)
             content_word_count += len(content_plain_text.split())
     else:
         content_plain_text = html_cleaner.strip_html_tags(
-            suggestion.change.translation_html)
+            suggestion.change_cmd.translation_html)
         content_word_count = len(content_plain_text.split())
 
     translation_review_stat_model = (
@@ -3065,13 +3146,13 @@ def update_translation_review_stats(
         # final_reviewer_id should not be None when the suggestion is
         # up-to-date.
         suggestion_models.TranslationReviewStatsModel.get(
-            suggestion.change.language_code, suggestion.final_reviewer_id,
+            suggestion.change_cmd.language_code, suggestion.final_reviewer_id,
             topic_id
         ))
 
     translation_reviewer_total_stat_model = (
         suggestion_models.TranslationReviewerTotalContributionStatsModel.get(
-            suggestion.change.language_code, suggestion.final_reviewer_id
+            suggestion.change_cmd.language_code, suggestion.final_reviewer_id
         ))
 
     if translation_reviewer_total_stat_model is None:
@@ -3090,7 +3171,7 @@ def update_translation_review_stats(
         if suggestion_is_accepted and suggestion.edited_by_reviewer:
             accepted_translations_with_reviewer_edits_count += 1
         suggestion_models.TranslationReviewerTotalContributionStatsModel.create(
-            language_code=suggestion.change.language_code,
+            language_code=suggestion.change_cmd.language_code,
             contributor_id=suggestion.final_reviewer_id,
             topic_ids_with_translation_reviews=[topic_id],
             reviewed_translations_count=1,
@@ -3137,7 +3218,7 @@ def update_translation_review_stats(
         if suggestion_is_accepted and suggestion.edited_by_reviewer:
             accepted_translations_with_reviewer_edits_count += 1
         suggestion_models.TranslationReviewStatsModel.create(
-            language_code=suggestion.change.language_code,
+            language_code=suggestion.change_cmd.language_code,
             reviewer_user_id=suggestion.final_reviewer_id,
             topic_id=topic_id,
             reviewed_translations_count=1,
@@ -3838,7 +3919,7 @@ def generate_contributor_certificate_data(
     language_code: Optional[str],
     from_date: datetime.datetime,
     to_date: datetime.datetime
-) -> suggestion_registry.ContributorCertificateInfoDict:
+) -> Optional[suggestion_registry.ContributorCertificateInfoDict]:
     """Returns data to generate the certificate.
 
     Args:
@@ -3853,7 +3934,8 @@ def generate_contributor_certificate_data(
             contributions were created.
 
     Returns:
-        ContributorCertificateInfoDict. Data to generate the certificate.
+        ContributorCertificateInfoDict|None. Data to generate the certificate,
+        or None if no data is found.
 
     Raises:
         Exception. The suggestion type is invalid.
@@ -3877,7 +3959,7 @@ def generate_contributor_certificate_data(
     else:
         raise Exception('The suggestion type is invalid.')
 
-    return data.to_dict()
+    return data.to_dict() if data is not None else None
 
 
 def _generate_translation_contributor_certificate_data(
@@ -3885,7 +3967,7 @@ def _generate_translation_contributor_certificate_data(
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     user_id: str
-) -> suggestion_registry.ContributorCertificateInfo:
+) -> Optional[suggestion_registry.ContributorCertificateInfo]:
     """Returns data to generate translation submitter certificate.
 
     Args:
@@ -3898,8 +3980,8 @@ def _generate_translation_contributor_certificate_data(
         user_id: str. The user ID of the contributor.
 
     Returns:
-        ContributorCertificateInfo. Data to generate translation submitter
-        certificate.
+        ContributorCertificateInfo|None. Data to generate translation submitter
+        certificate, or None if no data is found.
 
     Raises:
         Exception. The language is invalid.
@@ -3933,30 +4015,41 @@ def _generate_translation_contributor_certificate_data(
     words_count = 0
     for model in suggestions:
         suggestion = get_suggestion_from_model(model)
-
-        # Retrieve the html content that is emphasized on the
-        # Contributor Dashboard pages. This content is what stands
-        # out for each suggestion when a user views a list of
-        # suggestions.
-        get_html_representing_suggestion = (
-            SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
-                suggestion.suggestion_type]
+        suggestion_change = suggestion.change_cmd
+        data_is_list = (
+            translation_domain.TranslatableContentFormat
+            .is_data_format_list(suggestion_change.data_format)
         )
-        plain_text = _get_plain_text_from_html_content_string(
-            get_html_representing_suggestion(suggestion))
+        if (
+                suggestion_change.cmd == 'add_written_translation' and
+                data_is_list
+        ):
+            words_count += sum(
+                len(item.split()) for item in suggestion_change.translation_html
+            )
+        else:
+            # Retrieve the html content that is emphasized on the
+            # Contributor Dashboard pages. This content is what stands
+            # out for each suggestion when a user views a list of
+            # suggestions.
+            get_html_representing_suggestion = (
+                SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
+                    suggestion.suggestion_type]
+            )
+            plain_text = _get_plain_text_from_html_content_string(
+                get_html_representing_suggestion(suggestion))
 
-        words = plain_text.split(' ')
-        words_without_empty_strings = [
-            word for word in words if word != '']
-        words_count += len(words_without_empty_strings)
+            words = plain_text.split(' ')
+            words_without_empty_strings = [
+                word for word in words if word != '']
+            words_count += len(words_without_empty_strings)
     # Go to the below link for more information about how we count hours
     # contributed.# Goto the below link for more information.
     # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing
     hours_contributed = round(words_count / 300, 2)
 
     if words_count == 0:
-        raise Exception(
-            'There are no contributions for the given time range.')
+        return None
 
     return suggestion_registry.ContributorCertificateInfo(
         from_date.strftime('%d %b %Y'), to_date.strftime('%d %b %Y'),
@@ -3968,7 +4061,7 @@ def _generate_question_contributor_certificate_data(
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     user_id: str
-) -> suggestion_registry.ContributorCertificateInfo:
+) -> Optional[suggestion_registry.ContributorCertificateInfo]:
     """Returns data to generate question submitter certificate.
 
     Args:
@@ -3979,8 +4072,8 @@ def _generate_question_contributor_certificate_data(
         user_id: str. The user ID of the contributor.
 
     Returns:
-        ContributorCertificateInfo. Data to generate question submitter
-        certificate.
+        ContributorCertificateInfo|None. Data to generate question submitter
+        certificate, or None if no data is found.
 
     Raises:
         Exception. The suggestion type given to generate the certificate is
@@ -4020,8 +4113,7 @@ def _generate_question_contributor_certificate_data(
     hours_contributed = round(minutes_contributed / 60, 2)
 
     if minutes_contributed == 0:
-        raise Exception(
-            'There are no contributions for the given time range.')
+        return None
 
     return suggestion_registry.ContributorCertificateInfo(
         from_date.strftime('%d %b %Y'), to_date.strftime('%d %b %Y'),

@@ -16,14 +16,11 @@
  * @fileoverview Constants for the collection editor page.
  */
 
-// TODO(bhenning): These constants should be provided by the backend.
-
 export const CollectionEditorPageConstants = {
   EDITABLE_COLLECTION_DATA_URL_TEMPLATE:
     '/collection_editor_handler/data/<collection_id>',
   COLLECTION_RIGHTS_URL_TEMPLATE:
     '/collection_editor_handler/rights/<collection_id>',
 
-  COLLECTION_TITLE_INPUT_FOCUS_LABEL:
-    'collectionTitleInputFocusLabel'
+  COLLECTION_TITLE_INPUT_FOCUS_LABEL: 'collectionTitleInputFocusLabel',
 } as const;

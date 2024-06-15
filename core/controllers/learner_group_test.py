@@ -18,11 +18,11 @@ from __future__ import annotations
 
 import json
 
+from core import feature_flag_list
 from core import feconf
 from core.constants import constants
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
-from core.domain import platform_feature_services
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -406,7 +406,7 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
     LEARNER_2_USERNAME: Final = 'user2'
     TOPIC_ID_1: Final = 'topic_id_1'
     STORY_ID_1: Final = 'story_id_1'
-    SUBTOPIC_PAGE_ID_1: Final = TOPIC_ID_1 + ':1'
+    SUBTOPIC_PAGE_ID_1: Final = '%s:1' % TOPIC_ID_1
     STORY_URL_FRAGMENT: Final = 'title-one'
     STORY_URL_FRAGMENT_TWO: Final = 'story-two'
     NODE_ID_1: Final = 'node_1'
@@ -446,13 +446,13 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
         # Set up topics, subtopics and stories for learner group syllabus.
         self.save_new_valid_exploration(
             self.EXP_ID_0, self.admin_id, title='Title 1',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.admin_id, title='Title 2',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.save_new_valid_exploration(
             self.EXP_ID_7, self.admin_id, title='Title 3',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.publish_exploration(self.admin_id, self.EXP_ID_0)
         self.publish_exploration(self.admin_id, self.EXP_ID_1)
         self.publish_exploration(self.admin_id, self.EXP_ID_7)
@@ -664,7 +664,7 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
     LEARNER_1_USERNAME: Final = 'user1'
     TOPIC_ID_1: Final = 'topic_id_1'
     STORY_ID_1: Final = 'story_id_1'
-    SUBTOPIC_PAGE_ID_1: Final = TOPIC_ID_1 + ':1'
+    SUBTOPIC_PAGE_ID_1: Final = '%s:1' % TOPIC_ID_1
     STORY_URL_FRAGMENT: Final = 'title-one'
     STORY_URL_FRAGMENT_TWO: Final = 'story-two'
     NODE_ID_1: Final = 'node_1'
@@ -698,10 +698,10 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
         # Set up topics, subtopics and stories for learner group syllabus.
         self.save_new_valid_exploration(
             self.EXP_ID_0, self.admin_id, title='Title 1',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.admin_id, title='Title 2',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.publish_exploration(self.admin_id, self.EXP_ID_0)
         self.publish_exploration(self.admin_id, self.EXP_ID_1)
 
@@ -856,74 +856,6 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
         self.logout()
 
 
-class CreateLearnerGroupPageTests(test_utils.GenericTestBase):
-    """Checks the access and rendering of the create learner group page."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.login(self.NEW_USER_EMAIL)
-
-    def test_page_with_disabled_learner_groups_leads_to_404(self) -> None:
-        swap_is_feature_enabled = self.swap_to_always_return(
-            platform_feature_services,
-            'is_feature_enabled',
-            False
-        )
-        with swap_is_feature_enabled:
-            self.get_html_response(
-                feconf.CREATE_LEARNER_GROUP_PAGE_URL, expected_status_int=404)
-        self.logout()
-
-    def test_page_with_enabled_learner_groups_loads_correctly(self) -> None:
-        swap_is_feature_enabled = self.swap_to_always_return(
-            platform_feature_services,
-            'is_feature_enabled',
-            True
-        )
-        with swap_is_feature_enabled:
-            response = self.get_html_response(
-                feconf.CREATE_LEARNER_GROUP_PAGE_URL)
-        response.mustcontain(
-            '<oppia-create-learner-group-page>'
-            '</oppia-create-learner-group-page>')
-        self.logout()
-
-
-class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
-    """Checks the access and rendering of the facilitator dashboard page."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.login(self.NEW_USER_EMAIL)
-
-    def test_page_with_disabled_learner_groups_leads_to_404(self) -> None:
-        swap_is_feature_enabled = self.swap_to_always_return(
-            platform_feature_services,
-            'is_feature_enabled',
-            False
-        )
-        with swap_is_feature_enabled:
-            self.get_html_response(
-                feconf.FACILITATOR_DASHBOARD_PAGE_URL, expected_status_int=404)
-        self.logout()
-
-    def test_page_with_enabled_learner_groups_loads_correctly(self) -> None:
-        swap_is_feature_enabled = self.swap_to_always_return(
-            platform_feature_services,
-            'is_feature_enabled',
-            True
-        )
-        with swap_is_feature_enabled:
-            response = self.get_html_response(
-                feconf.FACILITATOR_DASHBOARD_PAGE_URL)
-        response.mustcontain(
-            '<oppia-facilitator-dashboard-page>'
-            '</oppia-facilitator-dashboard-page>')
-        self.logout()
-
-
 class LearnerGroupSearchLearnerHandlerTests(test_utils.GenericTestBase):
     """Tests searching a given user to invite to the learner group"""
 
@@ -1004,70 +936,6 @@ class LearnerGroupSearchLearnerHandlerTests(test_utils.GenericTestBase):
         assert user_settings is not None
         self.assertEqual(response['username'], user_settings.username)
         self.assertEqual(response['error'], '')
-        self.logout()
-
-
-class EditLearnerGroupPageTests(test_utils.GenericTestBase):
-    """Checks the access and rendering of the edit learner page."""
-
-    LEARNER_ID: Final = 'learner_user_1'
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.FACILITATOR_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.login(self.OWNER_EMAIL)
-        self.learner_group_id = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
-        self.learner_group = learner_group_services.create_learner_group(
-            self.learner_group_id, 'Learner Group Name', 'Description',
-            [self.FACILITATOR_ID], [self.LEARNER_ID], ['subtopic_id_1'],
-            ['story_id_1'])
-
-    def test_page_with_disabled_learner_groups_leads_to_404(self) -> None:
-        swap_is_feature_enabled = self.swap_to_always_return(
-            platform_feature_services,
-            'is_feature_enabled',
-            False
-        )
-        with swap_is_feature_enabled:
-            self.get_html_response(
-                '/edit-learner-group/%s' % self.learner_group_id,
-                expected_status_int=404)
-        self.logout()
-
-    def test_page_with_enabled_learner_groups_loads_correctly_for_facilitator(
-        self
-    ) -> None:
-        swap_is_feature_enabled = self.swap_to_always_return(
-            platform_feature_services,
-            'is_feature_enabled',
-            True
-        )
-        with swap_is_feature_enabled:
-            response = self.get_html_response(
-                '/edit-learner-group/%s' % self.learner_group_id)
-        response.mustcontain(
-            '<oppia-edit-learner-group-page>'
-            '</oppia-edit-learner-group-page>')
-        self.logout()
-
-    def test_page_with_enabled_learner_groups_leads_to_404_for_non_facilitators(
-        self
-    ) -> None:
-        swap_is_feature_enabled = self.swap_to_always_return(
-            platform_feature_services,
-            'is_feature_enabled',
-            True
-        )
-        self.logout()
-        self.login(self.NEW_USER_EMAIL)
-        with swap_is_feature_enabled:
-            self.get_html_response(
-                '/edit-learner-group/%s' % self.learner_group_id,
-                expected_status_int=404)
         self.logout()
 
 
@@ -1303,8 +1171,8 @@ class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
 class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
     """Tests for Learner Stories Chapters Progress Handler."""
 
-    NODE_ID_1: Final = story_domain.NODE_ID_PREFIX + '1'
-    NODE_ID_2: Final = story_domain.NODE_ID_PREFIX + '2'
+    NODE_ID_1: Final = '%s1' % story_domain.NODE_ID_PREFIX
+    NODE_ID_2: Final = '%s2' % story_domain.NODE_ID_PREFIX
 
     def setUp(self) -> None:
         super().setUp()
@@ -1323,34 +1191,28 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
         )
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.story_id)
-        changelist = [
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': self.NODE_ID_1,
-                'title': 'Title 1'
-            })
-        ]
-        story_services.update_story(
-            self.USER_ID, self.story_id, changelist,
-            'Added node.')
-        self.story = story_fetchers.get_story_by_id(self.story_id)
 
         self.exp_id_1 = 'expid1'
         self.save_new_valid_exploration(self.exp_id_1, self.USER_ID)
 
         change_list = [
             story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_1,
+                'title': 'Title 1'
+            }), story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': self.NODE_ID_1,
                 'old_value': None,
                 'new_value': self.exp_id_1
             })
         ]
         story_services.update_story(
             self.USER_ID, self.story_id, change_list,
-            'Added a node.')
+            'Added node.')
+        self.story = story_fetchers.get_story_by_id(self.story_id)
 
     def test_get_learner_stories_chapters_progress(self) -> None:
         self.login(self.NEW_USER_EMAIL)
@@ -1399,29 +1261,22 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
 class LearnerGroupsFeatureStatusHandlerTests(test_utils.GenericTestBase):
     """Unit test for LearnerGroupsFeatureStatusHandler."""
 
-    def test_get_request_returns_correct_status(self) -> None:
-        swap_is_feature_enabled_to_false = self.swap_to_always_return(
-            platform_feature_services,
-            'is_feature_enabled',
-            False
-        )
-        with swap_is_feature_enabled_to_false:
-            response = self.get_json('/learner_groups_feature_status_handler')
-        self.assertEqual(
-            response, {
-                'feature_is_enabled': False
-            })
-
-        swap_is_feature_enabled_to_true = self.swap_to_always_return(
-            platform_feature_services,
-            'is_feature_enabled',
-            True
-        )
-        with swap_is_feature_enabled_to_true:
-            response = self.get_json('/learner_groups_feature_status_handler')
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
+    def test_get_request_returns_true_when_learner_groups_featuer_flag_enabled(
+        self) -> None:
+        response = self.get_json('/learner_groups_feature_status_handler')
         self.assertEqual(
             response, {
                 'feature_is_enabled': True,
+            })
+
+    def test_get_request_returns_false_when_learner_groups_featuer_flag_disable(
+        self) -> None:
+        response = self.get_json('/learner_groups_feature_status_handler')
+        self.assertEqual(
+            response, {
+                'feature_is_enabled': False,
             })
 
 

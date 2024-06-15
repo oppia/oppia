@@ -16,12 +16,15 @@
  * @fileoverview Component for Delete Skill Modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { AssignedSkill } from 'domain/skill/assigned-skill.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {AssignedSkill} from 'domain/skill/assigned-skill.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {
+  TopicsAndSkillsDashboardBackendApiService,
+  TopicIdToDiagnosticTestSkillIdsResponse,
+} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 export interface TopicAssignmentsSummary {
   subtopicId: number;
@@ -35,7 +38,7 @@ export interface TopicNameToTopicAssignments {
 
 @Component({
   selector: 'oppia-delete-skill-modal',
-  templateUrl: './delete-skill-modal.component.html'
+  templateUrl: './delete-skill-modal.component.html',
 })
 export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
@@ -50,50 +53,50 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService,
+    private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
     private urlInterpolationService: UrlInterpolationService
   ) {
     super(ngbActiveModal);
   }
 
   fetchTopicIdToDiagnosticTestSkillIds(
-      topicAssignments: AssignedSkill[]): void {
+    topicAssignments: AssignedSkill[]
+  ): void {
     let allTopicIds = [];
     for (let topic of topicAssignments) {
       allTopicIds.push(topic.topicId);
     }
     this.ineligibleTopicNameToTopicAssignments = {};
     this.topicsAndSkillsDashboardBackendApiService
-      .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
-        (responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
-          for (let topic of topicAssignments) {
-            let diagnosticTestSkillIds = (
-              responseDict.topicIdToDiagnosticTestSkillIds[topic.topicId]);
+      .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds)
+      .then((responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
+        for (let topic of topicAssignments) {
+          let diagnosticTestSkillIds =
+            responseDict.topicIdToDiagnosticTestSkillIds[topic.topicId];
 
-            if (
-              diagnosticTestSkillIds.length === 1 &&
-              diagnosticTestSkillIds.indexOf(this.skillId) !== -1
-            ) {
-              this.ineligibleTopicNameToTopicAssignments[topic.topicName] = {
-                topicId: topic.topicId,
-                subtopicId: topic.subtopicId,
-                topicVersion: topic.topicVersion
-              };
-              this.skillCanBeDeleted = false;
-            }
+          if (
+            diagnosticTestSkillIds.length === 1 &&
+            diagnosticTestSkillIds.indexOf(this.skillId) !== -1
+          ) {
+            this.ineligibleTopicNameToTopicAssignments[topic.topicName] = {
+              topicId: topic.topicId,
+              subtopicId: topic.subtopicId,
+              topicVersion: topic.topicVersion,
+            };
+            this.skillCanBeDeleted = false;
           }
-          this.ineligibleTopicsCount = Object.keys(
-            this.ineligibleTopicNameToTopicAssignments).length;
-          this.topicsAssignments = topicAssignments;
-        });
+        }
+        this.ineligibleTopicsCount = Object.keys(
+          this.ineligibleTopicNameToTopicAssignments
+        ).length;
+        this.topicsAssignments = topicAssignments;
+      });
   }
 
   fetchTopicAssignmentsForSkill(): void {
     this.topicsAndSkillsDashboardBackendApiService
-      .fetchTopicAssignmentsForSkillAsync(
-        this.skillId
-      ).then((response: AssignedSkill[]) => {
+      .fetchTopicAssignmentsForSkillAsync(this.skillId)
+      .then((response: AssignedSkill[]) => {
         this.fetchTopicIdToDiagnosticTestSkillIds(response);
         this.topicsAssignmentsAreFetched = true;
       });
@@ -103,9 +106,11 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
     let topicId = topicAssignment.topicId;
     const TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>#/';
     return this.urlInterpolationService.interpolateUrl(
-      TOPIC_EDITOR_URL_TEMPLATE, {
-        topic_id: topicId
-      });
+      TOPIC_EDITOR_URL_TEMPLATE,
+      {
+        topic_id: topicId,
+      }
+    );
   }
 
   ngOnInit(): void {
@@ -114,7 +119,7 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
 
   showTopicsAssignments(): boolean {
     return Boolean(
-      this.topicsAssignmentsAreFetched &&
-        this.topicsAssignments.length);
+      this.topicsAssignmentsAreFetched && this.topicsAssignments.length
+    );
   }
 }

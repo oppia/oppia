@@ -21,6 +21,7 @@ from __future__ import annotations
 from core.constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
+from core.domain import caching_services
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
@@ -289,3 +290,64 @@ class AuthServicesTests(test_utils.GenericTestBase):
         ):
             auth_services.revoke_super_admin_privileges('uid1')
             self.assertEqual([], super_admin_privilage)
+
+    def test_get_csrf_secret_value_returns_when_no_models(self) -> None:
+        csrf_secret_model = auth_models.CsrfSecretModel.get(
+            auth_services.CSRF_SECRET_INSTANCE_ID, strict=False)
+        if csrf_secret_model is not None:
+            auth_models.CsrfSecretModel.delete(csrf_secret_model)
+            caching_services.delete_multi(
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
+                [auth_services.CSRF_SECRET_INSTANCE_ID]
+            )
+        self.assertIsNone(auth_models.CsrfSecretModel.get(
+            auth_services.CSRF_SECRET_INSTANCE_ID, strict=False))
+
+        actual_csrf_secret_value = auth_services.get_csrf_secret_value()
+
+        expected_csrf_secret = auth_models.CsrfSecretModel.get(
+            auth_services.CSRF_SECRET_INSTANCE_ID, strict=False
+        )
+        self.assertIsNotNone(expected_csrf_secret)
+        # Ruling out the possibility of csrf_secret_model being None in
+        # order to avoid mypy error.
+        assert expected_csrf_secret is not None
+        self.assertEqual(
+            expected_csrf_secret.oppia_csrf_secret, actual_csrf_secret_value)
+
+    def test_csrf_secret_mode_is_initialized_correctly(self) -> None:
+        self.assertIsNotNone(auth_models.CsrfSecretModel.get(
+            auth_services.CSRF_SECRET_INSTANCE_ID, strict=False))
+
+        actual_csrf_secret_value = auth_services.get_csrf_secret_value()
+
+        expected_csrf_secret = auth_models.CsrfSecretModel.get(
+            auth_services.CSRF_SECRET_INSTANCE_ID, strict=False
+        )
+        # Ruling out the possibility of csrf_secret_model being None in
+        # order to avoid mypy error.
+        assert expected_csrf_secret is not None
+        self.assertEqual(
+            expected_csrf_secret.oppia_csrf_secret, actual_csrf_secret_value)
+
+    def test_get_csrf_secret_from_model_when_not_in_cache(self) -> None:
+        self.assertIsNotNone(auth_models.CsrfSecretModel.get(
+            auth_services.CSRF_SECRET_INSTANCE_ID, strict=False))
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_DEFAULT,
+            None,
+            [auth_services.CSRF_SECRET_INSTANCE_ID]
+        )
+
+        actual_csrf_secret_value = auth_services.get_csrf_secret_value()
+
+        expected_csrf_secret = auth_models.CsrfSecretModel.get(
+            auth_services.CSRF_SECRET_INSTANCE_ID, strict=False
+        )
+        # Ruling out the possibility of csrf_secret_model being None in
+        # order to avoid mypy error.
+        assert expected_csrf_secret is not None
+        self.assertEqual(
+            expected_csrf_secret.oppia_csrf_secret, actual_csrf_secret_value
+        )

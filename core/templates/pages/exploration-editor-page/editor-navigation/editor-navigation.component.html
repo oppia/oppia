@@ -1,5 +1,5 @@
 <div class="navbar-mobile-container">
-  <i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" aria-label="Mobile navbar options"></i>
+  <i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" aria-label="Mobile navbar options" role="button"></i>
   <div class="navbar-mobile-options" *ngIf="mobileNavOptionsAreShown">
     <div class="exp-nav-dropdown-container">
       <div class="exp-nav-dropdown-content e2e-test-mobile-options-dropdown" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -30,7 +30,7 @@
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Translations</span>
             </a>
           </li>
-          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'preview'}">
+          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-preview-button" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'preview'}">
             <a href="#" ngbTooltip="Preview" placement="bottom" (click)="selectPreviewTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
               <i class="fa fa-play oppia-mobile-exploration-editor-tabs-icon"></i>
@@ -119,10 +119,10 @@
         </div>
 
         <ul class="dropdown-menu" aria-labelledby="discardButtonPopup">
-          <div (click)="discardChanges()">
+          <button class="btn btn-light e2e-test-mobile-exploration-discard-tab" (click)="discardChanges()" [disabled]="autosaveIsInProgress">
             <i class="fa fa-pen oppia-mobile-exploration-editor-tabs-icon"></i>
             Discard
-          </div>
+          </button>
           <div *ngIf="showPublishButton()" [ngClass]="{'disable-publish-button': !connectedToInternet || isExplorationLockedForEditing() || countWarnings()}">
             <button type="button" class="btn btn-light e2e-test-mobile-publish-button"
                     [ngClass]="{'btn-success': connectedToInternet && !isExplorationLockedForEditing() && !countWarnings()}"

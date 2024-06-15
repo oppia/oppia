@@ -24,9 +24,10 @@ from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import blog_domain
 from core.domain import blog_services
-from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 
 from typing import Dict, List, Optional, TypedDict
 
@@ -70,20 +71,6 @@ def _get_blog_card_summary_dicts_for_dashboard(
             'published_on': summary_dict['published_on'],
         })
     return summary_dicts
-
-
-class BlogDashboardPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Blog Dashboard Page Handler to render the frontend template."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_blog_dashboard
-    def get(self) -> None:
-        """Renders the blog dashboard page."""
-        self.render_template('blog-dashboard-page.mainpage.html')
 
 
 class BlogDashboardDataHandler(
@@ -270,19 +257,23 @@ class BlogPostHandler(
             blog_post_id: str. The ID of the blog post.
 
         Raises:
-            PageNotFoundException. The blog post with the given id
+            NotFoundException. The blog post with the given id
                 or url doesn't exist.
         """
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
         if blog_post is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'The blog post with the given id or url doesn\'t exist.')
 
         author_details = blog_services.get_blog_author_details(
             blog_post.author_id)
-        max_no_of_tags = config_domain.Registry.get_config_property(
-            'max_number_of_tags_assigned_to_blog_post', strict=True).value
+        max_no_of_tags = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.
+                MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+            )
+        )
         list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
 
         blog_post_dict = blog_post.to_dict()

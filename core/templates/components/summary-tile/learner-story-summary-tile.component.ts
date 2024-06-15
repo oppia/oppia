@@ -16,19 +16,19 @@
  * @fileoverview Component for a canonical story tile.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
-import { Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { AppConstants } from 'app.constants';
-import { StorySummary } from 'domain/story/story-summary.model';
-import { UrlService } from 'services/contextual/url.service';
+import {Component, OnInit} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
+import {Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {AppConstants} from 'app.constants';
+import {StorySummary} from 'domain/story/story-summary.model';
+import {UrlService} from 'services/contextual/url.service';
 
 @Component({
   selector: 'oppia-learner-story-summary-tile',
-  templateUrl: './learner-story-summary-tile.component.html'
+  templateUrl: './learner-story-summary-tile.component.html',
 })
 export class LearnerStorySummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -37,6 +37,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   @Input() storySummary!: StorySummary;
   @Input() displayArea!: string;
   @Input() topicName!: string;
+  @Input() redesignFeatureFlag!: boolean;
   nodeCount!: number;
   completedNodeCount!: number;
   storyProgress!: number;
@@ -53,7 +54,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,
-    private urlService: UrlService,
+    private urlService: UrlService
   ) {}
 
   getStoryLink(): string {
@@ -69,53 +70,67 @@ export class LearnerStorySummaryTileComponent implements OnInit {
         let explorationId = node.getExplorationId();
         if (explorationId) {
           let result = this.urlInterpolationService.interpolateUrl(
-            '/explore/<exp_id>', {
-              exp_id: explorationId
-            });
+            '/explore/<exp_id>',
+            {
+              exp_id: explorationId,
+            }
+          );
           result = this.urlService.addField(
-            result, 'topic_url_fragment', topicUrlFragment);
+            result,
+            'topic_url_fragment',
+            topicUrlFragment
+          );
           result = this.urlService.addField(
-            result, 'classroom_url_fragment', classroomUrlFragment);
+            result,
+            'classroom_url_fragment',
+            classroomUrlFragment
+          );
           result = this.urlService.addField(
-            result, 'story_url_fragment',
-            this.storySummary.getUrlFragment());
-          result = this.urlService.addField(
-            result, 'node_id', node.getId());
+            result,
+            'story_url_fragment',
+            this.storySummary.getUrlFragment()
+          );
+          result = this.urlService.addField(result, 'node_id', node.getId());
           return result;
         }
       }
     }
+
     return this.urlInterpolationService.interpolateUrl(
-      TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
+      TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE,
+      {
         classroom_url_fragment: classroomUrlFragment,
         story_url_fragment: this.storySummary.getUrlFragment(),
-        topic_url_fragment: topicUrlFragment
-      });
+        topic_url_fragment: topicUrlFragment,
+      }
+    );
   }
 
   ngOnInit(): void {
     this.nodeCount = this.storySummary.getNodeTitles().length;
     this.completedNodeCount = this.storySummary.getCompletedNodeTitles().length;
     this.storyProgress = Math.floor(
-      (this.completedNodeCount / this.nodeCount) * 100);
+      (this.completedNodeCount / this.nodeCount) * 100
+    );
     if (this.storyProgress === 100) {
       this.storyCompleted = true;
     }
 
     if (this.storySummary.getThumbnailFilename()) {
-      this.thumbnailUrl = (
+      this.thumbnailUrl =
         this.assetsBackendApiService.getThumbnailUrlForPreview(
-          AppConstants.ENTITY_TYPE.STORY, this.storySummary.getId(),
-          this.storySummary.getThumbnailFilename()));
+          AppConstants.ENTITY_TYPE.STORY,
+          this.storySummary.getId(),
+          this.storySummary.getThumbnailFilename()
+        );
     }
     this.storyLink = this.getStoryLink();
     this.storyTitle = this.storySummary.getTitle();
     this.thumbnailBgColor = this.storySummary.getThumbnailBgColor();
     if (this.nodeCount !== this.completedNodeCount) {
-      let nextIncompleteNode = this.storySummary.getNodeTitles()[
-        this.completedNodeCount];
-      this.nextIncompleteNodeTitle = (
-        `Chapter ${this.completedNodeCount + 1}: ${nextIncompleteNode}`);
+      let nextIncompleteNode =
+        this.storySummary.getNodeTitles()[this.completedNodeCount];
+      this.nextIncompleteNodeTitle = `Chapter ${this.completedNodeCount + 1}: ${nextIncompleteNode}`;
     }
     this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
   }
@@ -139,6 +154,9 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaLearnerStorySummaryTile', downgradeComponent(
-    {component: LearnerStorySummaryTileComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaLearnerStorySummaryTile',
+    downgradeComponent({component: LearnerStorySummaryTileComponent})
+  );

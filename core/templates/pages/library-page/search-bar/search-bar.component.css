@@ -104,7 +104,7 @@ oppia-search-bar .oppia-input-group {
   max-width: 150px;
 }
 .oppia-search-bar-dropdown-menu-section {
-  max-height: 400px;
+  max-height: 230px;
   overflow: auto;
 }
 .oppia-search-bar-hr {
@@ -205,11 +205,12 @@ oppia-search-bar .oppia-input-group {
     border-radius: 10px;
     color: #fff;
     height: 40px;
+    margin-left: 3px;
     margin-top: -60px;
     max-width: none;
     padding: 8px 7px 0 6px;
     text-align: center;
-    width: 159px;
+    width: 155px;
   }
   .oppia-search-bar-input.btn:hover,
   .oppia-search-bar-input.btn:focus {

@@ -17,17 +17,16 @@
  *  of the subtopic viewer.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, OnInit} from '@angular/core';
 
-import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlService} from 'services/contextual/url.service';
 
 @Component({
   selector: 'subtopic-viewer-navbar-pre-logo-action',
   templateUrl: './subtopic-viewer-navbar-pre-logo-action.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class SubtopicViewerNavbarPreLogoActionComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -41,17 +40,14 @@ export class SubtopicViewerNavbarPreLogoActionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.topicUrlFragment = (
-      this.urlService.getTopicUrlFragmentFromLearnerUrl());
+    this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.topicUrl = this.urlInterpolationService.interpolateUrl(
-      ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE, {
+      ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE,
+      {
         topic_url_fragment: this.topicUrlFragment,
-        classroom_url_fragment: (
-          this.urlService.getClassroomUrlFragmentFromLearnerUrl())
-      });
+        classroom_url_fragment:
+          this.urlService.getClassroomUrlFragmentFromLearnerUrl(),
+      }
+    );
   }
 }
-
-angular.module('oppia').component(
-  'subtopicViewerNavbarPreLogoActionComponent', downgradeComponent(
-    { component: SubtopicViewerNavbarPreLogoActionComponent }));

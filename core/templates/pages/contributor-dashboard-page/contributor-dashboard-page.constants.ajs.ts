@@ -18,22 +18,32 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { ContributorDashboardConstants } from
-  'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
-angular.module('oppia').constant(
-  'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
-  ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS
-);
+angular
+  .module('oppia')
+  .constant(
+    'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
+    ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS
+  );
 
-angular.module('oppia').constant(
-  'CORRESPONDING_DELETED_OPPORTUNITY_TEXT',
-  ContributorDashboardConstants.CORRESPONDING_DELETED_OPPORTUNITY_TEXT);
+angular
+  .module('oppia')
+  .constant(
+    'CORRESPONDING_DELETED_OPPORTUNITY_TEXT',
+    ContributorDashboardConstants.CORRESPONDING_DELETED_OPPORTUNITY_TEXT
+  );
 
-angular.module('oppia').constant(
-  'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
-  ContributorDashboardConstants.DEFAULT_OPPORTUNITY_LANGUAGE_CODE);
+angular
+  .module('oppia')
+  .constant(
+    'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
+    ContributorDashboardConstants.DEFAULT_OPPORTUNITY_LANGUAGE_CODE
+  );
 
-angular.module('oppia').constant(
-  'DEFAULT_OPPORTUNITY_TOPIC_NAME',
-  ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME);
+angular
+  .module('oppia')
+  .constant(
+    'DEFAULT_OPPORTUNITY_TOPIC_NAME',
+    ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME
+  );

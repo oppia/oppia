@@ -75,48 +75,18 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         rights_manager.release_ownership_of_collection(
             system_user, self.COLLECTION_ID)
 
-    def test_access_collection_editor_page(self) -> None:
-        """Test access to editor pages for the sample collection."""
-        whitelisted_usernames = [self.EDITOR_USERNAME]
-        self.set_collection_editors(whitelisted_usernames)
-
-        # Check that it is possible to access a page.
-        self.get_json(
-            '%s/%s' % (
-                feconf.COLLECTION_DATA_URL_PREFIX,
-                self.COLLECTION_ID))
-
-        # Check that non-editors cannot access the editor page. This is due
-        # to them not being whitelisted.
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.COLLECTION_EDITOR_URL_PREFIX,
-                self.COLLECTION_ID), expected_status_int=302)
-
-        # Check that whitelisted users can access and edit in the editor page.
-        self.login(self.EDITOR_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.COLLECTION_EDITOR_URL_PREFIX,
-                self.COLLECTION_ID))
-
-        json_response = self.get_json(
-            '%s/%s' % (feconf.COLLECTION_RIGHTS_PREFIX, self.COLLECTION_ID))
-        self.assertTrue(json_response['can_edit'])
-        self.logout()
-
     def test_editable_collection_handler_get(self) -> None:
-        whitelisted_usernames = [self.EDITOR_USERNAME]
-        self.set_collection_editors(whitelisted_usernames)
+        allowed_usernames = [self.EDITOR_USERNAME]
+        self.set_collection_editors(allowed_usernames)
 
         # Check that non-editors cannot access the editor data handler.
-        # This is due to them not being whitelisted.
+        # This is due to them not being allowed.
         self.get_json(
             '%s/%s' % (
                 feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
                 self.COLLECTION_ID), expected_status_int=401)
 
-        # Check that whitelisted users can access the data
+        # Check that allowed users can access the data
         # from the editable_collection_data_handler.
         self.login(self.EDITOR_EMAIL)
 
@@ -130,8 +100,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
     def test_editable_collection_handler_put_with_invalid_payload_version(
         self
     ) -> None:
-        whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
-        self.set_collection_editors(whitelisted_usernames)
+        allowed_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
+        self.set_collection_editors(allowed_usernames)
 
         rights_manager.create_new_collection_rights(
             self.COLLECTION_ID, self.owner_id)
@@ -180,8 +150,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
     def test_editable_collection_handler_put_cannot_access(self) -> None:
         """Check that non-editors cannot access editable put handler."""
-        whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
-        self.set_collection_editors(whitelisted_usernames)
+        allowed_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
+        self.set_collection_editors(allowed_usernames)
 
         # Assign viewer role to collection.
         rights_manager.create_new_collection_rights(
@@ -208,8 +178,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
     def test_editable_collection_handler_put_can_access(self) -> None:
         """Check that editors can access put handler."""
-        whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
-        self.set_collection_editors(whitelisted_usernames)
+        allowed_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
+        self.set_collection_editors(allowed_usernames)
 
         rights_manager.create_new_collection_rights(
             self.COLLECTION_ID, self.owner_id)
@@ -253,6 +223,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             long_message_dict, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/collection_editor_handler/data/0\' '
+            'these errors are happening:\n'
             'Schema validation for \'commit_message\' failed: Validation '
             'failed: has_length_at_most ({\'max_value\': 375}) for object %s'
             % long_message)
@@ -291,8 +263,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             rights_domain.ACTIVITY_STATUS_PRIVATE)
 
     def test_get_collection_rights(self) -> None:
-        whitelisted_usernames = [self.OWNER_USERNAME]
-        self.set_collection_editors(whitelisted_usernames)
+        allowed_usernames = [self.OWNER_USERNAME]
+        self.set_collection_editors(allowed_usernames)
 
         self.login(self.OWNER_EMAIL)
 

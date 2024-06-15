@@ -16,10 +16,10 @@
  * @fileoverview Service to add custom meta tags.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { WindowRef } from './window-ref.service';
+import {WindowRef} from './window-ref.service';
 
 export interface MetaAttribute {
   propertyType: string;
@@ -28,7 +28,7 @@ export interface MetaAttribute {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MetaTagCustomizationService {
   constructor(private windowRef: WindowRef) {}
@@ -36,9 +36,9 @@ export class MetaTagCustomizationService {
   addOrReplaceMetaTags(attrArray: MetaAttribute[]): void {
     attrArray.forEach(attr => {
       // Find and remove exisiting meta tag.
-      let existingMetaTag = (
-        this.windowRef.nativeWindow.document.querySelector(
-          'meta[' + attr.propertyType + '="' + attr.propertyValue + '"]'));
+      let existingMetaTag = this.windowRef.nativeWindow.document.querySelector(
+        'meta[' + attr.propertyType + '="' + attr.propertyValue + '"]'
+      );
       if (existingMetaTag) {
         existingMetaTag.remove();
       }
@@ -51,6 +51,9 @@ export class MetaTagCustomizationService {
   }
 }
 
-angular.module('oppia').factory(
-  'MetaTagCustomizationService',
-  downgradeInjectable(MetaTagCustomizationService));
+angular
+  .module('oppia')
+  .factory(
+    'MetaTagCustomizationService',
+    downgradeInjectable(MetaTagCustomizationService)
+  );

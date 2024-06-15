@@ -16,33 +16,42 @@
  * @fileoverview Model class for creating filters of frontend contributor
  * admin Dashboard.
  */
+
+import {ContributorDashboardAdminPageConstants as PageConstants} from './contributor-dashboard-admin-page.constants';
+
 export class ContributorAdminDashboardFilter {
   topicIds: string[];
   languageCode?: string;
-  sort?: string;
-  lastActivity?: number;
+  sort?: string | null;
+  maxDaysSinceLastActivity?: number;
 
   /**
- * @param {String} languageCode - Language Code to filter for.
- * @param {String[]} topicIds - keywords to filter for.
- * @param {string} sort - sort options.
- * @param {number} lastActivity - number of days since last activity.
- */
+   * @param {String} languageCode - Language Code to filter for.
+   * @param {String[]} topicIds - keywords to filter for.
+   * @param {string} sort - sort options.
+   * @param {number} maxDaysSinceLastActivity - The number of days before today from which to start considering
+    users' contributions, to filter users.
+   */
   constructor(
-      topicIds: string[], languageCode?: string,
-      sort?: string, lastActivity?: number) {
+    topicIds: string[],
+    languageCode?: string,
+    sort?: string | null,
+    maxDaysSinceLastActivity?: number
+  ) {
     this.languageCode = languageCode;
     this.topicIds = topicIds;
     this.sort = sort;
-    this.lastActivity = lastActivity;
+    this.maxDaysSinceLastActivity = maxDaysSinceLastActivity;
   }
 
-
   /**
- * @returns {ContributorAdminDashboardFilter} - A new
- *   ContributorAdminDashboardFilter instance.
- */
+   * @returns {ContributorAdminDashboardFilter} - A new
+   *   ContributorAdminDashboardFilter instance.
+   */
   static createDefault(): ContributorAdminDashboardFilter {
-    return new ContributorAdminDashboardFilter([], 'es');
+    return new ContributorAdminDashboardFilter(
+      [],
+      PageConstants.DEFAULT_LANGUAGE_FILTER
+    );
   }
 }

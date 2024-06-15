@@ -122,8 +122,10 @@ DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE: Final = (
 DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE: Final = (
     'mark_written_translations_as_needing_update')
 CMD_MARK_TRANSLATIONS_NEEDS_UPDATE: Final = 'mark_translations_needs_update'
+CMD_EDIT_TRANSLATION: Final = 'edit_translation'
 # This takes additional 'content_id' parameters.
 CMD_REMOVE_TRANSLATIONS: Final = 'remove_translations'
+CMD_UPDATE_VOICEOVERS: Final = 'update_voiceovers'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY: Final = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -320,7 +322,7 @@ class ExplorationChange(change_domain.BaseChange):
     EXPLORATION_PROPERTIES: List[str] = [
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
+        'init_state_name', 'auto_tts_enabled',
         'next_content_id_index', 'edits_allowed']
 
     ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
@@ -399,8 +401,24 @@ class ExplorationChange(change_domain.BaseChange):
         'allowed_values': {},
         'deprecated_values': {}
     }, {
+        'name': CMD_EDIT_TRANSLATION,
+        'required_attribute_names': [
+            'content_id', 'language_code', 'translation'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
         'name': CMD_REMOVE_TRANSLATIONS,
         'required_attribute_names': ['content_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_UPDATE_VOICEOVERS,
+        'required_attribute_names': [
+            'content_id', 'language_accent_code', 'voiceovers'],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
         'allowed_values': {},
@@ -829,17 +847,6 @@ class EditExplorationPropertyAutoTtsEnabledCmd(ExplorationChange):
     old_value: bool
 
 
-class EditExplorationPropertyCorrectnessFeedbackEnabledCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'correctness_feedback_enabled' as allowed value.
-    """
-
-    property_name: Literal['correctness_feedback_enabled']
-    new_value: bool
-    old_value: bool
-
-
 class EditExplorationPropertyNextContentIdIndexCmd(ExplorationChange):
     """Class representing the ExplorationChange's
     CMD_EDIT_EXPLORATION_PROPERTY command with
@@ -887,6 +894,25 @@ class TransientCheckpointUrlDict(TypedDict):
     furthest_reached_checkpoint_exp_version: int
     most_recently_reached_checkpoint_state_name: str
     most_recently_reached_checkpoint_exp_version: int
+
+
+class EditTranslationsChangesCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_TRANSLATION command.
+    """
+
+    language_code: str
+    content_id: str
+    translation: feconf.TranslatedContentDict
+
+
+class VoiceoversChangesCmd(ExplorationChange):
+    """Class representing the ExplorationChange's CMD_UPDATE_VOICEOVERS command.
+    """
+
+    content_id: str
+    language_accent_code: str
+    voiceovers: Dict[str, state_domain.VoiceoverDict]
 
 
 class TransientCheckpointUrl:
@@ -1231,7 +1257,6 @@ class ExplorationDict(TypedDict):
     param_specs: Dict[str, param_domain.ParamSpecDict]
     param_changes: List[param_domain.ParamChangeDict]
     auto_tts_enabled: bool
-    correctness_feedback_enabled: bool
     edits_allowed: bool
     next_content_id_index: int
     version: int
@@ -1253,7 +1278,6 @@ class ExplorationPlayerDict(TypedDict):
     title: str
     objective: str
     language_code: str
-    correctness_feedback_enabled: bool
     next_content_id_index: int
 
 
@@ -1314,7 +1338,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         param_changes_list: List[param_domain.ParamChangeDict],
         version: int,
         auto_tts_enabled: bool,
-        correctness_feedback_enabled: bool,
         next_content_id_index: int,
         edits_allowed: bool,
         created_on: Optional[datetime.datetime] = None,
@@ -1344,8 +1367,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 used to initialize a ParamChange domain object.
             version: int. The version of the exploration.
             auto_tts_enabled: bool. True if automatic text-to-speech is
-                enabled.
-            correctness_feedback_enabled: bool. True if correctness feedback is
                 enabled.
             next_content_id_index: int. The next content_id index to use for
                 generation of new content_ids.
@@ -1382,7 +1403,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.created_on = created_on
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
-        self.correctness_feedback_enabled = correctness_feedback_enabled
         self.next_content_id_index = next_content_id_index
         self.edits_allowed = edits_allowed
 
@@ -1455,7 +1475,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED,
-            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED,
             content_id_generator.next_content_id_index, True)
 
     @classmethod
@@ -1496,8 +1515,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration.blurb = exploration_dict['blurb']
         exploration.author_notes = exploration_dict['author_notes']
         exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
-        exploration.correctness_feedback_enabled = exploration_dict[
-            'correctness_feedback_enabled']
         exploration.next_content_id_index = exploration_dict[
             'next_content_id_index']
         exploration.edits_allowed = exploration_dict['edits_allowed']
@@ -1747,11 +1764,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected auto_tts_enabled to be a bool, received %s'
                 % self.auto_tts_enabled)
-
-        if not isinstance(self.correctness_feedback_enabled, bool):
-            raise utils.ValidationError(
-                'Expected correctness_feedback_enabled to be a bool, received '
-                '%s' % self.correctness_feedback_enabled)
 
         if not isinstance(self.next_content_id_index, int):
             raise utils.ValidationError(
@@ -2079,8 +2091,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             curr_queue.append(dest_if_stuck_state)
 
         if len(self.states) != len(processed_queue):
-            unseen_states = list(
-                set(self.states.keys()) - set(processed_queue))
+            unseen_states = sorted(list(
+                set(self.states.keys()) - set(processed_queue)))
             raise utils.ValidationError(
                 'The following states are not reachable from the initial '
                 'state: %s' % ', '.join(unseen_states))
@@ -2332,17 +2344,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.auto_tts_enabled = auto_tts_enabled
 
-    def update_correctness_feedback_enabled(
-        self, correctness_feedback_enabled: bool
-    ) -> None:
-        """Update whether correctness feedback is enabled.
-
-        Args:
-            correctness_feedback_enabled: bool. Whether correctness feedback
-                is enabled or not.
-        """
-        self.correctness_feedback_enabled = correctness_feedback_enabled
-
     def update_next_content_id_index(self, next_content_id_index: int) -> None:
         """Update the interaction next content id index attribute.
 
@@ -2529,7 +2530,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             self.tags, self.blurb, self.author_notes,
             self.states_schema_version, self.init_state_name,
             self.param_specs, self.param_changes, self.auto_tts_enabled,
-            self.correctness_feedback_enabled, self.edits_allowed
+            self.edits_allowed
         )
 
     @classmethod
@@ -3332,7 +3333,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         else:
             for idx, empty_choice in enumerate(empty_choices):
                 valid_choice = (
-                    '<p>' + 'Choice ' + str(idx + 1) + '</p>'
+                    '<p>Choice %s</p>' % str(idx + 1)
                 )
                 if valid_choice in choices_content:
                     choices_to_remove.append(empty_choice)
@@ -5695,7 +5696,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'param_specs': self.param_specs_dict,
             'tags': self.tags,
             'auto_tts_enabled': self.auto_tts_enabled,
-            'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'next_content_id_index': self.next_content_id_index,
             'edits_allowed': self.edits_allowed,
             'states': {state_name: state.to_dict()
@@ -5788,8 +5788,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 - title: str. The exploration title.
                 - objective: str. The exploration objective.
                 - language_code: str. The language code of the exploration.
-                - correctness_feedback_enabled: bool. Whether to show
-                    correctness feedback.
         """
         return {
             'init_state_name': self.init_state_name,
@@ -5802,7 +5800,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'title': self.title,
             'objective': self.objective,
             'language_code': self.language_code,
-            'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'next_content_id_index': self.next_content_id_index
         }
 
@@ -6496,7 +6493,6 @@ class ExplorationMetadataDict(TypedDict):
     param_specs: Dict[str, param_domain.ParamSpecDict]
     param_changes: List[param_domain.ParamChangeDict]
     auto_tts_enabled: bool
-    correctness_feedback_enabled: bool
     edits_allowed: bool
 
 
@@ -6517,7 +6513,6 @@ class ExplorationMetadata:
         param_specs: Dict[str, param_domain.ParamSpec],
         param_changes: List[param_domain.ParamChange],
         auto_tts_enabled: bool,
-        correctness_feedback_enabled: bool,
         edits_allowed: bool
     ) -> None:
         """Initializes an ExplorationMetadata domain object.
@@ -6540,8 +6535,6 @@ class ExplorationMetadata:
                 objects.
             auto_tts_enabled: bool. True if automatic text-to-speech is
                 enabled.
-            correctness_feedback_enabled: bool. True if correctness feedback is
-                enabled.
             edits_allowed: bool. True when edits to the exploration is allowed.
         """
         self.title = title
@@ -6556,7 +6549,6 @@ class ExplorationMetadata:
         self.param_specs = param_specs
         self.param_changes = param_changes
         self.auto_tts_enabled = auto_tts_enabled
-        self.correctness_feedback_enabled = correctness_feedback_enabled
         self.edits_allowed = edits_allowed
 
     def to_dict(self) -> ExplorationMetadataDict:
@@ -6584,7 +6576,6 @@ class ExplorationMetadata:
                 p_change.to_dict() for p_change in self.param_changes
             ],
             'auto_tts_enabled': self.auto_tts_enabled,
-            'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'edits_allowed': self.edits_allowed
         }
 

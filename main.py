@@ -43,6 +43,7 @@ from core.controllers import custom_landing_pages
 from core.controllers import diagnostic_test_player
 from core.controllers import editor
 from core.controllers import email_dashboard
+from core.controllers import feature_flag
 from core.controllers import features
 from core.controllers import feedback
 from core.controllers import feedback_updates
@@ -57,7 +58,6 @@ from core.controllers import library
 from core.controllers import moderator
 from core.controllers import oppia_root
 from core.controllers import pages
-from core.controllers import platform_feature
 from core.controllers import practice_sessions
 from core.controllers import profile
 from core.controllers import question_editor
@@ -79,6 +79,7 @@ from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import voice_artist
+from core.controllers import voiceover
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
@@ -237,9 +238,19 @@ URLS = [
         access_validators.ClassroomAccessValidationHandler),
 
     get_redirect_route(
+        r'%s/can_access_collection_editor_page/<collection_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.CollectionEditorAccessValidationPage
+    ),
+    get_redirect_route(
         r'%s/can_access_blog_home_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.BlogHomePageAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>' % # pylint: disable=line-too-long
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.SubtopicViewerPageAccessValidationHandler),
 
     get_redirect_route(
         r'%s/can_access_blog_post_page' %
@@ -267,16 +278,48 @@ URLS = [
     ),
 
     get_redirect_route(
+        r'%s/can_access_facilitator_dashboard_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.FacilitatorDashboardPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
+        r'%s/can_access_create_learner_group_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.CreateLearnerGroupPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
+        r'%s/can_access_edit_learner_group_page/<learner_group_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.EditLearnerGroupPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
         r'%s/does_learner_group_exist/<learner_group_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ViewLearnerGroupPageAccessValidationHandler),
 
-    get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
+    get_redirect_route(
+        r'%s/can_access_collection_player_page/<collection_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.CollectionViewerPageAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_diagnostic_test_player_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.DiagnosticTestPlayerAccessValidationHandler
+    ),
+
+    get_redirect_route(r'%s' % feconf.ADMIN_URL, oppia_root.OppiaRootPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(r'/bannedusershandler', admin.BannedUsersHandler),
     get_redirect_route(
         r'/topicmanagerrolehandler', admin.TopicManagerRoleHandler),
+    get_redirect_route(
+        r'/translationcoordinatorrolehandler',
+        admin.TranslationCoordinatorRoleHandler),
     get_redirect_route(
         r'/adminsuperadminhandler', admin.AdminSuperAdminPrivilegesHandler),
     get_redirect_route(
@@ -284,6 +327,9 @@ URLS = [
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
         r'/updateblogpostdatahandler', admin.UpdateBlogPostHandler),
+    get_redirect_route(
+        r'%s' % feconf.REGENERATE_TOPIC_SUMMARIES_URL,
+        admin.RegenerateTopicSummariesHandler),
     get_redirect_route(
         r'/contributionrightshandler/<category>',
         contributor_dashboard_admin.ContributionRightsHandler),
@@ -293,9 +339,6 @@ URLS = [
     get_redirect_route(
         r'/contributionrightsdatahandler',
         contributor_dashboard_admin.ContributionRightsDataHandler),
-    get_redirect_route(
-        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
-        contributor_dashboard_admin.ContributorDashboardAdminPage),
     get_redirect_route(
         r'%s/<contribution_type>/<contribution_subtype>' % (
             feconf.CONTRIBUTOR_DASHBOARD_ADMIN_STATS_URL_PREFIX),
@@ -352,6 +395,10 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
         contributor_dashboard.ReviewableOpportunitiesHandler),
+    get_redirect_route(
+        r'%s' % feconf.PINNED_OPPORTUNITIES_URL,
+        contributor_dashboard.LessonsPinningHandler,
+    ),
     get_redirect_route(
         r'/gettranslatabletexthandler',
         contributor_dashboard.TranslatableTextHandler),
@@ -421,22 +468,27 @@ URLS = [
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
-        r'%s' % feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
-        diagnostic_test_player.DiagnosticTestPlayerPage
-    ),
-    get_redirect_route(
         r'%s/<topic_id>' % feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL,
         diagnostic_test_player.DiagnosticTestQuestionsHandler
     ),
     get_redirect_route(
-        r'%s' % feconf.CLASSROOM_ADMIN_PAGE_URL,
-        classroom.ClassroomAdminPage),
+        r'%s' % feconf.CLASSROOM_ID_TO_NAME_HANDLER_URL,
+        classroom.ClassroomIdToNameHandler),
     get_redirect_route(
-        r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
-        classroom.ClassroomAdminDataHandler),
+        r'%s' % feconf.UNUSED_TOPICS_HANDLER_URL,
+        classroom.UnusedTopicsHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_CLASSROOM_ID_HANDLER_URL,
         classroom.NewClassroomIdHandler),
+    get_redirect_route(
+        r'%s' % feconf.NEW_CLASSROOM_HANDLER_URL,
+        classroom.NewClassroomHandler),
+    get_redirect_route(
+        r'%s' % feconf.TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL,
+        classroom.TopicsToClassroomsRelationHandler),
+    get_redirect_route(
+        r'%s' % feconf.ALL_CLASSROOMS_SUMMARY_HANDLER_URL,
+        classroom.AllClassroomsSummaryHandler),
     get_redirect_route(
         r'%s/<classroom_id>' % feconf.CLASSROOM_HANDLER_URL,
         classroom.ClassroomHandler),
@@ -446,6 +498,28 @@ URLS = [
     get_redirect_route(
         r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_ID_HANDLER_URL,
         classroom.ClassroomIdHandler
+    ),
+    get_redirect_route(
+        r'%s' % feconf.VOICEOVER_ADMIN_DATA_HANDLER_URL,
+        voiceover.VoiceoverAdminDataHandler
+    ),
+    get_redirect_route(
+        r'%s' % feconf.VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL,
+        voiceover.VoiceoverLanguageCodesMappingHandler
+    ),
+    get_redirect_route(
+        r'%s' % feconf.VOICE_ARTIST_METADATA_HANDLER,
+        voiceover.VoiceArtistMetadataHandler
+    ),
+    get_redirect_route(
+        r'%s/<voice_artist_id>/<language_code>' %
+        feconf.GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST,
+        voiceover.GetSampleVoiceoversForGivenVoiceArtistHandler
+    ),
+    get_redirect_route(
+        r'/entity_voiceovers_bulk_handler/<entity_type>/<entity_id>/'
+        r'<entity_version>/<language_code>',
+        voiceover.EntityVoiceoversBulkHandler
     ),
 
     get_redirect_route(
@@ -459,9 +533,6 @@ URLS = [
     get_redirect_route(
         r'%s/revision' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
-    get_redirect_route(
-        r'%s/revision/<subtopic_url_fragment>' %
-        feconf.TOPIC_VIEWER_URL_PREFIX, subtopic_viewer.SubtopicViewerPage),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
@@ -487,9 +558,6 @@ URLS = [
     get_redirect_route(
         '/learner_dashboard',
         learner_dashboard.OldLearnerDashboardRedirectPage),
-    get_redirect_route(
-        r'%s' % feconf.LEARNER_DASHBOARD_URL,
-        learner_dashboard.LearnerDashboardPage),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL,
         learner_dashboard.LearnerDashboardTopicsAndStoriesProgressHandler),
@@ -605,7 +673,6 @@ URLS = [
     get_redirect_route(r'/userinfohandler', profile.UserInfoHandler),
     get_redirect_route(r'/userinfohandler/data', profile.UserInfoHandler),
     get_redirect_route(r'/url_handler', profile.UrlHandler),
-    get_redirect_route(r'/moderator', moderator.ModeratorPage),
     get_redirect_route(
         r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
     get_redirect_route(
@@ -776,6 +843,9 @@ URLS = [
         r'%s/<entity_type>/<entity_id>' %
         feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
         editor.LearnerAnswerInfoHandler),
+    get_redirect_route(
+        r'/entity_translations_bulk_handler/<entity_type>/<entity_id>/<entity_version>', # pylint: disable=line-too-long
+        editor.EntityTranslationsBulkHandler),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
@@ -841,15 +911,8 @@ URLS = [
         r'%s/<exploration_id>' % feconf.FLAG_EXPLORATION_URL_PREFIX,
         reader.FlagExplorationHandler),
     get_redirect_route(
-        r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
-        collection_viewer.CollectionPage),
-    get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
         collection_viewer.CollectionDataHandler),
-
-    get_redirect_route(
-        r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
-        collection_editor.CollectionEditorPage),
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
         collection_editor.EditableCollectionDataHandler),
@@ -929,7 +992,6 @@ URLS = [
         feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX,
         story_editor.ValidateExplorationsHandler),
 
-    get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
         r'/emaildashboarddatahandler',
         email_dashboard.EmailDashboardDataHandler),
@@ -959,6 +1021,9 @@ URLS = [
         r'/verifyusermodelsdeletedhandler',
         admin.VerifyUserModelsDeletedHandler),
     get_redirect_route(r'/deleteuserhandler', admin.DeleteUserHandler),
+    get_redirect_route(
+        r'/interactions',
+        admin.InteractionsByExplorationIdHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
 
     get_redirect_route(r'/session_begin', base.SessionBeginHandler),
@@ -981,8 +1046,6 @@ URLS = [
         improvements.ExplorationImprovementsConfigHandler),
 
     get_redirect_route(
-        r'%s' % feconf.BLOG_ADMIN_PAGE_URL, blog_admin.BlogAdminPage),
-    get_redirect_route(
         r'%s' % feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
         blog_admin.BlogAdminRolesHandler),
     get_redirect_route(
@@ -1002,8 +1065,6 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
         blog_dashboard.BlogDashboardDataHandler),
-    get_redirect_route(
-        r'%s' % feconf.BLOG_DASHBOARD_URL, blog_dashboard.BlogDashboardPage),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
@@ -1024,11 +1085,11 @@ URLS = [
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
 
     get_redirect_route(
-        r'/platform_features_evaluation_handler',
-        platform_feature.PlatformFeaturesEvaluationHandler),
+        r'/feature_flags_evaluation_handler',
+        feature_flag.FeatureFlagsEvaluationHandler),
     get_redirect_route(
-        r'/platform_feature_dummy_handler',
-        platform_feature.PlatformFeatureDummyHandler),
+        r'/feature_flag_dummy_handler',
+        feature_flag.FeatureFlagDummyHandler),
 
     get_redirect_route(
         r'%s' % (
@@ -1080,12 +1141,6 @@ URLS = [
         learner_group.LearnerGroupLearnerSpecificProgressHandler
     ),
     get_redirect_route(
-        r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
-        learner_group.FacilitatorDashboardPage),
-    get_redirect_route(
-        r'%s' % feconf.CREATE_LEARNER_GROUP_PAGE_URL,
-        learner_group.CreateLearnerGroupPage),
-    get_redirect_route(
         r'/learner_group_search_learner_handler',
         learner_group.LearnerGroupSearchLearnerHandler),
     get_redirect_route(
@@ -1100,8 +1155,6 @@ URLS = [
     get_redirect_route(
         r'/exit_learner_group_handler/<learner_group_id>',
         learner_group.ExitLearnerGroupHandler),
-    get_redirect_route(
-        r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage),
     get_redirect_route(
         r'/user_progress_in_stories_chapters_handler/<username>',
         learner_group.LearnerStoriesChaptersProgressHandler),
@@ -1154,7 +1207,7 @@ URLS.extend((
         oppia_root.OppiaRootPage),
     get_redirect_route(
         r'/learn/<classroom_url_fragment>',
-        oppia_root.OppiaLightweightRootPage
+        oppia_root.OppiaRootPage
     ),
     get_redirect_route(
         r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
@@ -1197,6 +1250,9 @@ URLS.extend((
     get_redirect_route(
         r'/cron/mail/curriculum_admins/chapter_publication_notfications',
         cron.CronMailChapterPublicationsNotificationsHandler),
+    get_redirect_route(
+        r'/cron/mail/reviewers/new_contributor_dashboard_suggestions',
+        cron.CronMailReviewerNewSuggestionsHandler),
 ))
 
 # Add tasks urls.

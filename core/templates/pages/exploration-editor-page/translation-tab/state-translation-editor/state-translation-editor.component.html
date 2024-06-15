@@ -1,0 +1,119 @@
+<div class="oppia-translated-content-header">Translated content</div>
+<div class="oppia-state-translation-editor-section oppia-editor-card-section">
+  <div *ngIf="!translationEditorIsOpen" class="clearfix">
+    <button class="btn oppia-translation-needs-update-button" *ngIf="activeWrittenTranslation && activeWrittenTranslation.needsUpdate">
+      <i class="material-icons md-18"
+         [ngbTooltip]="'Translation needs update'"
+         placement="top">warning
+      </i>
+    </button>
+    <div class="e2e-test-edit-translation"
+         [ngClass]="{'oppia-editable-section': isEditable()}"
+         (click)="openTranslationEditor()">
+      <i *ngIf="isEditable()" class="material-icons oppia-editor-edit-icon"
+         title="Edit translation">&#xE254;
+      </i>
+      <div class="oppia-translated-content-display oppia-transition-200"
+           [ngClass]="{'oppia-prevent-selection': isEditable()}"
+           title="Translated Content">
+        <span class="oppia-placeholder" *ngIf="!activeWrittenTranslation || activeWrittenTranslation.translation === ''">
+          This section has not been translated yet. <span *ngIf="isEditable()">Click to add a translation!</span>
+        </span>
+        <span *ngIf="activeWrittenTranslation">
+          <oppia-rte-output-display *ngIf="activeWrittenTranslation.isHtml()"
+                                    [rteString]="activeWrittenTranslation.getTranslation()"
+                                    class="oppia-rte-editor e2e-test-translation-display">
+          </oppia-rte-output-display>
+          <p *ngIf="activeWrittenTranslation.isUnicode()">
+            {{activeWrittenTranslation.getTranslation()}}
+          </p>
+          <ul *ngIf="activeWrittenTranslation.isSetOfStrings()">
+            <li *ngFor="let item of activeWrittenTranslation.translation; index as index">
+              {{item}}
+            </li>
+          </ul>
+          <p *ngIf="!activeWrittenTranslation.isUnicode() && !activeWrittenTranslation.isHtml() && !activeWrittenTranslation.isSetOfStrings()">
+            <strong>ERROR:</strong> Unsupported translation data format.
+          </p>
+        </span>
+      </div>
+      <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
+      <div class="oppia-translation-editable-mask oppia-editable-section-mask">
+      </div>
+    </div>
+    <button *ngIf="activeWrittenTranslation && (activeWrittenTranslation.needsUpdate === false)"
+            type="button"
+            class="btn btn-secondary mt-4 float-right"
+            (click)="markAsNeedingUpdate()">
+      Mark translation as needing update
+    </button>
+  </div>
+
+  <div *ngIf="translationEditorIsOpen" class="e2e-test-state-translation-editor">
+    <div *ngIf="activeWrittenTranslation.isHtml()">
+      <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
+      <schema-based-editor [schema]="HTML_SCHEMA"
+                           [(ngModel)]="activeWrittenTranslation.translation">
+      </schema-based-editor>
+    </div>
+    <div *ngIf="activeWrittenTranslation.isUnicode()">
+      <schema-based-editor [schema]="UNICODE_SCHEMA"
+                           [(ngModel)]="activeWrittenTranslation.translation">
+      </schema-based-editor>
+    </div>
+    <div *ngIf="activeWrittenTranslation.isSetOfStrings()">
+      <schema-based-editor [schema]="SET_OF_STRINGS_SCHEMA"
+                           [(ngModel)]="activeWrittenTranslation.translation">
+      </schema-based-editor>
+    </div>
+    <div *ngIf="!activeWrittenTranslation.isUnicode() && !activeWrittenTranslation.isHtml() && !activeWrittenTranslation.isSetOfStrings()">
+      <strong>ERROR:</strong> Unsupported translation data format.
+    </div>
+
+    <div class="oppia-save-item-button-container">
+      <button type="button"
+              class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-translation"
+              (click)="onSaveTranslationButtonClicked()">
+        Save
+      </button>
+      <button type="button" class="btn btn-secondary float-right" (click)="cancelEdit()">Cancel</button>
+      <div class="oppia-clear"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .oppia-translated-content-header {
+    background: #ccc;
+    font-size: 12px;
+    font-style: italic;
+    height: 16px;
+    text-align: center;
+  }
+  .oppia-editor-edit-icon {
+    position: absolute;
+    top: 10px;
+  }
+  .oppia-translation-needs-update-button {
+    border-radius: 14px;
+    color: yellow;
+    height: 28px;
+    left: 3px;
+    padding: 0 0 3px 0;
+    position: absolute;
+    width: 28px;
+  }
+  .oppia-translation-editable-mask {
+    background-color: #eee;
+  }
+  .oppia-translated-content-display {
+    max-width: 100%;
+    text-align: left;
+  }
+  .oppia-translation-editor {
+    min-height: 160px;
+  }
+  state-translation-editor .oppia-save-item-button-container {
+    margin-top: 2px;
+  }
+</style>

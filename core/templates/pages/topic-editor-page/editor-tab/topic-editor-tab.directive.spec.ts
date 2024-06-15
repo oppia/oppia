@@ -12,42 +12,49 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the topic editor tab directive.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { Subtopic } from 'domain/topic/subtopic.model';
-import { StoryReference } from 'domain/topic/story-reference-object.model';
-import { Topic } from 'domain/topic/topic-object.model';
-import { ImageUploadHelperService } from 'services/image-upload-helper.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
-import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
-import { TopicUpdateService } from 'domain/topic/topic-update.service';
-import { StoryCreationBackendApiService } from 'components/entity-creation-services/story-creation-backend-api.service';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { EntityCreationService } from 'pages/topic-editor-page/services/entity-creation.service';
-import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
-import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
-import { TopicEditorTabComponent } from './topic-editor-tab.directive';
-import { ContextService } from 'services/context.service';
-import { RearrangeSkillsInSubtopicsModalComponent } from '../modal-templates/rearrange-skills-in-subtopics-modal.component';
-import { ChangeSubtopicAssignmentModalComponent } from '../modal-templates/change-subtopic-assignment-modal.component';
-import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ReactiveFormsModule, FormsModule} from '@angular/forms';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
+import {Subtopic} from 'domain/topic/subtopic.model';
+import {StoryReference} from 'domain/topic/story-reference-object.model';
+import {Topic} from 'domain/topic/topic-object.model';
+import {AppConstants} from 'app.constants';
+import {ImageUploadHelperService} from 'services/image-upload-helper.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
+import {SkillCreationService} from 'components/entity-creation-services/skill-creation.service';
+import {TopicUpdateService} from 'domain/topic/topic-update.service';
+import {StoryCreationBackendApiService} from 'components/entity-creation-services/story-creation-backend-api.service';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {EntityCreationService} from 'pages/topic-editor-page/services/entity-creation.service';
+import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
+import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
+import {TopicEditorTabComponent} from './topic-editor-tab.directive';
+import {ContextService} from 'services/context.service';
+import {RearrangeSkillsInSubtopicsModalComponent} from '../modal-templates/rearrange-skills-in-subtopics-modal.component';
+import {ChangeSubtopicAssignmentModalComponent} from '../modal-templates/change-subtopic-assignment-modal.component';
+import {SavePendingChangesModalComponent} from 'components/save-pending-changes/save-pending-changes-modal.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {CdkDragDrop} from '@angular/cdk/drag-drop';
 
 class MockNgbModal {
   open() {
     return {
-      result: Promise.resolve('1')
+      result: Promise.resolve('1'),
     };
   }
 }
@@ -67,10 +74,8 @@ class MockContextService {
 }
 
 class MockImageUploadHelperService {
-  getTrustedResourceUrlForThumbnailFilename(
-      filename, entityType, entityId) {
-    return (
-      entityType + '/' + entityId + '/' + filename);
+  getTrustedResourceUrlForThumbnailFilename(filename, entityType, entityId) {
+    return entityType + '/' + entityId + '/' + filename;
   }
 }
 
@@ -95,24 +100,22 @@ describe('Topic editor tab directive', () => {
   let topicInitializedEventEmitter = new EventEmitter();
   let topicReinitializedEventEmitter = new EventEmitter();
   let MockWindowDimensionsService = {
-    isWindowNarrow: () => false
+    isWindowNarrow: () => false,
   };
   let MockTopicsAndSkillsDashboardBackendApiService = {
     get onTopicsAndSkillsDashboardReinitialized() {
       return mockTasdReinitializedEventEmitter;
-    }
+    },
   };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-      ],
+      imports: [HttpClientTestingModule, FormsModule, ReactiveFormsModule],
       declarations: [
         TopicEditorTabComponent,
         RearrangeSkillsInSubtopicsModalComponent,
         ChangeSubtopicAssignmentModalComponent,
-        SavePendingChangesModalComponent
+        SavePendingChangesModalComponent,
       ],
       providers: [
         UrlInterpolationService,
@@ -134,18 +137,18 @@ describe('Topic editor tab directive', () => {
         },
         {
           provide: NgbModal,
-          useClass: MockNgbModal
+          useClass: MockNgbModal,
         },
         {
           provide: ContextService,
-          useClass: MockContextService
+          useClass: MockContextService,
         },
         {
           provide: ImageUploadHelperService,
-          useClass: MockImageUploadHelperService
+          useClass: MockImageUploadHelperService,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -166,22 +169,37 @@ describe('Topic editor tab directive', () => {
     spyOnProperty(topicEditorStateService, 'onTopicInitialized').and.callFake(
       () => {
         return topicInitializedEventEmitter;
-      });
-    spyOnProperty(
-      topicEditorStateService, 'onTopicReinitialized').and.callFake(
+      }
+    );
+    spyOnProperty(topicEditorStateService, 'onTopicReinitialized').and.callFake(
       () => {
         return topicReinitializedEventEmitter;
-      });
-
+      }
+    );
 
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     topic = new Topic(
-      'id', 'Topic name loading', 'Abbrev. name loading',
-      'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+      'id',
+      'Topic name loading',
+      'Abbrev. name loading',
+      'Url Fragment loading',
+      'Topic description loading',
+      'en',
+      [],
+      [],
+      [],
+      1,
+      1,
+      [],
+      'str',
+      '',
+      {},
+      false,
+      '',
+      '',
+      []
     );
-    skillSummary = ShortSkillSummary.create(
-      'skill_1', 'Description 1');
+    skillSummary = ShortSkillSummary.create('skill_1', 'Description 1');
     subtopic._skillSummaries = [skillSummary];
     topic._uncategorizedSkillSummaries = [skillSummary];
     topic._subtopics = [subtopic];
@@ -194,12 +212,12 @@ describe('Topic editor tab directive', () => {
 
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
     spyOnProperty(
-      topicEditorStateService, 'onStorySummariesInitialized').and.returnValue(
-      mockStorySummariesInitializedEventEmitter);
-    spyOn(urlInterpolationService, 'getStaticImageUrl')
-      .and.callFake((value) => {
-        return ('/assets/images' + value);
-      });
+      topicEditorStateService,
+      'onStorySummariesInitialized'
+    ).and.returnValue(mockStorySummariesInitializedEventEmitter);
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.callFake(value => {
+      return '/assets/images' + value;
+    });
 
     component.ngOnInit();
     fixture.detectChanges();
@@ -217,7 +235,7 @@ describe('Topic editor tab directive', () => {
     component.topic = null;
     component.drop({
       previousIndex: 1,
-      currentIndex: 2
+      currentIndex: 2,
     } as CdkDragDrop<Subtopic[]>);
 
     expect(topicUpdateService.rearrangeSubtopic).toHaveBeenCalled();
@@ -233,6 +251,24 @@ describe('Topic editor tab directive', () => {
     expect(component.SUBTOPIC_LIST).toEqual('subtopic');
     expect(component.SKILL_LIST).toEqual('skill');
     expect(component.STORY_LIST).toEqual('story');
+    expect(component.maxCharsInTopicName).toEqual(
+      AppConstants.MAX_CHARS_IN_TOPIC_NAME
+    );
+    expect(component.maxCharsInTopicUrlFragment).toEqual(
+      AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+    );
+    expect(component.maxCharsInTopicDescription).toEqual(
+      AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION
+    );
+    expect(component.maxCharsInPageTitleFragmentForWeb).toEqual(
+      AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+    );
+    expect(component.maxCharsInMetaTagContent).toEqual(
+      AppConstants.MAX_CHARS_IN_META_TAG_CONTENT
+    );
+    expect(component.minCharsInPageTitleFragmentForWeb).toEqual(
+      AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+    );
   });
 
   it('should call EntityCreationService to create skill', () => {
@@ -258,33 +294,27 @@ describe('Topic editor tab directive', () => {
         subtopics: null;
       };
     }
-    let uibModalSpy = spyOn(ngbModal, 'open').and.returnValue(
-      {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve(1)
-      } as NgbModalRef
-    );
+    let uibModalSpy = spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: MockNgbModalRef,
+      result: Promise.resolve(1),
+    } as NgbModalRef);
     component.reassignSkillsInSubtopics();
     tick();
 
     expect(uibModalSpy).toHaveBeenCalled();
   }));
 
-  it('should call the TopicUpdateService if skill is removed from subtopic',
-    () => {
-      let removeSkillSpy = (
-        spyOn(topicUpdateService, 'removeSkillFromSubtopic'));
-      component.removeSkillFromSubtopic(0, null);
-      expect(removeSkillSpy).toHaveBeenCalled();
-    });
+  it('should call the TopicUpdateService if skill is removed from subtopic', () => {
+    let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+    component.removeSkillFromSubtopic(0, null);
+    expect(removeSkillSpy).toHaveBeenCalled();
+  });
 
-  it('should call the TopicUpdateService if skill is removed from topic',
-    () => {
-      let removeSkillSpy = (
-        spyOn(topicUpdateService, 'removeSkillFromSubtopic'));
-      component.removeSkillFromTopic(0, skillSummary);
-      expect(removeSkillSpy).toHaveBeenCalled();
-    });
+  it('should call the TopicUpdateService if skill is removed from topic', () => {
+    let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+    component.removeSkillFromTopic(0, skillSummary);
+    expect(removeSkillSpy).toHaveBeenCalled();
+  });
 
   it('should show subtopic edit options', () => {
     component.showSubtopicEditOptions(1);
@@ -306,42 +336,72 @@ describe('Topic editor tab directive', () => {
   });
 
   it('should get the classroom URL fragment', () => {
-    expect(component.getClassroomUrlFragment()).toEqual('staging');
-    spyOn(
-      topicEditorStateService,
-      'getClassroomUrlFragment').and.returnValue('classroom-frag');
-    expect(component.getClassroomUrlFragment()).toEqual('classroom-frag');
+    expect(component.classroomUrlFragment).toBeNull();
+    topicEditorStateService._updateClassroomUrlFragment('classroom-frag');
+    component.ngOnInit();
+    expect(component.classroomUrlFragment).toEqual('classroom-frag');
   });
 
-  it('should open save changes warning modal before creating skill',
-    () => {
-      class MockNgbModalRef {
-        componentInstance: {
-          body: 'xyz';
-        };
-      }
-      spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return ({
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve()
-        }) as NgbModalRef;
-      });
-      component.createSkill();
-      expect(modalSpy).toHaveBeenCalled();
+  it('should get the classroom name', () => {
+    expect(component.classroomName).toBeNull();
+    topicEditorStateService._updateClassroomName('classroom-name');
+    component.ngOnInit();
+    expect(component.classroomName).toEqual('classroom-name');
+  });
+
+  it('should get the curriculum admin usernames', () => {
+    expect(component.curriculumAdminUsernames).toEqual([]);
+    topicEditorStateService._updateCurriculumAdminUsernames([
+      'admin1',
+      'admin2',
+    ]);
+    component.ngOnInit();
+    expect(component.curriculumAdminUsernames).toEqual(['admin1', 'admin2']);
+  });
+
+  it('should return true in isAssignedToAClassroom if the topic is assigned to a classroom.', () => {
+    component.classroomName = 'classroom-name';
+    component.classroomUrlFragment = 'classroom-frag';
+
+    expect(component.isAssignedToAClassroom()).toBeTrue();
+  });
+
+  it('should return false in isAssignedToAClassroom if the topic is not assigned to a classroom.', () => {
+    component.classroomName = null;
+    component.classroomUrlFragment = null;
+
+    expect(component.isAssignedToAClassroom()).toBeFalse();
+  });
+
+  it('should open save changes warning modal before creating skill', () => {
+    class MockNgbModalRef {
+      componentInstance: {
+        body: 'xyz';
+      };
+    }
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve(),
+      } as NgbModalRef;
     });
+    component.createSkill();
+    expect(modalSpy).toHaveBeenCalled();
+  });
 
-  it('should call TopicEditorStateService to load topic when ' +
+  it(
+    'should call TopicEditorStateService to load topic when ' +
       'topics and skills dashboard is reinitialized',
-  fakeAsync(() => {
-    let refreshTopicSpy = spyOn(topicEditorStateService, 'loadTopic');
+    fakeAsync(() => {
+      let refreshTopicSpy = spyOn(topicEditorStateService, 'loadTopic');
 
-    MockTopicsAndSkillsDashboardBackendApiService.
-      onTopicsAndSkillsDashboardReinitialized.emit();
-    tick();
+      MockTopicsAndSkillsDashboardBackendApiService.onTopicsAndSkillsDashboardReinitialized.emit();
+      tick();
 
-    expect(refreshTopicSpy).toHaveBeenCalled();
-  }));
+      expect(refreshTopicSpy).toHaveBeenCalled();
+    })
+  );
 
   it('should call EntityCreationService to create subtopic', () => {
     let skillSpy = spyOn(entityCreationService, 'createSubtopic');
@@ -358,21 +418,21 @@ describe('Topic editor tab directive', () => {
   it('should call the TopicUpdateService if name is updated', () => {
     let topicNameSpy = spyOn(topicUpdateService, 'setTopicName');
     spyOn(topicEditorStateService, 'updateExistenceOfTopicName').and.callFake(
-      (newName, successCallback) => successCallback());
+      (newName, successCallback) => successCallback()
+    );
     component.updateTopicName('Different Name');
     expect(topicNameSpy).toHaveBeenCalled();
   });
 
-  it('should not call updateExistenceOfTopicName if name is empty',
-    () => {
-      let topicNameSpy = spyOn(topicUpdateService, 'setTopicName');
-      spyOn(topicEditorStateService, 'updateExistenceOfTopicName');
-      component.updateTopicName('');
-      expect(topicNameSpy).toHaveBeenCalled();
-      expect(
-        topicEditorStateService.updateExistenceOfTopicName
-      ).not.toHaveBeenCalled();
-    });
+  it('should not call updateExistenceOfTopicName if name is empty', () => {
+    let topicNameSpy = spyOn(topicUpdateService, 'setTopicName');
+    spyOn(topicEditorStateService, 'updateExistenceOfTopicName');
+    component.updateTopicName('');
+    expect(topicNameSpy).toHaveBeenCalled();
+    expect(
+      topicEditorStateService.updateExistenceOfTopicName
+    ).not.toHaveBeenCalled();
+  });
 
   it('should not call the TopicUpdateService if name is same', () => {
     let topicNameSpy = spyOn(topicUpdateService, 'setTopicName');
@@ -380,150 +440,159 @@ describe('Topic editor tab directive', () => {
     expect(topicNameSpy).not.toHaveBeenCalled();
   });
 
-  it('should not call the TopicUpdateService if url fragment is same',
-    () => {
-      let topicUrlFragmentSpy = spyOn(
-        topicUpdateService, 'setTopicUrlFragment');
-      component.updateTopicUrlFragment('topic-url-fragment');
-      expect(topicUrlFragmentSpy).not.toHaveBeenCalled();
-    });
-
-  it('should not call the getTopicWithUrlFragmentExists if url fragment' +
-     'is not correct', () => {
-    let topicUrlFragmentSpy = spyOn(
-      topicUpdateService, 'setTopicUrlFragment');
-    let topicUrlFragmentExists = spyOn(
-      topicEditorStateService, 'getTopicWithUrlFragmentExists');
-    spyOn(
-      topicEditorStateService,
-      'updateExistenceOfTopicUrlFragment').and.callFake(
-      (newUrlFragment, successCallback, errorCallback) => errorCallback());
-    component.updateTopicUrlFragment('topic-url fragment');
-    expect(topicUrlFragmentSpy).toHaveBeenCalled();
-    expect(topicUrlFragmentExists).not.toHaveBeenCalled();
+  it('should not call the TopicUpdateService if url fragment is same', () => {
+    let topicUrlFragmentSpy = spyOn(topicUpdateService, 'setTopicUrlFragment');
+    component.updateTopicUrlFragment('topic-url-fragment');
+    expect(topicUrlFragmentSpy).not.toHaveBeenCalled();
   });
 
-  it('should call the TopicUpdateService if url fragment is updated',
+  it(
+    'should not call the getTopicWithUrlFragmentExists if url fragment' +
+      'is not correct',
     () => {
       let topicUrlFragmentSpy = spyOn(
-        topicUpdateService, 'setTopicUrlFragment');
+        topicUpdateService,
+        'setTopicUrlFragment'
+      );
+      let topicUrlFragmentExists = spyOn(
+        topicEditorStateService,
+        'getTopicWithUrlFragmentExists'
+      );
       spyOn(
         topicEditorStateService,
-        'updateExistenceOfTopicUrlFragment').and.callFake(
-        (newUrlFragment, successCallback, errorCallback) => successCallback());
-      component.updateTopicUrlFragment('topic');
+        'updateExistenceOfTopicUrlFragment'
+      ).and.callFake((newUrlFragment, successCallback, errorCallback) =>
+        errorCallback()
+      );
+      component.updateTopicUrlFragment('topic-url fragment');
       expect(topicUrlFragmentSpy).toHaveBeenCalled();
-    });
+      expect(topicUrlFragmentExists).not.toHaveBeenCalled();
+    }
+  );
 
-  it('should not update topic url fragment existence for empty url fragment',
-    () => {
-      let topicUrlFragmentSpy = spyOn(
-        topicUpdateService, 'setTopicUrlFragment');
-      spyOn(topicEditorStateService, 'updateExistenceOfTopicUrlFragment');
-      component.updateTopicUrlFragment('');
-      expect(topicUrlFragmentSpy).toHaveBeenCalled();
-      expect(
-        topicEditorStateService.updateExistenceOfTopicUrlFragment
-      ).not.toHaveBeenCalled();
-    });
+  it('should call the TopicUpdateService if url fragment is updated', () => {
+    let topicUrlFragmentSpy = spyOn(topicUpdateService, 'setTopicUrlFragment');
+    spyOn(
+      topicEditorStateService,
+      'updateExistenceOfTopicUrlFragment'
+    ).and.callFake((newUrlFragment, successCallback, errorCallback) =>
+      successCallback()
+    );
+    component.updateTopicUrlFragment('topic');
+    expect(topicUrlFragmentSpy).toHaveBeenCalled();
+  });
+
+  it('should not update topic url fragment existence for empty url fragment', () => {
+    let topicUrlFragmentSpy = spyOn(topicUpdateService, 'setTopicUrlFragment');
+    spyOn(topicEditorStateService, 'updateExistenceOfTopicUrlFragment');
+    component.updateTopicUrlFragment('');
+    expect(topicUrlFragmentSpy).toHaveBeenCalled();
+    expect(
+      topicEditorStateService.updateExistenceOfTopicUrlFragment
+    ).not.toHaveBeenCalled();
+  });
 
   it('should call the TopicUpdateService if thumbnail is updated', () => {
-    let topicThumbnailSpy = (
-      spyOn(topicUpdateService, 'setTopicThumbnailFilename'));
+    let topicThumbnailSpy = spyOn(
+      topicUpdateService,
+      'setTopicThumbnailFilename'
+    );
     component.updateTopicThumbnailFilename('img2.svg');
     expect(topicThumbnailSpy).toHaveBeenCalled();
   });
 
   it('should call the TopicUpdateService if thumbnail is updated', () => {
     component.updateTopicThumbnailFilename('img2.svg');
-    let topicThumbnailSpy = (
-      spyOn(topicUpdateService, 'setTopicThumbnailFilename'));
+    let topicThumbnailSpy = spyOn(
+      topicUpdateService,
+      'setTopicThumbnailFilename'
+    );
     component.updateTopicThumbnailFilename('img2.svg');
     expect(topicThumbnailSpy).not.toHaveBeenCalled();
   });
 
-  it('should call the TopicUpdateService if topic description is updated',
-    () => {
-      let topicDescriptionSpy = (
-        spyOn(topicUpdateService, 'setTopicDescription'));
-      component.updateTopicDescription('New description');
-      expect(topicDescriptionSpy).toHaveBeenCalled();
-    });
-
-  it('should not call the TopicUpdateService if topic description is same',
-    () => {
-      component.updateTopicDescription('New description');
-      let topicDescriptionSpy = (
-        spyOn(topicUpdateService, 'setTopicDescription'));
-      component.updateTopicDescription('New description');
-      expect(topicDescriptionSpy).not.toHaveBeenCalled();
-    });
-
-  it('should call the TopicUpdateService if topic meta tag content is updated',
-    () => {
-      let topicMetaTagContentSpy = (
-        spyOn(topicUpdateService, 'setMetaTagContent'));
-      component.updateTopicMetaTagContent('new meta tag content');
-      expect(topicMetaTagContentSpy).toHaveBeenCalled();
-    });
-
-  it('should not call the TopicUpdateService if topic description is same',
-    () => {
-      component.updateTopicMetaTagContent('New meta tag content');
-      let topicMetaTagContentSpy = (
-        spyOn(topicUpdateService, 'setMetaTagContent'));
-      component.updateTopicMetaTagContent('New meta tag content');
-      expect(topicMetaTagContentSpy).not.toHaveBeenCalled();
-    });
-
-  it('should call the TopicUpdateService if topic page title is updated',
-    () => {
-      let topicPageTitleFragmentForWebSpy = spyOn(
-        topicUpdateService, 'setPageTitleFragmentForWeb');
-      component.updateTopicPageTitleFragmentForWeb('new page title');
-      expect(topicPageTitleFragmentForWebSpy).toHaveBeenCalled();
-    });
-
-  it('should not call the TopicUpdateService if topic page title is same',
-    () => {
-      component.updateTopicPageTitleFragmentForWeb('New page title');
-      let topicPageTitleFragmentForWebSpy = spyOn(
-        topicUpdateService, 'setPageTitleFragmentForWeb');
-      component.updateTopicPageTitleFragmentForWeb('New page title');
-      expect(topicPageTitleFragmentForWebSpy).not.toHaveBeenCalled();
-    });
-
-  it('should set the practice tab as displayed if there are the defined ' +
-      'minimum number of practice questions in the topic', () => {
-    let topicPracticeTabSpy = (
-      spyOn(topicUpdateService, 'setPracticeTabIsDisplayed'));
-    component.skillQuestionCountDict = {skill1: 3, skill2: 6};
-    component.updatePracticeTabIsDisplayed(true);
-    expect(topicPracticeTabSpy).not.toHaveBeenCalled();
-    component.skillQuestionCountDict = {skill1: 3, skill2: 7};
-    component.updatePracticeTabIsDisplayed(true);
-    expect(topicPracticeTabSpy).toHaveBeenCalled();
+  it('should call the TopicUpdateService if topic description is updated', () => {
+    let topicDescriptionSpy = spyOn(topicUpdateService, 'setTopicDescription');
+    component.updateTopicDescription('New description');
+    expect(topicDescriptionSpy).toHaveBeenCalled();
   });
 
-  it('should call the TopicUpdateService if skill is deleted from topic',
-    () => {
-      let topicDeleteSpy = (
-        spyOn(topicUpdateService, 'removeUncategorizedSkill'));
-      component.deleteUncategorizedSkillFromTopic(null);
-      expect(topicDeleteSpy).toHaveBeenCalled();
-    });
+  it('should not call the TopicUpdateService if topic description is same', () => {
+    component.updateTopicDescription('New description');
+    let topicDescriptionSpy = spyOn(topicUpdateService, 'setTopicDescription');
+    component.updateTopicDescription('New description');
+    expect(topicDescriptionSpy).not.toHaveBeenCalled();
+  });
 
-  it('should call the TopicUpdateService if thumbnail bg color is updated',
+  it('should call the TopicUpdateService if topic meta tag content is updated', () => {
+    let topicMetaTagContentSpy = spyOn(topicUpdateService, 'setMetaTagContent');
+    component.updateTopicMetaTagContent('new meta tag content');
+    expect(topicMetaTagContentSpy).toHaveBeenCalled();
+  });
+
+  it('should not call the TopicUpdateService if topic description is same', () => {
+    component.updateTopicMetaTagContent('New meta tag content');
+    let topicMetaTagContentSpy = spyOn(topicUpdateService, 'setMetaTagContent');
+    component.updateTopicMetaTagContent('New meta tag content');
+    expect(topicMetaTagContentSpy).not.toHaveBeenCalled();
+  });
+
+  it('should call the TopicUpdateService if topic page title is updated', () => {
+    let topicPageTitleFragmentForWebSpy = spyOn(
+      topicUpdateService,
+      'setPageTitleFragmentForWeb'
+    );
+    component.updateTopicPageTitleFragmentForWeb('new page title');
+    expect(topicPageTitleFragmentForWebSpy).toHaveBeenCalled();
+  });
+
+  it('should not call the TopicUpdateService if topic page title is same', () => {
+    component.updateTopicPageTitleFragmentForWeb('New page title');
+    let topicPageTitleFragmentForWebSpy = spyOn(
+      topicUpdateService,
+      'setPageTitleFragmentForWeb'
+    );
+    component.updateTopicPageTitleFragmentForWeb('New page title');
+    expect(topicPageTitleFragmentForWebSpy).not.toHaveBeenCalled();
+  });
+
+  it(
+    'should set the practice tab as displayed if there are the defined ' +
+      'minimum number of practice questions in the topic',
     () => {
-      let topicThumbnailBGSpy = (
-        spyOn(topicUpdateService, 'setTopicThumbnailBgColor'));
-      component.updateTopicThumbnailBgColor('#FFFFFF');
-      expect(topicThumbnailBGSpy).toHaveBeenCalled();
-    });
+      let topicPracticeTabSpy = spyOn(
+        topicUpdateService,
+        'setPracticeTabIsDisplayed'
+      );
+      component.skillQuestionCountDict = {skill1: 3, skill2: 6};
+      component.updatePracticeTabIsDisplayed(true);
+      expect(topicPracticeTabSpy).not.toHaveBeenCalled();
+      component.skillQuestionCountDict = {skill1: 3, skill2: 7};
+      component.updatePracticeTabIsDisplayed(true);
+      expect(topicPracticeTabSpy).toHaveBeenCalled();
+    }
+  );
+
+  it('should call the TopicUpdateService if skill is deleted from topic', () => {
+    let topicDeleteSpy = spyOn(topicUpdateService, 'removeUncategorizedSkill');
+    component.deleteUncategorizedSkillFromTopic(null);
+    expect(topicDeleteSpy).toHaveBeenCalled();
+  });
+
+  it('should call the TopicUpdateService if thumbnail bg color is updated', () => {
+    let topicThumbnailBGSpy = spyOn(
+      topicUpdateService,
+      'setTopicThumbnailBgColor'
+    );
+    component.updateTopicThumbnailBgColor('#FFFFFF');
+    expect(topicThumbnailBGSpy).toHaveBeenCalled();
+  });
 
   it('should call TopicEditorRoutingService to navigate to skill', () => {
-    let topicThumbnailBGSpy = (
-      spyOn(topicEditorRoutingService, 'navigateToSkillEditorWithId'));
+    let topicThumbnailBGSpy = spyOn(
+      topicEditorRoutingService,
+      'navigateToSkillEditorWithId'
+    );
     component.navigateToSkill('id1');
     expect(topicThumbnailBGSpy).toHaveBeenCalledWith('id1');
   });
@@ -531,17 +600,19 @@ describe('Topic editor tab directive', () => {
   it('should return skill editor URL', () => {
     let skillId = 'asd4242a';
     expect(component.getSkillEditorUrl(skillId)).toEqual(
-      '/skill_editor/' + skillId);
+      '/skill_editor/' + skillId
+    );
   });
 
-  it('should not call the TopicUpdateService if thumbnail bg color is same',
-    () => {
-      component.updateTopicThumbnailBgColor('#FFFFFF');
-      let topicThumbnailBGSpy = (
-        spyOn(topicUpdateService, 'setTopicThumbnailBgColor'));
-      component.updateTopicThumbnailBgColor('#FFFFFF');
-      expect(topicThumbnailBGSpy).not.toHaveBeenCalled();
-    });
+  it('should not call the TopicUpdateService if thumbnail bg color is same', () => {
+    component.updateTopicThumbnailBgColor('#FFFFFF');
+    let topicThumbnailBGSpy = spyOn(
+      topicUpdateService,
+      'setTopicThumbnailBgColor'
+    );
+    component.updateTopicThumbnailBgColor('#FFFFFF');
+    expect(topicThumbnailBGSpy).not.toHaveBeenCalled();
+  });
 
   it('should toggle topic preview', () => {
     expect(component.topicPreviewCardIsShown).toEqual(false);
@@ -568,31 +639,35 @@ describe('Topic editor tab directive', () => {
     }
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return ({
+      return {
         componentInstance: MockNgbModalRef,
-        result: Promise.resolve()
-      }) as NgbModalRef;
+        result: Promise.resolve(),
+      } as NgbModalRef;
     });
     component.createCanonicalStory();
     expect(modalSpy).toHaveBeenCalled();
   });
 
   it('should call TopicRoutingService to navigate to subtopic', () => {
-    let topicRoutingSpy = (
-      spyOn(topicEditorRoutingService, 'navigateToSubtopicEditorWithId'));
+    let topicRoutingSpy = spyOn(
+      topicEditorRoutingService,
+      'navigateToSubtopicEditorWithId'
+    );
     component.navigateToSubtopic(2, '');
     expect(topicRoutingSpy).toHaveBeenCalledWith(2);
   });
 
-  it('should call TopicEditorService and TopicUpdateService ' +
-      'on to delete subtopic', () => {
-    let topicEditorSpy = spyOn(topicEditorStateService, 'deleteSubtopicPage');
-    let topicUpdateSpy = (
-      spyOn(topicUpdateService, 'deleteSubtopic'));
-    component.deleteSubtopic(2);
-    expect(topicEditorSpy).toHaveBeenCalled();
-    expect(topicUpdateSpy).toHaveBeenCalled();
-  });
+  it(
+    'should call TopicEditorService and TopicUpdateService ' +
+      'on to delete subtopic',
+    () => {
+      let topicEditorSpy = spyOn(topicEditorStateService, 'deleteSubtopicPage');
+      let topicUpdateSpy = spyOn(topicUpdateService, 'deleteSubtopic');
+      component.deleteSubtopic(2);
+      expect(topicEditorSpy).toHaveBeenCalled();
+      expect(topicUpdateSpy).toHaveBeenCalled();
+    }
+  );
 
   it('should return preview footer text for topic preview', () => {
     expect(component.getPreviewFooter()).toEqual('2 Stories');
@@ -602,36 +677,37 @@ describe('Topic editor tab directive', () => {
     expect(component.getPreviewFooter()).toEqual('1 Story');
   });
 
-  it('should only toggle preview of entity lists in mobile view',
-    fakeAsync(() => {
-      let MockWindowDimensionsServiceSpy = spyOn(
-        windowDimensionsService, 'isWindowNarrow');
+  it('should only toggle preview of entity lists in mobile view', fakeAsync(() => {
+    let MockWindowDimensionsServiceSpy = spyOn(
+      windowDimensionsService,
+      'isWindowNarrow'
+    );
 
-      expect(component.mainTopicCardIsShown).toEqual(true);
-      component.togglePreviewListCards('topic');
-      expect(component.mainTopicCardIsShown).toEqual(true);
-      tick();
+    expect(component.mainTopicCardIsShown).toEqual(true);
+    component.togglePreviewListCards('topic');
+    expect(component.mainTopicCardIsShown).toEqual(true);
+    tick();
 
-      MockWindowDimensionsServiceSpy.and.returnValue(true);
-      expect(component.subtopicsListIsShown).toEqual(true);
-      expect(component.storiesListIsShown).toEqual(true);
-      tick();
+    MockWindowDimensionsServiceSpy.and.returnValue(true);
+    expect(component.subtopicsListIsShown).toEqual(true);
+    expect(component.storiesListIsShown).toEqual(true);
+    tick();
 
-      component.togglePreviewListCards('subtopic');
-      expect(component.subtopicsListIsShown).toEqual(false);
-      expect(component.storiesListIsShown).toEqual(true);
-      tick();
+    component.togglePreviewListCards('subtopic');
+    expect(component.subtopicsListIsShown).toEqual(false);
+    expect(component.storiesListIsShown).toEqual(true);
+    tick();
 
-      component.togglePreviewListCards('story');
-      expect(component.subtopicsListIsShown).toEqual(false);
-      expect(component.storiesListIsShown).toEqual(false);
-      tick();
+    component.togglePreviewListCards('story');
+    expect(component.subtopicsListIsShown).toEqual(false);
+    expect(component.storiesListIsShown).toEqual(false);
+    tick();
 
-      expect(component.mainTopicCardIsShown).toEqual(true);
-      component.togglePreviewListCards('topic');
-      expect(component.mainTopicCardIsShown).toEqual(false);
-      tick();
-    }));
+    expect(component.mainTopicCardIsShown).toEqual(true);
+    component.togglePreviewListCards('topic');
+    expect(component.mainTopicCardIsShown).toEqual(false);
+    tick();
+  }));
 
   it('should toggle uncategorized skill options', () => {
     component.toggleUncategorizedSkillOptions(10);
@@ -640,73 +716,68 @@ describe('Topic editor tab directive', () => {
     expect(component.uncategorizedEditOptionsIndex).toEqual(20);
   });
 
-  it('should open ChangeSubtopicAssignment modal when change ' +
-      'subtopic assignment is called', () => {
+  it(
+    'should open ChangeSubtopicAssignment modal when change ' +
+      'subtopic assignment is called',
+    () => {
+      class MockNgbModalRef {
+        componentInstance: {
+          subtopics: null;
+        };
+      }
+
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(1),
+        } as NgbModalRef;
+      });
+      component.changeSubtopicAssignment(1, skillSummary);
+      expect(modalSpy).toHaveBeenCalled();
+    }
+  );
+
+  it('should open ChangeSubtopicAssignment modal and call TopicUpdateService', fakeAsync(() => {
+    let moveSkillUpdateSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
+    class MockNgbModalRef {
+      componentInstance: {
+        subtopics: null;
+      };
+    }
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: MockNgbModalRef,
+      result: Promise.resolve(2),
+    } as NgbModalRef);
+
+    component.changeSubtopicAssignment(1, skillSummary);
+    tick();
+
+    expect(moveSkillUpdateSpy).toHaveBeenCalled();
+  }));
+
+  it('should not call the TopicUpdateService if subtopicIds are same', fakeAsync(() => {
     class MockNgbModalRef {
       componentInstance: {
         subtopics: null;
       };
     }
 
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve(1)
-        } as NgbModalRef);
-    });
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: MockNgbModalRef,
+      result: Promise.resolve(1),
+    } as NgbModalRef);
+    let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
     component.changeSubtopicAssignment(1, skillSummary);
-    expect(modalSpy).toHaveBeenCalled();
-  });
-
-  it('should open ChangeSubtopicAssignment modal and call TopicUpdateService',
-    fakeAsync(() => {
-      let moveSkillUpdateSpy = spyOn(
-        topicUpdateService, 'moveSkillToSubtopic');
-      class MockNgbModalRef {
-        componentInstance: {
-          subtopics: null;
-        };
-      }
-      spyOn(ngbModal, 'open').and.returnValue(
-        {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve(2)
-        } as NgbModalRef
-      );
-
-      component.changeSubtopicAssignment(1, skillSummary);
-      tick();
-
-      expect(moveSkillUpdateSpy).toHaveBeenCalled();
-    }));
-
-  it('should not call the TopicUpdateService if subtopicIds are same',
-    fakeAsync(() => {
-      class MockNgbModalRef {
-        componentInstance: {
-          subtopics: null;
-        };
-      }
-
-      spyOn(ngbModal, 'open').and.returnValue(
-        {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve(1)
-        } as NgbModalRef
-      );
-      let moveSkillSpy = (
-        spyOn(topicUpdateService, 'moveSkillToSubtopic'));
-      component.changeSubtopicAssignment(1, skillSummary);
-      tick();
-      expect(moveSkillSpy).not.toHaveBeenCalled();
-    }));
+    tick();
+    expect(moveSkillSpy).not.toHaveBeenCalled();
+  }));
 
   it('should react to event when story summaries are initialized', () => {
     spyOn(topicEditorStateService, 'getCanonicalStorySummaries');
     mockStorySummariesInitializedEventEmitter.emit();
     expect(
-      topicEditorStateService.getCanonicalStorySummaries).toHaveBeenCalled();
+      topicEditorStateService.getCanonicalStorySummaries
+    ).toHaveBeenCalled();
   });
 
   it('should call initEditor on initialization of topic', () => {
@@ -716,51 +787,67 @@ describe('Topic editor tab directive', () => {
     expect(component.initEditor).toHaveBeenCalled();
   });
 
-  it('should call the TopicUpdateService if skillId is added in the ' +
-     'diagnostic test', fakeAsync(() => {
-    let updateSkillIdForDiagnosticTestSpy = spyOn(
-      topicUpdateService, 'updateDiagnosticTestSkills');
-    component.selectedSkillForDiagnosticTest = skillSummary;
-    component.availableSkillSummariesForDiagnosticTest = [skillSummary];
-    component.addSkillForDiagnosticTest();
-    tick();
-    tick();
-    expect(updateSkillIdForDiagnosticTestSpy).toHaveBeenCalledWith(
-      component.topic, component.selectedSkillSummariesForDiagnosticTest);
-  }));
+  it(
+    'should call the TopicUpdateService if skillId is added in the ' +
+      'diagnostic test',
+    fakeAsync(() => {
+      let updateSkillIdForDiagnosticTestSpy = spyOn(
+        topicUpdateService,
+        'updateDiagnosticTestSkills'
+      );
+      component.skillForDiagnosticTestFormControl.setValue(skillSummary);
+      component.availableSkillSummariesForDiagnosticTest = [skillSummary];
+      component.addSkillForDiagnosticTest();
+      tick();
+      tick();
+      expect(updateSkillIdForDiagnosticTestSpy).toHaveBeenCalledWith(
+        component.topic,
+        component.selectedSkillSummariesForDiagnosticTest
+      );
+    })
+  );
 
-  it('should call the TopicUpdateService if any skillId is removed from the ' +
-     'diagnostic test', () => {
-    let updateSkillIdForDiagnosticTestSpy = spyOn(
-      topicUpdateService, 'updateDiagnosticTestSkills');
-    component.selectedSkillSummariesForDiagnosticTest = [skillSummary];
+  it(
+    'should call the TopicUpdateService if any skillId is removed from the ' +
+      'diagnostic test',
+    () => {
+      let updateSkillIdForDiagnosticTestSpy = spyOn(
+        topicUpdateService,
+        'updateDiagnosticTestSkills'
+      );
+      component.selectedSkillSummariesForDiagnosticTest = [skillSummary];
 
-    component.removeSkillFromDiagnosticTest(skillSummary);
-    expect(updateSkillIdForDiagnosticTestSpy).toHaveBeenCalledWith(
-      component.topic, component.selectedSkillSummariesForDiagnosticTest);
-  });
+      component.removeSkillFromDiagnosticTest(skillSummary);
+      expect(updateSkillIdForDiagnosticTestSpy).toHaveBeenCalledWith(
+        component.topic,
+        component.selectedSkillSummariesForDiagnosticTest
+      );
+    }
+  );
 
   it('should get eligible skill for diagnostic test selection', () => {
     component.skillQuestionCountDict = {
-      skill_1: 3
+      skill_1: 3,
     };
     topic._uncategorizedSkillSummaries = [];
     topic._subtopics = [];
     expect(component.getEligibleSkillSummariesForDiagnosticTest()).toEqual([]);
 
-    spyOn(component.topic, 'getAvailableSkillSummariesForDiagnosticTest')
-      .and.returnValue([skillSummary]);
-    expect(component.getEligibleSkillSummariesForDiagnosticTest()).toEqual(
-      [skillSummary]);
+    spyOn(
+      component.topic,
+      'getAvailableSkillSummariesForDiagnosticTest'
+    ).and.returnValue([skillSummary]);
+    expect(component.getEligibleSkillSummariesForDiagnosticTest()).toEqual([
+      skillSummary,
+    ]);
   });
 
-  it('should be able to present diagnostic test dropdown selector correctly',
-    () => {
-      expect(component.diagnosticTestSkillsDropdownIsShown).toBeFalse();
-      component.presentDiagnosticTestSkillDropdown();
-      expect(component.diagnosticTestSkillsDropdownIsShown).toBeTrue();
+  it('should be able to present diagnostic test dropdown selector correctly', () => {
+    expect(component.diagnosticTestSkillsDropdownIsShown).toBeFalse();
+    component.presentDiagnosticTestSkillDropdown();
+    expect(component.diagnosticTestSkillsDropdownIsShown).toBeTrue();
 
-      component.removeDiagnosticTestSkillDropdown();
-      expect(component.diagnosticTestSkillsDropdownIsShown).toBeFalse();
-    });
+    component.removeDiagnosticTestSkillDropdown();
+    expect(component.diagnosticTestSkillsDropdownIsShown).toBeFalse();
+  });
 });

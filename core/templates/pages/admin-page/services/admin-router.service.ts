@@ -17,16 +17,15 @@
  * provide routing functionality, and store all available tab states.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {AdminPageConstants} from 'pages/admin-page/admin-page.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AdminRouterService {
-  currentTabHash: string = (
-    AdminPageConstants.ADMIN_TAB_URLS.ACTIVITIES);
+  currentTabHash: string = AdminPageConstants.ADMIN_TAB_URLS.ACTIVITIES;
 
   /**
    * Iterates through the ADMIN_TAB_URLS map and returns the
@@ -37,7 +36,8 @@ export class AdminRouterService {
    */
   getTabNameByHash(tabHash: string): string | null {
     for (const [tabName, tabUrl] of Object.entries(
-      AdminPageConstants.ADMIN_TAB_URLS)) {
+      AdminPageConstants.ADMIN_TAB_URLS
+    )) {
       if (tabUrl === tabHash) {
         return tabName;
       }
@@ -59,8 +59,7 @@ export class AdminRouterService {
    * @returns {boolean} Whether the activities tab is open.
    */
   isActivitiesTabOpen(): boolean {
-    return this.currentTabHash === (
-      AdminPageConstants.ADMIN_TAB_URLS.ACTIVITIES);
+    return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.ACTIVITIES;
   }
 
   /**
@@ -69,14 +68,8 @@ export class AdminRouterService {
   isPlatformParamsTabOpen(): boolean {
     return (
       this.currentTabHash ===
-      AdminPageConstants.ADMIN_TAB_URLS.PLATFORM_PARAMETERS);
-  }
-
-  /**
-   * @returns {boolean} Whether the config tab is open.
-   */
-  isConfigTabOpen(): boolean {
-    return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.CONFIG;
+      AdminPageConstants.ADMIN_TAB_URLS.PLATFORM_PARAMETERS
+    );
   }
 
   /**
@@ -94,5 +87,6 @@ export class AdminRouterService {
   }
 }
 
-angular.module('oppia').factory(
-  'AdminRouterService', downgradeInjectable(AdminRouterService));
+angular
+  .module('oppia')
+  .factory('AdminRouterService', downgradeInjectable(AdminRouterService));

@@ -69,48 +69,53 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
         suite:
-          - accessibility
-          - additionalEditorFeatures
-          - additionalEditorFeaturesModals
-          - additionalPlayerFeatures
-          - adminPage
-          - blogDashboard
-          - blog
-          - checkpointFeatures
-          - classroomPage
-          - classroomPageFileUploadFeatures
-          - collections
-          - contributorDashboard
-          - coreEditorAndPlayerFeatures
-          - creatorDashboard
-          - embedding
-          - explorationFeedbackTab
-          - explorationImprovementsTab
-          - explorationHistoryTab
-          - explorationStatisticsTab
-          - explorationTranslationTab
-          - extensions
-          - featureGating
-          - feedbackUpdates
-          - fileUploadExtensions
-          - fileUploadFeatures
-          - learner
-          - learnerDashboard
-          - library
-          - navigation
-          - playVoiceovers
-          - preferences
-          - profileFeatures
-          - profileMenu
-          - publication
-          - skillEditor
-          - subscriptions
-          - topicsAndSkillsDashboard
-          - topicAndStoryEditor
-          - topicAndStoryEditorFileUploadFeatures
-          - topicAndStoryViewer
-          - users
-          - wipeout
+          - name: accessibility
+          - name: additionalEditorFeatures
+          - name: additionalEditorFeaturesModals
+          - name: additionalPlayerFeatures
+          - name: adminPage
+          - name: blogDashboard
+          - name: blog
+          - name: checkpointFeatures
+          - name: classroomPage
+          - name: classroomPageFileUploadFeatures
+          - name: collections
+          - name: contributorDashboard
+          - name: contributorAdminDashboard
+          - name: coreEditorAndPlayerFeatures
+          - name: creatorDashboard
+          - name: embedding
+          - name: explorationFeedbackTab
+          - name: explorationImprovementsTab
+          - name: explorationHistoryTab
+          - name: explorationStatisticsTab
+          - name: explorationTranslationTab
+          - name: extensions
+          - name: featureGating
+          - name: feedbackUpdates
+          - name: fileUploadExtensions
+          - name: fileUploadFeatures
+            flaky_indicators: |
+              Play record button is not clickable
+              Translation tab button is not clickable
+          - name: learner
+          - name: learnerDashboard
+          - name: library
+          - name: navigation
+          - name: playVoiceovers
+          - name: preferences
+          - name: profileFeatures
+          - name: profileMenu
+          - name: publication
+          - name: skillEditor
+          - name: subscriptions
+          - name: topicsAndSkillsDashboard
+          - name: topicAndStoryEditor
+          - name: topicAndStoryEditorFileUploadFeatures
+          - name: topicAndStoryViewer
+          - name: users
+          - name: wipeout
+    name: e2e_test (${{ matrix.os }}, ${{ matrix.suite.name }})
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -180,25 +185,16 @@ jobs:
       - name: (Artifact re-build) Build Webpack
         if: steps.download_artifact_1.outcome == 'failure'
         run: python -m scripts.build --prod_env
-      - name: (Artifact re-build) Zip build files
-        if: steps.download_artifact_1.outcome == 'failure'
-        run: |
-          zip -rqy build_files.zip oppia/third_party oppia_tools oppia/build oppia/webpack_bundles oppia/proto_files oppia/app.yaml oppia/assets/hashes.json oppia/proto_files oppia/extensions/classifiers/proto/* oppia/backend_prod_files oppia/dist
-        working-directory: /home/runner/work/oppia
-      - name: (Artifact re-build) Upload build files 
-        if: steps.download_artifact_1.outcome == 'failure'
-        uses: actions/upload-artifact@v3
+      - name: Run E2E Test ${{ matrix.suite.name }}
+        uses: oppia/retry@a9fb265410e634c84ee90f3e87f323fde0541037
         with:
-          name: build_files
-          path: /home/runner/work/oppia/build_files.zip
-          retention-days: 1
-      - name: (artifact re-build) Remove build_files.zip
-        if: steps.download_artifact_1.outcome == 'failure'
-        run: rm build_files.zip
-      - name: Run E2E Test ${{ matrix.suite }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite=${{ matrix.suite }} --prod_env
-        env:
-          VIDEO_RECORDING_IS_ENABLED: 0
+          max_attempts: 2
+          substrings_indicating_flaky_execution: ${{ matrix.suite.flaky_indicators || '' }}
+          command: >
+            VIDEO_RECORDING_IS_ENABLED=0;
+            xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+            python -m scripts.run_e2e_tests --skip-install
+            --skip-build --suite=${{ matrix.suite.name }} --prod_env
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
@@ -248,12 +244,15 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - name: Download build files artifact
+      - name: Attempt to download build files artifact
+        id: download_artifact_1
         uses: actions/download-artifact@v3
+        continue-on-error: true
         with:
           name: build_files
           path: /home/runner/work/oppia/
       - name: Unzip build files
+        if: steps.download_artifact_1.outcome != 'failure'
         run: |
           ls -la
           unzip build_files.zip
@@ -270,6 +269,21 @@ jobs:
           ls -la oppia/third_party
         working-directory: /home/runner/work/oppia
         shell: bash
+      - name: (Artifact re-build) Cache third_party/static
+        if: steps.download_artifact_1.outcome == 'failure'
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: /home/runner/work/oppia/oppia/third_party/static
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('dependencies.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: (Artifact re-build) Build Webpack
+        if: steps.download_artifact_1.outcome == 'failure'
+        run: python -m scripts.build --prod_env
       - uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
@@ -296,8 +310,32 @@ jobs:
         matrix:
           os: [ubuntu-22.04]
           suite:
-            - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
-            - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+            - blog-admin/assign-roles-to-users-and-change-tag-properties
+            - blog-editor/create-and-delete-draft-blog-post
+            - blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked
+            - curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill
+            - exploration-editor/load-complete-and-restart-exploration-preview
+            - exploration-editor/create-exploration-and-change-basic-settings
+            - exploration-editor/save-draft-publish-and-discard-the-changes
+            - logged-out-user/click-all-buttons-on-about-page
+            - logged-out-user/click-all-buttons-on-about-foundation-page
+            - logged-out-user/click-all-buttons-on-donation-thanks-page
+            - logged-out-user/click-all-buttons-on-navbar
+            - logged-out-user/click-all-buttons-on-partnerships-page
+            - logged-out-user/click-all-buttons-on-teach-page
+            - logged-out-user/click-all-buttons-on-volunteer-page
+            - logged-out-user/click-all-links-in-about-oppia-footer
+            - logged-out-user/click-all-links-on-get-started-page
+            - logged-out-user/check-all-user-flow-of-donor
+            - logged-out-user/check-all-user-flow-of-parent-teacher
+            - logged-out-user/check-all-user-flow-of-partner
+            - logged-out-user/check-all-user-flow-of-volunteer
+            - logged-in-user/subscribe-to-creator-and-view-all-explorations-by-that-creator
+            - practice-question-admin/add-and-remove-contribution-rights
+            - translation-admin/add-and-remove-translation-rights
+            - voiceover-admin/add-voiceover-artist-to-an-exploration
+            - moderator/view-recent-commits-and-feedback-messages
+            - moderator/edit-featured-activities-list
       steps:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v3
@@ -363,23 +401,10 @@ jobs:
         - name: (Artifact re-build) Build Webpack
           if: steps.download_artifact_1.outcome == 'failure'
           run: python -m scripts.build --prod_env
-        - name: (Artifact re-build) Zip build files
-          if: steps.download_artifact_1.outcome == 'failure'
-          run: |
-            zip -rqy build_files.zip oppia/third_party oppia_tools oppia/build oppia/webpack_bundles oppia/proto_files oppia/app.yaml oppia/assets/hashes.json oppia/proto_files oppia/extensions/classifiers/proto/* oppia/backend_prod_files oppia/dist
-          working-directory: /home/runner/work/oppia
-        - name: (Artifact re-build) Upload build files 
-          if: steps.download_artifact_1.outcome == 'failure'
-          uses: actions/upload-artifact@v3
-          with:
-            name: build_files
-            path: /home/runner/work/oppia/build_files.zip
-            retention-days: 1
-        - name: (artifact re-build) Remove build_files.zip
-          if: steps.download_artifact_1.outcome == 'failure'
-          run: rm build_files.zip
-        - name: Run Acceptance Test ${{ matrix.suite }}
+        - name: Run Desktop Acceptance Test ${{ matrix.suite }}
           run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env
+        - name: Run Mobile Acceptance Test ${{ matrix.suite }}
+          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env --mobile
         - name: Uploading webpack bundles as an artifact
           if: ${{ failure() }}
           uses: actions/upload-artifact@v3

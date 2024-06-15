@@ -22,9 +22,14 @@ import 'zone.js';
 import uiValidate from 'angular-ui-validate';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'ui.bootstrap', uiValidate
+  require('angular-cookies'),
+  'ngAnimate',
+  'ngMaterial',
+  'ngSanitize',
+  'ngTouch',
+  'pascalprecht.translate',
+  'ui.bootstrap',
+  uiValidate,
 ]);
 
 require('Polyfills.ts');
@@ -38,5 +43,6 @@ require('base-components/oppia-root.directive.ts');
 
 require(
   'pages/topic-viewer-page/navbar-breadcrumb/' +
-  'topic-viewer-navbar-breadcrumb.component.ts');
+    'topic-viewer-navbar-breadcrumb.component.ts'
+);
 require('pages/topic-viewer-page/topic-viewer-page.component.ts');

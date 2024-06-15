@@ -16,23 +16,34 @@
  * @fileoverview Unit tests for HintAndSolutionButtonsComponent
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeDetectorRef, EventEmitter } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
-import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
-import { HintAndSolutionModalService } from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
-import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
-import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
-import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.component';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ChangeDetectorRef, EventEmitter} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {TranslateService} from '@ngx-translate/core';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {
+  Interaction,
+  InteractionObjectFactory,
+} from 'domain/exploration/InteractionObjectFactory';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
+import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
+import {HintsAndSolutionManagerService} from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
+import {StatsReportingService} from 'pages/exploration-player-page/services/stats-reporting.service';
+import {HintAndSolutionButtonsComponent} from './hint-and-solution-buttons.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 describe('HintAndSolutionButtonsComponent', () => {
   let component: HintAndSolutionButtonsComponent;
@@ -49,11 +60,72 @@ describe('HintAndSolutionButtonsComponent', () => {
   let newCard: StateCard;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
 
+  const defaultInteractionBackendDict = {
+    id: 'TextInput',
+    answer_groups: [
+      {
+        outcome: {
+          dest: 'State',
+          dest_if_really_stuck: null,
+          feedback: {
+            html: '',
+            content_id: 'This is a new feedback text',
+          },
+          refresher_exploration_id: 'test',
+          missing_prerequisite_skill_id: 'test_skill_id',
+          labelled_as_correct: true,
+          param_changes: [],
+        },
+        rule_specs: [],
+        training_data: [],
+        tagged_skill_misconception_id: '',
+      },
+    ],
+    default_outcome: {
+      dest: 'Hola',
+      dest_if_really_stuck: null,
+      feedback: {
+        content_id: '',
+        html: '',
+      },
+      labelled_as_correct: true,
+      param_changes: [],
+      refresher_exploration_id: 'test',
+      missing_prerequisite_skill_id: 'test_skill_id',
+    },
+    confirmed_unclassified_answers: [],
+    customization_args: {
+      rows: {
+        value: true,
+      },
+      placeholder: {
+        value: 1,
+      },
+      catchMisspellings: {
+        value: false,
+      },
+    },
+    hints: [],
+    solution: {
+      answer_is_exclusive: true,
+      correct_answer: 'test_answer',
+      explanation: {
+        content_id: '2',
+        html: 'test_explanation1',
+      },
+    },
+  };
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [HintAndSolutionButtonsComponent, MockTranslatePipe],
-      providers: []
+      providers: [
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService,
+        },
+      ],
     }).compileComponents();
   }));
 
@@ -61,89 +133,95 @@ describe('HintAndSolutionButtonsComponent', () => {
     fixture = TestBed.createComponent(HintAndSolutionButtonsComponent);
     component = fixture.componentInstance;
     playerPositionService = TestBed.inject(PlayerPositionService);
-    hintsAndSolutionManagerService = TestBed
-      .inject(HintsAndSolutionManagerService);
+    hintsAndSolutionManagerService = TestBed.inject(
+      HintsAndSolutionManagerService
+    );
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     hintAndSolutionModalService = TestBed.inject(HintAndSolutionModalService);
     explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService);
+      ExplorationPlayerStateService
+    );
     statsReportingService = TestBed.inject(StatsReportingService);
-    audioTranslationLanguageService = (
-      TestBed.inject(AudioTranslationLanguageService));
+    audioTranslationLanguageService = TestBed.inject(
+      AudioTranslationLanguageService
+    );
 
     spyOn(playerPositionService, 'onNewCardOpened').and.returnValue(
-      new EventEmitter<StateCard>());
+      new EventEmitter<StateCard>()
+    );
     spyOn(playerPositionService, 'onActiveCardChanged').and.returnValue(
-      new EventEmitter<void>());
+      new EventEmitter<void>()
+    );
     spyOn(hintsAndSolutionManagerService, 'onHintConsumed').and.returnValue(
-      new EventEmitter<void>());
-    spyOn(hintsAndSolutionManagerService, 'onSolutionViewedEventEmitter')
-      .and.returnValue(new EventEmitter<void>());
+      new EventEmitter<void>()
+    );
+    spyOn(
+      hintsAndSolutionManagerService,
+      'onSolutionViewedEventEmitter'
+    ).and.returnValue(new EventEmitter<void>());
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
+      true
+    );
 
     // A StateCard which supports hints.
     newCard = StateCard.createNewCard(
-      'State 2', '<p>Content</p>', '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict({
-        id: 'TextInput',
-        answer_groups: [
-          {
-            outcome: {
-              dest: 'State',
-              dest_if_really_stuck: null,
-              feedback: {
-                html: '',
-                content_id: 'This is a new feedback text',
-              },
-              refresher_exploration_id: 'test',
-              missing_prerequisite_skill_id: 'test_skill_id',
-              labelled_as_correct: true,
-              param_changes: [],
-            },
-            rule_specs: [],
-            training_data: [],
-            tagged_skill_misconception_id: '',
-          },
-        ],
-        default_outcome: {
-          dest: 'Hola',
-          dest_if_really_stuck: null,
-          feedback: {
-            content_id: '',
-            html: '',
-          },
-          labelled_as_correct: true,
-          param_changes: [],
-          refresher_exploration_id: 'test',
-          missing_prerequisite_skill_id: 'test_skill_id',
-        },
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          rows: {
-            value: true,
-          },
-          placeholder: {
-            value: 1,
-          },
-          catchMisspellings: {
-            value: false
-          }
-        },
-        hints: [],
-        solution: {
-          answer_is_exclusive: true,
-          correct_answer: 'test_answer',
-          explanation: {
-            content_id: '2',
-            html: 'test_explanation1',
-          },
-        }
-      }),
+      'State 2',
+      '<p>Content</p>',
+      '<interaction></interaction>',
+      interactionObjectFactory.createFromBackendDict(
+        defaultInteractionBackendDict
+      ),
       RecordedVoiceovers.createEmpty(),
-      'content', audioTranslationLanguageService);
+      'content',
+      audioTranslationLanguageService
+    );
+  });
+
+  it("should reset hints when solution doesn't exist", () => {
+    const interactionDict = JSON.parse(
+      JSON.stringify(defaultInteractionBackendDict)
+    );
+    interactionDict.solution = null;
+    const interaction =
+      interactionObjectFactory.createFromBackendDict(interactionDict);
+    const card = StateCard.createNewCard(
+      'Card 1',
+      'Content html',
+      'Interaction html',
+      interaction,
+      RecordedVoiceovers.createEmpty(),
+      'content',
+      audioTranslationLanguageService
+    );
+    spyOn(component, 'resetLocalHintsArray');
+
+    component.ngOnInit();
+    playerPositionService.onNewCardOpened.emit(card);
+
+    expect(component.resetLocalHintsArray).toHaveBeenCalledTimes(2);
+  });
+
+  it('should reset hints when solution exists', () => {
+    const interaction = interactionObjectFactory.createFromBackendDict(
+      defaultInteractionBackendDict
+    );
+    const card = StateCard.createNewCard(
+      'Card 1',
+      'Content html',
+      'Interaction html',
+      interaction,
+      RecordedVoiceovers.createEmpty(),
+      'content',
+      audioTranslationLanguageService
+    );
+    spyOn(component, 'resetLocalHintsArray');
+
+    component.ngOnInit();
+    playerPositionService.onNewCardOpened.emit(card);
+
+    expect(component.resetLocalHintsArray).toHaveBeenCalledTimes(2);
   });
 
   it('should subscribe to events on initialization', () => {
@@ -151,72 +229,91 @@ describe('HintAndSolutionButtonsComponent', () => {
     spyOn(playerPositionService.onActiveCardChanged, 'subscribe');
     spyOn(hintsAndSolutionManagerService.onHintConsumed, 'subscribe');
     spyOn(
-      hintsAndSolutionManagerService.onSolutionViewedEventEmitter, 'subscribe');
+      hintsAndSolutionManagerService.onSolutionViewedEventEmitter,
+      'subscribe'
+    );
 
     component.ngOnInit();
 
     expect(playerPositionService.onNewCardOpened.subscribe).toHaveBeenCalled();
-    expect(playerPositionService.onActiveCardChanged.subscribe)
-      .toHaveBeenCalled();
-    expect(hintsAndSolutionManagerService.onHintConsumed.subscribe)
-      .toHaveBeenCalled();
     expect(
-      hintsAndSolutionManagerService.onSolutionViewedEventEmitter.subscribe)
-      .toHaveBeenCalled();
+      playerPositionService.onActiveCardChanged.subscribe
+    ).toHaveBeenCalled();
+    expect(
+      hintsAndSolutionManagerService.onHintConsumed.subscribe
+    ).toHaveBeenCalled();
+    expect(
+      hintsAndSolutionManagerService.onSolutionViewedEventEmitter.subscribe
+    ).toHaveBeenCalled();
   });
 
-  it('should reset hints and solutions when new' +
-    ' card is opened', fakeAsync(() => {
-    let oldCard: StateCard = StateCard.createNewCard(
-      'State 1', '<p>Content</p>', '<interaction></interaction>',
-      {} as Interaction, RecordedVoiceovers.createEmpty(),
-      'content', audioTranslationLanguageService);
-    spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
+  it(
+    'should reset hints and solutions when new' + ' card is opened',
+    fakeAsync(() => {
+      let oldCard: StateCard = StateCard.createNewCard(
+        'State 1',
+        '<p>Content</p>',
+        '<interaction></interaction>',
+        {} as Interaction,
+        RecordedVoiceovers.createEmpty(),
+        'content',
+        audioTranslationLanguageService
+      );
+      spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
 
-    component.displayedCard = oldCard;
+      component.displayedCard = oldCard;
 
-    component.ngOnInit();
-    playerPositionService.onNewCardOpened.emit(newCard);
-    tick();
+      component.ngOnInit();
+      playerPositionService.onNewCardOpened.emit(newCard);
+      tick();
 
-    expect(component.displayedCard).toEqual(newCard);
-  }));
+      expect(component.displayedCard).toEqual(newCard);
+    })
+  );
 
   it('should get RTL language status correctly', () => {
     expect(component.isLanguageRTL()).toBeTrue();
   });
 
-  it('should reset local hints array if active card is' +
-    ' changed to the last one', fakeAsync(() => {
-    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
-    spyOn(component, 'resetLocalHintsArray');
+  it(
+    'should reset local hints array if active card is' +
+      ' changed to the last one',
+    fakeAsync(() => {
+      spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
+      spyOn(component, 'resetLocalHintsArray');
 
-    component.ngOnInit();
-    playerPositionService.onActiveCardChanged.emit();
-    tick();
+      component.ngOnInit();
+      playerPositionService.onActiveCardChanged.emit();
+      tick();
 
-    expect(component.resetLocalHintsArray).toHaveBeenCalledTimes(2);
-    component.ngOnDestroy();
-  }));
+      expect(component.resetLocalHintsArray).toHaveBeenCalledTimes(2);
+      component.ngOnDestroy();
+    })
+  );
 
-  it('should not reset local hints array if new active card is' +
-    ' not the last one', fakeAsync(() => {
-    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(false);
-    spyOn(component, 'resetLocalHintsArray');
+  it(
+    'should not reset local hints array if new active card is' +
+      ' not the last one',
+    fakeAsync(() => {
+      spyOn(playerTranscriptService, 'isLastCard').and.returnValue(false);
+      spyOn(component, 'resetLocalHintsArray');
 
-    component.ngOnInit();
-    playerPositionService.onActiveCardChanged.emit();
-    tick();
+      component.ngOnInit();
+      playerPositionService.onActiveCardChanged.emit();
+      tick();
 
-    expect(component.resetLocalHintsArray).toHaveBeenCalledTimes(1);
-    component.ngOnDestroy();
-  }));
+      expect(component.resetLocalHintsArray).toHaveBeenCalledTimes(1);
+      component.ngOnDestroy();
+    })
+  );
 
   it('should fire change detection when hint is used', fakeAsync(() => {
     const changeDetectorRef =
       fixture.debugElement.injector.get(ChangeDetectorRef);
-    const detectChangesSpy =
-      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
 
     component.ngOnInit();
     hintsAndSolutionManagerService.onHintConsumed.emit();
@@ -229,8 +326,10 @@ describe('HintAndSolutionButtonsComponent', () => {
   it('should fire change detection when solution is viewed', fakeAsync(() => {
     const changeDetectorRef =
       fixture.debugElement.injector.get(ChangeDetectorRef);
-    const detectChangesSpy =
-      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
 
     component.ngOnInit();
     hintsAndSolutionManagerService.onSolutionViewedEventEmitter.emit();
@@ -240,128 +339,147 @@ describe('HintAndSolutionButtonsComponent', () => {
     component.ngOnDestroy();
   }));
 
-  it('should show hint button if hint is viewable and displayed card\'s' +
-    ' interaction supports hints', () => {
-    spyOn(hintsAndSolutionManagerService, 'isHintViewable')
-      .and.returnValues(false, true, true);
+  it(
+    "should show hint button if hint is viewable and displayed card's" +
+      ' interaction supports hints',
+    () => {
+      spyOn(hintsAndSolutionManagerService, 'isHintViewable').and.returnValues(
+        false,
+        true,
+        true
+      );
 
-    expect(component.isHintButtonVisible(0)).toBe(false);
+      expect(component.isHintButtonVisible(0)).toBe(false);
 
-    // StateCard with EndExploration interaction, which does not supports hints.
-    component.displayedCard = StateCard.createNewCard(
-      'State 1', '<p>Content</p>', '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict({
-        id: 'EndExploration',
-        answer_groups: [],
-        default_outcome: null,
-        confirmed_unclassified_answers: [],
-        customization_args: {},
-        hints: [],
-        solution: null,
-      }), RecordedVoiceovers.createEmpty(),
-      'content',
-      audioTranslationLanguageService);
+      // StateCard with EndExploration interaction, which does not supports hints.
+      component.displayedCard = StateCard.createNewCard(
+        'State 1',
+        '<p>Content</p>',
+        '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict({
+          id: 'EndExploration',
+          answer_groups: [],
+          default_outcome: null,
+          confirmed_unclassified_answers: [],
+          customization_args: {},
+          hints: [],
+          solution: null,
+        }),
+        RecordedVoiceovers.createEmpty(),
+        'content',
+        audioTranslationLanguageService
+      );
 
-    expect(component.isHintButtonVisible(0)).toBe(false);
+      expect(component.isHintButtonVisible(0)).toBe(false);
 
-    // StateCard which supports hints.
-    component.displayedCard = newCard;
+      // StateCard which supports hints.
+      component.displayedCard = newCard;
 
-    expect(component.isHintButtonVisible(0)).toBe(true);
-  });
+      expect(component.isHintButtonVisible(0)).toBe(true);
+    }
+  );
 
   it('should show solution button if solution is released', () => {
-    spyOn(hintsAndSolutionManagerService, 'isSolutionViewable')
-      .and.returnValue(true);
+    spyOn(hintsAndSolutionManagerService, 'isSolutionViewable').and.returnValue(
+      true
+    );
 
     expect(component.isSolutionButtonVisible()).toBe(true);
   });
 
   it('should show solution button if solution is released', () => {
-    spyOn(hintsAndSolutionManagerService, 'isSolutionViewable')
-      .and.returnValue(true);
+    spyOn(hintsAndSolutionManagerService, 'isSolutionViewable').and.returnValue(
+      true
+    );
 
     expect(component.isSolutionButtonVisible()).toBe(true);
   });
 
   it('should not show solution button if solution is not released', () => {
-    spyOn(hintsAndSolutionManagerService, 'isSolutionViewable')
-      .and.returnValue(false);
+    spyOn(hintsAndSolutionManagerService, 'isSolutionViewable').and.returnValue(
+      false
+    );
 
     expect(component.isSolutionButtonVisible()).toBe(false);
   });
 
-  it('should display hint modal when user clicks on hints icon',
-    fakeAsync(() => {
-      spyOn(hintAndSolutionModalService, 'displayHintModal').and.returnValue(
-        {
-          result: Promise.resolve('success')
-        } as NgbModalRef
-      );
-
-      expect(component.activeHintIndex).toBe(undefined);
-      expect(component.isVisible).toBe(true);
-
-      component.displayHintModal(0);
-
-      expect(component.activeHintIndex).toBe(0);
-      expect(component.isVisible).toBe(false);
-    }));
-
-  it('should close display hint modal and reset active hint index when modal' +
-    ' is closed', fakeAsync(() => {
-    spyOn(hintAndSolutionModalService, 'displayHintModal').and.returnValue(
-      {
-        result: Promise.reject('failure')
-      } as NgbModalRef
-    );
+  it('should display hint modal when user clicks on hints icon', fakeAsync(() => {
+    spyOn(hintAndSolutionModalService, 'displayHintModal').and.returnValue({
+      result: Promise.resolve('success'),
+    } as NgbModalRef);
 
     expect(component.activeHintIndex).toBe(undefined);
     expect(component.isVisible).toBe(true);
 
     component.displayHintModal(0);
-    tick();
 
-    expect(component.activeHintIndex).toBe(null);
+    expect(component.activeHintIndex).toBe(0);
     expect(component.isVisible).toBe(false);
   }));
 
-  it('should display solution modal if solution is' +
-    ' already consumed', fakeAsync(() => {
-    spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
-      true);
-    spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValue(
-      false);
-    spyOn(statsReportingService, 'recordSolutionHit');
-    spyOn(playerPositionService, 'getCurrentStateName')
-      .and.returnValue('state1');
-    spyOn(hintAndSolutionModalService, 'displaySolutionModal').and.returnValue(
-      {
-        result: Promise.resolve('success')
-      } as NgbModalRef
-    );
+  it(
+    'should close display hint modal and reset active hint index when modal' +
+      ' is closed',
+    fakeAsync(() => {
+      spyOn(hintAndSolutionModalService, 'displayHintModal').and.returnValue({
+        result: Promise.reject('failure'),
+      } as NgbModalRef);
 
-    expect(component.solutionModalIsActive).toBe(false);
+      expect(component.activeHintIndex).toBe(undefined);
+      expect(component.isVisible).toBe(true);
 
-    component.onClickSolutionButton();
-    tick();
+      component.displayHintModal(0);
+      tick();
 
-    expect(component.solutionModalIsActive).toBe(true);
-  }));
+      expect(component.activeHintIndex).toBe(null);
+      expect(component.isVisible).toBe(false);
+    })
+  );
+
+  it(
+    'should display solution modal if solution is' + ' already consumed',
+    fakeAsync(() => {
+      spyOn(
+        hintsAndSolutionManagerService,
+        'isSolutionConsumed'
+      ).and.returnValue(true);
+      spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValue(
+        false
+      );
+      spyOn(statsReportingService, 'recordSolutionHit');
+      spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+        'state1'
+      );
+      spyOn(
+        hintAndSolutionModalService,
+        'displaySolutionModal'
+      ).and.returnValue({
+        result: Promise.resolve('success'),
+      } as NgbModalRef);
+
+      expect(component.solutionModalIsActive).toBe(false);
+
+      component.onClickSolutionButton();
+      tick();
+
+      expect(component.solutionModalIsActive).toBe(true);
+    })
+  );
 
   it('should close solution modal', fakeAsync(() => {
     spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
-      true);
-    spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValue(
-      false);
-    spyOn(statsReportingService, 'recordSolutionHit');
-    spyOn(playerPositionService, 'getCurrentStateName')
-      .and.returnValue('state1');
-    spyOn(hintAndSolutionModalService, 'displaySolutionModal').and.returnValue(
-      {
-        result: Promise.reject()
-      } as NgbModalRef
+      true
     );
+    spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValue(
+      false
+    );
+    spyOn(statsReportingService, 'recordSolutionHit');
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+      'state1'
+    );
+    spyOn(hintAndSolutionModalService, 'displaySolutionModal').and.returnValue({
+      result: Promise.reject(),
+    } as NgbModalRef);
 
     component.onClickSolutionButton();
     tick();
@@ -369,74 +487,96 @@ describe('HintAndSolutionButtonsComponent', () => {
     expect(component.solutionModalIsActive).toBe(false);
   }));
 
-  it('should open interstitial modal if solution has not' +
-    ' been consumed before and then display solution modal' +
-    ' after user confirms', fakeAsync(() => {
-    spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
-      false);
-    spyOn(hintAndSolutionModalService, 'displaySolutionInterstitialModal')
-      .and.returnValue(
-        {
-          result: Promise.resolve('success')
-        } as NgbModalRef
-      );
-    spyOn(component, 'displaySolutionModal').and.callFake(() => {});
+  it(
+    'should open interstitial modal if solution has not' +
+      ' been consumed before and then display solution modal' +
+      ' after user confirms',
+    fakeAsync(() => {
+      spyOn(
+        hintsAndSolutionManagerService,
+        'isSolutionConsumed'
+      ).and.returnValue(false);
+      spyOn(
+        hintAndSolutionModalService,
+        'displaySolutionInterstitialModal'
+      ).and.returnValue({
+        result: Promise.resolve('success'),
+      } as NgbModalRef);
+      spyOn(component, 'displaySolutionModal').and.callFake(() => {});
 
-    component.onClickSolutionButton();
-    tick();
+      component.onClickSolutionButton();
+      tick();
 
-    expect(component.displaySolutionModal).toHaveBeenCalled();
-  }));
+      expect(component.displaySolutionModal).toHaveBeenCalled();
+    })
+  );
 
-  it('should close interstitial modal if solution has not' +
-    ' been consumed before and user click cancel', fakeAsync(() => {
-    spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
-      false);
-    spyOn(hintAndSolutionModalService, 'displaySolutionInterstitialModal')
-      .and.returnValue(
-        {
-          result: Promise.reject('failure')
-        } as NgbModalRef
-      );
-    spyOn(component, 'displaySolutionModal').and.callFake(() => {});
+  it(
+    'should close interstitial modal if solution has not' +
+      ' been consumed before and user click cancel',
+    fakeAsync(() => {
+      spyOn(
+        hintsAndSolutionManagerService,
+        'isSolutionConsumed'
+      ).and.returnValue(false);
+      spyOn(
+        hintAndSolutionModalService,
+        'displaySolutionInterstitialModal'
+      ).and.returnValue({
+        result: Promise.reject('failure'),
+      } as NgbModalRef);
+      spyOn(component, 'displaySolutionModal').and.callFake(() => {});
 
-    component.solutionModalIsActive = true;
-    component.onClickSolutionButton();
-    tick();
+      component.solutionModalIsActive = true;
+      component.onClickSolutionButton();
+      tick();
 
-    expect(component.solutionModalIsActive).toBe(false);
-    expect(component.displaySolutionModal).not.toHaveBeenCalled();
-  }));
+      expect(component.solutionModalIsActive).toBe(false);
+      expect(component.displaySolutionModal).not.toHaveBeenCalled();
+    })
+  );
 
-  it('should show \'Would you like to view the complete solution?' +
-    ' \' tooltip', () => {
-    spyOn(hintsAndSolutionManagerService, 'isSolutionTooltipOpen')
-      .and.returnValues(true, false);
+  it(
+    "should show 'Would you like to view the complete solution?" + " ' tooltip",
+    () => {
+      spyOn(
+        hintsAndSolutionManagerService,
+        'isSolutionTooltipOpen'
+      ).and.returnValues(true, false);
 
-    expect(component.isSolutionTooltipVisible()).toBe(true);
-    expect(component.isSolutionTooltipVisible()).toBe(false);
-  });
+      expect(component.isSolutionTooltipVisible()).toBe(true);
+      expect(component.isSolutionTooltipVisible()).toBe(false);
+    }
+  );
 
-  it('should show \'Need help? View a hint for this' +
-    ' problem!\' tooltip', () => {
-    spyOn(hintsAndSolutionManagerService, 'isHintTooltipOpen')
-      .and.returnValues(true, false);
+  it(
+    "should show 'Need help? View a hint for this" + " problem!' tooltip",
+    () => {
+      spyOn(
+        hintsAndSolutionManagerService,
+        'isHintTooltipOpen'
+      ).and.returnValues(true, false);
 
-    expect(component.isTooltipVisible()).toBe(true);
-    expect(component.isTooltipVisible()).toBe(false);
-  });
+      expect(component.isTooltipVisible()).toBe(true);
+      expect(component.isTooltipVisible()).toBe(false);
+    }
+  );
 
   it('should show if hint is consumed or not', () => {
-    spyOn(hintsAndSolutionManagerService, 'isHintConsumed')
-      .and.returnValues(true, false);
+    spyOn(hintsAndSolutionManagerService, 'isHintConsumed').and.returnValues(
+      true,
+      false
+    );
 
     expect(component.isHintConsumed(0)).toBe(true);
     expect(component.isHintConsumed(0)).toBe(false);
   });
 
   it('should show solution is consumed or not', () => {
-    spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed')
-      .and.returnValues(true, false);
+    spyOn(
+      hintsAndSolutionManagerService,
+      'isSolutionConsumed'
+    ).and.returnValues(true, false);
 
     expect(component.isSolutionConsumed()).toBe(true);
     expect(component.isSolutionConsumed()).toBe(false);

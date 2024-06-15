@@ -323,3 +323,33 @@ class FirebaseSeedModel(base_models.BaseModel):
     def has_reference_to_user_id(cls, unused_user_id: str) -> bool:
         """Model does not correspond to any users."""
         return False
+
+
+class CsrfSecretModel(base_models.BaseModel):
+    """The value of the oppia's csrf secret value.
+
+    There is only one instance of this class, and it has a fixed ID, which is
+    auth_services.CSRF_SECRET_INSTANCE_ID.
+    """
+
+    # The csrf secret value.
+    oppia_csrf_secret = datastore_services.StringProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'oppia_csrf_secret':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })

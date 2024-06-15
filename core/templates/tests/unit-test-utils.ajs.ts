@@ -16,15 +16,18 @@
  * @fileoverview Utility functions for unit testing in AngularJS.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-import { AngularFireAuth } from '@angular/fire/auth';
-import { TranslateService } from '@ngx-translate/core';
-import { CookieModule, CookieService } from 'ngx-cookie';
-import { TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TestBed} from '@angular/core/testing';
+import {AngularFireAuth} from '@angular/fire/auth';
+import {TranslateService} from '@ngx-translate/core';
+import {CookieModule, CookieService} from 'ngx-cookie';
+import {
+  TranslateCacheService,
+  TranslateCacheSettings,
+} from 'ngx-translate-cache';
+import {RouterTestingModule} from '@angular/router/testing';
 
-import { angularServices } from 'services/angular-services.index';
-
+import {angularServices} from 'services/angular-services.index';
 
 declare var angular: ng.IAngularStatic;
 
@@ -34,33 +37,36 @@ export const importAllAngularServices = (): void => {
       imports: [
         HttpClientTestingModule,
         CookieModule.forRoot(),
+        RouterTestingModule,
       ],
       providers: [
         CookieService,
         {
           provide: AngularFireAuth,
-          useValue: null
+          useValue: null,
         },
         {
           provide: TranslateCacheService,
-          useValue: null
+          useValue: null,
         },
         {
           provide: TranslateCacheSettings,
-          useValue: null
+          useValue: null,
         },
         {
           provide: TranslateService,
-          useValue: null
-        }
+          useValue: null,
+        },
       ],
     });
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    for (let [serviceName, serviceType] of angularServices) {
-      $provide.value(serviceName, TestBed.inject(serviceType));
-    }
-  }));
+  beforeEach(
+    angular.mock.module('oppia', function ($provide) {
+      for (let [serviceName, serviceType] of angularServices) {
+        $provide.value(serviceName, TestBed.inject(serviceType));
+      }
+    })
+  );
 };
 
 /* This function overwrites the translationProvider for a dummy function
@@ -71,13 +77,17 @@ export const importAllAngularServices = (): void => {
  *   http://angular-translate.github.io/docs/#/guide
  * (see the 'Unit Testing' section).
  */
-export const TranslatorProviderForTests = function(
-    $provide: ng.auto.IProvideService,
-    $translateProvider: ng.translate.ITranslateProvider): void {
-  $provide.factory('customLoader', ['$q', function($q) {
-    return function() {
-      return $q.resolve({});
-    };
-  }]);
+export const TranslatorProviderForTests = function (
+  $provide: ng.auto.IProvideService,
+  $translateProvider: ng.translate.ITranslateProvider
+): void {
+  $provide.factory('customLoader', [
+    '$q',
+    function ($q) {
+      return function () {
+        return $q.resolve({});
+      };
+    },
+  ]);
   $translateProvider.useLoader('customLoader');
 };

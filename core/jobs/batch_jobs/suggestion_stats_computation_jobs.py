@@ -459,7 +459,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                     topic_id
                 )
                 try:
-                    change = suggestion.change
+                    change = suggestion.change_cmd
                     # In the new translation command the content in set format
                     # is a list, content in unicode and html format is a string.
                     # This code normalizes the content to the list type so that
@@ -917,7 +917,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                         translation.rejected_translations_count),
                     rejected_translation_word_count=(
                         translation.rejected_translation_word_count),
-                    contribution_dates=translation.contribution_dates
+                    contribution_dates=sorted(translation.contribution_dates)
                 )
             )
             translation_contributions_stats_model.update_timestamps()

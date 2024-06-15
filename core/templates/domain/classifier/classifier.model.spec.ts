@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for the Classifier model.
  */
 
-import { Classifier } from 'domain/classifier/classifier.model';
-import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
+import {Classifier} from 'domain/classifier/classifier.model';
+import {TextClassifierFrozenModel} from 'classifiers/proto/text_classifier';
 
 describe('Classifier model', () => {
   let classifierFrozenModel = new TextClassifierFrozenModel();
@@ -32,13 +32,13 @@ describe('Classifier model', () => {
       top: 0,
       fingerprint_data: {
         0: {
-          'class': 0,
-          fingerprint: [[0]]
-        }
+          class: 0,
+          fingerprint: [[0]],
+        },
       },
       token_to_id: {
-        a: 0
-      }
+        a: 0,
+      },
     },
     SVM: {
       classes: [0],
@@ -46,36 +46,39 @@ describe('Classifier model', () => {
         kernel: 'string',
         coef0: 0,
         degree: 0,
-        gamma: 0
+        gamma: 0,
       },
       intercept: [0],
       n_support: [0],
       probA: [0],
       support_vectors: [[0]],
       probB: [0],
-      dual_coef: [[0]]
+      dual_coef: [[0]],
     },
     cv_vocabulary: {
-      a: 0
-    }
+      a: 0,
+    },
   });
   let classifierBuffer: Uint8Array =
     classifierFrozenModel.serialize() as Uint8Array;
 
   it('should create a new classifier', () => {
-    var classifierObject = (
-      new Classifier(
-        'TestClassifier',
-        classifierBuffer.buffer.slice(
-          classifierBuffer.byteOffset,
-          classifierBuffer.byteOffset + classifierBuffer.byteLength),
-        1));
+    var classifierObject = new Classifier(
+      'TestClassifier',
+      classifierBuffer.buffer.slice(
+        classifierBuffer.byteOffset,
+        classifierBuffer.byteOffset + classifierBuffer.byteLength
+      ),
+      1
+    );
 
     expect(classifierObject.algorithmId).toEqual('TestClassifier');
     expect(classifierObject.classifierData).toEqual(
       classifierBuffer.buffer.slice(
         classifierBuffer.byteOffset,
-        classifierBuffer.byteOffset + classifierBuffer.byteLength));
+        classifierBuffer.byteOffset + classifierBuffer.byteLength
+      )
+    );
     expect(classifierObject.algorithmVersion).toEqual(1);
   });
 });

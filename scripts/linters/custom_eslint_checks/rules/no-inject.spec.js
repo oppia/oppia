@@ -25,8 +25,7 @@ var ruleTester = new RuleTester();
 ruleTester.run('no-inject', rule, {
   valid: [
     {
-      code:
-      `describe('Mark All Audio And Translations AsNeeding Update Controller',
+      code: `describe('Mark All Audio And Translations AsNeeding Update Controller',
       function() {
         var $scope, $uibModalInstance;
         beforeEach(angular.mock.module('oppia'));
@@ -35,14 +34,13 @@ ruleTester.run('no-inject', rule, {
           $uibModalInstance = jasmine.createSpyObj(
           '$uibModalInstance', ['close', 'dismiss']);
         }));
-      });`
-    }
+      });`,
+    },
   ],
 
   invalid: [
     {
-      code:
-      `describe('Mark All Audio And Translations AsNeeding Update Controller',
+      code: `describe('Mark All Audio And Translations AsNeeding Update Controller',
       function() {
         var $scope, $uibModalInstance;
         beforeEach(angular.mock.module('oppia'));
@@ -52,9 +50,11 @@ ruleTester.run('no-inject', rule, {
           '$uibModalInstance', ['close', 'dismiss']);
         }));
       });`,
-      errors: [{
-        message: 'Please use “angular.mock.inject”  instead of “inject”.'
-      }],
+      errors: [
+        {
+          message: 'Please use “angular.mock.inject”  instead of “inject”.',
+        },
+      ],
     },
-  ]
+  ],
 });

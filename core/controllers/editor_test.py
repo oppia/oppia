@@ -24,15 +24,18 @@ import logging
 import os
 import zipfile
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
 from core.controllers import creator_dashboard
-from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_registry
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -50,10 +53,13 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import stats_models
+    from mypy_imports import translation_models
     from mypy_imports import user_models
 
-(exp_models, user_models, stats_models) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.USER, models.Names.STATISTICS])
+(exp_models, stats_models, translation_models, user_models) = (
+    models.Registry.import_models([
+        models.Names.EXPLORATION, models.Names.STATISTICS,
+        models.Names.TRANSLATION, models.Names.USER]))
 
 
 class BaseEditorControllerTests(test_utils.GenericTestBase):
@@ -721,7 +727,7 @@ solicit_answer_details: false
         zf_saved = zipfile.ZipFile(io.BytesIO(response.body))
         self.assertEqual(
             zf_saved.namelist(),
-            ['The title for ZIP download handler test!.yaml'])
+            ['The title for ZIP download handler test.yaml'])
 
         # Load golden zip file.
         golden_zip_filepath = os.path.join(
@@ -734,7 +740,7 @@ solicit_answer_details: false
         # Compare saved with golden file.
         self.assertEqual(
             zf_saved.open(
-                'The title for ZIP download handler test!.yaml').read(),
+                'The title for ZIP download handler test.yaml').read(),
             zf_gold.open(
                 'The title for ZIP download handler test!.yaml').read())
 
@@ -748,7 +754,7 @@ solicit_answer_details: false
                 })], 'Updates exploration objective')
 
         # Download to JSON string using download handler.
-        self.maxDiff = 0
+        self.maxDiff = None
         download_url = (
             '/createhandler/download/%s?output_format=%s' %
             (exp_id, feconf.OUTPUT_FORMAT_JSON))
@@ -789,7 +795,7 @@ solicit_answer_details: false
             'attachment; filename=%s' % filename)
 
         zf_saved = zipfile.ZipFile(io.BytesIO(response.body))
-        self.assertEqual(zf_saved.namelist(), [u'¡Hola!.yaml'])
+        self.assertEqual(zf_saved.namelist(), [u'Hola.yaml'])
 
         self.logout()
 
@@ -894,6 +900,8 @@ solicit_answer_details: false
             % (exp_id), expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/createhandler/download/exp_id1?output_'
+            'format=invalid_output_format\' these errors are happening:\n'
             'Schema validation for \'output_format\' failed: Received '
             'invalid_output_format which is not in the allowed range of '
             'choices: [\'zip\', \'json\']'
@@ -1445,6 +1453,8 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/createhandler/revert/0\' '
+            'these errors are happening:\n'
             'Schema validation for \'current_version\' failed: Could not '
             'convert str to int: invalid_version'
         )
@@ -2255,6 +2265,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         )
 
         error_msg = (
+            'At \'http://localhost/createhandler/data/eid\' these errors are '
+            'happening:\n'
             'Schema validation for \'commit_message\' failed: Validation '
             'failed: has_length_at_most ({\'max_value\': 375}) for object %s'
             % long_commit_message
@@ -2386,6 +2398,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         self.assertEqual(
             response_dict['error'],
+            'At \'http://localhost/createhandler/rights/eid\' '
+            'these errors are happening:\n'
             'Missing key in handler args: version.')
 
         # Raises error as version from payload does not match the exploration
@@ -2470,6 +2484,8 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
             csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/createhandler/notificationpreferences/eid\' '
+            'these errors are happening:\n'
             'Schema validation for \'message_type\' failed: Received '
             'invalid_message_type which is not in the allowed range '
             'of choices: [\'feedback\', \'suggestion\']'
@@ -2502,148 +2518,195 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         # Set the default email config.
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        config_services.set_property(
-            self.admin_id, 'unpublish_exploration_email_html_body',
-            'Default unpublishing email body')
+        platform_parameter_registry.Registry.update_platform_parameter(
+            (
+                platform_parameter_list.ParamName.
+                UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.value
+            ),
+            self.admin_id,
+            'Updating email body.',
+            [
+                platform_parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [
+                        {
+                            'type': 'platform_type',
+                            'conditions': [
+                                ['=', 'Web']
+                            ],
+                        }
+                    ],
+                    'value_when_matched': 'Default unpublishing email body'
+                })
+            ],
+            'I\'m writing to inform you that I have unpublished the above '
+            'exploration.'
+        )
 
-    def test_error_cases_for_email_sending(self) -> None:
-        with self.swap(
-            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
-            ), self.swap(
-                feconf, 'CAN_SEND_EMAILS', False):
-            # Log in as a moderator.
-            self.login(self.MODERATOR_EMAIL)
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
+    )
+    def test_error_cases_when_can_send_emails_param_is_false(self) -> None:
+        # Log in as a moderator.
+        self.login(self.MODERATOR_EMAIL)
 
-            # Get csrf token.
-            csrf_token = self.get_new_csrf_token()
+        # Get csrf token.
+        csrf_token = self.get_new_csrf_token()
 
-            # Try to unpublish the exploration without an email body. This
-            # should cause an error.
-            response_dict = self.put_json(
-                '/createhandler/moderatorrights/%s' % self.EXP_ID, {
-                    'email_body': None,
-                    'version': 1,
-                }, csrf_token=csrf_token, expected_status_int=400)
-            self.assertIn(
-                'Missing key in handler args: email_body.',
-                response_dict['error'])
-
-            response_dict = self.put_json(
-                '/createhandler/moderatorrights/%s' % self.EXP_ID, {
-                    'email_body': '',
-                    'version': 1,
-                }, csrf_token=csrf_token, expected_status_int=400)
-
-            error_msg = (
-                'Moderator actions should include an email to the recipient.'
-            )
-            self.assertIn(error_msg, response_dict['error'])
-
-            # Try to unpublish the exploration even if the relevant feconf
-            # flags are not set. This should cause a system error.
-            valid_payload = {
-                'email_body': 'Your exploration is featured!',
+        # Try to unpublish the exploration without an email body. This
+        # should cause an error.
+        response_dict = self.put_json(
+            '/createhandler/moderatorrights/%s' % self.EXP_ID, {
+                'email_body': None,
                 'version': 1,
-            }
-            self.put_json(
-                '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                valid_payload, csrf_token=csrf_token,
-                expected_status_int=500)
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.assertIn(
+            'Missing key in handler args: email_body.',
+            response_dict['error'])
 
-            with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-                # Now the email gets sent with no error.
-                self.put_json(
-                    '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                    valid_payload, csrf_token=csrf_token)
-
-            # Log out.
-            self.logout()
-
-    def test_email_is_sent_correctly_when_unpublishing(self) -> None:
-        with self.swap(
-            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
-            ), self.swap(
-                feconf, 'CAN_SEND_EMAILS', True):
-            # Log in as a moderator.
-            self.login(self.MODERATOR_EMAIL)
-
-            # Go to the exploration editor page.
-            csrf_token = self.get_new_csrf_token()
-
-            new_email_body = 'Your exploration is unpublished :('
-
-            valid_payload = {
-                'email_body': new_email_body,
+        response_dict = self.put_json(
+            '/createhandler/moderatorrights/%s' % self.EXP_ID, {
+                'email_body': '',
                 'version': 1,
-            }
+            }, csrf_token=csrf_token, expected_status_int=400)
 
-            self.put_json(
-                '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                valid_payload, csrf_token=csrf_token)
+        error_msg = (
+            'Moderator actions should include an email to the recipient.'
+        )
+        self.assertIn(error_msg, response_dict['error'])
 
-            # Check that an email was sent with the correct content.
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
-            self.assertEqual(1, len(messages))
+        # Log out.
+        self.logout()
 
-            self.assertEqual(
-                messages[0].sender,
-                'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
-            self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
-            self.assertFalse(hasattr(messages[0], 'cc'))
-            self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(
-                messages[0].subject,
-                'Your Oppia exploration "My Exploration" has been unpublished')
-            self.assertEqual(messages[0].body, (
-                'Hi %s,\n\n'
-                '%s\n\n'
-                'Thanks!\n'
-                '%s (Oppia moderator)\n\n'
-                'You can change your email preferences via the Preferences '
-                'page.' % (
-                    self.EDITOR_USERNAME,
-                    new_email_body,
-                    self.MODERATOR_USERNAME)))
-            self.assertEqual(messages[0].html, (
-                'Hi %s,<br><br>'
-                '%s<br><br>'
-                'Thanks!<br>'
-                '%s (Oppia moderator)<br><br>'
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'), # pylint: disable=line-too-long
+        ]
+    )
+    def test_error_cases_when_can_send_emails_param_is_true(self) -> None:
+        # Log in as a moderator.
+        self.login(self.MODERATOR_EMAIL)
+
+        # Get csrf token.
+        csrf_token = self.get_new_csrf_token()
+
+        # Try to unpublish the exploration even if the relevant feconf
+        # flags are not set. This should cause a system error.
+        valid_payload = {
+            'email_body': 'Your exploration is featured!',
+            'version': 1,
+        }
+
+        # Now the email gets sent with no error.
+        self.put_json(
+            '/createhandler/moderatorrights/%s' % self.EXP_ID,
+            valid_payload, csrf_token=csrf_token)
+
+        # Log out.
+        self.logout()
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.EMAIL_FOOTER,
                 'You can change your email preferences via the '
                 '<a href="http://localhost:8181/preferences">Preferences</a> '
-                'page.' % (
-                    self.EDITOR_USERNAME,
-                    new_email_body,
-                    self.MODERATOR_USERNAME)))
+                'page.'
+            ),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'), # pylint: disable=line-too-long
+        ]
+    )
+    def test_email_is_sent_correctly_when_unpublishing(self) -> None:
+        # Log in as a moderator.
+        self.login(self.MODERATOR_EMAIL)
 
-            self.logout()
+        # Go to the exploration editor page.
+        csrf_token = self.get_new_csrf_token()
 
+        new_email_body = 'Your exploration is unpublished :('
+
+        valid_payload = {
+            'email_body': new_email_body,
+            'version': 1,
+        }
+
+        self.put_json(
+            '/createhandler/moderatorrights/%s' % self.EXP_ID,
+            valid_payload, csrf_token=csrf_token)
+
+        # Check that an email was sent with the correct content.
+        messages = self._get_sent_email_messages(
+            self.EDITOR_EMAIL)
+        self.assertEqual(1, len(messages))
+
+        self.assertEqual(
+            messages[0].sender,
+            'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
+        self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
+        self.assertFalse(hasattr(messages[0], 'cc'))
+        self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
+        self.assertEqual(
+            messages[0].subject,
+            'Your Oppia exploration "My Exploration" has been unpublished')
+        self.assertEqual(messages[0].body, (
+            'Hi %s,\n\n'
+            '%s\n\n'
+            'Thanks!\n'
+            '%s (Oppia moderator)\n\n'
+            'You can change your email preferences via the Preferences '
+            'page.' % (
+                self.EDITOR_USERNAME,
+                new_email_body,
+                self.MODERATOR_USERNAME)))
+        self.assertEqual(messages[0].html, (
+            'Hi %s,<br><br>'
+            '%s<br><br>'
+            'Thanks!<br>'
+            '%s (Oppia moderator)<br><br>'
+            'You can change your email preferences via the '
+            '<a href="http://localhost:8181/preferences">Preferences</a> '
+            'page.' % (
+                self.EDITOR_USERNAME,
+                new_email_body,
+                self.MODERATOR_USERNAME)))
+
+        self.logout()
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.EMAIL_FOOTER,
+                'You can change your email preferences via the '
+                '<a href="http://localhost:8181/preferences">Preferences</a> '
+                'page.'
+            ),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Site Admin'), # pylint: disable=line-too-long
+        ]
+    )
     def test_email_functionality_cannot_be_used_by_non_moderators(self) -> None:
-        with self.swap(
-            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
-            ), self.swap(
-                feconf, 'CAN_SEND_EMAILS', True):
-            # Log in as a non-moderator.
-            self.login(self.EDITOR_EMAIL)
+        # Log in as a non-moderator.
+        self.login(self.EDITOR_EMAIL)
 
-            # Go to the exploration editor page.
-            csrf_token = self.get_new_csrf_token()
+        # Go to the exploration editor page.
+        csrf_token = self.get_new_csrf_token()
 
-            new_email_body = 'Your exploration is unpublished :('
+        new_email_body = 'Your exploration is unpublished :('
 
-            valid_payload = {
-                'email_body': new_email_body,
-                'version': 1,
-            }
+        valid_payload = {
+            'email_body': new_email_body,
+            'version': 1,
+        }
 
-            # The user should receive an 'unauthorized user' error.
-            self.put_json(
-                '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                valid_payload, csrf_token=csrf_token,
-                expected_status_int=401)
+        # The user should receive an 'unauthorized user' error.
+        self.put_json(
+            '/createhandler/moderatorrights/%s' % self.EXP_ID,
+            valid_payload, csrf_token=csrf_token,
+            expected_status_int=401)
 
-            self.logout()
+        self.logout()
 
 
 class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
@@ -3097,6 +3160,8 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             csrf_token=self.csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/createhandler/data/3\' these errors '
+            'are happening:\n'
             'Schema validation for \'change_list\' failed: Command '
             'edit_exploration_propert is not allowed'
         )
@@ -3130,6 +3195,8 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             csrf_token=self.csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/createhandler/autosave_draft/1\' these '
+            'errors are happening:\n'
             'Schema validation for \'change_list\' failed: Command '
             'edit_exploration_propert is not allowed'
         )
@@ -3692,3 +3759,43 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         self.assertTrue(fs.isfile(filepath))
 
         self.logout()
+
+
+class EntityTranslationsBulkHandlerTest(test_utils.GenericTestBase):
+    """Test fetching all translations of a given entity in bulk."""
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames
+         .EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS])
+    def test_fetching_entity_translations_in_bulk(self) -> None:
+        """Test fetching all available translations with the
+        appropriate feature flag being enabled.
+        """
+        translations_mapping: Dict[str, feconf.TranslatedContentDict] = {
+            'content_0': {
+                'content_value': 'Translated content',
+                'content_format': 'html',
+                'needs_update': False
+            }
+        }
+        language_codes = ['hi', 'bn']
+        for language_code in language_codes:
+            translation_models.EntityTranslationsModel.create_new(
+                'exploration', 'exp1', 5, language_code, translations_mapping
+            ).put()
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        self.login(self.VIEWER_EMAIL)
+        url = '/entity_translations_bulk_handler/exploration/exp1/5'
+        entity_translations_bulk_dict = self.get_json(url)
+
+        for language in language_codes:
+            self.assertEqual(
+                entity_translations_bulk_dict[language]['translations'],
+                translations_mapping)
+        self.logout()
+
+    def test_fetching_translations_with_feature_flag_disabled(self) -> None:
+        url = '/entity_translations_bulk_handler/exploration/exp1/5'
+        self.get_json(url, expected_status_int=404)

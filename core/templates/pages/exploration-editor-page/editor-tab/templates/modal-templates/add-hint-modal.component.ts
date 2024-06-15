@@ -16,28 +16,34 @@
  * @fileoverview Component for add hint modal.
  */
 
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
-import { AppConstants } from 'app.constants';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
-import { Hint } from 'domain/exploration/hint-object.model';
-import { ContextService } from 'services/context.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
+import {AppConstants} from 'app.constants';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {StateHintsService} from 'components/state-editor/state-editor-properties-services/state-hints.service';
+import {Hint} from 'domain/exploration/hint-object.model';
+import {ContextService} from 'services/context.service';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
+import {
+  CALCULATION_TYPE_CHARACTER,
+  HtmlLengthService,
+} from 'services/html-length.service';
 
 interface HintFormSchema {
   type: string;
-  'ui_config': object;
+  ui_config: object;
 }
 
 @Component({
   selector: 'oppia-add-hint-modal',
-  templateUrl: './add-hint-modal.component.html'
+  templateUrl: './add-hint-modal.component.html',
 })
 export class AddHintModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -48,16 +54,18 @@ export class AddHintModalComponent
   HINT_FORM_SCHEMA: HintFormSchema = {
     type: 'html',
     ui_config: {
-      hide_complex_extensions: (
-        this.contextService.getEntityType() === 'question')
-    }};
+      hide_complex_extensions:
+        this.contextService.getEntityType() === 'question',
+    },
+  };
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
     private generateContentIdService: GenerateContentIdService,
     private ngbActiveModal: NgbActiveModal,
-    private stateHintsService: StateHintsService
+    private stateHintsService: StateHintsService,
+    private htmlLengthService: HtmlLengthService
   ) {
     super(ngbActiveModal);
   }
@@ -73,20 +81,12 @@ export class AddHintModalComponent
   }
 
   isHintLengthExceeded(tmpHint: string): boolean {
-    // The variable charCount stores the number of remaining characters after
-    // removing the html tags from tmpHint.
-    const domParser = new DOMParser();
-    let charCount = 0;
-    if (tmpHint.length) {
-      let dom = domParser.parseFromString(tmpHint, 'text/html');
-      if (dom.body.textContent) {
-        charCount = dom.body.textContent.replace(
-          ExplorationEditorPageConstants.NEW_LINE_REGEX, '').length;
-      }
-    }
-    // Note: charCount does not include the characters from Rich Text ELements.
     return Boolean(
-      charCount > ExplorationEditorPageConstants.HINT_CHARACTER_LIMIT);
+      this.htmlLengthService.computeHtmlLength(
+        tmpHint,
+        CALCULATION_TYPE_CHARACTER
+      ) > ExplorationEditorPageConstants.HINT_CHARACTER_LIMIT
+    );
   }
 
   updateLocalHint($event: string): void {
@@ -98,12 +98,12 @@ export class AddHintModalComponent
 
   saveHint(): void {
     let contentId = this.generateContentIdService.getNextStateId(
-      this.COMPONENT_NAME_HINT);
+      this.COMPONENT_NAME_HINT
+    );
     // Close the modal and save it afterwards.
     this.ngbActiveModal.close({
-      hint: cloneDeep(
-        Hint.createNew(contentId, this.tmpHint)),
-      contentId: contentId
+      hint: cloneDeep(Hint.createNew(contentId, this.tmpHint)),
+      contentId: contentId,
     });
   }
 }

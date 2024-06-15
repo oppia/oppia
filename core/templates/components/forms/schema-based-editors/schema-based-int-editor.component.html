@@ -8,9 +8,9 @@
              [disabled]="disabled"
              required="!notRequired"
              applyValidation [validators]="validators"
-             [oppiaFocusOn]="labelForFocusTarget"
              (blur)="inputBlur.emit()"
-             (focus)="inputFocus.emit()">
+             (focus)="inputFocus.emit()"
+             class="e2e-test-editor-int">
     </mat-form-field>
   </span>
 </div>

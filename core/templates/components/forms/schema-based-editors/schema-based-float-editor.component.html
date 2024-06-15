@@ -2,6 +2,7 @@
   <form #floatform="ngForm">
     <span>
       <input type="text"
+             id="float-input"
              step="any"
              ngControl="floatValue"
              autocomplete="off"
@@ -10,12 +11,11 @@
              class="form-control display-inline oppia-float-form-input e2e-test-float-form-input"
              name="floatValue"
              attr.placeholder="{{'I18N_FORMS_TYPE_NUMBER' | translate}}"
-             [oppiaFocusOn]="labelForFocusTarget"
              (keypress)="onKeypress($event)"
              applyValidation [validators]="validators"
              (blur)="onBlur()" (focus)="onFocus()"
-             inputmode="numeric">
-      <span *ngIf="errorStringI18nKey" class="oppia-form-error oppia-numeric-input-error">
+             inputmode="decimal">
+      <span *ngIf="errorStringI18nKey" class="oppia-form-error oppia-numeric-input-error" tabindex="0">
         {{ errorStringI18nKey | translate }}
       </span>
       <span *ngIf="hasLoaded && !userIsCurrentlyTyping && userHasFocusedAtLeastOnce"

@@ -48,7 +48,7 @@
   <div class="oppia-contributions-show-review-side-navbar-container" >
     <div class="oppia-contributions-side-navbar-part" *ngIf="reviewTabs.length > 0" tabindex="0">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Available Tasks" aria-label="Available tasks">
-        <div class="oppia-contributions-navbar-item" *ngFor="let tab of reviewTabs">
+        <div class="oppia-contributions-navbar-item e2e-test-review-buttons" *ngFor="let tab of reviewTabs">
           <button class="oppia-contributions-navbar-button"
                   (click)="switchToTab(TAB_TYPE_REVIEWS, tab.tabSubType)"
                   [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.tabSubType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
@@ -85,12 +85,12 @@
     </div>
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
       <div *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()" class="oppia-language-selector-container">
-        <review-translation-language-selector class="oppia-language-selector"
+        <review-translation-language-selector class="oppia-language-selector e2e-test-language-dropdown"
                                               [activeLanguageCode]="languageCode"
                                               (setActiveLanguageCode)="onChangeLanguage($event)">
         </review-translation-language-selector>
       </div>
-      <div class="oppia-contributions-tab-panel oppia-contributions-tab-panel-container">
+      <div class="oppia-contributions-tab-panel oppia-contributions-tab-panel-container" [hidden]="!isReviewQuestionsTab()">
         <span class="sort-questions-select float-right"
               *ngIf="isReviewQuestionsTab()">
           <p class="sort-by-text">Sort By</p>
@@ -108,11 +108,14 @@
       <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
+                                (clickPinButton)="pinReviewableTranslationOpportunity($event)"
+                                (clickUnpinButton)="unpinReviewableTranslationOpportunity($event)"
                                 [labelRequired]="!activeReviewTab"
                                 [showOpportunityButton]="true"
+                                [showPinUnpinButton]="true"
                                 #opportunitiesList>
       </oppia-opportunities-list>
-      <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab() && !isAccomplishmentsTabActive()">
+      <div *ngIf="(activeExplorationId !== null || !isReviewTranslationsTab()) && !isAccomplishmentsTabActive()">
         <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
           <button aria-label="Back to reviewable lessons"
                   (click)="onClickBackToReviewableLessons()"
@@ -126,7 +129,8 @@
                                   (clickActionButton)="onClickViewSuggestion($event)"
                                   [labelRequired]="!isReviewTranslationsTab()"
                                   [opportunityHeadingTruncationLength]="30"
-                                  [showOpportunityButton]="false">
+                                  [showOpportunityButton]="false"
+                                  [showPinUnpinButton]="false">
         </oppia-opportunities-list>
       </div>
       <div *ngIf="accomplishmentsTabIsEnabled && isAccomplishmentsTabActive() && activeTabSubtype === 'stats'">
@@ -360,11 +364,9 @@
 
   .oppia-contributions-tab-panel {
     font-size: 15px;
-    padding: 5px 0 20px 10px;
   }
 
   .oppia-contributions-tab-panel-container {
-    padding-bottom: 46px;
     padding-top: 13px;
   }
 

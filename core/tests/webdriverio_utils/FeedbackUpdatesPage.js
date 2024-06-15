@@ -20,7 +20,7 @@
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
-var FeedbackUpdatesPage = function() {
+var FeedbackUpdatesPage = function () {
   var FEEDBACK_UPDATES_URL = '/feedback-updates';
   var communityLessonsSection = $('.e2e-test-community-lessons-section');
   var feedbackMessage = $('.e2e-test-feedback-message');
@@ -28,16 +28,16 @@ var FeedbackUpdatesPage = function() {
   var feedbackThread = $('.e2e-test-feedback-thread');
 
   var feedbackExplorationTitleElement = $('.e2e-test-feedback-exploration');
-  var feedbackExplorationTitleSelector = function() {
+  var feedbackExplorationTitleSelector = function () {
     return $$('.e2e-test-feedback-exploration');
   };
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.url(FEEDBACK_UPDATES_URL);
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToCommunityLessonsSection = async function() {
+  this.navigateToCommunityLessonsSection = async function () {
     await waitFor.visibilityOf(
       communityLessonsSection,
       'Commmunity lesson section takes too long to appear'
@@ -45,25 +45,28 @@ var FeedbackUpdatesPage = function() {
     await action.click('Community Lessons Section', communityLessonsSection);
   };
 
-  this.navigateToFeedbackSection = async function() {
+  this.navigateToFeedbackSection = async function () {
     await action.click('Feedback Section', feedbackSection);
   };
 
-  this.navigateToFeedbackThread = async function() {
+  this.navigateToFeedbackThread = async function () {
     await action.click('Feedback Thread', feedbackThread);
   };
 
-  this.expectFeedbackExplorationTitleToMatch = async function(title) {
+  this.expectFeedbackExplorationTitleToMatch = async function (title) {
     await waitFor.visibilityOf(
       feedbackExplorationTitleElement,
-      'Feedback Exploration Title takes too long to appear');
+      'Feedback Exploration Title takes too long to appear'
+    );
     var feedbackExplorationTitle = await feedbackExplorationTitleSelector();
     expect(await feedbackExplorationTitle[0].getText()).toMatch(title);
   };
 
-  this.expectFeedbackMessageToMatch = async function(message) {
+  this.expectFeedbackMessageToMatch = async function (message) {
     await waitFor.visibilityOf(
-      feedbackMessage, 'Feedback Message takes too long to appear');
+      feedbackMessage,
+      'Feedback Message takes too long to appear'
+    );
     expect(await feedbackMessage.getText()).toMatch(message);
   };
 };

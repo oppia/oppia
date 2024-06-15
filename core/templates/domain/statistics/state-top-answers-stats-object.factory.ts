@@ -16,11 +16,13 @@
  * @fileoverview Domain object for state top answers stats.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AnswerStats, AnswerStatsBackendDict } from
-  'domain/exploration/answer-stats.model';
+import {
+  AnswerStats,
+  AnswerStatsBackendDict,
+} from 'domain/exploration/answer-stats.model';
 
 interface StateInteractionIds {
   [stateName: string]: string;
@@ -35,8 +37,8 @@ interface StateTopAnswersBackendDict {
 }
 
 export interface StateTopAnswersStatsBackendDict {
-  'answers': StateTopAnswersBackendDict;
-  'interaction_ids': StateInteractionIds;
+  answers: StateTopAnswersBackendDict;
+  interaction_ids: StateInteractionIds;
 }
 
 export class StateTopAnswersStats {
@@ -47,24 +49,30 @@ export class StateTopAnswersStats {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StateTopAnswersStatsObjectFactory {
   createFromBackendDict(
-      backendDict: StateTopAnswersStatsBackendDict): StateTopAnswersStats {
+    backendDict: StateTopAnswersStatsBackendDict
+  ): StateTopAnswersStats {
     let stateTopAnswers: StateTopAnswers = {};
 
     for (let stateName in backendDict.answers) {
       stateTopAnswers[stateName] = backendDict.answers[stateName].map(
-        answerStatsDict => AnswerStats
-          .createFromBackendDict(answerStatsDict));
+        answerStatsDict => AnswerStats.createFromBackendDict(answerStatsDict)
+      );
     }
 
     return new StateTopAnswersStats(
-      stateTopAnswers, backendDict.interaction_ids);
+      stateTopAnswers,
+      backendDict.interaction_ids
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'StateTopAnswersStatsObjectFactory', downgradeInjectable(
-    StateTopAnswersStatsObjectFactory));
+angular
+  .module('oppia')
+  .factory(
+    'StateTopAnswersStatsObjectFactory',
+    downgradeInjectable(StateTopAnswersStatsObjectFactory)
+  );

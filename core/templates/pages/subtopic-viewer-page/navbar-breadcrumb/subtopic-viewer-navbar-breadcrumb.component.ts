@@ -16,23 +16,22 @@
  * @fileoverview Component for the navbar breadcrumb of the subtopic viewer.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, OnInit} from '@angular/core';
 
-import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
-import { ReadOnlySubtopicPageData } from
-  'domain/subtopic_viewer/read-only-subtopic-page-data.model';
-import { SubtopicViewerBackendApiService } from
-  'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
+import {ReadOnlySubtopicPageData} from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
+import {SubtopicViewerBackendApiService} from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlService} from 'services/contextual/url.service';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'subtopic-viewer-navbar-breadcrumb',
   templateUrl: './subtopic-viewer-navbar-breadcrumb.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -53,42 +52,42 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.topicUrlFragment = (
-      this.urlService.getTopicUrlFragmentFromLearnerUrl());
-    this.classroomUrlFragment = (
-      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
-    this.subtopicUrlFragment = (
-      this.urlService.getSubtopicUrlFragmentFromLearnerUrl());
-    this.subtopicViewerBackendApiService.fetchSubtopicDataAsync(
-      this.topicUrlFragment,
-      this.classroomUrlFragment,
-      this.subtopicUrlFragment).then(
-      (subtopicDataObject: ReadOnlySubtopicPageData) => {
+    this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
+    this.classroomUrlFragment =
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
+    this.subtopicUrlFragment =
+      this.urlService.getSubtopicUrlFragmentFromLearnerUrl();
+    this.subtopicViewerBackendApiService
+      .fetchSubtopicDataAsync(
+        this.topicUrlFragment,
+        this.classroomUrlFragment,
+        this.subtopicUrlFragment
+      )
+      .then((subtopicDataObject: ReadOnlySubtopicPageData) => {
         this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
-        this.subtopicTitleTranslationKey = (
+        this.subtopicTitleTranslationKey =
           this.i18nLanguageCodeService.getSubtopicTranslationKey(
             subtopicDataObject.getParentTopicId(),
             this.subtopicUrlFragment,
             TranslationKeyType.TITLE
-          )
-        );
+          );
         this.topicName = subtopicDataObject.getParentTopicName();
-        this.topicNameTranslationKey = (
+        this.topicNameTranslationKey =
           this.i18nLanguageCodeService.getTopicTranslationKey(
             subtopicDataObject.getParentTopicId(),
             TranslationKeyType.TITLE
-          )
-        );
-      }
-    );
+          );
+      });
   }
 
   getTopicUrl(): string {
     return this.urlInterpolationService.interpolateUrl(
-      ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE, {
+      ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE,
+      {
         topic_url_fragment: this.topicUrlFragment,
-        classroom_url_fragment: this.classroomUrlFragment
-      });
+        classroom_url_fragment: this.classroomUrlFragment,
+      }
+    );
   }
 
   isHackyTopicNameTranslationDisplayed(): boolean {
@@ -107,7 +106,3 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'subtopicViewerNavbarBreadcrumb', downgradeComponent(
-    {component: SubtopicViewerNavbarBreadcrumbComponent}));

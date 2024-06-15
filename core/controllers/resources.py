@@ -25,10 +25,10 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_services
-from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
+from core.domain import platform_parameter_services
 from core.domain import value_generators_domain
 
 from typing import Dict, TypedDict
@@ -127,11 +127,11 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 string is encoded in the frontend using encodeURIComponent().
 
         Raises:
-            PageNotFoundException. The page cannot be found.
+            NotFoundException. The page cannot be found.
             Exception. File not found.
         """
         if not constants.EMULATOR_MODE:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         try:
             filename = urllib.parse.unquote(encoded_filename)
@@ -154,7 +154,7 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         except Exception as e:
             logging.exception(
                 'File not found: %s. %s' % (encoded_filename, e))
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
 
 class PromoBarHandlerNormalizedPayloadDict(TypedDict):
@@ -200,10 +200,10 @@ class PromoBarHandler(
         """Retrieves the configuration values for a promotional bar."""
         self.render_json({
             'promo_bar_enabled': (
-                platform_feature_services.get_platform_parameter_value(
+                platform_parameter_services.get_platform_parameter_value(
                     'promo_bar_enabled')),
             'promo_bar_message': (
-                platform_feature_services.get_platform_parameter_value(
+                platform_parameter_services.get_platform_parameter_value(
                     'promo_bar_message'))
         })
 
@@ -218,44 +218,28 @@ class PromoBarHandler(
         logging.info(
             '[RELEASE COORDINATOR] %s saved promo-bar config property values: '
             '%s' % (self.user_id, promo_bar_message_value))
-        server_mode = (
-            'dev'
-            if constants.DEV_MODE
-            else 'prod'
-            if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
-            else 'test'
-        )
+
         rules_for_promo_bar_enabled_value = [
             platform_parameter_domain.PlatformParameterRule.from_dict({
-                'filters': [
-                    {
-                        'type': 'server_mode',
-                        'conditions': [['=', server_mode]]
-                    }
-                ],
+                'filters': [],
                 'value_when_matched': promo_bar_enabled_value
             })
         ]
         rules_for_promo_bar_message_value = [
             platform_parameter_domain.PlatformParameterRule.from_dict({
-                'filters': [
-                    {
-                        'type': 'server_mode',
-                        'conditions': [['=', server_mode]]
-                    }
-                ],
+                'filters': [],
                 'value_when_matched': promo_bar_message_value
             })
         ]
 
         promo_bar_enabled_parameter = (
             registry.Registry.get_platform_parameter(
-                platform_parameter_list.ParamNames.PROMO_BAR_ENABLED.value)
+                platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value)
         )
 
         promo_bar_message_parameter = (
             registry.Registry.get_platform_parameter(
-                platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE.value)
+                platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value)
         )
 
         registry.Registry.update_platform_parameter(

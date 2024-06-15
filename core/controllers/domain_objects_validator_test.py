@@ -32,7 +32,7 @@ from core.domain import stats_domain
 from core.domain import translation_domain
 from core.tests import test_utils
 
-from typing import Dict, Mapping, Optional, Union
+from typing import Dict, List, Mapping, Optional, Union
 
 
 class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
@@ -112,32 +112,90 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
         domain_objects_validator.validate_suggestion_change(correct_change_dict)
 
 
-class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
-    """Tests to validate config properties dict coming from API."""
+class ValidateNewPlatformParamsValueForBlogAdminTests(
+    test_utils.GenericTestBase):
+    """Tests to validate platform parameters dict coming from API."""
 
-    def test_invalid_object_raises_exception(self) -> None:
-        config_properties = {'some_config_property': 20, }
-        with self.assertRaisesRegex(
-            Exception, 'some_config_property do not have any schema.'):
-            domain_objects_validator.validate_new_config_property_values(
-                config_properties)
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        config_properties = {1234: 20, } # type: ignore[dict-item]
-        with self.assertRaisesRegex(
-            Exception, 'config property name should be a string, received'
-            ': %s' % 1234):
-            domain_objects_validator.validate_new_config_property_values(
-                config_properties)
-
-    def test_valid_object_raises_no_exception(self) -> None:
-        config_properties = {
+    def test_valid_params_values_raises_no_exception(self) -> None:
+        new_platform_parameter_values = {
             'max_number_of_tags_assigned_to_blog_post': 20,
         }
-        domain_objects_validator.validate_new_config_property_values(
-            config_properties)
+        domain_objects_validator.validate_platform_params_values_for_blog_admin(
+            new_platform_parameter_values)
+
+        new_platform_parameter_values = {
+            'promo_bar_enabled': False,
+        }
+        domain_objects_validator.validate_platform_params_values_for_blog_admin(
+            new_platform_parameter_values)
+
+    def test_difference_of_incoming_value_and_parameter_data_type_raise_error(
+        self
+    ) -> None:
+        new_platform_parameter_values = {
+            'max_number_of_tags_assigned_to_blog_post': 'str'
+        }
+        with self.assertRaisesRegex(
+            Exception, 'The value of platform parameter max_number_of_tags_'
+            'assigned_to_blog_post is of type \'str\', expected it to be '
+            'of type \'number\''
+        ):
+            (
+                domain_objects_validator.
+                validate_platform_params_values_for_blog_admin(
+                    new_platform_parameter_values)
+            )
+
+    def test_param_name_type_other_than_str_raises_error(self) -> None:
+        new_platform_parameter_values = {1234: 20, }
+        with self.assertRaisesRegex(
+            Exception, 'Platform parameter name should be a string, received'
+            ': %s' % 1234
+        ):
+            (
+                # TODO(#13059): Here we use MyPy ignore because after we fully
+                # type the codebase we plan to get rid of the tests that
+                # intentionally test wrong inputs that we can normally catch
+                # by typing.
+                domain_objects_validator.
+                validate_platform_params_values_for_blog_admin(
+                    new_platform_parameter_values) # type: ignore[arg-type]
+            )
+
+    def test_with_invalid_type_raises_error(self) -> None:
+        new_platform_parameter_values = {
+            'max_number_of_tags_assigned_to_blog_post': [20]
+        }
+        with self.assertRaisesRegex(
+            Exception, 'The value of max_number_of_tags_assigned_to_blog_post '
+            'platform parameter is not of valid type, it should be one of '
+            'typing.Union\\[str, int, bool, float].'
+        ):
+            (
+                # TODO(#13059): Here we use MyPy ignore because after we fully
+                # type the codebase we plan to get rid of the tests that
+                # intentionally test wrong inputs that we can normally catch
+                # by typing.
+                domain_objects_validator.
+                validate_platform_params_values_for_blog_admin(
+                    new_platform_parameter_values) # type: ignore[arg-type]
+            )
+
+    def test_value_less_or_equal_0_for_max_no_of_tags_raises_errors(
+        self
+    ) -> None:
+        new_platform_parameter_values = {
+            'max_number_of_tags_assigned_to_blog_post': -2
+        }
+        with self.assertRaisesRegex(
+            Exception, 'The value of max_number_of_tags_assigned_to_blog_post '
+            'should be greater than 0, it is -2.'
+        ):
+            (
+                domain_objects_validator.
+                validate_platform_params_values_for_blog_admin(
+                    new_platform_parameter_values)
+            )
 
 
 class ValidateNewDefaultValueForPlatformParametersTests(
@@ -363,6 +421,112 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
         # The error is representing the keyerror.
         with self.assertRaisesRegex(Exception, 'content'):
             domain_objects_validator.validate_state_dict(invalid_state_dict)  # type: ignore[arg-type]
+
+
+class ValidateQuestionStateDict(test_utils.GenericTestBase):
+    """Tests to validate question_state_dict coming from frontend."""
+
+    def test_valid_object_raises_no_exception(self) -> None:
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {'html': '<p>1</p>', 'content_id': 'ca_choices_2'},
+            {'html': '<p>2</p>', 'content_id': 'ca_choices_3'}
+        ]
+        question_state_dict: state_domain.StateDict = {
+            'content': {'html': '', 'content_id': 'content_0'},
+            'classifier_model_id': None,
+            'linked_skill_id': None,
+            'interaction': {
+                'answer_groups': [{
+                    'rule_specs': [{'rule_type': 'Equals', 'inputs': {'x': 0}}],
+                    'outcome': {
+                        'dest': None,
+                        'dest_if_really_stuck': None,
+                        'feedback': {'html': '', 'content_id': 'feedback_4'},
+                        'labelled_as_correct': True,
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                },
+                {
+                    'rule_specs': [{'rule_type': 'Equals', 'inputs': {'x': 1}}],
+                    'outcome': {
+                        'dest': None,
+                        'dest_if_really_stuck': None,
+                        'feedback': {'html': '', 'content_id': 'feedback_5'},
+                        'labelled_as_correct': False,
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': 'pBi3XobmC4zq-0'
+                }],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'showChoicesInShuffledOrder': {'value': True},
+                    'choices': {'value': choices_subtitled_dicts}
+                },
+                'default_outcome': {
+                    'dest': None,
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'html': '', 'content_id': 'default_outcome_1'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [],
+                'id': 'MultipleChoiceInput',
+                'solution': None
+            },
+            'param_changes': [],
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content_0': {},
+                    'default_outcome_1': {},
+                    'ca_choices_2': {},
+                    'ca_choices_3': {},
+                    'feedback_4': {},
+                    'feedback_5': {}
+                }
+            },
+            'solicit_answer_details': False,
+            'card_is_checkpoint': False
+        }
+        domain_objects_validator.validate_question_state_dict(
+            question_state_dict)
+
+    def test_invalid_object_raises_exception(self) -> None:
+        invalid_question_state_dict: Dict[
+            str,
+            Optional[
+                Union[int, bool, Dict[str, Dict[str, Dict[str, str]]]]
+            ]
+        ] = {
+            'classifier_model_id': None,
+            'written_questions': {
+                'questions_mapping': {
+                    'content': {},
+                    'default_outcome': {},
+                    'ca_placeholder_0': {}
+                }
+            },
+            'next_content_id_index': 1,
+            'card_is_checkpoint': False,
+            'solicit_answer_details': False
+        }
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        # The error is representing the keyerror.
+        with self.assertRaisesRegex(Exception, 'content'):
+            domain_objects_validator.validate_question_state_dict(
+                invalid_question_state_dict)  # type: ignore[arg-type]
 
 
 class ValidateSuggestionImagesTests(test_utils.GenericTestBase):

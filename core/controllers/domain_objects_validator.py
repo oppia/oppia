@@ -26,11 +26,12 @@ from core.controllers import base
 from core.domain import blog_domain
 from core.domain import blog_services
 from core.domain import change_domain
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import image_validation_services
 from core.domain import improvements_domain
 from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_registry
 from core.domain import question_domain
 from core.domain import skill_domain
 from core.domain import state_domain
@@ -76,37 +77,68 @@ def validate_suggestion_change(
     return obj
 
 
-def validate_new_config_property_values(
-    new_config_property: Mapping[str, config_domain.AllowedDefaultValueTypes]
-) -> Mapping[str, config_domain.AllowedDefaultValueTypes]:
-    """Validates new config property values.
+def validate_platform_params_values_for_blog_admin(
+    new_platform_parameter_values: Mapping[
+        str, platform_parameter_domain.PlatformDataTypes]
+) -> Mapping[str, platform_parameter_domain.PlatformDataTypes]:
+    """Validates new platform parameter values.
 
     Args:
-        new_config_property: dict. Data that needs to be validated.
+        new_platform_parameter_values: dict. Data that needs to be validated.
 
     Returns:
-        dict(str, *). Returns a dict for new config properties.
+        dict(str, PlatformDataTypes). Returns the dict after validation.
 
     Raises:
-        Exception. The config property name is not a string.
-        Exception. The value corresponding to config property name
-            don't have any schema.
+        Exception. The name of the platform parameter is not of type string.
+        Exception. The value of the platform parameter is not of valid type.
+        Exception. The max_number_of_tags_assigned_to_blog_post platform
+            parameter has incoming value less than or equal to 0.
     """
-    for (name, value) in new_config_property.items():
+    for name, value in new_platform_parameter_values.items():
         if not isinstance(name, str):
             raise Exception(
-                'config property name should be a string, received'
+                'Platform parameter name should be a string, received'
                 ': %s' % name)
-        config_property = config_domain.Registry.get_config_property(name)
-        if config_property is None:
-            raise Exception('%s do not have any schema.' % name)
 
-        config_property.normalize(value)
-    # The new_config_property values do not represent a domain class directly
-    # and in the handler these dict values are used to set config properties
+        if not isinstance(value, (bool, float, int, str)):
+            raise Exception(
+                'The value of %s platform parameter is not of valid type, '
+                'it should be one of %s.' % (
+                    name, str(platform_parameter_domain.PlatformDataTypes))
+            )
+
+        parameter = platform_parameter_registry.Registry.get_platform_parameter(
+            name)
+
+        if not (
+            (isinstance(value, bool) and parameter.data_type == 'bool') or
+            (isinstance(value, str) and parameter.data_type == 'string') or
+            (isinstance(value, float) and parameter.data_type == 'number') or
+            (isinstance(value, int) and parameter.data_type == 'number')
+        ):
+            raise Exception(
+                'The value of platform parameter %s is of type \'%s\', '
+                'expected it to be of type \'%s\'' % (
+                    name, value, parameter.data_type)
+            )
+
+        if (
+            name ==
+            platform_parameter_list.ParamName.
+            MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+        ):
+            assert isinstance(value, int)
+            if value <= 0:
+                raise Exception(
+                    'The value of %s should be greater than 0, it is %s.' % (
+                        name, value)
+                )
+    # The new_platform_parameter_values do not represent a domain class directly
+    # and in the handler these dict values are used to set platform parameters
     # individually. Hence conversion of dicts to domain objects is not required
-    # for new_config_properties.
-    return new_config_property
+    # for new_platform_parameter_values.
+    return new_platform_parameter_values
 
 
 def validate_new_default_value_of_platform_parameter(
@@ -196,6 +228,29 @@ def validate_state_dict(
     # transferred into the domain layer. Hence dict form of the data is returned
     # after schema validation.
     return state_dict
+
+
+def validate_question_state_dict(
+    question_state_dict: state_domain.StateDict
+) -> state_domain.StateDict:
+    """Validates state dict for a question.
+
+    Args:
+        question_state_dict: dict. The dict representation of State object for
+            a question.
+
+    Returns:
+        State. The question_state_dict after validation.
+    """
+    question_state_object = state_domain.State.from_dict(question_state_dict)
+    # 'tagged_skill_misconception_id_required' is not None when a state is part
+    # of a Question object that tests a particular skill.
+    question_state_object.validate(
+        exp_param_specs_dict=None,
+        allow_null_interaction=True,
+        tagged_skill_misconception_id_required=True)
+
+    return question_state_dict
 
 
 def validate_email_dashboard_data(

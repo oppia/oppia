@@ -1,15 +1,15 @@
 <ng-template #ContentEditorTab>
-  <h3 class="e2e-test-joyride-title">Content</h3>
-  <p>An Oppia exploration is divided into several 'cards'. The first part of a card is the <b>content</b>. Use the content section to set the scene. Tell the learner a story,
+  <h3 class="e2e-test-joyride-title" tabindex="0">Content</h3>
+  <p tabindex="0">An Oppia exploration is divided into several 'cards'. The first part of a card is the <b>content</b>. Use the content section to set the scene. Tell the learner a story,
   give them some information, and then ask a relevant question.</p>
 </ng-template>
 
 <ng-template #StateInteractionEditorTab>
-  <h3 class="e2e-test-joyride-title">Interaction</h3>
-  <p>After you've written the content of your conversation, choose an <b>interaction type</b>. An interaction is how you want your learner to respond
+  <h3 class="e2e-test-joyride-title" tabindex="0">Interaction</h3>
+  <p tabindex="0">After you've written the content of your conversation, choose an <b>interaction type</b>. An interaction is how you want your learner to respond
     to your question. Oppia has several built-in interactions, including:
   </p>
-  <ul>
+  <ul tabindex="0">
     <li>Multiple Choice</li>
     <li>Text/Number input</li>
     <li>Code snippets</li>
@@ -17,8 +17,8 @@
 </ng-template>
 
 <ng-template #StateResponsesTab>
-  <h3 class="e2e-test-joyride-title">Responses</h3>
-  <p>
+  <h3 class="e2e-test-joyride-title" tabindex="0">Responses</h3>
+  <p tabindex="0">
     After the learner uses the interaction you created, it's your turn again to choose how your exploration will respond to their input. You can send a learner to a new card or have them repeat the same card, depending on how they answer.
   </p>
 </ng-template>
@@ -53,8 +53,7 @@
 
 <div joyrideStep="editorTabTourSlideStateInteractionEditorTab" [stepContent]="StateInteractionEditorTab">
   <oppia-state-interaction-editor (onSaveStateContent)="sendOnSaveStateContent($event)"
-                                  (onSaveInteractionId)="sendOnSaveInteractionId($event)"
-                                  (onSaveInteractionCustomizationArgs)="sendOnSaveInteractionCustomizationArgs($event)"
+                                  (onSaveInteractionData)="sendOnSaveInteractionData($event)"
                                   (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
                                   (onSaveSolution)="sendOnSaveSolution($event)"
                                   (recomputeGraph)="sendRecomputeGraph()"
@@ -152,7 +151,6 @@
   @media only screen and (max-width: 500px) {
     .oppia-mobile-collapsible-card-content {
       padding-left: 10px;
-      padding-right: 10px;
     }
   }
 </style>

@@ -16,31 +16,32 @@
  * @fileoverview Component for the subtopic viewer.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
-import { SubtopicPageContents } from 'domain/topic/subtopic-page-contents.model';
-import { Subtopic } from 'domain/topic/subtopic.model';
-import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
-import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
-import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
+import {AppConstants} from 'app.constants';
+import {SubtopicViewerBackendApiService} from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
+import {SubtopicPageContents} from 'domain/topic/subtopic-page-contents.model';
+import {Subtopic} from 'domain/topic/subtopic.model';
+import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+import {ContextService} from 'services/context.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
+import {LoaderService} from 'services/loader.service';
+import {PageTitleService} from 'services/page-title.service';
 
 import './subtopic-viewer-page.component.css';
-
 
 @Component({
   selector: 'oppia-subtopic-viewer-page',
   templateUrl: './subtopic-viewer-page.component.html',
-  styleUrls: ['./subtopic-viewer-page.component.css']
+  styleUrls: ['./subtopic-viewer-page.component.css'],
 })
 export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
@@ -74,7 +75,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   ) {}
 
   checkMobileView(): boolean {
-    return (this.windowDimensionsService.getWidth() < 500);
+    return this.windowDimensionsService.getWidth() < 500;
   }
 
   subscribeToOnLangChange(): void {
@@ -87,80 +88,90 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_SUBTOPIC_VIEWER_PAGE_TITLE', {
-        subtopicTitle: this.subtopicTitle
-      });
+      'I18N_SUBTOPIC_VIEWER_PAGE_TITLE',
+      {
+        subtopicTitle: this.subtopicTitle,
+      }
+    );
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   ngOnInit(): void {
-    this.topicUrlFragment = (
-      this.urlService.getTopicUrlFragmentFromLearnerUrl());
-    this.classroomUrlFragment = (
-      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
-    this.subtopicUrlFragment = (
-      this.urlService.getSubtopicUrlFragmentFromLearnerUrl());
+    this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
+    this.classroomUrlFragment =
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
+    this.subtopicUrlFragment =
+      this.urlService.getSubtopicUrlFragmentFromLearnerUrl();
 
     this.loaderService.showLoadingScreen('Loading');
-    this.subtopicViewerBackendApiService.fetchSubtopicDataAsync(
-      this.topicUrlFragment,
-      this.classroomUrlFragment,
-      this.subtopicUrlFragment).then((subtopicDataObject) => {
-      this.pageContents = subtopicDataObject.getPageContents();
-      this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
-      this.parentTopicId = subtopicDataObject.getParentTopicId();
-      this.contextService.setCustomEntityContext(
-        AppConstants.ENTITY_TYPE.TOPIC, this.parentTopicId);
-
-      // The onLangChange event is initially fired before the subtopic is
-      // loaded. Hence the first setpageTitle() call needs to made
-      // manually, and the onLangChange subscription is added after
-      // the subtopic is loaded.
-      this.setPageTitle();
-      this.subscribeToOnLangChange();
-      this.pageTitleService.updateMetaTag(
-        `Review the skill of ${this.subtopicTitle.toLowerCase()}.`);
-
-      let nextSubtopic = subtopicDataObject.getNextSubtopic();
-      let prevSubtopic = subtopicDataObject.getPrevSubtopic();
-      if (nextSubtopic) {
-        this.nextSubtopic = nextSubtopic;
-        this.subtopicSummaryIsShown = true;
-      }
-      if (prevSubtopic) {
-        this.prevSubtopic = prevSubtopic;
-        this.subtopicSummaryIsShown = true;
-      }
-
-      this.subtopicTitleTranslationKey = (
-        this.i18nLanguageCodeService.
-          getSubtopicTranslationKey(
-            this.parentTopicId, this.subtopicUrlFragment,
-            TranslationKeyType.TITLE)
-      );
-
-      this.topicViewerBackendApiService.fetchTopicDataAsync(
+    this.subtopicViewerBackendApiService
+      .fetchSubtopicDataAsync(
         this.topicUrlFragment,
-        this.classroomUrlFragment
-      ).then(topicDataObject => {
-        this.parentTopicTitle = topicDataObject.getTopicName();
-        this.parentTopicTitleTranslationKey = (
-          this.i18nLanguageCodeService
-            .getTopicTranslationKey(
-              topicDataObject.getTopicId(),
-              TranslationKeyType.TITLE
-            )
-        );
-      });
+        this.classroomUrlFragment,
+        this.subtopicUrlFragment
+      )
+      .then(
+        subtopicDataObject => {
+          this.pageContents = subtopicDataObject.getPageContents();
+          this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
+          this.parentTopicId = subtopicDataObject.getParentTopicId();
+          this.contextService.setCustomEntityContext(
+            AppConstants.ENTITY_TYPE.TOPIC,
+            this.parentTopicId
+          );
 
-      this.loaderService.hideLoadingScreen();
-    },
-    (errorResponse) => {
-      if (
-        AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-        this.alertsService.addWarning('Failed to get subtopic data');
-      }
-    });
+          // The onLangChange event is initially fired before the subtopic is
+          // loaded. Hence the first setpageTitle() call needs to made
+          // manually, and the onLangChange subscription is added after
+          // the subtopic is loaded.
+          this.setPageTitle();
+          this.subscribeToOnLangChange();
+          this.pageTitleService.updateMetaTag(
+            `Review the skill of ${this.subtopicTitle.toLowerCase()}.`
+          );
+
+          let nextSubtopic = subtopicDataObject.getNextSubtopic();
+          let prevSubtopic = subtopicDataObject.getPrevSubtopic();
+          if (nextSubtopic) {
+            this.nextSubtopic = nextSubtopic;
+            this.subtopicSummaryIsShown = true;
+          }
+          if (prevSubtopic) {
+            this.prevSubtopic = prevSubtopic;
+            this.subtopicSummaryIsShown = true;
+          }
+
+          this.subtopicTitleTranslationKey =
+            this.i18nLanguageCodeService.getSubtopicTranslationKey(
+              this.parentTopicId,
+              this.subtopicUrlFragment,
+              TranslationKeyType.TITLE
+            );
+
+          this.topicViewerBackendApiService
+            .fetchTopicDataAsync(
+              this.topicUrlFragment,
+              this.classroomUrlFragment
+            )
+            .then(topicDataObject => {
+              this.parentTopicTitle = topicDataObject.getTopicName();
+              this.parentTopicTitleTranslationKey =
+                this.i18nLanguageCodeService.getTopicTranslationKey(
+                  topicDataObject.getTopicId(),
+                  TranslationKeyType.TITLE
+                );
+            });
+
+          this.loaderService.hideLoadingScreen();
+        },
+        errorResponse => {
+          if (
+            AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1
+          ) {
+            this.alertsService.addWarning('Failed to get subtopic data');
+          }
+        }
+      );
   }
 
   ngOnDestroy(): void {
@@ -184,9 +195,3 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     );
   }
 }
-
-
-
-angular.module('oppia').directive(
-  'oppiaSubtopicViewerPage',
-  downgradeComponent({component: SubtopicViewerPageComponent}));

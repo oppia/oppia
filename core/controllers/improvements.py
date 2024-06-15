@@ -18,17 +18,18 @@ from __future__ import annotations
 
 import datetime
 
+from core import feature_flag_list
 from core import feconf
-from core import platform_feature_list
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator
 from core.domain import exp_fetchers
+from core.domain import feature_flag_services
 from core.domain import improvements_domain
 from core.domain import improvements_services
-from core.domain import platform_feature_services
 from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import user_services
 
 from typing import Dict, List, Optional, TypedDict
@@ -238,24 +239,25 @@ class ExplorationImprovementsConfigHandler(
             'exploration_version': (
                 exp_fetchers.get_exploration_by_id(exploration_id).version),
             'is_improvements_tab_enabled': (
-                platform_feature_services.is_feature_enabled(
-                    platform_feature_list.ParamNames.
-                    IS_IMPROVEMENTS_TAB_ENABLED.value)),
+                feature_flag_services.is_feature_flag_enabled(
+                    feature_flag_list.FeatureNames.
+                    IS_IMPROVEMENTS_TAB_ENABLED.value,
+                    self.user_id)),
             'high_bounce_rate_task_state_bounce_rate_creation_threshold': (
-                platform_feature_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamNames.
+                platform_parameter_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamName.
                     HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD.
                     value
                 )),
             'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': (
-                platform_feature_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamNames.
+                platform_parameter_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamName.
                     HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD
                     .value
                 )),
             'high_bounce_rate_task_minimum_exploration_starts': (
-                platform_feature_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamNames.
+                platform_parameter_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamName.
                     HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS.value
                 )),
         })

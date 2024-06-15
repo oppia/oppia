@@ -16,36 +16,44 @@
  * @fileoverview Tests for Learner Local Nav Component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { NgbModal, NgbModalRef, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {NgbModal, NgbModalRef, NgbPopover} from '@ng-bootstrap/ng-bootstrap';
+import {TranslateService} from '@ngx-translate/core';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
-import { AppConstants } from 'app.constants';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
-import { AttributionService } from 'services/attribution.service';
-import { LoaderService } from 'services/loader.service';
-import { UserService } from 'services/user.service';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
-import { LearnerLocalNavBackendApiService } from '../services/learner-local-nav-backend-api.service';
+import {AppConstants} from 'app.constants';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+import {AttributionService} from 'services/attribution.service';
+import {LoaderService} from 'services/loader.service';
+import {UserService} from 'services/user.service';
+import {ExplorationEngineService} from '../services/exploration-engine.service';
+import {LearnerLocalNavBackendApiService} from '../services/learner-local-nav-backend-api.service';
 
-import { LearnerLocalNavComponent } from './learner-local-nav.component';
-import { FlagExplorationModalComponent } from '../modals/flag-exploration-modal.component';
-import { UserInfo } from 'domain/user/user-info.model';
+import {LearnerLocalNavComponent} from './learner-local-nav.component';
+import {FlagExplorationModalComponent} from '../modals/flag-exploration-modal.component';
+import {UserInfo} from 'domain/user/user-info.model';
 
 describe('Learner Local Nav Component ', () => {
   let component: LearnerLocalNavComponent;
   let fixture: ComponentFixture<LearnerLocalNavComponent>;
   let ngbModal: NgbModal;
   let attributionService: AttributionService;
-  let readOnlyExplorationBackendApiService:
-    ReadOnlyExplorationBackendApiService;
+  let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let userService: UserService;
 
-  const MockNgbPopover = jasmine.createSpyObj(
-    'NgbPopover', ['close', 'toggle']);
+  const MockNgbPopover = jasmine.createSpyObj('NgbPopover', [
+    'close',
+    'toggle',
+  ]);
 
   const explorationBackendResponse = {
     can_edit: true,
@@ -59,8 +67,7 @@ describe('Learner Local Nav Component ', () => {
       title: '',
       language_code: '',
       objective: '',
-      correctness_feedback_enabled: false,
-      next_content_id_index: 0
+      next_content_id_index: 0,
     },
     exploration_metadata: {
       title: '',
@@ -75,8 +82,7 @@ describe('Learner Local Nav Component ', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: false,
-      edits_allowed: true
+      edits_allowed: true,
     },
     exploration_id: 'test_id',
     is_logged_in: true,
@@ -85,13 +91,12 @@ describe('Learner Local Nav Component ', () => {
     preferred_audio_language_code: 'en',
     preferred_language_codes: [],
     auto_tts_enabled: false,
-    correctness_feedback_enabled: true,
     record_playthrough_probability: 1,
     has_viewed_lesson_info_modal_once: false,
     furthest_reached_checkpoint_exp_version: 1,
     furthest_reached_checkpoint_state_name: 'State B',
     most_recently_reached_checkpoint_state_name: 'State A',
-    most_recently_reached_checkpoint_exp_version: 1
+    most_recently_reached_checkpoint_exp_version: 1,
   };
 
   const userInfoForCollectionCreator = UserInfo.createDefault();
@@ -99,11 +104,7 @@ describe('Learner Local Nav Component ', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        LearnerLocalNavComponent,
-        MockTranslatePipe,
-        NgbPopover
-      ],
+      declarations: [LearnerLocalNavComponent, MockTranslatePipe, NgbPopover],
       providers: [
         AlertsService,
         AttributionService,
@@ -111,9 +112,13 @@ describe('Learner Local Nav Component ', () => {
         LoaderService,
         ReadOnlyExplorationBackendApiService,
         UserService,
-        LearnerLocalNavBackendApiService
+        LearnerLocalNavBackendApiService,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LearnerLocalNavComponent);
@@ -124,7 +129,8 @@ describe('Learner Local Nav Component ', () => {
     userService = TestBed.inject(UserService);
     ngbModal = TestBed.inject(NgbModal);
     readOnlyExplorationBackendApiService = TestBed.inject(
-      ReadOnlyExplorationBackendApiService);
+      ReadOnlyExplorationBackendApiService
+    );
     attributionService = TestBed.inject(AttributionService);
   });
 
@@ -138,10 +144,13 @@ describe('Learner Local Nav Component ', () => {
   });
 
   it('should set properties when initialized', fakeAsync(() => {
-    spyOn(readOnlyExplorationBackendApiService, 'loadExplorationAsync')
-      .and.resolveTo(explorationBackendResponse);
-    spyOn(userService, 'getUserInfoAsync')
-      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'loadExplorationAsync'
+    ).and.resolveTo(explorationBackendResponse);
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfoForCollectionCreator)
+    );
 
     // This throws 'Cannot assign to 'ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS'
     // because it is a read-only property.'. We need to suppress this error
@@ -161,20 +170,24 @@ describe('Learner Local Nav Component ', () => {
     expect(component.canEdit).toBe(true);
   }));
 
-  it('should open a modal to report exploration when ' +
-    'clicking on flag button', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        { componentInstance: {},
-          result: Promise.resolve()
-        }) as NgbModalRef;
-    });
+  it(
+    'should open a modal to report exploration when ' +
+      'clicking on flag button',
+    () => {
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: {},
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      });
 
-    component.showFlagExplorationModal();
+      component.showFlagExplorationModal();
 
-    expect(modalSpy).toHaveBeenCalledWith(
-      FlagExplorationModalComponent, {backdrop: 'static'});
-  });
+      expect(modalSpy).toHaveBeenCalledWith(FlagExplorationModalComponent, {
+        backdrop: 'static',
+      });
+    }
+  );
 
   it('should toggle feedback popover', () => {
     component.feedbackPopOver = MockNgbPopover;
@@ -195,7 +208,9 @@ describe('Learner Local Nav Component ', () => {
   it('should hide attribution modal', () => {
     spyOn(attributionService, 'isAttributionModalShown').and.returnValue(true);
     const hideModalSpy = spyOn(
-      attributionService, 'hideAttributionModal').and.callThrough();
+      attributionService,
+      'hideAttributionModal'
+    ).and.callThrough();
 
     component.toggleAttributionModal();
 
@@ -205,7 +220,9 @@ describe('Learner Local Nav Component ', () => {
   it('should show attribution modal', () => {
     spyOn(attributionService, 'isAttributionModalShown').and.returnValue(false);
     const showModalSpy = spyOn(
-      attributionService, 'showAttributionModal').and.callThrough();
+      attributionService,
+      'showAttributionModal'
+    ).and.callThrough();
 
     component.toggleAttributionModal();
 

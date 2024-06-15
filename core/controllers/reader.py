@@ -27,7 +27,6 @@ from core.controllers import base
 from core.controllers import domain_objects_validator
 from core.controllers import editor
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -36,6 +35,8 @@ from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
@@ -158,7 +159,7 @@ class ExplorationEmbedPage(
             self.iframed = True
 
         if not _does_exploration_exist(exploration_id, version, collection_id):
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         self.iframed = True
         self.render_template(
@@ -258,7 +259,7 @@ class ExplorationPage(
             collection_id = self.normalized_request.get('collection_id')
 
         if not _does_exploration_exist(exploration_id, version, collection_id):
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         self.render_template('oppia-root.mainpage.html')
 
@@ -331,7 +332,7 @@ class ExplorationHandler(
         exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False, version=version)
         if exploration is None:
-            raise self.PageNotFoundException()
+            raise self.NotFoundException()
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
@@ -445,10 +446,12 @@ class ExplorationHandler(
             'preferred_audio_language_code': preferred_audio_language_code,
             'preferred_language_codes': preferred_language_codes,
             'auto_tts_enabled': exploration.auto_tts_enabled,
-            'correctness_feedback_enabled': (
-                exploration.correctness_feedback_enabled),
             'record_playthrough_probability': (
-                config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value),
+                platform_parameter_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamName.
+                    RECORD_PLAYTHROUGH_PROBABILITY.value
+                )
+            ),
             'has_viewed_lesson_info_modal_once': (
                 has_viewed_lesson_info_modal_once),
             'furthest_reached_checkpoint_exp_version': (
@@ -1906,10 +1909,6 @@ class RecommendationsHandler(
     if there are upcoming explorations for the learner to complete.
     """
 
-    # TODO(bhenning): Move the recommendation selection logic & related tests
-    # to the domain layer as service methods or to the frontend to reduce the
-    # amount of logic needed in this handler.
-
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -2173,7 +2172,7 @@ class TransientCheckpointUrlPage(
             exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
 
         if logged_out_user_data is None:
-            raise self.PageNotFoundException()
+            raise self.NotFoundException()
 
         redirect_url = '%s/%s?pid=%s' % (
             feconf.EXPLORATION_URL_PREFIX,
@@ -2369,7 +2368,7 @@ class LearnerAnswerDetailsSubmissionHandler(
         """
         assert self.normalized_payload is not None
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         interaction_id = self.normalized_payload['interaction_id']
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
@@ -2626,7 +2625,7 @@ class StateVersionHistoryHandler(
         )
 
         if version_history is None:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         state_version_history = (
             version_history.state_version_history[state_name]
@@ -2704,7 +2703,7 @@ class MetadataVersionHistoryHandler(
         )
 
         if version_history is None:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         metadata_version_history = version_history.metadata_version_history
         metadata_in_previous_version = None

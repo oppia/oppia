@@ -17,15 +17,18 @@
  */
 
 export const ClassroomDomainConstants = {
+  TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL: '/topics_to_classrooms_relation',
+  ALL_CLASSROOMS_SUMMARY_HANDLER_URL: '/all_classrooms_summary',
   CLASSROOOM_DATA_URL_TEMPLATE:
     '/classroom_data_handler/<classroom_url_fragment>',
-  TOPIC_VIEWER_URL_TEMPLATE: (
-    '/learn/<classroom_url_fragment>/<topic_url_fragment>'),
-  TOPIC_VIEWER_REVISION_URL_TEMPLATE: (
-    '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision'),
-  TOPIC_VIEWER_STORY_URL_TEMPLATE: (
-    '/learn/<classroom_url_fragment>/<topic_url_fragment>/story'),
+  TOPIC_VIEWER_URL_TEMPLATE:
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>',
+  TOPIC_VIEWER_REVISION_URL_TEMPLATE:
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision',
+  TOPIC_VIEWER_STORY_URL_TEMPLATE:
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/story',
   CLASSROOM_HANDLER_URL_TEMPLATE: '/classroom/<classroom_id>',
+  NEW_CLASSROOM_HANDLER_URL: '/classroom_admin/create_new',
   NEW_CLASSROOM_ID_HANDLER_URL_TEMPLATE: '/new_classroom_id_handler',
-  CLASSROOM_ADMIN_DATA_HANDLER_URL_TEMPLATE: '/classroom_admin_data_handler'
+  CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE: '/classroom_id_to_name_handler',
 } as const;

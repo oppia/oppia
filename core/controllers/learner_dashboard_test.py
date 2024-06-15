@@ -19,7 +19,6 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.domain import config_domain
 from core.domain import learner_progress_services
 from core.domain import story_domain
 from core.domain import story_services
@@ -232,23 +231,11 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
             self.owner_id, self.TOPIC_ID_1, self.STORY_ID_2)
         topic_services.publish_story(
             self.TOPIC_ID_1, self.STORY_ID_2, self.admin_id)
-        csrf_token = self.get_new_csrf_token()
-        new_config_value = [{
-            'name': 'math',
-            'url_fragment': 'math',
-            'topic_ids': [self.TOPIC_ID_1],
-            'course_details': '',
-            'topic_list_intro': ''
-        }]
-
-        payload = {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.CLASSROOM_PAGES_DATA.name: (
-                    new_config_value),
+        self.save_new_valid_classroom(
+            topic_id_to_prerequisite_topic_ids={
+                self.TOPIC_ID_1: []
             }
-        }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        )
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
@@ -278,23 +265,11 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
             self.owner_id, self.TOPIC_ID_1, self.STORY_ID_2)
         topic_services.publish_story(
             self.TOPIC_ID_1, self.STORY_ID_2, self.admin_id)
-        csrf_token = self.get_new_csrf_token()
-        new_config_value = [{
-            'name': 'math',
-            'url_fragment': 'math',
-            'topic_ids': [self.TOPIC_ID_1],
-            'course_details': '',
-            'topic_list_intro': ''
-        }]
-
-        payload = {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.CLASSROOM_PAGES_DATA.name: (
-                    new_config_value),
+        self.save_new_valid_classroom(
+            topic_id_to_prerequisite_topic_ids={
+                self.TOPIC_ID_1: []
             }
-        }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        )
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
@@ -433,14 +408,6 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
             learner_dashboard_activity_ids['topic_ids_to_learn'],
             [self.TOPIC_ID_3])
 
-    def test_learner_dashboard_page(self) -> None:
-        self.login(self.OWNER_EMAIL)
-
-        response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
-        self.assertIn(b'{"title": "Learner Dashboard | Oppia"})', response.body)
-
-        self.logout()
-
 
 class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
 
@@ -526,23 +493,11 @@ class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        new_config_value = [{
-            'name': 'math',
-            'url_fragment': 'math',
-            'topic_ids': [self.TOPIC_ID_1],
-            'course_details': '',
-            'topic_list_intro': ''
-        }]
-        payload = {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.CLASSROOM_PAGES_DATA.name: (
-                    new_config_value),
+        self.save_new_valid_classroom(
+            topic_id_to_prerequisite_topic_ids={
+                self.TOPIC_ID_1: []
             }
-        }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        )
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
@@ -666,14 +621,6 @@ class LearnerDashboardCollectionsProgressHandlerTests(
         self.assertEqual(len(response['collection_playlist']), 1)
         self.assertEqual(
             response['collection_playlist'][0]['id'], self.COL_ID_1)
-        self.logout()
-
-    def test_learner_dashboard_page(self) -> None:
-        self.login(self.OWNER_EMAIL)
-
-        response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
-        self.assertIn(b'{"title": "Learner Dashboard | Oppia"})', response.body)
-
         self.logout()
 
 

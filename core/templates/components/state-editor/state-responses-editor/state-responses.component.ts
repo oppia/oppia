@@ -17,42 +17,55 @@
  * editor.
  */
 
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
-import { DeleteAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
-import { Misconception, MisconceptionSkillMap, TaggedMisconception } from 'domain/skill/MisconceptionObjectFactory';
-import { Subscription } from 'rxjs';
-import { AnswerChoice, StateEditorService } from '../state-editor-properties-services/state-editor.service';
-import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
-import { StateSolicitAnswerDetailsService } from '../state-editor-properties-services/state-solicit-answer-details.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
-import { AppConstants } from 'app.constants';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AddAnswerGroupModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
+import {DeleteAnswerGroupModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
+import {
+  Misconception,
+  MisconceptionSkillMap,
+  TaggedMisconception,
+} from 'domain/skill/MisconceptionObjectFactory';
+import {Subscription} from 'rxjs';
+import {
+  AnswerChoice,
+  StateEditorService,
+} from '../state-editor-properties-services/state-editor.service';
+import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
+import {StateSolicitAnswerDetailsService} from '../state-editor-properties-services/state-solicit-answer-details.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {StateInteractionIdService} from '../state-editor-properties-services/state-interaction-id.service';
+import {AppConstants} from 'app.constants';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { StateCustomizationArgsService } from '../state-editor-properties-services/state-customization-args.service';
-import { AlertsService } from 'services/alerts.service';
-import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { Rule } from 'domain/exploration/rule.model';
-import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
-import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
-import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import { ItemSelectionInputCustomizationArgs } from 'interactions/customization-args-defs';
-import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
-import { EditabilityService } from 'services/editability.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
-import { InteractionRuleInputs } from 'interactions/rule-input-defs';
-
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {AlertsService} from 'services/alerts.service';
+import {
+  AnswerGroup,
+  AnswerGroupObjectFactory,
+} from 'domain/exploration/AnswerGroupObjectFactory';
+import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Rule} from 'domain/exploration/rule.model';
+import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
+import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
+import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import {CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
+import {EditabilityService} from 'services/editability.service';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 @Component({
   selector: 'oppia-state-responses',
-  templateUrl: './state-responses.component.html'
+  templateUrl: './state-responses.component.html',
 })
 export class StateResponsesComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
@@ -66,21 +79,22 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   activeAnswerGroupIndex!: number;
   // State name is null if their is no state selected or have no active state.
   // This is the case when the user is creating a new state.
-  stateName!: string | null;
   @Output() onResponsesInitialized = new EventEmitter<void>();
-  @Output() onSaveInteractionAnswerGroups = (
-    new EventEmitter<AnswerGroup[] | AnswerGroup>());
+  @Output() onSaveInteractionAnswerGroups = new EventEmitter<
+    AnswerGroup[] | AnswerGroup
+  >();
 
-  @Output() onSaveInteractionDefaultOutcome = (
-    new EventEmitter<Outcome | null>());
+  @Output() onSaveInteractionDefaultOutcome =
+    new EventEmitter<Outcome | null>();
 
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
   @Output() onSaveSolicitAnswerDetails = new EventEmitter<boolean>();
   @Output() navigateToState = new EventEmitter<string>();
   @Output() refreshWarnings = new EventEmitter<void>();
 
-  @Output() onSaveInapplicableSkillMisconceptionIds = (
-    new EventEmitter<string[]>());
+  @Output() onSaveInapplicableSkillMisconceptionIds = new EventEmitter<
+    string[]
+  >();
 
   directiveSubscriptions = new Subscription();
   activeEditOption: boolean = false;
@@ -93,7 +107,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   constructor(
     private stateEditorService: StateEditorService,
     private responsesService: ResponsesService,
-    private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService,
     private externalSaveService: ExternalSaveService,
     private stateInteractionIdService: StateInteractionIdService,
@@ -106,7 +119,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     private parameterizeRuleDescription: ParameterizeRuleDescriptionPipe,
     private truncate: TruncatePipe,
     private wrapTextWithEllipsis: WrapTextWithEllipsisPipe,
-    private editabilityService: EditabilityService,
+    private editabilityService: EditabilityService
   ) {}
 
   sendOnSaveNextContentIdIndex(event: number): void {
@@ -114,17 +127,17 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   }
 
   drop(event: CdkDragSortEvent<AnswerGroup[]>): void {
-    moveItemInArray(
-      this.answerGroups, event.previousIndex,
-      event.currentIndex);
+    moveItemInArray(this.answerGroups, event.previousIndex, event.currentIndex);
 
     this.responsesService.save(
-      this.answerGroups, this.defaultOutcome,
+      this.answerGroups,
+      this.defaultOutcome,
       (newAnswerGroups, newDefaultOutcome) => {
         this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
         this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
         this.refreshWarnings.emit();
-      });
+      }
+    );
   }
 
   _initializeTrainingData(): void {
@@ -137,119 +150,47 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     return this.stateEditorService.isInQuestionMode();
   }
 
-  suppressDefaultAnswerGroup(): boolean {
-    let interactionId = this.getCurrentInteractionId();
-    let answerGroups = this.responsesService.getAnswerGroups();
-    // This array contains the text of each of the possible answers
-    // for the interaction.
-    let answerChoices = [];
-    let customizationArgs = (
-      this.stateCustomizationArgsService.savedMemento);
-    let handledAnswersArray: InteractionRuleInputs[] = [];
-
-    if (interactionId === 'MultipleChoiceInput') {
-      let numChoices = this.getAnswerChoices().length;
-      let choiceIndices = [];
-      // Collect all answers which have been handled by at least one
-      // answer group.
-      for (let i = 0; i < answerGroups.length; i++) {
-        for (let j = 0; j < answerGroups[i].rules.length; j++) {
-          handledAnswersArray.push(answerGroups[i].rules[j].inputs.x);
-        }
-      }
-      for (let i = 0; i < numChoices; i++) {
-        choiceIndices.push(i);
-      }
-      // We only suppress the default warning if each choice index has
-      // been handled by at least one answer group.
-      return choiceIndices.every((choiceIndex) => {
-        return handledAnswersArray.indexOf(choiceIndex) !== -1;
-      });
-    } else if (interactionId === 'ItemSelectionInput') {
-      let maxSelectionCount = (
-        (customizationArgs as ItemSelectionInputCustomizationArgs)
-          .maxAllowableSelectionCount.value);
-      if (maxSelectionCount === 1) {
-        let numChoices = this.getAnswerChoices().length;
-        // This array contains a list of booleans, one for each answer
-        // choice. Each boolean is true if the corresponding answer has
-        // been covered by at least one rule, and false otherwise.
-        handledAnswersArray = [];
-        for (let i = 0; i < numChoices; i++) {
-          handledAnswersArray.push(false);
-          answerChoices.push(this.getAnswerChoices()[i].val);
-        }
-
-        let answerChoiceToIndex:
-         Record<string, number> = {};
-        answerChoices.forEach((answerChoice, choiceIndex) => {
-          answerChoiceToIndex[answerChoice as string] = choiceIndex;
-        });
-
-        answerGroups.forEach((answerGroup) => {
-          let rules = answerGroup.rules;
-          rules.forEach((rule) => {
-            let ruleInputs = rule.inputs.x;
-            Object.keys(ruleInputs).forEach((ruleInput) => {
-              let choiceIndex = answerChoiceToIndex[ruleInput];
-              if (rule.type === 'Equals' ||
-                  rule.type === 'ContainsAtLeastOneOf') {
-                handledAnswersArray[choiceIndex] = true;
-              } else if (rule.type === 'DoesNotContainAtLeastOneOf') {
-                for (let i = 0; i < handledAnswersArray.length; i++) {
-                  if (i !== choiceIndex) {
-                    handledAnswersArray[i] = true;
-                  }
-                }
-              }
-            });
-          });
-        });
-
-        let areAllChoicesCovered = handledAnswersArray.every(
-          (handledAnswer) => {
-            return handledAnswer;
-          });
-        // We only suppress the default warning if each choice text has
-        // been handled by at least one answer group, based on rule
-        // type.
-        return areAllChoicesCovered;
-      }
-    }
-    return false;
+  shouldHideDefaultAnswerGroup(): boolean {
+    return this.responsesService.shouldHideDefaultAnswerGroup();
   }
 
   onChangeSolicitAnswerDetails(): void {
     this.onSaveSolicitAnswerDetails.emit(
-      this.stateSolicitAnswerDetailsService.displayed);
+      this.stateSolicitAnswerDetailsService.displayed
+    );
     this.stateSolicitAnswerDetailsService.saveDisplayedValue();
   }
 
+  getActiveStateName(): string | null {
+    return this.stateEditorService.getActiveStateName();
+  }
+
   isSelfLoopWithNoFeedback(outcome: Outcome): boolean | void {
-    if (outcome && typeof outcome === 'object' && this.stateName &&
-      outcome.constructor.name === 'Outcome') {
-      return outcome.isConfusing(this.stateName);
+    let currentStateName = this.getActiveStateName();
+    if (
+      outcome &&
+      typeof outcome === 'object' &&
+      currentStateName &&
+      outcome.constructor.name === 'Outcome'
+    ) {
+      return outcome.isConfusing(currentStateName);
     }
   }
 
   isSelfLoopThatIsMarkedCorrect(outcome: Outcome): boolean {
-    if (!outcome ||
-        !this.stateEditorService.getCorrectnessFeedbackEnabled()) {
+    if (!outcome) {
       return false;
+    } else {
+      const currentStateName = this.getActiveStateName();
+      return outcome.dest === currentStateName && outcome.labelledAsCorrect;
     }
-
-    let currentStateName = this.stateName;
-
-    return (
-      (outcome.dest === currentStateName) &&
-      outcome.labelledAsCorrect);
   }
 
   changeActiveAnswerGroupIndex(newIndex: number): void {
     this.externalSaveService.onExternalSave.emit();
     this.responsesService.changeActiveAnswerGroupIndex(newIndex);
-    this.activeAnswerGroupIndex = (
-      this.responsesService.getActiveAnswerGroupIndex());
+    this.activeAnswerGroupIndex =
+      this.responsesService.getActiveAnswerGroupIndex();
   }
 
   getCurrentInteractionId(): string {
@@ -257,31 +198,37 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   }
 
   isCreatingNewState(outcome: Outcome): boolean {
-    return (outcome && outcome.dest === AppConstants.PLACEHOLDER_OUTCOME_DEST);
+    return outcome && outcome.dest === AppConstants.PLACEHOLDER_OUTCOME_DEST;
   }
 
   // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    return Boolean(interactionId) && INTERACTION_SPECS[
-      interactionId as InteractionSpecsKey].is_linear;
+    return (
+      Boolean(interactionId) &&
+      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear
+    );
   }
 
   isCurrentInteractionTrivial(): boolean {
     let interactionId = this.getCurrentInteractionId();
     let array: string[] = [
-      ...AppConstants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS];
-    return array.indexOf(
-      interactionId) !== -1;
+      ...AppConstants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS,
+    ];
+    return array.indexOf(interactionId) !== -1;
   }
 
   isLinearWithNoFeedback(outcome: Outcome): boolean | void {
     // Returns false if current interaction is linear and has no
     // feedback.
-    if (outcome && typeof outcome === 'object' &&
-      outcome.constructor.name === 'Outcome') {
-      return this.isCurrentInteractionLinear() &&
-        !outcome.hasNonemptyFeedback();
+    if (
+      outcome &&
+      typeof outcome === 'object' &&
+      outcome.constructor.name === 'Outcome'
+    ) {
+      return (
+        this.isCurrentInteractionLinear() && !outcome.hasNonemptyFeedback()
+      );
     }
   }
 
@@ -294,8 +241,10 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     if (this.isLinearWithNoFeedback(outcome)) {
       return 'Please direct the learner to a different card.';
     } else {
-      return 'Please give Oppia something useful to say,' +
-             ' or direct the learner to a different card.';
+      return (
+        'Please give Oppia something useful to say,' +
+        ' or direct the learner to a different card.'
+      );
     }
   }
 
@@ -310,40 +259,48 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       backdrop: 'static',
     });
 
-    modalRef.componentInstance.addState.subscribe(
-      (value: string) => {
-        addState(value);
-      });
+    modalRef.componentInstance.addState.subscribe((value: string) => {
+      addState(value);
+    });
 
     modalRef.componentInstance.currentInteractionId = currentInteractionId;
     modalRef.componentInstance.stateName = stateName;
 
-    modalRef.result.then((result) => {
-      this.onSaveNextContentIdIndex.emit();
+    modalRef.result.then(
+      result => {
+        this.onSaveNextContentIdIndex.emit();
 
-      // Create a new answer group.
-      this.answerGroups.push(this.answerGroupObjectFactory.createNew(
-        [result.tmpRule], result.tmpOutcome, [],
-        result.tmpTaggedSkillMisconceptionId));
-      this.responsesService.save(
-        this.answerGroups, this.defaultOutcome,
-        (newAnswerGroups, newDefaultOutcome) => {
-          this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
-          this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
-          this.refreshWarnings.emit();
-        });
-      this.changeActiveAnswerGroupIndex(
-        this.answerGroups.length - 1);
+        // Create a new answer group.
+        this.answerGroups.push(
+          this.answerGroupObjectFactory.createNew(
+            [result.tmpRule],
+            result.tmpOutcome,
+            [],
+            result.tmpTaggedSkillMisconceptionId
+          )
+        );
+        this.responsesService.save(
+          this.answerGroups,
+          this.defaultOutcome,
+          (newAnswerGroups, newDefaultOutcome) => {
+            this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
+            this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
+            this.refreshWarnings.emit();
+          }
+        );
+        this.changeActiveAnswerGroupIndex(this.answerGroups.length - 1);
 
-      // After saving it, check if the modal should be reopened right
-      // away.
-      if (result.reopen) {
-        this.openAddAnswerGroupModal();
+        // After saving it, check if the modal should be reopened right
+        // away.
+        if (result.reopen) {
+          this.openAddAnswerGroupModal();
+        }
+      },
+      () => {
+        this.alertsService.clearWarnings();
+        this.generateContentIdService.revertUnusedContentIdIndex();
       }
-    }, () => {
-      this.alertsService.clearWarnings();
-      this.generateContentIdService.revertUnusedContentIdIndex();
-    });
+    );
   }
 
   deleteAnswerGroup(evt: Event, index: number): void {
@@ -352,141 +309,173 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     evt.stopPropagation();
 
     this.alertsService.clearWarnings();
-    this.ngbModal.open(DeleteAnswerGroupModalComponent, {
-      backdrop: true,
-    }).result.then(() => {
-      this.responsesService.deleteAnswerGroup(
-        index, (newAnswerGroups) => {
-          this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
-          this.refreshWarnings.emit();
-        });
-    }, () => {
-      this.alertsService.clearWarnings();
-    });
+    this.ngbModal
+      .open(DeleteAnswerGroupModalComponent, {
+        backdrop: true,
+      })
+      .result.then(
+        () => {
+          this.responsesService.deleteAnswerGroup(index, newAnswerGroups => {
+            this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
+            this.refreshWarnings.emit();
+          });
+        },
+        () => {
+          this.alertsService.clearWarnings();
+        }
+      );
   }
 
   verifyAndUpdateInapplicableSkillMisconceptionIds(): void {
     let answerGroups = this.responsesService.getAnswerGroups();
     let taggedSkillMisconceptionIds: string[] = [];
     for (let i = 0; i < answerGroups.length; i++) {
-      let taggedSkillMisconceptionId = (
-        answerGroups[i].taggedSkillMisconceptionId);
-      if (!answerGroups[i].outcome.labelledAsCorrect &&
-          taggedSkillMisconceptionId !== null) {
-        taggedSkillMisconceptionIds.push(
-          taggedSkillMisconceptionId);
+      let taggedSkillMisconceptionId =
+        answerGroups[i].taggedSkillMisconceptionId;
+      if (
+        !answerGroups[i].outcome.labelledAsCorrect &&
+        taggedSkillMisconceptionId !== null
+      ) {
+        taggedSkillMisconceptionIds.push(taggedSkillMisconceptionId);
       }
     }
-    let commonSkillMisconceptionIds = (
-      taggedSkillMisconceptionIds.filter(
-        skillMisconceptionId => (
-          this.inapplicableSkillMisconceptionIds.includes(
-            skillMisconceptionId))));
+    let commonSkillMisconceptionIds = taggedSkillMisconceptionIds.filter(
+      skillMisconceptionId =>
+        this.inapplicableSkillMisconceptionIds.includes(skillMisconceptionId)
+    );
     if (commonSkillMisconceptionIds.length) {
-      commonSkillMisconceptionIds.forEach((skillMisconceptionId => {
-        this.inapplicableSkillMisconceptionIds = (
+      commonSkillMisconceptionIds.forEach(skillMisconceptionId => {
+        this.inapplicableSkillMisconceptionIds =
           this.inapplicableSkillMisconceptionIds.filter(
-            item => item !== skillMisconceptionId));
-      }));
+            item => item !== skillMisconceptionId
+          );
+      });
       this.onSaveInapplicableSkillMisconceptionIds.emit(
-        this.inapplicableSkillMisconceptionIds);
+        this.inapplicableSkillMisconceptionIds
+      );
     }
   }
 
   saveTaggedMisconception(taggedMisconception: TaggedMisconception): void {
-    const { skillId, misconceptionId } = taggedMisconception;
-    this.responsesService.updateActiveAnswerGroup({
-      taggedSkillMisconceptionId: skillId + '-' + misconceptionId
-    } as AnswerGroup, (newAnswerGroups) => {
-      this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
-      this.refreshWarnings.emit();
-    });
+    const {skillId, misconceptionId} = taggedMisconception;
+    this.responsesService.updateActiveAnswerGroup(
+      {
+        taggedSkillMisconceptionId: skillId + '-' + misconceptionId,
+      } as AnswerGroup,
+      newAnswerGroups => {
+        this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
+        this.refreshWarnings.emit();
+      }
+    );
   }
 
   saveActiveAnswerGroupFeedback(updatedOutcome: Outcome): void {
-    this.responsesService.updateActiveAnswerGroup({
-      feedback: updatedOutcome.feedback
-    }, (newAnswerGroups) => {
-      this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
-      this.refreshWarnings.emit();
-    });
+    this.responsesService.updateActiveAnswerGroup(
+      {
+        feedback: updatedOutcome.feedback,
+      },
+      newAnswerGroups => {
+        this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
+        this.refreshWarnings.emit();
+      }
+    );
   }
 
   saveActiveAnswerGroupDest(updatedOutcome: Outcome): void {
-    this.responsesService.updateActiveAnswerGroup({
-      dest: updatedOutcome.dest,
-      refresherExplorationId: updatedOutcome.refresherExplorationId,
-      missingPrerequisiteSkillId:
-        updatedOutcome.missingPrerequisiteSkillId
-    }, (newAnswerGroups) => {
-      this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
-      this.refreshWarnings.emit();
-    });
+    this.responsesService.updateActiveAnswerGroup(
+      {
+        dest: updatedOutcome.dest,
+        refresherExplorationId: updatedOutcome.refresherExplorationId,
+        missingPrerequisiteSkillId: updatedOutcome.missingPrerequisiteSkillId,
+      },
+      newAnswerGroups => {
+        this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
+        this.refreshWarnings.emit();
+      }
+    );
   }
 
   saveActiveAnswerGroupDestIfStuck(updatedOutcome: Outcome): void {
-    this.responsesService.updateActiveAnswerGroup({
-      destIfReallyStuck: updatedOutcome.destIfReallyStuck,
-    } as typeof updatedOutcome, (newAnswerGroups) => {
-      this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
-      this.refreshWarnings.emit();
-    });
+    this.responsesService.updateActiveAnswerGroup(
+      {
+        destIfReallyStuck: updatedOutcome.destIfReallyStuck,
+      } as typeof updatedOutcome,
+      newAnswerGroups => {
+        this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
+        this.refreshWarnings.emit();
+      }
+    );
   }
 
-  saveActiveAnswerGroupCorrectnessLabel(
-      updatedOutcome: Outcome): void {
-    this.responsesService.updateActiveAnswerGroup({
-      labelledAsCorrect: updatedOutcome.labelledAsCorrect
-    }, (newAnswerGroups) => {
-      this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
-      this.refreshWarnings.emit();
-    });
+  saveActiveAnswerGroupCorrectnessLabel(updatedOutcome: Outcome): void {
+    this.responsesService.updateActiveAnswerGroup(
+      {
+        labelledAsCorrect: updatedOutcome.labelledAsCorrect,
+      },
+      newAnswerGroups => {
+        this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
+        this.refreshWarnings.emit();
+      }
+    );
   }
 
   saveActiveAnswerGroupRules(updatedRules: Rule[]): void {
-    this.responsesService.updateActiveAnswerGroup({
-      rules: updatedRules
-    } as AnswerGroup, (newAnswerGroups) => {
-      this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
-      this.refreshWarnings.emit();
-    });
+    this.responsesService.updateActiveAnswerGroup(
+      {
+        rules: updatedRules,
+      } as AnswerGroup,
+      newAnswerGroups => {
+        this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
+        this.refreshWarnings.emit();
+      }
+    );
   }
 
   saveDefaultOutcomeFeedback(updatedOutcome: Outcome): void {
-    this.responsesService.updateDefaultOutcome({
-      feedback: updatedOutcome.feedback,
-      dest: updatedOutcome.dest
-    } as Outcome, (newDefaultOutcome) => {
-      this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
-    });
+    this.responsesService.updateDefaultOutcome(
+      {
+        feedback: updatedOutcome.feedback,
+        dest: updatedOutcome.dest,
+      } as Outcome,
+      newDefaultOutcome => {
+        this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
+      }
+    );
   }
 
   saveDefaultOutcomeDest(updatedOutcome: Outcome): void {
-    this.responsesService.updateDefaultOutcome({
-      dest: updatedOutcome.dest,
-      refresherExplorationId: updatedOutcome.refresherExplorationId,
-      missingPrerequisiteSkillId:
-        updatedOutcome.missingPrerequisiteSkillId
-    } as Outcome, (newDefaultOutcome) => {
-      this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
-    });
+    this.responsesService.updateDefaultOutcome(
+      {
+        dest: updatedOutcome.dest,
+        refresherExplorationId: updatedOutcome.refresherExplorationId,
+        missingPrerequisiteSkillId: updatedOutcome.missingPrerequisiteSkillId,
+      } as Outcome,
+      newDefaultOutcome => {
+        this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
+      }
+    );
   }
 
   saveDefaultOutcomeDestIfStuck(updatedOutcome: Outcome): void {
-    this.responsesService.updateDefaultOutcome({
-      destIfReallyStuck: updatedOutcome.destIfReallyStuck
-    } as Outcome, (newDefaultOutcome) => {
-      this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
-    });
+    this.responsesService.updateDefaultOutcome(
+      {
+        destIfReallyStuck: updatedOutcome.destIfReallyStuck,
+      } as Outcome,
+      newDefaultOutcome => {
+        this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
+      }
+    );
   }
 
-  saveDefaultOutcomeCorrectnessLabel(
-      updatedOutcome: Outcome): void {
-    this.responsesService.updateDefaultOutcome({
-      labelledAsCorrect: updatedOutcome.labelledAsCorrect
-    } as Outcome, (newDefaultOutcome) => {
-      this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
-    });
+  saveDefaultOutcomeCorrectnessLabel(updatedOutcome: Outcome): void {
+    this.responsesService.updateDefaultOutcome(
+      {
+        labelledAsCorrect: updatedOutcome.labelledAsCorrect,
+      } as Outcome,
+      newDefaultOutcome => {
+        this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
+      }
+    );
   }
 
   getAnswerChoices(): AnswerChoice[] {
@@ -494,8 +483,10 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   }
 
   summarizeAnswerGroup(
-      answerGroup: AnswerGroup, interactionId: string,
-      answerChoices: AnswerChoice[], shortenRule: boolean
+    answerGroup: AnswerGroup,
+    interactionId: string,
+    answerChoices: AnswerChoice[],
+    shortenRule: boolean
   ): string {
     let summary = '';
     let outcome = answerGroup.outcome;
@@ -504,28 +495,35 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     if (answerGroup.rules) {
       let firstRule = this.convertToPlainText.transform(
         this.parameterizeRuleDescription.transform(
-          answerGroup.rules[0], interactionId, answerChoices));
+          answerGroup.rules[0],
+          interactionId,
+          answerChoices
+        )
+      );
       summary = 'Answer ' + firstRule;
 
       if (hasFeedback && shortenRule) {
         summary = this.wrapTextWithEllipsis.transform(
-          summary, AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+          summary,
+          AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT
+        );
       }
       summary = '[' + summary + '] ';
     }
 
     if (hasFeedback) {
-      summary += (
-        shortenRule ?
-          this.truncate.transform(outcome.feedback.html, 30) :
-          this.convertToPlainText.transform(outcome.feedback.html));
+      summary += shortenRule
+        ? this.truncate.transform(outcome.feedback.html, 30)
+        : this.convertToPlainText.transform(outcome.feedback.html);
     }
     return summary;
   }
 
   summarizeDefaultOutcome(
-      defaultOutcome: Outcome, interactionId: string,
-      answerGroupCount: number, shortenRule: boolean
+    defaultOutcome: Outcome,
+    interactionId: string,
+    answerGroupCount: number,
+    shortenRule: boolean
   ): string {
     if (!defaultOutcome) {
       return '';
@@ -534,10 +532,13 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     let summary = '';
     let hasFeedback = defaultOutcome.hasNonemptyFeedback();
 
-    if (interactionId && INTERACTION_SPECS[
-      interactionId as InteractionSpecsKey].is_linear) {
-      let defaultOutcomeHeading = INTERACTION_SPECS[
-        interactionId as InteractionSpecsKey].default_outcome_heading;
+    if (
+      interactionId &&
+      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear
+    ) {
+      let defaultOutcomeHeading =
+        INTERACTION_SPECS[interactionId as InteractionSpecsKey]
+          .default_outcome_heading;
       if (defaultOutcomeHeading) {
         summary = defaultOutcomeHeading;
       }
@@ -549,20 +550,23 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
 
     if (hasFeedback && shortenRule) {
       summary = this.wrapTextWithEllipsis.transform(
-        summary, AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+        summary,
+        AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT
+      );
     }
     summary = '[' + summary + '] ';
 
     if (hasFeedback) {
-      summary +=
-        this.convertToPlainText.transform(defaultOutcome.feedback.html);
+      summary += this.convertToPlainText.transform(
+        defaultOutcome.feedback.html
+      );
     }
     return summary;
   }
 
   isOutcomeLooping(outcome: Outcome): boolean {
-    let activeStateName = this.stateName;
-    return outcome && (outcome.dest === activeStateName);
+    let activeStateName = this.getActiveStateName();
+    return outcome && outcome.dest === activeStateName;
   }
 
   toggleResponseCard(): void {
@@ -573,67 +577,74 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     let answerGroups = this.responsesService.getAnswerGroups();
     let taggedSkillMisconceptionIds: Record<string, boolean> = {};
     for (let i = 0; i < answerGroups.length; i++) {
-      let taggedSkillMisconceptionId = (
-        answerGroups[i].taggedSkillMisconceptionId);
-      if (!answerGroups[i].outcome.labelledAsCorrect &&
-          taggedSkillMisconceptionId !== null) {
+      let taggedSkillMisconceptionId =
+        answerGroups[i].taggedSkillMisconceptionId;
+      if (
+        !answerGroups[i].outcome.labelledAsCorrect &&
+        taggedSkillMisconceptionId !== null
+      ) {
         taggedSkillMisconceptionIds[taggedSkillMisconceptionId] = true;
       }
     }
     let unaddressedMisconceptionNames: string[] = [];
-    Object.keys(this.misconceptionsBySkill).forEach(
-      (skillId) => {
-        let misconceptions = this.misconceptionsBySkill[skillId];
-        for (let i = 0; i < misconceptions.length; i++) {
-          if (!misconceptions[i].isMandatory()) {
-            continue;
-          }
-          let skillMisconceptionId = (
-            skillId + '-' + misconceptions[i].getId());
-          if (!taggedSkillMisconceptionIds.hasOwnProperty(
-            skillMisconceptionId)) {
-            unaddressedMisconceptionNames.push(
-              misconceptions[i].getName());
-          }
+    Object.keys(this.misconceptionsBySkill).forEach(skillId => {
+      let misconceptions = this.misconceptionsBySkill[skillId];
+      for (let i = 0; i < misconceptions.length; i++) {
+        if (!misconceptions[i].isMandatory()) {
+          continue;
         }
-      });
+        let skillMisconceptionId = skillId + '-' + misconceptions[i].getId();
+        if (!taggedSkillMisconceptionIds.hasOwnProperty(skillMisconceptionId)) {
+          unaddressedMisconceptionNames.push(misconceptions[i].getName());
+        }
+      }
+    });
     return unaddressedMisconceptionNames;
   }
 
   getOptionalSkillMisconceptionStatus(
-      optionalSkillMisconceptionId: string): string {
+    optionalSkillMisconceptionId: string
+  ): string {
     let answerGroups = this.responsesService.getAnswerGroups();
     let taggedSkillMisconceptionIds = [];
     for (let i = 0; i < answerGroups.length; i++) {
-      let taggedSkillMisconceptionId = (
-        answerGroups[i].taggedSkillMisconceptionId);
-      if (!answerGroups[i].outcome.labelledAsCorrect &&
-          taggedSkillMisconceptionId !== null) {
+      let taggedSkillMisconceptionId =
+        answerGroups[i].taggedSkillMisconceptionId;
+      if (
+        !answerGroups[i].outcome.labelledAsCorrect &&
+        taggedSkillMisconceptionId !== null
+      ) {
         taggedSkillMisconceptionIds.push(taggedSkillMisconceptionId);
       }
     }
-    let skillMisconceptionIdIsAssigned = (
-      taggedSkillMisconceptionIds.includes(
-        optionalSkillMisconceptionId));
+    let skillMisconceptionIdIsAssigned = taggedSkillMisconceptionIds.includes(
+      optionalSkillMisconceptionId
+    );
     if (skillMisconceptionIdIsAssigned) {
       return 'Assigned';
     }
     return this.inapplicableSkillMisconceptionIds.includes(
-      optionalSkillMisconceptionId) ? 'Not Applicable' : '';
+      optionalSkillMisconceptionId
+    )
+      ? 'Not Applicable'
+      : '';
   }
 
   updateOptionalMisconceptionIdStatus(
-      skillMisconceptionId: string, isApplicable: boolean): void {
+    skillMisconceptionId: string,
+    isApplicable: boolean
+  ): void {
     if (isApplicable) {
-      this.inapplicableSkillMisconceptionIds = (
+      this.inapplicableSkillMisconceptionIds =
         this.inapplicableSkillMisconceptionIds.filter(
-          item => item !== skillMisconceptionId));
+          item => item !== skillMisconceptionId
+        );
     } else {
-      this.inapplicableSkillMisconceptionIds.push(
-        skillMisconceptionId);
+      this.inapplicableSkillMisconceptionIds.push(skillMisconceptionId);
     }
     this.onSaveInapplicableSkillMisconceptionIds.emit(
-      this.inapplicableSkillMisconceptionIds);
+      this.inapplicableSkillMisconceptionIds
+    );
     this.setActiveEditOption(false);
   }
 
@@ -643,8 +654,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
 
   isNoActionExpected(skillMisconceptionId: string): boolean {
     return ['Assigned', 'Not Applicable'].includes(
-      this.getOptionalSkillMisconceptionStatus(
-        skillMisconceptionId));
+      this.getOptionalSkillMisconceptionStatus(skillMisconceptionId)
+    );
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -652,15 +663,14 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
-      AppConstants.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
+    this.SHOW_TRAINABLE_UNRESOLVED_ANSWERS =
+      AppConstants.SHOW_TRAINABLE_UNRESOLVED_ANSWERS;
     this.responseCardIsShown = true;
-    this.stateName = this.stateEditorService.getActiveStateName();
-    this.enableSolicitAnswerDetailsFeature = (
-      AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);
+    this.enableSolicitAnswerDetailsFeature =
+      AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE;
     this.misconceptionsBySkill = {};
     this.directiveSubscriptions.add(
-      this.responsesService.onInitializeAnswerGroups.subscribe((data) => {
+      this.responsesService.onInitializeAnswerGroups.subscribe(data => {
         this.responsesService.init(data as Interaction);
         this.answerGroups = this.responsesService.getAnswerGroups();
         this.defaultOutcome = this.responsesService.getDefaultOutcome();
@@ -676,43 +686,44 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
         // Initialize training data for these answer groups.
         this._initializeTrainingData();
 
-        this.activeAnswerGroupIndex = (
-          this.responsesService.getActiveAnswerGroupIndex());
+        this.activeAnswerGroupIndex =
+          this.responsesService.getActiveAnswerGroupIndex();
         this.externalSaveService.onExternalSave.emit();
       })
     );
 
     this.directiveSubscriptions.add(
       this.stateInteractionIdService.onInteractionIdChanged.subscribe(
-        (newInteractionId) => {
+        newInteractionId => {
           this.externalSaveService.onExternalSave.emit();
           this.responsesService.onInteractionIdChanged(
             newInteractionId,
             (newAnswerGroups, newDefaultOutcome) => {
-              this.onSaveInteractionDefaultOutcome.emit(
-                newDefaultOutcome);
+              this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
               this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
               this.refreshWarnings.emit();
               this.answerGroups = this.responsesService.getAnswerGroups();
-              this.defaultOutcome =
-                this.responsesService.getDefaultOutcome();
+              this.defaultOutcome = this.responsesService.getDefaultOutcome();
 
               // Reinitialize training data if the interaction ID is
               // changed.
               this._initializeTrainingData();
 
-              this.activeAnswerGroupIndex = (
-                this.responsesService.getActiveAnswerGroupIndex());
-            });
+              this.activeAnswerGroupIndex =
+                this.responsesService.getActiveAnswerGroupIndex();
+            }
+          );
 
           // Prompt the user to create a new response if it is not a
           // linear or non-terminal interaction and if an actual
           // interaction is specified (versus one being deleted).
-          if (newInteractionId &&
-              !INTERACTION_SPECS[
-                newInteractionId as InteractionSpecsKey].is_linear &&
-              !INTERACTION_SPECS[
-                newInteractionId as InteractionSpecsKey].is_terminal) {
+          if (
+            newInteractionId &&
+            !INTERACTION_SPECS[newInteractionId as InteractionSpecsKey]
+              .is_linear &&
+            !INTERACTION_SPECS[newInteractionId as InteractionSpecsKey]
+              .is_terminal
+          ) {
             this.openAddAnswerGroupModal();
           }
         }
@@ -720,53 +731,55 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     );
 
     this.directiveSubscriptions.add(
-      this.responsesService.onAnswerGroupsChanged.subscribe(
-        () => {
-          this.answerGroups = this.responsesService.getAnswerGroups();
-          this.defaultOutcome = this.responsesService.getDefaultOutcome();
-          this.activeAnswerGroupIndex =
+      this.responsesService.onAnswerGroupsChanged.subscribe(() => {
+        this.answerGroups = this.responsesService.getAnswerGroups();
+        this.defaultOutcome = this.responsesService.getDefaultOutcome();
+        this.activeAnswerGroupIndex =
           this.responsesService.getActiveAnswerGroupIndex();
-          this.verifyAndUpdateInapplicableSkillMisconceptionIds();
-        }
-      ));
+        this.verifyAndUpdateInapplicableSkillMisconceptionIds();
+      })
+    );
     this.directiveSubscriptions.add(
       this.stateEditorService.onUpdateAnswerChoices.subscribe(
-        (newAnswerChoices) => {
+        newAnswerChoices => {
           this.responsesService.updateAnswerChoices(newAnswerChoices);
-        })
-    );
-
-    this.directiveSubscriptions.add(
-      this.stateEditorService.onHandleCustomArgsUpdate.subscribe(
-        (newAnswerChoices) => {
-          this.responsesService.handleCustomArgsUpdate(
-            newAnswerChoices, (newAnswerGroups) => {
-              this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
-              this.refreshWarnings.emit();
-            });
         }
       )
     );
 
     this.directiveSubscriptions.add(
-      this.stateEditorService.onStateEditorInitialized.subscribe(
-        () => {
-          this.misconceptionsBySkill = (
-            this.stateEditorService.getMisconceptionsBySkill());
+      this.stateEditorService.onHandleCustomArgsUpdate.subscribe(
+        newAnswerChoices => {
+          this.responsesService.handleCustomArgsUpdate(
+            newAnswerChoices,
+            newAnswerGroups => {
+              this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
+              this.refreshWarnings.emit();
+            }
+          );
+        }
+      )
+    );
 
-          this.containsOptionalMisconceptions = (
-            Object.values(this.misconceptionsBySkill).some(
-              (misconceptions: Misconception[]) => misconceptions.some(
-                misconception => !misconception.isMandatory())));
-        })
+    this.directiveSubscriptions.add(
+      this.stateEditorService.onStateEditorInitialized.subscribe(() => {
+        this.misconceptionsBySkill =
+          this.stateEditorService.getMisconceptionsBySkill();
+
+        this.containsOptionalMisconceptions = Object.values(
+          this.misconceptionsBySkill
+        ).some((misconceptions: Misconception[]) =>
+          misconceptions.some(misconception => !misconception.isMandatory())
+        );
+      })
     );
 
     if (this.stateEditorService.isInQuestionMode()) {
       this.onResponsesInitialized.emit();
     }
     this.stateEditorService.updateStateResponsesInitialised();
-    this.inapplicableSkillMisconceptionIds = (
-      this.stateEditorService.getInapplicableSkillMisconceptionIds());
+    this.inapplicableSkillMisconceptionIds =
+      this.stateEditorService.getInapplicableSkillMisconceptionIds();
     this.activeEditOption = false;
   }
 
@@ -775,7 +788,9 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive('oppiaStateResponses',
+angular.module('oppia').directive(
+  'oppiaStateResponses',
   downgradeComponent({
-    component: StateResponsesComponent
-  }) as angular.IDirectiveFactory);
+    component: StateResponsesComponent,
+  }) as angular.IDirectiveFactory
+);

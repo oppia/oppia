@@ -17,9 +17,9 @@
  * Changes may be undone, redone, or replaced.
  */
 
-import { EventEmitter } from '@angular/core';
+import {EventEmitter} from '@angular/core';
 
-import { BackendChangeObject, Change, DomainObject } from './change.model';
+import {BackendChangeObject, Change, DomainObject} from './change.model';
 
 /**
  * Stores a stack of changes to a domain object. Please note that only one
@@ -39,14 +39,12 @@ export class BaseUndoRedo {
     this._undoRedoChangeEventEmitter.emit();
   }
 
-  private _applyChange(
-      Change: Change, domainObject: DomainObject): void {
+  private _applyChange(Change: Change, domainObject: DomainObject): void {
     Change.applyChange(domainObject);
     this._dispatchMutation();
   }
 
-  private _reverseChange(
-      Change: Change, domainObject: DomainObject): void {
+  private _reverseChange(Change: Change, domainObject: DomainObject): void {
     Change.reverseChange(domainObject);
     this._dispatchMutation();
   }
@@ -103,7 +101,7 @@ export class BaseUndoRedo {
    * returned list will not be reflected in this class instance.
    */
   getChangeList(): Change[] {
-    // TODO(bhenning): Consider integrating something like Immutable.js to
+    // TODO(#20337): Consider integrating something like Immutable.js to
     // avoid the slice here and ensure the returned object is truly an
     // immutable copy.
     return this._appliedChanges.slice();

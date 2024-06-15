@@ -16,15 +16,26 @@
  * @fileoverview Unit Tests for CollectionPlayerBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
-import { CollectionNodeBackendDict } from 'domain/collection/collection-node.model';
-import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
-import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
-import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
-import { UserInfo } from 'domain/user/user-info.model';
-import { UserService } from 'services/user.service';
-import { CollectionPlayerBackendApiService } from './collection-player-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {
+  fakeAsync,
+  flushMicrotasks,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
+import {CollectionNodeBackendDict} from 'domain/collection/collection-node.model';
+import {
+  Collection,
+  CollectionBackendDict,
+} from 'domain/collection/collection.model';
+import {GuestCollectionProgressService} from 'domain/collection/guest-collection-progress.service';
+import {ReadOnlyCollectionBackendApiService} from 'domain/collection/read-only-collection-backend-api.service';
+import {UserInfo} from 'domain/user/user-info.model';
+import {UserService} from 'services/user.service';
+import {CollectionPlayerBackendApiService} from './collection-player-backend-api.service';
 
 describe('Collection Player Backend Api Service', () => {
   let cpbas: CollectionPlayerBackendApiService;
@@ -32,26 +43,35 @@ describe('Collection Player Backend Api Service', () => {
   let sampleCollection: Collection;
   let sampleCollectionBackendObject: CollectionBackendDict;
   let collectionNodeBackendObject: CollectionNodeBackendDict;
-  let readOnlyCollectionBackendApiService:
-    ReadOnlyCollectionBackendApiService;
+  let readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService;
   let userService: UserService;
   let guestCollectionProgressService: GuestCollectionProgressService;
 
   const userInfoForCollectionCreator = new UserInfo(
-    ['USER_ROLE'], true, false, false, false, true,
-    'en', 'username1', 'tester@example.com', true
+    ['USER_ROLE'],
+    true,
+    false,
+    false,
+    false,
+    true,
+    'en',
+    'username1',
+    'tester@example.com',
+    true
   );
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     cpbas = TestBed.inject(CollectionPlayerBackendApiService);
-    readOnlyCollectionBackendApiService =
-      TestBed.inject(ReadOnlyCollectionBackendApiService);
+    readOnlyCollectionBackendApiService = TestBed.inject(
+      ReadOnlyCollectionBackendApiService
+    );
     guestCollectionProgressService = TestBed.inject(
-      GuestCollectionProgressService);
+      GuestCollectionProgressService
+    );
     userService = TestBed.inject(UserService);
 
     collectionNodeBackendObject = {
@@ -72,14 +92,14 @@ describe('Collection Player Backend Api Service', () => {
           2: 0,
           3: 0,
           4: 0,
-          5: 0
+          5: 0,
         },
         status: 'public',
         tags: [],
         activity_type: 'exploration',
         category: 'Algebra',
-        title: 'Test Title'
-      }
+        title: 'Test Title',
+      },
     };
 
     sampleCollectionBackendObject = {
@@ -94,21 +114,23 @@ describe('Collection Player Backend Api Service', () => {
         collectionNodeBackendObject,
         collectionNodeBackendObject,
         collectionNodeBackendObject,
-        collectionNodeBackendObject
+        collectionNodeBackendObject,
       ],
       language_code: null,
       schema_version: null,
       tags: null,
       playthrough_dict: {
         next_exploration_id: 'expId',
-        completed_exploration_ids: ['expId2']
-      }
+        completed_exploration_ids: ['expId2'],
+      },
     };
 
     sampleCollection = Collection.create(sampleCollectionBackendObject);
     sampleCollectionBackendObject.nodes = [collectionNodeBackendObject];
-    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
-      .and.resolveTo(sampleCollection);
+    spyOn(
+      readOnlyCollectionBackendApiService,
+      'loadCollectionAsync'
+    ).and.resolveTo(sampleCollection);
   }));
 
   afterEach(() => {
@@ -116,17 +138,20 @@ describe('Collection Player Backend Api Service', () => {
   });
 
   it('should return response for collection summary', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
-    spyOn(guestCollectionProgressService, 'hasCompletedSomeExploration')
-      .and.returnValue(true);
-    let requestUrl = '/collectionsummarieshandler/data?' +
-    'stringified_collection_ids=%5B%22collectionId%22%5D';
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfoForCollectionCreator)
+    );
+    spyOn(
+      guestCollectionProgressService,
+      'hasCompletedSomeExploration'
+    ).and.returnValue(true);
+    let requestUrl =
+      '/collectionsummarieshandler/data?' +
+      'stringified_collection_ids=%5B%22collectionId%22%5D';
 
-    cpbas.fetchCollectionSummariesAsync('collectionId').then(
-      (dataUrl) => {
-        expect(dataUrl).toEqual({ stringified_collection_ids: '' });
-      });
+    cpbas.fetchCollectionSummariesAsync('collectionId').then(dataUrl => {
+      expect(dataUrl).toEqual({stringified_collection_ids: ''});
+    });
 
     const req2 = httpTestingController.expectOne(requestUrl);
     expect(req2.request.method).toEqual('GET');

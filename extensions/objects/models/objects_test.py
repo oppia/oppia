@@ -371,7 +371,6 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_html_validation(self) -> None:
         """Tests objects of type HTML."""
-        # TODO(sll): Add more tests.
         mappings = [
             (
                 '<p onclick="evil_function()">a paragraph</p>',

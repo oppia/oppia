@@ -1,4 +1,4 @@
-<oppia-angular-root>
+<oppia-angular-root *ngIf="pageIsShown">
   <oppia-base-content>
 
     <content>
@@ -7,3 +7,5 @@
 
   </oppia-base-content>
 </oppia-angular-root>
+
+<oppia-error-page-root *ngIf="errorPageIsShown"></oppia-error-page-root>

@@ -81,6 +81,7 @@
   bottom: 0;
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 1.5em;
   margin: 12px 0 0 0;
   padding: 0;
   position: relative;
@@ -248,6 +249,11 @@
   text-align: center;
   width: 25px;
   z-index: 0;
+}
+
+.completed-checkpoint-node:hover {
+  background-color: #00968e;
+  cursor: pointer;
 }
 
 .in-progress-checkpoint-node {

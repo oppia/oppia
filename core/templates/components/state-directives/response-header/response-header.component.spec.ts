@@ -16,18 +16,18 @@
  * @fileoverview Unit tests for Response Header Component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ResponseHeaderComponent } from './response-header.component';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ResponseHeaderComponent} from './response-header.component';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
 
 const mockInteractionState = {
   TextInput: {
-    is_linear: false
-  }
+    is_linear: false,
+  },
 };
 class MockStateInteractionIdService {
   savedMemento = 'TextInput';
@@ -41,22 +41,20 @@ describe('Response Header Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ResponseHeaderComponent
-      ],
+      declarations: [ResponseHeaderComponent],
       providers: [
         StateEditorService,
         OutcomeObjectFactory,
         {
           provide: INTERACTION_SPECS,
-          useValue: mockInteractionState
+          useValue: mockInteractionState,
         },
         {
           provide: StateInteractionIdService,
-          useClass: MockStateInteractionIdService
-        }
+          useClass: MockStateInteractionIdService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -81,13 +79,6 @@ describe('Response Header Component', () => {
 
   it('should get current interaction ID', () => {
     expect(component.getCurrentInteractionId()).toBe('TextInput');
-  });
-
-  it('should check if correctness feedback is enabled', () => {
-    spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
-      false);
-
-    expect(component.isCorrectnessFeedbackEnabled()).toBe(false);
   });
 
   it('should check if current interaction is linear or not', () => {

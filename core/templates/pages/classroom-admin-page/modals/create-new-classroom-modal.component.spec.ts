@@ -16,17 +16,22 @@
  * @fileoverview Tests for new classroom creation modal.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { CreateNewClassroomModalComponent } from './create-new-classroom-modal.component';
-import { ClassroomBackendApiService } from '../../../domain/classroom/classroom-backend-api.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {FormsModule} from '@angular/forms';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {CreateNewClassroomModalComponent} from './create-new-classroom-modal.component';
+import {ClassroomBackendApiService} from '../../../domain/classroom/classroom-backend-api.service';
 
-
-describe('Create new topic modal', () => {
+describe('Create new classroom modal', () => {
   let fixture: ComponentFixture<CreateNewClassroomModalComponent>;
   let componentInstance: CreateNewClassroomModalComponent;
   let ngbActiveModal: NgbActiveModal;
@@ -37,7 +42,7 @@ describe('Create new topic modal', () => {
       return {
         then: (callback: () => void) => {
           callback();
-        }
+        },
       };
     }
 
@@ -45,7 +50,7 @@ describe('Create new topic modal', () => {
       return {
         then: (callback: () => void) => {
           callback();
-        }
+        },
       };
     }
   }
@@ -53,33 +58,28 @@ describe('Create new topic modal', () => {
   class MockWindowRef {
     nativeWindow = {
       location: {
-        hostname: ''
-      }
+        hostname: '',
+      },
     };
   }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        FormsModule
-      ],
-      declarations: [
-        CreateNewClassroomModalComponent,
-      ],
+      imports: [HttpClientTestingModule, FormsModule],
+      declarations: [CreateNewClassroomModalComponent],
       providers: [
         NgbActiveModal,
         {
           provide: WindowRef,
-          useClass: MockWindowRef
+          useClass: MockWindowRef,
         },
         {
           provide: ClassroomBackendApiService,
-          useClass: MockClassroomBackendApiService
+          useClass: MockClassroomBackendApiService,
         },
-        ClassroomBackendApiService
+        ClassroomBackendApiService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -96,13 +96,10 @@ describe('Create new topic modal', () => {
 
   it('should be able to save new classroom name', fakeAsync(() => {
     spyOn(ngbActiveModal, 'close');
-    spyOn(classroomBackendApiService, 'updateClassroomDataAsync')
-      .and.returnValue(Promise.resolve());
-
     spyOn(
       classroomBackendApiService,
-      'getNewClassroomIdAsync'
-    ).and.returnValue(Promise.resolve('newClassroomId'));
+      'createNewClassroomAsync'
+    ).and.returnValue(Promise.resolve({new_classroom_id: 'newClassroomId'}));
 
     componentInstance.existingClassroomNames = ['math', 'chemistry'];
     componentInstance.ngOnInit();
@@ -116,9 +113,6 @@ describe('Create new topic modal', () => {
       classroom_id: 'newClassroomId',
       name: 'physics',
       url_fragment: 'physics',
-      course_details: '',
-      topic_list_intro: '',
-      topic_id_to_prerequisite_topic_ids: {}
     };
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith(expectedDefaultClassroom);

@@ -16,7 +16,10 @@
  * @fileoverview Unit tests for TranslatedContent object factory.
  */
 
-import { TranslatedContent, TranslatedContentBackendDict } from './TranslatedContentObjectFactory';
+import {
+  TranslatedContent,
+  TranslatedContentBackendDict,
+} from './TranslatedContentObjectFactory';
 
 describe('TranslatedContent', () => {
   let translatedContentBackendDict: TranslatedContentBackendDict;
@@ -30,7 +33,7 @@ describe('TranslatedContent', () => {
   });
 
   it('should create a translated content object from backend dict', () => {
-    let translatedContent = TranslatedContent.createFromBackendDict(
+    const translatedContent = TranslatedContent.createFromBackendDict(
       translatedContentBackendDict
     );
 
@@ -38,8 +41,9 @@ describe('TranslatedContent', () => {
   });
 
   it('should mark translated content needs update', () => {
-    let translatedContent = TranslatedContent.createFromBackendDict(
-      translatedContentBackendDict);
+    const translatedContent = TranslatedContent.createFromBackendDict(
+      translatedContentBackendDict
+    );
     expect(translatedContent.needsUpdate).toBeFalse();
 
     translatedContent.markAsNeedingUpdate();
@@ -49,46 +53,62 @@ describe('TranslatedContent', () => {
 
   it('should return correct value for isHtml function', () => {
     let translatedContent = TranslatedContent.createFromBackendDict(
-      translatedContentBackendDict);
+      translatedContentBackendDict
+    );
     expect(translatedContent.isHtml()).toBeTrue();
 
-    let newTranslatedContentBackendDict = {
+    const newTranslatedContentBackendDict = {
       content_value: ['<p>Translated html</p>'],
       content_format: 'set_of_normalized_string',
       needs_update: false,
     };
     translatedContent = TranslatedContent.createFromBackendDict(
-      newTranslatedContentBackendDict);
+      newTranslatedContentBackendDict
+    );
     expect(translatedContent.isHtml()).toBeFalse();
   });
 
   it('should return correct value for isUnicode function', () => {
     let translatedContent = TranslatedContent.createFromBackendDict(
-      translatedContentBackendDict);
+      translatedContentBackendDict
+    );
     expect(translatedContent.isUnicode()).toBeFalse();
 
-    let newTranslatedContentBackendDict = {
+    const newTranslatedContentBackendDict = {
       content_value: 'Translated unicode',
       content_format: 'unicode',
       needs_update: false,
     };
     translatedContent = TranslatedContent.createFromBackendDict(
-      newTranslatedContentBackendDict);
+      newTranslatedContentBackendDict
+    );
     expect(translatedContent.isUnicode()).toBeTrue();
   });
 
   it('should return correct value for isSetOfStrings function', () => {
     let translatedContent = TranslatedContent.createFromBackendDict(
-      translatedContentBackendDict);
+      translatedContentBackendDict
+    );
     expect(translatedContent.isSetOfStrings()).toBeFalse();
 
-    let newTranslatedContentBackendDict = {
+    const newTranslatedContentBackendDict = {
       content_value: ['<p>Translated html</p>'],
       content_format: 'set_of_normalized_string',
       needs_update: false,
     };
     translatedContent = TranslatedContent.createFromBackendDict(
-      newTranslatedContentBackendDict);
+      newTranslatedContentBackendDict
+    );
     expect(translatedContent.isSetOfStrings()).toBeTrue();
   });
+
+  it(
+    'should throw an error if dataFormat is not present' +
+      ' in DATA_FORMAT_TO_DEFAULT_VALUES',
+    () => {
+      expect(() => TranslatedContent.createNew('unicodex')).toThrowError(
+        'Invalid translation data format: unicodex'
+      );
+    }
+  );
 });

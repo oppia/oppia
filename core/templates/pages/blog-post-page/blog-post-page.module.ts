@@ -16,23 +16,23 @@
  * @fileoverview Module for the blog home page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { FormsModule } from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {InfiniteScrollModule} from 'ngx-infinite-scroll';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {FormsModule} from '@angular/forms';
+import {ReactiveFormsModule} from '@angular/forms';
+import {TranslateModule} from '@ngx-translate/core';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
-import { BlogPostPageRootComponent } from './blog-post-page-root.component';
-import { BlogPostPageComponent } from './blog-post-page.component';
-import { CommonModule } from '@angular/common';
-import { MatMenuModule } from '@angular/material/menu';
-import { BlogPostPageRoutingModule } from './blog-post-page-routing.module';
-import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
-import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
-import { SharedBlogComponentsModule } from 'pages/blog-dashboard-page/shared-blog-components.module';
+import {BlogPostPageRootComponent} from './blog-post-page-root.component';
+import {BlogPostPageComponent} from './blog-post-page.component';
+import {CommonModule} from '@angular/common';
+import {MatMenuModule} from '@angular/material/menu';
+import {BlogPostPageRoutingModule} from './blog-post-page-routing.module';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
+import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
+import {SharedBlogComponentsModule} from 'pages/blog-dashboard-page/shared-blog-components.module';
 
 @NgModule({
   imports: [
@@ -48,15 +48,9 @@ import { SharedBlogComponentsModule } from 'pages/blog-dashboard-page/shared-blo
     ReactiveFormsModule,
     Error404PageModule,
     SharedBlogComponentsModule,
-    MatTooltipModule
+    MatTooltipModule,
   ],
-  declarations: [
-    BlogPostPageComponent,
-    BlogPostPageRootComponent
-  ],
-  entryComponents: [
-    BlogPostPageComponent,
-    BlogPostPageRootComponent
-  ]
+  declarations: [BlogPostPageComponent, BlogPostPageRootComponent],
+  entryComponents: [BlogPostPageComponent, BlogPostPageRootComponent],
 })
 export class BlogPostPageModule {}

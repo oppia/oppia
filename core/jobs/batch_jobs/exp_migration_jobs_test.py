@@ -65,7 +65,6 @@ author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Art
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -265,8 +264,6 @@ class MigrateExplorationJobTests(
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
             auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
         )
         rights_manager.create_new_exploration_rights(
             self.EXP_ID_TWO, feconf.SYSTEM_COMMITTER_ID)
@@ -322,14 +319,14 @@ class MigrateExplorationJobTests(
         change_list = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'title': 'Title 1'
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'old_value': None,
                 'new_value': self.NEW_EXP_ID
             })
@@ -352,8 +349,6 @@ class MigrateExplorationJobTests(
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
             auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
         )
         rights_manager.create_new_exploration_rights(
             self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
@@ -446,7 +441,8 @@ class MigrateExplorationJobTests(
                 'hi': 0,
                 'bn': 0
             },
-            'translation_in_review_counts': {}}
+            'translation_in_review_counts': {},
+            'is_pinned': False}
 
         self.assertEqual(
             updated_opp_summary.to_dict(), expected_opp_summary_dict)
@@ -472,8 +468,6 @@ class MigrateExplorationJobTests(
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
             auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
         )
         rights_manager.create_new_exploration_rights(
             self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
@@ -550,9 +544,7 @@ class MigrateExplorationJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled']
         )
         rights_manager.create_new_exploration_rights(
             self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
@@ -736,14 +728,14 @@ class AuditExplorationMigrationJobTests(
         change_list = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'title': 'Title 1'
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'old_value': None,
                 'new_value': self.NEW_EXP_ID
             })
@@ -765,9 +757,7 @@ class AuditExplorationMigrationJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled']
         )
         rights_manager.create_new_exploration_rights(
             self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
@@ -859,7 +849,8 @@ class AuditExplorationMigrationJobTests(
             'translation_counts': {
                 'hi': 0
             },
-            'translation_in_review_counts': {}
+            'translation_in_review_counts': {},
+            'is_pinned': False
         }
 
         self.assertEqual(
@@ -878,9 +869,7 @@ class AuditExplorationMigrationJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled']
         )
         rights_manager.create_new_exploration_rights(
             self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
@@ -1159,9 +1148,7 @@ class ExpSnapshotsMigrationAuditJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled']
         )
         rights_manager.create_new_exploration_rights(
             self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
@@ -1248,9 +1235,7 @@ class ExpSnapshotsMigrationAuditJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled']
         )
         rights_manager.create_new_exploration_rights(
             self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
@@ -1511,9 +1496,7 @@ class ExpSnapshotsMigrationJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled']
         )
         rights_manager.create_new_exploration_rights(
             self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
@@ -1694,9 +1677,7 @@ class ExpSnapshotsMigrationJobTests(
             states_schema_version=EXP_V46_DICT['states_schema_version'],
             init_state_name=EXP_V46_DICT['init_state_name'],
             states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled']
         )
         rights_manager.create_new_exploration_rights(
             self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)

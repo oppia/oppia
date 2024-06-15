@@ -16,16 +16,16 @@
  * @fileoverview Unit tests for the pending account deletion root component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { PendingAccountDeletionPageRootComponent } from './pending-account-deletion-page-root.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {PendingAccountDeletionPageRootComponent} from './pending-account-deletion-page-root.component';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -42,21 +42,19 @@ describe('Pending Account Deletion Page Root', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
+      imports: [HttpClientTestingModule],
       declarations: [
         PendingAccountDeletionPageRootComponent,
-        MockTranslatePipe
+        MockTranslatePipe,
       ],
       providers: [
         PageHeadService,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -67,10 +65,9 @@ describe('Pending Account Deletion Page Root', () => {
     translateService = TestBed.inject(TranslateService);
   });
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', () => {
+    expect(component).toBeDefined();
+  });
 
   it('should initialize and subscribe to onLangChange', () => {
     spyOn(translateService.onLangChange, 'subscribe');
@@ -97,13 +94,13 @@ describe('Pending Account Deletion Page Root', () => {
     component.setPageTitleAndMetaTags();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-        .PENDING_ACCOUNT_DELETION.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION.TITLE
+    );
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-        .PENDING_ACCOUNT_DELETION.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-        .PENDING_ACCOUNT_DELETION.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION
+        .TITLE,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION.META
+    );
   });
 
   it('should unsubscribe on component destruction', () => {

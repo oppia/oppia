@@ -73,7 +73,7 @@
           <a ngbDropdownAnchor
              (click)="learnDropdown.toggle()"
              (keydown.enter)="learnDropdown.toggle()"
-             class="nav-link oppia-navbar-tab dropdown-toggle learn-tab"
+             class="nav-link oppia-navbar-tab dropdown-toggle learn-tab e2e-test-navbar-learn-menu"
              aria-hidden="false"
              aria-label="learn"
              role="button"
@@ -100,7 +100,7 @@
                       <div class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-classroom-link nav-item-top-link">
                         <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
                            (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                           class="nav-item-left-head underline" tabindex="0">
+                           class="nav-item-left-head underline e2e-test-basic-mathematics-link" tabindex="0">
                            {{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
                         </a>
                       </div>
@@ -149,7 +149,6 @@
                 <span class="nav-item-right d-flex flex-column">
                   <a class="nav-content mb-5"
                      tabindex="0"
-                     (blur)="androidPageIsEnabled ? null : learnDropdown.close()"
                      href="/community-library"
                      (click)="navigateToClassroomPage('/community-library')">
                     <div class="nav-item-right-head">
@@ -160,13 +159,15 @@
                     </div>
                     <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                          class="nav-item-bottom-link">
-                      <span class="link">
-                        {{ 'I18N_TOPNAV_LIBRARY' | translate }}
-                      </span>
-                      <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
+                      <a class="underline nav-item-bottom-link" tabindex="0" href="/community-library">
+                        <span class="link">
+                          {{ 'I18N_TOPNAV_LIBRARY' | translate }}
+                        </span>
+                        <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
+                      </a>
                     </div>
                   </a>
-                  <a *ngIf="androidPageIsEnabled"
+                  <a
                      class="nav-content"
                      tabindex="0"
                      (blur)="learnDropdown.close()"
@@ -198,7 +199,7 @@
           <a ngbDropdownAnchor
              (click)="aboutDropdown.toggle()"
              (keydown.enter)="aboutDropdown.toggle()"
-             class="nav-link oppia-navbar-tab dropdown-toggle"
+             class="nav-link oppia-navbar-tab dropdown-toggle e2e-test-navbar-about-menu"
              aria-expanded="true"
              role="button"
              tabindex="0"
@@ -223,7 +224,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
+              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-navbar-about-menu-about-foundation-button"
                  href="/about-foundation"
                  [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
@@ -236,13 +237,13 @@
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-blog-link"
                  [href]="getOppiaBlogUrl()"
-                 [target]="getOppiaBlogUrl() === '/blog' ? '_self' : '_blank'"
+                 [target]="'_self'"
                  (blur)="aboutDropdown.close()"
                  rel="noopener">
                 <span class="link">
                   {{'I18N_TOPNAV_BLOG' | translate}}
                 </span>
-                <span class="fas fa-external-link-alt launch" *ngIf="!platformFeatureService.status.BlogPages.isEnabled"></span>
+                <span class="fas fa-external-link-alt launch" ></span>
               </a>
             </li>
           </ul>
@@ -253,7 +254,7 @@
             [hidden]="navElementsVisibilityStatus.I18N_TOPNAV_GET_INVOLVED"
             class="nav-item oppia-navbar-clickable-dropdown e2e-test-about-oppia-list-item">
           <a ngbDropdownAnchor
-             class="nav-link oppia-navbar-tab dropdown-toggle get-involved"
+             class="nav-link oppia-navbar-tab dropdown-toggle get-involved e2e-test-navbar-get-involved-menu"
              aria-expanded="true"
              (click)="getInvolvedDropdown.toggle()"
              (keydown.enter)="getInvolvedDropdown.toggle()"
@@ -272,7 +273,7 @@
               (mouseleave)="closeSubmenuIfNotMobile($event)">
             <div class="d-flex flex-column">
               <div class="top-section d-flex">
-                <a class="item item-border d-flex flex-column innvolved-item"
+                <a class="item item-border d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-school-and-organizations-button"
                    href="/partnerships"
                    [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
                    rel="noopener"
@@ -287,7 +288,7 @@
                     {{'I18N_TOPNAV_PARTNERSHIPS_DESCRIPTION' | translate}}
                   </div>
                 </a>
-                <a class="item d-flex flex-column innvolved-item"
+                <a class="item d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-volunteer-button"
                    href="/volunteer"
                    [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
@@ -304,7 +305,7 @@
                 </a>
               </div>
               <div class="bottom-section d-flex">
-                <a class="item item-border d-flex flex-column innvolved-item"
+                <a class="item item-border d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-contact-us-button"
                    href="/contact"
                    [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
@@ -319,7 +320,7 @@
                     {{'I18N_TOPNAV_CONTACT_US_DESCRIPTION' | translate}}
                   </div>
                 </a>
-                <a class="item d-flex flex-column innvolved-item"
+                <a class="item d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-donate-button"
                    href="/donate"
                    [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
                    (blur)="getInvolvedDropdown.close()"
@@ -342,7 +343,7 @@
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_DONATE"
             class="nav-item e2e-test-about-oppia-list-item">
-          <a class="nav-link oppia-navbar-tab donate-tab"
+          <a class="nav-link oppia-navbar-tab donate-tab e2e-test-navbar-donate-button"
              tabindex="0"
              href="/donate"
              [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
@@ -451,7 +452,6 @@
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              [href]="profilePageUrl"
-             [smartRouterLink]="profilePageUrl"
              class="dropdown-item nav-link e2e-test-profile-link"
              (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE})">
             <strong>
@@ -507,7 +507,6 @@
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/preferences"
-             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
              class="dropdown-item nav-link e2e-test-preferences-link">
             <span [innerHTML]="'I18N_TOPNAV_PREFERENCES' | translate"></span>
           </a>
@@ -632,10 +631,12 @@ top: 2rem;
      padding: 3px;
   }
   :lang(ar) .langbtn {
+    height: 28px;
     margin-top: 6px;
     padding: 0;
     position: relative;
     top: 6.2rem;
+    width: 80px;
   }
   :lang(ar) .langi {
     font-size: 1.2rem;
@@ -668,7 +669,6 @@ top: 3.4rem;
     margin-top: 6px;
     padding: 0;
     position: relative;
-    top: 11.2rem;
   }
 }
 

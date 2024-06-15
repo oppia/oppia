@@ -17,13 +17,12 @@
  * is in developer mode.
  */
 
-import { Component, Output, OnInit, EventEmitter } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Output, OnInit, EventEmitter} from '@angular/core';
 
-import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
-import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
-import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
+import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
+import {AdminTaskManagerService} from 'pages/admin-page/services/admin-task-manager.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-admin-dev-mode-activities-tab',
@@ -35,8 +34,14 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   demoExplorationIds: string[] = [];
   numDummyExpsToPublish: number = 0;
   numDummyExpsToGenerate: number = 0;
+  numDummyTranslationOpportunitiesToGenerate: number = 0;
   DEMO_COLLECTIONS: string[][] = [[]];
   DEMO_EXPLORATIONS: string[][] = [[]];
+  DUMMY_BLOG_POST_TITLES = [
+    'Education',
+    'Leading The Arabic Translations Team',
+    'Blog with different font formatting',
+  ];
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -49,8 +54,11 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
-    if (!this.windowRef.nativeWindow.confirm(
-      'This action is irreversible. Are you sure?')) {
+    if (
+      !this.windowRef.nativeWindow.confirm(
+        'This action is irreversible. Are you sure?'
+      )
+    ) {
       return;
     }
 
@@ -58,29 +66,34 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
 
     this.adminTaskManagerService.startTask();
 
-    this.adminBackendApiService.reloadExplorationAsync(
-      explorationId
-    ).then(() => {
-      this.setStatusMessage.emit('Data reloaded successfully.');
-      this.adminTaskManagerService.finishTask();
-    }, (errorResponse) => {
-      this.setStatusMessage.emit(
-        'Server error: ' + errorResponse);
-      this.adminTaskManagerService.finishTask();
-    });
+    this.adminBackendApiService.reloadExplorationAsync(explorationId).then(
+      () => {
+        this.setStatusMessage.emit('Data reloaded successfully.');
+        this.adminTaskManagerService.finishTask();
+      },
+      errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+        this.adminTaskManagerService.finishTask();
+      }
+    );
   }
 
   printResult(numSucceeded: number, numFailed: number, numTried: number): void {
     if (numTried < this.demoExplorationIds.length) {
       this.setStatusMessage.emit(
-        'Processing...' + numTried + '/' +
-        this.demoExplorationIds.length);
+        'Processing...' + numTried + '/' + this.demoExplorationIds.length
+      );
       return;
     }
     this.setStatusMessage.emit(
-      'Reloaded ' + this.demoExplorationIds.length +
-      ' explorations: ' + numSucceeded + ' succeeded, ' + numFailed +
-      ' failed.');
+      'Reloaded ' +
+        this.demoExplorationIds.length +
+        ' explorations: ' +
+        numSucceeded +
+        ' succeeded, ' +
+        numFailed +
+        ' failed.'
+    );
     this.adminTaskManagerService.finishTask();
   }
 
@@ -91,8 +104,11 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
-    if (!this.windowRef.nativeWindow.confirm(
-      'This action is irreversible. Are you sure?')) {
+    if (
+      !this.windowRef.nativeWindow.confirm(
+        'This action is irreversible. Are you sure?'
+      )
+    ) {
       return;
     }
 
@@ -106,17 +122,18 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     for (var i = 0; i < this.demoExplorationIds.length; ++i) {
       var explorationId = this.demoExplorationIds[i];
 
-      this.adminBackendApiService.reloadExplorationAsync(
-        explorationId
-      ).then(() => {
-        ++numSucceeded;
-        ++numTried;
-        this.printResult(numSucceeded, numFailed, numTried);
-      }, () => {
-        ++numFailed;
-        ++numTried;
-        this.printResult(numSucceeded, numFailed, numTried);
-      });
+      this.adminBackendApiService.reloadExplorationAsync(explorationId).then(
+        () => {
+          ++numSucceeded;
+          ++numTried;
+          this.printResult(numSucceeded, numFailed, numTried);
+        },
+        () => {
+          ++numFailed;
+          ++numTried;
+          this.printResult(numSucceeded, numFailed, numTried);
+        }
+      );
     }
   }
 
@@ -124,20 +141,48 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     // Generate dummy explorations with random title.
     if (this.numDummyExpsToPublish > this.numDummyExpsToGenerate) {
       this.setStatusMessage.emit(
-        'Publish count should be less than or equal to generate count');
+        'Publish count should be less than or equal to generate count'
+      );
       return;
     }
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
-    this.adminBackendApiService.generateDummyExplorationsAsync(
-      this.numDummyExpsToGenerate, this.numDummyExpsToPublish
-    ).then(() => {
-      this.setStatusMessage.emit(
-        'Dummy explorations generated successfully.');
-    }, (errorResponse) => {
-      this.setStatusMessage.emit(
-        'Server error: ' + errorResponse);
-    });
+    this.adminBackendApiService
+      .generateDummyExplorationsAsync(
+        this.numDummyExpsToGenerate,
+        this.numDummyExpsToPublish
+      )
+      .then(
+        () => {
+          this.setStatusMessage.emit(
+            'Dummy explorations generated successfully.'
+          );
+        },
+        errorResponse => {
+          this.setStatusMessage.emit('Server error: ' + errorResponse);
+        }
+      );
+    this.adminTaskManagerService.finishTask();
+  }
+
+  generateDummyTranslationOpportunities(): void {
+    // Generate dummy explorations as translation opportunities for contributor dashboard.
+    this.adminTaskManagerService.startTask();
+    this.setStatusMessage.emit('Processing...');
+    this.adminBackendApiService
+      .generateDummyTranslationOpportunitiesAsync(
+        this.numDummyTranslationOpportunitiesToGenerate
+      )
+      .then(
+        () => {
+          this.setStatusMessage.emit(
+            'Dummy translation opportunities (explorations) generated successfully.'
+          );
+        },
+        errorResponse => {
+          this.setStatusMessage.emit(`Server error: ${errorResponse}`);
+        }
+      );
     this.adminTaskManagerService.finishTask();
   }
 
@@ -145,14 +190,16 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
 
-    this.adminBackendApiService.generateDummyNewStructuresDataAsync()
-      .then(() => {
+    this.adminBackendApiService.generateDummyNewStructuresDataAsync().then(
+      () => {
         this.setStatusMessage.emit(
-          'Dummy new structures data generated successfully.');
-      }, (errorResponse) => {
-        this.setStatusMessage.emit(
-          'Server error: ' + errorResponse);
-      });
+          'Dummy new structures data generated successfully.'
+        );
+      },
+      errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+      }
+    );
     this.adminTaskManagerService.finishTask();
   }
 
@@ -160,14 +207,33 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
 
-    this.adminBackendApiService.generateDummyNewSkillDataAsync()
-      .then(() => {
+    this.adminBackendApiService.generateDummyNewSkillDataAsync().then(
+      () => {
         this.setStatusMessage.emit(
-          'Dummy new skill and questions generated successfully.');
-      }, (errorResponse) => {
-        this.setStatusMessage.emit(
-          'Server error: ' + errorResponse);
-      });
+          'Dummy new skill and questions generated successfully.'
+        );
+      },
+      errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+      }
+    );
+    this.adminTaskManagerService.finishTask();
+  }
+
+  generateNewBlogPost(blogPostTitle: string): void {
+    if (!blogPostTitle) {
+      this.setStatusMessage.emit('Internal error: blogPostTitle is empty');
+    }
+    this.adminTaskManagerService.startTask();
+    this.setStatusMessage.emit('Processing...');
+    this.adminBackendApiService.generateDummyBlogPostAsync(blogPostTitle).then(
+      () => {
+        this.setStatusMessage.emit('Dummy Blog Post generated successfully.');
+      },
+      errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+      }
+    );
     this.adminTaskManagerService.finishTask();
   }
 
@@ -175,12 +241,16 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
 
-    this.adminBackendApiService.generateDummyClassroomDataAsync().then(() => {
-      this.setStatusMessage.emit('Dummy new classroom generated successfully.');
-    }, (errorResponse) => {
-      this.setStatusMessage.emit(
-        'Server error: ' + errorResponse);
-    });
+    this.adminBackendApiService.generateDummyClassroomDataAsync().then(
+      () => {
+        this.setStatusMessage.emit(
+          'Dummy new classroom generated successfully.'
+        );
+      },
+      errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+      }
+    );
     this.adminTaskManagerService.finishTask();
   }
 
@@ -188,8 +258,11 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
-    if (!this.windowRef.nativeWindow.confirm(
-      'This action is irreversible. Are you sure?')) {
+    if (
+      !this.windowRef.nativeWindow.confirm(
+        'This action is irreversible. Are you sure?'
+      )
+    ) {
       return;
     }
 
@@ -197,13 +270,14 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
 
     this.adminTaskManagerService.startTask();
 
-    this.adminBackendApiService.reloadCollectionAsync(collectionId)
-      .then(() => {
+    this.adminBackendApiService.reloadCollectionAsync(collectionId).then(
+      () => {
         this.setStatusMessage.emit('Data reloaded successfully.');
-      }, (errorResponse) => {
-        this.setStatusMessage.emit(
-          'Server error: ' + errorResponse);
-      });
+      },
+      errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+      }
+    );
     this.adminTaskManagerService.finishTask();
   }
 
@@ -220,7 +294,3 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.getDataAsync();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaAdminDevModeActivitiesTab', downgradeComponent(
-    {component: AdminDevModeActivitiesTabComponent}));

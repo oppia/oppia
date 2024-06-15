@@ -22,9 +22,9 @@ import {
   ETopicStatusOptions,
   ETopicSortOptions,
   ETopicNewSortingOptions,
-  TopicsAndSkillsDashboardPageConstants } from
+  TopicsAndSkillsDashboardPageConstants,
   // eslint-disable-next-line max-len
-  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+} from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
 export class TopicsAndSkillsDashboardFilter {
   classroom: string;
@@ -40,9 +40,11 @@ export class TopicsAndSkillsDashboardFilter {
    *   calues in ETopicPublishedOptions or ETopicStatusOptions.
    */
   constructor(
-      classroom: string, keywords: string[],
-      sort: ETopicSortOptions | ETopicNewSortingOptions,
-      status: ETopicPublishedOptions | ETopicStatusOptions) {
+    classroom: string,
+    keywords: string[],
+    sort: ETopicSortOptions | ETopicNewSortingOptions,
+    status: ETopicPublishedOptions | ETopicStatusOptions
+  ) {
     this.classroom = classroom;
     this.keywords = keywords;
     this.sort = sort;
@@ -54,9 +56,9 @@ export class TopicsAndSkillsDashboardFilter {
    */
   reset(): void {
     this.classroom =
-        TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL;
+      TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL;
     this.keywords = [];
-    this.sort = ETopicSortOptions.IncreasingCreatedOn;
+    this.sort = ETopicSortOptions.IncreasingUpdatedOn;
     this.status = ETopicPublishedOptions.All;
   }
 
@@ -67,6 +69,9 @@ export class TopicsAndSkillsDashboardFilter {
   static createDefault(): TopicsAndSkillsDashboardFilter {
     return new TopicsAndSkillsDashboardFilter(
       TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL,
-      [], ETopicSortOptions.IncreasingCreatedOn, ETopicPublishedOptions.All);
+      [],
+      ETopicSortOptions.IncreasingUpdatedOn,
+      ETopicPublishedOptions.All
+    );
   }
 }

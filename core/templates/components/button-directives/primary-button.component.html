@@ -1,0 +1,16 @@
+<a *ngIf="!componentIsButton" class="primary-button btn"
+   role="button"
+   [ngClass]="customClasses"
+   [href]="getButtonHref()"
+   [target]="getTarget()"
+   (click)="handleButtonClick($event)">
+  {{ buttonText }}
+</a>
+
+<button *ngIf="componentIsButton" type="submit"
+        class="primary-button btn"
+        [ngClass]="customClasses"
+        [disabled]="disabled"
+        (click)="handleButtonClick($event)">
+  {{ buttonText }}
+</button>

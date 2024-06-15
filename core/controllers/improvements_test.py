@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -27,7 +28,7 @@ from core.controllers import improvements
 from core.domain import exp_services
 from core.domain import improvements_domain
 from core.domain import improvements_services
-from core.domain import platform_feature_services
+from core.domain import platform_parameter_list
 from core.platform import models
 from core.tests import test_utils
 
@@ -692,27 +693,23 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
         self.assertFalse(json_response['is_improvements_tab_enabled'])
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED])
     def test_improvements_tab_enabled(self) -> None:
-        swap_is_feature_enabled = self.swap_to_always_return(
-            platform_feature_services,
-            'is_feature_enabled',
-            True
-        )
-
-        with swap_is_feature_enabled, self.login_context(
-            self.OWNER_EMAIL
-        ):
+        with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url())
 
         self.assertTrue(json_response['is_improvements_tab_enabled'])
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD, 0.35),  # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD, 0),  # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 0) # pylint: disable=line-too-long
+        ]
+    )
     def test_custom_high_bounce_rate_creation_threshold(self) -> None:
-        swap_get_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
-            'get_platform_parameter_value',
-            0.35
-        )
-        with swap_get_platform_parameter_value, self.login_context(
+        with self.login_context(
             self.OWNER_EMAIL
         ):
             json_response = self.get_json(self.get_url())
@@ -722,14 +719,15 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
                 'high_bounce_rate_task_state_bounce_rate_creation_threshold'],
             0.35)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD, 0),  # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD, 0.05),  # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 0) # pylint: disable=line-too-long
+        ]
+    )
     def test_custom_high_bounce_rate_obsoletion_threshold(self) -> None:
-        swap_get_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
-            'get_platform_parameter_value',
-            0.05
-        )
-
-        with swap_get_platform_parameter_value, self.login_context(
+        with self.login_context(
             self.OWNER_EMAIL
         ):
             json_response = self.get_json(self.get_url())
@@ -739,16 +737,17 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
                 'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold'],
             0.05)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD, 0),  # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD, 0),  # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 20) # pylint: disable=line-too-long
+        ]
+    )
     def test_custom_high_bounce_rate_task_minimum_exploration_starts(
         self
     ) -> None:
-        swap_get_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
-            'get_platform_parameter_value',
-            20
-        )
-
-        with swap_get_platform_parameter_value, self.login_context(
+        with self.login_context(
             self.OWNER_EMAIL
         ):
             json_response = self.get_json(self.get_url())

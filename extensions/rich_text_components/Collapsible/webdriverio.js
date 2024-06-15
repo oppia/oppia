@@ -18,25 +18,32 @@
  */
 
 var forms = require(process.cwd() + '/core/tests/webdriverio_utils/forms.js');
-var customizeComponent = async function(modal, heading, contentInstructions) {
-  await forms.UnicodeEditor(
-    await modal.$('<schema-based-unicode-editor>')
-  ).setValue(heading);
+var customizeComponent = async function (modal, heading, contentInstructions) {
+  await forms
+    .UnicodeEditor(await modal.$('<schema-based-unicode-editor>'))
+    .setValue(heading);
   var richTextEditor = await forms.RichTextEditor(
-    await modal.$('<schema-based-html-editor>'));
+    await modal.$('<schema-based-html-editor>')
+  );
   await richTextEditor.clear();
   await contentInstructions(richTextEditor);
 };
 
-var expectComponentDetailsToMatch = async function(
-    elem, heading, contentInstructions) {
-  var headerElement = elem.$(
-    '.e2e-test-collapsible-heading');
+var expectComponentDetailsToMatch = async function (
+  elem,
+  heading,
+  contentInstructions
+) {
+  var headerElement = elem.$('.e2e-test-collapsible-heading');
   expect(await headerElement.getText()).toMatch(heading);
   // Open the collapsible block so we can examine it.
   await headerElement.click();
-  const collapsibleElem = elem.$(
-    '.e2e-test-collapsible-content');
+  const collapsibleElem = elem.$('.e2e-test-collapsible-content');
+  // The collapsible element has a built-in animation which takes time to
+  // complete (even though the element exists on the page), so we need to build
+  // in an explicit waiting time here.
+  // eslint-disable-next-line oppia/e2e-practices
+  await browser.pause(1000);
   await forms.expectRichText(collapsibleElem).toMatch(contentInstructions);
 };
 

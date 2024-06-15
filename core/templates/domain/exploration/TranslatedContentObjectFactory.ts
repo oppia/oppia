@@ -17,34 +17,35 @@
  * TranslatedContent domain objects.
  */
 
+import cloneDeep from 'lodash/cloneDeep';
 
 export const TRANSLATION_DATA_FORMAT_HTML = 'html';
 export const TRANSLATION_DATA_FORMAT_UNICODE = 'unicode';
-export const TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING = (
-  'set_of_normalized_string');
-export const TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING = (
-  'set_of_unicode_string');
+export const TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING =
+  'set_of_normalized_string';
+export const TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING =
+  'set_of_unicode_string';
 export const DATA_FORMAT_TO_DEFAULT_VALUES = {
   [TRANSLATION_DATA_FORMAT_HTML]: '',
   [TRANSLATION_DATA_FORMAT_UNICODE]: '',
   [TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING]: [],
-  [TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING]: []
+  [TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING]: [],
 };
 
-export type DataFormatToDefaultValuesKey = (
-  keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES);
+export type DataFormatToDefaultValuesKey =
+  keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES;
 
 export interface TranslatedContentBackendDict {
-  'content_value': string|string[];
-  'content_format': string;
-  'needs_update': boolean;
+  content_value: string | string[];
+  content_format: string;
+  needs_update: boolean;
 }
 
 export class TranslatedContent {
   constructor(
-      public translation: string|string[],
-      public dataFormat: DataFormatToDefaultValuesKey,
-      public needsUpdate: boolean
+    public translation: string | string[],
+    public dataFormat: DataFormatToDefaultValuesKey,
+    public needsUpdate: boolean
   ) {}
 
   isHtml(): boolean {
@@ -56,21 +57,53 @@ export class TranslatedContent {
   }
 
   isSetOfStrings(): boolean {
-    return [
-      TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
-      TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING
-    ].indexOf(this.dataFormat) !== -1;
+    return (
+      [
+        TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
+        TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+      ].indexOf(this.dataFormat) !== -1
+    );
   }
 
   markAsNeedingUpdate(): void {
     this.needsUpdate = true;
   }
 
+  getTranslation(): string | string[] {
+    return this.translation;
+  }
+
+  toBackendDict(): TranslatedContentBackendDict {
+    return {
+      content_value: this.translation,
+      content_format: this.dataFormat,
+      needs_update: this.needsUpdate,
+    };
+  }
+
   static createFromBackendDict(
-      translationBackendDict: TranslatedContentBackendDict): TranslatedContent {
+    translationBackendDict: TranslatedContentBackendDict
+  ): TranslatedContent {
     return new TranslatedContent(
       translationBackendDict.content_value,
       translationBackendDict.content_format as DataFormatToDefaultValuesKey,
-      translationBackendDict.needs_update);
+      translationBackendDict.needs_update
+    );
+  }
+
+  static createNew(dataFormat: string): TranslatedContent {
+    if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat)) {
+      throw new Error('Invalid translation data format: ' + dataFormat);
+    }
+
+    return new TranslatedContent(
+      cloneDeep(
+        DATA_FORMAT_TO_DEFAULT_VALUES[
+          dataFormat as DataFormatToDefaultValuesKey
+        ]
+      ),
+      dataFormat as DataFormatToDefaultValuesKey,
+      false
+    );
   }
 }

@@ -17,14 +17,17 @@
 from __future__ import annotations
 
 from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import app_feedback_report_services
 from core.domain import beam_job_services
-from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import story_services
+from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
@@ -33,7 +36,7 @@ from core.jobs.batch_jobs import exp_recommendation_computation_jobs
 from core.jobs.batch_jobs import exp_search_indexing_jobs
 from core.jobs.batch_jobs import user_stats_computation_jobs
 
-from typing import Dict
+from typing import DefaultDict, Dict, List
 
 
 class CronModelsCleanupHandler(
@@ -118,10 +121,18 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
         """
         # Only execute this job if it's possible to send the emails and there
         # are reviewers to notify.
-        if not feconf.CAN_SEND_EMAILS:
+        server_can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.
+                SERVER_CAN_SEND_EMAILS.value
+            )
+        )
+        if not server_can_send_emails:
             return self.render_json({})
-        if not (config_domain
-                .CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value):
+        if not platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.
+            CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
+        ):
             return self.render_json({})
         reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
         if not reviewer_ids:
@@ -154,7 +165,10 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
         to alert the admins that specific suggestions have been waiting too long
         to get reviewed.
         """
-        if not feconf.CAN_SEND_EMAILS:
+        server_can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value))
+        if not server_can_send_emails:
             return self.render_json({})
 
         admin_ids = user_services.get_user_ids_by_role(
@@ -164,9 +178,10 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
         translation_admin_ids = user_services.get_user_ids_by_role(
             feconf.ROLE_ID_TRANSLATION_ADMIN)
 
-        if (
-                config_domain
-                .ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value):
+        if platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.
+            ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
+        ):
             suggestion_types_needing_reviewers = (
                 suggestion_services
                 .get_suggestion_types_that_need_reviewers()
@@ -176,10 +191,11 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                 translation_admin_ids,
                 question_admin_ids,
                 suggestion_types_needing_reviewers)
-        if (
-                config_domain
-                .ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW
-                .value):
+
+        if platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.
+            ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
+        ):
             info_about_suggestions_waiting_too_long_for_review = (
                 suggestion_services
                 .get_info_about_suggestions_waiting_too_long_for_review()
@@ -192,6 +208,73 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                     question_admin_ids,
                     info_about_suggestions_waiting_too_long_for_review)
             )
+        return self.render_json({})
+
+
+class CronMailReviewerNewSuggestionsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for mailing reviewers about new suggestions
+    on the Contributor Dashboard.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self) -> None:
+        """Sends email notifications to reviewers about new
+        suggestions on the Contributor Dashboard.
+        """
+        server_can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value))
+        if not server_can_send_emails:
+            return self.render_json({})
+
+        if not platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.
+            CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
+        ):
+            return self.render_json({})
+
+        new_suggestions_info = (
+            suggestion_services
+                .get_new_suggestions_for_reviewer_notifications())
+
+        # Initialize dictionaries to organize data.
+        reviewer_ids_by_language: DefaultDict[
+            str, List[str]] = DefaultDict(list)
+        suggestions_by_language: DefaultDict[
+            str, List[
+                suggestion_registry.
+                    ReviewableSuggestionEmailInfo]] = DefaultDict(list)
+
+        for suggestion in new_suggestions_info:
+            language_property = suggestion.language_code
+
+            # Collect reviewer IDs.
+            reviewer_usernames = user_services.get_contributor_usernames(
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+                language_property
+            )
+
+            reviewer_ids = [
+                user_services.get_user_id_from_username(
+                    username) for username in reviewer_usernames]
+            filtered_reviewer_ids = [
+                id for id in reviewer_ids if id is not None]
+            reviewer_ids_by_language[language_property].extend(
+                filtered_reviewer_ids)
+
+            # Collect suggestions.
+            suggestions_by_language[language_property].append(suggestion)
+
+        # Send email notifications to reviewers based on the organized data.
+        email_manager.send_reviewer_notifications(
+            reviewer_ids_by_language, suggestions_by_language)
+
         return self.render_json({})
 
 
@@ -300,7 +383,10 @@ class CronMailChapterPublicationsNotificationsHandler(
         and upcoming (within CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS days)
         chapter launches.
         """
-        if not feconf.CAN_SEND_EMAILS:
+        server_can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value))
+        if not server_can_send_emails:
             return self.render_json({})
 
         admin_ids = user_services.get_user_ids_by_role(

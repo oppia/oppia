@@ -22,7 +22,6 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import config_services
 from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
@@ -72,6 +71,11 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             subtopics=[subtopic], next_subtopic_id=2)
 
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
+        self.save_new_valid_classroom(
+            topic_id_to_prerequisite_topic_ids={
+                self.topic_id: []
+            }
+        )
 
 
 class TopicsAndSkillsDashboardPageDataHandlerTests(
@@ -90,15 +94,6 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
 
         # Check that admins can access the topics and skills dashboard data.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        config_services.set_property(
-            self.admin_id, 'classroom_pages_data', [{
-                'url_fragment': 'math',
-                'name': 'math',
-                'topic_ids': [self.topic_id],
-                'topic_list_intro': 'Topics covered',
-                'course_details': 'Course details'
-            }]
-        )
         json_response = self.get_json(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
         self.assertEqual(len(json_response['topic_summary_dicts']), 1)
@@ -189,7 +184,7 @@ class CategorizedAndUntriagedSkillsDataHandlerTests(
         # Check that logged out users can access the categorized and
         # untriaged skills data.
         json_response = self.get_json(
-            '/topics_and_skills_dashboard/' +
+            '/topics_and_skills_dashboard/'
             'categorized_and_untriaged_skills_data',
             expected_status_int=200)
         self.assertEqual(
@@ -204,7 +199,7 @@ class CategorizedAndUntriagedSkillsDataHandlerTests(
         # untriaged skills data.
         self.login(self.NEW_USER_EMAIL)
         json_response = self.get_json(
-            '/topics_and_skills_dashboard/' +
+            '/topics_and_skills_dashboard/'
             'categorized_and_untriaged_skills_data',
             expected_status_int=200)
         self.assertEqual(
@@ -468,6 +463,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         expected_error = (
+            'At \'http://localhost/skills_dashboard/data\' '
+            'these errors are happening:\n'
             'Schema validation for \'num_skills_to_fetch\' '
             'failed: Could not convert str to int: string'
         )
@@ -495,6 +492,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         expected_error = (
+            'At \'http://localhost/skills_dashboard/data\' '
+            'these errors are happening:\n'
             'Schema validation for \'next_cursor\' failed: '
             'Expected string, received 40'
         )
@@ -535,6 +534,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         expected_error = (
+            'At \'http://localhost/skills_dashboard/data\' '
+            'these errors are happening:\n'
             'Schema validation for \'classroom_name\' failed: '
             'Expected string, received 20'
         )
@@ -557,6 +558,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         expected_error = (
+            'At \'http://localhost/skills_dashboard/data\' '
+            'these errors are happening:\n'
             'Schema validation for \'keywords\' failed: '
             'Expected list, received 20'
         )
@@ -575,6 +578,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         expected_error = (
+            'At \'http://localhost/skills_dashboard/data\' '
+            'these errors are happening:\n'
             'Schema validation for \'keywords\' failed: '
             'Expected string, received 20'
         )
@@ -597,6 +602,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         expected_error = (
+            'At \'http://localhost/skills_dashboard/data\' '
+            'these errors are happening:\n'
             'Schema validation for \'status\' failed: '
             'Expected string, received 20'
         )
@@ -619,6 +626,8 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         expected_error = (
+            'At \'http://localhost/skills_dashboard/data\' '
+            'these errors are happening:\n'
             'Schema validation for \'sort\' failed: '
             'Expected string, received 20'
         )

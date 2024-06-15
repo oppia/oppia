@@ -976,7 +976,6 @@ class Graph(BaseObject):
         Checks that there are no self-loops or multiple edges.
         Checks that unlabeled graphs have all labels empty.
         Checks that unweighted graphs have all weights set to 1.
-        TODO(czx): Think about support for multigraphs?
 
         Args:
             raw: *. A Python object to be validated against the schema,
@@ -1355,8 +1354,9 @@ class DragAndDropPositiveInt(BaseObject):
     """
 
     description = (
-        'The rank(position) of a drag and drop item in the given list of sets' +
-        'of drag and drop items.')
+        'The rank(position) of a drag and drop item in the given list of sets'
+        'of drag and drop items.'
+    )
     default_value = 1
 
     @classmethod

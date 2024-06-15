@@ -16,13 +16,12 @@
  * @fileoverview Root routing module.
  */
 
-import { APP_BASE_HREF } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
+import {APP_BASE_HREF} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
 
-import { AppConstants } from 'app.constants';
-import { CanAccessSplashPageGuard } from './guards/can-access-splash-page.guard';
-
+import {AppConstants} from 'app.constants';
+import {CanAccessSplashPageGuard} from './guards/can-access-splash-page.guard';
 
 // All paths must be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
@@ -31,43 +30,36 @@ const routes: Route[] = [
     path: '',
     children: [
       {
-        path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
-        pathMatch: 'full',
-        loadChildren: () => import('pages/classroom-page/classroom-page.module')
-          .then(m => m.ClassroomPageModule)
-      },
-      {
         path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,
         pathMatch: 'full',
         canLoad: [CanAccessSplashPageGuard],
-        loadChildren: () => import('pages/splash-page/splash-page.module')
-          .then(m => m.SplashPageModule)
+        loadChildren: () =>
+          import('pages/splash-page/splash-page.module').then(
+            m => m.SplashPageModule
+          ),
       },
-    ]
-  }
+    ],
+  },
 ];
 
 // '**' wildcard route must be kept at the end,as it can override all other
 // routes.
 routes.push({
   path: '**',
-  loadChildren: () => import(
-    'pages/error-pages/error-404/error-404-page.module').then(
-    m => m.Error404PageModule)
+  loadChildren: () =>
+    import('pages/error-pages/error-404/error-404-page.module').then(
+      m => m.Error404PageModule
+    ),
 });
 
 @NgModule({
-  imports: [
-    RouterModule.forRoot(routes),
-  ],
-  exports: [
-    RouterModule
-  ],
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule],
   providers: [
     {
       provide: APP_BASE_HREF,
-      useValue: '/'
-    }
-  ]
+      useValue: '/',
+    },
+  ],
 })
 export class AppRoutingModule {}

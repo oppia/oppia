@@ -1,0 +1,94 @@
+<div class="modal-header e2e-test-language-selector-modal">
+  <h4 class="modal-title">Translation reviewer roles for user {{username}}</h4>
+</div>
+<div class="modal-body">
+  <div class="modal-body">
+    <p *ngIf="assignedLanguageIds.length">User has review rights in the following languages:</p>
+    <p *ngIf="!assignedLanguageIds.length">User does not have review rights in any languages.</p>
+    <ul>
+      <li *ngFor="let languageId of assignedLanguageIds">
+        <div class="d-flex justify-content-between">
+          <span>{{ languageIdToName[languageId] }}</span>
+          <div class="mat-icon-button oppia-progress-spinner" *ngIf="languageIdInUpdate === languageId">
+            <mat-spinner [diameter]="24"></mat-spinner>
+          </div>
+          <button mat-button matSuffix mat-icon-button
+                  *ngIf="languageIdInUpdate !== languageId"
+                  aria-label="Clear"
+                  (click)="removeLanguageId(languageId)">
+            <mat-icon matListIcon>close</mat-icon>
+          </button>
+        </div>
+      </li>
+    </ul>
+    <div>Add Language:</div>
+    <div *ngIf="languageIdsForSelection.length">
+      <div class="d-inline-flex mt-3 w-100 language-dropdown">
+        <select class="w-50 e2e-test-language-selector" placeholder="Select new language to add" label="Language selector" ngbAutofocus [(ngModel)]="selectedLanguageId">
+          <option *ngFor="let languageId of languageIdsForSelection" [value]="languageId">{{ languageIdToName[languageId] }}</option>
+        </select>
+        <button mat-icon-button color="primary" (click)="addLanguage()" class="e2e-test-language-selector-add-button">
+          <mat-icon aria-label="Example icon-button with a heart icon">add</mat-icon>
+        </button>
+      </div>
+    </div>
+    <div *ngIf="!languageIdsForSelection.length">
+      <i *ngIf="assignedLanguageIds.length">There are no languages remaining. User is assigned to all available languages.</i>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="cancel-button" (click)="close()">Close</button>
+</div>
+
+<style>
+  .modal-body.disabled, .language-dropdown.disabled {
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    color: #888;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  .cancel-button {
+    border-color: #00645c;
+    border-radius: 5px;
+    color: #00645c;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.30px;
+    padding: 5px;
+    text-transform: uppercase;
+  }
+  .oppia-progress-spinner {
+    align-items: center;
+    display: flex;
+    width: 32px;
+  }
+  .label {
+    color: #333;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    left: 32px;
+    top: 0;
+    word-wrap: break-word
+  }
+  .label-explanation {
+    color: #667085;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    word-wrap: break-word
+  }
+  .attribute-container {
+    display: flex;
+    padding-bottom: 5px;
+    padding-left: 20px;
+  }
+  .translation-submitter-role-checkbox {
+    color: #00645c;
+    cursor: pointer;
+    font-size: 20px;
+  }
+</style>

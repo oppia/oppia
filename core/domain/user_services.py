@@ -23,7 +23,6 @@ import hashlib
 import imghdr
 import itertools
 import logging
-import re
 import urllib
 
 from core import feconf
@@ -33,6 +32,8 @@ from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import exp_fetchers
 from core.domain import fs_services
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import role_services
 from core.domain import state_domain
 from core.domain import user_domain
@@ -41,7 +42,8 @@ from core.platform import models
 import requests
 
 from typing import (
-    Dict, Final, List, Literal, Optional, Sequence, TypedDict, overload)
+    Dict, Final, List, Literal, Optional, Sequence, TypedDict,
+    overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -351,18 +353,6 @@ def get_users_settings(
     return result
 
 
-def generate_initial_profile_picture(user_id: str) -> None:
-    """Generates a profile picture for a new user and
-    updates the user's settings in the datastore.
-
-    Args:
-        user_id: str. The unique ID of the user.
-    """
-    user_email = get_email_from_user_id(user_id)
-    user_gravatar = fetch_gravatar(user_email)
-    update_profile_picture_data_url(user_id, user_gravatar)
-
-
 def get_gravatar_url(email: str) -> str:
     """Returns the gravatar url for the specified email.
 
@@ -378,19 +368,19 @@ def get_gravatar_url(email: str) -> str:
         (hashlib.md5(email.encode('utf-8')).hexdigest(), GRAVATAR_SIZE_PX))
 
 
-def fetch_gravatar(email: str) -> str:
+def fetch_gravatar(user_email: str) -> str:
     """Returns the gravatar corresponding to the user's email, or an
     identicon generated from the email if the gravatar doesn't exist.
 
     Args:
-        email: str. The user email.
+        user_email: str. The user email.
 
     Returns:
         str. The gravatar url corresponding to the given user email. If the call
         to the gravatar service fails, this returns DEFAULT_IDENTICON_DATA_URL
         and logs an error.
     """
-    gravatar_url = get_gravatar_url(email)
+    gravatar_url = get_gravatar_url(user_email)
     try:
         response = requests.get(
             gravatar_url, headers={b'Content-Type': b'image/png'},
@@ -673,14 +663,15 @@ def _save_user_contribution_rights(
 def _update_user_contribution_rights(
     user_contribution_rights: user_domain.UserContributionRights
 ) -> None:
-    """Updates the users rights model if the updated object has review rights in
-    at least one item else delete the existing model.
+    """Updates the users rights model if the updated object has review rights
+     or submit rights in at least one item else delete the existing model.
 
     Args:
         user_contribution_rights: UserContributionRights. The updated
             UserContributionRights object of the user.
     """
-    if user_contribution_rights.can_review_at_least_one_item():
+    if user_contribution_rights.can_review_at_least_one_item() or (
+       user_contribution_rights.can_submit_at_least_one_item()):
         _save_user_contribution_rights(user_contribution_rights)
     else:
         remove_contribution_reviewer(user_contribution_rights.id)
@@ -1407,16 +1398,14 @@ def record_agreement_to_terms(user_id: str) -> None:
 
 
 def update_profile_picture_data_url(
-    user_id: str, profile_picture_data_url: str
+    username: str, profile_picture_data_url: str
 ) -> None:
-    """Updates profile_picture_data_url of user with given user_id.
+    """Updates profile_picture_data_url of user with given username.
 
     Args:
-        user_id: str. The unique ID of the user.
+        username: str. The username of the user.
         profile_picture_data_url: str. New profile picture url to be set.
     """
-    user_settings = get_user_settings(user_id, strict=True)
-    username = user_settings.username
     # Ruling out the possibility of different types for mypy type checking.
     assert isinstance(username, str)
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
@@ -1428,145 +1417,6 @@ def update_profile_picture_data_url(
     webp_binary = utils.convert_png_binary_to_webp_binary(png_binary)
     filename_webp = 'profile_picture.webp'
     fs.commit(filename_webp, webp_binary, mimetype='image/webp')
-
-
-def update_user_bio(user_id: str, user_bio: str) -> None:
-    """Updates user_bio of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        user_bio: str. New user biography to be set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.user_bio = user_bio
-    save_user_settings(user_settings)
-
-
-def update_user_default_dashboard(
-    user_id: str, default_dashboard: str
-) -> None:
-    """Updates the default dashboard of user with given user id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        default_dashboard: str. The dashboard the user wants.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.default_dashboard = default_dashboard
-    save_user_settings(user_settings)
-
-
-def update_user_creator_dashboard_display(
-    user_id: str, creator_dashboard_display_pref: str
-) -> None:
-    """Updates the creator dashboard preference of user with given user id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        creator_dashboard_display_pref: str. The creator dashboard preference
-            the user wants.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.creator_dashboard_display_pref = (
-        creator_dashboard_display_pref)
-    save_user_settings(user_settings)
-
-
-def update_subject_interests(
-    user_id: str, subject_interests: List[str]
-) -> None:
-    """Updates subject_interests of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        subject_interests: list(str). New subject interests to be set.
-    """
-    if not isinstance(subject_interests, list):
-        raise utils.ValidationError('Expected subject_interests to be a list.')
-
-    for interest in subject_interests:
-        if not isinstance(interest, str):
-            raise utils.ValidationError(
-                'Expected each subject interest to be a string.')
-        if not interest:
-            raise utils.ValidationError(
-                'Expected each subject interest to be non-empty.')
-        if not re.match(constants.TAG_REGEX, interest):
-            raise utils.ValidationError(
-                'Expected each subject interest to consist only of '
-                'lowercase alphabetic characters and spaces.')
-
-    if len(set(subject_interests)) != len(subject_interests):
-        raise utils.ValidationError(
-            'Expected each subject interest to be distinct.')
-
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.subject_interests = subject_interests
-    save_user_settings(user_settings)
-
-
-def update_preferred_language_codes(
-    user_id: str, preferred_language_codes: List[str]
-) -> None:
-    """Updates preferred_language_codes of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        preferred_language_codes: list(str). New exploration language
-            preferences to set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.preferred_language_codes = preferred_language_codes
-    save_user_settings(user_settings)
-
-
-def update_preferred_site_language_code(
-    user_id: str, preferred_site_language_code: str
-) -> None:
-    """Updates preferred_site_language_code of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        preferred_site_language_code: str. New system language preference
-            to set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.preferred_site_language_code = (
-        preferred_site_language_code)
-    save_user_settings(user_settings)
-
-
-def update_preferred_audio_language_code(
-    user_id: str, preferred_audio_language_code: str
-) -> None:
-    """Updates preferred_audio_language_code of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        preferred_audio_language_code: str. New audio language preference
-            to set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.preferred_audio_language_code = (
-        preferred_audio_language_code)
-    save_user_settings(user_settings)
-
-
-def update_preferred_translation_language_code(
-    user_id: str, preferred_translation_language_code: str
-) -> None:
-    """Updates preferred_translation_language_code of user with
-    given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        preferred_translation_language_code: str. New text translation
-            language preference to set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.preferred_translation_language_code = (
-        preferred_translation_language_code)
-    save_user_settings(user_settings)
 
 
 def add_user_role(user_id: str, role: str) -> None:
@@ -1744,21 +1594,23 @@ def record_user_created_an_exploration(user_id: str) -> None:
         save_user_settings(user_settings)
 
 
-def add_user_to_mailing_list(email: str, name: str, tag: str) -> bool:
+def add_user_to_mailing_list(
+    email: str,
+    tag: str,
+    name: Optional[str]=None
+) -> bool:
     """Adds user to the bulk email provider with the relevant tag and required
     merge fields.
 
     Args:
         email: str. Email of the user.
-        name: str. Name of the user.
         tag: str. Tag for the mailing list.
+        name: str or None. Name of the user, or None if no name was supplied.
 
     Returns:
         bool. Whether the operation was successful or not.
     """
-    merge_fields = {
-        'NAME': name
-    }
+    merge_fields = {'NAME': name} if name is not None else {}
     return bulk_email_services.add_or_update_user_status(
         email, merge_fields, tag, can_receive_email_updates=True)
 
@@ -1792,8 +1644,7 @@ def update_email_preferences(
             to the bulk email provider's database initiated the update here.
 
     Returns:
-        bool. Whether to send a mail to the user to complete bulk email service
-        signup.
+        bool. Whether updating the user's bulk email preferences failed.
     """
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
         user_id, strict=False)
@@ -1810,7 +1661,12 @@ def update_email_preferences(
     email = get_email_from_user_id(user_id)
     # Mailchimp database should not be updated in servers where sending
     # emails is not allowed.
-    if not bulk_email_db_already_updated and feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not bulk_email_db_already_updated and server_can_send_emails:
         user_creation_successful = (
             bulk_email_services.add_or_update_user_status(
                 email, {}, 'Account',
@@ -2540,34 +2396,27 @@ def get_contributor_usernames(
     user_ids = []
     if (
         category in (
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
         ) and language_code is None
     ):
         raise Exception(
             'The language_code cannot be None if review category is'
             ' \'translation\' or \'voiceover\'.'
         )
-    if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
+    if category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION:
         # Ruling out the possibility of None for mypy type checking.
         assert language_code is not None
         user_ids = (
             user_models.UserContributionRightsModel
             .get_translation_reviewer_user_ids(language_code))
-    elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER:
-        # Ruling out the possibility of None for mypy type checking.
-        assert language_code is not None
-        user_ids = (
-            user_models.UserContributionRightsModel
-            .get_voiceover_reviewer_user_ids(language_code))
-    elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION:
+    elif category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION:
         if language_code is not None:
             raise Exception('Expected language_code to be None, found: %s' % (
                 language_code))
         user_ids = (
             user_models.UserContributionRightsModel
             .get_question_reviewer_user_ids())
-    elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION:
+    elif category == constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION:
         user_ids = (
             user_models.UserContributionRightsModel
             .get_question_submitter_user_ids())
@@ -2995,3 +2844,233 @@ def is_user_blog_post_author(user_id: str) -> bool:
     user_settings = get_user_settings(user_id, strict=True)
     author_roles = [feconf.ROLE_ID_BLOG_ADMIN, feconf.ROLE_ID_BLOG_POST_EDITOR]
     return any(role in author_roles for role in user_settings.roles)
+
+
+def assign_coordinator(
+    committer: user_domain.UserActionsInfo,
+    assignee: user_domain.UserActionsInfo,
+    language_id: str
+) -> None:
+    """Assigns a new role to the user.
+
+    Args:
+        committer: UserActionsInfo. UserActionsInfo object for the user
+            who is performing the action.
+        assignee: UserActionsInfo. UserActionsInfo object for the user
+            whose role is being changed.
+        language_id: str. ID of the language.
+
+    Raises:
+        Exception. The committer does not have rights to modify a role.
+        Exception. The assignee is already coordinator for this language.
+        Exception. Guest user is not allowed to assign roles to a user.
+        Exception. The role of the Guest user cannot be changed.
+    """
+    committer_id = committer.user_id
+    if committer_id is None:
+        raise Exception(
+            'Guest user is not allowed to assign roles to a user.'
+        )
+
+    if (
+        role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
+            committer.actions
+    ):
+        logging.error(
+            'User %s tried to allow user %s to be a coordinator of language %s '
+            'but was refused permission.' % (
+                committer_id, assignee.user_id, language_id))
+        raise Exception(
+            'UnauthorizedUserException: Could not assign new role.')
+
+    if assignee.user_id is None:
+        raise Exception(
+            'Cannot change the role of the Guest user.'
+        )
+
+    language_rights = suggestion_models.TranslationCoordinatorsModel.get(
+        language_id, strict=False)
+
+    if language_rights is None:
+        model = suggestion_models.TranslationCoordinatorsModel(
+            id=language_id,
+            coordinator_ids=[assignee.user_id],
+            coordinators_count=1
+        )
+        model.update_timestamps()
+        model.put()
+    else:
+        if assignee.user_id in language_rights.coordinator_ids:
+            raise Exception(
+                'This user already is a coordinator for this language.'
+            )
+
+        language_rights.coordinator_ids.append(assignee.user_id)
+        language_rights.coordinators_count += 1
+
+        suggestion_models.TranslationCoordinatorsModel.update_timestamps(
+            language_rights,
+            update_last_updated_time=True)
+        suggestion_models.TranslationCoordinatorsModel.put(
+            language_rights)
+
+
+def deassign_coordinator(
+    committer: user_domain.UserActionsInfo,
+    assignee: user_domain.UserActionsInfo,
+    language_id: str
+) -> None:
+    """Removes the user as a coordinator of that language.
+
+    Args:
+        committer: UserActionsInfo. UserActionsInfo object for the user
+            who is performing the action.
+        assignee: UserActionsInfo. UserActionsInfo object for the user
+            whose role is being changed.
+        language_id: str. ID of the language.
+
+    Raises:
+        Exception. The committer does not have rights to modify a role.
+        Exception. The assignee is already coordinator for this language.
+        Exception. Guest user is not allowed to assign roles to a user.
+        Exception. The role of the Guest user cannot be changed.
+    """
+    committer_id = committer.user_id
+    if committer_id is None:
+        raise Exception(
+            'Guest user is not allowed to deassign roles to a user.'
+        )
+    language_rights = suggestion_models.TranslationCoordinatorsModel.get(
+        language_id, strict=False)
+    if (
+        role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
+            committer.actions
+    ):
+        logging.error(
+            'User %s tried to allow user %s to be a coordinator of language %s '
+            'but was refused permission.' % (
+                committer_id, assignee.user_id, language_id))
+        raise Exception(
+            'UnauthorizedUserException: Could not assign new role.')
+
+    if assignee.user_id is None:
+        raise Exception(
+            'Cannot change the role of the Guest user.'
+        )
+
+    if language_rights is None:
+        raise Exception(
+            'No model exists for provided language.'
+        )
+
+    if assignee.user_id not in language_rights.coordinator_ids:
+        raise Exception('This user is not a coordinator for this language')
+
+    language_rights.coordinator_ids.remove(assignee.user_id)
+    language_rights.coordinators_count -= 1
+
+    suggestion_models.TranslationCoordinatorsModel.update_timestamps(
+        language_rights,
+        update_last_updated_time=True)
+    suggestion_models.TranslationCoordinatorsModel.put(
+        language_rights)
+
+
+def get_translation_rights_from_model(
+    translation_coordinator_model:
+        suggestion_models.TranslationCoordinatorsModel
+) -> user_domain.TranslationCoordinatorStats:
+    """Constructs a TranslationCoordinatorStats object from the given
+    translation coordinator model.
+
+    Args:
+        translation_coordinator_model: TranslationCoordinatorsModel. The
+            model which is to be converted to an object.
+
+    Returns:
+        TranslationCoordinatorStats. The TranslationCoordinatorStats object
+        created from the model.
+    """
+    return user_domain.TranslationCoordinatorStats(
+        translation_coordinator_model.id,
+        translation_coordinator_model.coordinator_ids,
+        translation_coordinator_model.coordinators_count
+    )
+
+
+def get_translation_rights_with_user(user_id: str) -> List[
+    user_domain.TranslationCoordinatorStats
+]:
+    """Retrieves the rights object for all languages assigned to given user.
+
+    Args:
+        user_id: str. ID of the user.
+
+    Returns:
+        list(TranslationCoordinatorStats). The rights objects associated with
+        the languagesassigned to given user.
+    """
+    translation_coordinator_models: Sequence[
+        suggestion_models.TranslationCoordinatorsModel
+    ] = (
+        suggestion_models.TranslationCoordinatorsModel.get_by_user(user_id)
+    )
+
+    return [
+        get_translation_rights_from_model(model)
+        for model in translation_coordinator_models
+        if model is not None
+    ]
+
+
+def deassign_user_from_all_languages(
+    committer: user_domain.UserActionsInfo, user_id: str
+) -> None:
+    """Deassigns given user from all languages assigned to them.
+
+    Args:
+        committer: UserActionsInfo. UserActionsInfo object for the user
+            who is performing the action.
+        user_id: str. The ID of the user.
+
+    Raises:
+        Exception. Guest users are not allowed to deassign users from
+            all languages.
+    """
+    translation_rights_list = get_translation_rights_with_user(user_id)
+    if committer.user_id is None:
+        raise Exception(
+            'Guest users are not allowed to deassign users from all languages.'
+        )
+
+    for translation_rights in translation_rights_list:
+        translation_rights.coordinator_ids.remove(user_id)
+        translation_rights.coordinators_count -= 1
+        language_rights = suggestion_models.TranslationCoordinatorsModel(
+            id=translation_rights.language_id,
+            coordinator_ids=translation_rights.coordinator_ids,
+            coordinators_count=translation_rights.coordinators_count)
+        suggestion_models.TranslationCoordinatorsModel.update_timestamps(
+            language_rights,
+            update_last_updated_time=True)
+        suggestion_models.TranslationCoordinatorsModel.put(
+            language_rights)
+
+
+def check_user_is_coordinator(user_id: str, language_id: str) -> bool:
+    """Check if the given user is coordinator of provided language.
+
+    Args:
+        user_id:str. User ID.
+        language_id: str. ID of the language.
+
+    Returns:
+        bool. True if the user is coordinator or else False.
+    """
+    model = suggestion_models.TranslationCoordinatorsModel.get(
+        language_id, strict=False)
+
+    if model is None:
+        return False
+
+    return user_id in model.coordinator_ids

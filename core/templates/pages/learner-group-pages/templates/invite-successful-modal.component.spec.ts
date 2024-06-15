@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the invite successful modal component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { InviteSuccessfulModalComponent } from './invite-successful-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {InviteSuccessfulModalComponent} from './invite-successful-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -33,21 +32,20 @@ class MockActiveModal {
   }
 }
 
-describe('Invite successful Modal Component', function() {
+describe('Invite successful Modal Component', function () {
   let component: InviteSuccessfulModalComponent;
   let fixture: ComponentFixture<InviteSuccessfulModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        InviteSuccessfulModalComponent,
-        MockTranslatePipe
+      declarations: [InviteSuccessfulModalComponent, MockTranslatePipe],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

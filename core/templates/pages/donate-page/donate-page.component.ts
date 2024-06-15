@@ -16,132 +16,208 @@
  * @fileoverview Component for the donate page.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
-import { PageTitleService } from 'services/page-title.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import 'popper.js';
 import 'bootstrap';
-import { AppConstants } from 'app.constants';
-import { AlertsService } from 'services/alerts.service';
-import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
-import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
-import { ThanksForSubscribingModalComponent } from './thanks-for-subscribing-modal.component';
-import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
+import {ThanksForDonatingModalComponent} from './thanks-for-donating-modal.component';
+import {DonationBoxModalComponent} from './donation-box/donation-box-modal.component';
+
+interface ImpactStat {
+  imageUrl: string | null;
+  stat: string | null;
+  text: string;
+}
+
+interface DonationValue {
+  amount: string;
+  description: string;
+}
+
+interface Highlight {
+  imageUrl: string;
+  heading: string;
+  text: string;
+}
+
+interface Learner {
+  name: string;
+  country: string;
+  imageUrl: string;
+  webpUrl: string;
+  text: string;
+}
+
 @Component({
   selector: 'donate-page',
   templateUrl: './donate-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
-export class DonatePageComponent implements OnInit, OnDestroy {
-  directiveSubscriptions = new Subscription();
-  windowIsNarrow: boolean = false;
-  donateImgUrl: string = '';
-  emailAddress: string | null = null;
-  name: string | null = null;
-  OPPIA_AVATAR_IMAGE_URL = (
-    this.getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg')
-  );
+export class DonatePageComponent implements OnInit {
+  donationValues: DonationValue[] = [
+    {
+      amount: '10',
+      description: 'I18N_DONATE_PAGE_CONTENT_DONATION_DESCRIPTION_1',
+    },
+    {
+      amount: '25',
+      description: 'I18N_DONATE_PAGE_CONTENT_DONATION_DESCRIPTION_2',
+    },
+    {
+      amount: '100',
+      description: 'I18N_DONATE_PAGE_CONTENT_DONATION_DESCRIPTION_3',
+    },
+  ];
+
+  impactStats: ImpactStat[][] = [
+    [
+      {
+        imageUrl: '/donate/content-2-graph.svg',
+        stat: null,
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_1',
+      },
+      {
+        imageUrl: '/donate/content-2-screen.svg',
+        stat: null,
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_2',
+      },
+    ],
+    [
+      {
+        imageUrl: '/donate/content-2-phone.svg',
+        stat: null,
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_3',
+      },
+      {
+        imageUrl: '/donate/content-2-area-graph.svg',
+        stat: null,
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_4',
+      },
+      {
+        imageUrl: '/donate/content-2-visitors.svg',
+        stat: null,
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_5',
+      },
+    ],
+    [
+      {
+        imageUrl: null,
+        stat: '98%',
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_6',
+      },
+    ],
+    [
+      {
+        imageUrl: null,
+        stat: '90%',
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_7',
+      },
+    ],
+  ];
+
+  highlights: Highlight[] = [
+    {
+      imageUrl: '/donate/highlights-1',
+      heading: 'I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_TITLE_1',
+      text: 'I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_CONTENT_1',
+    },
+    {
+      imageUrl: '/donate/highlights-2',
+      heading: 'I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_TITLE_2',
+      text: 'I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_CONTENT_2',
+    },
+  ];
+
+  learners: Learner[] = [
+    {
+      name: 'Abasiekeme',
+      country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_1',
+      imageUrl: '/donate/learners-abasiekeme.png',
+      webpUrl: '/donate/learners-abasiekeme.webp',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_1',
+    },
+    {
+      name: 'Sandra Bosso',
+      country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_2',
+      imageUrl: '/donate/learners-sandra.png',
+      webpUrl: '/donate/learners-sandra.webp',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_2',
+    },
+    {
+      name: 'Kajal',
+      country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_3',
+      imageUrl: '/donate/learners-kajal.png',
+      webpUrl: '/donate/learners-kajal.webp',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_3',
+    },
+    {
+      name: 'Seneen',
+      country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_4',
+      imageUrl: '/donate/learners-seneen.png',
+      webpUrl: '/donate/learners-seneen.webp',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_4',
+    },
+    {
+      name: 'Juweria Cabdalla',
+      country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_5',
+      imageUrl: '/donate/learners-juweria.png',
+      webpUrl: '/donate/learners-juweria.webp',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_5',
+    },
+  ];
+
+  tileShown: number = 0;
+  @ViewChildren('tiles') tiles!: QueryList<ElementRef>;
 
   constructor(
-    private pageTitleService: PageTitleService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef,
-    private translateService: TranslateService,
-    private alertsService: AlertsService,
-    private mailingListBackendApiService: MailingListBackendApiService,
-    private ngbModal: NgbModal,
-    private insertScriptService: InsertScriptService,
+    private ngbModal: NgbModal
   ) {}
 
   ngOnInit(): void {
-    this.insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
-    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-    this.donateImgUrl = this.getStaticImageUrl('/general/opp_donate_text.svg');
-    this.directiveSubscriptions.add(
-      this.translateService.onLangChange.subscribe(() => {
-        this.setPageTitle();
-      })
-    );
-
     const searchParams = new URLSearchParams(
-      this.windowRef.nativeWindow.location.search);
+      this.windowRef.nativeWindow.location.search
+    );
     const params = Object.fromEntries(searchParams.entries());
     if (params.hasOwnProperty('thanks')) {
-      // Show the "thanks for donating" modal.
-      this.ngbModal.open(
-        ThanksForDonatingModalComponent,
-        {
-          backdrop: 'static',
-          size: 'xl'
-        }
-      );
+      this.ngbModal.open(ThanksForDonatingModalComponent, {
+        backdrop: 'static',
+        size: 'xl',
+      });
     }
-  }
-
-  setPageTitle(): void {
-    let translatedTitle = this.translateService.instant(
-      'I18N_DONATE_PAGE_BROWSER_TAB_TITLE');
-    this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  getImageSet(imageName: string, imageExt: string): string {
-    return (
-      this.getStaticImageUrl(imageName + '1x.' + imageExt) + ' 1x, ' +
-      this.getStaticImageUrl(imageName + '15x.' + imageExt) + ' 1.5x, ' +
-      this.getStaticImageUrl(imageName + '2x.' + imageExt) + ' 2x'
-    );
-  }
-
-  validateEmailAddress(): boolean {
-    let regex = new RegExp(AppConstants.EMAIL_REGEX);
-    return regex.test(String(this.emailAddress));
-  }
-
-  subscribeToMailingList(): void {
-    this.mailingListBackendApiService.subscribeUserToMailingList(
-      String(this.emailAddress),
-      String(this.name),
-      AppConstants.MAILING_LIST_WEB_TAG
-    ).then((status) => {
-      if (status) {
-        this.alertsService.addInfoMessage('Done!', 1000);
-        this.ngbModal.open(
-          ThanksForSubscribingModalComponent,
-          {
-            backdrop: 'static',
-            size: 'xl'
-          }
-        );
-      } else {
-        this.alertsService.addInfoMessage(
-          'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
-          'to be added to the mailing list.', 10000);
-      }
-    }).catch(errorResponse => {
-      this.alertsService.addInfoMessage(
-        'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
-        'to be added to the mailing list.', 10000);
+  openDonationBoxModal(): void {
+    this.ngbModal.open(DonationBoxModalComponent, {
+      backdrop: 'static',
+      size: 'xl',
+      windowClass: 'donation-box-modal',
     });
   }
 
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
+  nextTile(clickedVal: number): void {
+    let learnerTile = this.tiles.toArray()[clickedVal].nativeElement;
+    this.tileShown = clickedVal;
+
+    if (learnerTile !== null) {
+      learnerTile.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
+    }
   }
 }
-
-angular.module('oppia').directive(
-  'donatePage', downgradeComponent({component: DonatePageComponent}));

@@ -968,3 +968,67 @@ def untag_deleted_misconceptions(
         update_question(
             committer_id, question.id, change_list,
             'Untagged deleted skill misconception ids.')
+
+
+def populate_question_model_fields(
+    question_model: question_models.QuestionModel,
+    question: question_domain.Question
+) -> question_models.QuestionModel:
+    """Populate question model with the data from question object.
+
+    Args:
+        question_model: QuestionModel. The model to populate.
+        question: Question. The question domain object which should be used to
+            populate the model.
+
+    Returns:
+        QuestionModel. Populated model.
+    """
+    question_model.question_state_data = (
+        question.question_state_data.to_dict()
+    )
+    question_model.question_state_data_schema_version = (
+        question.question_state_data_schema_version)
+    question_model.next_content_id_index = question.next_content_id_index
+    question_model.language_code = question.language_code
+    question_model.linked_skill_ids = question.linked_skill_ids
+    question_model.inapplicable_skill_misconception_ids = (
+        question.inapplicable_skill_misconception_ids)
+
+    return question_model
+
+
+def populate_question_summary_model_fields(
+    question_summary_model: question_models.QuestionSummaryModel,
+    question_summary: question_domain.QuestionSummary
+) -> question_models.QuestionSummaryModel:
+    """Populate question summary model with the data from question summary
+    object.
+
+    Args:
+        question_summary_model: QuestionSummaryModel. The model to populate.
+        question_summary: QuestionSummary. The question summary domain object
+            which should be used to populate the model.
+
+    Returns:
+        QuestionSummaryModel. Populated model.
+    """
+    question_summary_dict = {
+        'question_model_last_updated': (
+            question_summary.last_updated),
+        'question_model_created_on': (
+            question_summary.created_on),
+        'question_content': question_summary.question_content,
+        'interaction_id': question_summary.interaction_id,
+        'version': question_summary.version,
+        'misconception_ids': question_summary.misconception_ids
+    }
+
+    if question_summary_model is not None:
+        question_summary_model.populate(**question_summary_dict)
+    else:
+        question_summary_dict['id'] = question_summary.id
+        question_summary_model = question_models.QuestionSummaryModel(
+            **question_summary_dict)
+
+    return question_summary_model

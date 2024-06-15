@@ -135,7 +135,7 @@ class ExplorationDisplayableSummariesTest(
         self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
         self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
         user_services.update_profile_picture_data_url(
-            self.user_c_id, user_services.DEFAULT_IDENTICON_DATA_URL)
+            self.USER_C_NAME, user_services.DEFAULT_IDENTICON_DATA_URL)
 
         self.save_new_valid_exploration(self.EXP_ID_4, self.user_c_id)
         exp_services.update_exploration(
@@ -467,7 +467,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
     def test_get_displayable_collection_summary_dicts_matching_ids(
         self
     ) -> None:
-        collection_id_1 = self.COLLECTION_ID + '_1'
+        collection_id_1 = '%s_1' % self.COLLECTION_ID
         self.save_new_valid_collection(self.COLLECTION_ID, self.owner_id)
         self.save_new_valid_collection(collection_id_1, self.owner_id)
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)

@@ -52,7 +52,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     """Test the story services module."""
 
     EXP_ID: Final = 'exp_id'
-    NODE_ID_1: Final = story_domain.NODE_ID_PREFIX + '1'
+    NODE_ID_1: Final = '%s1' % story_domain.NODE_ID_PREFIX
     NODE_ID_2: Final = 'node_2'
     USER_ID: Final = 'user'
 
@@ -79,8 +79,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID)
         self.save_new_valid_exploration(
-            self.EXP_ID, self.user_id_admin, end_state_name='End',
-            correctness_feedback_enabled=True)
+            self.EXP_ID, self.user_id_admin, end_state_name='End')
         self.publish_exploration(self.user_id_admin, self.EXP_ID)
         changelist = [
             story_domain.StoryChange({
@@ -243,6 +242,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_2,
+                'old_value': None,
+                'new_value': 'exp_2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
                     story_domain.STORY_NODE_PROPERTY_DESCRIPTION),
                 'node_id': self.NODE_ID_2,
                 'old_value': '',
@@ -357,13 +364,16 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             constants.STORY_NODE_STATUS_PUBLISHED)
         self.assertEqual(
             story.story_contents.nodes[1].
-            planned_publication_date, datetime.datetime(2023, 1, 2, 0, 0))
+            planned_publication_date, datetime.datetime(2023, 1, 2, 0, 0),
+            msg='Incorrect planned publication date received.')
         self.assertEqual(
             story.story_contents.nodes[1].
-            first_publication_date, datetime.datetime(2023, 1, 1, 0, 0))
+            first_publication_date, datetime.datetime(2023, 1, 1, 0, 0),
+            msg='Incorrect first publication date received.')
         self.assertEqual(
             story.story_contents.nodes[1].
-            last_modified, datetime.datetime(2023, 1, 1, 0, 0))
+            last_modified, datetime.datetime(2023, 1, 1, 0, 0),
+            msg='Incorrect last modified date received.')
 
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.node_titles, ['Title 1', 'Title 2'])
@@ -601,6 +611,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': self.NODE_ID_1,
                 'title': 'Title 1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': self.EXP_ID
             })
         ]
 
@@ -627,6 +645,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': self.NODE_ID_1,
                 'title': 'Title 1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': self.EXP_ID
             })
         ]
 
@@ -822,6 +848,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_2,
+                'old_value': None,
+                'new_value': 'exp_2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
                     story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
                 'node_id': self.NODE_ID_1,
                 'old_value': self.OLD_VALUE,
@@ -833,16 +867,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'Added node.')
         self.save_new_valid_exploration(
             '0', self.user_id_admin, title='Title 1',
-            category='Mathematics', language_code='en',
-            correctness_feedback_enabled=True)
+            category='Mathematics', language_code='en')
         self.save_new_valid_exploration(
             '1', self.user_id_admin, title='Title 2',
-            category='Mathematics', language_code='en',
-            correctness_feedback_enabled=True)
+            category='Mathematics', language_code='en')
         self.save_new_valid_exploration(
             '2', self.user_id_admin, title='Title 3',
-            category='Mathematics', language_code='en',
-            correctness_feedback_enabled=True)
+            category='Mathematics', language_code='en')
         self.publish_exploration(self.user_id_admin, '0')
         self.publish_exploration(self.user_id_admin, '1')
         self.publish_exploration(self.user_id_admin, '2')
@@ -1067,8 +1098,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.TOPIC_ID, 'story_id_2')
         self.save_new_valid_exploration(
             '0', self.user_id_admin, title='Title 1',
-            category='Mathematics', language_code='en',
-            correctness_feedback_enabled=True)
+            category='Mathematics', language_code='en')
         self.publish_exploration(self.user_id_admin, '0')
 
         change_list = [story_domain.StoryChange({
@@ -1241,7 +1271,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         with logging_swap, validate_fn_swap:
             self.save_new_valid_exploration(
                 'exp_id_1', self.user_id_a, title='title',
-                category='Algebra', correctness_feedback_enabled=True)
+                category='Algebra')
             self.publish_exploration(self.user_id_a, 'exp_id_1')
 
             with self.assertRaisesRegex(
@@ -1257,8 +1287,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
-            'exp_id_1', self.user_id_a, title='title', category='Algebra',
-            correctness_feedback_enabled=True)
+            'exp_id_1', self.user_id_a, title='title', category='Algebra')
         validation_error_messages = (
             story_services.validate_explorations_for_story(
                 ['invalid_exp', 'exp_id_1'], False))
@@ -1275,8 +1304,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
-            'exp_id_1', self.user_id_a, title='title', category='Algebra',
-            correctness_feedback_enabled=True)
+            'exp_id_1', self.user_id_a, title='title', category='Algebra')
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
             'property_name': (
@@ -1305,8 +1333,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         })]
 
         with self.assertRaisesRegex(
-            Exception, 'Story node with id node_1 does not contain an '
-            'exploration id.'):
+            Exception, 'Expected exploration ID to not be None'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -1316,13 +1343,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
-            'exp_id_1', self.user_id_a, title='title', category='Algebra',
-            correctness_feedback_enabled=True)
+            'exp_id_1', self.user_id_a, title='title', category='Algebra')
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
         self.save_new_valid_exploration(
-            'exp_id_2', self.user_id_a, title='title', category='Reading',
-            correctness_feedback_enabled=True)
+            'exp_id_2', self.user_id_a, title='title', category='Reading')
         self.publish_exploration(self.user_id_a, 'exp_id_2')
 
         change_list = [
@@ -1378,8 +1403,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
-            'exp_id_1', self.user_id_a, title='title', category='Category 1',
-            correctness_feedback_enabled=True)
+            'exp_id_1', self.user_id_a, title='title', category='Category 1')
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
         change_list = [
@@ -1415,7 +1439,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
-            language_code='es', correctness_feedback_enabled=True)
+            language_code='es')
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
         change_list = [
@@ -1443,40 +1467,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
-    def test_cannot_update_story_with_exps_without_correctness_feedback(
-        self
-    ) -> None:
-        topic_services.publish_story(
-            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
-        self.save_new_valid_exploration(
-            'exp_id_1', self.user_id_a, title='title', category='Algebra',
-            language_code='en')
-        self.publish_exploration(self.user_id_a, 'exp_id_1')
-
-        change_list = [
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': self.NODE_ID_1,
-                'old_value': None,
-                'new_value': 'exp_id_1'
-            })
-        ]
-
-        validation_error_messages = (
-            story_services.validate_explorations_for_story(['exp_id_1'], False))
-        self.assertEqual(
-            validation_error_messages, [
-                'Expected all explorations in a story to '
-                'have correctness feedback enabled. Invalid '
-                'exploration: exp_id_1'])
-        with self.assertRaisesRegex(
-            Exception, 'Expected all explorations in a story to '
-            'have correctness feedback enabled. Invalid exploration: exp_id_1'):
-            story_services.update_story(
-                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
-
     def test_cannot_update_story_with_exps_with_invalid_interactions(
         self
     ) -> None:
@@ -1484,7 +1474,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
-            interaction_id='GraphInput', correctness_feedback_enabled=True)
+            interaction_id='GraphInput')
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
         change_list = [
@@ -1517,8 +1507,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
-            interaction_id='TextInput', end_state_name='End',
-            correctness_feedback_enabled=True)
+            interaction_id='TextInput', end_state_name='End')
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
         exp_services.update_exploration(
@@ -1568,7 +1557,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.publish_exploration(self.user_id_a, 'exp_id_1')
         exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
@@ -1616,8 +1605,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
-            'exp_id_1', self.user_id_a, title='title', category='Algebra',
-            correctness_feedback_enabled=True)
+            'exp_id_1', self.user_id_a, title='title', category='Algebra')
         exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -1655,7 +1643,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(
             'exp_id_2', self.user_id_a, title='title 2', category='Algebra',
-            interaction_id='GraphInput', correctness_feedback_enabled=True)
+            interaction_id='GraphInput')
         exp_services.update_exploration(
             self.user_id_a, 'exp_id_2', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -1779,30 +1767,46 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'Updated story initial_node_id.')
 
     def test_rearrange_node_in_story(self) -> None:
-        changelist = [
+        first: Final = 0
+        second: Final = 1
+
+        change_list = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': self.NODE_ID_2,
                 'title': 'Title 2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_2,
+                'old_value': None,
+                'new_value': 'exp_2'
             })
         ]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, changelist, 'Added story node.')
-        story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.story_contents.nodes[0].id, self.NODE_ID_1)
-        self.assertEqual(story.story_contents.nodes[1].id, self.NODE_ID_2)
+            self.USER_ID, self.STORY_ID, change_list,
+            'Added story node.')
 
-        change_list = [story_domain.StoryChange({
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        self.assertEqual(story.story_contents.nodes[first].id, self.NODE_ID_1)
+        self.assertEqual(story.story_contents.nodes[second].id, self.NODE_ID_2)
+
+        change_rearrange_story_node = story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY,
             'property_name': story_domain.NODE,
-            'old_value': 1,
-            'new_value': 0
-        })]
+            'old_value': second,
+            'new_value': first
+        })
+
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, change_list, 'Added story node.')
+            self.USER_ID, self.STORY_ID, [change_rearrange_story_node],
+            'Rearranged story node.')
+
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.story_contents.nodes[0].id, self.NODE_ID_2)
-        self.assertEqual(story.story_contents.nodes[1].id, self.NODE_ID_1)
+        self.assertEqual(story.story_contents.nodes[first].id, self.NODE_ID_2)
+        self.assertEqual(story.story_contents.nodes[second].id, self.NODE_ID_1)
 
     def test_cannot_update_node_exploration_id_with_invalid_node_id(
         self
@@ -2036,6 +2040,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_2,
+                'old_value': None,
+                'new_value': 'exp_2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
                     story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
                 'node_id': self.NODE_ID_2,
                 'old_value': self.OLD_VALUE,
@@ -2084,7 +2096,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.STORY_ID, change_list, 'Delete node.')
 
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-
         self.assertIsNone(story.story_contents.initial_node_id)
 
     def test_get_chapter_notifications_list(self) -> None:
@@ -2275,7 +2286,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_1',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -2295,7 +2306,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_2',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -2315,7 +2326,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_3',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -2335,7 +2346,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_4',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,

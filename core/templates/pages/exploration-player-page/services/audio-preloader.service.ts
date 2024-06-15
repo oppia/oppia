@@ -16,18 +16,20 @@
  * @fileoverview Service to preload audio into AssetsBackendApiService's cache.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { AppConstants } from 'app.constants';
-import { Exploration } from 'domain/exploration/ExplorationObjectFactory';
-import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { ComputeGraphService } from 'services/compute-graph.service';
-import { ContextService } from 'services/context.service';
+import {AppConstants} from 'app.constants';
+import {Exploration} from 'domain/exploration/ExplorationObjectFactory';
+import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ComputeGraphService} from 'services/compute-graph.service';
+import {ContextService} from 'services/context.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AudioPreloaderService {
   private filenamesOfAudioCurrentlyDownloading: string[] = [];
@@ -43,24 +45,30 @@ export class AudioPreloaderService {
   private mostRecentlyRequestedAudioFilename: string | null = null;
 
   constructor(
-      private assetsBackendApiService: AssetsBackendApiService,
-      private audioTranslationLanguageService: AudioTranslationLanguageService,
-      private computeGraphService: ComputeGraphService,
-      private contextService: ContextService) {}
+    private assetsBackendApiService: AssetsBackendApiService,
+    private audioTranslationLanguageService: AudioTranslationLanguageService,
+    private computeGraphService: ComputeGraphService,
+    private contextService: ContextService,
+    private platformFeatureService: PlatformFeatureService,
+    private entityVoiceoversService: EntityVoiceoversService
+  ) {}
 
   init(exploration: Exploration): void {
     this.exploration = exploration;
   }
 
   kickOffAudioPreloader(sourceStateName: string): void {
-    this.filenamesOfAudioToBeDownloaded = (
-      this.getAudioFilenamesInBfsOrder(sourceStateName));
-    const numFilesToDownload = (
+    this.filenamesOfAudioToBeDownloaded =
+      this.getAudioFilenamesInBfsOrder(sourceStateName);
+
+    const numFilesToDownload =
       AppConstants.MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY -
-      this.filenamesOfAudioCurrentlyDownloading.length);
+      this.filenamesOfAudioCurrentlyDownloading.length;
     if (numFilesToDownload > 0) {
-      const filesToDownload = (
-        this.filenamesOfAudioToBeDownloaded.splice(0, numFilesToDownload));
+      const filesToDownload = this.filenamesOfAudioToBeDownloaded.splice(
+        0,
+        numFilesToDownload
+      );
       filesToDownload.forEach(filename => this.loadAudio(filename));
       this.filenamesOfAudioCurrentlyDownloading.push(...filesToDownload);
     }
@@ -98,8 +106,8 @@ export class AudioPreloaderService {
   }
 
   private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
-    const languageCode = (
-      this.audioTranslationLanguageService.getCurrentAudioLanguageCode());
+    const languageCode =
+      this.audioTranslationLanguageService.getCurrentAudioLanguageCode();
     // If the language code is not selected then there are no audio
     // files available, so we directly return empty array.
     if (languageCode === null) {
@@ -109,42 +117,78 @@ export class AudioPreloaderService {
     const initialStateName = this.exploration.getInitialState().name;
     let bfsTraversalOfStates: string[] = [];
     if (initialStateName !== null) {
-      bfsTraversalOfStates = (
+      bfsTraversalOfStates =
         this.computeGraphService.computeBfsTraversalOfStates(
-          initialStateName, this.exploration.getStates(),
-          sourceStateName));
+          initialStateName,
+          this.exploration.getStates(),
+          sourceStateName
+        );
     }
     const audioFilenamesInBfsOrder = [];
     for (const stateName of bfsTraversalOfStates) {
-      for (const voiceover of allVoiceovers[stateName]) {
-        audioFilenamesInBfsOrder.push(voiceover.filename);
+      if (this.isVoiceoverContributionWithAccentEnabled()) {
+        let contentIds = this.getAllContentIdsFromState(stateName) as string[];
+
+        let contentIdsToVoiceovers =
+          this.entityVoiceoversService.getAllContentIdsToVoiceovers();
+
+        for (let contentId of contentIds) {
+          let voiceovers = contentIdsToVoiceovers[contentId];
+
+          if (voiceovers === undefined) {
+            continue;
+          }
+
+          for (let voiceover of voiceovers) {
+            let filename = voiceover.filename;
+            if (audioFilenamesInBfsOrder.indexOf(filename) === -1) {
+              audioFilenamesInBfsOrder.push(voiceover.filename);
+            }
+          }
+        }
+      } else {
+        for (const voiceover of allVoiceovers[stateName]) {
+          audioFilenamesInBfsOrder.push(voiceover.filename);
+        }
       }
     }
     return audioFilenamesInBfsOrder;
   }
 
+  isVoiceoverContributionWithAccentEnabled(): boolean {
+    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
+  }
+
+  getAllContentIdsFromState(stateName: string): string[] | undefined {
+    let state = this.exploration.states.getState(stateName);
+    if (state !== undefined) {
+      return state.getAllContentIds();
+    }
+  }
+
   private loadAudio(audioFilename: string): void {
-    this.assetsBackendApiService.loadAudio(
-      this.contextService.getExplorationId(), audioFilename
-    ).then(loadedAudio => {
-      const index = this.filenamesOfAudioCurrentlyDownloading.findIndex(
-        filename => filename === loadedAudio.filename);
-      if (index !== -1) {
-        this.filenamesOfAudioCurrentlyDownloading.splice(index, 1);
-      }
-
-      if (this.filenamesOfAudioToBeDownloaded.length > 0) {
-        const nextAudioFilename = this.filenamesOfAudioToBeDownloaded.shift();
-        if (nextAudioFilename !== undefined) {
-          this.loadAudio(nextAudioFilename);
-          this.filenamesOfAudioCurrentlyDownloading.push(nextAudioFilename);
+    this.assetsBackendApiService
+      .loadAudio(this.contextService.getExplorationId(), audioFilename)
+      .then(loadedAudio => {
+        const index = this.filenamesOfAudioCurrentlyDownloading.findIndex(
+          filename => filename === loadedAudio.filename
+        );
+        if (index !== -1) {
+          this.filenamesOfAudioCurrentlyDownloading.splice(index, 1);
         }
-      }
 
-      if (this.audioLoadedCallback) {
-        this.audioLoadedCallback(loadedAudio.filename);
-      }
-    });
+        if (this.filenamesOfAudioToBeDownloaded.length > 0) {
+          const nextAudioFilename = this.filenamesOfAudioToBeDownloaded.shift();
+          if (nextAudioFilename !== undefined) {
+            this.loadAudio(nextAudioFilename);
+            this.filenamesOfAudioCurrentlyDownloading.push(nextAudioFilename);
+          }
+        }
+
+        if (this.audioLoadedCallback) {
+          this.audioLoadedCallback(loadedAudio.filename);
+        }
+      });
   }
 
   private cancelPreloading(): void {
@@ -153,5 +197,6 @@ export class AudioPreloaderService {
   }
 }
 
-angular.module('oppia').factory(
-  'AudioPreloaderService', downgradeInjectable(AudioPreloaderService));
+angular
+  .module('oppia')
+  .factory('AudioPreloaderService', downgradeInjectable(AudioPreloaderService));

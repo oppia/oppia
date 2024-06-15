@@ -16,10 +16,8 @@
  * @fileoverview Factory model for frontend learner answer info
  */
 
-import { LearnerAnswerInfo } from
-  'domain/statistics/learner-answer-info.model';
-import { InteractionCustomizationArgs } from
-  'interactions/customization-args-defs';
+import {LearnerAnswerInfo} from 'domain/statistics/learner-answer-info.model';
+import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 
 export class LearnerAnswerDetails {
   expId: string;
@@ -29,9 +27,12 @@ export class LearnerAnswerDetails {
   learnerAnswerInfoData: LearnerAnswerInfo[];
 
   constructor(
-      expId: string, stateName: string, interactionId: string,
-      customizationArgs: InteractionCustomizationArgs,
-      learnerAnswerInfoData: LearnerAnswerInfo[]) {
+    expId: string,
+    stateName: string,
+    interactionId: string,
+    customizationArgs: InteractionCustomizationArgs,
+    learnerAnswerInfoData: LearnerAnswerInfo[]
+  ) {
     this.expId = expId;
     this.stateName = stateName;
     this.interactionId = interactionId;
@@ -40,12 +41,19 @@ export class LearnerAnswerDetails {
   }
 
   static createDefaultLearnerAnswerDetails(
-      expId: string, stateName: string, interactionId: string,
-      customizationArgs: InteractionCustomizationArgs,
-      learnerAnswerInfoData: LearnerAnswerInfo[]): LearnerAnswerDetails {
+    expId: string,
+    stateName: string,
+    interactionId: string,
+    customizationArgs: InteractionCustomizationArgs,
+    learnerAnswerInfoData: LearnerAnswerInfo[]
+  ): LearnerAnswerDetails {
     return new LearnerAnswerDetails(
-      expId, stateName, interactionId, customizationArgs,
-      learnerAnswerInfoData);
+      expId,
+      stateName,
+      interactionId,
+      customizationArgs,
+      learnerAnswerInfoData
+    );
   }
 
   getExpId(): string {
@@ -61,8 +69,9 @@ export class LearnerAnswerDetails {
   }
 
   getLastUpdatedTime(): number {
-    var createdOnValues =
-      this.learnerAnswerInfoData.map(info => info.getCreatedOn());
+    var createdOnValues = this.learnerAnswerInfoData.map(info =>
+      info.getCreatedOn()
+    );
     return Math.max(...createdOnValues);
   }
 }

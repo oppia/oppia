@@ -29,6 +29,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import exp_services_test
 from core.domain import param_domain
+from core.domain import platform_parameter_list
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import translation_domain
@@ -2262,9 +2263,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state.interaction.customization_args[
             'maxAllowableSelectionCount'].value = 2
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Selected choices of rule \'0\' of answer '
-            'group \'0\' either less than min_selection_value or greater than '
-            'max_selection_value in ItemSelectionInput interaction.'
+            utils.ValidationError, 'Selected wrong number of choices in rule '
+            '\'0\' of answer group \'0\'. 3 were selected, it is either less '
+            'than 1 or greater than 2 in ItemSelectionInput interaction.'
         ):
             self.new_exploration.validate(strict=True)
 
@@ -3645,8 +3646,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'param_specs': {},
             'param_changes': [],
             'auto_tts_enabled': exploration.auto_tts_enabled,
-            'correctness_feedback_enabled': (
-                exploration.correctness_feedback_enabled),
             'edits_allowed': exploration.edits_allowed
         }
 
@@ -3915,21 +3914,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.auto_tts_enabled = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected auto_tts_enabled to be a bool, received 1'):
-            exploration.validate()
-
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally test
-    # wrong inputs that we can normally catch by typing.
-    def test_validate_exploration_correctness_feedback_enabled(self) -> None:
-        exploration = self.save_new_valid_exploration(
-            'exp_id', 'user@example.com', title='', category='',
-            objective='', end_state_name='End')
-        exploration.validate()
-
-        exploration.correctness_feedback_enabled = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            Exception,
-            'Expected correctness_feedback_enabled to be a bool, received 1'):
             exploration.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -4670,7 +4654,6 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 auto_tts_enabled: false
 blurb: ''
 category: Category
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: %s
 language_code: en
@@ -4755,7 +4738,6 @@ version: 0
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -4995,7 +4977,6 @@ class SchemaMigrationUnitTests(test_utils.GenericTestBase):
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5140,7 +5121,6 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5285,7 +5265,6 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5430,7 +5409,6 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5577,7 +5555,6 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5727,7 +5704,6 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5877,7 +5853,6 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -6027,7 +6002,6 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -6177,7 +6151,6 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -6316,7 +6289,6 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -6454,7 +6426,6 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -6599,7 +6570,6 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -6746,7 +6716,6 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -6897,7 +6866,6 @@ title: Title
 auto_tts_enabled: false
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7016,7 +6984,6 @@ title: Title
 auto_tts_enabled: false
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7136,7 +7103,6 @@ version: 0
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7265,7 +7231,6 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7394,7 +7359,6 @@ version: 0
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7485,7 +7449,6 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7573,7 +7536,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -7681,7 +7643,6 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -7786,7 +7747,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -7939,7 +7899,6 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -8079,7 +8038,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -8187,7 +8145,6 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -8284,7 +8241,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: hi
@@ -8374,7 +8330,6 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: hi
@@ -8470,7 +8425,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -8769,7 +8723,6 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -8937,7 +8890,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -9188,7 +9140,6 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -9358,7 +9309,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -9485,7 +9435,6 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -9603,7 +9552,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -9776,7 +9724,6 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -9916,7 +9863,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -10082,7 +10028,6 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -10235,7 +10180,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -10434,7 +10378,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -10554,7 +10497,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -10696,7 +10638,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -10812,7 +10753,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -10926,7 +10866,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -11042,7 +10981,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -11265,7 +11203,6 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -11402,7 +11339,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -11549,7 +11485,6 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -11683,7 +11618,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -11836,7 +11770,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -11963,7 +11896,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -12238,7 +12170,6 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -12439,7 +12370,6 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -12551,7 +12481,6 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -12732,7 +12661,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'param_specs': {},
             'language_code': 'en',
-            'correctness_feedback_enabled': True,
             'next_content_id_index': content_id_generator.next_content_id_index
         })
 
@@ -16484,10 +16412,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'auto_tts_enabled',
             'new_value': False
         }), exp_domain.ExplorationChange({
-            'cmd': 'edit_exploration_property',
-            'property_name': 'correctness_feedback_enabled',
-            'new_value': True
-        }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'confirmed_unclassified_answers',
             'state_name': 'Introduction',
@@ -17946,204 +17870,89 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 3, change_list)
         self.assertEqual(changes_are_not_mergeable, False)
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+    )
     def test_email_is_sent_to_admin_in_case_of_adding_deleting_state_changes(
         self
     ) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(len(messages), 0)
-            self.save_new_valid_exploration(
-                self.EXP_0_ID, self.owner_id, end_state_name='End')
+        messages = self._get_sent_email_messages(
+            feconf.ADMIN_EMAIL_ADDRESS)
+        self.assertEqual(len(messages), 0)
+        self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
 
-            rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
-            test_dict: Dict[str, str] = {}
-            # Changes to the various properties of the first and
-            # second state.
-            change_list = [exp_domain.ExplorationChange({
-                'old_value': 'TextInput',
-                'cmd': 'edit_state_property',
-                'property_name': 'widget_id',
-                'new_value': None,
-                'state_name': 'Introduction'
-            }), exp_domain.ExplorationChange({
-                'old_value': {
-                    'placeholder': {
-                        'value': {
-                            'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
-                            'unicode_str': ''
-                        }
-                    },
-                    'rows': {
-                        'value': 1
-                    },
-                    'catchMisspellings': {
-                        'value': False
+        test_dict: Dict[str, str] = {}
+        # Changes to the various properties of the first and
+        # second state.
+        change_list = [exp_domain.ExplorationChange({
+            'old_value': 'TextInput',
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'new_value': None,
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK),
+                        'unicode_str': ''
                     }
                 },
-                'cmd': 'edit_state_property',
-                'property_name': 'widget_customization_args',
-                'new_value': test_dict,
-                'state_name': 'Introduction'
-            }), exp_domain.ExplorationChange({
-                'old_value': None,
-                'cmd': 'edit_state_property',
-                'property_name': 'widget_id',
-                'new_value': 'NumericInput',
-                'state_name': 'Introduction'
-            }), exp_domain.ExplorationChange({
-                'state_name': 'Introduction',
-                'old_value':
+                'rows': {
+                    'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args',
+            'new_value': test_dict,
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': None,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'new_value': 'NumericInput',
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'old_value':
+            {
+                'requireNonnegativeInput':
                 {
-                    'requireNonnegativeInput':
-                    {
-                        'value': True
-                    }
-                },
-                'property_name': 'widget_customization_args',
-                'new_value':
+                    'value': True
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value':
+            {
+                'requireNonnegativeInput':
                 {
-                    'requireNonnegativeInput':
-                    {
-                        'value': False
-                    }
-                },
-                'cmd': 'edit_state_property'
-            }), exp_domain.ExplorationChange({
-                'old_value': ['old_value'],
-                'cmd': 'edit_state_property',
-                'property_name': 'answer_groups',
-                'new_value': [
-                    {
-                        'tagged_skill_misconception_id': None,
-                        'rule_specs': [
-                            {
-                                'rule_type': 'IsLessThanOrEqualTo',
-                                'inputs': {
-                                    'x': 50
-                                }
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'old_value': ['old_value'],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'new_value': [
+                {
+                    'tagged_skill_misconception_id': None,
+                    'rule_specs': [
+                        {
+                            'rule_type': 'IsLessThanOrEqualTo',
+                            'inputs': {
+                                'x': 50
                             }
-                        ],
-                        'training_data': [],
-                        'outcome': {
-                            'param_changes': [],
-                            'dest': 'End',
-                            'dest_if_really_stuck': None,
-                            'missing_prerequisite_skill_id': None,
-                            'feedback': {
-                                'content_id': (
-                                    self.content_id_generator.generate(
-                                        translation_domain.ContentType.FEEDBACK
-                                    )
-                                ),
-                                'html': ''
-                            },
-                            'labelled_as_correct': False,
-                            'refresher_exploration_id': None
                         }
-                    }
-                ],
-                'state_name': 'Introduction'
-            }), exp_domain.ExplorationChange({
-                'old_value': ['old_value'],
-                'cmd': 'edit_state_property',
-                'property_name': 'hints',
-                'new_value': [
-                    {
-                        'hint_content': {
-                            'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
-                            'html': '<p>Hint.</p>'
-                        }
-                    }
-                ],
-                'state_name': 'Introduction'
-            }), exp_domain.ExplorationChange({
-                'old_value': {
-                    'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
-                    'html': 'Congratulations, you have finished!'
-                },
-                'cmd': 'edit_state_property',
-                'property_name': 'content',
-                'new_value': {
-                    'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
-                    'html': '<p>2Congratulations, you have finished!</p>'
-                },
-                'state_name': 'End'
-            })]
-
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID,
-                self.append_next_content_id_index_change(change_list),
-                'Changed various properties in both states.')
-
-            change_list_2 = [exp_domain.ExplorationChange({
-                'new_state_name': 'End-State',
-                'cmd': 'rename_state',
-                'old_state_name': 'End'
-            }), exp_domain.ExplorationChange({
-                'cmd': 'delete_state',
-                'state_name': 'End-State'
-            }), exp_domain.ExplorationChange({
-                'cmd': 'add_state',
-                'state_name': 'End',
-                'content_id_for_state_content': 'content_0',
-                'content_id_for_default_outcome': 'default_outcome_1'
-            }), exp_domain.ExplorationChange({
-                'cmd': 'delete_state',
-                'state_name': 'End'
-            }), exp_domain.ExplorationChange({
-                'cmd': 'add_state',
-                'state_name': 'End',
-                'content_id_for_state_content': 'content_0',
-                'content_id_for_default_outcome': 'default_outcome_1'
-            }), exp_domain.ExplorationChange({
-                'new_state_name': 'End-State',
-                'cmd': 'rename_state',
-                'old_state_name': 'End'
-            }), exp_domain.ExplorationChange({
-                'new_state_name': 'End',
-                'cmd': 'rename_state',
-                'old_state_name': 'End-State'
-            }), exp_domain.ExplorationChange({
-                'old_value': [{
-                    'tagged_skill_misconception_id': None,
-                    'rule_specs': [{
-                        'rule_type': 'IsLessThanOrEqualTo',
-                        'inputs': {
-                            'x': 50
-                        }
-                    }],
-                    'training_data': [],
-                    'outcome': {
-                        'param_changes': [],
-                        'dest': 'Introduction',
-                        'dest_if_really_stuck': None,
-                        'missing_prerequisite_skill_id': None,
-                        'feedback': {
-                            'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
-                            'html': ''
-                        },
-                        'labelled_as_correct': False,
-                        'refresher_exploration_id': None
-                    }
-                }],
-                'cmd': 'edit_state_property',
-                'property_name': 'answer_groups',
-                'new_value': [{
-                    'tagged_skill_misconception_id': None,
-                    'rule_specs': [{
-                        'rule_type': 'IsLessThanOrEqualTo',
-                        'inputs': {
-                            'x': 50
-                        }
-                    }],
+                    ],
                     'training_data': [],
                     'outcome': {
                         'param_changes': [],
@@ -18151,230 +17960,349 @@ class ExplorationChangesMergeabilityUnitTests(
                         'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
-                            'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                            'content_id': (
+                                self.content_id_generator.generate(
+                                    translation_domain.ContentType.FEEDBACK
+                                )
+                            ),
                             'html': ''
                         },
                         'labelled_as_correct': False,
                         'refresher_exploration_id': None
                     }
+                }
+            ],
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': ['old_value'],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'new_value': [
+                {
+                    'hint_content': {
+                        'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Hint.</p>'
+                    }
+                }
+            ],
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK),
+                'html': 'Congratulations, you have finished!'
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content',
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK),
+                'html': '<p>2Congratulations, you have finished!</p>'
+            },
+            'state_name': 'End'
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Changed various properties in both states.')
+
+        change_list_2 = [exp_domain.ExplorationChange({
+            'new_state_name': 'End-State',
+            'cmd': 'rename_state',
+            'old_state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'delete_state',
+            'state_name': 'End-State'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'End',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'delete_state',
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'End',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
+        }), exp_domain.ExplorationChange({
+            'new_state_name': 'End-State',
+            'cmd': 'rename_state',
+            'old_state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'new_state_name': 'End',
+            'cmd': 'rename_state',
+            'old_state_name': 'End-State'
+        }), exp_domain.ExplorationChange({
+            'old_value': [{
+                'tagged_skill_misconception_id': None,
+                'rule_specs': [{
+                    'rule_type': 'IsLessThanOrEqualTo',
+                    'inputs': {
+                        'x': 50
+                    }
                 }],
-                'state_name': 'Introduction'
-            }), exp_domain.ExplorationChange({
-                'old_value': {
+                'training_data': [],
+                'outcome': {
                     'param_changes': [],
                     'dest': 'Introduction',
                     'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
                         'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                        translation_domain.ContentType.FEEDBACK),
                         'html': ''
                     },
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
-                },
-                'cmd': 'edit_state_property',
-                'property_name': 'default_outcome',
-                'new_value': {
+                }
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'new_value': [{
+                'tagged_skill_misconception_id': None,
+                'rule_specs': [{
+                    'rule_type': 'IsLessThanOrEqualTo',
+                    'inputs': {
+                        'x': 50
+                    }
+                }],
+                'training_data': [],
+                'outcome': {
                     'param_changes': [],
                     'dest': 'End',
                     'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
                         'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                        translation_domain.ContentType.FEEDBACK),
                         'html': ''
                     },
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
-                },
-                'state_name': 'Introduction'
-            }), exp_domain.ExplorationChange({
-                'old_value': {
+                }
+            }],
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'param_changes': [],
+                'dest': 'Introduction',
+                'dest_if_really_stuck': None,
+                'missing_prerequisite_skill_id': None,
+                'feedback': {
                     'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
+                        translation_domain.ContentType.FEEDBACK),
                     'html': ''
                 },
-                'cmd': 'edit_state_property',
-                'property_name': 'content',
-                'new_value': {
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'default_outcome',
+            'new_value': {
+                'param_changes': [],
+                'dest': 'End',
+                'dest_if_really_stuck': None,
+                'missing_prerequisite_skill_id': None,
+                'feedback': {
                     'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
-                    'html': 'Congratulations, you have finished!'
+                        translation_domain.ContentType.FEEDBACK),
+                    'html': ''
                 },
-                'state_name': 'End'
-            }), exp_domain.ExplorationChange({
-                'old_value': None,
-                'cmd': 'edit_state_property',
-                'property_name': 'widget_id',
-                'new_value': 'EndExploration',
-                'state_name': 'End'
-            }), exp_domain.ExplorationChange({
-                'old_value': test_dict,
-                'cmd': 'edit_state_property',
-                'property_name': 'widget_customization_args',
-                'new_value': {
-                    'recommendedExplorationIds': {
-                        'value': []
-                    }
-                },
-                'state_name': 'End'
-            }), exp_domain.ExplorationChange({
-                'old_value': {
-                    'param_changes': [],
-                    'dest': 'End',
-                    'dest_if_really_stuck': None,
-                    'missing_prerequisite_skill_id': None,
-                    'feedback': {
-                        'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
-                        'html': ''
-                    },
-                    'labelled_as_correct': False,
-                    'refresher_exploration_id': None
-                },
-                'cmd': 'edit_state_property',
-                'property_name': 'default_outcome',
-                'new_value': None,
-                'state_name': 'End'
-            })]
-
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID,
-                self.append_next_content_id_index_change(change_list_2),
-                'Added and deleted states.')
-            change_list_3 = [exp_domain.ExplorationChange({
-                'old_value': {
-                    'html': '',
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None
+            },
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK),
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content',
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK),
+                'html': 'Congratulations, you have finished!'
+            },
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'old_value': None,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'new_value': 'EndExploration',
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'old_value': test_dict,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args',
+            'new_value': {
+                'recommendedExplorationIds': {
+                    'value': []
+                }
+            },
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'param_changes': [],
+                'dest': 'End',
+                'dest_if_really_stuck': None,
+                'missing_prerequisite_skill_id': None,
+                'feedback': {
                     'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK)
+                        translation_domain.ContentType.FEEDBACK),
+                    'html': ''
                 },
-                'new_value': {
-                    'html': '<p>Hello Aryaman!</p>',
-                    'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK)
-                },
-                'state_name': 'Introduction',
-                'property_name': 'content',
-                'cmd': 'edit_state_property'
-            })]
-            changes_are_not_mergeable = exp_services.are_changes_mergeable(
-                self.EXP_0_ID, 1, change_list_3)
-            self.assertEqual(changes_are_not_mergeable, False)
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'default_outcome',
+            'new_value': None,
+            'state_name': 'End'
+        })]
 
-            change_list_3_dict = [change.to_dict() for change in change_list_3]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Added and deleted states.')
+        change_list_3 = [exp_domain.ExplorationChange({
+            'old_value': {
+                'html': '',
+                'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK)
+            },
+            'new_value': {
+                'html': '<p>Hello Aryaman!</p>',
+                'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK)
+            },
+            'state_name': 'Introduction',
+            'property_name': 'content',
+            'cmd': 'edit_state_property'
+        })]
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 1, change_list_3)
+        self.assertEqual(changes_are_not_mergeable, False)
 
-            expected_email_html_body = (
-                '(Sent from dev-project-id)<br/><br/>'
-                'Hi Admin,<br><br>'
-                'Some draft changes were rejected in exploration %s because '
-                'the changes were conflicting and could not be saved. Please '
-                'see the rejected change list below:<br>'
-                'Discarded change list: %s <br><br>'
-                'Frontend Version: %s<br>'
-                'Backend Version: %s<br><br>'
-                'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 1, 3)
-            )
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].html, expected_email_html_body)
+        change_list_3_dict = [change.to_dict() for change in change_list_3]
 
+        expected_email_html_body = (
+            '(Sent from dev-project-id)<br/><br/>'
+            'Hi Admin,<br><br>'
+            'Some draft changes were rejected in exploration %s because '
+            'the changes were conflicting and could not be saved. Please '
+            'see the rejected change list below:<br>'
+            'Discarded change list: %s <br><br>'
+            'Frontend Version: %s<br>'
+            'Backend Version: %s<br><br>'
+            'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 1, 3)
+        )
+        messages = self._get_sent_email_messages(
+            feconf.ADMIN_EMAIL_ADDRESS)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].html, expected_email_html_body)
+
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+    )
     def test_email_is_sent_to_admin_in_case_of_state_renames_changes_conflict(
         self
     ) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(len(messages), 0)
-            self.save_new_valid_exploration(
-                self.EXP_0_ID, self.owner_id, end_state_name='End')
+        messages = self._get_sent_email_messages(
+            feconf.ADMIN_EMAIL_ADDRESS)
+        self.assertEqual(len(messages), 0)
+        self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
 
-            rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
-            change_list = [exp_domain.ExplorationChange({
-                'old_value': {
-                    'html': '',
-                    'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK)
-                },
-                'new_value': {
-                    'html': '<p>End State</p>',
-                    'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK)
-                },
-                'state_name': 'End',
-                'property_name': 'content',
-                'cmd': 'edit_state_property'
-            })]
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID,
-                self.append_next_content_id_index_change(change_list),
-                'Changed various properties in both states.')
-
-            # State name changed.
-            change_list_2 = [exp_domain.ExplorationChange({
-                'new_state_name': 'End-State',
-                'cmd': 'rename_state',
-                'old_state_name': 'End'
-            })]
-
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID,
-                self.append_next_content_id_index_change(change_list_2),
-                'Changed various properties in both states.')
-
-            change_list_3 = [exp_domain.ExplorationChange({
-                'old_value': {
-                    'html': 'End State',
-                    'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK)
-                },
-                'new_value': {
-                    'html': '<p>End State Changed</p>',
-                    'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK)
-                },
-                'state_name': 'End',
-                'property_name': 'content',
-                'cmd': 'edit_state_property'
-            })]
-            changes_are_not_mergeable = exp_services.are_changes_mergeable(
-                self.EXP_0_ID, 2, change_list_3)
-            self.assertEqual(changes_are_not_mergeable, False)
-
-            change_list_3_dict = [change.to_dict() for change in change_list_3]
-            expected_email_html_body = (
-                '(Sent from dev-project-id)<br/><br/>'
-                'Hi Admin,<br><br>'
-                'Some draft changes were rejected in exploration %s because '
-                'the changes were conflicting and could not be saved. Please '
-                'see the rejected change list below:<br>'
-                'Discarded change list: %s <br><br>'
-                'Frontend Version: %s<br>'
-                'Backend Version: %s<br><br>'
-                'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 2, 3)
-            )
-            messages = self._get_sent_email_messages(
-                feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(expected_email_html_body, messages[0].html)
-
-            # Add a translation after state renames.
-            change_list_4 = [exp_domain.ExplorationChange({
-                'content_html': 'N/A',
-                'translation_html': '<p>State 2 Content Translation.</p>',
-                'state_name': 'End',
-                'language_code': 'de',
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+        change_list = [exp_domain.ExplorationChange({
+            'old_value': {
+                'html': '',
                 'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
-                'cmd': 'add_written_translation',
-                'data_format': 'html'
-            })]
-            changes_are_not_mergeable_2 = exp_services.are_changes_mergeable(
-                self.EXP_0_ID, 2, change_list_4)
-            self.assertEqual(changes_are_not_mergeable_2, False)
+                        translation_domain.ContentType.FEEDBACK)
+            },
+            'new_value': {
+                'html': '<p>End State</p>',
+                'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK)
+            },
+            'state_name': 'End',
+            'property_name': 'content',
+            'cmd': 'edit_state_property'
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Changed various properties in both states.')
+
+        # State name changed.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'new_state_name': 'End-State',
+            'cmd': 'rename_state',
+            'old_state_name': 'End'
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Changed various properties in both states.')
+
+        change_list_3 = [exp_domain.ExplorationChange({
+            'old_value': {
+                'html': 'End State',
+                'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK)
+            },
+            'new_value': {
+                'html': '<p>End State Changed</p>',
+                'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK)
+            },
+            'state_name': 'End',
+            'property_name': 'content',
+            'cmd': 'edit_state_property'
+        })]
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_not_mergeable, False)
+
+        change_list_3_dict = [change.to_dict() for change in change_list_3]
+        expected_email_html_body = (
+            '(Sent from dev-project-id)<br/><br/>'
+            'Hi Admin,<br><br>'
+            'Some draft changes were rejected in exploration %s because '
+            'the changes were conflicting and could not be saved. Please '
+            'see the rejected change list below:<br>'
+            'Discarded change list: %s <br><br>'
+            'Frontend Version: %s<br>'
+            'Backend Version: %s<br><br>'
+            'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 2, 3)
+        )
+        messages = self._get_sent_email_messages(
+            feconf.ADMIN_EMAIL_ADDRESS)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(expected_email_html_body, messages[0].html)
+
+        # Add a translation after state renames.
+        change_list_4 = [exp_domain.ExplorationChange({
+            'content_html': 'N/A',
+            'translation_html': '<p>State 2 Content Translation.</p>',
+            'state_name': 'End',
+            'language_code': 'de',
+            'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK),
+            'cmd': 'add_written_translation',
+            'data_format': 'html'
+        })]
+        changes_are_not_mergeable_2 = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_4)
+        self.assertEqual(changes_are_not_mergeable_2, False)
 
 
 class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
@@ -18440,7 +18368,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
             exploration.author_notes, exploration.states_schema_version,
             exploration.init_state_name, exploration.param_specs,
             exploration.param_changes, exploration.auto_tts_enabled,
-            exploration.correctness_feedback_enabled, exploration.edits_allowed
+            exploration.edits_allowed
         ).to_dict()
         expected_metadata_dict = {
             'title': exploration.title,
@@ -18471,8 +18399,6 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
                 ).to_dict()
             ],
             'auto_tts_enabled': exploration.auto_tts_enabled,
-            'correctness_feedback_enabled': (
-                exploration.correctness_feedback_enabled),
             'edits_allowed': exploration.edits_allowed
         }
 
@@ -18486,7 +18412,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
                 'title', 'category', 'objective', 'language_code',
                 'blurb', 'author_notes', 'states_schema_version',
                 'init_state_name', 'param_specs', 'param_changes',
-                'auto_tts_enabled', 'correctness_feedback_enabled',
+                'auto_tts_enabled',
                 'edits_allowed'
             ]
         )
@@ -18508,8 +18434,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
                 'title', 'category', 'objective', 'language_code', 'tags',
                 'blurb', 'author_notes', 'states_schema_version',
                 'init_state_name', 'param_specs', 'param_changes',
-                'auto_tts_enabled', 'correctness_feedback_enabled',
-                'edits_allowed', 'new_property'
+                'auto_tts_enabled', 'edits_allowed', 'new_property'
             ]
         )
         error_message = (

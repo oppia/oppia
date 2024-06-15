@@ -17,18 +17,28 @@
  * domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { Fraction } from 'domain/objects/fraction.model';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { Units, UnitsObjectFactory } from
-  'domain/objects/UnitsObjectFactory';
-import { Unit, NumberWithUnitsAnswer } from
-  'interactions/answer-defs';
+import {Fraction} from 'domain/objects/fraction.model';
+import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
+import {Units, UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
+import {Unit, NumberWithUnitsAnswer} from 'interactions/answer-defs';
+import {unit as mathjsUnit} from 'mathjs';
 
 type CurrencyUnitsKeys = (keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[];
+
+export const getCurrencyUnits = (): string[] => {
+  let currencyUnits: string[] = [];
+  for (const currency in ObjectsDomainConstants.CURRENCY_UNITS) {
+    const currencyInfo = ObjectsDomainConstants.CURRENCY_UNITS[currency];
+    currencyUnits.push(currency, ...currencyInfo.aliases);
+  }
+
+  return currencyUnits;
+};
+
+let currencyUnits = getCurrencyUnits();
 
 /* Guidelines for adding new custom currency units in Number with Units
   interaction:
@@ -48,8 +58,11 @@ export class NumberWithUnits {
   units: Unit[];
 
   constructor(
-      type: string, real: number, fractionObj: Fraction,
-      unitsObj: Units) {
+    type: string,
+    real: number,
+    fractionObj: Fraction,
+    unitsObj: Units
+  ) {
     this.type = type;
 
     if (this.type === 'real') {
@@ -73,8 +86,7 @@ export class NumberWithUnits {
     // type, real, fraction and units. Hence, we cannot inject
     // UnitsObjectFactory, since that'll lead to creation of 5th property
     // which isn't allowed. Refer objects.py L#956.
-    let unitsString = (new UnitsObjectFactory()).fromList(
-      this.units).toString();
+    let unitsString = new UnitsObjectFactory().fromList(this.units).toString();
     if (unitsString.includes('$')) {
       unitsString = unitsString.replace('$', '');
       numberWithUnitsString += '$' + ' ';
@@ -100,10 +112,10 @@ export class NumberWithUnits {
 
   toMathjsCompatibleString(): string {
     let numberWithUnitsString = '';
-    let unitsString = (new UnitsObjectFactory()).fromList(
-      this.units).toString();
-    unitsString = (new UnitsObjectFactory()).toMathjsCompatibleString(
-      unitsString);
+    let unitsString = new UnitsObjectFactory().fromList(this.units).toString();
+    unitsString = new UnitsObjectFactory().toMathjsCompatibleString(
+      unitsString
+    );
 
     if (this.type === 'real') {
       numberWithUnitsString += this.real + ' ';
@@ -121,13 +133,42 @@ export class NumberWithUnits {
       type: this.type,
       real: this.real,
       fraction: this.fraction?.toDict(),
-      units: this.units
+      units: this.units,
     };
+  }
+
+  getCanonicalRepresentationOfUnits(): Unit[] {
+    const updatedUnits = this.units.map(({unit, exponent}: Unit) => {
+      const baseUnit = currencyUnits.includes(unit)
+        ? ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING[unit]
+        : mathjsUnit(unit).units[0].unit.name;
+
+      const unitPrefix = currencyUnits.includes(unit)
+        ? ''
+        : mathjsUnit(unit).units[0].prefix.name;
+
+      let normalizedUnit =
+        (ObjectsDomainConstants.PREFIX_TO_NORMALIZED_PREFIX_MAPPING[
+          unitPrefix
+        ] ?? '') +
+        ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING[baseUnit];
+
+      return {
+        unit: normalizedUnit,
+        exponent: exponent,
+      };
+    });
+
+    updatedUnits.sort((a: Unit, b: Unit) => {
+      return a.unit.localeCompare(b.unit);
+    });
+
+    return updatedUnits;
   }
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NumberWithUnitsObjectFactory {
   constructor(private unitsFactory: UnitsObjectFactory) {}
@@ -160,38 +201,38 @@ export class NumberWithUnitsObjectFactory {
           units = rawInput.substr(ind).trim();
         }
 
-        const keys = (
-          Object.keys(
-            ObjectsDomainConstants.CURRENCY_UNITS
-          ) as CurrencyUnitsKeys
-        );
+        const keys = Object.keys(
+          ObjectsDomainConstants.CURRENCY_UNITS
+        ) as CurrencyUnitsKeys;
         for (let i = 0; i < keys.length; i++) {
-          let unitLength = (
-            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length);
+          let unitLength =
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length;
           for (let j = 0; j < unitLength; j++) {
-            if (units.indexOf(
-              ObjectsDomainConstants.CURRENCY_UNITS[
-                keys[i]].front_units[j]) !== -1) {
+            if (
+              units.indexOf(
+                ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units[j]
+              ) !== -1
+            ) {
               throw new Error(
-                ObjectsDomainConstants
-                  .NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS
-                  .INVALID_CURRENCY_FORMAT);
+                ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_CURRENCY_FORMAT
+              );
             }
           }
         }
       } else {
         let startsWithCorrectCurrencyUnit = false;
-        const keys = (
-          Object.keys(
-            ObjectsDomainConstants.CURRENCY_UNITS
-          ) as CurrencyUnitsKeys
-        );
+        const keys = Object.keys(
+          ObjectsDomainConstants.CURRENCY_UNITS
+        ) as CurrencyUnitsKeys;
         for (let i = 0; i < keys.length; i++) {
-          let unitLength = (
-            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length);
+          let unitLength =
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length;
           for (let j = 0; j < unitLength; j++) {
-            if (rawInput.startsWith(ObjectsDomainConstants.CURRENCY_UNITS[
-              keys[i]].front_units[j])) {
+            if (
+              rawInput.startsWith(
+                ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units[j]
+              )
+            ) {
               startsWithCorrectCurrencyUnit = true;
               break;
             }
@@ -200,25 +241,29 @@ export class NumberWithUnitsObjectFactory {
         if (startsWithCorrectCurrencyUnit === false) {
           throw new Error(
             // eslint-disable-next-line max-len
-            ObjectsDomainConstants
-              .NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_CURRENCY);
+            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_CURRENCY
+          );
         }
         const ind = rawInput.indexOf(String(rawInput.match(/[0-9]/)));
         if (ind === -1) {
           throw new Error(
             // eslint-disable-next-line max-len
-            ObjectsDomainConstants
-              .NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_CURRENCY);
+            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_CURRENCY
+          );
         }
         units = rawInput.substr(0, ind).trim();
 
         startsWithCorrectCurrencyUnit = false;
         for (let i = 0; i < keys.length; i++) {
-          let unitLength = (
-            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length);
+          let unitLength =
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length;
           for (let j = 0; j < unitLength; j++) {
-            if (units === ObjectsDomainConstants.CURRENCY_UNITS[
-              keys[i]].front_units[j].trim()) {
+            if (
+              units ===
+              ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units[
+                j
+              ].trim()
+            ) {
               startsWithCorrectCurrencyUnit = true;
               break;
             }
@@ -227,13 +272,14 @@ export class NumberWithUnitsObjectFactory {
         if (startsWithCorrectCurrencyUnit === false) {
           throw new Error(
             // eslint-disable-next-line max-len
-            ObjectsDomainConstants
-              .NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_CURRENCY);
+            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_CURRENCY
+          );
         }
         units = units + ' ';
 
-        const ind2 = rawInput.indexOf(String(
-          rawInput.substr(ind).match(/[a-z(]/i)));
+        const ind2 = rawInput.indexOf(
+          String(rawInput.substr(ind).match(/[a-z(]/i))
+        );
         if (ind2 !== -1) {
           value = rawInput.substr(ind, ind2 - ind).trim();
           units += rawInput.substr(ind2).trim();
@@ -246,7 +292,8 @@ export class NumberWithUnitsObjectFactory {
       if (value.match(/[a-z]/i) || value.match(/[*^$₹()#@]/)) {
         throw new Error(
           // eslint-disable-next-line max-len
-          ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_VALUE);
+          ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_VALUE
+        );
       }
 
       if (value.includes('/')) {
@@ -261,7 +308,8 @@ export class NumberWithUnitsObjectFactory {
         if (units.match(/[^0-9a-z/* ^()₹$-]/i)) {
           throw new Error(
             // eslint-disable-next-line max-len
-            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_UNIT_CHARS);
+            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_UNIT_CHARS
+          );
         }
       }
     }
@@ -275,10 +323,14 @@ export class NumberWithUnitsObjectFactory {
       numberWithUnitsDict.type,
       numberWithUnitsDict.real,
       Fraction.fromDict(numberWithUnitsDict.fraction),
-      this.unitsFactory.fromList(numberWithUnitsDict.units));
+      this.unitsFactory.fromList(numberWithUnitsDict.units)
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'NumberWithUnitsObjectFactory', downgradeInjectable(
-    NumberWithUnitsObjectFactory));
+angular
+  .module('oppia')
+  .factory(
+    'NumberWithUnitsObjectFactory',
+    downgradeInjectable(NumberWithUnitsObjectFactory)
+  );

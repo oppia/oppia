@@ -69,6 +69,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
     from mypy_imports import suggestion_models
     from mypy_imports import user_models
+    from mypy_imports import voiceover_models
 
 (
     feedback_models,
@@ -78,7 +79,8 @@ if MYPY:  # pragma: no cover
     translation_models,
     stats_models,
     suggestion_models,
-    user_models
+    user_models,
+    voiceover_models,
 ) = models.Registry.import_models([
     models.Names.FEEDBACK,
     models.Names.EXPLORATION,
@@ -87,7 +89,8 @@ if MYPY:  # pragma: no cover
     models.Names.TRANSLATION,
     models.Names.STATISTICS,
     models.Names.SUGGESTION,
-    models.Names.USER
+    models.Names.USER,
+    models.Names.VOICEOVER
 ])
 
 search_services = models.Registry.import_search_services()
@@ -161,7 +164,6 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             language_code=constants.DEFAULT_LANGUAGE_CODE
         )
         exploration.objective = 'An objective'
-        exploration.correctness_feedback_enabled = False
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
         )
@@ -1204,8 +1206,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_apply_change_list(self) -> None:
         self.save_new_linear_exp_with_state_names_and_interactions(
             self.EXP_0_ID, self.owner_id, ['State 1', 'State 2'],
-            ['TextInput'], category='Algebra',
-            correctness_feedback_enabled=True)
+            ['TextInput'], category='Algebra')
 
         recorded_voiceovers_dict = {
             'voiceovers_mapping': {
@@ -1321,7 +1322,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_validation_for_valid_exploration(self) -> None:
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id,
-            correctness_feedback_enabled=True,
             category='Algebra'
         )
         errors = exp_services.validate_exploration_for_story(exploration, False)
@@ -1330,8 +1330,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_validation_fail_for_exploration_for_invalid_language(self) -> None:
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='end',
-            language_code='bn', correctness_feedback_enabled=True,
-            category='Algebra')
+            language_code='bn', category='Algebra')
         error_string = (
             'Invalid language %s found for exploration '
             'with ID %s. This language is not supported for explorations '
@@ -1343,25 +1342,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegex(utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(exploration, True)
 
-    def test_validate_exploration_for_correctness_feedback_not_enabled(
-        self
-    ) -> None:
-        exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, category='Algebra')
-        error_string = (
-            'Expected all explorations in a story to '
-            'have correctness feedback '
-            'enabled. Invalid exploration: %s' % exploration.id)
-        errors = exp_services.validate_exploration_for_story(exploration, False)
-        self.assertEqual(len(errors), 1)
-        self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(utils.ValidationError, error_string):
-            exp_services.validate_exploration_for_story(exploration, True)
-
     def test_validate_exploration_for_default_category(self) -> None:
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
-            category='Test')
+            self.EXP_0_ID, self.owner_id, category='Test')
         error_string = (
             'Expected all explorations in a story to '
             'be of a default category. '
@@ -1374,8 +1357,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_validate_exploration_for_param_specs(self) -> None:
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
-            category='Algebra')
+            self.EXP_0_ID, self.owner_id, category='Algebra')
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
         error_string = (
@@ -1389,8 +1371,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_validate_exploration_for_invalid_interaction_id(self) -> None:
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
-            category='Algebra')
+            self.EXP_0_ID, self.owner_id, category='Algebra')
         error_string = (
             'Invalid interaction %s in exploration '
             'with ID: %s. This interaction is not supported for '
@@ -1438,8 +1419,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_validation_fail_for_end_exploration(self) -> None:
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
-            category='Algebra')
+            self.EXP_0_ID, self.owner_id, category='Algebra')
         error_string = (
             'Explorations in a story are not expected to contain '
             'exploration recommendations. Exploration with ID: '
@@ -1488,8 +1468,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_validation_fail_for_multiple_choice_exploration(self) -> None:
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
-            category='Algebra')
+            self.EXP_0_ID, self.owner_id, category='Algebra')
         error_string = (
             'Exploration in a story having MultipleChoiceInput '
             'interaction should have at least 4 choices present. '
@@ -1541,8 +1520,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_validation_fail_for_android_rte_content(self) -> None:
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
-            category='Algebra')
+            self.EXP_0_ID, self.owner_id, category='Algebra')
         error_string = (
             'RTE content in state %s of exploration '
             'with ID %s is not supported on mobile for explorations '
@@ -1578,8 +1556,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_validation_fail_for_state_classifier_model(self) -> None:
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
-            category='Algebra')
+            self.EXP_0_ID, self.owner_id, category='Algebra')
         exploration.states[
             feconf.DEFAULT_INIT_STATE_NAME].classifier_model_id = '2'
         error_string = (
@@ -1599,8 +1576,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_validation_fail_for_answer_groups(self) -> None:
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
-            category='Algebra')
+            self.EXP_0_ID, self.owner_id, category='Algebra')
         exploration.states[
             feconf.DEFAULT_INIT_STATE_NAME
         ].interaction.answer_groups = [state_domain.AnswerGroup(
@@ -1649,8 +1625,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_validation_fail_for_default_outcome(self) -> None:
         exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
-            category='Algebra')
+            self.EXP_0_ID, self.owner_id, category='Algebra')
         exploration.states[
             feconf.DEFAULT_INIT_STATE_NAME
         ].interaction.default_outcome = (
@@ -1886,7 +1861,6 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -2153,7 +2127,6 @@ title: Title
         auto_tts_enabled: true
         blurb: ''
         category: Category
-        correctness_feedback_enabled: false
         edits_allowed: true
         init_state_name: Introduction
         language_code: en
@@ -2529,7 +2502,6 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
 auto_tts_enabled: false
 blurb: ''
 category: Algebra
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: %s
 language_code: en
@@ -2634,7 +2606,6 @@ version: 2
 auto_tts_enabled: false
 blurb: ''
 category: Algebra
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: %s
 language_code: en
@@ -2840,6 +2811,26 @@ version: 3
         zf = zipfile.ZipFile(zip_file_output)
 
         self.assertEqual(zf.namelist(), ['Unpublished_exploration.yaml'])
+
+    def test_export_to_zip_file_with_a_nonstandard_char(self) -> None:
+        """Test the export_to_zip_file() method with a nonstandard char."""
+        self.save_new_default_exploration(
+            self.EXP_0_ID, self.owner_id, title='What is a Fraction?')
+
+        zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
+        zf = zipfile.ZipFile(zip_file_output)
+
+        self.assertEqual(zf.namelist(), ['What is a Fraction.yaml'])
+
+    def test_export_to_zip_file_with_all_nonstandard_chars(self) -> None:
+        """Test the export_to_zip_file() method with all nonstandard chars."""
+        self.save_new_default_exploration(
+            self.EXP_0_ID, self.owner_id, title='?!!!!!?')
+
+        zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
+        zf = zipfile.ZipFile(zip_file_output)
+
+        self.assertEqual(zf.namelist(), ['exploration.yaml'])
 
     def test_export_to_zip_file_with_assets(self) -> None:
         """Test exporting an exploration with assets to a zip file."""
@@ -3271,7 +3262,7 @@ solicit_answer_details: false
 
     def test_export_by_versions(self) -> None:
         """Test export_to_dict() for different versions."""
-        self.maxDiff = 0
+        self.maxDiff = None
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id)
         content_id_generator = translation_domain.ContentIdGenerator(
@@ -6384,14 +6375,14 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         change_list = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'title': 'Title 1'
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'old_value': None,
                 'new_value': self.EXP_ID_1
             })
@@ -6461,7 +6452,6 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
 auto_tts_enabled: true
 blurb: ''
 category: category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: %r
 language_code: en
@@ -6600,12 +6590,6 @@ title: Old Title
         exp_id = 'exp_id'
         user_id = 'user_id'
         self.save_new_default_exploration(exp_id, user_id)
-        exp_services.update_exploration(
-            user_id, exp_id, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'correctness_feedback_enabled',
-                'new_value': True
-            })], 'Changed correctness_feedback_enabled.')
         self.save_new_topic(
             topic_id, user_id, name='Topic',
             abbreviated_name='topic-one', url_fragment='topic-one',
@@ -6618,14 +6602,14 @@ title: Old Title
         change_list_story = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'title': 'Title 1'
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'old_value': None,
                 'new_value': exp_id
             })
@@ -7058,18 +7042,18 @@ title: Old Title
         self.assertEqual(exploration.title, 'new title')
         self.assertEqual(exploration.auto_tts_enabled, True)
 
-    def test_update_exploration_correctness_feedback_enabled(self) -> None:
+    def test_update_old_exploration_version_remains_editable(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.correctness_feedback_enabled, False)
+        self.assertEqual(exploration.language_code, 'en')
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'correctness_feedback_enabled',
-                'new_value': True
-            })], 'Changed correctness_feedback_enabled.')
+                'property_name': 'language_code',
+                'new_value': 'hi'
+            })], 'Changed language code.')
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.correctness_feedback_enabled, True)
+        self.assertEqual(exploration.language_code, 'hi')
 
         # Check that the property can be changed when working
         # on old version.
@@ -7083,20 +7067,20 @@ title: Old Title
 
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-            'property_name': 'correctness_feedback_enabled',
-            'new_value': False
+            'property_name': 'language_code',
+            'new_value': 'en'
         })]
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 2, change_list)
         self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, change_list,
-            'Changed correctness_feedback_enabled.')
+            'Changed language code again.')
 
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.title, 'new title')
-        self.assertEqual(exploration.correctness_feedback_enabled, False)
+        self.assertEqual(exploration.language_code, 'en')
 
     def test_update_exploration_with_mark_translation_needs_update_changes(
         self
@@ -8655,7 +8639,6 @@ author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -9008,7 +8991,6 @@ author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -9813,7 +9795,7 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         owner_id = 'owner_id'
         self.save_new_valid_exploration(
             exp_id, owner_id, title='title', category='Category 1',
-            end_state_name='END', correctness_feedback_enabled=True)
+            end_state_name='END')
         exp_services.update_exploration(
             owner_id, exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -9854,4 +9836,80 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
                     'state_name=\'END\')',
                 ], 8, 5
             )
+        )
+
+
+class ComputeVoiceoversModelFromExplorationChangeTest(
+    ExplorationServicesUnitTests
+):
+    """Tests entity voiceovers model creation from exploration change dict."""
+
+    def test_should_be_able_to_create_entity_voiceovers_models(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'test_exp_id', title='some title', category='Algebra',
+            language_code=constants.DEFAULT_LANGUAGE_CODE
+        )
+        exploration.objective = 'An objective'
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'NumericInput',
+            content_id_generator
+        )
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        manual_voiceover_1: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        manual_voiceover_2: state_domain.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+
+        voiceover_changes = [
+            exp_domain.ExplorationChange({
+                'cmd': 'update_voiceovers',
+                'language_accent_code': 'en-US',
+                'content_id': 'content_0',
+                'voiceovers': {
+                    'manual': manual_voiceover_1
+                }
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'update_voiceovers',
+                'language_accent_code': 'en-US',
+                'content_id': 'default_outcome_1',
+                'voiceovers': {
+                    'manual': manual_voiceover_2
+                }
+            })
+        ]
+
+        models_to_put = (
+            exp_services.compute_models_to_put_when_saving_new_exp_version(
+                self.owner_id, 'test_exp_id', voiceover_changes,
+                'Added voiceover', False
+            )
+        )
+        entity_voiceovers_models = []
+        for model_instance in models_to_put:
+            if isinstance(
+                    model_instance, voiceover_models.EntityVoiceoversModel
+            ):
+                entity_voiceovers_models.append(model_instance)
+
+        self.assertEqual(len(entity_voiceovers_models), 1)
+        self.assertDictEqual(
+            entity_voiceovers_models[0].voiceovers_mapping[
+                'content_0']['manual'], manual_voiceover_1
+        )
+        self.assertDictEqual(
+            entity_voiceovers_models[0].voiceovers_mapping[
+                'default_outcome_1']['manual'], manual_voiceover_2
         )

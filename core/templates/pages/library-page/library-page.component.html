@@ -42,7 +42,7 @@
              align="center"
              width="100%"
              alt="page banner">
-        <div class="text-center w-100 mt-4">
+        <div class="text-center w-100 mt-4" tabindex="0">
           <h1 class="oppia-library-h1 e2e-test-library-main-header">{{ 'I18N_LIBRARY_MAIN_HEADER' | translate }}</h1>
           <h2 class="oppia-library-h2">{{ 'I18N_LIBRARY_SUB_HEADER' | translate }}</h2>
         </div>
@@ -53,10 +53,11 @@
 
         <div class="oppia-classroom-div">
           <div class="oppia-classroom-text">
-            <h1 class="oppia-classroom-h2">{{ 'I18N_CLASSROOM_CALLOUT_HEADING_2' | translate }}</h1>
-            <h2 class="oppia-classroom-h1">{{ 'I18N_CLASSROOM_CALLOUT_HEADING_1' | translate }}</h2>
-            <p class="oppia-classroom-p">{{ 'I18N_CLASSROOM_CALLOUT_PARAGRAPH_1' | translate }}</p>
+            <h1 class="oppia-classroom-h2" tabindex="0">{{ 'I18N_CLASSROOM_CALLOUT_HEADING_2' | translate }}</h1>
+            <h2 class="oppia-classroom-h1" tabindex="0">{{ 'I18N_CLASSROOM_CALLOUT_HEADING_1' | translate }}</h2>
+            <p class="oppia-classroom-p" tabindex="0">{{ 'I18N_CLASSROOM_CALLOUT_PARAGRAPH_1' | translate }}</p>
             <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+               tabindex="0"
                href="/learn/math"
                smartRouterLink="/learn/math">
                {{ 'I18N_CLASSROOM_CALLOUT_BUTTON' | translate }}
@@ -86,6 +87,7 @@
             <h2 [ngClass]="{'active': !libraryWindowIsNarrow && activeGroupIndex === idx}" class="oppia-library-group-header">
               <a *ngIf="group.has_full_results_page"
                  class="e2e-test-library-{{group.protractor_id}}"
+                 (keydown.enter)="showFullResultsPage(group.categories, group.full_results_url)"
                  (click)="showFullResultsPage(group.categories, group.full_results_url)"
                  tabindex="0">
                 <span [translate]="group.header_i18n_id"></span>
@@ -100,6 +102,7 @@
           <div *ngIf="!libraryWindowIsNarrow" class="oppia-carousel-box">
             <button mat-button class="md-no-ink oppia-library-carousel-scroller"
                     (click)="scroll(idx, true)"
+                    tabindex="-1"
                     *ngIf="leftmostCardIndices[idx] != 0">
               <i class="fas fal fa-angle-left"></i>
             </button>
@@ -144,6 +147,7 @@
             <button mat-button class="md-no-ink oppia-library-carousel-scroller"
                     (click)="scroll(idx, false)"
                     [hidden]="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[idx]"
+                    tabindex="-1"
                     aria-hidden="true">
               <i class="fas fal fa-angle-right"></i>
             </button>
