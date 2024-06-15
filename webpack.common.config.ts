@@ -121,7 +121,9 @@ module.exports = {
     // is needed since we need to use the firebase endpoint when running scripts internally in a
     // docker container.
     new webpack.DefinePlugin({
-      'process.env.USE_FIREBASE_ENDPOINT': JSON.stringify(process.env.USE_FIREBASE_ENDPOINT),
+      'process.env.USE_FIREBASE_ENDPOINT': JSON.stringify(
+        process.env.USE_FIREBASE_ENDPOINT
+      ),
     }),
     new webpack.DefinePlugin({
       CAN_SEND_ANALYTICS_EVENTS: analyticsConstants.CAN_SEND_ANALYTICS_EVENTS,
