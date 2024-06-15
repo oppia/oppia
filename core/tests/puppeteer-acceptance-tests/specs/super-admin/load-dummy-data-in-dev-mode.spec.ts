@@ -74,9 +74,9 @@ describe('Super Admin', function () {
           mathClassroomURl
         );
 
-        await superAdmin.generateDummyBlogPost('Education');
+        await superAdmin.generateDummyBlogPost();
         await superAdmin.navigateToBlogPage();
-        await superAdmin.expectBlogPostToBePresent('Education-IJCCaHXXICvN');
+        await superAdmin.expectBlogPostToBePresent('Education');
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );

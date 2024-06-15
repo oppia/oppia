@@ -27,11 +27,26 @@ const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 
 const topicManagerRole = testConstants.Roles.TOPIC_MANAGER;
 
+const userRoleDescriptionSelector = '.oppia-user-role-description';
+const reloadExplorationTitle = '.e2e-test-reload-exploration-title';
+const selectTopicForAssignmentSelector = '.e2e-test-select-topic';
+const searchFieldCommunityLibrary = 'input.e2e-test-search-input';
+const addTopicButton = '.e2e-test-add-topic-button';
+const reloadExplorationButton = '.e2e-test-reload-exploration-button';
 const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
 const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
 const rolesSelectDropdown = 'div.mat-select-trigger';
+const reloadCollectionTitleSelector = '.e2e-test-reload-collection-title';
+const reloadCollectionButton = '.e2e-test-reload-collection-button';
 const addRoleButton = 'button.oppia-add-role-button';
-
+const generateExplorationButton = '.oppia-generate-exploration-text';
+const noOfExplorationToGeneratorField =
+  '#label-target-explorations-to-generate';
+const noOfExplorationToPublishField = '#label-target-explorations-to-generate';
+const explorationTileSelector = '.e2e-test-exploration-dashboard-card';
+const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
+const loadDummyMathClassRoomButton = '.load-dummy-math-classroom';
+const justifyContentDiv = 'div.justify-content-between';
 const topicsTab = 'a.e2e-test-topics-tab';
 const skillsTab = 'a.e2e-test-skills-tab';
 
@@ -117,8 +132,8 @@ export class SuperAdmin extends BaseUser {
   private async selectTopicForTopicManagerRole(
     topicName: string
   ): Promise<void> {
-    await this.page.waitForSelector('.e2e-test-select-topic');
-    const selectElement = await this.page.$('.e2e-test-select-topic');
+    await this.page.waitForSelector(selectTopicForAssignmentSelector);
+    const selectElement = await this.page.$(selectTopicForAssignmentSelector);
     if (!selectElement) {
       throw new Error('Select element not found');
     }
@@ -147,9 +162,9 @@ export class SuperAdmin extends BaseUser {
           throw new Error('Option value not found');
         }
 
-        await this.page.select('.e2e-test-select-topic', optionValue);
-        await this.page.waitForSelector('.e2e-test-add-topic-button');
-        const button = await this.page.$('.e2e-test-add-topic-button');
+        await this.page.select(selectTopicForAssignmentSelector, optionValue);
+        await this.page.waitForSelector(addTopicButton);
+        const button = await this.page.$(addTopicButton);
         if (!button) {
           throw new Error('Button not found');
         }
@@ -171,8 +186,8 @@ export class SuperAdmin extends BaseUser {
     await this.goto(AdminPageRolesTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
-    await this.page.waitForSelector('div.justify-content-between');
-    const userRoleElements = await this.page.$$('.oppia-user-role-description');
+    await this.page.waitForSelector(justifyContentDiv);
+    const userRoleElements = await this.page.$$(userRoleDescriptionSelector);
     for (let i = 0; i < userRoleElements.length; i++) {
       const roleText = await this.page.evaluate(
         (element: HTMLElement) => element.innerText,
@@ -184,7 +199,7 @@ export class SuperAdmin extends BaseUser {
         return;
       }
     }
-    throw new Error(`User does not have the ${role} role!`);
+    throw new Error(`User does not have the "${role}" role!`);
   }
 
   /**
@@ -195,15 +210,15 @@ export class SuperAdmin extends BaseUser {
     await this.goto(AdminPageRolesTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
-    await this.page.waitForSelector('div.justify-content-between');
-    const userRoleElements = await this.page.$$('.oppia-user-role-description');
+    await this.page.waitForSelector(justifyContentDiv);
+    const userRoleElements = await this.page.$$(userRoleDescriptionSelector);
     for (let i = 0; i < userRoleElements.length; i++) {
       const roleText = await this.page.evaluate(
         (element: HTMLElement) => element.innerText,
         userRoleElements[i]
       );
       if (roleText.toLowerCase() === role) {
-        throw new Error(`User has the ${role} role!`);
+        throw new Error(`User has the "${role}" role!`);
       }
     }
     showMessage(`User ${username} does not have the ${role} role!`);
@@ -220,7 +235,7 @@ export class SuperAdmin extends BaseUser {
     await this.page.waitForSelector(roleEditorInputField);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
-    await this.page.waitForSelector('div.justify-content-between');
+    await this.page.waitForSelector(justifyContentDiv);
     await this.page.waitForSelector(
       `.e2e-test-${role}-remove-button-container`
     );
@@ -229,7 +244,7 @@ export class SuperAdmin extends BaseUser {
       `.e2e-test-${role}-remove-button-container`
     );
     if (!deleteRoleButton) {
-      throw new Error(`User does not have the ${role} role!`);
+      throw new Error(`User does not have the "${role}" role!`);
     }
 
     await this.waitForElementToBeClickable(deleteRoleButton);
@@ -256,10 +271,10 @@ export class SuperAdmin extends BaseUser {
     for (const action of actions) {
       const isActionPresent = await this.isTextPresentOnPage(action);
       if (!isActionPresent) {
-        throw new Error(`Action ${action} is not allocated to the role`);
+        throw new Error(`Action "${action}" is not allocated to the role`);
       }
     }
-    showMessage(`${actions} is/are allocated to the role`);
+    showMessage(`"${actions}" is/are allocated to the role`);
   }
 
   /**
@@ -271,10 +286,10 @@ export class SuperAdmin extends BaseUser {
     for (const user of users) {
       const isUserPresent = await this.isTextPresentOnPage(user);
       if (!isUserPresent) {
-        throw new Error(`User ${user} is not assigned to the role`);
+        throw new Error(`User "${user}" is not assigned to the role`);
       }
     }
-    showMessage(`${users} is/are assigned to the role`);
+    showMessage(`"${users}" is/are assigned to the role`);
   }
 
   /**
@@ -290,7 +305,7 @@ export class SuperAdmin extends BaseUser {
 
     for (let i = 0; i < reloadExplorationRows.length; i++) {
       const explorationNameElement = await reloadExplorationRows[i].$(
-        '.e2e-test-reload-exploration-title'
+        reloadExplorationTitle
       );
       const name = await this.page.evaluate(
         element => element.innerText,
@@ -298,11 +313,9 @@ export class SuperAdmin extends BaseUser {
       );
 
       if (name === `${explorationName}`) {
-        await reloadExplorationRows[i].waitForSelector(
-          '.e2e-test-reload-exploration-button'
-        );
+        await reloadExplorationRows[i].waitForSelector(reloadExplorationButton);
         const reloadButton = await reloadExplorationRows[i].$(
-          '.e2e-test-reload-exploration-button'
+          reloadExplorationButton
         );
 
         if (!reloadButton) {
@@ -327,17 +340,17 @@ export class SuperAdmin extends BaseUser {
    */
   async expectActivityToBePresent(activityName: string): Promise<void> {
     try {
-      await this.page.waitForSelector('input.e2e-test-search-input', {
+      await this.page.waitForSelector(searchFieldCommunityLibrary, {
         visible: true,
       });
-      await this.type('input.e2e-test-search-input', activityName);
+      await this.type(searchFieldCommunityLibrary, activityName);
 
       const isActivityPresent = await this.isTextPresentOnPage(activityName);
       if (!isActivityPresent) {
-        throw new Error(`Activity ${activityName} is not present`);
+        throw new Error(`Activity "${activityName}" is not present`);
       }
 
-      showMessage(`Activity ${activityName} is present`);
+      showMessage(`Activity "${activityName}" is present`);
     } catch (error) {
       console.error(
         `An error occurred while checking the presence of the activity "${activityName}":`,
@@ -361,9 +374,9 @@ export class SuperAdmin extends BaseUser {
       );
       for (let i = 0; i < reloadCollectionRows.length; i++) {
         const collectionNameElement = await reloadCollectionRows[i].$(
-          '.e2e-test-reload-collection-title'
+          reloadCollectionTitleSelector
         );
-        await this.page.waitForSelector('.e2e-test-reload-collection-title', {
+        await this.page.waitForSelector(reloadCollectionTitleSelector, {
           visible: true,
         });
 
@@ -373,12 +386,11 @@ export class SuperAdmin extends BaseUser {
         );
         if (name.trim() === collectionName) {
           const reloadButton = await reloadCollectionRows[i].$(
-            '.e2e-test-reload-collection-button'
+            reloadCollectionButton
           );
-          await this.page.waitForSelector(
-            '.e2e-test-reload-collection-button',
-            {visible: true}
-          );
+          await this.page.waitForSelector(reloadCollectionButton, {
+            visible: true,
+          });
 
           if (!reloadButton) {
             throw new Error(
@@ -411,23 +423,17 @@ export class SuperAdmin extends BaseUser {
     noToPublish: number
   ): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
-    await this.page.waitForSelector('#label-target-explorations-to-generate', {
+    await this.page.waitForSelector(noOfExplorationToGeneratorField, {
       visible: true,
     });
-    await this.type(
-      '#label-target-explorations-to-generate',
-      noToGenerate.toString()
-    );
+    await this.type(noOfExplorationToGeneratorField, noToGenerate.toString());
 
-    await this.page.waitForSelector('#label-target-explorations-to-publish', {
+    await this.page.waitForSelector(noOfExplorationToPublishField, {
       visible: true,
     });
-    await this.type(
-      '#label-target-explorations-to-publish',
-      noToPublish.toString()
-    );
+    await this.type(noOfExplorationToPublishField, noToPublish.toString());
 
-    await this.page.waitForSelector('.oppia-generate-exploration-text', {
+    await this.page.waitForSelector(generateExplorationButton, {
       visible: true,
     });
     await this.clickOn(' Generate Explorations ');
@@ -438,12 +444,10 @@ export class SuperAdmin extends BaseUser {
    * @param {number} expectedNumber - The expected number of activities.
    */
   async expectNoOfActivitiesToBePresent(expectedNumber: number): Promise<void> {
-    await this.page.waitForSelector('.e2e-test-exploration-dashboard-card', {
+    await this.page.waitForSelector(explorationTileSelector, {
       visible: true,
     });
-    const noOfActivities = await this.page.$$(
-      '.e2e-test-exploration-dashboard-card'
-    );
+    const noOfActivities = await this.page.$$(explorationTileSelector);
 
     if (noOfActivities.length !== expectedNumber) {
       throw new Error(
@@ -518,8 +522,8 @@ export class SuperAdmin extends BaseUser {
    */
   async generateDummyMathClassroom(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
-    await this.page.waitForSelector('.load-dummy-math-classroom');
-    await this.clickOn('.load-dummy-math-classroom');
+    await this.page.waitForSelector(loadDummyMathClassRoomButton);
+    await this.clickOn(loadDummyMathClassRoomButton);
   }
 
   /**
@@ -541,30 +545,37 @@ export class SuperAdmin extends BaseUser {
   }
 
   /**
-   * Generates a specific blog post.
-   * @param {string} blogPostTitle - The title of the blog post to generate.
+   * Generates a dummy blog post.
    */
-  async generateDummyBlogPost(blogPostTitle: string): Promise<void> {
+
+  async generateDummyBlogPost(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
-    const generateButton = await this.page.$(
-      `.generate-blog-post-${blogPostTitle}`
-    );
-    if (generateButton) {
-      await generateButton.click();
-    }
+    await this.clickOn('.e2e-test-generate-blog-post');
   }
 
   /**
    * Checks if the blog post is present.
-   * @returns {Promise<void>}
+   * @param {string} expectedBlog - the title of the expected blog post.
    */
-  async expectBlogPostToBePresent(BlogName: string): Promise<void> {
+  async expectBlogPostToBePresent(expectedBlog: string): Promise<void> {
     await this.navigateToBlogPage();
-    const isBlogPostPresent = await this.isTextPresentOnPage(BlogName);
-    if (!isBlogPostPresent) {
-      throw new Error('The blog post was not found on the blog dashboard.');
+    const titleRegex = new RegExp(`^${expectedBlog}-[A-Za-z]{12}$`);
+
+    const blogPostTitles = await this.page.$$(blogPostTitleSelector);
+    for (const titleElement of blogPostTitles) {
+      const title = await this.page.evaluate(
+        el => el.textContent,
+        titleElement
+      );
+      if (titleRegex.test(title.trim())) {
+        showMessage('The blog post is present on the blog dashboard.');
+        return;
+      }
     }
-    showMessage('The blog post is present on the blog dashboard.');
+
+    throw new Error(
+      `The blog post "${expectedBlog}" was not found on the blog dashboard.`
+    );
   }
 
   /**
