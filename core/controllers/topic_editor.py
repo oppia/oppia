@@ -533,6 +533,9 @@ class EditableTopicDataHandler(
         classroom_url_fragment = (
             classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic_id))
+        classroom_name = (
+            classroom_config_services.get_classroom_name_for_topic_id(
+                topic_id))
         skill_question_count_dict = {}
         for skill_id in topic.get_all_skill_ids():
             skill_question_count_dict[skill_id] = (
@@ -541,14 +544,31 @@ class EditableTopicDataHandler(
         skill_creation_is_allowed = (
             role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
 
+        curriculum_admin_usernames = (
+            user_services.get_usernames_by_role('ADMIN'))
+
         self.values.update({
-            'classroom_url_fragment': classroom_url_fragment,
+            'classroom_url_fragment': (
+                None if (
+                    classroom_url_fragment
+                    ==
+                    str(constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)
+                ) else classroom_url_fragment
+            ),
+            'classroom_name': (
+                None if (
+                    classroom_name
+                    ==
+                    str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)
+                ) else classroom_name
+            ),
             'topic_dict': topic.to_dict(),
             'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
             'skill_question_count_dict': skill_question_count_dict,
             'skill_id_to_description_dict': skill_id_to_description_dict,
             'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict,
-            'skill_creation_is_allowed': skill_creation_is_allowed
+            'skill_creation_is_allowed': skill_creation_is_allowed,
+            'curriculum_admin_usernames': curriculum_admin_usernames
         })
 
         self.render_json(self.values)
@@ -638,12 +658,27 @@ class EditableTopicDataHandler(
 
         Args:
             topic_id: str. The ID of the topic.
+
+        Raises:
+            Exception. If topic is assigned to a classroom.
         """
         assert self.user_id is not None
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.NotFoundException(
                 'The topic with the given id doesn\'t exist.')
+
+        classroom_name = (
+            classroom_config_services.get_classroom_name_for_topic_id(
+                topic_id))
+
+        if classroom_name != str(
+            constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS):
+            raise Exception(
+                f'The topic is assigned to the {classroom_name} classroom. '
+                f'Contact the curriculum admins to remove it '
+                'from the classroom first.')
+
         topic_services.delete_topic(self.user_id, topic_id)
 
         self.render_json(self.values)
@@ -827,10 +862,20 @@ class TopicPublishHandler(
 
         publish_status = self.normalized_payload['publish_status']
 
+        classroom_name = (
+            classroom_config_services.get_classroom_name_for_topic_id(
+                topic_id))
+
         try:
             if publish_status:
                 topic_services.publish_topic(topic_id, self.user_id)
             else:
+                if classroom_name != str(
+                    constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS):
+                    raise Exception(
+                        f'The topic is assigned to the {classroom_name} '
+                        f'classroom. Contact the curriculum admins to '
+                        'remove it from the classroom first.')
                 topic_services.unpublish_topic(topic_id, self.user_id)
         except Exception as e:
             raise self.UnauthorizedUserException(e)

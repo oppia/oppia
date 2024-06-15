@@ -213,10 +213,12 @@ CHROME_PATHS = [
 
 ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-admin/assign-roles-to-users-and-change-tag-properties',
+    'blog-editor/create-and-delete-draft-blog-post',
     'blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked',
     'curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill',
     'exploration-editor/create-exploration-and-change-basic-settings',
     'exploration-editor/load-complete-and-restart-exploration-preview',
+    'exploration-editor/save-draft-publish-and-discard-the-changes',
     'logged-out-user/click-all-buttons-on-about-page',
     'logged-out-user/click-all-buttons-on-about-foundation-page',
     'logged-out-user/click-all-buttons-on-donation-thanks-page',
@@ -234,7 +236,9 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
        'by-that-creator',
     'practice-question-admin/add-and-remove-contribution-rights',
     'translation-admin/add-and-remove-translation-rights',
-    'voiceover-admin/add-voiceover-artist-to-an-exploration'
+    'voiceover-admin/add-voiceover-artist-to-an-exploration',
+    'moderator/view-recent-commits-and-feedback-messages',
+    'moderator/edit-featured-activities-list'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181
