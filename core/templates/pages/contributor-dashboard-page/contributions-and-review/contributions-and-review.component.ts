@@ -168,7 +168,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
    * This determines whether the contributor_dashboard_accomplishments feature
    * is enabled.
    */
-  accomplishmentsTabIsEnabled: boolean = false;
   defaultContributionType: string = 'translationContribution';
   SUGGESTION_LABELS = {
     review: {
@@ -699,8 +698,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.dropdownShown = false;
     this.activeDropdownTabChoice = '';
     this.reviewTabs = [];
-    this.accomplishmentsTabIsEnabled =
-      this.featureService.status.ContributorDashboardAccomplishments.isEnabled;
     this.contributionTabs = [
       {
         tabType: this.TAB_TYPE_CONTRIBUTIONS,
