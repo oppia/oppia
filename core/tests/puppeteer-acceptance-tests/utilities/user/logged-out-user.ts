@@ -54,7 +54,6 @@ const privacyPolicyUrl = testConstants.URLs.PrivacyPolicy;
 const googleGroupsOppiaUrl = testConstants.URLs.GoogleGroups.Oppia;
 const googleGroupsOppiaAnnouceUrl =
   testConstants.URLs.GoogleGroups.OppiaAnnounce;
-const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const allAboutCookiesUrl = testConstants.URLs.ExternalLink.AboutCookies;
 const googleAnalyticsPartnerPoliciesUrl =
   testConstants.URLs.GoogleAnalytics.PartnerPolicies;
@@ -103,7 +102,7 @@ const footerAboutFoundationLink = 'a.e2e-test-footer-about-foundation-link';
 const footerBlogLink = 'a.e2e-test-footer-blog-link';
 const footerForumlink = 'a.e2e-test-footer-forum-link';
 const footerGetStartedLink = 'a.e2e-test-get-started-link';
-const footerTeachPageLink = 'a.e2e-test-teach-link';
+const footerTeachLink = 'a.e2e-test-teach-link';
 const footerCreatorGuidelinesLink = 'a.e2e-test-creator-guidelines-link';
 const footerTermsLink = 'a.e2e-test-terms-link';
 const footerPrivacyPolicyLink = 'a.e2e-test-privacy-policy-link';
@@ -1040,18 +1039,6 @@ export class LoggedOutUser extends BaseUser {
       'Get Started link in the footer',
       getStartedUrl,
       'Get Started'
-    );
-  }
-
-  /**
-   * Navigates to the Teach page using the oppia website footer.
-   */
-  async navigateToTeachPageViaFooter(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      footerTeachPageLink,
-      '"For Parents/Teachers" link in the Teach/Learn section in the footer',
-      teachUrl,
-      'For Parents/Teachers'
     );
   }
 
