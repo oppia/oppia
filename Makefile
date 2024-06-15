@@ -6,7 +6,7 @@ ALL_SERVICES = datastore dev-server firebase elasticsearch webpack-compiler angu
 
 OS_NAME := $(shell uname)
 
-FLAGS = save_datastore disable_host_checking no_auto_restart prod_env maintenance_mode source_maps
+FLAGS = save_datastore disable_host_checking no_auto_restart prod_env maintenance_mode source_maps use_firebase_localhost
 
 sharding_instances := 3
 
@@ -238,7 +238,7 @@ run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests f
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 # Starting the development server for the lighthouse tests.
-	$(MAKE) start-devserver
+	$(MAKE) start-devserver use_firebase_endpoint=true
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Starting Lighthouse Accessibility tests  '
 	@echo '-----------------------------------------------------------------------'
@@ -254,7 +254,7 @@ run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for t
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 # Starting the development server for the lighthouse tests.
-	$(MAKE) start-devserver
+	$(MAKE) start-devserver use_firebase_endpoint=true
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Starting Lighthouse Performance tests  '
 	@echo '-----------------------------------------------------------------------'

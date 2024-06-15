@@ -127,8 +127,8 @@ export class AuthService {
   }
 
   static get firebaseEmulatorConfig(): readonly [string, number] | undefined {
-    let firebaseHost = process.env.OPPIA_IS_DOCKERIZED
-      ? '0.0.0.0'
+    let firebaseHost = process.env.USE_FIREBASE_ENDPOINT === 'true'
+      ? 'firebase'
       : 'localhost';
     // TODO(#18260): Change this when we permanently move to the Docker Setup.
     return AuthService.firebaseEmulatorIsEnabled
