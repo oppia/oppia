@@ -240,9 +240,9 @@ run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests f
 # Starting the development server for the lighthouse tests.
 	$(MAKE) start-devserver
 	@echo '-----------------------------------------------------------------------'
-	@echo '  Starting Lighthouse Accessibility tests -- shard number: $(shard)'
+	@echo '  Starting Lighthouse Accessibility tests  '
 	@echo '-----------------------------------------------------------------------'
-	$(SHELL_PREFIX) dev-server sh -c "python -m scripts.run_lighthouse_tests --mode accessibility --shard $(shard) $(PYTHON_ARGS)"
+	$(SHELL_PREFIX) dev-server sh -c "python -m scripts.run_lighthouse_tests --mode accessibility $(PYTHON_ARGS)"
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Lighthouse tests has been executed successfully....'
 	@echo '-----------------------------------------------------------------------'
@@ -256,9 +256,9 @@ run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for t
 # Starting the development server for the lighthouse tests.
 	$(MAKE) start-devserver
 	@echo '-----------------------------------------------------------------------'
-	@echo '  Starting Lighthouse Performance tests -- shard number: $(shard)'
+	@echo '  Starting Lighthouse Performance tests  '
 	@echo '-----------------------------------------------------------------------'
-	$(SHELL_PREFIX) dev-server sh -c "python -m scripts.run_lighthouse_tests --mode performance --shard $(shard) $(PYTHON_ARGS)""
+	$(SHELL_PREFIX) dev-server sh -c "python -m scripts.run_lighthouse_tests --mode performance $(PYTHON_ARGS)""
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Lighthouse tests has been executed successfully....'
 	@echo '-----------------------------------------------------------------------'
