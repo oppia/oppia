@@ -37,7 +37,8 @@
             </div>
           </div>
           <div *ngFor="let checkpointNode of checkpointStatusArray; index as idx"
-               [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}">
+               [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}"
+               (click)="returnToCheckpointIfCompleted(idx)">
             {{ idx + 1 }}
           </div>
         </div>

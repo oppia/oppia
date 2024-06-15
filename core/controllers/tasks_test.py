@@ -20,6 +20,7 @@ from core import feconf
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import platform_parameter_list
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
@@ -40,6 +41,9 @@ class TasksTests(test_utils.EmailTestBase):
 
     USER_A_EMAIL: Final = 'a@example.com'
     USER_B_EMAIL: Final = 'b@example.com'
+    EMAIL_FOOTER: Final = (
+        'You can change your email preferences via the Preferences page.'
+    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -55,15 +59,20 @@ class TasksTests(test_utils.EmailTestBase):
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
-        self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
-            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
         self.THREAD_ID = 'exploration.exp1.thread_1'
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender')
+        ]
+    )
     def test_email_sent_when_feedback_in_thread(self) -> None:
         # Create feedback thread.
-        with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -118,10 +127,11 @@ class TasksTests(test_utils.EmailTestBase):
             # What is expected in the email body.
             expected_message = (
                 'Hi editor,\n\nYou\'ve received a new message on your Oppia'
-                ' explorations:\n- Title:\n- ' + 'B' * 200 + '...' + '\nYou can'
+                ' explorations:\n- Title:\n- %s...\nYou can'
                 ' view and reply to your messages from your dashboard.\n\nThank'
                 's, and happy teaching!\n\nBest wishes,\nThe Oppia Team\n\nYou'
-                ' can change your email preferences via the Preferences page.')
+                ' can change your email preferences via the Preferences page.'
+                ) % ('B' * 200)
 
             # Check that greater than 200 word message is sent
             # and has correct message.
@@ -146,6 +156,13 @@ class TasksTests(test_utils.EmailTestBase):
             # Check that there are three messages.
             self.assertEqual(len(mock_email_messages), 3)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender')
+        ]
+    )
     def test_email_is_sent_when_contributor_achieves_a_new_rank(self) -> None:
         """Tests ContributorDashboardAchievementEmailHandler functionality."""
 
@@ -153,46 +170,52 @@ class TasksTests(test_utils.EmailTestBase):
         user_services.update_email_preferences(
             user_id, True, False, False, False)
 
-        with self.can_send_emails_ctx:
-            payload = {
-                'contributor_user_id': user_id,
-                'contribution_type': feconf.CONTRIBUTION_TYPE_TRANSLATION,
-                'contribution_sub_type': (
-                    feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE),
-                'language_code': 'hi',
-                'rank_name': 'Initial Contributor',
-            }
-            taskqueue_services.enqueue_task(
-                feconf
-                .TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS,
-                payload, 0)
-            self.process_and_flush_pending_tasks()
+        payload = {
+            'contributor_user_id': user_id,
+            'contribution_type': feconf.CONTRIBUTION_TYPE_TRANSLATION,
+            'contribution_sub_type': (
+                feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE),
+            'language_code': 'hi',
+            'rank_name': 'Initial Contributor',
+        }
+        taskqueue_services.enqueue_task(
+            feconf
+            .TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS,
+            payload, 0)
+        self.process_and_flush_pending_tasks()
 
-            # Check that user A received message.
-            messages = self._get_sent_email_messages(
-                self.USER_A_EMAIL)
-            self.assertEqual(len(messages), 1)
+        # Check that user A received message.
+        messages = self._get_sent_email_messages(
+            self.USER_A_EMAIL)
+        self.assertEqual(len(messages), 1)
 
-            # Check that user A received correct message.
-            expected_email_subject = 'Oppia Translator Rank Achievement!'
-            expected_email_html_body = (
-                'Hi userA,<br><br>'
-                'This is to let you know that you have successfully achieved '
-                'the Initial Contributor rank for submitting translations in '
-                'हिन्दी (Hindi). Your efforts help Oppia grow better every '
-                'day and support students around the world.<br><br>'
-                'You can check all the achievements you earned in the '
-                '<a href="http://localhost:8181/contributor-dashboard">'
-                'Contributor Dashboard</a>.<br><br>'
-                'Best wishes and we hope you can continue to contribute!'
-                '<br><br>'
-                'The Oppia Contributor Dashboard Team')
-            self.assertEqual(messages[0].html, expected_email_html_body)
-            self.assertEqual(messages[0].subject, expected_email_subject)
+        # Check that user A received correct message.
+        expected_email_subject = 'Oppia Translator Rank Achievement!'
+        expected_email_html_body = (
+            'Hi userA,<br><br>'
+            'This is to let you know that you have successfully achieved '
+            'the Initial Contributor rank for submitting translations in '
+            'हिन्दी (Hindi). Your efforts help Oppia grow better every '
+            'day and support students around the world.<br><br>'
+            'You can check all the achievements you earned in the '
+            '<a href="http://localhost:8181/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Best wishes and we hope you can continue to contribute!'
+            '<br><br>'
+            'The Oppia Contributor Dashboard Team')
+        self.assertEqual(messages[0].html, expected_email_html_body)
+        self.assertEqual(messages[0].subject, expected_email_subject)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender')
+        ]
+    )
     def test_instant_feedback_reply_email(self) -> None:
         """Tests Instant feedback message handler."""
-        with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
+        with self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
                 self.user_id_a, 'a subject', 'some text')
@@ -231,9 +254,16 @@ class TasksTests(test_utils.EmailTestBase):
                 ' via the Preferences page.')
             self.assertEqual(mock_email_messages[0].body, expected_message)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender')
+        ]
+    )
     def test_email_sent_when_status_changed(self) -> None:
         """Tests Feedback Thread Status Change Email Handler."""
-        with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
+        with self.can_send_feedback_email_ctx:
             # Create thread.
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
@@ -272,6 +302,13 @@ class TasksTests(test_utils.EmailTestBase):
             status_change_email = messages[0]
             self.assertEqual(status_change_email.body, expected_message)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender')
+        ]
+    )
     def test_email_sent_to_moderator_after_flag(self) -> None:
         """Tests Flagged Exploration Email Handler."""
 
@@ -282,7 +319,7 @@ class TasksTests(test_utils.EmailTestBase):
             user_services, 'get_user_ids_by_role',
             fake_get_user_ids_by_role)
 
-        with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
+        with self.can_send_feedback_email_ctx:
             with get_moderator_id_as_list:
 
                 # Create thread.
