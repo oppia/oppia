@@ -29,7 +29,9 @@ import {
   ExplorationEditor,
 } from '../user/exploration-editor';
 import {CurriculumAdminFactory} from '../user/curriculum-admin';
+import {TopicManagerFactory} from '../user/topic-manager';
 import {LoggedInUserFactory, LoggedInUser} from '../user/logged-in-user';
+import {ModeratorFactory} from '../user/moderator';
 import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
@@ -47,6 +49,8 @@ const USER_ROLE_MAPPING = {
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
+  [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
+  [ROLES.MODERATOR]: ModeratorFactory,
 } as const;
 
 /**
