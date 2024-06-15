@@ -28,9 +28,7 @@ describe('Super Admin', function () {
 
   beforeAll(async function () {
     superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
-    superAdmin = await UserFactory.assignRolesToUser(superAdmin, [
-      ROLES.CURRICULUM_ADMIN,
-    ]);
+    await UserFactory.assignRolesToUser(superAdmin, [ROLES.CURRICULUM_ADMIN]);
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   describe('When run in development mode, Super Admin', function () {
@@ -49,9 +47,9 @@ describe('Super Admin', function () {
         }
         await superAdmin.navigateToAdminPageActivitiesTab();
 
-        await superAdmin.reloadExplorations('solar system');
+        await superAdmin.reloadExplorations('solar_system');
         await superAdmin.navigateToCommunityLibrary();
-        await superAdmin.expectExplorationToBePresent('solar system');
+        await superAdmin.expectExplorationToBePresent(' The Solar System ');
 
         await superAdmin.reloadCollections('welcome to collections');
         await superAdmin.navigateToCommunityLibrary();

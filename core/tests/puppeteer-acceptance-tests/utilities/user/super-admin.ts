@@ -33,17 +33,27 @@ const reloadCollectionsRowsSelector = '.e2e-test-reload-collection-row';
 const topicManagerRole = testConstants.Roles.TOPIC_MANAGER;
 
 export class SuperAdmin extends BaseUser {
+  /**
+   * Navigates to the Admin Page Activities Tab.
+   */
   async navigateToAdminPageActivitiesTab(): Promise<void> {
     await this.goto(AdminPageActivitiesTab);
   }
 
+  /**
+   * Navigates to the Admin Page Roles Tab.
+   */
   async navigateToAdminPageRolesTab(): Promise<void> {
     await this.goto(AdminPageRolesTab);
   }
 
+  /**
+   * Navigates to the Topics and Skills Dashboard.
+   */
   async navigateToTopicsAndSkillsDashboard(): Promise<void> {
     await this.goto(topicsAndSkillsDashboardUrl);
   }
+
   /**
    * The function to assign a role to a user.
    */
@@ -244,11 +254,17 @@ export class SuperAdmin extends BaseUser {
     showMessage(`${users} is/are assigned to the role`);
   }
 
+  /**
+   * Reloads the specified exploration.
+   * @param {string} explorationName - The name of the exploration to reload.
+   */
   async reloadExplorations(explorationName: string): Promise<void> {
     await this.page.waitForSelector(reloadExplorationRowsSelector);
     const reloadExplorationRows = await this.page.$$(
       reloadExplorationRowsSelector
     );
+    console.log(reloadExplorationRows.length);
+
     for (let i = 0; i < reloadExplorationRows.length; i++) {
       const explorationNameElement = await reloadExplorationRows[i].$(
         '.e2e-test-reload-exploration-title'
@@ -257,19 +273,31 @@ export class SuperAdmin extends BaseUser {
         element => element.innerText,
         explorationNameElement
       );
+      console.log(name);
+
       if (name === ` ${explorationName} `) {
+        await reloadExplorationRows[i].waitForSelector(
+          '.e2e-test-reload-exploration-button'
+        );
         const reloadButton = await reloadExplorationRows[i].$(
           '.e2e-test-reload-exploration-button'
         );
-        if (reloadButton) {
-          await reloadButton.evaluate(element =>
-            (element as HTMLElement).click()
+        console.log('third');
+
+        if (!reloadButton) {
+          throw new Error(
+            `Failed to find reload button for exploration "${explorationName}"`
           );
-          await this.page.waitForNetworkIdle();
-          return;
         }
+        await this.waitForElementToBeClickable(reloadButton);
+        await reloadButton.click();
+        await this.page.waitForNetworkIdle();
+        await this.clickOn('OK');
+        return;
       }
     }
+
+    throw new Error(`Failed to find exploration "${explorationName}"`);
   }
 
   async expectExplorationToBePresent(explorationName: string): Promise<void> {
@@ -357,14 +385,23 @@ export class SuperAdmin extends BaseUser {
    */
   async expectControlsNotAvailable(): Promise<void> {
     try {
-      const areActivitiesPresent = await this.isTextPresentOnPage(
-        " The 'Activities' tab is not available in the production environment. "
+      const activitiesTabElement = await this.page.$(
+        'oppia-admin-prod-mode-activities-tab'
       );
-      if (!areActivitiesPresent) {
+      const activitiesTabText = await this.page.evaluate(
+        element => element.textContent,
+        activitiesTabElement
+      );
+
+      const expectedText =
+        "The 'Activities' tab is not available in the production environment.";
+
+      if (activitiesTabText.trim() !== expectedText) {
         throw new Error(
           'Activities tab is present in the production environment'
         );
       }
+
       showMessage(
         'Activities tab is not available in the production environment, as expected.'
       );
