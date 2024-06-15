@@ -25,6 +25,7 @@ export default {
     AboutFoundation: 'http://localhost:8181/about-foundation',
     AdminPage: 'http://localhost:8181/admin',
     AdminPageRolesTab: 'http://localhost:8181/admin#/roles',
+    AdminPageActivitiesTab: 'http://localhost:8181/admin#/activities',
     Android: 'http://localhost:8181/android',
     Blog: 'http://localhost:8181/blog',
     BlogAdmin: 'http://localhost:8181/blog-admin',
@@ -68,6 +69,8 @@ export default {
     PartnershipsFormInPortuguese:
       'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp',
     PartnershipsFormShortUrl: 'https://forms.gle/Y71U8FdhQwZpicJj8',
+    releaseCoordinatorPage: 'http://localhost:8181/release-coordinator',
+    splashPage: 'http://localhost:8181/splash',
     Teach: 'http://localhost:8181/teach',
     TopicAndSkillsDashboard:
       'http://localhost:8181/topics-and-skills-dashboard',
@@ -95,6 +98,7 @@ export default {
     VOICEOVER_ADMIN: 'voiceover admin',
     TOPIC_MANAGER: 'topic manager',
     MODERATOR: 'moderator',
+    RELEASE_COORDINATOR: 'release coordinator',
   } as const,
   BlogRights: {
     BLOG_ADMIN: 'BLOG_ADMIN',
