@@ -24,6 +24,7 @@ import {PartnershipsPageComponent} from './partnerships-page.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PageTitleService} from 'services/page-title.service';
+import {AppConstants} from '../../app.constants';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -119,7 +120,7 @@ describe('Partnerships page', () => {
 
   it('should set the correct form link for English language', () => {
     translateService.currentLang = 'en';
-    const formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+    const formLink = AppConstants.PARTNERSHIPS_FORM_LINK;
     component.setFormLink();
 
     expect(component.formLink).toBe(formLink);
@@ -147,7 +148,7 @@ describe('Partnerships page', () => {
     'should set english link for languages not supported by' + ' google forms',
     () => {
       translateService.currentLang = 'pcm';
-      const formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+      const formLink = AppConstants.PARTNERSHIPS_FORM_LINK;
       component.setFormLink();
 
       expect(component.formLink).toBe(formLink);

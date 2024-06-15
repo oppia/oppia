@@ -33,6 +33,7 @@ import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
 import {DonationBoxModalComponent} from '../donate-page/donation-box/donation-box-modal.component';
 import {ThanksForDonatingModalComponent} from '../donate-page/thanks-for-donating-modal.component';
 import {of} from 'rxjs';
+import {AppConstants} from '../../app.constants';
 
 class MockWindowRef {
   nativeWindow = {
@@ -163,23 +164,21 @@ describe('About Page', () => {
     expect(component.showNavigationArrowsForCarousel).toBeTrue();
   });
 
-  it(
-    'should obtain new form link whenever the selected' + 'language changes',
-    () => {
-      component.ngOnInit();
-      spyOn(component, 'setPartnershipsFormLink');
-      translateService.onLangChange.emit();
+  it('should obtain new form link whenever the selected language changes', () => {
+    component.ngOnInit();
+    spyOn(component, 'setPartnershipsFormLink');
+    translateService.onLangChange.emit();
 
-      expect(component.setPartnershipsFormLink).toHaveBeenCalled();
-    }
-  );
+    expect(component.setPartnershipsFormLink).toHaveBeenCalled();
+  });
 
   it('should set the correct form link for English language', () => {
     translateService.currentLang = 'en';
-    const formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
     component.setPartnershipsFormLink();
 
-    expect(component.partnershipsFormLink).toBe(formLink);
+    expect(component.partnershipsFormLink).toBe(
+      AppConstants.PARTNERSHIPS_FORM_LINK
+    );
   });
 
   it('should set the correct form link for Portuguese language', () => {
@@ -204,10 +203,11 @@ describe('About Page', () => {
     'should set english link for languages not supported by' + ' google forms',
     () => {
       translateService.currentLang = 'pcm';
-      const formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
       component.setPartnershipsFormLink();
 
-      expect(component.partnershipsFormLink).toBe(formLink);
+      expect(component.partnershipsFormLink).toBe(
+        AppConstants.PARTNERSHIPS_FORM_LINK
+      );
     }
   );
 
@@ -226,7 +226,7 @@ describe('About Page', () => {
       '/assets/images/about/testImageName15x.png 1.5x, ' +
       '/assets/images/about/testImageName2x.png 2x';
 
-    const result = component.getImageSet(imageName, imageExt);
+    const result = component.getImageSet(imageName, imageExt, [1, 1.5, 2]);
 
     expect(result).toBe(expectedImageSet);
   });

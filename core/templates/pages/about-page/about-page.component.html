@@ -217,7 +217,7 @@
             </ngb-carousel>
             <div class="oppia-about-cta-volunteer-buttons-container">
               <oppia-primary-button
-                buttonHref="https://forms.gle/rhFYoLLSFr3JEZHy8"
+                [buttonHref]="volunteerFormLink"
                 [customClasses]="['oppia-about-cta-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-desktop-volunteer-button']"
                 buttonText="{{ 'I18N_ABOUT_PAGE_CTA_VOLUNTEER_BUTTON_TEXT' | translate }}">
               </oppia-primary-button>
@@ -250,8 +250,8 @@
                   </p>
                   <div class="oppia-about-cta-image-container">
                     <picture class="oppia-about-cta-partners-image">
-                      <source type="image/webp" [srcset]="getImageSet('/about/partners', 'webp')">
-                      <source type="image/png" [srcset]="getImageSet('/about/partners', 'png')">
+                      <source type="image/webp" [srcset]="getImageSet('/about/partners', 'webp', [1,1.5])">
+                      <source type="image/png" [srcset]="getImageSet('/about/partners', 'png', [1,1.5])">
                       <img [src]="getStaticImageUrl('/about/partners1x.png')"
                            alt="Images of different organizations partnered with Oppia">
                     </picture>
@@ -273,8 +273,8 @@
                   </p>
                   <div class="oppia-about-cta-image-container">
                     <picture class="oppia-about-cta-schools-image">
-                      <source type="image/webp" [srcset]="getImageSet('/about/schools', 'webp')">
-                      <source type="image/png" [srcset]="getImageSet('/about/schools', 'png')">
+                      <source type="image/webp" [srcset]="getImageSet('/about/schools', 'webp', [1,1.5])">
+                      <source type="image/png" [srcset]="getImageSet('/about/schools', 'png', [1,1.5])">
                       <img [src]="getStaticImageUrl('/about/schools1x.png')"
                            alt="Images of activites at different schools partnered with Oppia">
                     </picture>
@@ -389,7 +389,7 @@
 
             <div class="oppia-about-cta-volunteer-buttons-container">
               <oppia-primary-button
-                buttonHref="https://forms.gle/rhFYoLLSFr3JEZHy8"
+                [buttonHref]="volunteerFormLink"
                 [customClasses]="['oppia-about-cta-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-mobile-volunteer-button']"
                 buttonText="{{ 'I18N_ABOUT_PAGE_CTA_VOLUNTEER_BUTTON_TEXT' | translate }}">
               </oppia-primary-button>
@@ -424,8 +424,8 @@
                   </p>
                   <div class="oppia-about-cta-image-container">
                     <picture class="oppia-about-cta-partners-image">
-                      <source type="image/webp" [srcset]="getImageSet('/about/partners', 'webp')">
-                      <source type="image/png" [srcset]="getImageSet('/about/partners', 'png')">
+                      <source type="image/webp" [srcset]="getImageSet('/about/partners', 'webp', [1,1.5])">
+                      <source type="image/png" [srcset]="getImageSet('/about/partners', 'png', [1,1.5])">
                       <img [src]="getStaticImageUrl('/about/partners1x.png')"
                            alt="Images of different organizations partnered with Oppia">
                     </picture>
@@ -447,8 +447,8 @@
                   </p>
                   <div class="oppia-about-cta-image-container">
                     <picture class="oppia-about-cta-schools-image">
-                      <source type="image/webp" [srcset]="getImageSet('/about/schools', 'webp')">
-                      <source type="image/png" [srcset]="getImageSet('/about/schools', 'png')">
+                      <source type="image/webp" [srcset]="getImageSet('/about/schools', 'webp', [1,1.5])">
+                      <source type="image/png" [srcset]="getImageSet('/about/schools', 'png', [1,1.5])">
                       <img [src]="getStaticImageUrl('/about/schools1x.png')"
                            alt="Images of activites at different schools partnered with Oppia">
                     </picture>

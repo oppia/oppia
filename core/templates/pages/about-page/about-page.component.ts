@@ -28,6 +28,7 @@ import {ThanksForDonatingModalComponent} from 'pages/donate-page/thanks-for-dona
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
+import {AppConstants} from 'app.constants';
 
 import './about-page.component.css';
 
@@ -62,6 +63,7 @@ export class AboutPageComponent implements OnInit, OnDestroy {
 
   directiveSubscriptions = new Subscription();
   partnershipsFormLink: string = '';
+  volunteerFormLink = AppConstants.VOLUNTEER_FORM_LINK;
   // Volunteer CTA is the default tab.
   selectedTabIndex = 1;
   volunteerRolesDetails = [
@@ -178,7 +180,7 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     const userLang = this.translateService.currentLang;
 
     if (userLang === 'en' || userLang === 'pcm' || userLang === 'kab') {
-      this.partnershipsFormLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+      this.partnershipsFormLink = AppConstants.PARTNERSHIPS_FORM_LINK;
     } else {
       let interpolatedLanguage = userLang === 'pt-br' ? 'pt' : userLang;
       this.partnershipsFormLink = `https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=${interpolatedLanguage}&_x_tr_hl=en-US&_x_tr_pto=wapp`;
@@ -189,15 +191,28 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  getImageSet(imageName: string, imageExt: string): string {
-    return (
-      this.getStaticImageUrl(imageName + '1x.' + imageExt) +
-      ' 1x, ' +
-      this.getStaticImageUrl(imageName + '15x.' + imageExt) +
-      ' 1.5x, ' +
-      this.getStaticImageUrl(imageName + '2x.' + imageExt) +
-      ' 2x'
-    );
+  /*
+   * Returns a string that contains the image set for the srcset attribute.
+   * @param {string} imagePrefix - The prefix name of the images
+   * @param {string} imageExt - The extension of the images
+   * @param {number[]} sizes - The sizes of the images.Eg: [1,1.5,2]
+   */
+  getImageSet(imagePrefix: string, imageExt: string, sizes: number[]): string {
+    var imageSet = '';
+    for (let i = 0; i < sizes.length; i++) {
+      const sizeAfterRemovingPeriod = sizes[i].toString().replace('.', '');
+      imageSet +=
+        this.getStaticImageUrl(
+          `${imagePrefix}${sizeAfterRemovingPeriod}x.${imageExt}`
+        ) +
+        ' ' +
+        sizes[i] +
+        'x';
+      if (i < sizes.length - 1) {
+        imageSet += ', ';
+      }
+    }
+    return imageSet;
   }
 
   openDonationBoxModal(): void {
