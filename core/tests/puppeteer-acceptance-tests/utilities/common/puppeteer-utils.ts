@@ -392,16 +392,21 @@ export class BaseUser {
   }
 
   /**
-   * This function checks if a particular text exists on the current page.
-   * It keeps checking until the text appears or a timeout occurs.
-   * @param {string} text - The text to check for.
+   * Checks if a given word is present on the page.
+   * This function only matches complete words, not substrings of words.
+   * For example, if the page contains "hello" and you search for "hell",
+   * it will return false.
+   * @param {string} word - The word to check.
    */
-  async isTextPresentOnPage(text: string): Promise<boolean> {
+  async isTextPresentOnPage(word: string): Promise<boolean> {
     try {
       await this.page.waitForFunction(
-        (text: string) => document.documentElement.outerHTML.includes(text),
+        (word: string) => {
+          const regex = new RegExp(`\\b${word}\\b`);
+          return regex.test(document.documentElement.outerHTML);
+        },
         {},
-        text
+        word
       );
       return true;
     } catch (error) {

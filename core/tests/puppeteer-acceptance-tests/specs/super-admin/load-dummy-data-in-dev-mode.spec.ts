@@ -21,6 +21,7 @@ import testConstants from '../../utilities/common/test-constants';
 import {SuperAdmin} from '../../utilities/user/super-admin';
 import {showMessage} from '../../utilities/common/show-message';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const mathClassroomURl = testConstants.URLs.MathClassroom;
 const ROLES = testConstants.Roles;
 
 describe('Super Admin', function () {
@@ -28,9 +29,7 @@ describe('Super Admin', function () {
 
   beforeAll(async function () {
     superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
-    superAdmin = await UserFactory.assignRolesToUser(superAdmin, [
-      ROLES.CURRICULUM_ADMIN,
-    ]);
+    await UserFactory.assignRolesToUser(superAdmin, [ROLES.CURRICULUM_ADMIN]);
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   describe('When run in development mode, Super Admin', function () {
@@ -49,32 +48,35 @@ describe('Super Admin', function () {
         }
         await superAdmin.navigateToAdminPageActivitiesTab();
 
-        await superAdmin.reloadExplorations('solar system');
+        await superAdmin.reloadExplorations('solar_system');
         await superAdmin.navigateToCommunityLibrary();
-        await superAdmin.expectExplorationToBePresent('solar system');
+        await superAdmin.expectActivityToBePresent('The Solar System');
 
-        await superAdmin.reloadCollections('welcome to collections');
+        await superAdmin.reloadCollections('welcome_to_collections.yaml');
         await superAdmin.navigateToCommunityLibrary();
-        await superAdmin.expectCollectionToBePresent('Test Collection');
+        await superAdmin.expectActivityToBePresent(
+          'First Example Exploration in Collection'
+        );
 
         await superAdmin.generateAndPublishDummyExplorations(2, 2);
         await superAdmin.navigateToCommunityLibrary();
-        await superAdmin.expectNoOfExplorationToBePresent(2);
-
-        await superAdmin.loadDummyNewStructuresData();
-        await superAdmin.navigateToTopicsAndSkillsDashboard();
-        await superAdmin.expectTopicToBePresent();
+        // Expecting 3 activities: 1 reloaded from line 51 and 2 generated from line 61.
+        await superAdmin.expectNoOfActivitiesToBePresent(3);
 
         await superAdmin.generateDummySkill();
-        await superAdmin.navigateToTopicsAndSkillsDashboard();
-        await superAdmin.expectSkillToBePresent();
+        await superAdmin.expectSkillInTopicsAndSkillsDashboard('Dummy Skill');
 
-        await superAdmin.generateMathClassroom();
-        await superAdmin.expectMathClassroomToBePresentAtTheUrl();
+        await superAdmin.loadDummyNewStructuresData();
+        await superAdmin.expectTopicInTopicsAndSkillDashboard('Dummy Topic 1');
 
-        await superAdmin.generateBlogPosts();
-        await superAdmin.navigateToBlogDashboard();
-        await superAdmin.expectBlogPostToBePresent();
+        await superAdmin.generateDummyMathClassroom();
+        await superAdmin.expectMathClassroomToBePresentAtTheUrl(
+          mathClassroomURl
+        );
+
+        await superAdmin.generateDummyBlogPost('Education');
+        await superAdmin.navigateToBlogPage();
+        await superAdmin.expectBlogPostToBePresent('Education-IJCCaHXXICvN');
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
