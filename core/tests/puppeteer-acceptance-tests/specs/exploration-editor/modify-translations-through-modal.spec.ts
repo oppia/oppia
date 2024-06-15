@@ -152,7 +152,7 @@ describe('Exploration Editor', function () {
       'Algebra'
     );
     if (!explorationId) {
-      throw new Error('Error publishing exploration successfully.');
+      throw new Error('Error in publishing exploration successfully.');
     }
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
@@ -161,7 +161,7 @@ describe('Exploration Editor', function () {
       'test-topic-one'
     );
     if (!topicId) {
-      throw new Error('Error publishing topic successfully.');
+      throw new Error('Error in publishing topic successfully.');
     }
 
     await curriculumAdmin.createSubtopicForTopic(
@@ -220,7 +220,6 @@ describe('Exploration Editor', function () {
   it(
     'should show translations of interactions in the modal.',
     async function () {
-      await explorationEditor.page.bringToFront();
       await explorationEditor.reloadPage();
       await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
       await explorationEditor.navigateToTranslationsTab();
@@ -248,7 +247,6 @@ describe('Exploration Editor', function () {
   it(
     'should show translations of hints in the modal.',
     async function () {
-      await explorationEditor.page.bringToFront();
       await explorationEditor.reloadPage();
       await explorationEditor.navigateToCard(
         CARD_NAME.MULTIPLE_CHOICE_QUESTION
@@ -274,7 +272,6 @@ describe('Exploration Editor', function () {
   it(
     'should show translations of solution explanations in the modal.',
     async function () {
-      await explorationEditor.page.bringToFront();
       await explorationEditor.reloadPage();
       await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
       await explorationEditor.navigateToTranslationsTab();
@@ -302,7 +299,6 @@ describe('Exploration Editor', function () {
   it(
     'should show translations of response feedback in the modal.',
     async function () {
-      await explorationEditor.page.bringToFront();
       await explorationEditor.reloadPage();
       await explorationEditor.navigateToCard(
         CARD_NAME.MULTIPLE_CHOICE_QUESTION

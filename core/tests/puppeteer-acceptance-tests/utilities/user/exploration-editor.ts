@@ -53,6 +53,7 @@ const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
 
 const interactionDiv = '.e2e-test-interaction';
+const addInteractionModalSelector = 'customize-interaction-body-container';
 const multipleChoiceInteractionButton =
   'div.e2e-test-interaction-tile-MultipleChoiceInput';
 const addResponseOptionButton = 'button.e2e-test-add-list-entry';
@@ -62,6 +63,7 @@ const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
 const textInputInteractionButton = 'div.e2e-test-interaction-tile-TextInput';
 const textInputInteractionOption =
   'tr#e2e-test-schema-based-list-editor-table-row';
+const textInputField = '.e2e-test-text-input';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
 const commitMessage = 'textarea.e2e-test-commit-message-input';
@@ -326,7 +328,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(addInteractionButton);
     await this.clickOn(` ${interactionToAdd} `);
     await this.clickOn(saveInteractionButton);
-    await this.page.waitForSelector('.customize-interaction-body-container', {
+    await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
     showMessage(`${interactionToAdd} interaction has been added successfully.`);
@@ -356,7 +358,7 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.clickOn(saveInteractionButton);
-    await this.page.waitForSelector('.customize-interaction-body-container', {
+    await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
     showMessage('Multiple Choice interaction has been added successfully.');
@@ -380,8 +382,8 @@ export class ExplorationEditor extends BaseUser {
    */
   async updateTextInputInteraction(content: string): Promise<void> {
     await this.clickOn(interactionDiv);
-    await this.clickOn('.e2e-test-text-input');
-    await this.type('.e2e-test-text-input', content);
+    await this.clickOn(textInputField);
+    await this.type(textInputField, content);
     await this.clickOn(saveInteractionButton);
   }
 
