@@ -63,7 +63,7 @@ describe('Super Admin', function () {
 
         await superAdmin.loadDummyNewStructuresData();
         await superAdmin.navigateToTopicsAndSkillsDashboard();
-        await superAdmin.expectTopicToBe();
+        await superAdmin.expectTopicToBePresent();
 
         await superAdmin.generateDummySkill();
         await superAdmin.navigateToTopicsAndSkillsDashboard();

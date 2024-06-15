@@ -352,18 +352,29 @@ export class SuperAdmin extends BaseUser {
     await this.clickOn(' Load Data ');
   }
 
+  /**
+   * Checks if the 'Activities' tab is not available in the production environment.
+   */
   async expectControlsNotAvailable(): Promise<void> {
-    const areActivitiesPresent = await this.isTextPresentOnPage(
-      " The 'Activities' tab is not available in the production environment. "
-    );
-    if (!areActivitiesPresent) {
-      throw new Error(
-        'Activities tab is present in the production environment'
+    try {
+      const areActivitiesPresent = await this.isTextPresentOnPage(
+        " The 'Activities' tab is not available in the production environment. "
       );
+      if (!areActivitiesPresent) {
+        throw new Error(
+          'Activities tab is present in the production environment'
+        );
+      }
+      showMessage(
+        'Activities tab is not available in the production environment, as expected.'
+      );
+    } catch (error) {
+      console.error(
+        'An error occurred while checking the availability of the Activities tab:',
+        error
+      );
+      throw error;
     }
-    showMessage(
-      'Activities tab is not available in the production environment, as expected.'
-    );
   }
 }
 
