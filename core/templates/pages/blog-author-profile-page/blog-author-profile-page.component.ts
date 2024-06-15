@@ -18,6 +18,7 @@
 
 import {Component, OnInit} from '@angular/core';
 import {BlogPostSummary} from 'domain/blog/blog-post-summary.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {
   BlogAuthorProfilePageData,
