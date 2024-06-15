@@ -180,9 +180,9 @@ const partnerWithUsMobileButtonInAboutPage =
 const donateDesktopButtonInAboutPage = '.e2e-test-donate-desktop-button';
 const donateMobileButtonInAboutPage = '.e2e-test-donate-mobile-button';
 const donorDesktopTabInAboutPage = '.e2e-test-about-page-donor-desktop-tab';
-const donorMobileTabInAboutPage = '#mat-expansion-panel-header-0';
+const donorMobileTabInAboutPage = '.e2e-test-about-page-donor-mobile-tab';
 const partnerDesktopTabInAboutPage = '.e2e-test-about-page-partner-desktop-tab';
-const partnerMobileTabInAboutPage = '#mat-expansion-panel-header-2';
+const partnerMobileTabInAboutPage = '.e2e-test-about-page-partner-mobile-tab';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -1458,7 +1458,7 @@ export class LoggedOutUser extends BaseUser {
     const partnerTab = this.isViewportAtMobileWidth()
       ? partnerMobileTabInAboutPage
       : partnerDesktopTabInAboutPage;
-    this.clickOn(partnerTab);
+    await this.clickOn(partnerTab);
 
     const partnerWithUsButtonInAboutPage = this.isViewportAtMobileWidth()
       ? partnerWithUsMobileButtonInAboutPage
@@ -1489,7 +1489,7 @@ export class LoggedOutUser extends BaseUser {
     const partnerTab = this.isViewportAtMobileWidth()
       ? partnerMobileTabInAboutPage
       : partnerDesktopTabInAboutPage;
-    this.clickOn(partnerTab);
+    await this.clickOn(partnerTab);
 
     const partnerWithUsButtonInAboutPage = this.isViewportAtMobileWidth()
       ? partnerWithUsMobileButtonInAboutPage
@@ -1515,12 +1515,12 @@ export class LoggedOutUser extends BaseUser {
     const donorTab = this.isViewportAtMobileWidth()
       ? donorMobileTabInAboutPage
       : donorDesktopTabInAboutPage;
-    this.clickOn(donorTab);
+    await this.clickOn(donorTab);
 
     const donateButtonInAboutPage = this.isViewportAtMobileWidth()
       ? donateMobileButtonInAboutPage
       : donateDesktopButtonInAboutPage;
-    this.clickOn(donateButtonInAboutPage);
+    await this.clickOn(donateButtonInAboutPage);
 
     const donorBox = await this.page.waitForSelector(donorBoxIframe);
     if (!donorBox) {

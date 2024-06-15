@@ -233,36 +233,43 @@
   opacity: 1;
 }
 
-.about-page .mat-expansion-panel-header {
+.about-page .accordion .card-body {
   border-bottom: 4px solid #eee;
+  border-top: 4px solid #00645c;
+  padding: 0;
+}
+.about-page .accordion > .card .card-header {
+  background-color: #fff;
+  border-bottom: 4px solid #eee;
+  display: flex;
   height: 75px;
-  opacity: 0.7;
-}
-
-.about-page .mat-expansion-panel-header .oppia-about-cta-title-small {
-  color: #333;
-}
-
-.about-page .mat-expansion-panel-header.mat-expanded .oppia-about-cta-title-small {
-  color: #00645c;
-  opacity: 1;
-}
-
-.about-page .mat-expansion-panel-header-title {
   justify-content: center;
-}
-
-.about-page .mat-expansion-panel-header.mat-expanded {
-  border-bottom: 4px solid #00645c;
-  opacity: 1;
-}
-
-.about-page .mat-expansion-panel-body {
   padding: 0;
 }
 
-.about-page .mat-expanded  .mat-expansion-panel-body {
-  border-bottom: 4px solid #eee;
+.about-page .accordion > .card .btn-link {
+  color: #00645c;
+  opacity: 1;
+  padding: 0;
+  width: 100%;
+}
+
+.about-page .accordion > .card .btn-link,
+.about-page .accordion > .card .btn-link:focus,
+.about-page .accordion > .card .btn-link:hover,
+.about-page .accordion > .card .btn-link:active {
+  border: none;
+  outline: none;
+  text-decoration: none;
+}
+
+.about-page .accordion > .card .btn-link.collapsed {
+  color: #333;
+  opacity: 0.7;
+}
+
+.about-page .accordion > .card .btn-link.collapsed:focus {
+  background-color: #f5f5f5;
 }
 
 .about-page .oppia-about-cta-section {
