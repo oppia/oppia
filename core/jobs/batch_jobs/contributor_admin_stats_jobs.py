@@ -183,7 +183,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 )
         )
 
-        (
+        invalid_question_contribution_stats_report = (
             invalid_question_contribution_stats
             | 'Report info on each invalid stat' >> beam.Map(
                 lambda invalid_question_contribution_stat:
@@ -282,7 +282,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 translation_submitter_models_job_run_results,
                 translation_reviewer_models_job_run_results,
                 question_submitter_models_job_run_results,
-                question_reviewer_models_job_run_results
+                question_reviewer_models_job_run_results,
+                invalid_question_contribution_stats_report
             )
             | 'Merge job run results' >> beam.Flatten()
         )
