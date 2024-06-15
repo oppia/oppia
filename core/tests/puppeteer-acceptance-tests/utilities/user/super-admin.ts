@@ -52,6 +52,8 @@ const skillsTab = 'a.e2e-test-skills-tab';
 
 const reloadExplorationRowsSelector = '.e2e-test-reload-exploration-row';
 const reloadCollectionsRowsSelector = '.e2e-test-reload-collection-row';
+const generateBlogPostButton = '.e2e-test-generate-blog-post';
+const prodModeActivitiesTab = 'oppia-admin-prod-mode-activities-tab';
 
 export class SuperAdmin extends BaseUser {
   /**
@@ -547,10 +549,9 @@ export class SuperAdmin extends BaseUser {
   /**
    * Generates a dummy blog post.
    */
-
   async generateDummyBlogPost(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
-    await this.clickOn('.e2e-test-generate-blog-post');
+    await this.clickOn(generateBlogPostButton);
   }
 
   /**
@@ -583,9 +584,7 @@ export class SuperAdmin extends BaseUser {
    */
   async expectControlsNotAvailable(): Promise<void> {
     try {
-      const activitiesTabElement = await this.page.$(
-        'oppia-admin-prod-mode-activities-tab'
-      );
+      const activitiesTabElement = await this.page.$(prodModeActivitiesTab);
       const activitiesTabText = await this.page.evaluate(
         element => element.textContent,
         activitiesTabElement

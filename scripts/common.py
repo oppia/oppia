@@ -219,7 +219,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'exploration-editor/create-exploration-and-change-basic-settings',
     'exploration-editor/load-complete-and-restart-exploration-preview',
     'exploration-editor/save-draft-publish-and-discard-the-changes',
-    'logged-in-user/subscribe-to-creator-and-view-all-explorations-by-that-creator',
+    'logged-in-user/subscribe-to-creator-and-'
+    'view-all-explorations-by-that-creator',
     'logged-out-user/check-all-user-flow-of-donor',
     'logged-out-user/check-all-user-flow-of-parent-teacher',
     'logged-out-user/check-all-user-flow-of-partner',

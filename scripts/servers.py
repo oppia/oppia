@@ -751,6 +751,8 @@ def managed_acceptance_tests_server(
         headless: bool. Whether to run the acceptance tests in headless mode.
         mobile: bool. Whether to run the acceptance tests in mobile mode.
         prod_env: bool. Whether to run the acceptance tests in production mode.
+        stdout: int. The file descriptor where the standard output of the 
+            subprocess is sent.
 
     Yields:
         psutil.Process. The jasmine testing process.
@@ -765,7 +767,6 @@ def managed_acceptance_tests_server(
     os.environ['HEADLESS'] = 'true' if headless else 'false'
     os.environ['MOBILE'] = 'true' if mobile else 'false'
     os.environ['PROD_ENV'] = 'true' if prod_env else 'false'
-
 
     nodemodules_jasmine_bin_path = os.path.join(
         common.NODE_MODULES_PATH, '.bin', 'jasmine')
