@@ -25,8 +25,8 @@ export class ReleaseCoordinator extends BaseUser {
     await this.page.goto(testConstants.URLs.releaseCoordinatorPage);
   }
 
-  async navigateToPromoBarTab(): Promise<void> {
-    await this.clickAndWaitForNavigation(' Misc');
+  async navigateToMiscTab(): Promise<void> {
+    await this.clickAndWaitForNavigation(' Misc ');
   }
 
   async enablePromoBar(): Promise<void> {

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance tests for the functionality of enabling and saving
- * a promo bar message by a release coordinator.
+ * @fileoverview Acceptance tests for the functionality of flushing the cache
+ * and getting the memory cache profile by a release coordinator.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -23,8 +23,6 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
-const promoMessage =
-  'New Features Alert! Check out our latest updates and enhancements. Explore now!';
 
 describe('Release Coordinator', function () {
   let releaseCoordinator: ReleaseCoordinator;
@@ -38,16 +36,12 @@ describe('Release Coordinator', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should navigate to the Promo Bar tab, enable the promo bar and save a promo bar message',
+    'should navigate to the Misc tab, flush the cache and get the memory cache profile',
     async function () {
       await releaseCoordinator.navigateToReleaseCoordinatorPage();
       await releaseCoordinator.navigateToMiscTab();
-      await releaseCoordinator.enablePromoBar();
-      await releaseCoordinator.enterPromoBarMessage(promoMessage);
-      await releaseCoordinator.savePromoBarMessage();
-      // Any page would work. We are just checking if the message is saved.
-      await releaseCoordinator.navigateToSplashPage();
-      await releaseCoordinator.expectPromoMessageToBe(promoMessage);
+      await releaseCoordinator.flushCache();
+      await releaseCoordinator.getMemoryCacheProfile();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

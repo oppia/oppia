@@ -235,6 +235,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user/subscribe-to-creator-and-view-all-explorations-'
        'by-that-creator',
     'practice-question-admin/add-and-remove-contribution-rights',
+    'release-coordinator/update-promo-bar-message',
+    'release-coordinator/flush-and-get-profile-of-redis-cache',
     'translation-admin/add-and-remove-translation-rights',
     'voiceover-admin/add-voiceover-artist-to-an-exploration',
     'moderator/view-recent-commits-and-feedback-messages',
