@@ -68,6 +68,8 @@ describe('Editable topic backend API service', () => {
       skill_id_1: [],
     },
     classroom_url_fragment: 'math',
+    classroom_name: 'math',
+    curriculum_admin_usernames: ['admin1'],
     skill_question_count_dict: {},
     subtopic_page: {
       id: 'topicId-1',
@@ -128,6 +130,8 @@ describe('Editable topic backend API service', () => {
       skillIdToRubricsDict: sampleDataResults.skill_id_to_rubrics_dict,
       skillQuestionCountDict: sampleDataResults.skill_question_count_dict,
       classroomUrlFragment: sampleDataResults.classroom_url_fragment,
+      classroomName: sampleDataResults.classroom_name,
+      curriculumAdminUsernames: sampleDataResults.curriculum_admin_usernames,
       skillCreationIsAllowed: true,
     });
     expect(failHandler).not.toHaveBeenCalled();
