@@ -42,6 +42,9 @@ export class SuperAdmin extends BaseUser {
   /**
    * Navigates to the Admin Page Activities Tab.
    */
+  /**
+   * Navigates to the Admin Page Activities Tab.
+   */
   async navigateToAdminPageActivitiesTab(): Promise<void> {
     await this.goto(AdminPageActivitiesTab);
   }
@@ -584,6 +587,7 @@ export class SuperAdmin extends BaseUser {
           'Activities tab is present in the production environment'
         );
       }
+
       showMessage(
         'Activities tab is not available in the production environment, as expected.'
       );
