@@ -334,6 +334,8 @@ jobs:
             - practice-question-admin/add-and-remove-contribution-rights
             - translation-admin/add-and-remove-translation-rights
             - voiceover-admin/add-voiceover-artist-to-an-exploration
+            - moderator/view-recent-commits-and-feedback-messages
+            - moderator/edit-featured-activities-list
       steps:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v3
