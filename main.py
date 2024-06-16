@@ -248,6 +248,11 @@ URLS = [
         access_validators.BlogHomePageAccessValidationHandler),
 
     get_redirect_route(
+        r'%s/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>' % # pylint: disable=line-too-long
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.SubtopicViewerPageAccessValidationHandler),
+
+    get_redirect_route(
         r'%s/can_access_blog_post_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.BlogPostPageAccessValidationHandler),
@@ -476,6 +481,15 @@ URLS = [
         r'%s' % feconf.NEW_CLASSROOM_ID_HANDLER_URL,
         classroom.NewClassroomIdHandler),
     get_redirect_route(
+        r'%s' % feconf.NEW_CLASSROOM_HANDLER_URL,
+        classroom.NewClassroomHandler),
+    get_redirect_route(
+        r'%s' % feconf.TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL,
+        classroom.TopicsToClassroomsRelationHandler),
+    get_redirect_route(
+        r'%s' % feconf.ALL_CLASSROOMS_SUMMARY_HANDLER_URL,
+        classroom.AllClassroomsSummaryHandler),
+    get_redirect_route(
         r'%s/<classroom_id>' % feconf.CLASSROOM_HANDLER_URL,
         classroom.ClassroomHandler),
     get_redirect_route(
@@ -519,9 +533,6 @@ URLS = [
     get_redirect_route(
         r'%s/revision' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
-    get_redirect_route(
-        r'%s/revision/<subtopic_url_fragment>' %
-        feconf.TOPIC_VIEWER_URL_PREFIX, subtopic_viewer.SubtopicViewerPage),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),

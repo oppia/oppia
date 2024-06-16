@@ -38,6 +38,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   numDummySuggestionQuesToGenerate: number = 0;
   skillList: SkillSummary[] = [];
   selectedOption: string = '';
+  numDummyTranslationOpportunitiesToGenerate: number = 0;
   DEMO_COLLECTIONS: string[][] = [[]];
   DEMO_EXPLORATIONS: string[][] = [[]];
   DUMMY_BLOG_POST_TITLES = [
@@ -164,6 +165,27 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
         },
         errorResponse => {
           this.setStatusMessage.emit('Server error: ' + errorResponse);
+        }
+      );
+    this.adminTaskManagerService.finishTask();
+  }
+
+  generateDummyTranslationOpportunities(): void {
+    // Generate dummy explorations as translation opportunities for contributor dashboard.
+    this.adminTaskManagerService.startTask();
+    this.setStatusMessage.emit('Processing...');
+    this.adminBackendApiService
+      .generateDummyTranslationOpportunitiesAsync(
+        this.numDummyTranslationOpportunitiesToGenerate
+      )
+      .then(
+        () => {
+          this.setStatusMessage.emit(
+            'Dummy translation opportunities (explorations) generated successfully.'
+          );
+        },
+        errorResponse => {
+          this.setStatusMessage.emit(`Server error: ${errorResponse}`);
         }
       );
     this.adminTaskManagerService.finishTask();

@@ -1,4 +1,5 @@
-<div class="lesson-card-container mr-4">
+<!--TODO(#18384): Fix when there's only one card, margin-right still appears-->
+<div class="lesson-card-container" [ngClass]="{'lesson-card-not-last': !lastCard}">
   <div class="align-items-center d-flex justify-content-center lesson-card-img relative rounded-top w-100" [ngStyle]="{'background-color': imgColor}">
     <img alt="" class="h-100" [src]="imgUrl">
     <div class="d-flex flex-column lesson-card-tags w-100">
@@ -11,7 +12,7 @@
         <p class="lesson-card-title mb-0"> {{ title }} </p>
       </div>
       <p class="lesson-card-topic mb-0"> {{ 'I18N_LEARNER_DASHBOARD_CARD_TOPIC' | translate: {cardTopic: lessonTopic} }} </p>
-      <p class="lesson-card-desc mb-0"> {{ desc }} </p>
+      <p class="lesson-card-desc mb-0"> {{ desc.charAt(0).toUpperCase() + desc.slice(1) }} </p>
     </div>
     <div class="align-items-center d-flex justify-content-between mt-2">
       <circle-progress [percent]="progress"> </circle-progress>
@@ -49,19 +50,20 @@
   }
 
   .lesson-card-info {
+    border-radius: 0 0 .25em .25em;
     height: 150px;
     padding: 8px;
   }
 
   .lesson-card-img {
     height: 136px;
+    position: relative;
   }
 
   .lesson-card-tags {
     left: 0;
     padding: 8px;
     position: absolute;
-    top: 0;
   }
 
   .lesson-card-title {
@@ -84,5 +86,9 @@
   .lesson-card-desc {
     font-size: 11px;
     -webkit-line-clamp: 2;
+  }
+
+  .lesson-card-not-last {
+    margin-right: 16px;
   }
 </style>
