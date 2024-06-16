@@ -45,8 +45,8 @@ describe('Release Coordinator', function () {
       await releaseCoordinator.enablePromoBar();
       await releaseCoordinator.enterPromoBarMessage(promoMessage);
       await releaseCoordinator.savePromoBarMessage();
-      // Any page would work. We are just checking if the message is saved.
-      await releaseCoordinator.navigateToSplashPage();
+      // Any learner facing page would work. We are just checking if the message is saved.
+      await releaseCoordinator.navigateToSplash();
       await releaseCoordinator.expectPromoMessageToBe(promoMessage);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

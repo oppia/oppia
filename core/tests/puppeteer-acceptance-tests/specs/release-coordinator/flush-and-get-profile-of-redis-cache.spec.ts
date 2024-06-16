@@ -41,7 +41,21 @@ describe('Release Coordinator', function () {
       await releaseCoordinator.navigateToReleaseCoordinatorPage();
       await releaseCoordinator.navigateToMiscTab();
       await releaseCoordinator.flushCache();
+      await releaseCoordinator.expectSuccessMessage(
+        'Success! Memory Cache Flushed.'
+      );
       await releaseCoordinator.getMemoryCacheProfile();
+      await releaseCoordinator.expectSuccessMessage('Success!');
+      await releaseCoordinator.expectCacheProfileToHaveProperties([
+        'totalAllocatedInBytes',
+        'peakAllocatedInBytes',
+        'totalKeysStored',
+      ]);
+
+      // Since the cache is flushed, the total keys stored should be less than 10.
+      // But, not necessarily 0, as there could be some keys stored in the cache
+      // while fetching the profile.
+      await releaseCoordinator.expectTotalKeysStoredToBeLessThan(10);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
