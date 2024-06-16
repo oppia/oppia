@@ -12,7 +12,7 @@
     <div *ngFor="let item of contentTranslations | keyvalue" class="content-translation-block">
       <div class="content-translation-language">
         <span>
-          <input type="checkbox" name="" id="">
+          <input type="checkbox">
           <p>{{ getLanguageName(item.key) }}</p>
         </span>
         <i class="fas fa-pencil-alt"></i>
@@ -47,10 +47,6 @@
 
   .modal-body {
     padding: 24px;
-  }
-
-  .modal-body p {
-    font-size: 15px;
   }
 
   .modal-body .content-translations-container {
@@ -117,12 +113,6 @@
     max-height: 115px;
     overflow-y: scroll;
     padding: 20px;
-  }
-
-  /* :ng-deep is used to style the inner elements of the modal.*/
-  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
-  ::ng-deep .translations-rte-output-display p {
-    font-size: 14px;
   }
 
   .modal-body p.no-translations-found-text {

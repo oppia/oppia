@@ -70,14 +70,14 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
       }
     }
 
-    this.changeListService.getTranslationChangeList().forEach(changeDict => {
-      if (
-        changeDict.cmd === 'remove_translations' &&
-        changeDict.content_id === this.contentId
-      ) {
-        this.allExistingTranslationsHaveBeenRemoved = true;
-      }
-    });
+    this.allExistingTranslationsHaveBeenRemoved = this.changeListService
+      .getTranslationChangeList()
+      .some(changeDict => {
+        return (
+          changeDict.cmd === 'remove_translations' &&
+          changeDict.content_id === this.contentId
+        );
+      });
 
     // Populate the content translations via published translations from the backend.
     // These translations are used for a language when the published translations are
