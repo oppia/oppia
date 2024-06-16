@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import translation_domain
 from core.domain import translation_fetchers
 from core.domain import translation_services
@@ -464,10 +465,10 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         self.assertEqual(len(
             entity_translation_models[1].translations), 3)
 
-        ts = translation_services
+        current_exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         entity_translation_models, _ = (
-            ts.compute_translation_related_changes_upon_revert(
-                self.EXP_ID, 5
+            translation_services.compute_translation_related_changes_upon_revert( # pylint: disable=line-too-long
+                current_exploration, 5
             )
         )
 

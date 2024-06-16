@@ -2564,20 +2564,17 @@ def revert_exploration(
 
     revert_version_history(exploration_id, current_version, revert_to_version)
 
-    models_to_put: List[
-        base_models.BaseModel
-    ] = []
-
+    current_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     new_translation_models, translation_counts = (
         translation_services.compute_translation_related_changes_upon_revert(
-            exploration_id, revert_to_version))
+            current_exploration, revert_to_version))
 
-    models_to_put.extend(new_translation_models)
+    translation_and_opportunity_models_to_put = (new_translation_models)
 
     if opportunity_services.is_exploration_available_for_contribution(
         exploration_id
     ):
-        models_to_put.extend(
+        translation_and_opportunity_models_to_put.extend(
             opportunity_services
             .compute_opportunity_models_with_updated_exploration(
                 exploration_id,
@@ -2603,7 +2600,7 @@ def revert_exploration(
         )
     )
     datastore_services.put_multi(exp_issues_models_to_put)
-    datastore_services.put_multi(models_to_put)
+    datastore_services.put_multi(translation_and_opportunity_models_to_put)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         exploration_to_revert_to = exp_fetchers.get_exploration_by_id(

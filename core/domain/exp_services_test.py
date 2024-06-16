@@ -7682,6 +7682,18 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
             )
         )
 
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = (
+            translation_models.EntityTranslationsModel.get_all().fetch())
+        translation_counts = translation_services.get_translation_counts(
+                feconf.TranslatableEntityType.EXPLORATION, exploration)
+
+        self.assertEqual(len(entity_translation_models), 1)
+        self.assertEqual(len(
+            entity_translation_models[0].translations), 3)
+        self.assertEqual(translation_counts['hi'], 3)
+
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -7830,6 +7842,18 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
             )
         )
 
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = (
+            translation_models.EntityTranslationsModel.get_all().fetch())
+        translation_counts = translation_services.get_translation_counts(
+                feconf.TranslatableEntityType.EXPLORATION, exploration)
+
+        self.assertEqual(len(entity_translation_models), 1)
+        self.assertEqual(len(
+            entity_translation_models[0].translations), 3)
+        self.assertEqual(translation_counts['hi'], 3)
+
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -7927,6 +7951,22 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Update 1')
+
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = (
+            translation_models.EntityTranslationsModel.get_all().fetch())
+        exp_opportunity_summary: Optional[
+            opportunity_domain.ExplorationOpportunitySummary] = (
+                opportunity_services.get_exploration_opportunity_summary_by_id(
+                    self.EXP_0_ID))
+        if exp_opportunity_summary is not None:
+            translation_counts = exp_opportunity_summary.translation_counts
+
+        self.assertEqual(len(entity_translation_models), 2)
+        self.assertEqual(len(
+            entity_translation_models[1].translations), 2)
+        self.assertEqual(translation_counts['hi'], 2)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         current_version = exploration.version
