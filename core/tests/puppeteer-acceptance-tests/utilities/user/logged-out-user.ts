@@ -1482,10 +1482,7 @@ export class LoggedOutUser extends BaseUser {
    * it navigates to the correct URL.
    */
   async clickDonateTodayButtonInContactUsPage(): Promise<void> {
-    await this.clickLinkAnchorInSameTab(
-      'DONATE TODAY',
-      testConstants.URLs.Donate
-    );
+    await this.clickLinkAnchorInSameTab('DONATE TODAY', donateUrl);
   }
 
   /**
@@ -1493,10 +1490,7 @@ export class LoggedOutUser extends BaseUser {
    * it navigates to the correct URL.
    */
   async clickBecomeAPartnerButtonInContactUsPage(): Promise<void> {
-    await this.clickLinkAnchorInSameTab(
-      'BECOME A PARTNER',
-      testConstants.URLs.Partnerships
-    );
+    await this.clickLinkAnchorInSameTab('BECOME A PARTNER', partnershipsUrl);
   }
 
   /**
@@ -1504,10 +1498,7 @@ export class LoggedOutUser extends BaseUser {
    * it navigates to the correct URL.
    */
   async clickVolunteerButtonInContactUsPage(): Promise<void> {
-    await this.clickLinkAnchorInSameTab(
-      'BECOME A VOLUNTEER',
-      testConstants.URLs.Volunteer
-    );
+    await this.clickLinkAnchorInSameTab('BECOME A VOLUNTEER', volunteerUrl);
   }
 
   /**
