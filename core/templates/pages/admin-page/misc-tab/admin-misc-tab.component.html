@@ -338,21 +338,21 @@
     <div class="col-10">
       <mat-chip-list #chipList aria-label="Users Associated With Selected User Group" tabindex="0">
         <mat-chip *ngFor="let user of getUsersForSelectedUserGroup()"
-                  [selectable]="selectable"
-                  [removable]="removable"
-                  (removed)="removeUser(user)">
+                  [selectable]="true"
+                  [removable]="true"
+                  (removed)="removeUserFromSelectedGroup(user)">
           <ng-container>
             <span tabindex="0" [attr.aria-label]="user+', selected'">{{ user }}</span>
           </ng-container>
-          <button class="oppia-cancel-button" role="button" tabindex="0" matChipRemove aria-label=". Remove" *ngIf="removable">
+          <button class="oppia-cancel-button" role="button" tabindex="0" matChipRemove aria-label=". Remove">
             <mat-icon class="oppia-cancel-button-text">cancel</mat-icon>
           </button>
         </mat-chip>
         <input placeholder="Add Username"
-               #userInput
+               #userInputToAddUserToGroup
                [matChipInputFor]="chipList"
                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-               (matChipInputTokenEnd)="addUser($event)">
+               (matChipInputTokenEnd)="addUserToSelectedGroup($event)">
       </mat-chip-list>
     </div>
   </div>

@@ -495,7 +495,7 @@ def get_user_settings_by_auth_id(
         return None
 
 
-def get_user_group_models_dict() -> Dict[str, List[str]]:
+def get_all_user_groups() -> Dict[str, List[str]]:
     """Return the dictionary of user groups data having key as user-group
     name and value as list of users associated to the user-group.
 
@@ -531,14 +531,14 @@ def update_user_groups(updated_user_groups: Dict[str, List[str]]) -> None:
             user_group_model.update_timestamps()
             user_group_model.put()
     # Delete UserGroup models.
-    all_exisiting_user_groups: List[
+    all_existing_user_groups: List[
         user_models.UserGroupModel] = list(
             user_models.UserGroupModel.get_all()
         )
     user_models_to_delete = []
-    for exising_user_group in all_exisiting_user_groups:
-        if exising_user_group.id not in updated_user_groups.keys():
-            user_models_to_delete.append(exising_user_group)
+    for existing_user_group in all_existing_user_groups:
+        if existing_user_group.id not in updated_user_groups.keys():
+            user_models_to_delete.append(existing_user_group)
     user_models.UserGroupModel.delete_multi(user_models_to_delete)
 
 

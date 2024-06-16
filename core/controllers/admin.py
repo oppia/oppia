@@ -395,7 +395,7 @@ class AdminHandler(
             get_all_platform_parameters_dicts()
         )
 
-        user_group_models_dict = user_services.get_user_group_models_dict()
+        user_group_models_dict = user_services.get_all_user_groups()
 
         # Removes promo-bar related and blog related platform params as
         # they are handled in release-coordinator page and blog admin page

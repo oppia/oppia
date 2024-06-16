@@ -43,7 +43,8 @@ import {LoaderService} from 'services/loader.service';
   templateUrl: './admin-misc-tab.component.html',
 })
 export class AdminMiscTabComponent {
-  @ViewChild('userInput') userInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('userInputToAddUserToGroup') userInputToAddUserToGroup!: (
+    ElementRef<HTMLInputElement>);
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
   DATA_EXTRACTION_QUERY_HANDLER_URL: string =
     '/explorationdataextractionhandler';
@@ -80,8 +81,6 @@ export class AdminMiscTabComponent {
   loadingMessage: string = '';
   selectedUserGroup: string = '';
   newUserGroupName: string = '';
-  removable: boolean = true;
-  selectable: boolean = true;
   separatorKeysCodes: number[] = [ENTER];
   userGroupToUsersMapBackup: Record<string, string[]> = {};
   userGroupsToUsers: Record<string, string[]> = {};
@@ -127,7 +126,7 @@ export class AdminMiscTabComponent {
     return userGroups;
   }
 
-  addUser(event: {value: string}): void {
+  addUserToSelectedGroup(event: {value: string}): void {
     const value = (event.value || '').trim();
     if (!value || value === '') {
       return;
@@ -141,10 +140,10 @@ export class AdminMiscTabComponent {
       return;
     }
     this.userGroupsToUsers[this.selectedUserGroup].push(value);
-    this.userInput.nativeElement.value = '';
+    this.userInputToAddUserToGroup.nativeElement.value = '';
   }
 
-  removeUser(username: string): void {
+  removeUserFromSelectedGroup(username: string): void {
     let usersOfSelectedUserGroup: string[] =
       this.userGroupsToUsers[this.selectedUserGroup];
     this.userGroupsToUsers[this.selectedUserGroup] =
@@ -202,7 +201,7 @@ export class AdminMiscTabComponent {
           this.adminTaskManagerService.finishTask();
         },
         errorResponse => {
-          this.setStatusMessage.emit('Server error: ' + errorResponse);
+          this.setStatusMessage.emit(`Server error: ${errorResponse}`);
           this.adminTaskManagerService.finishTask();
         }
       );

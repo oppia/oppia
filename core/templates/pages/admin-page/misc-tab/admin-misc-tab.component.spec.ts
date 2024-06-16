@@ -922,7 +922,7 @@ describe('Admin misc tab component ', () => {
           adminBackendApiService,
           'updateUserGroupsAsync'
         ).and.rejectWith('Internal Server Error.');
-        component.userInput = {
+        component.userInputToAddUserToGroup = {
           nativeElement: {
             value: '',
           },
@@ -931,7 +931,7 @@ describe('Admin misc tab component ', () => {
         component.newUserGroupName = 'UserGroup5';
         component.selectedUserGroup = 'UserGroup5';
         component.addUserGroup();
-        component.addUser({value: 'User'});
+        component.addUserToSelectedGroup({value: 'User'});
         component.updateUserGroups();
         tick();
 
@@ -969,7 +969,7 @@ describe('Admin misc tab component ', () => {
           adminBackendApiService,
           'updateUserGroupsAsync'
         );
-        component.userInput = {
+        component.userInputToAddUserToGroup = {
           nativeElement: {
             value: '',
           },
@@ -978,8 +978,8 @@ describe('Admin misc tab component ', () => {
         component.newUserGroupName = 'UserGroup5';
         component.selectedUserGroup = 'UserGroup5';
         component.addUserGroup();
-        component.addUser({value: 'User10'});
-        component.addUser({value: 'User12'});
+        component.addUserToSelectedGroup({value: 'User10'});
+        component.addUserToSelectedGroup({value: 'User12'});
         component.updateUserGroups();
         tick();
 
@@ -1086,7 +1086,7 @@ describe('Admin misc tab component ', () => {
         tick();
 
         component.selectedUserGroup = 'UserGroup1';
-        component.addUser({value: ''});
+        component.addUserToSelectedGroup({value: ''});
 
         expect(component.userGroupsToUsers.UserGroup1.includes('')).toBeFalse();
       }));
@@ -1095,26 +1095,26 @@ describe('Admin misc tab component ', () => {
         component.ngOnInit();
         tick();
 
-        component.userInput = {
+        component.userInputToAddUserToGroup = {
           nativeElement: {
             value: '',
           },
         } as ElementRef;
 
         component.selectedUserGroup = 'UserGroup1';
-        component.addUser({value: 'User11'});
+        component.addUserToSelectedGroup({value: 'User11'});
 
         expect(
           component.userGroupsToUsers.UserGroup1.includes('User11')
         ).toBeTrue();
-        component.removeUser('User9');
+        component.removeUserFromSelectedGroup('User9');
       }));
 
       it('should not add the user if it already exists', fakeAsync(() => {
         component.ngOnInit();
         tick();
 
-        component.userInput = {
+        component.userInputToAddUserToGroup = {
           nativeElement: {
             value: '',
           },
@@ -1122,7 +1122,7 @@ describe('Admin misc tab component ', () => {
         let alertServiceSpyon = spyOn(alertsService, 'addWarning');
 
         component.selectedUserGroup = 'UserGroup1';
-        component.addUser({value: 'User1'});
+        component.addUserToSelectedGroup({value: 'User1'});
 
         expect(alertServiceSpyon).toHaveBeenCalled();
       }));
@@ -1141,7 +1141,7 @@ describe('Admin misc tab component ', () => {
       component.ngOnInit();
       tick();
       component.selectedUserGroup = 'UserGroup2';
-      component.removeUser('User5');
+      component.removeUserFromSelectedGroup('User5');
 
       expect(
         component.userGroupsToUsers.UserGroup2.includes('User5')
