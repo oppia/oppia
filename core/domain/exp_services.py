@@ -2569,7 +2569,11 @@ def revert_exploration(
         translation_services.compute_translation_related_changes_upon_revert(
             current_exploration, revert_to_version))
 
-    translation_and_opportunity_models_to_put = (new_translation_models)
+    translation_and_opportunity_models_to_put: List[
+        base_models.BaseModel
+    ] = []
+
+    translation_and_opportunity_models_to_put.extend(new_translation_models)
 
     if opportunity_services.is_exploration_available_for_contribution(
         exploration_id

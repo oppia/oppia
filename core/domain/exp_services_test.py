@@ -7773,9 +7773,7 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Update 1')
 
-        entity_translation_models: Sequence[
-            translation_models.EntityTranslationsModel
-        ] = (
+        entity_translation_models = (
             translation_models.EntityTranslationsModel.get_all().fetch())
         exp_opportunity_summary: Optional[
             opportunity_domain.ExplorationOpportunitySummary] = (
@@ -7952,9 +7950,7 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Update 1')
 
-        entity_translation_models: Sequence[
-            translation_models.EntityTranslationsModel
-        ] = (
+        entity_translation_models = (
             translation_models.EntityTranslationsModel.get_all().fetch())
         exp_opportunity_summary: Optional[
             opportunity_domain.ExplorationOpportunitySummary] = (
@@ -8026,9 +8022,7 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
             )
         )
 
-        entity_translation_models: Sequence[
-            translation_models.EntityTranslationsModel
-        ] = (
+        entity_translation_models = (
             translation_models.EntityTranslationsModel.get_all().fetch())
         translation_counts = translation_services.get_translation_counts(
                 feconf.TranslatableEntityType.EXPLORATION, exploration)
@@ -8043,8 +8037,7 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
 
         entity_translation_models = (
             translation_models.EntityTranslationsModel.get_all().fetch())
-        exp_opportunity_summary: Optional[
-            opportunity_domain.ExplorationOpportunitySummary] = (
+        exp_opportunity_summary = (
                 opportunity_services.get_exploration_opportunity_summary_by_id(
                     self.EXP_0_ID))
         if exp_opportunity_summary is not None:

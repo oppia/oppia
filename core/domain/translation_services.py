@@ -22,7 +22,6 @@ import logging
 
 from core import feconf
 from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.domain import translation_domain
 from core.domain import translation_fetchers
 from core.platform import models
