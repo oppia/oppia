@@ -760,6 +760,10 @@ export class ClassroomAdminPageComponent implements OnInit {
     );
   }
 
+  saveClassroomValidationErrors(): string[] {
+    return this.classroomAdminDataService.getSaveClassroomValidationErrors();
+  }
+
   canPublishTheClassroom(): boolean {
     return this.validationErrors.length === 0;
   }

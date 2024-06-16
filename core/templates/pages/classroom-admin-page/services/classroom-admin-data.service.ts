@@ -129,6 +129,12 @@ export class ClassroomAdminDataService {
     ].filter(error => error !== '');
   }
 
+  getSaveClassroomValidationErrors(): string[] {
+    return [this.nameValidationError, this.urlValidationError].filter(
+      error => error !== ''
+    );
+  }
+
   reinitializeErrorMsgs(): void {
     this.nameValidationError = '';
     this.urlValidationError = '';

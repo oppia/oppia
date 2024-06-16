@@ -285,17 +285,6 @@
                     [disabled]="classroomDataSaveInProgress">
               Cancel
             </button>
-            <button *ngIf="!tempClassroomData._isPublished"
-                    [disabled]="!(canPublishTheClassroom())"
-                    class="btn btn-success publish-classroom-btn"
-                    (click)="publishClassroom()"
-                    >
-              <span *ngIf="!classroomDataPublishInProgress">Publish</span>
-              <mat-spinner *ngIf="classroomDataPublishInProgress"
-                           class="oppia-update-classroom-data-spinning-button"
-                           [diameter]="22">
-              </mat-spinner>
-            </button>
             <button *ngIf="tempClassroomData._isPublished"
                     [disabled]="false"
                     class="btn btn-secondary publish-classroom-btn"
@@ -307,15 +296,44 @@
                            [diameter]="22">
               </mat-spinner>
             </button>
-            <button class="btn btn-success save-classroom-changes e2e-test-save-classroom-config-button"
-                    [disabled]="!(classroomDataIsChanged && tempClassroomData.isClassroomDataValid())"
-                    (click)="saveClassroomData(classroom.key)">
-              <span *ngIf="!classroomDataSaveInProgress">Save</span>
-              <mat-spinner *ngIf="classroomDataSaveInProgress"
-                           class="oppia-update-classroom-data-spinning-button"
-                           [diameter]="22">
-              </mat-spinner>
-            </button>
+            <span [matTooltip]="validationErrors.join('\n')"
+                  matTooltipClass="oppia-mat-tooltip-list"
+                  [matTooltipDisabled]="false"
+                  aria-label="List that shows issues preventing to publish a classroom"
+                  >
+              <button *ngIf="!tempClassroomData._isPublished"
+                      [disabled]="!(canPublishTheClassroom())"
+                      class="btn btn-success publish-classroom-btn"
+                      (click)="publishClassroom()"
+                  >
+                <span *ngIf="!classroomDataPublishInProgress">Publish</span>
+                <mat-spinner *ngIf="classroomDataPublishInProgress"
+                             class="oppia-update-classroom-data-spinning-button"
+                             [diameter]="22">
+                </mat-spinner>
+                <mat-icon *ngIf="validationErrors.length > 0" class="save-draft-button-warning">
+                  warning
+                </mat-icon>
+              </button>
+            </span>
+            <span [matTooltip]="(saveClassroomValidationErrors()).join('\n')"
+                  matTooltipClass="oppia-mat-tooltip-list"
+                  [matTooltipDisabled]="false"
+                  aria-label="List that shows issues preventing to publish a classroom"
+                  >
+              <button class="btn btn-success save-classroom-changes e2e-test-save-classroom-config-button"
+                      [disabled]="!(classroomDataIsChanged && tempClassroomData.isClassroomDataValid())"
+                      (click)="saveClassroomData(classroom.key)">
+                <span *ngIf="!classroomDataSaveInProgress">Save</span>
+                <mat-spinner *ngIf="classroomDataSaveInProgress"
+                             class="oppia-update-classroom-data-spinning-button"
+                             [diameter]="22">
+                </mat-spinner>
+                <mat-icon *ngIf="saveClassroomValidationErrors().length > 0" class="save-draft-button-warning">
+                        warning
+                </mat-icon>
+              </button>
+            </span>
           </div>
         </div>
       </div>
@@ -527,6 +545,14 @@
   }
   .topics-selector-form-field {
     width: 100%;
+  }
+  .mat-icon.save-draft-button-warning {
+    color: #eec302;
+    float: right;
+    font-size: 20px;
+    height: fit-content;
+    margin-left: 3px;
+    z-index: 10;
   }
   @media screen and (max-width: 768px) {
     .oppia-editor-card-with-avatar {

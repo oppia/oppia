@@ -1332,6 +1332,25 @@ describe('Classroom Admin Page component ', () => {
     expect(component.canPublishTheClassroom()).toBeFalse();
   });
 
+  it('should not be able to save classroom due to validation errors', () => {
+    const response = {
+      classroomDict: {
+        ...dummyClassroomDict,
+        name: '',
+        urlFragment: '',
+      },
+    };
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.classroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.updateClassroomField();
+
+    expect(component.saveClassroomValidationErrors().length).toEqual(2);
+  });
+
   it('should be able to unpublish a published classroom', fakeAsync(() => {
     const response = {
       classroomDict: {
