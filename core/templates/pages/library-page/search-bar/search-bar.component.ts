@@ -192,12 +192,14 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
     this.updateSelectionDetails(itemsType);
     this.refreshSearchBarLabels();
+    this.searchService.triggerSearch();
   }
 
   deselectAll(itemsType: string): void {
     this.selectionDetails[itemsType].selections = {};
     this.updateSelectionDetails(itemsType);
     this.refreshSearchBarLabels();
+    this.searchService.triggerSearch();
   }
 
   onSearchQueryChangeExec(): void {
