@@ -184,7 +184,9 @@ describe('About Page', () => {
   it('should set the correct form link for Portuguese language', () => {
     translateService.currentLang = 'pt-br';
     const formLink =
-      'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp';
+      AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.PREFIX +
+      'pt' +
+      AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.SUFFIX;
     component.setPartnershipsFormLink();
 
     expect(component.partnershipsFormLink).toBe(formLink);
@@ -193,7 +195,9 @@ describe('About Page', () => {
   it('should set the correct form link for general languages', () => {
     translateService.currentLang = 'fr';
     const formLink =
-      'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=fr&_x_tr_hl=en-US&_x_tr_pto=wapp';
+      AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.PREFIX +
+      'fr' +
+      AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.SUFFIX;
     component.setPartnershipsFormLink();
 
     expect(component.partnershipsFormLink).toBe(formLink);
