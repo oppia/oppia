@@ -1599,9 +1599,10 @@ class AdminHandler(
             if (feconf.ROLE_ID_QUESTION_ADMIN not in self.user.roles
                 or not user_services.can_submit_question_suggestions(
                     self.user_id)):
-                raise Exception(
-                    'User "${self.username}" must be a question submitter or ' +
-                    'question admin in order to generate question suggestions.')
+                raise Exception((
+                    'User "%s" must be a question submitter or question admin'
+                    ' in order to generate question suggestions.'
+                ) % self.username)
             for _ in range(num_dummy_question_suggestions_generate):
                 content_id_generator = translation_domain.ContentIdGenerator()
                 content_id_generator.generate(

@@ -244,7 +244,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'skill_id\' must be provided when the '
-            'action is generate_dummy_question_suggestions.'
+            'action is _generate_dummy_question_suggestions.'
         )
         with assert_raises_regexp_context_manager, self.prod_mode_swap:
             self.post_json(
@@ -265,7 +265,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'num_dummy_question_suggestions_generate\' must be provided'
-            ' when the action is generate_dummy_question_suggestions.'
+            ' when the action is _generate_dummy_question_suggestions.'
         )
         with assert_raises_regexp_context_manager, self.prod_mode_swap:
             self.post_json(
