@@ -20,42 +20,47 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
-const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
-const homeUrl = testConstants.URLs.Home;
-const aboutUrl = testConstants.URLs.About;
-const mathClassroomUrl = testConstants.URLs.MathClassroom;
-const androidUrl = testConstants.URLs.Android;
-const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
-const aboutFoundationUrl = testConstants.URLs.AboutFoundation;
-const blogUrl = testConstants.URLs.Blog;
-const partnershipsUrl = testConstants.URLs.Partnerships;
-const volunteerUrl = testConstants.URLs.Volunteer;
-const donateUrl = testConstants.URLs.Donate;
-const contactUrl = testConstants.URLs.Contact;
-const _61MillionChildrenUrl = testConstants.URLs.ExternalLink61MillionChildren;
-const sourceUnescoUrl = testConstants.URLs.ExternalLinkSourceUnesco;
-const evenThoseWhoAreInSchoolUrl =
-  testConstants.URLs.ExternalLinkEvenThoseWhoAreInSchool;
 const _420MillionUrl = testConstants.URLs.ExternalLink61MillionChildren;
-const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
-const desktopWatchAVideoUrl = testConstants.URLs.DesktopExternalLinkWatchAVideo;
-const mobileWatchAVideoUrl = testConstants.URLs.MobileExternalLinkWatchAVideo;
-const getStartedUrl = testConstants.URLs.GetStarted;
-const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
-const electromagnetismUrl = testConstants.URLs.Electromagnetism;
-const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
-const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
-const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
-const teachUrl = testConstants.URLs.Teach;
+const _61MillionChildrenUrl = testConstants.URLs.ExternalLink61MillionChildren;
+const aboutFoundationUrl = testConstants.URLs.AboutFoundation;
+const aboutUrl = testConstants.URLs.About;
+const androidUrl = testConstants.URLs.Android;
 const blogPostUrlinPartnershipsPage =
   testConstants.URLs.BlogPostUrlInPartnershipsPage;
-const partnershipsFormUrl = testConstants.URLs.PartnershipsForm;
+const blogUrl = testConstants.URLs.Blog;
+const ccLicenseUrl = testConstants.URLs.CCLicense;
+const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
+const contactUrl = testConstants.URLs.Contact;
+const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
+const desktopWatchAVideoUrl = testConstants.URLs.DesktopExternalLinkWatchAVideo;
+const donateUrl = testConstants.URLs.Donate;
+const electromagnetismUrl = testConstants.URLs.Electromagnetism;
+const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
+const evenThoseWhoAreInSchoolUrl =
+  testConstants.URLs.ExternalLinkEvenThoseWhoAreInSchool;
+const getStartedUrl = testConstants.URLs.GetStarted;
+const homeUrl = testConstants.URLs.Home;
+const mathClassroomUrl = testConstants.URLs.MathClassroom;
+const mobileWatchAVideoUrl = testConstants.URLs.MobileExternalLinkWatchAVideo;
+const OppiaAnnounceGoogleGroupUrl = testConstants.URLs.OppiaAnnounceGoogleGroup;
+const partnershipsBrochureUrl = testConstants.URLs.PartnershipsBrochure;
 const partnershipsFormInPortugueseUrl =
   testConstants.URLs.PartnershipsFormInPortuguese;
 const partnershipsFormShortUrl = testConstants.URLs.PartnershipsFormShortUrl;
-const partnershipsBrochureUrl = testConstants.URLs.PartnershipsBrochure;
-const volunteerFormUrl = testConstants.URLs.VolunteerForm;
+const partnershipsFormUrl = testConstants.URLs.PartnershipsForm;
+const partnershipsUrl = testConstants.URLs.Partnerships;
+const privacyPolicyUrl = testConstants.URLs.PrivacyPolicy;
+const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
+const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
+const sourceUnescoUrl = testConstants.URLs.ExternalLinkSourceUnesco;
+const teachUrl = testConstants.URLs.Teach;
+const termsOfServiceUrl = testConstants.URLs.TermsOfService;
+const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
 const volunteerFormShortUrl = testConstants.URLs.VolunteerFormShortUrl;
+const volunteerFormUrl = testConstants.URLs.VolunteerForm;
+const volunteerUrl = testConstants.URLs.Volunteer;
+const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
+
 const allowedVolunteerFormUrls = [
   volunteerFormUrl,
   `${volunteerFormUrl}?usp=send_form`,
@@ -178,6 +183,13 @@ const explorationCard = '.e2e-test-exploration-dashboard-card';
 
 const libraryExplorationsGroupSelector = '.oppia-library-group';
 
+const privacyPolicyLinkInTosPage = '.e2e-test-privacy-policy-link';
+const ccLicenseLinkInTosPage = '.e2e-test-cc-license-link';
+const googleGroupSignUpLinkInTosPage =
+  '.e2e-test-oppia-announce-google-group-link';
+
+const emailLinkSelector = '.oppia-contact-mail';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -253,9 +265,23 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to navigate to the Terms of Service page.
+   */
+  async navigateToTosPage(): Promise<void> {
+    await this.goto(termsOfServiceUrl);
+  }
+
+  /**
+   * Function to navigate to the Contact Us page.
+   */
+  async navigateToContactUsPage(): Promise<void> {
+    await this.goto(contactUrl);
+  }
+
+  /**
    * Function to click a button and check if it opens the expected destination.
    */
-  async clickButtonToNavigateToNewPage(
+  private async clickButtonToNavigateToNewPage(
     button: string,
     buttonName: string,
     expectedDestinationPageUrl: string,
@@ -271,6 +297,75 @@ export class LoggedOutUser extends BaseUser {
         `${buttonName} should open the ${expectedDestinationPageName} page`
       )
       .toBe(expectedDestinationPageUrl);
+  }
+
+  /**
+   * Clicks a link based on its visible text and verifies that the resulting navigation
+   * in the same tab leads to the expected URL.
+   */
+  private async clickLinkAnchorInSameTab(
+    anchorInnerText: string,
+    expectedDestinationPageUrl: string
+  ): Promise<void> {
+    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
+
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: ['networkidle2', 'load']}),
+      this.clickOn(anchorInnerText),
+    ]);
+
+    const currentUrl = this.page.url();
+    if (currentUrl !== expectedDestinationPageUrl) {
+      throw new Error(
+        `Navigation led to ${currentUrl} instead of ${expectedDestinationPageUrl}`
+      );
+    }
+  }
+
+  /**
+   * Function to click an anchor tag and check if it opens the expected destination
+   * in a new tab. Closes the tab afterwards.
+   */
+  private async clickLinkAnchorToNewTab(
+    anchorInnerText: string,
+    expectedDestinationPageUrl: string
+  ): Promise<void> {
+    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
+    const pageTarget = this.page.target();
+    await this.clickOn(anchorInnerText);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
+    await newTabPage?.close();
+  }
+
+  /**
+   * Function to click a button and check if it opens the expected destination
+   * in a new tab. Closes the tab afterwards.
+   */
+  private async clickLinkButtonToNewTab(
+    button: string,
+    buttonName: string,
+    expectedDestinationPageUrl: string,
+    expectedDestinationPageName: string
+  ): Promise<void> {
+    const pageTarget = this.page.target();
+    await this.clickOn(button);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url())
+      .withContext(
+        `${buttonName} should open the ${expectedDestinationPageName} page`
+      )
+      .toBe(expectedDestinationPageUrl);
+    await newTabPage?.close();
   }
 
   /**
@@ -1005,26 +1100,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click an anchor tag and check if it opens the expected destination
-   * in a new tab. Closes the tab afterwards.
-   */
-  private async clickLinkAnchorToNewTab(
-    anchorInnerText: string,
-    expectedDestinationPageUrl: string
-  ): Promise<void> {
-    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
-    const pageTarget = this.page.target();
-    await this.clickOn(anchorInnerText);
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
-    const newTabPage = await newTarget.page();
-    expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
-    await newTabPage?.close();
-  }
-
-  /**
    * Clicks the link with the text "create on here" on the Get Stated page.
    */
   async clickCreateOneHereLinkInGetStartedPage(): Promise<void> {
@@ -1180,32 +1255,6 @@ export class LoggedOutUser extends BaseUser {
       mathClassroomUrl,
       'Math Classroom'
     );
-  }
-
-  /**
-   * Function to click a button and check if it opens the expected destination
-   * in a new tab. Closes the tab afterwards.
-   */
-  private async clickLinkButtonToNewTab(
-    button: string,
-    buttonName: string,
-    expectedDestinationPageUrl: string,
-    expectedDestinationPageName: string
-  ): Promise<void> {
-    const pageTarget = this.page.target();
-    await this.clickOn(button);
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
-    const newTabPage = await newTarget.page();
-
-    expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url())
-      .withContext(
-        `${buttonName} should open the ${expectedDestinationPageName} page`
-      )
-      .toBe(expectedDestinationPageUrl);
-    await newTabPage?.close();
   }
 
   /**
@@ -1379,6 +1428,120 @@ export class LoggedOutUser extends BaseUser {
       throw new Error('The donor box is not visible on the donate page.');
     } else {
       showMessage('The donor box is visible on the donate page.');
+    }
+  }
+
+  /**
+   * Clicks on the Privacy Policy link in the Terms of Service page and
+   * checks if it opens the correct URL.
+   */
+  async clickPrivacyPolicyLinkInTosPage(): Promise<void> {
+    await this.page.waitForSelector(privacyPolicyLinkInTosPage, {
+      visible: true,
+    });
+    await this.clickButtonToNavigateToNewPage(
+      privacyPolicyLinkInTosPage,
+      'Privacy Policy link in the Terms of Service page',
+      privacyPolicyUrl,
+      'Privacy Policy'
+    );
+  }
+
+  /**
+   * Clicks on the License link in the Terms of Service page and checks
+   * if it opens the correct URL.
+   */
+  async clickLicenseLinkInTosPage(): Promise<void> {
+    await this.page.waitForSelector(ccLicenseLinkInTosPage, {visible: true});
+    await this.clickButtonToNavigateToNewPage(
+      ccLicenseLinkInTosPage,
+      'License link in the Terms of Service page',
+      ccLicenseUrl,
+      'License'
+    );
+  }
+
+  /**
+   * Clicks on the Google Group Sign Up link in the Terms of Service page and checks
+   * if it opens the correct URL.
+   */
+  async clickGoogleGroupSignUpLinkInTosPage(): Promise<void> {
+    await this.page.waitForSelector(googleGroupSignUpLinkInTosPage, {
+      visible: true,
+    });
+    await this.clickButtonToNavigateToNewPage(
+      googleGroupSignUpLinkInTosPage,
+      'Google Group Sign Up link in the Terms of Service page',
+      OppiaAnnounceGoogleGroupUrl,
+      'Google Group Sign Up'
+    );
+  }
+
+  /**
+   * Clicks the "DONATE TODAY" button on the Contact Us page and checks that
+   * it navigates to the correct URL.
+   */
+  async clickDonateTodayButtonInContactUsPage(): Promise<void> {
+    await this.clickLinkAnchorInSameTab(
+      'DONATE TODAY',
+      testConstants.URLs.Donate
+    );
+  }
+
+  /**
+   * Clicks the "BECOME A PARTNER" button on the Contact Us page and checks that
+   * it navigates to the correct URL.
+   */
+  async clickBecomeAPartnerButtonInContactUsPage(): Promise<void> {
+    await this.clickLinkAnchorInSameTab(
+      'BECOME A PARTNER',
+      testConstants.URLs.Partnerships
+    );
+  }
+
+  /**
+   * Clicks the "VOLUNTEER WITH US" button on the Contact Us page and checks that
+   * it navigates to the correct URL.
+   */
+  async clickVolunteerButtonInContactUsPage(): Promise<void> {
+    await this.clickLinkAnchorInSameTab(
+      'BECOME A VOLUNTEER',
+      testConstants.URLs.Volunteer
+    );
+  }
+
+  /**
+   * Clicks the first admin email link in the Contact Us page and checks that it navigates
+   * to the correct mailto URL.
+   */
+  async clickAdminEmailLinkInContactUsPage(): Promise<void> {
+    await this.page.waitForSelector(emailLinkSelector);
+    const href = await this.page.$eval(emailLinkSelector, el =>
+      el.getAttribute('href')
+    );
+    if (href !== 'mailto:admin@oppia.org') {
+      throw new Error(
+        `Email link has href ${href} instead of mailto:admin@oppia.org`
+      );
+    }
+  }
+
+  /**
+   * Clicks the second press email link in the Contact Us page and checks that it navigates
+   * to the correct mailto URL.
+   */
+  async clickPressEmailLinkInContactUsPage(): Promise<void> {
+    await this.page.waitForSelector(emailLinkSelector);
+    const emailLinks = await this.page.$$(emailLinkSelector);
+
+    const href = await this.page.evaluate(
+      el => el.getAttribute('href'),
+      emailLinks[1]
+    );
+    if (href !== 'mailto:press@oppia.org') {
+      throw new Error(
+        `Email link has href ${href} instead of mailto:press@oppia.org`
+      );
     }
   }
 
