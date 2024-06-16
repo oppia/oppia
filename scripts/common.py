@@ -218,6 +218,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill',
     'exploration-editor/create-exploration-and-change-basic-settings',
     'exploration-editor/load-complete-and-restart-exploration-preview',
+    'exploration-editor/save-draft-publish-and-discard-the-changes',
     'logged-out-user/click-all-buttons-on-about-page',
     'logged-out-user/click-all-buttons-on-about-foundation-page',
     'logged-out-user/click-all-buttons-on-donation-thanks-page',
@@ -235,7 +236,9 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
        'by-that-creator',
     'practice-question-admin/add-and-remove-contribution-rights',
     'translation-admin/add-and-remove-translation-rights',
-    'voiceover-admin/add-voiceover-artist-to-an-exploration'
+    'voiceover-admin/add-voiceover-artist-to-an-exploration',
+    'moderator/view-recent-commits-and-feedback-messages',
+    'moderator/edit-featured-activities-list'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181
