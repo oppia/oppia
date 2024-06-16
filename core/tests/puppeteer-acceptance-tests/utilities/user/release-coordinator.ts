@@ -20,6 +20,9 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
+const releaseCoordinatorUrl = testConstants.URLs.releaseCoordinatorPage;
+const splashUrl = testConstants.URLs.splash;
+
 const navbarElementSelector = '.oppia-clickable-navbar-element';
 const promoBarToggleSelector = '#mat-slide-toggle-1';
 const promoMessageInputSelector = '.mat-input-element';
@@ -32,7 +35,7 @@ export class ReleaseCoordinator extends BaseUser {
    * Navigates to the release coordinator page.
    */
   async navigateToReleaseCoordinatorPage(): Promise<void> {
-    await this.page.goto(testConstants.URLs.releaseCoordinatorPage);
+    await this.page.goto(releaseCoordinatorUrl);
   }
 
   /**
@@ -83,7 +86,7 @@ export class ReleaseCoordinator extends BaseUser {
    * Navigates to the splash page.
    */
   async navigateToSplash(): Promise<void> {
-    await this.page.goto(testConstants.URLs.splash);
+    await this.page.goto(splashUrl);
   }
 
   /**
