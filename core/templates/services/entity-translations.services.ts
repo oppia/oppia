@@ -99,7 +99,7 @@ export class EntityTranslationsService {
     return htmlStrings;
   }
 
-  removeAllTranslationsForContent(contentId: string) {
+  removeAllTranslationsForContent(contentId: string): void {
     Object.keys(this.languageCodeToEntityTranslations).forEach(
       (language: string) => {
         this.languageCodeToEntityTranslations[language].removeTranslation(
