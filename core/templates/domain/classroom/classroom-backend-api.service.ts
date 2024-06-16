@@ -50,6 +50,10 @@ interface ClassroomIdBackendDict {
   classroom_id: string;
 }
 
+export interface NewClassroomBackendDict {
+  new_classroom_id: string;
+}
+
 export interface ClassroomBackendDict {
   classroom_id: string;
   name: string;
@@ -82,6 +86,29 @@ interface ClassroomDataResponse {
 
 interface DoesClassroomWithUrlFragmentExistBackendResponse {
   classroom_url_fragment_exists: boolean;
+}
+
+export interface TopicClassroomRelationDict {
+  topic_name: string;
+  topic_id: string;
+  classroom_name: string | null;
+  classroom_url_fragment: string | null;
+}
+
+interface TopicsClassroomRelationBackendDict {
+  topics_to_classrooms_relation: TopicClassroomRelationDict[];
+}
+
+export interface ClassroomSummaryDict {
+  name: string;
+  url_fragment: string;
+  teaser_text: string;
+  thumbnail_filename: string;
+  thumbnail_bg_color: string;
+}
+
+interface AllClassroomsSummaryBackendDict {
+  all_classrooms_summary: ClassroomSummaryDict[];
 }
 
 @Injectable({
@@ -211,7 +238,55 @@ export class ClassroomBackendApiService {
       );
 
       this.http
-        .put<void>(classroomUrl, {classroom_dict: classroomDict})
+        // TODO(#20418): Update this once Frontend part of M1.2 is complete.
+        .put<void>(classroomUrl, {
+          classroom_dict: {
+            classroom_id: classroomDict.classroom_id,
+            name: classroomDict.name,
+            url_fragment: classroomDict.url_fragment,
+            course_details: classroomDict.course_details || 'Course details',
+            topic_list_intro:
+              classroomDict.topic_list_intro || 'Topic List intro',
+            topic_id_to_prerequisite_topic_ids:
+              classroomDict.topic_id_to_prerequisite_topic_ids,
+            teaser_text: 'Teaser text of the classroom',
+            is_published: true,
+            thumbnail_data: {
+              filename: 'thumbnail.svg',
+              bg_color: 'transparent',
+              size_in_bytes: 1000,
+            },
+            banner_data: {
+              filename: 'banner.svg',
+              bg_color: 'transparent',
+              size_in_bytes: 1000,
+            },
+          },
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error);
+          }
+        );
+    });
+  }
+
+  async createNewClassroomAsync(
+    name: string,
+    urlFragment: string
+  ): Promise<NewClassroomBackendDict> {
+    return new Promise((resolve, reject) => {
+      let newClassroomUrl = ClassroomDomainConstants.NEW_CLASSROOM_HANDLER_URL;
+
+      this.http
+        .post<NewClassroomBackendDict>(newClassroomUrl, {
+          name,
+          url_fragment: urlFragment,
+        })
         .toPromise()
         .then(
           response => {
@@ -320,6 +395,46 @@ export class ClassroomBackendApiService {
         .then(
           response => {
             resolve(response.classroom_id);
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error);
+          }
+        );
+    });
+  }
+
+  async getAllTopicsClassroomInfoAsync(): Promise<
+    TopicClassroomRelationDict[]
+  > {
+    return new Promise((resolve, reject) => {
+      const topicsClassroomInfoUrl =
+        ClassroomDomainConstants.TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL;
+
+      this.http
+        .get<TopicsClassroomRelationBackendDict>(topicsClassroomInfoUrl)
+        .toPromise()
+        .then(
+          response => {
+            resolve(response.topics_to_classrooms_relation);
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error);
+          }
+        );
+    });
+  }
+
+  async getAllClassroomsSummaryAsync(): Promise<ClassroomSummaryDict[]> {
+    return new Promise((resolve, reject) => {
+      const topicsClassroomInfoUrl =
+        ClassroomDomainConstants.ALL_CLASSROOMS_SUMMARY_HANDLER_URL;
+
+      this.http
+        .get<AllClassroomsSummaryBackendDict>(topicsClassroomInfoUrl)
+        .toPromise()
+        .then(
+          response => {
+            resolve(response.all_classrooms_summary);
           },
           errorResponse => {
             reject(errorResponse?.error?.error);

@@ -717,7 +717,7 @@ class BaseHandler(
             self.values.update(values)
             if self.iframed:
                 self.render_template(
-                    'error-iframed.mainpage.html', iframe_restriction=None)
+                    'error-iframed-page.mainpage.html', iframe_restriction=None)
             elif values['status_code'] == 404:
                 # Only 404 routes can be handled with angular router as it only
                 # has access to the path, not to the status code.
