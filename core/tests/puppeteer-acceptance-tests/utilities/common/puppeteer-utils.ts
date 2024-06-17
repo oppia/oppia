@@ -26,8 +26,10 @@ import puppeteer, {
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
+import {showMessage} from './show-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
+const baseURL = testConstants.URLs.BaseURL;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
@@ -129,6 +131,16 @@ export class BaseUser {
       });
 
     return this.page;
+  }
+
+  /**
+   * Checks if the application is in development mode.
+   * @returns {Promise<boolean>} Returns true if the application is in development mode,
+   * false otherwise.
+   */
+  async isInProdMode(): Promise<boolean> {
+    const prodMode = process.env.PROD_ENV === 'true';
+    return prodMode;
   }
 
   /**
@@ -352,16 +364,17 @@ export class BaseUser {
     context: Page | Frame | ElementHandle,
     selector: string
   ): Promise<void> {
-    const element = await context.$(selector);
-    if (!element) {
-      throw new Error(`Element ${selector} not found`);
-    }
-    await this.waitForElementToBeClickable(element);
-
     try {
+      await context.waitForSelector(selector);
+      const element = await context.$(selector);
+      if (!element) {
+        throw new Error(`Element ${selector} not found`);
+      }
+      await this.waitForElementToBeClickable(element);
       await element.click();
     } catch (error) {
-      throw new Error(`Failed to click on element ${selector}`);
+      error.message = `Failed to click on element ${selector}: ${error.message}`;
+      throw error;
     }
   }
 
@@ -379,12 +392,29 @@ export class BaseUser {
   }
 
   /**
-   * This function checks if a particular text exists on the current page.
-   * @param {string} text - The text to check for.
+   * Checks if a given word is present on the page.
+   * This function only matches complete words, not substrings of words.
+   * For example, if the page contains "hello" and you search for "hell",
+   * it will return false.
+   * @param {string} word - The word to check.
    */
-  async isTextPresentOnPage(text: string): Promise<boolean> {
-    const pageContent = await this.page.content();
-    return pageContent.includes(text);
+  async isTextPresentOnPage(word: string): Promise<boolean> {
+    try {
+      await this.page.waitForFunction(
+        (word: string) => {
+          const regex = new RegExp(`\\b${word}\\b`);
+          return regex.test(document.documentElement.outerHTML);
+        },
+        {},
+        word
+      );
+      return true;
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        return false;
+      }
+      throw new Error(`Failed to find text on page: ${error.message}`);
+    }
   }
 
   /**
@@ -492,6 +522,51 @@ export class BaseUser {
    */
   getCurrentUrlWithoutParameters(): string {
     return this.page.url().split('?')[0];
+  }
+
+  /**
+   * This function checks the exploration accessibility by navigating to the
+   * exploration page based on the explorationID.
+   */
+  async expectExplorationToBeAccessibleByUrl(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('ExplorationId is null');
+    }
+    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      showMessage('Exploration is accessible with the URL, i.e. published.');
+    } catch (error) {
+      throw new Error('The exploration is not public.');
+    }
+  }
+
+  /**
+   * This function checks the exploration inaccessibility by navigating to the
+   * exploration page based on the explorationID.
+   */
+  async expectExplorationToBeNotAccessibleByUrl(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('ExplorationId is null');
+    }
+    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      throw new Error('The exploration is still public.');
+    } catch (error) {
+      showMessage('The exploration is not accessible with the URL.');
+    }
+  }
+
+  /**
+   * Waits for the page to fully load by checking the document's ready state.
+   */
+  async waitForPageToFullyLoad(): Promise<void> {
+    await this.page.waitForFunction('document.readyState === "complete"');
   }
 }
 
