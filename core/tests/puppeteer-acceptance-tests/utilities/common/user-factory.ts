@@ -29,11 +29,15 @@ import {
   ExplorationEditor,
 } from '../user/exploration-editor';
 import {CurriculumAdminFactory} from '../user/curriculum-admin';
+import {TopicManagerFactory} from '../user/topic-manager';
 import {LoggedInUserFactory, LoggedInUser} from '../user/logged-in-user';
+import {ModeratorFactory} from '../user/moderator';
 import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
+const cookieBannerAcceptButton =
+  'button.e2e-test-oppia-cookie-banner-accept-button';
 
 /**
  * Mapping of user roles to their respective function class.
@@ -45,6 +49,8 @@ const USER_ROLE_MAPPING = {
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
+  [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
+  [ROLES.MODERATOR]: ModeratorFactory,
 } as const;
 
 /**
@@ -183,6 +189,18 @@ export class UserFactory {
     return superAdminInstance;
   };
 
+  /**
+   * This function creates a new instance of a LoggedOutUser, opens a browser for that user,
+   * navigates to the home page, adds the user to the activeUsers array, and returns the user.
+   */
+  static createLoggedOutUser = async function (): Promise<LoggedOutUser> {
+    let user = new LoggedOutUser();
+    await user.openBrowser();
+    await user.page.goto(testConstants.URLs.Home);
+    await user.clickOn(cookieBannerAcceptButton);
+    activeUsers.push(user);
+    return user;
+  };
   /**
    * This function closes all the browsers opened by different users.
    */
