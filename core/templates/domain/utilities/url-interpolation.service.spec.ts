@@ -403,18 +403,6 @@ describe('URL Interpolation Service', () => {
         '.json'
     );
 
-    expect(uis.getFullStaticAssetUrl('/assets/msapplication-large.png')).toBe(
-      'http://sample.com/build/assets/msapplication-large.png'
-    );
-    expect(
-      uis.getFullStaticAssetUrl('/assets/images/msapplication-large.png')
-    ).toBe('http://sample.com/build/assets/images/msapplication-large.png');
-    expect(
-      uis.getFullStaticAssetUrl('/assets/images/path/msapplication-large.png')
-    ).toBe(
-      'http://sample.com/build/assets/images/path/msapplication-large.png'
-    );
-
     expect(uis.getExtensionResourceUrl('/test.html')).toBe(
       '/build/extensions/test.html'
     );

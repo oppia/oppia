@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 import {AlertsService} from 'services/alerts.service';
@@ -33,6 +32,7 @@ import {
 } from 'domain/blog/blog-homepage-backend-api.service';
 import {SearchResponseData} from 'domain/blog/blog-homepage-backend-api.service';
 import {BlogPostSummary} from 'domain/blog/blog-post-summary.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {LoaderService} from 'services/loader.service';

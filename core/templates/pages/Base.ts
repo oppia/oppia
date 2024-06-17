@@ -45,9 +45,6 @@ angular.module('oppia').controller('Base', [
     SUPPORTED_SITE_LANGUAGES
   ) {
     var ctrl = this;
-    $scope.getAssetUrl = function (path) {
-      return UrlInterpolationService.getFullStaticAssetUrl(path);
-    };
 
     ctrl.$onInit = function () {
       $scope.currentLang = 'en';
