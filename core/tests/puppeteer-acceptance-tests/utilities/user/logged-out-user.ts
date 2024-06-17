@@ -288,7 +288,7 @@ export class LoggedOutUser extends BaseUser {
     expectedDestinationPageName: string
   ): Promise<void> {
     await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
       this.clickOn(button),
     ]);
 
@@ -1450,7 +1450,7 @@ export class LoggedOutUser extends BaseUser {
       googleGroupSignUpLinkInTermsPage,
       'Google Group Sign Up link in the terms page',
       OppiaAnnounceGoogleGroupUrl,
-      'Google Group Sign Up'
+      'Oppia-announce Google Group page'
     );
   }
 
