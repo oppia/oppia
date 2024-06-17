@@ -122,14 +122,14 @@ describe('Logged-out Users', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
-  /*
+
   it(
     'should be able to visit the Oppia YouTube',
     async function () {
       await loggedOutUser.clickYouTubeIconInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
-  ); */
+  );
 
   it(
     'should be able to visit the Oppia Facebook',
