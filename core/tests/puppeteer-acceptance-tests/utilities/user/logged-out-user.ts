@@ -1394,7 +1394,7 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.page.waitForSelector(socialIconSelector);
     const pageTarget = this.page.target();
-    await this.clickOn(socialIconSelector);
+    await this.page.click(socialIconSelector);
     const newTarget = await this.browserObject.waitForTarget(
       target => target.opener() === pageTarget
     );

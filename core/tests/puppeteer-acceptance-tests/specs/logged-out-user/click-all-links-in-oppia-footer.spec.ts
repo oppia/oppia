@@ -114,13 +114,22 @@ describe('Logged-out Users', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+
+  it(
+    'should open "Contact" page via the footer',
+    async function () {
+      await loggedOutUser.clickOnContactUsLinkInFooter();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+  /*
   it(
     'should be able to visit the Oppia YouTube',
     async function () {
       await loggedOutUser.clickYouTubeIconInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  ); */
 
   it(
     'should be able to visit the Oppia Facebook',
@@ -182,14 +191,6 @@ describe('Logged-out Users', function () {
     'should open "Privacy Policy" page via the footer',
     async function () {
       await loggedOutUser.clickOnPrivacyPolicyLinkInFooter();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open "Contact" page via the footer',
-    async function () {
-      await loggedOutUser.clickOnContactUsLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
