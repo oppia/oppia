@@ -24,7 +24,9 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {PrimaryButtonComponent} from '../../components/button-directives/primary-button.component';
+import {FullExpandAccordionComponent} from './accordion/full-expand-accordion.component';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 class MockWindowRef {
   nativeWindow = {
@@ -51,8 +53,9 @@ describe('About Page', () => {
       declarations: [
         AboutPageComponent,
         MockTranslatePipe,
-        PrimaryButtonComponent,
+        FullExpandAccordionComponent,
       ],
+      imports: [SharedComponentsModule, NgbModule],
       providers: [
         SiteAnalyticsService,
         UrlInterpolationService,
@@ -75,6 +78,20 @@ describe('About Page', () => {
 
   it('should successfully instantiate the component', () => {
     expect(component).toBeDefined();
+  });
+
+  it('should instantiate the correct data for the features accrodion', () => {
+    expect(component.featuresData.length).toEqual(
+      component.panelIsCollapsed.length
+    );
+    expect(component.panelIsCollapsed.every(value => value)).toBeTrue();
+  });
+
+  it('should toggle the panels at given index', () => {
+    component.expandPanel(1);
+    expect(component.panelIsCollapsed[1]).toBeFalse();
+    component.closePanel(1);
+    expect(component.panelIsCollapsed[1]).toBeTrue();
   });
 
   it('should return correct static image url when calling getStaticImageUrl', () => {

@@ -23,6 +23,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 import './about-page.component.css';
+import {AccordionPanelData} from './data.model';
 
 @Component({
   selector: 'about-page',
@@ -30,6 +31,39 @@ import './about-page.component.css';
   styleUrls: ['./about-page.component.css'],
 })
 export class AboutPageComponent {
+  featuresData: AccordionPanelData[] = [
+    {
+      title: 'I18N_ABOUT_PAGE_FEATURE_TITLE1',
+      text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT1',
+      customPanelClassNames: ['feature-panel'],
+      customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
+    },
+    {
+      title: 'I18N_ABOUT_PAGE_FEATURE_TITLE2',
+      text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT2',
+      customPanelClassNames: ['feature-panel'],
+      customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
+    },
+    {
+      title: 'I18N_ABOUT_PAGE_FEATURE_TITLE3',
+      text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT3',
+      customPanelClassNames: ['feature-panel'],
+      customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
+    },
+    {
+      title: 'I18N_ABOUT_PAGE_FEATURE_TITLE4',
+      text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT4',
+      customPanelClassNames: ['feature-panel', 'free-of-cost-panel'],
+      customTitleClassNames: [
+        'feature-title',
+        'free-of-cost-title',
+        'oppia-about-platform-subtext',
+      ],
+    },
+  ];
+
+  panelIsCollapsed: boolean[] = [true, true, true, true];
+
   features = [
     {
       i18nDescription: 'I18N_ABOUT_PAGE_AUDIO_SUBTITLES_FEATURE',
@@ -72,6 +106,14 @@ export class AboutPageComponent {
 
   onClickCreateLessonButton(): void {
     this.siteAnalyticsService.registerCreateLessonButtonEvent();
+  }
+
+  expandPanel(index: number): void {
+    this.panelIsCollapsed[index] = false;
+  }
+
+  closePanel(index: number): void {
+    this.panelIsCollapsed[index] = true;
   }
 }
 angular
