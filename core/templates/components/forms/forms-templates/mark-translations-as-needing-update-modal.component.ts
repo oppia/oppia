@@ -30,6 +30,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
 })
 export class MarkTranslationsAsNeedingUpdateModalComponent extends ConfirmOrCancelModal {
   @Input() contentId!: string;
+  @Input() contentValue!: string;
   @Input() markNeedsUpdateHandler!: (contentId: string) => void;
   @Input() removeHandler!: (contentId: string) => void;
 
@@ -59,6 +60,7 @@ export class MarkTranslationsAsNeedingUpdateModalComponent extends ConfirmOrCanc
       windowClass: 'oppia-modify-translations-modal',
     });
     modalRef.componentInstance.contentId = this.contentId;
+    modalRef.componentInstance.contentValue = this.contentValue;
   }
 
   removeTranslations(): void {

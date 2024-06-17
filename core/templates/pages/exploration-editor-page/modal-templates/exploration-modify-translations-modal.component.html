@@ -9,19 +9,24 @@
   </p>
   <p>Any translations that don't have a check mark will be sent for re-translation.</p>
   <div *ngIf="contentTranslations && (contentTranslations | keyvalue).length > 0" class="content-translations-container">
-    <div *ngFor="let item of contentTranslations | keyvalue" class="content-translation-block">
-      <div class="content-translation-language">
-        <span>
-          <input type="checkbox" name="" id="">
-          <p>{{ getLanguageName(item.key) }}</p>
-        </span>
-        <i class="fas fa-pencil-alt"></i>
+    <form #form="ngForm">
+      <div *ngFor="let item of contentTranslations | keyvalue" class="content-translation-block">
+        <div class="content-translation-language">
+          <span>
+            <input type="checkbox" name="checkbox-{{item.key}}" [(ngModel)]="languageIsCheckedStatusDict[item.key]" />
+            <p>{{ getLanguageName(item.key) }}</p>
+            <div  *ngIf="!languageIsCheckedStatusDict[item.key]" class="re-translation-indicator">
+              Will be sent for re-translation
+            </div>    
+          </span>
+          <i class="fas fa-pencil-alt" (click)="openTranslationEditor(item.key)"></i>
+        </div>
+        <div class="content-translation-value e2e-test-translation-{{ item.key }}">
+          <oppia-rte-output-display [rteString]="item.value.translation" class="translations-rte-output-display">
+          </oppia-rte-output-display>
+        </div>
       </div>
-      <div class="content-translation-value e2e-test-translation-{{ item.key }}">
-        <oppia-rte-output-display [rteString]="item.value.translation" class="translations-rte-output-display">
-        </oppia-rte-output-display>
-      </div>
-    </div>
+    </form>
   </div>
   <div *ngIf="contentTranslations && (contentTranslations | keyvalue).length === 0">
     <p class="no-translations-found-text">No available translations found.</p>
@@ -91,6 +96,18 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.5);
   }
 
+  .modal-body .content-translation-block .re-translation-indicator {
+    align-self: center;
+    background-color: #fdf6cd;
+    border: 1px solid;
+    border-radius: 14px;
+    font-size: 12px;
+    margin: 0;
+    margin-left: 10px;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
   .modal-body .content-translation-language {
     display: flex;
     font-size: 18px;
@@ -104,6 +121,7 @@
 
   .content-translation-language p {
     font-size: 18px;
+    margin: 0;
   }
 
   .content-translation-language input[type=checkbox] {
@@ -121,7 +139,7 @@
 
   /* :ng-deep is used to style the inner elements of the modal.*/
   /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
-  ::ng-deep .translations-rte-output-display p {
+  .translations-rte-output-display p {
     font-size: 14px;
   }
 

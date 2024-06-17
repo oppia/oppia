@@ -17,7 +17,7 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ContextService} from 'services/context.service';
 import {EntityBulkTranslationsBackendApiService} from '../services/entity-bulk-translations-backend-api.service';
@@ -25,6 +25,13 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {ChangeListService} from '../services/change-list.service';
+import {
+  ModifyTranslationOpportunity,
+  TranslationModalComponent,
+  TranslationOpportunity,
+} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
+import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
 interface LanguageCodeToContentTranslations {
   [language_code: string]: TranslatedContent;
@@ -36,18 +43,25 @@ interface LanguageCodeToContentTranslations {
 })
 export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   @Input() contentId!: string;
+  @Input() contentValue!: string;
   explorationId!: string;
   explorationVersion!: number;
   contentTranslations: LanguageCodeToContentTranslations = {};
   allExistingTranslationsHaveBeenRemoved: boolean = false;
+  languageIsCheckedStatusDict: {
+    [language_code: string]: boolean;
+  } = {};
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
+    private ngbModal: NgbModal,
     private contextService: ContextService,
     private entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService,
     private languageUtilService: LanguageUtilService,
     private entityTranslationsService: EntityTranslationsService,
-    private changeListService: ChangeListService
+    private changeListService: ChangeListService,
+    private translationLanguageService: TranslationLanguageService,
+    private stateEditorService: StateEditorService
   ) {
     super(ngbActiveModal);
   }
@@ -105,6 +119,54 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
             }
           }
         });
+    }
+
+    Object.keys(this.contentTranslations).forEach(language_code => {
+      this.languageIsCheckedStatusDict[language_code] = false;
+    });
+  }
+
+  openTranslationEditor(languageCode: string) {
+    const modalRef = this.ngbModal.open(TranslationModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+    });
+
+    this.translationLanguageService.setActiveLanguageCode(languageCode);
+    const modifyTranslationOpportunity: ModifyTranslationOpportunity = {
+      id: this.explorationId,
+      heading: this.stateEditorService.getActiveStateName(),
+      subheading: 'Update Translation',
+      textToTranslate: this.contentValue,
+      activeWrittenTranslation:
+        this.contentTranslations[languageCode].translation,
+    };
+    modalRef.componentInstance.modifyTranslationOpportunity =
+      modifyTranslationOpportunity;
+
+    modalRef.result.then(result => {
+      if (result) {
+        this.contentTranslations[languageCode].translation = result;
+      }
+    });
+  }
+
+  confirm() {
+    console.log(this.languageIsCheckedStatusDict);
+    for (let language in this.contentTranslations) {
+      if (this.languageIsCheckedStatusDict[language] === true) {
+        this.changeListService.editTranslation(
+          this.contentId,
+          language,
+          new TranslatedContent(
+            this.contentTranslations[language].translation,
+            this.contentTranslations[language].dataFormat,
+            false
+          )
+        );
+      } else {
+        this.changeListService.markTranslationsAsNeedingUpdate(this.contentId);
+      }
     }
   }
 
