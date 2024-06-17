@@ -22,6 +22,7 @@ import {showMessage} from '../common/show-message';
 import {error} from 'console';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
+const baseUrl = testConstants.URLs.BaseURL;
 
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
@@ -116,6 +117,8 @@ const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 const subscriberCountLabel = '.e2e-test-oppia-total-subscribers';
 const subscriberTabButton = '.e2e-test-subscription-tab';
 const subscriberCard = '.e2e-test-subscription-card';
+const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
+const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
 
 export class ExplorationEditor extends BaseUser {
   /**
@@ -130,7 +133,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to exploration editor.
    */
   async navigateToExplorationEditorPage(): Promise<void> {
-    await this.clickOn(createExplorationButton);
+    await this.clickAndWaitForNavigation(createExplorationButton);
   }
 
   /**
@@ -949,6 +952,39 @@ export class ExplorationEditor extends BaseUser {
       showMessage(`User ${username} is a subscriber.`);
     } else {
       throw new Error(`User ${username} is not a subscriber.`);
+    }
+  }
+
+  /**
+   * Navigates to the exploration page and starts playing the exploration.
+   * @param {string} explorationId - The ID of the exploration to play.
+   */
+  async playExploration(explorationId: string): Promise<void> {
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
+      this.page.goto(`${baseUrl}/explore/${explorationId}`),
+    ]);
+  }
+
+  /**
+   * Gives feedback on the exploration.
+   * @param {string} feedback - The feedback to give on the exploration.
+   */
+  async giveFeedback(feedback: string): Promise<void> {
+    await this.page.waitForSelector('nav-options', {visible: true});
+    await this.clickOn(feedbackPopupSelector);
+    await this.page.waitForSelector(feedbackTextarea, {visible: true});
+    await this.type(feedbackTextarea, feedback);
+    await this.clickOn('Submit');
+
+    try {
+      await this.page.waitForFunction(
+        'document.querySelector(".oppia-feedback-popup-container") !== null',
+        {timeout: 5000}
+      );
+      showMessage('Feedback submitted successfully');
+    } catch (error) {
+      throw new Error('Feedback was not successfully submitted');
     }
   }
 }

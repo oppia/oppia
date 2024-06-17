@@ -1,5 +1,7 @@
 {
 	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "Tentang Yayasan Oppia",
+	"I18N_ABOUT_FOUNDATION_PAGE_CREATING_BUTTON": "PELAJARI LEBIH LANJUT TENTANG OPPIA",
+	"I18N_ABOUT_FOUNDATION_PAGE_HEADING": "Yayasan Oppia",
 	"I18N_ABOUT_FOUNDATION_PAGE_TITLE": "Tentang Yayasan Oppia | Oppia",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK": "Dapatkan umpan balik",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK_TEXT": "untuk meningkatkan penjelajahan Anda",
@@ -283,7 +285,7 @@
 	"I18N_PREFERENCES_BREADCRUMB": "Preferensi",
 	"I18N_PREFERENCES_CANCEL_BUTTON": "Batal",
 	"I18N_PREFERENCES_CHANGE_PICTURE": "Ganti gambar profil",
-	"I18N_PREFERENCES_EMAIL": "Email",
+	"I18N_PREFERENCES_EMAIL": "Surel",
 	"I18N_PREFERENCES_EMAIL_EXPLAIN": "Hanya moderator dan admin situs yang dapat melihat ini.",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Terima berita dan pemberitahuan mengenai situs ini",
 	"I18N_PREFERENCES_HEADING": "Preferensi",
