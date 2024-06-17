@@ -420,6 +420,9 @@
     column-gap: 8px;
     row-gap: 16px;
   }
+  .about-page .feature-panel.free-of-cost-panel {
+    padding-bottom: 46px;
+  }
 }
 @media only screen and (max-width: 361px) {
   .about-page .oppia-about-platform-section {
