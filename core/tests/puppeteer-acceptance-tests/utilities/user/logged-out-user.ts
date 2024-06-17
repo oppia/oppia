@@ -61,6 +61,11 @@ const allowedVolunteerFormUrls = [
   `${volunteerFormUrl}?usp=send_form`,
   volunteerFormShortUrl,
 ];
+const allowedPartnershipsFormUrls = [
+  partnershipsFormShortUrl,
+  partnershipsFormUrl,
+  `${partnershipsFormUrl}?usp=send_form`,
+];
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const navbarLearnTabBasicMathematicsButton =
@@ -1227,19 +1232,13 @@ export class LoggedOutUser extends BaseUser {
    * The button is in the first section of the page.
    */
   async clickPartnerWithUsButtonInPartnershipsPage(): Promise<void> {
-    const allowedUrls = [
-      partnershipsFormShortUrl,
-      partnershipsFormUrl,
-      `${partnershipsFormUrl}?usp=send_form`,
-    ];
-
     // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
     // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
     // control.So we need to check for all the 3 URLs as all of them are valid.
     await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
       partnerWithUsButtonAtTheTopOfPartnershipsPage,
       'Partner With Us button at the bottom of the Partnerships page',
-      allowedUrls,
+      allowedPartnershipsFormUrls,
       'Partnerships Google Form'
     );
   }
@@ -1449,12 +1448,6 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Partnerships Google form.
    */
   async clickPartnerWithUsButtonInAboutPage(): Promise<void> {
-    const allowedUrls = [
-      partnershipsFormShortUrl,
-      partnershipsFormUrl,
-      `${partnershipsFormUrl}?usp=send_form`,
-    ];
-
     const partnerTab = this.isViewportAtMobileWidth()
       ? partnerMobileTabInAboutPage
       : partnerDesktopTabInAboutPage;
@@ -1470,7 +1463,7 @@ export class LoggedOutUser extends BaseUser {
     await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
       partnerWithUsButtonInAboutPage,
       'Partner With Us button at the bottom of the Partnerships page',
-      allowedUrls,
+      allowedPartnershipsFormUrls,
       'Partnerships Google Form'
     );
   }
