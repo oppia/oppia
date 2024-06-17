@@ -86,8 +86,7 @@ export default {
     VolunteerFormShortUrl: 'https://forms.gle/rhFYoLLSFr3JEZHy8',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
     ProfilePagePrefix: 'http://localhost:8181/profile',
-    OppiaAnnounceGoogleGroup:
-      'https://groups.google.com/forum/#!forum/oppia-announce',
+    OppiaAnnounceGoogleGroup: 'https://groups.google.com/g/oppia-announce',
   },
 
   Dashboard: {
