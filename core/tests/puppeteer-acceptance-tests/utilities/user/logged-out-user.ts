@@ -127,6 +127,7 @@ const mobileSidebarExpandGetInvolvedMenuButton =
   'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
 const mobileSidebarGetInvolvedMenuPartnershipsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-partnerships-button';
+const carouselSlideSelector = '[data-test="mat-card-content"]';
 const mobileSidebarGetInvolvedMenuVolunteerButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-volunteer-button';
 const mobileSidevbarGetInvolvedMenuDonateButton =
@@ -1314,9 +1315,10 @@ export class LoggedOutUser extends BaseUser {
       : readBlogPostDesktopButtonInPartnershipsPage;
 
     if (this.isViewportAtMobileWidth()) {
-      const matCardContentSelector = '[data-test="mat-card-content"]';
-      await this.page.waitForSelector(matCardContentSelector, {visible: true});
-      await this.page.click(matCardContentSelector);
+      // Waits for the visibility of the 'mat-card-content' that contains the button to be clicked
+      // and clicks on it. This action halts the automatic scrolling of slides in the carousel.
+      await this.page.waitForSelector(carouselSlideSelector, {visible: true});
+      await this.page.click(carouselSlideSelector);
       await this.page.waitForSelector(readBlogPostButtonInPartnershipsPage, {
         visible: true,
       });
