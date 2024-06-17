@@ -24,9 +24,10 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {FullExpandAccordionComponent} from './accordion/full-expand-accordion.component';
-import {SharedComponentsModule} from 'components/shared-component.module';
+import {MatIconModule} from '@angular/material/icon';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {FullExpandAccordionComponent} from './accordion/full-expand-accordion.component';
+import {PrimaryButtonComponent} from '../../components/button-directives/primary-button.component';
 
 class MockWindowRef {
   nativeWindow = {
@@ -54,8 +55,9 @@ describe('About Page', () => {
         AboutPageComponent,
         MockTranslatePipe,
         FullExpandAccordionComponent,
+        PrimaryButtonComponent,
       ],
-      imports: [SharedComponentsModule, NgbModule],
+      imports: [NgbModule, MatIconModule],
       providers: [
         SiteAnalyticsService,
         UrlInterpolationService,
@@ -80,18 +82,17 @@ describe('About Page', () => {
     expect(component).toBeDefined();
   });
 
-  it('should instantiate the correct data for the features accrodion', () => {
-    expect(component.featuresData.length).toEqual(
-      component.panelIsCollapsed.length
-    );
-    expect(component.panelIsCollapsed.every(value => value)).toBeTrue();
+  it('should ensure all items in featuresData array have panelIsCollapsed property as true', () => {
+    expect(
+      component.featuresData.every(item => item.panelIsCollapsed === true)
+    ).toBeTrue();
   });
 
   it('should toggle the panels at given index', () => {
     component.expandPanel(1);
-    expect(component.panelIsCollapsed[1]).toBeFalse();
+    expect(component.featuresData[1].panelIsCollapsed).toBeFalse();
     component.closePanel(1);
-    expect(component.panelIsCollapsed[1]).toBeTrue();
+    expect(component.featuresData[1].panelIsCollapsed).toBeTrue();
   });
 
   it('should return correct static image url when calling getStaticImageUrl', () => {

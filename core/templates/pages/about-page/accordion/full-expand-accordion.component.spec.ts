@@ -20,7 +20,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {FullExpandAccordionComponent} from './full-expand-accordion.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {SharedComponentsModule} from 'components/shared-component.module';
+import {MatIconModule} from '@angular/material/icon';
 
 describe('FullExpandAccordionComponent', () => {
   let component: FullExpandAccordionComponent;
@@ -29,7 +29,7 @@ describe('FullExpandAccordionComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [FullExpandAccordionComponent, MockTranslatePipe],
-      imports: [NgbModule, SharedComponentsModule],
+      imports: [NgbModule, MatIconModule],
     }).compileComponents();
   });
 
@@ -42,12 +42,14 @@ describe('FullExpandAccordionComponent', () => {
         text: 'Text 1',
         customPanelClassNames: ['class1'],
         customTitleClassNames: ['class1', 'class2'],
+        panelIsCollapsed: true,
       },
       {
         title: 'Title 2',
         text: 'Text 2',
         customPanelClassNames: ['class1'],
         customTitleClassNames: ['class1', 'class2'],
+        panelIsCollapsed: true,
       },
     ];
     component.listContainerCustomClasses = ['class1', 'class2'];

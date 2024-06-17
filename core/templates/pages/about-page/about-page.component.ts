@@ -37,18 +37,21 @@ export class AboutPageComponent {
       text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT1',
       customPanelClassNames: ['feature-panel'],
       customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
+      panelIsCollapsed: true,
     },
     {
       title: 'I18N_ABOUT_PAGE_FEATURE_TITLE2',
       text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT2',
       customPanelClassNames: ['feature-panel'],
       customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
+      panelIsCollapsed: true,
     },
     {
       title: 'I18N_ABOUT_PAGE_FEATURE_TITLE3',
       text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT3',
       customPanelClassNames: ['feature-panel'],
       customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
+      panelIsCollapsed: true,
     },
     {
       title: 'I18N_ABOUT_PAGE_FEATURE_TITLE4',
@@ -59,31 +62,7 @@ export class AboutPageComponent {
         'free-of-cost-title',
         'oppia-about-platform-subtext',
       ],
-    },
-  ];
-
-  panelIsCollapsed: boolean[] = [true, true, true, true];
-
-  features = [
-    {
-      i18nDescription: 'I18N_ABOUT_PAGE_AUDIO_SUBTITLES_FEATURE',
-      imageFilename: '/about/cc.svg',
-    },
-    {
-      i18nDescription: 'I18N_ABOUT_PAGE_LESSON_FEATURE',
-      imageFilename: '/about/lesson_icon.svg',
-    },
-    {
-      i18nDescription: 'I18N_ABOUT_PAGE_MOBILE_FEATURE',
-      imageFilename: '/about/mobile_alt_solid.svg',
-    },
-    {
-      i18nDescription: 'I18N_ABOUT_PAGE_WIFI_FEATURE',
-      imageFilename: '/about/wifi_solid.svg',
-    },
-    {
-      i18nDescription: 'I18N_ABOUT_PAGE_LANGUAGE_FEATURE',
-      imageFilename: '/about/language_icon.svg',
+      panelIsCollapsed: true,
     },
   ];
 
@@ -109,11 +88,11 @@ export class AboutPageComponent {
   }
 
   expandPanel(index: number): void {
-    this.panelIsCollapsed[index] = false;
+    this.featuresData[index].panelIsCollapsed = false;
   }
 
   closePanel(index: number): void {
-    this.panelIsCollapsed[index] = true;
+    this.featuresData[index].panelIsCollapsed = true;
   }
 }
 angular

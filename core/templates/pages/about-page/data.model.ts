@@ -22,4 +22,5 @@ export interface AccordionPanelData {
   image?: string;
   customPanelClassNames: string[];
   customTitleClassNames: string[];
+  panelIsCollapsed: boolean;
 }

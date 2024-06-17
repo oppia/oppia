@@ -43,13 +43,13 @@
       <div class="oppia-about-features-list oppia-about-non-desktop-content">
         <div *ngFor="let panel of featuresData; let i = index"
              class="oppia-about-accordion-item">
-          <button (click)="expandPanel(i)" *ngIf="panelIsCollapsed[i]"
+          <button (click)="expandPanel(i)" *ngIf="featuresData[i].panelIsCollapsed"
                   class="oppia-about-accordion-title-container"
                   [ngClass]="panel.customTitleClassNames">
             <p class="oppia-about-platform-subtext"> {{ panel.title | translate }} </p>
             <mat-icon> add </mat-icon>
           </button>
-          <div [(ngbCollapse)]="panelIsCollapsed[i]" [animation]="false" class="collapse-container panel-container"
+          <div [(ngbCollapse)]="featuresData[i].panelIsCollapsed" [animation]="false" class="collapse-container panel-container"
             [ngClass]="panel.customPanelClassNames">
             <div class="oppia-about-accordion-title-container ">
               <p class="oppia-about-accordion-panel-title oppia-about-platform-subtext"> {{ panel.title | translate }} </p>
