@@ -43,6 +43,7 @@ import {
   BlogPostSummary,
   BlogPostSummaryBackendDict,
 } from 'domain/blog/blog-post-summary.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AlertsService} from 'services/alerts.service';
 import {UserService} from 'services/user.service';
 // This throws "TS2307". We need to
