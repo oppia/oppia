@@ -42,12 +42,10 @@ export default {
     CreatorDashboard: 'http://localhost:8181/creator-dashboard',
     CreatorDashboardCreateMode:
       'http://localhost:8181/creator-dashboard?mode=create',
-    CreatingAnExploration:
-      'https://www.oppia.org.github.io/#/CreatingAnExploration',
+    CreatingAnExploration: 'https://oppia.github.io/#/CreatingAnExploration',
     Donate: 'http://localhost:8181/donate',
     DonateWithThanksModal: 'http://localhost:8181/donate?thanks=',
-    EmbeddingAnExploration:
-      'https://www.oppia.org.github.io/#/EmbeddingAnExploration',
+    EmbeddingAnExploration: 'https://oppia.github.io/#/EmbeddingAnExploration',
     ExternalLink61MillionChildren:
       'https://uis.unesco.org/en/news/world-poverty-could-be-cut-half-' +
       'if-all-adults-completed-secondary-education',
@@ -78,7 +76,7 @@ export default {
     PartnershipsFormShortUrl: 'https://forms.gle/Y71U8FdhQwZpicJj8',
     PrivacyPolicy: 'http://localhost:8181/privacy-policy',
     Teach: 'http://localhost:8181/teach',
-    TermsOfService: 'http://localhost:8181/terms',
+    Terms: 'http://localhost:8181/terms',
     TopicAndSkillsDashboard:
       'http://localhost:8181/topics-and-skills-dashboard',
     ProgrammingWithCarla: 'https://www.oppia.org/collection/inDXV0w8-p1C',

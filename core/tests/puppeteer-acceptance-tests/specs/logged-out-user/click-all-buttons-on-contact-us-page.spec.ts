@@ -61,13 +61,13 @@ describe('Logged-out User', function () {
   it(
     'should have a mailto link for "admin@oppia.org" in the other inquiries section.',
     async function () {
-      await loggedOutUser.clickAdminEmailLinkInContactUsPage();
+      await loggedOutUser.verifyAdminEmailLinkInContactUsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it('should have a mailto link for "press@oppia.org" in the other inquiries section.', async function () {
-    await loggedOutUser.clickPressEmailLinkInContactUsPage();
+    await loggedOutUser.verifyPressEmailLinkInContactUsPage();
   });
 
   afterAll(async function () {

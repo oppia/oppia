@@ -54,7 +54,7 @@ const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
 const sourceUnescoUrl = testConstants.URLs.ExternalLinkSourceUnesco;
 const teachUrl = testConstants.URLs.Teach;
-const termsOfServiceUrl = testConstants.URLs.TermsOfService;
+const termsUrl = testConstants.URLs.Terms;
 const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
 const volunteerFormShortUrl = testConstants.URLs.VolunteerFormShortUrl;
 const volunteerFormUrl = testConstants.URLs.VolunteerForm;
@@ -183,9 +183,9 @@ const explorationCard = '.e2e-test-exploration-dashboard-card';
 
 const libraryExplorationsGroupSelector = '.oppia-library-group';
 
-const privacyPolicyLinkInTosPage = '.e2e-test-privacy-policy-link';
-const ccLicenseLinkInTosPage = '.e2e-test-cc-license-link';
-const googleGroupSignUpLinkInTosPage =
+const privacyPolicyLinkInTermsPage = '.e2e-test-privacy-policy-link';
+const ccLicenseLinkInTermsPage = '.e2e-test-cc-license-link';
+const googleGroupSignUpLinkInTermsPage =
   '.e2e-test-oppia-announce-google-group-link';
 
 const emailLinkSelector = '.oppia-contact-mail';
@@ -265,10 +265,10 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to navigate to the Terms of Service page.
+   * Function to navigate to the /Terms page.
    */
-  async navigateToTosPage(): Promise<void> {
-    await this.goto(termsOfServiceUrl);
+  async navigateToTermsPage(): Promise<void> {
+    await this.goto(termsUrl);
   }
 
   /**
@@ -297,29 +297,6 @@ export class LoggedOutUser extends BaseUser {
         `${buttonName} should open the ${expectedDestinationPageName} page`
       )
       .toBe(expectedDestinationPageUrl);
-  }
-
-  /**
-   * Clicks a link based on its visible text and verifies that the resulting navigation
-   * in the same tab leads to the expected URL.
-   */
-  private async clickLinkAnchorInSameTab(
-    anchorInnerText: string,
-    expectedDestinationPageUrl: string
-  ): Promise<void> {
-    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
-
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['networkidle2', 'load']}),
-      this.clickOn(anchorInnerText),
-    ]);
-
-    const currentUrl = this.page.url();
-    if (currentUrl !== expectedDestinationPageUrl) {
-      throw new Error(
-        `Navigation led to ${currentUrl} instead of ${expectedDestinationPageUrl}`
-      );
-    }
   }
 
   /**
@@ -1432,46 +1409,46 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Clicks on the Privacy Policy link in the Terms of Service page and
+   * Clicks on the Privacy Policy link in the /terms page and
    * checks if it opens the correct URL.
    */
-  async clickPrivacyPolicyLinkInTosPage(): Promise<void> {
-    await this.page.waitForSelector(privacyPolicyLinkInTosPage, {
+  async clickPrivacyPolicyLinkInTermsPage(): Promise<void> {
+    await this.page.waitForSelector(privacyPolicyLinkInTermsPage, {
       visible: true,
     });
     await this.clickButtonToNavigateToNewPage(
-      privacyPolicyLinkInTosPage,
-      'Privacy Policy link in the Terms of Service page',
+      privacyPolicyLinkInTermsPage,
+      'Privacy Policy link in the terms page',
       privacyPolicyUrl,
       'Privacy Policy'
     );
   }
 
   /**
-   * Clicks on the License link in the Terms of Service page and checks
+   * Clicks on the License link in the /terms page and checks
    * if it opens the correct URL.
    */
-  async clickLicenseLinkInTosPage(): Promise<void> {
-    await this.page.waitForSelector(ccLicenseLinkInTosPage, {visible: true});
+  async clickLicenseLinkInTermsPage(): Promise<void> {
+    await this.page.waitForSelector(ccLicenseLinkInTermsPage, {visible: true});
     await this.clickButtonToNavigateToNewPage(
-      ccLicenseLinkInTosPage,
-      'License link in the Terms of Service page',
+      ccLicenseLinkInTermsPage,
+      'License link in the terms page',
       ccLicenseUrl,
       'License'
     );
   }
 
   /**
-   * Clicks on the Google Group Sign Up link in the Terms of Service page and checks
+   * Clicks on the Google Group Sign Up link in the /terms page and checks
    * if it opens the correct URL.
    */
-  async clickGoogleGroupSignUpLinkInTosPage(): Promise<void> {
-    await this.page.waitForSelector(googleGroupSignUpLinkInTosPage, {
+  async clickGoogleGroupSignUpLinkInTermsPage(): Promise<void> {
+    await this.page.waitForSelector(googleGroupSignUpLinkInTermsPage, {
       visible: true,
     });
     await this.clickButtonToNavigateToNewPage(
-      googleGroupSignUpLinkInTosPage,
-      'Google Group Sign Up link in the Terms of Service page',
+      googleGroupSignUpLinkInTermsPage,
+      'Google Group Sign Up link in the terms page',
       OppiaAnnounceGoogleGroupUrl,
       'Google Group Sign Up'
     );
@@ -1482,7 +1459,12 @@ export class LoggedOutUser extends BaseUser {
    * it navigates to the correct URL.
    */
   async clickDonateTodayButtonInContactUsPage(): Promise<void> {
-    await this.clickLinkAnchorInSameTab('DONATE TODAY', donateUrl);
+    await this.clickButtonToNavigateToNewPage(
+      'DONATE TODAY',
+      'DONATE TODAY button',
+      donateUrl,
+      'Donate'
+    );
   }
 
   /**
@@ -1490,7 +1472,12 @@ export class LoggedOutUser extends BaseUser {
    * it navigates to the correct URL.
    */
   async clickBecomeAPartnerButtonInContactUsPage(): Promise<void> {
-    await this.clickLinkAnchorInSameTab('BECOME A PARTNER', partnershipsUrl);
+    await this.clickButtonToNavigateToNewPage(
+      'BECOME A PARTNER',
+      'BECOME A PARTNER button',
+      partnershipsUrl,
+      'Partnerships'
+    );
   }
 
   /**
@@ -1498,30 +1485,35 @@ export class LoggedOutUser extends BaseUser {
    * it navigates to the correct URL.
    */
   async clickVolunteerButtonInContactUsPage(): Promise<void> {
-    await this.clickLinkAnchorInSameTab('BECOME A VOLUNTEER', volunteerUrl);
+    await this.clickButtonToNavigateToNewPage(
+      'BECOME A VOLUNTEER',
+      'BECOME A VOLUNTEER button',
+      volunteerUrl,
+      'Volunteer'
+    );
   }
 
   /**
-   * Clicks the first admin email link in the Contact Us page and checks that it navigates
-   * to the correct mailto URL.
+   * Checks the admin email link in the Contact Us page and verifies
+   * that it navigates to the correct mailto URL.
    */
-  async clickAdminEmailLinkInContactUsPage(): Promise<void> {
+  async verifyAdminEmailLinkInContactUsPage(): Promise<void> {
     await this.page.waitForSelector(emailLinkSelector);
     const href = await this.page.$eval(emailLinkSelector, el =>
       el.getAttribute('href')
     );
     if (href !== 'mailto:admin@oppia.org') {
       throw new Error(
-        `Email link has href ${href} instead of mailto:admin@oppia.org`
+        `Email link has href "${href}" instead of "mailto:admin@oppia.org"`
       );
     }
   }
 
   /**
-   * Clicks the second press email link in the Contact Us page and checks that it navigates
-   * to the correct mailto URL.
+   * Checks the second press email link in the Contact Us page and verifies
+   * that it navigates to the correct mailto URL.
    */
-  async clickPressEmailLinkInContactUsPage(): Promise<void> {
+  async verifyPressEmailLinkInContactUsPage(): Promise<void> {
     await this.page.waitForSelector(emailLinkSelector);
     const emailLinks = await this.page.$$(emailLinkSelector);
 
@@ -1534,6 +1526,55 @@ export class LoggedOutUser extends BaseUser {
         `Email link has href ${href} instead of mailto:press@oppia.org`
       );
     }
+  }
+
+  /**
+   * Clicks on a option of Terms of Use bookmark menu and waits for the page to scroll
+   * to the corresponding section.
+   */
+  async clickBookmarkInTermsPage(bookmark: string): Promise<void> {
+    try {
+      await this.page.waitForXPath(`//a[text()="${bookmark}"]`, {
+        visible: true,
+      });
+      const linkToClick = await this.page.$x(`//a[text()="${bookmark}"]`);
+      if (linkToClick.length > 0) {
+        await this.waitForElementToBeClickable(linkToClick[0]);
+        await linkToClick[0].click();
+      } else {
+        throw new Error(`Link not found: ${bookmark}`);
+      }
+
+      // Update the bookmark if it's "Hosted Created Content and IP" to match the heading of the
+      // corresponding section.
+      if (bookmark === 'Hosted Created Content and IP') {
+        bookmark = 'Hosted Created Content and Intellectual Property';
+      }
+
+      await this.page.waitForFunction(
+        (bookmark: string) => {
+          const element = document.evaluate(
+            `//h2[text()="${bookmark}"]`,
+            document,
+            null,
+            XPathResult.FIRST_ORDERED_NODE_TYPE,
+            null
+          ).singleNodeValue as HTMLElement;
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            return rect.top >= 0 && rect.bottom <= window.innerHeight;
+          }
+          return false;
+        },
+        {},
+        bookmark
+      );
+    } catch (error) {
+      error.message =
+        `Failed to scroll to bookmark: ${bookmark}. ` + error.message;
+      throw error;
+    }
+    showMessage(`Scrolled successfully to the bookmark: ${bookmark}`);
   }
 
   /**
