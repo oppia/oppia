@@ -148,21 +148,20 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   // Update the description, numSelections and summary fields of the
   // relevant entry of selectionDetails.
   updateSelectionDetails(itemsType: string): void {
-    let selectionDetails = this.selectionDetails;
-    let itemsName = selectionDetails[itemsType].itemsName;
-    let masterList = selectionDetails[itemsType].masterList;
+    let itemsName = this.selectionDetails[itemsType].itemsName;
+    let masterList = this.selectionDetails[itemsType].masterList;
 
     let selectedItems = [];
     for (let i = 0; i < masterList.length; i++) {
-      if (selectionDetails[itemsType].selections[masterList[i].id]) {
+      if (this.selectionDetails[itemsType].selections[masterList[i].id]) {
         selectedItems.push(masterList[i].text);
       }
     }
 
     let totalCount = selectedItems.length;
-    selectionDetails[itemsType].numSelections = totalCount;
+    this.selectionDetails[itemsType].numSelections = totalCount;
 
-    selectionDetails[itemsType].summary =
+    this.selectionDetails[itemsType].summary =
       totalCount === 0
         ? 'I18N_LIBRARY_ALL_' + itemsName.toUpperCase()
         : totalCount === 1
@@ -175,9 +174,9 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       for (let i = 0; i < selectedItems.length; i++) {
         translatedItems.push(this.translateService.instant(selectedItems[i]));
       }
-      selectionDetails[itemsType].description = translatedItems.join(', ');
+      this.selectionDetails[itemsType].description = translatedItems.join(', ');
     } else {
-      selectionDetails[itemsType].description =
+      this.selectionDetails[itemsType].description =
         'I18N_LIBRARY_ALL_' + itemsName.toUpperCase() + '_SELECTED';
     }
   }
@@ -203,16 +202,15 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   onSearchQueryChangeExec(): void {
-    let selectionDetails = this.selectionDetails;
     let searchUrlQueryString = this.searchService.getSearchUrlQueryString(
       this.searchQuery,
-      selectionDetails.categories.selections,
-      selectionDetails.languageCodes.selections
+      this.selectionDetails.categories.selections,
+      this.selectionDetails.languageCodes.selections
     );
     this.searchService.executeSearchQuery(
       this.searchQuery,
-      selectionDetails.categories.selections,
-      selectionDetails.languageCodes.selections,
+      this.selectionDetails.categories.selections,
+      this.selectionDetails.languageCodes.selections,
       () => {
         let url = new URL(this.windowRef.nativeWindow.location.toString());
         let siteLangCode: string | null = url.searchParams.get('lang');
@@ -234,13 +232,12 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   updateSearchFieldsBasedOnUrlQuery(): void {
-    let selectionDetails = this.selectionDetails;
-    selectionDetails.categories.selections = {};
-    selectionDetails.languageCodes.selections = {};
+    this.selectionDetails.categories.selections = {};
+    this.selectionDetails.languageCodes.selections = {};
 
     let newQuery = this.searchService.updateSearchFieldsBasedOnUrlQuery(
       this.windowRef.nativeWindow.location.search,
-      selectionDetails
+      this.selectionDetails
     );
 
     if (this.searchQuery !== newQuery) {
@@ -259,18 +256,17 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     // would generate FOUC for languages other than English. As an
     // exception, we translate them here and update the translation
     // every time the language is changed.
-    let selectionDetails = this.selectionDetails;
     this.searchBarPlaceholder = this.translateService.instant(
       'I18N_LIBRARY_SEARCH_PLACEHOLDER'
     );
     // 'messageformat' is the interpolation method for plural forms.
     // http://angular-translate.github.io/docs/#/guide/14_pluralization.
     this.categoryButtonText = this.translateService.instant(
-      selectionDetails.categories.summary,
+      this.selectionDetails.categories.summary,
       {...this.translationData, messageFormat: true}
     );
     this.languageButtonText = this.translateService.instant(
-      selectionDetails.languageCodes.summary,
+      this.selectionDetails.languageCodes.summary,
       {...this.translationData, messageFormat: true}
     );
   }
