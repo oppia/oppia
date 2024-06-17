@@ -219,6 +219,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'exploration-editor/create-exploration-and-change-basic-settings',
     'exploration-editor/load-complete-and-restart-exploration-preview',
     'exploration-editor/save-draft-publish-and-discard-the-changes',
+    'logged-in-user/subscribe-to-creator-and-'
+    'view-all-explorations-by-that-creator',
     'logged-out-user/check-all-user-flow-of-donor',
     'logged-out-user/check-all-user-flow-of-parent-teacher',
     'logged-out-user/check-all-user-flow-of-partner',
@@ -235,13 +237,13 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/click-all-links-on-get-started-page',
     'logged-out-user/click-all-links-on-privacy-policy-page',
     'logged-out-user/click-all-links-on-terms-page',
-    'logged-in-user/subscribe-to-creator-and-view-all-explorations-'
-       'by-that-creator',
+    'moderator/edit-featured-activities-list',
+    'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
+    'super-admin/edit-user-roles',
+    'super-admin/load-dummy-data-in-dev-mode',
     'translation-admin/add-and-remove-translation-rights',
     'voiceover-admin/add-voiceover-artist-to-an-exploration',
-    'moderator/view-recent-commits-and-feedback-messages',
-    'moderator/edit-featured-activities-list'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181
