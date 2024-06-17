@@ -16,12 +16,20 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
+import puppeteer, {
+  Page,
+  Frame,
+  Browser,
+  Viewport,
+  ElementHandle,
+} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
+import {showMessage} from './show-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
+const baseURL = testConstants.URLs.BaseURL;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
@@ -123,6 +131,16 @@ export class BaseUser {
       });
 
     return this.page;
+  }
+
+  /**
+   * Checks if the application is in development mode.
+   * @returns {Promise<boolean>} Returns true if the application is in development mode,
+   * false otherwise.
+   */
+  async isInProdMode(): Promise<boolean> {
+    const prodMode = process.env.PROD_ENV === 'true';
+    return prodMode;
   }
 
   /**
@@ -304,6 +322,101 @@ export class BaseUser {
       await this.page.click(selector);
     }
   }
+
+  /**
+   * The function clicks the element using the text on the button
+   * and wait until the new page is fully loaded.
+   */
+  async clickAndWaitForNavigation(selector: string): Promise<void> {
+    /** Normalize-space is used to remove the extra spaces in the text.
+     * Check the documentation for the normalize-space function here :
+     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
+    const [button] = await this.page.$x(
+      `\/\/*[contains(text(), normalize-space('${selector}'))]`
+    );
+    // If we fail to find the element by its XPATH, then the button is undefined and
+    // we try to find it by its CSS selector.
+    if (button !== undefined) {
+      await this.waitForElementToBeClickable(button);
+      await Promise.all([
+        this.page.waitForNavigation({
+          waitUntil: ['networkidle2', 'load'],
+        }),
+        button.click(),
+      ]);
+    } else {
+      await this.waitForElementToBeClickable(selector);
+      await Promise.all([
+        this.page.waitForNavigation({
+          waitUntil: ['networkidle2', 'load'],
+        }),
+        this.page.click(selector),
+      ]);
+    }
+  }
+
+  /**
+   * Clicks an element on the page.
+   * @param {Page | Frame | ElementHandle} context - The Puppeteer context, usually a Page or Frame.
+   * @param {string} selector - The CSS selector of the element to click.
+   */
+  async clickElement(
+    context: Page | Frame | ElementHandle,
+    selector: string
+  ): Promise<void> {
+    try {
+      await context.waitForSelector(selector);
+      const element = await context.$(selector);
+      if (!element) {
+        throw new Error(`Element ${selector} not found`);
+      }
+      await this.waitForElementToBeClickable(element);
+      await element.click();
+    } catch (error) {
+      error.message = `Failed to click on element ${selector}: ${error.message}`;
+      throw error;
+    }
+  }
+
+  /**
+   * This function retrieves the text content of a specified element.
+   */
+  async getElementText(selector: string): Promise<string> {
+    await this.page.waitForSelector(selector);
+    const element = await this.page.$(selector);
+    if (element === null) {
+      throw new Error(`No element found for the selector: ${selector}`);
+    }
+    const textContent = await this.page.evaluate(el => el.textContent, element);
+    return textContent ?? '';
+  }
+
+  /**
+   * Checks if a given word is present on the page.
+   * This function only matches complete words, not substrings of words.
+   * For example, if the page contains "hello" and you search for "hell",
+   * it will return false.
+   * @param {string} word - The word to check.
+   */
+  async isTextPresentOnPage(word: string): Promise<boolean> {
+    try {
+      await this.page.waitForFunction(
+        (word: string) => {
+          const regex = new RegExp(`\\b${word}\\b`);
+          return regex.test(document.documentElement.outerHTML);
+        },
+        {},
+        word
+      );
+      return true;
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        return false;
+      }
+      throw new Error(`Failed to find text on page: ${error.message}`);
+    }
+  }
+
   /**
    * The function selects all text content and delete it.
    */
@@ -409,6 +522,51 @@ export class BaseUser {
    */
   getCurrentUrlWithoutParameters(): string {
     return this.page.url().split('?')[0];
+  }
+
+  /**
+   * This function checks the exploration accessibility by navigating to the
+   * exploration page based on the explorationID.
+   */
+  async expectExplorationToBeAccessibleByUrl(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('ExplorationId is null');
+    }
+    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      showMessage('Exploration is accessible with the URL, i.e. published.');
+    } catch (error) {
+      throw new Error('The exploration is not public.');
+    }
+  }
+
+  /**
+   * This function checks the exploration inaccessibility by navigating to the
+   * exploration page based on the explorationID.
+   */
+  async expectExplorationToBeNotAccessibleByUrl(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('ExplorationId is null');
+    }
+    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      throw new Error('The exploration is still public.');
+    } catch (error) {
+      showMessage('The exploration is not accessible with the URL.');
+    }
+  }
+
+  /**
+   * Waits for the page to fully load by checking the document's ready state.
+   */
+  async waitForPageToFullyLoad(): Promise<void> {
+    await this.page.waitForFunction('document.readyState === "complete"');
   }
 }
 
