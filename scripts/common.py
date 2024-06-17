@@ -219,8 +219,14 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'exploration-editor/create-exploration-and-change-basic-settings',
     'exploration-editor/load-complete-and-restart-exploration-preview',
     'exploration-editor/save-draft-publish-and-discard-the-changes',
-    'logged-out-user/click-all-buttons-on-about-page',
+    'logged-in-user/subscribe-to-creator-and-'
+    'view-all-explorations-by-that-creator',
+    'logged-out-user/check-all-user-flow-of-donor',
+    'logged-out-user/check-all-user-flow-of-parent-teacher',
+    'logged-out-user/check-all-user-flow-of-partner',
+    'logged-out-user/check-all-user-flow-of-volunteer',
     'logged-out-user/click-all-buttons-on-about-foundation-page',
+    'logged-out-user/click-all-buttons-on-about-page',
     'logged-out-user/click-all-buttons-on-donation-thanks-page',
     'logged-out-user/click-all-buttons-on-navbar',
     'logged-out-user/click-all-buttons-on-partnerships-page',
@@ -228,17 +234,13 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/click-all-buttons-on-volunteer-page',
     'logged-out-user/click-all-links-in-about-oppia-footer',
     'logged-out-user/click-all-links-on-get-started-page',
-    'logged-out-user/check-all-user-flow-of-donor',
-    'logged-out-user/check-all-user-flow-of-parent-teacher',
-    'logged-out-user/check-all-user-flow-of-partner',
-    'logged-out-user/check-all-user-flow-of-volunteer',
-    'logged-in-user/subscribe-to-creator-and-view-all-explorations-'
-       'by-that-creator',
+    'moderator/edit-featured-activities-list',
+    'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
+    'super-admin/edit-user-roles',
+    'super-admin/load-dummy-data-in-dev-mode',
     'translation-admin/add-and-remove-translation-rights',
     'voiceover-admin/add-voiceover-artist-to-an-exploration',
-    'moderator/view-recent-commits-and-feedback-messages',
-    'moderator/edit-featured-activities-list'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181

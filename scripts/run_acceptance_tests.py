@@ -144,6 +144,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             suite_name=args.suite,
             headless=args.headless,
             mobile=args.mobile,
+            prod_env=args.prod_env,
             stdout=subprocess.PIPE))
 
         print('Servers have come up.\n')
