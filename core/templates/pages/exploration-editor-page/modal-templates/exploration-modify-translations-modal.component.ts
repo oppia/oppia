@@ -165,9 +165,13 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
           )
         );
       } else {
-        this.changeListService.markTranslationsAsNeedingUpdate(this.contentId);
+        this.changeListService.markTranslationAsNeedingUpdateForLanguage(
+          this.contentId,
+          language
+        );
       }
     }
+    console.log(this.changeListService.getTranslationChangeList());
   }
 
   getLanguageName(languageCode: string): string {

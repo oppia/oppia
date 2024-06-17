@@ -40,6 +40,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {
   ExplorationChangeEditTranslation,
   ExplorationChangeMarkTranslationsNeedsUpdate,
+  ExplorationChangeMarkTranslationNeedsUpdateForLanguage,
   ExplorationChangeRemoveTranslations,
   ExplorationTranslationChange,
 } from 'domain/exploration/exploration-draft.model';
@@ -242,6 +243,7 @@ export class TranslatorOverviewComponent implements OnInit {
           entityTranslation.removeTranslation(changeDict.content_id);
           break;
         case 'mark_translations_needs_update':
+        case 'mark_translation_needs_update_for_language':
           changeDict =
             changeDict as ExplorationChangeMarkTranslationsNeedsUpdate;
           entityTranslation.markTranslationAsNeedingUpdate(
