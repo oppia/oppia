@@ -42,11 +42,11 @@ import {
   BlogHomePageData,
   SearchResponseData,
 } from 'domain/blog/blog-homepage-backend-api.service';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {Subject} from 'rxjs/internal/Subject';
 import {BlogCardComponent} from 'pages/blog-dashboard-page/blog-card/blog-card.component';
 import {TagFilterComponent} from './tag-filter/tag-filter.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {BlogHomePageConstants} from './blog-home-page.constants';
 import {
   BlogPostSummary,
