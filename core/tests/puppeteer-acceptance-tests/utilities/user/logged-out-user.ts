@@ -1244,9 +1244,10 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Partner With Us button in the Partnerships page
-   * and check if it opens the Partnerships Google form in Portuguese.
-   * The button is in the bottom section of the page.
+   * This function changes the site language based on the provided parameter,
+   * then clicks the 'Partner With Us' button in the bottom section of the Partnerships page
+   * and verifies if the Partnerships Google form opens in the specified language.
+   * @param {string} langCode - The language code to change the site language to.
    */
   async clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
     langCode: string
@@ -1428,13 +1429,13 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Volunteer form.
    */
   async clickVolunteerWithOppiaButtonInAboutPage(): Promise<void> {
+    const volunteerWithOppiaButtonInAboutPage = this.isViewportAtMobileWidth()
+      ? volunteerWithOppiaMobileButtonInAboutPage
+      : volunteerWithOppiaDesktopButtonInAboutPage;
     // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
     // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
     // control.So we need to check for all the 3 URLs in the 'allowedVolunteerFormUrls' array
     // as all of them are valid.
-    const volunteerWithOppiaButtonInAboutPage = this.isViewportAtMobileWidth()
-      ? volunteerWithOppiaMobileButtonInAboutPage
-      : volunteerWithOppiaDesktopButtonInAboutPage;
     await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
       volunteerWithOppiaButtonInAboutPage,
       'Apply To Volunteer at the top of the Volunteer page',
@@ -1451,12 +1452,12 @@ export class LoggedOutUser extends BaseUser {
     const partnerTab = this.isViewportAtMobileWidth()
       ? partnerMobileTabInAboutPage
       : partnerDesktopTabInAboutPage;
-    await this.clickOn(partnerTab);
 
     const partnerWithUsButtonInAboutPage = this.isViewportAtMobileWidth()
       ? partnerWithUsMobileButtonInAboutPage
       : partnerWithUsDesktopButtonInAboutPage;
 
+    await this.clickOn(partnerTab);
     // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
     // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
     // control.So we need to check for all the 3 URLs as all of them are valid.
@@ -1469,8 +1470,10 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Partner With Us button in the Partnerships page
-   * and check if it opens the Partnerships Google form in Portuguese.
+   * This function changes the site language based on the provided parameter,
+   * then clicks the 'Partner With Us' button on the About page, and
+   * verifies if the Partnerships Google form opens in the specified language.
+   * @param {string} langCode - The language code to change the site language to.
    */
   async clickPartnerWithUsButtonInAboutPageInGivenLanguage(
     langCode: string
@@ -1482,12 +1485,12 @@ export class LoggedOutUser extends BaseUser {
     const partnerTab = this.isViewportAtMobileWidth()
       ? partnerMobileTabInAboutPage
       : partnerDesktopTabInAboutPage;
-    await this.clickOn(partnerTab);
 
     const partnerWithUsButtonInAboutPage = this.isViewportAtMobileWidth()
       ? partnerWithUsMobileButtonInAboutPage
       : partnerWithUsDesktopButtonInAboutPage;
 
+    await this.clickOn(partnerTab);
     // Here we are not verifying the 3 URLs as we did in the English version
     // because we have put the direct translated Google Form URL in the page itself.
     // Refer core/templates/pages/partnerships-page/partnerships-page.component.ts to see how it's done.
@@ -1508,11 +1511,12 @@ export class LoggedOutUser extends BaseUser {
     const donorTab = this.isViewportAtMobileWidth()
       ? donorMobileTabInAboutPage
       : donorDesktopTabInAboutPage;
-    await this.clickOn(donorTab);
 
     const donateButtonInAboutPage = this.isViewportAtMobileWidth()
       ? donateMobileButtonInAboutPage
       : donateDesktopButtonInAboutPage;
+
+    await this.clickOn(donorTab);
     await this.clickOn(donateButtonInAboutPage);
 
     const donorBox = await this.page.waitForSelector(donorBoxIframe);
