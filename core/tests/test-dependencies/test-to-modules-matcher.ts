@@ -43,7 +43,7 @@ const COMMON_MODULES_TO_EXCLUDE: Record<string, string[]> = {
     'core/tests/test-modules-mappings/acceptance/logged-out-user/sign-in-and-save-exploration-progress.txt',
   ],
   'core/templates/pages/admin-page/admin-page.module.ts': [
-    'core/tests/test-modules-mappings/acceptance/site-admin/*',
+    'core/tests/test-modules-mappings/acceptance/super-admin/*',
   ],
   'core/templates/pages/learner-dashboard-page/learner-dashboard-page.module.ts':
     [
