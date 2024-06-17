@@ -285,11 +285,16 @@ export class SuperAdmin extends BaseUser {
    */
   async expectRoleToHaveAssignedUsers(users: string[]): Promise<void> {
     await this.clickOn(' Assigned users ');
+
     for (const user of users) {
-      const isUserPresent = await this.isTextPresentOnPage(user);
-      if (!isUserPresent) {
-        throw new Error(`User "${user}" is not assigned to the role`);
-      }
+      await this.page.waitForFunction(
+        (user: string) => {
+          const regex = new RegExp(`\\b${user}\\b`);
+          return regex.test(document.documentElement.outerHTML);
+        },
+        {},
+        user
+      );
     }
     showMessage(`"${users}" is/are assigned to the role`);
   }

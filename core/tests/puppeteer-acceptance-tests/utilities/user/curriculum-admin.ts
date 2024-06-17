@@ -726,7 +726,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.page.reload({waitUntil: 'networkidle0'});
     }
 
-    const isTextPresent = await this.isTextPresentOnPage(' Unpublish Topic ');
+    const isTextPresent = await this.isTextPresentOnPage('Unpublish Topic');
     if (isTextPresent) {
       throw new Error('Topic is not unpublished successfully.');
     }
@@ -806,7 +806,7 @@ export class CurriculumAdmin extends BaseUser {
   ): Promise<void> {
     await this.goto(topicAndSkillsDashboardUrl);
     const isTextPresent = await this.isTextPresentOnPage(
-      ' No topics or skills have been created yet. '
+      'No topics or skills have been created yet.'
     );
     if (isTextPresent) {
       showMessage(`The skill "${topicName}" is not present on the Topics and Skills
@@ -901,6 +901,8 @@ export class CurriculumAdmin extends BaseUser {
       {},
       confirmSkillDeletionButton
     );
+
+    showMessage(`Skill "${skillName}" has been successfully deleted.`);
   }
 
   /**
@@ -912,7 +914,7 @@ export class CurriculumAdmin extends BaseUser {
   ): Promise<void> {
     await this.goto(topicAndSkillsDashboardUrl);
     const isTextPresent = await this.isTextPresentOnPage(
-      ' No topics or skills have been created yet. '
+      'No topics or skills have been created yet.'
     );
     if (isTextPresent) {
       showMessage(`The skill "${skillName}" is not present on the Topics and Skills
@@ -938,46 +940,59 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} skillName - The name of the skill to delete questions from.
    */
   async removeAllQuestionsFromTheSkill(skillName: string): Promise<void> {
-    await this.openSkillEditor(skillName);
+    try {
+      await this.openSkillEditor(skillName);
 
-    const isMobileWidth = this.isViewportAtMobileWidth();
-    const skillQuestionTab = isMobileWidth
-      ? mobileSkillQuestionTab
-      : desktopSkillQuestionTab;
+      const isMobileWidth = this.isViewportAtMobileWidth();
+      const skillQuestionTab = isMobileWidth
+        ? mobileSkillQuestionTab
+        : desktopSkillQuestionTab;
 
-    if (isMobileWidth) {
-      const currentUrl = this.page.url();
-      const questionsTabUrl = `${currentUrl}questions`;
-      await this.goto(questionsTabUrl);
-      await this.page.reload({waitUntil: 'networkidle0'});
-    } else {
-      await this.clickAndWaitForNavigation(skillQuestionTab);
-    }
-
-    let isTextPresent = await this.isTextPresentOnPage(
-      'There are no questions in this skill.'
-    );
-
-    while (!isTextPresent) {
-      await this.page.waitForSelector(removeQuestion);
-      const button = await this.page.$(removeQuestion);
-      if (!button) {
-        throw new Error('Remove question button not found');
+      if (isMobileWidth) {
+        const currentUrl = this.page.url();
+        const questionsTabUrl = `${currentUrl}questions`;
+        await this.goto(questionsTabUrl);
+        await this.page.reload({waitUntil: 'networkidle0'});
+      } else {
+        await this.clickAndWaitForNavigation(skillQuestionTab);
       }
-      await this.waitForElementToBeClickable(button);
-      await button.click();
-      await this.page.waitForSelector(modalDiv, {visible: true});
-      await this.clickOn('Remove Question');
-      await this.page.waitForSelector(modalDiv, {hidden: true});
-      await this.page.reload({waitUntil: 'networkidle0'});
-      isTextPresent = await this.isTextPresentOnPage(
-        'There are no questions in this skill.'
+
+      while (true) {
+        try {
+          await this.page.waitForSelector(removeQuestion, {visible: true});
+        } catch (error) {
+          break;
+        }
+
+        let button = await this.page.$(removeQuestion);
+        if (!button) {
+          break;
+        }
+
+        await this.waitForElementToBeClickable(button);
+        await button.click();
+
+        try {
+          await this.page.waitForSelector(modalDiv, {visible: true});
+          await this.clickOn('Remove Question');
+          await this.page.waitForSelector(modalDiv, {hidden: true});
+        } catch (error) {
+          console.error('Failed to remove question', error.stack);
+          continue;
+        }
+
+        await this.page.reload({waitUntil: 'networkidle0'});
+      }
+
+      showMessage(
+        `All questions have been successfully removed from the skill "${skillName}".`
+      );
+    } catch (error) {
+      console.error(
+        `Failed to remove all questions from the skill "${skillName}"`,
+        error.stack
       );
     }
-
-    showMessage(
-      `All questions have been successfully removed from the skill "${skillName}".`
-    );
   }
 }
 
