@@ -1,9 +1,3 @@
-name: Lighthouse CI accessibility tests
-on:
-  merge_group:
-    types: [checks_requested]
-  push:
-    branches:
       - develop
       - release-*
   pull_request:
@@ -12,12 +6,23 @@ on:
       - release-*
 
 jobs:
+  check_test_suites_to_run:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    outputs:
+      test_suites_to_run: ${{ steps.check_test_suites_to_run.outputs.test_suites_to_run }}
+    steps:
+      - uses: ./.github/actions/merge
+      - id: check_test_suites_to_run
+        uses: ./.github/actions/check-test-suites-to-run
   lighthouse:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-22.04]
-        shard: [1, 2]
+        suite: ${{ needs.check_test_suites_to_run.outputs.test_suites_to_run.lighthouse_accessibility.suites }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -64,7 +69,7 @@ jobs:
         run: python -m scripts.install_chrome_for_ci
       - name: Run Lighthouse accessibility checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --mode accessibility --shard ${{ matrix.shard }}
+        run: python -m scripts.run_lighthouse_tests --mode accessibility --pages ${{ matrix.suite.pages_to_run }}
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification

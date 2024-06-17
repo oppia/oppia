@@ -57,7 +57,8 @@
     "extensions/rich_text_components/README.md",
     "core/tests/ci-test-suite-configs/README.md",
     "core/templates/AppSpec.ts",
-    "core/templates/domain/skill/MisconceptionObjectFactorySpec.ts"
+    "core/templates/domain/skill/MisconceptionObjectFactorySpec.ts",
+    "core/templates/domain/exploration/AnswerGroupObjectFactorySpec.ts"
   ],
   "RUN_ALL_TESTS_ROOT_FILES": [
     "extensions/ckeditor_plugins/pre/plugin.js",
