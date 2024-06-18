@@ -162,12 +162,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
 
   opportunities: ExplorationOpportunitySummary[] = [];
 
-  /**
-   * The feature flag state to gate the contributor_dashboard_accomplishments.
-   * @type {boolean} - contributor_dashboard_accomplishments - A boolean value.
-   * This determines whether the contributor_dashboard_accomplishments feature
-   * is enabled.
-   */
   defaultContributionType: string = 'translationContribution';
   SUGGESTION_LABELS = {
     review: {
