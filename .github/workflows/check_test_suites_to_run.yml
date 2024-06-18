@@ -2,7 +2,9 @@ name: Checks CI Test Suites To Run
 on:
   workflow_call:
     outputs:
-      test_suites_to_run: ${{ fromJson(steps.check_test_suites_to_run.outputs.test_suites_to_run) }}
+      test_suites_to_run:
+        description: "The test suites to run."
+        value: ${{ fromJson(steps.check_test_suites_to_run.outputs.test_suites_to_run) }}
 
 jobs:
   check_test_suites_to_run:
