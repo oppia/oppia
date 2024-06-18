@@ -6448,7 +6448,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
                 '/mock_edit_question/%s' % self.question_id)
         self.assertEqual(response['question_id'], self.question_id)
         self.logout()
-        
+
     def test_question_admins_can_edit_question(self) -> None:
         self.login(self.QUESTION_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -6634,7 +6634,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
                 '/mock_delete_question/%s' % self.question_id)
         self.assertEqual(response['question_id'], self.question_id)
         self.logout()
-        
+
     def test_question_admins_can_delete_question(self) -> None:
         self.login(self.QUESTION_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):

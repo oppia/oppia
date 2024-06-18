@@ -2919,26 +2919,31 @@ def can_edit_question(
             raise self.NotFoundException
         if role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions:
             return handler(self, question_id, **kwargs)
-        if role_services.ACTION_EDIT_OWNED_QUESTION in self.user.actions:
-            skills = question_services.get_skills_linked_to_question(question_id)
+        if (role_services.ACTION_EDIT_QUESTION_IN_MANAGED_TOPIC
+        in self.user.actions):
+            skills = question_services.get_skills_linked_to_question(
+                question_id)
             if not skills:
                 raise self.UnauthorizedUserException(
                     'You do not have credentials to edit this question.')
-            skill_ids = [skill.id for skill in skills]
-            all_topics = topic_fetchers.get_all_topics()
-            for topic in all_topics:
+            skill_ids = set(skill.id for skill in skills)
+            managed_topic_ids = [
+                    rights.id for rights in
+                    topic_fetchers.get_topic_rights_with_user(self.user_id)]
+            if not managed_topic_ids:
+                raise self.UnauthorizedUserException(
+                    'You do not have credentials to edit this question.')
+            for topic_id in managed_topic_ids:
+                topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+                if topic is None:
+                    raise base.UserFacingExceptions.NotFoundException
                 for skill_id in topic.get_all_skill_ids():
                     if skill_id in skill_ids:
-                        topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=False)
-                        if topic_rights is None or topic is None:
-                            raise base.UserFacingExceptions.NotFoundException
-                        if topic_services.check_can_edit_topic(self.user, topic_rights):
-                            return handler(self, question_id, **kwargs)
+                        return handler(self, question_id, **kwargs)
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this question.')
-        else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to edit this question.')
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to edit this question.')
 
     return test_can_edit
 
@@ -3076,7 +3081,7 @@ def can_delete_question(
         if (role_services.ACTION_DELETE_ANY_QUESTION in
                 user_actions_info.actions):
             return handler(self, question_id, **kwargs)
-        if (role_services.ACTION_DELETE_OWNED_QUESTION in
+        if (role_services.ACTION_DELETE_QUESTION_IN_MANAGED_TOPIC in
                 user_actions_info.actions):
             return can_edit_topic(handler)(self, question_id, **kwargs)
         else:

@@ -1341,6 +1341,7 @@ def check_can_edit_topic(
 
     return False
 
+
 def check_can_edit_question(
     user: user_domain.UserActionsInfo,
     topic_rights: Optional[topic_domain.TopicRights]
@@ -1359,9 +1360,10 @@ def check_can_edit_question(
         return False
     if role_services.ACTION_EDIT_ANY_QUESTION in user.actions:
         return True
-    if role_services.ACTION_EDIT_OWNED_QUESTION in user.actions:
+    if role_services.ACTION_EDIT_QUESTION_IN_MANAGED_TOPIC in user.actions:
         return check_can_edit_topic(user, topic_rights)
     return False
+
 
 def deassign_user_from_all_topics(
     committer: user_domain.UserActionsInfo, user_id: str
