@@ -95,8 +95,8 @@ def compile_test_ts_files() -> None:
         raise Exception(stderr)
 
     shutil.copytree(
-        os.path.join(puppeteer_acceptance_tests_dir_path, 'images'),
-        os.path.join(build_dir_path, 'images'))
+        os.path.join(puppeteer_acceptance_tests_dir_path, 'data'),
+        os.path.join(build_dir_path, 'data'))
 
 
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
@@ -144,6 +144,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             suite_name=args.suite,
             headless=args.headless,
             mobile=args.mobile,
+            prod_env=args.prod_env,
             stdout=subprocess.PIPE))
 
         print('Servers have come up.\n')

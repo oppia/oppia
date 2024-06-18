@@ -22,8 +22,6 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
 from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
@@ -89,8 +87,11 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
                 }
             )
         )
-        classroom_config_services.update_or_create_classroom_model(
-            math_classroom)
+        self.save_new_valid_classroom(
+            topic_id_to_prerequisite_topic_ids={
+                self.topic_id: []
+            }
+        )
 
 
 class TopicsAndSkillsDashboardPageDataHandlerTests(
@@ -245,7 +246,7 @@ class CategorizedAndUntriagedSkillsDataHandlerTests(
         # Check that logged out users can access the categorized and
         # untriaged skills data.
         json_response = self.get_json(
-            '/topics_and_skills_dashboard/' +
+            '/topics_and_skills_dashboard/'
             'categorized_and_untriaged_skills_data',
             expected_status_int=200)
         self.assertEqual(
@@ -260,7 +261,7 @@ class CategorizedAndUntriagedSkillsDataHandlerTests(
         # untriaged skills data.
         self.login(self.NEW_USER_EMAIL)
         json_response = self.get_json(
-            '/topics_and_skills_dashboard/' +
+            '/topics_and_skills_dashboard/'
             'categorized_and_untriaged_skills_data',
             expected_status_int=200)
         self.assertEqual(
