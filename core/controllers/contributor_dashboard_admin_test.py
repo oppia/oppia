@@ -46,7 +46,6 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
     TRANSLATION_REVIEWER_EMAIL: Final = 'translationreviewer@example.com'
     QUESTION_REVIEWER_EMAIL: Final = 'questionreviewer@example.com'
     TRANSLATION_ADMIN_EMAIL: Final = 'translationadmin@example.com'
-    QUESTION_ADMIN_EMAIL: Final = 'questionadmin@example.com'
 
     def setUp(self) -> None:
         super().setUp()
@@ -359,7 +358,6 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
     TRANSLATION_REVIEWER_EMAIL: Final = 'translationreviewer@example.com'
     QUESTION_REVIEWER_EMAIL: Final = 'questionreviewer@example.com'
     TRANSLATION_ADMIN_EMAIL: Final = 'translationadmin@example.com'
-    QUESTION_ADMIN_EMAIL: Final = 'questionadmin@example.com'
 
     def setUp(self) -> None:
         super().setUp()
