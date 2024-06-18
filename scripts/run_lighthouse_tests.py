@@ -211,7 +211,7 @@ def run_lighthouse_checks(lighthouse_mode: str) -> None:
         pages_count = len(os.environ['LIGHTHOUSE_URLS_TO_RUN'].split(','))
         all_pages_count = len(os.environ['ALL_LIGHTHOUSE_URLS'].split(','))
         print(
-            '\0133[1m %s out of %s lighthouse checks run, see '
+            '\033[1m%s out of %s lighthouse checks run, see '
             'https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure '
             'for more information.\033[0m' % (pages_count, all_pages_count)
         )

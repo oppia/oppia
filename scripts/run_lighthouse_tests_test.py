@@ -340,10 +340,25 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_popen,
             expected_args=((self.lighthouse_check_bash_command,),))
 
+        os.environ['ALL_LIGHTHOUSE_URLS'] = (
+            'http://localhost:8181/,'
+            'http://localhost:8181/about,'
+            'http://localhost:8181/contact'
+        )
+        os.environ['LIGHTHOUSE_URLS_TO_RUN'] = (
+            'http://localhost:8181/,'
+            'http://localhost:8181/about'
+        )
         with self.print_swap, swap_popen:
             run_lighthouse_tests.run_lighthouse_checks(
                 LIGHTHOUSE_MODE_PERFORMANCE)
 
+        self.assertIn(
+            '\033[1m2 out of 3 lighthouse checks run, see '
+            'https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure '
+            'for more information.\033[0m',
+            self.print_arr
+        )
         self.assertIn(
             'Lighthouse checks completed successfully.', self.print_arr)
 
