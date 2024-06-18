@@ -138,8 +138,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
       heading: this.stateEditorService.getActiveStateName(),
       subheading: 'Update Translation',
       textToTranslate: this.contentValue,
-      activeWrittenTranslation:
-        this.contentTranslations[languageCode].translation,
+      currentContentTranslation: this.contentTranslations[languageCode],
     };
     modalRef.componentInstance.modifyTranslationOpportunity =
       modifyTranslationOpportunity;
@@ -172,6 +171,11 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
       }
     }
     console.log(this.changeListService.getTranslationChangeList());
+    this.ngbActiveModal.close();
+  }
+
+  cancel(): void {
+    this.ngbActiveModal.dismiss();
   }
 
   getLanguageName(languageCode: string): string {

@@ -52,6 +52,7 @@ import {
 // @ts-ignore
 import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -82,7 +83,7 @@ export interface ModifyTranslationOpportunity {
   heading: string;
   subheading: string;
   textToTranslate: string;
-  activeWrittenTranslation: string | string[];
+  currentContentTranslation: TranslatedContent;
 }
 export interface HTMLSchema {
   type: string;
@@ -236,9 +237,10 @@ export class TranslationModalComponent {
     } else {
       this.textToTranslate = this.modifyTranslationOpportunity.textToTranslate;
       this.activeWrittenTranslation =
-        this.modifyTranslationOpportunity.activeWrittenTranslation;
+        this.modifyTranslationOpportunity.currentContentTranslation.translation;
+      this.activeDataFormat =
+        this.modifyTranslationOpportunity.currentContentTranslation.dataFormat;
       this.loadingData = false;
-      this.activeDataFormat = 'html';
     }
 
     console.log(this.textToTranslate);

@@ -61,6 +61,16 @@ export class MarkTranslationsAsNeedingUpdateModalComponent extends ConfirmOrCanc
     });
     modalRef.componentInstance.contentId = this.contentId;
     modalRef.componentInstance.contentValue = this.contentValue;
+    modalRef.result.then(
+      result => {
+        this.ngbActiveModal.close();
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
   }
 
   removeTranslations(): void {
