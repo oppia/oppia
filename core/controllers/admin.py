@@ -2644,6 +2644,7 @@ class InteractionsByExplorationIdHandler(
 
         self.render_json({'interaction_ids': interaction_ids})
 
+
 class QuestionAdminRoleHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of QuestionAdmin's normalized_payload
     dictionary.

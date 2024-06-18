@@ -1118,7 +1118,6 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
             expected_status_int=401)
         self.logout()
 
-
     def test_can_not_get_topic_rights_when_topic_id_has_no_associated_topic(
         self
     ) -> None:
