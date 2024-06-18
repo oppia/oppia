@@ -28,7 +28,7 @@ import {formatDate} from '@angular/common';
 export class ISODatePickerAdapter extends NativeDateAdapter {
   format(date: Date, displayFormat: Object): string {
     if (displayFormat === 'input') {
-      return formatDate(date, 'dd-MMM-yyyy', this.locale);
+      return formatDate(date, 'dd-MMM-yyyy', 'en-US');
     } else {
       return date.toDateString();
     }
