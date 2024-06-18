@@ -126,20 +126,6 @@ class ClassroomDataHandler(
         self.render_json(self.values)
 
 
-class DefaultClassroomRedirectPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Redirects to the default classroom page."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Redirects to default classroom page."""
-        self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
-
-
 class ClassroomIdToNameHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -497,6 +483,7 @@ class AllClassroomsSummaryHandler(
 
         for classroom in classrooms:
             classroom_summary_dict: Dict[str, str|bool] = {
+                'classroom_id': classroom.classroom_id,
                 'name': classroom.name,
                 'url_fragment': classroom.url_fragment,
                 'teaser_text': classroom.teaser_text,
