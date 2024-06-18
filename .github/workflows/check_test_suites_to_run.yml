@@ -1,0 +1,37 @@
+name: Checks CI Test Suites To Run
+on:
+  workflow_call:
+    outputs:
+      test_suites_to_run: 
+        value: ${{ jobs.check_test_suites_to_run.outputs.test_suites_to_run }}
+
+jobs:
+  check_test_suites_to_run:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    outputs:
+      test_suites_to_run: ${{ steps.check_test_suites_to_run.outputs.test_suites_to_run }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/merge
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.15'
+          architecture: 'x64'
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements.in
+            requirements.txt
+            requirements_dev.in
+            requirements_dev.txt
+      - uses: ./.github/actions/install-oppia-dependencies
+      - name: Check test suites to run
+        id: check_test_suites_to_run
+        run: >
+          python -m scripts.check_ci_test_suites_to_run
+          --github_head_ref="origin/${{ github.event.pull_request.head.ref }}"
+          --github_base_ref="origin/${{ github.event.pull_request.base.ref }}"
