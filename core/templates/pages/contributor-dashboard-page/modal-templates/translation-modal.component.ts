@@ -80,6 +80,7 @@ export interface TranslationOpportunity {
 }
 export interface ModifyTranslationOpportunity {
   id: string;
+  contentId: string;
   heading: string;
   subheading: string;
   textToTranslate: string;
@@ -236,6 +237,8 @@ export class TranslationModalComponent {
       );
     } else {
       this.textToTranslate = this.modifyTranslationOpportunity.textToTranslate;
+      this.activeContentType =
+        this.modifyTranslationOpportunity.contentId.split('_')[0];
       this.activeWrittenTranslation =
         this.modifyTranslationOpportunity.currentContentTranslation.translation;
       this.activeDataFormat =
