@@ -208,6 +208,13 @@ def run_lighthouse_checks(lighthouse_mode: str) -> None:
     # print it.
     print(stdout.decode('utf-8'))
     if process.returncode == 0:
+        pages_count = len(os.environ['LIGHTHOUSE_URLS_TO_RUN'].split(','))
+        all_pages_count = len(os.environ['ALL_LIGHTHOUSE_URLS'].split(','))
+        print(
+            '\0133[1m %s out of %s lighthouse checks run, see '
+            'https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure '
+            'for more information.\033[0m' % (pages_count, all_pages_count)
+        )
         print('Lighthouse checks completed successfully.')
     else:
         print('Return code: %s' % process.returncode)
