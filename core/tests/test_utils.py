@@ -2763,7 +2763,7 @@ version: 1
                     'action': 'assign',
                     'topic_id': topic_id
                 }, csrf_token=self.get_new_csrf_token())
-                
+
     def set_question_admins(
         self, question_admins_usernames: List[str]
     ) -> None:
@@ -2778,7 +2778,6 @@ version: 1
                     'username': username,
                     'action': 'assign'
                 }, csrf_token=self.get_new_csrf_token())
-
 
     def set_translation_coordinators(
         self, translation_coordinator_usernames: List[str], language_id: str

@@ -46,8 +46,8 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             role_services.get_all_actions([feconf.ROLE_ID_GUEST]),
             [role_services.ACTION_PLAY_ANY_PUBLIC_ACTIVITY])
-        
-    def test_get_actions_questionAdmin(self) -> None:
+
+    def test_get_actions_question_admin(self) -> None:
         self.assertCountEqual(
             role_services.get_all_actions([feconf.ROLE_ID_QUESTION_ADMIN]),
             [

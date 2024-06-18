@@ -2707,7 +2707,7 @@ class QuestionAdminRoleHandler(
             # a Bad Request error will be thrown. Hence, 'action' must be
             # 'deassign' if this branch is executed.
             assert action == 'deassign'
-           
+
             # The case where user does not have manager rights it will be
             # caught before in topic_services.deassign_manager_role_from_topic
             # method.
@@ -2716,4 +2716,3 @@ class QuestionAdminRoleHandler(
                 user_id, feconf.ROLE_ID_QUESTION_ADMIN)
 
         self.render_json({})
-
