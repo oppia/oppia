@@ -91,6 +91,18 @@ LIGHTHOUSE_PAGES_CONFIG = {
     'volunteer': {
         'url': 'http://localhost:8181/volunteer',
         'page_module': 'volunteer-page.module.ts'
+    },
+    'contributor-dashboard': {
+        'url': 'http://localhost:8181/contributor-dashboard',
+        'page_module': 'contributor-dashboard-page.module.ts'
+    },
+    'learner-dashboard': {
+        'url': 'http://localhost:8181/learner-dashboard',
+        'page_module': 'learner-dashboard-page.module.ts'
+    },
+    'email-dashboard': {
+        'url': 'http://localhost:8181/email-dashboard',
+        'page_module': 'email-dashboard-page.module.ts'
     }
 }
 
@@ -109,11 +121,14 @@ LIGHTHOUSE_PAGES_FOR_SUITES = {
         'contact',
         'donate',
         'get-started',
-        'teach'
+        'teach',
+        'thanks',
+        'volunteer',
+        'contributor-dashboard',
     ],
     '2': [
-        'thanks',
-        'volunteer'
+        'learner-dashboard',
+        'email-dashboard'
     ]
 }
 

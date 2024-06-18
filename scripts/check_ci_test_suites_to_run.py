@@ -108,7 +108,7 @@ CI_TEST_SUITE_CONFIGS_DIRECTORY: Final = os.path.join(
 TEST_MODULES_MAPPING_DIRECTORY: Final = os.path.join(
     'core', 'tests', 'test-modules-mappings')
 
-LIGHTHOUSE_PAGES_PER_SHARD: Final = 14
+LIGHTHOUSE_PAGES_PER_SHARD: Final = 17
 LIGHTHOUSE_ACCESSIBILITY_MODULE: Final = '.lighthouserc-accessibility.js'
 LIGHTHOUSE_PERFORMANCE_MODULE: Final = '.lighthouserc-performance.js'
 
@@ -318,9 +318,9 @@ def partition_lighthouse_pages_into_test_suites(
                 'module': lighthouse_module,
                 'pages_to_run': []
             }
-        if current_lighthouse_test_suite:
-            current_lighthouse_test_suite['pages_to_run'].append(
-                page['name'])
+        assert current_lighthouse_test_suite is not None
+        current_lighthouse_test_suite['pages_to_run'].append(
+            page['name'])
     if current_lighthouse_test_suite:
         lighthouse_test_suites.append(current_lighthouse_test_suite)
     return lighthouse_test_suites
