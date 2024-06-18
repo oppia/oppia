@@ -1,0 +1,54 @@
+name: 'Check Test Suites To Run'
+description: 'Check which test suites to run based on the files changed in the PR.'
+outputs:
+  test_suites_to_run: {{ fromJson(steps.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN) }}
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.8.15'
+        architecture: 'x64'
+        cache: 'pip'
+        cache-dependency-path: |
+          requirements.in
+          requirements.txt
+          requirements_dev.in
+          requirements_dev.txt
+    - uses: ./.github/actions/merge
+    - name: Cache node modules
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: /home/runner/work/oppia/yarn_cache
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - name: Check Yarn Cache
+      run: |
+        cd ..
+        echo 'cachefolder "yarn_cache"' > .yarnrc
+        yarn cache list
+        rm .yarnrc
+        cd -
+    - name: Install third party
+      run: python -m scripts.install_third_party_libs
+      shell: bash
+    - name: Check Yarn Cache
+      run: yarn cache list
+      shell: bash
+    - name: Check test suites to run
+      id: check_test_suites_to_run
+      run: >
+        python -m scripts.check_ci_test_suites_to_run
+        --github_head_ref="origin/${{ github.event.pull_request.head.ref }}"
+        --github_base_ref="origin/${{ github.event.pull_request.base.ref }}"
+        ${{ $SHOULD_OUTPUT_ALL_TESTS && '--output_all_test_suites' || '' }}
+      env:
+        SHOULD_OUTPUT_ALL_TESTS: ${{ github.event_name == 'push' || github.event_name == 'merge_group' }}

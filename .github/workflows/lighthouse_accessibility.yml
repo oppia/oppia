@@ -14,8 +14,6 @@ jobs:
     outputs:
       test_suites_to_run: ${{ steps.check_test_suites_to_run.outputs.test_suites_to_run }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/merge
       - id: check_test_suites_to_run
         uses: ./.github/actions/check-test-suites-to-run
   lighthouse:
