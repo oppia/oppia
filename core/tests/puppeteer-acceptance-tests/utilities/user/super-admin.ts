@@ -16,10 +16,10 @@
  * @fileoverview Super Admin users utility file.
  */
 
+import * as puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-
 const AdminPageRolesTab = testConstants.URLs.AdminPageRolesTab;
 const AdminPageActivitiesTab = testConstants.URLs.AdminPageActivitiesTab;
 const CommunityLibraryUrl = testConstants.URLs.CommunityLibrary;
@@ -287,15 +287,27 @@ export class SuperAdmin extends BaseUser {
     await this.clickOn(' Assigned users ');
 
     for (const user of users) {
-      await this.page.waitForFunction(
-        (user: string) => {
-          const regex = new RegExp(`\\b${user}\\b`);
-          return regex.test(document.documentElement.outerHTML);
-        },
-        {},
-        user
-      );
+      try {
+        await this.page.waitForFunction(
+          (user: string) => {
+            const regex = new RegExp(`\\b${user}\\b`);
+            return regex.test(document.documentElement.outerHTML);
+          },
+          {},
+          user
+        );
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          const newError = new Error(
+            `User "${user}" is not assigned to the role`
+          );
+          newError.stack = error.stack;
+          throw newError;
+        }
+        throw error;
+      }
     }
+
     showMessage(`"${users}" is/are assigned to the role`);
   }
 
