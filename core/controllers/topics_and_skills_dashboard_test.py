@@ -75,18 +75,6 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
 
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
         self.set_question_admins([self.QUESTION_ADMIN_USERNAME])
-        math_classroom: classroom_config_domain.Classroom = (
-            classroom_config_domain.Classroom(
-                classroom_id='math_classroom_id',
-                name='math',
-                url_fragment='math',
-                course_details='Course details',
-                topic_list_intro='Topics covered',
-                topic_id_to_prerequisite_topic_ids={
-                    self.topic_id: []
-                }
-            )
-        )
         self.save_new_valid_classroom(
             topic_id_to_prerequisite_topic_ids={
                 self.topic_id: []
@@ -186,7 +174,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.logout()
 
         # Check that question admins can access the topics and skills
-        # dashboard but only edit questions. 
+        # dashboard but only edit questions.
         self.login(self.QUESTION_ADMIN_EMAIL)
         json_response = self.get_json(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
