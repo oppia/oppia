@@ -69,7 +69,7 @@ export default {
     PartnershipsFormInPortuguese:
       'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp',
     PartnershipsFormShortUrl: 'https://forms.gle/Y71U8FdhQwZpicJj8',
-    releaseCoordinatorPage: 'http://localhost:8181/release-coordinator',
+    ReleaseCoordinator: 'http://localhost:8181/release-coordinator',
     splash: 'http://localhost:8181/splash',
     Teach: 'http://localhost:8181/teach',
     TopicAndSkillsDashboard:

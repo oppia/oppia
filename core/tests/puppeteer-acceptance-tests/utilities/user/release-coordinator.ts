@@ -20,7 +20,7 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
-const releaseCoordinatorUrl = testConstants.URLs.releaseCoordinatorPage;
+const releaseCoordinatorUrl = testConstants.URLs.ReleaseCoordinator;
 const splashUrl = testConstants.URLs.splash;
 
 const navbarElementSelector = '.oppia-clickable-navbar-element';
@@ -29,6 +29,7 @@ const promoMessageInputSelector = '.mat-input-element';
 const actionStatusMessageSelector = '.e2e-test-status-message';
 const toastMessageSelector = '.toast-message';
 const memoryCacheProfileTableSelector = '.view-results-table';
+const viewResultsTableSelector = '.view-results-table tbody tr td';
 
 export class ReleaseCoordinator extends BaseUser {
   /**
@@ -153,7 +154,7 @@ export class ReleaseCoordinator extends BaseUser {
 
     const memoryCacheProfile = await this.page.evaluate(() => {
       const cells = Array.from(
-        document.querySelectorAll('.view-results-table tbody tr td')
+        document.querySelectorAll(viewResultsTableSelector)
       );
       const totalAllocatedInBytes = cells[0]?.textContent;
       const peakAllocatedInBytes = cells[1]?.textContent;
@@ -194,7 +195,7 @@ export class ReleaseCoordinator extends BaseUser {
 
     const totalKeysStored = await this.page.evaluate(() => {
       const cells = Array.from(
-        document.querySelectorAll('.view-results-table tbody tr td')
+        document.querySelectorAll(viewResultsTableSelector)
       );
       const totalKeysStoredText = cells[2]?.textContent;
       return totalKeysStoredText ? parseInt(totalKeysStoredText, 10) : null;
