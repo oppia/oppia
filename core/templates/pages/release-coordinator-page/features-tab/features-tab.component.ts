@@ -16,13 +16,16 @@
  * @fileoverview Component for the feature tab on the release coordinator page.
  */
 
-import {Component, OnInit, EventEmitter, Output} from '@angular/core';
+import {ENTER} from '@angular/cdk/keycodes';
+import {Component, OnInit, EventEmitter, Output,   ViewChild, ElementRef} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
+import {MatAutocompleteTrigger} from '@angular/material/autocomplete';
 
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import {Subscription} from 'rxjs';
 
+import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
 import {LoaderService} from 'services/loader.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {FeatureFlagDummyBackendApiService} from 'domain/feature-flag/feature-flag-dummy-backend-api.service';
@@ -41,6 +44,8 @@ interface IntSchema {
   templateUrl: './features-tab.component.html',
 })
 export class FeaturesTabComponent implements OnInit {
+  @ViewChild(MatAutocompleteTrigger) autocompleteTrigger!: MatAutocompleteTrigger;
+  @ViewChild('userGroupInput') userGroupInput!: ElementRef<HTMLInputElement>;
   @Output() setStatusMessage = new EventEmitter<string>();
 
   DEV_SERVER_STAGE = 'dev';
@@ -51,19 +56,24 @@ export class FeaturesTabComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  directiveSubscriptions = new Subscription();
   featureFlagNameToBackupMap!: Map<string, FeatureFlag>;
   featureFlags: FeatureFlag[] = [];
   featureFlagsAreFetched: boolean = false;
   isDummyApiEnabled: boolean = false;
   loadingMessage: string = '';
-  directiveSubscriptions = new Subscription();
+  separatorKeysCodes: number[] = [ENTER];
+  allUserGroupsArray: string[] = [];
+  userGroupSearchQuery: string = '';
+  filteredUserGroups: string[] = [];
 
   constructor(
-    private windowRef: WindowRef,
+    private adminDataService: AdminDataService,
     private apiService: FeatureFlagBackendApiService,
-    private featureService: PlatformFeatureService,
     private dummyApiService: FeatureFlagDummyBackendApiService,
-    private loaderService: LoaderService
+    private featureService: PlatformFeatureService,
+    private loaderService: LoaderService,
+    private windowRef: WindowRef
   ) {}
 
   async reloadFeatureFlagsAsync(): Promise<void> {
@@ -75,6 +85,13 @@ export class FeaturesTabComponent implements OnInit {
       this.featureFlags.map(feature => [feature.name, cloneDeep(feature)])
     );
     this.loaderService.hideLoadingScreen();
+  }
+
+  async fetchUserGroupData(): Promise<void> {
+    const data = await this.adminDataService.getDataAsync();
+    for (let key in data.userGroups) {
+      this.allUserGroupsArray.push(key);
+    }
   }
 
   getSchema(): IntSchema {
@@ -133,6 +150,71 @@ export class FeaturesTabComponent implements OnInit {
       return 'Test (can only be enabled on dev and test server).';
     } else {
       return 'Prod (can only be enabled on dev, test and prod server).';
+    }
+  }
+
+  resetUserGroupSearch(): void {
+    this.userGroupSearchQuery = '';
+    this.filteredUserGroups = this.allUserGroupsArray;
+  }
+
+  onInputClick(): void {
+    this.resetUserGroupSearch();
+    this.autocompleteTrigger.openPanel();
+  }
+
+  validInput(value: string, featureFlag: FeatureFlag): boolean {
+    let availableUserGroups = false;
+    for (let i = 0; i < this.filteredUserGroups.length; i++) {
+      if (this.filteredUserGroups[i] === value) {
+        availableUserGroups = true;
+        break;
+      }
+    }
+    return availableUserGroups && featureFlag.userGroupIds.indexOf(value) < 0
+      ? true
+      : false;
+  }
+
+  removeUserGroup(userGroup: string, featureFlag: FeatureFlag): void {
+    const index = featureFlag.userGroupIds.indexOf(userGroup);
+
+    if (index >= 0) {
+      featureFlag.userGroupIds.splice(index, 1);
+    }
+  }
+
+  addUserGroup(event: {value: string}, featureFlag: FeatureFlag): void {
+    const value = (event.value || '').trim();
+    if (!value) {
+      return;
+    }
+
+    if (this.validInput(value, featureFlag)) {
+      featureFlag.userGroupIds.push(value);
+      this.userGroupInput.nativeElement.value = '';
+    }
+    this.resetUserGroupSearch();
+  }
+
+  onUserGroupSearchInputChange(): void {
+    if (this.userGroupSearchQuery) {
+      this.filteredUserGroups = this.allUserGroupsArray.filter(userGroup => {
+        const lowerSearchQuery = this.userGroupSearchQuery.toLowerCase();
+        return (
+          userGroup.toLowerCase().includes(lowerSearchQuery)
+        );
+      });
+    } else {
+      this.filteredUserGroups = [];
+    }
+  }
+
+  selected(event: {option: {value: string}}, featureFlag: FeatureFlag): void {
+    if (featureFlag.userGroupIds.indexOf(event.option.value) > -1) {
+      this.removeUserGroup(event.option.value, featureFlag);
+    } else {
+      this.addUserGroup(event.option, featureFlag);
     }
   }
 
@@ -256,6 +338,7 @@ export class FeaturesTabComponent implements OnInit {
       })
     );
     this.loaderService.showLoadingScreen('Loading');
+    this.fetchUserGroupData();
     this.reloadFeatureFlagsAsync();
     this.reloadDummyHandlerStatusAsync();
   }

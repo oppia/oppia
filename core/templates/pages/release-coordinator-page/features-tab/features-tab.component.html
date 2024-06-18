@@ -49,6 +49,37 @@
       </div>
     </div>
     <div class="row oppia-feature-top-margin">
+      <div class="col-2"><b>User Groups:</b></div>
+      <div class="col-10">
+        <mat-chip-list #chipList aria-label="User Groups Associated With Feature Flag" tabindex="0">
+          <mat-chip *ngFor="let userGroup of featureFlag.userGroupIds"
+                    [selectable]="true"
+                    [removable]="true"
+                    (removed)="removeUserGroup(userGroup, featureFlag)">
+            <ng-container>
+              <span tabindex="0" [attr.aria-label]="user-group+', selected'">{{ userGroup }}</span>
+            </ng-container>
+            <button class="oppia-cancel-button" role="button" tabindex="0" matChipRemove aria-label=". Remove">
+              <mat-icon class="oppia-cancel-button-text">cancel</mat-icon>
+            </button>
+          </mat-chip>
+          <input placeholder="Add user group"
+                 #userGroupInput
+                 [matChipInputFor]="chipList"
+                 [matAutocomplete]="auto"
+                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                 (matChipInputTokenEnd)="addUserGroup($event, featureFlag)"
+                 (click)="onInputClick()"
+                 [(ngModel)]="userGroupSearchQuery" (ngModelChange)="onUserGroupSearchInputChange()" (click)="resetUserGroupSearch()">
+        </mat-chip-list>
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event, featureFlag)">
+          <mat-option *ngFor="let userGroup of filteredUserGroups" [value]="userGroup">
+            {{ userGroup }}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
+    <div class="row oppia-feature-top-margin">
       <div class="col-2"><b>Last Updated:</b></div>
       <div class="col-10">{{ getLastUpdatedDate(featureFlag) }}</div>
     </div>
