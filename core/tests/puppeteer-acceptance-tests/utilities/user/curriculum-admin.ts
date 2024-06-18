@@ -856,7 +856,6 @@ export class CurriculumAdmin extends BaseUser {
 
     const skills = await this.page.$$(skillListItemSelector);
     for (let skill of skills) {
-      await skill.waitForSelector(skillSelector, {visible: true});
       const skillNameElement = await skill.$(skillSelector);
       if (skillNameElement) {
         const name = await (
