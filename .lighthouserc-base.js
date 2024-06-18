@@ -16,49 +16,15 @@
  * @fileoverview Configuration for lighthouse-ci.
  */
 
+const ALL_LIGHTHOUSE_URLS = process.env.ALL_LIGHTHOUSE_URLS.split(',');
+const LIGHTHOUSE_URLS_TO_RUN = process.env.LIGHTHOUSE_URLS_TO_RUN
+  ? process.env.LIGHTHOUSE_URLS_TO_RUN.split(',')
+  : ALL_LIGHTHOUSE_URLS;
+
 module.exports = {
   numberOfRuns: 3,
   puppeteerScript: 'puppeteer-login-script.js',
-  urlShards: {
-    1: [
-      'http://localhost:8181/',
-      'http://localhost:8181/about',
-      'http://localhost:8181/about-foundation',
-      'http://localhost:8181/admin',
-      'http://localhost:8181/blog-dashboard',
-      'http://localhost:8181/community-library',
-      'http://localhost:8181/contact',
-      'http://localhost:8181/contributor-dashboard',
-      'http://localhost:8181/creator-dashboard',
-      'http://localhost:8181/creator-guidelines',
-      'http://localhost:8181/delete-account',
-      'http://localhost:8181/donate',
-      'http://localhost:8181/emaildashboard',
-      'http://localhost:8181/get-started',
-      'http://localhost:8181/learner-dashboard',
-      'http://localhost:8181/license',
-      'http://localhost:8181/moderator',
-    ],
-    2: [
-      'http://localhost:8181/preferences',
-      'http://localhost:8181/privacy-policy',
-      'http://localhost:8181/profile/username1',
-      'http://localhost:8181/signup?return_url=%2F',
-      'http://localhost:8181/teach',
-      'http://localhost:8181/topics-and-skills-dashboard',
-      'http://localhost:8181/terms',
-      'http://localhost:8181/thanks',
-      'http://localhost:8181/volunteer',
-      'http://localhost:8181/learn/staging/dummy-topic-one/story',
-      'http://localhost:8181/learn/staging/dummy-topic-one/story/help-jamie-win-arcade',
-      'http://localhost:8181/learn/math',
-      `http://localhost:8181/create/${process.env.exploration_id}`,
-      `http://localhost:8181/explore/${process.env.exploration_id}`,
-      `http://localhost:8181/topic_editor/${process.env.topic_id}`,
-      `http://localhost:8181/skill_editor/${process.env.skill_id}`,
-      `http://localhost:8181/story_editor/${process.env.story_id}`,
-    ],
-  },
+  urls: LIGHTHOUSE_URLS_TO_RUN,
   basePerformanceAssertMatrix: {
     matchingUrlPattern: '.*',
     assertions: {

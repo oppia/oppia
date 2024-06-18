@@ -23,10 +23,94 @@ module.exports = {
     collect: {
       numberOfRuns: baseConfig['numberOfRuns'],
       puppeteerScript: baseConfig['puppeteerScript'],
-      url: baseConfig['urlShards'][2],
+      url: baseConfig['urls'],
     },
     assert: {
       assertMatrix: [
+        {
+          matchingUrlPattern: '^http://localhost:8181/$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/about$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 0.98}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/admin$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/blog-dashboard$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 0.98}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/community-library$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/contact$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/contributor-dashboard$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/creator-dashboard$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/delete-account$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 0.98}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/donate$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 0.98}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/emailDashboard$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/get-started$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 0.98}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/learner-dashboard$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
+        },
+        {
+          matchingUrlPattern: '^http://localhost:8181/moderator$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 0.98}],
+          },
+        },
         {
           matchingUrlPattern: '^http://localhost:8181/preferences$',
           assertions: {
