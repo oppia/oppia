@@ -13,19 +13,7 @@ on:
 
 jobs:
   check_test_suites_to_run:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-22.04]
-    outputs:
-      test_suites_to_run: ${{ steps.check_test_suites_to_run.outputs.test_suites_to_run }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: ./.github/actions/merge
-      - id: check_test_suites_to_run
-        uses: ./.github/actions/check-test-suites-to-run
+    - uses: ./.github/workflows/check_test_suites_to_run.yml
   build:
     needs: check_test_suites_to_run
     if: ${{ needs.check_test_suites_to_run.outputs.test_suites_to_run.e2e.count > 0 ||

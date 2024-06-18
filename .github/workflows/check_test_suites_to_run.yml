@@ -1,10 +1,20 @@
-name: 'Check Test Suites To Run'
-description: 'Check which test suites to run based on the files changed in the PR.'
-outputs:
-  test_suites_to_run: {{ fromJson(steps.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN) }}
-runs:
-  using: 'composite'
-  steps:
+name: Checks CI Test Suites To Run
+on:
+  workflow_call:
+    outputs:
+      test_suites_to_run: ${{ fromJson(steps.check_test_suites_to_run.outputs.test_suites_to_run) }}
+
+jobs:
+  check_test_suites_to_run:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/merge
     - uses: actions/setup-python@v4
       with:
         python-version: '3.8.15'
