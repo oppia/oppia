@@ -16,13 +16,7 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, {
-  Page,
-  Frame,
-  Browser,
-  Viewport,
-  ElementHandle,
-} from 'puppeteer';
+import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
@@ -352,29 +346,6 @@ export class BaseUser {
         }),
         this.page.click(selector),
       ]);
-    }
-  }
-
-  /**
-   * Clicks an element on the page.
-   * @param {Page | Frame | ElementHandle} context - The Puppeteer context, usually a Page or Frame.
-   * @param {string} selector - The CSS selector of the element to click.
-   */
-  async clickElement(
-    context: Page | Frame | ElementHandle,
-    selector: string
-  ): Promise<void> {
-    try {
-      await context.waitForSelector(selector);
-      const element = await context.$(selector);
-      if (!element) {
-        throw new Error(`Element ${selector} not found`);
-      }
-      await this.waitForElementToBeClickable(element);
-      await element.click();
-    } catch (error) {
-      error.message = `Failed to click on element ${selector}: ${error.message}`;
-      throw error;
     }
   }
 

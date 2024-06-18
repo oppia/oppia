@@ -256,7 +256,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to click a button and check if it opens the expected destination.
    */
-  async clickButtonToNavigateToNewPage(
+  private async clickButtonToNavigateToNewPage(
     button: string,
     buttonName: string,
     expectedDestinationPageUrl: string,

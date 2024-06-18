@@ -795,6 +795,7 @@ export class CurriculumAdmin extends BaseUser {
         }
       }
     }
+    showMessage(`Topic "${topicName}" has been successfully deleted.`);
   }
 
   /**
@@ -840,9 +841,6 @@ export class CurriculumAdmin extends BaseUser {
     const skillListItemSelector = isMobileWidth
       ? mobileSkillListItemSelector
       : desktopSkillListItemSelector;
-    const skillNameSelector = isMobileWidth
-      ? mobileSkillSelector
-      : desktopSkillSelector;
     const skillListItemOptions = isMobileWidth
       ? mobileSkillListItemOptions
       : desktopSkillListItemOptions;
@@ -857,50 +855,46 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(skillListItemSelector);
 
     const skills = await this.page.$$(skillListItemSelector);
-    const skillToDelete = skills.find(async skill => {
-      const skillNameElement = await skill.$(skillNameSelector);
-      if (!skillNameElement) {
-        return false;
+    for (let skill of skills) {
+      await skill.waitForSelector(skillSelector, {visible: true});
+      const skillNameElement = await skill.$(skillSelector);
+      if (skillNameElement) {
+        const name = await (
+          await skillNameElement.getProperty('textContent')
+        ).jsonValue();
+
+        if (name === `${skillName}`) {
+          await this.page.waitForSelector(skillListItemOptions);
+          const editBox = await skill.$(skillListItemOptions);
+          if (editBox) {
+            await this.waitForElementToBeClickable(editBox);
+            await editBox.click();
+            await this.page.waitForSelector(deleteSkillButton);
+          } else {
+            throw new Error('Edit button not found');
+          }
+
+          const deleteButton = await skill.$(deleteSkillButton);
+          if (deleteButton) {
+            await this.waitForElementToBeClickable(deleteButton);
+            await deleteButton.click();
+            await this.page.waitForSelector(confirmSkillDeletionButton);
+          } else {
+            throw new Error('Delete button not found');
+          }
+
+          const confirmButton = await this.page.$(confirmSkillDeletionButton);
+          if (confirmButton) {
+            await this.waitForElementToBeClickable(confirmButton);
+            await confirmButton.click();
+            await this.page.waitForSelector(modalDiv, {hidden: true});
+          } else {
+            throw new Error('Confirm button not found');
+          }
+          break;
+        }
       }
-      const name = await (
-        await skillNameElement.getProperty('textContent')
-      ).jsonValue();
-      return name === skillName;
-    });
-
-    if (!skillToDelete) {
-      console.error(`Skill ${skillName} not found`);
-      return;
     }
-
-    await this.page.waitForSelector(skillListItemOptions, {visible: true});
-    await this.clickElement(skillToDelete, skillListItemOptions);
-
-    await this.page.waitForFunction(
-      (skill: Element) => !skill.isConnected,
-      {},
-      skillListItemOptions
-    );
-
-    await this.page.waitForSelector(deleteSkillButton, {visible: true});
-    await this.clickElement(skillToDelete, deleteSkillButton);
-
-    await this.page.waitForFunction(
-      (button: Element) => !button.isConnected,
-      {},
-      deleteSkillButton
-    );
-
-    await this.page.waitForSelector(confirmSkillDeletionButton, {
-      visible: true,
-    });
-    await this.clickElement(this.page, confirmSkillDeletionButton);
-
-    await this.page.waitForFunction(
-      (button: Element) => !button.isConnected,
-      {},
-      confirmSkillDeletionButton
-    );
 
     showMessage(`Skill "${skillName}" has been successfully deleted.`);
   }
