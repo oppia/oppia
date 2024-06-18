@@ -279,7 +279,7 @@ jobs:
       strategy:
         matrix:
           os: [ubuntu-22.04]
-      name: acceptance_test (${{ matrix.os }}, ${{ matrix.suite.name }})
+          suite: ${{ needs.check_test_suites_to_run.outputs.test_suites_to_run.acceptance.suites }}
       steps:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v3
