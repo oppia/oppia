@@ -31,7 +31,9 @@ export default {
     BlogAdmin: 'http://localhost:8181/blog-admin',
     BlogDashboard: 'http://localhost:8181/blog-dashboard',
     BlogPostUrlInPartnershipsPage:
-      'https://www.oppia.org/blog/teaching-a-chapter-of-expressions-equations-in-summer-school-0q6r28fzsrwc',
+      'https://www.oppia.org/blog/teaching-a-chapter-of-expressions-equations-' +
+      'in-summer-school-0q6r28fzsrwc',
+    CCLicense: 'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
     ClassroomAdmin: 'http://localhost:8181/classroom-admin',
     CommunityLibrary: 'http://localhost:8181/community-library',
     Contact: 'http://localhost:8181/contact',
@@ -46,9 +48,11 @@ export default {
     DonateWithThanksModal: 'http://localhost:8181/donate?thanks=',
     EmbeddingAnExploration: 'https://oppia.github.io/#/EmbeddingAnExploration',
     ExternalLink61MillionChildren:
-      'https://uis.unesco.org/en/news/world-poverty-could-be-cut-half-if-all-adults-completed-secondary-education',
+      'https://uis.unesco.org/en/news/world-poverty-could-be-cut-half-' +
+      'if-all-adults-completed-secondary-education',
     ExternalLinkEvenThoseWhoAreInSchool:
-      'https://uis.unesco.org/sites/default/files/documents/fs46-more-than-half-children-not-learning-en-2017.pdf',
+      'https://uis.unesco.org/sites/default/files/documents/' +
+      'fs46-more-than-half-children-not-learning-en-2017.pdf',
     ExternalLinkSourceUnesco:
       'https://uis.unesco.org/en/news/new-report-how-measure-equity-education',
     DesktopExternalLinkWatchAVideo:
@@ -68,9 +72,12 @@ export default {
     PartnershipsForm:
       'https://docs.google.com/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform',
     PartnershipsFormInPortuguese:
-      'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp',
+      'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform' +
+      '?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp',
     PartnershipsFormShortUrl: 'https://forms.gle/Y71U8FdhQwZpicJj8',
+    PrivacyPolicy: 'http://localhost:8181/privacy-policy',
     Teach: 'http://localhost:8181/teach',
+    Terms: 'http://localhost:8181/terms',
     TopicAndSkillsDashboard:
       'http://localhost:8181/topics-and-skills-dashboard',
     ProgrammingWithCarla: 'https://www.oppia.org/collection/inDXV0w8-p1C',
@@ -81,14 +88,18 @@ export default {
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
     ProfilePagePrefix: 'http://localhost:8181/profile',
     ReleaseCoordinator: 'http://localhost:8181/release-coordinator',
+    OppiaAnnounceGoogleGroup: 'https://groups.google.com/g/oppia-announce',
   },
+
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
     LearnerDashboard: '.oppia-learner-dashboard-main-content',
   },
+
   SignInDetails: {
     inputField: 'input.e2e-test-sign-in-email-input',
   },
+
   Roles: {
     TRANSLATION_ADMIN: 'translation admin',
     BLOG_ADMIN: 'blog admin',
@@ -100,13 +111,16 @@ export default {
     RELEASE_COORDINATOR: 'release coordinator',
     MODERATOR: 'moderator',
   } as const,
+
   BlogRights: {
     BLOG_ADMIN: 'BLOG_ADMIN',
     BLOG_POST_EDITOR: 'BLOG_POST_EDITOR',
   } as const,
+
   ViewportWidthBreakpoints: {
     MOBILE_PX: 768,
   },
+
   data: {
     blogPostThumbnailImage: path.resolve(
       __dirname,
@@ -117,5 +131,6 @@ export default {
       '../../data/curriculum-admin-thumbnail.svg'
     ),
   },
+
   DEFAULT_SPEC_TIMEOUT_MSECS: 300000,
 };

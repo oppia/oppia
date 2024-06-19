@@ -20,42 +20,47 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
-const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
-const homeUrl = testConstants.URLs.Home;
-const aboutUrl = testConstants.URLs.About;
-const mathClassroomUrl = testConstants.URLs.MathClassroom;
-const androidUrl = testConstants.URLs.Android;
-const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
-const aboutFoundationUrl = testConstants.URLs.AboutFoundation;
-const blogUrl = testConstants.URLs.Blog;
-const partnershipsUrl = testConstants.URLs.Partnerships;
-const volunteerUrl = testConstants.URLs.Volunteer;
-const donateUrl = testConstants.URLs.Donate;
-const contactUrl = testConstants.URLs.Contact;
-const _61MillionChildrenUrl = testConstants.URLs.ExternalLink61MillionChildren;
-const sourceUnescoUrl = testConstants.URLs.ExternalLinkSourceUnesco;
-const evenThoseWhoAreInSchoolUrl =
-  testConstants.URLs.ExternalLinkEvenThoseWhoAreInSchool;
 const _420MillionUrl = testConstants.URLs.ExternalLink61MillionChildren;
-const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
-const desktopWatchAVideoUrl = testConstants.URLs.DesktopExternalLinkWatchAVideo;
-const mobileWatchAVideoUrl = testConstants.URLs.MobileExternalLinkWatchAVideo;
-const getStartedUrl = testConstants.URLs.GetStarted;
-const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
-const electromagnetismUrl = testConstants.URLs.Electromagnetism;
-const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
-const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
-const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
-const teachUrl = testConstants.URLs.Teach;
+const _61MillionChildrenUrl = testConstants.URLs.ExternalLink61MillionChildren;
+const aboutFoundationUrl = testConstants.URLs.AboutFoundation;
+const aboutUrl = testConstants.URLs.About;
+const androidUrl = testConstants.URLs.Android;
 const blogPostUrlinPartnershipsPage =
   testConstants.URLs.BlogPostUrlInPartnershipsPage;
-const partnershipsFormUrl = testConstants.URLs.PartnershipsForm;
+const blogUrl = testConstants.URLs.Blog;
+const ccLicenseUrl = testConstants.URLs.CCLicense;
+const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
+const contactUrl = testConstants.URLs.Contact;
+const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
+const desktopWatchAVideoUrl = testConstants.URLs.DesktopExternalLinkWatchAVideo;
+const donateUrl = testConstants.URLs.Donate;
+const electromagnetismUrl = testConstants.URLs.Electromagnetism;
+const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
+const evenThoseWhoAreInSchoolUrl =
+  testConstants.URLs.ExternalLinkEvenThoseWhoAreInSchool;
+const getStartedUrl = testConstants.URLs.GetStarted;
+const homeUrl = testConstants.URLs.Home;
+const mathClassroomUrl = testConstants.URLs.MathClassroom;
+const mobileWatchAVideoUrl = testConstants.URLs.MobileExternalLinkWatchAVideo;
+const OppiaAnnounceGoogleGroupUrl = testConstants.URLs.OppiaAnnounceGoogleGroup;
+const partnershipsBrochureUrl = testConstants.URLs.PartnershipsBrochure;
 const partnershipsFormInPortugueseUrl =
   testConstants.URLs.PartnershipsFormInPortuguese;
 const partnershipsFormShortUrl = testConstants.URLs.PartnershipsFormShortUrl;
-const partnershipsBrochureUrl = testConstants.URLs.PartnershipsBrochure;
-const volunteerFormUrl = testConstants.URLs.VolunteerForm;
+const partnershipsFormUrl = testConstants.URLs.PartnershipsForm;
+const partnershipsUrl = testConstants.URLs.Partnerships;
+const privacyPolicyUrl = testConstants.URLs.PrivacyPolicy;
+const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
+const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
+const sourceUnescoUrl = testConstants.URLs.ExternalLinkSourceUnesco;
+const teachUrl = testConstants.URLs.Teach;
+const termsUrl = testConstants.URLs.Terms;
+const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
 const volunteerFormShortUrl = testConstants.URLs.VolunteerFormShortUrl;
+const volunteerFormUrl = testConstants.URLs.VolunteerForm;
+const volunteerUrl = testConstants.URLs.Volunteer;
+const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
+
 const allowedVolunteerFormUrls = [
   volunteerFormUrl,
   `${volunteerFormUrl}?usp=send_form`,
@@ -196,6 +201,13 @@ const explorationCard = '.e2e-test-exploration-dashboard-card';
 
 const libraryExplorationsGroupSelector = '.oppia-library-group';
 
+const privacyPolicyLinkInTermsPage = '.e2e-test-privacy-policy-link';
+const ccLicenseLinkInTermsPage = '.e2e-test-cc-license-link';
+const googleGroupSignUpLinkInTermsPage =
+  '.e2e-test-oppia-announce-google-group-link';
+
+const emailLinkSelector = '.oppia-contact-mail';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -271,6 +283,20 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to navigate to the /Terms page.
+   */
+  async navigateToTermsPage(): Promise<void> {
+    await this.goto(termsUrl);
+  }
+
+  /**
+   * Function to navigate to the Contact Us page.
+   */
+  async navigateToContactUsPage(): Promise<void> {
+    await this.goto(contactUrl);
+  }
+
+  /**
    * Function to click a button and check if it opens the expected destination.
    */
   private async clickButtonToNavigateToNewPage(
@@ -280,7 +306,7 @@ export class LoggedOutUser extends BaseUser {
     expectedDestinationPageName: string
   ): Promise<void> {
     await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
       this.clickOn(button),
     ]);
 
@@ -289,6 +315,52 @@ export class LoggedOutUser extends BaseUser {
         `${buttonName} should open the ${expectedDestinationPageName} page`
       )
       .toBe(expectedDestinationPageUrl);
+  }
+
+  /**
+   * Function to click an anchor tag and check if it opens the expected destination
+   * in a new tab. Closes the tab afterwards.
+   */
+  private async clickLinkAnchorToNewTab(
+    anchorInnerText: string,
+    expectedDestinationPageUrl: string
+  ): Promise<void> {
+    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
+    const pageTarget = this.page.target();
+    await this.clickOn(anchorInnerText);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
+    await newTabPage?.close();
+  }
+
+  /**
+   * Function to click a button and check if it opens the expected destination
+   * in a new tab. Closes the tab afterwards.
+   */
+  private async clickLinkButtonToNewTab(
+    button: string,
+    buttonName: string,
+    expectedDestinationPageUrl: string,
+    expectedDestinationPageName: string
+  ): Promise<void> {
+    const pageTarget = this.page.target();
+    await this.clickOn(button);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url())
+      .withContext(
+        `${buttonName} should open the ${expectedDestinationPageName} page`
+      )
+      .toBe(expectedDestinationPageUrl);
+    await newTabPage?.close();
   }
 
   /**
@@ -985,26 +1057,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click an anchor tag and check if it opens the expected destination
-   * in a new tab. Closes the tab afterwards.
-   */
-  private async clickLinkAnchorToNewTab(
-    anchorInnerText: string,
-    expectedDestinationPageUrl: string
-  ): Promise<void> {
-    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
-    const pageTarget = this.page.target();
-    await this.clickOn(anchorInnerText);
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
-    const newTabPage = await newTarget.page();
-    expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
-    await newTabPage?.close();
-  }
-
-  /**
    * Clicks the link with the text "create on here" on the Get Stated page.
    */
   async clickCreateOneHereLinkInGetStartedPage(): Promise<void> {
@@ -1160,32 +1212,6 @@ export class LoggedOutUser extends BaseUser {
       mathClassroomUrl,
       'Math Classroom'
     );
-  }
-
-  /**
-   * Function to click a button and check if it opens the expected destination
-   * in a new tab. Closes the tab afterwards.
-   */
-  private async clickLinkButtonToNewTab(
-    button: string,
-    buttonName: string,
-    expectedDestinationPageUrl: string,
-    expectedDestinationPageName: string
-  ): Promise<void> {
-    const pageTarget = this.page.target();
-    await this.clickOn(button);
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
-    const newTabPage = await newTarget.page();
-
-    expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url())
-      .withContext(
-        `${buttonName} should open the ${expectedDestinationPageName} page`
-      )
-      .toBe(expectedDestinationPageUrl);
-    await newTabPage?.close();
   }
 
   /**
@@ -1365,6 +1391,175 @@ export class LoggedOutUser extends BaseUser {
     } else {
       showMessage('The donor box is visible on the donate page.');
     }
+  }
+
+  /**
+   * Clicks on the Privacy Policy link in the /terms page and
+   * checks if it opens the correct URL.
+   */
+  async clickPrivacyPolicyLinkInTermsPage(): Promise<void> {
+    await this.page.waitForSelector(privacyPolicyLinkInTermsPage, {
+      visible: true,
+    });
+    await this.clickButtonToNavigateToNewPage(
+      privacyPolicyLinkInTermsPage,
+      'Privacy Policy link in the terms page',
+      privacyPolicyUrl,
+      'Privacy Policy'
+    );
+  }
+
+  /**
+   * Clicks on the License link in the /terms page and checks
+   * if it opens the correct URL.
+   */
+  async clickLicenseLinkInTermsPage(): Promise<void> {
+    await this.page.waitForSelector(ccLicenseLinkInTermsPage, {visible: true});
+    await this.clickButtonToNavigateToNewPage(
+      ccLicenseLinkInTermsPage,
+      'License link in the terms page',
+      ccLicenseUrl,
+      'License'
+    );
+  }
+
+  /**
+   * Clicks on the Google Group Sign Up link in the /terms page and checks
+   * if it opens the correct URL.
+   */
+  async clickGoogleGroupSignUpLinkInTermsPage(): Promise<void> {
+    await this.page.waitForSelector(googleGroupSignUpLinkInTermsPage, {
+      visible: true,
+    });
+    await this.clickButtonToNavigateToNewPage(
+      googleGroupSignUpLinkInTermsPage,
+      'Google Group Sign Up link in the terms page',
+      OppiaAnnounceGoogleGroupUrl,
+      'Oppia-announce Google Group page'
+    );
+  }
+
+  /**
+   * Clicks the "DONATE TODAY" button on the Contact Us page and checks that
+   * it navigates to the correct URL.
+   */
+  async clickDonateTodayButtonInContactUsPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      'DONATE TODAY',
+      'DONATE TODAY button',
+      donateUrl,
+      'Donate'
+    );
+  }
+
+  /**
+   * Clicks the "BECOME A PARTNER" button on the Contact Us page and checks that
+   * it navigates to the correct URL.
+   */
+  async clickBecomeAPartnerButtonInContactUsPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      'BECOME A PARTNER',
+      'BECOME A PARTNER button',
+      partnershipsUrl,
+      'Partnerships'
+    );
+  }
+
+  /**
+   * Clicks the "VOLUNTEER WITH US" button on the Contact Us page and checks that
+   * it navigates to the correct URL.
+   */
+  async clickVolunteerButtonInContactUsPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      'BECOME A VOLUNTEER',
+      'BECOME A VOLUNTEER button',
+      volunteerUrl,
+      'Volunteer'
+    );
+  }
+
+  /**
+   * Checks the admin email link in the Contact Us page and verifies
+   * that it navigates to the correct mailto URL.
+   */
+  async verifyAdminEmailLinkInContactUsPage(): Promise<void> {
+    await this.page.waitForSelector(emailLinkSelector);
+    const href = await this.page.$eval(emailLinkSelector, el =>
+      el.getAttribute('href')
+    );
+    if (href !== 'mailto:admin@oppia.org') {
+      throw new Error(
+        `Email link has href "${href}" instead of "mailto:admin@oppia.org"`
+      );
+    }
+  }
+
+  /**
+   * Checks the second press email link in the Contact Us page and verifies
+   * that it navigates to the correct mailto URL.
+   */
+  async verifyPressEmailLinkInContactUsPage(): Promise<void> {
+    await this.page.waitForSelector(emailLinkSelector);
+    const emailLinks = await this.page.$$(emailLinkSelector);
+
+    const href = await this.page.evaluate(
+      el => el.getAttribute('href'),
+      emailLinks[1]
+    );
+    if (href !== 'mailto:press@oppia.org') {
+      throw new Error(
+        `Email link has href ${href} instead of mailto:press@oppia.org`
+      );
+    }
+  }
+
+  /**
+   * Clicks on a option of Terms of Use bookmark menu and waits for the page to scroll
+   * to the corresponding section.
+   */
+  async clickBookmarkInTermsPage(bookmark: string): Promise<void> {
+    try {
+      await this.page.waitForXPath(`//a[text()="${bookmark}"]`, {
+        visible: true,
+      });
+      const linkToClick = await this.page.$x(`//a[text()="${bookmark}"]`);
+      if (linkToClick.length > 0) {
+        await this.waitForElementToBeClickable(linkToClick[0]);
+        await linkToClick[0].click();
+      } else {
+        throw new Error(`Link not found: ${bookmark}`);
+      }
+
+      // Update the bookmark if it's "Hosted Created Content and IP" to match the heading of the
+      // corresponding section.
+      if (bookmark === 'Hosted Created Content and IP') {
+        bookmark = 'Hosted Created Content and Intellectual Property';
+      }
+
+      await this.page.waitForFunction(
+        (bookmark: string) => {
+          const element = document.evaluate(
+            `//h2[text()="${bookmark}"]`,
+            document,
+            null,
+            XPathResult.FIRST_ORDERED_NODE_TYPE,
+            null
+          ).singleNodeValue as HTMLElement;
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            return rect.top >= 0 && rect.bottom <= window.innerHeight;
+          }
+          return false;
+        },
+        {},
+        bookmark
+      );
+    } catch (error) {
+      error.message =
+        `Failed to scroll to bookmark: ${bookmark}. ` + error.message;
+      throw error;
+    }
+    showMessage(`Scrolled successfully to the bookmark: ${bookmark}`);
   }
 
   /**
