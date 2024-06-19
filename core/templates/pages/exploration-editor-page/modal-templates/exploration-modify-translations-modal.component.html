@@ -14,7 +14,10 @@
         <div *ngIf="item.value.needsUpdate === false">
           <div class="content-translation-language">
             <span>
-              <input type="checkbox" name="checkbox-{{item.key}}" [(ngModel)]="languageIsCheckedStatusDict[item.key]" class="e2e-test-{{ item.key }}-translation-checkbox"/>
+              <input type="checkbox"
+                     name="checkbox-{{item.key}}"
+                     [(ngModel)]="languageIsCheckedStatusDict[item.key]"
+                     class="e2e-test-{{ item.key }}-translation-checkbox">
               <p>{{ getLanguageName(item.key) }}</p>
               <div  *ngIf="!languageIsCheckedStatusDict[item.key]" class="re-translation-indicator">
                 Will be sent for re-translation
