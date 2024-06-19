@@ -39,6 +39,18 @@ export class ReleaseCoordinator extends BaseUser {
   }
 
   /**
+   * Navigate to the features tab.
+   */
+  async navigateToFeaturesTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavBar);
+      await this.clickOn(mobileFeaturesTab);
+    } else {
+      await this.clickOn(featuresTab);
+    }
+  }
+
+  /**
    * Enable specified feature flag from the release coordinator page.
    */
   async enableFeatureFlag(featureName: string): Promise<void> {
@@ -125,7 +137,7 @@ export class ReleaseCoordinator extends BaseUser {
    * Waits for a job to complete.
    */
   async waitForJobToComplete(): Promise<void> {
-    // waiting for 30 seconds for the job to complete. However, if some job takes longer,
+    // Waiting for 30 seconds for the job to complete. However, if some job takes longer,
     // than the default timeout of the function below can be increased.
     try {
       await this.page.waitForFunction(() => {
@@ -149,7 +161,6 @@ export class ReleaseCoordinator extends BaseUser {
     await this.clickOn(' View Output ');
     await this.page.waitForSelector('.mat-row');
     const output = await this.page.$eval('.mat-row', el => el.textContent);
-    console.log(output);
     await this.clickOn(' Copy Output ');
 
     // Read the clipboard data.

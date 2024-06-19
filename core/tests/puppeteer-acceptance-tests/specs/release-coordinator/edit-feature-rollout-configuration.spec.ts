@@ -23,8 +23,6 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
-const promoMessage =
-  'New Features Alert! Check out our latest updates and enhancements. Explore now!';
 
 describe('Release Coordinator', function () {
   let releaseCoordinator: ReleaseCoordinator;
@@ -42,12 +40,12 @@ describe('Release Coordinator', function () {
     async function () {
       await releaseCoordinator.navigateToReleaseCoordinatorPage();
       await releaseCoordinator.navigateToFeaturesTab();
-      await releaseCoordinator.alterRolloutPercentageForLoggedInUsers(50);
-      await releaseCoordinator.toggleForceEnableForAllUsers();
+      await releaseCoordinator.updateRolloutPercentageForLoggedInUsers(50);
       await releaseCoordinator.saveChanges();
-
-      // Verify the changes
       await releaseCoordinator.expectRolloutPercentageForLoggedInUsersToBe(50);
+
+      await releaseCoordinator.EnableForAllUsers();
+      await releaseCoordinator.saveChanges();
       await releaseCoordinator.expectForceEnableForAllUsersToBe(true);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

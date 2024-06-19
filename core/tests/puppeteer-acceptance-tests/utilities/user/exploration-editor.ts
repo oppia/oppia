@@ -860,10 +860,10 @@ export class ExplorationEditor extends BaseUser {
         await this.type(floatFormInput, answer);
         break;
       case 'Math Equation Input':
-        // Click on the math equation input field to focus it
+        // Click on the math equation input field to focus it.
         await this.page.click(mathEquationInputSelector);
 
-        // Type the answer into the focused input field
+        // Type the answer into the focused input field.
         await this.page.keyboard.type('a = b');
         break;
       case 'Multiple Choice':
