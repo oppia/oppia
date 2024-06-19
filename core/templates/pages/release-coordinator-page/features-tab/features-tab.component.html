@@ -1,17 +1,17 @@
 <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
-<div *ngFor="let featureFlag of featureFlags;">
-  <div *ngIf="getFeatureValidOnCurrentServer(featureFlag)" class="container oppia-page-card oppia-long-text oppia-features e2e-test-feature-flag">
+<div *ngFor="let featureFlag of featureFlags; index as index">
+  <div *ngIf="getFeatureValidOnCurrentServer(featureFlag)" class="container oppia-page-card oppia-long-text oppia-features e2e-test-feature-flag e2e-test-feature-flag-{{index}}">
     <h2 class="oppia-feature-name e2e-test-feature-name">{{featureFlag.name}}</h2>
     <div class="row oppia-feature-top-margin">
-      <div class="col-2"><b>Description:</b></div>
+      <div class="col-2 oppia-feature-column-mobile"><b>Description:</b></div>
       <div class="col-10 oppia-description-content">{{featureFlag.description}}</div>
     </div>
     <div class="row oppia-feature-top-margin">
-      <div class="col-2"><b>Feature Stage:</b></div>
+      <div class="col-2 oppia-feature-column-mobile"><b>Feature Stage:</b></div>
       <div class="col-10">{{ getFeatureStageString(featureFlag) }}</div>
     </div>
     <div class="row oppia-feature-top-margin">
-      <div class="col-2"><b>Rollout percentage for logged-in users (0-100):</b></div>
+      <div class="col-2 oppia-feature-column-mobile"><b>Rollout percentage for logged-in users (0-100):</b></div>
       <div class="col-10">
         <div class="row">
           <div class="col-3">
@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="row oppia-feature-top-margin">
-      <div class="col-2"><b>Force-enable for all users:</b></div>
+      <div class="col-2 oppia-feature-column-mobile"><b>Force-enable for all users:</b></div>
       <div class="col-10">
         <div>
           <select [(ngModel)]="featureFlag.forceEnableForAllUsers" class="e2e-test-value-selector">
@@ -49,7 +49,7 @@
       </div>
     </div>
     <div class="row oppia-feature-top-margin">
-      <div class="col-2"><b>Last Updated:</b></div>
+      <div class="col-2 oppia-feature-column-mobile"><b>Last Updated:</b></div>
       <div class="col-10">{{ getLastUpdatedDate(featureFlag) }}</div>
     </div>
     <div class="row oppia-control-buttons-container oppia-feature-top-margin">
@@ -78,7 +78,7 @@
     </div>
     <h2 class="oppia-feature-name e2e-test-feature-name">{{featureFlag.name}}</h2>
     <div class="row oppia-feature-top-margin">
-      <div class="col-2"><b>Description:</b></div>
+      <div class="col-2 oppia-feature-column-mobile"><b>Description:</b></div>
       <div class="col-10 oppia-description-content">{{featureFlag.description}}</div>
     </div>
   </div>
@@ -195,6 +195,7 @@
 
   .oppia-features .oppia-feature-name {
     border-bottom: 1px solid #dee2e6;
+    overflow-wrap: break-word;
   }
 
   .oppia-features .oppia-description-content {
@@ -244,5 +245,12 @@
 
   .e2e-test-angular-dummy-feature-indicator {
     bottom: 10px;
+  }
+
+  @media screen and (max-width: 767px) {
+    .oppia-feature-column-mobile {
+      flex: none;
+      max-width: none;
+    }
   }
 </style>
