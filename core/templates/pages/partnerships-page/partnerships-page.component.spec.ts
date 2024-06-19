@@ -24,6 +24,7 @@ import {PartnershipsPageComponent} from './partnerships-page.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PageTitleService} from 'services/page-title.service';
+import {AppConstants} from '../../app.constants';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -119,7 +120,7 @@ describe('Partnerships page', () => {
 
   it('should set the correct form link for English language', () => {
     translateService.currentLang = 'en';
-    const formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+    const formLink = AppConstants.PARTNERSHIPS_FORM_LINK;
     component.setFormLink();
 
     expect(component.formLink).toBe(formLink);
@@ -128,7 +129,9 @@ describe('Partnerships page', () => {
   it('should set the correct form link for Portuguese language', () => {
     translateService.currentLang = 'pt-br';
     const formLink =
-      'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp';
+      AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.PREFIX +
+      'pt' +
+      AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.SUFFIX;
     component.setFormLink();
 
     expect(component.formLink).toBe(formLink);
@@ -137,7 +140,9 @@ describe('Partnerships page', () => {
   it('should set the correct form link for general languages', () => {
     translateService.currentLang = 'fr';
     const formLink =
-      'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=fr&_x_tr_hl=en-US&_x_tr_pto=wapp';
+      AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.PREFIX +
+      'fr' +
+      AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.SUFFIX;
     component.setFormLink();
 
     expect(component.formLink).toBe(formLink);
@@ -147,7 +152,7 @@ describe('Partnerships page', () => {
     'should set english link for languages not supported by' + ' google forms',
     () => {
       translateService.currentLang = 'pcm';
-      const formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+      const formLink = AppConstants.PARTNERSHIPS_FORM_LINK;
       component.setFormLink();
 
       expect(component.formLink).toBe(formLink);

@@ -177,14 +177,6 @@ export class SiteAnalyticsService {
     );
   }
 
-  registerCreateLessonButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'CreateLessonButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
-  }
-
   registerApplyToTeachWithOppiaEvent(): void {
     this._sendEventToLegacyGoogleAnalytics(
       'ApplyToTeachWithOppia',

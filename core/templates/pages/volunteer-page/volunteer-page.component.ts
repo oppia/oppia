@@ -24,6 +24,7 @@ import {Subscription} from 'rxjs';
 
 import {PageTitleService} from 'services/page-title.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'volunteer-page',
@@ -37,6 +38,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
   bannerImgPath = '';
   footerImgPath = '';
   mobBannerImgPath = '';
+  formLink = AppConstants.VOLUNTEER_FORM_LINK;
   art!: {
     images: string[];
     caption: {

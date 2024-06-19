@@ -61,6 +61,11 @@ const allowedVolunteerFormUrls = [
   `${volunteerFormUrl}?usp=send_form`,
   volunteerFormShortUrl,
 ];
+const allowedPartnershipsFormUrls = [
+  partnershipsFormShortUrl,
+  partnershipsFormUrl,
+  `${partnershipsFormUrl}?usp=send_form`,
+];
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const navbarLearnTabBasicMathematicsButton =
@@ -92,8 +97,6 @@ const browseOurLessonsButton = '.e2e-test-about-page-browse-our-lessons-button';
 const accessAndroidAppButton = '.e2e-test-about-page-access-android-app-button';
 const visitClassroomButton = '.e2e-test-about-page-visit-classroom-button';
 const browseLibraryButton = '.e2e-test-about-page-browse-library-button';
-const createLessonsButton = '.e2e-test-about-page-create-lessons-button';
-const exploreLessonsButton = '.e2e-test-about-page-explore-lessons-button';
 
 const aboutFoundationClass = '.oppia-about-foundation-hero-content h1';
 const millionsOfContentId =
@@ -172,6 +175,20 @@ const applyToVolunteerButtonAtTheBottomOfVolunteerPage =
   '.e2e-test-volunteer-page-apply-to-volunteer-button-at-the-bottom';
 const donorBoxIframe = '.e2e-test-donate-page-iframe';
 const languageDropdown = '.e2e-test-language-dropdown';
+const volunteerWithOppiaDesktopButtonInAboutPage =
+  '.e2e-test-about-page-desktop-volunteer-button';
+const volunteerWithOppiaMobileButtonInAboutPage =
+  '.e2e-test-about-page-mobile-volunteer-button';
+const partnerWithUsDesktopButtonInAboutPage =
+  '.e2e-test-about-page-desktop-partner-button';
+const partnerWithUsMobileButtonInAboutPage =
+  '.e2e-test-about-page-mobile-partner-button';
+const donateDesktopButtonInAboutPage = '.e2e-test-donate-desktop-button';
+const donateMobileButtonInAboutPage = '.e2e-test-donate-mobile-button';
+const donorDesktopTabInAboutPage = '.e2e-test-about-page-donor-desktop-tab';
+const donorMobileTabInAboutPage = '.e2e-test-about-page-donor-mobile-tab';
+const partnerDesktopTabInAboutPage = '.e2e-test-about-page-partner-desktop-tab';
+const partnerMobileTabInAboutPage = '.e2e-test-about-page-partner-mobile-tab';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -371,44 +388,6 @@ export class LoggedOutUser extends BaseUser {
       'Browse Library button',
       communityLibraryUrl,
       'Community Library'
-    );
-  }
-
-  /**
-   * Function to click the Create Lessons button in the About page
-   * and check if it opens the Sign-in page with a return URL to the Creator Dashboard in create mode.
-   */
-  async clickCreateLessonsButtonInAboutPage(): Promise<void> {
-    await this.clickOn(createLessonsButton);
-    await this.page.waitForNavigation();
-
-    const expectedSignInPageUrl =
-      testConstants.URLs.Login +
-      '?return_url=http:%2F%2Flocalhost:8181%2Fcreator-dashboard%3Fmode%3Dcreate';
-
-    if (this.page.url() !== expectedSignInPageUrl) {
-      throw new Error(
-        `The Create Lessons button does not open the Sign-in page with a return URL to the Creator Dashboard in create mode!
-         It opens ${this.page.url()} instead.`
-      );
-    } else {
-      showMessage(
-        'The Create Lessons button opens the Sign-in page ' +
-          'with a return URL to the Creator Dashboard in create mode.'
-      );
-    }
-  }
-
-  /**
-   * Function to click the Browse Our Lessons button in the About page
-   * and check if it opens the Math Classroom page.
-   */
-  async clickExploreLessonsButtonInAboutPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      exploreLessonsButton,
-      'Explore Lessons button',
-      mathClassroomUrl,
-      'Math Classroom'
     );
   }
 
@@ -1239,29 +1218,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Partner With Us button in the Partnerships page
-   * and check if it opens the Partnerships Google form.
-   * The button is in the first section of the page.
-   */
-  async clickPartnerWithUsButtonInPartnershipsPage(): Promise<void> {
-    const allowedUrls = [
-      partnershipsFormShortUrl,
-      partnershipsFormUrl,
-      `${partnershipsFormUrl}?usp=send_form`,
-    ];
-
-    // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
-    // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
-    // control.So we need to check for all the 3 URLs as all of them are valid.
-    await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
-      partnerWithUsButtonAtTheTopOfPartnershipsPage,
-      'Partner With Us button at the bottom of the Partnerships page',
-      allowedUrls,
-      'Partnerships Google Form'
-    );
-  }
-
-  /**
    * Function to change the site language to the given language code.
    * @param langCode - The language code to change the site language to. Example: 'pt-br', 'en'
    */
@@ -1273,8 +1229,26 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to click the Partner With Us button in the Partnerships page
-   * and check if it opens the Partnerships Google form in Portuguese.
-   * The button is in the bottom section of the page.
+   * and check if it opens the Partnerships Google form.
+   * The button is in the first section of the page.
+   */
+  async clickPartnerWithUsButtonInPartnershipsPage(): Promise<void> {
+    // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
+    // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
+    // control.So we need to check for all the 3 URLs as all of them are valid.
+    await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage,
+      'Partner With Us button at the bottom of the Partnerships page',
+      allowedPartnershipsFormUrls,
+      'Partnerships Google Form'
+    );
+  }
+
+  /**
+   * This function changes the site language based on the provided parameter,
+   * then clicks the 'Partner With Us' button in the bottom section of the Partnerships page
+   * and verifies if the Partnerships Google form opens in the specified language.
+   * @param {string} langCode - The language code to change the site language to.
    */
   async clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
     langCode: string
@@ -1458,6 +1432,109 @@ export class LoggedOutUser extends BaseUser {
         );
       }
       showMessage(`Activity with title ${expectedActivity} found as expected.`);
+    }
+  }
+
+  /**
+   * Function to click the Volunteer with Oppia on the about page
+   * and check if it opens the Volunteer form.
+   */
+  async clickVolunteerWithOppiaButtonInAboutPage(): Promise<void> {
+    const volunteerWithOppiaButtonInAboutPage = this.isViewportAtMobileWidth()
+      ? volunteerWithOppiaMobileButtonInAboutPage
+      : volunteerWithOppiaDesktopButtonInAboutPage;
+    // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
+    // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
+    // control.So we need to check for all the 3 URLs in the 'allowedVolunteerFormUrls' array
+    // as all of them are valid.
+    await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
+      volunteerWithOppiaButtonInAboutPage,
+      'Apply To Volunteer at the top of the Volunteer page',
+      allowedVolunteerFormUrls,
+      'Volunteer Form'
+    );
+  }
+
+  /**
+   * Function to click the Partner With Us button in the About page
+   * and check if it opens the Partnerships Google form.
+   */
+  async clickPartnerWithUsButtonInAboutPage(): Promise<void> {
+    const partnerTab = this.isViewportAtMobileWidth()
+      ? partnerMobileTabInAboutPage
+      : partnerDesktopTabInAboutPage;
+
+    const partnerWithUsButtonInAboutPage = this.isViewportAtMobileWidth()
+      ? partnerWithUsMobileButtonInAboutPage
+      : partnerWithUsDesktopButtonInAboutPage;
+
+    await this.clickOn(partnerTab);
+    // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
+    // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
+    // control.So we need to check for all the 3 URLs as all of them are valid.
+    await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
+      partnerWithUsButtonInAboutPage,
+      'Partner With Us button at the bottom of the Partnerships page',
+      allowedPartnershipsFormUrls,
+      'Partnerships Google Form'
+    );
+  }
+
+  /**
+   * This function changes the site language based on the provided parameter,
+   * then clicks the 'Partner With Us' button on the About page, and
+   * verifies if the Partnerships Google form opens in the specified language.
+   * @param {string} langCode - The language code to change the site language to.
+   */
+  async clickPartnerWithUsButtonInAboutPageInGivenLanguage(
+    langCode: string
+  ): Promise<void> {
+    await this.changeSiteLanguage(langCode);
+    // Here we need to reload the page again to confirm the language change.
+    await this.page.reload();
+
+    const partnerTab = this.isViewportAtMobileWidth()
+      ? partnerMobileTabInAboutPage
+      : partnerDesktopTabInAboutPage;
+
+    const partnerWithUsButtonInAboutPage = this.isViewportAtMobileWidth()
+      ? partnerWithUsMobileButtonInAboutPage
+      : partnerWithUsDesktopButtonInAboutPage;
+
+    await this.clickOn(partnerTab);
+    // Here we are not verifying the 3 URLs as we did in the English version
+    // because we have put the direct translated Google Form URL in the page itself.
+    // Refer core/templates/pages/partnerships-page/partnerships-page.component.ts to see how it's done.
+    await this.clickLinkButtonToNewTab(
+      partnerWithUsButtonInAboutPage,
+      'Partner With Us button at the bottom of the Partnerships page',
+      partnershipsFormInPortugueseUrl,
+      'Partnerships Google Form'
+    );
+  }
+
+  /**
+   * Function to check if the donor box is visible by clicking on the "Donate" button
+   * on the about page. Here we don't test the functionality of the donor box, just
+   * its visibility, because the donor box is an iframe and a third-party service.
+   */
+  async clickDonateButtonInAboutPage(): Promise<void> {
+    const donorTab = this.isViewportAtMobileWidth()
+      ? donorMobileTabInAboutPage
+      : donorDesktopTabInAboutPage;
+
+    const donateButtonInAboutPage = this.isViewportAtMobileWidth()
+      ? donateMobileButtonInAboutPage
+      : donateDesktopButtonInAboutPage;
+
+    await this.clickOn(donorTab);
+    await this.clickOn(donateButtonInAboutPage);
+
+    const donorBox = await this.page.waitForSelector(donorBoxIframe);
+    if (!donorBox) {
+      throw new Error('The donor box is not visible on the about page.');
+    } else {
+      showMessage('The donor box is visible on the about page.');
     }
   }
 }

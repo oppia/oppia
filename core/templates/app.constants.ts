@@ -237,4 +237,11 @@ export const AppConstants = {
   CONTRIBUTOR_BADGE_INITIAL_LEVELS: [1, 10, 20, 50, 100, 200, 300, 400, 500],
   CONTRIBUTOR_CERTIFICATE_LOGO:
     '/assets/images/contributor_dashboard/oppia-logo.jpg',
+  PARTNERSHIPS_FORM_LINK: 'https://forms.gle/Y71U8FdhQwZpicJj8',
+  PARTNERSHIPS_FORM_TRANSLATED_LINK: {
+    PREFIX:
+      'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=',
+    SUFFIX: '&_x_tr_hl=en-US&_x_tr_pto=wapp',
+  },
+  VOLUNTEER_FORM_LINK: 'https://forms.gle/rhFYoLLSFr3JEZHy8',
 } as const;
