@@ -43,11 +43,16 @@ export class BlogPostEditor extends BaseUser {
    * Function for adding blog post author bio in blog dashboard.
    */
   async addUserBioInBlogDashboard(): Promise<void> {
-    await this.type(blogAuthorBioField, 'Dummy-User-Bio');
-    await this.page.waitForSelector(
-      'button.e2e-test-save-author-details-button:not([disabled])'
-    );
-    await this.clickOn(LABEL_FOR_SAVE_BUTTON);
+    const inputBar = await this.page.$(blogAuthorBioField);
+    // It is used here to avoid filling the user bio each time. We fill it only once when
+    // the user is accessing the blog dashboard for the first time.
+    if (inputBar) {
+      await this.type(blogAuthorBioField, 'Dummy-User-Bio');
+      await this.page.waitForSelector(
+        'button.e2e-test-save-author-details-button:not([disabled])'
+      );
+      await this.clickOn(LABEL_FOR_SAVE_BUTTON);
+    }
   }
 
   /**
@@ -66,11 +71,10 @@ export class BlogPostEditor extends BaseUser {
   ): Promise<void> {
     await this.addUserBioInBlogDashboard();
     await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
-    await this.type(blogTitleInput, draftBlogPostTitle);
-    await this.page.keyboard.press('Tab');
-    await this.type(blogBodyInput, 'test blog post body content');
-    await this.clickOn(LABEL_FOR_DONE_BUTTON);
-    await this.clickOn(LABEL_FOR_SAVE_DRAFT_BUTTON);
+    await this.updateTitleTo(draftBlogPostTitle);
+    await this.updateBodyTextTo('test blog post body content');
+    await this.saveTheChanges();
+    await this.saveTheDraftBlogPost();
 
     showMessage('Successfully created a draft blog post!');
     await this.goto(blogDashboardUrl);
@@ -145,22 +149,73 @@ export class BlogPostEditor extends BaseUser {
   }
 
   /**
+   * This is a composite function that can be used when a straightforward, simple blog published is required.
    * This function publishes a blog post with given title.
    */
   async publishNewBlogPostWithTitle(newBlogPostTitle: string): Promise<void> {
-    await this.addUserBioInBlogDashboard();
-    await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
-    await this.expectPublishButtonToBeDisabled();
-
+    await this.navigateToBlogEditorPage();
     await this.uploadBlogPostThumbnailImage();
     await this.expectPublishButtonToBeDisabled();
 
+    await this.updateTitleTo(newBlogPostTitle);
+    await this.updateBodyTextTo('test blog post body content');
+    await this.selectTags('News', 'International');
+    await this.saveTheChanges();
+
+    await this.publishTheBlogPost();
+  }
+
+  /**
+   * This function navigates to the blog editor page.
+   */
+  async navigateToBlogEditorPage(): Promise<void> {
+    await this.addUserBioInBlogDashboard();
+    await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
+    await this.expectPublishButtonToBeDisabled();
+  }
+
+  /**
+   * This function updates the title of the blog post.
+   */
+  async updateTitleTo(newBlogPostTitle: string): Promise<void> {
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
-    await this.type(blogBodyInput, 'test blog post body content');
+  }
+
+  /**
+   * This function updates the body text of the blog post.
+   */
+  async updateBodyTextTo(newBodyText: string): Promise<void> {
+    await this.type(blogBodyInput, newBodyText);
+  }
+
+  /**
+   * This function saves the blog post.
+   */
+  async saveTheChanges(): Promise<void> {
     await this.clickOn('button.mat-button-toggle-button');
     await this.clickOn(LABEL_FOR_DONE_BUTTON);
+  }
 
+  /**
+   * This function selects two tags for the blog post.
+   */
+  async selectTags(Tag1: string, Tag2: string): Promise<void> {
+    await this.clickOn(Tag1);
+    await this.clickOn(Tag2);
+  }
+
+  /**
+   * This function saves the draft blog post.
+   */
+  async saveTheDraftBlogPost(): Promise<void> {
+    await this.clickOn(LABEL_FOR_SAVE_DRAFT_BUTTON);
+  }
+
+  /**
+   * This function publishes the blog post.
+   */
+  async publishTheBlogPost(): Promise<void> {
     await this.clickOn('PUBLISH');
     await this.page.waitForSelector('button.e2e-test-confirm-button');
     await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
@@ -178,10 +233,10 @@ export class BlogPostEditor extends BaseUser {
     await this.uploadBlogPostThumbnailImage();
     await this.expectPublishButtonToBeDisabled();
 
-    await this.type(blogTitleInput, newBlogPostTitle);
-    await this.page.keyboard.press('Tab');
-    await this.type(blogBodyInput, 'test blog post body content - duplicate');
-    await this.clickOn(LABEL_FOR_DONE_BUTTON);
+    await this.updateTitleTo(newBlogPostTitle);
+    await this.updateBodyTextTo('test blog post body content - duplicate');
+    await this.selectTags('News', 'International');
+    await this.saveTheChanges();
   }
 
   /**
