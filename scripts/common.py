@@ -217,6 +217,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked',
     'curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill',
     'exploration-editor/create-exploration-and-change-basic-settings',
+    'exploration-editor/modify-translations-through-modal',
     'exploration-editor/load-complete-and-restart-exploration-preview',
     'exploration-editor/save-draft-publish-and-discard-the-changes',
     'logged-in-user/subscribe-to-creator-and-'
