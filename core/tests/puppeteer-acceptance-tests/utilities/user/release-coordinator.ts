@@ -22,6 +22,7 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const releaseCoordinatorUrl = testConstants.URLs.ReleaseCoordinator;
+const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const featuresTab = '.e2e-test-features-tab';
 const mobileFeaturesTab = '.e2e-test-features-tab-mobile';
 const mobileNavBar = '.e2e-test-navbar-dropdown-toggle';
@@ -47,6 +48,84 @@ export class ReleaseCoordinator extends BaseUser {
       await this.clickOn(mobileFeaturesTab);
     } else {
       await this.clickOn(featuresTab);
+    }
+  }
+
+  /**
+   * Edit the rollout percentage for a feature.
+   */
+  async editFeatureRolloutPercentage(
+    featureName: string,
+    percentage: number
+  ): Promise<void> {
+    await this.goto(releaseCoordinatorUrl);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavBar);
+      await this.clickOn(mobileFeaturesTab);
+    } else {
+      await this.clickOn(featuresTab);
+    }
+
+    await this.page.waitForSelector(featureFlagDiv);
+    const featureFlagIndex = await this.page.evaluate(
+      (featureFlagDiv, featureName, featureFlagNameSelector) => {
+        const featureFlagDivs = Array.from(
+          document.querySelectorAll(featureFlagDiv)
+        );
+
+        for (let i = 0; i < featureFlagDivs.length; i++) {
+          if (
+            featureFlagDivs[i]
+              .querySelector(featureFlagNameSelector)
+              ?.textContent?.trim() === featureName
+          ) {
+            return i;
+          }
+        }
+      },
+      featureFlagDiv,
+      featureName,
+      featureFlagNameSelector
+    );
+
+    // Find the input field for rollout percentage and set its value to the specified percentage.
+    await this.page.evaluate(
+      (percentage, inputSelector) => {
+        const inputElem = document.querySelector(
+          inputSelector
+        ) as HTMLInputElement | null;
+        if (!inputElem) {
+          console.error('Input element not found');
+          return;
+        }
+
+        inputElem.value = percentage.toString();
+        const event = new Event('input', {bubbles: true});
+        inputElem.dispatchEvent(event);
+      },
+      percentage,
+      `.e2e-test-feature-flag-${featureFlagIndex} .e2e-test-editor-int`
+    );
+
+    // Save the changes.
+    await this.clickOn(
+      `.e2e-test-feature-flag-${featureFlagIndex} ${saveFeatureFlagButtonSelector}`
+    );
+    showMessage(
+      `Feature flag: "${featureName}" rollout percentage has been set to ${percentage}%.`
+    );
+  }
+
+  /**
+   * Check if the redesigned learner dashboard feature is enabled.
+   */
+  async expectNewDesignInLearnerDashboard(enabled: boolean): Promise<void> {
+    await this.goto(learnerDashboardUrl);
+    const newSideBar = await this.page.$('.oppia-learner-dash-sidebar_pic');
+    if (newSideBar && enabled) {
+      showMessage('New design in learner dashboard is enabled.');
+    } else {
+      throw new Error('New design in learner dashboard is not enabled.');
     }
   }
 
@@ -128,7 +207,7 @@ export class ReleaseCoordinator extends BaseUser {
    */
   async selectAndRunJob(jobName: string): Promise<void> {
     await this.type('.mat-input-element', jobName);
-    await this.page.keyboard.press('Enter');
+    await this.clickOn('.mat-option-text');
     await this.clickOn('.job-start-button');
     await this.clickOn(' Start New Job ');
   }

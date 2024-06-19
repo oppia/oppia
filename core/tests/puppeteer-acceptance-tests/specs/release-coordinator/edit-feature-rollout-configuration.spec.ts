@@ -40,13 +40,18 @@ describe('Release Coordinator', function () {
     async function () {
       await releaseCoordinator.navigateToReleaseCoordinatorPage();
       await releaseCoordinator.navigateToFeaturesTab();
-      await releaseCoordinator.updateRolloutPercentageForLoggedInUsers(50);
-      await releaseCoordinator.saveChanges();
-      await releaseCoordinator.expectRolloutPercentageForLoggedInUsersToBe(50);
 
-      await releaseCoordinator.EnableForAllUsers();
-      await releaseCoordinator.saveChanges();
-      await releaseCoordinator.expectForceEnableForAllUsersToBe(true);
+      await releaseCoordinator.expectNewDesignInLearnerDashboard(false);
+      await releaseCoordinator.editFeatureRolloutPercentage(
+        'show_redesigned_learner_dashboard',
+        100
+      );
+      await releaseCoordinator.expectNewDesignInLearnerDashboard(true);
+
+      await releaseCoordinator.enableFeatureFlag(
+        'show_redesigned_learner_dashboard'
+      );
+      await releaseCoordinator.expectNewDesignInLearnerDashboard(true);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
