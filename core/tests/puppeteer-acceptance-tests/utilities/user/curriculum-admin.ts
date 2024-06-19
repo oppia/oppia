@@ -45,6 +45,7 @@ const createQuestionButton = 'div.e2e-test-create-question';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const interactionNumberInputButton =
   'div.e2e-test-interaction-tile-NumericInput';
+const interactionNameDiv = 'div.oppia-interaction-tile-name';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const responseRuleDropdown =
   'oppia-rule-type-selector.e2e-test-answer-description';
@@ -212,7 +213,20 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(interactionNumberInputButton, {
       visible: true,
     });
-    await this.clickOn(interactionNumberInputButton);
+    await this.page.evaluate(interactionNameDiv => {
+      const interactionDivs = Array.from(
+        document.querySelectorAll(interactionNameDiv)
+      );
+      const element = interactionDivs.find(
+        element => element.textContent?.trim() === 'Number Input'
+      ) as HTMLElement;
+      if (element) {
+        element.click();
+      } else {
+        throw new Error('Cannot find number input interaction option.');
+      }
+    }, interactionNameDiv);
+
     await this.clickOn(saveInteractionButton);
     await this.page.waitForSelector('oppia-add-answer-group-modal-component', {
       visible: true,
@@ -255,7 +269,7 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Create a topic in the topics-and-skills dashboard.
    */
-  async createTopic(name: string, urlFragment: string): Promise<void> {
+  async createTopic(name: string, urlFragment: string): Promise<string> {
     await this.clickOn('Create Topic');
     await this.type(topicNameField, name);
     await this.type(topicUrlFragmentField, urlFragment);
@@ -280,6 +294,12 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(topicMetaTagInput, 'meta');
     await this.page.keyboard.press('Tab');
     await this.saveTopicDraft(name);
+    const topicUrl = this.page.url();
+    let topicId = topicUrl
+      .replace(/^.*\/topic_editor\//, '')
+      .replace(/#\/.*/, '');
+
+    return topicId;
   }
 
   /**

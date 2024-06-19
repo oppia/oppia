@@ -19,8 +19,14 @@
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbActiveModal,
+  NgbModal,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
 import {MarkTranslationsAsNeedingUpdateModalComponent} from './mark-translations-as-needing-update-modal.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ModifyTranslationsModalComponent} from '../../../pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -32,10 +38,27 @@ class MockActiveModal {
   }
 }
 
+class MockPlatformFeatureService {
+  status = {
+    ExplorationEditorCanModifyTranslations: {
+      isEnabled: false,
+    },
+  };
+}
+
+export class MockNgbModalRef {
+  componentInstance = {
+    contentId: null,
+  };
+}
+
 describe('Mark Translations As Needing Update Modal Component', () => {
   let component: MarkTranslationsAsNeedingUpdateModalComponent;
   let fixture: ComponentFixture<MarkTranslationsAsNeedingUpdateModalComponent>;
   let ngbActiveModal: NgbActiveModal;
+  let ngbModal: NgbModal;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
+  let ngbModalRef: MockNgbModalRef = new MockNgbModalRef();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -45,6 +68,10 @@ describe('Mark Translations As Needing Update Modal Component', () => {
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -57,10 +84,21 @@ describe('Mark Translations As Needing Update Modal Component', () => {
     fixture.detectChanges();
 
     ngbActiveModal = TestBed.inject(NgbActiveModal);
+    ngbModal = TestBed.inject(NgbModal);
   }));
 
   it('should check whether component is initialized', () => {
     expect(component).toBeDefined();
+  });
+
+  it('should check feature flag when initialized', () => {
+    mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled =
+      true;
+    expect(component.modifyTranslationsFeatureFlagIsEnabled).toBeFalse();
+
+    component.ngOnInit();
+
+    expect(component.modifyTranslationsFeatureFlagIsEnabled).toBeTrue();
   });
 
   it('should call markNeedingUpdateHandler', () => {
@@ -71,6 +109,21 @@ describe('Mark Translations As Needing Update Modal Component', () => {
     component.markNeedsUpdate();
 
     expect(handlerWithSpy).toHaveBeenCalledOnceWith('contentId_1');
+  });
+
+  it('should open the ModifyTranslations modal', () => {
+    component.contentId = 'content0';
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValue(
+      ngbModalRef as NgbModalRef
+    );
+
+    component.openModifyTranslationsModal();
+
+    expect(modalSpy).toHaveBeenCalledWith(ModifyTranslationsModalComponent, {
+      backdrop: 'static',
+      windowClass: 'oppia-modify-translations-modal',
+    });
+    expect(ngbModalRef.componentInstance.contentId).toBe('content0');
   });
 
   it('should call removeTranslations', () => {

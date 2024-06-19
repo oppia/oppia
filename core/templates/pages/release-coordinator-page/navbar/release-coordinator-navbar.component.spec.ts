@@ -89,6 +89,7 @@ describe('Release coordinator navbar component', () => {
     expect(component.activeTab).toBe(
       ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS
     );
+    expect(component.dropdownMenuIsActive).toBe(false);
   }));
 
   it('should get default profile pictures when username is null', fakeAsync(() => {
@@ -144,4 +145,21 @@ describe('Release coordinator navbar component', () => {
 
     expect(component.profileDropdownIsActive).toBe(false);
   });
+
+  it('should set dropdownMenuIsActive to true', fakeAsync(() => {
+    component.ngOnInit();
+    expect(component.dropdownMenuIsActive).toBe(false);
+
+    component.activateDropdownMenu();
+    expect(component.dropdownMenuIsActive).toBe(true);
+  }));
+
+  it('should set dropdownMenuIsActive to false', fakeAsync(() => {
+    component.ngOnInit();
+    component.dropdownMenuIsActive = true;
+    expect(component.dropdownMenuIsActive).toBe(true);
+
+    component.deactivateDropdownMenu();
+    expect(component.dropdownMenuIsActive).toBe(false);
+  }));
 });

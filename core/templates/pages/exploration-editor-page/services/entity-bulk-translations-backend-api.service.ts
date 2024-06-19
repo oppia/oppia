@@ -21,6 +21,10 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {LanguageCodeToEntityTranslations} from 'services/entity-translations.services';
+import {
+  EntityTranslation,
+  languageCodeToEntityTranslationBackendDict,
+} from 'domain/translation/EntityTranslationObjectFactory';
 
 @Injectable({
   providedIn: 'root',
@@ -52,13 +56,19 @@ export class EntityBulkTranslationsBackendApiService {
   ): Promise<LanguageCodeToEntityTranslations> {
     return new Promise((resolve, reject) => {
       this.httpClient
-        .get<LanguageCodeToEntityTranslations>(
+        .get<languageCodeToEntityTranslationBackendDict>(
           this._getUrl(entityId, entityType, entityVersion)
         )
         .toPromise()
         .then(
           response => {
-            resolve(response);
+            let languageCodeToEntityTranslations: LanguageCodeToEntityTranslations =
+              {};
+            for (let language in response) {
+              languageCodeToEntityTranslations[language] =
+                EntityTranslation.createFromBackendDict(response[language]);
+            }
+            resolve(languageCodeToEntityTranslations);
           },
           errorResponse => {
             reject(errorResponse.error.error);

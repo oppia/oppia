@@ -44,6 +44,7 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
   logoPngImageSrc!: string;
   logoutUrl: string =
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE;
+  dropdownMenuIsActive: boolean = false;
 
   profileDropdownIsActive: boolean = false;
   TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
@@ -64,11 +65,20 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
     return (this.profileDropdownIsActive = false);
   }
 
+  activateDropdownMenu(): boolean {
+    return (this.dropdownMenuIsActive = true);
+  }
+
+  deactivateDropdownMenu(): boolean {
+    return (this.dropdownMenuIsActive = false);
+  }
+
   switchTab(tabName: string): void {
     if (tabName !== this.activeTab) {
       this.activeTabChange.emit(tabName);
       this.activeTab = tabName;
     }
+    this.dropdownMenuIsActive = false;
   }
 
   async getUserInfoAsync(): Promise<void> {

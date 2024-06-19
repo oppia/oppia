@@ -75,6 +75,8 @@ import {VersionHistoryService} from './services/version-history.service';
 import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 
 interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: boolean;
@@ -346,11 +348,48 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         }
       }
 
-      // Initialize changeList by draft changes if they exist.
+      // Initialize changeList by draft changes if they exist,
+      // and initialize the entity translations by draft changes
+      // if they exist.
       if (explorationData.draft_changes !== null) {
         this.changeListService.loadAutosavedChangeList(
           explorationData.draft_changes
         );
+
+        for (let i in explorationData.draft_changes) {
+          let changeDict = explorationData.draft_changes[i];
+
+          if (changeDict.cmd === 'edit_translation') {
+            // Create the entity translation objects first if they don't exist.
+            if (
+              !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+                changeDict.language_code
+              )
+            ) {
+              this.entityTranslationsService.languageCodeToEntityTranslations[
+                changeDict.language_code
+              ] = EntityTranslation.createFromBackendDict({
+                entity_id: this.explorationId,
+                entity_type: 'exploration',
+                entity_version: explorationData.version,
+                language_code: changeDict.language_code,
+                translations: {},
+              });
+            }
+
+            // Update the translations appropriately, via latest draft changes.
+            this.entityTranslationsService.languageCodeToEntityTranslations[
+              changeDict.language_code
+            ].updateTranslation(
+              changeDict.content_id,
+              TranslatedContent.createFromBackendDict(changeDict.translation)
+            );
+          } else if (changeDict.cmd === 'remove_translations') {
+            this.entityTranslationsService.removeAllTranslationsForContent(
+              changeDict.content_id
+            );
+          }
+        }
       }
 
       if (

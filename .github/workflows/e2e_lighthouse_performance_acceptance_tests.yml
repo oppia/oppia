@@ -314,6 +314,8 @@ jobs:
       strategy:
         matrix:
           os: [ubuntu-22.04]
+          # TODO(#20467): Add exploration-editor/modify-translations-through-modal spec file
+          # to suites once the exploration_editor_can_modify_translations feature is in prod stage.
           suite:
             - blog-admin/assign-roles-to-users-and-change-tag-properties
             - blog-editor/create-and-delete-draft-blog-post

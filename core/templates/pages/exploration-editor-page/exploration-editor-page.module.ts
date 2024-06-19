@@ -102,6 +102,7 @@ import {ValueGeneratorEditorComponent} from './param-changes-editor/value-genera
 import {ParamChangesEditorComponent} from './param-changes-editor/param-changes-editor.component';
 import {ExplorationEditorPageComponent} from './exploration-editor-page.component';
 import {VoiceoverRemovalConfirmModalComponent} from './translation-tab/voiceover-card/modals/voiceover-removal-confirm-modal.component';
+import {ModifyTranslationsModalComponent} from './modal-templates/exploration-modify-translations-modal.component';
 
 @NgModule({
   imports: [
@@ -191,6 +192,7 @@ import {VoiceoverRemovalConfirmModalComponent} from './translation-tab/voiceover
     TranslationTabComponent,
     ExplorationEditorPageComponent,
     StateVersionHistoryComponent,
+    ModifyTranslationsModalComponent,
   ],
   entryComponents: [
     DeleteStateSkillModalComponent,
@@ -259,6 +261,7 @@ import {VoiceoverRemovalConfirmModalComponent} from './translation-tab/voiceover
     TranslationTabComponent,
     ExplorationEditorPageComponent,
     StateVersionHistoryComponent,
+    ModifyTranslationsModalComponent,
   ],
   providers: [
     {

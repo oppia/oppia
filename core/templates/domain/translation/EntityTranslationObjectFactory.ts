@@ -33,6 +33,10 @@ export interface EntityTranslationBackendDict {
   translations: TranslationMappingDict;
 }
 
+export interface languageCodeToEntityTranslationBackendDict {
+  [languageCode: string]: EntityTranslationBackendDict;
+}
+
 interface TranslationMapping {
   [contentId: string]: TranslatedContent;
 }
