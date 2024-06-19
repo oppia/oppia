@@ -22,9 +22,16 @@ import {AboutPageRootComponent} from './about-page-root.component';
 import {AboutPageRoutingModule} from './about-page-routing.module';
 import {CommonModule} from '@angular/common';
 import {SharedComponentsModule} from 'components/shared-component.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
-  imports: [CommonModule, SharedComponentsModule, AboutPageRoutingModule],
+  imports: [
+    CommonModule,
+    SharedComponentsModule,
+    AboutPageRoutingModule,
+    NgbModule,
+  ],
+  entryComponents: [AboutPageComponent, AboutPageRootComponent],
   declarations: [AboutPageComponent, AboutPageRootComponent],
 })
 export class AboutPageModule {}

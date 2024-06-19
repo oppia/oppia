@@ -31,13 +31,13 @@ describe('ISODatePickerAdapter', () => {
   });
 
   it('should format date for input display', () => {
-    const date = new Date('2024-03-16');
+    const date = new Date('2024-03-16T00:00');
     const formattedDate = cda.format(date, 'input');
     expect(formattedDate).toBe('16-Mar-2024');
   });
 
   it('should return date as a string for other display formats', () => {
-    const date = new Date('2024-03-16');
+    const date = new Date('2024-03-16T00:00');
     const formattedDate = cda.format(date, 'otherFormat');
     expect(formattedDate).toBe(date.toDateString());
   });
