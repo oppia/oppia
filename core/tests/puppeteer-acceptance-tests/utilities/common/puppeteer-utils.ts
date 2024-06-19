@@ -16,13 +16,7 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, {
-  Page,
-  Frame,
-  Browser,
-  Viewport,
-  ElementHandle,
-} from 'puppeteer';
+import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
@@ -131,6 +125,16 @@ export class BaseUser {
       });
 
     return this.page;
+  }
+
+  /**
+   * Checks if the application is in development mode.
+   * @returns {Promise<boolean>} Returns true if the application is in development mode,
+   * false otherwise.
+   */
+  async isInProdMode(): Promise<boolean> {
+    const prodMode = process.env.PROD_ENV === 'true';
+    return prodMode;
   }
 
   /**
@@ -346,29 +350,6 @@ export class BaseUser {
   }
 
   /**
-   * Clicks an element on the page.
-   * @param {Page | Frame | ElementHandle} context - The Puppeteer context, usually a Page or Frame.
-   * @param {string} selector - The CSS selector of the element to click.
-   */
-  async clickElement(
-    context: Page | Frame | ElementHandle,
-    selector: string
-  ): Promise<void> {
-    try {
-      await context.waitForSelector(selector);
-      const element = await context.$(selector);
-      if (!element) {
-        throw new Error(`Element ${selector} not found`);
-      }
-      await this.waitForElementToBeClickable(element);
-      await element.click();
-    } catch (error) {
-      error.message = `Failed to click on element ${selector}: ${error.message}`;
-      throw error;
-    }
-  }
-
-  /**
    * This function retrieves the text content of a specified element.
    */
   async getElementText(selector: string): Promise<string> {
@@ -382,8 +363,8 @@ export class BaseUser {
   }
 
   /**
-   * This function checks if a particular text exists on the current page.
-   * @param {string} text - The text to check for.
+   * Checks if a given word is present on the page.
+   * @param {string} word - The word to check.
    */
   async isTextPresentOnPage(text: string): Promise<boolean> {
     const pageContent = await this.page.content();
