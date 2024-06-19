@@ -7120,7 +7120,7 @@ title: Old Title
         self.assertTrue(
             entity_translations[0].translations['content_0'].needs_update)
 
-    def test_update_exploration_with_mark_translation_needs_update_for_language_changes(
+    def test_update_exploration_with_mark_translation_needs_update_for_language(
         self
     ) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -7145,7 +7145,8 @@ title: Old Title
 
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE,
+                'cmd': (
+                    exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE),
                 'content_id': 'content_0',
                 'language_code': 'hi'
             })], 'Marked translation need update.')
@@ -7158,7 +7159,6 @@ title: Old Title
         self.assertEqual(len(entity_translations), 1)
         self.assertTrue(
             entity_translations[0].translations['content_0'].needs_update)
-
 
     def test_update_exploration_with_remove_translation_changes(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)

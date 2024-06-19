@@ -285,6 +285,33 @@ describe('Translator Overview component', () => {
       expect(translatedContent.needsUpdate).toBeTrue();
     }));
 
+    it('should handle mark needs update translation changes for language', fakeAsync(() => {
+      let translatedContent = entityTranslation.getWrittenTranslation(
+        'content1'
+      ) as TranslatedContent;
+      expect(translatedContent.needsUpdate).toBeFalse();
+
+      spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
+        {
+          cmd: 'mark_translation_needs_update_for_language',
+          content_id: 'content1',
+          language_code: 'hi',
+        },
+      ]);
+      spyOn(
+        translationLanguageService,
+        'getActiveLanguageCode'
+      ).and.returnValue(undefined as unknown as string);
+
+      component.ngOnInit();
+      tick();
+
+      translatedContent = entityTranslation.getWrittenTranslation(
+        'content1'
+      ) as TranslatedContent;
+      expect(translatedContent.needsUpdate).toBeTrue();
+    }));
+
     it('should update entity translations with remove translation changes', fakeAsync(() => {
       expect(entityTranslation.hasWrittenTranslation('content1')).toBeTrue();
 

@@ -122,7 +122,8 @@ DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE: Final = (
 DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE: Final = (
     'mark_written_translations_as_needing_update')
 CMD_MARK_TRANSLATIONS_NEEDS_UPDATE: Final = 'mark_translations_needs_update'
-CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE: Final = 'mark_translation_needs_update_for_language'
+CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE: Final = (
+    'mark_translation_needs_update_for_language')
 CMD_EDIT_TRANSLATION: Final = 'edit_translation'
 # This takes additional 'content_id' parameters.
 CMD_REMOVE_TRANSLATIONS: Final = 'remove_translations'

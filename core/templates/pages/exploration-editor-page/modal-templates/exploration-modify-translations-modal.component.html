@@ -18,7 +18,7 @@
               <p>{{ getLanguageName(item.key) }}</p>
               <div  *ngIf="!languageIsCheckedStatusDict[item.key]" class="re-translation-indicator">
                 Will be sent for re-translation
-              </div>    
+              </div>
             </span>
             <i class="fas fa-pencil-alt e2e-test-{{ item.key }}-translation-edit" (click)="openTranslationEditor(item.key)"></i>
           </div>

@@ -57,7 +57,7 @@ export class MockNgbModalRef {
     contentId: null,
     contentValue: null,
   };
-  result: Promise<any>;
+  result: null;
 }
 
 describe('Mark Translations As Needing Update Modal Component', () => {

@@ -33,7 +33,7 @@ import {TranslationLanguageService} from '../translation-tab/services/translatio
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
 interface LanguageCodeToContentTranslations {
-  [language_code: string]: TranslatedContent;
+  [languageCode: string]: TranslatedContent;
 }
 
 @Component({
@@ -49,7 +49,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   contentHasDisplayableTranslations: boolean = false;
   allExistingTranslationsHaveBeenRemoved: boolean = false;
   languageIsCheckedStatusDict: {
-    [language_code: string]: boolean;
+    [languageCode: string]: boolean;
   } = {};
 
   constructor(
@@ -121,8 +121,8 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
         });
     }
 
-    Object.keys(this.contentTranslations).forEach(language_code => {
-      this.languageIsCheckedStatusDict[language_code] = false;
+    Object.keys(this.contentTranslations).forEach(languageCode => {
+      this.languageIsCheckedStatusDict[languageCode] = false;
     });
     this.contentHasDisplayableTranslations =
       this.doesContentHaveDisplayableTranslations();
@@ -153,8 +153,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     });
   }
 
-  confirm() {
-    console.log(this.languageIsCheckedStatusDict);
+  confirm(): void {
     for (let language in this.contentTranslations) {
       if (this.languageIsCheckedStatusDict[language] === true) {
         this.changeListService.editTranslation(
@@ -173,7 +172,6 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
         );
       }
     }
-    console.log(this.changeListService.getTranslationChangeList());
     this.ngbActiveModal.close();
   }
 
@@ -187,7 +185,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     ) as string;
   }
 
-  doesContentHaveDisplayableTranslations() {
+  doesContentHaveDisplayableTranslations(): boolean {
     // Check if at least one translation is not stale and can be displayed.
     for (const translation of Object.values(this.contentTranslations)) {
       if (!translation.needsUpdate) {

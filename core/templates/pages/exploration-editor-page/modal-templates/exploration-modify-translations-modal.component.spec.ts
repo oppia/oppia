@@ -48,7 +48,7 @@ class MockNgbModalRef {
   };
 }
 
-fdescribe('Modify Translations Modal Component', function () {
+describe('Modify Translations Modal Component', function () {
   let component: ModifyTranslationsModalComponent;
   let fixture: ComponentFixture<ModifyTranslationsModalComponent>;
   let entityTranslationsService: EntityTranslationsService;
@@ -233,7 +233,7 @@ fdescribe('Modify Translations Modal Component', function () {
     expect(
       translationLanguageService.setActiveLanguageCode
     ).toHaveBeenCalledWith('hi');
-    expect(component.contentTranslations['hi'].translation).toEqual(
+    expect(component.contentTranslations.hi.translation).toEqual(
       testTranslation
     );
   }));
@@ -261,7 +261,7 @@ fdescribe('Modify Translations Modal Component', function () {
     tick();
 
     expect(ngbModal.open).toHaveBeenCalled();
-    expect(component.contentTranslations['hi'].translation).toEqual(
+    expect(component.contentTranslations.hi.translation).toEqual(
       testTranslation
     );
 
@@ -294,7 +294,7 @@ fdescribe('Modify Translations Modal Component', function () {
     tick();
 
     expect(ngbModal.open).toHaveBeenCalled();
-    expect(component.contentTranslations['hi'].translation).toEqual(
+    expect(component.contentTranslations.hi.translation).toEqual(
       testTranslation
     );
 
@@ -324,7 +324,7 @@ fdescribe('Modify Translations Modal Component', function () {
       }),
     };
 
-    expect(component.contentHasDisplayableTranslations).toBe(false);
+    expect(component.doesContentHaveDisplayableTranslations).toBe(false);
 
     component.contentTranslations = {
       hi: TranslatedContent.createFromBackendDict({
@@ -334,6 +334,6 @@ fdescribe('Modify Translations Modal Component', function () {
       }),
     };
 
-    expect(component.contentHasDisplayableTranslations).toBe(true);
+    expect(component.doesContentHaveDisplayableTranslations).toBe(true);
   });
 });

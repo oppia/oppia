@@ -246,7 +246,6 @@ export class TranslationModalComponent {
       this.loadingData = false;
     }
 
-    console.log(this.textToTranslate);
     this.userService
       .getUserContributionRightsDataAsync()
       .then(userContributionRights => {

@@ -299,7 +299,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ], [False, True]
         )
 
-    def test_compute_translation_related_change_mark_translation_needs_update_for_language(
+    def test_compute_translation_related_change_needs_update_for_language(
         self
     ) -> None:
         translation_services.add_new_translation(
@@ -351,7 +351,6 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
                 for t in entity_translation.translations.values()
             ], [False, True]
         )
-
 
     def test_compute_translation_related_change_edits_existing_translation(
         self
