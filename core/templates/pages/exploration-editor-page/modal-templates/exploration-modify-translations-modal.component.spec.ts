@@ -324,7 +324,7 @@ describe('Modify Translations Modal Component', function () {
       }),
     };
 
-    expect(component.doesContentHaveDisplayableTranslations).toBe(false);
+    expect(component.doesContentHaveDisplayableTranslations()).toBe(false);
 
     component.contentTranslations = {
       hi: TranslatedContent.createFromBackendDict({
@@ -334,6 +334,6 @@ describe('Modify Translations Modal Component', function () {
       }),
     };
 
-    expect(component.doesContentHaveDisplayableTranslations).toBe(true);
+    expect(component.doesContentHaveDisplayableTranslations()).toBe(true);
   });
 });
