@@ -48,7 +48,7 @@ class MockNgbModalRef {
   };
 }
 
-fdescribe('Modify Translations Modal Component', function () {
+describe('Modify Translations Modal Component', function () {
   let component: ModifyTranslationsModalComponent;
   let fixture: ComponentFixture<ModifyTranslationsModalComponent>;
   let entityTranslationsService: EntityTranslationsService;
