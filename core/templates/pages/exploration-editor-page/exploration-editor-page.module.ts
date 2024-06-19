@@ -103,7 +103,6 @@ import {ParamChangesEditorComponent} from './param-changes-editor/param-changes-
 import {ExplorationEditorPageComponent} from './exploration-editor-page.component';
 import {VoiceoverRemovalConfirmModalComponent} from './translation-tab/voiceover-card/modals/voiceover-removal-confirm-modal.component';
 import {ModifyTranslationsModalComponent} from './modal-templates/exploration-modify-translations-modal.component';
-import {TranslationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 
 @NgModule({
   imports: [
@@ -194,7 +193,6 @@ import {TranslationModalComponent} from 'pages/contributor-dashboard-page/modal-
     ExplorationEditorPageComponent,
     StateVersionHistoryComponent,
     ModifyTranslationsModalComponent,
-    TranslationModalComponent,
   ],
   entryComponents: [
     DeleteStateSkillModalComponent,
@@ -264,7 +262,6 @@ import {TranslationModalComponent} from 'pages/contributor-dashboard-page/modal-
     ExplorationEditorPageComponent,
     StateVersionHistoryComponent,
     ModifyTranslationsModalComponent,
-    TranslationModalComponent,
   ],
   providers: [
     {

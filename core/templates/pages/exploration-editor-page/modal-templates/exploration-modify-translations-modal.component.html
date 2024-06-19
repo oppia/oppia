@@ -10,8 +10,8 @@
   <p>Any translations that don't have a check mark will be sent for re-translation.</p>
   <div *ngIf="contentHasDisplayableTranslations && (contentTranslations | keyvalue).length > 0" class="content-translations-container">
     <form #form="ngForm">
-      <div *ngFor="let item of contentTranslations | keyvalue" class="content-translation-block">
-        <div *ngIf="item.value.needsUpdate === false">
+      <div *ngFor="let item of contentTranslations | keyvalue">
+        <div *ngIf="item.value.needsUpdate === false" class="content-translation-block">
           <div class="content-translation-language">
             <span>
               <input type="checkbox"

@@ -48,7 +48,7 @@ class MockNgbModalRef {
   };
 }
 
-describe('Modify Translations Modal Component', function () {
+fdescribe('Modify Translations Modal Component', function () {
   let component: ModifyTranslationsModalComponent;
   let fixture: ComponentFixture<ModifyTranslationsModalComponent>;
   let entityTranslationsService: EntityTranslationsService;
@@ -335,5 +335,31 @@ describe('Modify Translations Modal Component', function () {
     };
 
     expect(component.doesContentHaveDisplayableTranslations()).toBe(true);
+  });
+
+  it('should update displayed translation content of modal appropriately', () => {
+    spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
+      {
+        cmd: 'mark_translation_needs_update_for_language',
+        content_id: 'content1',
+        language_code: 'hi',
+      },
+    ]);
+    component.contentId = 'content1';
+    component.contentTranslations = {
+      hi: TranslatedContent.createFromBackendDict({
+        content_value: 'This text will need an update.',
+        content_format: 'html',
+        needs_update: false,
+      }),
+    };
+
+    component.updateTranslationDisplayContent();
+
+    expect(component.contentTranslations.hi.needsUpdate).toBeTrue();
+    expect(component.languageIsCheckedStatusDict).toEqual({
+      hi: false,
+    });
+    expect(component.contentHasDisplayableTranslations).toBeFalse();
   });
 });

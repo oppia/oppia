@@ -118,8 +118,21 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
               );
             }
           }
+          this.updateTranslationDisplayContent();
         });
+    } else {
+      this.updateTranslationDisplayContent();
     }
+  }
+
+  updateTranslationDisplayContent(): void {
+    this.changeListService.getTranslationChangeList().forEach(changeDict => {
+      if (changeDict.cmd === 'mark_translation_needs_update_for_language') {
+        if (changeDict.content_id === this.contentId) {
+          this.contentTranslations[changeDict.language_code].needsUpdate = true;
+        }
+      }
+    });
 
     Object.keys(this.contentTranslations).forEach(languageCode => {
       this.languageIsCheckedStatusDict[languageCode] = false;
