@@ -147,6 +147,7 @@ fdescribe('Modify Translations Modal Component', function () {
         content_format: 'html',
         needs_update: false,
       });
+      expect(component.contentTranslations).toEqual({});
 
       component.contentId = 'content1';
       component.ngOnInit();
@@ -164,6 +165,7 @@ fdescribe('Modify Translations Modal Component', function () {
         content_format: 'html',
         needs_update: false,
       });
+      expect(component.contentTranslations).toEqual({});
 
       component.contentId = 'content4';
       component.ngOnInit();
@@ -195,6 +197,8 @@ fdescribe('Modify Translations Modal Component', function () {
         content_id: 'content4',
       },
     ]);
+    expect(component.contentTranslations).toEqual({});
+
     component.contentId = 'content4';
     component.ngOnInit();
     expect(component.contentTranslations).toEqual({});

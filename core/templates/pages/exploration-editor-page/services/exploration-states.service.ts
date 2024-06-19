@@ -310,12 +310,7 @@ export class ExplorationStatesService {
       recordedVoiceovers.voiceoversMapping[contentId] = {};
       this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
     }
-    for (let language in this.entityTranslationsService
-      .languageCodeToEntityTranslations) {
-      this.entityTranslationsService.languageCodeToEntityTranslations[
-        language
-      ].removeTranslation(contentId);
-    }
+    this.entityTranslationsService.removeAllTranslationsForContent(contentId);
   }
 
   private _getElementsInFirstSetButNotInSecond(

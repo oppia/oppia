@@ -28,7 +28,6 @@ import {ChangeListService} from '../services/change-list.service';
 import {
   ModifyTranslationOpportunity,
   TranslationModalComponent,
-  TranslationOpportunity,
 } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -85,14 +84,14 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
       }
     }
 
-    this.changeListService.getTranslationChangeList().forEach(changeDict => {
-      if (
-        changeDict.cmd === 'remove_translations' &&
-        changeDict.content_id === this.contentId
-      ) {
-        this.allExistingTranslationsHaveBeenRemoved = true;
-      }
-    });
+    this.allExistingTranslationsHaveBeenRemoved = this.changeListService
+      .getTranslationChangeList()
+      .some(changeDict => {
+        return (
+          changeDict.cmd === 'remove_translations' &&
+          changeDict.content_id === this.contentId
+        );
+      });
 
     // Populate the content translations via published translations from the backend.
     // These translations are used for a language when the published translations are

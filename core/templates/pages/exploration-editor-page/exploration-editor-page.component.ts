@@ -385,12 +385,9 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
               TranslatedContent.createFromBackendDict(changeDict.translation)
             );
           } else if (changeDict.cmd === 'remove_translations') {
-            for (let language in this.entityTranslationsService
-              .languageCodeToEntityTranslations) {
-              this.entityTranslationsService.languageCodeToEntityTranslations[
-                language
-              ].removeTranslation(changeDict.content_id);
-            }
+            this.entityTranslationsService.removeAllTranslationsForContent(
+              changeDict.content_id
+            );
           }
         }
       }

@@ -945,6 +945,9 @@ describe('Exploration editor page component', () => {
           },
         },
       });
+      expect(
+        entityTranslationsService.languageCodeToEntityTranslations
+      ).toEqual({});
 
       mockInitExplorationPageEmitter.emit();
       tick();
