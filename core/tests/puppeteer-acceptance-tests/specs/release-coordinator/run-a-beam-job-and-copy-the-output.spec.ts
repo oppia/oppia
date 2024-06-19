@@ -45,47 +45,47 @@ describe('Release Coordinator', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    // explorationEditor = await UserFactory.createNewUser(
-    //   'explorationEditor',
-    //   'exploration_editor@example.com'
-    // );
+    explorationEditor = await UserFactory.createNewUser(
+      'explorationEditor',
+      'exploration_editor@example.com'
+    );
 
-    // // Creating data for the beam job.
-    // await explorationEditor.navigateToCreatorDashboardPage();
-    // await explorationEditor.navigateToExplorationEditorPage();
-    // await explorationEditor.dismissWelcomeModal();
-    // await explorationEditor.updateCardContent(
-    //   'We will be learning Equations today.'
-    // );
-    // await explorationEditor.addMathInteraction('Math Equation Input');
-    // await explorationEditor.addResponseToTheInteraction(
-    //   INTERACTION_TYPES.MATH_EQUATION_INPUT,
-    //   'y = 2x + 3',
-    //   'Prefect!',
-    //   CARD_NAME.FINAL_CARD,
-    //   true
-    // );
-    // await explorationEditor.saveExplorationDraft();
+    // Creating data for the beam job.
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.updateCardContent(
+      'We will be learning Equations today.'
+    );
+    await explorationEditor.addMathInteraction('Math Equation Input');
+    await explorationEditor.addResponseToTheInteraction(
+      INTERACTION_TYPES.MATH_EQUATION_INPUT,
+      'y = 2x + 3',
+      'Prefect!',
+      CARD_NAME.FINAL_CARD,
+      true
+    );
+    await explorationEditor.saveExplorationDraft();
 
-    // // Navigate to the final card and update its content.
-    // await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    // await explorationEditor.updateCardContent(
-    //   'We have practiced negative numbers.'
-    // );
-    // await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    // Navigate to the final card and update its content.
+    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
+    await explorationEditor.updateCardContent(
+      'We have practiced negative numbers.'
+    );
+    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
-    // // Navigate back to the introduction card and save the draft.
-    // await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    // await explorationEditor.saveExplorationDraft();
+    // Navigate back to the introduction card and save the draft.
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.saveExplorationDraft();
 
-    // explorationId = await explorationEditor.publishExplorationWithMetadata(
-    //   'Test Exploration Title',
-    //   'Test Exploration Goal',
-    //   'Algebra'
-    // );
-    // if (!explorationId) {
-    //   throw new Error('Error in publishing the exploration');
-    // }
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
+      'Test Exploration Title',
+      'Test Exploration Goal',
+      'Algebra'
+    );
+    if (!explorationId) {
+      throw new Error('Error in publishing the exploration');
+    }
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
