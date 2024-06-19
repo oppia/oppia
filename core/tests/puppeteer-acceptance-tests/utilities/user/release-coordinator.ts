@@ -21,15 +21,48 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const releaseCoordinatorUrl = testConstants.URLs.ReleaseCoordinator;
+const splashUrl = testConstants.URLs.splash;
+
 const featuresTab = '.e2e-test-features-tab';
 const mobileFeaturesTab = '.e2e-test-features-tab-mobile';
+const mobileMiscTab = '.e2e-test-misc-tab-mobile';
 const mobileNavBar = '.e2e-test-navbar-dropdown-toggle';
 const featureFlagDiv = '.e2e-test-feature-flag';
 const featureFlagOptionSelector = '.e2e-test-value-selector';
 const featureFlagNameSelector = '.e2e-test-feature-name';
 const saveFeatureFlagButtonSelector = '.e2e-test-save-button';
 
+const navbarElementSelector = '.oppia-clickable-navbar-element';
+const promoBarToggleSelector = '#mat-slide-toggle-1';
+const promoMessageInputSelector = '.mat-input-element';
+const actionStatusMessageSelector = '.e2e-test-status-message';
+const toastMessageSelector = '.toast-message';
+const memoryCacheProfileTableSelector = '.view-results-table';
+
 export class ReleaseCoordinator extends BaseUser {
+  /**
+   * Navigates to the release coordinator page.
+   */
+  async navigateToReleaseCoordinatorPage(): Promise<void> {
+    await this.page.goto(releaseCoordinatorUrl);
+  }
+
+  /**
+   * Navigates to the Misc tab.
+   */
+  async navigateToMiscTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavBar);
+      await this.page.waitForSelector(mobileMiscTab, {visible: true});
+      await this.clickOn(mobileMiscTab);
+    } else {
+      await this.page.waitForSelector(navbarElementSelector);
+      const navbarElements = await this.page.$$(navbarElementSelector);
+      await this.waitForElementToBeClickable(navbarElements[2]);
+      await navbarElements[2].click();
+    }
+  }
+
   /**
    * Enable specified feature flag from the release coordinator page.
    */
@@ -100,60 +133,6 @@ export class ReleaseCoordinator extends BaseUser {
     showMessage(
       `Feature flag: "${featureName}" has been enabled successfully.`
     );
-  }
-}
-
-export let ReleaseCoordinatorFactory = (): ReleaseCoordinator =>
-  new ReleaseCoordinator();
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-/**
- * @fileoverview Utility functions for the release coordinator page.
- */
-
-import {BaseUser} from '../common/puppeteer-utils';
-import testConstants from '../common/test-constants';
-import {showMessage} from '../common/show-message';
-
-const releaseCoordinatorUrl = testConstants.URLs.ReleaseCoordinator;
-const splashUrl = testConstants.URLs.splash;
-
-const navbarElementSelector = '.oppia-clickable-navbar-element';
-const promoBarToggleSelector = '#mat-slide-toggle-1';
-const promoMessageInputSelector = '.mat-input-element';
-const actionStatusMessageSelector = '.e2e-test-status-message';
-const toastMessageSelector = '.toast-message';
-const memoryCacheProfileTableSelector = '.view-results-table';
-const viewResultsTableSelector = '.view-results-table tbody tr td';
-
-export class ReleaseCoordinator extends BaseUser {
-  /**
-   * Navigates to the release coordinator page.
-   */
-  async navigateToReleaseCoordinatorPage(): Promise<void> {
-    await this.page.goto(releaseCoordinatorUrl);
-  }
-
-  /**
-   * Navigates to the Misc tab.
-   */
-  async navigateToMiscTab(): Promise<void> {
-    await this.page.waitForSelector(navbarElementSelector);
-    const navbarElements = await this.page.$$(navbarElementSelector);
-    await this.waitForElementToBeClickable(navbarElements[2]);
-    await navbarElements[2].click();
   }
 
   /**
@@ -261,7 +240,7 @@ export class ReleaseCoordinator extends BaseUser {
 
     const memoryCacheProfile = await this.page.evaluate(() => {
       const cells = Array.from(
-        document.querySelectorAll(viewResultsTableSelector)
+        document.querySelectorAll('.view-results-table tbody tr td')
       );
       const totalAllocatedInBytes = cells[0]?.textContent;
       const peakAllocatedInBytes = cells[1]?.textContent;
@@ -302,7 +281,7 @@ export class ReleaseCoordinator extends BaseUser {
 
     const totalKeysStored = await this.page.evaluate(() => {
       const cells = Array.from(
-        document.querySelectorAll(viewResultsTableSelector)
+        document.querySelectorAll('.view-results-table tbody tr td')
       );
       const totalKeysStoredText = cells[2]?.textContent;
       return totalKeysStoredText ? parseInt(totalKeysStoredText, 10) : null;

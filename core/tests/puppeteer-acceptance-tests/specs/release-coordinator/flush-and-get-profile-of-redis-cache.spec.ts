@@ -20,7 +20,6 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
-import {showMessage} from '../../utilities/common/show-message';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -39,15 +38,6 @@ describe('Release Coordinator', function () {
   it(
     'should navigate to the Misc tab, flush the cache and get the memory cache profile',
     async function () {
-      // TODO(20476): This test is currently skipped in mobile viewport due to an issue
-      // that prevents navigation to the "MISC" tab on the release coordinator page.
-      // This tab is necessary for testing the promo messages.
-      // Once the issue is resolved, remove the code that skips this test in mobile viewport.
-      if (process.env.MOBILE === 'true') {
-        showMessage('Test skipped in mobile viewport');
-        return;
-      }
-
       await releaseCoordinator.navigateToReleaseCoordinatorPage();
       await releaseCoordinator.navigateToMiscTab();
       await releaseCoordinator.flushCache();
