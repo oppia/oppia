@@ -47,6 +47,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   explorationId!: string;
   explorationVersion!: number;
   contentTranslations: LanguageCodeToContentTranslations = {};
+  contentHasDisplayableTranslations: boolean = false;
   allExistingTranslationsHaveBeenRemoved: boolean = false;
   languageIsCheckedStatusDict: {
     [language_code: string]: boolean;
@@ -124,6 +125,8 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     Object.keys(this.contentTranslations).forEach(language_code => {
       this.languageIsCheckedStatusDict[language_code] = false;
     });
+    this.contentHasDisplayableTranslations =
+      this.doesContentHaveDisplayableTranslations();
   }
 
   openTranslationEditor(languageCode: string) {
@@ -131,8 +134,8 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
       size: 'lg',
       backdrop: 'static',
     });
-
     this.translationLanguageService.setActiveLanguageCode(languageCode);
+
     const modifyTranslationOpportunity: ModifyTranslationOpportunity = {
       id: this.explorationId,
       contentId: this.contentId,
@@ -183,5 +186,15 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     return this.languageUtilService.getContentLanguageDescription(
       languageCode
     ) as string;
+  }
+
+  doesContentHaveDisplayableTranslations() {
+    // Check if at least one translation is not stale and can be displayed.
+    for (const translation of Object.values(this.contentTranslations)) {
+      if (!translation.needsUpdate) {
+        return true;
+      }
+    }
+    return false;
   }
 }

@@ -8,19 +8,19 @@
     as you save the pending changes to the exploration.
   </p>
   <p>Any translations that don't have a check mark will be sent for re-translation.</p>
-  <div *ngIf="contentTranslations && (contentTranslations | keyvalue).length > 0" class="content-translations-container">
+  <div *ngIf="contentHasDisplayableTranslations && (contentTranslations | keyvalue).length > 0" class="content-translations-container">
     <form #form="ngForm">
       <div *ngFor="let item of contentTranslations | keyvalue" class="content-translation-block">
         <div *ngIf="item.value.needsUpdate === false">
           <div class="content-translation-language">
             <span>
-              <input type="checkbox" name="checkbox-{{item.key}}" [(ngModel)]="languageIsCheckedStatusDict[item.key]" />
+              <input type="checkbox" name="checkbox-{{item.key}}" [(ngModel)]="languageIsCheckedStatusDict[item.key]" class="e2e-test-{{ item.key }}-translation-checkbox"/>
               <p>{{ getLanguageName(item.key) }}</p>
               <div  *ngIf="!languageIsCheckedStatusDict[item.key]" class="re-translation-indicator">
                 Will be sent for re-translation
               </div>    
             </span>
-            <i class="fas fa-pencil-alt e2e-test-{{ item.key }}-translation-check" (click)="openTranslationEditor(item.key)"></i>
+            <i class="fas fa-pencil-alt e2e-test-{{ item.key }}-translation-edit" (click)="openTranslationEditor(item.key)"></i>
           </div>
           <div class="content-translation-value e2e-test-translation-{{ item.key }}">
             <oppia-rte-output-display [rteString]="item.value.translation" class="translations-rte-output-display">
@@ -30,13 +30,13 @@
       </div>
     </form>
   </div>
-  <div *ngIf="contentTranslations && (contentTranslations | keyvalue).length === 0">
+  <div *ngIf="!contentHasDisplayableTranslations">
     <p class="no-translations-found-text">No available translations found.</p>
   </div>
 </div>
 <div class="modal-footer">
   <button type="button" (click)="cancel()" class="btn modify-translations-cancel-button">Cancel</button>
-  <button type="button" (click)="confirm()" class="btn modify-translations-done-button">Done</button>
+  <button type="button" (click)="confirm()" class="btn modify-translations-done-button e2e-test-modify-translations-done-button">Done</button>
 </div>
 
 <style>
