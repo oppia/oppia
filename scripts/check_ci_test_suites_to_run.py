@@ -408,8 +408,8 @@ def get_test_suite_by_name_from_list(
     """
     return next(
         (
-            test_suite for test_suite in test_suites if
-                test_suite['name'] == test_suite_name
+            test_suite for test_suite in test_suites
+            if test_suite['name'] == test_suite_name
         ),
         None
     )
@@ -531,12 +531,13 @@ def get_test_suites_affected_by_root_file(
         test_suite_modules
     ) in test_suites_to_module_mapping.items():
         test_suite_by_name = get_test_suite_by_name_from_list(
-            test_suites,
-            test_suite_name
+            test_suites, test_suite_name
         )
-        if test_suite_by_name is not None and (
-            root_file in test_suite_modules or
-            root_file == test_suite_by_name['module']
+        if (
+            test_suite_by_name is not None and (
+                root_file in test_suite_modules or
+                root_file == test_suite_by_name['module']
+            )
         ):
             test_suites_affected.append(test_suite_by_name)
 
