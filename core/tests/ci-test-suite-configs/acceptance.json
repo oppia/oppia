@@ -13,10 +13,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked.spec.ts"
     },
     {
-      "name": "curriculum-admin-tests/create-and-publish-topics-and-stories",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-and-publish-topics-and-stories.spec.ts"
-    },
-    {
       "name": "curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill",
       "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill.spec.ts"
     },
@@ -33,16 +29,16 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/save-draft-publish-and-discard-the-changes.spec.ts"
     },
     {
+      "name": "exploration-editor/modify-translations-through-modal",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/modify-translations-through-modal.spec.ts"
+    },
+    {
       "name": "logged-out-user/click-all-buttons-on-about-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-about-page.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-about-foundation-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-about-foundation-page.spec.ts"
-    },
-    {
-      "name": "logged-out-user/click-all-buttons-on-thanks-for-donating-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-thanks-for-donating-page.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-navbar",
@@ -89,6 +85,14 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-volunteer-page.spec.ts"
     },
     {
+      "name": "logged-out-user/click-all-buttons-on-contact-us-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-contact-us-page.spec.ts"
+    },
+    {
+      "name": "logged-out-user/click-all-links-in-terms-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-links-in-terms-page.spec.ts"
+    },
+    {
       "name": "moderator/edit-featured-activities-list",
       "module": "core/tests/puppeteer-acceptance-tests/specs/moderator/edit-featured-activities-list.spec.ts"
     },
@@ -111,6 +115,14 @@
     {
       "name": "voiceover-admin/add-voiceover-artist-to-an-exploration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/add-voiceover-artist-to-an-exploration.spec.ts"
+    },
+    {
+      "name": "super-admin/edit-user-roles",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/edit-user-roles.spec.ts"
+    },
+    {
+      "name": "super-admin/load-dummy-data-in-dev-mode",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/load-dummy-data-in-dev-mode.spec.ts"
     }
   ]
 }
