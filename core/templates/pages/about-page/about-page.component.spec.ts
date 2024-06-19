@@ -25,6 +25,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PrimaryButtonComponent} from '../../components/button-directives/primary-button.component';
+import {BarChartComponent} from './charts/bar-chart.component';
 import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -71,6 +72,7 @@ describe('About Page', () => {
         AboutPageComponent,
         MockTranslatePipe,
         PrimaryButtonComponent,
+        BarChartComponent,
       ],
       providers: [
         SiteAnalyticsService,
