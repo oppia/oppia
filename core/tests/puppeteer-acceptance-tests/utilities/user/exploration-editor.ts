@@ -30,7 +30,7 @@ const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
-const mathInteractionTab = '.e2e-test-interaction-tab-math';
+const mathInteractionsTab = '.e2e-test-interaction-tab-math';
 const mathEquationInputSelector = '.e2e-test-guppy-div';
 
 // Settings Tab elements.
@@ -277,6 +277,22 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Fetches the exploration ID from the current URL of the exploration editor page.
+   * The exploration ID is the string after '/create/' in the URL.
+   */
+  async getExplorationId(): Promise<string> {
+    const url = await this.page.url();
+    const match = url.match(/\/create\/(.*?)\//);
+    if (!match) {
+      throw new Error(
+        'Exploration ID not found in the URL' +
+          'Ensure you are on the exploration editor page.'
+      );
+    }
+    return match[1];
+  }
+
+  /**
    * Function to dismiss welcome modal.
    */
   async dismissWelcomeModal(): Promise<void> {
@@ -356,7 +372,7 @@ export class ExplorationEditor extends BaseUser {
 
     const responseInputs = await this.page.$$(stateContentInputField);
     for (let i = 0; i < options.length; i++) {
-      await responseInputs[i].type(`${options[i]}`);
+      await responseInputs[i].type(`${options[i]} `);
     }
 
     await this.clickOn(saveInteractionButton);
@@ -395,7 +411,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async addMathInteraction(interactionToAdd: string): Promise<void> {
     await this.clickOn(addInteractionButton);
-    await this.clickOn(mathInteractionTab);
+    await this.clickOn(mathInteractionsTab);
     await this.clickOn(` ${interactionToAdd} `);
     await this.clickOn(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
@@ -412,7 +428,7 @@ export class ExplorationEditor extends BaseUser {
     await this.type(addTitleBar, title);
     await this.page.keyboard.press('Tab');
 
-    showMessage(`Title has been updated to ${title}`);
+    showMessage(`Title has been updated to ${title} `);
   }
 
   /**
@@ -813,31 +829,41 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - The name of the card to navigate to.
    */
   async navigateToCard(cardName: string): Promise<void> {
-    let elements;
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileStateGraphResizeButton);
+    try {
+      let elements;
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(mobileStateGraphResizeButton);
+      }
+
+      await this.page.waitForSelector(stateNodeSelector);
+      elements = await this.page.$$(stateNodeSelector);
+
+      const cardNames = await Promise.all(
+        elements.map(element =>
+          element.$eval('tspan', node => node.textContent)
+        )
+      );
+      // The card name is suffixed with a space to match the format in the UI.
+      const cardIndex = cardNames.indexOf(cardName + ' ');
+
+      if (cardIndex === -1) {
+        throw new Error(`Card name ${cardName} not found in the graph.`);
+      }
+
+      if (this.isViewportAtMobileWidth()) {
+        await elements[cardIndex + elements.length / 2].click();
+      } else {
+        await elements[cardIndex].click();
+      }
+
+      await this.page.waitForNetworkIdle({idleTime: 700});
+    } catch (error) {
+      const newError = new Error(
+        `Error navigating to card ${cardName}: ${error.message} `
+      );
+      newError.stack = error.stack;
+      throw newError;
     }
-
-    await this.page.waitForSelector(stateNodeSelector);
-    elements = await this.page.$$(stateNodeSelector);
-
-    const cardNames = await Promise.all(
-      elements.map(element => element.$eval('tspan', node => node.textContent))
-    );
-    // The card name is suffixed with a space to match the format in the UI.
-    const cardIndex = cardNames.indexOf(cardName + ' ');
-
-    if (cardIndex === -1) {
-      throw new Error(`Card name ${cardName} not found in the graph.`);
-    }
-
-    if (this.isViewportAtMobileWidth()) {
-      await elements[cardIndex + elements.length / 2].click();
-    } else {
-      await elements[cardIndex].click();
-    }
-
-    await this.page.waitForNetworkIdle({idleTime: 700});
   }
 
   /**
@@ -858,13 +884,6 @@ export class ExplorationEditor extends BaseUser {
     switch (interactionType) {
       case 'Number Input':
         await this.type(floatFormInput, answer);
-        break;
-      case 'Math Equation Input':
-        // Click on the math equation input field to focus it.
-        await this.page.click(mathEquationInputSelector);
-
-        // Type the answer into the focused input field.
-        await this.page.keyboard.type('a = b');
         break;
       case 'Multiple Choice':
         await this.clickOn(multipleChoiceResponseDropdown);
@@ -894,12 +913,15 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOn(addResponseOptionButton);
         await this.type(textInputInteractionOption, answer);
         break;
+      case 'Numeric Expression Input':
+        await this.page.type('.e2e-test-guppy-div', answer);
+        break;
       // Add cases for other interaction types here
       // case 'otherInteractionType':
       //   await this.type(otherFormInput, answer);
       //   break;
       default:
-        throw new Error(`Unsupported interaction type: ${interactionType}`);
+        throw new Error(`Unsupported interaction type: ${interactionType} `);
     }
 
     await this.clickOn(feedbackEditorSelector);
@@ -926,7 +948,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(defaultFeedbackTab);
     await this.clickOn(openOutcomeFeedBackEditor);
     await this.clickOn(stateContentInputField);
-    await this.type(stateContentInputField, `${defaultResponseFeedback}`);
+    await this.type(stateContentInputField, `${defaultResponseFeedback} `);
     await this.clickOn(saveOutcomeFeedbackButton);
   }
 
@@ -942,10 +964,10 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(addSolutionButton);
     await this.page.waitForSelector(solutionInput, {visible: true});
     await this.type(solutionInput, answer);
-    await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
+    await this.page.waitForSelector(`${submitAnswerButton}: not([disabled])`);
     await this.clickOn(submitAnswerButton);
     await this.type(stateContentInputField, answerExplanation);
-    await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
+    await this.page.waitForSelector(`${submitSolutionButton}: not([disabled])`);
     await this.clickOn(submitSolutionButton);
   }
 
@@ -1087,7 +1109,7 @@ export class ExplorationEditor extends BaseUser {
         await this.type(floatFormInput, answer);
         break;
       default:
-        throw new Error(`Unsupported input type: ${inputType}`);
+        throw new Error(`Unsupported input type: ${inputType} `);
     }
 
     await this.clickOn(submitAnswerButton);
@@ -1100,7 +1122,7 @@ export class ExplorationEditor extends BaseUser {
   async getInputType(selector: string): Promise<string> {
     const inputField = await this.page.$(selector);
     if (!inputField) {
-      throw new Error(`Input field not found for selector: ${selector}`);
+      throw new Error(`Input field not found for selector: ${selector} `);
     }
     const inputType = (await (
       await inputField.getProperty('type')
@@ -1236,7 +1258,7 @@ export class ExplorationEditor extends BaseUser {
   async playExploration(explorationId: string): Promise<void> {
     await Promise.all([
       this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      this.page.goto(`${baseUrl}/explore/${explorationId}`),
+      this.page.goto(`${baseUrl} /explore/${explorationId} `),
     ]);
   }
 
@@ -1282,7 +1304,7 @@ export class ExplorationEditor extends BaseUser {
     );
     if (!activeContentType?.includes(contentType)) {
       showMessage(
-        `Switching content type from ${activeContentType} to ${contentType}`
+        `Switching content type from ${activeContentType} to ${contentType} `
       );
       await this.clickOn(contentType);
     }
@@ -1299,13 +1321,13 @@ export class ExplorationEditor extends BaseUser {
         await this.type(stateTranslationEditorSelector, translation);
         break;
       case 'Feedback':
-        await this.clickOn(`.e2e-test-feedback-${feedbackIndex}`);
+        await this.clickOn(`.e2e - test - feedback - ${feedbackIndex} `);
         await this.clickOn(editTranslationSelector);
         await this.clickOn(stateContentInputField);
         await this.type(stateContentInputField, translation);
         break;
       default:
-        throw new Error(`Invalid content type: ${contentType}`);
+        throw new Error(`Invalid content type: ${contentType} `);
     }
     await this.clickOn(saveTranslationButton);
     await this.page.waitForNetworkIdle();
@@ -1333,13 +1355,13 @@ export class ExplorationEditor extends BaseUser {
     expectedTranslation: string
   ): Promise<void> {
     await this.page.waitForSelector(
-      `div.e2e-test-translation-${languageCode}`,
+      `div.e2e - test - translation - ${languageCode} `,
       {visible: true}
     );
 
     const translationElementText = await this.page.evaluate(languageCode => {
       const element = document.querySelector(
-        `div.e2e-test-translation-${languageCode}`
+        `div.e2e - test - translation - ${languageCode} `
       );
       return element ? element.textContent : null;
     }, languageCode);
@@ -1348,7 +1370,7 @@ export class ExplorationEditor extends BaseUser {
       showMessage('The expected translation exists in the modal.');
     } else {
       throw new Error(
-        `The expected translation does not exist in the modal. Found "${translationElementText}", expected "${expectedTranslation}"`
+        `The expected translation does not exist in the modal.Found "${translationElementText}", expected "${expectedTranslation}"`
       );
     }
   }

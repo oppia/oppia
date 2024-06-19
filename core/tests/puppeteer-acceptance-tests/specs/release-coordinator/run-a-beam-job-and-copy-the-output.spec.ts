@@ -25,7 +25,7 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 enum INTERACTION_TYPES {
-  MATH_EQUATION_INPUT = 'Math Equation Input',
+  NUMERIC_EXPRESSION_INPUT = 'Numeric Expression Input',
   END_EXPLORATION = 'End Exploration',
 }
 enum CARD_NAME {
@@ -55,12 +55,14 @@ describe('Release Coordinator', function () {
     await explorationEditor.navigateToExplorationEditorPage();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent(
-      'We will be learning Equations today.'
+      'We will be learning Expressions today.'
     );
-    await explorationEditor.addMathInteraction('Math Equation Input');
+    await explorationEditor.addMathInteraction(
+      INTERACTION_TYPES.NUMERIC_EXPRESSION_INPUT
+    );
     await explorationEditor.addResponseToTheInteraction(
-      INTERACTION_TYPES.MATH_EQUATION_INPUT,
-      'y = 2x + 3',
+      INTERACTION_TYPES.NUMERIC_EXPRESSION_INPUT,
+      '1',
       'Prefect!',
       CARD_NAME.FINAL_CARD,
       true
@@ -70,22 +72,14 @@ describe('Release Coordinator', function () {
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.updateCardContent(
-      'We have practiced negative numbers.'
+      'We have learnt numeric expressions'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
-
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
-      'Test Exploration Title',
-      'Test Exploration Goal',
-      'Algebra'
-    );
-    if (!explorationId) {
-      throw new Error('Error in publishing the exploration');
-    }
+    explorationId = await explorationEditor.getExplorationId();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -102,8 +96,9 @@ describe('Release Coordinator', function () {
       await releaseCoordinator.viewAndCopyJobOutput();
 
       // Verify that the output was copied correctly.
-      await releaseCoordinator.expectJobOutputToBe('af');
-
+      await releaseCoordinator.expectJobOutputToBe(
+        `(${explorationId}, 'Introduction', ['MatchesExactlyWith'])`
+      );
       await releaseCoordinator.closeOutputModal();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

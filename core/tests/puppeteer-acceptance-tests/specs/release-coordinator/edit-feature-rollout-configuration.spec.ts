@@ -20,12 +20,15 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
+import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {log} from 'console';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Release Coordinator', function () {
   let releaseCoordinator: ReleaseCoordinator;
+  let loggedInUser: LoggedInUser;
 
   beforeAll(async function () {
     releaseCoordinator = await UserFactory.createNewUser(
@@ -33,25 +36,48 @@ describe('Release Coordinator', function () {
       'release_coordinator@example.com',
       [ROLES.RELEASE_COORDINATOR]
     );
+    loggedInUser = await UserFactory.createNewUser(
+      'loggedInUser',
+      'logged_in_user@example.com'
+    );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should navigate to the "Features" tab, alter the rollout percentage for logged-in users, enable or disable the "Force-enable for all users" option, and save the changes',
+    'should be able to alter the rollout percentage for logged-in users and save' +
+      'the changes in release coordinator page',
     async function () {
       await releaseCoordinator.navigateToReleaseCoordinatorPage();
       await releaseCoordinator.navigateToFeaturesTab();
 
-      await releaseCoordinator.expectNewDesignInLearnerDashboard(false);
+      await loggedInUser.verifyNewDesignInLearnerDashboard(false);
       await releaseCoordinator.editFeatureRolloutPercentage(
         'show_redesigned_learner_dashboard',
         100
       );
-      await releaseCoordinator.expectNewDesignInLearnerDashboard(true);
+      // Since the rollout percentage is 100, the new design should be visible to all users.
+      await loggedInUser.verifyNewDesignInLearnerDashboard(true);
 
+      await releaseCoordinator.editFeatureRolloutPercentage(
+        'show_redesigned_learner_dashboard',
+        0
+      );
+      await loggedInUser.verifyNewDesignInLearnerDashboard(false);
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should enable the "Force-enable for all users" option and save the changes in' +
+      'release coordinator page',
+    async function () {
+      await releaseCoordinator.navigateToReleaseCoordinatorPage();
+      await releaseCoordinator.navigateToFeaturesTab();
+
+      await loggedInUser.verifyNewDesignInLearnerDashboard(false);
       await releaseCoordinator.enableFeatureFlag(
         'show_redesigned_learner_dashboard'
       );
-      await releaseCoordinator.expectNewDesignInLearnerDashboard(true);
+      await loggedInUser.verifyNewDesignInLearnerDashboard(true);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

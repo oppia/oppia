@@ -16,7 +16,7 @@
  * @fileoverview Release coordinator users utility file.
  */
 
-import * as puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -89,6 +89,7 @@ export class ReleaseCoordinator extends BaseUser {
     );
 
     // Find the input field for rollout percentage and set its value to the specified percentage.
+    await this.page.waitForSelector('.e2e-test-editor-int');
     await this.page.evaluate(
       (percentage, inputSelector) => {
         const inputElem = document.querySelector(
@@ -114,19 +115,6 @@ export class ReleaseCoordinator extends BaseUser {
     showMessage(
       `Feature flag: "${featureName}" rollout percentage has been set to ${percentage}%.`
     );
-  }
-
-  /**
-   * Check if the redesigned learner dashboard feature is enabled.
-   */
-  async expectNewDesignInLearnerDashboard(enabled: boolean): Promise<void> {
-    await this.goto(learnerDashboardUrl);
-    const newSideBar = await this.page.$('.oppia-learner-dash-sidebar_pic');
-    if (newSideBar && enabled) {
-      showMessage('New design in learner dashboard is enabled.');
-    } else {
-      throw new Error('New design in learner dashboard is not enabled.');
-    }
   }
 
   /**
@@ -207,22 +195,31 @@ export class ReleaseCoordinator extends BaseUser {
    */
   async selectAndRunJob(jobName: string): Promise<void> {
     await this.type('.mat-input-element', jobName);
-    await this.clickOn('.mat-option-text');
-    await this.clickOn('.job-start-button');
-    await this.clickOn(' Start New Job ');
+    await this.page.keyboard.press('Enter');
+    await this.page.evaluate(selector => {
+      const element = document.querySelector(selector) as HTMLElement;
+      element?.click();
+    }, '.job-start-button');
+    await this.page.waitForSelector('.e2e-test-start-new-job-button', {
+      visible: true,
+    });
+    await this.page.evaluate(selector => {
+      const element = document.querySelector(selector) as HTMLElement;
+      element?.click();
+    }, '.e2e-test-start-new-job-button');
+    showMessage('Job started');
   }
 
   /**
    * Waits for a job to complete.
    */
   async waitForJobToComplete(): Promise<void> {
-    // Waiting for 30 seconds for the job to complete. However, if some job takes longer,
-    // than the default timeout of the function below can be increased.
     try {
-      await this.page.waitForFunction(() => {
-        const regex = new RegExp('\\bView Output\\b');
-        return regex.test(document.documentElement.outerHTML);
-      }, {});
+      // Adjust the timeout as needed. Some jobs may take longer to complete.
+      await this.page.waitForSelector('.mat-row', {
+        visible: true,
+        timeout: 30000,
+      });
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
         const newError = new Error('Job did not complete within 30 seconds');
@@ -231,6 +228,7 @@ export class ReleaseCoordinator extends BaseUser {
       }
       throw error;
     }
+    showMessage('Job completed');
   }
 
   /**
@@ -274,7 +272,8 @@ export class ReleaseCoordinator extends BaseUser {
    * @returns {Promise<void>}
    */
   async closeOutputModal(): Promise<void> {
-    await this.clickOn(' Close ');
+    await this.clickOn('Close');
+    showMessage('Output modal closed');
   }
 }
 
