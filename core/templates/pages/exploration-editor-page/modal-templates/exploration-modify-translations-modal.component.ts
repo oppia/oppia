@@ -138,7 +138,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     const modifyTranslationOpportunity: ModifyTranslationOpportunity = {
       id: this.explorationId,
       contentId: this.contentId,
-      heading: this.stateEditorService.getActiveStateName(),
+      heading: this.stateEditorService.getActiveStateName() || '',
       subheading: 'Update Translation',
       textToTranslate: this.contentValue,
       currentContentTranslation: this.contentTranslations[languageCode],
