@@ -331,12 +331,14 @@ jobs:
             - logged-out-user/check-all-user-flow-of-volunteer
             - logged-out-user/click-all-buttons-on-about-foundation-page
             - logged-out-user/click-all-buttons-on-about-page
+            - logged-out-user/click-all-buttons-on-contact-us-page
             - logged-out-user/click-all-buttons-on-donation-thanks-page
             - logged-out-user/click-all-buttons-on-navbar
             - logged-out-user/click-all-buttons-on-partnerships-page
             - logged-out-user/click-all-buttons-on-teach-page
             - logged-out-user/click-all-buttons-on-volunteer-page
             - logged-out-user/click-all-links-in-about-oppia-footer
+            - logged-out-user/click-all-links-in-terms-page
             - logged-out-user/click-all-links-on-get-started-page
             - moderator/edit-featured-activities-list
             - moderator/view-recent-commits-and-feedback-messages
