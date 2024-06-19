@@ -127,6 +127,7 @@ const mobileSidebarExpandGetInvolvedMenuButton =
   'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
 const mobileSidebarGetInvolvedMenuPartnershipsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-partnerships-button';
+const carouselSlideSelector = '[data-test="mat-card-content"]';
 const mobileSidebarGetInvolvedMenuVolunteerButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-volunteer-button';
 const mobileSidevbarGetInvolvedMenuDonateButton =
@@ -255,7 +256,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to click a button and check if it opens the expected destination.
    */
-  async clickButtonToNavigateToNewPage(
+  private async clickButtonToNavigateToNewPage(
     button: string,
     buttonName: string,
     expectedDestinationPageUrl: string,
@@ -1312,6 +1313,16 @@ export class LoggedOutUser extends BaseUser {
     const readBlogPostButtonInPartnershipsPage = this.isViewportAtMobileWidth()
       ? readBlogPostMobileButtonInPartnershipsPage
       : readBlogPostDesktopButtonInPartnershipsPage;
+
+    if (this.isViewportAtMobileWidth()) {
+      // Waits for the visibility of the 'mat-card-content' that contains the button to be clicked
+      // and clicks on it. This action halts the automatic scrolling of slides in the carousel.
+      await this.page.waitForSelector(carouselSlideSelector, {visible: true});
+      await this.page.click(carouselSlideSelector);
+      await this.page.waitForSelector(readBlogPostButtonInPartnershipsPage, {
+        visible: true,
+      });
+    }
 
     await this.clickLinkButtonToNewTab(
       readBlogPostButtonInPartnershipsPage,
