@@ -37,4 +37,4 @@ jobs:
           --github_base_ref="origin/${{ github.event.pull_request.base.ref }}"
           ${{ env.SHOULD_OUTPUT_ALL_TESTS && '--output_all_test_suites' || '' }}
         env:
-          SHOULD_OUTPUT_ALL_TESTS: ${{ github.event_name == 'push' || github.event_name == 'merge_group' || vars.RUN_SUITES_ON_CHANGED_FILES == 'true' }}
+          SHOULD_OUTPUT_ALL_TESTS: ${{ github.event_name != 'pull_request' || vars.RUN_SUITES_ON_CHANGED_FILES == 'true' }}
