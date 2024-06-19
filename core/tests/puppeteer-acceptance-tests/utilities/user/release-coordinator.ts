@@ -16,6 +16,7 @@
  * @fileoverview Release coordinator users utility file.
  */
 
+import * as puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -100,6 +101,83 @@ export class ReleaseCoordinator extends BaseUser {
     showMessage(
       `Feature flag: "${featureName}" has been enabled successfully.`
     );
+  }
+
+  /**
+   * Selects and runs a job.
+   * @param {string} jobName - The name of the job to run.
+   */
+  async selectAndRunJob(jobName: string): Promise<void> {
+    await this.type('.mat-input-element', jobName);
+    await this.page.keyboard.press('Enter');
+    await this.clickOn('.job-start-button');
+    await this.clickOn(' Start New Job ');
+  }
+
+  /**
+   * Waits for a job to complete.
+   */
+  async waitForJobToComplete(): Promise<void> {
+    // waiting for 30 seconds for the job to complete. However, if some job takes longer,
+    // than the default timeout of the function below can be increased.
+    try {
+      await this.page.waitForFunction(() => {
+        const regex = new RegExp('\\bView Output\\b');
+        return regex.test(document.documentElement.outerHTML);
+      }, {});
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        const newError = new Error('Job did not complete within 30 seconds');
+        newError.stack = error.stack;
+        throw newError;
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Views and copies the output of a job.
+   */
+  async viewAndCopyJobOutput(): Promise<string> {
+    await this.clickOn(' View Output ');
+    await this.page.waitForSelector('.mat-row');
+    const output = await this.page.$eval('.mat-row', el => el.textContent);
+    console.log(output);
+    await this.clickOn(' Copy Output ');
+
+    // Read the clipboard data.
+    const clipboardData = await this.page.evaluate(async () => {
+      return await navigator.clipboard.readText();
+    });
+
+    if (clipboardData !== output) {
+      throw new Error('Data was not copied correctly');
+    }
+    showMessage('Data was copied correctly');
+
+    return output;
+  }
+
+  /**
+   * Expects the output of a job to be a certain value.
+   * @param {string} expectedOutput - The expected output of the job.
+   */
+  async expectJobOutputToBe(expectedOutput: string): Promise<void> {
+    await this.page.waitForSelector('.mat-row');
+    const actualOutput = await this.page.$eval(
+      '.mat-row',
+      el => el.textContent
+    );
+    expect(actualOutput).toEqual(expectedOutput);
+    showMessage('Output is as expected');
+  }
+
+  /**
+   * Closes the output modal.
+   * @returns {Promise<void>}
+   */
+  async closeOutputModal(): Promise<void> {
+    await this.clickOn(' Close ');
   }
 }
 

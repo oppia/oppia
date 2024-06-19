@@ -30,6 +30,8 @@ const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
+const mathInteractionTab = '.e2e-test-interaction-tab-math';
+const mathEquationInputSelector = '.e2e-test-guppy-div';
 
 // Settings Tab elements.
 const settingsTab = 'a.e2e-test-exploration-settings-tab';
@@ -385,6 +387,21 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(textInputField);
     await this.type(textInputField, content);
     await this.clickOn(saveInteractionButton);
+  }
+
+  /**
+   * Adds a math interaction to the current exploration.
+   * @param {string} interactionToAdd - The interaction type to add to the exploration.
+   */
+  async addMathInteraction(interactionToAdd: string): Promise<void> {
+    await this.clickOn(addInteractionButton);
+    await this.clickOn(mathInteractionTab);
+    await this.clickOn(` ${interactionToAdd} `);
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+    showMessage(`${interactionToAdd} interaction has been added successfully.`);
   }
 
   /**
@@ -842,10 +859,13 @@ export class ExplorationEditor extends BaseUser {
       case 'Number Input':
         await this.type(floatFormInput, answer);
         break;
-      // Add cases for other interaction types here
-      // case 'otherInteractionType':
-      //   await this.type(otherFormInput, answer);
-      //   break;
+      case 'Math Equation Input':
+        // Click on the math equation input field to focus it
+        await this.page.click(mathEquationInputSelector);
+
+        // Type the answer into the focused input field
+        await this.page.keyboard.type('a = b');
+        break;
       case 'Multiple Choice':
         await this.clickOn(multipleChoiceResponseDropdown);
         await this.page.waitForSelector(multipleChoiceResponseOption, {
@@ -874,6 +894,10 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOn(addResponseOptionButton);
         await this.type(textInputInteractionOption, answer);
         break;
+      // Add cases for other interaction types here
+      // case 'otherInteractionType':
+      //   await this.type(otherFormInput, answer);
+      //   break;
       default:
         throw new Error(`Unsupported interaction type: ${interactionType}`);
     }
