@@ -188,7 +188,7 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
         suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).lighthouse_performance.suites }}
-    name: lighthouse_performance (${{ matrix.os }}, ${{ matrix.suite.name }})
+    name: lighthouse (${{ matrix.os }}, ${{ matrix.suite.name }})
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -253,7 +253,7 @@ jobs:
         run: python -m scripts.install_chrome_for_ci
       - name: Run Lighthouse performance checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ matrix.suite.pages_to_run }}
+        run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
       - name: Uploading puppeteer video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
