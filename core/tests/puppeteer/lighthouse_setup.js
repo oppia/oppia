@@ -457,10 +457,15 @@ const addThumbnailToTopic = async function (page, topicName) {
 };
 
 const main = async function () {
-  process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
+  process.env.FIREBASE_AUTH_EMULATOR_HOST = 'firebase:9099';
   FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
   // Change headless to false to see the puppeteer actions.
-  const browser = await puppeteer.launch({headless: true});
+  const browser = await puppeteer.launch({
+    headless: true,
+    // Sandbox requires a non-root user, and we use a root user in docker.
+    // Thus, we need to disable the sandbox.
+    args: ['--no-sandbox'],
+  });
   const page = await browser.newPage();
   await page.setViewport({
     width: 1920,
