@@ -32,6 +32,13 @@ const saveFeatureFlagButtonSelector = '.e2e-test-save-button';
 
 export class ReleaseCoordinator extends BaseUser {
   /**
+   * Navigate to the release coordinator page.
+   */
+  async navigateToReleaseCoordinatorPage(): Promise<void> {
+    await this.goto(releaseCoordinatorUrl);
+  }
+
+  /**
    * Enable specified feature flag from the release coordinator page.
    */
   async enableFeatureFlag(featureName: string): Promise<void> {
