@@ -69,14 +69,13 @@ describe('About Page', () => {
   beforeEach(async () => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [NgbAccordionModule],
+      imports: [NgbAccordionModule, NgbModule, MatIconModule],
       declarations: [
         AboutPageComponent,
         MockTranslatePipe,
         FullExpandAccordionComponent,
         PrimaryButtonComponent,
       ],
-      imports: [NgbModule, MatIconModule],
       providers: [
         SiteAnalyticsService,
         UrlInterpolationService,
