@@ -819,7 +819,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             csrf_token=csrf_token, expected_status_int=404)
         self.logout()
 
-    def test_put_with_topic_manager_email_allows_question_editing(self) -> None:
+    def test_put_with_topic_manager_email_returns_401_status(
+        self
+    ) -> None:
         new_question_data = self._create_valid_question_data(
             'DEF', self.content_id_generator)
         change_list = [{
@@ -851,18 +853,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         }]
         payload['change_list'] = new_change_list
         payload['commit_message'] = 'update question data'
-        response_json = self.put_json(
-            '%s/%s' % (
+        self.put_json('%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
-            payload, csrf_token=csrf_token)
-
-        self.assertEqual(
-            response_json['question_dict']['language_code'], 'en')
-        self.assertEqual(
-            response_json['question_dict']['question_state_data'],
-            new_question_data.to_dict())
-        self.assertEqual(
-            response_json['question_dict']['id'], self.question_id)
+            payload, csrf_token=csrf_token, expected_status_int=401)
         self.logout()
 
     def test_put_with_creating_new_fully_specified_question_returns_400(
