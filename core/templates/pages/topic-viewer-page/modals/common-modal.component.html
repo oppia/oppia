@@ -1,0 +1,74 @@
+<div class="common-modal" *ngIf="startResumemodalvisible">
+  <h3 class="class-title">This lesson is already in progress</h3>
+  <p class="title-description">
+    Would you like to resume the lesson or start it over again?
+  </p>
+  <button class="class-action-button-1" (click)="resumeAction()">Resume</button>
+  <button class="class-action-button-2" (click)="startAction()">Start over</button>
+  <div class="close-modal" (click)="closeResumeModal()">x
+
+  </div>
+</div>
+
+<div class="common-modal" *ngIf="reviewModalVisibility">
+  <h3 class="class-title">You've already finished this lesson</h3>
+  <p class="title-description">
+    Would you like to review your answers, or start the lesson over again?
+  </p>
+  <button class="class-action-button-1" (click)="reviewAction()">Review</button>
+  <button class="class-action-button-2" (click)="startAction()">Start over</button>
+  <div class="close-modal" (click)="closeReviewModal()">x</div>
+</div>
+
+<style>
+  .common-modal {
+    align-items: center;
+    background-color: white;
+    border-radius: 6px;
+    display: flex;
+    height: 250px;
+  }
+
+  .class-title {
+    color: #00645c;
+    font-size: 1.5em;
+    margin-left: 111px;
+    margin-top: -140px;
+    width: 509px;
+  }
+
+  .class-action-button-1 {
+    background-color: #00645c;
+    border-radius: 4px;
+    color: white;
+    margin-left: 40px;
+    margin-right: 4px;
+    margin-top: 200px;
+    width: 104px;
+  }
+
+  .class-action-button-2 {
+    background-color: #00645c;
+    border-radius: 4px;
+    color: white;
+    margin-left: -183px;
+    margin-right: 4px;
+    margin-top: 200px;
+    width: 111px;
+  }
+
+  .close-modal {
+    cursor: pointer;
+    font-size: x-large;
+    margin-left: 80px;
+    margin-top: -210px;
+  }
+
+  .title-description {
+    font-size: larger;
+    margin-left: -412px;
+    margin-right: -37px;
+    place-items: center;
+    text-align: center;
+  }
+</style>
