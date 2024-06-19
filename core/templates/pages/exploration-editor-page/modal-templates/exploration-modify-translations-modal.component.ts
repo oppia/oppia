@@ -128,7 +128,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
       this.doesContentHaveDisplayableTranslations();
   }
 
-  openTranslationEditor(languageCode: string) {
+  openTranslationEditor(languageCode: string): void {
     const modalRef = this.ngbModal.open(TranslationModalComponent, {
       size: 'lg',
       backdrop: 'static',

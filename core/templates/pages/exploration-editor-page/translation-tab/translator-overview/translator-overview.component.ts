@@ -250,6 +250,8 @@ export class TranslatorOverviewComponent implements OnInit {
           );
           break;
         case 'mark_translation_needs_update_for_language':
+          changeDict =
+            changeDict as ExplorationChangeMarkTranslationNeedsUpdateForLanguage;
           if (this.languageCode === changeDict.language_code) {
             entityTranslation.markTranslationAsNeedingUpdate(
               changeDict.content_id
