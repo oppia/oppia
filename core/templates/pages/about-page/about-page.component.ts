@@ -21,6 +21,7 @@ import {downgradeComponent} from '@angular/upgrade/static';
 
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {OppiaPlatformStatsData} from '../../oppia-platform-stats';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
@@ -60,6 +61,28 @@ export class AboutPageComponent implements OnInit, OnDestroy {
       imageFilename: '/about/language_icon.svg',
     },
   ];
+
+  oppiaWebRawBarChartData: readonly {
+    country: string;
+    userCount: number;
+    annotationText?: string;
+  }[] = OppiaPlatformStatsData.OPPIA_WEB_RAW_BAR_CHART_DATA;
+
+  oppiaAndroidRawBarChartData: readonly {
+    country: string;
+    userCount: number;
+    annotationText?: string;
+  }[] = OppiaPlatformStatsData.OPPIA_ANDROID_RAW_BAR_CHART_DATA;
+
+  oppiaWebBarChartTicks: readonly {
+    value: string;
+    width: string;
+  }[] = OppiaPlatformStatsData.OPPIA_WEB_BAR_CHART_TICKS;
+
+  oppiaAndroidBarChartTicks: readonly {
+    value: string;
+    width: string;
+  }[] = OppiaPlatformStatsData.OPPIA_ANDROID_BAR_CHART_TICKS;
 
   directiveSubscriptions = new Subscription();
   partnershipsFormLink: string = '';
