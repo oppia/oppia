@@ -43,20 +43,190 @@
       </div>
     </div>
   </div>
-  <div class="oppia-about-page-section-three oppia-about-section">
-    <div class="oppia-about-fixed-section">
-      <h2 class="oppia-about-outcome-title-mobile oppia-about-section-title-mobile text-white" [innerHTML]="'I18N_ABOUT_PAGE_OUR_OUTCOMES' | translate"></h2>
-      <div class="oppia-about-section-three-right oppia-about-image-right">
-        <div class="oppia-about-graph-image">
-          <img [src]="getStaticImageUrl('/about/graph.svg')" alt="graph image">
+
+  <div class="oppia-about-foundation-section">
+    <div class="oppia-about-foundation-section-right">
+      <div class="oppia-about-foundation-section-products">
+        <p class="oppia-about-title-new">
+          {{ 'I18N_ABOUT_PAGE_FOUNDATION_SECTION_TITLE' | translate }}
+        </p>
+        <p class="oppia-about-section-subtext-new">
+          {{ 'I18N_ABOUT_PAGE_FOUNDATION_SECTION_SUBTEXT1' | translate }}
+        </p>
+        <p class="oppia-about-section-subtext-new">
+          {{ 'I18N_ABOUT_PAGE_FOUNDATION_SECTION_SUBTEXT2' | translate }}
+        </p>
+      </div>
+      <div class="oppia-about-foundation-section-goals-container">
+        <div class="oppia-about-foundation-section-goal">
+          <p class="oppia-about-foundation-section-goal-title">
+            {{ 'I18N_ABOUT_PAGE_FOUNDATION_SECTION_MISSION' | translate }}
+          </p>
+          <p class="oppia-about-section-subtext-new">
+            {{ 'I18N_ABOUT_PAGE_FOUNDATION_SECTION_MISSION_SUBTEXT' | translate }}
+          </p>
+        </div>
+        <div class="oppia-about-foundation-section-goal">
+          <p class="oppia-about-foundation-section-goal-title">
+            {{ 'I18N_ABOUT_PAGE_FOUNDATION_SECTION_VISION' | translate }}
+          </p>
+          <p class="oppia-about-section-subtext-new">
+            {{ 'I18N_ABOUT_PAGE_FOUNDATION_SECTION_VISION_SUBTEXT' | translate }}
+          </p>
         </div>
       </div>
-      <div class="oppia-about-content-left">
-        <h2 class="oppia-about-outcome-title oppia-about-section-title oppia-about-title-mobile-display-none text-white" [innerHTML]="'I18N_ABOUT_PAGE_OUR_OUTCOMES' | translate"></h2>
-        <p class="oppia-about-outcome-content oppia-about-section-content text-white" [innerHTML]="'I18N_ABOUT_PAGE_OUR_OUTCOMES_CONTENT' | translate"></p>
+    </div>
+    <div class="oppia-about-foundation-section-left">
+      <p class="oppia-about-foundation-section-timeline-subtitle">
+        {{ 'I18N_ABOUT_PAGE_FOUNDATION_SECTION_TIMELINE' | translate }}
+      </p>
+      <div class="oppia-about-foundation-section-timeline">
+        <div class="oppia-about-foundation-section-timeline-item">
+          <p class="oppia-about-foundation-section-timeline-year">
+            {{ 'I18N_ABOUT_PAGE_FOUNDATION_SECTION_TIMELINE_YEAR1' | translate }}
+          </p>
+          <p class="about-page oppia-about-section-subtext-new">
+            {{ 'I18N_ABOUT_PAGE_FOUNDATION_SECTION_TIMELINE_YEAR1_SUBTEXT' | translate }}
+          </p>
+        </div>
+        <div class="oppia-about-foundation-section-timeline-circle">
+        </div>
+        <div class="oppia-about-foundation-section-timeline-item">
+          <p class="oppia-about-foundation-section-timeline-year">
+            {{ 'I18N_ABOUT_PAGE_FOUNDATION_SECTION_TIMELINE_YEAR2' | translate }}
+          </p>
+          <p class="about-page oppia-about-section-subtext-new"
+             [innerHTML]="'I18N_ABOUT_PAGE_FOUNDATION_SECTION_TIMELINE_YEAR2_SUBTEXT' | translate">
+          </p>
+        </div>
+        <div class="oppia-about-foundation-section-timeline-circle">
+        </div>
+        <div class="oppia-about-foundation-section-timeline-item">
+          <p class="oppia-about-foundation-section-timeline-year">
+            {{ 'I18N_ABOUT_PAGE_FOUNDATION_SECTION_TIMELINE_YEAR3' | translate }}
+          </p>
+          <p class="about-page oppia-about-section-subtext-new">
+            {{ 'I18N_ABOUT_PAGE_FOUNDATION_SECTION_TIMELINE_YEAR3_SUBTEXT' | translate }}
+          </p>
+        </div>
       </div>
     </div>
   </div>
+
+  <div class="oppia-about-impact-section">
+    <div class="oppia-about-impact-section-top">
+      <p class="oppia-about-title-new">
+        {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_TITLE' | translate }}
+      </p>
+      <div class="oppia-about-impact-desktop-content oppia-about-impact-content">
+        <p class="oppia-about-section-subtext-new oppia-about-impact-section-top-text">
+          {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_SUBTEXT1' | translate }}
+        </p>
+        <p class="oppia-about-section-subtext-new">
+          {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_SUBTEXT2' | translate }}
+        </p>
+      </div>
+      <p class="oppia-about-section-subtext-new oppia-about-impact-mobile-content">
+        {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_SUBTEXT1' | translate }}{{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_SUBTEXT2' | translate }}
+      </p>
+      <div class="oppia-about-impact-section-stats" >
+        <div class="oppia-about-impact-section-stat-container">
+          <div class="oppia-about-impact-section-stat">
+            <p class="oppia-about-impact-section-stat-title">
+              {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_STAT1_TITLE' | translate }}
+            </p>
+          </div>
+          <p class="oppia-about-section-subtext-new stat-subtext">
+            {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_STAT1_SUBTEXT' | translate }}
+          </p>
+        </div>
+        <div class="oppia-about-impact-section-stat-container">
+          <div class="oppia-about-impact-section-stat">
+            <p class="oppia-about-impact-section-stat-title">
+              {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_STAT2_TITLE' | translate }}
+            </p>
+          </div>
+          <p class="oppia-about-section-subtext-new stat-subtext">
+            {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_STAT2_SUBTEXT' | translate }}
+          </p>
+        </div>
+        <div class="oppia-about-impact-section-stat-container">
+          <div class="oppia-about-impact-section-stat">
+            <p class="oppia-about-impact-section-stat-title">
+              {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_STAT3_TITLE' | translate }}
+            </p>
+          </div>
+          <p class="oppia-about-section-subtext-new stat-subtext">
+            {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_STAT3_SUBTEXT' | translate }}
+          </p>
+        </div>
+        <div class="oppia-about-impact-section-stat-container">
+          <div class="oppia-about-impact-section-stat">
+            <p class="oppia-about-impact-section-stat-title">
+              {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_STAT4_TITLE' | translate }}
+            </p>
+          </div>
+          <p class="about-page oppia-about-section-subtext-new stat-subtext">
+            {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_STAT4_SUBTEXT' | translate }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="oppia-about-impact-charts-container">
+      <div class="oppia-about-impact-chart-container">
+        <p class="oppia-about-section-subtext-new">
+          {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_TOP_10_COUNTRIES_TEXT' | translate }}
+          <br class="oppia-mobile-portrait-content" >
+          <span class="oppia-impact-section-grey-bg-text">
+            {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_OPPIA_WEBSITE' | translate }}
+          </span>
+        </p>
+        <div class="oppia-about-impact-bar-chart-container">
+          <oppia-bar-chart [ticks]="oppiaWebBarChartTicks"
+            chartId="oppiaWebBarChart"
+            [rawData]="oppiaWebRawBarChartData"
+            barsColor="#00645c"
+            labelsColor="#00645c4d"
+            annotationTextColor="#fff">
+          </oppia-bar-chart>
+        </div>
+      </div>
+      <div class="oppia-about-impact-chart-container">
+        <p class="oppia-about-section-subtext-new">
+          {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_TOP_10_COUNTRIES_TEXT' | translate }}
+          <br class="oppia-mobile-portrait-content">
+          <span class="oppia-impact-section-yellow-bg-text">
+            {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_OPPIA_ANDROID_APP' | translate }}
+          </span>
+        </p>
+        <div class="oppia-about-impact-bar-chart-container">
+          <oppia-bar-chart [ticks]="oppiaAndroidBarChartTicks"
+            chartId="oppiaAndroidBarChart"
+            [rawData]="oppiaAndroidRawBarChartData"
+            barsColor="#d2ac61"
+            labelsColor="#97a4062e"
+            annotationTextColor="#333">
+          </oppia-bar-chart>
+        </div>
+      </div>
+    </div>
+
+    <div class="oppia-about-impact-section-button-container">
+      <p class="oppia-about-section-subtext-new oppia-about-impact-buttons-content">
+        {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_REPORT_BUTTON_SUBTEXT' | translate }}
+      </p>
+      <div>
+        <oppia-primary-button
+          buttonHref="https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view"
+          [customClasses]="['oppia-about-impact-button']"
+          buttonText="{{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_REPORT_BUTTON_TEXT' | translate }}">
+        </oppia-primary-button>
+      </div>
+    </div>
+
+  </div>
+
   <div class="oppia-about-page-section-four oppia-about-section">
     <div class="oppia-section-four oppia-about-fixed-section">
       <h2 class="oppia-about-learn-title-mobile oppia-about-section-title-mobile" [innerHTML]="'I18N_ABOUT_PAGE_LEARN_FROM' | translate"></h2>
