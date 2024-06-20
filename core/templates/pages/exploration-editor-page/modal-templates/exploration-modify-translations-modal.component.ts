@@ -51,6 +51,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   languageIsCheckedStatusDict: {
     [languageCode: string]: boolean;
   } = {};
+  translationsHaveLoaded: boolean = false;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -139,6 +140,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     });
     this.contentHasDisplayableTranslations =
       this.doesContentHaveDisplayableTranslations();
+    this.translationsHaveLoaded = true;
   }
 
   openTranslationEditor(languageCode: string): void {

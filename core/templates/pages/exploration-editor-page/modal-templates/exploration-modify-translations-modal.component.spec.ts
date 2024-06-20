@@ -353,6 +353,7 @@ describe('Modify Translations Modal Component', function () {
         needs_update: false,
       }),
     };
+    expect(component.translationsHaveLoaded).toBeFalse();
 
     component.updateTranslationDisplayContent();
 
@@ -361,5 +362,6 @@ describe('Modify Translations Modal Component', function () {
       hi: false,
     });
     expect(component.contentHasDisplayableTranslations).toBeFalse();
+    expect(component.translationsHaveLoaded).toBeTrue();
   });
 });
