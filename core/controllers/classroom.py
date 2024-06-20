@@ -295,6 +295,8 @@ class ClassroomHandler(
         Raises:
             InvalidInputException. Classroom ID of the URL path argument must
                 match with the ID given in the classroom payload dict.
+            InvalidInputException. A topic can only be assigned to one
+                classroom.
         """
         assert self.normalized_payload is not None
         assert self.normalized_request is not None
