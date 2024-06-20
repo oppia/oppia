@@ -45,6 +45,7 @@ from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -1400,6 +1401,36 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.assertEqual(published_exps, {})
 
         self.logout()
+
+
+class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
+    """Test the conditions for generation of dummy question suggestions."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.QUESTION_ADMIN_EMAIL,
+            self.QUESTION_ADMIN_USERNAME,
+            is_super_admin=True)
+        self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL)
+        self.add_user_role(
+            self.QUESTION_ADMIN_USERNAME,
+            feconf.ROLE_ID_QUESTION_ADMIN)
+
+    def test_generate_dummy_question_suggestions_(self) -> None:
+        self.login(self.QUESTION_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_question_suggestions',
+                'skill_id': 'N8daS2n2aoQr',
+                'num_dummy_question_suggestions_generate': 12
+            }, csrf_token=csrf_token)
+        generated_question_suggestions = suggestion_services.get_submitted_suggestions( # pylint: disable=line-too-long
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL),
+                feconf.SUGGESTION_TYPE_ADD_QUESTION)
+        self.assertEqual(len(generated_question_suggestions), 12)
 
 
 class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):

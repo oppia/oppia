@@ -2197,6 +2197,8 @@ class GenericTestBase(AppEngineTestBase):
     OWNER_USERNAME: Final = 'owner'
     EDITOR_EMAIL: Final = 'editor@example.com'
     EDITOR_USERNAME: Final = 'editor'
+    QUESTION_ADMIN_EMAIL: Final = 'questionExpert@app.com'
+    QUESTION_ADMIN_USERNAME: Final = 'questionExpert'
     TOPIC_MANAGER_EMAIL: Final = 'topicmanager@example.com'
     TOPIC_MANAGER_USERNAME: Final = 'topicmanager'
     VOICE_ARTIST_EMAIL: Final = 'voiceartist@example.com'
