@@ -331,13 +331,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to navigate to the /Terms page.
-   */
-  async navigateToTermsPage(): Promise<void> {
-    await this.goto(termsUrl);
-  }
-
-  /**
    * Function to navigate to the Contact Us page.
    */
   async navigateToContactUsPage(): Promise<void> {
