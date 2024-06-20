@@ -27,22 +27,6 @@
       </div>
     </div>
   </div>
-  <div class="oppia-about-page-section-two oppia-about-section">
-    <div class="oppia-about-section-two-top oppia-about-fixed-section">
-      <div class="oppia-section-two-content">
-        <h3 class="oppia-about-title oppia-about-section-title" [innerHTML]="'I18N_ABOUT_PAGE_OUR_FEATURES' | translate"></h3>
-        <p class="oppia-about-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_OUR_FEATURES_CONTENT' | translate"></p>
-      </div>
-      <div class="oppia-about-icons">
-        <div class="oppia-about-features-container d-flex">
-          <div class="oppia-about-feature-description-container" *ngFor="let feature of features let i = index">
-            <img [src]="getStaticImageUrl(feature.imageFilename)" alt="{{feature.i18nDescription | translate}}" class="oppia-feature-icon">
-            <h4 class="oppia-about-feature-text" [innerHTML]="feature.i18nDescription | translate"></h4>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div class="oppia-about-foundation-section">
     <div class="oppia-about-foundation-section-right">
@@ -109,6 +93,68 @@
             {{ 'I18N_ABOUT_PAGE_FOUNDATION_SECTION_TIMELINE_YEAR3_SUBTEXT' | translate }}
           </p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="oppia-about-platform-section">
+    <div class="oppia-about-platform-section-left">
+      <p class="oppia-about-subtitle">
+        {{ 'I18N_ABOUT_PAGE_FEATURES' | translate }}
+      </p>
+
+      <div class="oppia-about-desktop-accordion-container">
+        <oppia-full-expand-accordion [accordionData]="featuresData" class="oppia-about-desktop-content"
+        [listContainerCustomClasses]="['oppia-about-features-list']">
+        </oppia-full-expand-accordion>
+      </div>
+
+      <div class="oppia-about-features-list oppia-about-non-desktop-content">
+        <div *ngFor="let panel of featuresData; let i = index"
+             class="oppia-about-accordion-item">
+          <button (click)="expandPanel(i)" *ngIf="featuresData[i].panelIsCollapsed"
+                  class="oppia-about-accordion-title-container"
+                  [ngClass]="panel.customTitleClassNames">
+            <p class="oppia-about-platform-subtext"> {{ panel.title | translate }} </p>
+            <mat-icon> add </mat-icon>
+          </button>
+          <div [(ngbCollapse)]="featuresData[i].panelIsCollapsed" [animation]="false" class="collapse-container panel-container"
+            [ngClass]="panel.customPanelClassNames">
+            <div class="oppia-about-accordion-title-container ">
+              <p class="oppia-about-accordion-panel-title oppia-about-platform-subtext"> {{ panel.title | translate }} </p>
+              <button (click)="closePanel(i)">
+                <mat-icon> remove </mat-icon>
+              </button>
+            </div>
+            <p class="oppia-about-platform-subtext"> {{ panel.text | translate }} </p>
+            <img *ngIf="panel.image" [src]="panel.image" >
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="oppia-about-platform-section-right">
+      <p class="oppia-about-title-new">
+        {{ 'I18N_ABOUT_PAGE_PLATFORM_SECTION_TITLE' | translate }}
+      </p>
+      <div class="oppia-about-platform-content">
+        <p class="oppia-about-platform-subtext">
+          {{ 'I18N_ABOUT_PAGE_PLATFORM_SECTION_SUBTEXT1' | translate }}
+        </p>
+        <p class="oppia-about-platform-subtext"
+           [innerHTML]="'I18N_ABOUT_PAGE_PLATFORM_SECTION_SUBTEXT2' | translate">
+        </p>
+      </div>
+      <div class="oppia-about-platform-button-container">
+        <oppia-primary-button
+          buttonHref="/learn/math"
+          [customClasses]="['oppia-about-platform-button', 'oppia-about-platform-subtext']"
+          buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate }}">
+        </oppia-primary-button>
+        <oppia-primary-button
+          buttonHref="/android"
+          [customClasses]="['oppia-about-platform-button', 'oppia-about-secondary-button', 'oppia-about-platform-subtext']"
+          buttonText="{{ 'I18N_ACTION_DOWNLOAD_ANDRIOD_APP' | translate }}">
+        </oppia-primary-button>
       </div>
     </div>
   </div>
