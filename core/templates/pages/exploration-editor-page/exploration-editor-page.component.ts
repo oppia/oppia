@@ -73,6 +73,10 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ExplorationNextContentIdIndexService} from './services/exploration-next-content-id-index.service';
 import {VersionHistoryService} from './services/version-history.service';
 import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 
 interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: boolean;
@@ -175,7 +179,9 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private userExplorationPermissionsService: UserExplorationPermissionsService,
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
-    private versionHistoryService: VersionHistoryService
+    private versionHistoryService: VersionHistoryService,
+    private entityVoiceoversService: EntityVoiceoversService,
+    private voiceoverBackendApiService: VoiceoverBackendApiService
   ) {}
 
   setDocumentTitle(): void {
@@ -239,6 +245,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         this.explorationId,
         'exploration',
         explorationData.version
+      );
+      this.contextService.setExplorationVersion(explorationData.version);
+
+      this.entityVoiceoversService.init(
+        this.explorationId,
+        'exploration',
+        explorationData.version,
+        explorationData.language_code
       );
 
       this.explorationTitleService.init(explorationData.title);
@@ -334,11 +348,48 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         }
       }
 
-      // Initialize changeList by draft changes if they exist.
+      // Initialize changeList by draft changes if they exist,
+      // and initialize the entity translations by draft changes
+      // if they exist.
       if (explorationData.draft_changes !== null) {
         this.changeListService.loadAutosavedChangeList(
           explorationData.draft_changes
         );
+
+        for (let i in explorationData.draft_changes) {
+          let changeDict = explorationData.draft_changes[i];
+
+          if (changeDict.cmd === 'edit_translation') {
+            // Create the entity translation objects first if they don't exist.
+            if (
+              !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+                changeDict.language_code
+              )
+            ) {
+              this.entityTranslationsService.languageCodeToEntityTranslations[
+                changeDict.language_code
+              ] = EntityTranslation.createFromBackendDict({
+                entity_id: this.explorationId,
+                entity_type: 'exploration',
+                entity_version: explorationData.version,
+                language_code: changeDict.language_code,
+                translations: {},
+              });
+            }
+
+            // Update the translations appropriately, via latest draft changes.
+            this.entityTranslationsService.languageCodeToEntityTranslations[
+              changeDict.language_code
+            ].updateTranslation(
+              changeDict.content_id,
+              TranslatedContent.createFromBackendDict(changeDict.translation)
+            );
+          } else if (changeDict.cmd === 'remove_translations') {
+            this.entityTranslationsService.removeAllTranslationsForContent(
+              changeDict.content_id
+            );
+          }
+        }
       }
 
       if (

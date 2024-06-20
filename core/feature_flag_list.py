@@ -53,6 +53,12 @@ class FeatureNames(enum.Enum):
     CD_ALLOW_UNDOING_TRANSLATION_REVIEW = 'cd_allow_undoing_translation_review'
     ENABLE_VOICEOVER_CONTRIBUTION = 'enable_voiceover_contribution'
     AUTO_UPDATE_EXP_VOICE_ARTIST_LINK = 'auto_update_exp_voice_artist_link'
+    EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS = (
+        'exploration_editor_can_modify_translations')
+    EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS = (
+        'exploration_editor_can_tag_misconceptions')
+    ENABLE_MULTIPLE_CLASSROOMS = 'enable_multiple_classrooms'
+    REDESIGNED_TOPIC_VIEWER_PAGE = 'redesigned_topic_viewer_page'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -78,8 +84,10 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
-    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
-    FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
+    FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
+    FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
+    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
+    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -90,7 +98,9 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.DIAGNOSTIC_TEST,
     FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
-    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK
+    FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
+    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
+    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -207,14 +217,14 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'The flag allows voice artists to add voiceovers in a specific '
             'accent for the given language.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW.value: (
         (
             'This flag allows translation reviewers to undo translation '
             'suggestion review on the contributor dashboard.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION.value: (
@@ -230,6 +240,36 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'The flag allows auto-updating of the exploration voice artists '
             'link model after an exploration update.',
             feature_flag_domain.ServerMode.TEST
+        )
+    ),
+    FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value: (
+        (
+            'This flag allows exploration editors to promptly update '
+            'translations of content they are editing in the exploration '
+            'editor page.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value: (
+        (
+            'This flag allows exploration editors to view a list of '
+            'misconceptions and tag answer groups with misconceptions '
+            'for a curated exploration.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value: (
+        (
+            'The flag enables flow for multiple classrooms '
+            'and makes the classrooms page available to learners.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE.value: (
+        (
+            'This flag activates the redesigned topic viewer page'
+            'and makes it accessible to learners.',
+            feature_flag_domain.ServerMode.DEV
         )
     )
 }

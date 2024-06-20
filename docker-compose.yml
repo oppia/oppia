@@ -30,6 +30,7 @@ services:
     environment:
       - prod_env=${prod_env:-false}
       - source_maps=${source_maps:-false}
+      - USE_FIREBASE_ENDPOINT=${use_firebase_endpoint:-false}
     entrypoint: bash /app/oppia/docker/webpack-compiler.entrypoint.sh
 
   dev-server:
@@ -86,6 +87,8 @@ services:
       context: .
       dockerfile: ./docker/Dockerfile.backend
     container_name: oppia-cloud-datastore
+    ports:
+      - "8080:8080"
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - DATASTORE_HOST=datastore
