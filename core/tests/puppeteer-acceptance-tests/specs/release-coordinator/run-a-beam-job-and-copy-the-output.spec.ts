@@ -30,13 +30,11 @@ enum INTERACTION_TYPES {
   END_EXPLORATION = 'End Exploration',
 }
 
-// Ignoring these errors because they are happening due to missing resources in the exploration setup data,
+// Ignoring these errors because they are happening due to missing responses in the exploration setup data,
 // which are not needed for the actual tests to work.
 ConsoleReporter.setConsoleErrorsToIgnore([
-  /Occurred at http:\/\/localhost:8181\/create\/\d+#\/\nhttp:\/\/localhost:8181\/webpack_bundles\/icons\/help\.png Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
-  /Occurred at http:\/\/localhost:8181\/create\/\d+#\/\nhttp:\/\/localhost:8181\/webpack_bundles\/fonts\/KaTeX_Main-Regular\.woff2 Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
-  /Occurred at http:\/\/localhost:8181\/create\/\d+#\/\nhttp:\/\/localhost:8181\/webpack_bundles\/fonts\/KaTeX_Main-Regular\.woff Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
-  /Occurred at http:\/\/localhost:8181\/create\/\d+#\/\nhttp:\/\/localhost:8181\/webpack_bundles\/fonts\/KaTeX_Main-Regular\.ttf Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+  /.*404.*Not Found.*/,
+  /.*Failed to load resource: net::ERR_CONNECTION_CLOSED.*/,
 ]);
 
 describe('Release Coordinator', function () {

@@ -60,7 +60,7 @@ describe('Release Coordinator', function () {
       await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(true);
 
       await releaseCoordinator1.editFeatureRolloutPercentage(
-        'show_redesigned_learner_dashboard',
+        'dummy_feature_flag_for_e2e_tests',
         0
       );
       // Since the rollout percentage is 0, the new design should not be visible to any users.
@@ -78,7 +78,7 @@ describe('Release Coordinator', function () {
 
       await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(false);
       await releaseCoordinator1.enableFeatureFlag(
-        'show_redesigned_learner_dashboard'
+        'dummy_feature_flag_for_e2e_tests'
       );
       await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(true);
     },

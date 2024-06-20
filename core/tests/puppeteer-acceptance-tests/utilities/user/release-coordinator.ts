@@ -333,11 +333,22 @@ export class ReleaseCoordinator extends BaseUser {
     showMessage('Output modal closed');
   }
 
+  /**
+   * Verifies the status of the Dummy Handler in the Features Tab.
+   *
+   * @param {boolean} enabled - Expected status of the Dummy Handler.
+   * If true, the function will verify that the Dummy Handler is enabled.
+   * If false, it will verify that the Dummy Handler is disabled.
+   */
   async verifyDummyHandlerStatusInFeaturesTab(enabled: boolean): Promise<void> {
-    await this.page.reload({waitUntil: ['load', 'networkidle0']});
+    await this.navigateToReleaseCoordinatorPage();
+    await this.navigateToFeaturesTab();
     try {
-      const dummyHandlerExists =
-        (await this.page.$(e2eTestAngularDummyHandlerIndicator)) !== null;
+      // Wait for the selector to be present in the DOM before fetching it.
+      const dummyHandlerExists = await this.page
+        .waitForSelector(e2eTestAngularDummyHandlerIndicator, {timeout: 5000})
+        .then(() => true)
+        .catch(() => false);
 
       if (enabled) {
         if (!dummyHandlerExists) {

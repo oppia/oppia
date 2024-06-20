@@ -18,7 +18,6 @@
  */
 
 var action = require('./action.js');
-var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var ReleaseCoordinatorPage = function () {
@@ -29,9 +28,7 @@ var ReleaseCoordinatorPage = function () {
   var featureFlagElement = $('.e2e-test-feature-flag');
   var featureNameLocator = '.e2e-test-feature-name';
   var featuresTab = $('.e2e-test-features-tab');
-  var saveButtonLocator = '.e2e-test-save-button';
   var valueSelectorLocator = '.e2e-test-value-selector';
-  var statusMessage = $('.e2e-test-status-message');
   var featureFlagRolloutPercentage = '.e2e-test-rollout-percentage';
 
   this.get = async function () {
@@ -184,16 +181,6 @@ var ReleaseCoordinatorPage = function () {
     await this.saveChangeOfFeature(featureElement);
   };
 
-  this.disableFeatureFlag = async function (featureFlagElement) {
-    await waitFor.visibilityOf(
-      featureFlagElement.$(valueSelectorLocator),
-      'Disabling force-enable property takes too long to appear'
-    );
-
-    await featureFlagElement.$(valueSelectorLocator).selectByVisibleText('No');
-    await this.saveChangeOfFeature(featureFlagElement);
-  };
-
   this.setRolloutPercentageForFeatureFlag = async function (
     featureFlagElement,
     rolloutPercentage
@@ -210,33 +197,6 @@ var ReleaseCoordinatorPage = function () {
       rolloutPercentage
     );
     await this.saveChangeOfFeature(featureFlagElement);
-  };
-
-  this.expectRolloutPercentageToMatch = async function (
-    featureFlagElement,
-    rolloutPercentage
-  ) {
-    await waitFor.visibilityOf(
-      featureFlagElement.$(featureFlagRolloutPercentage),
-      'Rollout-percentage property takes too long to appear'
-    );
-    var value = await action.getValue(
-      'rolloutPercentage',
-      featureFlagElement
-        .$(featureFlagRolloutPercentage)
-        .$('.e2e-test-editor-int')
-    );
-    expect(value).toBe(rolloutPercentage);
-  };
-
-  this.saveChangeOfFeature = async function (featureElement) {
-    await action.click(
-      'Save feature button',
-      featureElement.$(saveButtonLocator)
-    );
-
-    await general.acceptAlert();
-    await waitFor.visibilityOf(statusMessage);
   };
 };
 
