@@ -3,8 +3,12 @@
     <div class="classrooms-breadcrumbs">
       <div class="desktop-breadcrumbs">
         <a href="/">Home</a>
-        <span>&gt;</span>
+        <i class="fa fa-angle-right"></i>
         <span>Classrooms</span>
+      </div>
+      <div class="mobile-breadcrumbs">
+        <i class="fa fa-angle-left"></i>
+        <a href="/">Back to Home</a>
       </div>
     </div>
   </div>
@@ -56,16 +60,29 @@
     width: 70vw;
   }
 
-  .breadcrumbs-container .classrooms-breadcrumbs .desktop-breadcrumbs a,
-  .breadcrumbs-container .classrooms-breadcrumbs .desktop-breadcrumbs span {
-    color: #00645c;
+  .breadcrumbs-container .classrooms-breadcrumbs .desktop-breadcrumbs {
+    align-items: center;
     display: flex;
+    gap: 4px;
+  }
+
+  .breadcrumbs-container .classrooms-breadcrumbs .mobile-breadcrumbs {
+    display: none;
+  }
+
+  .breadcrumbs-container .classrooms-breadcrumbs .mobile-breadcrumbs a,
+  .breadcrumbs-container .classrooms-breadcrumbs .desktop-breadcrumbs a {
+    color: #00645c;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 14px;
     font-style: normal;
     font-weight: 500;
-    gap: 5px;
     line-height: 16px;
+  }
+
+  .breadcrumbs-container .classrooms-breadcrumbs .mobile-breadcrumbs i,
+  .breadcrumbs-container .classrooms-breadcrumbs .desktop-breadcrumbs i {
+    font-size: 13px;
   }
 
   .classrooms-main-content .classroom-tile-container {
@@ -74,6 +91,7 @@
     flex-wrap: wrap;
     gap: 20px;
     justify-content: center;
+    width: 100vw;
   }
 
   .classrooms-main-content .classrooms-description {
@@ -148,8 +166,7 @@
     height: 140px;
     justify-content: center;
     margin-top: 20px;
-    padding-bottom: 10px;
-    padding-top: 10px;
+    padding: 10px 0;
     width: 100vw;
   }
 
@@ -166,6 +183,7 @@
     font-style: normal;
     font-weight: 700;
     margin: 0;
+    text-align: center;
   }
 
   .oppia-classrooms-search-container .search-box-text-container .classrooms-page-search-subheading {
@@ -175,11 +193,16 @@
     font-style: normal;
     font-weight: 400;
     letter-spacing: -0.02em;
+    text-align: center;
   }
 
 @media screen and (max-width: 768px) {
     .breadcrumbs-container .classrooms-breadcrumbs {
         width: 90vw;
+    }
+
+    .oppia-classrooms-page-container .breadcrumbs-container {
+      margin-top: 26px;
     }
 
     .classrooms-main-content .classrooms-description {
@@ -197,6 +220,16 @@
 
     .oppia-classrooms-search-container {
         height: 220px;
+    }
+
+    .breadcrumbs-container .classrooms-breadcrumbs .mobile-breadcrumbs {
+      align-items: center;
+      display: flex;
+      gap: 4px;
+    }
+
+    .breadcrumbs-container .classrooms-breadcrumbs .desktop-breadcrumbs {
+      display: none;
     }
 }
 </style>
