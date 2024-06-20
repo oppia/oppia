@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-out users
- * can open all the links on the "Terms of Use" page.
+ * @fileoverview Acceptance Test for checking if all buttons on the
+ * "Contact Us" page can be clicked by logged-out users.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -23,7 +23,7 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-out Users', function () {
+describe('Logged-out User', function () {
   let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
@@ -31,32 +31,44 @@ describe('Logged-out Users', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await loggedOutUser.navigateToTermsPage();
+    await loggedOutUser.navigateToContactUsPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to follow the link to view the Privacy Policy',
+    'should be able to navigate to /donate page from the "DONATE TODAY" button.',
     async function () {
-      await loggedOutUser.clickLinkToPrivacyPolicyOnTermsPage();
+      await loggedOutUser.clickDonateTodayButtonInContactUsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should be able to follow the link about the CC-BY-SA 4.0 license',
+    'should be able to navigate to /partnerships page from the "BECOME A PARTNER" button.',
     async function () {
-      await loggedOutUser.clickLinkToLicenseOnTermsPage();
+      await loggedOutUser.clickBecomeAPartnerButtonInContactUsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should be able to follow the link to the Oppia Annouce google group.',
+    'should be able to navigate to /volunteer page from the "BECOME A VOLUNTEER" button.',
     async function () {
-      await loggedOutUser.clickLinkToGoogleGroupOnTermsPage();
+      await loggedOutUser.clickVolunteerButtonInContactUsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+
+  it(
+    'should have a mailto link for "admin@oppia.org" in the other inquiries section.',
+    async function () {
+      await loggedOutUser.verifyAdminEmailLinkInContactUsPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it('should have a mailto link for "press@oppia.org" in the other inquiries section.', async function () {
+    await loggedOutUser.verifyPressEmailLinkInContactUsPage();
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
