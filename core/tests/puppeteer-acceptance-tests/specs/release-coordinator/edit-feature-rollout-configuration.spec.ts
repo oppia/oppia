@@ -30,14 +30,14 @@ describe('Release Coordinator', function () {
 
   beforeAll(async function () {
     releaseCoordinator1 = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'release_coordinator@example.com',
+      'releaseCoordinator1',
+      'release_coordinator1@example.com',
       [ROLES.RELEASE_COORDINATOR]
     );
 
     releaseCoordinator2 = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'release_coordinator@example.com',
+      'releaseCoordinator2',
+      'release_coordinator2@example.com',
       [ROLES.RELEASE_COORDINATOR]
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);

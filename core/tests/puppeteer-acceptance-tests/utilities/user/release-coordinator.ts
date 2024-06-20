@@ -47,6 +47,9 @@ const rolloutPercentageInput = '.e2e-test-editor-int';
 const jobInputField = '.mat-input-element';
 const jobOutputRowSelector = '.mat-row';
 const beamJobRunOutputSelector = '.beam-job-run-output';
+
+const e2eTestAngularDummyHandlerIndicator =
+  '.e2e-test-angular-dummy-handler-indicator';
 export class ReleaseCoordinator extends BaseUser {
   /**
    * Navigate to the release coordinator page.
@@ -334,8 +337,7 @@ export class ReleaseCoordinator extends BaseUser {
     await this.page.reload({waitUntil: ['load', 'networkidle0']});
     try {
       const dummyHandlerExists =
-        (await this.page.$('.e2e-test-angular-dummy-handler-indicator')) !==
-        null;
+        (await this.page.$(e2eTestAngularDummyHandlerIndicator)) !== null;
 
       if (enabled) {
         if (!dummyHandlerExists) {

@@ -915,10 +915,6 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOn(addResponseOptionButton);
         await this.type(textInputInteractionOption, answer);
         break;
-      case 'Numeric Expression Input':
-        await this.page.focus('.e2e-test-guppy-div');
-        await this.page.keyboard.type('9');
-        break;
       // Add cases for other interaction types here
       // case 'otherInteractionType':
       //   await this.type(otherFormInput, answer);
