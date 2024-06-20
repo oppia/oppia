@@ -34,7 +34,7 @@
   flex-direction: row-reverse;
   height: fit-content;
   justify-content: space-between;
-  padding: 36px 64px 112px 64px;
+  padding: 112px 64px;
 }
 
 .about-page .oppia-about-foundation-section-right {
@@ -55,6 +55,11 @@
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 3rem;
   line-height: 3.6rem;
+  margin-bottom: 0;
+}
+
+.about-page .oppia-about-foundation-section  .oppia-about-title-new {
+  margin-bottom: 16px;
 }
 
 .about-page .oppia-about-foundation-section-goals-container {
@@ -129,6 +134,10 @@
   display: flex;
   flex-direction: column;
   padding: 0 64px 80px 64px;
+}
+
+.about-page .oppia-about-impact-section  .oppia-about-title-new {
+  margin-bottom: 8px;
 }
 
 .about-page .oppia-about-impact-content {
@@ -270,7 +279,7 @@
 
   .about-page .oppia-about-foundation-section {
     flex-direction: column;
-    padding: 0 15px 80px;
+    padding: 80px 15px;
     row-gap: 5.6rem;
   }
 
@@ -359,7 +368,7 @@
   }
 
   .about-page .oppia-about-foundation-section {
-    padding: 36px 24px 64px;
+    padding: 64px 24px;
     row-gap: 4.8rem;
   }
 
@@ -409,7 +418,7 @@
   }
 
   .about-page .oppia-about-foundation-section {
-    padding: 4px 20px 56px;
+    padding: 56px 20px;
     row-gap: 4rem;
   }
 
@@ -456,6 +465,10 @@
 
   .about-page .oppia-about-impact-section {
     padding: 0 20px 56px;
+  }
+
+  .about-page .oppia-about-foundation-section  .oppia-about-title-new {
+    max-width: 92%;
   }
 
   .about-page .oppia-about-impact-section-stats {
@@ -1021,14 +1034,6 @@
   }
 }
 
-.about-page .oppia-about-title-new {
-  color: #00645c;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 3rem;
-  line-height: 3.6rem;
-  margin-bottom: 0;
-}
-
 .about-page .oppia-about-subtitle {
   color: #717171;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -1077,7 +1082,7 @@
   flex-direction: row;
   gap: 68px;
   justify-content: start;
-  padding: 64px;
+  padding: 0 64px 64px;
 }
 
 .about-page .oppia-about-platform-section-right {
@@ -1169,7 +1174,7 @@
   .about-page .oppia-about-platform-section {
     flex-direction: column-reverse;
     gap: 56px;
-    padding: 48px;
+    padding: 0 48px 48px;
   }
   .about-page .oppia-about-platform-section-right {
     width: 100%;
@@ -1235,10 +1240,6 @@
 }
 
 @media only screen and (max-width: 769px) {
-  .about-page .oppia-about-title-new {
-    font-size: 2rem;
-    line-height: 2.5rem;
-  }
   .about-page .oppia-about-platform-subtext {
     font-size: 16px;
     line-height: 19.2px;
@@ -1248,7 +1249,7 @@
   
   .about-page .oppia-about-platform-section {
     gap: 48px;
-    padding: 40px;
+    padding: 0 40px 40px;
   }
   .about-page .oppia-about-platform-content {
     margin: 16px 0 24px;
@@ -1264,7 +1265,7 @@
 @media only screen and (max-width: 361px) {
   .about-page .oppia-about-platform-section {
     gap: 40px;
-    padding: 28px 20px;
+    padding: 0 20px 56px;
   }
   .about-page .oppia-about-platform-content {
     margin: 16px 0 32px;
