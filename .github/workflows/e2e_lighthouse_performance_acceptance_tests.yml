@@ -251,7 +251,7 @@ jobs:
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_chrome_for_ci
-      - name: Run Lighthouse performance checks shard
+      - name: Run Lighthouse performance checks shard ${{ matrix.suite.name }}
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
       - name: Uploading puppeteer video as Artifacts
@@ -339,9 +339,9 @@ jobs:
         - name: (Artifact re-build) Build Webpack
           if: steps.download_artifact_1.outcome == 'failure'
           run: python -m scripts.build --prod_env
-        - name: Run Desktop Acceptance Test ${{ matrix.suite }}
+        - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
           run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env
-        - name: Run Mobile Acceptance Test ${{ matrix.suite }}
+        - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
           run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env --mobile
         - name: Uploading webpack bundles as an artifact
           if: ${{ failure() }}

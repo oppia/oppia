@@ -67,7 +67,7 @@ jobs:
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_chrome_for_ci
-      - name: Run Lighthouse accessibility checks shard
+      - name: Run Lighthouse accessibility checks shard ${{ matrix.suite.name }}
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.run_lighthouse_tests --mode accessibility --pages ${{ join(matrix.suite.pages_to_run, ',') }}
       - name: Report failure if failed on oppia/oppia develop branch
