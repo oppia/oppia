@@ -380,10 +380,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  getOppiaBlogUrl(): string {
-    return this.OPPIA_BLOG_URL;
-  }
-
   changeLanguage(languageCode: string): void {
     this.i18nService.updateUserPreferredLanguage(languageCode);
   }
