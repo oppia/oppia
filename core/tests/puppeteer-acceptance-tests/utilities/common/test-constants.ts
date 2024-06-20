@@ -76,6 +76,8 @@ export default {
       '?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp',
     PartnershipsFormShortUrl: 'https://forms.gle/Y71U8FdhQwZpicJj8',
     PrivacyPolicy: 'http://localhost:8181/privacy-policy',
+    ReleaseCoordinator: 'http://localhost:8181/release-coordinator',
+    splash: 'http://localhost:8181/splash',
     Teach: 'http://localhost:8181/teach',
     Terms: 'http://localhost:8181/terms',
     TopicAndSkillsDashboard:
@@ -87,7 +89,6 @@ export default {
     VolunteerFormShortUrl: 'https://forms.gle/rhFYoLLSFr3JEZHy8',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
     ProfilePagePrefix: 'http://localhost:8181/profile',
-    ReleaseCoordinator: 'http://localhost:8181/release-coordinator',
     OppiaAnnounceGoogleGroup: 'https://groups.google.com/g/oppia-announce',
   },
 
@@ -108,8 +109,8 @@ export default {
     QUESTION_ADMIN: 'question admin',
     VOICEOVER_ADMIN: 'voiceover admin',
     TOPIC_MANAGER: 'topic manager',
-    RELEASE_COORDINATOR: 'release coordinator',
     MODERATOR: 'moderator',
+    RELEASE_COORDINATOR: 'release coordinator',
   } as const,
 
   BlogRights: {

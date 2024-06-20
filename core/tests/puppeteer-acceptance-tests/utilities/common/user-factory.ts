@@ -32,8 +32,8 @@ import {CurriculumAdminFactory} from '../user/curriculum-admin';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 import {LoggedInUserFactory, LoggedInUser} from '../user/logged-in-user';
 import {ModeratorFactory} from '../user/moderator';
-import testConstants from './test-constants';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
+import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
@@ -51,8 +51,8 @@ const USER_ROLE_MAPPING = {
   [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
-  [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.MODERATOR]: ModeratorFactory,
+  [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
 } as const;
 
 /**
