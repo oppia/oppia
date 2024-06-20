@@ -21,16 +21,32 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
+// URLs.
 const releaseCoordinatorUrl = testConstants.URLs.ReleaseCoordinator;
-const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
-const featuresTab = '.e2e-test-features-tab';
-const mobileFeaturesTab = '.e2e-test-features-tab-mobile';
-const mobileNavBar = '.e2e-test-navbar-dropdown-toggle';
-const featureFlagDiv = '.e2e-test-feature-flag';
-const featureFlagOptionSelector = '.e2e-test-value-selector';
-const featureFlagNameSelector = '.e2e-test-feature-name';
+
+// Selectors for buttons.
+const copyOutputButton = '.e2e-test-copy-output-button';
+const startNewJobButton = '.job-start-button';
+const startNewJobConfirmationButton = '.e2e-test-start-new-job-button';
 const saveFeatureFlagButtonSelector = '.e2e-test-save-button';
 
+// Selectors for tabs.
+const featuresTab = '.e2e-test-features-tab';
+const mobileFeaturesTab = '.e2e-test-features-tab-mobile';
+
+// Selectors for mobile navigation.
+const mobileNavBar = '.e2e-test-navbar-dropdown-toggle';
+
+// Selectors for feature flags.
+const featureFlagDiv = '.e2e-test-feature-flag';
+const featureFlagNameSelector = '.e2e-test-feature-name';
+const featureFlagOptionSelector = '.e2e-test-value-selector';
+const rolloutPercentageInput = '.e2e-test-editor-int';
+
+// Selectors for jobs.
+const jobInputField = '.mat-input-element';
+const jobOutputRowSelector = '.mat-row';
+const beamJobRunOutputSelector = '.beam-job-run-output';
 export class ReleaseCoordinator extends BaseUser {
   /**
    * Navigate to the release coordinator page.
@@ -89,7 +105,7 @@ export class ReleaseCoordinator extends BaseUser {
     );
 
     // Find the input field for rollout percentage and set its value to the specified percentage.
-    await this.page.waitForSelector('.e2e-test-editor-int');
+    await this.page.waitForSelector(rolloutPercentageInput);
     await this.page.evaluate(
       (percentage, inputSelector) => {
         const inputElem = document.querySelector(
@@ -105,7 +121,7 @@ export class ReleaseCoordinator extends BaseUser {
         inputElem.dispatchEvent(event);
       },
       percentage,
-      `.e2e-test-feature-flag-${featureFlagIndex} .e2e-test-editor-int`
+      `.e2e-test-feature-flag-${featureFlagIndex} ${rolloutPercentageInput}`
     );
 
     // Save the changes.
@@ -194,19 +210,21 @@ export class ReleaseCoordinator extends BaseUser {
    * @param {string} jobName - The name of the job to run.
    */
   async selectAndRunJob(jobName: string): Promise<void> {
-    await this.type('.mat-input-element', jobName);
+    await this.page.waitForSelector(jobInputField, {visible: true});
+    await this.type(jobInputField, jobName);
     await this.page.keyboard.press('Enter');
+    await this.page.waitForSelector(startNewJobButton, {visible: true});
     await this.page.evaluate(selector => {
       const element = document.querySelector(selector) as HTMLElement;
       element?.click();
-    }, '.job-start-button');
-    await this.page.waitForSelector('.e2e-test-start-new-job-button', {
+    }, startNewJobButton);
+    await this.page.waitForSelector(startNewJobConfirmationButton, {
       visible: true,
     });
     await this.page.evaluate(selector => {
       const element = document.querySelector(selector) as HTMLElement;
       element?.click();
-    }, '.e2e-test-start-new-job-button');
+    }, startNewJobConfirmationButton);
     showMessage('Job started');
   }
 
@@ -216,9 +234,8 @@ export class ReleaseCoordinator extends BaseUser {
   async waitForJobToComplete(): Promise<void> {
     try {
       // Adjust the timeout as needed. Some jobs may take longer to complete.
-      await this.page.waitForSelector('.mat-row', {
+      await this.page.waitForSelector(jobOutputRowSelector, {
         visible: true,
-        timeout: 30000,
       });
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
@@ -235,22 +252,44 @@ export class ReleaseCoordinator extends BaseUser {
    * Views and copies the output of a job.
    */
   async viewAndCopyJobOutput(): Promise<string> {
-    await this.clickOn(' View Output ');
-    await this.page.waitForSelector('.mat-row');
-    const output = await this.page.$eval('.mat-row', el => el.textContent);
-    await this.clickOn(' Copy Output ');
+    try {
+      // OverridePermissions is used to allow clipboard access.
+      const context = await this.browserObject.defaultBrowserContext();
+      await context.overridePermissions('http://localhost:8181', [
+        'clipboard-read',
+        'clipboard-write',
+      ]);
+      const pages = await this.browserObject.pages();
+      this.page = pages[pages.length - 1];
 
-    // Read the clipboard data.
-    const clipboardData = await this.page.evaluate(async () => {
-      return await navigator.clipboard.readText();
-    });
+      await this.clickOn(' View Output ');
+      await this.page.waitForSelector(beamJobRunOutputSelector, {
+        visible: true,
+      });
 
-    if (clipboardData !== output) {
-      throw new Error('Data was not copied correctly');
+      // Getting the output text directly from the element.
+      const output = await this.page.$eval(
+        beamJobRunOutputSelector,
+        el => el.textContent
+      );
+
+      await this.clickOn(copyOutputButton);
+
+      // Reading the clipboard data.
+      const clipboardData = await this.page.evaluate(async () => {
+        return await navigator.clipboard.readText();
+      });
+
+      if (clipboardData !== output) {
+        throw new Error('Data was not copied correctly');
+      }
+      showMessage('Data was copied correctly');
+
+      return output;
+    } catch (error) {
+      console.error('An error occurred:', error);
+      throw error;
     }
-    showMessage('Data was copied correctly');
-
-    return output;
   }
 
   /**
@@ -258,13 +297,28 @@ export class ReleaseCoordinator extends BaseUser {
    * @param {string} expectedOutput - The expected output of the job.
    */
   async expectJobOutputToBe(expectedOutput: string): Promise<void> {
-    await this.page.waitForSelector('.mat-row');
-    const actualOutput = await this.page.$eval(
-      '.mat-row',
-      el => el.textContent
-    );
-    expect(actualOutput).toEqual(expectedOutput);
-    showMessage('Output is as expected');
+    try {
+      await this.page.waitForSelector(beamJobRunOutputSelector, {
+        visible: true,
+      });
+      const actualOutput = await this.page.$eval(
+        beamJobRunOutputSelector,
+        el => el.textContent
+      );
+      if (!actualOutput) {
+        throw new Error('Output element is empty or not found.');
+      }
+
+      if (actualOutput === expectedOutput) {
+        showMessage('Output is as expected');
+      } else {
+        throw new Error(`Output is not as expected. Expected: ${expectedOutput} 
+        Actual: ${actualOutput}`);
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+      throw error;
+    }
   }
 
   /**
@@ -274,6 +328,34 @@ export class ReleaseCoordinator extends BaseUser {
   async closeOutputModal(): Promise<void> {
     await this.clickOn('Close');
     showMessage('Output modal closed');
+  }
+
+  async verifyDummyHandlerStatusInFeaturesTab(enabled: boolean): Promise<void> {
+    await this.page.reload({waitUntil: ['load', 'networkidle0']});
+    try {
+      const dummyHandlerExists =
+        (await this.page.$('.e2e-test-angular-dummy-handler-indicator')) !==
+        null;
+
+      if (enabled) {
+        if (!dummyHandlerExists) {
+          throw new Error(
+            'Dummy handler is expected to be enabled but it is disabled'
+          );
+        }
+        showMessage('Dummy handler is enabled');
+      } else {
+        if (dummyHandlerExists) {
+          throw new Error(
+            'Dummy handler is expected to be disabled but it is enabled'
+          );
+        }
+        showMessage('Dummy handler is disabled');
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+      throw error;
+    }
   }
 }
 

@@ -31,7 +31,7 @@ const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
 const mathInteractionsTab = '.e2e-test-interaction-tab-math';
-const mathEquationInputSelector = '.e2e-test-guppy-div';
+const closeResponseModalButton = '.e2e-test-close-add-response-modal';
 
 // Settings Tab elements.
 const settingsTab = 'a.e2e-test-exploration-settings-tab';
@@ -282,7 +282,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async getExplorationId(): Promise<string> {
     const url = await this.page.url();
-    const match = url.match(/\/create\/(.*?)\//);
+    const match = url.match(/\/create\/(.*?)(\/|#)/);
     if (!match) {
       throw new Error(
         'Exploration ID not found in the URL' +
@@ -372,7 +372,7 @@ export class ExplorationEditor extends BaseUser {
 
     const responseInputs = await this.page.$$(stateContentInputField);
     for (let i = 0; i < options.length; i++) {
-      await responseInputs[i].type(`${options[i]} `);
+      await responseInputs[i].type(`${options[i]}`);
     }
 
     await this.clickOn(saveInteractionButton);
@@ -417,6 +417,8 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
+    await this.page.waitForSelector(closeResponseModalButton, {visible: true});
+    await this.clickOn(closeResponseModalButton);
     showMessage(`${interactionToAdd} interaction has been added successfully.`);
   }
 
@@ -428,7 +430,7 @@ export class ExplorationEditor extends BaseUser {
     await this.type(addTitleBar, title);
     await this.page.keyboard.press('Tab');
 
-    showMessage(`Title has been updated to ${title} `);
+    showMessage(`Title has been updated to ${title}`);
   }
 
   /**
@@ -859,7 +861,7 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForNetworkIdle({idleTime: 700});
     } catch (error) {
       const newError = new Error(
-        `Error navigating to card ${cardName}: ${error.message} `
+        `Error navigating to card ${cardName}: ${error.message}`
       );
       newError.stack = error.stack;
       throw newError;
@@ -914,14 +916,15 @@ export class ExplorationEditor extends BaseUser {
         await this.type(textInputInteractionOption, answer);
         break;
       case 'Numeric Expression Input':
-        await this.page.type('.e2e-test-guppy-div', answer);
+        await this.page.focus('.e2e-test-guppy-div');
+        await this.page.keyboard.type('9');
         break;
       // Add cases for other interaction types here
       // case 'otherInteractionType':
       //   await this.type(otherFormInput, answer);
       //   break;
       default:
-        throw new Error(`Unsupported interaction type: ${interactionType} `);
+        throw new Error(`Unsupported interaction type: ${interactionType}`);
     }
 
     await this.clickOn(feedbackEditorSelector);
@@ -948,7 +951,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(defaultFeedbackTab);
     await this.clickOn(openOutcomeFeedBackEditor);
     await this.clickOn(stateContentInputField);
-    await this.type(stateContentInputField, `${defaultResponseFeedback} `);
+    await this.type(stateContentInputField, `${defaultResponseFeedback}`);
     await this.clickOn(saveOutcomeFeedbackButton);
   }
 
@@ -1109,7 +1112,7 @@ export class ExplorationEditor extends BaseUser {
         await this.type(floatFormInput, answer);
         break;
       default:
-        throw new Error(`Unsupported input type: ${inputType} `);
+        throw new Error(`Unsupported input type: ${inputType}`);
     }
 
     await this.clickOn(submitAnswerButton);
@@ -1122,7 +1125,7 @@ export class ExplorationEditor extends BaseUser {
   async getInputType(selector: string): Promise<string> {
     const inputField = await this.page.$(selector);
     if (!inputField) {
-      throw new Error(`Input field not found for selector: ${selector} `);
+      throw new Error(`Input field not found for selector: ${selector}`);
     }
     const inputType = (await (
       await inputField.getProperty('type')
@@ -1258,7 +1261,7 @@ export class ExplorationEditor extends BaseUser {
   async playExploration(explorationId: string): Promise<void> {
     await Promise.all([
       this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      this.page.goto(`${baseUrl} /explore/${explorationId} `),
+      this.page.goto(`${baseUrl} /explore/${explorationId}`),
     ]);
   }
 
@@ -1304,7 +1307,7 @@ export class ExplorationEditor extends BaseUser {
     );
     if (!activeContentType?.includes(contentType)) {
       showMessage(
-        `Switching content type from ${activeContentType} to ${contentType} `
+        `Switching content type from ${activeContentType} to ${contentType}`
       );
       await this.clickOn(contentType);
     }
@@ -1321,13 +1324,13 @@ export class ExplorationEditor extends BaseUser {
         await this.type(stateTranslationEditorSelector, translation);
         break;
       case 'Feedback':
-        await this.clickOn(`.e2e - test - feedback - ${feedbackIndex} `);
+        await this.clickOn(`.e2e - test - feedback - ${feedbackIndex}`);
         await this.clickOn(editTranslationSelector);
         await this.clickOn(stateContentInputField);
         await this.type(stateContentInputField, translation);
         break;
       default:
-        throw new Error(`Invalid content type: ${contentType} `);
+        throw new Error(`Invalid content type: ${contentType}`);
     }
     await this.clickOn(saveTranslationButton);
     await this.page.waitForNetworkIdle();
@@ -1355,13 +1358,13 @@ export class ExplorationEditor extends BaseUser {
     expectedTranslation: string
   ): Promise<void> {
     await this.page.waitForSelector(
-      `div.e2e - test - translation - ${languageCode} `,
+      `div.e2e - test - translation - ${languageCode}`,
       {visible: true}
     );
 
     const translationElementText = await this.page.evaluate(languageCode => {
       const element = document.querySelector(
-        `div.e2e - test - translation - ${languageCode} `
+        `div.e2e - test - translation - ${languageCode}`
       );
       return element ? element.textContent : null;
     }, languageCode);

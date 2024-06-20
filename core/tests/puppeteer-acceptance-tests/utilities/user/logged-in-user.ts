@@ -16,17 +16,14 @@
  * @fileoverview Logged-in users utility file.
  */
 
-import puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
-const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
-const newLearnerDashboardSidebar = '.oppia-learner-dash-sidebar_pic';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -97,37 +94,6 @@ export class LoggedInUser extends BaseUser {
       );
     } else {
       showMessage('The link returns 404 as expected.');
-    }
-  }
-
-  /**
-   * Check if the redesigned learner dashboard feature is enabled.
-   */
-  async verifyNewDesignInLearnerDashboard(enabled: boolean): Promise<void> {
-    await this.goto(learnerDashboardUrl);
-
-    const newSideBar = await this.page
-      .waitForSelector(newLearnerDashboardSidebar)
-      .catch(error => {
-        if (error instanceof puppeteer.errors.TimeoutError) {
-          if (enabled) {
-            throw new Error('New design in learner dashboard is not enabled.');
-          } else {
-            showMessage(
-              'New design in learner dashboard is not enabled, as expected.'
-            );
-          }
-        } else {
-          throw error;
-        }
-      });
-
-    if (newSideBar && !enabled) {
-      throw new Error('New design in learner dashboard is enabled.');
-    }
-
-    if (enabled) {
-      showMessage('New design in learner dashboard is enabled, as expected.');
     }
   }
 }

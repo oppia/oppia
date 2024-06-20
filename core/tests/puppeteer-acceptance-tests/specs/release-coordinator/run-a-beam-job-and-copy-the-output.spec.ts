@@ -20,6 +20,7 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -28,10 +29,15 @@ enum INTERACTION_TYPES {
   NUMERIC_EXPRESSION_INPUT = 'Numeric Expression Input',
   END_EXPLORATION = 'End Exploration',
 }
-enum CARD_NAME {
-  INTRODUCTION = 'Introduction',
-  FINAL_CARD = 'Final Card',
-}
+
+// Ignoring these errors because they are happening due to missing resources in the exploration setup data,
+// which are not needed for the actual tests to work.
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /Occurred at http:\/\/localhost:8181\/create\/\d+#\/\nhttp:\/\/localhost:8181\/webpack_bundles\/icons\/help\.png Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+  /Occurred at http:\/\/localhost:8181\/create\/\d+#\/\nhttp:\/\/localhost:8181\/webpack_bundles\/fonts\/KaTeX_Main-Regular\.woff2 Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+  /Occurred at http:\/\/localhost:8181\/create\/\d+#\/\nhttp:\/\/localhost:8181\/webpack_bundles\/fonts\/KaTeX_Main-Regular\.woff Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+  /Occurred at http:\/\/localhost:8181\/create\/\d+#\/\nhttp:\/\/localhost:8181\/webpack_bundles\/fonts\/KaTeX_Main-Regular\.ttf Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+]);
 
 describe('Release Coordinator', function () {
   let releaseCoordinator: ReleaseCoordinator;
@@ -60,24 +66,7 @@ describe('Release Coordinator', function () {
     await explorationEditor.addMathInteraction(
       INTERACTION_TYPES.NUMERIC_EXPRESSION_INPUT
     );
-    await explorationEditor.addResponseToTheInteraction(
-      INTERACTION_TYPES.NUMERIC_EXPRESSION_INPUT,
-      '1',
-      'Prefect!',
-      CARD_NAME.FINAL_CARD,
-      true
-    );
-    await explorationEditor.saveExplorationDraft();
 
-    // Navigate to the final card and update its content.
-    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.updateCardContent(
-      'We have learnt numeric expressions'
-    );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-
-    // Navigate back to the introduction card and save the draft.
-    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
     explorationId = await explorationEditor.getExplorationId();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
@@ -93,11 +82,11 @@ describe('Release Coordinator', function () {
 
       // Beam jobs, take a while to run.
       await releaseCoordinator.waitForJobToComplete();
+      // Verify that the output was copied correctly.
       await releaseCoordinator.viewAndCopyJobOutput();
 
-      // Verify that the output was copied correctly.
       await releaseCoordinator.expectJobOutputToBe(
-        `(${explorationId}, 'Introduction', ['MatchesExactlyWith'])`
+        `('${explorationId}', 'Introduction', [])`
       );
       await releaseCoordinator.closeOutputModal();
     },

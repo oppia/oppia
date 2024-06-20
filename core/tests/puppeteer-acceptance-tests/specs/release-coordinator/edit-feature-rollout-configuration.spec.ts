@@ -20,25 +20,25 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {log} from 'console';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Release Coordinator', function () {
-  let releaseCoordinator: ReleaseCoordinator;
-  let loggedInUser: LoggedInUser;
+  let releaseCoordinator1: ReleaseCoordinator;
+  let releaseCoordinator2: ReleaseCoordinator;
 
   beforeAll(async function () {
-    releaseCoordinator = await UserFactory.createNewUser(
+    releaseCoordinator1 = await UserFactory.createNewUser(
       'releaseCoordinator',
       'release_coordinator@example.com',
       [ROLES.RELEASE_COORDINATOR]
     );
-    loggedInUser = await UserFactory.createNewUser(
-      'loggedInUser',
-      'logged_in_user@example.com'
+
+    releaseCoordinator2 = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'release_coordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
@@ -46,22 +46,25 @@ describe('Release Coordinator', function () {
     'should be able to alter the rollout percentage for logged-in users and save' +
       'the changes in release coordinator page',
     async function () {
-      await releaseCoordinator.navigateToReleaseCoordinatorPage();
-      await releaseCoordinator.navigateToFeaturesTab();
+      await releaseCoordinator2.navigateToReleaseCoordinatorPage();
+      await releaseCoordinator2.navigateToFeaturesTab();
+      await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(false);
 
-      await loggedInUser.verifyNewDesignInLearnerDashboard(false);
-      await releaseCoordinator.editFeatureRolloutPercentage(
-        'show_redesigned_learner_dashboard',
+      await releaseCoordinator1.navigateToReleaseCoordinatorPage();
+      await releaseCoordinator1.navigateToFeaturesTab();
+      await releaseCoordinator1.editFeatureRolloutPercentage(
+        'dummy_feature_flag_for_e2e_tests',
         100
       );
       // Since the rollout percentage is 100, the new design should be visible to all users.
-      await loggedInUser.verifyNewDesignInLearnerDashboard(true);
+      await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(true);
 
-      await releaseCoordinator.editFeatureRolloutPercentage(
+      await releaseCoordinator1.editFeatureRolloutPercentage(
         'show_redesigned_learner_dashboard',
         0
       );
-      await loggedInUser.verifyNewDesignInLearnerDashboard(false);
+      // Since the rollout percentage is 0, the new design should not be visible to any users.
+      await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(false);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -70,14 +73,14 @@ describe('Release Coordinator', function () {
     'should enable the "Force-enable for all users" option and save the changes in' +
       'release coordinator page',
     async function () {
-      await releaseCoordinator.navigateToReleaseCoordinatorPage();
-      await releaseCoordinator.navigateToFeaturesTab();
+      await releaseCoordinator1.navigateToReleaseCoordinatorPage();
+      await releaseCoordinator1.navigateToFeaturesTab();
 
-      await loggedInUser.verifyNewDesignInLearnerDashboard(false);
-      await releaseCoordinator.enableFeatureFlag(
+      await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(false);
+      await releaseCoordinator1.enableFeatureFlag(
         'show_redesigned_learner_dashboard'
       );
-      await loggedInUser.verifyNewDesignInLearnerDashboard(true);
+      await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(true);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
