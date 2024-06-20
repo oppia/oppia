@@ -19,7 +19,7 @@
         </picture>
       </div>
       <oppia-primary-button
-          buttonHref="https://forms.gle/rhFYoLLSFr3JEZHy8"
+          [buttonHref]="formLink"
           [customClasses]="['volunteer-btn','e2e-test-volunteer-page-apply-to-volunteer-button-at-the-top']"
           buttonText="{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_BUTTON' | translate }}">
       </oppia-primary-button>
@@ -269,7 +269,7 @@
     <p>{{ 'I18N_VOLUNTEER_PAGE_FOOTER' | translate }}</p>
 
     <oppia-primary-button
-        buttonHref="https://forms.gle/rhFYoLLSFr3JEZHy8"
+        [buttonHref]="formLink"
         [customClasses]="['volunteer-btn','e2e-test-volunteer-page-apply-to-volunteer-button-at-the-bottom']"
         buttonText="{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_BUTTON' | translate }}">
     </oppia-primary-button>
