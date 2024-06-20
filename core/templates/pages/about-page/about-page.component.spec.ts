@@ -28,6 +28,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {FullExpandAccordionComponent} from './accordion/full-expand-accordion.component';
 import {PrimaryButtonComponent} from '../../components/button-directives/primary-button.component';
+import {BarChartComponent} from './charts/bar-chart.component';
 import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -75,6 +76,7 @@ describe('About Page', () => {
         MockTranslatePipe,
         FullExpandAccordionComponent,
         PrimaryButtonComponent,
+        BarChartComponent,
       ],
       providers: [
         SiteAnalyticsService,
