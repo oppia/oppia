@@ -44,12 +44,12 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
     """
 
     TRANSLATION_REVIEWER_EMAIL: Final = 'translationreviewer@example.com'
-    QUESTION_REVIEWER_EMAIL: Final = 'questionreviewer@example.com'
     TRANSLATION_ADMIN_EMAIL: Final = 'translationadmin@example.com'
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
+        self.signup(
+            self.QUESTION_REVIEWER_EMAIL, self.QUESTION_REVIEWER_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.TRANSLATION_ADMIN_EMAIL, 'translationExpert')
         self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTION_ADMIN_USERNAME)
@@ -356,13 +356,14 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
     """Tests ContributorUsersListHandler."""
 
     TRANSLATION_REVIEWER_EMAIL: Final = 'translationreviewer@example.com'
-    QUESTION_REVIEWER_EMAIL: Final = 'questionreviewer@example.com'
     TRANSLATION_ADMIN_EMAIL: Final = 'translationadmin@example.com'
 
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
-        self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
+        self.signup(
+            self.QUESTION_REVIEWER_EMAIL,
+            self.QUESTION_REVIEWER_USERNAME)
         self.signup(self.TRANSLATION_ADMIN_EMAIL, 'translationAdmen')
         self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTION_ADMIN_USERNAME)
 

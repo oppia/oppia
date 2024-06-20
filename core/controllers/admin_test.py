@@ -1409,26 +1409,36 @@ class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(
+            self.QUESTION_REVIEWER_EMAIL, self.QUESTION_REVIEWER_USERNAME)
+        self.signup(
             self.QUESTION_ADMIN_EMAIL,
             self.QUESTION_ADMIN_USERNAME,
             is_super_admin=True)
-        self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL)
+        self.question_reviewer_id = self.get_user_id_from_email(
+            self.QUESTION_REVIEWER_EMAIL)
         self.add_user_role(
             self.QUESTION_ADMIN_USERNAME,
             feconf.ROLE_ID_QUESTION_ADMIN)
+        self.prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
 
     def test_generate_dummy_question_suggestions_(self) -> None:
         self.login(self.QUESTION_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/contributionrightshandler/submit_question', {
+                'username': 'question'
+            }, csrf_token=csrf_token)
+
         self.post_json(
             '/adminhandler', {
                 'action': 'generate_dummy_question_suggestions',
                 'skill_id': 'N8daS2n2aoQr',
                 'num_dummy_question_suggestions_generate': 12
             }, csrf_token=csrf_token)
+
         generated_question_suggestions = suggestion_services.get_submitted_suggestions( # pylint: disable=line-too-long
             self.get_user_id_from_email(
-                self.CURRICULUM_ADMIN_EMAIL),
+                self.QUESTION_ADMIN_EMAIL),
                 feconf.SUGGESTION_TYPE_ADD_QUESTION)
         self.assertEqual(len(generated_question_suggestions), 12)
 

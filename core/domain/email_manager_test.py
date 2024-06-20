@@ -7065,7 +7065,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
     """Test for assignment and removal of contribution reviewers."""
 
     TRANSLATION_REVIEWER_EMAIL: Final = 'translationreviewer@example.com'
-    QUESTION_REVIEWER_EMAIL: Final = 'questionreviewer@example.com'
     QUESTION_SUBMITTER_EMAIL: Final = 'questionsubmitter@example.com'
 
     def setUp(self) -> None:
