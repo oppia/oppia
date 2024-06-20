@@ -16,13 +16,7 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, {
-  Page,
-  Frame,
-  Browser,
-  Viewport,
-  ElementHandle,
-} from 'puppeteer';
+import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
@@ -356,29 +350,6 @@ export class BaseUser {
   }
 
   /**
-   * Clicks an element on the page.
-   * @param {Page | Frame | ElementHandle} context - The Puppeteer context, usually a Page or Frame.
-   * @param {string} selector - The CSS selector of the element to click.
-   */
-  async clickElement(
-    context: Page | Frame | ElementHandle,
-    selector: string
-  ): Promise<void> {
-    try {
-      await context.waitForSelector(selector);
-      const element = await context.$(selector);
-      if (!element) {
-        throw new Error(`Element ${selector} not found`);
-      }
-      await this.waitForElementToBeClickable(element);
-      await element.click();
-    } catch (error) {
-      error.message = `Failed to click on element ${selector}: ${error.message}`;
-      throw error;
-    }
-  }
-
-  /**
    * This function retrieves the text content of a specified element.
    */
   async getElementText(selector: string): Promise<string> {
@@ -393,28 +364,11 @@ export class BaseUser {
 
   /**
    * Checks if a given word is present on the page.
-   * This function only matches complete words, not substrings of words.
-   * For example, if the page contains "hello" and you search for "hell",
-   * it will return false.
    * @param {string} word - The word to check.
    */
-  async isTextPresentOnPage(word: string): Promise<boolean> {
-    try {
-      await this.page.waitForFunction(
-        (word: string) => {
-          const regex = new RegExp(`\\b${word}\\b`);
-          return regex.test(document.documentElement.outerHTML);
-        },
-        {},
-        word
-      );
-      return true;
-    } catch (error) {
-      if (error instanceof puppeteer.errors.TimeoutError) {
-        return false;
-      }
-      throw new Error(`Failed to find text on page: ${error.message}`);
-    }
+  async isTextPresentOnPage(text: string): Promise<boolean> {
+    const pageContent = await this.page.content();
+    return pageContent.includes(text);
   }
 
   /**
