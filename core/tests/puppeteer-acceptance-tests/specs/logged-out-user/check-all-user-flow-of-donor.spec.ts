@@ -46,7 +46,7 @@ describe('Donor', function () {
       'and see the donorbox form in donate page.',
     async function () {
       // Navigating to about foundation page via navbar from home page.
-      await loggedOutUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
+      await loggedOutUser.clickAboutButtonInAboutMenuOnNavbar();
       // Navigating back to home page for the next test.
       await loggedOutUser.navigateToHome();
       // Navigating to about foundation page via footer from home page.

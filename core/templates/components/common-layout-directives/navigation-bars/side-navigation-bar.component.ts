@@ -43,6 +43,7 @@ export class SideNavigationBarComponent {
   topicTitlesTranslationKeys: string[] = [];
   getinvolvedSubmenuIsShown: boolean = false;
   learnSubmenuIsShown: boolean = true;
+  aboutSubmenuIsShown: boolean = false;
   userIsLoggedIn!: boolean;
 
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
@@ -94,6 +95,10 @@ export class SideNavigationBarComponent {
 
   togglegetinvolvedSubmenu(): void {
     this.getinvolvedSubmenuIsShown = !this.getinvolvedSubmenuIsShown;
+  }
+
+  toggleAboutSubmenu(): void {
+    this.aboutSubmenuIsShown = !this.aboutSubmenuIsShown;
   }
 
   navigateToClassroomPage(classroomUrl: string): void {
