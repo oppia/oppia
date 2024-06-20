@@ -210,11 +210,12 @@ export class MusicNotesInputComponent
   // Staff has to be reinitialized every time that the staff is resized or
   // displayed. The staffContainerElt and all subsequent measurements
   // must be recalculated in order for the grid to work properly.
-  // TODO(#14340): Remove some usages of jQuery from the codebase.
   reinitStaff(): void {
-    $('.oppia-music-input-valid-note-area').css('visibility', 'hidden');
+    const noteArea =
+      document.getElementsByClassName('oppia-music-input-valid-note-area')[0];
+    noteArea.style.visibility = 'hidden';
     setTimeout(() => {
-      $('.oppia-music-input-valid-note-area').css('visibility', 'visible');
+      noteArea.style.visibility = 'visible';
       this.init();
     }, 20);
   }
