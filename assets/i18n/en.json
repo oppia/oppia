@@ -298,6 +298,7 @@
     "I18N_CLASSROOM_PAGE_TAKE_A_TEST_BUTTON": "Take a test",
     "I18N_CLASSROOM_PAGE_TITLE": "Learn <[classroomName]> with Oppia | Oppia",
     "I18N_CLASSROOM_PAGE_TOPICS_COVERED": "Topics Covered",
+    "I18N_CLASSROOMS_PAGE_DESCRIPTION": "Step into Oppia Classrooms and explore educational materials curated by our team with your learning journey in mind!",
     "I18N_COLLECTION_EDITOR_PAGE_TITLE": "<[collectionTitle]> - Oppia Editor",
     "I18N_COLLECTION_EDITOR_UNTITLED_COLLECTION_PAGE_TITLE": "Untitled - Oppia Editor",
     "I18N_COLLECTION_PLAYER_PAGE_BEGIN": "Begin",

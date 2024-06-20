@@ -298,6 +298,7 @@
 	"I18N_CLASSROOM_PAGE_TAKE_A_TEST_BUTTON": "The text is displayed on the right tile of the math classroom page. The text asks the learner to take a test. After clicking the button the diagnostic test session will start, which helps to recommend a topic to the learner.",
 	"I18N_CLASSROOM_PAGE_TITLE": "The title displayed on the browser tab when on a classroom page.",
 	"I18N_CLASSROOM_PAGE_TOPICS_COVERED": "The header displayed above the topics list section in the classroom page.",
+	"I18N_CLASSROOMS_PAGE_DESCRIPTION": "The text which is displayed in the classrooms page. Gives information about classrooms.",
 	"I18N_COLLECTION_EDITOR_PAGE_TITLE": "The title displayed on the browser tab when on the collection editor page and the collection is not untitled.",
 	"I18N_COLLECTION_EDITOR_UNTITLED_COLLECTION_PAGE_TITLE": "The title displayed on the browser tab when on the collection editor page and the collection is untitled.",
 	"I18N_COLLECTION_PLAYER_PAGE_BEGIN": "Part of heading displayed on collection player page - It is shown when explorations are not started in a collection.",
