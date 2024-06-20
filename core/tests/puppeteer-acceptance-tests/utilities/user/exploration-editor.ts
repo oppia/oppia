@@ -967,10 +967,10 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(addSolutionButton);
     await this.page.waitForSelector(solutionInput, {visible: true});
     await this.type(solutionInput, answer);
-    await this.page.waitForSelector(`${submitAnswerButton}: not([disabled])`);
+    await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
     await this.clickOn(submitAnswerButton);
     await this.type(stateContentInputField, answerExplanation);
-    await this.page.waitForSelector(`${submitSolutionButton}: not([disabled])`);
+    await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOn(submitSolutionButton);
   }
 
@@ -1261,7 +1261,7 @@ export class ExplorationEditor extends BaseUser {
   async playExploration(explorationId: string): Promise<void> {
     await Promise.all([
       this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      this.page.goto(`${baseUrl} /explore/${explorationId}`),
+      this.page.goto(`${baseUrl}/explore/${explorationId}`),
     ]);
   }
 
@@ -1324,7 +1324,7 @@ export class ExplorationEditor extends BaseUser {
         await this.type(stateTranslationEditorSelector, translation);
         break;
       case 'Feedback':
-        await this.clickOn(`.e2e - test - feedback - ${feedbackIndex}`);
+        await this.clickOn(`.e2e-test-feedback-${feedbackIndex}`);
         await this.clickOn(editTranslationSelector);
         await this.clickOn(stateContentInputField);
         await this.type(stateContentInputField, translation);
@@ -1358,13 +1358,13 @@ export class ExplorationEditor extends BaseUser {
     expectedTranslation: string
   ): Promise<void> {
     await this.page.waitForSelector(
-      `div.e2e - test - translation - ${languageCode}`,
+      `div.e2e-test-translation-${languageCode}`,
       {visible: true}
     );
 
     const translationElementText = await this.page.evaluate(languageCode => {
       const element = document.querySelector(
-        `div.e2e - test - translation - ${languageCode}`
+        `div.e2e-test-translation-${languageCode}`
       );
       return element ? element.textContent : null;
     }, languageCode);
@@ -1373,7 +1373,7 @@ export class ExplorationEditor extends BaseUser {
       showMessage('The expected translation exists in the modal.');
     } else {
       throw new Error(
-        `The expected translation does not exist in the modal.Found "${translationElementText}", expected "${expectedTranslation}"`
+        `The expected translation does not exist in the modal. Found "${translationElementText}", expected "${expectedTranslation}"`
       );
     }
   }
