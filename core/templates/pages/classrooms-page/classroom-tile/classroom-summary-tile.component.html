@@ -6,7 +6,7 @@
      class="classroom-content"
      [ngClass]="{'diable-classroom-tile-click': !isPublished()}"
   >
-    <img alt="Classrooms thumbnail image"
+    <img alt="Classroom thumbnail image"
          class="classroom-thumbnail"
          [src]="classroomThumbnailUrl">
     <div class="classroom-text-container">
@@ -21,7 +21,7 @@
     align-items: center;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 24px;
     text-align: center;
     width: 158px;
   }
@@ -37,6 +37,7 @@
     font-style: normal;
     font-weight: 400;
     letter-spacing: 0.0075em;
+    margin: 0;
     text-align: center;
   }
 
@@ -47,8 +48,9 @@
     font-style: normal;
     font-weight: 400;
     letter-spacing: -0.02em;
+    margin: 0;
     text-align: center;
-    width: 200px;
+    width: 158px;
   }
 
   .classroom-tile-dropshadow {
@@ -75,10 +77,22 @@
     align-items: center;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 32px;
     height: 100%;
     justify-content: start;
     text-decoration: none;
     width: 100%;
+  }
+
+  @media only screen and (max-width: 575px) {
+    .oppia-classroom-tile-container {
+      height: 354px;
+      width: 318px;
+    }
+
+    .oppia-classroom-tile-container .classroom-content {
+      gap: 0;
+      justify-content: space-around;
+    }
   }
 </style>
