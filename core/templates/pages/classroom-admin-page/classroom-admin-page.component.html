@@ -53,7 +53,7 @@
                 {{tempClassroomData.getClassroomName()}}
               </span>
               <input *ngIf="classroomEditorMode"
-                     class="form-control"
+                     class="form-control e2e-update-classroom-name"
                      [(ngModel)]="tempClassroomData._name"
                      (blur)="updateClassroomField()"
                      (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
@@ -70,7 +70,7 @@
                 {{tempClassroomData.getClassroomUrlFragment()}}
               </span>
               <input *ngIf="classroomEditorMode"
-                     class="form-control"
+                     class="form-control e2e-update-classroom-url-fragment"
                      [(ngModel)]="tempClassroomData._urlFragment"
                      (blur)="updateClassroomField()"
                      (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
@@ -90,7 +90,7 @@
                       (blur)="updateClassroomField()"
                       (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
                       rows="1"
-                      class="classroom-field form-control">
+                      class="classroom-field form-control e2e-update-classroom-teaser-text">
             </textarea>
           </div>
 
@@ -106,7 +106,7 @@
                       (blur)="updateClassroomField()"
                       (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
                       rows="1"
-                      class="classroom-field form-control">
+                      class="classroom-field form-control e2e-update-classroom-topic-list-intro">
             </textarea>
           </div>
 
@@ -122,7 +122,7 @@
                       (blur)="updateClassroomField()"
                       (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
                       rows="2"
-                      class="classroom-field form-control">
+                      class="classroom-field form-control e2e-update-classroom-course-details">
             </textarea>
           </div>
 
@@ -130,7 +130,7 @@
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Thumbnail</strong>
             </span>
-            <div>
+            <div class="e2e-classroom-thumbnail-container">
               <oppia-image-uploader [imageUploaderParameters]="thumbnailParameters" (imageSave)="updateThumbnailData($event)"></oppia-image-uploader>
             </div>
           </div>
@@ -139,7 +139,7 @@
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Banner</strong>
             </span>
-            <div>
+            <div class="e2e-classroom-banner-container">
               <oppia-image-uploader [imageUploaderParameters]="bannerParameters" (imageSave)="updateBannerData($event)"></oppia-image-uploader>
             </div>
           </div>
@@ -287,7 +287,7 @@
             </button>
             <button *ngIf="tempClassroomData._isPublished"
                     [disabled]="false"
-                    class="btn btn-secondary publish-classroom-btn"
+                    class="btn btn-secondary publish-classroom-btn e2e-unpublish-classroom-btn"
                     (click)="unpublishClassroom()"
                     >
               <span *ngIf="!classroomDataUnpublishInProgress">Unpublish</span>
@@ -303,7 +303,7 @@
                   >
               <button *ngIf="!tempClassroomData._isPublished"
                       [disabled]="!(canPublishTheClassroom())"
-                      class="btn btn-success publish-classroom-btn"
+                      class="btn btn-success publish-classroom-btn e2e-publish-classroom-btn"
                       (click)="publishClassroom()"
                   >
                 <span *ngIf="!classroomDataPublishInProgress">Publish</span>

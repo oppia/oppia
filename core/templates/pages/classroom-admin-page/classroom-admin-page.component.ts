@@ -267,15 +267,16 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   filterTopicsByName(searchTerm: string): void {
     const availableTopicNames = this.getAvailableTopics();
+    if (!searchTerm) {
+      this.filteredTopicsToClassroomRelation = availableTopicNames;
+      return;
+    }
     this.filteredTopicsToClassroomRelation = availableTopicNames.filter(
       value =>
         value.topic_name
           .toLocaleLowerCase()
           .indexOf(searchTerm.toLocaleLowerCase()) > -1
     );
-    if (!searchTerm) {
-      this.filteredTopicsToClassroomRelation = availableTopicNames;
-    }
   }
 
   updateThumbnailAndBannerParameters(

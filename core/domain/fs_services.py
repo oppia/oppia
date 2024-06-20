@@ -431,9 +431,7 @@ def validate_and_save_image(
         image_validation_services.validate_image_and_filename(
         raw_image, filename
     ))
-    is_compressible = image_validation_services.is_image_compressible(
-        validated_file_format
-    )
+    is_compressible = validated_file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS
     save_original_and_compressed_versions_of_image(
         filename, entity_type, entity_id, raw_image,
         filename_prefix, is_compressible
