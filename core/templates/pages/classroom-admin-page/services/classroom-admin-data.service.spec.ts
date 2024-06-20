@@ -161,7 +161,7 @@ describe('Classroom Admin Data Service', () => {
     );
     expect(
       classroomAdminDataService.getAllClassroomValidationErrors().length
-    ).toEqual(7);
+    ).toEqual(9);
     expect(
       classroomAdminDataService.getSaveClassroomValidationErrors().length
     ).toEqual(2);
@@ -171,25 +171,15 @@ describe('Classroom Admin Data Service', () => {
     classroomAdminDataService.nameValidationError = 'Name error';
     classroomAdminDataService.urlValidationError = 'URL error';
     classroomAdminDataService.topicsGraphValidationError = 'Topics graph error';
-    classroomAdminDataService.teaserTextValidationError = 'Teaser text error';
-    classroomAdminDataService.courseDetailsValidationError =
-      'Course details error';
-    classroomAdminDataService.thumbnailValidationError = 'Thumbnail error';
-    classroomAdminDataService.bannerValidationError = 'Banner error';
-    classroomAdminDataService.topicCountValidationError = 'Topic count error';
-    classroomAdminDataService.topicListIntroValidationError =
-      'Topic list intro error';
+    classroomAdminDataService.classroomValidationErrors = ['Erro1', 'Error2'];
 
     classroomAdminDataService.reinitializeErrorMsgs();
 
     expect(classroomAdminDataService.nameValidationError).toEqual('');
     expect(classroomAdminDataService.urlValidationError).toEqual('');
     expect(classroomAdminDataService.topicsGraphValidationError).toEqual('');
-    expect(classroomAdminDataService.teaserTextValidationError).toEqual('');
-    expect(classroomAdminDataService.courseDetailsValidationError).toEqual('');
-    expect(classroomAdminDataService.thumbnailValidationError).toEqual('');
-    expect(classroomAdminDataService.bannerValidationError).toEqual('');
-    expect(classroomAdminDataService.topicCountValidationError).toEqual('');
-    expect(classroomAdminDataService.topicListIntroValidationError).toEqual('');
+    expect(classroomAdminDataService.classroomValidationErrors.length).toEqual(
+      0
+    );
   });
 });

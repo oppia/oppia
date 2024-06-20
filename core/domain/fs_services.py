@@ -21,6 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core import utils
 from core.domain import image_services
+from core.domain import image_validation_services
 from core.platform import models
 
 from typing import Dict, List, Optional
@@ -404,3 +405,36 @@ def copy_images(
             ('image/%s' % compressed_image_filename))
         destination_fs.copy(
             source_fs.assets_path, ('image/%s' % micro_image_filename))
+
+
+def validate_and_save_image(
+    raw_image: bytes,
+    filename: str,
+    filename_prefix: str,
+    entity_type: str,
+    entity_id: str
+) -> None:
+    """Validates and saves image.
+
+    Args:
+        raw_image: bytes. The image data.
+        filename: str. The image filename.
+        filename_prefix: str. The prefix for image.
+        entity_type: str. The entity type of the image.
+        entity_id: str. The entity id of the image.
+
+    Raises:
+        ValidationError. Image or filename supplied fails one of the
+            validation checks.
+    """
+    validated_file_format = (
+        image_validation_services.validate_image_and_filename(
+        raw_image, filename
+    ))
+    is_compressible = image_validation_services.is_image_compressible(
+        validated_file_format
+    )
+    save_original_and_compressed_versions_of_image(
+        filename, entity_type, entity_id, raw_image,
+        filename_prefix, is_compressible
+    )

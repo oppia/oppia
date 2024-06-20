@@ -51,12 +51,7 @@ interface ExistingClassroom extends NewClassroom {
   getTopicIdToPrerequisiteTopicId: () => TopicIdToPrerequisiteTopicIds;
   validateDependencyGraph: () => string;
   getPrerequisiteTopicIds: (topicId: string) => string[];
-  getClassroomCourseDetailsValidationErrors: () => string;
-  getClassroomThumbnailValidationErrors: () => string;
-  getClassroomBannerValidationErrors: () => string;
-  getClassroomTopicCountValidationError: () => string;
-  getClassroomTeaserTextValidationErrors: () => string;
-  getClassroomTopicListIntroValidationErrors: () => string;
+  getAllValidationErrors: () => string[];
 }
 
 export type ClassroomData = ExistingClassroom | NewClassroom;
@@ -302,7 +297,7 @@ export class ExistingClassroomData
     this._topicIdToTopicName = topicIdToTopicName;
   }
 
-  getClassroomTeaserTextValidationErrors(): string {
+  private getClassroomTeaserTextValidationErrors(): string {
     let errorMsg = '';
     if (this._teaserText === '') {
       errorMsg = 'The classroom teaser text should not be empty.';
@@ -315,7 +310,7 @@ export class ExistingClassroomData
     return errorMsg;
   }
 
-  getClassroomCourseDetailsValidationErrors(): string {
+  private getClassroomCourseDetailsValidationErrors(): string {
     let errorMsg = '';
     if (this._courseDetails === '') {
       errorMsg = 'The classroom course details should not be empty.';
@@ -329,7 +324,7 @@ export class ExistingClassroomData
     return errorMsg;
   }
 
-  getClassroomTopicListIntroValidationErrors(): string {
+  private getClassroomTopicListIntroValidationErrors(): string {
     let errorMsg = '';
     if (this._topicListIntro === '') {
       errorMsg = 'The classroom topic list intro should not be empty.';
@@ -343,27 +338,42 @@ export class ExistingClassroomData
     return errorMsg;
   }
 
-  getClassroomThumbnailValidationErrors(): string {
+  private getClassroomThumbnailValidationErrors(): string {
     let errorMsg = '';
     if (this._thumbnail_data.filename === '') {
-      errorMsg = 'The classroom thumbnail should not be empty';
+      errorMsg = 'The classroom thumbnail should not be empty.';
     }
     return errorMsg;
   }
 
-  getClassroomBannerValidationErrors(): string {
+  private getClassroomBannerValidationErrors(): string {
     let errorMsg = '';
     if (this._thumbnail_data.filename === '') {
-      errorMsg = 'The classroom banner should not be empty';
+      errorMsg = 'The classroom banner should not be empty.';
     }
     return errorMsg;
   }
 
-  getClassroomTopicCountValidationError(): string {
+  private getClassroomTopicCountValidationError(): string {
     let errorMsg = '';
     if (this.getTopicsCount() === 0) {
       errorMsg = 'A classroom should have at least one topic.';
     }
     return errorMsg;
+  }
+
+  getAllValidationErrors(): string[] {
+    return [
+      this.getClassroomBannerValidationErrors(),
+      this.getClassroomNameValidationErrors(),
+      this.getClassroomCourseDetailsValidationErrors(),
+      this.getClassroomTopicListIntroValidationErrors(),
+      this.getClassroomTopicCountValidationError(),
+      this.getClassroomThumbnailValidationErrors(),
+      this.getClassroomTeaserTextValidationErrors(),
+      this.getClassroomNameValidationErrors(),
+      this.getClassroomUrlValidationErrors(),
+      this.validateDependencyGraph(),
+    ].filter(error => error !== '');
   }
 }

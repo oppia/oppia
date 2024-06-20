@@ -24,7 +24,6 @@ from core.controllers import base
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import fs_services
-from core.domain import image_validation_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 
@@ -306,30 +305,33 @@ class ClassroomHandler(
                 'Classroom ID of the URL path argument must match with the ID '
                 'given in the classroom payload dict.'
             )
+        classrooms = classroom_config_services.get_all_classrooms()
+        invalid_topic_ids = [
+            topic_id for classroom in classrooms
+            if classroom.classroom_id != classroom_id
+            for topic_id in classroom.get_topic_ids()
+        ]
+
+        for topic_id in classroom.get_topic_ids():
+            if topic_id in invalid_topic_ids:
+                topic_name = topic_fetchers.get_topic_by_id(topic_id).name
+                raise self.InvalidInputException(
+                    'Topic %s is already assigned to a classroom. A topic '
+                    'can only be assigned to one classroom.' % topic_name
+                )
 
         raw_thumbnail_image = self.normalized_request['thumbnail_image']
         thumbnail_filename = classroom.thumbnail_data.filename
         raw_banner_image = self.normalized_request['banner_image']
         banner_filename = classroom.banner_data.filename
         existing_classroom = classroom_config_services.get_classroom_by_id(
-            classroom_id
-        )
+            classroom_id)
 
         if thumbnail_filename != existing_classroom.thumbnail_data.filename:
             try:
-                thumbnail_file_format = (
-                    image_validation_services.validate_image_and_filename(
-                        raw_thumbnail_image, thumbnail_filename
-                    )
-                )
-                thumbnail_is_compressible = (
-                    image_validation_services.is_image_compressible(
-                        thumbnail_file_format)
-                )
-                fs_services.save_original_and_compressed_versions_of_image(
-                    thumbnail_filename, feconf.ENTITY_TYPE_CLASSROOM,
-                    classroom_id, raw_thumbnail_image, 'thumbnail',
-                    thumbnail_is_compressible
+                fs_services.validate_and_save_image(
+                    raw_thumbnail_image, thumbnail_filename, 'thumbnail',
+                    feconf.ENTITY_TYPE_CLASSROOM, classroom_id
                 )
             except utils.ValidationError as e:
                 raise self.InvalidInputException(e)
@@ -339,18 +341,10 @@ class ClassroomHandler(
             existing_classroom.banner_data.filename
         ):
             try:
-                banner_file_format = (
-                    image_validation_services.validate_image_and_filename(
-                    raw_banner_image, banner_filename)
+                fs_services.validate_and_save_image(
+                    raw_banner_image, banner_filename, 'image',
+                    feconf.ENTITY_TYPE_CLASSROOM, classroom_id
                 )
-                banner_is_compressible = (
-                    image_validation_services.is_image_compressible(
-                        banner_file_format)
-                )
-                fs_services.save_original_and_compressed_versions_of_image(
-                    banner_filename, feconf.ENTITY_TYPE_CLASSROOM,
-                    classroom_id, raw_banner_image, 'image',
-                    banner_is_compressible)
             except utils.ValidationError as e:
                 raise self.InvalidInputException(e)
 

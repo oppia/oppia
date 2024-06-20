@@ -35,12 +35,7 @@ export class ClassroomAdminDataService {
   nameValidationError: string = '';
   urlValidationError: string = '';
   topicsGraphValidationError: string = '';
-  teaserTextValidationError: string = '';
-  courseDetailsValidationError: string = '';
-  thumbnailValidationError: string = '';
-  bannerValidationError: string = '';
-  topicCountValidationError: string = '';
-  topicListIntroValidationError: string = '';
+  classroomValidationErrors: string[] = [];
 
   onClassroomNameChange(classroom: ClassroomData): void {
     this.nameValidationError = classroom.getClassroomNameValidationErrors();
@@ -96,16 +91,7 @@ export class ClassroomAdminDataService {
     );
     if (tempClassroom instanceof ExistingClassroomData) {
       this.onTopicDependencyChange(tempClassroom);
-      this.teaserTextValidationError =
-        tempClassroom.getClassroomTeaserTextValidationErrors();
-      this.courseDetailsValidationError =
-        tempClassroom.getClassroomCourseDetailsValidationErrors();
-      this.topicCountValidationError =
-        tempClassroom.getClassroomTopicCountValidationError();
-      this.thumbnailValidationError =
-        tempClassroom.getClassroomThumbnailValidationErrors();
-      this.bannerValidationError =
-        tempClassroom.getClassroomBannerValidationErrors();
+      this.classroomValidationErrors = tempClassroom.getAllValidationErrors();
     }
 
     tempClassroom.setClassroomValidityFlag(
@@ -116,17 +102,7 @@ export class ClassroomAdminDataService {
   }
 
   getAllClassroomValidationErrors(): string[] {
-    return [
-      this.nameValidationError,
-      this.urlValidationError,
-      this.topicsGraphValidationError,
-      this.teaserTextValidationError,
-      this.courseDetailsValidationError,
-      this.thumbnailValidationError,
-      this.bannerValidationError,
-      this.topicCountValidationError,
-      this.topicListIntroValidationError,
-    ].filter(error => error !== '');
+    return this.classroomValidationErrors;
   }
 
   getSaveClassroomValidationErrors(): string[] {
@@ -136,14 +112,9 @@ export class ClassroomAdminDataService {
   }
 
   reinitializeErrorMsgs(): void {
+    this.classroomValidationErrors = [];
     this.nameValidationError = '';
     this.urlValidationError = '';
     this.topicsGraphValidationError = '';
-    this.teaserTextValidationError = '';
-    this.courseDetailsValidationError = '';
-    this.thumbnailValidationError = '';
-    this.bannerValidationError = '';
-    this.topicCountValidationError = '';
-    this.topicListIntroValidationError = '';
   }
 }
