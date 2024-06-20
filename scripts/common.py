@@ -242,6 +242,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'practice-question-admin/add-and-remove-contribution-rights',
     'release-coordinator/edit-feature-rollout-configuration',
     'release-coordinator/run-a-beam-job-and-copy-the-output',
+    'release-coordinator/update-promo-bar-message',
+    'release-coordinator/flush-and-get-profile-of-redis-cache',
     'super-admin/edit-user-roles',
     'super-admin/load-dummy-data-in-dev-mode',
     'translation-admin/add-and-remove-translation-rights',
