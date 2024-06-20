@@ -81,6 +81,22 @@ export class ReleaseCoordinator extends BaseUser {
   }
 
   /**
+   * Navigates to the Misc tab.
+   */
+  async navigateToMiscTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavBar);
+      await this.page.waitForSelector(mobileMiscTab, {visible: true});
+      await this.clickOn(mobileMiscTab);
+    } else {
+      await this.page.waitForSelector(navbarElementSelector);
+      const navbarElements = await this.page.$$(navbarElementSelector);
+      await this.waitForElementToBeClickable(navbarElements[2]);
+      await navbarElements[2].click();
+    }
+  }
+
+  /**
    * Edit the rollout percentage for a feature.
    */
   async editFeatureRolloutPercentage(
@@ -144,29 +160,6 @@ export class ReleaseCoordinator extends BaseUser {
     showMessage(
       `Feature flag: "${featureName}" rollout percentage has been set to ${percentage}%.`
     );
-  }
-
-  /**
-   * Navigates to the release coordinator page.
-   */
-  async navigateToReleaseCoordinatorPage(): Promise<void> {
-    await this.page.goto(releaseCoordinatorUrl);
-  }
-
-  /**
-   * Navigates to the Misc tab.
-   */
-  async navigateToMiscTab(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavBar);
-      await this.page.waitForSelector(mobileMiscTab, {visible: true});
-      await this.clickOn(mobileMiscTab);
-    } else {
-      await this.page.waitForSelector(navbarElementSelector);
-      const navbarElements = await this.page.$$(navbarElementSelector);
-      await this.waitForElementToBeClickable(navbarElements[2]);
-      await navbarElements[2].click();
-    }
   }
 
   /**
@@ -540,7 +533,7 @@ export class ReleaseCoordinator extends BaseUser {
     try {
       // Wait for the selector to be present in the DOM before fetching it.
       const dummyHandlerExists = await this.page
-        .waitForSelector(e2eTestAngularDummyHandlerIndicator, {timeout: 5000})
+        .waitForSelector(e2eTestAngularDummyHandlerIndicator, {timeout: 10000})
         .then(() => true)
         .catch(() => false);
 
