@@ -11,7 +11,9 @@
          [src]="classroomThumbnailUrl">
     <div class="classroom-text-container">
       <h3 class="classroom-name">{{getName()}}</h3>
-      <p class="classroom-teaser-text">{{getTeaserText()}}</p>
+      <p class="classroom-teaser-text"
+         [ngClass]="{'private-classroom-teaser-text': !isPublished()}"
+      >{{getTeaserText()}}</p>
     </div>
   </a>
 </div>
@@ -51,6 +53,10 @@
     margin: 0;
     text-align: center;
     width: 158px;
+  }
+
+  .classroom-text-container .private-classroom-teaser-text {
+    width: 193px;
   }
 
   .classroom-tile-dropshadow {

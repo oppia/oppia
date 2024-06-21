@@ -59,7 +59,7 @@
 <style>
   .breadcrumbs-container .classrooms-breadcrumbs {
     color: #00645c;
-    width: 70vw;
+    width: 884px;
   }
 
   .breadcrumbs-container .classrooms-breadcrumbs .desktop-breadcrumbs {
@@ -98,6 +98,13 @@
     width: 100vw;
   }
 
+  .classrooms-main-content .description-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    width: 884px;
+  }
+
   .classrooms-main-content .description-container .classrooms-description {
     color: #3c3c3c;
     font-family: 'Roboto', Arial, sans-serif;
@@ -114,7 +121,7 @@
     display: flex;
     flex-direction: column;
     justify-content: start;
-    width: 70vw;
+    width: 884px;
   }
 
   .classrooms-page-content .classrooms-heading {
@@ -201,7 +208,8 @@
   }
 
 @media screen and (max-width: 768px) {
-    .breadcrumbs-container .classrooms-breadcrumbs {
+    .breadcrumbs-container .classrooms-breadcrumbs,
+    .classrooms-main-content .description-container {
         width: 90vw;
     }
 
