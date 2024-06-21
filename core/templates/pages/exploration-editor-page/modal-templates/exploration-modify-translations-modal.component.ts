@@ -31,6 +31,7 @@ import {
 } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 
 interface LanguageCodeToContentTranslations {
   [languageCode: string]: TranslatedContent;
@@ -118,6 +119,22 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
                 translationDict.needsUpdate
               );
             }
+            // Initialize the entity translations object to track future draft changes.
+            if (
+              !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+                language
+              )
+            ) {
+              this.entityTranslationsService.languageCodeToEntityTranslations[
+                language
+              ] = EntityTranslation.createFromBackendDict({
+                entity_id: this.explorationId,
+                entity_type: 'exploration',
+                entity_version: response[language].entityVersion,
+                language_code: language,
+                translations: {},
+              });
+            }
           }
           this.updateTranslationDisplayContent();
         });
@@ -171,15 +188,19 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   confirm(): void {
     for (let language in this.contentTranslations) {
       if (this.languageIsCheckedStatusDict[language] === true) {
+        const updatedTranslatedContent = new TranslatedContent(
+          this.contentTranslations[language].translation,
+          this.contentTranslations[language].dataFormat,
+          false
+        );
         this.changeListService.editTranslation(
           this.contentId,
           language,
-          new TranslatedContent(
-            this.contentTranslations[language].translation,
-            this.contentTranslations[language].dataFormat,
-            false
-          )
+          updatedTranslatedContent
         );
+        this.entityTranslationsService.languageCodeToEntityTranslations[
+          language
+        ].updateTranslation(this.contentId, updatedTranslatedContent);
       } else {
         this.changeListService.markTranslationAsNeedingUpdateForLanguage(
           this.contentId,

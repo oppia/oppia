@@ -124,6 +124,14 @@ describe('Modify Translations Modal Component', function () {
               dataFormat: 'html',
               needsUpdate: true,
             },
+          },
+        },
+        fr: {
+          entityId: 'entity1',
+          entityType: 'exploration',
+          entityVersion: 5,
+          languageCode: 'fr',
+          translationMapping: {
             content4: {
               translation: '<p>This is content 4.</p>',
               dataFormat: 'html',
@@ -172,7 +180,7 @@ describe('Modify Translations Modal Component', function () {
       tick();
 
       expect(component.contentTranslations).toEqual({
-        hi: expectedTranslation,
+        fr: expectedTranslation,
       });
     }));
   });
