@@ -198,6 +198,16 @@ var ReleaseCoordinatorPage = function () {
     );
     await this.saveChangeOfFeature(featureFlagElement);
   };
+
+  this.saveChangeOfFeature = async function (featureElement) {
+    await action.click(
+      'Save feature button',
+      featureElement.$(saveButtonLocator)
+    );
+
+    await general.acceptAlert();
+    await waitFor.visibilityOf(statusMessage);
+  };
 };
 
 exports.ReleaseCoordinatorPage = ReleaseCoordinatorPage;

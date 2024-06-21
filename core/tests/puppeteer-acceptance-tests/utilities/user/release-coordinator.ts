@@ -528,14 +528,19 @@ export class ReleaseCoordinator extends BaseUser {
    * If false, it will verify that the Dummy Handler is disabled.
    */
   async verifyDummyHandlerStatusInFeaturesTab(enabled: boolean): Promise<void> {
-    await this.page.reload({waitUntil: ['load', 'networkidle0']});
+    await this.navigateToReleaseCoordinatorPage();
     await this.navigateToFeaturesTab();
     try {
-      // Wait for the selector to be present in the DOM before fetching it.
       const dummyHandlerExists = await this.page
-        .waitForSelector(e2eTestAngularDummyHandlerIndicator, {timeout: 15000})
-        .then(() => true)
-        .catch(() => false);
+        .waitForSelector(e2eTestAngularDummyHandlerIndicator)
+        .then(() => {
+          showMessage('Dummy handler found');
+          return true;
+        })
+        .catch(() => {
+          console.error('Dummy handler not found within timeout');
+          return false;
+        });
 
       if (enabled) {
         if (!dummyHandlerExists) {

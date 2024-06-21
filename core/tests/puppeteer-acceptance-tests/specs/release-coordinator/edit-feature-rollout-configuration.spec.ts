@@ -46,24 +46,22 @@ describe('Release Coordinator', function () {
     'should be able to alter the rollout percentage for logged-in users and save' +
       'the changes in release coordinator page',
     async function () {
-      await releaseCoordinator2.navigateToReleaseCoordinatorPage();
-      await releaseCoordinator2.navigateToFeaturesTab();
-      await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(false);
-
       await releaseCoordinator1.navigateToReleaseCoordinatorPage();
       await releaseCoordinator1.navigateToFeaturesTab();
       await releaseCoordinator1.editFeatureRolloutPercentage(
         'dummy_feature_flag_for_e2e_tests',
         100
       );
-      // Since the rollout percentage is 100, the new design should be visible to all users.
+      // Since the rollout percentage is 100, the Dummy Handler should be visible to all users.
+      await releaseCoordinator2.navigateToReleaseCoordinatorPage();
+      await releaseCoordinator2.navigateToFeaturesTab();
       await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(true);
 
       await releaseCoordinator1.editFeatureRolloutPercentage(
         'dummy_feature_flag_for_e2e_tests',
         0
       );
-      // Since the rollout percentage is 0, the new design should not be visible to any users.
+      // Since the rollout percentage is 0, the Dummy handler should not be visible to any users.
       await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(false);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
