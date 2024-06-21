@@ -43,27 +43,12 @@ describe('Release Coordinator', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should enable the "Force-enable for all users" option and save the changes in' +
-      'release coordinator page',
-    async function () {
-      await releaseCoordinator1.navigateToReleaseCoordinatorPage();
-      await releaseCoordinator1.navigateToFeaturesTab();
-
-      await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(false);
-      await releaseCoordinator1.enableFeatureFlag(
-        'dummy_feature_flag_for_e2e_tests'
-      );
-      await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(true);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
     'should be able to alter the rollout percentage for logged-in users and save' +
       'the changes in release coordinator page',
     async function () {
       await releaseCoordinator1.navigateToReleaseCoordinatorPage();
       await releaseCoordinator1.navigateToFeaturesTab();
+
       await releaseCoordinator1.editFeatureRolloutPercentage(
         'dummy_feature_flag_for_e2e_tests',
         100
@@ -79,6 +64,23 @@ describe('Release Coordinator', function () {
       );
       // Since the rollout percentage is 0, the Dummy handler should not be visible to any users.
       await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(false);
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should enable the "Force-enable for all users" option and save the changes in' +
+      'release coordinator page',
+    async function () {
+      await releaseCoordinator1.navigateToReleaseCoordinatorPage();
+      await releaseCoordinator1.navigateToFeaturesTab();
+      await releaseCoordinator1.enableFeatureFlag(
+        'dummy_feature_flag_for_e2e_tests'
+      );
+
+      await releaseCoordinator2.navigateToReleaseCoordinatorPage();
+      await releaseCoordinator2.navigateToFeaturesTab();
+      await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(true);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

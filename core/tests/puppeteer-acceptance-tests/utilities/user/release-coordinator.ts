@@ -59,6 +59,7 @@ const promoMessageInputSelector = '.mat-input-element';
 const actionStatusMessageSelector = '.e2e-test-status-message';
 const toastMessageSelector = '.toast-message';
 const memoryCacheProfileTableSelector = '.view-results-table';
+const featureFlagSelector = '.e2e-test-feature-flag';
 export class ReleaseCoordinator extends BaseUser {
   /**
    * Navigate to the release coordinator page.
@@ -71,11 +72,22 @@ export class ReleaseCoordinator extends BaseUser {
    * Navigate to the features tab.
    */
   async navigateToFeaturesTab(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavBar);
-      await this.clickOn(mobileFeaturesTab);
-    } else {
-      await this.clickOn(featuresTab);
+    try {
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(mobileNavBar);
+        await this.clickOn(mobileFeaturesTab);
+      } else {
+        await this.clickOn(featuresTab);
+      }
+
+      await this.page.waitForSelector(featureFlagSelector, {
+        visible: true,
+        timeout: 10000,
+      });
+      showMessage('Successfully navigated to features tab.');
+    } catch (error) {
+      console.error('Failed to navigate to features tab:', error);
+      throw error;
     }
   }
 
@@ -521,35 +533,35 @@ export class ReleaseCoordinator extends BaseUser {
 
   /**
    * Verifies the status of the Dummy Handler in the Features Tab.
-   *
-   * @param {boolean} enabled - Expected status of the Dummy Handler.
    * If true, the function will verify that the Dummy Handler is enabled.
    * If false, it will verify that the Dummy Handler is disabled.
+   * @param {boolean} enabled - Expected status of the Dummy Handler.
    */
   async verifyDummyHandlerStatusInFeaturesTab(enabled: boolean): Promise<void> {
     await this.navigateToReleaseCoordinatorPage();
     await this.navigateToFeaturesTab();
-    const isOnFeaturesTab = await this.page.$('.e2e-test-feature-flag');
-    if (!isOnFeaturesTab) {
-      throw new Error('Not on the features tab');
-    }
-    const dummyHandlerElement = await this.page.$(agDummyFeatureIndicator);
-
-    if (enabled) {
-      if (!dummyHandlerElement) {
+    let dummyHandlerElement;
+    try {
+      await this.page.waitForSelector(agDummyFeatureIndicator, {
+        timeout: 10000,
+      });
+      dummyHandlerElement = await this.page.$(agDummyFeatureIndicator);
+    } catch (error) {
+      if (enabled) {
         throw new Error(
           'Dummy handler is expected to be enabled but it is disabled'
         );
       }
-      showMessage('Dummy handler is enabled, as expected');
-    } else {
-      if (dummyHandlerElement) {
-        throw new Error(
-          'Dummy handler is expected to be disabled but it is enabled'
-        );
-      }
-      showMessage('Dummy handler is disabled, as expected');
     }
+
+    if (!enabled && dummyHandlerElement) {
+      throw new Error(
+        'Dummy handler is expected to be disabled but it is enabled'
+      );
+    }
+    showMessage(
+      `Dummy handler is ${enabled ? 'enabled' : 'disabled'}, as expected`
+    );
   }
 }
 
