@@ -24,9 +24,9 @@ import os
 import re
 import zipfile
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
-from core import feature_flag_list
 from core.constants import constants
 from core.domain import change_domain
 from core.domain import classifier_services

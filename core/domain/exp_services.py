@@ -34,8 +34,8 @@ import pprint
 import re
 import zipfile
 
-from core import feature_flag_list
 from core import android_validation_constants
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -46,9 +46,9 @@ from core.domain import classifier_services
 from core.domain import draft_upgrade_services
 from core.domain import email_manager
 from core.domain import email_subscription_services
-from core.domain import feature_flag_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import feature_flag_services
 from core.domain import feedback_services
 from core.domain import fs_services
 from core.domain import html_cleaner
