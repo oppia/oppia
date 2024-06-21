@@ -16,7 +16,6 @@
  * @fileoverview Component for a story node tile.
  */
 
-export let completedCheckpointsCount: number;
 import {Component, OnInit, Input} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {StoryNode} from 'domain/story/story-node.model';
@@ -61,7 +60,7 @@ export class StoryNodeTileComponent implements OnInit {
   thumbnailBgColor: string;
   thumbnailUrl: string;
   nodeId: string;
-  pathIconParameters!: IconParametersArray[];
+  pathIconParameters: IconParametersArray[] = [];
   EXPLORE_PAGE_PREFIX = '/explore/';
   explorationId: string;
   expStates: StateObjectsBackendDict;
@@ -90,10 +89,12 @@ export class StoryNodeTileComponent implements OnInit {
     this.nodeId = this.node.getId();
     this.pathIconParameters = this.generatePathIconParameters();
     this.explorationId = this.node.getExplorationId();
-    this.pinIdUrl = this.urlService.getPidFromUrl();
     let states: StateObjectsBackendDict;
     this.readOnlyExplorationBackendApiService
-      .loadLatestExplorationAsync(this.explorationId, this.pinIdUrl)
+      .loadLatestExplorationAsync(
+        this.explorationId,
+        this.urlService.getPidFromUrl()
+      )
       .then(response => {
         states = response.exploration.states;
 
@@ -116,7 +117,6 @@ export class StoryNodeTileComponent implements OnInit {
           exploration_metadata: response.exploration_metadata,
         });
         this.explorationEngineService.exploration = exploration;
-
         this.prevSessionStatesProgress =
           this.explorationEngineService.getShortestPathToState(
             states,
@@ -236,11 +236,9 @@ export class StoryNodeTileComponent implements OnInit {
   }
 }
 
-angular
-  .module('oppia')
-  .directive(
-    'oppiaStoryNodeTile',
-    downgradeComponent({
-      component: StoryNodeTileComponent,
-    }) as angular.IDirectiveFactory
-  );
+angular.module('oppia').directive(
+  'oppiaStoryNodeTile',
+  downgradeComponent({
+    component: StoryNodeTileComponent,
+  }) as angular.IDirectiveFactory
+);
