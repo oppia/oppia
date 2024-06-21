@@ -31,7 +31,7 @@ class MockExplorationEngineService {
   }
 }
 
-fdescribe('Learner View Rating Backend Api Service', () => {
+describe('Learner View Rating Backend Api Service', () => {
   let lvrbas: LearnerViewRatingBackendApiService;
   let httpTestingController: HttpTestingController;
   let successHandler = jasmine.createSpy('success');
