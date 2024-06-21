@@ -121,7 +121,11 @@ class ClassroomDataHandler(
             'topic_summary_dicts': topic_summary_dicts,
             'topic_list_intro': classroom.topic_list_intro,
             'course_details': classroom.course_details,
-            'name': classroom.name
+            'name': classroom.name,
+            'teaser_text': classroom.teaser_text,
+            'is_published': classroom.is_published,
+            'thumbnail_data': classroom.thumbnail_data.to_dict(),
+            'banner_data': classroom.banner_data.to_dict()
         })
         self.render_json(self.values)
 

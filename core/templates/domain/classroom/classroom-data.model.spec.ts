@@ -60,7 +60,11 @@ describe('Classroom data model', () => {
       'Math',
       topicSummaryDicts,
       'Course Details',
-      'Topics Covered'
+      'Topics Covered',
+      'Learn math',
+      true,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'}
     );
     expect(classroomData.getName()).toEqual('Math');
     expect(classroomData.getCourseDetails()).toEqual('Course Details');
@@ -68,5 +72,13 @@ describe('Classroom data model', () => {
     expect(classroomData.getTopicSummaries()[0]).toEqual(
       CreatorTopicSummary.createFromBackendDict(topicSummaryDicts[0])
     );
+    expect(classroomData.getTeaserText()).toEqual('Learn math');
+    expect(classroomData.getIsPublished()).toBeTrue();
+    expect(classroomData.getThumbnailData().filename).toEqual('thumbnail.svg');
+    expect(classroomData.getThumbnailData().size_in_bytes).toEqual(100);
+    expect(classroomData.getThumbnailData().bg_color).toEqual('transparent');
+    expect(classroomData.getBannerData().filename).toEqual('banner.png');
+    expect(classroomData.getBannerData().size_in_bytes).toEqual(100);
+    expect(classroomData.getBannerData().bg_color).toEqual('transparent');
   });
 });

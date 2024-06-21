@@ -28,6 +28,13 @@ export interface TopicIdToTopicName {
   [topicId: string]: string;
 }
 
+export interface ImageData {
+  filename: string;
+  bg_color: string;
+  size_in_bytes: number;
+  image_data?: Blob;
+}
+
 interface ExistingClassroom extends NewClassroom {
   _courseDetails: string;
   _topicListIntro: string;

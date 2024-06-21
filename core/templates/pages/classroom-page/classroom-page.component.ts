@@ -56,6 +56,8 @@ export class ClassroomPageComponent implements OnDestroy {
   begineWithFirstTopicDescriptionText: string = '';
   firstTopicUrl: string = '';
 
+  mathThumbnail = '';
+
   constructor(
     private accessValidationBackendApiService: AccessValidationBackendApiService,
     private alertsService: AlertsService,
@@ -73,6 +75,10 @@ export class ClassroomPageComponent implements OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.mathThumbnail = this.urlInterpolationService.getStaticImageUrl(
+      '/classrooms/math.svg'
+    );
+
     this.classroomUrlFragment =
       this.urlService.getClassroomUrlFragmentFromUrl();
     this.bannerImageFileUrl =
