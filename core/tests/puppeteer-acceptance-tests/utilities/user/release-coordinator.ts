@@ -51,8 +51,7 @@ const jobInputField = '.mat-input-element';
 const jobOutputRowSelector = '.mat-row';
 const beamJobRunOutputSelector = '.beam-job-run-output';
 
-const e2eTestAngularDummyHandlerIndicator =
-  '.e2e-test-angular-dummy-handler-indicator';
+const agDummyFeatureIndicator = '.e2e-test-angular-dummy-feature-indicator';
 
 const navbarElementSelector = '.oppia-clickable-navbar-element';
 const promoBarToggleSelector = '#mat-slide-toggle-1';
@@ -530,36 +529,22 @@ export class ReleaseCoordinator extends BaseUser {
   async verifyDummyHandlerStatusInFeaturesTab(enabled: boolean): Promise<void> {
     await this.navigateToReleaseCoordinatorPage();
     await this.navigateToFeaturesTab();
-    try {
-      const dummyHandlerExists = await this.page
-        .waitForSelector(e2eTestAngularDummyHandlerIndicator)
-        .then(() => {
-          showMessage('Dummy handler found');
-          return true;
-        })
-        .catch(() => {
-          console.error('Dummy handler not found within timeout');
-          return false;
-        });
+    const dummyHandlerElement = await this.page.$(agDummyFeatureIndicator);
 
-      if (enabled) {
-        if (!dummyHandlerExists) {
-          throw new Error(
-            'Dummy handler is expected to be enabled but it is disabled'
-          );
-        }
-        showMessage('Dummy handler is enabled, as expected');
-      } else {
-        if (dummyHandlerExists) {
-          throw new Error(
-            'Dummy handler is expected to be disabled but it is enabled'
-          );
-        }
-        showMessage('Dummy handler is disabled, as expected');
+    if (enabled) {
+      if (!dummyHandlerElement) {
+        throw new Error(
+          'Dummy handler is expected to be enabled but it is disabled'
+        );
       }
-    } catch (error) {
-      console.error('An error occurred:', error);
-      throw error;
+      showMessage('Dummy handler is enabled, as expected');
+    } else {
+      if (dummyHandlerElement) {
+        throw new Error(
+          'Dummy handler is expected to be disabled but it is enabled'
+        );
+      }
+      showMessage('Dummy handler is disabled, as expected');
     }
   }
 }

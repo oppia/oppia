@@ -18,6 +18,7 @@
  */
 
 var action = require('./action.js');
+var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var ReleaseCoordinatorPage = function () {
@@ -28,8 +29,9 @@ var ReleaseCoordinatorPage = function () {
   var featureFlagElement = $('.e2e-test-feature-flag');
   var featureNameLocator = '.e2e-test-feature-name';
   var featuresTab = $('.e2e-test-features-tab');
+  var saveButtonLocator = '.e2e-test-save-button';
   var valueSelectorLocator = '.e2e-test-value-selector';
-  var featureFlagRolloutPercentage = '.e2e-test-rollout-percentage';
+  var statusMessage = $('.e2e-test-status-message');
 
   this.get = async function () {
     await browser.url(RELEASE_COORDINATOR_URL_SUFFIX);
@@ -181,21 +183,13 @@ var ReleaseCoordinatorPage = function () {
     await this.saveChangeOfFeature(featureElement);
   };
 
-  this.setRolloutPercentageForFeatureFlag = async function (
-    featureFlagElement,
-    rolloutPercentage
-  ) {
+  this.disableFeatureFlag = async function (featureFlagElement) {
     await waitFor.visibilityOf(
-      featureFlagElement.$(featureFlagRolloutPercentage),
-      'Setting rollout-percentage property takes too long to appear'
+      featureFlagElement.$(valueSelectorLocator),
+      'Disabling force-enable property takes too long to appear'
     );
-    await action.setValue(
-      'rolloutPercentage',
-      featureFlagElement
-        .$(featureFlagRolloutPercentage)
-        .$('.e2e-test-editor-int'),
-      rolloutPercentage
-    );
+
+    await featureFlagElement.$(valueSelectorLocator).selectByVisibleText('No');
     await this.saveChangeOfFeature(featureFlagElement);
   };
 
