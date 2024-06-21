@@ -360,7 +360,10 @@ class Classroom:
             if self.banner_data.filename == '':
                 raise utils.ValidationError(
                     'banner_filename field should not be empty')
-
+            if not self.topic_id_to_prerequisite_topic_ids:
+                raise utils.ValidationError(
+                    'A classroom should have at least one topic.'
+                )
             self.require_valid_teaser_text(self.teaser_text)
             self.require_valid_topic_list_intro(self.topic_list_intro)
             self.require_valid_course_details(self.course_details)

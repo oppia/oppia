@@ -363,6 +363,12 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, error_msg):
             self.classroom.validate(strict=True)
 
+        error_msg = 'A classroom should have at least one topic.'
+        self.classroom.topic_id_to_prerequisite_topic_ids = {}
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom.validate(strict=True)
+
     def test_valid_topic_id_to_prerequisite_topic_ids_graph(self) -> None:
         # Test valid graph 1.
         self.classroom.topic_id_to_prerequisite_topic_ids = {
@@ -382,16 +388,12 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         self.classroom.validate(strict=True)
 
         # Test valid graph 3.
-        self.classroom.topic_id_to_prerequisite_topic_ids = {}
-        self.classroom.validate(strict=True)
-
-        # Test valid graph 4.
         self.classroom.topic_id_to_prerequisite_topic_ids = {
             'topic_id_1': []
         }
         self.classroom.validate(strict=True)
 
-        # Test valid graph 5.
+        # Test valid graph 4.
         self.classroom.topic_id_to_prerequisite_topic_ids = {
             'topic_id_1': [],
             'topic_id_2': ['topic_id_1'],
