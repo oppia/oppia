@@ -172,7 +172,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
             self.tempdir.name, 'root-files-config.json')
         with open(root_files_config_file, 'w', encoding='utf-8') as f:
             f.write(json.dumps({
-                'VALID_ROOT_FILES': [
+                'RUN_NO_TESTS_ROOT_FILES': [
                     'README.md',
                     'assets/README.md',
                     'CODEOWNERS'

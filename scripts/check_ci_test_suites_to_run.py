@@ -93,7 +93,7 @@ class CITestSuitesToRunDict(TypedDict):
 class RootFilesConfigDict(TypedDict):
     """A dictionary representing the root files configuration."""
 
-    valid_root_files: List[str]
+    run_no_tests_root_files: List[str]
     run_all_tests_root_files: List[str]
 
 
@@ -216,7 +216,7 @@ def get_root_files_config() -> RootFilesConfigDict:
     with open(ROOT_FILES_CONFIG_FILE_PATH, 'r', encoding='utf-8') as f:
         config = json.load(f)
         return {
-            'valid_root_files': config['VALID_ROOT_FILES'],
+            'run_no_tests_root_files': config['RUN_NO_TESTS_ROOT_FILES'],
             'run_all_tests_root_files': config['RUN_ALL_TESTS_ROOT_FILES']
         }
 
