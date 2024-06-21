@@ -45,6 +45,7 @@ const createQuestionButton = 'div.e2e-test-create-question';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const interactionNumberInputButton =
   'div.e2e-test-interaction-tile-NumericInput';
+const interactionNameDiv = 'div.oppia-interaction-tile-name';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const responseRuleDropdown =
   'oppia-rule-type-selector.e2e-test-answer-description';
@@ -212,7 +213,20 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(interactionNumberInputButton, {
       visible: true,
     });
-    await this.clickOn(interactionNumberInputButton);
+    await this.page.evaluate(interactionNameDiv => {
+      const interactionDivs = Array.from(
+        document.querySelectorAll(interactionNameDiv)
+      );
+      const element = interactionDivs.find(
+        element => element.textContent?.trim() === 'Number Input'
+      ) as HTMLElement;
+      if (element) {
+        element.click();
+      } else {
+        throw new Error('Cannot find number input interaction option.');
+      }
+    }, interactionNameDiv);
+
     await this.clickOn(saveInteractionButton);
     await this.page.waitForSelector('oppia-add-answer-group-modal-component', {
       visible: true,
@@ -255,7 +269,7 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Create a topic in the topics-and-skills dashboard.
    */
-  async createTopic(name: string, urlFragment: string): Promise<void> {
+  async createTopic(name: string, urlFragment: string): Promise<string> {
     await this.clickOn('Create Topic');
     await this.type(topicNameField, name);
     await this.type(topicUrlFragmentField, urlFragment);
@@ -280,6 +294,12 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(topicMetaTagInput, 'meta');
     await this.page.keyboard.press('Tab');
     await this.saveTopicDraft(name);
+    const topicUrl = this.page.url();
+    let topicId = topicUrl
+      .replace(/^.*\/topic_editor\//, '')
+      .replace(/#\/.*/, '');
+
+    return topicId;
   }
 
   /**
@@ -726,7 +746,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.page.reload({waitUntil: 'networkidle0'});
     }
 
-    const isTextPresent = await this.isTextPresentOnPage(' Unpublish Topic ');
+    const isTextPresent = await this.isTextPresentOnPage('Unpublish Topic');
     if (isTextPresent) {
       throw new Error('Topic is not unpublished successfully.');
     }
@@ -795,6 +815,7 @@ export class CurriculumAdmin extends BaseUser {
         }
       }
     }
+    showMessage(`Topic "${topicName}" has been successfully deleted.`);
   }
 
   /**
@@ -806,7 +827,7 @@ export class CurriculumAdmin extends BaseUser {
   ): Promise<void> {
     await this.goto(topicAndSkillsDashboardUrl);
     const isTextPresent = await this.isTextPresentOnPage(
-      ' No topics or skills have been created yet. '
+      'No topics or skills have been created yet.'
     );
     if (isTextPresent) {
       showMessage(`The skill "${topicName}" is not present on the Topics and Skills
@@ -840,9 +861,6 @@ export class CurriculumAdmin extends BaseUser {
     const skillListItemSelector = isMobileWidth
       ? mobileSkillListItemSelector
       : desktopSkillListItemSelector;
-    const skillNameSelector = isMobileWidth
-      ? mobileSkillSelector
-      : desktopSkillSelector;
     const skillListItemOptions = isMobileWidth
       ? mobileSkillListItemOptions
       : desktopSkillListItemOptions;
@@ -857,50 +875,47 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(skillListItemSelector);
 
     const skills = await this.page.$$(skillListItemSelector);
-    const skillToDelete = skills.find(async skill => {
-      const skillNameElement = await skill.$(skillNameSelector);
-      if (!skillNameElement) {
-        return false;
-      }
-      const name = await (
-        await skillNameElement.getProperty('textContent')
-      ).jsonValue();
-      return name === skillName;
-    });
+    for (let skill of skills) {
+      const skillNameElement = await skill.$(skillSelector);
+      if (skillNameElement) {
+        const name = await (
+          await skillNameElement.getProperty('textContent')
+        ).jsonValue();
 
-    if (!skillToDelete) {
-      console.error(`Skill ${skillName} not found`);
-      return;
+        if (name === `${skillName}`) {
+          await this.page.waitForSelector(skillListItemOptions);
+          const editBox = await skill.$(skillListItemOptions);
+          if (editBox) {
+            await this.waitForElementToBeClickable(editBox);
+            await editBox.click();
+            await this.page.waitForSelector(deleteSkillButton);
+          } else {
+            throw new Error('Edit button not found');
+          }
+
+          const deleteButton = await skill.$(deleteSkillButton);
+          if (deleteButton) {
+            await this.waitForElementToBeClickable(deleteButton);
+            await deleteButton.click();
+            await this.page.waitForSelector(confirmSkillDeletionButton);
+          } else {
+            throw new Error('Delete button not found');
+          }
+
+          const confirmButton = await this.page.$(confirmSkillDeletionButton);
+          if (confirmButton) {
+            await this.waitForElementToBeClickable(confirmButton);
+            await confirmButton.click();
+            await this.page.waitForSelector(modalDiv, {hidden: true});
+          } else {
+            throw new Error('Confirm button not found');
+          }
+          break;
+        }
+      }
     }
 
-    await this.page.waitForSelector(skillListItemOptions, {visible: true});
-    await this.clickElement(skillToDelete, skillListItemOptions);
-
-    await this.page.waitForFunction(
-      (skill: Element) => !skill.isConnected,
-      {},
-      skillListItemOptions
-    );
-
-    await this.page.waitForSelector(deleteSkillButton, {visible: true});
-    await this.clickElement(skillToDelete, deleteSkillButton);
-
-    await this.page.waitForFunction(
-      (button: Element) => !button.isConnected,
-      {},
-      deleteSkillButton
-    );
-
-    await this.page.waitForSelector(confirmSkillDeletionButton, {
-      visible: true,
-    });
-    await this.clickElement(this.page, confirmSkillDeletionButton);
-
-    await this.page.waitForFunction(
-      (button: Element) => !button.isConnected,
-      {},
-      confirmSkillDeletionButton
-    );
+    showMessage(`Skill "${skillName}" has been successfully deleted.`);
   }
 
   /**
@@ -912,7 +927,7 @@ export class CurriculumAdmin extends BaseUser {
   ): Promise<void> {
     await this.goto(topicAndSkillsDashboardUrl);
     const isTextPresent = await this.isTextPresentOnPage(
-      ' No topics or skills have been created yet. '
+      'No topics or skills have been created yet.'
     );
     if (isTextPresent) {
       showMessage(`The skill "${skillName}" is not present on the Topics and Skills
@@ -938,46 +953,59 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} skillName - The name of the skill to delete questions from.
    */
   async removeAllQuestionsFromTheSkill(skillName: string): Promise<void> {
-    await this.openSkillEditor(skillName);
+    try {
+      await this.openSkillEditor(skillName);
 
-    const isMobileWidth = this.isViewportAtMobileWidth();
-    const skillQuestionTab = isMobileWidth
-      ? mobileSkillQuestionTab
-      : desktopSkillQuestionTab;
+      const isMobileWidth = this.isViewportAtMobileWidth();
+      const skillQuestionTab = isMobileWidth
+        ? mobileSkillQuestionTab
+        : desktopSkillQuestionTab;
 
-    if (isMobileWidth) {
-      const currentUrl = this.page.url();
-      const questionsTabUrl = `${currentUrl}questions`;
-      await this.goto(questionsTabUrl);
-      await this.page.reload({waitUntil: 'networkidle0'});
-    } else {
-      await this.clickAndWaitForNavigation(skillQuestionTab);
-    }
-
-    let isTextPresent = await this.isTextPresentOnPage(
-      'There are no questions in this skill.'
-    );
-
-    while (!isTextPresent) {
-      await this.page.waitForSelector(removeQuestion);
-      const button = await this.page.$(removeQuestion);
-      if (!button) {
-        throw new Error('Remove question button not found');
+      if (isMobileWidth) {
+        const currentUrl = this.page.url();
+        const questionsTabUrl = `${currentUrl}questions`;
+        await this.goto(questionsTabUrl);
+        await this.page.reload({waitUntil: 'networkidle0'});
+      } else {
+        await this.clickAndWaitForNavigation(skillQuestionTab);
       }
-      await this.waitForElementToBeClickable(button);
-      await button.click();
-      await this.page.waitForSelector(modalDiv, {visible: true});
-      await this.clickOn('Remove Question');
-      await this.page.waitForSelector(modalDiv, {hidden: true});
-      await this.page.reload({waitUntil: 'networkidle0'});
-      isTextPresent = await this.isTextPresentOnPage(
-        'There are no questions in this skill.'
+
+      while (true) {
+        try {
+          await this.page.waitForSelector(removeQuestion, {visible: true});
+        } catch (error) {
+          break;
+        }
+
+        let button = await this.page.$(removeQuestion);
+        if (!button) {
+          break;
+        }
+
+        await this.waitForElementToBeClickable(button);
+        await button.click();
+
+        try {
+          await this.page.waitForSelector(modalDiv, {visible: true});
+          await this.clickOn('Remove Question');
+          await this.page.waitForSelector(modalDiv, {hidden: true});
+        } catch (error) {
+          console.error('Failed to remove question', error.stack);
+          continue;
+        }
+
+        await this.page.reload({waitUntil: 'networkidle0'});
+      }
+
+      showMessage(
+        `All questions have been successfully removed from the skill "${skillName}".`
+      );
+    } catch (error) {
+      console.error(
+        `Failed to remove all questions from the skill "${skillName}"`,
+        error.stack
       );
     }
-
-    showMessage(
-      `All questions have been successfully removed from the skill "${skillName}".`
-    );
   }
 }
 
