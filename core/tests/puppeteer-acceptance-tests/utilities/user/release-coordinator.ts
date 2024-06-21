@@ -529,10 +529,11 @@ export class ReleaseCoordinator extends BaseUser {
    */
   async verifyDummyHandlerStatusInFeaturesTab(enabled: boolean): Promise<void> {
     await this.page.reload({waitUntil: ['load', 'networkidle0']});
+    await this.navigateToFeaturesTab();
     try {
       // Wait for the selector to be present in the DOM before fetching it.
       const dummyHandlerExists = await this.page
-        .waitForSelector(e2eTestAngularDummyHandlerIndicator)
+        .waitForSelector(e2eTestAngularDummyHandlerIndicator, {timeout: 15000})
         .then(() => true)
         .catch(() => false);
 
