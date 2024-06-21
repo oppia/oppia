@@ -244,9 +244,9 @@ google-cloud-audit-log==0.2.0 \
     --hash=sha256:d0852f525ad65705f9fbff6288be4493e1449a7906fb5e01bd71c8d1e424d1fc \
     --hash=sha256:ecc7f5f2168ad4014331d6397fcea3750b2d41900f0ef6d1081cd78b3a6420e9
     # via google-cloud-logging
-google-cloud-bigquery==1.28.0 \
-    --hash=sha256:9266e989531f290d3b836dc7b308ac22b350c4d664af19325bd0102261231b71 \
-    --hash=sha256:9784cff71d6a46ce202748169f9c7e38fc99d6babbb2f3cdc540475d11f572b9
+google-cloud-bigquery==2.34.4 \
+    --hash=sha256:14a4f996411556757b5d32f11a0ebf34257d6fc5c60d53fb66e674a63a7bf9ca \
+    --hash=sha256:7c6dc11e6bd65a5981a8bc18a472e6132e9aaa1fa5363f1680a9425dd3868660
     # via apache-beam
 google-cloud-bigquery-storage==2.10.0 \
     --hash=sha256:7e313338caa76bd71a6583224a703dbf63177dc689b27beb511244a782c6d32d \
@@ -450,6 +450,7 @@ grpcio==1.43.0 \
     # via
     #   apache-beam
     #   google-api-core
+    #   google-cloud-bigquery
     #   google-cloud-pubsub
     #   google-cloud-pubsublite
     #   googleapis-common-protos
@@ -624,6 +625,7 @@ packaging==20.4 \
     # via
     #   bleach
     #   google-cloud-appengine-logging
+    #   google-cloud-bigquery
     #   pytest
 pillow==10.1.0 \
     --hash=sha256:00f438bb841382b15d7deb9a05cc946ee0f2c352653c7aa659e75e592f6fa17d \
@@ -694,6 +696,7 @@ proto-plus==1.22.1 \
     # via
     #   apache-beam
     #   google-cloud-appengine-logging
+    #   google-cloud-bigquery
     #   google-cloud-bigquery-storage
     #   google-cloud-dataflow-client
     #   google-cloud-dlp
@@ -731,6 +734,7 @@ protobuf==3.20.2 \
     #   apache-beam
     #   google-api-core
     #   google-cloud-audit-log
+    #   google-cloud-bigquery
     #   google-cloud-secret-manager
     #   google-cloud-storage
     #   googleapis-common-protos
@@ -865,7 +869,9 @@ pytest==7.4.4 \
 python-dateutil==2.8.1 \
     --hash=sha256:73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c \
     --hash=sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a
-    # via apache-beam
+    # via
+    #   apache-beam
+    #   google-cloud-bigquery
 pytz==2021.3 \
     --hash=sha256:3672058bc3453457b622aab7a1c3bfd5ab0bdae451512f6cf25f64ed37f5b87c \
     --hash=sha256:acad2d8b20a1af07d4e4c9d2e9285c5ed9104354062f275f3fcd88dcef4f1326
@@ -933,6 +939,7 @@ requests==2.31.0 \
     #   apache-beam
     #   cachecontrol
     #   google-api-core
+    #   google-cloud-bigquery
     #   google-cloud-storage
     #   hdfs
     #   mailchimp3
@@ -1016,7 +1023,6 @@ six==1.16.0 \
     #   google-apitools
     #   google-auth
     #   google-auth-httplib2
-    #   google-cloud-bigquery
     #   google-cloud-core
     #   google-resumable-media
     #   grpcio
