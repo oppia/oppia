@@ -37,12 +37,8 @@ var DiagnosticTestPage = function () {
   var classroomTileSelector = $('.e2e-test-classroom-tile');
   var editClassroomConfigButton = $('.e2e-test-edit-classroom-config-button');
   var addTopicToClassroomButton = $('.e2e-test-add-topic-to-classroom-button');
-  var addTopicToClassroomInput = $('.e2e-test-add-topic-to-classroom-input');
-  var submitTopicIdToClassroomButton = $(
-    '.e2e-test-submit-topic-id-to-classroom-button'
-  );
   var saveClassroomConfigButton = $('.e2e-test-save-classroom-config-button');
-
+  var classroomTopicDropdownElement = $('.e2e-test-classroom-topics-modal');
   this.startDiagnosticTest = async function () {
     await action.click(
       'Start diagnostic test button',
@@ -84,7 +80,7 @@ var DiagnosticTestPage = function () {
     );
   };
 
-  this.addTopicIdToClassroomConfig = async function (topicId, index) {
+  this.addTopicToClassroomConfig = async function (topicName) {
     await action.click('Classroom config tile selector', classroomTileSelector);
 
     await action.click(
@@ -97,16 +93,11 @@ var DiagnosticTestPage = function () {
       addTopicToClassroomButton
     );
 
-    await action.setValue(
-      'Add topic ID to classroom input',
-      addTopicToClassroomInput,
-      topicId
+    await AutocompleteTopicDropdownEditor(
+      classroomTopicDropdownElement,
+      topicName
     );
-
-    await action.click(
-      'Add topic ID to classroom submit button',
-      submitTopicIdToClassroomButton
-    );
+    await action.waitForAutosave();
 
     await action.click(
       'Save classroom config button',
@@ -130,6 +121,30 @@ var DiagnosticTestPage = function () {
     } else {
       expect(recommendedTopicSummaryTiles.length).toEqual(0);
     }
+  };
+
+  var AutocompleteTopicDropdownEditor = async function (elem, topicName) {
+    var containerLocator = '.e2e-test-classroom-category-dropdown';
+    var searchInputLocator = '.mat-select-search-input.mat-input-element';
+    var searchInputLocatorTextElement = function (text) {
+      return $$(`.e2e-test-classroom-topic-selector-choice=${text}`);
+    };
+
+    await action.click('Container Element', elem.$(containerLocator));
+    await action.waitForAutosave();
+    // NOTE: the input field is top-level in the DOM, and is outside the
+    // context of 'elem'. The 'select2-dropdown' id is assigned to the input
+    // field when it is 'activated', i.e. when the dropdown is clicked.
+
+    await action.setValue(
+      'Dropdown Element Search',
+      $(searchInputLocator),
+      topicName
+    );
+
+    var searchInputLocatorTextOption =
+      await searchInputLocatorTextElement(topicName)[0];
+    await action.click('Dropdown Element Select', searchInputLocatorTextOption);
   };
 };
 

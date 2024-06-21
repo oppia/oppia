@@ -239,10 +239,10 @@
             <div *ngIf="classroomEditorMode">
               <div class="new-topic-input-container" *ngIf="newTopicCanBeAdded">
                 <div class="topic-selector-container">
-                  <mat-form-field appearance="fill" class="topics-selector-form-field">
+                  <mat-form-field appearance="fill" class="topics-selector-form-field e2e-test-classroom-topics-modal">
                     <mat-label for="explorationCategory" class="d-block">Select a topic</mat-label>
-                    <mat-select (selectionChange)="addNewTopicToClassroom($event.value)">
-                      <mat-option>
+                    <mat-select (selectionChange)="addNewTopicToClassroom($event.value)" class="e2e-test-classroom-category-dropdown">
+                      <mat-option class="e2e-test-exploration-new-category-add">
                         <ngx-mat-select-search
                           ngModel
                           (ngModelChange)="filterTopicsByName($event)"
@@ -250,7 +250,7 @@
                         </ngx-mat-select-search>
                       </mat-option>
                       <mat-option *ngFor="let option of filteredTopicsToClassroomRelation"
-                                  class="e2e-test-exploration-category-selector-choice"
+                                  class="e2e-test-classroom-topic-selector-choice"
                                   [value]="option.topic_id">
                           {{ option.topic_name }}
                       </mat-option>
