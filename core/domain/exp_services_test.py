@@ -26,6 +26,7 @@ import zipfile
 
 from core import feconf
 from core import utils
+from core import feature_flag_list
 from core.constants import constants
 from core.domain import change_domain
 from core.domain import classifier_services
@@ -1316,6 +1317,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'property_name': 'title',
             'new_value': 'New title'
         })]
+        self.assertFalse(
+            exp_services.is_voiceover_change_list(not_voiceover_change_list))
+
+        test_utils.enable_feature_flags(
+            [feature_flag_list.FeatureNames.ADD_VOICEOVER_WITH_ACCENT])
         self.assertFalse(
             exp_services.is_voiceover_change_list(not_voiceover_change_list))
 

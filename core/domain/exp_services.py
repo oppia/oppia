@@ -34,6 +34,7 @@ import pprint
 import re
 import zipfile
 
+from core import feature_flag_list
 from core import android_validation_constants
 from core import feconf
 from core import utils
@@ -45,6 +46,7 @@ from core.domain import classifier_services
 from core.domain import draft_upgrade_services
 from core.domain import email_manager
 from core.domain import email_subscription_services
+from core.domain import feature_flag_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -2893,10 +2895,22 @@ def is_voiceover_change_list(
         bool. Whether the change_list contains only the changes which are
         allowed for voice artist to do.
     """
+    voiceover_with_accent_feature_is_enabled = (
+        feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ADD_VOICEOVER_WITH_ACCENT.value,
+            None)
+    )
+
     for change in change_list:
-        if (change.property_name !=
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
-            return False
+        if voiceover_with_accent_feature_is_enabled:
+            if change.cmd != exp_domain.CMD_UPDATE_VOICEOVERS:
+                return False
+        else:
+            if (
+                change.property_name !=
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
+            ):
+                return False
     return True
 
 
