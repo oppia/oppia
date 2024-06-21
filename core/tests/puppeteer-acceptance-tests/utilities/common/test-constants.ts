@@ -26,6 +26,8 @@ export default {
     AdminPage: 'http://localhost:8181/admin',
     AdminPageRolesTab: 'http://localhost:8181/admin#/roles',
     AdminPageActivitiesTab: 'http://localhost:8181/admin#/activities',
+    AdminPagePlatformParametersTab:
+      'http://localhost:8181/admin#/platform-parameters',
     Android: 'http://localhost:8181/android',
     Blog: 'http://localhost:8181/blog',
     BlogAdmin: 'http://localhost:8181/blog-admin',

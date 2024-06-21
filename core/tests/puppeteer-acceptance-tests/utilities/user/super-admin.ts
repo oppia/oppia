@@ -20,13 +20,17 @@ import * as puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-const AdminPageRolesTab = testConstants.URLs.AdminPageRolesTab;
-const AdminPageActivitiesTab = testConstants.URLs.AdminPageActivitiesTab;
-const CommunityLibraryUrl = testConstants.URLs.CommunityLibrary;
+
+const adminPageRolesTab = testConstants.URLs.AdminPageRolesTab;
+const adminPageActivitiesTab = testConstants.URLs.AdminPageActivitiesTab;
+const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
+const adminPagePlatformParametersTab =
+  testConstants.URLs.AdminPagePlatformParametersTab;
 const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 
 const topicManagerRole = testConstants.Roles.TOPIC_MANAGER;
 
+const actionStatusMessageSelector = '.e2e-test-status-message';
 const userRoleDescriptionSelector = '.oppia-user-role-description';
 const reloadExplorationTitle = '.e2e-test-reload-exploration-title';
 const selectTopicForAssignmentSelector = '.e2e-test-select-topic';
@@ -63,14 +67,14 @@ export class SuperAdmin extends BaseUser {
    * Navigates to the Admin Page Activities Tab.
    */
   async navigateToAdminPageActivitiesTab(): Promise<void> {
-    await this.goto(AdminPageActivitiesTab);
+    await this.goto(adminPageActivitiesTab);
   }
 
   /**
    * Navigates to the Admin Page Roles Tab.
    */
   async navigateToAdminPageRolesTab(): Promise<void> {
-    await this.goto(AdminPageRolesTab);
+    await this.goto(adminPageRolesTab);
   }
 
   /**
@@ -91,7 +95,11 @@ export class SuperAdmin extends BaseUser {
    * Navigates to the community library page.
    */
   async navigateToCommunityLibrary(): Promise<void> {
-    await this.goto(CommunityLibraryUrl);
+    await this.goto(communityLibraryUrl);
+  }
+
+  async navigateToAdminPagePlatformParametersTab(): Promise<void> {
+    await this.goto(adminPagePlatformParametersTab);
   }
 
   /**
@@ -102,7 +110,7 @@ export class SuperAdmin extends BaseUser {
     role: string,
     topicName?: string
   ): Promise<void> {
-    await this.goto(AdminPageRolesTab);
+    await this.goto(adminPageRolesTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.clickOn(addRoleButton);
@@ -185,7 +193,7 @@ export class SuperAdmin extends BaseUser {
    */
   async expectUserToHaveRole(username: string, role: string): Promise<void> {
     const currentPageUrl = this.page.url();
-    await this.goto(AdminPageRolesTab);
+    await this.goto(adminPageRolesTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.page.waitForSelector(justifyContentDiv);
@@ -209,7 +217,7 @@ export class SuperAdmin extends BaseUser {
    */
   async expectUserNotToHaveRole(username: string, role: string): Promise<void> {
     const currentPageUrl = this.page.url();
-    await this.goto(AdminPageRolesTab);
+    await this.goto(adminPageRolesTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.page.waitForSelector(justifyContentDiv);
@@ -233,7 +241,7 @@ export class SuperAdmin extends BaseUser {
    */
   async unassignRoleFromUser(username: string, role: string): Promise<void> {
     role = role.replace(/ /g, '-');
-    await this.goto(AdminPageRolesTab);
+    await this.goto(adminPageRolesTab);
     await this.page.waitForSelector(roleEditorInputField);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
@@ -625,6 +633,176 @@ export class SuperAdmin extends BaseUser {
       );
       throw error;
     }
+  }
+
+  /**
+   * Selects a platform parameter by its name.
+   * @param {string} parameterName - The name of the platform parameter.
+   * @returns {Promise<ElementHandle<Element>>} - The ElementHandle of the selected platform parameter.
+   */
+  async selectPlatformParameter(
+    parameterName: string
+  ): Promise<puppeteer.ElementHandle<Element>> {
+    await this.page.waitForSelector('.e2e-test-platform-param');
+    const platformParameters = await this.page.$$('.e2e-test-platform-param');
+    for (const platformParameter of platformParameters) {
+      const nameElement = await platformParameter.$('.e2e-test-parameter-name');
+      const name = await this.page.evaluate(
+        element => element.textContent,
+        nameElement
+      );
+      if (name === parameterName) {
+        return platformParameter;
+      }
+    }
+    throw new Error(`Platform parameter "${parameterName}" not found.`);
+  }
+
+  /**
+   * Waits for a success message to appear and checks if it matches the expected message.
+   * @param {string} expectedMessage - The expected success message.
+   */
+  async expectActionSuccessMessage(expectedMessage: string): Promise<void> {
+    await this.page.waitForSelector(actionStatusMessageSelector, {
+      visible: true,
+    });
+    const actualMessage = await this.page.$eval(
+      actionStatusMessageSelector,
+      el => el.textContent?.trim()
+    );
+    if (actualMessage === expectedMessage.trim()) {
+      showMessage('Action was successful.');
+      return;
+    }
+    throw new Error(
+      `Action failed. Actual message: "${actualMessage}", expected message: "${expectedMessage}"`
+    );
+  }
+
+  /**
+   * Clicks the button to add a rule to a platform parameter and types the provided rule.
+   * @param {string} platformParam - The name of the platform parameter.
+   *  @param {string} ruleValue - The value to be typed.
+   */
+  async addRuleToPlatformParameter(
+    platformParam: string,
+    condition: string,
+    ruleValue: string
+  ): Promise<void> {
+    const platformParameter = await this.selectPlatformParameter(platformParam);
+
+    const editButton = await platformParameter.$('.oppia-edit-param-button');
+    if (editButton) {
+      await this.waitForElementToBeClickable(editButton);
+      await editButton.click();
+    }
+
+    // Add the rule.
+    const addRuleButton = await platformParameter.$(
+      '.e2e-test-parameter-add-rule-button'
+    );
+    if (addRuleButton) {
+      await this.waitForElementToBeClickable(addRuleButton);
+      await addRuleButton.click();
+    }
+    await this.clickOn('.e2e-test-add-condition-button');
+    await this.select('.e2e-test-server-mode-selector', condition);
+    await this.page.type('e2e-test-text-input', ruleValue);
+  }
+
+  /**
+   * Changes the default value of a platform parameter to the provided value.
+   * @param {string} value - The new default value.
+   */
+  async changeDefaultValueOfPlatformParameter(
+    platformParam: string,
+    value: string
+  ): Promise<void> {
+    const platformParameter = await this.selectPlatformParameter(platformParam);
+
+    const editButton = await platformParameter.$('.oppia-edit-param-button');
+    if (editButton) {
+      await this.waitForElementToBeClickable(editButton);
+      await editButton.click();
+    }
+
+    const valueInput = await platformParameter.$$('.e2e-test-parameter-value');
+    await this.waitForElementToBeClickable(valueInput[1]);
+    await valueInput[1].type(value);
+  }
+
+  /**
+   * Clicks the button to save changes to a platform parameter.
+   */
+  async savePlatformParameterChanges(parameterName: string): Promise<void> {
+    const platformParameter = await this.selectPlatformParameter(parameterName);
+    const saveButton = await platformParameter.$('.save-button-container');
+    if (saveButton) {
+      await this.waitForElementToBeClickable(saveButton);
+      await saveButton.click();
+    }
+  }
+
+  /**
+   * Checks if a platform parameter has a specific rule.
+   * @param {string} platformParam - The name of the platform parameter.
+   * @param {string} expectedCondition - The expected condition.
+   * @param {string} expectedValue - The expected value.
+   */
+  async expectPlatformParameterToHaveRule(
+    platformParam: string,
+    expectedCondition: string,
+    expectedValue: string
+  ): Promise<void> {
+    const platformParameter = await this.selectPlatformParameter(platformParam);
+    const ruleItems = await platformParameter.$$('.oppia-rule-item-header');
+    for (const ruleItem of ruleItems) {
+      const spans = await ruleItem.$$('span');
+      const condition = await this.page.evaluate(
+        element => element.textContent,
+        spans[0]
+      );
+      const value = await this.page.evaluate(
+        element => element.textContent,
+        spans[1]
+      );
+      if (condition === expectedCondition && value === expectedValue) {
+        showMessage(
+          `Rule with condition "${expectedCondition}" and value "${expectedValue}" found in platform parameter "${platformParam}".`
+        );
+        return;
+      }
+    }
+    throw new Error(
+      `Rule with condition "${expectedCondition}" and value "${expectedValue}" not found in platform parameter "${platformParam}".`
+    );
+  }
+
+  /**
+   * Checks if a platform parameter has a specific default value.
+   * @param {string} parameter - The name of the platform parameter.
+   * @param {string} expectedValue - The expected default value.
+   */
+  async expectPlatformParameterToHaveDefaultValue(
+    parameter: string,
+    expectedValue: string
+  ): Promise<void> {
+    const platformParameter = await this.selectPlatformParameter(parameter);
+    const valueElement = await platformParameter.$(
+      '.e2e-test-param-default-value'
+    );
+    const value = await this.page.evaluate(
+      element => element.textContent,
+      valueElement
+    );
+    expect(value).toEqual(expectedValue);
+  }
+
+  /**
+   * Clicks the button to save changes to storage.
+   */
+  async saveChangesToStorage(): Promise<void> {
+    await this.page.click('.save-default-values-button .btn.btn-primary');
   }
 }
 
