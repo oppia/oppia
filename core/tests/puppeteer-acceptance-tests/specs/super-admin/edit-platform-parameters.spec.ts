@@ -21,7 +21,6 @@ import testConstants from '../../utilities/common/test-constants';
 import {SuperAdmin} from '../../utilities/user/super-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
-const ROLES = testConstants.Roles;
 
 describe('Super Admin', function () {
   let superAdmin: SuperAdmin;
@@ -37,19 +36,19 @@ describe('Super Admin', function () {
 
       await superAdmin.addRuleToPlatformParameter(
         'dummy_parameter',
-        'web',
+        'Android',
         'always'
       );
       await superAdmin.savePlatformParameterChanges('dummy_parameter');
       await superAdmin.expectPlatformParameterToHaveRule(
         'dummy_parameter',
-        'Platform Type in[Web]',
+        'Platform Type in [Android]',
         'always'
       );
 
       await superAdmin.changeDefaultValueOfPlatformParameter(
         'dummy_parameter',
-        'Test Value'
+        'always'
       );
       await superAdmin.savePlatformParameterChanges('dummy_parameter');
       await superAdmin.expectPlatformParameterToHaveDefaultValue(
@@ -58,7 +57,7 @@ describe('Super Admin', function () {
       );
 
       await superAdmin.saveChangesToStorage();
-      await superAdmin.expectActionSuccessMessage('Saved Successfully');
+      await superAdmin.expectActionSuccessMessage('Saved successfully.');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

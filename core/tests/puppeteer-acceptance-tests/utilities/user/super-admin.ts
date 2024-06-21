@@ -21,45 +21,71 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
-const adminPageRolesTab = testConstants.URLs.AdminPageRolesTab;
+// URLs.
 const adminPageActivitiesTab = testConstants.URLs.AdminPageActivitiesTab;
-const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const adminPagePlatformParametersTab =
   testConstants.URLs.AdminPagePlatformParametersTab;
+const adminPageRolesTab = testConstants.URLs.AdminPageRolesTab;
+const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 
+// Roles.
 const topicManagerRole = testConstants.Roles.TOPIC_MANAGER;
 
+// Admin Page.
 const actionStatusMessageSelector = '.e2e-test-status-message';
-const userRoleDescriptionSelector = '.oppia-user-role-description';
-const reloadExplorationTitle = '.e2e-test-reload-exploration-title';
-const selectTopicForAssignmentSelector = '.e2e-test-select-topic';
-const searchFieldCommunityLibrary = 'input.e2e-test-search-input';
-const addTopicButton = '.e2e-test-add-topic-button';
-const reloadExplorationButton = '.e2e-test-reload-exploration-button';
-const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
-const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
-const rolesSelectDropdown = 'div.mat-select-trigger';
-const reloadCollectionTitleSelector = '.e2e-test-reload-collection-title';
-const reloadCollectionButton = '.e2e-test-reload-collection-button';
 const addRoleButton = 'button.oppia-add-role-button';
+const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
+const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
+const rolesSelectDropdown = 'div.mat-select-trigger';
+const userRoleDescriptionSelector = '.oppia-user-role-description';
+
+// Blog Post.
+const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
+const generateBlogPostButton = '.e2e-test-generate-blog-post';
+
+// Community Library.
+const searchFieldCommunityLibrary = 'input.e2e-test-search-input';
+
+// Exploration.
+const explorationTileSelector = '.e2e-test-exploration-dashboard-card';
 const generateExplorationButton = '.oppia-generate-exploration-text';
 const noOfExplorationToGeneratorField =
   '#label-target-explorations-to-generate';
 const noOfExplorationToPublishField = '#label-target-explorations-to-generate';
-const explorationTileSelector = '.e2e-test-exploration-dashboard-card';
-const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
-const loadDummyMathClassRoomButton = '.load-dummy-math-classroom';
-const justifyContentDiv = 'div.justify-content-between';
-const topicsTab = 'a.e2e-test-topics-tab';
-const skillsTab = 'a.e2e-test-skills-tab';
-
+const reloadExplorationButton = '.e2e-test-reload-exploration-button';
 const reloadExplorationRowsSelector = '.e2e-test-reload-exploration-row';
-const reloadCollectionsRowsSelector = '.e2e-test-reload-collection-row';
-const generateBlogPostButton = '.e2e-test-generate-blog-post';
-const prodModeActivitiesTab = 'oppia-admin-prod-mode-activities-tab';
-const platformParameterSelector = '.e2e-test-platform-param';
+const reloadExplorationTitle = '.e2e-test-reload-exploration-title';
+
+// Platform Parameters.
+const addConditionButton = '.e2e-test-add-condition-button';
+const addRuleButtonSelector = '.e2e-test-parameter-add-rule-button';
+const defaultParamValueDivSelector = '.e2e-test-param-default-value';
+const editParamButton = '.oppia-edit-param-button';
+const paramRuleItemHeaderSelector = '.oppia-rule-item-header';
+const paramSaveChangesButton = '.save-button-container';
+const paramValueInput = '.e2e-test-text-input';
 const platformParameterNameSelector = '.e2e-test-parameter-name';
+const platformParameterSelector = '.e2e-test-platform-param';
+const saveValuesToStorageButton =
+  '.save-default-values-button .btn.btn-primary';
+const serverModeSelector = '.e2e-test-server-mode-selector';
+
+// Skills and Topics.
+const addTopicButton = '.e2e-test-add-topic-button';
+const justifyContentDiv = 'div.justify-content-between';
+const selectTopicForAssignmentSelector = '.e2e-test-select-topic';
+const skillsTab = 'a.e2e-test-skills-tab';
+const topicsTab = 'a.e2e-test-topics-tab';
+
+// Collections.
+const reloadCollectionButton = '.e2e-test-reload-collection-button';
+const reloadCollectionTitleSelector = '.e2e-test-reload-collection-title';
+const reloadCollectionsRowsSelector = '.e2e-test-reload-collection-row';
+
+// Other.
+const loadDummyMathClassRoomButton = '.load-dummy-math-classroom';
+const prodModeActivitiesTab = 'oppia-admin-prod-mode-activities-tab';
 
 export class SuperAdmin extends BaseUser {
   /**
@@ -685,66 +711,116 @@ export class SuperAdmin extends BaseUser {
   }
 
   /**
-   * Clicks the button to add a rule to a platform parameter and types the provided rule.
+   * Adds a rule to a platform parameter.
    * @param {string} platformParam - The name of the platform parameter.
-   *  @param {string} ruleValue - The value to be typed.
+   * @param {string} condition - The condition for the rule.
+   * @param {string} ruleValue - The value to be typed.
    */
   async addRuleToPlatformParameter(
     platformParam: string,
     condition: string,
     ruleValue: string
   ): Promise<void> {
-    const platformParameter = await this.selectPlatformParameter(platformParam);
+    try {
+      const platformParameter =
+        await this.selectPlatformParameter(platformParam);
 
-    const editButton = await platformParameter.$('.oppia-edit-param-button');
-    if (editButton) {
+      await platformParameter.waitForSelector(editParamButton, {visible: true});
+      const editButton = await platformParameter.$(editParamButton);
+      if (!editButton) {
+        throw new Error(
+          `Edit button not found for platform parameter "${platformParam}".`
+        );
+      }
       await this.waitForElementToBeClickable(editButton);
       await editButton.click();
-    }
 
-    // Add the rule.
-    const addRuleButton = await platformParameter.$(
-      '.e2e-test-parameter-add-rule-button'
-    );
-    if (addRuleButton) {
+      const addRuleButton = await platformParameter.$(addRuleButtonSelector);
+      if (!addRuleButton) {
+        throw new Error(
+          `Add rule button not found for platform parameter "${platformParam}".`
+        );
+      }
       await this.waitForElementToBeClickable(addRuleButton);
       await addRuleButton.click();
+
+      await this.waitForElementToBeClickable(addConditionButton);
+      await this.clickOn(addConditionButton);
+
+      await this.page.waitForSelector(serverModeSelector, {visible: true});
+      await this.waitForElementToBeClickable(serverModeSelector);
+      await this.page.select(serverModeSelector, condition);
+
+      await this.waitForElementToBeClickable(paramValueInput);
+      await this.page.type(paramValueInput, ruleValue);
+      showMessage('Rule added successfully.');
+    } catch (error) {
+      console.error(
+        `Failed to add rule to platform parameter "${platformParam}": ${error}`
+      );
+      throw error;
     }
-    await this.clickOn('.e2e-test-add-condition-button');
-    await this.select('.e2e-test-server-mode-selector', condition);
-    await this.page.type('e2e-test-text-input', ruleValue);
   }
 
   /**
    * Changes the default value of a platform parameter to the provided value.
+   * @param {string} platformParam - The name of the platform parameter.
    * @param {string} value - The new default value.
    */
   async changeDefaultValueOfPlatformParameter(
     platformParam: string,
     value: string
   ): Promise<void> {
-    const platformParameter = await this.selectPlatformParameter(platformParam);
+    await this.navigateToAdminPagePlatformParametersTab();
+    try {
+      const platformParameter =
+        await this.selectPlatformParameter(platformParam);
 
-    const editButton = await platformParameter.$('.oppia-edit-param-button');
-    if (editButton) {
+      await platformParameter.waitForSelector(editParamButton, {visible: true});
+      const editButton = await platformParameter.$(editParamButton);
+      if (!editButton) {
+        throw new Error(
+          `Edit button not found for platform parameter "${platformParam}".`
+        );
+      }
       await this.waitForElementToBeClickable(editButton);
       await editButton.click();
+      await platformParameter.waitForSelector(paramValueInput, {visible: true});
+      const valueInputs = await platformParameter.$$(paramValueInput);
+      await valueInputs[1].type(value);
+      showMessage('Default value changed successfully.');
+    } catch (error) {
+      console.error(
+        `Failed to change default value of platform parameter "${platformParam}": ${error}`
+      );
+      throw error;
     }
-
-    const valueInput = await platformParameter.$$('.e2e-test-parameter-value');
-    await this.waitForElementToBeClickable(valueInput[1]);
-    await valueInput[1].type(value);
   }
 
   /**
-   * Clicks the button to save changes to a platform parameter.
+   * Saves changes to a platform parameter.
+   * @param {string} parameterName - The name of the platform parameter.
    */
   async savePlatformParameterChanges(parameterName: string): Promise<void> {
-    const platformParameter = await this.selectPlatformParameter(parameterName);
-    const saveButton = await platformParameter.$('.save-button-container');
-    if (saveButton) {
+    try {
+      const platformParameter =
+        await this.selectPlatformParameter(parameterName);
+      await platformParameter.waitForSelector(paramSaveChangesButton, {
+        visible: true,
+      });
+      const saveButton = await platformParameter.$(paramSaveChangesButton);
+      if (!saveButton) {
+        throw new Error(
+          `Save button not found for platform parameter "${parameterName}".`
+        );
+      }
       await this.waitForElementToBeClickable(saveButton);
       await saveButton.click();
+    } catch (error) {
+      console.error(
+        `Failed to save changes to platform parameter "${parameterName}": ${error}`
+      );
+      throw error;
     }
   }
 
@@ -759,28 +835,46 @@ export class SuperAdmin extends BaseUser {
     expectedCondition: string,
     expectedValue: string
   ): Promise<void> {
+    await this.navigateToAdminPagePlatformParametersTab();
     const platformParameter = await this.selectPlatformParameter(platformParam);
-    const ruleItems = await platformParameter.$$('.oppia-rule-item-header');
+
+    await platformParameter.waitForSelector(paramRuleItemHeaderSelector, {
+      visible: true,
+    });
+    const ruleItems = await platformParameter.$$(paramRuleItemHeaderSelector);
+    if (ruleItems.length === 0) {
+      throw new Error(
+        `No rule items found in platform parameter "${platformParam}".`
+      );
+    }
+
     for (const ruleItem of ruleItems) {
-      const spans = await ruleItem.$$('span');
-      const condition = await this.page.evaluate(
-        element => element.textContent,
-        spans[0]
-      );
-      const value = await this.page.evaluate(
-        element => element.textContent,
-        spans[1]
-      );
-      if (condition === expectedCondition && value === expectedValue) {
-        showMessage(
-          `Rule with condition "${expectedCondition}" and value "${expectedValue}" found in platform parameter "${platformParam}".`
+      const divs = await ruleItem.$$('div');
+      if (divs.length < 2) {
+        throw new Error(
+          `Expected at least two divs in rule item, but found ${divs.length}.`
         );
-        return;
+      }
+      const condition = (
+        await this.page.evaluate(element => element.textContent, divs[0])
+      ).trim();
+      const value = (
+        await this.page.evaluate(element => element.textContent, divs[1])
+      ).trim();
+
+      if (condition !== expectedCondition || value !== expectedValue) {
+        throw new Error(
+          `Rule with condition "${expectedCondition}" and value "${expectedValue}" 
+          not found in platform parameter "${platformParam}". Actual conditions: ${condition} and value: ${value}`
+        );
+      } else {
+        showMessage(
+          `Rule with condition "${expectedCondition}" and value "${expectedValue}" 
+          found in platform parameter "${platformParam}".`
+        );
+        break;
       }
     }
-    throw new Error(
-      `Rule with condition "${expectedCondition}" and value "${expectedValue}" not found in platform parameter "${platformParam}".`
-    );
   }
 
   /**
@@ -793,21 +887,35 @@ export class SuperAdmin extends BaseUser {
     expectedValue: string
   ): Promise<void> {
     const platformParameter = await this.selectPlatformParameter(parameter);
+    if (!platformParameter) {
+      throw new Error(`Platform parameter "${parameter}" not found.`);
+    }
+
     const valueElement = await platformParameter.$(
-      '.e2e-test-param-default-value'
+      defaultParamValueDivSelector
     );
-    const value = await this.page.evaluate(
-      element => element.textContent,
-      valueElement
-    );
-    expect(value).toEqual(expectedValue);
+    if (!valueElement) {
+      throw new Error(
+        `Default value element not found in platform parameter "${parameter}".`
+      );
+    }
+
+    const value = (
+      await this.page.evaluate(element => element.textContent, valueElement)
+    ).trim();
+
+    if (value !== expectedValue) {
+      throw new Error(
+        `Expected "${expectedValue}" but got "${value}" for platform parameter "${parameter}".`
+      );
+    }
   }
 
   /**
    * Clicks the button to save changes to storage.
    */
   async saveChangesToStorage(): Promise<void> {
-    await this.page.click('.save-default-values-button .btn.btn-primary');
+    await this.clickOn(saveValuesToStorageButton);
   }
 }
 
