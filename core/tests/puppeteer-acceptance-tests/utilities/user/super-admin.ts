@@ -58,6 +58,8 @@ const reloadExplorationRowsSelector = '.e2e-test-reload-exploration-row';
 const reloadCollectionsRowsSelector = '.e2e-test-reload-collection-row';
 const generateBlogPostButton = '.e2e-test-generate-blog-post';
 const prodModeActivitiesTab = 'oppia-admin-prod-mode-activities-tab';
+const platformParameterSelector = '.e2e-test-platform-param';
+const platformParameterNameSelector = '.e2e-test-parameter-name';
 
 export class SuperAdmin extends BaseUser {
   /**
@@ -643,15 +645,18 @@ export class SuperAdmin extends BaseUser {
   async selectPlatformParameter(
     parameterName: string
   ): Promise<puppeteer.ElementHandle<Element>> {
-    await this.page.waitForSelector('.e2e-test-platform-param');
-    const platformParameters = await this.page.$$('.e2e-test-platform-param');
+    await this.page.waitForSelector(platformParameterSelector);
+    const platformParameters = await this.page.$$(platformParameterSelector);
     for (const platformParameter of platformParameters) {
-      const nameElement = await platformParameter.$('.e2e-test-parameter-name');
+      const nameElement = await platformParameter.$(
+        platformParameterNameSelector
+      );
       const name = await this.page.evaluate(
         element => element.textContent,
         nameElement
       );
       if (name === parameterName) {
+        showMessage('Platform parameter found.');
         return platformParameter;
       }
     }

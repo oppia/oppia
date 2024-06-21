@@ -18,7 +18,6 @@
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {SuperAdmin} from '../../utilities/user/super-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
@@ -26,23 +25,9 @@ const ROLES = testConstants.Roles;
 
 describe('Super Admin', function () {
   let superAdmin: SuperAdmin;
-  let curriculumAdmin: CurriculumAdmin;
 
   beforeAll(async function () {
     superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
-    curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm',
-      'curriculum_admin@example.com',
-      [ROLES.CURRICULUM_ADMIN]
-    );
-    const guestUser1 = await UserFactory.createNewUser(
-      'guestUser1',
-      'guest_user1@example.com'
-    );
-    await guestUser1.closeBrowser();
-
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(

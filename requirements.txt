@@ -244,7 +244,6 @@ google-cloud-audit-log==0.2.0 \
     --hash=sha256:d0852f525ad65705f9fbff6288be4493e1449a7906fb5e01bd71c8d1e424d1fc \
     --hash=sha256:ecc7f5f2168ad4014331d6397fcea3750b2d41900f0ef6d1081cd78b3a6420e9
     # via google-cloud-logging
-google-cloud-bigquery==1.28.0 \
     --hash=sha256:9266e989531f290d3b836dc7b308ac22b350c4d664af19325bd0102261231b71 \
     --hash=sha256:9784cff71d6a46ce202748169f9c7e38fc99d6babbb2f3cdc540475d11f572b9
     # via apache-beam
