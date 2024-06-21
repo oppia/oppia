@@ -529,6 +529,10 @@ export class ReleaseCoordinator extends BaseUser {
   async verifyDummyHandlerStatusInFeaturesTab(enabled: boolean): Promise<void> {
     await this.navigateToReleaseCoordinatorPage();
     await this.navigateToFeaturesTab();
+    const isOnFeaturesTab = await this.page.$('.e2e-test-feature-flag');
+    if (!isOnFeaturesTab) {
+      throw new Error('Not on the features tab');
+    }
     const dummyHandlerElement = await this.page.$(agDummyFeatureIndicator);
 
     if (enabled) {
