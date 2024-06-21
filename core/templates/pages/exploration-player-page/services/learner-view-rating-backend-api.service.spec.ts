@@ -23,8 +23,15 @@ import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {LearnerViewRatingBackendApiService} from './learner-view-rating-backend-api.service';
+import {ExplorationEngineService} from './exploration-engine.service';
 
-describe('Learner View Rating Backend Api Service', () => {
+class MockExplorationEngineService {
+  getExplorationId() {
+    return 'expId';
+  }
+}
+
+fdescribe('Learner View Rating Backend Api Service', () => {
   let lvrbas: LearnerViewRatingBackendApiService;
   let httpTestingController: HttpTestingController;
   let successHandler = jasmine.createSpy('success');
@@ -35,6 +42,10 @@ describe('Learner View Rating Backend Api Service', () => {
       imports: [HttpClientTestingModule],
       providers: [
         LearnerViewRatingBackendApiService,
+        {
+          provide: ExplorationEngineService,
+          useClass: MockExplorationEngineService,
+        },
         {
           provide: TranslateService,
           useClass: MockTranslateService,
