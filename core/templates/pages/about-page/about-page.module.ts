@@ -22,8 +22,9 @@ import {AboutPageRootComponent} from './about-page-root.component';
 import {AboutPageRoutingModule} from './about-page-routing.module';
 import {CommonModule} from '@angular/common';
 import {SharedComponentsModule} from 'components/shared-component.module';
+import {BarChartComponent} from './charts/bar-chart.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-
+import {FullExpandAccordionComponent} from './accordion/full-expand-accordion.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -31,7 +32,11 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     AboutPageRoutingModule,
     NgbModule,
   ],
-  entryComponents: [AboutPageComponent, AboutPageRootComponent],
-  declarations: [AboutPageComponent, AboutPageRootComponent],
+  declarations: [
+    AboutPageComponent,
+    AboutPageRootComponent,
+    BarChartComponent,
+    FullExpandAccordionComponent,
+  ],
 })
 export class AboutPageModule {}
