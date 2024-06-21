@@ -1,3 +1,21 @@
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for story node tile component.
+ */
+
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
@@ -32,7 +50,7 @@ class MockAssetsBackendApiService {
   }
 }
 
-fdescribe('StoryNodeTileComponent', () => {
+describe('StoryNodeTileComponent', () => {
   let fixture: ComponentFixture<StoryNodeTileComponent>;
   let componentInstance: StoryNodeTileComponent;
   let explorationEngineService: ExplorationEngineService;
@@ -41,25 +59,8 @@ fdescribe('StoryNodeTileComponent', () => {
   let editableExplorationBackendApiService: EditableExplorationBackendApiService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let explorationObjectFactory: ExplorationObjectFactory;
-  let windowDimensionsService: WindowDimensionsService;
 
   let mockStoryNode: StoryNode;
-  // id: 'node_1',
-  // title: 'Sample Title',
-  // description: 'Sample Description',
-  // destination_node_ids: ['node_2'],
-  // prerequisite_skill_ids: ['skill_1'],
-  // acquired_skill_ids: ['skill_2'],
-  // outline: 'Sample Outline',
-  // outline_is_finalized: true,
-  // exploration_id: 'exp_1',
-  // thumbnail_bg_color: '#FFFFFF',
-  // thumbnail_filename: 'thumbnail.png',
-  // status: 'in-progress',
-  // planned_publication_date_msecs: null,
-  // last_modified_msecs: 1622499200000,
-  // first_publication_date_msecs: 1622499200000,
-  // unpublishing_reason: null
 
   let explorationDict = {
     states: {
@@ -268,8 +269,6 @@ fdescribe('StoryNodeTileComponent', () => {
     draft_changes: null,
   };
 
-  // let states: FetchExplorationBackendResponse = {}
-
   let sampleExpResponse: FetchExplorationBackendResponse = {
     exploration: {
       init_state_name: 'Start',
@@ -339,7 +338,6 @@ fdescribe('StoryNodeTileComponent', () => {
       ReadOnlyExplorationBackendApiService
     );
     explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
-    windowDimensionsService = TestBed.inject(WindowDimensionsService);
 
     var sampleStoryNodeBackendDict = {
       id: 'node_1',
@@ -374,7 +372,6 @@ fdescribe('StoryNodeTileComponent', () => {
     componentInstance.classroomUrlFragment = 'classroom-url';
     componentInstance.storyUrlFragment = 'story-url';
     componentInstance.checkpointCount = 3;
-    // componentInstance.completedcheckpoints = 1;
     componentInstance.totalCheckpointLoaded = true;
     componentInstance.mostRecentlyReachedCheckpoint = 'Mid';
   }));
