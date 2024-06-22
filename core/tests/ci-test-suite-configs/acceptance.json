@@ -123,6 +123,14 @@
     {
       "name": "super-admin/load-dummy-data-in-dev-mode",
       "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/load-dummy-data-in-dev-mode.spec.ts"
+    },
+    {
+      "name": "release-coordinator/flush-and-get-profile-of-redis-cache",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/flush-and-get-profile-of-redis-cache.spec.ts"
+    },
+    {
+      "name": "release-coordinator/update-promo-bar-message",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/update-promo-bar-message.spec.ts"
     }
   ]
 }
