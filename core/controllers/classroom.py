@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -330,25 +329,19 @@ class ClassroomHandler(
             classroom_id)
 
         if thumbnail_filename != existing_classroom.thumbnail_data.filename:
-            try:
-                fs_services.validate_and_save_image(
-                    raw_thumbnail_image, thumbnail_filename, 'thumbnail',
-                    feconf.ENTITY_TYPE_CLASSROOM, classroom_id
-                )
-            except utils.ValidationError as e:
-                raise self.InvalidInputException(e)
+            fs_services.validate_and_save_image(
+                raw_thumbnail_image, thumbnail_filename, 'thumbnail',
+                feconf.ENTITY_TYPE_CLASSROOM, classroom_id
+            )
 
         if (
             banner_filename !=
             existing_classroom.banner_data.filename
         ):
-            try:
-                fs_services.validate_and_save_image(
-                    raw_banner_image, banner_filename, 'image',
-                    feconf.ENTITY_TYPE_CLASSROOM, classroom_id
-                )
-            except utils.ValidationError as e:
-                raise self.InvalidInputException(e)
+            fs_services.validate_and_save_image(
+                raw_banner_image, banner_filename, 'image',
+                feconf.ENTITY_TYPE_CLASSROOM, classroom_id
+            )
 
         classroom_config_services.update_classroom(
             classroom, strict=classroom.is_published
