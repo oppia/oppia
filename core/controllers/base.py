@@ -847,11 +847,11 @@ class BaseHandler(
             self._render_exception(values)
             return
 
-        if isinstance(exception , TypeError):
+        if isinstance(exception, TypeError):
             self.error(405)
             values = {
                 'error': 'Invalid method. %s does not have %s requests' % (
-                    handler_class_name , request_method),
+                    handler_class_name, request_method),
                 'status_code': 405
             }
             self._render_exception(values)
