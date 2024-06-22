@@ -70,7 +70,7 @@ export class BaseUser {
       '--use-fake-ui-for-media-stream',
     ];
 
-    const headless = process.env.HEADLESS === 'false';
+    const headless = process.env.HEADLESS === 'true';
     const mobile = process.env.MOBILE === 'true';
     /**
      * Here we are disabling the site isolation trials because it is causing
