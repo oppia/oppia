@@ -25,6 +25,7 @@ import {
 } from 'domain/classroom/classroom-backend-api.service';
 import {LoaderService} from 'services/loader.service';
 import {AppConstants} from 'app.constants';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-classrooms-page',
@@ -33,8 +34,6 @@ import {AppConstants} from 'app.constants';
 export class ClassroomsPageComponent {
   classroomSummaries: ClassroomSummaryDict[] = [];
   haveAtleastOnePrivateClassroom: boolean = false;
-  publicClassroomCount: number = 0;
-  singlePublicClassroomUrlFragment: string = '';
   privateClassroomSummary: ClassroomSummaryDict = {
     classroom_id: '',
     name: '',
@@ -51,8 +50,13 @@ export class ClassroomsPageComponent {
     private classroomBackendApiService: ClassroomBackendApiService,
     private alertsService: AlertsService,
     private loaderService: LoaderService,
-    private router: Router
+    private router: Router,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
@@ -60,21 +64,21 @@ export class ClassroomsPageComponent {
     this.classroomBackendApiService
       .getAllClassroomsSummaryAsync()
       .then(data => {
+        let singlePublicClassroomUrlFragment = '';
+        let publicClassroomCount = 0;
         this.classroomSummaries = data;
         for (let i = 0; i < this.classroomSummaries.length; i++) {
           if (this.classroomSummaries[i].is_published) {
-            this.publicClassroomCount += 1;
-            this.singlePublicClassroomUrlFragment =
+            publicClassroomCount += 1;
+            singlePublicClassroomUrlFragment =
               this.classroomSummaries[i].url_fragment;
           } else {
             this.haveAtleastOnePrivateClassroom = true;
           }
         }
 
-        if (this.publicClassroomCount === 1) {
-          this.router.navigate([
-            `/learn/${this.singlePublicClassroomUrlFragment}`,
-          ]);
+        if (publicClassroomCount === 1) {
+          this.router.navigate([`/learn/${singlePublicClassroomUrlFragment}`]);
         } else {
           this.loaderService.hideLoadingScreen();
         }

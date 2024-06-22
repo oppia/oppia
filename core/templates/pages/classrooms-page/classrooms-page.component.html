@@ -3,11 +3,13 @@
     <div class="classrooms-breadcrumbs">
       <div class="desktop-breadcrumbs">
         <a href="/">Home</a>
-        <i class="fa fa-angle-right"></i>
+        <i class="fa fa-angle-right" *ngIf="!isLanguageRTL()"></i>
+        <i class="fa fa-angle-left" *ngIf="isLanguageRTL()"></i>
         <span>Classrooms</span>
       </div>
       <div class="mobile-breadcrumbs">
-        <i class="fa fa-angle-left"></i>
+        <i class="fa fa-angle-left" *ngIf="!isLanguageRTL()"></i>
+        <i class="fa fa-angle-right" *ngIf="isLanguageRTL()"></i>
         <a href="/">Back to Home</a>
       </div>
     </div>
@@ -210,6 +212,14 @@
     flex-direction: column;
   }
 
+  .oppia-classrooms-search-container .oppia-classrooms-search-section .search-box-text-container {
+    align-items: start;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 5px;
+    width: 100%;
+  }
+
   .oppia-classrooms-search-container .search-box-text-container .classrooms-page-search-heading {
     color: #00645c;
     font-family: 'Roboto', Arial, sans-serif;
@@ -266,6 +276,10 @@
 
     .breadcrumbs-container .classrooms-breadcrumbs .desktop-breadcrumbs {
       display: none;
+    }
+
+    .oppia-classrooms-search-container .oppia-classrooms-search-section .search-box-text-container {
+      align-items: center;
     }
   }
 

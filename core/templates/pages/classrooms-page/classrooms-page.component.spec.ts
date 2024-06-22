@@ -25,7 +25,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -36,6 +36,12 @@ import {Router} from '@angular/router';
 class MockCapitalizePipe {
   transform(input: string): string {
     return input;
+  }
+}
+
+class MockI18nLanguageCodeService {
+  isCurrentLanguageRTL() {
+    return true;
   }
 }
 
@@ -51,6 +57,7 @@ describe('Classroom Page Component', () => {
   let classroomBackendApiService: ClassroomBackendApiService;
   let alertsService: AlertsService;
   let router: Router;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -64,10 +71,15 @@ describe('Classroom Page Component', () => {
         },
         ClassroomBackendApiService,
         {provide: Router, useClass: MockRouter},
+        {
+          provide: I18nLanguageCodeService,
+          useClass: MockI18nLanguageCodeService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     router = TestBed.inject(Router);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   }));
 
   beforeEach(() => {
@@ -152,7 +164,6 @@ describe('Classroom Page Component', () => {
         classroomBackendApiService.getAllClassroomsSummaryAsync
       ).toHaveBeenCalled();
       expect(component.haveAtleastOnePrivateClassroom).toBeTrue();
-      expect(component.publicClassroomCount).toEqual(0);
     })
   );
 
@@ -185,8 +196,14 @@ describe('Classroom Page Component', () => {
         classroomBackendApiService.getAllClassroomsSummaryAsync
       ).toHaveBeenCalled();
       expect(component.haveAtleastOnePrivateClassroom).toBeFalse();
-      expect(component.publicClassroomCount).toEqual(1);
       expect(navigateSpy).toHaveBeenCalledWith(['/learn/math']);
     })
   );
+
+  it('should get RTL language status correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    expect(component.isLanguageRTL()).toBeTrue();
+  });
 });

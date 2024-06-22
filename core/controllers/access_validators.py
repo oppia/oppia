@@ -101,16 +101,17 @@ class ClassroomsPageAccessValidationHandler(
             PageNotFoundException. No public classrooms are present.
         """
         classrooms = classroom_config_services.get_all_classrooms()
-        have_atleast_one_public_classroom = False
-        for classroom in classrooms:
-            if classroom.is_published:
-                have_atleast_one_public_classroom = True
-                break
+        has_public_classrooms = [
+            classroom for classroom in classrooms if classroom.is_published
+        ]
 
         if not feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value,
             user_id=self.user_id
-        ) or (not have_atleast_one_public_classroom and not constants.DEV_MODE):
+        ):
+            raise self.NotFoundException
+
+        if not (has_public_classrooms or constants.DEV_MODE):
             raise self.NotFoundException
 
 
