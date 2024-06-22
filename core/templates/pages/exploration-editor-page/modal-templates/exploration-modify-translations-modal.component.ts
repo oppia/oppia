@@ -32,6 +32,7 @@ import {
 import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 
 interface LanguageCodeToContentTranslations {
   [languageCode: string]: TranslatedContent;
@@ -53,6 +54,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     [languageCode: string]: boolean;
   } = {};
   translationsHaveLoaded: boolean = false;
+  interactionId?: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -63,7 +65,8 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     private entityTranslationsService: EntityTranslationsService,
     private changeListService: ChangeListService,
     private translationLanguageService: TranslationLanguageService,
-    private stateEditorService: StateEditorService
+    private stateEditorService: StateEditorService,
+    private stateInteractionIdService: StateInteractionIdService
   ) {
     super(ngbActiveModal);
   }
@@ -72,6 +75,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     this.explorationId = this.contextService.getExplorationId();
     this.explorationVersion =
       this.contextService.getExplorationVersion() as number;
+    this.interactionId = this.stateInteractionIdService.savedMemento;
 
     // Populate the content translations via latest draft changes first,
     // in order to get the most recently updated translations.
@@ -174,6 +178,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
       subheading: 'Update Translation',
       textToTranslate: this.contentValue,
       currentContentTranslation: this.contentTranslations[languageCode],
+      interactionId: this.interactionId,
     };
     modalRef.componentInstance.modifyTranslationOpportunity =
       modifyTranslationOpportunity;
