@@ -1,5 +1,5 @@
 {
-  "VALID_ROOT_FILES": [
+  "RUN_NO_TESTS_ROOT_FILES": [
     "AUTHORS",
     "CONTRIBUTORS",
     ".github/CODEOWNERS",
