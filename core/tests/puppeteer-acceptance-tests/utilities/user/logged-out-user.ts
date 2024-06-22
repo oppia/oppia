@@ -404,7 +404,6 @@ export class LoggedOutUser extends BaseUser {
         aboutUrl,
         'About'
       );
-      showMessage('Clicked on the About Oppia button in the mobile sidebar.');
     } else {
       await this.clickOn(navbarAboutTab);
       await this.clickButtonToNavigateToNewPage(
