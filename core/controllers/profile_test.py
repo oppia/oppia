@@ -1168,7 +1168,7 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
                     'email': 'email@example.com',
                     'tag': 'Web',
                     'name': 'Name'
-                }, csrf_token=csrf_token, expected_status_int=500)
+                }, csrf_token=csrf_token, expected_status_int=405)
 
         self.logout()
 
