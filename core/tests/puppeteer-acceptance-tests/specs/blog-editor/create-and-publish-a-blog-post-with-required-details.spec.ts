@@ -38,9 +38,7 @@ describe('Blog Editor', function () {
     'should create and publish a blog post with thumbnail, title, body and tags.',
     async function () {
       await blogPostEditor.navigateToBlogDashboardPage();
-      await blogPostEditor.publishNewBlogPostWithTitle(
-        'This is a test blog post'
-      );
+      await blogPostEditor.publishNewBlogPost('This is a test blog post');
       await blogPostEditor.navigateToPublishTab();
       await blogPostEditor.expectPublishedBlogPostWithTitleToBePresent(
         'This is a test blog post'
