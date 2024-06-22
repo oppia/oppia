@@ -357,6 +357,55 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
 
         self.logout()
 
+    def test_should_raise_error_if_image_data_is_invalid(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        classroom_handler_url = '%s/%s' % (
+            feconf.CLASSROOM_HANDLER_URL, self.physics_classroom_id)
+        csrf_token = self.get_new_csrf_token()
+
+        self.physics_classroom_dict['thumbnail_data']['filename'] = ''
+
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None
+        ) as f:
+            raw_thumbnail_image = f.read()
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_banner_image = f.read()
+        params = {'payload': json.dumps({
+            'classroom_dict': self.physics_classroom_dict
+        })}
+        params['csrf_token'] = csrf_token
+        thumbnail = (
+            'thumbnail_image', 'thumbnail_filename1', raw_thumbnail_image)
+        banner = ('banner_image', 'banner_filename1', raw_banner_image)
+        response = self._parse_json_response(self.testapp.put(
+                    classroom_handler_url,
+                    params=params, expect_errors=True,
+                    upload_files=[thumbnail, banner]
+        ), True)
+
+        self.assertEqual(
+            response['error'],
+            'No filename supplied'
+        )
+        self.physics_classroom_dict['thumbnail_data']['filename'] = 'new.svg'
+        self.physics_classroom_dict['banner_data']['filename'] = ''
+        response = self._parse_json_response(self.testapp.put(
+                    classroom_handler_url,
+                    params=params, expect_errors=True,
+                    upload_files=[thumbnail, banner]
+        ), True)
+
+        self.assertEqual(
+            response['error'],
+            'No filename supplied'
+        )
+        self.logout()
+
     def test_delete_classroom_data(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         classroom_handler_url = '%s/%s' % (
