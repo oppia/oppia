@@ -3033,19 +3033,29 @@ version: 1
                 self.assertIn(
                     http_method, ['POST', 'PUT', 'DELETE'])
 
-        http_method_map = {
-            'GET': self.testapp.get,
-            'POST': self.testapp.post,
-            'PUT': self.testapp.put,
-            'DELETE': self.testapp.delete
-        }
-
         # This swap is required to ensure that the templates are fetched from
         # source directory instead of webpack_bundles since webpack_bundles is
         # only produced after webpack compilation which is not performed during
         # backend tests.
         with self.swap(base, 'load_template', mock_load_template):
-            response = http_method_map[http_method](
+
+            if (http_method == 'GET'):
+                response = self.testapp.get(
+                url, params=params, expect_errors=True
+                )
+
+            elif (http_method == 'POST'):
+                response = self.testapp.post(
+                url, params=params, expect_errors=True
+                )
+
+            elif (http_method == 'PUT'):
+                response = self.testapp.put(
+                url, params=params, expect_errors=True
+                )
+
+            elif (http_method == 'DELETE'):
+                response = self.testapp.delete(
                 url, params=params, expect_errors=True
                 )
 
