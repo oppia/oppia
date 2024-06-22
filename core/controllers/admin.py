@@ -1596,13 +1596,13 @@ class AdminHandler(
         """
         assert self.user_id is not None
         if constants.DEV_MODE:
-            if (feconf.ROLE_ID_QUESTION_ADMIN not in self.user.roles
-                or not user_services.can_submit_question_suggestions(
-                    self.user_id)):
+            if ((feconf.ROLE_ID_QUESTION_ADMIN not in self.user.roles)
+                and (not user_services.can_submit_question_suggestions(
+                    self.user_id))):
                 raise Exception((
-                    'User "%s" must be a question submitter or question admin'
+                    'User \'%s\' must be a question submitter or question admin'
                     ' in order to generate question suggestions.'
-                ) % self.username)
+                    ) % self.username)
             for _ in range(num_dummy_question_suggestions_generate):
                 content_id_generator = translation_domain.ContentIdGenerator()
                 content_id_generator.generate(
@@ -1692,7 +1692,8 @@ class AdminHandler(
                     .update_question_contribution_stats_at_submission(
                         suggestion))
         else:
-            raise Exception('Cannot generate dummy skills in production.')
+            raise Exception(
+                'Cannot generate dummy question suggestion in production.')
 
 
 class AdminRoleHandlerNormalizedGetRequestDict(TypedDict):
