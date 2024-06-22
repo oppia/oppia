@@ -362,11 +362,11 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           if (changeDict.cmd === 'edit_translation') {
             // Create the entity translation objects first if they don't exist.
             if (
-              !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+              !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
                 changeDict.language_code
               )
             ) {
-              this.entityTranslationsService.languageCodeToEntityTranslations[
+              this.entityTranslationsService.languageCodeToLatestEntityTranslations[
                 changeDict.language_code
               ] = EntityTranslation.createFromBackendDict({
                 entity_id: this.explorationId,
@@ -378,7 +378,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
             }
 
             // Update the translations appropriately, via latest draft changes.
-            this.entityTranslationsService.languageCodeToEntityTranslations[
+            this.entityTranslationsService.languageCodeToLatestEntityTranslations[
               changeDict.language_code
             ].updateTranslation(
               changeDict.content_id,

@@ -15,6 +15,9 @@
       <span *ngIf="!showDiff">Show Changes</span>
       <span *ngIf="showDiff">Hide Changes</span>
     </button>
+    <button class="btn btn-secondary" (click)="showStateDiffModalForTranslations()">
+      <span>Show Translation Changes</span>
+    </button>
     <oppia-version-diff-visualization *ngIf="showDiff"
                                       [diffData]="diffData"
                                       [earlierVersionHeader]="earlierVersionHeader"

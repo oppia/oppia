@@ -76,9 +76,9 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     // Populate the content translations via latest draft changes first,
     // in order to get the most recently updated translations.
     for (let language in this.entityTranslationsService
-      .languageCodeToEntityTranslations) {
+      .languageCodeToLatestEntityTranslations) {
       let translationContent =
-        this.entityTranslationsService.languageCodeToEntityTranslations[
+        this.entityTranslationsService.languageCodeToLatestEntityTranslations[
           language
         ].getWrittenTranslation(this.contentId);
       if (translationContent) {
@@ -121,11 +121,11 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
             }
             // Initialize the entity translations object to track future draft changes.
             if (
-              !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+              !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
                 language
               )
             ) {
-              this.entityTranslationsService.languageCodeToEntityTranslations[
+              this.entityTranslationsService.languageCodeToLatestEntityTranslations[
                 language
               ] = EntityTranslation.createFromBackendDict({
                 entity_id: this.explorationId,
@@ -198,14 +198,22 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
           language,
           updatedTranslatedContent
         );
-        this.entityTranslationsService.languageCodeToEntityTranslations[
+        this.entityTranslationsService.languageCodeToLatestEntityTranslations[
           language
         ].updateTranslation(this.contentId, updatedTranslatedContent);
       } else {
+        const updatedTranslatedContent = new TranslatedContent(
+          this.contentTranslations[language].translation,
+          this.contentTranslations[language].dataFormat,
+          true
+        );
         this.changeListService.markTranslationAsNeedingUpdateForLanguage(
           this.contentId,
           language
         );
+        this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+          language
+        ].updateTranslation(this.contentId, updatedTranslatedContent);
       }
     }
     this.ngbActiveModal.close();

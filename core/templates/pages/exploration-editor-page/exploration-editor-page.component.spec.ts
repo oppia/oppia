@@ -946,7 +946,7 @@ describe('Exploration editor page component', () => {
         },
       });
       expect(
-        entityTranslationsService.languageCodeToEntityTranslations
+        entityTranslationsService.languageCodeToLatestEntityTranslations
       ).toEqual({});
 
       mockInitExplorationPageEmitter.emit();
@@ -961,7 +961,7 @@ describe('Exploration editor page component', () => {
       });
 
       expect(
-        entityTranslationsService.languageCodeToEntityTranslations
+        entityTranslationsService.languageCodeToLatestEntityTranslations
       ).toEqual({
         fr: entityTranslation,
       });

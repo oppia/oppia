@@ -125,7 +125,7 @@ describe('State Translation Editor Component', () => {
       translationTabActiveContentIdService,
       'onActiveContentIdChanged'
     ).and.returnValue(mockActiveLanguageIdChangedEventEmitter);
-    entityTranslationsService.languageCodeToEntityTranslations = {
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {
       hi: EntityTranslation.createFromBackendDict({
         entity_id: 'id',
         entity_type: 'type',

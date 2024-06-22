@@ -115,14 +115,14 @@ describe('Entity translations service', () => {
     expect(failHandler).not.toHaveBeenCalled();
 
     expect(
-      entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+      entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         'hi'
       )
     ).toBeTrue();
     entityTranslationsService.reset();
 
     expect(
-      entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+      entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         'hi'
       )
     ).not.toBeTrue();
@@ -133,7 +133,7 @@ describe('Entity translations service', () => {
     var failHandler = jasmine.createSpy('fail');
 
     entityTranslationsService.init('entity1', 'exploration', 5);
-    entityTranslationsService.languageCodeToEntityTranslations.hi =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       entityTranslation;
 
     entityTranslationsService
@@ -146,7 +146,7 @@ describe('Entity translations service', () => {
   }));
 
   it('should return correct html for given contentIds', () => {
-    entityTranslationsService.languageCodeToEntityTranslations.hi =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       entityTranslation;
 
     const htmlData = entityTranslationsService.getHtmlTranslations('hi', [
@@ -159,7 +159,7 @@ describe('Entity translations service', () => {
   });
 
   it('should return empty list for translation not available in language', () => {
-    entityTranslationsService.languageCodeToEntityTranslations.hi =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       entityTranslation;
 
     const htmlData = entityTranslationsService.getHtmlTranslations('ar', [

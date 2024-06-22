@@ -153,7 +153,7 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
     };
 
     const entityTranslations =
-      this.entityTranslationsService.languageCodeToEntityTranslations[
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         this.languageCode
       ];
     if (entityTranslations) {
@@ -179,7 +179,7 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
       this.languageCode,
       this.activeWrittenTranslation
     );
-    this.entityTranslationsService.languageCodeToEntityTranslations[
+    this.entityTranslationsService.languageCodeToLatestEntityTranslations[
       this.languageCode
     ].updateTranslation(this.contentId, this.activeWrittenTranslation);
 

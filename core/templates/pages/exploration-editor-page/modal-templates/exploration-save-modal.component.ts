@@ -18,10 +18,15 @@
 
 import {Component, Input} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbActiveModal,
+  NgbModal,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {AppConstants} from 'app.constants';
 import {DiffNodeData} from 'components/version-diff-visualization/version-diff-visualization.component';
+import {StateDiffModalComponent} from './state-diff-modal.component';
 
 @Component({
   selector: 'oppia-exploration-save-modal',
@@ -34,18 +39,45 @@ export class ExplorationSaveModalComponent extends ConfirmOrCancelModal {
   showDiff: boolean = false;
   MAX_COMMIT_MESSAGE_LENGTH = String(AppConstants.MAX_COMMIT_MESSAGE_LENGTH);
 
+  STATE_PROPERTY_ADDED: string = 'added';
+  STATE_PROPERTY_DELETED: string = 'deleted';
+  STATE_PROPERTY_CHANGED: string = 'changed';
+  STATE_PROPERTY_UNCHANGED: string = 'unchanged';
+
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() isExplorationPrivate!: boolean;
   @Input() diffData!: DiffNodeData;
 
-  constructor(private ngbActiveModal: NgbActiveModal) {
+  constructor(
+    private ngbActiveModal: NgbActiveModal,
+    private ngbModal: NgbModal
+  ) {
     super(ngbActiveModal);
   }
 
   onClickToggleDiffButton(): void {
     this.showDiff = !this.showDiff;
+  }
+
+  showStateDiffModalForTranslations(): void {
+    let modalRef: NgbModalRef = this.ngbModal.open(StateDiffModalComponent, {
+      backdrop: true,
+      windowClass: 'state-diff-modal',
+      size: 'xl',
+    });
+
+    modalRef.componentInstance.showingTranslationChanges = true;
+    modalRef.componentInstance.headers = {
+      leftPane: this.earlierVersionHeader,
+      rightPane: this.laterVersionHeader,
+    };
+
+    modalRef.result.then(
+      () => {},
+      () => {}
+    );
   }
 }
 
