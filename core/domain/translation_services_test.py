@@ -326,8 +326,8 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         entity_translation_model = entity_translation_models[0]
         self.assertEqual(entity_translation_model.entity_version, 5)
         self.assertEqual([
-            t['needs_update']
-            for t in entity_translation_model.translations.values()
+            translation['needs_update']
+            for translation in entity_translation_model.translations.values()
         ], [False, False])
 
         self.exp.version = 6
@@ -347,8 +347,8 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         entity_translation = entity_translation_models[0]
         self.assertItemsEqual(
             [
-                t['needs_update']
-                for t in entity_translation.translations.values()
+                translation['needs_update']
+                for translation in entity_translation.translations.values()
             ], [False, True]
         )
 
