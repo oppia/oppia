@@ -18,6 +18,7 @@
 
 import {ENTER} from '@angular/cdk/keycodes';
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Output,
@@ -43,8 +44,8 @@ import {LoaderService} from 'services/loader.service';
   templateUrl: './admin-misc-tab.component.html',
 })
 export class AdminMiscTabComponent {
-  @ViewChild('userInputToAddUserToGroup') userInputToAddUserToGroup!: (
-    ElementRef<HTMLInputElement>);
+  @ViewChild('userInputToAddUserToGroup')
+  userInputToAddUserToGroup!: ElementRef<HTMLInputElement>;
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
   DATA_EXTRACTION_QUERY_HANDLER_URL: string =
     '/explorationdataextractionhandler';
@@ -79,17 +80,19 @@ export class AdminMiscTabComponent {
   explorationInteractionIds: string[] = [];
   directiveSubscriptions = new Subscription();
   loadingMessage: string = '';
-  selectedUserGroup: string = '';
   newUserGroupName: string = '';
   separatorKeysCodes: number[] = [ENTER];
   userGroupToUsersMapBackup: Record<string, string[]> = {};
   userGroupsToUsers: Record<string, string[]> = {};
+  userGroupIdsToDetailsShowRecord: Record<string, boolean> = {};
+  allUsersUsernames: string[] = [];
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
     private adminDataService: AdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
     private alertsService: AlertsService,
+    private changeDetectorRef: ChangeDetectorRef,
     private windowRef: WindowRef,
     private loaderService: LoaderService
   ) {}
@@ -97,62 +100,62 @@ export class AdminMiscTabComponent {
   async fetchUserGroupData(): Promise<void> {
     const data = await this.adminDataService.getDataAsync();
     this.userGroupsToUsers = data.userGroups;
+    this.allUsersUsernames = data.allUsersUsernames;
     this.userGroupToUsersMapBackup = cloneDeep(this.userGroupsToUsers);
+    for (let userGroup in this.userGroupsToUsers) {
+      this.userGroupIdsToDetailsShowRecord[userGroup] = false;
+    }
     this.loaderService.hideLoadingScreen();
   }
 
-  resetUserGroups(): void {
-    if (this.areUserGroupsUpdated()) {
-      if (
-        !this.windowRef.nativeWindow.confirm(
-          'This will revert all changes you made. Are you sure?'
-        )
-      ) {
-        return;
+  toggleUserGroupDetailsSection(userGroupId: string): void {
+    let currentValue = this.userGroupIdsToDetailsShowRecord[userGroupId];
+    this.userGroupIdsToDetailsShowRecord[userGroupId] =
+      currentValue === true ? false : true;
+    for (let useGroup in this.userGroupIdsToDetailsShowRecord) {
+      if (useGroup === userGroupId) {
+        continue;
       }
-      this.userGroupsToUsers = cloneDeep(this.userGroupToUsersMapBackup);
+      this.userGroupIdsToDetailsShowRecord[useGroup] = false;
     }
   }
 
-  areUserGroupsUpdated(): boolean {
-    return !isEqual(this.userGroupsToUsers, this.userGroupToUsersMapBackup);
+  deleteUserGroup(userGroupId: string): void {
+    delete this.userGroupsToUsers[userGroupId];
+    delete this.userGroupIdsToDetailsShowRecord[userGroupId];
   }
 
-  getUserGroups(): string[] {
-    let userGroups: string[] = [];
-    for (let key in this.userGroupsToUsers) {
-      userGroups.push(key);
-    }
-    return userGroups;
+  removeUserFromUserGroup(userGroupId: string, username: string): void {
+    let usersOfSelectedUserGroup: string[] =
+      this.userGroupsToUsers[userGroupId];
+    this.userGroupsToUsers[userGroupId] = usersOfSelectedUserGroup.filter(
+      obj => obj !== username
+    );
   }
 
-  addUserToSelectedGroup(event: {value: string}): void {
+  addUserToUserGroup(event: {value: string}, userGroupId: string): void {
     const value = (event.value || '').trim();
     if (!value || value === '') {
       return;
     }
 
-    if (this.userGroupsToUsers[this.selectedUserGroup].includes(value)) {
+    if (this.userGroupsToUsers[userGroupId].includes(value)) {
       this.alertsService.addWarning(
         `The user ${value} already exists in the user ` +
-          `group ${this.selectedUserGroup}.`
+          `group ${userGroupId}.`
       );
+      this.changeDetectorRef.detectChanges();
       return;
     }
-    this.userGroupsToUsers[this.selectedUserGroup].push(value);
+    if (!this.allUsersUsernames.includes(value)) {
+      this.alertsService.addWarning(
+        `The user with username ${value} does not exists.`
+      );
+      this.changeDetectorRef.detectChanges();
+      return;
+    }
+    this.userGroupsToUsers[userGroupId].push(value);
     this.userInputToAddUserToGroup.nativeElement.value = '';
-  }
-
-  removeUserFromSelectedGroup(username: string): void {
-    let usersOfSelectedUserGroup: string[] =
-      this.userGroupsToUsers[this.selectedUserGroup];
-    this.userGroupsToUsers[this.selectedUserGroup] =
-      usersOfSelectedUserGroup.filter(obj => obj !== username);
-  }
-
-  removeUserGroup(): void {
-    delete this.userGroupsToUsers[this.selectedUserGroup];
-    this.selectedUserGroup = '';
   }
 
   addUserGroup(): void {
@@ -160,21 +163,20 @@ export class AdminMiscTabComponent {
       this.alertsService.addWarning(
         `The user group ${this.newUserGroupName} already exists.`
       );
+      this.changeDetectorRef.detectChanges();
       return;
     }
 
     if (this.newUserGroupName.trim() !== '') {
       this.userGroupsToUsers[this.newUserGroupName.trim()] = [];
-      this.selectedUserGroup = this.newUserGroupName.trim();
+      this.userGroupIdsToDetailsShowRecord[this.newUserGroupName.trim()] =
+        false;
       this.newUserGroupName = '';
     }
   }
 
-  getUsersForSelectedUserGroup(): string[] {
-    if (this.selectedUserGroup in this.userGroupsToUsers) {
-      return this.userGroupsToUsers[this.selectedUserGroup];
-    }
-    return [];
+  areUserGroupsUpdated(): boolean {
+    return !isEqual(this.userGroupsToUsers, this.userGroupToUsersMapBackup);
   }
 
   updateUserGroups(): void {
@@ -205,6 +207,23 @@ export class AdminMiscTabComponent {
           this.adminTaskManagerService.finishTask();
         }
       );
+  }
+
+  resetUserGroups(): void {
+    if (this.areUserGroupsUpdated()) {
+      if (
+        !this.windowRef.nativeWindow.confirm(
+          'This will revert all changes you made. Are you sure?'
+        )
+      ) {
+        return;
+      }
+      this.userGroupsToUsers = cloneDeep(this.userGroupToUsersMapBackup);
+      this.userGroupIdsToDetailsShowRecord = {};
+      for (let userGroup in this.userGroupsToUsers) {
+        this.userGroupIdsToDetailsShowRecord[userGroup] = false;
+      }
+    }
   }
 
   clearSearchIndex(): void {

@@ -2233,6 +2233,16 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'invalid_user_id', 'exp_1', strict=True
             )
 
+    def test_returns_list_of_all_users_usernames(self) -> None:
+        self.signup('user1@email.com', 'user1')
+        self.signup('user2@email.com', 'user2')
+        self.signup('user3@email.com', 'user3')
+        self.signup('user4@email.com', 'user4')
+        # Count is 5 as one user already exists which is tmpsuperadm1n.
+        self.assertEqual(
+            len(user_services.get_all_users_usernames()), 5
+        )
+
 
 class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
     """Tests whether user checkpoint progress is updated correctly"""

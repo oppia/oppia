@@ -308,53 +308,52 @@
 </mat-card>
 
 <mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
-  <h3>Update UserGroup model</h3>
-  <div class="row">
-    <div class="col-2">UserGroup:</div>
-    <div class="col-10">
-      <ng-container>
-        <select class="oppia-admin-page-ele-margin" [(ngModel)]="selectedUserGroup">
-          <ng-container *ngFor="let userGroup of getUserGroups()">
-            <option [value]="userGroup">
-              {{userGroup}}
-            </option>
-          </ng-container>
-        </select>
-      </ng-container>
-      <button class="oppia-admin-page-ele-margin" (click)="removeUserGroup()">
-        x
-      </button>
-      <input class="oppia-admin-page-ele-margin" placeholder="Add UserGroup"
-             type="text"
-             [(ngModel)]="newUserGroupName"
-             [ngModelOptions]="{standalone: true}">
-      <button (click)="addUserGroup()">
-        +
-      </button>
+  <h3>Update UserGroups</h3>
+  <div>
+    <div *ngFor="let userGroup of userGroupIdsToDetailsShowRecord | keyvalue">
+      <div class="oppia-user-group" (click)="toggleUserGroupDetailsSection(userGroup.key)">
+        {{ userGroup.key }}
+        <button mat-button matSuffix mat-icon-button
+                aria-label="Clear"
+                (click)="deleteUserGroup(userGroup.key)">
+          <mat-icon matListIcon>close</mat-icon>
+        </button>
+      </div>
+      <div class="user-group-details" *ngIf="userGroup.value">
+        <div class="row">
+          <div class="col-2">Users:</div>
+          <div class="col-10">
+            <mat-chip-list #chipList aria-label="Users Associated With The User Group" tabindex="0">
+              <mat-chip *ngFor="let user of userGroupsToUsers[userGroup.key]"
+                        [selectable]="true"
+                        [removable]="true"
+                        (removed)="removeUserFromUserGroup(userGroup.key, user)">
+                <ng-container>
+                  <span tabindex="0" [attr.aria-label]="user+', selected'">{{ user }}</span>
+                </ng-container>
+                <button class="oppia-cancel-button" role="button" tabindex="0" matChipRemove aria-label=". Remove">
+                  <mat-icon class="oppia-cancel-button-text">cancel</mat-icon>
+                </button>
+              </mat-chip>
+              <input placeholder="Add Username"
+                     #userInputToAddUserToGroup
+                     [matChipInputFor]="chipList"
+                     [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                     (matChipInputTokenEnd)="addUserToUserGroup($event, userGroup.key)">
+            </mat-chip-list>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-2">Users:</div>
-    <div class="col-10">
-      <mat-chip-list #chipList aria-label="Users Associated With Selected User Group" tabindex="0">
-        <mat-chip *ngFor="let user of getUsersForSelectedUserGroup()"
-                  [selectable]="true"
-                  [removable]="true"
-                  (removed)="removeUserFromSelectedGroup(user)">
-          <ng-container>
-            <span tabindex="0" [attr.aria-label]="user+', selected'">{{ user }}</span>
-          </ng-container>
-          <button class="oppia-cancel-button" role="button" tabindex="0" matChipRemove aria-label=". Remove">
-            <mat-icon class="oppia-cancel-button-text">cancel</mat-icon>
-          </button>
-        </mat-chip>
-        <input placeholder="Add Username"
-               #userInputToAddUserToGroup
-               [matChipInputFor]="chipList"
-               [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-               (matChipInputTokenEnd)="addUserToSelectedGroup($event)">
-      </mat-chip-list>
-    </div>
+  <div class="oppia-add-user-group">
+    <input placeholder="New UserGroup Name"
+           type="text"
+           [(ngModel)]="newUserGroupName"
+           [ngModelOptions]="{standalone: true}">
+    <button (click)="addUserGroup()">
+      + Add New UserGroup
+    </button>
   </div>
   <div class="row">
     <div class="col-1">
@@ -367,6 +366,24 @@
 </mat-card>
 
 <style>
+  .oppia-user-group {
+    align-items: center;
+    background: #e0f2f1;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 20px;
+    padding: 10px;
+    width: 94%;
+  }
+  .oppia-add-user-group {
+    margin: 10px 20px;
+    padding: 10px;
+  }
+  .user-group-details {
+    margin: 10px 20px;
+    padding: 0 15px;
+  }
   .oppia-admin-page-card {
     max-width: 700px
   }

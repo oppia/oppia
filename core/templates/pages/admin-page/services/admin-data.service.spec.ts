@@ -99,6 +99,16 @@ describe('Admin Data Service', () => {
       UserGroup2: ['User4', 'User5'],
       UserGroup3: ['User6', 'User7', 'User8'],
     },
+    all_users_usernames: [
+      'User1',
+      'User2',
+      'User3',
+      'User4',
+      'User5',
+      'User6',
+      'User7',
+      'User8',
+    ],
   };
   let adminDataResponse: AdminPageData;
 
@@ -124,6 +134,7 @@ describe('Admin Data Service', () => {
         PlatformParameter.createFromBackendDict(dict)
       ),
       userGroups: sampleAdminData.user_group_models_dict,
+      allUsersUsernames: sampleAdminData.all_users_usernames,
     };
   });
 

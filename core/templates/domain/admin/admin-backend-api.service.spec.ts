@@ -101,6 +101,16 @@ describe('Admin backend api service', () => {
       UserGroup2: ['User4', 'User5'],
       UserGroup3: ['User6', 'User7', 'User8'],
     },
+    all_users_usernames: [
+      'User1',
+      'User2',
+      'User3',
+      'User4',
+      'User5',
+      'User6',
+      'User7',
+      'User8',
+    ],
   };
   let adminDataObject: AdminPageData;
 
@@ -129,6 +139,7 @@ describe('Admin backend api service', () => {
         PlatformParameter.createFromBackendDict(dict)
       ),
       userGroups: adminBackendResponse.user_group_models_dict,
+      allUsersUsernames: adminBackendResponse.all_users_usernames,
     };
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {

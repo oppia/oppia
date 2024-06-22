@@ -87,6 +87,23 @@ describe('Admin misc tab component ', () => {
       UserGroup3: ['User6', 'User7', 'User8'],
       UserGroup9: ['User12', 'User13'],
     },
+    allUsersUsernames: [
+      'User1',
+      'User2',
+      'User3',
+      'User4',
+      'User5',
+      'User6',
+      'User7',
+      'User8',
+      'User9',
+      'User10',
+      'User11',
+      'User12',
+      'User13',
+      'User14',
+      'User15',
+    ],
   };
 
   beforeEach(() => {
@@ -908,8 +925,7 @@ describe('Admin misc tab component ', () => {
         expect(statusMessageSpy).toHaveBeenCalledWith(
           'UserGroups successfully updated.'
         );
-        component.selectedUserGroup = 'UserGroup5';
-        component.removeUserGroup();
+        component.deleteUserGroup('UserGroup5');
       }));
 
       it('should not update in case of backend error', fakeAsync(() => {
@@ -929,9 +945,8 @@ describe('Admin misc tab component ', () => {
         } as ElementRef;
 
         component.newUserGroupName = 'UserGroup5';
-        component.selectedUserGroup = 'UserGroup5';
         component.addUserGroup();
-        component.addUserToSelectedGroup({value: 'User'});
+        component.addUserToUserGroup({value: 'User'}, 'UserGroup5');
         component.updateUserGroups();
         tick();
 
@@ -939,7 +954,7 @@ describe('Admin misc tab component ', () => {
         expect(statusMessageSpy).toHaveBeenCalledWith(
           'Server error: Internal Server Error.'
         );
-        component.removeUserGroup();
+        component.deleteUserGroup('UserGroup5');
       }));
 
       it('should not update if a task is still running in the queue', fakeAsync(() => {
@@ -976,49 +991,16 @@ describe('Admin misc tab component ', () => {
         } as ElementRef;
 
         component.newUserGroupName = 'UserGroup5';
-        component.selectedUserGroup = 'UserGroup5';
         component.addUserGroup();
-        component.addUserToSelectedGroup({value: 'User10'});
-        component.addUserToSelectedGroup({value: 'User12'});
+        component.addUserToUserGroup({value: 'User10'}, 'UserGroup5');
+        component.addUserToUserGroup({value: 'User12'}, 'UserGroup5');
         component.updateUserGroups();
         tick();
 
         expect(updateUserGroupSpy).not.toHaveBeenCalled();
-        component.removeUserGroup();
+        component.deleteUserGroup('UserGroup5');
       }));
     });
-
-    describe('when getting users for the selected user groups', () => {
-      it('should return users for the selected user group', fakeAsync(() => {
-        component.ngOnInit();
-        tick();
-
-        component.selectedUserGroup = 'UserGroup9';
-        const users = component.getUsersForSelectedUserGroup();
-
-        expect(users).toEqual(['User12', 'User13']);
-      }));
-
-      it('should return empty array when user group is not present', fakeAsync(() => {
-        component.ngOnInit();
-        tick();
-        component.selectedUserGroup = '';
-        const users = component.getUsersForSelectedUserGroup();
-
-        expect(users).toEqual([]);
-      }));
-    });
-
-    it('should get the array of all the user groups', fakeAsync(() => {
-      component.ngOnInit();
-      tick();
-
-      const userGroups = component.getUserGroups();
-
-      expect(userGroups.length).toEqual(
-        Object.keys(component.userGroupsToUsers).length
-      );
-    }));
 
     it('should check if any updates are made to user groups', fakeAsync(() => {
       component.ngOnInit();
@@ -1027,8 +1009,7 @@ describe('Admin misc tab component ', () => {
       component.addUserGroup();
 
       expect(component.areUserGroupsUpdated()).toBeTrue();
-      component.selectedUserGroup = 'UserGroup4';
-      component.removeUserGroup();
+      component.deleteUserGroup('UserGroup4');
     }));
 
     describe('when resetting the edited user groups', () => {
@@ -1085,8 +1066,7 @@ describe('Admin misc tab component ', () => {
         component.ngOnInit();
         tick();
 
-        component.selectedUserGroup = 'UserGroup1';
-        component.addUserToSelectedGroup({value: ''});
+        component.addUserToUserGroup({value: ''}, 'UserGroup1');
 
         expect(component.userGroupsToUsers.UserGroup1.includes('')).toBeFalse();
       }));
@@ -1101,13 +1081,12 @@ describe('Admin misc tab component ', () => {
           },
         } as ElementRef;
 
-        component.selectedUserGroup = 'UserGroup1';
-        component.addUserToSelectedGroup({value: 'User11'});
+        component.addUserToUserGroup({value: 'User11'}, 'UserGroup1');
 
         expect(
           component.userGroupsToUsers.UserGroup1.includes('User11')
         ).toBeTrue();
-        component.removeUserFromSelectedGroup('User9');
+        component.removeUserFromUserGroup('UserGroup1', 'User9');
       }));
 
       it('should not add the user if it already exists', fakeAsync(() => {
@@ -1121,8 +1100,23 @@ describe('Admin misc tab component ', () => {
         } as ElementRef;
         let alertServiceSpyon = spyOn(alertsService, 'addWarning');
 
-        component.selectedUserGroup = 'UserGroup1';
-        component.addUserToSelectedGroup({value: 'User1'});
+        component.addUserToUserGroup({value: 'User1'}, 'UserGroup1');
+
+        expect(alertServiceSpyon).toHaveBeenCalled();
+      }));
+
+      it('should not add user if username does not exists', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+
+        component.userInputToAddUserToGroup = {
+          nativeElement: {
+            value: '',
+          },
+        } as ElementRef;
+        let alertServiceSpyon = spyOn(alertsService, 'addWarning');
+
+        component.addUserToUserGroup({value: 'User'}, 'UserGroup1');
 
         expect(alertServiceSpyon).toHaveBeenCalled();
       }));
@@ -1131,8 +1125,7 @@ describe('Admin misc tab component ', () => {
     it('should remove the selected user group when requested', fakeAsync(() => {
       component.ngOnInit();
       tick();
-      component.selectedUserGroup = 'UserGroup3';
-      component.removeUserGroup();
+      component.deleteUserGroup('UserGroup3');
 
       expect('UserGroup3' in component.userGroupsToUsers).toBeFalse();
     }));
@@ -1140,12 +1133,21 @@ describe('Admin misc tab component ', () => {
     it('should remove user from user group when requested', fakeAsync(() => {
       component.ngOnInit();
       tick();
-      component.selectedUserGroup = 'UserGroup2';
-      component.removeUserFromSelectedGroup('User5');
+      component.removeUserFromUserGroup('UserGroup2', 'User5');
 
       expect(
         component.userGroupsToUsers.UserGroup2.includes('User5')
       ).toBeFalse();
+    }));
+
+    it('should toggle the user group detail section', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+
+      expect(component.userGroupIdsToDetailsShowRecord.UserGroup1).toBeFalse();
+
+      component.toggleUserGroupDetailsSection('UserGroup1');
+      expect(component.userGroupIdsToDetailsShowRecord.UserGroup1).toBeTrue();
     }));
 
     describe('when adding a new user group', () => {

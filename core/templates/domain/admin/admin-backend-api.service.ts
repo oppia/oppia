@@ -83,6 +83,7 @@ export interface AdminPageDataBackendDict {
   topic_summaries: CreatorTopicSummaryBackendDict[];
   platform_params_dicts: PlatformParameterBackendDict[];
   user_group_models_dict: Record<string, string[]>;
+  all_users_usernames: string[];
 }
 
 export interface AdminPageData {
@@ -96,6 +97,7 @@ export interface AdminPageData {
   topicSummaries: CreatorTopicSummary[];
   platformParameters: PlatformParameter[];
   userGroups: Record<string, string[]>;
+  allUsersUsernames: string[];
 }
 
 export interface ExplorationInteractionIdsBackendResponse {
@@ -133,6 +135,7 @@ export class AdminBackendApiService {
                 PlatformParameter.createFromBackendDict(dict)
               ),
               userGroups: response.user_group_models_dict,
+              allUsersUsernames: response.all_users_usernames,
             });
           },
           errorResponse => {

@@ -1433,6 +1433,19 @@ def set_username(user_id: str, new_username: str) -> None:
     save_user_settings(user_settings)
 
 
+def get_all_users_usernames() -> List[str]:
+    """Returns list of all users usernames.
+
+    Returns:
+        List[str]. List containing usernames of all the users.
+    """
+    all_user_models = user_models.UserSettingsModel.get_all()
+    all_users_usernames = []
+    for user_model in all_user_models:
+        all_users_usernames.append(user_model.normalized_username)
+    return all_users_usernames
+
+
 def record_agreement_to_terms(user_id: str) -> None:
     """Records that the user with given user_id has agreed to the license terms.
 
