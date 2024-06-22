@@ -3041,7 +3041,7 @@ version: 1
 
             if http_method == 'GET':
                 response = self.testapp.get(
-                url, params=params, expect_errors=True
+                    url, params=params, expect_errors=True
                 )
 
             elif http_method == 'POST':
