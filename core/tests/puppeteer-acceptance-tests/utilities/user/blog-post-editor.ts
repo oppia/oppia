@@ -154,7 +154,7 @@ export class BlogPostEditor extends BaseUser {
    * This function publishes a blog post with given title.
    */
   async publishNewBlogPost(newBlogPostTitle: string): Promise<void> {
-    await this.navigateToBlogEditorPage();
+    await this.openBlogEditorPage();
     await this.uploadBlogPostThumbnailImage();
     await this.expectPublishButtonToBeDisabled();
 
@@ -169,7 +169,7 @@ export class BlogPostEditor extends BaseUser {
   /**
    * This function navigates to the blog editor page.
    */
-  async navigateToBlogEditorPage(): Promise<void> {
+  async openBlogEditorPage(): Promise<void> {
     await this.addUserBioInBlogDashboard();
     await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
     await this.expectPublishButtonToBeDisabled();

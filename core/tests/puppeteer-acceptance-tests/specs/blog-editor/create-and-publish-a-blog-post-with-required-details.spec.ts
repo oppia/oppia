@@ -56,7 +56,7 @@ describe('Blog Editor', function () {
     'should not create an empty blog post.',
     async function () {
       await blogPostEditor.navigateToBlogDashboardPage();
-      await blogPostEditor.navigateToBlogEditorPage();
+      await blogPostEditor.openBlogEditorPage();
       await blogPostEditor.updateTitleTo('');
       await blogPostEditor.updateBodyTextTo('');
       await blogPostEditor.expectPublishButtonToBeDisabled();
