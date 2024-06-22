@@ -27,6 +27,8 @@ const aboutUrl = testConstants.URLs.About;
 const androidUrl = testConstants.URLs.Android;
 const blogPostUrlinPartnershipsPage =
   testConstants.URLs.BlogPostUrlInPartnershipsPage;
+const creatorDashboardCreateModeUrl =
+  testConstants.URLs.CreatorDashboardCreateMode;
 const blogUrl = testConstants.URLs.Blog;
 const ccLicenseUrl = testConstants.URLs.CCLicense;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
@@ -36,6 +38,18 @@ const desktopWatchAVideoUrl = testConstants.URLs.DesktopExternalLinkWatchAVideo;
 const donateUrl = testConstants.URLs.Donate;
 const electromagnetismUrl = testConstants.URLs.Electromagnetism;
 const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
+const creatorGuidelinesUrl = testConstants.URLs.CreatorGuidelines;
+const googleGroupsOppiaUrl = testConstants.URLs.GoogleGroups.Oppia;
+const googleGroupsOppiaAnnouceUrl =
+  testConstants.URLs.GoogleGroups.OppiaAnnounce;
+const allAboutCookiesUrl = testConstants.URLs.ExternalLink.AboutCookies;
+const googleAnalyticsPartnerPoliciesUrl =
+  testConstants.URLs.GoogleAnalytics.PartnerPolicies;
+const googleAnalyticsOptOutUrl = testConstants.URLs.GoogleAnalytics.OptOut;
+const CreativeCommonsLegalCodeUrl =
+  testConstants.URLs.ExternalLink.CreativeCommonsLegalCode;
+const explorationDesignTipsUrl = testConstants.URLs.ExplorationDesignTips;
+const googleSignUpUrl = testConstants.URLs.ExternalLink.GoogleSignUp;
 const evenThoseWhoAreInSchoolUrl =
   testConstants.URLs.ExternalLinkEvenThoseWhoAreInSchool;
 const getStartedUrl = testConstants.URLs.GetStarted;
@@ -96,7 +110,20 @@ const footerAboutFoundationLink = 'a.e2e-test-footer-about-foundation-link';
 const footerBlogLink = 'a.e2e-test-footer-blog-link';
 const footerForumlink = 'a.e2e-test-footer-forum-link';
 const footerGetStartedLink = 'a.e2e-test-get-started-link';
-const footerTeachPageLink = 'a.e2e-test-teach-link';
+const footerTeachLink = 'a.e2e-test-teach-link';
+const footerCreatorGuidelinesLink = 'a.e2e-test-creator-guidelines-link';
+const footerTermsLink = 'a.e2e-test-terms-link';
+const footerPrivacyPolicyLink = 'a.e2e-test-privacy-policy-link';
+const footerCommunityLibraryLink = 'a.e2e-test-community-library-link';
+const footerContactUsLink = 'a.e2e-test-contact-link';
+
+const oppiaYouTubeLinkIcon = '.oppia-youtube-follow';
+const oppiaFacebookLinkIcon = '.oppia-facebook-follow';
+const oppiaInstagramLinkIcon = '.oppia-instagram-follow';
+const oppiaTwitterLinkIcon = '.oppia-twitter-follow';
+const oppiaGithubLinkIcon = '.oppia-github-follow';
+const oppiaLinkedInLinkIcon = '.oppia-linkedin-follow';
+const oppiaAndroidAppButton = '.oppia-android-app-button';
 
 const browseOurLessonsButton = '.e2e-test-about-page-browse-our-lessons-button';
 const accessAndroidAppButton = '.e2e-test-about-page-access-android-app-button';
@@ -248,6 +275,27 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to navigate to the Creator Guidelines page.
+   */
+  async navigateToCreatorGuidelinesPage(): Promise<void> {
+    await this.goto(creatorGuidelinesUrl);
+  }
+
+  /**
+   * Function to navigate to the Terms page.
+   */
+  async navigateToTermsPage(): Promise<void> {
+    await this.goto(termsUrl);
+  }
+
+  /**
+   * Function to navigate to the Privacy Policy page.
+   */
+  async navigateToPrivacyPolicyPage(): Promise<void> {
+    await this.goto(privacyPolicyUrl);
+  }
+
+  /**
    * Navigates to the community library page.
    */
   async navigateToCommunitylibrary(): Promise<void> {
@@ -280,13 +328,6 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToDonatePage(): Promise<void> {
     await this.goto(donateUrl);
-  }
-
-  /**
-   * Function to navigate to the /Terms page.
-   */
-  async navigateToTermsPage(): Promise<void> {
-    await this.goto(termsUrl);
   }
 
   /**
@@ -988,7 +1029,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates to the About page using the oppia website footer.
    */
-  async navigateToAboutPageViaFooter(): Promise<void> {
+  async clickOnAboutLinkInFooter(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       footerAboutLink,
       'About Oppia link in the About Oppia section in the footer',
@@ -999,7 +1040,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates to the About Foundation page using the oppia website footer.
    */
-  async navigateToAboutFoundationPageViaFooter(): Promise<void> {
+  async clickOnTheOppiaFoundationLinkInFooter(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       footerAboutFoundationLink,
       'About Foundation link in the About Oppia section in the footer',
@@ -1010,7 +1051,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates to the Blog page using the oppia website footer.
    */
-  async navigateToBlogPageViaFooter(): Promise<void> {
+  async clickOnBlogLinkInFooter(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       footerBlogLink,
       'Blog link in the About Oppia section in the footer',
@@ -1022,44 +1063,132 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates to the Forum page using the oppia website footer.
    */
-  async navigateToForumPageViaFooter(): Promise<void> {
+  async clickOnForumLinkInFooter(): Promise<void> {
     await Promise.all([
       this.page.waitForNavigation(),
       await this.clickOn(footerForumlink),
     ]);
 
-    expect(this.page.url()).toBe('https://groups.google.com/g/oppia');
+    expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
 
   /**
-   * Navigates to the GetStarted page using the oppia website footer.
+   * Navigates to the Get Started page using the oppia website footer.
    */
-  async navigateToGetStartedPageViaFooter(): Promise<void> {
+  async clickOnGetStartedLinkInFooter(): Promise<void> {
     await this.page.waitForSelector(footerGetStartedLink);
     await this.clickButtonToNavigateToNewPage(
       footerGetStartedLink,
-      'Get Started link in the About Oppia section in the footer',
+      'Get Started link in the footer',
       getStartedUrl,
       'Get Started'
     );
   }
 
   /**
+   * Navigates to the Creator Guidelines page using the oppia website footer.
+   */
+  async clickOnCreatorGuidelinesLinkinFooter(): Promise<void> {
+    await this.page.waitForSelector(footerCreatorGuidelinesLink);
+    await this.clickButtonToNavigateToNewPage(
+      footerCreatorGuidelinesLink,
+      'Creator Guidelines link in the footer',
+      creatorGuidelinesUrl,
+      'Creator Guidelines'
+    );
+  }
+
+  /**
    * Navigates to the Teach page using the oppia website footer.
    */
-  async navigateToTeachPageViaFooter(): Promise<void> {
+  async clickOnForParentsSlashTeachersLinkInFooter(): Promise<void> {
+    await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
-      footerTeachPageLink,
-      '"For Parents/Teachers" link in the Teach/Learn section in the footer',
+      footerTeachLink,
+      'For Parents/Teachers link in footer',
       teachUrl,
-      'For Parents/Teachers'
+      'Oppia for Parents, Teachers, and Guardians'
     );
+  }
+
+  /**
+   * Navigates to the Terms page using the oppia website footer.
+   */
+  async clickOnTermsOfServiceLinkInFooter(): Promise<void> {
+    await this.page.waitForSelector(footerCreatorGuidelinesLink);
+    await this.clickButtonToNavigateToNewPage(
+      footerTermsLink,
+      'Terms of use link in footer',
+      termsUrl,
+      'Terms of Use'
+    );
+  }
+
+  /**
+   * Navigates to the Privacy Policy page using the oppia website footer.
+   */
+  async clickOnPrivacyPolicyLinkInFooter(): Promise<void> {
+    await this.page.waitForSelector(footerCreatorGuidelinesLink);
+    await this.clickButtonToNavigateToNewPage(
+      footerPrivacyPolicyLink,
+      'Privacy Policy link in the footer',
+      privacyPolicyUrl,
+      'Privacy Policy'
+    );
+  }
+
+  /**
+   * Navigates to the Community Library page using the oppia website footer.
+   */
+  async clickOnBrowseTheLibraryLinkInFooter(): Promise<void> {
+    await this.page.waitForSelector(footerCreatorGuidelinesLink);
+    await this.clickButtonToNavigateToNewPage(
+      footerCommunityLibraryLink,
+      'Browse the Library link in the footer',
+      communityLibraryUrl,
+      'Community Library'
+    );
+  }
+
+  /**
+   * Navigates to the Contact page using the oppia website footer.
+   */
+  async clickOnContactUsLinkInFooter(): Promise<void> {
+    await this.page.waitForSelector(footerCreatorGuidelinesLink);
+    await this.clickButtonToNavigateToNewPage(
+      footerContactUsLink,
+      'Contact Us link in the footer',
+      contactUrl,
+      'Contact'
+    );
+  }
+
+  /**
+   * Navigates to the Terms page using the oppia website footer.
+   */
+  async clickOnDonateLinkInFooter(): Promise<void> {
+    await this.page.waitForXPath('(//a[contains(text(),"Donate")])');
+    const [link] = await this.page.$x('(//a[contains(text(),"Donate")])');
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
+
+    expect(this.page.url()).toBe(donateUrl);
+  }
+
+  /**
+   * Navigates to the Terms page using the oppia website footer.
+   */
+  async clickOnVolunteerLinkInFooter(): Promise<void> {
+    await this.page.waitForXPath('(//a[contains(text(),"volunteer")])');
+    const [link] = await this.page.$x('(//a[contains(text(),"volunteer")])');
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
+
+    expect(this.page.url()).toBe(volunteerUrl);
   }
 
   /**
    * Clicks the link with the text "create on here" on the Get Stated page.
    */
-  async clickCreateOneHereLinkInGetStartedPage(): Promise<void> {
+  async clickCreateOneHereLinkOnGetStartedPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"create one here")]');
     const pageTarget = this.page.target();
     await this.clickOn('create one here');
@@ -1068,30 +1197,29 @@ export class LoggedOutUser extends BaseUser {
     );
     const newTabPage = await newTarget.page();
     await newTabPage?.waitForNetworkIdle();
-    expect(newTabPage?.url()).toContain(
-      'https://accounts.google.com/lifecycle/steps/signup/name'
-    );
+
+    expect(newTabPage?.url()).toContain(googleSignUpUrl);
     await newTabPage?.close();
   }
 
   /**
    * Clicks the link with the text "Welcome to Oppia" on the Get Stated page.
    */
-  async clickWelcomeToOppiaLinkInGetStartedPage(): Promise<void> {
+  async clickWelcomeToOppiaLinkOnGetStartedPage(): Promise<void> {
     await this.clickLinkAnchorToNewTab('Welcome to Oppia', welcomeToOppiaUrl);
   }
 
   /**
    * Clicks the link with the text "Get Electrified!" on the Get Stated page.
    */
-  async clickGetElectrifiedLinkInGetStartedPage(): Promise<void> {
+  async clickGetElectrifiedLinkOnGetStartedPage(): Promise<void> {
     await this.clickLinkAnchorToNewTab('Get Electrified!', electromagnetismUrl);
   }
 
   /**
    * Clicks the link with the text "Programming with Carla" on the Get Stated page.
    */
-  async clickProgrammingWithCarlaLinkInGetStartedPage(): Promise<void> {
+  async clickProgrammingWithCarlaLinkOnGetStartedPage(): Promise<void> {
     await this.clickLinkAnchorToNewTab(
       'Programming with Carla',
       programmingWithCarlaUrl
@@ -1101,7 +1229,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Clicks the link with the text "in our user documentation" on the Get Stated page.
    */
-  async clickInOurUserDocumentationLinkInGetStartedPage(): Promise<void> {
+  async clickInOurUserDocumentationLinkOnGetStartedPage(): Promise<void> {
     await this.clickLinkAnchorToNewTab(
       'in our user documentation',
       creatingAnExplorationUrl
@@ -1111,7 +1239,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Clicks the link with the text "embed it in your own web page" on the Get Stated page.
    */
-  async clickEmbedItInYourOwnWebPageLinkInGetStartedPage(): Promise<void> {
+  async clickEmbedItInYourOwnWebPageLinkOnGetStartedPage(): Promise<void> {
     await this.clickLinkAnchorToNewTab(
       'embed it in your own web page',
       embeddingAnExplorationUrl
@@ -1121,17 +1249,260 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Clicks the link with the text "discover more ways to get involved" on the Get Stated page.
    */
-  async clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage(): Promise<void> {
+  async clickDiscoverMoreWaysToGetInvolvedLinkOnGetStartedPage(): Promise<void> {
     await this.page.waitForXPath(
       '//a[contains(text(),"discover more ways to get involved")]'
     );
-
     await Promise.all([
       this.page.waitForNavigation(),
       await this.clickOn('discover more ways to get involved'),
     ]);
 
     expect(this.page.url()).toBe(contactUrl);
+  }
+
+  /**
+   * Clicks the link with the text "forum" on the Creator Guidelines page.
+   */
+  async clickForumLinkOnCreatorGuidelinesPage(): Promise<void> {
+    await this.page.waitForXPath('//a[contains(text(),"forum")]');
+    await Promise.all([this.page.waitForNavigation(), this.clickOn('forum')]);
+    await this.page.waitForNetworkIdle();
+
+    expect(this.page.url()).toBe(googleGroupsOppiaUrl);
+  }
+
+  /**
+   * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
+   */
+  async clickDesignTipsLinkOnCreatorGuidelinesPage(): Promise<void> {
+    await this.page.waitForXPath('//a[contains(text(),"Design Tips")]');
+
+    await Promise.all([
+      this.page.waitForNavigation(),
+      await this.clickOn('Design Tips'),
+    ]);
+
+    expect(this.page.url()).toBe(explorationDesignTipsUrl);
+  }
+
+  /**
+   * Clicks the link with the text "Create an Exploration" on the Creator Guidelines page.
+   */
+  async clickCreateAnExplorationLinkOnCreatorGuidelinesPage(): Promise<void> {
+    await this.page.waitForXPath(
+      '//a[contains(text(),"Create an Exploration")]'
+    );
+
+    await Promise.all([
+      this.page.waitForNavigation(),
+      await this.clickOn('Create an Exploration'),
+    ]);
+
+    expect(this.page.url()).toBe(creatorDashboardCreateModeUrl);
+  }
+
+  /**
+   * Clicks the link with the text "Browse our Expectations" on the Creator Guidelines page.
+   */
+  async clickBrowseOurExpectationsLinkOnCreatorGuidelinesPage(): Promise<void> {
+    await this.page.waitForXPath(
+      '//a[contains(text(),"Browse our Explorations")]'
+    );
+
+    await Promise.all([
+      this.page.waitForNavigation(),
+      await this.clickOn('Browse our Explorations'),
+    ]);
+
+    expect(this.page.url()).toBe(communityLibraryUrl);
+  }
+
+  /**
+   * Clicks the link on the Terms page that leads to the Privacy Policy page.
+   */
+  async clickLinkToPrivacyPolicyOnTermsPage(): Promise<void> {
+    await this.page.waitForXPath('//a[contains(text(),"Privacy Policy")]');
+    const [link] = await this.page.$x('//a[contains(text(),"Privacy Policy")]');
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
+
+    expect(this.page.url()).toBe(privacyPolicyUrl);
+  }
+
+  /**
+   * Clicks the link on the Terms page about the CC-BY-SA 4.0 license.
+   */
+  async clickLinkToLicenseOnTermsPage(): Promise<void> {
+    await this.page.waitForXPath('(//a[contains(text(),"here")])[1]');
+    const [link] = await this.page.$x('(//a[contains(text(),"here")])[1]');
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
+
+    expect(this.page.url()).toBe(CreativeCommonsLegalCodeUrl);
+  }
+
+  /**
+   * Clicks the link on the Terms page that leads to the Oppia Announce google group.
+   */
+  async clickLinkToGoogleGroupOnTermsPage(): Promise<void> {
+    await this.page.waitForXPath('(//a[contains(text(),"here")])[2]');
+    const [link] = await this.page.$x('(//a[contains(text(),"here")])[2]');
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
+
+    expect(this.page.url()).toBe(googleGroupsOppiaAnnouceUrl);
+  }
+
+  /**
+   * Clicks the link on the Privacy Policy page that goes to the home page.
+   */
+  async clickLinkToHomePageOnPrivacyPolicyPage(): Promise<void> {
+    await this.page.waitForXPath(
+      '//a[contains(text(),"https://www.oppia.org")]'
+    );
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: 'networkidle0'}),
+      this.clickOn('https://www.oppia.org'),
+    ]);
+
+    expect(this.page.url()).toBe(homeUrl);
+  }
+
+  /**
+   * Clicks the link to learn about cookies on the Privacy Policy page.
+   */
+  async clickLinkAboutCookiesOnPrivacyPolicyPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      'http://www.allaboutcookies.org/manage-cookies/index.html',
+      'link to learn about cookies on the Privacy Policy page',
+      allAboutCookiesUrl,
+      'All About Cookies'
+    );
+  }
+
+  /**
+   * Clicks the link to learn about Google Analytivs on the Privacy Policy page.
+   */
+  async clickLinkAboutGoogleAnalyticsOnPrivacyPolicyPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      'https://www.google.com/policies/privacy/partners/',
+      'link to learn about Google Analytivs on the Privacy Policy page',
+      googleAnalyticsPartnerPoliciesUrl,
+      'Google Privacy & Terms'
+    );
+  }
+
+  /**
+   * Clicks the link to opt out of cookies on the Privacy Policy page.
+   */
+  async clickLinkAboutGoogleAnalyticsOptOutOnPrivacyPolicyPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      googleAnalyticsOptOutUrl,
+      'link to opt out of cookies on the Privacy Policy pager',
+      googleAnalyticsOptOutUrl,
+      'Google Analytics Opt-out Browser Add-on'
+    );
+  }
+
+  /**
+   * Click the speficed social icon and checks it's destination.
+   *
+   * Due to the somewhat unpredictable behaviors of these external sites,
+   * such as sometimes redirecting to log-in pages,
+   * we don't match the full url.
+   */
+  private async openSocialLinkInNewTabViaIcon(
+    socialIconSelector: string,
+    expectedDestinationDomain: string,
+    expectedAccountId: string
+  ): Promise<void> {
+    await this.page.waitForSelector(socialIconSelector);
+    const pageTarget = this.page.target();
+    await this.page.click(socialIconSelector);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url()).toContain(expectedDestinationDomain);
+    expect(newTabPage?.url()).toContain(expectedAccountId);
+    await newTabPage?.close();
+  }
+
+  /**
+   * Clicks the YouTube social icon in the footer.
+   */
+  async clickYouTubeIconInFooter(): Promise<void> {
+    await this.openSocialLinkInNewTabViaIcon(
+      oppiaYouTubeLinkIcon,
+      testConstants.OppiaSocials.YouTube.Domain,
+      testConstants.OppiaSocials.YouTube.Id
+    );
+  }
+
+  /**
+   * Clicks the Facebooksocial icon in the footer.
+   */
+  async clickFacebookIconInFooter(): Promise<void> {
+    await this.openSocialLinkInNewTabViaIcon(
+      oppiaFacebookLinkIcon,
+      testConstants.OppiaSocials.FaceBook.Domain,
+      testConstants.OppiaSocials.FaceBook.Id
+    );
+  }
+
+  /**
+   * Clicks the Instagram social icon in the footer.
+   */
+  async clickInstagramIconInFooter(): Promise<void> {
+    await this.openSocialLinkInNewTabViaIcon(
+      oppiaInstagramLinkIcon,
+      testConstants.OppiaSocials.Instagram.Domain,
+      testConstants.OppiaSocials.Instagram.Id
+    );
+  }
+
+  /**
+   * Clicks the Twitter social icon in the footer.
+   */
+  async clickTwitterIconInFooter(): Promise<void> {
+    await this.openSocialLinkInNewTabViaIcon(
+      oppiaTwitterLinkIcon,
+      testConstants.OppiaSocials.Twitter.Domain,
+      testConstants.OppiaSocials.Twitter.Id
+    );
+  }
+
+  /**
+   * Clicks the Github social icon in the footer.
+   */
+  async clickGithubIconInFooter(): Promise<void> {
+    await this.openSocialLinkInNewTabViaIcon(
+      oppiaGithubLinkIcon,
+      testConstants.OppiaSocials.Github.Domain,
+      testConstants.OppiaSocials.Github.Id
+    );
+  }
+
+  /**
+   * Clicks the LinkedIn social icon in the footer.
+   */
+  async clickLinkedInIconInFooter(): Promise<void> {
+    await this.openSocialLinkInNewTabViaIcon(
+      oppiaLinkedInLinkIcon,
+      testConstants.OppiaSocials.LinkedIn.Domain,
+      testConstants.OppiaSocials.LinkedIn.Id
+    );
+  }
+
+  /**
+   * Clicks the Google Play banner in the footer.
+   */
+  async clickGooglePlayButtonInFooter(): Promise<void> {
+    await this.openSocialLinkInNewTabViaIcon(
+      oppiaAndroidAppButton,
+      testConstants.OppiaSocials.GooglePlay.Domain,
+      testConstants.OppiaSocials.GooglePlay.Id
+    );
   }
 
   /**

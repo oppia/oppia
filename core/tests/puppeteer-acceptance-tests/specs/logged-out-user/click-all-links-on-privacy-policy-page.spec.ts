@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-out users can
- * navigate using all the links under the "About Oppia" footer section.
+ * @fileoverview Acceptance Test for checking if logged-out users
+ * can open all the links on the "Privacy Policy" page.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -31,43 +31,42 @@ describe('Logged-out Users', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    // Navigate to a page that has the oppia footer.
-    await loggedOutUser.goto(testConstants.URLs.Volunteer);
+    await loggedOutUser.navigateToPrivacyPolicyPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should open About page via the footer',
+    'should be able to follow link to home page',
     async function () {
-      await loggedOutUser.navigateToAboutPageViaFooter();
+      await loggedOutUser.clickLinkToHomePageOnPrivacyPolicyPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should open "About Foundation" page via the footer',
+    'should be able to follow link to learn about cookies',
     async function () {
-      await loggedOutUser.navigateToAboutFoundationPageViaFooter();
+      await loggedOutUser.clickLinkAboutCookiesOnPrivacyPolicyPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should open "Blog" page via the footer',
+    'should be able to follow link to learn about Google Analytics',
     async function () {
-      await loggedOutUser.navigateToBlogPageViaFooter();
+      await loggedOutUser.clickLinkAboutGoogleAnalyticsOnPrivacyPolicyPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should open "Forum" page via the footer',
+    'should be able to follow link to learn how to opt out of Google Analytics',
     async function () {
-      await loggedOutUser.navigateToForumPageViaFooter();
+      await loggedOutUser.clickLinkAboutGoogleAnalyticsOptOutOnPrivacyPolicyPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+});
 
-  afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
-  });
+afterAll(async function () {
+  await UserFactory.closeAllBrowsers();
 });
