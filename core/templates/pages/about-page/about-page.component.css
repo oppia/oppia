@@ -1213,11 +1213,11 @@
     width: calc((100% - 56px) / 2);
   }
   .about-page .oppia-about-cta-section .carousel-indicators {
-    gap: 12px;
+    gap: 4px;
   }
   .about-page .oppia-about-cta-section .carousel-indicators li {
-    height: 16px;
-    width: 16px;
+    height: 8px;
+    width: 8px;
   }
   .about-page .oppia-about-cta-section .carousel-control-prev-icon {
     background-image: url(/assets/images/icons/oppia-left-chevron-icon.svg);
@@ -1283,9 +1283,6 @@
   }
   .about-page .oppia-about-cta-section .carousel-control-prev {
     left: -14px;
-  }
-  .about-page .oppia-about-cta-section .carousel-indicators {
-    gap: 2px;
   }
 }
 
