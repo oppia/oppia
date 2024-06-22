@@ -71,36 +71,7 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     },
   ];
 
-  partnersData = [
-    {
-      title: 'I18N_ABOUT_PAGE_PARTNER1_TITLE',
-      name: 'I18N_ABOUT_PAGE_PARTNER1_NAME',
-      description: 'I18N_ABOUT_PAGE_PARTNER1_DESCRIPTION',
-      label: 'I18N_ABOUT_PAGE_PARTNERS_LABEL1',
-      imageUrl: '/about/partners/partner1-',
-    },
-    {
-      title: 'I18N_ABOUT_PAGE_PARTNER2_TITLE',
-      name: 'I18N_ABOUT_PAGE_PARTNER2_NAME',
-      description: 'I18N_ABOUT_PAGE_PARTNER2_DESCRIPTION',
-      label: 'I18N_ABOUT_PAGE_PARTNERS_LABEL1',
-      imageUrl: '/about/partners/partner2-',
-    },
-    {
-      title: 'I18N_ABOUT_PAGE_PARTNER3_TITLE',
-      name: 'I18N_ABOUT_PAGE_PARTNER3_NAME',
-      description: 'I18N_ABOUT_PAGE_PARTNER3_DESCRIPTION',
-      label: 'I18N_ABOUT_PAGE_PARTNERS_LABEL1',
-      imageUrl: '/about/partners/partner3-',
-    },
-    {
-      title: 'I18N_ABOUT_PAGE_PARTNER4_TITLE',
-      name: 'I18N_ABOUT_PAGE_PARTNER4_NAME',
-      description: 'I18N_ABOUT_PAGE_PARTNER4_DESCRIPTION',
-      label: 'I18N_ABOUT_PAGE_PARTNERS_LABEL2',
-      imageUrl: '/about/partners/partner4-',
-    },
-  ];
+  partnersData = OppiaPlatformStatsData.OPPIA_PARTNERS_DATA;
 
   oppiaWebRawBarChartData: readonly {
     country: string;
