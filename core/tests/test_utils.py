@@ -3033,7 +3033,6 @@ version: 1
                 self.assertIn(
                     http_method, ['POST', 'PUT', 'DELETE'])
 
-        # Dictionary to map HTTP methods to corresponding self testapp methods
         http_method_map = {
             'GET': self.testapp.get,
             'POST': self.testapp.post,
