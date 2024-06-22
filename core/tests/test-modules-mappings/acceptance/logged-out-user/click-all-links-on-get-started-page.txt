@@ -1,0 +1,3 @@
+core/templates/pages/about-foundation-page/about-foundation-page.module.ts
+core/templates/pages/get-started-page/get-started-page.module.ts
+core/templates/pages/contact-page/contact-page.module.ts

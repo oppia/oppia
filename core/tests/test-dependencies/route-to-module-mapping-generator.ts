@@ -120,6 +120,12 @@ const MANUAL_ROUTE_TO_MODULE_MAPPING: Map<Route, string> = new Map([
   ],
   [
     {
+      path: 'learn/:classroom_url_fragment/:topic_url_fragment',
+    },
+    'core/templates/pages/topic-viewer-page/topic-viewer-page.import.ts',
+  ],
+  [
+    {
       path: 'learn/:classroom_url_fragment/:topic_url_fragment/story',
     },
     'core/templates/pages/topic-viewer-page/topic-viewer-page.import.ts',

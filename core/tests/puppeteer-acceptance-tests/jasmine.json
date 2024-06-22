@@ -1,5 +1,5 @@
 {
-  "spec_dir": "core/tests/puppeteer-acceptance-tests/build/specs",
+  "spec_dir": "core/tests/puppeteer-acceptance-tests/build/puppeteer-acceptance-tests/specs",
   "spec_files": [
     "**/*.spec.js"
   ],
