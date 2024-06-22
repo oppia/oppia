@@ -77,6 +77,7 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 
 interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: boolean;
@@ -139,6 +140,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private changeListService: ChangeListService,
     private contextService: ContextService,
     public editabilityService: EditabilityService,
+    private entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService,
     private entityTranslationsService: EntityTranslationsService,
     private explorationAutomaticTextToSpeechService: ExplorationAutomaticTextToSpeechService,
     private explorationCategoryService: ExplorationCategoryService,
@@ -347,6 +349,40 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           this.routerService.navigateToFeedbackTab();
         }
       }
+
+      this.entityBulkTranslationsBackendApiService
+        .fetchEntityBulkTranslationsAsync(
+          this.explorationId,
+          'exploration',
+          this.currentVersion
+        )
+        .then(response => {
+          for (let language in response) {
+            // Initialize the entity translation objects with the last published translations
+            // in order to compare translation changes made.
+            let languageTranslations =
+              response[language].translationMappingToBackendDict();
+            this.entityTranslationsService.languageCodeToLastPublishedEntityTranslations[
+              language
+            ] = EntityTranslation.createFromBackendDict({
+              entity_id: this.explorationId,
+              entity_type: 'exploration',
+              entity_version: response[language].entityVersion,
+              language_code: language,
+              translations: languageTranslations,
+            });
+
+            this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+              language
+            ] = EntityTranslation.createFromBackendDict({
+              entity_id: this.explorationId,
+              entity_type: 'exploration',
+              entity_version: response[language].entityVersion,
+              language_code: language,
+              translations: languageTranslations,
+            });
+          }
+        });
 
       // Initialize changeList by draft changes if they exist,
       // and initialize the entity translations by draft changes
