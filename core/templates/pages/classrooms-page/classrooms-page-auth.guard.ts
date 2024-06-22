@@ -24,7 +24,8 @@ import {
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
-
+import {AppConstants} from 'app.constants';
+import {Location} from '@angular/common';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 @Injectable({
@@ -33,7 +34,8 @@ import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access
 export class ClassroomsPageAuthGuard implements CanActivate {
   constructor(
     private accessValidationBackendApiService: AccessValidationBackendApiService,
-    private router: Router
+    private router: Router,
+    private location: Location
   ) {}
 
   async canActivate(
@@ -47,9 +49,14 @@ export class ClassroomsPageAuthGuard implements CanActivate {
           resolve(true);
         })
         .catch(err => {
-          this.router.navigate(['/learn/math']).then(() => {
-            resolve(false);
-          });
+          this.router
+            .navigate([
+              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+            ])
+            .then(() => {
+              resolve(false);
+              this.location.replaceState(state.url);
+            });
         });
     });
   }

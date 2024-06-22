@@ -16,6 +16,7 @@
  * @fileoverview Tests for ClassroomsPageAuthGuard
  */
 import {Location} from '@angular/common';
+import {AppConstants} from 'app.constants';
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {
   ActivatedRouteSnapshot,
@@ -111,6 +112,8 @@ describe('ClassroomsPageAuthGuard', () => {
     tick();
 
     expect(canActivateResult).toBeFalse();
-    expect(navigateSpy).toHaveBeenCalledWith(['/learn/math']);
+    expect(navigateSpy).toHaveBeenCalledWith([
+      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+    ]);
   }));
 });

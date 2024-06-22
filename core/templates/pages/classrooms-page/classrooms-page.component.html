@@ -13,6 +13,12 @@
     </div>
   </div>
 
+  <div *ngIf="(DEV_MODE && classroomSummaries.length === 0)"
+       class="classroom-admin-banner"
+  >
+    <span>To create classrooms, visit the <a href="/classroom-admin">classroom admin</a> page.</span>
+  </div>
+
   <div class="classrooms-page-content-container">
     <div class="classrooms-page-content">
       <h1 class="classrooms-heading">Oppia Classrooms</h1>
@@ -152,6 +158,23 @@
     justify-content: center;
     position: relative;
     width: 100vw;
+  }
+
+  .oppia-classrooms-page-container .classroom-admin-banner {
+    align-items: center;
+    background-color: #015f9c ;
+    color: white;
+    display: flex;
+    justify-content: center;
+    padding: 8px;
+    position: absolute;
+    top: 0;
+    width: 100vw;
+  }
+
+  .classroom-admin-banner a {
+    color: #fff;
+    text-decoration: underline;
   }
 
   .oppia-classrooms-page-container .breadcrumbs-container {

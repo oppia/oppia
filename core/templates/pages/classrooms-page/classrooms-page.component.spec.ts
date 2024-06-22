@@ -31,10 +31,17 @@ import {AlertsService} from 'services/alerts.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {ClassroomsPageComponent} from './classrooms-page.component';
 import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
+import {Router} from '@angular/router';
 
 class MockCapitalizePipe {
   transform(input: string): string {
     return input;
+  }
+}
+
+class MockRouter {
+  navigate(commands: string[]): Promise<boolean> {
+    return Promise.resolve(true);
   }
 }
 
@@ -43,6 +50,7 @@ describe('Classroom Page Component', () => {
   let fixture: ComponentFixture<ClassroomsPageComponent>;
   let classroomBackendApiService: ClassroomBackendApiService;
   let alertsService: AlertsService;
+  let router: Router;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -55,9 +63,11 @@ describe('Classroom Page Component', () => {
           useClass: MockCapitalizePipe,
         },
         ClassroomBackendApiService,
+        {provide: Router, useClass: MockRouter},
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
+    router = TestBed.inject(Router);
   }));
 
   beforeEach(() => {
@@ -142,6 +152,41 @@ describe('Classroom Page Component', () => {
         classroomBackendApiService.getAllClassroomsSummaryAsync
       ).toHaveBeenCalled();
       expect(component.haveAtleastOnePrivateClassroom).toBeTrue();
+      expect(component.publicClassroomCount).toEqual(0);
+    })
+  );
+
+  it(
+    'should set redirect to classroom page if we just have ' +
+      'one public classroom',
+    fakeAsync(() => {
+      let response = [
+        {
+          classroom_id: 'mathclassroom',
+          name: 'math',
+          url_fragment: 'math',
+          teaser_text: 'Learn math',
+          is_published: true,
+          thumbnail_filename: 'thumbnail.svg',
+          thumbnail_bg_color: 'transparent',
+        },
+      ];
+      spyOn(
+        classroomBackendApiService,
+        'getAllClassroomsSummaryAsync'
+      ).and.returnValue(Promise.resolve(response));
+      const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+        Promise.resolve(true)
+      );
+      component.ngOnInit();
+      tick();
+
+      expect(
+        classroomBackendApiService.getAllClassroomsSummaryAsync
+      ).toHaveBeenCalled();
+      expect(component.haveAtleastOnePrivateClassroom).toBeFalse();
+      expect(component.publicClassroomCount).toEqual(1);
+      expect(navigateSpy).toHaveBeenCalledWith(['/learn/math']);
     })
   );
 });

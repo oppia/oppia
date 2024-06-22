@@ -18,11 +18,13 @@
 
 import {Component} from '@angular/core';
 import {AlertsService} from 'services/alerts.service';
+import {Router} from '@angular/router';
 import {
   ClassroomBackendApiService,
   ClassroomSummaryDict,
 } from 'domain/classroom/classroom-backend-api.service';
 import {LoaderService} from 'services/loader.service';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'oppia-classrooms-page',
@@ -31,6 +33,8 @@ import {LoaderService} from 'services/loader.service';
 export class ClassroomsPageComponent {
   classroomSummaries: ClassroomSummaryDict[] = [];
   haveAtleastOnePrivateClassroom: boolean = false;
+  publicClassroomCount: number = 0;
+  singlePublicClassroomUrlFragment: string = '';
   privateClassroomSummary: ClassroomSummaryDict = {
     classroom_id: '',
     name: '',
@@ -41,10 +45,13 @@ export class ClassroomsPageComponent {
     is_published: false,
   };
 
+  DEV_MODE = AppConstants.DEV_MODE;
+
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
     private alertsService: AlertsService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -55,12 +62,22 @@ export class ClassroomsPageComponent {
       .then(data => {
         this.classroomSummaries = data;
         for (let i = 0; i < this.classroomSummaries.length; i++) {
-          if (!this.classroomSummaries[i].is_published) {
+          if (this.classroomSummaries[i].is_published) {
+            this.publicClassroomCount += 1;
+            this.singlePublicClassroomUrlFragment =
+              this.classroomSummaries[i].url_fragment;
+          } else {
             this.haveAtleastOnePrivateClassroom = true;
-            break;
           }
         }
-        this.loaderService.hideLoadingScreen();
+
+        if (this.publicClassroomCount === 1) {
+          this.router.navigate([
+            `/learn/${this.singlePublicClassroomUrlFragment}`,
+          ]);
+        } else {
+          this.loaderService.hideLoadingScreen();
+        }
       })
       .catch(err => {
         this.alertsService.addWarning('Failed to get classrooms data.');
