@@ -24,6 +24,7 @@ import os
 import re
 import zipfile
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -1318,6 +1319,36 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         })]
         self.assertFalse(
             exp_services.is_voiceover_change_list(not_voiceover_change_list))
+
+    @test_utils.enable_feature_flags(
+            [feature_flag_list.FeatureNames.ADD_VOICEOVER_WITH_ACCENT])
+    def test_changes_in_voiceover_list_with_feature_flag_enabled(self) -> None:
+        not_voiceover_change_list = [exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'new_value': 'New title'
+        })]
+        self.assertFalse(
+            exp_services.is_voiceover_change_list(not_voiceover_change_list))
+
+        manual_voiceover_1: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        change_list_voiceover = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_UPDATE_VOICEOVERS,
+                'language_accent_code': 'en-US',
+                'content_id': 'content_0',
+                'voiceovers': {
+                    'manual': manual_voiceover_1
+                }
+            })
+        ]
+        self.assertTrue(
+            exp_services.is_voiceover_change_list(change_list_voiceover))
 
     def test_validation_for_valid_exploration(self) -> None:
         exploration = self.save_new_valid_exploration(
