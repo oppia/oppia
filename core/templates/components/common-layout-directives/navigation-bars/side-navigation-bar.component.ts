@@ -38,6 +38,7 @@ export class SideNavigationBarComponent {
   @Input() display!: boolean;
 
   DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
+  IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
   currentUrl!: string;
   classroomData: CreatorTopicSummary[] = [];
   topicTitlesTranslationKeys: string[] = [];
