@@ -236,6 +236,9 @@ export class TranslationModalComponent {
         }
       );
     } else {
+      // Initialize the translation modal with the "modify translation" opportunity
+      // in case it was called from the exploration editor page for modifying
+      // a particular translation.
       this.textToTranslate = this.modifyTranslationOpportunity.textToTranslate;
       this.activeContentType =
         this.modifyTranslationOpportunity.contentId.split('_')[0];
