@@ -1419,14 +1419,13 @@ class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
         self.add_user_role(
             self.QUESTION_ADMIN_USERNAME,
             feconf.ROLE_ID_QUESTION_ADMIN)
-        self.prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
 
     def test_generate_dummy_question_suggestions_(self) -> None:
         self.login(self.QUESTION_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/contributionrightshandler/submit_question', {
-                'username': 'question'
+                'username': 'questionExpert'
             }, csrf_token=csrf_token)
 
         self.post_json(
