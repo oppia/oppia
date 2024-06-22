@@ -3039,22 +3039,22 @@ version: 1
         # backend tests.
         with self.swap(base, 'load_template', mock_load_template):
 
-            if (http_method == 'GET'):
+            if http_method == 'GET':
                 response = self.testapp.get(
                 url, params=params, expect_errors=True
                 )
 
-            elif (http_method == 'POST'):
+            elif http_method == 'POST':
                 response = self.testapp.post(
                 url, params=params, expect_errors=True
                 )
 
-            elif (http_method == 'PUT'):
+            elif http_method == 'PUT':
                 response = self.testapp.put(
                 url, params=params, expect_errors=True
                 )
 
-            elif (http_method == 'DELETE'):
+            elif http_method == 'DELETE':
                 response = self.testapp.delete(
                 url, params=params, expect_errors=True
                 )
