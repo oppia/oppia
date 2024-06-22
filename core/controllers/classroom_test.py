@@ -329,6 +329,8 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         self.physics_classroom_dict['name'] = 'Quantum physics'
+        self.physics_classroom_dict['thumbnail_data']['filename'] = 'update.svg'
+        self.physics_classroom_dict['banner_data']['filename'] = 'update.png'
 
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
@@ -345,8 +347,8 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         })}
         params['csrf_token'] = csrf_token
         thumbnail = (
-            'thumbnail_image', 'thumbnail_filename', raw_thumbnail_image)
-        banner = ('banner_image', 'banner_filename', raw_banner_image)
+            'thumbnail_image', 'thumbnail_filename1', raw_thumbnail_image)
+        banner = ('banner_image', 'banner_filename1', raw_banner_image)
         self.testapp.put(
                     classroom_handler_url,
                     params=params, expect_errors=False,
@@ -389,8 +391,8 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         })}
         params['csrf_token'] = csrf_token
         thumbnail = (
-            'thumbnail_image', 'thumbnail_filename', raw_thumbnail_image)
-        banner = ('banner_image', 'banner_filename', raw_banner_image)
+            'thumbnail_image', 'thumbnail_filename2', raw_thumbnail_image)
+        banner = ('banner_image', 'banner_filename2', raw_banner_image)
         response = self._parse_json_response(self.testapp.put(
                     classroom_handler_url,
                     params=params, expect_errors=True,
@@ -475,8 +477,8 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         })}
         params['csrf_token'] = csrf_token
         thumbnail = (
-            'thumbnail_image', 'thumbnail_filename', raw_thumbnail_image)
-        banner = ('banner_image', 'banner_filename', raw_banner_image)
+            'thumbnail_image', 'thumbnail_filename3', raw_thumbnail_image)
+        banner = ('banner_image', 'banner_filename3', raw_banner_image)
         response = self._parse_json_response(self.testapp.put(
                     classroom_handler_url,
                     params=params, expect_errors=True,
