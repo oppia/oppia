@@ -202,10 +202,18 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
           language
         ].updateTranslation(this.contentId, updatedTranslatedContent);
       } else {
+        const updatedTranslatedContent = new TranslatedContent(
+          this.contentTranslations[language].translation,
+          this.contentTranslations[language].dataFormat,
+          true
+        );
         this.changeListService.markTranslationAsNeedingUpdateForLanguage(
           this.contentId,
           language
         );
+        this.entityTranslationsService.languageCodeToEntityTranslations[
+          language
+        ].updateTranslation(this.contentId, updatedTranslatedContent);
       }
     }
     this.ngbActiveModal.close();
