@@ -15,7 +15,7 @@
 
 .about-page .oppia-about-hero-section {
   align-items: end;
-  background-image: url('/assets/images/about/about-banner-desktop.webp'), url('/assets/images/about/about-banner-desktop.png');
+  background-image: url('/assets/images/about/about-banner-desktop.webp');
   background-repeat: no-repeat;
   background-size: cover;
   display: flex;
@@ -88,7 +88,7 @@
 
 @media only screen and (max-width: 481px) {
   .about-page .oppia-about-hero-section {
-    background-image: url('/assets/images/about/about-banner-mobile.webp'), url('/assets/images/about/about-banner-mobile.png');
+    background-image: url('/assets/images/about/about-banner-mobile.webp');
     height: 18em;
     padding: 0 12px 48px;
   }
