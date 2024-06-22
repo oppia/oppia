@@ -3007,6 +3007,7 @@ version: 1
         self,
         url: str,
         expected_status_int_list: List[int],
+        http_method: Optional[str] = 'GET',
         params: Optional[Dict[str, str]] = None
     ) -> webtest.TestResponse:
         """Get a response, transformed to a Python object and checks for a list
@@ -3016,6 +3017,7 @@ version: 1
             url: str. The URL to fetch the response.
             expected_status_int_list: list(int). A list of integer status code
                 to expect.
+            http_method: str. The http method by which the request is to be sent.
             params: dict. A dictionary that will be encoded into a query string.
 
         Returns:
@@ -3025,13 +3027,26 @@ version: 1
             self.assertIsInstance(
                 params, dict,
                 msg='Expected params to be a dict, received %s' % params)
+            
+        if http_method != 'GET':
+            self.assertIn(
+                http_method,['POST','PUT','DELETE'],
+                msg='Expected http_method to be one of "POST","PUT" OR "DELETE", received %s' % http_method) 
+            
+        # Dictionary to map HTTP methods to corresponding self.testapp methods
+        http_method_map = {
+            'GET': self.testapp.get,
+            'POST': self.testapp.post,
+            'PUT': self.testapp.put,
+            'DELETE': self.testapp.delete
+        }
 
         # This swap is required to ensure that the templates are fetched from
         # source directory instead of webpack_bundles since webpack_bundles is
         # only produced after webpack compilation which is not performed during
         # backend tests.
         with self.swap(base, 'load_template', mock_load_template):
-            response = self.testapp.get(url, params=params, expect_errors=True)
+            response = http_method_map[http_method](url, params=params, expect_errors=True)
 
         self.assertIn(response.status_int, expected_status_int_list)
 
