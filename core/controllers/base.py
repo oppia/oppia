@@ -850,8 +850,8 @@ class BaseHandler(
         if isinstance(exception, TypeError):
             self.error(405)
             values = {
-                'error': 'Invalid method %s for %s or Extra Parameters passed.' % (
-                    request_method, handler_class_name ),
+                'error': 'Invalid method %s for %s/ Extra Parameters passed.' % (
+                    request_method, handler_class_name),
                 'status_code': 405
             }
             self._render_exception(values)
