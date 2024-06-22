@@ -540,18 +540,13 @@ export class ReleaseCoordinator extends BaseUser {
   async verifyDummyHandlerStatusInFeaturesTab(enabled: boolean): Promise<void> {
     await this.navigateToReleaseCoordinatorPage();
     await this.navigateToFeaturesTab();
-    let dummyHandlerElement;
-    try {
-      await this.page.waitForSelector(agDummyFeatureIndicator, {
-        timeout: 10000,
-      });
-      dummyHandlerElement = await this.page.$(agDummyFeatureIndicator);
-    } catch (error) {
-      if (enabled) {
-        throw new Error(
-          'Dummy handler is expected to be enabled but it is disabled'
-        );
-      }
+
+    const dummyHandlerElement = await this.page.$(agDummyFeatureIndicator);
+
+    if (enabled && !dummyHandlerElement) {
+      throw new Error(
+        'Dummy handler is expected to be enabled but it is disabled'
+      );
     }
 
     if (!enabled && dummyHandlerElement) {
@@ -559,6 +554,7 @@ export class ReleaseCoordinator extends BaseUser {
         'Dummy handler is expected to be disabled but it is enabled'
       );
     }
+
     showMessage(
       `Dummy handler is ${enabled ? 'enabled' : 'disabled'}, as expected`
     );
