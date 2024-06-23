@@ -64,7 +64,7 @@ describe('Topic Manager User Journey', function () {
       await topicManager.expectTopicsInOrder(['Test Topic 1', 'Test Topic 2']);
 
       await topicManager.adjustPaginatorToShowTopicsPerPage(15);
-      await topicManager.expectNextPageOfTopicsButtonToBe('disabled');
+      await topicManager.checkIfPageChangesAfterClickingNext(false);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

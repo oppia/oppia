@@ -19,6 +19,7 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import {over} from 'lodash';
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
@@ -1136,6 +1137,21 @@ export class CurriculumAdmin extends BaseUser {
         error.stack
       );
     }
+  }
+
+  async createSkill(skillName: string, reviewMaterial: string): Promise<void> {
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.clickOn(skillsTab);
+    await this.clickOn('.e2e-test-create-skill-button-circle');
+    await this.type(skillDescriptionField, skillName);
+    await this.clickOn(skillReviewMaterialHeader);
+    await this.clickOn(richTextAreaField);
+    await this.type(
+      richTextAreaField,
+      `Review material text content for ${reviewMaterial}.`
+    );
+    await this.clickOn(confirmSkillCreationButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
   }
 }
 

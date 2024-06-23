@@ -48,7 +48,7 @@ describe('Topic Manager User Journey', function () {
   it(
     'should filter skills, sort them, use the paginator, and open an existing skill.',
     async function () {
-      await topicManager.navigateToSkillsAndTopicsDashboardPage();
+      await topicManager.navigateToTopicAndSkillsDashboardPage();
       await topicManager.filterSkillsByStatus('Unassigned');
       await topicManager.expectFilteredSkills(['Test Skill 1', 'Test Skill 2']);
       await topicManager.filterSkillsByStatus('Published');
@@ -63,8 +63,8 @@ describe('Topic Manager User Journey', function () {
       await topicManager.sortSkills('name');
       await topicManager.expectSkillsInOrder(['Test Skill 1', 'Test Skill 2']);
 
-      await topicManager.adjustPaginatorToShowSkillsPerPage(15);
-      await topicManager.expectNextPageOfSkillsButtonToBe('disabled');
+      await topicManager.adjustPaginatorToShowItemsPerPage(15);
+      await topicManager.checkIfSkillPageChangesAfterClickingNext(false);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

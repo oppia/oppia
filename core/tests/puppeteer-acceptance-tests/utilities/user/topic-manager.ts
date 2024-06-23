@@ -516,9 +516,9 @@ export class TopicManager extends BaseUser {
     selector: string,
     optionText: string
   ): Promise<void> {
-    await this.page.click(selector);
+    await this.clickOn(selector);
     await this.page.waitForSelector('.mat-option-text');
-    await this.page.click(`.mat-option-text:contains(${optionText})`);
+    await this.clickOn(`.mat-option-text:contains(${optionText})`);
   }
 
   /**
@@ -566,17 +566,15 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Adjusts the paginator to show a certain number of topics per page.
-   * @param {number} topicsPerPage - The number of topics to show per page.
+   * Adjusts the paginator to show a certain number of items per page.
+   * @param {number} itemsPerPage - The number of items to show per page.
    */
-  async adjustPaginatorToShowTopicsPerPage(
-    topicsPerPage: number
-  ): Promise<void> {
+  async adjustPaginatorToShowItemsPerPage(itemsPerPage: number): Promise<void> {
     await this.selectOption(
-      '.e2e-test-select-topics-per-page-dropdown',
-      topicsPerPage.toString()
+      '.e2e-test-select-items-per-page-dropdown',
+      itemsPerPage.toString()
     );
-    showMessage(`Paginator adjusted to show ${topicsPerPage} topics per page.`);
+    showMessage(`Paginator adjusted to show ${itemsPerPage} items per page.`);
   }
 
   async checkIfPageChangesAfterClickingNext(
@@ -604,6 +602,113 @@ export class TopicManager extends BaseUser {
     showMessage(
       'Page changes as expected after clicking the next page button.'
     );
+  }
+
+  /**
+   * Filters skills by status.
+   * @param {string} status - The status to filter by.
+   */
+  async filterSkillsByStatus(status: string): Promise<void> {
+    await this.clickOn('.e2e-test-select-skill-status-dropdown');
+    await this.clickOn(`option[value="${status}"]`);
+  }
+
+  /**
+   * Filters skills by classroom.
+   * @param {string} classroom - The classroom to filter by.
+   */
+  async filterSkillsByClassroom(classroom: string): Promise<void> {
+    await this.clickOn('.e2e-test-select-classroom-dropdown');
+    await this.clickOn(`option[value="${classroom}"]`);
+  }
+
+  /**
+   * Filters skills by keyword.
+   * @param {string} keyword - The keyword to filter by.
+   */
+  async filterSkillsByKeyword(keyword: string): Promise<void> {
+    await this.clickOn('.e2e-test-select-keyword-dropdown');
+    await this.page.type('.e2e-test-select-keyword-dropdown', keyword);
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Sorts skills by a given option.
+   * @param {string} sortOption - The option to sort by.
+   */
+  async sortSkills(sortOption: string): Promise<void> {
+    await this.clickOn('.e2e-test-select-sort-dropdown');
+    await this.clickOn(`option[value="${sortOption}"]`);
+  }
+
+  /**
+   * Expects the filtered skills to match the provided list.
+   * @param {string[]} expectedSkills - The expected list of skills.
+   * @returns {Promise<void>}
+   */
+  async expectFilteredSkills(expectedSkills: string[]): Promise<void> {
+    const skillElements = await this.page.$$('.e2e-test-skill-description');
+    const skillDescriptions = await Promise.all(
+      skillElements.map(element =>
+        this.page.evaluate(el => el.textContent, element)
+      )
+    );
+
+    const missingSkills = expectedSkills.filter(
+      skill => !skillDescriptions.includes(skill)
+    );
+
+    if (missingSkills.length > 0) {
+      throw new Error(
+        `Expected skills ${missingSkills.join(', ')} to be present, but they were not found.`
+      );
+    }
+
+    showMessage('Filtered skills match the expected skills.');
+  }
+
+  /**
+   * Expects the skills to be in a certain order.
+   * @param {string[]} expectedOrder - The expected order of skills.
+   */
+  async expectSkillsInOrder(expectedOrder: string[]): Promise<void> {
+    const skillElements = await this.page.$$('.e2e-test-skill-description');
+    const skillDescriptions = await Promise.all(
+      skillElements.map(element =>
+        this.page.evaluate(el => el.textContent, element)
+      )
+    );
+
+    if (
+      !skillDescriptions.every((name, index) => name === expectedOrder[index])
+    ) {
+      throw new Error('Skills are not in the expected order.');
+    }
+
+    showMessage('Skills are in the expected order.');
+  }
+
+  async checkIfSkillPageChangesAfterClickingNext(
+    shouldChange: boolean
+  ): Promise<void> {
+    const initialSkill = await this.page.$eval(
+      '.e2e-test-skill-description',
+      skill => skill.textContent
+    );
+    await this.clickOn('.e2e-test-next-page-button');
+    const finalSkill = await this.page.$eval(
+      '.e2e-test-skill-description',
+      skill => skill.textContent
+    );
+    if (shouldChange && initialSkill === finalSkill) {
+      throw new Error(
+        'Expected the page to change when clicking the next page button, but it did not.'
+      );
+    } else if (!shouldChange && initialSkill !== finalSkill) {
+      throw new Error(
+        'Expected the page not to change when clicking the next page button, but it did.'
+      );
+    }
   }
 }
 
