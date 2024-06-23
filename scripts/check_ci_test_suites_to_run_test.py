@@ -732,7 +732,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                 '--github_head_ref', 'head'
                             ]
                         )
-                        print(self.get_test_suites_to_run_from_github_output())
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),
                             {

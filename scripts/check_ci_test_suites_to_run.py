@@ -592,9 +592,10 @@ def get_ci_test_suites_to_run(
         modified_root_files.update(root_files_mapping[file])
 
     root_files_config = get_root_files_config()
-    for modified_root_file in modified_root_files:
-        if modified_root_file in root_files_config['run_all_tests_root_files']:
-            return None
+    if modified_root_files.intersection(
+        root_files_config['run_all_tests_root_files']
+    ):
+        return None
 
     all_test_suites_by_type = get_all_test_suites_by_type()
 

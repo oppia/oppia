@@ -295,8 +295,9 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
                         'Acceptance test suites and CI test suites are not '
                         'in sync. The following suites are not in sync: %s. '
                         'Please update the CI config file for acceptance tests '
-                        'at core/tests/ci-test-suite-configs/acceptance.json.'
-                            % (json.dumps(ACCEPTANCE_TEST_SUITES[1:2]))
+                        'at core/tests/ci-test-suite-configs/acceptance.json '
+                        'with the suites listed above.' % (
+                            json.dumps(ACCEPTANCE_TEST_SUITES[1:2]))
                     )
                 ):
                     check_tests_are_captured_in_ci.main()
@@ -351,8 +352,8 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
                         'E2E test suites and CI test suites are not in sync. '
                         'The following suites are not in sync: %s. Please '
                         'update the CI config file for e2e tests at core/tests/'
-                        'ci-test-suite-configs/e2e.json.' % (
-                            json.dumps(E2E_TEST_SUITES[1:2]))
+                        'ci-test-suite-configs/e2e.json with the suites listed '
+                        'above.' % (json.dumps(E2E_TEST_SUITES[1:2]))
                     )
                 ):
                     check_tests_are_captured_in_ci.main()
