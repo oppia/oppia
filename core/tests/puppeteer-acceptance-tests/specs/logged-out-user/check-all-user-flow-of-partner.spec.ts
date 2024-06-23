@@ -47,7 +47,7 @@ describe('Partner', function () {
       // Navigating back to home page for the next test.
       await loggedOutUser.navigateToHome();
       // Navigating to about foundation page via footer from home page.
-      await loggedOutUser.navigateToAboutFoundationPageViaFooter();
+      await loggedOutUser.clickOnTheOppiaFoundationLinkInFooter();
 
       // Navigating to partnerships page by clicking on "Consider becoming a partner today" link on the about foundation page.
       await loggedOutUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();

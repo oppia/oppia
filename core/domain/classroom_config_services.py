@@ -319,21 +319,6 @@ def create_new_default_classroom(
     return classroom
 
 
-def update_or_create_classroom_model(
-    classroom: classroom_config_domain.Classroom
-) -> None:
-    """Updates the properties of an existing classroom model or creates a new
-    classroom model.
-    """
-    model = classroom_models.ClassroomModel.get(
-        classroom.classroom_id, strict=False)
-
-    if model is None:
-        create_new_classroom(classroom)
-    else:
-        update_classroom(classroom)
-
-
 def delete_classroom(classroom_id: str) -> None:
     """Deletes the classroom model.
 
