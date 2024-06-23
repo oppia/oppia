@@ -112,4 +112,20 @@ describe('State Diff Modal Component', () => {
       expect(component.yamlStrs.rightPane).toBe('Yaml data');
     });
   }));
+
+  it('should evaluate yaml string objects for translation changes', fakeAsync(() => {
+    spyOn(
+      historyTabYamlConversionService,
+      'getYamlStringFromTranslations'
+    ).and.resolveTo('Yaml data');
+
+    component.showingTranslationChanges = true;
+    component.ngOnInit();
+    tick();
+
+    fixture.whenStable().then(() => {
+      expect(component.yamlStrs.leftPane).toBe('Yaml data');
+      expect(component.yamlStrs.rightPane).toBe('Yaml data');
+    });
+  }));
 });

@@ -18,7 +18,10 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed, fakeAsync, flushMicrotasks, tick} from '@angular/core/testing';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {
+  EntityTranslation,
+  EntityTranslationBackendDict,
+} from 'domain/translation/EntityTranslationObjectFactory';
 import {EntityTranslationBackendApiService} from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import {EntityTranslationsService} from './entity-translations.services';
 
@@ -26,6 +29,7 @@ describe('Entity translations service', () => {
   let entityTranslationsService: EntityTranslationsService;
   let etbs: EntityTranslationBackendApiService;
   let entityTranslation: EntityTranslation;
+  let entityTranslationBackendDict: EntityTranslationBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -35,7 +39,7 @@ describe('Entity translations service', () => {
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     etbs = TestBed.inject(EntityTranslationBackendApiService);
 
-    entityTranslation = EntityTranslation.createFromBackendDict({
+    entityTranslationBackendDict = {
       entity_id: 'exp',
       entity_type: 'exploration',
       entity_version: 5,
@@ -77,7 +81,11 @@ describe('Entity translations service', () => {
           needs_update: false,
         },
       },
-    });
+    };
+    entityTranslation = EntityTranslation.createFromBackendDict(
+      entityTranslationBackendDict
+    );
+
     spyOn(etbs, 'fetchEntityTranslationAsync').and.returnValue(
       Promise.resolve(entityTranslation)
     );
@@ -169,5 +177,18 @@ describe('Entity translations service', () => {
     ]);
 
     expect(htmlData).toEqual([]);
+  });
+
+  it('should return backend dict for LanguageCodeToEntityTranslation objects', () => {
+    entityTranslationsService.languageCodeToLatestEntityTranslations.fr =
+      entityTranslation;
+
+    expect(
+      entityTranslationsService.converBulkTranslationsToBackendDict(
+        entityTranslationsService.languageCodeToLatestEntityTranslations
+      )
+    ).toEqual({
+      fr: entityTranslationBackendDict,
+    });
   });
 });

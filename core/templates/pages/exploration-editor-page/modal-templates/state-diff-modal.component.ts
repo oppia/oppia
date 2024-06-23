@@ -79,7 +79,6 @@ export class StateDiffModalComponent
 
   ngOnInit(): void {
     if (!this.showingTranslationChanges) {
-      console.log('here');
       this.historyTabYamlConversionService
         .getYamlStringFromStateOrMetadata(this.oldState)
         .then(result => {
@@ -92,9 +91,6 @@ export class StateDiffModalComponent
           this.yamlStrs.rightPane = result;
         });
     } else {
-      console.log(
-        this.entityTranslationsService.languageCodeToLatestEntityTranslations
-      );
       this.historyTabYamlConversionService
         .getYamlStringFromTranslations(
           this.entityTranslationsService

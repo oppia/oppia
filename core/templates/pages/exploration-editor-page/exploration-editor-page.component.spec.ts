@@ -75,6 +75,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
+import {LanguageCodeToEntityTranslations} from '../../services/entity-translations.services';
 
 class MockNgbModalRef {
   componentInstance = {};
@@ -119,6 +121,7 @@ describe('Exploration editor page component', () => {
   let focusManagerService: FocusManagerService;
   let explorationPermissionsBackendApiService: ExplorationPermissionsBackendApiService;
   let entityTranslationsService: EntityTranslationsService;
+  let entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService;
   let ngbModal: NgbModal;
   let refreshGraphEmitter = new EventEmitter<void>();
   let mockRefreshTranslationTabEventEmitter = new EventEmitter<void>();
@@ -357,6 +360,9 @@ describe('Exploration editor page component', () => {
       ExplorationPermissionsBackendApiService
     );
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
+    entityBulkTranslationsBackendApiService = TestBed.inject(
+      EntityBulkTranslationsBackendApiService
+    );
 
     isLocationSetToNonStateEditorTabSpy = spyOn(
       rs,
@@ -765,6 +771,7 @@ describe('Exploration editor page component', () => {
 
   describe('when user permission is false and draft changes are true', () => {
     let mockExplorationPropertyChangedEventEmitter = new EventEmitter();
+    let lastPublishedTranslations: LanguageCodeToEntityTranslations;
 
     beforeEach(() => {
       ueps = TestBed.inject(UserExplorationPermissionsService);
@@ -825,6 +832,25 @@ describe('Exploration editor page component', () => {
       spyOnProperty(esaves, 'onInitExplorationPage').and.returnValue(
         mockInitExplorationPageEmitter
       );
+      lastPublishedTranslations = {
+        hi: EntityTranslation.createFromBackendDict({
+          entity_id: 'exp1',
+          entity_type: 'exploration',
+          entity_version: 5,
+          language_code: 'hi',
+          translations: {
+            content1: {
+              translation: '<p>This is content 1.</p>',
+              dataFormat: 'html',
+              needsUpdate: true,
+            },
+          },
+        }),
+      };
+      spyOn(
+        entityBulkTranslationsBackendApiService,
+        'fetchEntityBulkTranslationsAsync'
+      ).and.returnValue(Promise.resolve(lastPublishedTranslations));
       explorationData.is_version_of_draft_valid = false;
       explorationData.draft_changes = [
         {
@@ -961,10 +987,20 @@ describe('Exploration editor page component', () => {
       });
 
       expect(
-        entityTranslationsService.languageCodeToLatestEntityTranslations
-      ).toEqual({
-        fr: entityTranslation,
-      });
+        entityTranslationsService.languageCodeToLatestEntityTranslations.fr
+      ).toEqual(entityTranslation);
+
+      flush();
+      discardPeriodicTasks();
+    }));
+
+    it('should initialize entity translation object for last published translations', fakeAsync(() => {
+      mockInitExplorationPageEmitter.emit();
+      tick();
+
+      expect(
+        entityTranslationsService.languageCodeToLastPublishedEntityTranslations
+      ).toEqual(lastPublishedTranslations);
 
       flush();
       discardPeriodicTasks();
