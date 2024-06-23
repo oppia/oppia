@@ -888,7 +888,6 @@ export class CurriculumAdmin extends BaseUser {
           await this.page.waitForSelector(skillListItemOptions);
           const editBox = await skill.$(skillListItemOptions);
           if (editBox) {
-            await this.waitForElementToBeClickable(editBox);
             await editBox.click();
             await this.page.waitForSelector(deleteSkillButton);
           } else {
