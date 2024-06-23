@@ -178,8 +178,6 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	fi
 # Adding env variable for mobile view
 	@export MOBILE=${MOBILE:-false}
-# Adding env variable for the spec name
-	@export SPEC_NAME=$(suite)
 # Starting the development server for the acceptance tests.
 	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
@@ -190,7 +188,7 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	fi
 	../oppia_tools/node-16.13.0/bin/node ./node_modules/typescript/bin/tsc -p ./tsconfig.puppeteer-acceptance-tests.json
 	cp -r ./core/tests/puppeteer-acceptance-tests/data ./core/tests/puppeteer-acceptance-tests/build/
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/build/puppeteer-acceptance-tests/specs/$(suite).spec.js
+	SPEC_NAME=$(suite) ../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/build/puppeteer-acceptance-tests/specs/$(suite).spec.js
 	@echo '------------------------------------------------------'
 	@echo '  Acceptance test has been executed successfully....'
 	@echo '------------------------------------------------------'
