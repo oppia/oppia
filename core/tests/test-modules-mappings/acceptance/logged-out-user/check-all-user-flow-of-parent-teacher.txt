@@ -1,0 +1,2 @@
+core/templates/pages/teach-page/teach-page.module.ts
+core/templates/pages/classroom-page/classroom-page.module.ts
