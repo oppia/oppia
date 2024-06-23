@@ -27,9 +27,14 @@ const unauthErrorContainer = 'div.e2e-test-error-container';
 const blogDashboardAuthorDetailsModal = 'div.modal-dialog';
 const blogAuthorBioField = 'textarea.e2e-test-blog-author-bio-field';
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
+const authorBioSaveButton = 'button.e2e-test-save-author-details-button';
+const confirmButton = 'button.e2e-test-confirm-button';
 const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
 const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
 const blogPostThumbnailImage = testConstants.data.blogPostThumbnailImage;
+const toastMessage = 'div.e2e-test-toast-warning-message';
+const blogPostTitlePage = '.e2e-test-blog-post-title';
+const listOfBlogsInBlogDashboard = '.blog-dashboard-tile-content';
 
 const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = 'CREATE NEW BLOG POST';
 const LABEL_FOR_SAVE_BUTTON = 'Save';
@@ -43,11 +48,14 @@ export class BlogPostEditor extends BaseUser {
    * Function for adding blog post author bio in blog dashboard.
    */
   async addUserBioInBlogDashboard(): Promise<void> {
-    await this.type(blogAuthorBioField, 'Dummy-User-Bio');
-    await this.page.waitForSelector(
-      'button.e2e-test-save-author-details-button:not([disabled])'
-    );
-    await this.clickOn(LABEL_FOR_SAVE_BUTTON);
+    const inputBar = await this.page.$(blogAuthorBioField);
+    // It is used here to avoid filling the user bio each time. We fill it only once when
+    // the user is accessing the blog dashboard for the first time.
+    if (inputBar) {
+      await this.type(blogAuthorBioField, 'Dummy-User-Bio');
+      await this.page.waitForSelector(`${authorBioSaveButton}:not([disabled])`);
+      await this.clickOn(LABEL_FOR_SAVE_BUTTON);
+    }
   }
 
   /**
@@ -66,11 +74,10 @@ export class BlogPostEditor extends BaseUser {
   ): Promise<void> {
     await this.addUserBioInBlogDashboard();
     await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
-    await this.type(blogTitleInput, draftBlogPostTitle);
-    await this.page.keyboard.press('Tab');
-    await this.type(blogBodyInput, 'test blog post body content');
-    await this.clickOn(LABEL_FOR_DONE_BUTTON);
-    await this.clickOn(LABEL_FOR_SAVE_DRAFT_BUTTON);
+    await this.updateTitleTo(draftBlogPostTitle);
+    await this.updateBodyTextTo('test blog post body content');
+    await this.saveTheChanges();
+    await this.saveTheDraftBlogPost();
 
     showMessage('Successfully created a draft blog post!');
     await this.goto(blogDashboardUrl);
@@ -82,12 +89,10 @@ export class BlogPostEditor extends BaseUser {
   async deleteDraftBlogPostWithTitle(
     draftBlogPostTitle: string
   ): Promise<void> {
-    const allDraftBlogPosts = await this.page.$$(
-      '.blog-dashboard-tile-content'
-    );
+    const allDraftBlogPosts = await this.page.$$(listOfBlogsInBlogDashboard);
     for (let i = 0; i < allDraftBlogPosts.length; i++) {
       let checkDraftBlogPostTitle = await allDraftBlogPosts[i].$eval(
-        '.e2e-test-blog-post-title',
+        blogPostTitlePage,
         element => (element as HTMLElement).innerText
       );
       if (draftBlogPostTitle === checkDraftBlogPostTitle) {
@@ -120,12 +125,12 @@ export class BlogPostEditor extends BaseUser {
     if (!publishedButtonIsDisabled) {
       throw new Error(
         'Published button is not disabled when the blog post data is not' +
-          ' completely filled'
+          ' completely filled.'
       );
     }
     showMessage(
       'Published button is disabled when blog post data is not completely' +
-        ' filled'
+        ' filled.'
     );
   }
 
@@ -145,24 +150,74 @@ export class BlogPostEditor extends BaseUser {
   }
 
   /**
+   * This is a composite function that can be used when a straightforward, simple blog published is required.
    * This function publishes a blog post with given title.
    */
-  async publishNewBlogPostWithTitle(newBlogPostTitle: string): Promise<void> {
-    await this.addUserBioInBlogDashboard();
-    await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
-    await this.expectPublishButtonToBeDisabled();
-
+  async publishNewBlogPost(newBlogPostTitle: string): Promise<void> {
+    await this.openBlogEditorPage();
     await this.uploadBlogPostThumbnailImage();
     await this.expectPublishButtonToBeDisabled();
 
+    await this.updateTitleTo(newBlogPostTitle);
+    await this.updateBodyTextTo('test blog post body content');
+    await this.selectTags('News', 'International');
+    await this.saveTheChanges();
+
+    await this.publishTheBlogPost();
+  }
+
+  /**
+   * This function navigates to the blog editor page.
+   */
+  async openBlogEditorPage(): Promise<void> {
+    await this.addUserBioInBlogDashboard();
+    await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
+    await this.expectPublishButtonToBeDisabled();
+  }
+
+  /**
+   * This function updates the title of the blog post.
+   */
+  async updateTitleTo(newBlogPostTitle: string): Promise<void> {
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
-    await this.type(blogBodyInput, 'test blog post body content');
-    await this.clickOn('button.mat-button-toggle-button');
-    await this.clickOn(LABEL_FOR_DONE_BUTTON);
+  }
 
+  /**
+   * This function updates the body text of the blog post.
+   */
+  async updateBodyTextTo(newBodyText: string): Promise<void> {
+    await this.type(blogBodyInput, newBodyText);
+  }
+
+  /**
+   * This function saves the blog post.
+   */
+  async saveTheChanges(): Promise<void> {
+    await this.clickOn(LABEL_FOR_DONE_BUTTON);
+  }
+
+  /**
+   * This function selects two tags for the blog post.
+   */
+  async selectTags(Tag1: string, Tag2: string): Promise<void> {
+    await this.clickOn(Tag1);
+    await this.clickOn(Tag2);
+  }
+
+  /**
+   * This function saves the draft blog post.
+   */
+  async saveTheDraftBlogPost(): Promise<void> {
+    await this.clickOn(LABEL_FOR_SAVE_DRAFT_BUTTON);
+  }
+
+  /**
+   * This function publishes the blog post.
+   */
+  async publishTheBlogPost(): Promise<void> {
     await this.clickOn('PUBLISH');
-    await this.page.waitForSelector('button.e2e-test-confirm-button');
+    await this.page.waitForSelector(confirmButton);
     await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
     showMessage('Successfully published a blog post!');
   }
@@ -172,16 +227,15 @@ export class BlogPostEditor extends BaseUser {
    */
   async createNewBlogPostWithTitle(newBlogPostTitle: string): Promise<void> {
     await this.clickOn('NEW POST');
-    await this.clickOn('button.mat-button-toggle-button');
     await this.expectPublishButtonToBeDisabled();
 
     await this.uploadBlogPostThumbnailImage();
     await this.expectPublishButtonToBeDisabled();
 
-    await this.type(blogTitleInput, newBlogPostTitle);
-    await this.page.keyboard.press('Tab');
-    await this.type(blogBodyInput, 'test blog post body content - duplicate');
-    await this.clickOn(LABEL_FOR_DONE_BUTTON);
+    await this.updateTitleTo(newBlogPostTitle);
+    await this.updateBodyTextTo('test blog post body content - duplicate');
+    await this.selectTags('News', 'International');
+    await this.saveTheChanges();
   }
 
   /**
@@ -190,11 +244,11 @@ export class BlogPostEditor extends BaseUser {
   async deletePublishedBlogPostWithTitle(blogPostTitle: string): Promise<void> {
     await this.clickOn('PUBLISHED');
     const allPublishedBlogPosts = await this.page.$$(
-      '.blog-dashboard-tile-content'
+      listOfBlogsInBlogDashboard
     );
     for (let i = 0; i < allPublishedBlogPosts.length; i++) {
       let publishedBlogPostTitle = await allPublishedBlogPosts[i].$eval(
-        '.e2e-test-blog-post-title',
+        blogPostTitlePage,
         element => (element as HTMLElement).innerText
       );
       if (publishedBlogPostTitle === blogPostTitle) {
@@ -203,7 +257,7 @@ export class BlogPostEditor extends BaseUser {
           element => (element as HTMLElement).click()
         );
         await this.clickOn(LABEL_FOR_DELETE_BUTTON);
-        await this.page.waitForSelector('button.e2e-test-confirm-button');
+        await this.page.waitForSelector(confirmButton);
         await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
         showMessage(
           'Published blog post with given title deleted successfully!'
@@ -219,9 +273,7 @@ export class BlogPostEditor extends BaseUser {
   async expectUserUnableToPublishBlogPost(
     expectedWarningMessage: string
   ): Promise<void> {
-    const toastMessageBox = await this.page.$(
-      'div.e2e-test-toast-warning-message'
-    );
+    const toastMessageBox = await this.page.$(toastMessage);
     const toastMessageWarning = await this.page.evaluate(
       (element: HTMLDivElement) => element.textContent,
       toastMessageBox
@@ -251,7 +303,7 @@ export class BlogPostEditor extends BaseUser {
    * This function checks the number of the blog posts in the blog dashboard.
    */
   async expectNumberOfBlogPostsToBe(number: number): Promise<void> {
-    const allBlogPosts = await this.page.$$('.blog-dashboard-tile-content');
+    const allBlogPosts = await this.page.$$(listOfBlogsInBlogDashboard);
     if (allBlogPosts.length !== number) {
       throw new Error(`Number of blog posts is not equal to ${number}`);
     }
@@ -275,13 +327,11 @@ export class BlogPostEditor extends BaseUser {
     checkDraftBlogPostByTitle: string
   ): Promise<void> {
     await this.goto(blogDashboardUrl);
-    const allDraftBlogPosts = await this.page.$$(
-      '.blog-dashboard-tile-content'
-    );
+    const allDraftBlogPosts = await this.page.$$(listOfBlogsInBlogDashboard);
     let count = 0;
     for (let i = 0; i < allDraftBlogPosts.length; i++) {
       let draftBlogPostTitle = await allDraftBlogPosts[i].$eval(
-        '.e2e-test-blog-post-title',
+        blogPostTitlePage,
         element => (element as HTMLElement).innerText
       );
       if (draftBlogPostTitle === checkDraftBlogPostByTitle) {
@@ -313,12 +363,12 @@ export class BlogPostEditor extends BaseUser {
     await this.goto(blogDashboardUrl);
     await this.clickOn('PUBLISHED');
     const allPublishedBlogPosts = await this.page.$$(
-      '.blog-dashboard-tile-content'
+      listOfBlogsInBlogDashboard
     );
     let count = 0;
     for (let i = 0; i < allPublishedBlogPosts.length; i++) {
       let publishedBlogPostTitle = await allPublishedBlogPosts[i].$eval(
-        '.e2e-test-blog-post-title',
+        blogPostTitlePage,
         element => (element as HTMLElement).innerText
       );
       if (publishedBlogPostTitle === blogPostTitle) {
