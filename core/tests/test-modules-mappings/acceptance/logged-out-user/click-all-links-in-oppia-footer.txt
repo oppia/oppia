@@ -6,6 +6,6 @@ core/templates/pages/get-started-page/get-started-page.module.ts
 core/templates/pages/library-page/library-page.module.ts
 core/templates/pages/participation-playbook/playbook.module.ts
 core/templates/pages/privacy-page/privacy-page.module.ts
-core/templates/pages/terms-page/terms-page.module.ts
 core/templates/pages/teach-page/teach-page.module.ts
+core/templates/pages/terms-page/terms-page.module.ts
 core/templates/pages/volunteer-page/volunteer-page.module.ts
