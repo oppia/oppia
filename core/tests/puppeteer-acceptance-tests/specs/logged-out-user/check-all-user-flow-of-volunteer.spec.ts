@@ -45,7 +45,7 @@ describe('Volunteer', function () {
       'and open the volunteer form when the "Apply to Volunteer" button is clicked',
     async function () {
       // Navigating to about foundation page via footer from home page.
-      await loggedOutUser.navigateToAboutFoundationPageViaFooter();
+      await loggedOutUser.clickOnTheOppiaFoundationLinkInFooter();
 
       // Navigating to the Volunteer page by clicking on the "Become a Volunteer" button.
       await loggedOutUser.clickBecomeAVolunteerButtonInAboutFoundation();

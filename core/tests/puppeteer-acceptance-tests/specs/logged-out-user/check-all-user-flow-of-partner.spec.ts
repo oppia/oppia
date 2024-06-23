@@ -43,7 +43,7 @@ describe('Partner', function () {
       'and open the partnerships form in partnerships page.',
     async function () {
       // Navigating to about foundation page via footer from home page.
-      await loggedOutUser.navigateToAboutFoundationPageViaFooter();
+      await loggedOutUser.clickOnTheOppiaFoundationLinkInFooter();
 
       // Navigating to partnerships page by clicking on "Consider becoming a partner today" link on the about foundation page.
       await loggedOutUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();

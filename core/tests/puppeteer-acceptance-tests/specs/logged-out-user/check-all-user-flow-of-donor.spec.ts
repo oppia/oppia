@@ -46,7 +46,7 @@ describe('Donor', function () {
       'and see the donorbox form in donate page.',
     async function () {
       // Navigating to about foundation page via footer from home page.
-      await loggedOutUser.navigateToAboutFoundationPageViaFooter();
+      await loggedOutUser.clickOnTheOppiaFoundationLinkInFooter();
 
       // Navigating to donate page by clicking on the "donations" link on the about foundation page.
       await loggedOutUser.clickDonationsLinkInAboutFoundation();
