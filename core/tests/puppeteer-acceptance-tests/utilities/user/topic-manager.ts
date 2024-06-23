@@ -16,7 +16,9 @@
  * @fileoverview Topic manager utility file.
  */
 
+import puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
+import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
 
 const curriculumAdminThumbnailImage =
@@ -26,8 +28,6 @@ const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const modalDiv = 'div.modal-content';
 const closeSaveModalButton = '.e2e-test-close-save-modal-button';
 
-const storyPhotoBoxButton =
-  'oppia-create-new-story-modal .e2e-test-photo-button';
 const chapterPhotoBoxButton =
   '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
 
@@ -36,15 +36,7 @@ const desktopTopicSelector = 'a.e2e-test-topic-name';
 
 const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
 
-const addStoryButton = 'button.e2e-test-create-story-button';
-const storyTitleField = 'input.e2e-test-new-story-title-field';
-const storyDescriptionField = 'textarea.e2e-test-new-story-description-field';
-const storyUrlFragmentField = 'input.e2e-test-new-story-url-fragment-field';
-const createStoryButton = 'button.e2e-test-confirm-story-creation-button';
 const saveStoryButton = 'button.e2e-test-save-story-button';
-const publishStoryButton = 'button.e2e-test-publish-story-button';
-const storyMetaTagInput = '.e2e-test-story-meta-tag-content-field';
-const unpublishStoryButton = 'button.e2e-test-unpublish-story-button';
 
 const addChapterButton = 'button.e2e-test-add-chapter-button';
 const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
@@ -54,13 +46,8 @@ const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 const mobileOptionsSelector = '.e2e-test-mobile-options-base';
 const mobileTopicSelector = 'div.e2e-test-mobile-topic-name a';
 
-const mobileStoryDropdown = '.e2e-test-story-dropdown';
-const mobileSaveStoryChangesDropdown =
-  'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
 const mobileSaveStoryChangesButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-changes';
-const mobilePublishStoryButton =
-  'div.navbar-mobile-options .e2e-test-mobile-publish-button';
 const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
 
 const subtopicReassignHeader = 'div.subtopic-reassign-header';
@@ -79,7 +66,16 @@ const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
 const mobileSaveTopicButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
 const saveTopicButton = 'button.e2e-test-save-topic-button';
+const mobileStoryDropdown = '.e2e-test-story-dropdown';
 
+const addStoryButton = 'button.e2e-test-create-story-button';
+const storyTitleField = 'input.e2e-test-new-story-title-field';
+const storyDescriptionField = 'textarea.e2e-test-new-story-description-field';
+const storyUrlFragmentField = 'input.e2e-test-new-story-url-fragment-field';
+const createStoryButton = 'button.e2e-test-confirm-story-creation-button';
+const storyPhotoBoxButton =
+  'oppia-create-new-story-modal .e2e-test-photo-button';
+const storyMetaTagInput = '.e2e-test-story-meta-tag-content-field';
 export class TopicManager extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -121,27 +117,6 @@ export class TopicManager extends BaseUser {
       ),
       this.page.waitForNavigation(),
     ]);
-  }
-
-  /**
-   * Create a chapter for a certain story.
-   */
-  async createChapter(explorationId: string): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileAddChapterDropdown);
-    }
-    await this.clickOn(addChapterButton);
-    await this.type(chapterTitleField, 'Test Chapter 1');
-    await this.type(chapterExplorationIdField, explorationId);
-
-    await this.clickOn(chapterPhotoBoxButton);
-    await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadPhotoButton);
-
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickOn(createChapterButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
   }
 
   /**
@@ -226,6 +201,278 @@ export class TopicManager extends BaseUser {
       await this.clickOn(closeSaveModalButton);
       await this.page.waitForSelector(modalDiv, {hidden: true});
     }
+  }
+
+  async verifySubtopicPresenceInTopic(
+    topicName: string,
+    subtopicName: string,
+    isPresent: boolean
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+
+    const subtopicElements = await this.page.$$('.e2e-test-subtopic');
+    const subtopicNames = await Promise.all(
+      subtopicElements.map(element =>
+        this.page.evaluate(el => el.textContent, element)
+      )
+    );
+
+    const isSubtopicPresent = subtopicNames.includes(subtopicName);
+
+    if (isPresent && !isSubtopicPresent) {
+      throw new Error(
+        `Expected subtopic '${subtopicName}' to be present in topic '${topicName}', but it was not found.`
+      );
+    }
+
+    if (!isPresent && isSubtopicPresent) {
+      throw new Error(
+        `Expected subtopic '${subtopicName}' to be absent in topic '${topicName}', but it was found.`
+      );
+    }
+  }
+
+  /**
+   * Add a story with a chapter to a certain topic.
+   */
+  async addStoryWithChapterToTopic(
+    topicName: string,
+    storyTitle: string,
+    explorationId: string,
+    chapterTitle: string
+  ): Promise<void> {
+    const storyUrlFragment = storyTitle.replace(/\s+/g, '-').toLowerCase();
+
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileStoryDropdown);
+    }
+    await this.clickOn(addStoryButton);
+    await this.type(storyTitleField, storyTitle);
+    await this.type(storyUrlFragmentField, storyUrlFragment);
+    await this.type(
+      storyDescriptionField,
+      `Story creation description for ${storyTitle}.`
+    );
+
+    await this.clickOn(storyPhotoBoxButton);
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createStoryButton);
+
+    await this.page.waitForSelector(storyMetaTagInput);
+    await this.page.focus(storyMetaTagInput);
+    await this.page.type(storyMetaTagInput, 'meta');
+    await this.page.keyboard.press('Tab');
+
+    await this.createChapter(explorationId, chapterTitle);
+    await this.saveStoryDraft();
+  }
+
+  /**
+   * Create a chapter for a certain story.
+   */
+  async createChapter(
+    explorationId: string,
+    chapterTitle: string
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileAddChapterDropdown);
+    }
+    await this.clickOn(addChapterButton);
+    await this.type(chapterTitleField, chapterTitle);
+    await this.type(chapterExplorationIdField, explorationId);
+
+    await this.clickOn(chapterPhotoBoxButton);
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createChapterButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+  }
+
+  async verifyChapterPresenceInStory(
+    storyTitle: string,
+    chapterTitle: string,
+    isPresent: boolean
+  ): Promise<void> {
+    await this.openTopicEditor(storyTitle);
+    await this.clickOn(storyTitle);
+
+    const chapterElements = await this.page.$$('.e2e-test-chapter-title');
+    const chapterTitles = await Promise.all(
+      chapterElements.map(element =>
+        this.page.evaluate(el => el.textContent, element)
+      )
+    );
+
+    const isChapterPresent = chapterTitles.includes(chapterTitle);
+
+    if (isPresent && !isChapterPresent) {
+      throw new Error(
+        `Expected chapter '${chapterTitle}' to be present in story '${storyTitle}', but it was not found.`
+      );
+    }
+
+    if (!isPresent && isChapterPresent) {
+      throw new Error(
+        `Expected chapter '${chapterTitle}' to be absent in story '${storyTitle}', but it was found.`
+      );
+    }
+    showMessage('Chapter is present in the story');
+  }
+
+  async verifyStoryPresenceInTopic(
+    topicName: string,
+    storyTitle: string,
+    isPresent: boolean
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+
+    const storyElements = await this.page.$$('.e2e-test-story-title');
+    const storyTitles = await Promise.all(
+      storyElements.map(element =>
+        this.page.evaluate(el => el.textContent, element)
+      )
+    );
+
+    const isStoryPresent = storyTitles.includes(storyTitle);
+
+    if (isPresent && !isStoryPresent) {
+      throw new Error(
+        `Expected story '${storyTitle}' to be present in topic '${topicName}', but it was not found.`
+      );
+    }
+
+    if (!isPresent && isStoryPresent) {
+      throw new Error(
+        `Expected story '${storyTitle}' to be absent in topic '${topicName}', but it was found.`
+      );
+    }
+    showMessage('Story is present in the topic');
+  }
+
+  async deleteChapterFromStory(storyName: string, chapterTitle: string) {
+    await this.openTopicEditor(storyName);
+    await this.clickOn(storyName);
+
+    const chapterElements = await this.page.$$('.e2e-test-chapter-title');
+    let chapterElement: puppeteer.ElementHandle<Element> | null = null;
+    for (const element of chapterElements) {
+      const title = await this.page.evaluate(el => el.textContent, element);
+      if (title === chapterTitle) {
+        chapterElement = element;
+        break;
+      }
+    }
+
+    if (!chapterElement) {
+      throw new Error(`Chapter with title ${chapterTitle} not found.`);
+    }
+
+    const editOptionsButton = await chapterElement.$('.e2e-test-edit-options');
+    if (!editOptionsButton) {
+      throw new Error('Edit options button not found.');
+    }
+
+    await editOptionsButton.click();
+    await this.page.waitForSelector('.chapter-option-box', {visible: true});
+    await this.clickOn('.chapter-option-box');
+
+    await this.page.waitForSelector('.e2e-test-confirm-delete-chapter-button', {
+      visible: true,
+    });
+    await this.clickOn('.e2e-test-confirm-delete-chapter-button');
+    await this.page.waitForSelector('.e2e-test-chapter-title', {hidden: true});
+  }
+
+  async deleteStoryFromTopic(topicName: string, storyTitle: string) {
+    await this.openTopicEditor(topicName);
+    const storyElements = await this.page.$$('.e2e-test-story-list-item');
+
+    let storyElement: puppeteer.ElementHandle<Element> | null = null;
+
+    for (const element of storyElements) {
+      const titleElement = await element.$('.e2e-test-story-title');
+      if (!titleElement) {
+        continue;
+      }
+      const title = await this.page.evaluate(
+        el => el.textContent,
+        titleElement
+      );
+      if (title === storyTitle) {
+        storyElement = element;
+        break;
+      }
+    }
+
+    if (!storyElement) {
+      throw new Error(`Story with title ${storyTitle} not found.`);
+    }
+
+    const deleteButton = await storyElement.$('.e2e-test-delete-story-button');
+    if (!deleteButton) {
+      throw new Error('Delete button not found.');
+    }
+
+    await deleteButton.click();
+
+    const confirmDeleteButton = await this.page.$(
+      '.e2e-test-confirm-story-deletion-button'
+    );
+    if (!confirmDeleteButton) {
+      throw new Error('Confirm delete button not found.');
+    }
+
+    await confirmDeleteButton.click();
+  }
+
+  async deleteSubtopicFromTopic(topicName: string, subtopicName: string) {
+    await this.openTopicEditor(topicName);
+    const subtopicElements = await this.page.$$('.subtopic-name-header');
+
+    let subtopicElement: puppeteer.ElementHandle<Element> | null = null;
+
+    for (const element of subtopicElements) {
+      const titleElement = await element.$('.e2e-test-subtopic');
+      if (!titleElement) {
+        continue;
+      }
+      const title = await this.page.evaluate(
+        el => el.textContent,
+        titleElement
+      );
+      if (title === subtopicName) {
+        subtopicElement = element;
+        break;
+      }
+    }
+
+    if (!subtopicElement) {
+      throw new Error(`Subtopic with title ${subtopicName} not found.`);
+    }
+
+    const showOptionsButton = await subtopicElement.$(
+      '.e2e-test-show-subtopic-options'
+    );
+    if (!showOptionsButton) {
+      throw new Error('Show options button not found.');
+    }
+
+    await showOptionsButton.click();
+
+    const deleteButton = await this.page.$('.e2e-test-delete-subtopic-button');
+    if (!deleteButton) {
+      throw new Error('Delete button not found.');
+    }
+
+    await deleteButton.click();
   }
 }
 

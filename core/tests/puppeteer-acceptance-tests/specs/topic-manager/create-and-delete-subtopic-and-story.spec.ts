@@ -72,21 +72,21 @@ describe('Topic Manager User Journey', function () {
         true
       );
 
-      await topicManager.addStoryToTopic('Test Topic 1', 'Test Story 1');
-      // Verify the story is present in the topic
-      await topicManager.verifyStoryPresenceInTopic(
+      await topicManager.addStoryWithChapterToTopic(
+        'Test Topic 1',
+        'Test Story 1',
+        '',
+        ''
+      );
+      // Verify the chapter is present in the story
+      await topicManager.verifyChapterPresenceInStory(
         'Test Topic 1',
         'Test Story 1',
         true
       );
 
-      await topicManager.addChapterToStory(
-        'Test Topic 1',
-        'Test Story 1',
-        explorationId as string
-      );
-      // Verify the chapter is present in the story
-      await topicManager.verifyChapterPresenceInStory(
+      // Verify the story is present in the topic
+      await topicManager.verifyStoryPresenceInTopic(
         'Test Topic 1',
         'Test Story 1',
         true
@@ -98,11 +98,7 @@ describe('Topic Manager User Journey', function () {
   it(
     'should delete a chapter from a story, delete the story from a topic, and delete the subtopic from a topic.',
     async function () {
-      await topicManager.deleteChapterFromStory(
-        'Test Topic 1',
-        'Test Story 1',
-        1
-      );
+      await topicManager.deleteChapterFromStory('Test Topic 1', 'Test Story 1');
       // Verify the chapter is not present in the story
       await topicManager.verifyChapterPresenceInStory(
         'Test Topic 1',
@@ -110,11 +106,7 @@ describe('Topic Manager User Journey', function () {
         false
       );
 
-      await topicManager.deleteStoryFromTopic(
-        'Test Topic 1',
-        'Test Subtopic 1',
-        'Test Story 1'
-      );
+      await topicManager.deleteStoryFromTopic('Test Topic 1', 'Test Story 1');
       // Verify the story is not present in the topic
       await topicManager.verifyStoryPresenceInTopic(
         'Test Topic 1',
