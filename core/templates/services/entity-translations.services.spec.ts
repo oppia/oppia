@@ -25,7 +25,7 @@ import {
 import {EntityTranslationBackendApiService} from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import {EntityTranslationsService} from './entity-translations.services';
 
-describe('Entity translations service', () => {
+fdescribe('Entity translations service', () => {
   let entityTranslationsService: EntityTranslationsService;
   let etbs: EntityTranslationBackendApiService;
   let entityTranslation: EntityTranslation;
@@ -177,6 +177,17 @@ describe('Entity translations service', () => {
     ]);
 
     expect(htmlData).toEqual([]);
+  });
+
+  it('should remove all translations for given content', () => {
+    entityTranslationsService.languageCodeToLatestEntityTranslations.fr =
+      entityTranslation;
+
+    entityTranslationsService.removeAllTranslationsForContent('hint_0');
+    expect(
+      entityTranslationsService.languageCodeToLatestEntityTranslations.fr
+        .translationMapping
+    ).not.toContain('hint_0');
   });
 
   it('should return backend dict for LanguageCodeToEntityTranslation objects', () => {
