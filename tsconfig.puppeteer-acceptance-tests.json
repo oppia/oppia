@@ -6,7 +6,8 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "noImplicitReturns": true,
-    "rootDir": "core/tests/puppeteer-acceptance-tests",
+    "downlevelIteration": true,
+    "rootDir": "core/tests",
     "outDir": "core/tests/puppeteer-acceptance-tests/build",
     "sourceMap": true,
     "typeRoots": [

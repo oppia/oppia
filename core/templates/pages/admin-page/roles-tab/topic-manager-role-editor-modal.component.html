@@ -24,10 +24,10 @@
     </li>
     <li *ngIf="topicIdsForSelection.length">
       <div class="d-inline-flex mt-3 w-100">
-        <select class="w-50" placeholder="Select new topic to add" label="Topic selector" ngbAutofocus [(ngModel)]="newTopicId">
+        <select class="w-50 e2e-test-select-topic" placeholder="Select new topic to add" label="Topic selector" ngbAutofocus [(ngModel)]="newTopicId">
           <option *ngFor="let topicId of topicIdsForSelection" [value]="topicId">{{ topicIdToName[topicId] }}</option>
         </select>
-        <button mat-icon-button color="primary" (click)="addTopic()">
+        <button mat-icon-button color="primary" (click)="addTopic()" class="e2e-test-add-topic-button">
           <mat-icon aria-label="Example icon-button with a heart icon">add</mat-icon>
         </button>
       </div>

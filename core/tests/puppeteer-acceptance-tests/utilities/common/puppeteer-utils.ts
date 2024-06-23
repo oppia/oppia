@@ -16,16 +16,11 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, {
-  Page,
-  Frame,
-  Browser,
-  Viewport,
-  ElementHandle,
-} from 'puppeteer';
+import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
+import {TestToModulesMatcher} from '../../../test-dependencies/test-to-modules-matcher';
 import {showMessage} from './show-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
@@ -78,6 +73,7 @@ export class BaseUser {
 
     const headless = process.env.HEADLESS === 'true';
     const mobile = process.env.MOBILE === 'true';
+    const specName = process.env.SPEC_NAME;
     /**
      * Here we are disabling the site isolation trials because it is causing
      * tests to fail while running in non headless mode (see
@@ -99,6 +95,12 @@ export class BaseUser {
         this.startTimeInMilliseconds = Date.now();
         this.browserObject = browser;
         ConsoleReporter.trackConsoleMessagesInBrowser(browser);
+        if (!mobile) {
+          TestToModulesMatcher.setGoldenFilePath(
+            `core/tests/test-modules-mappings/acceptance/${specName}.txt`
+          );
+          TestToModulesMatcher.registerPuppeteerBrowser(browser);
+        }
         this.page = await browser.newPage();
 
         if (mobile) {
@@ -131,6 +133,16 @@ export class BaseUser {
       });
 
     return this.page;
+  }
+
+  /**
+   * Checks if the application is in development mode.
+   * @returns {Promise<boolean>} Returns true if the application is in development mode,
+   * false otherwise.
+   */
+  async isInProdMode(): Promise<boolean> {
+    const prodMode = process.env.PROD_ENV === 'true';
+    return prodMode;
   }
 
   /**
@@ -346,28 +358,6 @@ export class BaseUser {
   }
 
   /**
-   * Clicks an element on the page.
-   * @param {Page | Frame | ElementHandle} context - The Puppeteer context, usually a Page or Frame.
-   * @param {string} selector - The CSS selector of the element to click.
-   */
-  async clickElement(
-    context: Page | Frame | ElementHandle,
-    selector: string
-  ): Promise<void> {
-    const element = await context.$(selector);
-    if (!element) {
-      throw new Error(`Element ${selector} not found`);
-    }
-    await this.waitForElementToBeClickable(element);
-
-    try {
-      await element.click();
-    } catch (error) {
-      throw new Error(`Failed to click on element ${selector}`);
-    }
-  }
-
-  /**
    * This function retrieves the text content of a specified element.
    */
   async getElementText(selector: string): Promise<string> {
@@ -381,8 +371,8 @@ export class BaseUser {
   }
 
   /**
-   * This function checks if a particular text exists on the current page.
-   * @param {string} text - The text to check for.
+   * Checks if a given word is present on the page.
+   * @param {string} word - The word to check.
    */
   async isTextPresentOnPage(text: string): Promise<boolean> {
     const pageContent = await this.page.content();
