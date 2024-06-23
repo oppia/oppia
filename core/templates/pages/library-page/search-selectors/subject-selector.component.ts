@@ -56,7 +56,7 @@ export class SubjectSelectorComponent implements OnInit, OnDestroy {
     let itemsName = selectionDetails[itemsType].itemsName;
     let masterList = selectionDetails[itemsType].masterList;
 
-    let selectedItems = [];
+    let selectedItems: string[] = [];
     masterList.forEach(function (item) {
       if (selectionDetails[itemsType].selections[item.id]) {
         selectedItems.push(item.text);

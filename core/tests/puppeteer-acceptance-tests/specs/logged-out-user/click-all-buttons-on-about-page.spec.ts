@@ -75,19 +75,36 @@ describe('Logged-out User in About page', function () {
   );
 
   it(
-    'should open the Sign-in page when the Create Lessons button is clicked by a logged-out user',
+    'should open the Volunteer form when the "Volunteer with Oppia" button ' +
+      'is clicked.',
     async function () {
-      // The Contributor Dashboard is not accessible to logged-out users.
-      // Therefore, clicking the Create Lessons button will redirect the user to the Sign-in page.
-      await loggedOutUser.clickCreateLessonsButtonInAboutPage();
+      await loggedOutUser.clickVolunteerWithOppiaButtonInAboutPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should open Math Classroom page with the Explore Lessons button.',
+    'should open the donorbox when the "Donate" button is clicked',
     async function () {
-      await loggedOutUser.clickExploreLessonsButtonInAboutPage();
+      await loggedOutUser.clickDonateButtonInAboutPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should open the Partnerships form when the "Partner with us" button is clicked',
+    async function () {
+      await loggedOutUser.clickPartnerWithUsButtonInAboutPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should open the translated Partnerships form when the "Partner with us" button is clicked after the language change',
+    async function () {
+      await loggedOutUser.clickPartnerWithUsButtonInAboutPageInGivenLanguage(
+        'pt-br'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
