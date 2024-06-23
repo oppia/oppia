@@ -132,7 +132,7 @@ describe('Contributor Admin Dashboard', function () {
     await waitFor.pageToFullyLoad();
     await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
     await diagnosticTestPage.addTopicToClassroomConfig(TOPIC_NAMES[0]);
-
+    await diagnosticTestPage.publishClassroom();
     await workflow.createSkillAndAssignTopic(
       SKILL_DESCRIPTIONS[0],
       REVIEW_MATERIALS[0],

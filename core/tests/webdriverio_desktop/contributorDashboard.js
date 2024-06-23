@@ -107,6 +107,7 @@ describe('Contributor dashboard page', function () {
     await waitFor.pageToFullyLoad();
     await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
     await diagnosticTestPage.addTopicToClassroomConfig(TOPIC_NAMES[0], 0);
+    await diagnosticTestPage.publishClassroom();
     await users.logout();
 
     await users.login(QUESTION_ADMIN_EMAIL);

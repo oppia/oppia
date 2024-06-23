@@ -113,6 +113,7 @@ describe('Checkpoints functionality', function () {
     await diagnosticTestPage.addTopicToClassroomConfig(
       'Checkpoint features topic'
     );
+    await diagnosticTestPage.publishClassroom();
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(

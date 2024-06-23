@@ -19,6 +19,7 @@
 
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var DiagnosticTestPage = function () {
   var startDiagnosticTestButton = $('.e2e-test-start-diagnostic-test');
@@ -39,6 +40,21 @@ var DiagnosticTestPage = function () {
   var addTopicToClassroomButton = $('.e2e-test-add-topic-to-classroom-button');
   var saveClassroomConfigButton = $('.e2e-test-save-classroom-config-button');
   var classroomTopicDropdownElement = $('.e2e-test-classroom-topics-modal');
+  var updateClassroomTeaserTextInput = $(
+    '.e2e-test-update-classroom-teaser-text'
+  );
+  var updateClassroomTopicListIntroInput = $(
+    '.e2e-test-update-classroom-topic-list-intro'
+  );
+  var updateClassroomCourseDetailsInput = $(
+    '.e2e-test-update-classroom-course-details'
+  );
+  var publishClassroomButton = $('.e2e-test-publish-classroom-btn');
+  var thumbnailContainer = $('.e2e-test-thumbnail-container');
+  var topicThumbnailButton = $('.e2e-test-photo-button');
+  var bannerClickable = $('.e2e-test-classroom-banner-container');
+  var bannerCropper = $('.e2e-test-photo-crop .cropper-container');
+
   this.startDiagnosticTest = async function () {
     await action.click(
       'Start diagnostic test button',
@@ -78,6 +94,12 @@ var DiagnosticTestPage = function () {
       newClassroomNameInput,
       'Create classroom config modal taking too long to disappear.'
     );
+    await this.updateClassroomData();
+    await action.click(
+      'Save classroom config button',
+      saveClassroomConfigButton
+    );
+    await action.click('Classroom config tile selector', classroomTileSelector);
   };
 
   this.addTopicToClassroomConfig = async function (topicName) {
@@ -100,6 +122,56 @@ var DiagnosticTestPage = function () {
       'Save classroom config button',
       saveClassroomConfigButton
     );
+  };
+
+  this.updateClassroomData = async function () {
+    await action.click('Classroom config tile selector', classroomTileSelector);
+
+    await action.click(
+      'Edit classroom config button',
+      editClassroomConfigButton
+    );
+
+    await action.setValue(
+      'New classroom teaser text input',
+      updateClassroomTeaserTextInput,
+      'teaser text'
+    );
+
+    await action.setValue(
+      'New classroom course details input',
+      updateClassroomCourseDetailsInput,
+      'course details'
+    );
+
+    await action.setValue(
+      'New classroom topic list intro input',
+      updateClassroomTopicListIntroInput,
+      'topic list intro'
+    );
+
+    await workflow.submitImage(
+      topicThumbnailButton,
+      thumbnailContainer,
+      '../data/test_svg.svg',
+      false
+    );
+
+    await workflow.submitImage(
+      bannerClickable,
+      bannerCropper,
+      '../data/img.png',
+      false
+    );
+  };
+
+  this.publishClassroom = async function () {
+    await action.click(
+      'Edit classroom config button',
+      editClassroomConfigButton
+    );
+
+    await action.click('Publish classroom button', publishClassroomButton);
   };
 
   this.expectNumberOfRecommendedTopicsToBe = async function (count) {

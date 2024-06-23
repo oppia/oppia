@@ -193,6 +193,7 @@ describe('Topics and skills dashboard functionality', function () {
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
     await diagnosticTestPage.addTopicToClassroomConfig(TOPIC_NAME);
+    await diagnosticTestPage.publishClassroom();
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(

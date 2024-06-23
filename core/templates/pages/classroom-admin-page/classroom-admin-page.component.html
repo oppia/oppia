@@ -90,7 +90,7 @@
                       (blur)="updateClassroomField()"
                       (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
                       rows="1"
-                      class="classroom-field form-control e2e-update-classroom-teaser-text">
+                      class="classroom-field form-control e2e-test-update-classroom-teaser-text">
             </textarea>
           </div>
 
@@ -106,7 +106,7 @@
                       (blur)="updateClassroomField()"
                       (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
                       rows="1"
-                      class="classroom-field form-control e2e-update-classroom-topic-list-intro">
+                      class="classroom-field form-control e2e-test-update-classroom-topic-list-intro">
             </textarea>
           </div>
 
@@ -122,7 +122,7 @@
                       (blur)="updateClassroomField()"
                       (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
                       rows="2"
-                      class="classroom-field form-control e2e-update-classroom-course-details">
+                      class="classroom-field form-control e2e-test-update-classroom-course-details">
             </textarea>
           </div>
 
@@ -130,7 +130,7 @@
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Thumbnail</strong>
             </span>
-            <div class="e2e-classroom-thumbnail-container">
+            <div class="e2e-test-classroom-thumbnail-container">
               <oppia-image-uploader [imageUploaderParameters]="thumbnailParameters" (imageSave)="updateThumbnailData($event)"></oppia-image-uploader>
             </div>
           </div>
@@ -139,7 +139,7 @@
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Banner</strong>
             </span>
-            <div class="e2e-classroom-banner-container">
+            <div class="e2e-test-classroom-banner-container">
               <oppia-image-uploader [imageUploaderParameters]="bannerParameters" (imageSave)="updateBannerData($event)"></oppia-image-uploader>
             </div>
           </div>
@@ -280,7 +280,7 @@
                     *ngIf="tempClassroomData.getTopicsCount() > 0">
               View Graph
             </button>
-            <button class="btn btn-secondary cancel-classroom-changes"
+            <button class="btn btn-secondary cancel-classroom-changes e2e-cancel-classroom-changes"
                     (click)="closeClassroomConfigEditor()"
                     [disabled]="classroomDataSaveInProgress">
               Cancel
@@ -303,7 +303,7 @@
                   >
               <button *ngIf="!tempClassroomData._isPublished"
                       [disabled]="!(validationErrors.length === 0)"
-                      class="btn btn-success publish-classroom-btn e2e-publish-classroom-btn"
+                      class="btn btn-success publish-classroom-btn e2e-test-publish-classroom-btn"
                       (click)="publishClassroom()"
                   >
                 <span *ngIf="!classroomDataPublishInProgress">Publish</span>

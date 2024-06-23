@@ -246,6 +246,7 @@ describe('Learner dashboard functionality', function () {
       await waitFor.pageToFullyLoad();
       await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
       await diagnosticTestPage.addTopicToClassroomConfig(TOPIC_NAME);
+      await diagnosticTestPage.publishClassroom();
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
       await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(

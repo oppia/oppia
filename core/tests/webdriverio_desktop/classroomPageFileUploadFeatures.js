@@ -73,6 +73,7 @@ describe('Classroom page functionality', function () {
     await waitFor.pageToFullyLoad();
     await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
     await diagnosticTestPage.addTopicToClassroomConfig('Topic 1');
+    await diagnosticTestPage.publishClassroom();
     await classroomPage.get('math');
     // Even if the topic is unpublished, an unclickable tile is shown
     // currently.

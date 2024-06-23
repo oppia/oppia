@@ -122,6 +122,7 @@ describe('Topic and Story viewer functionality', function () {
     await waitFor.pageToFullyLoad();
     await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
     await diagnosticTestPage.addTopicToClassroomConfig('Topic TASV1');
+    await diagnosticTestPage.publishClassroom();
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill TASV1',
