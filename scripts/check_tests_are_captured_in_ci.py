@@ -229,7 +229,7 @@ def main() -> None:
         raise Exception(
             'Acceptance test suites and CI test suites are not in sync. '
             'The following suites are not in sync: %s' % (
-                acceptance_test_suites_difference)
+                json.dumps(acceptance_test_suites_difference))
         )
     print('Done!')
 
@@ -257,7 +257,7 @@ def main() -> None:
     if len(e2e_test_suites_difference) > 0:
         raise Exception(
             'E2E test suites and CI test suites are not in sync. The following '
-            'suites are not in sync: %s' % e2e_test_suites_difference
+            'suites are not in sync: %s' % json.dumps(e2e_test_suites_difference)
         )
     print('Done!')
 

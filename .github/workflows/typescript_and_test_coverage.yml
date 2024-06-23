@@ -40,7 +40,7 @@ jobs:
       - uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         run: python -m scripts.install_chrome_for_ci
-      - name: Check that e2e test files are captured in CI
+      - name: Check that test files are captured in CI
         run: python -m scripts.check_tests_are_captured_in_ci
       - name: Run typescript tests
         run: python -m scripts.run_typescript_checks
