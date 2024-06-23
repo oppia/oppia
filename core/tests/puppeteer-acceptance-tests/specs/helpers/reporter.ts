@@ -19,6 +19,7 @@
 import util from 'util';
 import sourceMapSupport from 'source-map-support';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {TestToModulesMatcher} from '../../../test-dependencies/test-to-modules-matcher';
 
 sourceMapSupport.install();
 
@@ -268,4 +269,11 @@ jasmine.getEnv().addReporter(Reporter);
 // Here we report console errors after each test suite.
 afterEach(() => {
   ConsoleReporter.reportConsoleErrors();
+});
+
+afterAll(() => {
+  const mobile = process.env.MOBILE === 'true';
+  if (!mobile) {
+    TestToModulesMatcher.compareCollectedModulesWithGoldenFile();
+  }
 });
