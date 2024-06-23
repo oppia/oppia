@@ -165,6 +165,10 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
       this.activeWrittenTranslation = entityTranslations.getWrittenTranslation(
         this.translationTabActiveContentIdService.getActiveContentId() as string
       );
+    } else {
+      this.activeWrittenTranslation = TranslatedContent.createNew(
+        this.dataFormat
+      );
     }
   }
 
