@@ -25,7 +25,7 @@ import {
 import {EntityTranslationBackendApiService} from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import {EntityTranslationsService} from './entity-translations.services';
 
-fdescribe('Entity translations service', () => {
+describe('Entity translations service', () => {
   let entityTranslationsService: EntityTranslationsService;
   let etbs: EntityTranslationBackendApiService;
   let entityTranslation: EntityTranslation;
