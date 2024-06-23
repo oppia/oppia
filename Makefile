@@ -178,6 +178,8 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	fi
 # Adding env variable for mobile view
 	@export MOBILE=${MOBILE:-false}
+# Adding env variable for the suite name
+	SUITE_NAME=$(suite)
 # Starting the development server for the acceptance tests.
 	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
