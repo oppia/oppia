@@ -23,7 +23,7 @@ import subprocess
 
 from scripts import generate_root_files_mapping
 
-from typing import Final, List, Optional, Sequence, TypedDict
+from typing import Final, List, Optional, Sequence, Set, TypedDict
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
@@ -548,15 +548,15 @@ def get_test_suites_affected_by_root_file(
 
 
 def get_affected_lighthouse_pages(
-    modified_root_files: List[str]
+    modified_root_files: Set[str]
 ) -> List[LighthousePageDict]:
     """Gets the affected Lighthouse pages by a list of modified root files.
 
     Args:
-        modified_root_files: list(str). The list of modified root files.
+        modified_root_files: set(str). The set of modified root files.
 
     Returns:
-        list(dict). The affected Lighthouse pages.
+        list(dict). The affected Lighthouse pages sorted by name.
     """
     lighthouse_pages = get_lighthouse_pages_from_config()
     affected_lighthouse_pages: List[LighthousePageDict] = []
@@ -565,7 +565,7 @@ def get_affected_lighthouse_pages(
             if modified_root_file == lighthouse_page['page_module']:
                 affected_lighthouse_pages.append(lighthouse_page)
 
-    return affected_lighthouse_pages
+    return sorted(affected_lighthouse_pages, key=lambda x: x['name'])
 
 
 def get_ci_test_suites_to_run(
@@ -582,13 +582,14 @@ def get_ci_test_suites_to_run(
         dict | None. The test suites to run in the CI or None if all test
         suites should be run.
     """
-    modified_root_files = []
+    modified_root_files: Set[str] = set()
     for file in modified_files:
+        # If the file is not in the root files mapping, then all test suites
+        # should be run. This is the case for files that are not scraped by
+        # the root files mapping script (e.g. files like package.json).
         if file not in root_files_mapping:
             return None
-        for root_file in root_files_mapping[file]:
-            if root_file not in modified_root_files:
-                modified_root_files.append(root_file)
+        modified_root_files.update(root_files_mapping[file])
 
     root_files_config = get_root_files_config()
     for modified_root_file in modified_root_files:

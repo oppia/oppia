@@ -145,6 +145,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
+        self.maxDiff = None
         self.tempdir = tempfile.TemporaryDirectory()
         root_files_mapping_file = os.path.join(
             self.tempdir.name, 'root-files-mapping.json')
@@ -731,6 +732,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                 '--github_head_ref', 'head'
                             ]
                         )
+                        print(self.get_test_suites_to_run_from_github_output())
                         self.assertEqual(
                             self.get_test_suites_to_run_from_github_output(),
                             {
@@ -744,31 +746,31 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                     ],
                                     'count': 1
                                 },
-                                'lighthouse_accessibility': {
-                                    'suites': [
-                                        {
-                                            'name': '1',
-                                            'module': '.lighthouserc-accessibility.js', # pylint: disable=line-too-long
-                                            'pages_to_run': [
-                                                'splash',
-                                                'about',
-                                                'terms',
-                                                'exploration-player'
-                                            ]
-                                        }
-                                    ],
-                                    'count': 1
-                                },
                                 'lighthouse_performance': {
                                     'suites': [
                                         {
                                             'name': '1',
                                             'module': '.lighthouserc-performance.js', # pylint: disable=line-too-long
                                             'pages_to_run': [
-                                                'splash',
                                                 'about',
-                                                'terms',
-                                                'exploration-player'
+                                                'exploration-player',
+                                                'splash',
+                                                'terms'
+                                            ]
+                                        }
+                                    ],
+                                    'count': 1
+                                },
+                                'lighthouse_accessibility': {
+                                    'suites': [
+                                        {
+                                            'name': '1',
+                                            'module': '.lighthouserc-accessibility.js', # pylint: disable=line-too-long
+                                            'pages_to_run': [
+                                                'about',
+                                                'exploration-player',
+                                                'splash',
+                                                'terms'
                                             ]
                                         }
                                     ],

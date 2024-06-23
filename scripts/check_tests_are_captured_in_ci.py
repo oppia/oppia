@@ -55,7 +55,7 @@ def get_acceptance_test_suites_from_ci_config_file() -> List[TestSuiteDict]:
     """Extracts the test suite names from the acceptance test suite config file.
 
     Returns:
-        list(dict). A list of dictionaries sorted by name, each containing
+        list(dict). A list of test suites dictionaries, each containing
         the name and module of a test suite from the acceptance test suite
         config file.
     """
@@ -65,14 +65,14 @@ def get_acceptance_test_suites_from_ci_config_file() -> List[TestSuiteDict]:
         acceptance_test_suite_config = json.load(f)
         acceptance_test_suites: List[TestSuiteDict] = (
             acceptance_test_suite_config['suites'])
-    return sorted(acceptance_test_suites, key=lambda x: x['name'])
+    return acceptance_test_suites
 
 
 def get_e2e_test_suites_from_ci_config_file() -> List[TestSuiteDict]:
     """Extracts the test suite names from the e2e test suite config file.
 
     Returns:
-        list(dict). A list of dictionaries sorted by name, each containing 
+        list(dict). A list of test suites dictionaries, each containing
         the name and module of a test suite from the e2e test suite config file.
     """
     with open(E2E_CI_TEST_SUITE_CONFIG_FILE_PATH, 'r', encoding='utf-8') as f:
@@ -97,8 +97,8 @@ def get_e2e_test_modules_from_webdriverio_directory() -> List[str]:
     and core/tests/webdriverio_desktop directory.
 
     Returns:
-        list(str). An alphabetically-sorted list of of the all test files
-        in core/tests/webdriverio and core/tests/webdriverio_desktop directory.
+        list(str). A list of filenames from the webdriverio and
+        webdriverio_desktop directories.
     """
     webdriverio_test_suite_modules = []
     webdriverio_files = os.path.join(
@@ -110,7 +110,7 @@ def get_e2e_test_modules_from_webdriverio_directory() -> List[str]:
     for file_name in os.listdir(webdriverio_desktop_files):
         webdriverio_test_suite_modules.append(file_name)
 
-    return sorted(webdriverio_test_suite_modules)
+    return webdriverio_test_suite_modules
 
 
 def get_e2e_test_modules_from_webdriverio_config_file() -> List[str]:
@@ -118,8 +118,8 @@ def get_e2e_test_modules_from_webdriverio_config_file() -> List[str]:
     wdio.conf.js file.
 
     Returns:
-        list(str). An alphabetically-sorted list of filenames extracted
-        from the wdio.conf.js file.
+        list(str). A list of filenames from the suites object of
+        wdio.conf.js file.
     """
     webdriverio_config_file_content = read_webdriverio_config_file()
     # The following line extracts suite object from wdio.conf.js.
@@ -127,11 +127,16 @@ def get_e2e_test_modules_from_webdriverio_config_file() -> List[str]:
         r'suites = {([^}]+)}').findall(webdriverio_config_file_content)[0]
     test_files_regex = re.compile(r'/([a-zA-Z]*.js)')
     e2e_test_modules = test_files_regex.findall(suite_object_string)
-    return sorted(e2e_test_modules)
+    return e2e_test_modules
 
 
 def get_e2e_test_suites_from_webdriverio_config_file() -> List[TestSuiteDict]:
-    """Extracts the test suites from the wdio.conf.js file."""
+    """Extracts the test suites from the wdio.conf.js file.
+
+    Returns:
+        list(dict). A list of test suites dictionaries, each containing
+        the name and module of a test suite from the wdio.conf.js file.
+    """
     webdriverio_config_file_content = read_webdriverio_config_file()
     # The following line extracts suite object from wdio.conf.js.
     suite_object_string = re.sub(r'[\n\t\s]*', '', re.compile(
@@ -157,12 +162,17 @@ def get_e2e_test_suites_from_webdriverio_config_file() -> List[TestSuiteDict]:
                     'module': test_suite_module
                 }
             )
-    return sorted(e2e_test_suites, key=lambda x: x['name'])
+    return e2e_test_suites
 
 
 def get_acceptance_test_suites_from_acceptance_directory() -> List[TestSuiteDict]: # pylint: disable=line-too-long
     """Gets the acceptance test suites from the acceptance test 
     specs directory.
+
+    Returns:
+        list(dict). A list of test suites dictionaries, each containing
+        the name and module of a test suite from the acceptance test
+        specs directory.
     """
 
     acceptance_test_files = glob.glob(
@@ -176,7 +186,7 @@ def get_acceptance_test_suites_from_acceptance_directory() -> List[TestSuiteDict
             'module': os.path.relpath(module, os.getcwd())
         } for module in acceptance_test_files
     ]
-    return sorted(acceptance_test_suites, key=lambda x: x['name'])
+    return acceptance_test_suites
 
 
 def compute_test_suites_difference(
@@ -228,7 +238,9 @@ def main() -> None:
     if len(acceptance_test_suites_difference) > 0:
         raise Exception(
             'Acceptance test suites and CI test suites are not in sync. '
-            'The following suites are not in sync: %s' % (
+            'The following suites are not in sync: %s. Please update the '
+            'CI config file for acceptance tests at core/tests/ci-test-'
+            'suite-configs/acceptance.json.' % (
                 json.dumps(acceptance_test_suites_difference))
         )
     print('Done!')
@@ -239,7 +251,11 @@ def main() -> None:
     webdriverio_conf_test_modules = (
         get_e2e_test_modules_from_webdriverio_config_file())
 
-    if not webdriverio_test_suite_modules == webdriverio_conf_test_modules:
+    if not (
+        sorted(
+            webdriverio_test_suite_modules
+        ) == sorted(webdriverio_conf_test_modules)
+    ):
         raise Exception(
             'One or more test module from webdriverio or webdriverio_desktop '
             'directory is missing from wdio.conf.js'
@@ -257,7 +273,9 @@ def main() -> None:
     if len(e2e_test_suites_difference) > 0:
         raise Exception(
             'E2E test suites and CI test suites are not in sync. The following '
-            'suites are not in sync: %s' % json.dumps(e2e_test_suites_difference)
+            'suites are not in sync: %s. Please update the CI config file for '
+            'e2e tests at core/tests/ci-test-suite-configs/e2e.json.' % (
+                json.dumps(e2e_test_suites_difference))
         )
     print('Done!')
 
