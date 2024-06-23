@@ -115,7 +115,7 @@ var DiagnosticTestPage = function () {
       addTopicToClassroomButton
     );
 
-    await AutocompleteTopicDropdownEditor(topicName);
+    await autocompleteTopicDropdownEditor(topicName);
     await action.waitForAutosave();
 
     await action.click(
@@ -138,17 +138,35 @@ var DiagnosticTestPage = function () {
       'teaser text'
     );
 
+    var teaserText = await action.getText(
+      'Teaser text input element',
+      updateClassroomTeaserTextInput
+    );
+    expect(teaserText).toEqual('teaser text');
+
     await action.setValue(
       'New classroom course details input',
       updateClassroomCourseDetailsInput,
       'course details'
     );
 
+    var courseDetailsText = await action.getText(
+      'Course details input element',
+      updateClassroomCourseDetailsInput
+    );
+    expect(courseDetailsText).toEqual('course details');
+
     await action.setValue(
       'New classroom topic list intro input',
       updateClassroomTopicListIntroInput,
       'topic list intro'
     );
+
+    var topicListIntroText = await action.getText(
+      'Topic list intro input element',
+      updateClassroomTopicListIntroInput
+    );
+    expect(topicListIntroText).toEqual('topic list intro');
 
     await workflow.submitImage(
       topicThumbnailButton,
@@ -192,9 +210,14 @@ var DiagnosticTestPage = function () {
     }
   };
 
-  var AutocompleteTopicDropdownEditor = async function (topicName) {
+  var autocompleteTopicDropdownEditor = async function (topicName) {
     var containerLocator = '.e2e-test-classroom-category-dropdown';
+    // We cannot add the 'e2e-test' prefix to this selector because the element
+    // is part of the mat-form-field component of Angular Material.
     var searchInputLocator = '.mat-select-search-input.mat-input-element';
+    var searchInputLocatorTextOption = $(
+      '.e2e-test-classroom-topic-selector-choice'
+    );
 
     await action.click(
       'Container Element',
@@ -208,13 +231,6 @@ var DiagnosticTestPage = function () {
       topicName
     );
 
-    var searchInputLocatorTextOption = $(
-      '.e2e-test-classroom-topic-selector-choice'
-    );
-    await waitFor.elementToBeClickable(
-      searchInputLocatorTextOption,
-      'Topic option taking too long to be clickable'
-    );
     await action.click('Dropdown Element Select', searchInputLocatorTextOption);
   };
 };
