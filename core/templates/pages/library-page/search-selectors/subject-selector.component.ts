@@ -94,11 +94,6 @@ export class SubjectSelectorComponent implements OnInit, OnDestroy {
     let selectionDetails = this.selectionDetails;
     let selections = selectionDetails[itemsType].selections;
 
-    if (!selections.hasOwnProperty(optionName)) {
-      // Initialize the selection as false if it doesn't exist.
-      selections[optionName] = false;
-    }
-
     // Toggle the selection state.
     selections[optionName] = !selections[optionName];
 

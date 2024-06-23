@@ -183,12 +183,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
   toggleSelection(itemsType: string, optionName: string): void {
     let selections = this.selectionDetails[itemsType].selections;
-    if (!selections.hasOwnProperty(optionName)) {
-      selections[optionName] = true;
-    } else {
-      selections[optionName] = !selections[optionName];
-    }
-
+    selections[optionName] = !selections[optionName];
     this.updateSelectionDetails(itemsType);
     this.refreshSearchBarLabels();
     this.searchService.triggerSearch();
