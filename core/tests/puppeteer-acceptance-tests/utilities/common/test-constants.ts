@@ -44,9 +44,11 @@ export default {
     CreatorDashboardCreateMode:
       'http://localhost:8181/creator-dashboard?mode=create',
     CreatingAnExploration: 'https://oppia.github.io/#/CreatingAnExploration',
+    CreatorGuidelines: 'http://localhost:8181/creator-guidelines',
     Donate: 'http://localhost:8181/donate',
     DonateWithThanksModal: 'http://localhost:8181/donate?thanks=',
     EmbeddingAnExploration: 'https://oppia.github.io/#/EmbeddingAnExploration',
+    ExplorationDesignTips: 'http://oppia.github.io/#/DesignTips',
     ExternalLink61MillionChildren:
       'https://uis.unesco.org/en/news/world-poverty-could-be-cut-half-' +
       'if-all-adults-completed-secondary-education',
@@ -91,8 +93,21 @@ export default {
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
     ProfilePagePrefix: 'http://localhost:8181/profile',
     OppiaAnnounceGoogleGroup: 'https://groups.google.com/g/oppia-announce',
+    GoogleGroups: {
+      Oppia: 'https://groups.google.com/g/oppia',
+      OppiaAnnounce: 'https://groups.google.com/g/oppia-announce',
+    },
+    GoogleAnalytics: {
+      PartnerPolicies: 'https://policies.google.com/technologies/partner-sites',
+      OptOut: 'https://tools.google.com/dlpage/gaoptout',
+    },
+    ExternalLink: {
+      AboutCookies: 'https://allaboutcookies.org/how-to-manage-cookies',
+      CreativeCommonsLegalCode:
+        'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
+      GoogleSignUp: 'https://accounts.google.com/lifecycle/steps/signup/name',
+    },
   },
-
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
     LearnerDashboard: '.oppia-learner-dashboard-main-content',
@@ -133,6 +148,35 @@ export default {
       '../../data/curriculum-admin-thumbnail.svg'
     ),
   },
-
+  OppiaSocials: {
+    YouTube: {
+      Domain: 'youtube.com',
+      Id: 'UC5c1G7BNDCfv1rczcBp9FPw',
+    },
+    FaceBook: {
+      Domain: 'facebook.com',
+      Id: 'oppiaorg',
+    },
+    Instagram: {
+      Domain: 'instagram.com',
+      Id: 'oppia.global',
+    },
+    Twitter: {
+      Domain: 'x.com',
+      Id: 'oppiaorg',
+    },
+    Github: {
+      Domain: 'github.com',
+      Id: 'oppia',
+    },
+    LinkedIn: {
+      Domain: 'linkedin.com',
+      Id: 'oppia-org',
+    },
+    GooglePlay: {
+      Domain: 'play.google.com',
+      Id: 'org.oppia.android',
+    },
+  },
   DEFAULT_SPEC_TIMEOUT_MSECS: 300000,
 };
