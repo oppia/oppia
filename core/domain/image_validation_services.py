@@ -48,9 +48,11 @@ def validate_image_and_filename(
         ValidationError. Image or filename supplied fails one of the
             validation checks.
     """
+    entity_types_with_max_size_one_mb = [
+        feconf.ENTITY_TYPE_BLOG_POST, feconf.ENTITY_TYPE_CLASSROOM
+    ]
     if (
-        entity_type in
-        [feconf.ENTITY_TYPE_BLOG_POST, feconf.ENTITY_TYPE_CLASSROOM]
+        entity_type in entity_types_with_max_size_one_mb
     ):
         max_file_size = ONE_MB_IN_BYTES
     else:

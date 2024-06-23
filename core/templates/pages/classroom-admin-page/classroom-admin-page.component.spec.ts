@@ -799,7 +799,7 @@ describe('Classroom Admin Page component ', () => {
       'getTopicIdToTopicNameAsync'
     ).and.returnValue(Promise.resolve(topicIdToTopicName));
 
-    component.addNewTopicToClassroom('topicId1');
+    component.onNewTopicInputModelChange('topicId1');
 
     tick();
 
@@ -842,7 +842,7 @@ describe('Classroom Admin Page component ', () => {
   it('should remove existing error for topic ID model change', () => {
     component.topicWithGivenIdExists = false;
 
-    component.onNewTopicInputModelChange();
+    component.onNewTopicInputModelChange('DUMMY_ID');
 
     expect(component.topicWithGivenIdExists).toBeTrue();
   });
@@ -1290,7 +1290,7 @@ describe('Classroom Admin Page component ', () => {
     expect(component.getPrerequisiteLength('Dummy topic 3')).toEqual(1);
   });
 
-  it('should be able to publish classroom', () => {
+  it('should be able to publish classroom', fakeAsync(() => {
     const response = {
       classroomDict: {
         ...dummyClassroomDict,
@@ -1304,13 +1304,14 @@ describe('Classroom Admin Page component ', () => {
       response.classroomDict
     );
 
-    expect(component.canPublishTheClassroom()).toBeTrue();
+    expect(component.validationErrors.length).toEqual(0);
     expect(component.classroomDataPublishInProgress).toBeFalse();
-    spyOn(component, 'updateClassroomData');
+    spyOn(component, 'updateClassroomData').and.returnValue(Promise.resolve());
+    tick();
 
     component.publishClassroom();
     expect(component.updateClassroomData).toHaveBeenCalled();
-  });
+  }));
 
   it('should not be able to publish classroom due to validation errors', () => {
     const response = {
@@ -1329,7 +1330,7 @@ describe('Classroom Admin Page component ', () => {
     component.classroomDataIsChanged = false;
     component.updateClassroomField();
 
-    expect(component.canPublishTheClassroom()).toBeFalse();
+    expect(component.validationErrors.length).toEqual(3);
   });
 
   it('should not be able to save classroom due to validation errors', () => {
@@ -1365,7 +1366,8 @@ describe('Classroom Admin Page component ', () => {
       response.classroomDict
     );
 
-    spyOn(component, 'updateClassroomData');
+    spyOn(component, 'updateClassroomData').and.returnValue(Promise.resolve());
+    tick();
 
     component.unpublishClassroom();
     expect(component.updateClassroomData).toHaveBeenCalled();

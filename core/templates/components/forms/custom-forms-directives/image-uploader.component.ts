@@ -134,6 +134,9 @@ export class ImageUploaderComponent implements OnInit {
           this.imageUploadHelperService.generateImageFilename(
             data.dimensions.height,
             data.dimensions.width,
+            // SVGs are XML-based; hence, the MIME type for them is image/svg+xml.
+            // When saving the image, we need .svg as the extension, which is why we need
+            // to omit the +xml part.
             imageBlobData?.type?.split('/')[1]?.replace('+xml', '')
           );
         this.hidePlaceholder = true;

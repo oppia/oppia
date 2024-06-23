@@ -126,11 +126,6 @@ export class ClassroomAdminPageComponent implements OnInit {
     aspectRatio: '16:9',
   };
 
-  addNewTopicToClassroom(topicId: string): void {
-    this.onNewTopicInputModelChange();
-    this.addTopicId(topicId);
-  }
-
   getEligibleTopicPrerequisites(currentTopicName: string): void {
     this.eligibleTopicNamesForPrerequisites = [];
     this.prerequisiteInput = '';
@@ -382,25 +377,32 @@ export class ClassroomAdminPageComponent implements OnInit {
   unpublishClassroom(): void {
     this.classroomDataUnpublishInProgress = true;
     this.tempClassroomData.setIsPublished(false);
-    this.updateClassroomData(this.tempClassroomData.getClassroomId());
-    this.classroomDataUnpublishInProgress = false;
+    this.updateClassroomData(this.tempClassroomData.getClassroomId()).then(
+      () => {
+        this.classroomDataUnpublishInProgress = false;
+      }
+    );
   }
 
   publishClassroom(): void {
     this.classroomDataPublishInProgress = true;
     this.tempClassroomData.setIsPublished(true);
-    this.updateClassroomData(this.tempClassroomData.getClassroomId());
-    this.classroomDataPublishInProgress = false;
+    this.updateClassroomData(this.tempClassroomData.getClassroomId()).then(
+      () => {
+        this.classroomDataPublishInProgress = false;
+      }
+    );
   }
 
   saveClassroomData(classroomId: string): void {
     this.classroomDataSaveInProgress = true;
     this.openClassroomInViewerMode();
-    this.updateClassroomData(classroomId);
-    this.classroomDataIsChanged = false;
+    this.updateClassroomData(classroomId).then(() => {
+      this.classroomDataIsChanged = false;
+    });
   }
 
-  updateClassroomData(classroomId: string): void {
+  async updateClassroomData(classroomId: string): Promise<void> {
     const backendDict = this.convertClassroomDictToBackendForm(
       this.tempClassroomData.getClassroomDict()
     );
@@ -582,10 +584,11 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.topicWithGivenIdExists = true;
   }
 
-  onNewTopicInputModelChange(): void {
+  onNewTopicInputModelChange(topicId: string): void {
     if (!this.topicWithGivenIdExists) {
       this.topicWithGivenIdExists = true;
     }
+    this.addTopicId(topicId);
   }
 
   getTopicIdFromTopicName(topicName: string): string {
@@ -763,10 +766,6 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   saveClassroomValidationErrors(): string[] {
     return this.classroomAdminDataService.getSaveClassroomValidationErrors();
-  }
-
-  canPublishTheClassroom(): boolean {
-    return this.validationErrors.length === 0;
   }
 
   getPrerequisiteLength(topicName: string): number {

@@ -241,7 +241,7 @@
                 <div class="topic-selector-container">
                   <mat-form-field appearance="fill" class="topics-selector-form-field e2e-test-classroom-topics-modal">
                     <mat-label for="explorationCategory" class="d-block">Select a topic</mat-label>
-                    <mat-select (selectionChange)="addNewTopicToClassroom($event.value)" class="e2e-test-classroom-category-dropdown">
+                    <mat-select (selectionChange)="onNewTopicInputModelChange($event.value)" class="e2e-test-classroom-category-dropdown">
                       <mat-option class="e2e-test-exploration-new-category-add">
                         <ngx-mat-select-search
                           ngModel
@@ -302,7 +302,7 @@
                   aria-label="List that shows issues preventing to publish a classroom"
                   >
               <button *ngIf="!tempClassroomData._isPublished"
-                      [disabled]="!(canPublishTheClassroom())"
+                      [disabled]="!(validationErrors.length === 0)"
                       class="btn btn-success publish-classroom-btn e2e-publish-classroom-btn"
                       (click)="publishClassroom()"
                   >
