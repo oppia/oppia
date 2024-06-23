@@ -167,6 +167,8 @@ import {OppiaVisualizationEnumeratedFrequencyTableComponent} from 'visualization
 import {RandomSelectorComponent} from 'value_generators/templates/random-selector.component';
 import {CopierComponent} from 'value_generators/templates/copier.component';
 import {UndoSnackbarComponent} from './custom-snackbar/undo-snackbar.component';
+import {TranslationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
+import {OppiaCkEditorCopyToolBarModule} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
 
 // Pipes.
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -212,6 +214,7 @@ import {DirectivesModule} from 'directives/directives.module';
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
+    OppiaCkEditorCopyToolBarModule,
     RichTextComponentsModule,
     SearchBarModule,
     SharedFormsModule,
@@ -366,6 +369,7 @@ import {DirectivesModule} from 'directives/directives.module';
     VisualizationSortedTilesComponent,
     RteHelperModalComponent,
     UndoSnackbarComponent,
+    TranslationModalComponent,
   ],
 
   entryComponents: [
@@ -502,6 +506,7 @@ import {DirectivesModule} from 'directives/directives.module';
     RandomSelectorComponent,
     RteHelperModalComponent,
     UndoSnackbarComponent,
+    TranslationModalComponent,
   ],
 
   exports: [
@@ -518,6 +523,7 @@ import {DirectivesModule} from 'directives/directives.module';
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
+    OppiaCkEditorCopyToolBarModule,
     SearchBarModule,
     SharedFormsModule,
     StringUtilityPipesModule,
@@ -647,6 +653,7 @@ import {DirectivesModule} from 'directives/directives.module';
     VisualizationSortedTilesComponent,
     RteHelperModalComponent,
     UndoSnackbarComponent,
+    TranslationModalComponent,
   ],
 })
 export class SharedComponentsModule {}
