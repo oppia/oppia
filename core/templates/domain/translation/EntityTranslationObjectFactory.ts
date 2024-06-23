@@ -91,7 +91,7 @@ export class EntityTranslation {
   }
 
   translationMappingToBackendDict(): TranslationMappingDict {
-    const translationMappingDict = {};
+    const translationMappingDict: TranslationMappingDict = {};
     Object.keys(this.translationMapping).forEach(contentId => {
       translationMappingDict[contentId] =
         this.translationMapping[contentId].toBackendDict();
