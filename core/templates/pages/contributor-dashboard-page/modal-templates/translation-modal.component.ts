@@ -85,6 +85,7 @@ export interface ModifyTranslationOpportunity {
   subheading: string;
   textToTranslate: string;
   currentContentTranslation: TranslatedContent;
+  interactionId?: string;
 }
 export interface HTMLSchema {
   type: string;
@@ -236,9 +237,16 @@ export class TranslationModalComponent {
         }
       );
     } else {
+      // Initialize the translation modal with the "modify translation" opportunity
+      // in case it was called from the exploration editor page for modifying
+      // a particular translation.
       this.textToTranslate = this.modifyTranslationOpportunity.textToTranslate;
-      this.activeContentType =
+      const contentType =
         this.modifyTranslationOpportunity.contentId.split('_')[0];
+      this.activeContentType = this.getFormattedContentType(
+        contentType,
+        this.modifyTranslationOpportunity.interactionId
+      );
       this.activeWrittenTranslation =
         this.modifyTranslationOpportunity.currentContentTranslation.translation;
       this.activeDataFormat =
