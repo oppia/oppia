@@ -18,7 +18,13 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  tick,
+  fakeAsync,
+} from '@angular/core/testing';
 import {
   NgbActiveModal,
   NgbModal,
@@ -49,7 +55,9 @@ class MockPlatformFeatureService {
 export class MockNgbModalRef {
   componentInstance = {
     contentId: null,
+    contentValue: null,
   };
+  result: null;
 }
 
 describe('Mark Translations As Needing Update Modal Component', () => {
@@ -111,11 +119,34 @@ describe('Mark Translations As Needing Update Modal Component', () => {
     expect(handlerWithSpy).toHaveBeenCalledOnceWith('contentId_1');
   });
 
-  it('should open the ModifyTranslations modal', () => {
+  it('should open the ModifyTranslations modal', fakeAsync(() => {
     component.contentId = 'content0';
+    component.contentValue = 'Content value';
+    ngbModalRef.result = Promise.resolve();
     const modalSpy = spyOn(ngbModal, 'open').and.returnValue(
       ngbModalRef as NgbModalRef
     );
+    spyOn(ngbActiveModal, 'close');
+
+    component.openModifyTranslationsModal();
+    tick();
+
+    expect(modalSpy).toHaveBeenCalledWith(ModifyTranslationsModalComponent, {
+      backdrop: 'static',
+      windowClass: 'oppia-modify-translations-modal',
+    });
+    expect(ngbModalRef.componentInstance.contentId).toBe('content0');
+    expect(ngbModalRef.componentInstance.contentValue).toBe('Content value');
+    expect(ngbActiveModal.close).toHaveBeenCalled();
+  }));
+
+  it('should cancel ModifyTranslations modal', () => {
+    component.contentId = 'content0';
+    ngbModalRef.result = Promise.reject();
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValue(
+      ngbModalRef as NgbModalRef
+    );
+    spyOn(ngbActiveModal, 'close');
 
     component.openModifyTranslationsModal();
 
@@ -124,6 +155,7 @@ describe('Mark Translations As Needing Update Modal Component', () => {
       windowClass: 'oppia-modify-translations-modal',
     });
     expect(ngbModalRef.componentInstance.contentId).toBe('content0');
+    expect(ngbActiveModal.close).not.toHaveBeenCalled();
   });
 
   it('should call removeTranslations', () => {
