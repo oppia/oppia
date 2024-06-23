@@ -2919,8 +2919,9 @@ def can_edit_question(
             raise self.NotFoundException
         if role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions:
             return handler(self, question_id, **kwargs)
+
         if (role_services.ACTION_EDIT_QUESTION_IN_MANAGED_TOPIC
-        in self.user.actions):
+                in self.user.actions):
             skills = question_services.get_skills_linked_to_question(
                 question_id)
             if not skills:
@@ -2928,8 +2929,8 @@ def can_edit_question(
                     'You do not have credentials to edit this question.')
             skill_ids = set(skill.id for skill in skills)
             managed_topic_ids = [
-                    rights.id for rights in
-                    topic_fetchers.get_topic_rights_with_user(self.user_id)]
+                topic_rights.id for topic_rights in
+                topic_fetchers.get_topic_rights_with_user(self.user_id)]
             if not managed_topic_ids:
                 raise self.UnauthorizedUserException(
                     'You do not have credentials to edit this question.')
