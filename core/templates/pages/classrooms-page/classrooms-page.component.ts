@@ -33,7 +33,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 })
 export class ClassroomsPageComponent {
   classroomSummaries: ClassroomSummaryDict[] = [];
-  haveAtleastOnePrivateClassroom: boolean = false;
+  hasPublicClassrooms: boolean = false;
   privateClassroomSummary: ClassroomSummaryDict = {
     classroom_id: '',
     name: '',
@@ -73,7 +73,7 @@ export class ClassroomsPageComponent {
             singlePublicClassroomUrlFragment =
               this.classroomSummaries[i].url_fragment;
           } else {
-            this.haveAtleastOnePrivateClassroom = true;
+            this.hasPublicClassrooms = true;
           }
         }
 

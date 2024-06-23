@@ -39,7 +39,7 @@
               <oppia-classroom-summary-tile [classroomSummary]="classroomSummary"></oppia-classroom-summary-tile>
             </ng-container>
           </ng-container>
-          <ng-container *ngIf="haveAtleastOnePrivateClassroom">
+          <ng-container *ngIf="hasPublicClassrooms">
             <oppia-classroom-summary-tile [classroomSummary]="privateClassroomSummary"></oppia-classroom-summary-tile>
           </ng-container>
         </div>

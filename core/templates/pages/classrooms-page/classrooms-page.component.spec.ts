@@ -138,8 +138,7 @@ describe('Classroom Page Component', () => {
   }));
 
   it(
-    'should set haveAtleastOnePrivateClassroom to true if we' +
-      'have a private classroom',
+    'should set hasPublicClassrooms to true if we' + 'have a private classroom',
     fakeAsync(() => {
       let response = [
         {
@@ -163,7 +162,7 @@ describe('Classroom Page Component', () => {
       expect(
         classroomBackendApiService.getAllClassroomsSummaryAsync
       ).toHaveBeenCalled();
-      expect(component.haveAtleastOnePrivateClassroom).toBeTrue();
+      expect(component.hasPublicClassrooms).toBeTrue();
     })
   );
 
@@ -195,7 +194,7 @@ describe('Classroom Page Component', () => {
       expect(
         classroomBackendApiService.getAllClassroomsSummaryAsync
       ).toHaveBeenCalled();
-      expect(component.haveAtleastOnePrivateClassroom).toBeFalse();
+      expect(component.hasPublicClassrooms).toBeFalse();
       expect(navigateSpy).toHaveBeenCalledWith(['/learn/math']);
     })
   );
