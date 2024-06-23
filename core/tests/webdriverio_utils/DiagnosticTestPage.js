@@ -93,10 +93,7 @@ var DiagnosticTestPage = function () {
       addTopicToClassroomButton
     );
 
-    await AutocompleteTopicDropdownEditor(
-      classroomTopicDropdownElement,
-      topicName
-    );
+    await AutocompleteTopicDropdownEditor(topicName);
     await action.waitForAutosave();
 
     await action.click(
@@ -123,18 +120,15 @@ var DiagnosticTestPage = function () {
     }
   };
 
-  var AutocompleteTopicDropdownEditor = async function (elem, topicName) {
+  var AutocompleteTopicDropdownEditor = async function (topicName) {
     var containerLocator = '.e2e-test-classroom-category-dropdown';
     var searchInputLocator = '.mat-select-search-input.mat-input-element';
-    var searchInputLocatorTextElement = function (text) {
-      return $$(`.e2e-test-classroom-topic-selector-choice=${text}`);
-    };
 
-    await action.click('Container Element', elem.$(containerLocator));
+    await action.click(
+      'Container Element',
+      classroomTopicDropdownElement.$(containerLocator)
+    );
     await action.waitForAutosave();
-    // NOTE: the input field is top-level in the DOM, and is outside the
-    // context of 'elem'. The 'select2-dropdown' id is assigned to the input
-    // field when it is 'activated', i.e. when the dropdown is clicked.
 
     await action.setValue(
       'Dropdown Element Search',
@@ -142,8 +136,13 @@ var DiagnosticTestPage = function () {
       topicName
     );
 
-    var searchInputLocatorTextOption =
-      await searchInputLocatorTextElement(topicName)[0];
+    var searchInputLocatorTextOption = $(
+      '.e2e-test-classroom-topic-selector-choice'
+    );
+    await waitFor.elementToBeClickable(
+      searchInputLocatorTextOption,
+      'Topic option taking too long to be clickable'
+    );
     await action.click('Dropdown Element Select', searchInputLocatorTextOption);
   };
 };
