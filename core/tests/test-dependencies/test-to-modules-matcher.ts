@@ -245,7 +245,7 @@ export class TestToModulesMatcher {
 
     if (!this.isArraySorted(goldenFileModules)) {
       throw new Error(
-        `The modules in the golden file at the path ${this.goldenFilePath} is not sorted.` +
+        `The modules in the golden file at the path ${this.goldenFilePath} is not sorted. ` +
           'Please ensure that the modules are sorted in ascending order. The sorted modules are:\n' +
           goldenFileModules.sort().join('\n')
       );
