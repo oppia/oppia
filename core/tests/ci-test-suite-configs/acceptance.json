@@ -5,6 +5,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-admin/assign-roles-to-users-and-change-tag-properties.spec.ts"
     },
     {
+      "name": "blog-editor/create-and-publish-a-blog-post-with-required-details",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/create-and-publish-a-blog-post-with-required-details.spec.ts"
+    },
+    {
       "name": "blog-editor/create-and-delete-draft-blog-post",
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/create-and-delete-draft-blog-post.spec.ts"
     },
@@ -85,14 +89,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-contact-us-page.spec.ts"
     },
     {
-      "name": "moderator/edit-featured-activities-list",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/moderator/edit-featured-activities-list.spec.ts"
-    },
-    {
-      "name": "moderator/view-recent-commits-and-feedback-messages",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/moderator/view-recent-commits-and-feedback-messages.spec.ts"
-    },
-    {
       "name": "logged-in-user/subscribe-to-creator-and-view-all-explorations-by-that-creator",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/subscribe-to-creator-and-view-all-explorations-by-that-creator.spec.ts"
     },
@@ -112,6 +108,14 @@
       "name": "logged-out-user/click-all-links-on-terms-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-links-on-terms-page.spec.ts"
     },
+    {
+      "name": "moderator/edit-featured-activities-list",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/moderator/edit-featured-activities-list.spec.ts"
+    },
+    {
+      "name": "moderator/view-recent-commits-and-feedback-messages",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/moderator/view-recent-commits-and-feedback-messages.spec.ts"
+    }, 
     {
       "name": "practice-question-admin/add-and-remove-contribution-rights",
       "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-admin/add-and-remove-contribution-rights.spec.ts"
