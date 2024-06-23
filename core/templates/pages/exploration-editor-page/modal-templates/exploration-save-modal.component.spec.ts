@@ -108,7 +108,7 @@ describe('Exploration Save Modal component', () => {
     }
   );
 
-  it('show state diff modal for translation changes', fakeAsync(() => {
+  it('should show state diff modal for translation changes', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue(ngbModalRef as NgbModalRef);
 
     component.showStateDiffModalForTranslations();

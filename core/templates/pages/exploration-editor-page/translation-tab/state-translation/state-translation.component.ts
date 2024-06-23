@@ -159,7 +159,6 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     if (!translationContent) {
       return subtitledHtml.html;
     }
-    console.log(translationContent);
 
     return translationContent.translation as string;
   }

@@ -124,7 +124,7 @@ export class EntityTranslationsService {
 
   converBulkTranslationsToBackendDict(
     languageCodeToEntityTranslations: LanguageCodeToEntityTranslations
-  ) {
+  ): LanguageCodeToEntityTranslationBackendDict {
     let bulkTranslationsBackendDict: LanguageCodeToEntityTranslationBackendDict =
       {};
 
