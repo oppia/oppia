@@ -69,6 +69,10 @@ class ClassroomDataHandler(
         """
         classroom = classroom_config_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
+        public_classrooms_count = len([
+            c for c in classroom_config_services.get_all_classrooms()
+            if c.is_published
+        ])
 
         # Here we are asserting that classroom can never be none, because
         # in the decorator `does_classroom_exist` we are already handling
@@ -125,7 +129,9 @@ class ClassroomDataHandler(
             'teaser_text': classroom.teaser_text,
             'is_published': classroom.is_published,
             'thumbnail_data': classroom.thumbnail_data.to_dict(),
-            'banner_data': classroom.banner_data.to_dict()
+            'banner_data': classroom.banner_data.to_dict(),
+            'public_classrooms_count': public_classrooms_count,
+            'classroom_id': classroom.classroom_id
         })
         self.render_json(self.values)
 

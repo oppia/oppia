@@ -23,6 +23,7 @@ import {
 import {ImageData} from 'pages/classroom-admin-page/existing-classroom.model';
 
 export class ClassroomData {
+  _classroom_id: string;
   _name: string;
   _topicSummaries: CreatorTopicSummary[];
   _courseDetails: string;
@@ -31,8 +32,10 @@ export class ClassroomData {
   _isPublished: boolean;
   _thumbnailData: ImageData;
   _bannerData: ImageData;
+  _publicClassroomsCount: number;
 
   constructor(
+    classroomId: string,
     name: string,
     topicSummaries: CreatorTopicSummary[],
     courseDetails: string,
@@ -40,8 +43,10 @@ export class ClassroomData {
     teaserText: string,
     isPublished: boolean,
     thumbnailData: ImageData,
-    bannerData: ImageData
+    bannerData: ImageData,
+    publicClassroomsCount: number
   ) {
+    this._classroom_id = classroomId;
     this._name = name;
     this._topicSummaries = topicSummaries;
     this._courseDetails = courseDetails;
@@ -50,9 +55,11 @@ export class ClassroomData {
     this._isPublished = isPublished;
     this._thumbnailData = thumbnailData;
     this._bannerData = bannerData;
+    this._publicClassroomsCount = publicClassroomsCount;
   }
 
   static createFromBackendData(
+    classroomId: string,
     name: string,
     topicSummaryDicts: CreatorTopicSummaryBackendDict[],
     courseDetails: string,
@@ -60,12 +67,14 @@ export class ClassroomData {
     teaserText: string,
     isPublished: boolean,
     thumbnailData: ImageData,
-    bannerData: ImageData
+    bannerData: ImageData,
+    publicClassroomsCount: number
   ): ClassroomData {
     let topicSummaries = topicSummaryDicts.map(summaryDict => {
       return CreatorTopicSummary.createFromBackendDict(summaryDict);
     });
     return new ClassroomData(
+      classroomId,
       name,
       topicSummaries,
       courseDetails,
@@ -73,7 +82,8 @@ export class ClassroomData {
       teaserText,
       isPublished,
       thumbnailData,
-      bannerData
+      bannerData,
+      publicClassroomsCount
     );
   }
 
@@ -107,5 +117,13 @@ export class ClassroomData {
 
   getIsPublished(): boolean {
     return this._isPublished;
+  }
+
+  getPublicClassroomsCount(): number {
+    return this._publicClassroomsCount;
+  }
+
+  getClassroomId(): string {
+    return this._classroom_id;
   }
 }

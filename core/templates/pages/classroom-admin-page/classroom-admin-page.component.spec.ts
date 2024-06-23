@@ -1237,4 +1237,6 @@ describe('Classroom Admin Page component ', () => {
     expect(component.getPrerequisiteLength('Dummy topic 2')).toEqual(1);
     expect(component.getPrerequisiteLength('Dummy topic 3')).toEqual(1);
   });
+
+  it('should show private classroom banner to curriculum admins', fakeAsync(() => {}));
 });

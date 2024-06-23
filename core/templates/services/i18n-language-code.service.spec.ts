@@ -92,13 +92,24 @@ describe('I18nLanguageCodeService', () => {
     expect(hackyTranslationIsAvailable).toBe(false);
   });
 
-  it('should get classroom translation key correctly', () => {
-    translationKey = i18nLanguageCodeService.getClassroomTranslationKey('Math');
-    expect(translationKey).toBe('I18N_CLASSROOM_MATH_TITLE');
+  it('should get classroom translation keys correctly', () => {
+    let translationKeys =
+      i18nLanguageCodeService.getClassroomTranslationKeys('Math');
+    expect(translationKeys).toEqual({
+      name: 'I18N_CLASSROOM_MATH_NAME',
+      courseDetails: 'I18N_CLASSROOM_MATH_COURSE_DETAILS',
+      teaserText: 'I18N_CLASSROOM_MATH_TEASER_TEXT',
+      topicListIntro: 'I18N_CLASSROOM_MATH_TOPICS_LIST_INTRO',
+    });
 
-    translationKey =
-      i18nLanguageCodeService.getClassroomTranslationKey('Science');
-    expect(translationKey).toBe('I18N_CLASSROOM_SCIENCE_TITLE');
+    translationKeys =
+      i18nLanguageCodeService.getClassroomTranslationKeys('Science');
+    expect(translationKeys).toEqual({
+      name: 'I18N_CLASSROOM_SCIENCE_NAME',
+      courseDetails: 'I18N_CLASSROOM_SCIENCE_COURSE_DETAILS',
+      teaserText: 'I18N_CLASSROOM_SCIENCE_TEASER_TEXT',
+      topicListIntro: 'I18N_CLASSROOM_SCIENCE_TOPICS_LIST_INTRO',
+    });
   });
 
   it('should get topic and subtopic translation key correctly', () => {

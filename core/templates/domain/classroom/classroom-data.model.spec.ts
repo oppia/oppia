@@ -57,6 +57,7 @@ describe('Classroom data model', () => {
 
   it('should create a new classroom object from a backend dictionary', () => {
     let classroomData = ClassroomData.createFromBackendData(
+      'mathid',
       'Math',
       topicSummaryDicts,
       'Course Details',

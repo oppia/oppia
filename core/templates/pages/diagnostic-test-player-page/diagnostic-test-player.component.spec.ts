@@ -234,7 +234,17 @@ describe('Diagnostic test player component', () => {
     );
 
     let array: CreatorTopicSummary[] = [cData1, cData2];
-    let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
+    let classroomData = new ClassroomData(
+      'id',
+      'test',
+      array,
+      'dummy',
+      'dummy',
+      'dummy',
+      true,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'}
+    );
 
     spyOn(
       classroomBackendApiService,

@@ -1,23 +1,31 @@
 <div class="oppia-classroom-page-container">
-  <div class="classroom-top breadcrumbs-container">
+  <div class="classroom-top breadcrumbs-container" aria-label="Classroom banner" [style.background-image]="'url(' + classroomBanner + ')'">
+    <div *ngIf="showPrivateClassroomBanner"
+         class="classroom-admin-banner"
+    >
+      <span>{{'I18N_UNPUBLISHED_CLASSROOM_BANNER_TEXT' | translate}}</span>
+    </div>
     <div class="classroom-breadcrumbs">
       <div class="desktop-breadcrumbs">
-        <a href="/">Home</a>
+        <a *ngIf="publicClassroomsCount <= 1" href="/">Home</a>
+        <a *ngIf="publicClassroomsCount >= 2" href="/learn">Classrooms</a>
         <i class="fa fa-angle-right"></i>
-        <span>Classroom</span>
+        <span *ngIf="!isHackyClassroomTranslationDisplayed('name')">{{classroomData.getName()}}</span>
+        <span *ngIf="isHackyClassroomTranslationDisplayed('name')">{{CLASSROOM_I18N_KEYS.name | translate}}</span>
       </div>
       <div class="mobile-breadcrumbs">
         <i class="fa fa-angle-left"></i>
-        <a href="/">Back to Home</a>
+        <a href="/">{{ 'I18N_BACK_TO_HOME_TEXT' | translate }}</a>
       </div>
     </div>
     <div class="classroom-information-container">
       <div class="classroom-text-container">
-        <h3>The Math Classroom</h3>
-        <h1>Math</h1>
+        <h3>{{ 'I18N_CLASSROOM__HEADING' | translate:{ classroomName: classroomData.getName() } }}</h3>
+        <h1 *ngIf="!isHackyClassroomTranslationDisplayed('name')">{{classroomData.getName()}}</h1>
+        <h1 *ngIf="isHackyClassroomTranslationDisplayed('name')">{{CLASSROOM_I18N_KEYS.name | translate}}</h1>
       </div>
       <div class="classroom-thumbnail-container">
-        <img class="classroom-thumbnail" alt="Classroom thumbnail image" [src]="mathThumbnail">
+        <img class="classroom-thumbnail" alt="Classroom thumbnail image" [src]="classroomThumbnail">
       </div>
     </div>
   </div>
@@ -25,27 +33,29 @@
   <div class="classroom-content-container">
     <div class="classroom-content">
       <div class="content-section">
-        <h1 class="classroom-content-heading">Course details</h1>
-        <p class="classroom-content-text">{{classroomData.getCourseDetails()}}</p>
+        <h1 class="classroom-content-heading">{{'I18N_CLASSROOM_PAGE_COURSE_DETAILS' | translate}}</h1>
+        <p class="classroom-content-text" *ngIf="!isHackyClassroomTranslationDisplayed('courseDetails')">{{classroomData.getCourseDetails()}}</p>
+        <p class="classroom-content-text" *ngIf="isHackyClassroomTranslationDisplayed('courseDetails')">{{CLASSROOM_I18N_KEYS.courseDetails | translate}}</p>
       </div>
       <div class="content-section">
-        <h1 class="classroom-content-heading">Topics covered</h1>
-        <p class="classroom-content-text">{{classroomData.getTopicListIntro()}}</p>
+        <h1 class="classroom-content-heading">{{'I18N_CLASSROOM_PAGE_TOPICS_COVERED' | translate}}</h1>
+        <p class="classroom-content-text" *ngIf="!isHackyClassroomTranslationDisplayed('topicListIntro')">{{classroomData.getTopicListIntro()}}</p>
+        <p class="classroom-content-text" *ngIf="isHackyClassroomTranslationDisplayed('topicListIntro')">{{ CLASSROOM_I18N_KEYS.topicListIntro | translate }}</p>
       </div>
       <div *ngIf="isDiagnosticTestFeatureFlagEnabled()" class="content-section diagnostic-test-container">
         <div class="diagnostic-test-box">
           <div class="diagnostic-test-info">
-            <h4>Don’t know where to start?</h4>
-            <p>We recommend to start with the Place Value lesson.</p>
+            <h4>{{ 'I18N_CLASSROOM_PAGE_NEW_TO_MATH_HEADING' | translate }}?</h4>
+            <p>{{ beginWithFirstTopicButtonText }}</p>
           </div>
-          <a>Start here</a>
+          <a [href]="firstTopicUrl">{{ 'I18N_START_FIRST_CLASSROOM_TOPIC' | translate }}</a>
         </div>
         <div class="diagnostic-test-box">
           <div class="diagnostic-test-info">
-            <h4>Don’t know where to start?</h4>
-            <p>We recommend to start with the Place Value lesson.</p>
+            <h4>{{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_HEADING' | translate }}</h4>
+            <p>{{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_TEXT' | translate }}</p>
           </div>
-          <a>Start here</a>
+          <a href="/diagnostic-test-player" class="e2e-test-take-diagnostic-test">{{ 'I18N_CLASSROOM_PAGE_QUIZ_TEST_BUTTON' | translate }}</a>
         </div>
       </div>
       <div class="topic-tiles-container">
