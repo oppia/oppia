@@ -71,6 +71,7 @@ import {
   TranslatableField,
 } from 'domain/objects/BaseTranslatableObject.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
+import {EntityTranslationsService} from 'services/entity-translations.services';
 
 interface ContentsMapping {
   [contentId: string]: TranslatableField;
@@ -117,7 +118,8 @@ export class ExplorationStatesService {
     private statesObjectFactory: StatesObjectFactory,
     private validatorsService: ValidatorsService,
     private generateContentIdService: GenerateContentIdService,
-    private explorationNextContentIdIndexService: ExplorationNextContentIdIndexService
+    private explorationNextContentIdIndexService: ExplorationNextContentIdIndexService,
+    private entityTranslationsService: EntityTranslationsService
   ) {}
 
   // Properties that have a different backend representation from the
@@ -278,6 +280,8 @@ export class ExplorationStatesService {
         }
       );
       modalRef.componentInstance.contentId = contentId;
+      modalRef.componentInstance.contentValue =
+        BaseTranslatableObject.getContentValue(content);
       modalRef.componentInstance.markNeedsUpdateHandler =
         this.markTranslationAndVoiceoverNeedsUpdate.bind(this);
       modalRef.componentInstance.removeHandler =
@@ -306,6 +310,7 @@ export class ExplorationStatesService {
       recordedVoiceovers.voiceoversMapping[contentId] = {};
       this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
     }
+    this.entityTranslationsService.removeAllTranslationsForContent(contentId);
   }
 
   private _getElementsInFirstSetButNotInSecond(

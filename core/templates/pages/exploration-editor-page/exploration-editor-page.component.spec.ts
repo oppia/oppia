@@ -73,6 +73,8 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 
 class MockNgbModalRef {
   componentInstance = {};
@@ -116,6 +118,7 @@ describe('Exploration editor page component', () => {
   let registerDeclineTutorialModalEventSpy;
   let focusManagerService: FocusManagerService;
   let explorationPermissionsBackendApiService: ExplorationPermissionsBackendApiService;
+  let entityTranslationsService: EntityTranslationsService;
   let ngbModal: NgbModal;
   let refreshGraphEmitter = new EventEmitter<void>();
   let mockRefreshTranslationTabEventEmitter = new EventEmitter<void>();
@@ -353,6 +356,7 @@ describe('Exploration editor page component', () => {
     explorationPermissionsBackendApiService = TestBed.inject(
       ExplorationPermissionsBackendApiService
     );
+    entityTranslationsService = TestBed.inject(EntityTranslationsService);
 
     isLocationSetToNonStateEditorTabSpy = spyOn(
       rs,
@@ -822,7 +826,32 @@ describe('Exploration editor page component', () => {
         mockInitExplorationPageEmitter
       );
       explorationData.is_version_of_draft_valid = false;
-      explorationData.draft_changes = ['data1', 'data2'];
+      explorationData.draft_changes = [
+        {
+          cmd: 'edit_translation',
+          language_code: 'fr',
+          content_id: 'content0',
+          translation: {
+            content_value: '<p>test content one</p>',
+            content_format: 'html',
+            needs_update: false,
+          },
+        },
+        {
+          cmd: 'edit_translation',
+          language_code: 'fr',
+          content_id: 'content4',
+          translation: {
+            content_value: '<p>test content four</p>',
+            content_format: 'html',
+            needs_update: false,
+          },
+        },
+        {
+          cmd: 'remove_translations',
+          content_id: 'content0',
+        },
+      ];
 
       component.ngOnInit();
     });
@@ -896,6 +925,46 @@ describe('Exploration editor page component', () => {
 
       expect(cls.loadAutosavedChangeList).toHaveBeenCalled();
       expect(component.explorationEditorPageHasInitialized).toEqual(true);
+
+      flush();
+      discardPeriodicTasks();
+    }));
+
+    it('should update entity translations dict with draft changes', fakeAsync(() => {
+      spyOn(EntityTranslation, 'createFromBackendDict').and.callThrough();
+      let entityTranslation = EntityTranslation.createFromBackendDict({
+        entity_id: explorationId,
+        entity_type: 'exploration',
+        entity_version: explorationData.version,
+        language_code: 'fr',
+        translations: {
+          content4: {
+            content_value: '<p>test content four</p>',
+            content_format: 'html',
+            needs_update: false,
+          },
+        },
+      });
+      expect(
+        entityTranslationsService.languageCodeToEntityTranslations
+      ).toEqual({});
+
+      mockInitExplorationPageEmitter.emit();
+      tick();
+
+      expect(EntityTranslation.createFromBackendDict).toHaveBeenCalledWith({
+        entity_id: explorationId,
+        entity_type: 'exploration',
+        entity_version: explorationData.version,
+        language_code: 'fr',
+        translations: {},
+      });
+
+      expect(
+        entityTranslationsService.languageCodeToEntityTranslations
+      ).toEqual({
+        fr: entityTranslation,
+      });
 
       flush();
       discardPeriodicTasks();

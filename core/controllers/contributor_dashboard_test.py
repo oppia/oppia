@@ -21,7 +21,6 @@ import unittest.mock
 
 from core import feconf
 from core.constants import constants
-from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -116,15 +115,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         # Add skill opportunity topic to a classroom.
         self.classroom_id = classroom_config_services.get_new_classroom_id()
-        classroom = classroom_config_domain.Classroom(
+        self.save_new_valid_classroom(
             classroom_id=self.classroom_id,
-            name='math',
-            url_fragment='math-one',
-            course_details='',
-            topic_list_intro='',
-            topic_id_to_prerequisite_topic_ids={self.topic_id: []}
+            topic_id_to_prerequisite_topic_ids={
+                self.topic_id: []
+            }
         )
-        classroom_config_services.update_or_create_classroom_model(classroom)
 
         self.expected_skill_opportunity_dict_0 = {
             'id': self.skill_id_0,
@@ -284,15 +280,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             topic, [skill_id_3, skill_id_4, skill_id_5])
 
         # Add new topic to a classroom.
-        classroom = classroom_config_domain.Classroom(
+        self.save_new_valid_classroom(
             classroom_id=self.classroom_id,
-            name='math',
-            url_fragment='math-one',
-            course_details='',
-            topic_list_intro='',
-            topic_id_to_prerequisite_topic_ids={topic_id: []}
+            topic_id_to_prerequisite_topic_ids={
+                topic_id: []
+            }
         )
-        classroom_config_services.update_or_create_classroom_model(classroom)
 
         # Opportunities with IDs skill_id_0, skill_id_1, skill_id_2 will be
         # fetched first. Since skill_id_0, skill_id_1, skill_id_2 are not linked
@@ -2005,9 +1998,9 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_contributor_certificate(self) -> None:
-        score_category: str = (
-            suggestion_models.SCORE_TYPE_TRANSLATION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        score_category: str = ('%s%sEnglish' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER))
         change_cmd = {
             'cmd': 'add_written_translation',
             'content_id': 'content',
@@ -2062,10 +2055,10 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_json(
-            '/contributorcertificate/%s/%s?language=%s&'
+            '/contributorcertificate/%s/%s?language=hi&'
             'from_date=%s&to_date=%s' % (
                 self.OWNER_USERNAME, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                'hi', from_date_str, to_date_str
+                from_date_str, to_date_str
             ),
             expected_status_int=400
         )

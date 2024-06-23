@@ -20,8 +20,11 @@ import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
+import {TestToModulesMatcher} from '../../../test-dependencies/test-to-modules-matcher';
+import {showMessage} from './show-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
+const baseURL = testConstants.URLs.BaseURL;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
@@ -70,6 +73,7 @@ export class BaseUser {
 
     const headless = process.env.HEADLESS === 'true';
     const mobile = process.env.MOBILE === 'true';
+    const specName = process.env.SPEC_NAME;
     /**
      * Here we are disabling the site isolation trials because it is causing
      * tests to fail while running in non headless mode (see
@@ -91,6 +95,12 @@ export class BaseUser {
         this.startTimeInMilliseconds = Date.now();
         this.browserObject = browser;
         ConsoleReporter.trackConsoleMessagesInBrowser(browser);
+        if (!mobile) {
+          TestToModulesMatcher.setGoldenFilePath(
+            `core/tests/test-modules-mappings/acceptance/${specName}.txt`
+          );
+          TestToModulesMatcher.registerPuppeteerBrowser(browser);
+        }
         this.page = await browser.newPage();
 
         if (mobile) {
@@ -123,6 +133,16 @@ export class BaseUser {
       });
 
     return this.page;
+  }
+
+  /**
+   * Checks if the application is in development mode.
+   * @returns {Promise<boolean>} Returns true if the application is in development mode,
+   * false otherwise.
+   */
+  async isInProdMode(): Promise<boolean> {
+    const prodMode = process.env.PROD_ENV === 'true';
+    return prodMode;
   }
 
   /**
@@ -304,6 +324,61 @@ export class BaseUser {
       await this.page.click(selector);
     }
   }
+
+  /**
+   * The function clicks the element using the text on the button
+   * and wait until the new page is fully loaded.
+   */
+  async clickAndWaitForNavigation(selector: string): Promise<void> {
+    /** Normalize-space is used to remove the extra spaces in the text.
+     * Check the documentation for the normalize-space function here :
+     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
+    const [button] = await this.page.$x(
+      `\/\/*[contains(text(), normalize-space('${selector}'))]`
+    );
+    // If we fail to find the element by its XPATH, then the button is undefined and
+    // we try to find it by its CSS selector.
+    if (button !== undefined) {
+      await this.waitForElementToBeClickable(button);
+      await Promise.all([
+        this.page.waitForNavigation({
+          waitUntil: ['networkidle2', 'load'],
+        }),
+        button.click(),
+      ]);
+    } else {
+      await this.waitForElementToBeClickable(selector);
+      await Promise.all([
+        this.page.waitForNavigation({
+          waitUntil: ['networkidle2', 'load'],
+        }),
+        this.page.click(selector),
+      ]);
+    }
+  }
+
+  /**
+   * This function retrieves the text content of a specified element.
+   */
+  async getElementText(selector: string): Promise<string> {
+    await this.page.waitForSelector(selector);
+    const element = await this.page.$(selector);
+    if (element === null) {
+      throw new Error(`No element found for the selector: ${selector}`);
+    }
+    const textContent = await this.page.evaluate(el => el.textContent, element);
+    return textContent ?? '';
+  }
+
+  /**
+   * Checks if a given word is present on the page.
+   * @param {string} word - The word to check.
+   */
+  async isTextPresentOnPage(text: string): Promise<boolean> {
+    const pageContent = await this.page.content();
+    return pageContent.includes(text);
+  }
+
   /**
    * The function selects all text content and delete it.
    */
@@ -409,6 +484,51 @@ export class BaseUser {
    */
   getCurrentUrlWithoutParameters(): string {
     return this.page.url().split('?')[0];
+  }
+
+  /**
+   * This function checks the exploration accessibility by navigating to the
+   * exploration page based on the explorationID.
+   */
+  async expectExplorationToBeAccessibleByUrl(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('ExplorationId is null');
+    }
+    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      showMessage('Exploration is accessible with the URL, i.e. published.');
+    } catch (error) {
+      throw new Error('The exploration is not public.');
+    }
+  }
+
+  /**
+   * This function checks the exploration inaccessibility by navigating to the
+   * exploration page based on the explorationID.
+   */
+  async expectExplorationToBeNotAccessibleByUrl(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('ExplorationId is null');
+    }
+    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      throw new Error('The exploration is still public.');
+    } catch (error) {
+      showMessage('The exploration is not accessible with the URL.');
+    }
+  }
+
+  /**
+   * Waits for the page to fully load by checking the document's ready state.
+   */
+  async waitForPageToFullyLoad(): Promise<void> {
+    await this.page.waitForFunction('document.readyState === "complete"');
   }
 }
 

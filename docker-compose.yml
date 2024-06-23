@@ -30,6 +30,7 @@ services:
     environment:
       - prod_env=${prod_env:-false}
       - source_maps=${source_maps:-false}
+      - USE_FIREBASE_ENDPOINT=${use_firebase_endpoint:-false}
     entrypoint: bash /app/oppia/docker/webpack-compiler.entrypoint.sh
 
   dev-server:
