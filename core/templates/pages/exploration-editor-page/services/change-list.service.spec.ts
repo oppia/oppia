@@ -260,6 +260,23 @@ describe('Change List Service when changes are mergable', () => {
     expect(saveSpy).toHaveBeenCalled();
   }));
 
+  it('should add change for markTranslationAsNeedingUpdateForLanguage', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
+
+    changeListService.markTranslationAsNeedingUpdateForLanguage(
+      'content_id_1',
+      'fr'
+    );
+    flush();
+    expect(saveSpy).toHaveBeenCalled();
+  }));
+
   it('should add change for removeTranslations', fakeAsync(() => {
     changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;

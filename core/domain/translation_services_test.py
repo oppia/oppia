@@ -299,6 +299,59 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ], [False, True]
         )
 
+    def test_compute_translation_related_change_needs_update_for_language(
+        self
+    ) -> None:
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 5, 'hi',
+            'content_5', translation_domain.TranslatedContent(
+                'Translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 5, 'hi',
+            'content_6', translation_domain.TranslatedContent(
+                'Translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
+        self.assertEqual(len(entity_translation_models), 1)
+        entity_translation_model = entity_translation_models[0]
+        self.assertEqual(entity_translation_model.entity_version, 5)
+        self.assertEqual([
+            translation['needs_update']
+            for translation in entity_translation_model.translations.values()
+        ], [False, False])
+
+        self.exp.version = 6
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE,
+            'content_id': 'content_5',
+            'language_code': 'hi'
+        })]
+
+        entity_translation_models, _ = (
+            translation_services.compute_translation_related_change(
+                self.exp, change_list
+            )
+        )
+
+        self.assertEqual(len(entity_translation_models), 1)
+        entity_translation = entity_translation_models[0]
+        self.assertItemsEqual(
+            [
+                translation['needs_update']
+                for translation in entity_translation.translations.values()
+            ], [False, True]
+        )
+
     def test_compute_translation_related_change_edits_existing_translation(
         self
     ) -> None:

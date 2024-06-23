@@ -17,7 +17,7 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ContextService} from 'services/context.service';
 import {EntityBulkTranslationsBackendApiService} from '../services/entity-bulk-translations-backend-api.service';
@@ -25,9 +25,17 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {ChangeListService} from '../services/change-list.service';
+import {
+  ModifyTranslationOpportunity,
+  TranslationModalComponent,
+} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
+import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 
 interface LanguageCodeToContentTranslations {
-  [language_code: string]: TranslatedContent;
+  [languageCode: string]: TranslatedContent;
 }
 
 @Component({
@@ -36,18 +44,29 @@ interface LanguageCodeToContentTranslations {
 })
 export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   @Input() contentId!: string;
+  @Input() contentValue!: string;
   explorationId!: string;
   explorationVersion!: number;
   contentTranslations: LanguageCodeToContentTranslations = {};
+  contentHasDisplayableTranslations: boolean = false;
   allExistingTranslationsHaveBeenRemoved: boolean = false;
+  languageIsCheckedStatusDict: {
+    [languageCode: string]: boolean;
+  } = {};
+  translationsHaveLoaded: boolean = false;
+  interactionId?: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
+    private ngbModal: NgbModal,
     private contextService: ContextService,
     private entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService,
     private languageUtilService: LanguageUtilService,
     private entityTranslationsService: EntityTranslationsService,
-    private changeListService: ChangeListService
+    private changeListService: ChangeListService,
+    private translationLanguageService: TranslationLanguageService,
+    private stateEditorService: StateEditorService,
+    private stateInteractionIdService: StateInteractionIdService
   ) {
     super(ngbActiveModal);
   }
@@ -56,6 +75,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     this.explorationId = this.contextService.getExplorationId();
     this.explorationVersion =
       this.contextService.getExplorationVersion() as number;
+    this.interactionId = this.stateInteractionIdService.savedMemento;
 
     // Populate the content translations via latest draft changes first,
     // in order to get the most recently updated translations.
@@ -103,14 +123,124 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
                 translationDict.needsUpdate
               );
             }
+            // Initialize the entity translations object to track future draft changes.
+            if (
+              !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+                language
+              )
+            ) {
+              this.entityTranslationsService.languageCodeToEntityTranslations[
+                language
+              ] = EntityTranslation.createFromBackendDict({
+                entity_id: this.explorationId,
+                entity_type: 'exploration',
+                entity_version: response[language].entityVersion,
+                language_code: language,
+                translations: {},
+              });
+            }
           }
+          this.updateTranslationDisplayContent();
         });
+    } else {
+      this.updateTranslationDisplayContent();
     }
+  }
+
+  updateTranslationDisplayContent(): void {
+    this.changeListService.getTranslationChangeList().forEach(changeDict => {
+      if (changeDict.cmd === 'mark_translation_needs_update_for_language') {
+        if (changeDict.content_id === this.contentId) {
+          this.contentTranslations[changeDict.language_code].needsUpdate = true;
+        }
+      }
+    });
+
+    Object.keys(this.contentTranslations).forEach(languageCode => {
+      this.languageIsCheckedStatusDict[languageCode] = false;
+    });
+    this.contentHasDisplayableTranslations =
+      this.doesContentHaveDisplayableTranslations();
+    this.translationsHaveLoaded = true;
+  }
+
+  openTranslationEditor(languageCode: string): void {
+    const modalRef = this.ngbModal.open(TranslationModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+    });
+    this.translationLanguageService.setActiveLanguageCode(languageCode);
+
+    const modifyTranslationOpportunity: ModifyTranslationOpportunity = {
+      id: this.explorationId,
+      contentId: this.contentId,
+      heading: this.stateEditorService.getActiveStateName() || '',
+      subheading: 'Update Translation',
+      textToTranslate: this.contentValue,
+      currentContentTranslation: this.contentTranslations[languageCode],
+      interactionId: this.interactionId,
+    };
+    modalRef.componentInstance.modifyTranslationOpportunity =
+      modifyTranslationOpportunity;
+
+    modalRef.result.then(result => {
+      if (result) {
+        this.contentTranslations[languageCode].translation = result;
+      }
+    });
+  }
+
+  confirm(): void {
+    for (let language in this.contentTranslations) {
+      if (this.languageIsCheckedStatusDict[language] === true) {
+        const updatedTranslatedContent = new TranslatedContent(
+          this.contentTranslations[language].translation,
+          this.contentTranslations[language].dataFormat,
+          false
+        );
+        this.changeListService.editTranslation(
+          this.contentId,
+          language,
+          updatedTranslatedContent
+        );
+        this.entityTranslationsService.languageCodeToEntityTranslations[
+          language
+        ].updateTranslation(this.contentId, updatedTranslatedContent);
+      } else {
+        const updatedTranslatedContent = new TranslatedContent(
+          this.contentTranslations[language].translation,
+          this.contentTranslations[language].dataFormat,
+          true
+        );
+        this.changeListService.markTranslationAsNeedingUpdateForLanguage(
+          this.contentId,
+          language
+        );
+        this.entityTranslationsService.languageCodeToEntityTranslations[
+          language
+        ].updateTranslation(this.contentId, updatedTranslatedContent);
+      }
+    }
+    this.ngbActiveModal.close();
+  }
+
+  cancel(): void {
+    this.ngbActiveModal.dismiss();
   }
 
   getLanguageName(languageCode: string): string {
     return this.languageUtilService.getContentLanguageDescription(
       languageCode
     ) as string;
+  }
+
+  doesContentHaveDisplayableTranslations(): boolean {
+    // Check if at least one translation is not stale and can be displayed.
+    for (const translation of Object.values(this.contentTranslations)) {
+      if (!translation.needsUpdate) {
+        return true;
+      }
+    }
+    return false;
   }
 }

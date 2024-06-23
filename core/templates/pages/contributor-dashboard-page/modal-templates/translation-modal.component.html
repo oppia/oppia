@@ -131,7 +131,7 @@
     </div>
   </div>
 </div>
-<div class="oppia-translate-modal-footer modal-footer">
+<div *ngIf="opportunity && !modifyTranslationOpportunity" class="oppia-translate-modal-footer modal-footer">
   <button class="btn btn-default"
           (click)="close()">
     Cancel
@@ -150,6 +150,20 @@
     </span>
     <span [hidden]="uploadingTranslation || !moreAvailable">
       Save and translate another
+    </span>
+  </button>
+</div>
+<div *ngIf="modifyTranslationOpportunity && !opportunity" class="oppia-translate-modal-footer modal-footer">
+  <button class="btn btn-default"
+          (click)="close()">
+    Cancel
+  </button>
+  <button class="btn btn-success oppia-upload-translated-text-button e2e-test-save-button"
+          [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted()"
+          (click)="updateTranslatedText()">
+    <i [hidden]="!uploadingTranslation" class="fa fa-spinner"></i>
+    <span [hidden]="uploadingTranslation">
+      Save
     </span>
   </button>
 </div>

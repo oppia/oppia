@@ -193,7 +193,7 @@ describe('Exploration Editor', function () {
   }, 400000);
 
   it(
-    'should show translations of main content in the modal.',
+    'should show translations of main content and edit them via the modal.',
     async function () {
       await explorationEditor.page.bringToFront();
       await explorationEditor.reloadPage();
@@ -212,14 +212,24 @@ describe('Exploration Editor', function () {
         'de',
         'Content translation text'
       );
+      await explorationEditor.updateTranslationFromModal(
+        'de',
+        'Content',
+        'New content translation text.'
+      );
+      await explorationEditor.verifyTranslationInTranslationsTab(
+        'New content translation text.',
+        'Content'
+      );
       showMessage('The content translation has been verified successfully.');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should show translations of interactions in the modal.',
+    'should show translations of interactions and edit them via the modal.',
     async function () {
+      await explorationEditor.navigateToEditorTab();
       await explorationEditor.reloadPage();
       await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
       await explorationEditor.navigateToTranslationsTab();
@@ -237,6 +247,15 @@ describe('Exploration Editor', function () {
         'de',
         'Interaction translation text'
       );
+      await explorationEditor.updateTranslationFromModal(
+        'de',
+        'Interaction',
+        'New interaction translation text.'
+      );
+      await explorationEditor.verifyTranslationInTranslationsTab(
+        'New interaction translation text.',
+        'Interaction'
+      );
       showMessage(
         'The interaction translation has been verified successfully.'
       );
@@ -245,8 +264,9 @@ describe('Exploration Editor', function () {
   );
 
   it(
-    'should show translations of hints in the modal.',
+    'should show translations of hints and edit them via the modal.',
     async function () {
+      await explorationEditor.navigateToEditorTab();
       await explorationEditor.reloadPage();
       await explorationEditor.navigateToCard(
         CARD_NAME.MULTIPLE_CHOICE_QUESTION
@@ -264,14 +284,24 @@ describe('Exploration Editor', function () {
         'de',
         'Hint translation text'
       );
+      await explorationEditor.updateTranslationFromModal(
+        'de',
+        'Hint',
+        'New hint translation text.'
+      );
+      await explorationEditor.verifyTranslationInTranslationsTab(
+        'New hint translation text.',
+        'Hint'
+      );
       showMessage('The hint translation has been verified successfully.');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should show translations of solution explanations in the modal.',
+    'should show translations of solution explanations and edit them via the modal.',
     async function () {
+      await explorationEditor.navigateToEditorTab();
       await explorationEditor.reloadPage();
       await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
       await explorationEditor.navigateToTranslationsTab();
@@ -289,6 +319,15 @@ describe('Exploration Editor', function () {
         'de',
         'Solution explanation translation text'
       );
+      await explorationEditor.updateTranslationFromModal(
+        'de',
+        'Solution',
+        'New solution explanation translation text.'
+      );
+      await explorationEditor.verifyTranslationInTranslationsTab(
+        'New solution explanation translation text.',
+        'Solution'
+      );
       showMessage(
         'The solution explanation translation has been verified successfully.'
       );
@@ -297,8 +336,9 @@ describe('Exploration Editor', function () {
   );
 
   it(
-    'should show translations of response feedback in the modal.',
+    'should show translations of response feedback and edit them via the modal.',
     async function () {
+      await explorationEditor.navigateToEditorTab();
       await explorationEditor.reloadPage();
       await explorationEditor.navigateToCard(
         CARD_NAME.MULTIPLE_CHOICE_QUESTION
@@ -316,6 +356,16 @@ describe('Exploration Editor', function () {
       await explorationEditor.verifyTranslationInModifyTranslationsModal(
         'de',
         'Response feedback translation text'
+      );
+      await explorationEditor.updateTranslationFromModal(
+        'de',
+        'Feedback',
+        'New feedback translation text.'
+      );
+      await explorationEditor.verifyTranslationInTranslationsTab(
+        'New feedback translation text.',
+        'Feedback',
+        1
       );
       showMessage(
         'The response feedback translation has been verified successfully.'

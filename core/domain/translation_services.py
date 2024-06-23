@@ -161,6 +161,11 @@ def _apply_changes(
         elif change.cmd == exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE:
             entity_translation.mark_translations_needs_update(
                 [change.content_id])
+        elif change.cmd == (
+            exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE):
+            if entity_translation.language_code == change.language_code:
+                entity_translation.mark_translations_needs_update(
+                    [change.content_id])
         else:
             raise Exception(
                 'Invalid translation change cmd: %s' % change.cmd)

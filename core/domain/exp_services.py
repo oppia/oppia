@@ -2107,7 +2107,8 @@ def compute_models_to_put_when_saving_new_exp_version(
         if not change.cmd in [
             exp_domain.CMD_EDIT_TRANSLATION,
             exp_domain.CMD_REMOVE_TRANSLATIONS,
-            exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE
+            exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
+            exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE
         ]:
             continue
 

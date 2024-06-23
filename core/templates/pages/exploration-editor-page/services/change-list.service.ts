@@ -350,6 +350,7 @@ export class ChangeListService {
           'edit_translation',
           'remove_translations',
           'mark_translations_needs_update',
+          'mark_translation_needs_update_for_language',
         ].includes(change.cmd);
       })
     );
@@ -430,6 +431,17 @@ export class ChangeListService {
     this.addChange({
       cmd: 'mark_translations_needs_update',
       content_id: contentId,
+    });
+  }
+
+  markTranslationAsNeedingUpdateForLanguage(
+    contentId: string,
+    languageCode: string
+  ): void {
+    this.addChange({
+      cmd: 'mark_translation_needs_update_for_language',
+      content_id: contentId,
+      language_code: languageCode,
     });
   }
 
