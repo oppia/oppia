@@ -178,13 +178,13 @@ describe('subject-selector component', () => {
     expect(component.selectionDetails).toEqual(selectionDetailsStub);
   });
 
-  it('should initialize', () => {
+  it('should be able to initialize component', () => {
     spyOn(component, 'updateSelectionDetails');
     component.ngOnInit();
     expect(component.updateSelectionDetails).toHaveBeenCalled();
   });
 
-  it('should detect selections', () => {
+  it('should detect and update selection when Algorithms is selected', () => {
     spyOn(component, 'updateSelectionDetails');
 
     searchService.selectionDetails = {

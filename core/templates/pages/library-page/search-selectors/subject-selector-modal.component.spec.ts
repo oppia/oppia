@@ -100,7 +100,7 @@ describe('subject-selector-modal component', () => {
     searchService.selectionDetails = selectionDetailsStub;
   });
 
-  it('should initialize', () => {
+  it('should be able to initialize component', () => {
     component.ngOnInit();
   });
 });

@@ -57,11 +57,11 @@ export class SubjectSelectorComponent implements OnInit, OnDestroy {
     let masterList = selectionDetails[itemsType].masterList;
 
     let selectedItems = [];
-    for (let i = 0; i < masterList.length; i++) {
-      if (selectionDetails[itemsType].selections[masterList[i].id]) {
-        selectedItems.push(masterList[i].text);
+    masterList.forEach(function (item) {
+      if (selectionDetails[itemsType].selections[item.id]) {
+        selectedItems.push(item.text);
       }
-    }
+    });
 
     let totalCount = selectedItems.length;
     selectionDetails[itemsType].numSelections = totalCount;
