@@ -191,4 +191,22 @@ describe('Entity translations service', () => {
       fr: entityTranslationBackendDict,
     });
   });
+
+  it('should sort bulk translations by language code', () => {
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {
+      pt: entityTranslation,
+      fr: entityTranslation,
+      hi: entityTranslation,
+    };
+
+    expect(
+      entityTranslationsService.sortBulkTranslationsByLanguageCode(
+        entityTranslationsService.languageCodeToLatestEntityTranslations
+      )
+    ).toEqual({
+      fr: entityTranslation,
+      hi: entityTranslation,
+      pt: entityTranslation,
+    });
+  });
 });

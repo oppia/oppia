@@ -135,6 +135,21 @@ export class EntityTranslationsService {
     return bulkTranslationsBackendDict;
   }
 
+  sortBulkTranslationsByLanguageCode(
+    languageCodeToEntityTranslations: LanguageCodeToEntityTranslations
+  ): LanguageCodeToEntityTranslations {
+    const sortedLanguageCodes = Object.keys(
+      languageCodeToEntityTranslations
+    ).sort();
+    const sortedTranslations: LanguageCodeToEntityTranslations = {};
+
+    sortedLanguageCodes.forEach(language => {
+      sortedTranslations[language] = languageCodeToEntityTranslations[language];
+    });
+
+    return sortedTranslations;
+  }
+
   reset(): void {
     this.languageCodeToLatestEntityTranslations = {};
   }

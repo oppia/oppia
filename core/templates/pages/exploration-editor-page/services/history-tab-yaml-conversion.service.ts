@@ -62,10 +62,14 @@ export class HistoryTabYamlConversionService {
       // displayed. This causes issues with the e2e tests.
       setTimeout(() => {
         if (languageCodeToEntityTranslations) {
+          const sortedBulkTranslations: LanguageCodeToEntityTranslations =
+            this.entityTranslationService.sortBulkTranslationsByLanguageCode(
+              languageCodeToEntityTranslations
+            );
           resolve(
             this.yamlService.stringify(
               this.entityTranslationService.converBulkTranslationsToBackendDict(
-                languageCodeToEntityTranslations
+                sortedBulkTranslations
               )
             )
           );
