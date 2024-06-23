@@ -30,8 +30,6 @@ const storyPhotoBoxButton =
   'oppia-create-new-story-modal .e2e-test-photo-button';
 const chapterPhotoBoxButton =
   '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
-const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
-const photoUploadModal = 'edit-thumbnail-modal';
 
 const topicsTab = 'a.e2e-test-topics-tab';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
@@ -64,6 +62,23 @@ const mobileSaveStoryChangesButton =
 const mobilePublishStoryButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-button';
 const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
+
+const subtopicReassignHeader = 'div.subtopic-reassign-header';
+const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
+const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
+const subtopicUrlFragmentField =
+  'input.e2e-test-new-subtopic-url-fragment-field';
+const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
+const richTextAreaField = 'div.e2e-test-rte';
+const subtopicPhotoBoxButton =
+  '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
+const photoUploadModal = 'edit-thumbnail-modal';
+const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
+const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
+
+const mobileSaveTopicButton =
+  'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
+const saveTopicButton = 'button.e2e-test-save-topic-button';
 
 export class TopicManager extends BaseUser {
   /**
@@ -109,54 +124,6 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Create a story, execute chapter creation for
-   * the story, and then publish the story.
-   */
-  async createAndPublishStoryWithChapter(
-    storyTitle: string,
-    storyUrlFragment: string,
-    explorationId: string,
-    topicName: string
-  ): Promise<void> {
-    await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileStoryDropdown);
-    }
-    await this.clickOn(addStoryButton);
-    await this.type(storyTitleField, storyTitle);
-    await this.type(storyUrlFragmentField, storyUrlFragment);
-    await this.type(
-      storyDescriptionField,
-      `Story creation description for ${storyTitle}.`
-    );
-
-    await this.clickOn(storyPhotoBoxButton);
-    await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadPhotoButton);
-
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickOn(createStoryButton);
-
-    await this.page.waitForSelector(storyMetaTagInput);
-    await this.page.focus(storyMetaTagInput);
-    await this.page.type(storyMetaTagInput, 'meta');
-    await this.page.keyboard.press('Tab');
-
-    await this.createChapter(explorationId);
-    await this.saveStoryDraft();
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileSaveStoryChangesDropdown);
-      await this.page.waitForSelector(mobilePublishStoryButton);
-      await this.clickOn(mobilePublishStoryButton);
-    } else {
-      await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
-      await this.clickOn(publishStoryButton);
-      await this.page.waitForSelector(unpublishStoryButton, {visible: true});
-    }
-  }
-
-  /**
    * Create a chapter for a certain story.
    */
   async createChapter(explorationId: string): Promise<void> {
@@ -178,7 +145,7 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Save a story as a curriculum admin.
+   * Save a story curriculum admin.
    */
   async saveStoryDraft(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -194,6 +161,71 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
+  }
+
+  /**
+   * Create a subtopic as a topic manager
+   */
+  async createSubtopicForTopic(
+    title: string,
+    urlFragment: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(subtopicReassignHeader);
+    }
+    await this.clickOn(addSubtopicButton);
+    await this.type(subtopicTitleField, title);
+    await this.type(subtopicUrlFragmentField, urlFragment);
+
+    await this.clickOn(subtopicDescriptionEditorToggle);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.type(
+      richTextAreaField,
+      `Subtopic creation description text for ${title}`
+    );
+
+    await this.clickOn(subtopicPhotoBoxButton);
+    await this.page.waitForSelector(photoUploadModal, {visible: true});
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createSubtopicButton);
+    await this.saveTopicDraft(topicName);
+  }
+
+  /**
+   * Save a topic as a curriculum admin.
+   */
+  async saveTopicDraft(topicName: string): Promise<void> {
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileSaveTopicButton);
+      await this.page.waitForSelector('oppia-topic-editor-save-modal', {
+        visible: true,
+      });
+      await this.type(
+        saveChangesMessageInput,
+        'Test saving topic as curriculum admin.'
+      );
+      await this.page.waitForSelector(
+        `${closeSaveModalButton}:not([disabled])`
+      );
+      await this.clickOn(closeSaveModalButton);
+      await this.page.waitForSelector('oppia-topic-editor-save-modal', {
+        hidden: true,
+      });
+      await this.openTopicEditor(topicName);
+    } else {
+      await this.clickOn(saveTopicButton);
+      await this.page.waitForSelector(modalDiv, {visible: true});
+      await this.clickOn(closeSaveModalButton);
+      await this.page.waitForSelector(modalDiv, {hidden: true});
+    }
   }
 }
 
