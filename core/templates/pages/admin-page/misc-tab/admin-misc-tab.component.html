@@ -339,8 +339,13 @@
                      #userInputToAddUserToGroup
                      [matChipInputFor]="chipList"
                      [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                     (matChipInputTokenEnd)="addUserToUserGroup($event, userGroup.key)">
+                     (matChipInputTokenEnd)="addUserToUserGroup($event, userGroup.key)"
+                     (input)="onUserGroupUserInputChange()">
             </mat-chip-list>
+            <p *ngIf="userInUserGroupValidationError.length > 0"
+               class="oppia-warning-text">
+              {{ userInUserGroupValidationError }}
+            </p>
           </div>
         </div>
       </div>
@@ -350,10 +355,15 @@
     <input placeholder="New UserGroup Name"
            type="text"
            [(ngModel)]="newUserGroupName"
-           [ngModelOptions]="{standalone: true}">
+           [ngModelOptions]="{standalone: true}"
+           (ngModelChange)="onUserGroupInputChange()">
     <button (click)="addUserGroup()">
       + Add New UserGroup
     </button>
+    <p *ngIf="userGroupValidationError.length > 0"
+       class="oppia-warning-text">
+      {{ userGroupValidationError }}
+    </p>
   </div>
   <div class="row">
     <div class="col-1">
@@ -366,6 +376,11 @@
 </mat-card>
 
 <style>
+  .oppia-warning-text {
+    color: #f00;
+    font-size: 0.8em;
+    width: 500px
+  }
   .oppia-user-group {
     align-items: center;
     background: #e0f2f1;

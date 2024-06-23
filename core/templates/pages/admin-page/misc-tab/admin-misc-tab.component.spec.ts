@@ -29,7 +29,6 @@ import {FormsModule} from '@angular/forms';
 import {AdminPageData} from 'domain/admin/admin-backend-api.service';
 import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
-import {AlertsService} from 'services/alerts.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminTaskManagerService} from '../services/admin-task-manager.service';
 import {AdminMiscTabComponent} from './admin-misc-tab.component';
@@ -73,7 +72,6 @@ describe('Admin misc tab component ', () => {
 
   let adminBackendApiService: AdminBackendApiService;
   let adminTaskManagerService: AdminTaskManagerService;
-  let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
   let adminDataService: AdminDataService;
 
@@ -118,7 +116,6 @@ describe('Admin misc tab component ', () => {
           provide: WindowRef,
           useValue: mockWindowRef,
         },
-        AlertsService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -131,7 +128,6 @@ describe('Admin misc tab component ', () => {
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
     adminDataService = TestBed.get(AdminDataService);
-    alertsService = TestBed.inject(AlertsService);
 
     statusMessageSpy = spyOn(
       component.setStatusMessage,
@@ -902,7 +898,12 @@ describe('Admin misc tab component ', () => {
       component.ngOnInit();
       tick();
 
+      component.onUserGroupUserInputChange();
+      component.onUserGroupInputChange();
+
       expect(Object.keys(component.userGroupsToUsers).length > 0).toBeTrue();
+      expect(component.userInUserGroupValidationError).toEqual('');
+      expect(component.userGroupValidationError).toEqual('');
     }));
 
     describe('when clicking on save button to update user groups ', () => {
@@ -933,7 +934,6 @@ describe('Admin misc tab component ', () => {
         tick();
 
         confirmSpy.and.returnValue(true);
-        spyOn(alertsService, 'addWarning');
         let updateUserGroupSpy = spyOn(
           adminBackendApiService,
           'updateUserGroupsAsync'
@@ -1098,11 +1098,10 @@ describe('Admin misc tab component ', () => {
             value: '',
           },
         } as ElementRef;
-        let alertServiceSpyon = spyOn(alertsService, 'addWarning');
 
         component.addUserToUserGroup({value: 'User1'}, 'UserGroup1');
 
-        expect(alertServiceSpyon).toHaveBeenCalled();
+        expect(component.userInUserGroupValidationError.length > 0).toBeTrue();
       }));
 
       it('should not add user if username does not exists', fakeAsync(() => {
@@ -1114,11 +1113,10 @@ describe('Admin misc tab component ', () => {
             value: '',
           },
         } as ElementRef;
-        let alertServiceSpyon = spyOn(alertsService, 'addWarning');
 
         component.addUserToUserGroup({value: 'User'}, 'UserGroup1');
 
-        expect(alertServiceSpyon).toHaveBeenCalled();
+        expect(component.userInUserGroupValidationError.length > 0).toBeTrue();
       }));
     });
 
@@ -1154,12 +1152,11 @@ describe('Admin misc tab component ', () => {
       it('should not update when user group already exists', fakeAsync(() => {
         component.ngOnInit();
         tick();
-        let alertServiceSpyon = spyOn(alertsService, 'addWarning');
 
         component.newUserGroupName = 'UserGroup1';
         component.addUserGroup();
 
-        expect(alertServiceSpyon).toHaveBeenCalled();
+        expect(component.userGroupValidationError.length > 0).toBeTrue();
       }));
 
       it('should not update when the given user group is empty string', fakeAsync(() => {

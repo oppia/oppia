@@ -18,7 +18,6 @@
 
 import {ENTER} from '@angular/cdk/keycodes';
 import {
-  ChangeDetectorRef,
   Component,
   EventEmitter,
   Output,
@@ -33,7 +32,6 @@ import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
-import {AlertsService} from 'services/alerts.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminPageConstants} from '../admin-page.constants';
 import {AdminTaskManagerService} from '../services/admin-task-manager.service';
@@ -86,13 +84,13 @@ export class AdminMiscTabComponent {
   userGroupsToUsers: Record<string, string[]> = {};
   userGroupIdsToDetailsShowRecord: Record<string, boolean> = {};
   allUsersUsernames: string[] = [];
+  userInUserGroupValidationError: string = '';
+  userGroupValidationError: string = '';
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
     private adminDataService: AdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
-    private alertsService: AlertsService,
-    private changeDetectorRef: ChangeDetectorRef,
     private windowRef: WindowRef,
     private loaderService: LoaderService
   ) {}
@@ -134,24 +132,18 @@ export class AdminMiscTabComponent {
   }
 
   addUserToUserGroup(event: {value: string}, userGroupId: string): void {
+    this.userInUserGroupValidationError = '';
     const value = (event.value || '').trim();
     if (!value || value === '') {
       return;
     }
 
     if (this.userGroupsToUsers[userGroupId].includes(value)) {
-      this.alertsService.addWarning(
-        `The user ${value} already exists in the user ` +
-          `group ${userGroupId}.`
-      );
-      this.changeDetectorRef.detectChanges();
+      this.userInUserGroupValidationError = `The user '${value}' already exists in the user group '${userGroupId}'.`;
       return;
     }
     if (!this.allUsersUsernames.includes(value)) {
-      this.alertsService.addWarning(
-        `The user with username ${value} does not exists.`
-      );
-      this.changeDetectorRef.detectChanges();
+      this.userInUserGroupValidationError = `The user with username '${value}' does not exists.`;
       return;
     }
     this.userGroupsToUsers[userGroupId].push(value);
@@ -160,10 +152,8 @@ export class AdminMiscTabComponent {
 
   addUserGroup(): void {
     if (this.newUserGroupName.trim() in this.userGroupsToUsers) {
-      this.alertsService.addWarning(
-        `The user group ${this.newUserGroupName} already exists.`
-      );
-      this.changeDetectorRef.detectChanges();
+      this.userGroupValidationError = '';
+      this.userGroupValidationError = `The user group '${this.newUserGroupName}' already exists.`;
       return;
     }
 
@@ -173,6 +163,14 @@ export class AdminMiscTabComponent {
         false;
       this.newUserGroupName = '';
     }
+  }
+
+  onUserGroupUserInputChange(): void {
+    this.userInUserGroupValidationError = '';
+  }
+
+  onUserGroupInputChange(): void {
+    this.userGroupValidationError = '';
   }
 
   areUserGroupsUpdated(): boolean {
