@@ -62,8 +62,9 @@
                 <span>Items Per Page: </span>
                 <select [(ngModel)]="itemsPerPage"
                         (change)="refreshPagination()"
-                        aria-label="Items Per Page">
-                  <option *ngFor="let choice of itemsPerPageChoice" [value]="choice" >{{ choice }}</option>
+                        aria-label="Items Per Page"
+                        class="e2e-test-select-items-per-page-dropdown">
+                  <option *ngFor="let choice of itemsPerPageChoice" [value]="choice">{{ choice }}</option>
                 </select>
               </div>
               <div *ngIf="activeTab === TAB_NAME_TOPICS">
@@ -75,7 +76,9 @@
                   </span>
                   <span *ngIf="pageNumber !== idx">{{ idx + 1 }}</span>
                 </span>
-                <i class="fa fa-angle-right topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_NEXT_PAGE)"></i>
+                <i class="fa fa-angle-right topic-pagination-arrow e2e-test-next-page-button" 
+                  (click)="changePageByOne(MOVE_TO_NEXT_PAGE)">
+                </i>
               </div>
               <div *ngIf="activeTab === TAB_NAME_SKILLS">
                 <i class="fa fa-angle-left topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_PREV_PAGE)"></i>
@@ -230,7 +233,8 @@
               </div>
               <div class="topic-skill-filter-value">
                 <div>
-                  <oppia-filtered-choices-field [choices]="sortOptions"
+                  <oppia-filtered-choices-field class="e2e-test-select-sort-dropdown"
+                                                [choices]="sortOptions"
                                                 placeholder="Sort Options"
                                                 [isSearchable]="false"
                                                 searchLabel="Search"

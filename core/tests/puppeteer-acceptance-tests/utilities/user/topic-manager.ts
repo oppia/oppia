@@ -474,6 +474,137 @@ export class TopicManager extends BaseUser {
 
     await deleteButton.click();
   }
+
+  /**
+   * Filters topics by status.
+   * @param {string} status - The status to filter by.
+   */
+  async filterTopicsByStatus(status: string): Promise<void> {
+    await this.selectOption('.e2e-test-select-status-dropdown', status);
+  }
+
+  /**
+   * Filters topics by classroom.
+   * @param {string} classroom - The classroom to filter by.
+   */
+  async filterTopicsByClassroom(classroom: string): Promise<void> {
+    await this.selectOption('.e2e-test-select-classroom-dropdown', classroom);
+  }
+
+  /**
+   * Filters topics by keyword.
+   * @param {string} keyword - The keyword to filter by.
+   */
+  async filterTopicsByKeyword(keyword: string): Promise<void> {
+    await this.selectOption('.e2e-test-select-keyword-dropdown', keyword);
+  }
+
+  /**
+   * Sorts topics by a given option.
+   * @param {string} sortOption - The option to sort by.
+   */
+  async sortTopics(sortOption: string): Promise<void> {
+    await this.selectOption('.e2e-test-select-sort-dropdown', sortOption);
+  }
+
+  /**
+   * Selects an option from a dropdown.
+   * @param {string} selector - The CSS selector for the dropdown.
+   * @param {string} optionText - The text of the option to select.
+   */
+  private async selectOption(
+    selector: string,
+    optionText: string
+  ): Promise<void> {
+    await this.page.click(selector);
+    await this.page.waitForSelector('.mat-option-text');
+    await this.page.click(`.mat-option-text:contains(${optionText})`);
+  }
+
+  /**
+   * Checks if the filtered topics match the expected topics.
+   * @param {string[]} expectedTopics - The expected topics.
+   */
+  async expectFilteredTopics(expectedTopics: string[]): Promise<void> {
+    const topicElements = await this.page.$$('.e2e-test-topic-name');
+    const topicNames = await Promise.all(
+      topicElements.map(element =>
+        this.page.evaluate(el => el.textContent, element)
+      )
+    );
+
+    const missingTopics = expectedTopics.filter(
+      topic => !topicNames.includes(topic)
+    );
+
+    if (missingTopics.length > 0) {
+      throw new Error(
+        `Expected topics ${missingTopics.join(', ')} to be present, but they were not found.`
+      );
+    }
+
+    showMessage('Filtered topics match the expected topics.');
+  }
+
+  /**
+   * Checks if the topics are in the expected order.
+   * @param {string[]} expectedOrder - The expected order of topics.
+   */
+  async expectTopicsInOrder(expectedOrder: string[]): Promise<void> {
+    const topicElements = await this.page.$$('.e2e-test-topic-name');
+    const topicNames = await Promise.all(
+      topicElements.map(element =>
+        this.page.evaluate(el => el.textContent, element)
+      )
+    );
+
+    if (!topicNames.every((name, index) => name === expectedOrder[index])) {
+      throw new Error('Topics are not in the expected order.');
+    }
+
+    showMessage('Topics are in the expected order.');
+  }
+
+  /**
+   * Adjusts the paginator to show a certain number of topics per page.
+   * @param {number} topicsPerPage - The number of topics to show per page.
+   */
+  async adjustPaginatorToShowTopicsPerPage(
+    topicsPerPage: number
+  ): Promise<void> {
+    await this.selectOption(
+      '.e2e-test-select-topics-per-page-dropdown',
+      topicsPerPage.toString()
+    );
+    showMessage(`Paginator adjusted to show ${topicsPerPage} topics per page.`);
+  }
+
+  async checkIfPageChangesAfterClickingNext(
+    shouldChange: boolean
+  ): Promise<void> {
+    const initialTopic = await this.page.$eval(
+      '.e2e-test-topic-name',
+      topic => topic.textContent
+    );
+    await this.clickOn('.e2e-test-next-page-button');
+    const finalTopic = await this.page.$eval(
+      '.e2e-test-topic-name',
+      topic => topic.textContent
+    );
+
+    if (shouldChange && initialTopic === finalTopic) {
+      throw new Error(
+        'Expected the page to change when clicking the next page button, but it did not.'
+      );
+    } else if (!shouldChange && initialTopic !== finalTopic) {
+      throw new Error(
+        'Expected the page not to change when clicking the next page button, but it did.'
+      );
+    }
+    showMessage(
+      'Page changes as expected after clicking the next page button.'
+    );
+  }
 }
 
 export let TopicManagerFactory = (): TopicManager => new TopicManager();
