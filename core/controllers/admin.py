@@ -397,6 +397,8 @@ class AdminHandler(
 
         user_group_models_dict = user_services.get_all_user_groups()
 
+        all_users_usernames = user_services.get_all_users_usernames()
+
         # Removes promo-bar related and blog related platform params as
         # they are handled in release-coordinator page and blog admin page
         # respectively.
@@ -418,7 +420,8 @@ class AdminHandler(
             'role_to_actions': role_services.get_role_actions(),
             'topic_summaries': topic_summary_dicts,
             'platform_params_dicts': platform_params_dicts,
-            'user_group_models_dict': user_group_models_dict
+            'user_group_models_dict': user_group_models_dict,
+            'all_users_usernames': all_users_usernames
         })
 
     @acl_decorators.can_access_admin_page
