@@ -35,6 +35,8 @@ import {
   TranslatedContent,
 } from 'domain/exploration/TranslatedContentObjectFactory';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {ContextService} from 'services/context.service';
 
 interface HTMLSchema {
   type: string;
@@ -65,6 +67,8 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
   UNICODE_SCHEMA: {type: string} = {
     type: 'unicode',
   };
+  explorationId!: string;
+  explorationVersion!: number;
 
   SET_OF_STRINGS_SCHEMA: ListSchema = {
     type: 'list',
@@ -91,7 +95,8 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
     private stateEditorService: StateEditorService,
     private translationLanguageService: TranslationLanguageService,
     private translationStatusService: TranslationStatusService,
-    private translationTabActiveContentIdService: TranslationTabActiveContentIdService
+    private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
+    private contextService: ContextService
   ) {}
 
   showMarkAudioAsNeedingUpdateModalIfRequired(
@@ -179,6 +184,23 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
       this.languageCode,
       this.activeWrittenTranslation
     );
+
+    // Initialize the entity translation object if it doesn't exist.
+    if (
+      !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
+        this.languageCode
+      )
+    ) {
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+        this.languageCode
+      ] = EntityTranslation.createFromBackendDict({
+        entity_id: this.explorationId,
+        entity_type: 'exploration',
+        entity_version: this.explorationVersion,
+        language_code: this.languageCode,
+        translations: {},
+      });
+    }
     this.entityTranslationsService.languageCodeToLatestEntityTranslations[
       this.languageCode
     ].updateTranslation(this.contentId, this.activeWrittenTranslation);
@@ -231,6 +253,9 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.dataFormat =
       this.translationTabActiveContentIdService.getActiveDataFormat() as string;
+    this.explorationId = this.contextService.getExplorationId();
+    this.explorationVersion =
+      this.contextService.getExplorationVersion() as number;
 
     this.directiveSubscriptions.add(
       this.translationTabActiveContentIdService.onActiveContentIdChanged.subscribe(

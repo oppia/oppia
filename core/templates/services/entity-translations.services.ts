@@ -77,8 +77,10 @@ export class EntityTranslationsService {
           languageCode
         )
         .then(entityTranslation => {
-          this.languageCodeToLatestEntityTranslations[languageCode] =
-            entityTranslation;
+          if (Object.keys(entityTranslation.translationMapping).length > 0) {
+            this.languageCodeToLatestEntityTranslations[languageCode] =
+              entityTranslation;
+          }
           this.alertsService.clearMessages();
           this.alertsService.addSuccessMessage('Translations fetched.');
           resolve(entityTranslation);
