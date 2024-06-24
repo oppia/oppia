@@ -183,6 +183,18 @@ export class TestToModulesMatcher {
   }
 
   /**
+   * Checks if an array is sorted.
+   */
+  private static isArraySorted(array: string[]): boolean {
+    for (let i = 0; i < array.length - 1; i++) {
+      if (array[i] > array[i + 1]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Compares the collected Angular modules with the golden file that contains
    * the list of Angular modules that are expected to be used by tests.
    */
@@ -201,12 +213,12 @@ export class TestToModulesMatcher {
       .split('\n')
       .map(module => module.trim())
       .filter(module => module !== '');
-    const missingGoldenFileModules = this.collectedModules.filter(
-      module => !goldenFileModules.includes(module)
-    );
-    const extraGoldenFileModules = goldenFileModules.filter(
-      module => !this.collectedModules.includes(module)
-    );
+    const missingGoldenFileModules = this.collectedModules
+      .filter(module => !goldenFileModules.includes(module))
+      .sort();
+    const extraGoldenFileModules = goldenFileModules
+      .filter(module => !this.collectedModules.includes(module))
+      .sort();
 
     const generatedGoldenFilePath = this.goldenFilePath.replace(
       '.txt',
@@ -228,6 +240,14 @@ export class TestToModulesMatcher {
           `at the path ${this.goldenFilePath}:\n${extraGoldenFileModules.join('\n')}\n` +
           'Please remove them from the golden file or copy and paste the uploaded github artifact ' +
           'into the golden file location.'
+      );
+    }
+
+    if (!this.isArraySorted(goldenFileModules)) {
+      throw new Error(
+        `The modules in the golden file at the path ${this.goldenFilePath} is not sorted. ` +
+          'Please ensure that the modules are sorted in ascending order. The sorted modules are:\n' +
+          goldenFileModules.sort().join('\n')
       );
     }
   }

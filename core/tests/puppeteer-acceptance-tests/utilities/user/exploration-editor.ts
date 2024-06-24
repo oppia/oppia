@@ -133,6 +133,10 @@ const stateHintTab = '.e2e-test-hint-tab';
 const editStateHintSelector = '.e2e-test-open-hint-editor';
 const saveHintEditButton = 'button.e2e-test-save-hint-edit';
 
+const modalSaveButton = '.e2e-test-save-button';
+const modifyTranslationsModalDoneButton =
+  '.e2e-test-modify-translations-done-button';
+
 // For mobile.
 const mobileSettingsBar = 'li.e2e-test-mobile-settings-button';
 const mobileChangesDropdown = 'div.e2e-test-mobile-changes-dropdown';
@@ -1010,7 +1014,6 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(mainTabButton);
     }
     await this.page.waitForNetworkIdle();
-    await this.clickOn(mobileOptionsButton);
   }
 
   /**
@@ -1325,6 +1328,111 @@ export class ExplorationEditor extends BaseUser {
     } else {
       throw new Error(
         `The expected translation does not exist in the modal. Found "${translationElementText}", expected "${expectedTranslation}"`
+      );
+    }
+  }
+
+  /**
+   * Update a specific translation from the "modify translations" modal after it has opened.
+   * @param languageCode - The language code for which the translation should be modified.
+   * @param contentType - Type of the content such as "Interaction" or "Hint".
+   * @param newTranslation - The new translation to be written for the content in given language.
+   */
+  async updateTranslationFromModal(
+    languageCode: string,
+    contentType: string,
+    newTranslation: string
+  ): Promise<void> {
+    await this.clickOn(`.e2e-test-${languageCode}-translation-edit`);
+    switch (contentType) {
+      case 'Content':
+      case 'Hint':
+      case 'Solution':
+      case 'Feedback':
+        await this.clickOn(stateContentInputField);
+        await this.page.evaluate(selector => {
+          document.querySelector(selector).textContent = '';
+        }, `${stateContentInputField} p`);
+        await this.type(stateContentInputField, newTranslation);
+        break;
+      case 'Interaction':
+        await this.clickOn(stateTranslationEditorSelector);
+        await this.page.evaluate(selector => {
+          document.querySelector(selector).value = '';
+        }, `${textInputField}`);
+        await this.type(stateTranslationEditorSelector, newTranslation);
+        break;
+      default:
+        throw new Error(`Invalid content type: ${contentType}`);
+    }
+
+    await this.clickOn(modalSaveButton);
+    await this.clickOn(`.e2e-test-${languageCode}-translation-checkbox`);
+    await this.clickOn(modifyTranslationsModalDoneButton);
+    showMessage('Successfully updated translation from modal.');
+  }
+
+  /**
+   * Verify if a particular translation exists in the translations tab.
+   * @param {string} expectedTranslation - The translation which should exist for the content.
+   * @param {string} contentType - Type of the content such as "Interaction" or "Hint".
+   * @param {number} feedbackIndex - The index of the feedback to edit, since multiple feedback responses exist.
+   */
+  async verifyTranslationInTranslationsTab(
+    expectedTranslation: string,
+    contentType: string,
+    feedbackIndex?: number
+  ): Promise<void> {
+    let translation: string | null = '';
+    await this.navigateToTranslationsTab();
+    await this.clickOn(translationModeButton);
+
+    const activeContentType = await this.page.$eval(activeTranslationTab, el =>
+      el.textContent?.trim()
+    );
+
+    if (!activeContentType?.includes(contentType)) {
+      showMessage(
+        `Switching content type from ${activeContentType} to ${contentType}`
+      );
+      await this.clickOn(contentType);
+    }
+
+    await this.clickOn(editTranslationSelector);
+    switch (contentType) {
+      case 'Content':
+      case 'Hint':
+      case 'Solution':
+        translation = await this.page.$eval(
+          stateContentInputField,
+          el => el.textContent
+        );
+        break;
+      case 'Interaction':
+        translation = await this.page.$eval(
+          textInputField,
+          el => (el as HTMLInputElement).value
+        );
+        break;
+      case 'Feedback':
+        await this.clickOn(`.e2e-test-feedback-${feedbackIndex}`);
+        await this.clickOn(editTranslationSelector);
+        translation = await this.page.$eval(
+          stateContentInputField,
+          el => el.textContent
+        );
+        break;
+      default:
+        throw new Error(`Invalid content type: ${contentType}`);
+    }
+
+    if (translation === expectedTranslation) {
+      showMessage(
+        'The newly updated translation exists in the translations tab.'
+      );
+    } else {
+      throw new Error(
+        `The expected translation does not exist in the translations tab. Found "${translation}", expected "${expectedTranslation}"`
       );
     }
   }
