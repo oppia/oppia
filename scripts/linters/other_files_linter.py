@@ -75,9 +75,9 @@ WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT: Final = (
     'revert-web-wiki-updates.yml',
     'frontend_tests.yml'
 )
-JOBS_EXEMPT_FROM_MERGE_REQUIREMENT: Final = (
+JOBS_EXEMPT_FROM_MERGE_REQUIREMENT: Final = [
     'check_test_suites_to_run'
-)
+]
 
 THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
     {
