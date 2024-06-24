@@ -19,11 +19,13 @@
 /*
   This is the user journey of a volunteer:
 
-  1. Navigate to the About Foundation page via the footer or navbar from the home (splash) page.
-  2. Navigate to the volunteer page from the About Foundation Page by clicking on the volunteer link or button.
-  3. Fill out the volunteer form via either of the two buttons on the volunteer page.
+  1.Go to About page via footer or navbar from the home(splash) page
+  2.View the Impact report on the About page.
+  3.Fill the volunteer form by clicking on the "Volunteer with Oppia" button of Volunteer tab on the About page.
+  4.Go to the volunteer page from About Page by clicking on the "Learn more" button of volunteer tab on the About page.
+  5.Fill the volunteer form via any one of the 2 buttons on volunteer page.
 
-  This is the page flow: home page --> Foundation page --> volunteer page.
+  This is the page flow: home page --> About page --> volunteer page.
   Testing: Can volunteers successfully fill out the volunteer form if
   they visit the website for the first time (typically landing on the home page)?
  */
@@ -44,24 +46,21 @@ describe('Volunteer', function () {
     'should be able to navigate to volunteer page when started from the home page ' +
       'and open the volunteer form when the "Apply to Volunteer" button is clicked',
     async function () {
-      // Navigating to about foundation page via navbar from home page.
-      await loggedOutUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
+      // Navigating to About page via navbar from home page.
+      await loggedOutUser.clickAboutButtonInAboutMenuOnNavbar();
       // Navigating back to home page for the next test.
       await loggedOutUser.navigateToHome();
-      // Navigating to about foundation page via footer from home page.
-      await loggedOutUser.clickOnTheOppiaFoundationLinkInFooter();
+      // Navigating to About page via footer from home page.
+      await loggedOutUser.clickOnAboutLinkInFooter();
 
-      // Navigating to the Volunteer page by clicking on the "Become a Volunteer" button.
-      await loggedOutUser.clickBecomeAVolunteerButtonInAboutFoundation();
-      // Navigating back to about foundation page for the next test.
-      await loggedOutUser.navigateToAboutFoundationPage();
-      // Navigating to the Volunteer page by clicking on the "Join our large volunteer community" link.
-      await loggedOutUser.clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation();
+      // Opening the Volunteer form by clicking on the "Volunteer with Oppia" button of Volunteer tab on the About page.
+      await loggedOutUser.clickVolunteerWithOppiaButtonInAboutPage();
+      // Navigating to the Volunteer page by clicking on the Learn More button of Volunteer tab.
+      await loggedOutUser.clickVolunteerLearnMoreButtonInAboutPage();
 
       // Opening the Volunteer form by clicking the "Apply to Volunteer" button at the top of the Volunteer page.
       await loggedOutUser.clickApplyToVolunteerAtTheTopOfVolunteerPage();
-
-      // Navigating back to about foundation page for the next test.
+      // Navigating back to Volunteer page for the next test.
       await loggedOutUser.navigateToVolunteerPage();
       // Opening the Volunteer form by clicking the "Apply to Volunteer" button at the bottom of the Volunteer page.
       await loggedOutUser.clickApplyToVolunteerAtTheBottomOfVolunteerPage();

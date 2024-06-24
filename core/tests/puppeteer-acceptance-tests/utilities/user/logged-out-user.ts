@@ -103,7 +103,8 @@ const navbarGetInvolvedTabDonateButton =
   'a.e2e-test-navbar-get-involved-menu-donate-button';
 const navbarGetInvolvedTabContactUsButton =
   'a.e2e-test-navbar-get-involved-menu-contact-us-button';
-const navbarDonateButton = 'a.e2e-test-navbar-donate-button';
+const navbarDonateDesktopButton = 'a.e2e-test-navbar-donate-desktop-button';
+const navbarDonateMobileButton = 'a.e2e-test-navbar-donate-mobile-button';
 
 const footerAboutLink = 'a.e2e-test-footer-about-link';
 const footerAboutFoundationLink = 'a.e2e-test-footer-about-foundation-link';
@@ -221,6 +222,14 @@ const donorDesktopTabInAboutPage = '.e2e-test-about-page-donor-desktop-tab';
 const donorMobileTabInAboutPage = '.e2e-test-about-page-donor-mobile-tab';
 const partnerDesktopTabInAboutPage = '.e2e-test-about-page-partner-desktop-tab';
 const partnerMobileTabInAboutPage = '.e2e-test-about-page-partner-mobile-tab';
+const volunteerLearnMoreDesktopButtonInAboutPage =
+  '.e2e-test-about-page-volunteer-learn-more-desktop-button';
+const volunteerLearnMoreMobileButtonInAboutPage =
+  '.e2e-test-about-page-volunteer-learn-more-mobile-button';
+const partnerLearnMoreDesktopButtonInAboutPage =
+  '.e2e-test-about-page-partner-learn-more-desktop-button';
+const partnerLearnMoreMobileButtonInAboutPage =
+  '.e2e-test-about-page-partner-learn-more-mobile-button';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -878,14 +887,18 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Donate page.
    */
   async clickDonateButtonOnNavbar(): Promise<void> {
-    if (!this.isViewportAtMobileWidth()) {
-      await this.clickButtonToNavigateToNewPage(
-        navbarDonateButton,
-        'Donate button on navbar',
-        donateUrl,
-        'Donate'
-      );
+    const navbarDonateButton = this.isViewportAtMobileWidth()
+      ? navbarDonateMobileButton
+      : navbarDonateDesktopButton;
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarOpenSidebarButton);
     }
+    await this.clickButtonToNavigateToNewPage(
+      navbarDonateButton,
+      'Donate button on navbar',
+      donateUrl,
+      'Donate'
+    );
   }
 
   /**
@@ -1620,8 +1633,17 @@ export class LoggedOutUser extends BaseUser {
    */
   private async changeSiteLanguage(langCode: string): Promise<void> {
     const languageOption = `.e2e-test-i18n-language-${langCode} a`;
+
+    if (this.isViewportAtMobileWidth()) {
+      // This reload is required to ensure the language dropdown is visible in mobile view,
+      // if the earlier movements of the page have hidden it and since the inbuilt
+      // scrollIntoView function call of the clickOn function didn't work as expected.
+      await this.page.reload();
+    }
     await this.clickOn(languageDropdown);
     await this.clickOn(languageOption);
+    // Here we need to reload the page again to confirm the language change.
+    await this.page.reload();
   }
 
   /**
@@ -1651,8 +1673,6 @@ export class LoggedOutUser extends BaseUser {
     langCode: string
   ): Promise<void> {
     await this.changeSiteLanguage(langCode);
-    // Here we need to reload the page again to confirm the language change.
-    await this.page.reload();
 
     // Here we are not verifying the 3 URLs as we did in the English version
     // because we have put the direct translated Google Form URL in the page itself.
@@ -2022,6 +2042,43 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to click the Learn More button of Volunteer tab on the about page
+   * and check if it opens the Volunteer page.
+   */
+  async clickVolunteerLearnMoreButtonInAboutPage(): Promise<void> {
+    const volunteerLearnMoreButtonInAboutPage = this.isViewportAtMobileWidth()
+      ? volunteerLearnMoreMobileButtonInAboutPage
+      : volunteerLearnMoreDesktopButtonInAboutPage;
+    await this.clickButtonToNavigateToNewPage(
+      volunteerLearnMoreButtonInAboutPage,
+      'Learn More button of Volunteer tab',
+      volunteerUrl,
+      'Volunteer'
+    );
+  }
+
+  /**
+   * Function to click the Learn More button of Partner tab on the about page
+   * and check if it opens the partnerships page.
+   */
+  async clickPartnerLearnMoreButtonInAboutPage(): Promise<void> {
+    const partnerTab = this.isViewportAtMobileWidth()
+      ? partnerMobileTabInAboutPage
+      : partnerDesktopTabInAboutPage;
+    const partnerLearnMoreButtonInAboutPage = this.isViewportAtMobileWidth()
+      ? partnerLearnMoreMobileButtonInAboutPage
+      : partnerLearnMoreDesktopButtonInAboutPage;
+
+    await this.clickOn(partnerTab);
+    await this.clickButtonToNavigateToNewPage(
+      partnerLearnMoreButtonInAboutPage,
+      'Learn More button of Partner tab',
+      partnershipsUrl,
+      'Partnerships'
+    );
+  }
+
+  /**
    * Function to click the Partner With Us button in the About page
    * and check if it opens the Partnerships Google form.
    */
@@ -2056,8 +2113,6 @@ export class LoggedOutUser extends BaseUser {
     langCode: string
   ): Promise<void> {
     await this.changeSiteLanguage(langCode);
-    // Here we need to reload the page again to confirm the language change.
-    await this.page.reload();
 
     const partnerTab = this.isViewportAtMobileWidth()
       ? partnerMobileTabInAboutPage
@@ -2077,6 +2132,7 @@ export class LoggedOutUser extends BaseUser {
       partnershipsFormInPortugueseUrl,
       'Partnerships Google Form'
     );
+    await this.changeSiteLanguage('en');
   }
 
   /**
