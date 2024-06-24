@@ -7151,6 +7151,46 @@ title: Old Title
         self.assertTrue(
             entity_translations[0].translations['content_0'].needs_update)
 
+    def test_update_exploration_with_mark_translation_needs_update_for_language(
+        self
+    ) -> None:
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+            exploration.version, 'hi', 'content_0',
+            translation_domain.TranslatedContent(
+                'Translation',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        entity_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+                exploration.version
+            )
+        )
+        self.assertEqual(len(entity_translations), 1)
+        self.assertFalse(
+            entity_translations[0].translations['content_0'].needs_update)
+
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': (
+                    exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE),
+                'content_id': 'content_0',
+                'language_code': 'hi'
+            })], 'Marked translation need update.')
+        entity_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+                exploration.version + 1
+            )
+        )
+        self.assertEqual(len(entity_translations), 1)
+        self.assertTrue(
+            entity_translations[0].translations['content_0'].needs_update)
+
     def test_update_exploration_with_remove_translation_changes(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
