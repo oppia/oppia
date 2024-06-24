@@ -31,10 +31,19 @@ describe('Topic Manager User Journey', function () {
   let explorationId: string | null;
 
   beforeAll(async function () {
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdmin',
+      'curriculum_Admin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
+
+    curriculumAdmin.createTopic('Addition', 'add');
+
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topic_manager@example.com',
-      [ROLES.TOPIC_MANAGER]
+      [ROLES.TOPIC_MANAGER],
+      ['Addition']
     );
 
     await curriculumAdmin.navigateToCreatorDashboardPage();
@@ -57,8 +66,6 @@ describe('Topic Manager User Journey', function () {
   it(
     'should create a topic, add a subtopic, story, and chapters to it.',
     async function () {
-      await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
-
       await topicManager.navigateToTopicAndSkillsDashboardPage();
       await topicManager.createSubtopicForTopic(
         'Test Topic 1',

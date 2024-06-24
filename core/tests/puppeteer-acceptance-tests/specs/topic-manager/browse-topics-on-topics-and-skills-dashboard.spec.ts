@@ -29,20 +29,21 @@ describe('Topic Manager User Journey', function () {
   let curriculumAdmin: CurriculumAdmin;
 
   beforeAll(async function () {
-    topicManager = await UserFactory.createNewUser(
-      'topicManager',
-      'topic_manager@example.com',
-      [ROLES.TOPIC_MANAGER]
-    );
-
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdmin',
       'curriculum_Admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    curriculumAdmin.createTopic('Test Topic 1', 'Mathematics');
-    curriculumAdmin.createTopic('Test Topic 2', 'Mathematics');
+    curriculumAdmin.createTopic('Addition', 'add');
+    curriculumAdmin.createTopic('Subtraction', 'subtract');
+
+    topicManager = await UserFactory.createNewUser(
+      'topicManager',
+      'topic_manager@example.com',
+      [ROLES.TOPIC_MANAGER],
+      ['Addition', 'Subtraction']
+    );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
