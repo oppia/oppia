@@ -14,7 +14,7 @@ on:
 jobs:
   check_test_suites_to_run:
     uses: ./.github/workflows/check_test_suites_to_run.yml
-  lighthouse:
+  lighthouse_accessibility:
     needs: check_test_suites_to_run
     if: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).lighthouse_accessibility.count > 0 }}
     runs-on: ${{ matrix.os }}
@@ -76,3 +76,23 @@ jobs:
         with:
           message: "A Lighthouse test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+  check_workflow_status:
+    needs: [lighthouse_accessibility]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.15'
+          architecture: 'x64'
+      - uses: ./.github/actions/merge
+      - uses: ./.github/actions/check_workflow_status
+        id: check_workflow_status
+        with:
+          jobs: ${{ toJson(needs) }}
+      - name: Fail if workflow status is failure
+        if: ${{ steps.check_workflow_status.outputs.WORKFLOW_STATUS == 'failure' }}
+        run: exit 1
