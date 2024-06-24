@@ -22,6 +22,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
+from core.domain import fs_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 
@@ -126,20 +127,6 @@ class ClassroomDataHandler(
         self.render_json(self.values)
 
 
-class DefaultClassroomRedirectPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Redirects to the default classroom page."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Redirects to default classroom page."""
-        self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
-
-
 class ClassroomIdToNameHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -215,9 +202,19 @@ class ClassroomHandlerNormalizedPayloadDict(TypedDict):
     classroom_dict: classroom_config_domain.Classroom
 
 
+class ClassroomHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of NewTopicHandler's
+    normalized_request dictionary.
+    """
+
+    thumbnail_image: bytes
+    banner_image: bytes
+
+
 class ClassroomHandler(
     base.BaseHandler[
-        ClassroomHandlerNormalizedPayloadDict, Dict[str, str]
+        ClassroomHandlerNormalizedPayloadDict,
+        ClassroomHandlerNormalizedRequestDict
     ]
 ):
     """Edits classroom data."""
@@ -235,6 +232,16 @@ class ClassroomHandler(
                 'schema': {
                     'type': 'object_dict',
                     'object_class': classroom_config_domain.Classroom
+                }
+            },
+            'thumbnail_image': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'banner_image': {
+                'schema': {
+                    'type': 'basestring'
                 }
             }
         },
@@ -277,6 +284,7 @@ class ClassroomHandler(
                 classroom.
         """
         assert self.normalized_payload is not None
+        assert self.normalized_request is not None
         classroom = self.normalized_payload['classroom_dict']
 
         if classroom_id != classroom.classroom_id:
@@ -284,7 +292,6 @@ class ClassroomHandler(
                 'Classroom ID of the URL path argument must match with the ID '
                 'given in the classroom payload dict.'
             )
-
         classrooms = classroom_config_services.get_all_classrooms()
         invalid_topic_ids = [
             topic_id for classroom in classrooms
@@ -300,7 +307,31 @@ class ClassroomHandler(
                     'can only be assigned to one classroom.' % topic_name
                 )
 
-        classroom_config_services.update_classroom(classroom)
+        raw_thumbnail_image = self.normalized_request['thumbnail_image']
+        thumbnail_filename = classroom.thumbnail_data.filename
+        raw_banner_image = self.normalized_request['banner_image']
+        banner_filename = classroom.banner_data.filename
+        existing_classroom = classroom_config_services.get_classroom_by_id(
+            classroom_id)
+
+        if thumbnail_filename != existing_classroom.thumbnail_data.filename:
+            fs_services.validate_and_save_image(
+                raw_thumbnail_image, thumbnail_filename, 'thumbnail',
+                feconf.ENTITY_TYPE_CLASSROOM, classroom_id
+            )
+
+        if (
+            banner_filename !=
+            existing_classroom.banner_data.filename
+        ):
+            fs_services.validate_and_save_image(
+                raw_banner_image, banner_filename, 'image',
+                feconf.ENTITY_TYPE_CLASSROOM, classroom_id
+            )
+
+        classroom_config_services.update_classroom(
+            classroom, strict=classroom.is_published
+        )
         self.render_json(self.values)
 
     @acl_decorators.can_access_classroom_admin_page
@@ -497,6 +528,7 @@ class AllClassroomsSummaryHandler(
 
         for classroom in classrooms:
             classroom_summary_dict: Dict[str, str|bool] = {
+                'classroom_id': classroom.classroom_id,
                 'name': classroom.name,
                 'url_fragment': classroom.url_fragment,
                 'teaser_text': classroom.teaser_text,

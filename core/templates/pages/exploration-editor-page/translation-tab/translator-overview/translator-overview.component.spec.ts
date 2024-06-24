@@ -222,7 +222,7 @@ describe('Translator Overview component', () => {
           content1: new TranslatedContent('translated content', 'html', false),
         }
       );
-      entityTranslationsService.languageCodeToEntityTranslations = {
+      entityTranslationsService.languageCodeToLatestEntityTranslations = {
         hi: entityTranslation,
       };
       spyOn(windowRef.nativeWindow.localStorage, 'getItem').and.returnValue(
