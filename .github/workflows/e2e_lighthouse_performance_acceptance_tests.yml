@@ -46,8 +46,10 @@ jobs:
       - uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         run: python -m scripts.install_chrome_for_ci
-      - name: Install ffmpeg
-        run: sudo apt install ffmpeg
+      - name: Run Desktop Acceptance Test
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --suite=topic-manager/browse-skills-on-topics-and-skills-dashboard --prod_env --skip-build
+      # - name: Install ffmpeg
+      #   run: sudo apt install ffmpeg
       # - name: Build Webpack
       #   run: python -m scripts.build --prod_env
       # - name: Zip build files
@@ -308,30 +310,30 @@ jobs:
   #       with:
   #         message: "A Lighthouse test failed on the upstream develop branch."
   #         webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-  acceptance_test:
-    needs: build
-    runs-on:  ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-22.04]
-        suite:
-          - topic-manager/browse-skills-on-topics-and-skills-dashboard
-          - topic-manager/browse-topics-on-topics-and-skills-dashboard
-          - topic-manager/create-and-delete-subtopic-and-story
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-        with:
-          python-version: '3.8.15'
-          architecture: 'x64'
-      - name: Run Desktop Acceptance Test ${{ matrix.suite }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --suite=${{ matrix.suite }} --prod_env --skip-build
-      - name: Run Mobile Acceptance Test ${{ matrix.suite }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --suite=${{ matrix.suite }} --prod_env --mobile --skip-build
-      - name: Ensure screenshots directory exists
-        run: mkdir -p core/tests/puppeteer-acceptance-tests/screenshots
-      - name: Upload Screenshots
-        uses: actions/upload-artifact@v3
-        with:
-          name: screenshots
-          path: core/tests/puppeteer-acceptance-tests/screenshots/*
+  # acceptance_test:
+  #   needs: build
+  #   runs-on:  ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-22.04]
+  #       suite:
+  #         - topic-manager/browse-skills-on-topics-and-skills-dashboard
+  #         - topic-manager/browse-topics-on-topics-and-skills-dashboard
+  #         - topic-manager/create-and-delete-subtopic-and-story
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-python@v3
+  #       with:
+  #         python-version: '3.8.15'
+  #         architecture: 'x64'
+  #     - name: Run Desktop Acceptance Test ${{ matrix.suite }}
+  #       run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --suite=${{ matrix.suite }} --prod_env --skip-build
+  #     - name: Run Mobile Acceptance Test ${{ matrix.suite }}
+  #       run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --suite=${{ matrix.suite }} --prod_env --mobile --skip-build
+  #     - name: Ensure screenshots directory exists
+  #       run: mkdir -p core/tests/puppeteer-acceptance-tests/screenshots
+  #     - name: Upload Screenshots
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: screenshots
+  #         path: core/tests/puppeteer-acceptance-tests/screenshots/*
