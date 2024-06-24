@@ -178,14 +178,11 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
           cloneDeep(response.classroomDict)
         );
-        if (this.tempClassroomData.getThumbnailData().filename) {
-          this.contextService.setCustomEntityContext(
-            AppConstants.ENTITY_TYPE.CLASSROOM,
-            classroomId
-          );
-        } else {
-          this.contextService.removeCustomEntityContext();
-        }
+
+        this.contextService.setCustomEntityContext(
+          AppConstants.ENTITY_TYPE.CLASSROOM,
+          classroomId
+        );
 
         this.classroomDataIsChanged = false;
 

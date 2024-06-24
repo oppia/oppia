@@ -248,6 +248,9 @@ describe('Classroom Admin Page component ', () => {
       'getAllTopicsToClassroomRelation'
     ).and.returnValue(Promise.resolve(response));
 
+    expect(component.topicsToClassroomRelation.length).toEqual(0);
+    expect(component.filteredTopicsToClassroomRelation.length).toEqual(0);
+
     component.getClassroomData('getAllTopicsToClassroomRelation');
     tick();
 

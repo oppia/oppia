@@ -27,6 +27,9 @@ from typing import Optional, Union
 
 HUNDRED_KB_IN_BYTES = 100 * 1024
 ONE_MB_IN_BYTES = 1 * 1024 * 1024
+ENTITY_TYPES_WITH_MAX_SIZE_ONE_MB = [
+    feconf.ENTITY_TYPE_BLOG_POST, feconf.ENTITY_TYPE_CLASSROOM
+]
 
 
 def validate_image_and_filename(
@@ -48,11 +51,8 @@ def validate_image_and_filename(
         ValidationError. Image or filename supplied fails one of the
             validation checks.
     """
-    entity_types_with_max_size_one_mb = [
-        feconf.ENTITY_TYPE_BLOG_POST, feconf.ENTITY_TYPE_CLASSROOM
-    ]
     if (
-        entity_type in entity_types_with_max_size_one_mb
+        entity_type in ENTITY_TYPES_WITH_MAX_SIZE_ONE_MB
     ):
         max_file_size = ONE_MB_IN_BYTES
     else:
