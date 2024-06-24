@@ -657,6 +657,7 @@ def main(args: Optional[list[str]] = None) -> None:
     """Checks and outputs the test suites to run in the CI."""
     parsed_args = _PARSER.parse_args(args)
 
+    generate_root_files_mapping.main()
     if parsed_args.output_all_test_suites:
         output_all_test_suites_to_run_to_github_workflow()
         return
@@ -667,8 +668,6 @@ def main(args: Optional[list[str]] = None) -> None:
     if does_files_include_python(changed_files):
         output_all_test_suites_to_run_to_github_workflow()
         return
-
-    generate_root_files_mapping.main()
 
     with open(ROOT_FILES_MAPPING_FILE_PATH, 'r', encoding='utf-8') as f:
         root_files_mapping = json.load(f)
