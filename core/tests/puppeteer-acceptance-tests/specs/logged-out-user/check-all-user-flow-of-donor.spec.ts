@@ -50,7 +50,7 @@ describe('Donor', function () {
       // Navigating back to home page for the next test.
       await loggedOutUser.navigateToHome();
       // Navigating to about foundation page via footer from home page.
-      await loggedOutUser.navigateToAboutFoundationPageViaFooter();
+      await loggedOutUser.clickOnTheOppiaFoundationLinkInFooter();
 
       // Navigating to donate page by clicking on the "donations" link on the about foundation page.
       await loggedOutUser.clickDonationsLinkInAboutFoundation();

@@ -20,6 +20,7 @@ import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
+import {TestToModulesMatcher} from '../../../test-dependencies/test-to-modules-matcher';
 import {showMessage} from './show-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
@@ -72,6 +73,7 @@ export class BaseUser {
 
     const headless = process.env.HEADLESS === 'true';
     const mobile = process.env.MOBILE === 'true';
+    const specName = process.env.SPEC_NAME;
     /**
      * Here we are disabling the site isolation trials because it is causing
      * tests to fail while running in non headless mode (see
@@ -93,6 +95,12 @@ export class BaseUser {
         this.startTimeInMilliseconds = Date.now();
         this.browserObject = browser;
         ConsoleReporter.trackConsoleMessagesInBrowser(browser);
+        if (!mobile) {
+          TestToModulesMatcher.setGoldenFilePath(
+            `core/tests/test-modules-mappings/acceptance/${specName}.txt`
+          );
+          TestToModulesMatcher.registerPuppeteerBrowser(browser);
+        }
         this.page = await browser.newPage();
 
         if (mobile) {
