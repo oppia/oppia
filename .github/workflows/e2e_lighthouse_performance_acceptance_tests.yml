@@ -309,7 +309,7 @@ jobs:
   #         message: "A Lighthouse test failed on the upstream develop branch."
   #         webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   acceptance_test:
-    # needs: build
+    needs: build
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
