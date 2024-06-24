@@ -16,7 +16,7 @@ jobs:
     uses: ./.github/workflows/check_test_suites_to_run.yml
     with:
       github_head_ref: 'HEAD'
-      github_base_ref: 'origin/${{ github.event.pull_request.base.ref }}'
+      github_base_ref: 'origin/develop'
       output_all_test_suites: ${{ github.event_name != 'pull_request' || vars.RUN_SUITES_ON_CHANGED_FILES == 'false' }}
   build:
     needs: check_test_suites_to_run
