@@ -40,6 +40,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {
   ExplorationChangeEditTranslation,
   ExplorationChangeMarkTranslationsNeedsUpdate,
+  ExplorationChangeMarkTranslationNeedsUpdateForLanguage,
   ExplorationChangeRemoveTranslations,
   ExplorationTranslationChange,
 } from 'domain/exploration/exploration-draft.model';
@@ -248,6 +249,14 @@ export class TranslatorOverviewComponent implements OnInit {
             changeDict.content_id
           );
           break;
+        case 'mark_translation_needs_update_for_language':
+          changeDict =
+            changeDict as ExplorationChangeMarkTranslationNeedsUpdateForLanguage;
+          if (this.languageCode === changeDict.language_code) {
+            entityTranslation.markTranslationAsNeedingUpdate(
+              changeDict.content_id
+            );
+          }
       }
     });
   }
