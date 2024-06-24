@@ -55,7 +55,7 @@ class CheckGithubWorkflowStatusTests(test_utils.GenericTestBase):
 
     def test_get_github_workflow_status_with_all_jobs_success(self) -> None:
         jobs = {
-            'job1': {'result': 'success'},
+            'job1': {'result': 'skipped'},
             'job2': {'result': 'success'},
             'job3': {'result': 'success'},
         }

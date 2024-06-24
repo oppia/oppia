@@ -57,8 +57,9 @@ class GithubJobDict(TypedDict):
 def get_workflow_status(jobs: Dict[str, GithubJobDict]) -> WorkflowStatusEnum:
     """Gets the status of a GitHub workflow run using the status of its jobs."""
     workflow_is_successful = all(
-        GithubJobResultEnum(job['result']) == GithubJobResultEnum.SUCCESS
-        for job in jobs.values()
+        GithubJobResultEnum(job['result']) in [
+            GithubJobResultEnum.SUCCESS, GithubJobResultEnum.SKIPPED
+        ] for job in jobs.values()
     )
 
     return (
