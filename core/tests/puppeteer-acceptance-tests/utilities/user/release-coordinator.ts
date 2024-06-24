@@ -164,7 +164,6 @@ export class ReleaseCoordinator extends BaseUser {
       `.e2e-test-feature-flag-${featureFlagIndex} ${rolloutPercentageInput}`
     );
 
-    // Save the changes.
     await this.clickOn(
       `.e2e-test-feature-flag-${featureFlagIndex} ${saveFeatureFlagButtonSelector}`
     );
@@ -541,7 +540,6 @@ export class ReleaseCoordinator extends BaseUser {
     await this.navigateToReleaseCoordinatorPage();
     await this.navigateToFeaturesTab();
 
-    await this.page.screenshot({path: 'features-tab.png'});
     const dummyHandlerElement = await this.page.$(agDummyFeatureIndicator);
 
     if (enabled && !dummyHandlerElement) {
