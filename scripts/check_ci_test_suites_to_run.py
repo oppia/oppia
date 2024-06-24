@@ -231,6 +231,7 @@ def output_variable_to_github_workflow(
         output_variable: str. The name of the output variable.
         output_value: str. The value of the output variable.
     """
+    print(f'{output_variable} is {output_value}')
     with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as o:
         print(f'{output_variable}={output_value}', file=o)
 
@@ -672,6 +673,8 @@ def main(args: Optional[list[str]] = None) -> None:
 
     changed_files = get_git_diff_name_status_files(
         parsed_args.github_base_ref, parsed_args.github_head_ref)
+
+    print('Changed files:', changed_files)
 
     if does_files_include_python(changed_files):
         output_all_test_suites_to_run_to_github_workflow()
