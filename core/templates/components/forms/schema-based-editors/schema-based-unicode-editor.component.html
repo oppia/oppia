@@ -15,7 +15,7 @@
 
   <span *ngIf="!getCodingMode() && !getRows()">
     <input type="text"
-           class="form-control display-inline"
+           class="form-control display-inline e2e-test-text-input"
            [(ngModel)]="localValue"
            (input)="updateLocalValue($event)"
            [disabled]="disabled"

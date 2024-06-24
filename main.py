@@ -238,6 +238,12 @@ URLS = [
         access_validators.ClassroomAccessValidationHandler),
 
     get_redirect_route(
+        r'%s/can_access_classrooms_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ClassroomsPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
         r'%s/can_access_collection_editor_page/<collection_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.CollectionEditorAccessValidationPage
@@ -641,7 +647,6 @@ URLS = [
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
     get_redirect_route(r'/gallery', library.LibraryRedirectPage),
     get_redirect_route(r'/contribute', library.LibraryRedirectPage),
-    get_redirect_route(r'/learn', classroom.DefaultClassroomRedirectPage),
     get_redirect_route(r'/playtest', library.LibraryRedirectPage),
     get_redirect_route(
         feconf.EXPLORATION_SUMMARIES_DATA_URL,
