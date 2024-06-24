@@ -541,6 +541,7 @@ export class ReleaseCoordinator extends BaseUser {
     await this.navigateToReleaseCoordinatorPage();
     await this.navigateToFeaturesTab();
 
+    await this.page.screenshot({path: 'features-tab.png'});
     const dummyHandlerElement = await this.page.$(agDummyFeatureIndicator);
 
     if (enabled && !dummyHandlerElement) {
