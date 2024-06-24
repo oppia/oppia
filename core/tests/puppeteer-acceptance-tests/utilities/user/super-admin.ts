@@ -891,6 +891,9 @@ export class SuperAdmin extends BaseUser {
       throw new Error(`Platform parameter "${parameter}" not found.`);
     }
 
+    await platformParameter.waitForSelector(defaultParamValueDivSelector, {
+      visible: true,
+    });
     const valueElement = await platformParameter.$(
       defaultParamValueDivSelector
     );
