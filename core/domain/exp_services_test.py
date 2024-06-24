@@ -24,6 +24,7 @@ import os
 import re
 import zipfile
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -1318,6 +1319,36 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         })]
         self.assertFalse(
             exp_services.is_voiceover_change_list(not_voiceover_change_list))
+
+    @test_utils.enable_feature_flags(
+            [feature_flag_list.FeatureNames.ADD_VOICEOVER_WITH_ACCENT])
+    def test_changes_in_voiceover_list_with_feature_flag_enabled(self) -> None:
+        not_voiceover_change_list = [exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'new_value': 'New title'
+        })]
+        self.assertFalse(
+            exp_services.is_voiceover_change_list(not_voiceover_change_list))
+
+        manual_voiceover_1: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        change_list_voiceover = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_UPDATE_VOICEOVERS,
+                'language_accent_code': 'en-US',
+                'content_id': 'content_0',
+                'voiceovers': {
+                    'manual': manual_voiceover_1
+                }
+            })
+        ]
+        self.assertTrue(
+            exp_services.is_voiceover_change_list(change_list_voiceover))
 
     def test_validation_for_valid_exploration(self) -> None:
         exploration = self.save_new_valid_exploration(
@@ -7109,6 +7140,46 @@ title: Old Title
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
                 'content_id': 'content_0'
+            })], 'Marked translation need update.')
+        entity_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+                exploration.version + 1
+            )
+        )
+        self.assertEqual(len(entity_translations), 1)
+        self.assertTrue(
+            entity_translations[0].translations['content_0'].needs_update)
+
+    def test_update_exploration_with_mark_translation_needs_update_for_language(
+        self
+    ) -> None:
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+            exploration.version, 'hi', 'content_0',
+            translation_domain.TranslatedContent(
+                'Translation',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        entity_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+                exploration.version
+            )
+        )
+        self.assertEqual(len(entity_translations), 1)
+        self.assertFalse(
+            entity_translations[0].translations['content_0'].needs_update)
+
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': (
+                    exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE),
+                'content_id': 'content_0',
+                'language_code': 'hi'
             })], 'Marked translation need update.')
         entity_translations = (
             translation_fetchers.get_all_entity_translations_for_entity(
