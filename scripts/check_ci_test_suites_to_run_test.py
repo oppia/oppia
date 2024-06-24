@@ -168,6 +168,9 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                 'exploration-player/view-exploration.spec.ts': [
                     'exploration-player/view-exploration.spec.ts'
                 ],
+                '.lighthouserc-performance.js': [
+                    '.lighthouserc-performance.js'
+                ],
             }))
         root_files_config_file = os.path.join(
             self.tempdir.name, 'root-files-config.json')
@@ -600,7 +603,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_output_all_suites(self) -> None:
         with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap: # pylint: disable=line-too-long
             with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap: # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap:
+                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap: # pylint: disable=line-too-long
                     check_ci_test_suites_to_run.main(
                         [
                             '--github_base_ref', 'base',
@@ -616,7 +619,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_python_file(self) -> None:
         with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap: # pylint: disable=line-too-long
             with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap: # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap:
+                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap: # pylint: disable=line-too-long
                     with self.swap(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
@@ -815,6 +818,57 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                 'lighthouse_performance': {
                                     'suites': [],
                                     'count': 0
+                                }
+                            }
+                        )
+
+    def test_check_ci_test_suites_to_run_with_changed_lighthouse_modules(self) -> None: # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap: # pylint: disable=line-too-long
+            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap: # pylint: disable=line-too-long
+                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap: # pylint: disable=line-too-long
+                    with self.swap(
+                        check_ci_test_suites_to_run,
+                        'get_git_diff_name_status_files',
+                        lambda *args: [
+                            '.lighthouserc-performance.js'
+                        ]
+                    ):
+                        check_ci_test_suites_to_run.main(
+                            [
+                                '--github_base_ref', 'base',
+                                '--github_head_ref', 'head'
+                            ]
+                        )
+                        self.assertEqual(
+                            self.get_test_suites_to_run_from_github_output(),
+                            {
+                                'e2e': self.all_test_suites['e2e'],
+                                'acceptance': {
+                                    'suites': [],
+                                    'count': 0
+                                },
+                                'lighthouse_accessibility': {
+                                    'suites': [],
+                                    'count': 0
+                                },
+                                'lighthouse_performance': {
+                                    'suites': [
+                                        {
+                                            'name': '1',
+                                            'module':
+                                                '.lighthouserc-performance.js',
+                                            'pages_to_run':
+                                                LIGHTHOUSE_PAGES_FOR_SUITES['1']
+                                        },
+                                        {
+                                            'name': '2',
+                                            'module':
+                                                '.lighthouserc-performance.js',
+                                            'pages_to_run':
+                                                LIGHTHOUSE_PAGES_FOR_SUITES['2']
+                                        }
+                                    ],
+                                    'count': 2
                                 }
                             }
                         )
