@@ -418,7 +418,7 @@ describe('Exploration editor page component', () => {
     fixture.destroy();
   });
 
-  fdescribe('when user permission is true and draft changes not valid', () => {
+  describe('when user permission is true and draft changes not valid', () => {
     beforeEach(() => {
       ngbModal = TestBed.inject(NgbModal);
       tds = TestBed.inject(ThreadDataBackendApiService);
@@ -708,7 +708,7 @@ describe('Exploration editor page component', () => {
     }));
   });
 
-  fdescribe('Checking internet Connection', () => {
+  describe('Checking internet Connection', () => {
     beforeEach(() => {
       ueps = TestBed.inject(UserExplorationPermissionsService);
       registerAcceptTutorialModalEventSpy = spyOn(
@@ -783,7 +783,7 @@ describe('Exploration editor page component', () => {
     });
   });
 
-  fdescribe('when user permission is false and draft changes are true', () => {
+  describe('when user permission is false and draft changes are true', () => {
     let mockExplorationPropertyChangedEventEmitter = new EventEmitter();
     let lastPublishedTranslations: LanguageCodeToEntityTranslations;
 
@@ -1089,7 +1089,7 @@ describe('Exploration editor page component', () => {
     });
   });
 
-  fdescribe('Initializing improvements tab', () => {
+  describe('Initializing improvements tab', () => {
     beforeEach(() => {
       tds = TestBed.inject(ThreadDataBackendApiService);
       ueps = TestBed.inject(UserExplorationPermissionsService);
