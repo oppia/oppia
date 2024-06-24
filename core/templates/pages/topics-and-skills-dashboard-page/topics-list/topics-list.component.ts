@@ -116,10 +116,35 @@ export class TopicsListComponent {
   }
 
   /**
+   ** @param {Number} topicId - ID of the topic.
+   * @returns {CreatorTopicSummary} The topic summary of the topic
+   * of the topic with given topicId.
+   */
+  getTopicSummaryForTopicId(topicId: string): CreatorTopicSummary | undefined {
+    const topicSummary = this.topicSummaries.find(
+      (topicSummary: CreatorTopicSummary) => {
+        return topicSummary.id === topicId;
+      }
+    );
+
+    return topicSummary;
+  }
+
+  /**
    * @param {String} topicId - ID of the topic.
    * @param {String} topicName - Name of the topic.
    */
   deleteTopic(topicId: string, topicName: string): void {
+    const topicSummary = this.getTopicSummaryForTopicId(topicId);
+
+    if (topicSummary?.classroom) {
+      const errorMessage =
+        `The topic is assigned to the ${topicSummary.classroom} classroom.` +
+        ' Contact the curriculum admins to remove it from the classroom first.';
+      this.alertsService.addWarning(errorMessage);
+      return;
+    }
+
     this.selectedIndex = null;
     let modalRef: NgbModalRef = this.ngbModal.open(DeleteTopicModalComponent, {
       backdrop: true,
