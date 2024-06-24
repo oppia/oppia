@@ -414,4 +414,44 @@ describe('Access validation backend api service', () => {
     expect(successSpy).toHaveBeenCalled();
     expect(failSpy).not.toHaveBeenCalled();
   }));
+
+  it('should validate access to classrooms page', fakeAsync(() => {
+    avbas.validateAccessToClassroomsPage().then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_classrooms_page'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
+  it(
+    'should not validate access to classrooms page if feature ' +
+      'is not enabled or we just have one classroom',
+    fakeAsync(() => {
+      avbas.validateAccessToClassroomsPage().then(successSpy, failSpy);
+
+      const req = httpTestingController.expectOne(
+        '/access_validation_handler/can_access_classrooms_page'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        {
+          error: 'Page not found',
+        },
+        {
+          status: 404,
+          statusText: 'Page not found',
+        }
+      );
+
+      flushMicrotasks();
+      expect(successSpy).not.toHaveBeenCalled();
+      expect(failSpy).toHaveBeenCalled();
+    })
+  );
 });

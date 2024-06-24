@@ -634,9 +634,11 @@ describe('Classroom backend API service', function () {
     req.flush({
       all_classrooms_summary: [
         {
+          classroom_id: 'mathclassroom',
           name: 'math',
           url_fragment: 'math',
           teaser_text: 'math teaser text',
+          is_published: true,
           thumbnail_filename: 'thumbnail.svg',
           thumbnail_bg_color: 'transparent',
         },

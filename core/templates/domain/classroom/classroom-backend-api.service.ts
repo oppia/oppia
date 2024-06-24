@@ -100,9 +100,11 @@ interface TopicsClassroomRelationBackendDict {
 }
 
 export interface ClassroomSummaryDict {
+  classroom_id: string;
   name: string;
   url_fragment: string;
   teaser_text: string;
+  is_published: boolean;
   thumbnail_filename: string;
   thumbnail_bg_color: string;
 }
