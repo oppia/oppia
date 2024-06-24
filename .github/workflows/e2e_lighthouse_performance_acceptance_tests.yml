@@ -48,22 +48,22 @@ jobs:
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
-      - name: Build Webpack
-        run: python -m scripts.build --prod_env
+      # - name: Build Webpack
+      #   run: python -m scripts.build --prod_env
       - name: Zip build files
         # We avoid using ../ or absolute paths because unzip treats these as
         # security issues and will refuse to follow them.
         run: |
           zip -rqy build_files.zip oppia/third_party oppia_tools oppia/build oppia/webpack_bundles oppia/proto_files oppia/app.yaml oppia/assets/hashes.json oppia/proto_files oppia/extensions/classifiers/proto/* oppia/backend_prod_files oppia/dist
         working-directory: /home/runner/work/oppia
-      - name: Upload build files artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: build_files
-          path: /home/runner/work/oppia/build_files.zip
-          retention-days: 1
+      # - name: Upload build files artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: build_files
+      #     path: /home/runner/work/oppia/build_files.zip
+      #     retention-days: 1
   acceptance_test:
-      # needs: build
+      needs: build
       runs-on:  ${{ matrix.os }}
       strategy:
         matrix:
@@ -171,9 +171,9 @@ jobs:
               ${{ runner.os }}-build-${{ env.cache-name }}-
               ${{ runner.os }}-build-
               ${{ runner.os }}-
-        - name: (Artifact re-build) Build Webpack
-          if: steps.download_artifact_1.outcome == 'failure'
-          run: python -m scripts.build --prod_env
+        # - name: (Artifact re-build) Build Webpack
+        #   if: steps.download_artifact_1.outcome == 'failure'
+        #   run: python -m scripts.build --prod_env
         - name: Run Desktop Acceptance Test ${{ matrix.suite }}
           run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env
         - name: Uploading generated test to angular module mapping as an artifact
@@ -184,12 +184,12 @@ jobs:
             path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ matrix.suite.name }}-generated.txt
         - name: Run Mobile Acceptance Test ${{ matrix.suite }}
           run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env --mobile
-        - name: Uploading webpack bundles as an artifact
-          if: ${{ failure() }}
-          uses: actions/upload-artifact@v3
-          with:
-            name: webpack-bundles
-            path: /home/runner/work/oppia/oppia/build
+        # - name: Uploading webpack bundles as an artifact
+        #   if: ${{ failure() }}
+        #   uses: actions/upload-artifact@v3
+          # with:
+          #   name: webpack-bundles
+          #   path: /home/runner/work/oppia/oppia/build
         - name: Report failure if failed on oppia/oppia develop branch
           if: ${{
             failure() &&
