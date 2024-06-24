@@ -71,7 +71,7 @@ describe('Release Coordinator', function () {
 
   it(
     'should navigate to the Release Coordinator page, select a job, run it,' +
-      'view and copy the output, and close the output modal',
+      ' view and copy the output, and close the output modal',
     async function () {
       await releaseCoordinator.navigateToReleaseCoordinatorPage();
       await releaseCoordinator.selectAndRunJob(
