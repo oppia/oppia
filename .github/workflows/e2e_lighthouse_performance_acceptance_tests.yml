@@ -14,6 +14,10 @@ on:
 jobs:
   check_test_suites_to_run:
     uses: ./.github/workflows/check_test_suites_to_run.yml
+    with:
+      github_head_ref: 'HEAD'
+      github_base_ref: 'origin/${{ github.event.pull_request.base.ref }}'
+      output_all_test_suites: ${{ github.event_name != 'pull_request' || vars.RUN_SUITES_ON_CHANGED_FILES == 'false' }}
   build:
     needs: check_test_suites_to_run
     if: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).e2e.count > 0 ||

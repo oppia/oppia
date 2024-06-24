@@ -1,6 +1,16 @@
 name: Checks CI Test Suites To Run
 on:
   workflow_call:
+    inputs:
+      github_head_ref:
+        required: true
+        type: string
+      github_base_ref:
+        required: true
+        type: string
+      output_all_test_suites:
+        required: true
+        type: boolean
     outputs:
       test_suites_to_run: 
         value: ${{ jobs.check_test_suites_to_run.outputs.test_suites_to_run }}
@@ -33,8 +43,6 @@ jobs:
         id: check_test_suites_to_run
         run: >
           python -m scripts.check_ci_test_suites_to_run
-          --github_head_ref="HEAD"
-          --github_base_ref="origin/${{ github.event.pull_request.base.ref }}"
-          ${{ env.SHOULD_OUTPUT_ALL_TESTS && '--output_all_test_suites' || '' }}
-        env:
-          SHOULD_OUTPUT_ALL_TESTS: ${{ github.event_name != 'pull_request' || vars.RUN_SUITES_ON_CHANGED_FILES == 'false' }}
+          --github_head_ref="${{ inputs.github_head_ref }}"
+          --github_base_ref="${{ inputs.github_base_ref }}"
+          ${{ inputs.output_all_test_suites && '--output_all_test_suites' || '' }}
