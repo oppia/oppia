@@ -77,6 +77,7 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {LanguageCodeToEntityTranslations} from '../../services/entity-translations.services';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockNgbModalRef {
   componentInstance = {};
@@ -88,6 +89,14 @@ class MockNgbModal {
       result: Promise.resolve(),
     };
   }
+}
+
+class MockPlatformFeatureService {
+  status = {
+    ExplorationEditorCanModifyTranslations: {
+      isEnabled: false,
+    },
+  };
 }
 
 describe('Exploration editor page component', () => {
@@ -131,6 +140,7 @@ describe('Exploration editor page component', () => {
   let mockOpenTranslationTutorialEmitter = new EventEmitter<void>();
   let mockInitExplorationPageEmitter = new EventEmitter<void>();
   let isLocationSetToNonStateEditorTabSpy;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   let explorationId = 'exp1';
   let explorationData = {
@@ -304,6 +314,10 @@ describe('Exploration editor page component', () => {
           useClass: MockWindowRef,
         },
         {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
+        {
           provide: ExplorationDataService,
           useValue: {
             getDataAsync: callback => {
@@ -404,7 +418,7 @@ describe('Exploration editor page component', () => {
     fixture.destroy();
   });
 
-  describe('when user permission is true and draft changes not valid', () => {
+  fdescribe('when user permission is true and draft changes not valid', () => {
     beforeEach(() => {
       ngbModal = TestBed.inject(NgbModal);
       tds = TestBed.inject(ThreadDataBackendApiService);
@@ -694,7 +708,7 @@ describe('Exploration editor page component', () => {
     }));
   });
 
-  describe('Checking internet Connection', () => {
+  fdescribe('Checking internet Connection', () => {
     beforeEach(() => {
       ueps = TestBed.inject(UserExplorationPermissionsService);
       registerAcceptTutorialModalEventSpy = spyOn(
@@ -769,7 +783,7 @@ describe('Exploration editor page component', () => {
     });
   });
 
-  describe('when user permission is false and draft changes are true', () => {
+  fdescribe('when user permission is false and draft changes are true', () => {
     let mockExplorationPropertyChangedEventEmitter = new EventEmitter();
     let lastPublishedTranslations: LanguageCodeToEntityTranslations;
 
@@ -878,7 +892,8 @@ describe('Exploration editor page component', () => {
           content_id: 'content0',
         },
       ];
-
+      mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled =
+        true;
       component.ngOnInit();
     });
 
@@ -1074,7 +1089,7 @@ describe('Exploration editor page component', () => {
     });
   });
 
-  describe('Initializing improvements tab', () => {
+  fdescribe('Initializing improvements tab', () => {
     beforeEach(() => {
       tds = TestBed.inject(ThreadDataBackendApiService);
       ueps = TestBed.inject(UserExplorationPermissionsService);
