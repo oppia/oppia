@@ -23,85 +23,74 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-out Users', function () {
+describe('Logged-out Users on Get Stared page', function () {
   let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
+  beforeEach(async function () {
+    await loggedOutUser.navigateToGetStartedPage();
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
   it(
-    'should be able to navigate to the Get Started page using the footer',
+    'should be able to use the "create one here" link',
     async function () {
-      await loggedOutUser.navigateToAboutFoundationPage();
-      await loggedOutUser.navigateToGetStartedPageViaFooter();
+      await loggedOutUser.clickCreateOneHereLinkOnGetStartedPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  describe('on the Get Started page', function () {
-    beforeEach(async function () {
-      await loggedOutUser.navigateToGetStartedPage();
-    }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  it(
+    'should be able to use the "Welcome to Oppia" link',
+    async function () {
+      await loggedOutUser.clickWelcomeToOppiaLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "create one here" link',
-      async function () {
-        await loggedOutUser.clickCreateOneHereLinkInGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use the "Get Electrified!" link',
+    async function () {
+      await loggedOutUser.clickGetElectrifiedLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "Welcome to Oppia" link',
-      async function () {
-        await loggedOutUser.clickWelcomeToOppiaLinkInGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use the "Programming with Carla" link',
+    async function () {
+      await loggedOutUser.clickProgrammingWithCarlaLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "Get Electrified!" link',
-      async function () {
-        await loggedOutUser.clickGetElectrifiedLinkInGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use "in our user documentation" link',
+    async function () {
+      await loggedOutUser.clickInOurUserDocumentationLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "Programming with Carla" link',
-      async function () {
-        await loggedOutUser.clickProgrammingWithCarlaLinkInGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use the "embed it in your own web page" link',
+    async function () {
+      await loggedOutUser.clickEmbedItInYourOwnWebPageLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use "in our user documentation" link',
-      async function () {
-        await loggedOutUser.clickInOurUserDocumentationLinkInGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use the "discover more ways to get involved" link',
+    async function () {
+      await loggedOutUser.clickDiscoverMoreWaysToGetInvolvedLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "embed it in your own web page" link',
-      async function () {
-        await loggedOutUser.clickEmbedItInYourOwnWebPageLinkInGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
-
-    it(
-      'should be able to use the "discover more ways to get involved" link',
-      async function () {
-        await loggedOutUser.clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
-
-    afterAll(async function () {
-      await UserFactory.closeAllBrowsers();
-    });
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
   });
 });

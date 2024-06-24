@@ -280,6 +280,8 @@ export class ExplorationStatesService {
         }
       );
       modalRef.componentInstance.contentId = contentId;
+      modalRef.componentInstance.contentValue =
+        BaseTranslatableObject.getContentValue(content);
       modalRef.componentInstance.markNeedsUpdateHandler =
         this.markTranslationAndVoiceoverNeedsUpdate.bind(this);
       modalRef.componentInstance.removeHandler =
