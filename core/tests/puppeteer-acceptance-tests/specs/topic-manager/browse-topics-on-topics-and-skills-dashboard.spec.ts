@@ -63,7 +63,7 @@ describe('Topic Manager User Journey', function () {
       await topicManager.sortTopics('name');
       await topicManager.expectTopicsInOrder(['Test Topic 1', 'Test Topic 2']);
 
-      await topicManager.adjustPaginatorToShowTopicsPerPage(15);
+      await topicManager.adjustPaginatorToShowItemsPerPage(15);
       await topicManager.checkIfPageChangesAfterClickingNext(false);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
