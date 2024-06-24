@@ -138,7 +138,7 @@ var DiagnosticTestPage = function () {
       'teaser text'
     );
 
-    var teaserText = await action.getText(
+    var teaserText = await action.getValue(
       'Teaser text input element',
       updateClassroomTeaserTextInput
     );
@@ -150,7 +150,7 @@ var DiagnosticTestPage = function () {
       'course details'
     );
 
-    var courseDetailsText = await action.getText(
+    var courseDetailsText = await action.getValue(
       'Course details input element',
       updateClassroomCourseDetailsInput
     );
@@ -162,7 +162,7 @@ var DiagnosticTestPage = function () {
       'topic list intro'
     );
 
-    var topicListIntroText = await action.getText(
+    var topicListIntroText = await action.getValue(
       'Topic list intro input element',
       updateClassroomTopicListIntroInput
     );
