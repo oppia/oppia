@@ -1,4 +1,3 @@
-core/templates/pages/about-foundation-page/about-foundation-page.module.ts
 core/templates/pages/about-page/about-page.module.ts
 core/templates/pages/blog-home-page/blog-home-page.module.ts
 core/templates/pages/contact-page/contact-page.module.ts

@@ -20,9 +20,6 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
-const _420MillionUrl = testConstants.URLs.ExternalLink61MillionChildren;
-const _61MillionChildrenUrl = testConstants.URLs.ExternalLink61MillionChildren;
-const aboutFoundationUrl = testConstants.URLs.AboutFoundation;
 const aboutUrl = testConstants.URLs.About;
 const androidUrl = testConstants.URLs.Android;
 const blogPostUrlinPartnershipsPage =
@@ -50,8 +47,6 @@ const CreativeCommonsLegalCodeUrl =
   testConstants.URLs.ExternalLink.CreativeCommonsLegalCode;
 const explorationDesignTipsUrl = testConstants.URLs.ExplorationDesignTips;
 const googleSignUpUrl = testConstants.URLs.ExternalLink.GoogleSignUp;
-const evenThoseWhoAreInSchoolUrl =
-  testConstants.URLs.ExternalLinkEvenThoseWhoAreInSchool;
 const getStartedUrl = testConstants.URLs.GetStarted;
 const homeUrl = testConstants.URLs.Home;
 const mathClassroomUrl = testConstants.URLs.MathClassroom;
@@ -66,7 +61,6 @@ const partnershipsUrl = testConstants.URLs.Partnerships;
 const privacyPolicyUrl = testConstants.URLs.PrivacyPolicy;
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
-const sourceUnescoUrl = testConstants.URLs.ExternalLinkSourceUnesco;
 const teachUrl = testConstants.URLs.Teach;
 const termsUrl = testConstants.URLs.Terms;
 const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
@@ -107,7 +101,6 @@ const navbarDonateDesktopButton = 'a.e2e-test-navbar-donate-desktop-button';
 const navbarDonateMobileButton = 'a.e2e-test-navbar-donate-mobile-button';
 
 const footerAboutLink = 'a.e2e-test-footer-about-link';
-const footerAboutFoundationLink = 'a.e2e-test-footer-about-foundation-link';
 const footerBlogLink = 'a.e2e-test-footer-blog-link';
 const footerForumlink = 'a.e2e-test-footer-forum-link';
 const footerGetStartedLink = 'a.e2e-test-get-started-link';
@@ -132,18 +125,6 @@ const visitClassroomButton = '.e2e-test-about-page-visit-classroom-button';
 const browseLibraryButton = '.e2e-test-about-page-browse-library-button';
 
 const aboutFoundationClass = '.oppia-about-foundation-hero-content h1';
-const millionsOfContentId =
-  '.e2e-test-about-foundation-page-millions-of-content';
-const weCannotContentId = '.e2e-test-about-foundation-page-we-cannot-content';
-const sourceUnescoButton =
-  'a.e2e-test-about-foundation-page-source-unesco-button';
-const learnMoreAboutOppiaButton =
-  '.e2e-test-about-foundation-page-learn-more-about-oppia-button';
-const becomeAVolunteerButton =
-  '.e2e-test-about-foundation-page-become-a-volunteer-button';
-const sectionSixPart1 = '.e2e-test-about-foundation-page-section-six-part-1';
-const sectionSixPart2 = '.e2e-test-about-foundation-page-section-six-part-2';
-const sectionSixPart3 = '.e2e-test-about-foundation-page-section-six-part-3';
 
 const watchAVideoButton =
   'a.e2e-test-thanks-for-donating-page-watch-a-video-button';
@@ -257,13 +238,6 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToAboutPage(): Promise<void> {
     await this.goto(aboutUrl);
-  }
-
-  /**
-   * Function to navigate to the about foundation page.
-   */
-  async navigateToAboutFoundationPage(): Promise<void> {
-    await this.goto(aboutFoundationUrl);
   }
 
   /**
@@ -544,225 +518,6 @@ export class LoggedOutUser extends BaseUser {
         'The Oppia Foundation button in About Menu on navbar ' +
           'opens the About Foundation page.'
       );
-    }
-  }
-
-  /**
-   * Function to click the 61 million children link
-   * in the About Foundation page and check if it opens the right page.
-   */
-  async click61MillionChildrenLinkInAboutFoundation(): Promise<void> {
-    await this.page.waitForSelector(millionsOfContentId);
-    const buttonText = await this.page.$eval(
-      millionsOfContentId,
-      element => element.getElementsByTagName('a')[0].textContent
-    );
-
-    if (buttonText !== '61 million children') {
-      throw new Error('The 61 Million Children button does not exist!');
-    }
-    await this.page.$eval(millionsOfContentId, element =>
-      element.getElementsByTagName('a')[0].click()
-    );
-    if (this.page.url() !== _61MillionChildrenUrl) {
-      throw new Error(
-        `The 61 Million Children link should open the right page,
-          but it opens ${this.page.url()} instead.`
-      );
-    } else {
-      showMessage('The 61 Million Children link opens the right page.');
-    }
-  }
-  /**
-   * Function to click the even those who are in school link
-   * in the About Foundation page and check if it opens the right page.
-   */
-  async clickEvenThoseWhoAreInSchoolLinkInAboutFoundation(): Promise<void> {
-    await this.page.waitForSelector(millionsOfContentId);
-    const anchorElementSelector = `${millionsOfContentId} a:nth-child(2)`;
-    const buttonText = await this.page.$eval(
-      anchorElementSelector,
-      element => element.textContent
-    );
-    if (buttonText !== 'even those who are in school') {
-      throw new Error(
-        'The Even Those Who Are In School button does not exist!'
-      );
-    }
-    await this.openExternalPdfLink(
-      anchorElementSelector,
-      evenThoseWhoAreInSchoolUrl
-    );
-    showMessage('The Even Those Who Are In School link opens the right page.');
-  }
-
-  /**
-   * Function to click the Source: UNESCO link in the About Foundation page
-   * and check if it opens the right page.
-   */
-  async clickSourceUnescoLinkInAboutFoundation(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      sourceUnescoButton,
-      'Source: UNESCO link',
-      sourceUnescoUrl,
-      'right'
-    );
-  }
-
-  /**
-   * Function to click the 420 million link
-   * in the About Foundation page and check if it opens the right page.
-   */
-  async click420MillionLinkInAboutFoundation(): Promise<void> {
-    await this.page.waitForSelector(weCannotContentId);
-    const buttonText = await this.page.$eval(
-      weCannotContentId,
-      element => element.getElementsByTagName('a')[0].textContent
-    );
-    if (buttonText !== '420 million') {
-      throw new Error('The 420 Million link does not exist!');
-    }
-
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle2']}),
-      this.page.$eval(weCannotContentId, element =>
-        element.getElementsByTagName('a')[0].click()
-      ),
-    ]);
-
-    if (this.page.url() !== _420MillionUrl) {
-      throw new Error(
-        `The 420 Million link does not open the right page!
-          It opens ${this.page.url()} instead.`
-      );
-    } else {
-      showMessage('The 420 Million link opens the right page.');
-    }
-  }
-
-  /**
-   * Function to click the Learn More About Oppia button
-   * in the About Foundation page and check if it opens the About page.
-   */
-  async clickLearnMoreAboutOppiaButtonInAboutFoundation(): Promise<void> {
-    await this.clickOn(learnMoreAboutOppiaButton);
-    const newTab = await this.browserObject.waitForTarget(
-      target => target.url() === aboutUrl
-    );
-    if (newTab.url() !== aboutUrl) {
-      throw new Error(
-        `The Learn More About Oppia button does not open the About page!
-           It opens ${newTab.url()} instead.`
-      );
-    } else {
-      showMessage('The Learn More About Oppia button opens the About page.');
-    }
-  }
-
-  /**
-   * Function to click the Become A Volunteer button
-   * in the About Foundation page and check if it opens the Volunteer page.
-   */
-  async clickBecomeAVolunteerButtonInAboutFoundation(): Promise<void> {
-    await this.clickOn(becomeAVolunteerButton);
-    const newTab = await this.browserObject.waitForTarget(
-      target => target.url() === volunteerUrl
-    );
-    if (newTab.url() !== volunteerUrl) {
-      throw new Error(
-        `The Become A Volunteer button does not open the Volunteer page!
-          It opens ${newTab.url()} instead.`
-      );
-    } else {
-      showMessage('The Become A Volunteer button opens the Volunteer page.');
-    }
-  }
-
-  /**
-   * Function to click the Consider Becoming A Partner Today! link
-   * in the About Foundation page and check if it opens the Partnerships page.
-   */
-  async clickConsiderBecomingAPartnerTodayLinkInAboutFoundation(): Promise<void> {
-    await this.page.waitForSelector(sectionSixPart1);
-    const buttonText = await this.page.$eval(
-      sectionSixPart1,
-      element => element.getElementsByTagName('a')[0].textContent
-    );
-    if (buttonText !== 'Consider becoming a partner today!') {
-      throw new Error(
-        'The Consider becoming a partner today! link does not exist!'
-      );
-    }
-    await this.page.$eval(sectionSixPart1, element =>
-      element.getElementsByTagName('a')[0].click()
-    );
-    if (this.page.url() !== partnershipsUrl) {
-      throw new Error(
-        `The Consider becoming a partner today! link does not open
-          the Partnerships page! It opens ${this.page.url()} instead.`
-      );
-    } else {
-      showMessage(
-        'The Consider becoming a partner today! link opens ' +
-          'the Partnerships page.'
-      );
-    }
-  }
-
-  /**
-   * Function to click the Join our large volunteer community! link
-   * in the About Foundation page and check if it opens the Volunteer page.
-   */
-  async clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation(): Promise<void> {
-    await this.page.waitForSelector(sectionSixPart2);
-    const buttonText = await this.page.$eval(
-      sectionSixPart2,
-      element => element.getElementsByTagName('a')[0].textContent
-    );
-    if (buttonText !== 'Join our large volunteer community!') {
-      throw new Error(
-        'The Join our large volunteer community! link does not exist!'
-      );
-    }
-    await this.page.$eval(sectionSixPart2, element =>
-      element.getElementsByTagName('a')[0].click()
-    );
-    if (this.page.url() !== volunteerUrl) {
-      throw new Error(
-        `The Join our large volunteer community! link does not open
-          the Volunteer page! It opens ${this.page.url()} instead.`
-      );
-    } else {
-      showMessage(
-        'The Join our large volunteer community! link opens ' +
-          'the Volunteer page.'
-      );
-    }
-  }
-
-  /**
-   * Function to click the donations link
-   * in the About Foundation page and check if it opens the Donate page.
-   */
-  async clickDonationsLinkInAboutFoundation(): Promise<void> {
-    await this.page.waitForSelector(sectionSixPart3);
-    const buttonText = await this.page.$eval(
-      sectionSixPart3,
-      element => element.getElementsByTagName('a')[0].textContent
-    );
-    if (buttonText !== 'donations') {
-      throw new Error('The donations link does not exist!');
-    }
-    await this.page.$eval(sectionSixPart3, element =>
-      element.getElementsByTagName('a')[0].click()
-    );
-    if (this.page.url() !== donateUrl) {
-      throw new Error(
-        `The donations link does not open the Donate page!
-          It opens ${this.page.url()} instead.`
-      );
-    } else {
-      showMessage('The donations link opens the Donate page.');
     }
   }
 
@@ -1048,17 +803,6 @@ export class LoggedOutUser extends BaseUser {
       'About Oppia link in the About Oppia section in the footer',
       aboutUrl,
       'About'
-    );
-  }
-  /**
-   * Navigates to the About Foundation page using the oppia website footer.
-   */
-  async clickOnTheOppiaFoundationLinkInFooter(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      footerAboutFoundationLink,
-      'About Foundation link in the About Oppia section in the footer',
-      aboutFoundationUrl,
-      'About Foundation'
     );
   }
   /**
