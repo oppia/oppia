@@ -115,7 +115,7 @@ var DiagnosticTestPage = function () {
       addTopicToClassroomButton
     );
 
-    await autocompleteTopicDropdownEditor(topicName);
+    await addTopicToClassroom(topicName);
     await action.waitForAutosave();
 
     await action.click(
@@ -210,11 +210,11 @@ var DiagnosticTestPage = function () {
     }
   };
 
-  var autocompleteTopicDropdownEditor = async function (topicName) {
+  var addTopicToClassroom = async function (topicName) {
     var containerLocator = '.e2e-test-classroom-category-dropdown';
-    // We cannot add the 'e2e-test' prefix to this selector because the element
-    // is part of the mat-form-field component of Angular Material.
-    var searchInputLocator = '.mat-select-search-input.mat-input-element';
+    var searchTopicInput = $('.e2e-test-exploration-new-category-add').$(
+      '.mat-select-search-input.mat-input-element'
+    );
     var searchInputLocatorTextOption = $(
       '.e2e-test-classroom-topic-selector-choice'
     );
@@ -227,7 +227,7 @@ var DiagnosticTestPage = function () {
 
     await action.setValue(
       'Dropdown Element Search',
-      $(searchInputLocator),
+      searchTopicInput,
       topicName
     );
 
