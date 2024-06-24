@@ -23,8 +23,6 @@ import os
 
 from typing import Dict, Final, List, Optional, TypedDict
 
-_PARSER = argparse.ArgumentParser()
-
 _PARSER: Final = argparse.ArgumentParser(
     description="""
 Checks the status of a GitHub workflow run using the status of its jobs.
@@ -59,13 +57,13 @@ class GithubJobDict(TypedDict):
 def get_workflow_status(jobs: Dict[str, GithubJobDict]) -> WorkflowStatusEnum:
     """Gets the status of a GitHub workflow run using the status of its jobs."""
     workflow_is_successful = all(
-        job['result'] == GithubJobResultEnum.SUCCESS.value
+        GithubJobResultEnum(job['result']) == GithubJobResultEnum.SUCCESS
         for job in jobs.values()
     )
 
     return (
-        WorkflowStatusEnum.SUCCESS.value if workflow_is_successful
-        else WorkflowStatusEnum.FAILURE.value
+        WorkflowStatusEnum.SUCCESS if workflow_is_successful
+        else WorkflowStatusEnum.FAILURE
     )
 
 
@@ -80,7 +78,7 @@ def main(args: Optional[List[str]] = None) -> None:
     workflow_status = get_workflow_status(jobs)
 
     with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as f:
-        print(f'WORKFLOW_STATUS={workflow_status}', file=f)
+        print(f'WORKFLOW_STATUS={workflow_status.value}', file=f)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

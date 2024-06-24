@@ -36,16 +36,16 @@ class CheckGithubWorkflowStatusTests(test_utils.GenericTestBase):
         super().tearDown()
         self.temp_dir.cleanup()
 
-    def get_workflow_status_from_github_output(self) -> bool:
+    def get_workflow_status_from_github_output(self) -> str:
         """Gets the workflow status from the GitHub output file."""
         with open(os.environ['GITHUB_OUTPUT'], 'r', encoding='utf-8') as f:
             workflow_status = f.read().split('=')[1].strip()
             return workflow_status
 
-    def test_get_github_workflow_status_with_job_error(self) -> None:
+    def test_get_github_workflow_status_with_job_failure(self) -> None:
         jobs = {
             'job1': {'result': 'success'},
-            'job2': {'result': 'error'},
+            'job2': {'result': 'failure'},
             'job3': {'result': 'success'},
         }
 

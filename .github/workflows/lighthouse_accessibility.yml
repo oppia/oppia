@@ -78,6 +78,7 @@ jobs:
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   check_workflow_status:
     needs: [lighthouse_accessibility]
+    if: always()
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
