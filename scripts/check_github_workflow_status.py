@@ -16,10 +16,10 @@
 
 from __future__ import annotations
 
-import json
-import os
 import argparse
 import enum
+import json
+import os
 
 from typing import Dict, Final, List, Optional, TypedDict
 
@@ -30,16 +30,25 @@ _PARSER: Final = argparse.ArgumentParser(
 Checks the status of a GitHub workflow run using the status of its jobs.
 """)
 
+_PARSER.add_argument(
+    '--jobs', type=str, required=True,
+)
+
+
 class GithubJobResultEnum(enum.Enum):
     """The possible results of a GitHub job."""
+
     SUCCESS = 'success'
     FAILURE = 'failure'
     SKIPPED = 'skipped'
 
+
 class WorkflowStatusEnum(enum.Enum):
     """The possible statuses of a GitHub workflow."""
+
     SUCCESS = 'success'
     FAILURE = 'failure'
+
 
 class GithubJobDict(TypedDict):
     """A dictionary representing a GitHub job."""
@@ -47,15 +56,11 @@ class GithubJobDict(TypedDict):
     result: GithubJobResultEnum
 
 
-_PARSER.add_argument(
-    '--jobs', type=str, required=True,
-)
-
-
 def get_workflow_status(jobs: Dict[str, GithubJobDict]) -> WorkflowStatusEnum:
     """Gets the status of a GitHub workflow run using the status of its jobs."""
     workflow_is_successful = all(
-        job['result'] == GithubJobResultEnum.SUCCESS.value for job in jobs.values()
+        job['result'] == GithubJobResultEnum.SUCCESS.value
+        for job in jobs.values()
     )
 
     return (
@@ -65,11 +70,13 @@ def get_workflow_status(jobs: Dict[str, GithubJobDict]) -> WorkflowStatusEnum:
 
 
 def main(args: Optional[List[str]] = None) -> None:
-    """Checks the status of a GitHub workflow run using the status of its jobs."""
+    """Checks the status of a GitHub workflow run using the status
+    of its jobs.
+    """
     parsed_args = _PARSER.parse_args(args)
 
     jobs: Dict[str, GithubJobDict] = json.loads(parsed_args.jobs) or {}
-    
+
     workflow_status = get_workflow_status(jobs)
 
     with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as f:

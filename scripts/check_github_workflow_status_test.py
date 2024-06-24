@@ -23,7 +23,8 @@ import tempfile
 from core.tests import test_utils
 from . import check_github_workflow_status
 
-class CheckGithubWorkflowStatusTests(test_utils.GenericTestBase): 
+
+class CheckGithubWorkflowStatusTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -40,7 +41,7 @@ class CheckGithubWorkflowStatusTests(test_utils.GenericTestBase):
         with open(os.environ['GITHUB_OUTPUT'], 'r', encoding='utf-8') as f:
             workflow_status = f.read().split('=')[1].strip()
             return workflow_status
- 
+
     def test_get_github_workflow_status_with_job_error(self) -> None:
         jobs = {
             'job1': {'result': 'success'},
@@ -48,7 +49,7 @@ class CheckGithubWorkflowStatusTests(test_utils.GenericTestBase):
             'job3': {'result': 'success'},
         }
 
-        check_github_workflow_status.main(['--jobs', json.dumps(jobs)]) 
+        check_github_workflow_status.main(['--jobs', json.dumps(jobs)])
         self.assertEqual(
             self.get_workflow_status_from_github_output(), 'failure')
 
@@ -59,6 +60,6 @@ class CheckGithubWorkflowStatusTests(test_utils.GenericTestBase):
             'job3': {'result': 'success'},
         }
 
-        check_github_workflow_status.main(['--jobs', json.dumps(jobs)]) 
+        check_github_workflow_status.main(['--jobs', json.dumps(jobs)])
         self.assertEqual(
             self.get_workflow_status_from_github_output(), 'success')
