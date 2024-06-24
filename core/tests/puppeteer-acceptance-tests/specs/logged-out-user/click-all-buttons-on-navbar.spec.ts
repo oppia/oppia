@@ -49,7 +49,7 @@ describe('Logged-out User', function () {
     'should open About Foundation Url with The Oppia Foundation button ' +
       'in About Menu on navbar',
     async function () {
-      await loggedOutUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
+      await loggedOutUser.clickAboutButtonInAboutMenuOnNavbar();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
