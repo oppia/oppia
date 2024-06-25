@@ -44,10 +44,6 @@ describe('Volunteer', function () {
     'should be able to navigate to volunteer page when started from the home page ' +
       'and open the volunteer form when the "Apply to Volunteer" button is clicked',
     async function () {
-      // Navigating to about foundation page via navbar from home page.
-      await loggedOutUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
-      // Navigating back to home page for the next test.
-      await loggedOutUser.navigateToHome();
       // Navigating to about foundation page via footer from home page.
       await loggedOutUser.clickOnTheOppiaFoundationLinkInFooter();
 

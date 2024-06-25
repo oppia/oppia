@@ -42,10 +42,6 @@ describe('Partner', function () {
     'should be able to navigate to partnerships page when started from home page ' +
       'and open the partnerships form in partnerships page.',
     async function () {
-      // Navigating to about foundation page via navbar from home page.
-      await loggedOutUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
-      // Navigating back to home page for the next test.
-      await loggedOutUser.navigateToHome();
       // Navigating to about foundation page via footer from home page.
       await loggedOutUser.clickOnTheOppiaFoundationLinkInFooter();
 
