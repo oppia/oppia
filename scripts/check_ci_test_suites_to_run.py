@@ -237,15 +237,12 @@ def output_variable_to_github_workflow(
 
 def output_test_suites_to_run_to_github_workflow(
     test_suites_to_run: CITestSuitesToRunDict
-) -> str:
+) -> None:
     """Formats the test suites to run and converts it to JSON
     for GitHub output.
 
     Args:
         test_suites_to_run: dict. The test suites to run.
-
-    Returns:
-        dict. The formatted test suites to run.
     """
     test_suites_to_run_output = {
         'e2e': test_suites_to_run['e2e'],

@@ -42,4 +42,3 @@ jobs:
         with:
           name: root-files-mapping
           path: root-files-mapping.json
-          retention-days: 1
