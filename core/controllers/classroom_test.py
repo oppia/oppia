@@ -119,14 +119,6 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class DefaultClassroomRedirectPageTests(BaseClassroomControllerTests):
-
-    def test_redirect_to_default_classroom(self) -> None:
-        response = self.get_html_response('/learn', expected_status_int=302)
-        self.assertEqual(
-            'http://localhost/learn/math', response.headers['location'])
-
-
 class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self) -> None:
@@ -649,6 +641,7 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
         )
         expected_response = [
             {
+                'classroom_id': 'classroom1',
                 'name': 'history',
                 'url_fragment': 'history',
                 'teaser_text': 'Teaser Text',
@@ -657,6 +650,7 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
                 'thumbnail_bg_color': 'transparent'
             },
             {
+                'classroom_id': 'classroom2',
                 'name': 'english',
                 'url_fragment': 'english',
                 'teaser_text': 'Teaser Text',
