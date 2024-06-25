@@ -67,13 +67,14 @@ class ClassroomDataHandler(
         Args:
             classroom_url_fragment: str. THe classroom URL fragment.
         """
-        classroom = classroom_config_services.get_classroom_by_url_fragment(
-            classroom_url_fragment)
-        public_classrooms_count = len([
-            c for c in classroom_config_services.get_all_classrooms()
-            if c.is_published
-        ])
+        classrooms = classroom_config_services.get_all_classrooms()
+        public_classrooms_count = 0
 
+        for c in classrooms:
+            if c.url_fragment == classroom_url_fragment:
+                classroom = c
+            if c.is_published:
+                public_classrooms_count += 1
         # Here we are asserting that classroom can never be none, because
         # in the decorator `does_classroom_exist` we are already handling
         # the None case of classroom.
