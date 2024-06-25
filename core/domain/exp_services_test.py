@@ -24,6 +24,7 @@ import os
 import re
 import zipfile
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -69,6 +70,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
     from mypy_imports import suggestion_models
     from mypy_imports import user_models
+    from mypy_imports import voiceover_models
 
 (
     feedback_models,
@@ -78,7 +80,8 @@ if MYPY:  # pragma: no cover
     translation_models,
     stats_models,
     suggestion_models,
-    user_models
+    user_models,
+    voiceover_models,
 ) = models.Registry.import_models([
     models.Names.FEEDBACK,
     models.Names.EXPLORATION,
@@ -87,7 +90,8 @@ if MYPY:  # pragma: no cover
     models.Names.TRANSLATION,
     models.Names.STATISTICS,
     models.Names.SUGGESTION,
-    models.Names.USER
+    models.Names.USER,
+    models.Names.VOICEOVER
 ])
 
 search_services = models.Registry.import_search_services()
@@ -1316,6 +1320,36 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertFalse(
             exp_services.is_voiceover_change_list(not_voiceover_change_list))
 
+    @test_utils.enable_feature_flags(
+            [feature_flag_list.FeatureNames.ADD_VOICEOVER_WITH_ACCENT])
+    def test_changes_in_voiceover_list_with_feature_flag_enabled(self) -> None:
+        not_voiceover_change_list = [exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'new_value': 'New title'
+        })]
+        self.assertFalse(
+            exp_services.is_voiceover_change_list(not_voiceover_change_list))
+
+        manual_voiceover_1: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        change_list_voiceover = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_UPDATE_VOICEOVERS,
+                'language_accent_code': 'en-US',
+                'content_id': 'content_0',
+                'voiceovers': {
+                    'manual': manual_voiceover_1
+                }
+            })
+        ]
+        self.assertTrue(
+            exp_services.is_voiceover_change_list(change_list_voiceover))
+
     def test_validation_for_valid_exploration(self) -> None:
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id,
@@ -2123,7 +2157,7 @@ title: Title
         author_notes: ''
         auto_tts_enabled: true
         blurb: ''
-        category: Category    
+        category: Category
         edits_allowed: true
         init_state_name: Introduction
         language_code: en
@@ -6372,14 +6406,14 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         change_list = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'title': 'Title 1'
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'old_value': None,
                 'new_value': self.EXP_ID_1
             })
@@ -6599,14 +6633,14 @@ title: Old Title
         change_list_story = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'title': 'Title 1'
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'old_value': None,
                 'new_value': exp_id
             })
@@ -7106,6 +7140,46 @@ title: Old Title
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
                 'content_id': 'content_0'
+            })], 'Marked translation need update.')
+        entity_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+                exploration.version + 1
+            )
+        )
+        self.assertEqual(len(entity_translations), 1)
+        self.assertTrue(
+            entity_translations[0].translations['content_0'].needs_update)
+
+    def test_update_exploration_with_mark_translation_needs_update_for_language(
+        self
+    ) -> None:
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+            exploration.version, 'hi', 'content_0',
+            translation_domain.TranslatedContent(
+                'Translation',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        entity_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, self.NEW_EXP_ID,
+                exploration.version
+            )
+        )
+        self.assertEqual(len(entity_translations), 1)
+        self.assertFalse(
+            entity_translations[0].translations['content_0'].needs_update)
+
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': (
+                    exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE),
+                'content_id': 'content_0',
+                'language_code': 'hi'
             })], 'Marked translation need update.')
         entity_translations = (
             translation_fetchers.get_all_entity_translations_for_entity(
@@ -9833,4 +9907,80 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
                     'state_name=\'END\')',
                 ], 8, 5
             )
+        )
+
+
+class ComputeVoiceoversModelFromExplorationChangeTest(
+    ExplorationServicesUnitTests
+):
+    """Tests entity voiceovers model creation from exploration change dict."""
+
+    def test_should_be_able_to_create_entity_voiceovers_models(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'test_exp_id', title='some title', category='Algebra',
+            language_code=constants.DEFAULT_LANGUAGE_CODE
+        )
+        exploration.objective = 'An objective'
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'NumericInput',
+            content_id_generator
+        )
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        manual_voiceover_1: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        manual_voiceover_2: state_domain.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+
+        voiceover_changes = [
+            exp_domain.ExplorationChange({
+                'cmd': 'update_voiceovers',
+                'language_accent_code': 'en-US',
+                'content_id': 'content_0',
+                'voiceovers': {
+                    'manual': manual_voiceover_1
+                }
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'update_voiceovers',
+                'language_accent_code': 'en-US',
+                'content_id': 'default_outcome_1',
+                'voiceovers': {
+                    'manual': manual_voiceover_2
+                }
+            })
+        ]
+
+        models_to_put = (
+            exp_services.compute_models_to_put_when_saving_new_exp_version(
+                self.owner_id, 'test_exp_id', voiceover_changes,
+                'Added voiceover', False
+            )
+        )
+        entity_voiceovers_models = []
+        for model_instance in models_to_put:
+            if isinstance(
+                    model_instance, voiceover_models.EntityVoiceoversModel
+            ):
+                entity_voiceovers_models.append(model_instance)
+
+        self.assertEqual(len(entity_voiceovers_models), 1)
+        self.assertDictEqual(
+            entity_voiceovers_models[0].voiceovers_mapping[
+                'content_0']['manual'], manual_voiceover_1
+        )
+        self.assertDictEqual(
+            entity_voiceovers_models[0].voiceovers_mapping[
+                'default_outcome_1']['manual'], manual_voiceover_2
         )

@@ -51,7 +51,8 @@
         "core.controllers.android_test",
         "core.jobs.batch_jobs.translation_migration_jobs_test",
         "core.controllers.release_coordinator_test",
-        "core.platform.secrets.dev_mode_secrets_services_test"
+        "core.platform.secrets.dev_mode_secrets_services_test",
+        "scripts.generate_root_files_mapping_test"
     ],
     "2": [
         "core.domain.rights_manager_test",

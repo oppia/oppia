@@ -30,8 +30,34 @@ export interface EdgeCentre {
   providedIn: 'root',
 })
 export class GraphDetailService {
-  VERTEX_RADIUS: number = 6;
-  EDGE_WIDTH: number = 3;
+  VERTEX_RADIUS_PX: number = 6;
+  EDGE_WIDTH_PX: number = 3;
+
+  // The minimum margin to the left and top of the display.
+  // The first vertex should be at (MIN_MARGIN_PX, MIN_MARGIN_PX).
+  // This value should not be 0 because only half of the vertex will be shown.
+  MIN_MARGIN_PX: number = 10;
+
+  getMinMargin(graph: GraphAnswer): number {
+    if (!graph.isLabeled) {
+      return this.MIN_MARGIN_PX;
+    }
+    // If the graph is labeled, the label's size should be taken into account
+    // because in Arabic, the labels will be shown on the left side of the vertex.
+    return Math.max(
+      ...graph.vertices.map(
+        vertex => vertex.label.length * (this.MIN_MARGIN_PX / 2)
+      )
+    );
+  }
+
+  getMinX(graph: GraphAnswer): number {
+    return Math.min(...graph.vertices.map(vertex => vertex.x));
+  }
+
+  getMinY(graph: GraphAnswer): number {
+    return Math.min(...graph.vertices.map(vertex => vertex.y));
+  }
 
   getDirectedEdgeArrowPoints(graph: GraphAnswer, index: number): string {
     var ARROW_WIDTH = 5;

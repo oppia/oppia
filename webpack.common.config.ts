@@ -65,10 +65,6 @@ module.exports = {
     },
   },
   entry: {
-    collection_player:
-      commonPrefix +
-      '/pages/collection-player-page/' +
-      'collection-player-page.import.ts',
     console_errors: commonPrefix + '/tests/console_errors.import.ts',
     creator_dashboard:
       commonPrefix +
@@ -104,9 +100,6 @@ module.exports = {
       commonPrefix + '/pages/skill-editor-page/skill-editor-page.import.ts',
     story_editor:
       commonPrefix + '/pages/story-editor-page/story-editor-page.import.ts',
-    subtopic_viewer:
-      commonPrefix +
-      '/pages/subtopic-viewer-page/subtopic-viewer-page.import.ts',
     topic_editor:
       commonPrefix + '/pages/topic-editor-page/topic-editor-page.import.ts',
     topics_and_skills_dashboard:
@@ -122,6 +115,16 @@ module.exports = {
    * once angularjs is removed from corresponding pages.
    */
   plugins: [
+    // TODO(#18260): Change this when we permanently move to the Docker Setup.
+    // This plugin is used to define the environment variable USE_FIREBASE_ENDPOINT, which is used
+    // in the AuthService class to determine whether to use the localhost or firebase endpoint. This
+    // is needed since we need to use the firebase endpoint when running scripts internally in a
+    // docker container.
+    new webpack.DefinePlugin({
+      'process.env.USE_FIREBASE_ENDPOINT': JSON.stringify(
+        process.env.USE_FIREBASE_ENDPOINT
+      ),
+    }),
     new webpack.DefinePlugin({
       CAN_SEND_ANALYTICS_EVENTS: analyticsConstants.CAN_SEND_ANALYTICS_EVENTS,
     }),
@@ -189,7 +192,7 @@ module.exports = {
       template:
         commonPrefix +
         '/pages/error-pages/error-iframed-page/' +
-        'error-iframed.mainpage.html',
+        'error-iframed-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
     }),
@@ -308,18 +311,6 @@ module.exports = {
         commonPrefix +
         '/pages/story-editor-page/' +
         'story-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['subtopic_viewer'],
-      filename: 'subtopic-viewer-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/subtopic-viewer-page/' +
-        'subtopic-viewer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
     }),
