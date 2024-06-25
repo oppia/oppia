@@ -2989,7 +2989,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': translation_html,
             'data_format': 'html'
         }
@@ -3013,7 +3013,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         submission datetime.
         """
         with self.swap(
-            feconf, 'DEFAULT_INIT_STATE_CONTENT_STR', question_html):
+            feconf, 'DEFAULT_STATE_CONTENT_STR', question_html):
             content_id_generator = translation_domain.ContentIdGenerator()
             add_question_change_dict: Dict[
                 str, Union[str, float, question_domain.QuestionDict]
@@ -4771,7 +4771,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': translation_html,
             'data_format': 'html'
         }
@@ -4795,7 +4795,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         submission datetime.
         """
         with self.swap(
-            feconf, 'DEFAULT_INIT_STATE_CONTENT_STR', question_html):
+            feconf, 'DEFAULT_STATE_CONTENT_STR', question_html):
             content_id_generator = translation_domain.ContentIdGenerator()
             add_question_change_dict: Dict[
                 str, Union[str, float, question_domain.QuestionDict]
@@ -5758,7 +5758,7 @@ class NotifyReviewersNewSuggestionsTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': translation_html,
             'data_format': 'html'
         }
@@ -5920,7 +5920,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
             'data_format': 'html'
         }
@@ -7332,7 +7332,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
     """Test for assignment and removal of contribution reviewers."""
 
     TRANSLATION_REVIEWER_EMAIL: Final = 'translationreviewer@example.com'
-    QUESTION_REVIEWER_EMAIL: Final = 'questionreviewer@example.com'
     QUESTION_SUBMITTER_EMAIL: Final = 'questionsubmitter@example.com'
 
     def setUp(self) -> None:

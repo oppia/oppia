@@ -2499,8 +2499,6 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
 
     username = 'user'
     user_email = 'user@example.com'
-    QUESTION_ADMIN_EMAIL: Final = 'questionExpert@app.com'
-    QUESTION_ADMIN_USERNAME: Final = 'questionExpert'
     TRANSLATION_ADMIN_EMAIL: Final = 'translatorExpert@app.com'
     TRANSLATION_ADMIN_USERNAME: Final = 'translationExpert'
 
