@@ -9,8 +9,12 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked.spec.ts"
     },
     {
-      "name": "curriculum-admin-tests/create-and-publish-topics-and-stories",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-and-publish-topics-and-stories.spec.ts"
+      "name": "blog-editor/create-and-delete-draft-blog-post",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/create-and-delete-draft-blog-post.spec.ts"
+    },
+    {
+      "name": "curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill.spec.ts"
     },
     {
       "name": "exploration-editor/load-complete-and-restart-exploration-preview",
@@ -21,16 +25,16 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/create-exploration-and-change-basic-settings.spec.ts"
     },
     {
+      "name": "exploration-editor/save-draft-publish-and-discard-the-changes",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/save-draft-publish-and-discard-the-changes.spec.ts"
+    },
+    {
       "name": "logged-out-user/click-all-buttons-on-about-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-about-page.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-about-foundation-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-about-foundation-page.spec.ts"
-    },
-    {
-      "name": "logged-out-user/click-all-buttons-on-thanks-for-donating-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-thanks-for-donating-page.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-navbar",
@@ -47,6 +51,34 @@
     {
       "name": "logged-out-user/click-all-buttons-on-donation-thanks-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-donation-thanks-page.spec.ts"
+    },
+    {
+      "name": "logged-out-user/check-all-user-flow-of-donor",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/check-all-user-flow-of-donor.spec.ts"
+    },
+    {
+      "name": "logged-out-user/check-all-user-flow-of-parent-teacher",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/check-all-user-flow-of-parent-teacher.spec.ts"
+    },
+    {
+      "name": "logged-out-user/check-all-user-flow-of-partner",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/check-all-user-flow-of-partner.spec.ts"
+    },
+    {
+      "name": "logged-out-user/check-all-user-flow-of-volunteer",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/check-all-user-flow-of-volunteer.spec.ts"
+    },
+    {
+      "name": "logged-out-user/click-all-buttons-on-partnerships-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-partnerships-page.spec.ts"
+    },
+    {
+      "name": "logged-out-user/click-all-buttons-on-teach-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-teach-page.spec.ts"
+    },
+    {
+      "name": "logged-out-user/click-all-buttons-on-volunteer-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-volunteer-page.spec.ts"
     },
     {
       "name": "logged-in-user/subscribe-to-creator-and-view-all-explorations-by-that-creator",
