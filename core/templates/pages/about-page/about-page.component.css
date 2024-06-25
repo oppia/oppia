@@ -412,6 +412,12 @@
   }
 }
 
+@media only screen and (max-width: 392px) {
+  .about-page .oppia-about-impact-chart-container .oppia-about-section-subtext-new {
+    width: 70%;
+  }
+}
+
 @media only screen and (max-width: 361px) {
   .about-page .oppia-mobile-portrait-content {
     display: block;

@@ -221,12 +221,8 @@
 
     <div class="oppia-about-impact-charts-container">
       <div class="oppia-about-impact-chart-container">
-        <p class="oppia-about-section-subtext-new">
-          {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_TOP_10_COUNTRIES_TEXT' | translate }}
-          <br class="oppia-mobile-portrait-content" >
-          <span class="oppia-impact-section-grey-bg-text">
-            {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_OPPIA_WEBSITE' | translate }}
-          </span>
+        <p class="oppia-about-section-subtext-new"
+           [innerHTML]="'I18N_ABOUT_PAGE_IMPACT_SECTION_TOP_10_COUNTRIES_TEXT_WEBSITE' | translate">
         </p>
         <div class="oppia-about-impact-bar-chart-container">
           <oppia-bar-chart [ticks]="oppiaWebBarChartTicks"
@@ -239,12 +235,8 @@
         </div>
       </div>
       <div class="oppia-about-impact-chart-container">
-        <p class="oppia-about-section-subtext-new">
-          {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_TOP_10_COUNTRIES_TEXT' | translate }}
-          <br class="oppia-mobile-portrait-content">
-          <span class="oppia-impact-section-yellow-bg-text">
-            {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_OPPIA_ANDROID_APP' | translate }}
-          </span>
+        <p class="oppia-about-section-subtext-new"
+           [innerHTML]="'I18N_ABOUT_PAGE_IMPACT_SECTION_TOP_10_COUNTRIES_TEXT_ANDROID' | translate">
         </p>
         <div class="oppia-about-impact-bar-chart-container">
           <oppia-bar-chart [ticks]="oppiaAndroidBarChartTicks"
@@ -264,7 +256,7 @@
       </p>
       <div>
         <oppia-primary-button
-          buttonHref="https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view"
+          [buttonHref]="IMPACT_REPORT_LINK"
           [customClasses]="['oppia-about-impact-button']"
           buttonText="{{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_REPORT_BUTTON_TEXT' | translate }}">
         </oppia-primary-button>
