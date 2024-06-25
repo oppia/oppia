@@ -38,11 +38,13 @@ export class SideNavigationBarComponent {
   @Input() display!: boolean;
 
   DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
+  IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
   currentUrl!: string;
   classroomData: CreatorTopicSummary[] = [];
   topicTitlesTranslationKeys: string[] = [];
   getinvolvedSubmenuIsShown: boolean = false;
   learnSubmenuIsShown: boolean = true;
+  aboutSubmenuIsShown: boolean = false;
   userIsLoggedIn!: boolean;
 
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
@@ -94,6 +96,10 @@ export class SideNavigationBarComponent {
 
   togglegetinvolvedSubmenu(): void {
     this.getinvolvedSubmenuIsShown = !this.getinvolvedSubmenuIsShown;
+  }
+
+  toggleAboutSubmenu(): void {
+    this.aboutSubmenuIsShown = !this.aboutSubmenuIsShown;
   }
 
   navigateToClassroomPage(classroomUrl: string): void {
