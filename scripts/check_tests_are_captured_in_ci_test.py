@@ -271,6 +271,25 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             self.assertEqual(
                 acceptance_test_suites, ACCEPTANCE_TEST_SUITES)
 
+    def test_get_acceptance_test_suites_from_acceptance_directory_with_exclusion(self) -> None: # pylint: disable=line-too-long
+        def mock_get_cwd() -> str:
+            return self.temp_directory.name
+        acceptance_test_suites_that_are_not_run_in_ci_swap = self.swap(
+            check_tests_are_captured_in_ci,
+            'ACCEPTANCE_TEST_SUITES_THAT_ARE_NOT_RUN_IN_CI',
+            ['test2/acceptance_suite2'])
+        os_getcwd_swap = self.swap(os, 'getcwd', mock_get_cwd)
+
+        with self.acceptance_test_specs_directory_swap, os_getcwd_swap:
+            with acceptance_test_suites_that_are_not_run_in_ci_swap:
+                acceptance_test_suites = (
+                    check_tests_are_captured_in_ci
+                        .get_acceptance_test_suites_from_acceptance_directory())
+                self.assertEqual(
+                    acceptance_test_suites,
+                    ACCEPTANCE_TEST_SUITES[:1]
+                )
+
     def test_check_tests_are_captured_in_ci_with_acceptance_error(self) -> None:
         def mock_get_acceptance_test_suites_from_ci_config_file() -> List[check_tests_are_captured_in_ci.TestSuiteDict]: # pylint: disable=line-too-long
             return ACCEPTANCE_TEST_SUITES[:1]

@@ -29,6 +29,9 @@ from typing import List, TypedDict
 
 
 E2E_TEST_SUITES_THAT_ARE_NOT_RUN_IN_CI = ['full']
+ACCEPTANCE_TEST_SUITES_THAT_ARE_NOT_RUN_IN_CI = [
+    'exploration-editor/modify-translations-through-modal'
+]
 
 
 CI_TEST_SUITE_CONFIGS_DIRECTORY = os.path.join(
@@ -177,15 +180,19 @@ def get_acceptance_test_suites_from_acceptance_directory() -> List[TestSuiteDict
 
     acceptance_test_files = glob.glob(
         os.path.join(ACCEPTANCE_TEST_SPECS_DIRECTORY, '**/*.spec.ts'))
-    acceptance_test_suites: List[TestSuiteDict] = [
-        {
-            'name': os.path.relpath(
-                module,
-                ACCEPTANCE_TEST_SPECS_DIRECTORY
-            ).replace('.spec.ts', ''),
+    acceptance_test_suites: List[TestSuiteDict] = []
+    for module in acceptance_test_files:
+        acceptance_test_suite_name = os.path.relpath(
+            module, ACCEPTANCE_TEST_SPECS_DIRECTORY).replace('.spec.ts', '')
+        if (
+            acceptance_test_suite_name in
+            ACCEPTANCE_TEST_SUITES_THAT_ARE_NOT_RUN_IN_CI
+        ):
+            continue
+        acceptance_test_suites.append({
+            'name': acceptance_test_suite_name,
             'module': os.path.relpath(module, os.getcwd())
-        } for module in acceptance_test_files
-    ]
+        })
     return acceptance_test_suites
 
 
