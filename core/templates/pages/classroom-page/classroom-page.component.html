@@ -23,7 +23,7 @@
     </div>
     <div class="classroom-information-container">
       <div class="classroom-text-container">
-        <h3>{{ 'I18N_CLASSROOM__HEADING' | translate:{ classroomName: classroomData.getName() } }}</h3>
+        <h3>{{ 'I18N_CLASSROOM_HEADING' | translate:{ classroomName: classroomData.getName() } }}</h3>
         <h1 *ngIf="!isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}">{{classroomData.getName()}}</h1>
         <h1 *ngIf="isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}">{{classroom_translation_keys.name | translate}}</h1>
       </div>
