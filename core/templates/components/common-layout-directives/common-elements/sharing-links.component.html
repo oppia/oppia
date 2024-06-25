@@ -3,19 +3,19 @@
 <div class="oppia-sharing-links" [ngClass]="getFontAndFlexClass()">
   <div class="fx-main-center fx-cross-center padding-0-2">
     <a title="Facebook" class="fx-main-center fx-cross-start" [href]="getUrl('facebook')" (click)="registerShareEvent('facebook')" target="_window">
-      <i class="oppia-share-icons fab fa-facebook-square" [ngClass]="{'blog-post-sharing-link-icon': shareType === 'blog','font-small': smallFont, 'font-big': !smallFont}" ></i>
+      <i class="oppia-share-icons fa-brands fa-facebook fa-2xl" [ngClass]="{'blog-post-sharing-link-icon': shareType === 'blog','font-small': smallFont, 'font-big': !smallFont}" ></i>
       <span class="oppia-icon-accessibility-label">Share on Facebook</span>
     </a>
   </div>
   <div class="fx-main-center fx-cross-center padding-0-2 twitter-icon">
     <a title="Twitter" class="fx-main-center fx-cross-start" [href]="getUrl('twitter')"  (click)="registerShareEvent('twitter')" target="_window">
-      <i class="oppia-share-icons fa-brands fa-square-x-twitter" [ngClass]="{'blog-post-sharing-link-icon': shareType === 'blog','font-small': smallFont, 'font-big': !smallFont}" ></i>
+      <i class="oppia-share-icons fa-brands fa-square-x-twitter fa-2xl" [ngClass]="{'blog-post-sharing-link-icon': shareType === 'blog','font-small': smallFont, 'font-big': !smallFont}" ></i>
       <span class="oppia-icon-accessibility-label">Share on Twitter</span>
     </a>
   </div>
   <div *ngIf="shareType === 'blog'" class="fx-main-center fx-cross-center padding-0-2 linkedin-icon">
     <a title="LinkedIn" class="fx-main-center fx-cross-start" [href]="getUrl('linkedin')"  (click)="registerShareEvent('linkedin')" target="_window">
-      <i class="oppia-share-icons fab fa-linkedin" [ngClass]="{'blog-post-sharing-link-icon': shareType === 'blog','font-small': smallFont, 'font-big': !smallFont}" ></i>
+      <i class="oppia-share-icons fa-brands fa-linkedin fa-2xl" [ngClass]="{'blog-post-sharing-link-icon': shareType === 'blog','font-small': smallFont, 'font-big': !smallFont}" ></i>
       <span class="oppia-icon-accessibility-label">Share on LinkedIn</span>
     </a>
   </div>
