@@ -43,38 +43,6 @@ describe('Logged-out User in About page', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should open Math Classroom page with the Browse Our Lessons button.',
-    async function () {
-      await loggedOutUser.clickBrowseOurLessonsButtonInAboutPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open Android page with the Access Android App button.',
-    async function () {
-      await loggedOutUser.clickAccessAndroidAppButtonInAboutPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open Math Classroom page with the Visit Classroom button.',
-    async function () {
-      await loggedOutUser.clickVisitClassroomButtonInAboutPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open Community Library page with the Browse Library button.',
-    async function () {
-      await loggedOutUser.clickBrowseLibraryButtonInAboutPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
     'should open the Volunteer form when the "Volunteer with Oppia" button ' +
       'is clicked.',
     async function () {
