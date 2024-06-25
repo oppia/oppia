@@ -126,11 +126,6 @@ const oppiaGithubLinkIcon = '.oppia-github-follow';
 const oppiaLinkedInLinkIcon = '.oppia-linkedin-follow';
 const oppiaAndroidAppButton = '.oppia-android-app-button';
 
-const browseOurLessonsButton = '.e2e-test-about-page-browse-our-lessons-button';
-const accessAndroidAppButton = '.e2e-test-about-page-access-android-app-button';
-const visitClassroomButton = '.e2e-test-about-page-visit-classroom-button';
-const browseLibraryButton = '.e2e-test-about-page-browse-library-button';
-
 const millionsOfContentId =
   '.e2e-test-about-foundation-page-millions-of-content';
 const weCannotContentId = '.e2e-test-about-foundation-page-we-cannot-content';
@@ -500,58 +495,6 @@ export class LoggedOutUser extends BaseUser {
         impactReportUrl
       );
     }
-  }
-
-  /**
-   * Function to click the Browse Our Lessons button in the About page
-   * and check if it opens the Math Classroom page.
-   */
-  async clickBrowseOurLessonsButtonInAboutPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      browseOurLessonsButton,
-      'Browse Our Lessons button',
-      mathClassroomUrl,
-      'Math Classroom'
-    );
-  }
-
-  /**
-   * Function to click the Access Android App button in the About page
-   * and check if it opens the Android page.
-   */
-  async clickAccessAndroidAppButtonInAboutPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      accessAndroidAppButton,
-      'Access the Android App button',
-      androidUrl,
-      'Android'
-    );
-  }
-
-  /**
-   * Function to click the Visit Classroom button in the About page
-   * and check if it opens the Math Classroom page.
-   */
-  async clickVisitClassroomButtonInAboutPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      visitClassroomButton,
-      'Visit Classroom button',
-      mathClassroomUrl,
-      'Math Classroom'
-    );
-  }
-
-  /**
-   * Function to click the Browse Library button in the About page
-   * and check if it opens the Community Library page.
-   */
-  async clickBrowseLibraryButtonInAboutPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      browseLibraryButton,
-      'Browse Library button',
-      communityLibraryUrl,
-      'Community Library'
-    );
   }
 
   /**
