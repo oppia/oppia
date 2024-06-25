@@ -246,6 +246,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'release-coordinator/flush-and-get-profile-of-redis-cache',
     'super-admin/edit-user-roles',
     'super-admin/load-dummy-data-in-dev-mode',
+    'topic-manager/edit-and-preview-a-subtopic',
+    'topic-manager/edit-and-preview-a-topic',
     'translation-admin/add-and-remove-translation-rights',
     'voiceover-admin/add-voiceover-artist-to-an-exploration',
 ]

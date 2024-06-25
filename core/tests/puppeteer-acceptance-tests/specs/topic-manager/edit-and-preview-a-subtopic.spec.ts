@@ -67,7 +67,7 @@ describe('Topic Manager User Journey', function () {
         title: 'Updated Sub-Topic 1',
         skillDescription: 'Test Skill 2'
       );
-      
+
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
