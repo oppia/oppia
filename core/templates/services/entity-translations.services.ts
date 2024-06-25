@@ -20,7 +20,10 @@
 import {Injectable} from '@angular/core';
 import {downgradeInjectable} from '@angular/upgrade/static';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {
+  EntityTranslation,
+  LanguageCodeToEntityTranslationBackendDict,
+} from 'domain/translation/EntityTranslationObjectFactory';
 import {EntityTranslationBackendApiService} from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import {AlertsService} from './alerts.service';
 
@@ -35,7 +38,15 @@ export class EntityTranslationsService {
   private entityId!: string;
   private entityType!: string;
   private entityVersion!: number;
-  public languageCodeToEntityTranslations: LanguageCodeToEntityTranslations =
+
+  // Dictionary storing translations that exist in the last published version
+  // of the exploration.
+  public languageCodeToLastPublishedEntityTranslations: LanguageCodeToEntityTranslations =
+    {};
+
+  // Dictionary storing latest translations including those that have been modified
+  // in the editor and haven't been published yet.
+  public languageCodeToLatestEntityTranslations: LanguageCodeToEntityTranslations =
     {};
 
   constructor(
@@ -53,8 +64,8 @@ export class EntityTranslationsService {
     languageCode: string
   ): Promise<EntityTranslation> {
     return new Promise((resolve, reject) => {
-      if (languageCode in this.languageCodeToEntityTranslations) {
-        resolve(this.languageCodeToEntityTranslations[languageCode]);
+      if (languageCode in this.languageCodeToLatestEntityTranslations) {
+        resolve(this.languageCodeToLatestEntityTranslations[languageCode]);
         return;
       }
       this.alertsService.addInfoMessage('Fetching translation.');
@@ -66,8 +77,10 @@ export class EntityTranslationsService {
           languageCode
         )
         .then(entityTranslation => {
-          this.languageCodeToEntityTranslations[languageCode] =
-            entityTranslation;
+          if (Object.keys(entityTranslation.translationMapping).length > 0) {
+            this.languageCodeToLatestEntityTranslations[languageCode] =
+              entityTranslation;
+          }
           this.alertsService.clearMessages();
           this.alertsService.addSuccessMessage('Translations fetched.');
           resolve(entityTranslation);
@@ -76,11 +89,13 @@ export class EntityTranslationsService {
   }
 
   getHtmlTranslations(languageCode: string, contentIds: string[]): string[] {
-    if (!this.languageCodeToEntityTranslations.hasOwnProperty(languageCode)) {
+    if (
+      !this.languageCodeToLatestEntityTranslations.hasOwnProperty(languageCode)
+    ) {
       return [];
     }
 
-    let entityTranslation = this.languageCodeToEntityTranslations[
+    let entityTranslation = this.languageCodeToLatestEntityTranslations[
       languageCode
     ] as EntityTranslation;
     let htmlStrings: string[] = [];
@@ -100,17 +115,45 @@ export class EntityTranslationsService {
   }
 
   removeAllTranslationsForContent(contentId: string): void {
-    Object.keys(this.languageCodeToEntityTranslations).forEach(
+    Object.keys(this.languageCodeToLatestEntityTranslations).forEach(
       (language: string) => {
-        this.languageCodeToEntityTranslations[language].removeTranslation(
+        this.languageCodeToLatestEntityTranslations[language].removeTranslation(
           contentId
         );
       }
     );
   }
 
+  converBulkTranslationsToBackendDict(
+    languageCodeToEntityTranslations: LanguageCodeToEntityTranslations
+  ): LanguageCodeToEntityTranslationBackendDict {
+    let bulkTranslationsBackendDict: LanguageCodeToEntityTranslationBackendDict =
+      {};
+
+    Object.keys(languageCodeToEntityTranslations).forEach(languageCode => {
+      bulkTranslationsBackendDict[languageCode] =
+        languageCodeToEntityTranslations[languageCode].toBackendDict();
+    });
+    return bulkTranslationsBackendDict;
+  }
+
+  sortBulkTranslationsByLanguageCode(
+    languageCodeToEntityTranslations: LanguageCodeToEntityTranslations
+  ): LanguageCodeToEntityTranslations {
+    const sortedLanguageCodes = Object.keys(
+      languageCodeToEntityTranslations
+    ).sort();
+    const sortedTranslations: LanguageCodeToEntityTranslations = {};
+
+    sortedLanguageCodes.forEach(language => {
+      sortedTranslations[language] = languageCodeToEntityTranslations[language];
+    });
+
+    return sortedTranslations;
+  }
+
   reset(): void {
-    this.languageCodeToEntityTranslations = {};
+    this.languageCodeToLatestEntityTranslations = {};
   }
 }
 
