@@ -16,5 +16,5 @@ runs:
   steps:
     - name: Check workflow status
       id: check_workflow_status
-      run: python -m scripts.check_github_workflow_status --jobs "$(cat << EOM ${{ inputs.jobs }} EOM)"
+      run: python -m scripts.check_github_workflow_status --jobs '${{ inputs.jobs }}'
       shell: bash
