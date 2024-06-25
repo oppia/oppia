@@ -25,6 +25,7 @@ import subprocess
 import sys
 
 from core.tests import test_utils
+from scripts import common
 
 from typing import Dict, List, Tuple
 
@@ -125,12 +126,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
             'does_diff_include_ci_config_or_js_files',
             mock_does_diff_include_ci_config_or_js_files)
 
-    def test_start_subprocess_for_result(self) -> None:
-        with self.popen_swap:
-            self.assertEqual(
-                pre_push_hook.start_subprocess_for_result(['cmd']),
-                (b'test\n', b''))
-
     def test_start_linter(self) -> None:
         with self.popen_swap:
             self.assertEqual(pre_push_hook.start_linter([b'files']), 0)
@@ -167,7 +162,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         islink_swap = self.swap(os.path, 'islink', mock_islink)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
-            pre_push_hook, 'start_subprocess_for_result',
+            common, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
         with islink_swap, exists_swap, subprocess_swap, self.print_swap:
@@ -194,7 +189,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         islink_swap = self.swap(os.path, 'islink', mock_islink)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
-            pre_push_hook, 'start_subprocess_for_result',
+            common, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
         with islink_swap, exists_swap, subprocess_swap, self.print_swap:
@@ -222,7 +217,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         islink_swap = self.swap(os.path, 'islink', mock_islink)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
-            pre_push_hook, 'start_subprocess_for_result',
+            common, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
         symlink_swap = self.swap(os, 'symlink', mock_symlink)
 
@@ -261,7 +256,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         islink_swap = self.swap(os.path, 'islink', mock_islink)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
-            pre_push_hook, 'start_subprocess_for_result',
+            common, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
         symlink_swap = self.swap(os, 'symlink', mock_symlink)
         copy_swap = self.swap(shutil, 'copy', mock_copy)
@@ -295,7 +290,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         islink_swap = self.swap(os.path, 'islink', mock_islink)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
-            pre_push_hook, 'start_subprocess_for_result',
+            common, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
         unlink_swap = self.swap(os, 'unlink', mock_unlink)
         symlink_swap = self.swap(os, 'symlink', mock_symlink)

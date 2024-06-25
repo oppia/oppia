@@ -209,17 +209,17 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
-            '--specs_to_run=home-page.component.spec.ts,'
+            '--specs_to_run=AppSpec.ts,'
             'about-page.component.spec.ts,'
-            'test-module.spec.js,'
-            'AppSpec.ts']
+            'home-page.component.spec.ts,'
+            'test-module.spec.js']
         self.assertIn(cmd, self.cmd_token_list)
         self.assertTrue(self.frontend_coverage_checks_called)
         self.assertEqual(self.frontend_coverage_checks_args, [[
-            '--files_to_check=home-page.component.spec.ts,'
+            '--files_to_check=AppSpec.ts,'
             'about-page.component.spec.ts,'
-            'test-module.spec.js,'
-            'AppSpec.ts'
+            'home-page.component.spec.ts,'
+            'test-module.spec.js'
         ]])
 
     def test_frontend_tests_with_specs_to_run_no_specs_found(self) -> None:

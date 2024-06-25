@@ -37,7 +37,7 @@ import subprocess
 import sys
 
 from types import TracebackType
-from typing import Final, List, Optional, Tuple, Type
+from typing import Final, List, Optional, Type
 
 # `pre_push_hook.py` is symlinked into `/.git/hooks`, so we explicitly import
 # the current working directory so that Git knows where to find python_utils.
@@ -115,14 +115,6 @@ class ChangedBranch:
             subprocess.check_output(
                 ['git', 'checkout', self.old_branch, '--'], encoding='utf-8'
             )
-
-
-def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
-    """Starts subprocess and returns (stdout, stderr)."""
-    task = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = task.communicate()
-    return out, err
 
 
 def start_linter(files: List[bytes]) -> int:
@@ -203,7 +195,7 @@ def install_hook() -> None:
             print('Copied file to .git/hooks directory')
 
     print('Making pre-push hook file executable ...')
-    _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
+    _, err_chmod_cmd = common.start_subprocess_for_result(chmod_cmd)
 
     if not err_chmod_cmd:
         print('pre-push hook file is now executable!')

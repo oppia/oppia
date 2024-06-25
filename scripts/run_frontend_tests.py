@@ -27,7 +27,7 @@ import sys
 from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
 from scripts import git_changes_utils # isort:skip pylint: disable=wrong-import-position, unused-import
 
-from typing import Optional, Sequence  # isort:skip
+from typing import Optional, Sequence, Set  # isort:skip
 
 from . import build  # isort:skip
 from . import check_frontend_test_coverage  # isort:skip
@@ -174,12 +174,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
         'start', os.path.join('core', 'tests', 'karma.conf.ts')]
 
-    specs_to_run = []
+    specs_to_run: Set[str] = set()
     if parsed_args.specs_to_run:
         for spec in parsed_args.specs_to_run.split(','):
             spec_file = get_file_spec(spec.strip())
             if spec_file:
-                specs_to_run.append(spec_file)
+                specs_to_run.add(spec_file)
 
     if parsed_args.run_on_changed_files:
         remote = git_changes_utils.get_local_git_repository_remote_name()
@@ -197,14 +197,14 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             for file_path in files_to_run:
                 spec_file = get_file_spec(file_path)
                 if spec_file:
-                    specs_to_run.append(spec_file)
+                    specs_to_run.add(spec_file)
         staged_files = git_changes_utils.get_staged_files()
         staged_files_to_run = git_changes_utils.get_js_or_ts_files_from_diff(
             staged_files)
         for file_path in staged_files_to_run:
             spec_file = get_file_spec(file_path)
-            if spec_file and spec_file not in specs_to_run:
-                specs_to_run.append(spec_file)
+            if spec_file:
+                specs_to_run.add(spec_file)
 
     if parsed_args.specs_to_run or parsed_args.run_on_changed_files:
         if len(specs_to_run) == 0:
@@ -212,7 +212,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             sys.exit(0)
         else:
             print('Running the following specs:', specs_to_run)
-            cmd.append('--specs_to_run=%s' % ','.join(specs_to_run))
+            cmd.append('--specs_to_run=%s' % ','.join(sorted(specs_to_run)))
 
     if parsed_args.run_minified_tests:
         print('Running test in production environment')
@@ -302,7 +302,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             check_frontend_test_coverage_args = []
             if len(specs_to_run) > 0:
                 check_frontend_test_coverage_args.append(
-                    '--files_to_check=%s' % ','.join(specs_to_run)
+                    '--files_to_check=%s' % ','.join(sorted(specs_to_run))
                 )
             check_frontend_test_coverage.main(
                 check_frontend_test_coverage_args

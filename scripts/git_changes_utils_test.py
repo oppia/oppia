@@ -41,7 +41,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str],
             stdout: int = subprocess.PIPE,
             stderr: int = subprocess.PIPE
-        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
+        ) -> subprocess.Popen[bytes]:
             return process
         self.print_arr: List[str] = []
         def mock_print(msg: str) -> None:
@@ -55,12 +55,6 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         self.get_js_or_ts_files_from_diff_swap = self.swap(
             git_changes_utils, 'get_js_or_ts_files_from_diff',
             mock_get_js_or_ts_files_from_diff)
-
-    def test_start_subprocess_for_result(self) -> None:
-        with self.popen_swap:
-            self.assertEqual(
-                git_changes_utils.start_subprocess_for_result(['cmd']),
-                (b'test\n', b''))
 
     def test_get_remote_name_without_errors(self) -> None:
         process_for_remote = subprocess.Popen(
@@ -197,7 +191,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ) -> Tuple[bytes, None]:
             return (b'M\tfile1\nA\tfile2', None)
         subprocess_swap = self.swap(
-            git_changes_utils, 'start_subprocess_for_result',
+            common, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
         with subprocess_swap:
@@ -214,7 +208,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ) -> Tuple[str, str]:
             return ('M\tfile1\nA\tfile2', 'test_oppia_error')
         subprocess_swap = self.swap(
-            git_changes_utils, 'start_subprocess_for_result',
+            common, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
         with subprocess_swap, self.assertRaisesRegex(
@@ -247,7 +241,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             check_function_calls['get_merge_base_is_called'] = True
             return 'Merge Base'
         subprocess_swap = self.swap(
-            git_changes_utils, 'start_subprocess_for_result',
+            common, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
         git_diff_swap = self.swap(
             git_changes_utils, 'git_diff_name_status',
@@ -268,7 +262,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ) -> Tuple[None, str]:
             return None, 'Test'
         subprocess_swap = self.swap(
-            git_changes_utils, 'start_subprocess_for_result',
+            common, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
         with subprocess_swap, self.assertRaisesRegex(ValueError, 'Test'):
@@ -287,7 +281,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             check_function_calls['start_subprocess_for_result_is_called'] = True
             return b'Test', None
         subprocess_swap = self.swap(
-            git_changes_utils, 'start_subprocess_for_result',
+            common, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
         with subprocess_swap:
@@ -427,7 +421,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         get_branch_swap = self.swap(
             common, 'get_current_branch_name', mock_get_branch)
         start_subprocess_for_result_swap = self.swap_with_checks(
-            git_changes_utils, 'start_subprocess_for_result',
+            common, 'start_subprocess_for_result',
             mock_start_subprocess_for_result,
             expected_args=[(['git', 'show-ref', 'branch1'],)])
 
@@ -450,7 +444,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         get_branch_swap = self.swap(
             common, 'get_current_branch_name', mock_get_branch)
         start_subprocess_for_result_swap = self.swap_with_checks(
-            git_changes_utils, 'start_subprocess_for_result',
+            common, 'start_subprocess_for_result',
             mock_start_subprocess_for_result,
             expected_args=[(['git', 'show-ref', 'branch1'],)])
 

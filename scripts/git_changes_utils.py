@@ -31,14 +31,6 @@ GitRef = collections.namedtuple(
 FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 
 
-def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
-    """Starts subprocess and returns (stdout, stderr)."""
-    task = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = task.communicate()
-    return out, err
-
-
 def get_local_git_repository_remote_name() -> Optional[bytes]:
     """Get the remote name of the local repository.
 
@@ -87,7 +79,13 @@ def get_local_git_repository_remote_name() -> Optional[bytes]:
 
     if remote_num > 1:
         print(
-            'Warning: Please keep only one remote branch for oppia:develop.\n')
+            'Warning: Please keep only one remote branch for oppia:develop.\n'
+            'To do that follow these steps:\n'
+            '1. Run the command \'git remote -v\'\n'
+            '2. If there are multiple remotes listed for upstream, then run '
+            'the command, \'git remote remove <remote_name>\' for all remotes '
+            'that are not the main oppia repository.\n'
+        )
         return None
     return remote_name
 
@@ -117,7 +115,7 @@ def git_diff_name_status(
         # Append -- to avoid conflicts between branch and directory name.
         # More here: https://stackoverflow.com/questions/26349191
         git_cmd.append('--')
-    out, err = start_subprocess_for_result(git_cmd)
+    out, err = common.start_subprocess_for_result(git_cmd)
     if not err:
         file_list = []
         for line in out.splitlines():
@@ -153,7 +151,7 @@ def get_merge_base(branch: str, other_branch: str) -> str:
     Raises:
         ValueError. An error occurred in the git command.
     """
-    merge_base, err = start_subprocess_for_result(
+    merge_base, err = common.start_subprocess_for_result(
         ['git', 'merge-base', branch, other_branch])
     if err:
         raise ValueError(err)
@@ -183,7 +181,7 @@ def compare_to_remote(
     remote_branch = remote_branch if remote_branch else local_branch
     git_remote = '%s/%s' % (remote, remote_branch)
     # Ensure that references to the remote branches exist on the local machine.
-    start_subprocess_for_result(['git', 'pull', remote])
+    common.start_subprocess_for_result(['git', 'pull', remote])
     # Only compare differences to the merge base of the local and remote
     # branches (what GitHub shows in the files tab of pull requests).
     return git_diff_name_status(
@@ -218,7 +216,7 @@ def get_refs() -> List[GitRef]:
         ref_list = [GitRef(*ref_str.split()) for ref_str in sys.stdin]
     if len(ref_list) == 0:
         current_branch = common.get_current_branch_name()
-        encoded_stdout, encoded_stderr = start_subprocess_for_result(
+        encoded_stdout, encoded_stderr = common.start_subprocess_for_result(
             ['git', 'show-ref', current_branch])
         stderr = encoded_stderr.decode('utf-8')
         if stderr:
@@ -301,6 +299,6 @@ def get_js_or_ts_files_from_diff(diff_files: List[bytes]) -> List[str]:
     """
     js_or_ts_files = []
     for file_path in diff_files:
-        if file_path.endswith(b'.ts') or file_path.endswith(b'.js'):
+        if file_path.endswith((b'.ts', b'.js')):
             js_or_ts_files.append(file_path.decode())
     return js_or_ts_files
