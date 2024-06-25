@@ -1,4 +1,1 @@
 core/templates/pages/about-page/about-page.module.ts
-core/templates/pages/android-page/android-page.module.ts
-core/templates/pages/classroom-page/classroom-page.module.ts
-core/templates/pages/library-page/library-page.module.ts
