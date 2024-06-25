@@ -113,7 +113,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     bgColor: 'transparent',
     allowedBgColors: ['transparent'],
     allowedImageFormats: ['svg'],
-    aspectRatio: '4:3',
+    aspectRatio: '4:3'
   };
   bannerParameters: ImageUploaderParameters = {
     disabled: false,
@@ -123,7 +123,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     bgColor: 'transparent',
     allowedBgColors: ['transparent'],
     allowedImageFormats: ['png', 'jpeg'],
-    aspectRatio: '16:9',
+    aspectRatio: '2851:197'
   };
 
   getEligibleTopicPrerequisites(currentTopicName: string): void {
