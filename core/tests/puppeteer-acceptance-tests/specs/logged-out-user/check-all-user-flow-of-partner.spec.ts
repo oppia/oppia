@@ -23,7 +23,7 @@
   3.Fill the partnerships form by clicking on the "Partner with us" button ,in any language, on the About page.
   4.Go to the partnerships page from About Page by clicking on the "Learn more" button of partnerships tab on the About page.
   5.Fill the partnerships form via any one of the 2 buttons, in any language on partnerships page.
-  This is the page flow : home page --> About page --> partnerships - page
+  This is the page flow : home page --> About page --> Partnerships page
   Testing - Can partners successfully fill the partnerships form if they visit the website for the first time (typically lands on home page) ?
  */
 
