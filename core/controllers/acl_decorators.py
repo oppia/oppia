@@ -2924,16 +2924,10 @@ def can_edit_question(
                 in self.user.actions):
             skills = question_services.get_skills_linked_to_question(
                 question_id)
-            if not skills:
-                raise self.UnauthorizedUserException(
-                    'You do not have credentials to edit this question.')
             skill_ids = set(skill.id for skill in skills)
             managed_topic_ids = [
                 topic_rights.id for topic_rights in
                 topic_fetchers.get_topic_rights_with_user(self.user_id)]
-            if not managed_topic_ids:
-                raise self.UnauthorizedUserException(
-                    'You do not have credentials to edit this question.')
             managed_topics = topic_fetchers.get_topics_by_ids(managed_topic_ids)
             for topic in managed_topics:
                 for skill_id in topic.get_all_skill_ids():
