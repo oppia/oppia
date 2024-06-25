@@ -113,11 +113,11 @@ describe('Exploration Metadata Diff Modal Component', () => {
     component.oldMetadata = oldMetadata;
   });
 
-  it('should evaluate yaml strings object', fakeAsync(() => {
+  it('should evaluate YAML strings object', fakeAsync(() => {
     spyOn(
       historyTabYamlConversionService,
       'getYamlStringFromStateOrMetadata'
-    ).and.resolveTo('Yaml data');
+    ).and.resolveTo('YAML data');
 
     expect(component.yamlStrs.leftPane).toBe('');
     expect(component.yamlStrs.rightPane).toBe('');
@@ -125,7 +125,7 @@ describe('Exploration Metadata Diff Modal Component', () => {
     component.ngOnInit();
     tick(201);
 
-    expect(component.yamlStrs.leftPane).toBe('Yaml data');
-    expect(component.yamlStrs.rightPane).toBe('Yaml data');
+    expect(component.yamlStrs.leftPane).toBe('YAML data');
+    expect(component.yamlStrs.rightPane).toBe('YAML data');
   }));
 });

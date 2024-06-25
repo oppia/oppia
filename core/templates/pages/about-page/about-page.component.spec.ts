@@ -60,7 +60,6 @@ class MockTranslateService {
 describe('About Page', () => {
   let windowRef: MockWindowRef;
   let component: AboutPageComponent;
-  let siteAnalyticsService: SiteAnalyticsService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let translateService: TranslateService;
   let windowDimensionsService: WindowDimensionsService;
@@ -100,7 +99,6 @@ describe('About Page', () => {
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
-    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     component = aboutPageComponent.componentInstance;
 
@@ -294,30 +292,5 @@ describe('About Page', () => {
     component.ngOnDestroy();
 
     expect(component.directiveSubscriptions.closed).toBe(true);
-  });
-
-  it('should register correct event on calling onClickBrowseLibraryButton', () => {
-    spyOn(
-      siteAnalyticsService,
-      'registerClickBrowseLibraryButtonEvent'
-    ).and.callThrough();
-
-    component.onClickBrowseLibraryButton();
-
-    expect(
-      siteAnalyticsService.registerClickBrowseLibraryButtonEvent
-    ).toHaveBeenCalledWith();
-  });
-
-  it('should register correct event on calling onClickVisitClassroomButton', () => {
-    spyOn(
-      siteAnalyticsService,
-      'registerClickVisitClassroomButtonEvent'
-    ).and.callThrough();
-    component.onClickVisitClassroomButton();
-
-    expect(
-      siteAnalyticsService.registerClickVisitClassroomButtonEvent
-    ).toHaveBeenCalledWith();
   });
 });
