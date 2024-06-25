@@ -28,7 +28,6 @@ import {Subscription} from 'rxjs';
 @Component({
   selector: 'oppia-subject-selector',
   templateUrl: './subject-selector.component.html',
-  styleUrls: ['./subject-selector.component.css'],
 })
 export class SubjectSelectorComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
