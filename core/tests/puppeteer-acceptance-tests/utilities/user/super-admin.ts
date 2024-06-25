@@ -100,7 +100,7 @@ export class SuperAdmin extends BaseUser {
   async assignRoleToUser(
     username: string,
     role: string,
-    topicName?: string
+    topicName?: string[]
   ): Promise<void> {
     await this.goto(AdminPageRolesTab);
     await this.type(roleEditorInputField, username);
@@ -119,7 +119,7 @@ export class SuperAdmin extends BaseUser {
         );
         await this.page.waitForNetworkIdle();
         if (role === topicManagerRole) {
-          await this.selectTopicForTopicManagerRole(topicName as string);
+          await this.selectTopicsForTopicManagerRole(topicName as string[]);
         }
         return;
       }
@@ -131,53 +131,51 @@ export class SuperAdmin extends BaseUser {
    * Selects a topic for the Topic Manager role.
    * @param {string} topicName - The name of the topic to select.
    */
-  private async selectTopicForTopicManagerRole(
-    topicName: string
-  ): Promise<void> {
-    await this.page.waitForSelector(selectTopicForAssignmentSelector);
-    const selectElement = await this.page.$(selectTopicForAssignmentSelector);
-    if (!selectElement) {
-      throw new Error('Select element not found');
-    }
-
-    await this.page.waitForSelector('.e2e-test-select-topic option');
-    const optionElements = await selectElement.$$('option');
-    if (!optionElements.length) {
-      throw new Error('No options found in the select element');
-    }
-
-    for (const optionElement of optionElements) {
-      const optionText = await this.page.evaluate(
-        el => el.textContent,
-        optionElement
-      );
-      if (!optionText) {
-        throw new Error('Option text not found');
+  async selectTopicsForTopicManagerRole(topicNames: string[]): Promise<void> {
+    for (const topicName of topicNames) {
+      await this.page.waitForSelector(selectTopicForAssignmentSelector);
+      const selectElement = await this.page.$(selectTopicForAssignmentSelector);
+      if (!selectElement) {
+        throw new Error('Select element not found');
       }
 
-      if (optionText.trim() === topicName) {
-        const optionValue = await this.page.evaluate(
-          el => el.value,
+      await this.page.waitForSelector('.e2e-test-select-topic option');
+      const optionElements = await selectElement.$$('option');
+      if (!optionElements.length) {
+        throw new Error('No options found in the select element');
+      }
+
+      for (const optionElement of optionElements) {
+        const optionText = await this.page.evaluate(
+          el => el.textContent,
           optionElement
         );
-        if (!optionValue) {
-          throw new Error('Option value not found');
+        if (!optionText) {
+          throw new Error('Option text not found');
         }
 
-        await this.page.select(selectTopicForAssignmentSelector, optionValue);
-        await this.page.waitForSelector(addTopicButton);
-        const button = await this.page.$(addTopicButton);
-        if (!button) {
-          throw new Error('Button not found');
-        }
-        await this.waitForElementToBeClickable(button);
-        await button.click();
+        if (optionText.trim() === topicName) {
+          const optionValue = await this.page.evaluate(
+            el => el.value,
+            optionElement
+          );
+          if (!optionValue) {
+            throw new Error('Option value not found');
+          }
 
-        return;
+          await this.page.select(selectTopicForAssignmentSelector, optionValue);
+          await this.page.waitForSelector(addTopicButton);
+          const button = await this.page.$(addTopicButton);
+          if (!button) {
+            throw new Error('Button not found');
+          }
+          await this.waitForElementToBeClickable(button);
+          await button.click();
+
+          break;
+        }
       }
     }
-
-    throw new Error(`Topic "${topicName}" not found in the options`);
   }
 
   /**
