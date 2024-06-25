@@ -12653,7 +12653,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'objective': feconf.DEFAULT_EXPLORATION_OBJECTIVE,
             'states': {
                 feconf.DEFAULT_INIT_STATE_NAME: _get_default_state_dict(
-                    feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+                    feconf.DEFAULT_STATE_CONTENT_STR,
                     feconf.DEFAULT_INIT_STATE_NAME, True, content_id_generator),
                 second_state_name: _get_default_state_dict(
                     '', second_state_name, False, content_id_generator),

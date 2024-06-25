@@ -71,6 +71,8 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     },
   ];
 
+  partnersData = OppiaPlatformStatsData.OPPIA_PARTNERS_DATA;
+
   oppiaWebRawBarChartData: readonly {
     country: string;
     userCount: number;
@@ -96,6 +98,7 @@ export class AboutPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   partnershipsFormLink: string = '';
   volunteerFormLink = AppConstants.VOLUNTEER_FORM_LINK;
+  IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
   // Volunteer CTA is the default tab.
   selectedTabIndex = 1;
   volunteerRolesDetails = [
@@ -263,14 +266,6 @@ export class AboutPageComponent implements OnInit, OnDestroy {
       backdrop: 'static',
       size: 'xl',
     });
-  }
-
-  onClickVisitClassroomButton(): void {
-    this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
-  }
-
-  onClickBrowseLibraryButton(): void {
-    this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
   }
 
   expandPanel(index: number): void {
