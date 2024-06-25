@@ -20,7 +20,6 @@ import argparse
 import json
 import os
 import subprocess
-import pprint
 
 from scripts import generate_root_files_mapping
 
@@ -232,7 +231,7 @@ def output_variable_to_github_workflow(
         output_variable: str. The name of the output variable.
         output_value: str. The value of the output variable.
     """
-    pprint.pprint(f'{output_variable} is {output_value}')
+    print(f'{output_variable} is {output_value}')
     with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as o:
         print(f'{output_variable}={output_value}', file=o)
 
@@ -256,7 +255,7 @@ def format_test_suites_to_run_for_github_output(
             test_suites_to_run['lighthouse_performance'],
         'lighthouse_accessibility':
             test_suites_to_run['lighthouse_accessibility'],
-    })
+    }, indent=4)
 
 
 def get_test_suites_from_config(
