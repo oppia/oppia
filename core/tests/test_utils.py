@@ -2765,15 +2765,15 @@ version: 1
                 }, csrf_token=self.get_new_csrf_token())
 
     def set_question_admins(
-        self, question_admins_usernames: List[str]
+        self, question_admin_usernames: List[str]
     ) -> None:
         """Sets role of given users as QUESTION_ADMIN.
 
         Args:
-            question_admins_usernames: list(str). List of usernames.
+            question_admin_usernames: list(str). List of usernames.
         """
         with self.super_admin_context():
-            for username in question_admins_usernames:
+            for username in question_admin_usernames:
                 self.put_json('/questionadminrolehandler', {
                     'username': username,
                     'action': 'assign'
