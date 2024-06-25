@@ -75,11 +75,11 @@ describe('I18nLanguageCodeService', () => {
   });
 
   it('should check whether hacky translation is available correctly', () => {
-    // I18N_CLASSROOM_MATH_TITLE is present in constants file and hence
+    // I18N_CLASSROOM_MATH_NAME is present in constants file and hence
     // it is valid.
     hackyTranslationIsAvailable =
       i18nLanguageCodeService.isHackyTranslationAvailable(
-        'I18N_CLASSROOM_MATH_TITLE'
+        'I18N_CLASSROOM_MATH_NAME'
       );
     expect(hackyTranslationIsAvailable).toBe(true);
 

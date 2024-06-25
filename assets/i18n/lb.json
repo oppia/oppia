@@ -46,7 +46,7 @@
 	"I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR": "Feeler: De Bildfichier konnt net gelies ginn.",
 	"I18N_BLOG_POST_UNTITLED_HEADING": "Ouni Titel",
 	"I18N_CLASSROOM_CALLOUT_HEADING_1": "Grondlage vun der Mathematik",
-	"I18N_CLASSROOM_MATH_TITLE": "Mathematik",
+	"I18N_CLASSROOM_MATH_NAME": "Mathematik",
 	"I18N_CLASSROOM_PAGE_COMING_SOON": "Deemnächst",
 	"I18N_CLASSROOM_PAGE_COURSE_DETAILS": "Detailer vum Cours",
 	"I18N_CLASSROOM_PAGE_TITLE": "Léiert <[classroomName]> mat Oppia | Oppia",

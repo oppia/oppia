@@ -130,9 +130,6 @@ describe('Classroom Page Component', () => {
     );
     translateService = TestBed.inject(TranslateService);
     userService = TestBed.inject(UserService);
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true
-    );
   });
 
   it('should create', () => {
@@ -298,13 +295,13 @@ describe('Classroom Page Component', () => {
     component.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_CLASSROOM_PAGE_TITLE',
+      'I18N_CLASSROOM_MATH_NAME',
       {
         classroomName: 'dummy_name',
       }
     );
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_CLASSROOM_PAGE_TITLE'
+      'I18N_CLASSROOM_MATH_NAME'
     );
   });
 
@@ -362,4 +359,27 @@ describe('Classroom Page Component', () => {
 
     expect(component.showPrivateClassroomBanner).toBeTrue();
   }));
+
+  it(
+    'should not get classroom translation keys if classroom_translation_keys ' +
+      'if key is not present',
+    () => {
+      component.classroom_translation_keys = {
+        name: 'I18N_CLASSROOM_MATH_NAME',
+        courseDetails: 'I18N_CLASSROOM_MATH_COURSE_DETAILS',
+        teaserText: 'I18N_CLASSROOM_MATH_TEASER_TEXT',
+        topicListIntro: 'I18N_CLASSROOM_MATH_TOPICS_LIST_INTRO',
+      };
+      expect(
+        component.isHackyClassroomTranslationDisplayed('tags')
+      ).toBeFalse();
+    }
+  );
+
+  it('should get RTL language status correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    expect(component.isLanguageRTL()).toBeTrue();
+  });
 });

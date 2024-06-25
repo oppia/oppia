@@ -68,7 +68,7 @@ export class ClassroomPageComponent implements OnDestroy {
   showPrivateClassroomBanner: boolean = false;
   classroomThumbnail = '';
   classroomBanner = '';
-  CLASSROOM_I18N_KEYS!: ClassroomTranslationKeys;
+  classroom_translation_keys!: ClassroomTranslationKeys;
 
   @ViewChild('croppableImage') croppableImageRef!: ElementRef;
 
@@ -116,6 +116,10 @@ export class ClassroomPageComponent implements OnDestroy {
         );
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   ngOnInit(): void {
     this.classroomUrlFragment =
       this.urlService.getClassroomUrlFragmentFromUrl();
@@ -143,7 +147,7 @@ export class ClassroomPageComponent implements OnDestroy {
                 this.publicClassroomsCount =
                   classroomData.getPublicClassroomsCount();
 
-                this.CLASSROOM_I18N_KEYS =
+                this.classroom_translation_keys =
                   this.i18nLanguageCodeService.getClassroomTranslationKeys(
                     classroomData.getName()
                   );
@@ -213,7 +217,7 @@ export class ClassroomPageComponent implements OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_CLASSROOM_PAGE_TITLE',
+      'I18N_CLASSROOM_MATH_NAME',
       {
         classroomName: this.classroomDisplayName,
       }
@@ -228,9 +232,17 @@ export class ClassroomPageComponent implements OnDestroy {
   // This method is used to choose whether to display the translation
   // for a classroom property.
   isHackyClassroomTranslationDisplayed(property: string): boolean {
+    if (
+      !(
+        this.classroom_translation_keys &&
+        property in this.classroom_translation_keys
+      )
+    ) {
+      return false;
+    }
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.CLASSROOM_I18N_KEYS[property]
+        this.classroom_translation_keys[property]
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
