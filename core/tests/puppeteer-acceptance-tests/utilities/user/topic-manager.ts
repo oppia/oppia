@@ -63,7 +63,33 @@ const mobileSaveStoryChangesButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-changes';
 const mobilePublishStoryButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-button';
+
+const subtopicReassignHeader = 'div.subtopic-reassign-header';
+const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
+const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
+const subtopicUrlFragmentField =
+  'input.e2e-test-new-subtopic-url-fragment-field';
+const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
+const richTextAreaField = 'div.e2e-test-rte';
+const subtopicPhotoBoxButton =
+  '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
+const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
+const mobileSaveTopicButton =
+  'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
+const saveTopicButton = 'button.e2e-test-save-topic-button';
 const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
+
+const addSkillButton = 'button.e2e-test-add-skill-button';
+const skillDescriptionField = 'input.e2e-test-new-skill-description-field';
+const skillReviewMaterialHeader = 'div.e2e-test-open-concept-card';
+const confirmSkillCreationButton =
+  'button.e2e-test-confirm-skill-creation-button';
+
+const editSkillItemSelector = 'i.e2e-test-skill-item-edit-btn';
+const assignSubtopicButton = '.e2e-test-assign-subtopic';
+const subtopicNameSelector = '.e2e-test-subtopic-name';
+const confirmSkillAssignationButton =
+  'button.e2e-test-skill-assign-subtopic-confirm';
 
 export class TopicManager extends BaseUser {
   /**
@@ -194,6 +220,170 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
+  }
+
+  /**
+   * Create a subtopic as a topic manager
+   */
+  async createSubtopicForTopic(
+    title: string,
+    urlFragment: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(subtopicReassignHeader);
+    }
+    await this.clickOn(addSubtopicButton);
+    await this.type(subtopicTitleField, title);
+    await this.type(subtopicUrlFragmentField, urlFragment);
+
+    await this.clickOn(subtopicDescriptionEditorToggle);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.type(
+      richTextAreaField,
+      `Subtopic creation description text for ${title}`
+    );
+
+    await this.clickOn(subtopicPhotoBoxButton);
+    await this.page.waitForSelector(photoUploadModal, {visible: true});
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createSubtopicButton);
+    await this.saveTopicDraft(topicName);
+  }
+
+  /**
+   * Save a topic as a curriculum admin.
+   */
+  async saveTopicDraft(topicName: string): Promise<void> {
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileSaveTopicButton);
+      await this.page.waitForSelector('oppia-topic-editor-save-modal', {
+        visible: true,
+      });
+      await this.type(
+        saveChangesMessageInput,
+        'Test saving topic as curriculum admin.'
+      );
+      await this.page.waitForSelector(
+        `${closeSaveModalButton}:not([disabled])`
+      );
+      await this.clickOn(closeSaveModalButton);
+      await this.page.waitForSelector('oppia-topic-editor-save-modal', {
+        hidden: true,
+      });
+      await this.openTopicEditor(topicName);
+    } else {
+      await this.clickOn(saveTopicButton);
+      await this.page.waitForSelector(modalDiv, {visible: true});
+      await this.clickOn(closeSaveModalButton);
+      await this.page.waitForSelector(modalDiv, {hidden: true});
+    }
+  }
+
+  /**
+   * Create a skill for a particular topic.
+   */
+  async createSkillForTopic(
+    description: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(subtopicReassignHeader);
+    }
+    await this.clickOn(addSkillButton);
+    await this.type(skillDescriptionField, description);
+    await this.page.waitForSelector(skillReviewMaterialHeader);
+    await this.clickOn(skillReviewMaterialHeader);
+    await this.clickOn(richTextAreaField);
+    await this.type(
+      richTextAreaField,
+      `Review material text content for ${description}.`
+    );
+    await this.page.waitForSelector(
+      `${confirmSkillCreationButton}:not([disabled])`
+    );
+    await this.clickOn(confirmSkillCreationButton);
+    await this.page.bringToFront();
+  }
+
+  /**
+   * Assign a skill to a subtopic in the topic editor page.
+   */
+  async assignSkillToSubtopicInTopicEditor(
+    skillName: string,
+    subtopicName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(subtopicReassignHeader);
+    }
+
+    await this.page.waitForSelector('div.e2e-test-skill-item', {visible: true});
+    await this.page.evaluate(
+      (skillName, topicName, editSkillItemSelector) => {
+        const skillItemDivs = Array.from(
+          document.querySelectorAll('div.e2e-test-skill-item')
+        );
+        const element = skillItemDivs.find(
+          element => element.textContent?.trim() === skillName
+        ) as HTMLElement;
+        if (element) {
+          const assignSkillButton = element.querySelector(
+            editSkillItemSelector
+          ) as HTMLElement;
+          assignSkillButton.click();
+        } else {
+          throw new Error(
+            `Cannot find skill called "${skillName}" in ${topicName}.`
+          );
+        }
+      },
+      skillName,
+      topicName,
+      editSkillItemSelector
+    );
+
+    await this.page.waitForSelector(assignSubtopicButton, {
+      visible: true,
+    });
+    await this.clickOn('Assign to Subtopic');
+
+    await this.page.waitForSelector(subtopicNameSelector, {visible: true});
+    await this.page.evaluate(
+      (subtopicName, subtopicNameSelector) => {
+        const subtopicDivs = Array.from(
+          document.querySelectorAll(subtopicNameSelector)
+        );
+        const element = subtopicDivs.find(
+          element => element.textContent?.trim() === subtopicName
+        ) as HTMLElement;
+        if (element) {
+          element.click();
+        } else {
+          throw new Error(
+            `Cannot find subtopic called "${subtopicName}" to assign to skill.`
+          );
+        }
+      },
+      subtopicName,
+      subtopicNameSelector
+    );
+
+    await this.page.waitForSelector(
+      `${confirmSkillAssignationButton}:not([disabled])`
+    );
+    await this.clickOn(confirmSkillAssignationButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+    await this.saveTopicDraft(topicName);
   }
 }
 

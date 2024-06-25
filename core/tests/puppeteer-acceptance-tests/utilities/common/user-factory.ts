@@ -113,7 +113,8 @@ export class UserFactory {
     TRoles extends (keyof typeof USER_ROLE_MAPPING)[],
   >(
     user: TUser,
-    roles: TRoles
+    roles: TRoles,
+    topics: string[] = []
   ): Promise<TUser & MultipleRoleIntersection<TRoles>> {
     for (const role of roles) {
       if (superAdminInstance === null) {
@@ -125,6 +126,13 @@ export class UserFactory {
           await superAdminInstance.assignUserToRoleFromBlogAdminPage(
             user.username,
             BLOG_RIGHTS.BLOG_POST_EDITOR
+          );
+          break;
+        case ROLES.TOPIC_MANAGER:
+          await superAdminInstance.assignRoleToUser(
+            user.username,
+            ROLES.TOPIC_MANAGER,
+            topics
           );
           break;
         default:
@@ -145,7 +153,8 @@ export class UserFactory {
   >(
     username: string,
     email: string,
-    roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
+    roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>,
+    topics: string[] = []
   ): Promise<
     LoggedOutUser &
       LoggedInUser &
@@ -159,11 +168,12 @@ export class UserFactory {
       ExplorationEditorFactory(),
       TopicManagerFactory(),
     ]);
+
     await user.openBrowser();
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
 
-    return await UserFactory.assignRolesToUser(user, roles);
+    return await UserFactory.assignRolesToUser(user, roles, topics);
   };
 
   /**
