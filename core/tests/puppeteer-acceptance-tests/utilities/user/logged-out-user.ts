@@ -85,15 +85,16 @@ const allowedPartnershipsFormUrls = [
   partnershipsFormUrl,
   `${partnershipsFormUrl}?usp=send_form`,
 ];
+const impactReportUrl = testConstants.URLs.ImpactReportUrl;
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const navbarLearnTabBasicMathematicsButton =
   'a.e2e-test-basic-mathematics-link';
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
-const navbarAboutTabAboutFoundationButton =
-  'a.e2e-test-navbar-about-menu-about-foundation-button';
-const navbarAboutTabBlogButton = 'a.e2e-test-blog-link';
+const navbarAboutTabTeachButton = 'a.e2e-test-navbar-about-menu-teach-button';
+const navbarAboutTabImpactReportButton =
+  'a.e2e-test-navbar-impact-report-button';
 const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
 const navbarGetInvolvedTabSchoolAndOrganizationsButton =
   'a.e2e-test-navbar-get-involved-menu-school-and-organizations-button';
@@ -130,7 +131,6 @@ const accessAndroidAppButton = '.e2e-test-about-page-access-android-app-button';
 const visitClassroomButton = '.e2e-test-about-page-visit-classroom-button';
 const browseLibraryButton = '.e2e-test-about-page-browse-library-button';
 
-const aboutFoundationClass = '.oppia-about-foundation-hero-content h1';
 const millionsOfContentId =
   '.e2e-test-about-foundation-page-millions-of-content';
 const weCannotContentId = '.e2e-test-about-foundation-page-we-cannot-content';
@@ -156,8 +156,11 @@ const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
 const mobileSidebarBasicMathematicsButton =
   'a.e2e-mobile-test-mathematics-link';
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
-const mobileSidebarAboutFoundationButton =
-  'a.e2e-mobile-test-sidebar-about-foundation-button';
+const mobileSidebarTeachButton = 'a.e2e-mobile-test-sidebar-teach-button';
+const mobileSidebarImpactReportButton =
+  'a.e2e-mobile-test-sidebar-impact-report-button';
+const mobileSidebarExpandAboutMenuButton =
+  'div.e2e-mobile-test-sidebar-expand-about-menu';
 const mobileSidebarExpandGetInvolvedMenuButton =
   'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
 const mobileSidebarGetInvolvedMenuPartnershipsButton =
@@ -435,6 +438,7 @@ export class LoggedOutUser extends BaseUser {
   async clickAboutButtonInAboutMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOn(mobileSidebarExpandAboutMenuButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarAboutButton,
         'About Oppia button in the About Menu on mobile sidebar',
@@ -448,6 +452,52 @@ export class LoggedOutUser extends BaseUser {
         'About Oppia button in the About Menu on navbar',
         aboutUrl,
         'About'
+      );
+    }
+  }
+
+  /**
+   * Function to click the Teach button in the About Menu on navbar
+   * and check if it opens the Teach page.
+   */
+  async clickTeachButtonInAboutMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOn(mobileSidebarExpandAboutMenuButton);
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarTeachButton,
+        'Teach button in the About Menu on mobile sidebar',
+        teachUrl,
+        'Teach'
+      );
+    } else {
+      await this.clickOn(navbarAboutTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarAboutTabTeachButton,
+        'Teach button in the About Menu on navbar',
+        teachUrl,
+        'Teach'
+      );
+    }
+  }
+
+  /**
+   * Function to click the Impact Report button in the About Menu on navbar
+   * and check if it opens the Impact Report.
+   */
+  async clickImpactReportButtonInAboutMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOn(mobileSidebarExpandAboutMenuButton);
+      await this.openExternalPdfLink(
+        mobileSidebarImpactReportButton,
+        impactReportUrl
+      );
+    } else {
+      await this.clickOn(navbarAboutTab);
+      await this.openExternalPdfLink(
+        navbarAboutTabImpactReportButton,
+        impactReportUrl
       );
     }
   }
@@ -502,40 +552,6 @@ export class LoggedOutUser extends BaseUser {
       communityLibraryUrl,
       'Community Library'
     );
-  }
-
-  /**
-   * Function to click the The Oppia Foundation button in the About Menu
-   * on navbar and check if it opens The About Foundation page.
-   */
-  async clickAboutFoundationButtonInAboutMenuOnNavbar(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavbarOpenSidebarButton);
-      await this.clickOn(mobileSidebarAboutFoundationButton);
-    } else {
-      await this.clickOn(navbarAboutTab);
-      await this.clickOn(navbarAboutTabAboutFoundationButton);
-    }
-    await this.page.waitForSelector(aboutFoundationClass);
-    const displayedH1 = await this.page.$eval(
-      aboutFoundationClass,
-      element => (element as HTMLElement).innerText
-    );
-    if (
-      this.page.url() !== aboutFoundationUrl &&
-      displayedH1 !== 'THE OPPIA FOUNDATION'
-    ) {
-      throw new Error(
-        `The Oppia Foundation button in About Menu on navbar
-          should open the About Foundation page,
-          but it opens ${this.page.url()} instead.`
-      );
-    } else {
-      showMessage(
-        'The Oppia Foundation button in About Menu on navbar ' +
-          'opens the About Foundation page.'
-      );
-    }
   }
 
   /**
@@ -754,22 +770,6 @@ export class LoggedOutUser extends BaseUser {
       );
     } else {
       showMessage('The donations link opens the Donate page.');
-    }
-  }
-
-  /**
-   * Function to click the Blog button in the About Menu on navbar
-   * and check if it opens the Blog page.
-   */
-  async clickBlogButtonInAboutMenuOnNavbar(): Promise<void> {
-    if (!this.isViewportAtMobileWidth()) {
-      await this.clickOn(navbarAboutTab);
-      await this.clickButtonToNavigateToNewPage(
-        navbarAboutTabBlogButton,
-        'Blog button in the About Menu on navbar',
-        blogUrl,
-        'Blog'
-      );
     }
   }
 
