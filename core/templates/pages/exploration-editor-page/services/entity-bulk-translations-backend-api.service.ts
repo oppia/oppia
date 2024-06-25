@@ -23,7 +23,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {LanguageCodeToEntityTranslations} from 'services/entity-translations.services';
 import {
   EntityTranslation,
-  languageCodeToEntityTranslationBackendDict,
+  LanguageCodeToEntityTranslationBackendDict,
 } from 'domain/translation/EntityTranslationObjectFactory';
 
 @Injectable({
@@ -56,7 +56,7 @@ export class EntityBulkTranslationsBackendApiService {
   ): Promise<LanguageCodeToEntityTranslations> {
     return new Promise((resolve, reject) => {
       this.httpClient
-        .get<languageCodeToEntityTranslationBackendDict>(
+        .get<LanguageCodeToEntityTranslationBackendDict>(
           this._getUrl(entityId, entityType, entityVersion)
         )
         .toPromise()

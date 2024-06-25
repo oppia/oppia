@@ -18,7 +18,10 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed, fakeAsync, flushMicrotasks, tick} from '@angular/core/testing';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {
+  EntityTranslation,
+  EntityTranslationBackendDict,
+} from 'domain/translation/EntityTranslationObjectFactory';
 import {EntityTranslationBackendApiService} from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import {EntityTranslationsService} from './entity-translations.services';
 
@@ -26,6 +29,7 @@ describe('Entity translations service', () => {
   let entityTranslationsService: EntityTranslationsService;
   let etbs: EntityTranslationBackendApiService;
   let entityTranslation: EntityTranslation;
+  let entityTranslationBackendDict: EntityTranslationBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -35,7 +39,7 @@ describe('Entity translations service', () => {
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     etbs = TestBed.inject(EntityTranslationBackendApiService);
 
-    entityTranslation = EntityTranslation.createFromBackendDict({
+    entityTranslationBackendDict = {
       entity_id: 'exp',
       entity_type: 'exploration',
       entity_version: 5,
@@ -77,7 +81,11 @@ describe('Entity translations service', () => {
           needs_update: false,
         },
       },
-    });
+    };
+    entityTranslation = EntityTranslation.createFromBackendDict(
+      entityTranslationBackendDict
+    );
+
     spyOn(etbs, 'fetchEntityTranslationAsync').and.returnValue(
       Promise.resolve(entityTranslation)
     );
@@ -115,14 +123,14 @@ describe('Entity translations service', () => {
     expect(failHandler).not.toHaveBeenCalled();
 
     expect(
-      entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+      entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         'hi'
       )
     ).toBeTrue();
     entityTranslationsService.reset();
 
     expect(
-      entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+      entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         'hi'
       )
     ).not.toBeTrue();
@@ -133,7 +141,7 @@ describe('Entity translations service', () => {
     var failHandler = jasmine.createSpy('fail');
 
     entityTranslationsService.init('entity1', 'exploration', 5);
-    entityTranslationsService.languageCodeToEntityTranslations.hi =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       entityTranslation;
 
     entityTranslationsService
@@ -146,7 +154,7 @@ describe('Entity translations service', () => {
   }));
 
   it('should return correct html for given contentIds', () => {
-    entityTranslationsService.languageCodeToEntityTranslations.hi =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       entityTranslation;
 
     const htmlData = entityTranslationsService.getHtmlTranslations('hi', [
@@ -159,7 +167,7 @@ describe('Entity translations service', () => {
   });
 
   it('should return empty list for translation not available in language', () => {
-    entityTranslationsService.languageCodeToEntityTranslations.hi =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       entityTranslation;
 
     const htmlData = entityTranslationsService.getHtmlTranslations('ar', [
@@ -169,5 +177,47 @@ describe('Entity translations service', () => {
     ]);
 
     expect(htmlData).toEqual([]);
+  });
+
+  it('should remove all translations for given content', () => {
+    entityTranslationsService.languageCodeToLatestEntityTranslations.fr =
+      entityTranslation;
+
+    entityTranslationsService.removeAllTranslationsForContent('hint_0');
+    expect(
+      entityTranslationsService.languageCodeToLatestEntityTranslations.fr
+        .translationMapping
+    ).not.toContain('hint_0');
+  });
+
+  it('should return backend dict for LanguageCodeToEntityTranslation objects', () => {
+    entityTranslationsService.languageCodeToLatestEntityTranslations.fr =
+      entityTranslation;
+
+    expect(
+      entityTranslationsService.converBulkTranslationsToBackendDict(
+        entityTranslationsService.languageCodeToLatestEntityTranslations
+      )
+    ).toEqual({
+      fr: entityTranslationBackendDict,
+    });
+  });
+
+  it('should sort bulk translations by language code', () => {
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {
+      pt: entityTranslation,
+      fr: entityTranslation,
+      hi: entityTranslation,
+    };
+
+    expect(
+      entityTranslationsService.sortBulkTranslationsByLanguageCode(
+        entityTranslationsService.languageCodeToLatestEntityTranslations
+      )
+    ).toEqual({
+      fr: entityTranslation,
+      hi: entityTranslation,
+      pt: entityTranslation,
+    });
   });
 });
