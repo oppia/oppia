@@ -5,13 +5,14 @@
 */
 .oppia-arrow-button {
   color: #00645c;
+  cursor: pointer;
   float: left;
   height: 44px;
   position: relative;
   right: 10px;
   text-align: right;
   width: 6px;
-  cursor: pointer;
+  
 }
 .oppia-current-goals-content {
   border-bottom: 1px solid #ccc;
