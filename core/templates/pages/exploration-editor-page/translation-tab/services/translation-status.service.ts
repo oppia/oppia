@@ -424,7 +424,7 @@ export class TranslationStatusService implements OnInit {
   refresh(): void {
     this.langCode = this.translationLanguageService.getActiveLanguageCode();
     this.entityTranslation =
-      this.entityTranslationsService.languageCodeToEntityTranslations[
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         this.langCode
       ];
     this._computeAllStatesStatus();

@@ -140,6 +140,14 @@ describe('Side Navigation Bar Component', () => {
     expect(componentInstance.getinvolvedSubmenuIsShown).toBeFalse();
   });
 
+  it('should toggle about submenu', () => {
+    componentInstance.aboutSubmenuIsShown = false;
+    componentInstance.toggleAboutSubmenu();
+    expect(componentInstance.aboutSubmenuIsShown).toBeTrue();
+    componentInstance.toggleAboutSubmenu();
+    expect(componentInstance.aboutSubmenuIsShown).toBeFalse();
+  });
+
   it('should get static image url', () => {
     expect(componentInstance.getStaticImageUrl('test')).toEqual(imageUrl);
   });
