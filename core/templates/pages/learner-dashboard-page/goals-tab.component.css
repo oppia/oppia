@@ -11,6 +11,7 @@
   right: 10px;
   text-align: right;
   width: 6px;
+  cursor: pointer;
 }
 .oppia-current-goals-content {
   border-bottom: 1px solid #ccc;
