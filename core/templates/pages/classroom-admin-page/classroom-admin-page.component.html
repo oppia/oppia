@@ -20,7 +20,7 @@
           <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())">
             {{ classroom.value }}
           </span>
-          <span *ngIf="classroomEditorMode && classroom.key === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length > 0">
+          <span *ngIf="classroomEditorMode && classroom.key === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length > 0" class="classroom-tile-name">
             {{ this.tempClassroomData.getClassroomName() }}
           </span>
           <span *ngIf="classroomEditorMode && classroom.key === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length === 0">
@@ -44,7 +44,7 @@
             </i>
           </div>
 
-          <div class="row oppia-description-text-container">
+          <div class="row oppia-classroom-input-container">
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Name</strong>
             </span>
@@ -52,57 +52,51 @@
               <span *ngIf="classroomViewerMode">
                 {{tempClassroomData.getClassroomName()}}
               </span>
-              <textarea *ngIf="classroomEditorMode"
-                        [(ngModel)]="tempClassroomData._name"
-                        (blur)="updateClassroomField()"
-                        (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
-                        rows="1">
-              </textarea>
-              <p *ngIf="classroomAdminDataService.nameValidationError.length > 0" class="oppia-warning-text">
-                {{ classroomAdminDataService.nameValidationError }}
-              </p>
+              <input *ngIf="classroomEditorMode"
+                     class="form-control e2e-update-classroom-name"
+                     [(ngModel)]="tempClassroomData._name"
+                     (blur)="updateClassroomField()"
+                     (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
+                    >
             </div>
           </div>
 
-          <div class="row oppia-description-text-container">
+          <div class="row oppia-classroom-input-container">
             <span class="col-lg-3 col-md-3 col-sm-3">
-              <strong>URL fragment</strong>
+              <strong>URL Fragment</strong>
             </span>
             <div class="classroom-field">
               <span *ngIf="classroomViewerMode">
                 {{tempClassroomData.getClassroomUrlFragment()}}
               </span>
-              <textarea *ngIf="classroomEditorMode"
-                        [(ngModel)]="tempClassroomData._urlFragment"
-                        (blur)="updateClassroomField()"
-                        (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
-                        rows="1">
-              </textarea>
-              <p *ngIf="classroomAdminDataService.urlValidationError.length > 0" class="oppia-warning-text">
-                {{ classroomAdminDataService.urlValidationError }}
-              </p>
+              <input *ngIf="classroomEditorMode"
+                     class="form-control e2e-update-classroom-url-fragment"
+                     [(ngModel)]="tempClassroomData._urlFragment"
+                     (blur)="updateClassroomField()"
+                     (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
+                    >
             </div>
           </div>
 
-          <div class="row oppia-description-text-container">
+          <div class="row oppia-classroom-input-container">
             <span class="col-lg-3 col-md-3 col-sm-3">
-              <strong>Course details</strong>
+              <strong>Teaser Text</strong>
             </span>
             <span *ngIf="classroomViewerMode" class="classroom-field">
-              {{ tempClassroomData.getCourseDetails() }}
+              {{ tempClassroomData.getTeaserText() }}
             </span>
             <textarea *ngIf="classroomEditorMode"
-                      [(ngModel)]="tempClassroomData._courseDetails"
+                      [(ngModel)]="tempClassroomData._teaserText"
                       (blur)="updateClassroomField()"
                       (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
-                      rows="6"
-                      class="classroom-field">
+                      rows="1"
+                      class="classroom-field form-control e2e-test-update-classroom-teaser-text">
             </textarea>
           </div>
 
-          <div class="row oppia-description-text-container">
+          <div class="row oppia-classroom-input-container">
             <span class="col-lg-3 col-md-3 col-sm-3">
-              <strong>Topic list intro</strong>
+              <strong>Topic List Intro</strong>
             </span>
             <span *ngIf="classroomViewerMode" class="classroom-field">
                 {{tempClassroomData.getTopicListIntro()}}
@@ -111,9 +105,43 @@
                       [(ngModel)]="tempClassroomData._topicListIntro"
                       (blur)="updateClassroomField()"
                       (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
-                      rows="4"
-                      class="classroom-field">
+                      rows="1"
+                      class="classroom-field form-control e2e-test-update-classroom-topic-list-intro">
             </textarea>
+          </div>
+
+          <div class="row oppia-classroom-input-container">
+            <span class="col-lg-3 col-md-3 col-sm-3">
+              <strong>Course Details</strong>
+            </span>
+            <span *ngIf="classroomViewerMode" class="classroom-field">
+              {{ tempClassroomData.getCourseDetails() }}
+            </span>
+            <textarea *ngIf="classroomEditorMode"
+                      [(ngModel)]="tempClassroomData._courseDetails"
+                      (blur)="updateClassroomField()"
+                      (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
+                      rows="2"
+                      class="classroom-field form-control e2e-test-update-classroom-course-details">
+            </textarea>
+          </div>
+
+          <div class="row oppia-classroom-input-container">
+            <span class="col-lg-3 col-md-3 col-sm-3">
+              <strong>Thumbnail</strong>
+            </span>
+            <div class="e2e-test-classroom-thumbnail-container">
+              <oppia-image-uploader [imageUploaderParameters]="thumbnailParameters" (imageSave)="updateThumbnailData($event)"></oppia-image-uploader>
+            </div>
+          </div>
+
+          <div class="row oppia-classroom-input-container">
+            <span class="col-lg-3 col-md-3 col-sm-3">
+              <strong>Banner</strong>
+            </span>
+            <div class="e2e-test-classroom-banner-container">
+              <oppia-image-uploader [imageUploaderParameters]="bannerParameters" (imageSave)="updateBannerData($event)"></oppia-image-uploader>
+            </div>
           </div>
 
           <div>
@@ -210,18 +238,28 @@
 
             <div *ngIf="classroomEditorMode">
               <div class="new-topic-input-container" *ngIf="newTopicCanBeAdded">
-                <input [(ngModel)]="newTopicId"
-                       class="form-control new-topic-input e2e-test-add-topic-to-classroom-input"
-                       (ngModelChange)="onNewTopicInputModelChange()"
-                       placeholder="Topic ID">
+                <div class="topic-selector-container">
+                  <mat-form-field appearance="fill" class="topics-selector-form-field e2e-test-classroom-topics-modal">
+                    <mat-label for="explorationCategory" class="d-block">Select a topic</mat-label>
+                    <mat-select (selectionChange)="onNewTopicInputModelChange($event.value)" class="e2e-test-classroom-category-dropdown">
+                      <mat-option class="e2e-test-exploration-new-category-add">
+                        <ngx-mat-select-search
+                          ngModel
+                          (ngModelChange)="filterTopicsByName($event)"
+                          placeholderLabel="Search topic name here...">
+                        </ngx-mat-select-search>
+                      </mat-option>
+                      <mat-option *ngFor="let option of filteredTopicsToClassroomRelation"
+                                  class="e2e-test-classroom-topic-selector-choice"
+                                  [value]="option.topic_id">
+                          {{ option.topic_name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
                 <button (click)="removeNewTopicInputField()"
-                        class="btn btn-secondary">
-                  Cancel
-                </button>
-                <button (click)="addTopicId(newTopicId)"
-                        class="btn btn-success e2e-test-submit-topic-id-to-classroom-button"
-                        [disabled]="newTopicId.length === 0">
-                  Submit
+                        class="btn btn-secondary cancel-btn">
+                    Cancel
                 </button>
               </div>
 
@@ -242,20 +280,60 @@
                     *ngIf="tempClassroomData.getTopicsCount() > 0">
               View Graph
             </button>
-            <button class="btn btn-secondary cancel-classroom-changes"
+            <button class="btn btn-secondary cancel-classroom-changes e2e-cancel-classroom-changes"
                     (click)="closeClassroomConfigEditor()"
                     [disabled]="classroomDataSaveInProgress">
               Cancel
             </button>
-            <button class="btn btn-success save-classroom-changes e2e-test-save-classroom-config-button"
-                    [disabled]="!(classroomDataIsChanged && tempClassroomData.isClassroomDataValid())"
-                    (click)="saveClassroomData(classroom.key)">
-              <span *ngIf="!classroomDataSaveInProgress">Save</span>
-              <mat-spinner *ngIf="classroomDataSaveInProgress"
-                           class="oppia-save-classroom-spinning-button"
+            <button *ngIf="tempClassroomData._isPublished"
+                    [disabled]="false"
+                    class="btn btn-secondary publish-classroom-btn e2e-unpublish-classroom-btn"
+                    (click)="unpublishClassroom()"
+                    >
+              <span *ngIf="!classroomDataUnpublishInProgress">Unpublish</span>
+              <mat-spinner *ngIf="classroomDataUnpublishInProgress"
+                           class="oppia-update-classroom-data-spinning-button"
                            [diameter]="22">
               </mat-spinner>
             </button>
+            <span [matTooltip]="validationErrors.join('\n')"
+                  matTooltipClass="oppia-mat-tooltip-list"
+                  [matTooltipDisabled]="false"
+                  aria-label="List that shows issues preventing to publish a classroom"
+                  >
+              <button *ngIf="!tempClassroomData._isPublished"
+                      [disabled]="!(validationErrors.length === 0)"
+                      class="btn btn-success publish-classroom-btn e2e-test-publish-classroom-btn"
+                      (click)="publishClassroom()"
+                  >
+                <span *ngIf="!classroomDataPublishInProgress">Publish</span>
+                <mat-spinner *ngIf="classroomDataPublishInProgress"
+                             class="oppia-update-classroom-data-spinning-button"
+                             [diameter]="22">
+                </mat-spinner>
+                <mat-icon *ngIf="validationErrors.length > 0" class="save-draft-button-warning">
+                  warning
+                </mat-icon>
+              </button>
+            </span>
+            <span [matTooltip]="(saveClassroomValidationErrors()).join('\n')"
+                  matTooltipClass="oppia-mat-tooltip-list"
+                  [matTooltipDisabled]="false"
+                  aria-label="List that shows issues preventing to save a classroom"
+                  >
+              <button class="btn btn-success save-classroom-changes e2e-test-save-classroom-config-button"
+                      [disabled]="!(classroomDataIsChanged && tempClassroomData.isClassroomDataValid())"
+                      (click)="saveClassroomData(classroom.key)">
+                <span *ngIf="!classroomDataSaveInProgress">Save</span>
+                <mat-spinner *ngIf="classroomDataSaveInProgress"
+                             class="oppia-update-classroom-data-spinning-button"
+                             [diameter]="22">
+                </mat-spinner>
+                <mat-icon *ngIf="saveClassroomValidationErrors().length > 0" class="save-draft-button-warning">
+                        warning
+                </mat-icon>
+              </button>
+            </span>
           </div>
         </div>
       </div>
@@ -279,9 +357,6 @@
   .classroom-editor {
     display: flex;
     width: 90%;
-  }
-  .new-topic-input-container {
-    margin-top: 10px;
   }
   .topics-form-field {
     width: 400px;
@@ -366,10 +441,10 @@
     justify-content: space-between;
   }
   /* TODO(#16156): Remove the instances of /deep/ from the codebase. */
-  :host /deep/ .oppia-save-classroom-spinning-button circle {
+  :host /deep/ .oppia-update-classroom-data-spinning-button circle {
     stroke: #fff;
   }
-  .oppia-save-classroom-spinning-button {
+  .oppia-update-classroom-data-spinning-button {
     margin: 0 5px;
   }
   .create-new-classroom-button-wrapper {
@@ -382,14 +457,14 @@
     margin-right: 5px;
     margin-top: 5px;
   }
-  .cancel-classroom-changes {
+  .cancel-classroom-changes, .publish-classroom-btn {
     margin-right: 5px;
     margin-top: 5px;
   }
   .classroom-field {
     width: 400px;
   }
-  .oppia-description-text-container {
+  .oppia-classroom-input-container {
     margin-top: 10px;
   }
   .loading-spinner {
@@ -446,6 +521,38 @@
     color: #f00;
     font-size: 0.8em;
     width: 500px
+  }
+  .classroom-tile-name {
+    overflow: hidden;
+  }
+  .new-topic-input-container {
+    align-items: end;
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+  }
+  .topic-selector-container {
+    align-items: center;
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+    width: 100%;
+  }
+  .new-topic-input-container button.cancel-btn {
+    bottom: 14px;
+    position: relative;
+    width: 75px;
+  }
+  .topics-selector-form-field {
+    width: 100%;
+  }
+  .mat-icon.save-draft-button-warning {
+    color: #eec302;
+    float: right;
+    font-size: 20px;
+    height: fit-content;
+    margin-left: 3px;
+    z-index: 10;
   }
   @media screen and (max-width: 768px) {
     .oppia-editor-card-with-avatar {

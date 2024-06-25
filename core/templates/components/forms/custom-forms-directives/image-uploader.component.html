@@ -9,7 +9,9 @@
         [ngStyle]="{'right.px': !isImageInPortraitMode() ? -20 : 8}" (click)="showImageUploaderModal()">
       </i>
       <img [hidden]="hidePlaceholder" [src]="placeholderImageUrl" align="center" alt=""
-        [ngClass]="{'oppia-image-placeholder-landscape': !isImageInPortraitMode(), 'oppia-image-placeholder-portrait': isImageInPortraitMode()}">
+           [ngClass]="{'oppia-image-placeholder-landscape': !isImageInPortraitMode(), 'oppia-image-placeholder-portrait': isImageInPortraitMode()}"
+           class="e2e-test-custom-photo"
+        >
 
       <oppia-thumbnail-display *ngIf="editableImageDataUrl" [imgSrc]="editableImageDataUrl"
         [aspectRatio]="imageUploaderParameters.aspectRatio" [classes]="['img-thumbnail', 'e2e-test-custom-photo']" [background]="imageBgColor">

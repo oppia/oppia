@@ -16,6 +16,7 @@
  * @fileoverview Existing classroom model.
  */
 
+import {AppConstants} from 'app.constants';
 import {ClassroomDict} from '../../domain/classroom/classroom-backend-api.service';
 import {NewClassroom, NewClassroomData} from './new-classroom.model';
 import cloneDeep from 'lodash/cloneDeep';
@@ -28,17 +29,29 @@ export interface TopicIdToTopicName {
   [topicId: string]: string;
 }
 
+export interface ImageData {
+  filename: string;
+  bg_color: string;
+  size_in_bytes: number;
+  image_data?: Blob;
+}
+
 interface ExistingClassroom extends NewClassroom {
   _courseDetails: string;
+  _teaserText: string;
   _topicListIntro: string;
   _topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds;
   _topicIdToTopicName: TopicIdToTopicName;
+  _isPublished: boolean;
+  _thumbnail_data: ImageData;
+  _banner_data: ImageData;
   getClassroomDict: () => ClassroomDict;
   getCourseDetails: () => string;
   getTopicListIntro: () => string;
   getTopicIdToPrerequisiteTopicId: () => TopicIdToPrerequisiteTopicIds;
   validateDependencyGraph: () => string;
   getPrerequisiteTopicIds: (topicId: string) => string[];
+  getAllValidationErrors: () => string[];
 }
 
 export type ClassroomData = ExistingClassroom | NewClassroom;
@@ -48,47 +61,91 @@ export class ExistingClassroomData
   implements ExistingClassroom
 {
   _courseDetails: string;
+  _teaserText: string;
   _topicListIntro: string;
   _topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds;
   _topicsCountInClassroom: number;
   _topicIdToTopicName!: TopicIdToTopicName;
+  _isPublished: boolean;
+  _thumbnail_data: ImageData;
+  _banner_data: ImageData;
 
   constructor(
     classroomId: string,
     name: string,
     urlFragment: string,
     courseDetails: string,
+    teaserText: string,
     topicListIntro: string,
-    topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
+    topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds,
+    isPublished: boolean,
+    thumbnailData: ImageData,
+    bannerData: ImageData
   ) {
     super(classroomId, name, urlFragment);
     this._courseDetails = courseDetails;
+    this._teaserText = teaserText;
     this._topicListIntro = topicListIntro;
     this._topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
     this._topicsCountInClassroom = 0;
     this._topicsCountInClassroom = Object.keys(
       this._topicIdToPrerequisiteTopicIds
     ).length;
+    this._isPublished = isPublished;
+    this._thumbnail_data = thumbnailData;
+    this._banner_data = bannerData;
   }
 
   getCourseDetails(): string {
     return this._courseDetails;
   }
 
+  getTeaserText(): string {
+    return this._teaserText;
+  }
+
   getTopicListIntro(): string {
     return this._topicListIntro;
+  }
+
+  getThumbnailData(): ImageData {
+    return this._thumbnail_data;
+  }
+
+  getBannerData(): ImageData {
+    return this._banner_data;
   }
 
   getTopicIdToPrerequisiteTopicId(): TopicIdToPrerequisiteTopicIds {
     return this._topicIdToPrerequisiteTopicIds;
   }
 
+  getIsPublished(): boolean {
+    return this._isPublished;
+  }
+
   setCourseDetails(courseDetails: string): void {
     this._courseDetails = courseDetails;
   }
 
+  setIsPublished(isPublished: boolean): void {
+    this._isPublished = isPublished;
+  }
+
+  setTeaserText(teaserText: string): void {
+    this._teaserText = teaserText;
+  }
+
   setTopicListIntro(topicListIntro: string): void {
     this._topicListIntro = topicListIntro;
+  }
+
+  setBannerData(bannerData: ImageData): void {
+    this._banner_data = bannerData;
+  }
+
+  setThumbnailData(thumbnailData: ImageData): void {
+    this._thumbnail_data = thumbnailData;
   }
 
   setTopicIdToPrerequisiteTopicId(
@@ -105,8 +162,12 @@ export class ExistingClassroomData
       classroomDict.name,
       classroomDict.urlFragment,
       classroomDict.courseDetails,
+      classroomDict.teaserText,
       classroomDict.topicListIntro,
-      classroomDict.topicIdToPrerequisiteTopicIds
+      classroomDict.topicIdToPrerequisiteTopicIds,
+      classroomDict.isPublished,
+      classroomDict.thumbnailData,
+      classroomDict.bannerData
     );
   }
 
@@ -116,8 +177,12 @@ export class ExistingClassroomData
       name: this._name,
       urlFragment: this._urlFragment,
       courseDetails: this._courseDetails,
+      teaserText: this._teaserText,
       topicListIntro: this._topicListIntro,
       topicIdToPrerequisiteTopicIds: this._topicIdToPrerequisiteTopicIds,
+      isPublished: this._isPublished,
+      thumbnailData: this._thumbnail_data,
+      bannerData: this._banner_data,
     };
     return classroomDict;
   }
@@ -230,5 +295,85 @@ export class ExistingClassroomData
 
   setTopicIdToTopicName(topicIdToTopicName: TopicIdToTopicName): void {
     this._topicIdToTopicName = topicIdToTopicName;
+  }
+
+  private getClassroomTeaserTextValidationErrors(): string {
+    let errorMsg = '';
+    if (this._teaserText === '') {
+      errorMsg = 'The classroom teaser text should not be empty.';
+    } else if (
+      this._teaserText.length > AppConstants.MAX_CHARS_IN_CLASSROOM_TEASER_TEXT
+    ) {
+      errorMsg =
+        'The classroom teaser text should contain at most 68 characters.';
+    }
+    return errorMsg;
+  }
+
+  private getClassroomCourseDetailsValidationErrors(): string {
+    let errorMsg = '';
+    if (this._courseDetails === '') {
+      errorMsg = 'The classroom course details should not be empty.';
+    } else if (
+      this._courseDetails.length >
+      AppConstants.MAX_CHARS_IN_CLASSROOM_COURSE_DETAILS
+    ) {
+      errorMsg =
+        'The classroom course details should contain at most 720 characters.';
+    }
+    return errorMsg;
+  }
+
+  private getClassroomTopicListIntroValidationErrors(): string {
+    let errorMsg = '';
+    if (this._topicListIntro === '') {
+      errorMsg = 'The classroom topic list intro should not be empty.';
+    } else if (
+      this._topicListIntro.length >
+      AppConstants.MAX_CHARS_IN_CLASSROOM_TOPIC_LIST_INTRO
+    ) {
+      errorMsg =
+        'The classroom topic list intro should contain at most 240 characters.';
+    }
+    return errorMsg;
+  }
+
+  private getClassroomThumbnailValidationErrors(): string {
+    let errorMsg = '';
+    if (this._thumbnail_data.filename === '') {
+      errorMsg = 'The classroom thumbnail should not be empty.';
+    }
+    return errorMsg;
+  }
+
+  private getClassroomBannerValidationErrors(): string {
+    let errorMsg = '';
+    if (this._thumbnail_data.filename === '') {
+      errorMsg = 'The classroom banner should not be empty.';
+    }
+    return errorMsg;
+  }
+
+  private getClassroomTopicCountValidationError(): string {
+    let errorMsg = '';
+    if (this.getTopicsCount() === 0) {
+      errorMsg = 'A classroom should have at least one topic.';
+    }
+    return errorMsg;
+  }
+
+  getAllValidationErrors(): string[] {
+    return [
+      this.getClassroomBannerValidationErrors(),
+      this.getClassroomNameValidationErrors(),
+      this.getClassroomCourseDetailsValidationErrors(),
+      this.getClassroomTopicListIntroValidationErrors(),
+      this.getClassroomTopicCountValidationError(),
+      this.getClassroomThumbnailValidationErrors(),
+      this.getClassroomTeaserTextValidationErrors(),
+      this.getClassroomNameValidationErrors(),
+      this.getClassroomUrlValidationErrors(),
+      this.validateDependencyGraph(),
+    ].filter(error => error !== '');
   }
 }

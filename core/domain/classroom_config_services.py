@@ -204,15 +204,17 @@ def get_new_classroom_id() -> str:
 
 
 def update_classroom(
-    classroom: classroom_config_domain.Classroom
+    classroom: classroom_config_domain.Classroom,
+    strict: bool = False
 ) -> None:
     """Saves a Clasroom domain object to the datastore.
 
     Args:
         classroom: Classroom. The classroom domain object for the given
             classroom.
+        strict: bool. Whether to perform strict checking.
     """
-    classroom.validate()
+    classroom.validate(strict)
     classroom_model = classroom_models.ClassroomModel.get(
         classroom.classroom_id, strict=False)
 
