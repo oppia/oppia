@@ -231,12 +231,11 @@ def output_variable_to_github_workflow(
         output_variable: str. The name of the output variable.
         output_value: str. The value of the output variable.
     """
-    print(f'{output_variable} is {output_value}')
     with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as o:
         print(f'{output_variable}={output_value}', file=o)
 
 
-def format_test_suites_to_run_for_github_output(
+def output_test_suites_to_run_to_github_workflow(
     test_suites_to_run: CITestSuitesToRunDict
 ) -> str:
     """Formats the test suites to run and converts it to JSON
@@ -248,14 +247,22 @@ def format_test_suites_to_run_for_github_output(
     Returns:
         dict. The formatted test suites to run.
     """
-    return json.dumps({
+    test_suites_to_run_output = {
         'e2e': test_suites_to_run['e2e'],
         'acceptance': test_suites_to_run['acceptance'],
         'lighthouse_performance':
             test_suites_to_run['lighthouse_performance'],
         'lighthouse_accessibility':
             test_suites_to_run['lighthouse_accessibility'],
-    }, indent=4)
+    }
+    print(
+        'Test Suites to Run: ',
+        json.dumps(test_suites_to_run_output, indent=4)
+    )
+    output_variable_to_github_workflow(
+        GITHUB_OUTPUT_TEST_SUITES_TO_RUN,
+        json.dumps(test_suites_to_run_output)
+    )
 
 
 def get_test_suites_from_config(
@@ -387,10 +394,7 @@ def output_all_test_suites_to_run_to_github_workflow() -> None:
             all_test_suites_by_type['lighthouse_accessibility']
         )
     )
-    output_variable_to_github_workflow(
-        GITHUB_OUTPUT_TEST_SUITES_TO_RUN,
-        format_test_suites_to_run_for_github_output(test_suites_to_run)
-    )
+    output_test_suites_to_run_to_github_workflow(test_suites_to_run)
 
 
 def get_test_suite_by_name_from_list(
@@ -689,10 +693,7 @@ def main(args: Optional[list[str]] = None) -> None:
             output_all_test_suites_to_run_to_github_workflow()
             return
 
-        output_variable_to_github_workflow(
-            GITHUB_OUTPUT_TEST_SUITES_TO_RUN,
-            format_test_suites_to_run_for_github_output(ci_test_suites_to_run)
-        )
+        output_test_suites_to_run_to_github_workflow(ci_test_suites_to_run)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
