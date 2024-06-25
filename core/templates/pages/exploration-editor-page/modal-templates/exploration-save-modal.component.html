@@ -15,6 +15,9 @@
       <span *ngIf="!showDiff">Show Changes</span>
       <span *ngIf="showDiff">Hide Changes</span>
     </button>
+    <button class="btn btn-secondary oppia-show-translation-changes" (click)="showStateDiffModalForTranslations()">
+      <span>Show Translation Changes</span>
+    </button>
     <oppia-version-diff-visualization *ngIf="showDiff"
                                       [diffData]="diffData"
                                       [earlierVersionHeader]="earlierVersionHeader"
@@ -33,5 +36,9 @@
 <style>
   .modal-body .oppia-commit-message-input {
     resize: vertical;
+  }
+
+  .modal-body .oppia-show-translation-changes {
+    margin-left: 10px;
   }
 </style>
