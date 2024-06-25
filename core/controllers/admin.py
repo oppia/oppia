@@ -2697,8 +2697,7 @@ class QuestionAdminRoleHandler(
                 'User with given username does not exist.')
 
         user_id = user_settings.user_id
-        if action == 'assign':
-            if not feconf.ROLE_ID_QUESTION_ADMIN in user_settings.roles:
+        if action == 'assign' and not feconf.ROLE_ID_QUESTION_ADMIN in user_settings.roles:
                 user_services.add_user_role(
                     user_id, feconf.ROLE_ID_QUESTION_ADMIN)
 
