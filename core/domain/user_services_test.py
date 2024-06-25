@@ -3625,10 +3625,6 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
 
     TRANSLATOR_EMAIL: Final = 'translator@community.org'
     TRANSLATOR_USERNAME: Final = 'translator'
-
-    QUESTION_REVIEWER_EMAIL: Final = 'question@community.org'
-    QUESTION_REVIEWER_USERNAME: Final = 'questionreviewer'
-
     QUESTION_SUBMITTER_EMAIL: Final = 'submitter@community.org'
     QUESTION_SUBMITTER_USERNAME: Final = 'questionsubmitter'
 

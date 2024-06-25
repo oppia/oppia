@@ -45,6 +45,7 @@ from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -231,6 +232,48 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                     'action': 'generate_dummy_explorations',
                     'num_dummy_exps_to_generate': 5,
                     'num_dummy_exps_to_publish': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_skill_id_dummy_question_suggestions_action_is_not_performed( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'skill_id\' must be provided when the '
+            'action is _generate_dummy_question_suggestions.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_question_suggestions',
+                    'skill_id': None,
+                    'num_dummy_question_suggestions_generate': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_num_dummy_question_suggestions_generate_action_is_not_performed( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'num_dummy_question_suggestions_generate\' must be provided'
+            ' when the action is _generate_dummy_question_suggestions.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_question_suggestions',
+                    'skill_id': 'N8daS2n2aoQr',
+                    'num_dummy_question_suggestions_generate': None
                 }, csrf_token=csrf_token)
 
         self.logout()
@@ -1357,6 +1400,100 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.assertEqual(generated_exps, {})
         self.assertEqual(published_exps, {})
 
+        self.logout()
+
+
+class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
+    """Test the conditions for generation of dummy question suggestions."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.QUESTION_REVIEWER_EMAIL, self.QUESTION_REVIEWER_USERNAME)
+        self.signup(
+            self.QUESTION_ADMIN_EMAIL,
+            self.QUESTION_ADMIN_USERNAME,
+            is_super_admin=True)
+        self.question_reviewer_id = self.get_user_id_from_email(
+            self.QUESTION_REVIEWER_EMAIL)
+        self.add_user_role(
+            self.QUESTION_ADMIN_USERNAME,
+            feconf.ROLE_ID_QUESTION_ADMIN)
+
+    def test_generate_dummy_question_suggestions_(self) -> None:
+        self.login(self.QUESTION_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/contributionrightshandler/submit_question', {
+                'username': 'questionExpert'
+            }, csrf_token=csrf_token)
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_question_suggestions',
+                'skill_id': 'N8daS2n2aoQr',
+                'num_dummy_question_suggestions_generate': 12
+            }, csrf_token=csrf_token)
+
+        generated_question_suggestions = suggestion_services.get_submitted_suggestions( # pylint: disable=line-too-long
+            self.get_user_id_from_email(
+                self.QUESTION_ADMIN_EMAIL),
+                feconf.SUGGESTION_TYPE_ADD_QUESTION)
+        self.assertEqual(len(generated_question_suggestions), 12)
+        self.logout()
+
+    def test_cannot_generate_dummy_question_suggestions_in_prod_mode_(# pylint: disable=line-too-long
+            self) -> None:
+        self.login(self.QUESTION_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy question suggestion in production.')
+
+        self.post_json(
+            '/contributionrightshandler/submit_question', {
+                'username': 'questionExpert'
+            }, csrf_token=csrf_token)
+
+        with assert_raises_regexp_context_manager, prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_question_suggestions',
+                    'skill_id': 'N8daS2n2aoQr',
+                    'num_dummy_question_suggestions_generate': 12
+                }, csrf_token=csrf_token)
+
+        generated_question_suggestions = suggestion_services.get_submitted_suggestions( # pylint: disable=line-too-long
+            self.get_user_id_from_email(
+                self.QUESTION_ADMIN_EMAIL),
+                feconf.SUGGESTION_TYPE_ADD_QUESTION)
+        self.assertNotEqual(len(generated_question_suggestions), 12)
+        self.logout()
+
+    def test_raises_error_if_not_question_admin_or_question_submitter_(# pylint: disable=line-too-long
+            self) -> None:
+        self.login(
+            self.QUESTION_REVIEWER_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'User \'question\' must be a question submitter or question admin'
+                    ' in order to generate question suggestions.')
+
+        with assert_raises_regexp:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_question_suggestions',
+                    'skill_id': 'N8daS2n2aoQr',
+                    'num_dummy_question_suggestions_generate': 12
+                }, csrf_token=csrf_token)
+
+        generated_question_suggestions = suggestion_services.get_submitted_suggestions( # pylint: disable=line-too-long
+            self.get_user_id_from_email(
+                self.QUESTION_ADMIN_EMAIL),
+                feconf.SUGGESTION_TYPE_ADD_QUESTION)
+        self.assertNotEqual(len(generated_question_suggestions), 12)
         self.logout()
 
 
