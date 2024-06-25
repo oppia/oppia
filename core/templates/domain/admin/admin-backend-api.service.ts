@@ -29,6 +29,10 @@ import {
   CreatorTopicSummary,
   CreatorTopicSummaryBackendDict,
 } from 'domain/topic/creator-topic-summary.model';
+import {
+  SkillSummary,
+  SkillSummaryBackendDict,
+} from 'domain/skill/skill-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 export interface UserRolesBackendResponse {
@@ -84,6 +88,7 @@ export interface AdminPageDataBackendDict {
   platform_params_dicts: PlatformParameterBackendDict[];
   user_group_models_dict: Record<string, string[]>;
   all_users_usernames: string[];
+  skill_list: SkillSummaryBackendDict[];
 }
 
 export interface AdminPageData {
@@ -98,6 +103,7 @@ export interface AdminPageData {
   platformParameters: PlatformParameter[];
   userGroups: Record<string, string[]>;
   allUsersUsernames: string[];
+  skillList: SkillSummary[];
 }
 
 export interface ExplorationInteractionIdsBackendResponse {
@@ -136,6 +142,9 @@ export class AdminBackendApiService {
               ),
               userGroups: response.user_group_models_dict,
               allUsersUsernames: response.all_users_usernames,
+              skillList: response.skill_list.map(dict =>
+                SkillSummary.createFromBackendDict(dict)
+              ),
             });
           },
           errorResponse => {
@@ -647,6 +656,17 @@ export class AdminBackendApiService {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_blog_post',
       blog_post_title: blogPostTitle,
+    });
+  }
+
+  async generateDummySuggestionQuestionsAsync(
+    skillId: string,
+    numberOfQuestions: number
+  ): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_question_suggestions',
+      skill_id: skillId,
+      num_dummy_question_suggestions_generate: numberOfQuestions,
     });
   }
 

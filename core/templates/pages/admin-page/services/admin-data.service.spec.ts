@@ -30,6 +30,7 @@ import {
   AdminPageDataBackendDict,
 } from 'domain/admin/admin-backend-api.service';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
 
 describe('Admin Data Service', () => {
   let adminDataService: AdminDataService;
@@ -109,6 +110,7 @@ describe('Admin Data Service', () => {
       'User7',
       'User8',
     ],
+    skill_list: [],
   };
   let adminDataResponse: AdminPageData;
 
@@ -135,6 +137,9 @@ describe('Admin Data Service', () => {
       ),
       userGroups: sampleAdminData.user_group_models_dict,
       allUsersUsernames: sampleAdminData.all_users_usernames,
+      skillList: sampleAdminData.skill_list.map(dict =>
+        SkillSummary.createFromBackendDict(dict)
+      ),
     };
   });
 

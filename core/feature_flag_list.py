@@ -84,7 +84,6 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
-    FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE
@@ -100,6 +99,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
+    FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -108,7 +108,6 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
     FeatureNames.END_CHAPTER_CELEBRATION,
     FeatureNames.CHECKPOINT_CELEBRATION,
-    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
     FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED,
     FeatureNames.LEARNER_GROUPS_ARE_ENABLED,
     FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
@@ -120,6 +119,7 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
 DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.ANDROID_BETA_LANDING_PAGE,
     FeatureNames.BLOG_PAGES,
+    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
@@ -138,13 +138,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.CHECKPOINT_CELEBRATION.value: (
         (
             'This flag is for the checkpoint celebration feature.',
-            feature_flag_domain.ServerMode.PROD
-        )
-    ),
-    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS.value: (
-        (
-            'This flag enables showing per-contributor accomplishments on the '
-            'contributor dashboard.',
             feature_flag_domain.ServerMode.PROD
         )
     ),
@@ -247,7 +240,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag allows exploration editors to promptly update '
             'translations of content they are editing in the exploration '
             'editor page.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value: (

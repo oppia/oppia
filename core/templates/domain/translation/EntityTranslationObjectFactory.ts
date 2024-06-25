@@ -33,7 +33,7 @@ export interface EntityTranslationBackendDict {
   translations: TranslationMappingDict;
 }
 
-export interface languageCodeToEntityTranslationBackendDict {
+export interface LanguageCodeToEntityTranslationBackendDict {
   [languageCode: string]: EntityTranslationBackendDict;
 }
 
@@ -78,6 +78,25 @@ export class EntityTranslation {
 
   hasWrittenTranslation(contentId: string): boolean {
     return this.translationMapping.hasOwnProperty(contentId);
+  }
+
+  toBackendDict(): EntityTranslationBackendDict {
+    return {
+      entity_id: this.entityId,
+      entity_type: this.entityType,
+      entity_version: this.entityVersion,
+      language_code: this.languageCode,
+      translations: this.translationMappingToBackendDict(),
+    };
+  }
+
+  translationMappingToBackendDict(): TranslationMappingDict {
+    const translationMappingDict: TranslationMappingDict = {};
+    Object.keys(this.translationMapping).forEach(contentId => {
+      translationMappingDict[contentId] =
+        this.translationMapping[contentId].toBackendDict();
+    });
+    return translationMappingDict;
   }
 
   static createTranslationMappingFromBackendDict(
