@@ -35,7 +35,9 @@ describe('Topic Manager User Journey', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Addition', 'add');
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Subtraction', 'subtract');
 
     topicManager = await UserFactory.createNewUser(

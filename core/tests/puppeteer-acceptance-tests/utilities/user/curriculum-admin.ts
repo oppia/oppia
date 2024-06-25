@@ -19,7 +19,6 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import {over} from 'lodash';
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
