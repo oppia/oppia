@@ -49,7 +49,7 @@ describe('Blog Editor', function () {
     async function () {
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
-      await blogPostEditor.publishNewBlogPostWithTitle('Test-Blog');
+      await blogPostEditor.publishNewBlogPost('Test-Blog');
 
       await blogPostEditor.navigateToPublishTab();
       await blogPostEditor.expectNumberOfBlogPostsToBe(1);

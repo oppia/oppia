@@ -44,9 +44,11 @@ export default {
     CreatorDashboardCreateMode:
       'http://localhost:8181/creator-dashboard?mode=create',
     CreatingAnExploration: 'https://oppia.github.io/#/CreatingAnExploration',
+    CreatorGuidelines: 'http://localhost:8181/creator-guidelines',
     Donate: 'http://localhost:8181/donate',
     DonateWithThanksModal: 'http://localhost:8181/donate?thanks=',
     EmbeddingAnExploration: 'https://oppia.github.io/#/EmbeddingAnExploration',
+    ExplorationDesignTips: 'http://oppia.github.io/#/DesignTips',
     ExternalLink61MillionChildren:
       'https://uis.unesco.org/en/news/world-poverty-could-be-cut-half-' +
       'if-all-adults-completed-secondary-education',
@@ -60,6 +62,7 @@ export default {
     Electromagnetism: 'https://www.oppia.org/collection/wqCTKpKA0LBe',
     GetStarted: 'http://localhost:8181/get-started',
     Home: 'http://localhost:8181/',
+    LearnerDashboard: 'http://localhost:8181/learner-dashboard',
     Login: 'http://localhost:8181/login',
     Logout: 'http://localhost:8181/logout',
     MathClassroom: 'http://localhost:8181/learn/math',
@@ -76,6 +79,8 @@ export default {
       '?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp',
     PartnershipsFormShortUrl: 'https://forms.gle/Y71U8FdhQwZpicJj8',
     PrivacyPolicy: 'http://localhost:8181/privacy-policy',
+    ReleaseCoordinator: 'http://localhost:8181/release-coordinator',
+    splash: 'http://localhost:8181/splash',
     Teach: 'http://localhost:8181/teach',
     Terms: 'http://localhost:8181/terms',
     TopicAndSkillsDashboard:
@@ -87,10 +92,22 @@ export default {
     VolunteerFormShortUrl: 'https://forms.gle/rhFYoLLSFr3JEZHy8',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
     ProfilePagePrefix: 'http://localhost:8181/profile',
-    ReleaseCoordinator: 'http://localhost:8181/release-coordinator',
     OppiaAnnounceGoogleGroup: 'https://groups.google.com/g/oppia-announce',
+    GoogleGroups: {
+      Oppia: 'https://groups.google.com/g/oppia',
+      OppiaAnnounce: 'https://groups.google.com/g/oppia-announce',
+    },
+    GoogleAnalytics: {
+      PartnerPolicies: 'https://policies.google.com/technologies/partner-sites',
+      OptOut: 'https://tools.google.com/dlpage/gaoptout',
+    },
+    ExternalLink: {
+      AboutCookies: 'https://allaboutcookies.org/how-to-manage-cookies',
+      CreativeCommonsLegalCode:
+        'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
+      GoogleSignUp: 'https://accounts.google.com/lifecycle/steps/signup/name',
+    },
   },
-
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
     LearnerDashboard: '.oppia-learner-dashboard-main-content',
@@ -108,8 +125,8 @@ export default {
     QUESTION_ADMIN: 'question admin',
     VOICEOVER_ADMIN: 'voiceover admin',
     TOPIC_MANAGER: 'topic manager',
-    RELEASE_COORDINATOR: 'release coordinator',
     MODERATOR: 'moderator',
+    RELEASE_COORDINATOR: 'release coordinator',
   } as const,
 
   BlogRights: {
@@ -131,6 +148,35 @@ export default {
       '../../data/curriculum-admin-thumbnail.svg'
     ),
   },
-
+  OppiaSocials: {
+    YouTube: {
+      Domain: 'youtube.com',
+      Id: 'UC5c1G7BNDCfv1rczcBp9FPw',
+    },
+    FaceBook: {
+      Domain: 'facebook.com',
+      Id: 'oppiaorg',
+    },
+    Instagram: {
+      Domain: 'instagram.com',
+      Id: 'oppia.global',
+    },
+    Twitter: {
+      Domain: 'x.com',
+      Id: 'oppiaorg',
+    },
+    Github: {
+      Domain: 'github.com',
+      Id: 'oppia',
+    },
+    LinkedIn: {
+      Domain: 'linkedin.com',
+      Id: 'oppia-org',
+    },
+    GooglePlay: {
+      Domain: 'play.google.com',
+      Id: 'org.oppia.android',
+    },
+  },
   DEFAULT_SPEC_TIMEOUT_MSECS: 300000,
 };
