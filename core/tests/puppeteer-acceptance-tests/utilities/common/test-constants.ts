@@ -137,7 +137,7 @@ export default {
   } as const,
 
   ViewportWidthBreakpoints: {
-    MOBILE_PX: 768,
+    MOBILE_PX: 769,
   },
 
   data: {
