@@ -888,22 +888,8 @@ export class CurriculumAdmin extends BaseUser {
           await skill.waitForSelector(skillListItemOptions, {visible: true});
           const editBox = await skill.$(skillListItemOptions);
           if (editBox) {
-            // Retry clicking the editBox if it gets detached.
-            await this.page.waitForFunction(
-              (selector: string) => {
-                const freshEl = document.querySelector(selector);
-                if (
-                  freshEl instanceof HTMLElement &&
-                  document.body.contains(freshEl)
-                ) {
-                  freshEl.click();
-                  return true;
-                }
-                return false;
-              },
-              {},
-              skillListItemOptions
-            );
+            await this.waitForElementToBeClickable(editBox);
+            await editBox.click();
             await this.page.waitForSelector(deleteSkillButton);
           } else {
             throw new Error('Edit button not found');
