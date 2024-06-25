@@ -54,7 +54,7 @@ class MockStoryEditorNavigationService {
   checkIfPresentInChapterEditor = () => this.activeTab === 'chapter_editor';
   checkIfPresentInStoryPreviewTab = () => this.activeTab === 'story_preview';
   getActiveTab = () => this.activeTab;
-  navigateToChapterEditorWithChapterId = () => {
+  navigateToChapterEditorWithId = () => {
     this.activeTab = 'chapter_editor';
   };
 
@@ -654,7 +654,7 @@ describe('Story Editor Page Component', () => {
     spyOn(pageTitleService, 'setDocumentTitle');
     storyEditorNavigationService.checkIfPresentInChapterEditor = () => true;
 
-    spyOn(component, 'navigateToChapterEditorWithChapterId');
+    spyOn(component, 'navigateToChapterEditorWithChapterId').and.callThrough();
     spyOn(storyEditorStateService, 'isLoadingStory').and.returnValue(true);
     
     component.ngOnInit();
