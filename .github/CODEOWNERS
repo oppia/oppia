@@ -653,6 +653,21 @@
 /core/templates/pages/volunteer-page/ @oppia/lace-frontend-reviewers
 
 
+# Classrooms Pages.
+/core/templates/pages/classrooms-page/classroom-tile/classroom-summary-tile.component.html @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classroom-tile/classroom-summary-tile.component.spec.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classroom-tile/classroom-summary-tile.component.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page-auth.guard.spec.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page-auth.guard.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page.component.html @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page.component.spec.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page.component.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page.module.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page-root.component.html @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page-root.component.spec.ts @oppia/lace-frontend-reviewers
+/core/templates/pages/classrooms-page/classrooms-page-root.component.ts @oppia/lace-frontend-reviewers
+
+
 # Speed Improvement team.
 /core/templates/google-analytics.initializer.ts @oppia/lace-frontend-reviewers
 /core/templates/base-components/ @oppia/lace-frontend-reviewers

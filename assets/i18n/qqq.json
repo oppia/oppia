@@ -1105,6 +1105,7 @@
 	"I18N_MODAL_CANCEL_BUTTON": "Text that is displayed in a button of a modal. On clicking it the modal closes.\n{{Identical|Cancel}}",
 	"I18N_MODAL_CONTINUE_BUTTON": "Text that is displayed in a button of a modal. On clicking it the user confirms to continue with the action.\n{{Identical|Continue}}",
 	"I18N_MODAL_REMOVE_BUTTON": "Text that is displayed in a button of a modal. On clicking it the user confirms to remove a syllabus item from the learner group syllabus.",
+	"I18N_MULTIPLE_CLASSROOMS_PAGE_DESCRIPTION": "The text which is displayed in the classrooms page. Gives information about classrooms.",
 	"I18N_NEXT_LESSON": "Title of the section that shows the next lesson in a story once a chapter is completed.",
 	"I18N_NO": "Text on button to reject the content of a modal.\n\n{{Identical|No}}",
 	"I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME": "Text shown on learners progress tab on edit learner group page when no learners are found to have username matching the searched keyword.",
