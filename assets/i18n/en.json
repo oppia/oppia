@@ -1699,7 +1699,7 @@
     "I18N_TOPNAV_TRY_ANDROID_APP_TEXT": "Try it today!",
     "I18N_TOPNAV_VOLUNTEER_DESCRIPTION": "Join our global team to create and improve lessons.",
     "I18N_TOTAL_SUBSCRIBERS_TEXT": "You have a total of <[totalSubscribers]> subscribers.",
-    "I18N_UNPUBLISHED_CLASSROOM_BANNER_TEXT": "The classroom is not yet published. To make it visible to learners, go to the /classroom-admin page to publish it",
+    "I18N_UNPUBLISHED_CLASSROOM_BANNER_TEXT": "The classroom is not yet published. To make it visible to learners, go to the /classroom-admin page to publish it.",
     "I18N_UNSUBSCRIBE_BUTTON_TEXT": "Unsubscribe",
     "I18N_VIEW_ALL_TOPICS": "View all <[classroomName]> topics",
     "I18N_VOLUNTEER_PAGE_BREADCRUMB": "Volunteer",
