@@ -22,6 +22,7 @@ import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ContextService} from 'services/context.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {ImageUploaderModalComponent} from './image-uploader-modal.component';
 
@@ -42,14 +43,18 @@ export interface ImageUploaderParameters {
   previewImageUrl?: string;
 }
 
+export interface ImageUploaderData {
+  filename: string;
+  bg_color: string;
+  image_data: Blob;
+}
+
 @Component({
   selector: 'oppia-image-uploader',
   templateUrl: './image-uploader.component.html',
 })
 export class ImageUploaderComponent implements OnInit {
-  @Output() updateBgColor: EventEmitter<string> = new EventEmitter();
-  @Output() updateFilename: EventEmitter<string> = new EventEmitter();
-  @Output() imageSave: EventEmitter<Blob> = new EventEmitter();
+  @Output() imageSave: EventEmitter<ImageUploaderData> = new EventEmitter();
 
   @Input() imageUploaderParameters!: ImageUploaderParameters;
 
@@ -62,7 +67,8 @@ export class ImageUploaderComponent implements OnInit {
     private imageUploadHelperService: ImageUploadHelperService,
     private contextService: ContextService,
     private ngbModal: NgbModal,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private assetsBackendApiService: AssetsBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -77,12 +83,21 @@ export class ImageUploaderComponent implements OnInit {
       if (entityType === undefined) {
         throw new Error('No image present for preview');
       }
-      this.editableImageDataUrl =
-        this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
-          this.imageUploaderParameters.filename,
-          entityType,
-          this.contextService.getEntityId()
-        );
+      if (this.imageUploaderParameters.imageName === 'Thumbnail') {
+        this.editableImageDataUrl =
+          this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
+            this.imageUploaderParameters.filename,
+            entityType,
+            this.contextService.getEntityId()
+          );
+      } else {
+        this.editableImageDataUrl =
+          this.assetsBackendApiService.getImageUrlForPreview(
+            entityType,
+            this.contextService.getEntityId(),
+            this.imageUploaderParameters.filename
+          );
+      }
       this.imageBgColor = this.imageUploaderParameters.bgColor;
       this.imageUploaderParameters.previewImageUrl = this.editableImageDataUrl;
       this.hidePlaceholder = true;
@@ -119,14 +134,19 @@ export class ImageUploaderComponent implements OnInit {
           this.imageUploadHelperService.generateImageFilename(
             data.dimensions.height,
             data.dimensions.width,
-            imageBlobData?.type?.split('/')[1]
+            // SVGs are XML-based; hence, the MIME type for them is image/svg+xml.
+            // When saving the image, we need .svg as the extension, which is why we need
+            // to omit the +xml part.
+            imageBlobData?.type?.split('/')[1]?.replace('+xml', '')
           );
-
         this.hidePlaceholder = true;
         this.imageBgColor = data.newBgColor;
-        this.imageSave.emit(imageBlobData);
-        this.updateBgColor.emit(data.newBgColor);
-        this.updateFilename.emit(imageFilename);
+
+        this.imageSave.emit({
+          filename: imageFilename,
+          bg_color: data.newBgColor,
+          image_data: imageBlobData,
+        });
       },
       () => {
         // Note to developers:
