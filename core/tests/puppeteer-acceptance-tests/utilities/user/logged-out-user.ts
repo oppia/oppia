@@ -2117,7 +2117,8 @@ export class LoggedOutUser extends BaseUser {
         await this.page.waitForSelector(mobileDonateButtonOnDonatePage, {
           visible: true,
         });
-        await this.clickOn(mobileDonateButtonOnDonatePage);
+        const donateButton = await this.page.$(mobileDonateButtonOnDonatePage);
+        await donateButton?.click();
 
         await this.page.waitForFunction(
           'document.querySelectorAll(".e2e-test-donate-page-iframe").length === 2'
