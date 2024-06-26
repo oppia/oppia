@@ -222,7 +222,7 @@ describe('Translator Overview component', () => {
           content1: new TranslatedContent('translated content', 'html', false),
         }
       );
-      entityTranslationsService.languageCodeToEntityTranslations = {
+      entityTranslationsService.languageCodeToLatestEntityTranslations = {
         hi: entityTranslation,
       };
       spyOn(windowRef.nativeWindow.localStorage, 'getItem').and.returnValue(
@@ -275,6 +275,33 @@ describe('Translator Overview component', () => {
           content_id: 'content1',
         },
       ]);
+
+      component.ngOnInit();
+      tick();
+
+      translatedContent = entityTranslation.getWrittenTranslation(
+        'content1'
+      ) as TranslatedContent;
+      expect(translatedContent.needsUpdate).toBeTrue();
+    }));
+
+    it('should handle mark needs update translation changes for language', fakeAsync(() => {
+      let translatedContent = entityTranslation.getWrittenTranslation(
+        'content1'
+      ) as TranslatedContent;
+      expect(translatedContent.needsUpdate).toBeFalse();
+
+      spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
+        {
+          cmd: 'mark_translation_needs_update_for_language',
+          content_id: 'content1',
+          language_code: 'hi',
+        },
+      ]);
+      spyOn(
+        translationLanguageService,
+        'getActiveLanguageCode'
+      ).and.returnValue(undefined as unknown as string);
 
       component.ngOnInit();
       tick();
