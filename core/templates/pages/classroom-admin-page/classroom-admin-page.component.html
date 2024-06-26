@@ -17,7 +17,7 @@
       <div *ngFor="let classroom of classroomIdToClassroomName | keyvalue">
         <div class="oppia-classroom-tile e2e-test-classroom-tile"
              (click)="getClassroomData(classroom.key)">
-          <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())">
+          <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())" class="e2e-test-classroom-tile-name">
             {{ classroom.value }}
           </span>
           <span *ngIf="classroomEditorMode && classroom.key === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length > 0" class="classroom-tile-name">

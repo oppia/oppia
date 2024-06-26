@@ -177,6 +177,7 @@ const topicDropDownFormFeild = '.e2e-test-classroom-category-dropdown';
 const topicSelector = '.e2e-test-classroom-topic-selector-choice';
 const publishClassroomButton = '.e2e-test-publish-classroom-btn';
 const saveClassroomButton = '.e2e-test-save-classroom-config-button';
+const classroomTileNameSpan = '.e2e-test-classroom-tile-name';
 
 export class CurriculumAdmin extends BaseUser {
   /**
@@ -1048,11 +1049,35 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for opening the classroom tile in edit mode.
    */
-  async editClassroom(): Promise<void> {
-    await this.clickOn(classroomTileSelector);
-    await this.page.waitForSelector(editClassroomConfigButton);
-    await this.clickOn(editClassroomConfigButton);
-    await this.page.waitForSelector(closeClassroomConfigButton);
+  async editClassroom(name: string): Promise<void> {
+    const classroomTiles = await this.page.$$(classroomTileSelector);
+
+    if (classroomTiles.length === 0) {
+      throw new Error('No classrooms are present.');
+    }
+
+    let foundClassroom = false;
+
+    for (let i = 0; i < classroomTiles.length; i++) {
+      const classroomName = await classroomTiles[i].$eval(
+        classroomTileNameSpan,
+        element => (element as HTMLSpanElement).innerText.trim()
+      );
+
+      if (classroomName === name) {
+        await this.clickOn(classroomTileSelector);
+        await this.page.waitForSelector(editClassroomConfigButton);
+        await this.clickOn(editClassroomConfigButton);
+        await this.page.waitForSelector(closeClassroomConfigButton);
+
+        foundClassroom = true;
+        break;
+      }
+    }
+
+    if (!foundClassroom) {
+      throw new Error(`${name} classroom do not exists.`);
+    }
   }
 
   /**
@@ -1072,11 +1097,13 @@ export class CurriculumAdmin extends BaseUser {
    * Function for updating a classroom.
    */
   async updateClassroom(
+    name: string,
     teaserText: string,
     courseDetails: string,
     topicListIntro: string
   ): Promise<void> {
-    await this.editClassroom();
+    await this.navigateToClassroomAdminPage();
+    await this.editClassroom(name);
 
     await this.page.type(editClassroomTeaserTextInputFeild, teaserText);
     await this.page.type(editClassroomTopicListIntroInputFeild, topicListIntro);
@@ -1097,20 +1124,16 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadClassroomImageButton);
     await this.clickOn(saveClassroomButton);
+
+    showMessage(`Updated ${name} classroom.`);
   }
 
   /**
    * Function for adding a topic to a classroom
    */
-  async addTopicToClassroom(): Promise<void> {
+  async addTopicToClassroom(name: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
-    await this.editClassroom();
-
-    await this.page.waitForTimeout(1000);
-
-    await this.page.evaluate(() => {
-      window.scrollTo(0, 350);
-    });
+    await this.editClassroom(name);
 
     await this.clickOn(openTopicDropdownButton);
     await this.clickOn(topicDropDownFormFeild);
@@ -1122,15 +1145,10 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for publishing a classroom.
    */
-  async publishClassroom(): Promise<void> {
+  async publishClassroom(name: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
-    await this.editClassroom();
+    await this.editClassroom(name);
 
-    await this.page.waitForTimeout(1000);
-
-    await this.page.evaluate(() => {
-      window.scrollTo(0, 350);
-    });
     await this.clickOn(publishClassroomButton);
   }
 }

@@ -66,12 +66,13 @@ describe('Curriculum Admin', function () {
       await curriculumAdmin.navigateToClassroomAdminPage();
       await curriculumAdmin.createNewClassroom('Math', 'math');
       await curriculumAdmin.updateClassroom(
+        'Math',
         'Teaser text',
         'Course details',
         'Topic list intro'
       );
-      await curriculumAdmin.addTopicToClassroom();
-      await curriculumAdmin.publishClassroom();
+      await curriculumAdmin.addTopicToClassroom('Math');
+      await curriculumAdmin.publishClassroom('Math');
 
       await loggedOutUser.navigateToClassroomPage('math');
       await loggedOutUser.validateCurrentClassroomPage('Math');
