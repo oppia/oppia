@@ -16,15 +16,55 @@
  * @fileoverview Auth guard for Subtopic viewer page.
  */
 
+import {Location} from '@angular/common';
 import {Injectable} from '@angular/core';
-import {CanActivate} from '@angular/router';
+import {
+  ActivatedRouteSnapshot,
+  CanActivate,
+  Router,
+  RouterStateSnapshot,
+} from '@angular/router';
+import {AppConstants} from 'app.constants';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SubtopicViewerAuthGuard implements CanActivate {
-  async canActivate(): Promise<boolean> {
-    // Return true as all users can access the Subtopic Viewer Page.
-    return true;
+  constructor(
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
+    private urlService: UrlService,
+    private router: Router,
+    private location: Location
+  ) {}
+
+  async canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Promise<boolean> {
+    return new Promise<boolean>(() => {
+      this.accessValidationBackendApiService
+        .validateAccessToSubtopicViewerPage(
+          this.urlService.getClassroomUrlFragmentFromLearnerUrl(),
+          this.urlService.getTopicUrlFragmentFromLearnerUrl(),
+          this.urlService.getSubtopicUrlFragmentFromLearnerUrl()
+        )
+        .then(
+          () => {
+            return true;
+          },
+          () => {
+            this.router
+              .navigate([
+                `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
+              ])
+              .then(() => {
+                this.location.replaceState(state.url);
+              });
+            return false;
+          }
+        );
+    });
   }
 }

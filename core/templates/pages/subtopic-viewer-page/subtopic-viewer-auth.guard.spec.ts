@@ -20,19 +20,84 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 
 import {SubtopicViewerAuthGuard} from './subtopic-viewer-auth.guard';
+import {AccessValidationBackendApiService} from '../../pages/oppia-root/routing/access-validation-backend-api.service';
+import {UrlService} from '../../services/contextual/url.service';
+import {
+  ActivatedRouteSnapshot,
+  NavigationExtras,
+  Router,
+  RouterStateSnapshot,
+} from '@angular/router';
+import {AppConstants} from '../../app.constants';
+
+class MockRouter {
+  navigate(commands: string[], extras?: NavigationExtras): Promise<boolean> {
+    return Promise.resolve(true);
+  }
+}
 
 describe('SubtopicViewerAuthGuard', () => {
   let guard: SubtopicViewerAuthGuard;
+  let urlService: UrlService;
+  let accessValidationBackendApiService: AccessValidationBackendApiService;
+  let router: Router;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [UrlService, {provide: Router, useClass: MockRouter}],
     }).compileComponents();
 
     guard = TestBed.inject(SubtopicViewerAuthGuard);
+    urlService = TestBed.inject(UrlService);
+    accessValidationBackendApiService = TestBed.inject(
+      AccessValidationBackendApiService
+    );
+    router = TestBed.inject(Router);
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'classroomUrlFrag'
+    );
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topicUrlFrag'
+    );
+    spyOn(urlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'subtopicUrlFrag'
+    );
   });
 
-  it('should allow users to access the subtopic viewer page', async () => {
-    expect(await guard.canActivate()).toBeTrue();
+  it('should allow users to access the subtopic viewer page', done => {
+    let avbasSpy = spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToSubtopicViewerPage'
+    ).and.returnValue(Promise.resolve());
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then(canActivate => {
+        expect(canActivate).toBeTrue();
+        expect(avbasSpy).toHaveBeenCalledTimes(1);
+        expect(navigateSpy).not.toHaveBeenCalled();
+        done();
+      });
+  });
+
+  it('should redirect users to 401 page if they are not allowed to view the subtopic viewer page', done => {
+    let avbasSpy = spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToSubtopicViewerPage'
+    ).and.returnValue(Promise.reject());
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then(canActivate => {
+        expect(canActivate).toBeFalse();
+        expect(avbasSpy).toHaveBeenCalledTimes(1);
+        expect(navigateSpy).toHaveBeenCalledWith([
+          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
+        ]);
+        done();
+      });
   });
 });
