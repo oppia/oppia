@@ -27,6 +27,7 @@
             [New Classroom]
           </span>
           <button mat-button matSuffix mat-icon-button
+                  class="e2e-test-delete-classroom-button"
                   aria-label="Clear"
                   *ngIf="!classroomEditorMode"
                   (click)="deleteClassroom(classroom.key); $event.stopPropagation()">

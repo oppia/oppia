@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for classroom creation by curriculum admin
+ * @fileoverview Acceptance Test for Creating, Updating, Publishing, and Deleting a Classroom by a Curriculum Admin.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -61,10 +61,12 @@ describe('Curriculum Admin', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should create and publish a classroom.',
+    'should create, publish and delete a classroom and then delete it.',
     async function () {
       await curriculumAdmin.navigateToClassroomAdminPage();
+      await curriculumAdmin.expectNumberOfClassroomsToBe(0);
       await curriculumAdmin.createNewClassroom('Math', 'math');
+      await curriculumAdmin.expectNumberOfClassroomsToBe(1);
       await curriculumAdmin.updateClassroom(
         'Math',
         'Teaser text',
@@ -73,9 +75,16 @@ describe('Curriculum Admin', function () {
       );
       await curriculumAdmin.addTopicToClassroom('Math');
       await curriculumAdmin.publishClassroom('Math');
+      await curriculumAdmin.expectNumberOfTopicsInTopicDependencyGraphToBe(
+        'Math',
+        1
+      );
 
       await loggedOutUser.navigateToClassroomPage('math');
       await loggedOutUser.validateCurrentClassroomPage('Math');
+
+      await curriculumAdmin.deleteClassroom('Math');
+      await curriculumAdmin.expectNumberOfClassroomsToBe(0);
     },
 
     DEFAULT_SPEC_TIMEOUT_MSECS

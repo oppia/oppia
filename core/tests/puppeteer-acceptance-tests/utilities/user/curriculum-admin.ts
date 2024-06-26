@@ -178,6 +178,13 @@ const topicSelector = '.e2e-test-classroom-topic-selector-choice';
 const publishClassroomButton = '.e2e-test-publish-classroom-btn';
 const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const classroomTileNameSpan = '.e2e-test-classroom-tile-name';
+const deleteClassroomButton = '.e2e-test-delete-classroom-button';
+const deleteClassroomModal = '.e2e-test-delete-classroom-modal';
+const confirmDeleteClassroomButton = '.e2e-test-confirm-delete-classroom';
+const viewTopicGraphButton = 'button.view-graph-button';
+const topicDependencyGraphDiv = '.e2e-test-topic-dependency-graph-container';
+const topicNode = '.e2e-test-topic-node';
+const closeTopicDependencyButton = '.e2e-test-close-topic-dependency-modal';
 
 export class CurriculumAdmin extends BaseUser {
   /**
@@ -1049,7 +1056,7 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for opening the classroom tile in edit mode.
    */
-  async editClassroom(name: string): Promise<void> {
+  async editClassroom(classroomName: string): Promise<void> {
     const classroomTiles = await this.page.$$(classroomTileSelector);
 
     if (classroomTiles.length === 0) {
@@ -1059,12 +1066,12 @@ export class CurriculumAdmin extends BaseUser {
     let foundClassroom = false;
 
     for (let i = 0; i < classroomTiles.length; i++) {
-      const classroomName = await classroomTiles[i].$eval(
+      const currentClassroomName = await classroomTiles[i].$eval(
         classroomTileNameSpan,
         element => (element as HTMLSpanElement).innerText.trim()
       );
 
-      if (classroomName === name) {
+      if (currentClassroomName === classroomName) {
         await this.clickOn(classroomTileSelector);
         await this.page.waitForSelector(editClassroomConfigButton);
         await this.clickOn(editClassroomConfigButton);
@@ -1076,34 +1083,37 @@ export class CurriculumAdmin extends BaseUser {
     }
 
     if (!foundClassroom) {
-      throw new Error(`${name} classroom do not exists.`);
+      throw new Error(`${classroomName} classroom do not exists.`);
     }
   }
 
   /**
    * Function for creating a new classroom.
    */
-  async createNewClassroom(name: string, urlFragment: string): Promise<void> {
+  async createNewClassroom(
+    classroomName: string,
+    urlFragment: string
+  ): Promise<void> {
     await this.clickOn(createNewClassroomButton);
     await this.page.waitForSelector(createNewClassroomModal);
-    await this.page.type(newClassroomNameInputFeild, name);
+    await this.page.type(newClassroomNameInputFeild, classroomName);
     await this.page.type(newClassroomUrlFragmentInputFeild, urlFragment);
     await this.clickOn(saveNewClassroomButton);
     await this.page.waitForSelector(createNewClassroomModal, {visible: false});
-    showMessage(`Created ${name} classroom.`);
+    showMessage(`Created ${classroomName} classroom.`);
   }
 
   /**
    * Function for updating a classroom.
    */
   async updateClassroom(
-    name: string,
+    classroomName: string,
     teaserText: string,
     courseDetails: string,
     topicListIntro: string
   ): Promise<void> {
     await this.navigateToClassroomAdminPage();
-    await this.editClassroom(name);
+    await this.editClassroom(classroomName);
 
     await this.page.type(editClassroomTeaserTextInputFeild, teaserText);
     await this.page.type(editClassroomTopicListIntroInputFeild, topicListIntro);
@@ -1125,15 +1135,15 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(uploadClassroomImageButton);
     await this.clickOn(saveClassroomButton);
 
-    showMessage(`Updated ${name} classroom.`);
+    showMessage(`Updated ${classroomName} classroom.`);
   }
 
   /**
    * Function for adding a topic to a classroom
    */
-  async addTopicToClassroom(name: string): Promise<void> {
+  async addTopicToClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
-    await this.editClassroom(name);
+    await this.editClassroom(classroomName);
 
     await this.clickOn(openTopicDropdownButton);
     await this.clickOn(topicDropDownFormFeild);
@@ -1143,13 +1153,96 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
+   * Function to check number of classrooms present in classroom-admin page.
+   */
+  async expectNumberOfClassroomsToBe(classroomsCount: number): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    const classroomTiles = await this.page.$$(classroomTileSelector);
+
+    if (classroomTiles.length === classroomsCount) {
+      showMessage(`There are ${classroomsCount} classrooms present.`);
+    } else {
+      throw new Error(
+        `Expected ${classroomTiles.length} classrooms found ${classroomsCount} classrooms.`
+      );
+    }
+  }
+
+  /**
    * Function for publishing a classroom.
    */
-  async publishClassroom(name: string): Promise<void> {
+  async publishClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
-    await this.editClassroom(name);
+    await this.editClassroom(classroomName);
 
     await this.clickOn(publishClassroomButton);
+  }
+
+  /**
+   * Function for deleting a classroom.
+   */
+  async deleteClassroom(classroomName: string): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    const classroomTiles = await this.page.$$(classroomTileSelector);
+
+    if (classroomTiles.length === 0) {
+      throw new Error('No classrooms are present.');
+    }
+
+    let foundClassroom = false;
+
+    for (let i = 0; i < classroomTiles.length; i++) {
+      const currentClassroomName = await classroomTiles[i].$eval(
+        classroomTileNameSpan,
+        element => (element as HTMLSpanElement).innerText.trim()
+      );
+
+      if (currentClassroomName === classroomName) {
+        const classroomTile = classroomTiles[i];
+        await classroomTile.$eval(deleteClassroomButton, element =>
+          (element as HTMLButtonElement).click()
+        );
+        await this.page.waitForSelector(deleteClassroomModal, {visible: true});
+        await this.clickOn(confirmDeleteClassroomButton);
+        await this.page.waitForSelector(deleteClassroomModal, {visible: false});
+
+        showMessage(`Deleted ${classroomName} classroom.`);
+        foundClassroom = true;
+        break;
+      }
+    }
+
+    if (!foundClassroom) {
+      throw new Error(`${classroomName} classroom do not exists.`);
+    }
+  }
+
+  /**
+   * Function for opening topic dependency graph modal.
+   * And checking the number of topics in a classroom.
+   */
+  async expectNumberOfTopicsInTopicDependencyGraphToBe(
+    classroomName: string,
+    numberOfTopics: number
+  ): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    await this.editClassroom(classroomName);
+
+    await this.clickOn(viewTopicGraphButton);
+    await this.page.waitForSelector(topicDependencyGraphDiv);
+
+    const topicNodes = await this.page.$$(topicNode);
+
+    if (topicNodes.length === numberOfTopics) {
+      showMessage(`The ${classroomName} has ${numberOfTopics} topics.`);
+    } else {
+      throw new Error(
+        `${classroomName} have ${topicNodes.length} topics, expected ${numberOfTopics} topics.`
+      );
+    }
+
+    await this.clickOn(closeTopicDependencyButton);
+    await this.page.waitForSelector(topicDependencyGraphDiv, {visible: false});
   }
 }
 
