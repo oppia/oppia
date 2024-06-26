@@ -186,6 +186,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     modalRef.result.then(result => {
       if (result) {
         this.contentTranslations[languageCode].translation = result;
+        this.languageIsCheckedStatusDict[languageCode] = true;
       }
     });
   }
