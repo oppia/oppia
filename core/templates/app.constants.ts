@@ -193,6 +193,7 @@ export const AppConstants = {
     STORY: 'story',
     QUESTION: 'question',
     BLOG_POST: 'blog_post',
+    CLASSROOM: 'classroom',
   },
 
   AUDIO_UPLOAD_URL_TEMPLATE: '/createhandler/audioupload/<exploration_id>',
@@ -244,4 +245,6 @@ export const AppConstants = {
     SUFFIX: '&_x_tr_hl=en-US&_x_tr_pto=wapp',
   },
   VOLUNTEER_FORM_LINK: 'https://forms.gle/rhFYoLLSFr3JEZHy8',
+  IMPACT_REPORT_LINK:
+    'https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view',
 } as const;
