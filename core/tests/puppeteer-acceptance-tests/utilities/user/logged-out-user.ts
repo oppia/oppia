@@ -236,6 +236,7 @@ const googleGroupSignUpLinkInTermsPage =
 const emailLinkSelector = '.oppia-contact-mail';
 
 const mobileDonateButtonOnDonatePage = '.donate-modal-button';
+const donateModalIframeSelector = '.e2e-test-donate-page-iframe';
 
 export class LoggedOutUser extends BaseUser {
   /**
@@ -2121,7 +2122,7 @@ export class LoggedOutUser extends BaseUser {
         await donateButton?.click();
 
         await this.page.waitForFunction(
-          'document.querySelectorAll(".e2e-test-donate-page-iframe").length === 2'
+          `document.querySelectorAll("${donateModalIframeSelector}").length === 2`
         );
       } catch (error) {
         const newError = new Error(
