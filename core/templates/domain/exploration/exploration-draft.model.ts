@@ -31,6 +31,7 @@ export type ExplorationChange =
   | ExplorationChangeAddState
   | ExplorationChangeAddWrittenTranslation
   | ExplorationChangeMarkTranslationsNeedsUpdate
+  | ExplorationChangeMarkTranslationNeedsUpdateForLanguage
   | ExplorationChangeEditTranslation
   | ExplorationChangeEditVoiceovers
   | ExplorationChangeRemoveTranslations
@@ -44,6 +45,7 @@ export type ExplorationChange =
 
 export type ExplorationTranslationChange =
   | ExplorationChangeMarkTranslationsNeedsUpdate
+  | ExplorationChangeMarkTranslationNeedsUpdateForLanguage
   | ExplorationChangeEditTranslation
   | ExplorationChangeRemoveTranslations;
 
@@ -130,6 +132,12 @@ export interface ExplorationChangeAddWrittenTranslation {
 export interface ExplorationChangeMarkTranslationsNeedsUpdate {
   cmd: 'mark_translations_needs_update';
   content_id: string;
+}
+
+export interface ExplorationChangeMarkTranslationNeedsUpdateForLanguage {
+  cmd: 'mark_translation_needs_update_for_language';
+  content_id: string;
+  language_code: string;
 }
 
 export interface ExplorationChangeEditTranslation {
