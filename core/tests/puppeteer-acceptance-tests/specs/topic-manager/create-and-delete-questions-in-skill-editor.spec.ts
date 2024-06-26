@@ -25,7 +25,7 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Topic Manager User Journey', function () {
-  let topicManager: TopicManager;
+  let topicManager: TopicManager & CurriculumAdmin;
   let curriculumAdmin: CurriculumAdmin;
 
   beforeAll(async function () {
@@ -36,7 +36,8 @@ describe('Topic Manager User Journey', function () {
     );
 
     curriculumAdmin.createTopic('Addition', 'add');
-    curriculumAdmin.createSkillForTopic('Skill Name', 'Addition');
+    curriculumAdmin.createSkillForTopic('Skill 1', 'Addition');
+    curriculumAdmin.createSkillForTopic('skill 2', 'Addition');
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
@@ -50,17 +51,24 @@ describe('Topic Manager User Journey', function () {
     'should be able to open question editor, edit a question, manage skill associations, create and delete questions, and preview a question.',
     async function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.openQuestionEditorForSkill('Skill Name');
-      await topicManager.editQuestion('Question Text', 'Image Path');
-      await topicManager.associateSkillWithQuestion('Skill Name');
-      await topicManager.disassociateSkillFromQuestion('Skill Name');
-      await topicManager.createQuestionForSkill(
-        'Question Text',
-        'Skill Name',
-        'Misconception Name'
+      await topicManager.openSkillEditor('Skill Name');
+      await topicManager.navigateToQuestionEditorTab('Skill Name');
+
+      await topicManager.createQuestionsForSkill('Skill Name', 1);
+      await topicManager.expectTooltipSuccessMessage(
+        'Question created successfully.'
       );
-      await topicManager.deleteQuestion('Question Text');
+
+      await topicManager.navigateToPreviewTab();
       await topicManager.previewQuestion('Question Text');
+      await topicManager.expectPreviewQuestionText('Question Text');
+      await topicManager.expectPreviewInteractionType('Multiple Choice');
+
+      await topicManager.navigateToQuestionEditorTab('Skill Name');
+      await topicManager.deleteQuestion('Question Text');
+      await topicManager.expectTooltipSuccessMessage(
+        'Question deleted successfully.'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

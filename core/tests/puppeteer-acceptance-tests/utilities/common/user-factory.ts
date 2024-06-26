@@ -28,7 +28,10 @@ import {
   ExplorationEditorFactory,
   ExplorationEditor,
 } from '../user/exploration-editor';
-import {CurriculumAdminFactory} from '../user/curriculum-admin';
+import {
+  CurriculumAdmin,
+  CurriculumAdminFactory,
+} from '../user/curriculum-admin';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 import {LoggedInUserFactory, LoggedInUser} from '../user/logged-in-user';
 import {ModeratorFactory} from '../user/moderator';
@@ -160,6 +163,7 @@ export class UserFactory {
       LoggedInUser &
       ExplorationEditor &
       TopicManager &
+      CurriculumAdmin &
       MultipleRoleIntersection<TRoles>
   > {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
@@ -167,6 +171,7 @@ export class UserFactory {
       LoggedInUserFactory(),
       ExplorationEditorFactory(),
       TopicManagerFactory(),
+      CurriculumAdminFactory(),
     ]);
 
     await user.openBrowser();
