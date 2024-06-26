@@ -74,6 +74,7 @@ const volunteerFormShortUrl = testConstants.URLs.VolunteerFormShortUrl;
 const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
+const classroomsPage = testConstants.URLs.ClassroomsPage;
 
 const allowedVolunteerFormUrls = [
   volunteerFormUrl,
@@ -333,6 +334,13 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToContactUsPage(): Promise<void> {
     await this.goto(contactUrl);
+  }
+
+  /**
+   * Function to navigate to the classroom page.
+   */
+  async navigateToClassroomPage(urlFragment: string): Promise<void> {
+    await this.goto(`${classroomsPage}/${urlFragment}`);
   }
 
   /**
@@ -2044,6 +2052,24 @@ export class LoggedOutUser extends BaseUser {
       throw new Error('The donor box is not visible on the about page.');
     } else {
       showMessage('The donor box is visible on the about page.');
+    }
+  }
+
+  /**
+   * This function checks that user is on correct classroom page.
+   */
+  async validateCurrentClassroomPage(classroomName: string): Promise<void> {
+    await this.page.waitForSelector('.classroom-name');
+
+    const buttonText = await this.page.$eval(
+      '.classroom-name',
+      element => (element as HTMLHeadElement).innerText
+    );
+
+    if (buttonText !== classroomName) {
+      throw new Error(`The ${classroomName} is not visible.`);
+    } else {
+      showMessage(`The ${classroomName} is visible.`);
     }
   }
 }

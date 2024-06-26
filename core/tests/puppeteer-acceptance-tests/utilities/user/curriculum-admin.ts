@@ -22,6 +22,8 @@ import {showMessage} from '../common/show-message';
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
+const classroomBannerImgae = testConstants.data.classroomBannerImage;
+const classroomAdminUrl = testConstants.URLs.ClassroomAdmin;
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const baseURL = testConstants.URLs.BaseURL;
 
@@ -149,6 +151,32 @@ const mobileOptionsDropdown = '.e2e-test-mobile-options-dropdown';
 const mobileSettingsButton = 'li.e2e-test-mobile-settings-button';
 const explorationControlsSettingsDropdown =
   'h3.e2e-test-controls-bar-settings-container';
+
+const createNewClassroomModal = '.e2e-test-create-new-classroom-modal';
+const createNewClassroomButton = '.e2e-test-add-new-classroom-config';
+const newClassroomNameInputFeild = '.e2e-test-new-classroom-name';
+const newClassroomUrlFragmentInputFeild =
+  '.e2e-test-new-classroom-url-fragment';
+const saveNewClassroomButton = '.e2e-test-create-new-classroom';
+const classroomTileSelector = '.e2e-test-classroom-tile';
+
+const editClassroomConfigButton = '.e2e-test-edit-classroom-config-button';
+const closeClassroomConfigButton = '.e2e-cancel-classroom-changes';
+const editClassroomCourseDetailsInputFeild =
+  '.e2e-test-update-classroom-course-details';
+const editClassroomTeaserTextInputFeild =
+  '.e2e-test-update-classroom-teaser-text';
+const editClassroomTopicListIntroInputFeild =
+  '.e2e-test-update-classroom-topic-list-intro';
+const classroomThumbnailContainer = '.e2e-test-classroom-thumbnail-container';
+const classroomBannerContainer = '.e2e-test-classroom-banner-container';
+const uploadClassroomImageButton = '.e2e-test-photo-upload-submit';
+const imageUploaderModal = '.e2e-test-thumbnail-editor';
+const openTopicDropdownButton = '.e2e-test-add-topic-to-classroom-button';
+const topicDropDownFormFeild = '.e2e-test-classroom-category-dropdown';
+const topicSelector = '.e2e-test-classroom-topic-selector-choice';
+const publishClassroomButton = '.e2e-test-publish-classroom-btn';
+const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 
 export class CurriculumAdmin extends BaseUser {
   /**
@@ -1008,6 +1036,102 @@ export class CurriculumAdmin extends BaseUser {
         error.stack
       );
     }
+  }
+
+  /**
+   * Function for navigating to the classroom admin page.
+   */
+  async navigateToClassroomAdminPage(): Promise<void> {
+    await this.goto(classroomAdminUrl);
+  }
+
+  /**
+   * Function for opening the classroom tile in edit mode.
+   */
+  async editClassroom(): Promise<void> {
+    await this.clickOn(classroomTileSelector);
+    await this.page.waitForSelector(editClassroomConfigButton);
+    await this.clickOn(editClassroomConfigButton);
+    await this.page.waitForSelector(closeClassroomConfigButton);
+  }
+
+  /**
+   * Function for creating a new classroom.
+   */
+  async createNewClassroom(name: string, urlFragment: string): Promise<void> {
+    await this.clickOn(createNewClassroomButton);
+    await this.page.waitForSelector(createNewClassroomModal);
+    await this.page.type(newClassroomNameInputFeild, name);
+    await this.page.type(newClassroomUrlFragmentInputFeild, urlFragment);
+    await this.clickOn(saveNewClassroomButton);
+    await this.page.waitForSelector(createNewClassroomModal, {visible: false});
+    showMessage(`Created ${name} classroom.`);
+  }
+
+  /**
+   * Function for updating a classroom.
+   */
+  async updateClassroom(
+    teaserText: string,
+    courseDetails: string,
+    topicListIntro: string
+  ): Promise<void> {
+    await this.editClassroom();
+
+    await this.page.type(editClassroomTeaserTextInputFeild, teaserText);
+    await this.page.type(editClassroomTopicListIntroInputFeild, topicListIntro);
+    await this.page.type(editClassroomCourseDetailsInputFeild, courseDetails);
+
+    await this.clickOn(classroomThumbnailContainer);
+    await this.page.waitForSelector(imageUploaderModal, {visible: true});
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadClassroomImageButton);
+    await this.page.waitForSelector(imageUploaderModal, {visible: false});
+
+    await this.page.waitForTimeout(1000);
+
+    await this.clickOn(classroomBannerContainer);
+    await this.page.waitForSelector(imageUploaderModal, {visible: true});
+    await this.uploadFile(classroomBannerImgae);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadClassroomImageButton);
+    await this.clickOn(saveClassroomButton);
+  }
+
+  /**
+   * Function for adding a topic to a classroom
+   */
+  async addTopicToClassroom(): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    await this.editClassroom();
+
+    await this.page.waitForTimeout(1000);
+
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 350);
+    });
+
+    await this.clickOn(openTopicDropdownButton);
+    await this.clickOn(topicDropDownFormFeild);
+    await this.clickOn(topicSelector);
+    await this.page.waitForSelector(openTopicDropdownButton);
+    await this.clickOn(saveClassroomButton);
+  }
+
+  /**
+   * Function for publishing a classroom.
+   */
+  async publishClassroom(): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    await this.editClassroom();
+
+    await this.page.waitForTimeout(1000);
+
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 350);
+    });
+    await this.clickOn(publishClassroomButton);
   }
 }
 
