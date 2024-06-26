@@ -81,6 +81,9 @@ class MockPlatformFeatureService {
       EnableVoiceoverContribution: {
         isEnabled: true,
       },
+      AddVoiceoverWithAccent: {
+        isEnabled: false,
+      },
     };
   }
 }
@@ -438,6 +441,28 @@ describe('State translation component', () => {
         } as FeatureStatusChecker);
 
         expect(component.isVoiceoverContributionEnabled()).toBeTrue();
+      });
+
+      it('should disable voiceover with accent feature flag data', () => {
+        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+          AddVoiceoverWithAccent: {
+            isEnabled: false,
+          },
+        } as FeatureStatusChecker);
+
+        expect(
+          component.isVoiceoverContributionWithAccentEnabled()
+        ).toBeFalse();
+      });
+
+      it('should enable voiceover with accent feature flag data', () => {
+        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+          AddVoiceoverWithAccent: {
+            isEnabled: true,
+          },
+        } as FeatureStatusChecker);
+
+        expect(component.isVoiceoverContributionWithAccentEnabled()).toBeTrue();
       });
 
       it(
@@ -1634,7 +1659,7 @@ describe('State translation component', () => {
 
   it('should update correct translation with updateTranslatedContent', () => {
     component.activeTranslatedContent = new TranslatedContent();
-    entityTranslationsService.languageCodeToEntityTranslations.en =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_0: new TranslatedContent('Translated HTML', 'html', true),
       });
@@ -1721,7 +1746,7 @@ describe('State translation component', () => {
   });
 
   it('should return translation html when translation available', () => {
-    entityTranslationsService.languageCodeToEntityTranslations.en =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_0: new TranslatedContent('Translated HTML', 'html', true),
       });
@@ -1734,7 +1759,7 @@ describe('State translation component', () => {
   });
 
   it('should return unicode when translation is empty in voiceover mode', () => {
-    entityTranslationsService.languageCodeToEntityTranslations.en =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_0: new TranslatedContent('Translated unicode', 'unicode', true),
       });
@@ -1747,7 +1772,7 @@ describe('State translation component', () => {
   });
 
   it('should return translation html when translation no available', () => {
-    entityTranslationsService.languageCodeToEntityTranslations.en =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_1: new TranslatedContent('Translated HTML', 'html', true),
       });
@@ -1760,7 +1785,7 @@ describe('State translation component', () => {
   });
 
   it('should return translated unicode in voiceover mode when translation exist', () => {
-    entityTranslationsService.languageCodeToEntityTranslations.en =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_1: new TranslatedContent('Translated UNICODE', 'unicode', true),
       });

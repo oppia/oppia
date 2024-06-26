@@ -181,16 +181,19 @@ _EDITOR_ROLE_EMAIL_HTML_RIGHTS: Dict[str, str] = {
 # We don't include "can_voiceover" for managers and editors, since this is
 # implied by the email description for "can_edit".
 EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE: Dict[str, str] = {
-    EXPLORATION_ROLE_MANAGER: (
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_manage'] +
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
-    EXPLORATION_ROLE_EDITOR: (
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
-    EXPLORATION_ROLE_VOICE_ARTIST: (
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_voiceover'] +
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
+    EXPLORATION_ROLE_MANAGER: ('%s%s%s' % (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_manage'],
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'],
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play'])
+    ),
+    EXPLORATION_ROLE_EDITOR: ('%s%s' % (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'],
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play'])
+    ),
+    EXPLORATION_ROLE_VOICE_ARTIST: ('%s%s' % (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_voiceover'],
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play'])
+    ),
     EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
 }
 
@@ -242,13 +245,11 @@ CURRICULUM_ADMIN_CHAPTER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
     ),
     'upcoming_chapters_template': (
         'The following stories have unpublished chapters which are due for '
-        'publication in the next ' +
-        str(constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS)
-        + ' days. Please ensure they are published '
+        'publication in the next %s days. Please ensure they are published '
         'on or before the planned date or adjust the planned publication date.'
         '<br><br>'
-        '<ol>%s</ol>'
-    ),
+        '<ol>%%s</ol>'
+    ) % constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS,
     'email_subject': 'Chapter Publication Notifications'
 }
 
@@ -771,7 +772,7 @@ def send_post_signup_email(
     """Sends a post-signup email to the given user.
 
     Raises an exception if emails are not allowed to be sent to users (i.e.
-    feconf.CAN_SEND_EMAILS is False).
+    SERVER_CAN_SEND_EMAILS platform parameter is False).
 
     Args:
         user_id: str. User ID of the user that signed up.
@@ -851,18 +852,18 @@ def require_moderator_email_prereqs_are_satisfied() -> None:
     """Raises an exception if, for any reason, moderator emails cannot be sent.
 
     Raises:
-        ValidationError. The feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION is False.
-        ValidationError. The feconf.CAN_SEND_EMAILS is False.
+        ValidationError. The SERVER_CAN_SEND_EMAILS platform parameter is False.
     """
 
-    if not feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         raise utils.ValidationError(
             'For moderator emails to be sent, please ensure that '
-            'REQUIRE_EMAIL_ON_MODERATOR_ACTION is set to True.')
-    if not feconf.CAN_SEND_EMAILS:
-        raise utils.ValidationError(
-            'For moderator emails to be sent, please ensure that '
-            'CAN_SEND_EMAILS is set to True.')
+            'SERVER_CAN_SEND_EMAILS is set to True.')
 
 
 def send_moderator_action_email(
@@ -876,7 +877,7 @@ def send_moderator_action_email(
     delete) to the given user.
 
     Raises an exception if emails are not allowed to be sent to users (i.e.
-    feconf.CAN_SEND_EMAILS is False).
+    SERVER_CAN_SEND_EMAILS platform parameter is False).
 
     Args:
         sender_id: str. User ID of the sender.
@@ -971,12 +972,17 @@ def send_role_notification_email(
         '<br>%s')
 
     # Return from here if sending email is turned off.
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
     # Return from here is sending editor role email is disabled.
-    if not feconf.CAN_SEND_EDITOR_ROLE_EMAILS:
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send editor role emails to users.')
         return
 
@@ -1039,11 +1045,16 @@ def send_emails_to_subscribers(
         '- The Oppia Team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
-    if not feconf.CAN_SEND_SUBSCRIPTION_EMAILS:
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send subscription emails to users.')
         return
 
@@ -1102,11 +1113,16 @@ def send_feedback_message_email(
         'The Oppia Team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
-    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send feedback message emails to users.')
         return
 
@@ -1214,11 +1230,16 @@ def send_suggestion_email(
         '- The Oppia Team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
-    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send feedback message emails to users.')
         return
 
@@ -1274,11 +1295,16 @@ def send_instant_feedback_message_email(
         'The Oppia team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
-    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send feedback message emails to users.')
         return
 
@@ -1326,7 +1352,12 @@ def send_flag_exploration_email(
         '- The Oppia Team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -1507,7 +1538,12 @@ def send_mail_to_onboard_new_reviewers(
         '- The Oppia Team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -1553,7 +1589,12 @@ def send_mail_to_notify_users_to_review(
         '- The Oppia Team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -1661,7 +1702,12 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
             content and review submission date. The objects are sorted in
             descending order based on review wait time.
     """
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -1784,7 +1830,12 @@ def send_reviewer_notifications(
         reviewer_ids_by_language: dict. A dictionary that organizes reviewer
             IDs by language code.
     """
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -1799,14 +1850,14 @@ def send_reviewer_notifications(
         email_subject = 'Contributor Dashboard New Reviewer Opportunities'
         email_body_template = (
             'Hi %s,<br><br>'
-            'There are new <a href="%s%s">opportunities</a>' +
-            ' to review translations that we think you might be interested' +
-            ' in on the Contributor Dashboard page. Here are some examples' +
-            ' of contributions that are waiting for review:<br><br>' +
-            'The following suggestions are available for review: ' +
-            '<br><br><ul>%s</ul><br>Please take some time to review any ' +
-            'of the above contributions (if they still need a review)' +
-            ' or any other contributions on the dashboard.' +
+            'There are new <a href="%s%s">opportunities</a>'
+            ' to review translations that we think you might be interested'
+            ' in on the Contributor Dashboard page. Here are some examples'
+            ' of contributions that are waiting for review:<br><br>'
+            'The following suggestions are available for review: '
+            '<br><br><ul>%s</ul><br>Please take some time to review any '
+            'of the above contributions (if they still need a review)'
+            ' or any other contributions on the dashboard.'
             ' We appreciate your help!<br><br>Thanks again, '
             'and happy reviewing!<br><br>The Oppia Contributor Dashboard Team'
         )
@@ -1861,7 +1912,12 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             would be a set of language codes that translations are offered in
             that need more reviewers.
     """
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -2009,7 +2065,12 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA[
             'email_body_template'])
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -2084,7 +2145,12 @@ def send_mail_to_notify_contributor_ranking_achievement(
             ContributorMilestoneEmailInfo. An object with contributor ranking
             email information.
     """
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -2143,7 +2209,12 @@ def send_reminder_mail_to_notify_curriculum_admins(
             of stories having behind-schedule or upcoming chapters to be
             notified.
     """
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
     if len(curriculum_admin_ids) == 0:
@@ -2164,10 +2235,11 @@ def send_reminder_mail_to_notify_curriculum_admins(
         if len(overdue_story.overdue_chapters) == 0:
             continue
         chapters_are_overdue = True
-        story_link = (
-            str(feconf.OPPIA_SITE_URL) +
-            str(feconf.STORY_EDITOR_URL_PREFIX) +
-            '/' + overdue_story.id)
+        story_link = ('%s%s/%s' % (
+            str(feconf.OPPIA_SITE_URL),
+            str(feconf.STORY_EDITOR_URL_PREFIX),
+            overdue_story.id
+        ))
         story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
             overdue_story.story_name, overdue_story.topic_name,
             story_link)
@@ -2185,10 +2257,11 @@ def send_reminder_mail_to_notify_curriculum_admins(
         if len(upcoming_story.upcoming_chapters) == 0:
             continue
         chapters_are_upcoming = True
-        story_link = (
-            str(feconf.OPPIA_SITE_URL) +
-            str(feconf.STORY_EDITOR_URL_PREFIX) +
-            '/' + upcoming_story.id)
+        story_link = ('%s%s/%s' % (
+            str(feconf.OPPIA_SITE_URL),
+            str(feconf.STORY_EDITOR_URL_PREFIX),
+            upcoming_story.id
+        ))
         story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
             upcoming_story.story_name, upcoming_story.topic_name,
             story_link)
@@ -2226,7 +2299,12 @@ def send_account_deleted_email(user_id: str, user_email: str) -> None:
         'Your account was successfully deleted.<br><br>'
         '- The Oppia Team')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -2265,14 +2343,14 @@ def send_email_to_new_cd_user(
 
     Args:
         recipient_id: str. The ID of the user.
-        category: str. The category in which user can review or submit 
+        category: str. The category in which user can review or submit
             contributions.
-        language_code: None|str. The language code for a language if 
+        language_code: None|str. The language code for a language if
             the category is 'translation' else None.
 
     Raises:
         Exception. The contribution category is not valid.
-        Exception. The language_code cannot be None if the 
+        Exception. The language_code cannot be None if the
             category is 'translation'.
     """
     if category not in NEW_CD_USER_EMAIL_DATA:
@@ -2305,7 +2383,12 @@ def send_email_to_new_cd_user(
         rights_message = (
             category_data['rights_message'])
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -2363,12 +2446,12 @@ def send_email_to_removed_cd_user(
     category: str,
     language_code: Optional[str] = None
 ) -> None:
-    """Sends an email to user who is removed from a specific 
+    """Sends an email to user who is removed from a specific
         contributor position.
 
     Args:
         user_id: str. The ID of the user.
-        category: str. The category in which user can no longer review or 
+        category: str. The category in which user can no longer review or
             submit contributions.
         language_code: None|str. The language code for a language if the review
             item is translation else None.
@@ -2417,7 +2500,12 @@ def send_email_to_removed_cd_user(
         'Best wishes,<br>'
         'The Oppia Community')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -2469,7 +2557,12 @@ def send_not_mergeable_change_list_to_admin_for_review(
         'Backend Version: %s<br><br>'
         'Thanks!')
 
-    if feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if server_can_send_emails:
         email_body = email_body_template % (
             exp_id, change_list_dict, frontend_version, backend_version)
         send_mail_to_admin(email_subject, email_body)

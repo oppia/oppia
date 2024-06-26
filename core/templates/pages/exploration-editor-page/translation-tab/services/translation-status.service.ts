@@ -31,6 +31,8 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
 interface AvailabilityStatus {
   available: boolean;
@@ -63,7 +65,9 @@ export class TranslationStatusService implements OnInit {
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
     private entityTranslationsService: EntityTranslationsService,
-    private stateEditorService: StateEditorService
+    private stateEditorService: StateEditorService,
+    private platformFeatureService: PlatformFeatureService,
+    private entityVoiceoversService: EntityVoiceoversService
   ) {}
 
   ngOnInit(): void {
@@ -97,6 +101,29 @@ export class TranslationStatusService implements OnInit {
     return availabilityStatus;
   }
 
+  _getEntityVoiceoverStatus(contentId: string): AvailabilityStatus {
+    let availabilityStatus = {
+      available: false,
+      needsUpdate: false,
+    };
+    let entityVoiceovers =
+      this.entityVoiceoversService.getActiveEntityVoiceovers();
+
+    if (entityVoiceovers === undefined) {
+      return availabilityStatus;
+    }
+
+    let voiceover = entityVoiceovers.getManualVoiceover(contentId);
+
+    if (voiceover === undefined) {
+      return availabilityStatus;
+    }
+    availabilityStatus.available = true;
+    availabilityStatus.needsUpdate = voiceover.needsUpdate;
+
+    return availabilityStatus;
+  }
+
   _getTranslationStatus(contentId: string): AvailabilityStatus {
     let availabilityStatus = {
       available: false,
@@ -124,6 +151,9 @@ export class TranslationStatusService implements OnInit {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return this._getTranslationStatus(contentId);
     } else {
+      if (this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled) {
+        return this._getEntityVoiceoverStatus(contentId);
+      }
       this.langCode = this.translationLanguageService.getActiveLanguageCode();
       let recordedVoiceovers =
         this.explorationStatesService.getRecordedVoiceoversMemento(stateName);
@@ -137,6 +167,9 @@ export class TranslationStatusService implements OnInit {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return this._getTranslationStatus(contentId);
     } else {
+      if (this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled) {
+        return this._getEntityVoiceoverStatus(contentId);
+      }
       let recordedVoiceovers = this.stateRecordedVoiceoversService.displayed;
       return this._getVoiceOverStatus(recordedVoiceovers, contentId);
     }
@@ -157,6 +190,7 @@ export class TranslationStatusService implements OnInit {
         let noVoiceoverCount = 0;
         let recordedVoiceovers =
           this.explorationStatesService.getRecordedVoiceoversMemento(stateName);
+
         let allContentIds = recordedVoiceovers.getAllContentIds();
         let interactionId =
           this.explorationStatesService.getInteractionIdMemento(stateName);
@@ -230,10 +264,31 @@ export class TranslationStatusService implements OnInit {
             }
           }
         });
+
         this.explorationTranslationContentNotAvailableCount +=
           noTranslationCount;
         this.explorationVoiceoverContentNotAvailableCount += noVoiceoverCount;
-        if (noTranslationCount === 0 && !stateNeedsUpdate) {
+
+        let activeEntityVoiceovers =
+          this.entityVoiceoversService.getActiveEntityVoiceovers();
+
+        let voiceoverContentIds: string[] = [];
+        if (activeEntityVoiceovers) {
+          voiceoverContentIds = Object.keys(
+            activeEntityVoiceovers.voiceoversMapping
+          );
+        }
+
+        if (
+          this.translationTabActiveModeService.isVoiceoverModeActive() &&
+          this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled
+        ) {
+          this.stateWiseStatusColor[stateName] =
+            this.getStateGraphColorInVoiceoverMode(
+              allContentIds,
+              voiceoverContentIds
+            );
+        } else if (noTranslationCount === 0 && !stateNeedsUpdate) {
           this.stateWiseStatusColor[stateName] =
             this.ALL_ASSETS_AVAILABLE_COLOR;
         } else if (
@@ -247,6 +302,27 @@ export class TranslationStatusService implements OnInit {
         }
       });
     }
+  }
+
+  getStateGraphColorInVoiceoverMode(
+    stateContentIdsNeedingVoiceover: string[],
+    explorationContentIdsWithVoiceover: string[]
+  ): string {
+    let color = this.NO_ASSETS_AVAILABLE_COLOR;
+    let allContentsHaveVoiceover: boolean = true;
+    for (let contentId of stateContentIdsNeedingVoiceover) {
+      if (explorationContentIdsWithVoiceover.indexOf(contentId) !== -1) {
+        color = this.FEW_ASSETS_AVAILABLE_COLOR;
+      } else {
+        allContentsHaveVoiceover = false;
+      }
+    }
+
+    if (allContentsHaveVoiceover) {
+      color = this.ALL_ASSETS_AVAILABLE_COLOR;
+    }
+
+    return color;
   }
 
   _getContentIdListRelatedToComponent(
@@ -348,7 +424,7 @@ export class TranslationStatusService implements OnInit {
   refresh(): void {
     this.langCode = this.translationLanguageService.getActiveLanguageCode();
     this.entityTranslation =
-      this.entityTranslationsService.languageCodeToEntityTranslations[
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         this.langCode
       ];
     this._computeAllStatesStatus();
