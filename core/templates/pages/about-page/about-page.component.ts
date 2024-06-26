@@ -28,6 +28,7 @@ import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation
 import {ThanksForDonatingModalComponent} from 'pages/donate-page/thanks-for-donating-modal.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TranslateService} from '@ngx-translate/core';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 
@@ -56,17 +57,21 @@ export class AboutPageComponent implements OnInit, OnDestroy {
       panelIsCollapsed: true,
     },
     {
-      title: 'I18N_ABOUT_PAGE_FEATURE_TITLE2',
-      text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT2',
+      title: 'I18N_ABOUT_PAGE_FEATURE_TITLE3',
+      text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT3',
       customPanelClassNames: ['feature-panel'],
       customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
       panelIsCollapsed: true,
     },
     {
-      title: 'I18N_ABOUT_PAGE_FEATURE_TITLE3',
-      text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT3',
-      customPanelClassNames: ['feature-panel'],
-      customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
+      title: 'I18N_ABOUT_PAGE_FEATURE_TITLE4',
+      text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT4',
+      customPanelClassNames: ['feature-panel', 'free-of-cost-panel'],
+      customTitleClassNames: [
+        'feature-title',
+        'oppia-about-platform-subtext',
+        'free-of-cost-title',
+      ],
       panelIsCollapsed: true,
     },
   ];
@@ -173,7 +178,8 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     private windowRef: WindowRef,
     private ngbModal: NgbModal,
     private windowDimensionsService: WindowDimensionsService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   ngOnInit(): void {
@@ -274,6 +280,10 @@ export class AboutPageComponent implements OnInit, OnDestroy {
 
   closePanel(index: number): void {
     this.featuresData[index].panelIsCollapsed = true;
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   ngOnDestroy(): void {
