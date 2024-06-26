@@ -28,7 +28,7 @@ jobs:
             requirements.txt
             requirements_dev.in
             requirements_dev.txt
-      - uses: ./.github/actions/install-third-party-libaries
+      - uses: ./.github/actions/install-oppia-dependencies
       - name: Check test suites to run
         id: check_test_suites_to_run
         run: >
