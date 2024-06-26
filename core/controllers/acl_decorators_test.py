@@ -6396,8 +6396,16 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_skill('skill_1', self.admin_id)
-        self.save_new_topic(topic_id=self.topic_id, owner_id=self.admin_id, uncategorized_skill_ids=['skill_1'])
-        self.save_new_topic(topic_id='other_topic', owner_id=self.admin_id,name="other_topic",abbreviated_name='other_topic', url_fragment='other-topic')
+        self.save_new_topic(
+            topic_id=self.topic_id,
+            owner_id=self.admin_id,
+            uncategorized_skill_ids=['skill_1'])
+        self.save_new_topic(
+            topic_id='other_topic',
+            owner_id=self.admin_id,
+            name='other_topic',
+            abbreviated_name='other_topic',
+            url_fragment='other-topic')
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id, self.owner_id,
@@ -6445,7 +6453,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
                 '/mock_edit_question/%s' % self.question_id)
         self.assertEqual(response['question_id'], self.question_id)
         self.logout()
-    
+
     def test_topic_manager_can_edit_question(self) -> None:
         self.login(self.TOPIC_MANAGER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
