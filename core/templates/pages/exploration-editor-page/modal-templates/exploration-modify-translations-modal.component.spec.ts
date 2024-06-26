@@ -83,7 +83,7 @@ describe('Modify Translations Modal Component', function () {
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     stateEditorService = TestBed.inject(StateEditorService);
 
-    entityTranslationsService.languageCodeToEntityTranslations = {
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {
       hi: EntityTranslation.createFromBackendDict({
         entity_id: 'expId',
         entity_type: 'exploration',
