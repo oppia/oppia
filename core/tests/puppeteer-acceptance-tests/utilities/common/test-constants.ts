@@ -62,6 +62,8 @@ export default {
     Electromagnetism: 'https://www.oppia.org/collection/wqCTKpKA0LBe',
     GetStarted: 'http://localhost:8181/get-started',
     Home: 'http://localhost:8181/',
+    ImpactReportUrl:
+      'https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view',
     LearnerDashboard: 'http://localhost:8181/learner-dashboard',
     Login: 'http://localhost:8181/login',
     Logout: 'http://localhost:8181/logout',
