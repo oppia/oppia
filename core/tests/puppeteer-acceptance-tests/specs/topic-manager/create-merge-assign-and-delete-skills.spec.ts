@@ -1,0 +1,71 @@
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes creating a new skill, assigning and unassigning it to a topic, merging two skills, using filters to select a skill for merging, merging an outside skill with a topic, and deleting a skill.
+ */
+
+import {UserFactory} from '../../utilities/common/user-factory';
+import testConstants from '../../utilities/common/test-constants';
+import {TopicManager} from '../../utilities/user/topic-manager';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const ROLES = testConstants.Roles;
+
+describe('Topic Manager User Journey', function () {
+  let topicManager: TopicManager;
+  let curriculumAdmin: CurriculumAdmin;
+
+  beforeAll(async function () {
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculum_Admin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
+
+    curriculumAdmin.createTopic('Addition', 'add');
+    curriculumAdmin.createSkillInSkillsTab();
+    curriculumAdmin.createSkillInSkillsTab();
+
+    topicManager = await UserFactory.createNewUser(
+      'topicManager',
+      'topic_manager@example.com',
+      [ROLES.TOPIC_MANAGER],
+      'Addition'
+    );
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
+  it(
+    'should be able to assign and unassign a skill to a topic, and merge an outside skill with a topic.',
+    async function () {
+      await topicManager.navigateToTopicAndSkillsDashboardPage();
+      await topicManager.navigateToSkillTab();
+
+      await topicManager.assignSkillToTopic('New Skill', 'Addition');
+      await topicManager.expectSuccessMessage('Skill assigned successfully.');
+
+      await topicManager.unassignSkillFromTopic('New Skill', 'Addition');
+      await topicManager.expectSuccessMessage('Skill unassigned successfully.');
+
+      await topicManager.mergeSkills('Skill 1', 'Skill 2');
+      await topicManager.expectSuccessMessage('Skills merged successfully.');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
+});
