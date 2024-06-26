@@ -25,6 +25,8 @@ import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access
 import {LoaderService} from 'services/loader.service';
 import {PageHeadService} from 'services/page-head.service';
 
+import {Router} from '@angular/router';
+
 @Component({
   selector: 'oppia-preferences-page-root',
   templateUrl: './preferences-page-root.component.html',
@@ -38,7 +40,8 @@ export class PreferencesPageRootComponent implements OnDestroy {
     private accessValidationBackendApiService: AccessValidationBackendApiService,
     private loaderService: LoaderService,
     private pageHeadService: PageHeadService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private router: Router
   ) {}
 
   setPageTitleAndMetaTags(): void {
@@ -65,7 +68,12 @@ export class PreferencesPageRootComponent implements OnDestroy {
           this.pageIsShown = true;
         },
         err => {
-          this.errorPageIsShown = true;
+          this.router.navigate(
+            [`/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.ROUTE}`],
+            {
+              queryParams: {return_url: '/preferences'},
+            }
+          );
         }
       )
       .then(() => {

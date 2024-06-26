@@ -34,6 +34,9 @@ import {PageHeadService} from 'services/page-head.service';
 
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {PreferencesPageRootComponent} from './preferences-page-root.component';
+import {Router} from '@angular/router';
+import {RouterTestingModule} from '@angular/router/testing';
+import {Component} from '@angular/core';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -42,6 +45,9 @@ class MockTranslateService {
   }
 }
 
+@Component({template: ''})
+class MockLoginComponent {}
+
 describe('Preferences Page Root', () => {
   let fixture: ComponentFixture<PreferencesPageRootComponent>;
   let component: PreferencesPageRootComponent;
@@ -49,11 +55,21 @@ describe('Preferences Page Root', () => {
   let pageHeadService: PageHeadService;
   let loaderService: LoaderService;
   let translateService: TranslateService;
+  let router: Router;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      declarations: [PreferencesPageRootComponent, MockTranslatePipe],
+      imports: [
+        HttpClientTestingModule,
+        RouterTestingModule.withRoutes([
+          {path: 'login', component: MockLoginComponent},
+        ]),
+      ],
+      declarations: [
+        PreferencesPageRootComponent,
+        MockTranslatePipe,
+        MockLoginComponent,
+      ],
       providers: [
         PageHeadService,
         {
@@ -74,6 +90,7 @@ describe('Preferences Page Root', () => {
       AccessValidationBackendApiService
     );
     translateService = TestBed.inject(TranslateService);
+    router = TestBed.inject(Router);
   });
 
   it('should successfully instantiate the component', () => {
@@ -100,13 +117,14 @@ describe('Preferences Page Root', () => {
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
 
-  it('should initialize and show error page when server respond with error', fakeAsync(() => {
+  it('should initialize and redirect to login page when server respond with error', fakeAsync(() => {
     spyOn(
       accessValidationBackendApiService,
       'validateCanManageOwnAccount'
     ).and.returnValue(Promise.reject());
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
     component.ngOnInit();
     tick();
@@ -116,7 +134,11 @@ describe('Preferences Page Root', () => {
       accessValidationBackendApiService.validateCanManageOwnAccount
     ).toHaveBeenCalled();
     expect(component.pageIsShown).toBeFalse();
-    expect(component.errorPageIsShown).toBeTrue();
+    expect(component.errorPageIsShown).toBeFalse();
+    expect(navigateSpy).toHaveBeenCalledWith(
+      [`/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.ROUTE}`],
+      {queryParams: {return_url: '/preferences'}}
+    );
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
 
