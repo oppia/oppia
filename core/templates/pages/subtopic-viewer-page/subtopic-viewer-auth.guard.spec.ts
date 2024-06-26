@@ -17,7 +17,7 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {TestBed} from '@angular/core/testing';
+import {TestBed, fakeAsync, tick} from '@angular/core/testing';
 
 import {SubtopicViewerAuthGuard} from './subtopic-viewer-auth.guard';
 import {AccessValidationBackendApiService} from '../../pages/oppia-root/routing/access-validation-backend-api.service';
@@ -65,12 +65,14 @@ describe('SubtopicViewerAuthGuard', () => {
     );
   });
 
-  it('should allow users to access the subtopic viewer page', done => {
+  it('should allow users to access the subtopic viewer page', fakeAsync(done => {
     let avbasSpy = spyOn(
       accessValidationBackendApiService,
       'validateAccessToSubtopicViewerPage'
     ).and.returnValue(Promise.resolve());
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+
+    tick();
 
     guard
       .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
@@ -80,14 +82,16 @@ describe('SubtopicViewerAuthGuard', () => {
         expect(navigateSpy).not.toHaveBeenCalled();
         done();
       });
-  });
+  }));
 
-  it('should redirect users to 401 page if they are not allowed to view the subtopic viewer page', done => {
+  it('should redirect users to 401 page if they are not allowed to view the subtopic viewer page', fakeAsync(done => {
     let avbasSpy = spyOn(
       accessValidationBackendApiService,
       'validateAccessToSubtopicViewerPage'
     ).and.returnValue(Promise.reject());
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+
+    tick();
 
     guard
       .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
@@ -99,5 +103,5 @@ describe('SubtopicViewerAuthGuard', () => {
         ]);
         done();
       });
-  });
+  }));
 });
