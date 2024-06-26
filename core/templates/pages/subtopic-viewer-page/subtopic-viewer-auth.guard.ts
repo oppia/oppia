@@ -43,7 +43,7 @@ export class SubtopicViewerAuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Promise<boolean> {
-    return new Promise<boolean>(() => {
+    return new Promise<boolean>((resolve) => {
       this.accessValidationBackendApiService
         .validateAccessToSubtopicViewerPage(
           this.urlService.getClassroomUrlFragmentFromLearnerUrl(),
@@ -52,19 +52,19 @@ export class SubtopicViewerAuthGuard implements CanActivate {
         )
         .then(
           () => {
-            return true;
-          },
-          () => {
-            this.router
-              .navigate([
-                `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
-              ])
-              .then(() => {
-                this.location.replaceState(state.url);
-              });
-            return false;
+            resolve(true);
           }
-        );
+        )
+        .catch(err => {
+          this.router
+            .navigate([
+              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+            ])
+            .then(() => {
+              resolve(false);
+              this.location.replaceState(state.url);
+            });
+        });
     });
   }
 }

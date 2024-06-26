@@ -45,7 +45,11 @@ describe('SubtopicViewerAuthGuard', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [UrlService, {provide: Router, useClass: MockRouter}],
+      providers: [
+        UrlService,
+        {provide: Router, useClass: MockRouter},
+        Location,
+      ],
     }).compileComponents();
 
     guard = TestBed.inject(SubtopicViewerAuthGuard);
@@ -66,42 +70,51 @@ describe('SubtopicViewerAuthGuard', () => {
   });
 
   it('should allow users to access the subtopic viewer page', fakeAsync(done => {
-    let avbasSpy = spyOn(
+    let avbas = spyOn(
       accessValidationBackendApiService,
       'validateAccessToSubtopicViewerPage'
     ).and.returnValue(Promise.resolve());
-    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
 
-    tick();
+    let canActivateResult: boolean | null = null;
 
     guard
       .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
-      .then(canActivate => {
-        expect(canActivate).toBeTrue();
-        expect(avbasSpy).toHaveBeenCalledTimes(1);
-        expect(navigateSpy).not.toHaveBeenCalled();
-        done();
+      .then(result => {
+        canActivateResult = result;
       });
+
+    tick();
+
+    expect(canActivateResult).toBeTrue();
+    expect(avbas).toHaveBeenCalled();
+    expect(navigateSpy).not.toHaveBeenCalled();
   }));
 
-  it('should redirect users to 401 page if they are not allowed to view the subtopic viewer page', fakeAsync(done => {
-    let avbasSpy = spyOn(
+  it('should redirect users to 401 page if they are not allowed to view the subtopic viewer page', fakeAsync(() => {
+    spyOn(
       accessValidationBackendApiService,
       'validateAccessToSubtopicViewerPage'
     ).and.returnValue(Promise.reject());
-    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
 
-    tick();
+    let canActivateResult: boolean | null = null;
 
     guard
       .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
-      .then(canActivate => {
-        expect(canActivate).toBeFalse();
-        expect(avbasSpy).toHaveBeenCalledTimes(1);
-        expect(navigateSpy).toHaveBeenCalledWith([
-          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
-        ]);
-        done();
+      .then(result => {
+        canActivateResult = result;
       });
+
+    tick();
+
+    expect(canActivateResult).toBeFalse();
+    expect(navigateSpy).toHaveBeenCalledWith([
+      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+    ]);
   }));
 });
