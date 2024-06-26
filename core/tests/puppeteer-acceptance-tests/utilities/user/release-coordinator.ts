@@ -540,6 +540,7 @@ export class ReleaseCoordinator extends BaseUser {
     await this.navigateToReleaseCoordinatorPage();
     await this.navigateToFeaturesTab();
 
+    await this.page.waitForTimeout(60000);
     const dummyHandlerElement = await this.page.$(agDummyFeatureIndicator);
 
     if (enabled && !dummyHandlerElement) {
