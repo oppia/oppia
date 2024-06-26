@@ -8,7 +8,7 @@
     as you save the pending changes to the exploration.
   </p>
   <p class="modify-translations-modal-text">Any translations that don't have a check mark will be sent for re-translation.</p>
-  <div *ngIf="translationsHaveLoaded && contentHasDisplayableTranslations && (contentTranslations | keyvalue).length > 0" class="content-translations-container">
+  <div *ngIf="translationsHaveLoaded && (contentTranslations | keyvalue).length > 0" class="content-translations-container">
     <form #form="ngForm">
       <div *ngFor="let item of contentTranslations | keyvalue">
         <div *ngIf="item.value.needsUpdate === false" class="content-translation-block">
@@ -35,9 +35,6 @@
   </div>
   <div *ngIf="!translationsHaveLoaded">
     <p class="translations-status-text">Please wait. Fetching translations...</p>
-  </div>
-  <div *ngIf="translationsHaveLoaded && !contentHasDisplayableTranslations">
-    <p class="translations-status-text">No available translations found.</p>
   </div>
 </div>
 <div class="modal-footer">
@@ -155,7 +152,6 @@
   }
 
   .modal-body p.translations-status-text {
-    border-top: 1px solid rgba(0, 0, 0, 0.5);
     color: #333;
     font-size: 18px;
     font-weight: 500;

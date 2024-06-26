@@ -323,28 +323,6 @@ describe('Modify Translations Modal Component', function () {
     expect(ngbActiveModal.dismiss).toHaveBeenCalled();
   });
 
-  it('should determine if content has displayable translations appropriately', () => {
-    component.contentTranslations = {
-      hi: TranslatedContent.createFromBackendDict({
-        content_value: 'This text needs an update.',
-        content_format: 'html',
-        needs_update: true,
-      }),
-    };
-
-    expect(component.doesContentHaveDisplayableTranslations()).toBe(false);
-
-    component.contentTranslations = {
-      hi: TranslatedContent.createFromBackendDict({
-        content_value: 'This text does not need an update.',
-        content_format: 'html',
-        needs_update: false,
-      }),
-    };
-
-    expect(component.doesContentHaveDisplayableTranslations()).toBe(true);
-  });
-
   it('should update displayed translation content of modal appropriately', () => {
     spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
       {
@@ -369,7 +347,6 @@ describe('Modify Translations Modal Component', function () {
     expect(component.languageIsCheckedStatusDict).toEqual({
       hi: false,
     });
-    expect(component.contentHasDisplayableTranslations).toBeFalse();
     expect(component.translationsHaveLoaded).toBeTrue();
   });
 });

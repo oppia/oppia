@@ -33,6 +33,8 @@ import {
 import {MarkTranslationsAsNeedingUpdateModalComponent} from './mark-translations-as-needing-update-modal.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ModifyTranslationsModalComponent} from '../../../pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 
 class MockActiveModal {
   close(): void {
@@ -67,6 +69,7 @@ describe('Mark Translations As Needing Update Modal Component', () => {
   let ngbModal: NgbModal;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let ngbModalRef: MockNgbModalRef = new MockNgbModalRef();
+  let entityTranslationsService: EntityTranslationsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -93,6 +96,7 @@ describe('Mark Translations As Needing Update Modal Component', () => {
 
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     ngbModal = TestBed.inject(NgbModal);
+    entityTranslationsService = TestBed.inject(EntityTranslationsService);
   }));
 
   it('should check whether component is initialized', () => {
@@ -173,5 +177,27 @@ describe('Mark Translations As Needing Update Modal Component', () => {
     component.cancel();
 
     expect(dismissSpy).toHaveBeenCalled();
+  });
+
+  it('should determine if content has displayable translations appropriately', () => {
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {
+      hi: TranslatedContent.createFromBackendDict({
+        content_value: 'This text needs an update.',
+        content_format: 'html',
+        needs_update: true,
+      }),
+    };
+
+    expect(component.doesContentHaveDisplayableTranslations()).toBe(false);
+
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {
+      hi: TranslatedContent.createFromBackendDict({
+        content_value: 'This text does not need an update.',
+        content_format: 'html',
+        needs_update: false,
+      }),
+    };
+
+    expect(component.doesContentHaveDisplayableTranslations()).toBe(true);
   });
 });
