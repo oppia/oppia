@@ -39,6 +39,7 @@ class GithubJobResultEnum(enum.Enum):
     SUCCESS = 'success'
     FAILURE = 'failure'
     SKIPPED = 'skipped'
+    CANCELLED = 'cancelled'
 
 
 class WorkflowStatusEnum(enum.Enum):

@@ -367,8 +367,8 @@ jobs:
           with:
             message: "An acceptance test failed on the upstream develop branch."
             webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-  check_e2e_acceptance_workflow_status:
-    needs: [e2e_test, lighthouse_performance, acceptance_test]
+  check_e2e_lighthouse_performance_acceptance_workflow_status:
+    needs: [check_test_suites_to_run, build, e2e_test, lighthouse_performance, acceptance_test]
     if: always()
     runs-on: ${{ matrix.os }}
     strategy:

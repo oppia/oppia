@@ -76,8 +76,8 @@ jobs:
         with:
           message: "A Lighthouse test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-  check_accessibility_workflow_status:
-    needs: [lighthouse_accessibility]
+  check_lighthouse_accessibility_workflow_status:
+    needs: [check_test_suites_to_run, lighthouse_accessibility]
     if: always()
     runs-on: ${{ matrix.os }}
     strategy:
