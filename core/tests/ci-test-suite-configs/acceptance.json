@@ -133,6 +133,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/load-dummy-data-in-dev-mode.spec.ts"
     },
     {
+      "name": "super-admin/edit-platform-parameters",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/edit-platform-parameters.spec.ts"
+    },
+    {
       "name": "release-coordinator/flush-and-get-profile-of-redis-cache",
       "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/flush-and-get-profile-of-redis-cache.spec.ts"
     },
