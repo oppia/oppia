@@ -235,6 +235,8 @@ const googleGroupSignUpLinkInTermsPage =
 
 const emailLinkSelector = '.oppia-contact-mail';
 
+const mobileDonateButtonOnDonatePage = '.donate-modal-button';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -2101,6 +2103,35 @@ export class LoggedOutUser extends BaseUser {
       throw new Error('The donor box is not visible on the about page.');
     } else {
       showMessage('The donor box is visible on the about page.');
+    }
+  }
+
+  /**
+   * Clicks on the donate button on the donate page in mobile mode and waits
+   *  for the second iframe to appear(one used in the mobile viewport).
+   * @returns {Promise<void>}
+   */
+  async clickDonateButtonOnDonatePageInMobileMode(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      try {
+        await this.page.waitForSelector(mobileDonateButtonOnDonatePage, {
+          visible: true,
+        });
+        await this.clickOn(mobileDonateButtonOnDonatePage);
+
+        await this.page.waitForFunction(
+          'document.querySelectorAll(".e2e-test-donate-page-iframe").length === 2'
+        );
+      } catch (error) {
+        const newError = new Error(
+          `Failed to find the donate modal after clicking the donate button.
+          Original error: ${error.message}`
+        );
+        newError.stack = error.stack;
+        throw newError;
+      }
+    } else {
+      return;
     }
   }
 }
