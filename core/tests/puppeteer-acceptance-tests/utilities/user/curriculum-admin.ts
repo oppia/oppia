@@ -902,7 +902,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(skillsTab, {visible: true});
     await this.clickOn(skillsTab);
     await this.page.waitForSelector(skillSelector, {visible: true});
-    await this.page.waitForSelector(skillListItemSelector);
+    await this.page.waitForSelector(skillListItemSelector, {visible: true});
 
     const skills = await this.page.$$(skillListItemSelector);
     for (let skill of skills) {
@@ -913,7 +913,7 @@ export class CurriculumAdmin extends BaseUser {
         ).jsonValue();
 
         if (name === `${skillName}`) {
-          await this.page.waitForSelector(skillListItemOptions);
+          await skill.waitForSelector(skillListItemOptions, {visible: true});
           const editBox = await skill.$(skillListItemOptions);
           if (editBox) {
             await this.waitForElementToBeClickable(editBox);
