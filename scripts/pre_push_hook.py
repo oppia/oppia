@@ -473,23 +473,6 @@ def does_diff_include_ts_files(diff_files: List[bytes]) -> bool:
     return False
 
 
-def does_diff_include_ci_config_or_js_files(diff_files: List[bytes]) -> bool:
-    """Returns true if diff includes CI config or Javascript files.
-
-    Args:
-        diff_files: list(bytes). List of files changed.
-
-    Returns:
-        bool. Whether the diff contains changes in CI config or
-        Javascript files.
-    """
-
-    for file_path in diff_files:
-        if file_path.endswith(b'.js') or re.search(rb'e2e_.*\.yml', file_path):
-            return True
-    return False
-
-
 def does_diff_include_ci_config_or_test_files(diff_files: List[bytes]) -> bool:
     """Returns true if diff includes CI config or test files.
 

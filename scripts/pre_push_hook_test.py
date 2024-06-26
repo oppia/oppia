@@ -654,18 +654,30 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook.does_diff_include_ts_files(
                 [b'file1.html', b'file2.yml', b'file3.js']))
 
-    def test_does_diff_include_ci_config_or_js_files(self) -> None:
+    def test_does_diff_include_ci_config_or_test_files(self) -> None:
         self.assertTrue(
-            pre_push_hook.does_diff_include_ci_config_or_js_files(
-                [b'core/tests/ci-test-suite-configs/acceptance.json',
-                 b'core/tests/wdio.conf.js',
-                 b'webdriverio_desktop/test.js',
-                 b'webdriverio/test.js',
-                 b'core/tests/puppeteer-acceptance-tests/specs/test.spec.ts']))
+            pre_push_hook.does_diff_include_ci_config_or_test_files(
+                [b'core/tests/ci-test-suite-configs/acceptance.json']))
+        self.assertTrue(
+            pre_push_hook.does_diff_include_ci_config_or_test_files(
+                [b'core/tests/wdio.conf.js',
+                 b'test.html']))
+        self.assertTrue(
+            pre_push_hook.does_diff_include_ci_config_or_test_files(
+                [b'webdriverio_desktop/test.js',
+                 b'test.html']))
+        self.assertTrue(
+            pre_push_hook.does_diff_include_ci_config_or_test_files(
+                [b'webdriverio/test.js',
+                 b'test.js']))
+        self.assertTrue(
+            pre_push_hook.does_diff_include_ci_config_or_test_files(
+                [b'core/tests/puppeteer-acceptance-tests/specs/test.spec.ts',
+                 b'test.ts']))
 
-    def test_does_diff_include_ci_config_or_js_files_fail(self) -> None:
+    def test_does_diff_include_ci_config_or_test_files_fail(self) -> None:
         self.assertFalse(
-            pre_push_hook.does_diff_include_ci_config_or_js_files(
+            pre_push_hook.does_diff_include_ci_config_or_test_files(
                 [b'file1.ts', b'file2.ts', b'file3.html']))
 
     def test_repo_in_dirty_state(self) -> None:
