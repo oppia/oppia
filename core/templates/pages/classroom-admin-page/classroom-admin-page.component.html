@@ -89,7 +89,7 @@
                       [(ngModel)]="tempClassroomData._teaserText"
                       (blur)="updateClassroomField()"
                       (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
-                      rows="2"
+                      rows="3"
                       class="classroom-field form-control e2e-test-update-classroom-teaser-text">
             </textarea>
           </div>
@@ -105,7 +105,7 @@
                       [(ngModel)]="tempClassroomData._topicListIntro"
                       (blur)="updateClassroomField()"
                       (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
-                      rows="2"
+                      rows="3"
                       class="classroom-field form-control e2e-test-update-classroom-topic-list-intro">
             </textarea>
           </div>
@@ -121,7 +121,7 @@
                       [(ngModel)]="tempClassroomData._courseDetails"
                       (blur)="updateClassroomField()"
                       (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
-                      rows="2"
+                      rows="3"
                       class="classroom-field form-control e2e-test-update-classroom-course-details">
             </textarea>
           </div>
@@ -318,20 +318,20 @@
                 </mat-icon>
               </button>
             </span>
-            <span [matTooltip]="(saveClassroomValidationErrors()).join('\n')"
+            <span [matTooltip]="(saveClassroomValidationErrors).join('\n')"
                   matTooltipClass="oppia-mat-tooltip-list"
                   [matTooltipDisabled]="false"
                   aria-label="List that shows issues preventing to save a classroom"
                   >
               <button class="btn btn-success save-classroom-changes e2e-test-save-classroom-config-button"
-                      [disabled]="!(classroomDataIsChanged && tempClassroomData.isClassroomDataValid())"
+                      [disabled]="!(classroomDataIsChanged && tempClassroomData.isClassroomDataValid() && saveClassroomValidationErrors.length===0)"
                       (click)="saveClassroomData(classroom.key)">
                 <span *ngIf="!classroomDataSaveInProgress">Save</span>
                 <mat-spinner *ngIf="classroomDataSaveInProgress"
                              class="oppia-update-classroom-data-spinning-button"
                              [diameter]="22">
                 </mat-spinner>
-                <mat-icon *ngIf="saveClassroomValidationErrors().length > 0" class="save-draft-button-warning">
+                <mat-icon *ngIf="saveClassroomValidationErrors.length > 0" class="save-draft-button-warning">
                         warning
                 </mat-icon>
               </button>

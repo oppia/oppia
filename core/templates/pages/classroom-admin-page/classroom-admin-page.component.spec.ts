@@ -1342,6 +1342,7 @@ describe('Classroom Admin Page component ', () => {
         ...dummyClassroomDict,
         name: '',
         urlFragment: '',
+        isPublished: false,
       },
     };
     component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
@@ -1352,7 +1353,31 @@ describe('Classroom Admin Page component ', () => {
     );
     component.updateClassroomField();
 
-    expect(component.saveClassroomValidationErrors().length).toEqual(2);
+    expect(component.saveClassroomValidationErrors.length).toEqual(2);
+  });
+
+  it('should not save a published classroom if user deletes some data', () => {
+    spyOn(component, 'updateClassroomData');
+    const response = {
+      classroomDict: {
+        ...dummyClassroomDict,
+        name: '',
+        urlFragment: '',
+        isPublished: true,
+        teaserText: '',
+      },
+    };
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.classroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.updateClassroomField();
+    component.saveClassroomData();
+
+    expect(component.canSaveClassroom()).toBeFalse();
+    expect(component.updateClassroomData).not.toHaveBeenCalled();
   });
 
   it('should be able to unpublish a published classroom', fakeAsync(() => {

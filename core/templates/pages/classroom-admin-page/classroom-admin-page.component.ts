@@ -104,6 +104,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   topicsToClassroomRelation: TopicClassroomRelationDict[] = [];
   filteredTopicsToClassroomRelation: TopicClassroomRelationDict[] = [];
   validationErrors: string[] = [];
+  saveClassroomValidationErrors: string[] = [];
 
   thumbnailParameters: ImageUploaderParameters = {
     disabled: false,
@@ -206,6 +207,8 @@ export class ClassroomAdminPageComponent implements OnInit {
         );
         this.validationErrors =
           this.classroomAdminDataService.getAllClassroomValidationErrors();
+        this.saveClassroomValidationErrors =
+          this.getSaveClassroomValidationErrors();
         this.setTopicDependencyByTopicName(
           this.tempClassroomData.getTopicIdToPrerequisiteTopicId()
         );
@@ -331,6 +334,8 @@ export class ClassroomAdminPageComponent implements OnInit {
     );
     this.validationErrors =
       this.classroomAdminDataService.getAllClassroomValidationErrors();
+    this.saveClassroomValidationErrors =
+      this.getSaveClassroomValidationErrors();
     const topicDependencyIsChanged =
       JSON.stringify(
         this.tempClassroomData.getTopicIdToPrerequisiteTopicId()
@@ -392,6 +397,9 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   saveClassroomData(classroomId: string): void {
+    if (!this.canSaveClassroom()) {
+      return;
+    }
     this.classroomDataSaveInProgress = true;
     this.openClassroomInViewerMode();
     this.updateClassroomData(classroomId).then(() => {
@@ -761,7 +769,20 @@ export class ClassroomAdminPageComponent implements OnInit {
     );
   }
 
-  saveClassroomValidationErrors(): string[] {
+  canSaveClassroom(): boolean {
+    if (
+      this.tempClassroomData.getIsPublished() &&
+      this.validationErrors.length !== 0
+    ) {
+      return false;
+    }
+    return this.saveClassroomValidationErrors.length === 0;
+  }
+
+  getSaveClassroomValidationErrors(): string[] {
+    if (!this.canSaveClassroom()) {
+      return this.validationErrors;
+    }
     return this.classroomAdminDataService.getSaveClassroomValidationErrors();
   }
 
