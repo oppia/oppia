@@ -12,20 +12,20 @@
         <i class="fa fa-angle-right" *ngIf="!isLanguageRTL()"></i>
         <i class="fa fa-angle-left" *ngIf="isLanguageRTL()"></i>
         <span *ngIf="!isHackyClassroomTranslationDisplayed('name')">{{classroomData.getName()}}</span>
-        <span *ngIf="isHackyClassroomTranslationDisplayed('name')">{{classroom_translation_keys.name | translate}}</span>
+        <span *ngIf="isHackyClassroomTranslationDisplayed('name')">{{classroomTranslationKeys.name | translate}}</span>
       </div>
       <div class="mobile-breadcrumbs">
         <i class="fa fa-angle-left" *ngIf="!isLanguageRTL()"></i>
         <i class="fa fa-angle-right" *ngIf="isLanguageRTL()"></i>
         <a href="/" *ngIf="publicClassroomsCount <= 1">{{ 'I18N_BACK_TO_HOME_TEXT' | translate }}</a>
-        <a href="/learn" *ngIf="publicClassroomsCount > 1">{{ 'I18N_BACK_TO_HOME_TEXT' | translate }}</a>
+        <a href="/learn" *ngIf="publicClassroomsCount > 1">{{ 'I18N_BACK_TO_CLASSROOMS' | translate }}</a>
       </div>
     </div>
     <div class="classroom-information-container">
       <div class="classroom-text-container">
         <h3>{{ 'I18N_CLASSROOM_HEADING' | translate:{ classroomName: classroomData.getName() } }}</h3>
         <h1 *ngIf="!isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}">{{classroomData.getName()}}</h1>
-        <h1 *ngIf="isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}">{{classroom_translation_keys.name | translate}}</h1>
+        <h1 *ngIf="isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}">{{classroomTranslationKeys.name | translate}}</h1>
       </div>
       <div class="classroom-thumbnail-container">
         <img class="classroom-thumbnail" alt="Classroom thumbnail image" [src]="classroomThumbnail">
@@ -38,12 +38,12 @@
       <div class="content-section">
         <h1 class="classroom-content-heading">{{'I18N_CLASSROOM_PAGE_COURSE_DETAILS' | translate}}</h1>
         <p class="classroom-content-text" *ngIf="!isHackyClassroomTranslationDisplayed('courseDetails')">{{classroomData.getCourseDetails()}}</p>
-        <p class="classroom-content-text" *ngIf="isHackyClassroomTranslationDisplayed('courseDetails')">{{classroom_translation_keys.courseDetails | translate}}</p>
+        <p class="classroom-content-text" *ngIf="isHackyClassroomTranslationDisplayed('courseDetails')">{{classroomTranslationKeys.courseDetails | translate}}</p>
       </div>
       <div class="content-section">
         <h1 class="classroom-content-heading">{{'I18N_CLASSROOM_PAGE_TOPICS_COVERED' | translate}}</h1>
         <p class="classroom-content-text" *ngIf="!isHackyClassroomTranslationDisplayed('topicListIntro')">{{classroomData.getTopicListIntro()}}</p>
-        <p class="classroom-content-text" *ngIf="isHackyClassroomTranslationDisplayed('topicListIntro')">{{ classroom_translation_keys.topicListIntro | translate }}</p>
+        <p class="classroom-content-text" *ngIf="isHackyClassroomTranslationDisplayed('topicListIntro')">{{ classroomTranslationKeys.topicListIntro | translate }}</p>
       </div>
       <div *ngIf="isDiagnosticTestFeatureFlagEnabled()" class="content-section diagnostic-test-container">
         <div class="diagnostic-test-box">

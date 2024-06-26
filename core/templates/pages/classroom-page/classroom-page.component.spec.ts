@@ -361,10 +361,10 @@ describe('Classroom Page Component', () => {
   }));
 
   it(
-    'should not get classroom translation keys if classroom_translation_keys ' +
+    'should not get classroom translation keys if classroomTranslationKeys ' +
       'if key is not present',
     () => {
-      component.classroom_translation_keys = {
+      component.classroomTranslationKeys = {
         name: 'I18N_CLASSROOM_MATH_NAME',
         courseDetails: 'I18N_CLASSROOM_MATH_COURSE_DETAILS',
         teaserText: 'I18N_CLASSROOM_MATH_TEASER_TEXT',

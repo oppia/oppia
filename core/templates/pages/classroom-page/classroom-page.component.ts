@@ -68,7 +68,7 @@ export class ClassroomPageComponent implements OnDestroy {
   showPrivateClassroomBanner: boolean = false;
   classroomThumbnail = '';
   classroomBanner = '';
-  classroom_translation_keys!: ClassroomTranslationKeys;
+  classroomTranslationKeys!: ClassroomTranslationKeys;
 
   constructor(
     private accessValidationBackendApiService: AccessValidationBackendApiService,
@@ -145,7 +145,7 @@ export class ClassroomPageComponent implements OnDestroy {
                 this.publicClassroomsCount =
                   classroomData.getPublicClassroomsCount();
 
-                this.classroom_translation_keys =
+                this.classroomTranslationKeys =
                   this.i18nLanguageCodeService.getClassroomTranslationKeys(
                     classroomData.getName()
                   );
@@ -232,15 +232,15 @@ export class ClassroomPageComponent implements OnDestroy {
   isHackyClassroomTranslationDisplayed(property: string): boolean {
     if (
       !(
-        this.classroom_translation_keys &&
-        property in this.classroom_translation_keys
+        this.classroomTranslationKeys &&
+        property in this.classroomTranslationKeys
       )
     ) {
       return false;
     }
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.classroom_translation_keys[property]
+        this.classroomTranslationKeys[property]
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
