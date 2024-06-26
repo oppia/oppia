@@ -381,7 +381,7 @@ jobs:
           python-version: '3.8.15'
           architecture: 'x64'
       - uses: ./.github/actions/merge
-      - uses: ./.github/actions/check_workflow_status
+      - uses: ./.github/actions/check-workflow-status
         id: check_workflow_status
         with:
           jobs: ${{ toJson(needs) }}
