@@ -327,34 +327,14 @@ class Classroom:
                 )
                 visited_topic_ids_for_current_node.append(ancestor_topic_id)
 
-    def validate(self) -> None:
+    def validate(self, strict: bool = False) -> None:
         """Validates various properties of the Classroom."""
 
         if not isinstance(self.classroom_id, str):
             raise utils.ValidationError(
                 'Expected ID of the classroom to be a string, received: %s.'
                 % self.classroom_id)
-        if not isinstance(self.thumbnail_data, ImageData):
-            raise utils.ValidationError(
-                'Expected thumbnail_data of the classroom to be a string, '
-                'received: %s.' % self.thumbnail_data
-            )
-        if not isinstance(self.banner_data, ImageData):
-            raise utils.ValidationError(
-                'Expected banner_data of the classroom to be a string, '
-                'received: %s.' % self.banner_data
-            )
-        if self.thumbnail_data.filename == '':
-            raise utils.ValidationError(
-                'thumbnail_filename field should not be empty')
-        if self.banner_data.filename == '':
-            raise utils.ValidationError(
-                'banner_filename field should not be empty')
-
         self.require_valid_name(self.name)
-        self.require_valid_teaser_text(self.teaser_text)
-        self.require_valid_topic_list_intro(self.topic_list_intro)
-        self.require_valid_course_details(self.course_details)
         self.require_valid_url_fragment(self.url_fragment)
         self.check_for_cycles_in_topic_id_to_prerequisite_topic_ids(
             self.topic_id_to_prerequisite_topic_ids)
@@ -362,10 +342,35 @@ class Classroom:
             raise utils.ValidationError(
                 'Expected is_published of the classroom to be a boolean, '
                 'received: %s.' % self.is_published)
-        self.require_valid_bg_color(self.thumbnail_data.bg_color, True)
-        self.require_valid_bg_color(self.banner_data.bg_color, False)
-        utils.require_valid_image_filename(self.banner_data.filename)
-        utils.require_valid_thumbnail_filename(self.thumbnail_data.filename)
+
+        if strict:
+            if not isinstance(self.thumbnail_data, ImageData):
+                raise utils.ValidationError(
+                    'Expected thumbnail_data of the classroom to be a string, '
+                    'received: %s.' % self.thumbnail_data
+                )
+            if not isinstance(self.banner_data, ImageData):
+                raise utils.ValidationError(
+                    'Expected banner_data of the classroom to be a string, '
+                    'received: %s.' % self.banner_data
+                )
+            if self.thumbnail_data.filename == '':
+                raise utils.ValidationError(
+                    'thumbnail_filename field should not be empty')
+            if self.banner_data.filename == '':
+                raise utils.ValidationError(
+                    'banner_filename field should not be empty')
+            if not self.topic_id_to_prerequisite_topic_ids:
+                raise utils.ValidationError(
+                    'A classroom should have at least one topic.'
+                )
+            self.require_valid_teaser_text(self.teaser_text)
+            self.require_valid_topic_list_intro(self.topic_list_intro)
+            self.require_valid_course_details(self.course_details)
+            self.require_valid_bg_color(self.thumbnail_data.bg_color, True)
+            self.require_valid_bg_color(self.banner_data.bg_color, False)
+            utils.require_valid_image_filename(self.banner_data.filename)
+            utils.require_valid_thumbnail_filename(self.thumbnail_data.filename)
 
 
 class ImageDataDict(TypedDict, total=False):
