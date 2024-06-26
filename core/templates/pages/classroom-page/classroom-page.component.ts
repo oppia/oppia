@@ -16,7 +16,7 @@
  * @fileoverview Component for the classroom page.
  */
 
-import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
+import {Component, OnDestroy} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
@@ -69,8 +69,6 @@ export class ClassroomPageComponent implements OnDestroy {
   classroomThumbnail = '';
   classroomBanner = '';
   classroom_translation_keys!: ClassroomTranslationKeys;
-
-  @ViewChild('croppableImage') croppableImageRef!: ElementRef;
 
   constructor(
     private accessValidationBackendApiService: AccessValidationBackendApiService,
