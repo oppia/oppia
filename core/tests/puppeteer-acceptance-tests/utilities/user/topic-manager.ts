@@ -65,6 +65,10 @@ const mobilePublishStoryButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-button';
 const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
 
+const skillsTab = 'a.e2e-test-skills-tab';
+const desktopSkillSelector = '.e2e-test-skill-description';
+const mobileSkillSelector = 'span.e2e-test-mobile-skill-name';
+
 export class TopicManager extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -195,6 +199,117 @@ export class TopicManager extends BaseUser {
     await this.clickOn(closeSaveModalButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
   }
+
+  /**
+   * Open the skill editor page for a skill.
+   */
+  async openSkillEditor(skillName: string): Promise<void> {
+    const skillSelector = this.isViewportAtMobileWidth()
+      ? mobileSkillSelector
+      : desktopSkillSelector;
+    await this.page.bringToFront();
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.clickOn(skillsTab);
+    await this.page.waitForSelector(skillSelector, {visible: true});
+
+    await Promise.all([
+      this.page.evaluate(
+        (skillSelector, skillName) => {
+          const skillDivs = Array.from(
+            document.querySelectorAll(skillSelector)
+          );
+          const skillDivToSelect = skillDivs.find(
+            element => element?.textContent.trim() === skillName
+          ) as HTMLElement;
+          if (skillDivToSelect) {
+            skillDivToSelect.click();
+          } else {
+            throw new Error('Cannot open skill editor page.');
+          }
+        },
+        skillSelector,
+        skillName
+      ),
+      this.page.waitForNavigation(),
+    ]);
+  }
+
+  /**
+   * Adds a worked example to the topic.
+   * @param {string} exampleQuestion - The question part of the worked example.
+   * @param {string} exampleExplanation - The explanation part of the worked example.
+   */
+  async addWorkedExample(
+    exampleQuestion: string,
+    exampleExplanation: string
+  ): Promise<void> {
+    const exampleQuestionSelector = '.e2e-test-rte';
+    const exampleExplanationSelector = '.e2e-test-rte';
+    const saveButtonSelector = '.e2e-test-save-worked-example-button';
+    const addWorkedExampleButton = '.e2e-test-add-worked-example';
+
+    await this.clickOn(addWorkedExampleButton);
+    await this.type(exampleQuestionSelector, exampleQuestion);
+    await this.type(exampleExplanationSelector, exampleExplanation);
+    await this.clickOn(saveButtonSelector);
+  }
+
+  /**
+   * Deletes a worked example from the topic.
+   * @param {string} exampleQuestion - The question part of the worked example to delete.
+   */
+  async deleteWorkedExample(exampleQuestion: string): Promise<void> {
+    const workedExampleSelector =
+      '.oppia-skill-concept-card-preview-list .e2e-test-worked-example-title';
+    const deleteButtonSelector =
+      '.oppia-skill-concept-card-preview-list .e2e-test-delete-example-button';
+
+    const workedExamples = await this.page.$$(workedExampleSelector);
+
+    for (const workedExample of workedExamples) {
+      const title = await this.page.evaluate(
+        el => el.textContent,
+        workedExample
+      );
+      if (title.trim() === exampleQuestion) {
+        const deleteButton = await workedExample.$(deleteButtonSelector);
+        if (deleteButton) {
+          await deleteButton.click();
+        }
+        break;
+      }
+    }
+  }
+
+  /**
+   * Adds a misconception to the topic.
+   * @param {string} misconceptionName - The name of the misconception to add.
+   * @param {string} notes - The notes for question creators to understand how handling this misconception is useful for the skill being tested.
+   * @param {string} feedback - The feedback for the misconception to add.
+   */
+  async addMisconception(
+    misconceptionName: string,
+    notes: string,
+    feedback: string
+  ): Promise<void> {
+    const addButtonSelector = '.e2e-test-add-misconception-modal-button';
+    const nameFieldSelector = '.e2e-test-misconception-name-field';
+    const notesFieldSelector = '.e2e-test-rte';
+    const feedbackFieldSelector = '.e2e-test-rte';
+    const saveButtonSelector = '.e2e-test-confirm-add-misconception-button';
+
+    await this.clickOn(addButtonSelector);
+    await this.type(nameFieldSelector, misconceptionName);
+    await this.type(notesFieldSelector, notes);
+    await this.type(feedbackFieldSelector, feedback);
+    await this.clickOn(saveButtonSelector);
+  }
+
+  /**
+   * Deletes a misconception from the topic.
+   * @param {string} misconceptionName - The name of the misconception to delete.
+   */
+  async deleteMisconception(misconceptionName: string): Promise<void> {}
 }
 
 export let TopicManagerFactory = (): TopicManager => new TopicManager();
