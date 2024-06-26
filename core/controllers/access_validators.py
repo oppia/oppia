@@ -80,6 +80,39 @@ class ClassroomAccessValidationHandler(
             raise self.NotFoundException
 
 
+class ClassroomsPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to classrooms page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Retrieves information about classrooms.
+
+        Raises:
+            PageNotFoundException. The multiple classrooms
+                feature is not enabled.
+            PageNotFoundException. No public classrooms are present.
+        """
+        if not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value,
+            user_id=self.user_id
+        ):
+            raise self.NotFoundException
+
+        classrooms = classroom_config_services.get_all_classrooms()
+        has_public_classrooms = any(map(lambda c: c.is_published, classrooms))
+
+        if not (has_public_classrooms or constants.DEV_MODE):
+            raise self.NotFoundException
+
+
 class SubtopicViewerPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
