@@ -114,7 +114,7 @@ export class UserFactory {
   >(
     user: TUser,
     roles: TRoles,
-    topics: string[] = []
+    topic: string = ''
   ): Promise<TUser & MultipleRoleIntersection<TRoles>> {
     for (const role of roles) {
       if (superAdminInstance === null) {
@@ -132,7 +132,7 @@ export class UserFactory {
           await superAdminInstance.assignRoleToUser(
             user.username,
             ROLES.TOPIC_MANAGER,
-            topics
+            topic
           );
           break;
         default:
@@ -154,7 +154,7 @@ export class UserFactory {
     username: string,
     email: string,
     roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>,
-    topics: string[] = []
+    topic: string = ''
   ): Promise<
     LoggedOutUser &
       LoggedInUser &
@@ -173,7 +173,7 @@ export class UserFactory {
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
 
-    return await UserFactory.assignRolesToUser(user, roles, topics);
+    return await UserFactory.assignRolesToUser(user, roles, topic);
   };
 
   /**
