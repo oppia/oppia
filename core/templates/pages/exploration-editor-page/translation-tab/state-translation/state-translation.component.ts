@@ -145,7 +145,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
     let langCode = this.translationLanguageService.getActiveLanguageCode();
     if (
-      !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+      !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         langCode
       )
     ) {
@@ -153,7 +153,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     }
 
     let translationContent =
-      this.entityTranslationsService.languageCodeToEntityTranslations[
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         langCode
       ].getWrittenTranslation(subtitledHtml.contentId);
     if (!translationContent) {
@@ -170,7 +170,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
     let langCode = this.translationLanguageService.getActiveLanguageCode();
     if (
-      !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+      !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         langCode
       )
     ) {
@@ -178,7 +178,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     }
 
     let translationContent =
-      this.entityTranslationsService.languageCodeToEntityTranslations[
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         langCode
       ].getWrittenTranslation(SubtitledUnicode.contentId);
     if (!translationContent) {
@@ -282,7 +282,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     if (!this.translationTabActiveModeService.isVoiceoverModeActive()) {
       let langCode = this.translationLanguageService.getActiveLanguageCode();
       const entityTranslations =
-        this.entityTranslationsService.languageCodeToEntityTranslations[
+        this.entityTranslationsService.languageCodeToLatestEntityTranslations[
           langCode
         ];
       if (entityTranslations) {

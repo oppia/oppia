@@ -320,7 +320,7 @@ describe('Translation status service', () => {
     ess.init(statesWithAudioDict, false);
     ttams.activateVoiceoverMode();
     tls.setActiveLanguageCode('en');
-    entityTranslationsService.languageCodeToEntityTranslations.hi =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       EntityTranslation.createFromBackendDict({
         entity_id: 'exp_id',
         entity_type: 'exploration',
@@ -378,7 +378,7 @@ describe('Translation status service', () => {
       var statesNeedingTranslationUpdate = tss.getAllStatesNeedUpdatewarning();
       expect(Object.keys(statesNeedingTranslationUpdate).length).toBe(0);
 
-      entityTranslationsService.languageCodeToEntityTranslations.hi =
+      entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
         EntityTranslation.createFromBackendDict({
           entity_id: 'exp_id',
           entity_type: 'exploration',
