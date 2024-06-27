@@ -101,6 +101,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-links-on-terms-page.spec.ts"
     },
     {
+      "name": "logged-out-user/click-all-buttons-on-donate-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-donate-page.spec.ts"
+    },
+    {
       "name": "moderator/edit-featured-activities-list",
       "module": "core/tests/puppeteer-acceptance-tests/specs/moderator/edit-featured-activities-list.spec.ts"
     },
