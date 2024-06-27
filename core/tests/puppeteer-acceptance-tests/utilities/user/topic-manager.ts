@@ -69,18 +69,31 @@ const skillTab = '.e2e-test-skills-tab';
 
 const skillEditBox = '.e2e-test-skill-edit-box';
 const mobileSkillsOption = '.e2e-test-mobile-skills-option';
-const unassignSkillButtonDesktop = `.e2e-test-unassign-skill-button`;
-const unassignSkillButtonMobile = `.e2e-test-mobile-unassign-skill-button`;
-const confirmSkillButton = '.e2e-test-confirm-skill-button';
+const unassignSkillButtonDesktop = '.e2e-test-unassign-skill-button';
+const unassignSkillButtonMobile = '.e2e-test-mobile-unassign-skill-button';
+const confirmSkillButton = 'e2e-test-remove-question-confirmation-button';
 const unassignTopicLabel = '.e2e-test-unassign-topic-label';
 const unassignTopicCheckbox = '.e2e-test-unassign-topic';
 const topicNameSpan = '.topic-name';
-
 const skillItemSelector = '.e2e-test-skill-item';
 const skillDescriptionSelector = '.e2e-test-skill-description';
-const questionTab = '.e2e-test-question-tab';
+const questionTab = '.e2e-test-questions-tab';
 const toastMessageSelector = '.e2e-test-toast-message';
-
+const assignSkillButtonDesktop = '.e2e-test-assign-skill-to-topic-button';
+const assignSkillButtonMobile = '.e2e-test-mobile-assign-skill-to-topic-button';
+const topicNameSelector = '.e2e-test-topic-name-in-topic-select-modal';
+const confirmMoveButton = '.e2e-test-confirm-move-button';
+const mergeSkillsButtonMobile = '.e2e-test-mobile-merge-skills-button';
+const mergeSkillsButtonDesktop = '.e2e-test-merge-skills-button';
+const editQuestionButtons = '.e2e-test-edit-question-button';
+const linkOffIcon = '.link-off-icon';
+const removeQuestionConfirmationButton =
+  '.e2e-test-remove-question-confirmation-button';
+const questionPreviewTab = '.e2e-test-question-preview-tab';
+const questionTextInput = '.e2e-test-question-text-input';
+const questionData = '.question-data';
+const questionContentSelector = 'oppia-learner-view-card-top-content';
+const textInputInteractionField = '.e2e-test-description-box';
 export class TopicManager extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -305,6 +318,181 @@ export class TopicManager extends BaseUser {
       el => el.textContent
     );
     expect(actualMessage).toEqual(expectedMessage);
+  }
+
+  /**
+   * Assign a skill to a topic.
+   *
+   * @param {string} topicName - The name of the topic to assign the skill to.
+   * @param {string} skillName - The name of the skill to assign.
+   */
+  async assignSkillToTopic(
+    skillName: string,
+    topicName: string
+  ): Promise<void> {
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const skillOptions = isMobileWidth ? mobileSkillsOption : skillEditBox;
+    const assignSkillButton = isMobileWidth
+      ? assignSkillButtonMobile
+      : assignSkillButtonDesktop;
+
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.navigateToSkillTab();
+
+    const skillItem = await this.selectSkill(skillName);
+
+    const skillOptionsElement = await skillItem.$(skillOptions);
+    if (skillOptionsElement) {
+      await skillOptionsElement.click();
+    }
+
+    await this.page.waitForSelector(assignSkillButton);
+    await this.clickOn(assignSkillButton);
+
+    const topicNames = await this.page.$$(topicNameSelector);
+    for (const topic of topicNames) {
+      const name = await topic.$eval('span', el => el.textContent);
+      if (name === topicName) {
+        await topic.click();
+        break;
+      }
+    }
+
+    await this.page.waitForSelector(confirmMoveButton);
+    await this.clickOn(confirmMoveButton);
+  }
+
+  /**
+   * Function to merge two skills with the given names.
+   * @param {string} skillName1 - The name of the first skill to merge.
+   * @param {string} skillName2 - The name of the second skill to merge.
+   */
+
+  async mergeSkills(skillName1: string, skillName2: string): Promise<void> {
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const skillOptions = isMobileWidth ? mobileSkillsOption : skillEditBox;
+    const mergeSkillsButton = isMobileWidth
+      ? mergeSkillsButtonMobile
+      : mergeSkillsButtonDesktop;
+
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.navigateToSkillTab();
+
+    const skillItem1 = await this.selectSkill(skillName1);
+    const skillOptionsElement1 = await skillItem1.$(skillOptions);
+    if (skillOptionsElement1) {
+      await skillOptionsElement1.click();
+    }
+
+    const skillItem2 = await this.selectSkill(skillName2);
+    await skillItem2.click();
+
+    await this.page.waitForSelector(mergeSkillsButton);
+    await this.clickOn(mergeSkillsButton);
+
+    await this.page.waitForSelector('.e2e-test-skill-name-input');
+    await this.page.type('.e2e-test-skill-name-input', skillName2);
+
+    await this.page.waitForSelector('.mat-radio-inner-circle');
+    await this.clickOn('.mat-radio-inner-circle');
+
+    await this.page.waitForSelector('.e2e-test-confirm-skill-selection-button');
+    await this.clickOn('.e2e-test-confirm-skill-selection-button');
+  }
+
+  /**
+   * Function to delete a question with the given text.
+   * @param {string} questionText - The text of the question to delete.
+   */
+  async deleteQuestion(questionText: string): Promise<void> {
+    const buttons = await this.page.$$(editQuestionButtons);
+    for (const button of buttons) {
+      const questionTextElement = await button.$('.question-text');
+      if (questionTextElement) {
+        const text = await questionTextElement.$eval(
+          'span',
+          el => el.textContent
+        );
+        if (text === questionText) {
+          const icon = await button.$(linkOffIcon);
+          if (icon) {
+            await icon.click();
+            break;
+          }
+        }
+      }
+    }
+
+    await this.page.waitForSelector(removeQuestionConfirmationButton);
+    await this.clickOn(removeQuestionConfirmationButton);
+  }
+
+  /**
+   * Function to navigate to the question preview tab.
+   */
+  async navigateToQuestionPreviewTab(): Promise<void> {
+    await this.page.waitForSelector(questionPreviewTab);
+    await this.clickOn(questionPreviewTab);
+  }
+
+  /**
+   * Function to preview a question.
+   * @param {string} questionText - The text of the question to preview.
+   */
+  async previewQuestion(questionText: string): Promise<void> {
+    await this.page.waitForSelector(questionTextInput);
+    await this.page.type(questionTextInput, questionText);
+    await this.page.keyboard.press('Enter');
+
+    await this.page.waitForSelector(questionData);
+    await this.clickOn(questionData);
+  }
+
+  /**
+   * Function to expect the preview question text.
+   * @param {string} expectedText - The expected question text.
+   */
+  async expectPreviewQuestionText(expectedText: string): Promise<void> {
+    await this.page.waitForSelector(questionContentSelector);
+    const questionContentElement = await this.page.$(questionContentSelector);
+    const questionText = await this.page.evaluate(
+      element => element.textContent,
+      questionContentElement
+    );
+
+    if (questionText !== expectedText) {
+      throw new Error(
+        `Expected question text to be "${expectedText}", but it was "${questionText}"`
+      );
+    }
+  }
+
+  /**
+   * Function to expect the preview interaction type.
+   * @param {string} expectedType - The expected interaction type.
+   */
+  async expectPreviewInteractionType(expectedType: string): Promise<void> {
+    let selector: string;
+
+    // Add cases for different interaction types here.
+    // For each case, set the selector to the corresponding element for that interaction type.
+    switch (expectedType) {
+      case 'Text Input':
+        selector = textInputInteractionField;
+        break;
+      // Add more cases as needed.
+      default:
+        throw new Error(`Unsupported interaction type: ${expectedType}`);
+    }
+
+    await this.page.waitForSelector(selector);
+    const element = await this.page.$(selector);
+
+    if (!element) {
+      throw new Error(
+        `Expected to find element for interaction type "${expectedType}", but it was not found`
+      );
+    }
   }
 }
 

@@ -54,13 +54,17 @@ describe('Topic Manager User Journey', function () {
       await topicManager.navigateToSkillTab();
 
       await topicManager.unassignSkillFromTopic('New Skill', 'Addition');
-      await topicManager.expectSuccessMessage('Skill unassigned successfully.');
+      await topicManager.expectToastMeassageToBe(
+        'Skill unassigned successfully.'
+      );
 
       await topicManager.assignSkillToTopic('New Skill', 'Addition');
-      await topicManager.expectSuccessMessage('Skill assigned successfully.');
+      await topicManager.expectToastMeassageToBe(
+        'Skill assigned successfully.'
+      );
 
       await topicManager.mergeSkills('Skill 1', 'Skill 2');
-      await topicManager.expectSuccessMessage('Skills merged successfully.');
+      await topicManager.expectToastMeassageToBe('Skills merged successfully.');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

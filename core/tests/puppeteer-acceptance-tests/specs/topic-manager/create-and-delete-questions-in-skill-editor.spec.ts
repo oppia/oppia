@@ -52,21 +52,21 @@ describe('Topic Manager User Journey', function () {
     async function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
       await topicManager.openSkillEditor('Skill Name');
-      await topicManager.navigateToQuestionEditorTab('Skill Name');
+      await topicManager.navigateToQuestionEditorTab();
 
       await topicManager.createQuestionsForSkill('Skill Name', 1);
-      await topicManager.expectTooltipSuccessMessage(
+      await topicManager.expectToastMeassageToBe(
         'Question created successfully.'
       );
 
-      await topicManager.navigateToPreviewTab();
+      await topicManager.navigateToQuestionPreviewTab();
       await topicManager.previewQuestion('Question Text');
       await topicManager.expectPreviewQuestionText('Question Text');
       await topicManager.expectPreviewInteractionType('Multiple Choice');
 
-      await topicManager.navigateToQuestionEditorTab('Skill Name');
+      await topicManager.navigateToQuestionEditorTab();
       await topicManager.deleteQuestion('Question Text');
-      await topicManager.expectTooltipSuccessMessage(
+      await topicManager.expectToastMeassageToBe(
         'Question deleted successfully.'
       );
     },
