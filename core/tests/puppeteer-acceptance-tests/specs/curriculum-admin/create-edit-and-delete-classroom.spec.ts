@@ -73,7 +73,7 @@ describe('Curriculum Admin', function () {
         'Course details',
         'Topic list intro'
       );
-      await curriculumAdmin.addTopicToClassroom('Math');
+      await curriculumAdmin.addTopicToClassroom('Math', 'Test Topic 1');
       await curriculumAdmin.publishClassroom('Math');
       await curriculumAdmin.expectNumberOfTopicsInTopicDependencyGraphToBe(
         'Math',

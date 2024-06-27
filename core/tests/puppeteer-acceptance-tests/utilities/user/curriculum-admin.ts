@@ -185,6 +185,7 @@ const viewTopicGraphButton = 'button.view-graph-button';
 const topicDependencyGraphDiv = '.e2e-test-topic-dependency-graph-container';
 const topicNode = '.e2e-test-topic-node';
 const closeTopicDependencyButton = '.e2e-test-close-topic-dependency-modal';
+const addTopicFormFieldInput = '.mat-input-element';
 
 export class CurriculumAdmin extends BaseUser {
   /**
@@ -1141,15 +1142,22 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for adding a topic to a classroom
    */
-  async addTopicToClassroom(classroomName: string): Promise<void> {
+  async addTopicToClassroom(
+    classroomName: string,
+    topicName: string
+  ): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
 
     await this.clickOn(openTopicDropdownButton);
     await this.clickOn(topicDropDownFormFeild);
+    await this.page.waitForSelector(addTopicFormFieldInput);
+    await this.page.type(addTopicFormFieldInput, topicName);
     await this.clickOn(topicSelector);
     await this.page.waitForSelector(openTopicDropdownButton);
     await this.clickOn(saveClassroomButton);
+
+    showMessage(`Added ${topicName} topic to the ${classroomName} classroom.`);
   }
 
   /**
