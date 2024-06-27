@@ -227,7 +227,6 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/check-all-user-flow-of-parent-teacher',
     'logged-out-user/check-all-user-flow-of-partner',
     'logged-out-user/check-all-user-flow-of-volunteer',
-    'logged-out-user/click-all-buttons-on-about-foundation-page',
     'logged-out-user/click-all-buttons-on-about-page',
     'logged-out-user/click-all-buttons-on-contact-us-page',
     'logged-out-user/click-all-buttons-on-donation-thanks-page',
@@ -240,6 +239,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/click-all-links-on-get-started-page',
     'logged-out-user/click-all-links-on-privacy-policy-page',
     'logged-out-user/click-all-links-on-terms-page',
+    'logged-out-user/click-all-buttons-on-donate-page',
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
@@ -247,6 +247,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'release-coordinator/flush-and-get-profile-of-redis-cache',
     'super-admin/edit-user-roles',
     'super-admin/load-dummy-data-in-dev-mode',
+    'super-admin/edit-platform-parameters',
     'translation-admin/add-and-remove-translation-rights',
     'voiceover-admin/add-voiceover-artist-to-an-exploration',
 ]
