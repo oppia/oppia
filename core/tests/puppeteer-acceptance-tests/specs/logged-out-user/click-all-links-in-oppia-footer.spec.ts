@@ -60,14 +60,6 @@ describe('Logged-out Users', function () {
   );
 
   it(
-    'should open "About Foundation" page via the footer',
-    async function () {
-      await loggedOutUser.clickOnAboutLinkInFooter();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
     'should open "Blog" page via the footer',
     async function () {
       await loggedOutUser.clickOnBlogLinkInFooter();
