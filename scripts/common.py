@@ -239,6 +239,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/click-all-links-on-get-started-page',
     'logged-out-user/click-all-links-on-privacy-policy-page',
     'logged-out-user/click-all-links-on-terms-page',
+    'logged-out-user/click-all-buttons-on-donate-page',
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
