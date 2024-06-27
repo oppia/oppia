@@ -77,8 +77,8 @@
                 <span> Unassign Skill </span>
               </div>
             </div>
-            <div class="delete-icon-box e2e-test-delete-skill-button" (click)="deleteSkill(skill.id)">
-              <a *ngIf="userCanDeleteSkill">
+            <div *ngIf="userCanDeleteSkill" class="delete-icon-box e2e-test-delete-skill-button" (click)="deleteSkill(skill.id)">
+              <a>
                 <span class="fa fa-trash-alt"></span>
                 <span> Delete </span>
               </a>
@@ -120,8 +120,8 @@
                     <span> Unassign Skill </span>
                   </div>
                 </div>
-                <div class="delete-icon-box" (click)="deleteSkill(skill.id)">
-                  <span *ngIf="userCanDeleteSkill">
+                <div *ngIf="userCanDeleteSkill" class="delete-icon-box" (click)="deleteSkill(skill.id)">
+                  <span>
                     <i class="fa fa-trash-alt e2e-test-mobile-delete-skill-button"></i>
                     <span> Delete </span>
                   </span>
