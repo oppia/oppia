@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes creating a new skill, assigning and unassigning it to a topic, merging two skills, using filters to select a skill for merging, merging an outside skill with a topic, and deleting a skill.
+ * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes assigning and unassigning a skill to a topic, merging two skills and using filters to select a skill for merging.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -30,41 +30,42 @@ describe('Topic Manager User Journey', function () {
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm',
-      'curriculum_Admin@example.com',
+      'curriculumAdmin',
+      'curriculum_admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    curriculumAdmin.createTopic('Addition', 'add');
-    curriculumAdmin.createSkillForTopic('Skill 1', 'Addition');
-    curriculumAdmin.createSkillForTopic('Skill 2', 'Addition');
+    curriculumAdmin.createTopic('Mathematics', 'math');
+    curriculumAdmin.createSkillForTopic('Addition', 'Mathematics');
+    curriculumAdmin.createSkillForTopic('Subtraction', 'Mathematics');
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topic_manager@example.com',
       [ROLES.TOPIC_MANAGER],
-      'Addition'
+      'Mathematics'
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to assign and unassign a skill to a topic, and merge an outside skill with a topic.',
+    'should be able to assign and unassign a skill to a topic, link and unlink skills to a question and merge skills',
+    // TODO(#20590): Once the issue is resolved, please ensure to add a check for
+    // this scenario (linking and unlinking a skill to a question) in the acceptance test.
+    // See: https://github.com/oppia/oppia/issues/20590
     async function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
       await topicManager.navigateToSkillTab();
 
-      await topicManager.unassignSkillFromTopic('New Skill', 'Addition');
-      await topicManager.expectToastMeassageToBe(
+      await topicManager.unassignSkillFromTopic('Addition', 'Mathematics');
+      await topicManager.expectToastMassageToBe(
         'Skill unassigned successfully.'
       );
 
-      await topicManager.assignSkillToTopic('New Skill', 'Addition');
-      await topicManager.expectToastMeassageToBe(
-        'Skill assigned successfully.'
-      );
+      await topicManager.assignSkillToTopic('Addition', 'Mathematics');
+      await topicManager.expectToastMassageToBe('Skill assigned successfully.');
 
-      await topicManager.mergeSkills('Skill 1', 'Skill 2');
-      await topicManager.expectToastMeassageToBe('Skills merged successfully.');
+      await topicManager.mergeSkills('Addition', 'Subtraction');
+      await topicManager.expectToastMassageToBe('Skills merged successfully.');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

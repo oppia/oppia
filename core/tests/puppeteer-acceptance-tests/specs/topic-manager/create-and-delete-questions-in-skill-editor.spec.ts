@@ -30,20 +30,20 @@ describe('Topic Manager User Journey', function () {
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm',
-      'curriculum_Admin@example.com',
+      'curriculumAdmin',
+      'curriculum_admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    curriculumAdmin.createTopic('Addition', 'add');
-    curriculumAdmin.createSkillForTopic('Skill 1', 'Addition');
-    curriculumAdmin.createSkillForTopic('skill 2', 'Addition');
+    curriculumAdmin.createTopic('Mathematics', 'math');
+    curriculumAdmin.createSkillForTopic('Addition', 'Mathematics');
+    curriculumAdmin.createSkillForTopic('Subtraction', 'Mathematics');
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topic_manager@example.com',
       [ROLES.TOPIC_MANAGER],
-      'Addition'
+      'Mathematics'
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
@@ -51,22 +51,23 @@ describe('Topic Manager User Journey', function () {
     'should be able to open question editor, edit a question, manage skill associations, create and delete questions, and preview a question.',
     async function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.openSkillEditor('Skill Name');
+      await topicManager.openSkillEditor('Addition');
       await topicManager.navigateToQuestionEditorTab();
 
-      await topicManager.createQuestionsForSkill('Skill Name', 1);
-      await topicManager.expectToastMeassageToBe(
+      await topicManager.createQuestionsForSkill('Addition', 1);
+      await topicManager.expectToastMassageToBe(
         'Question created successfully.'
       );
 
       await topicManager.navigateToQuestionPreviewTab();
-      await topicManager.previewQuestion('Question Text');
-      await topicManager.expectPreviewQuestionText('Question Text');
+      const questionText = 'What is 2 + 2?';
+      await topicManager.previewQuestion(questionText);
+      await topicManager.expectPreviewQuestionText(questionText);
       await topicManager.expectPreviewInteractionType('Multiple Choice');
 
       await topicManager.navigateToQuestionEditorTab();
-      await topicManager.deleteQuestion('Question Text');
-      await topicManager.expectToastMeassageToBe(
+      await topicManager.deleteQuestion(questionText);
+      await topicManager.expectToastMassageToBe(
         'Question deleted successfully.'
       );
     },

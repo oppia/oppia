@@ -26,7 +26,9 @@ const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 
 const modalDiv = 'div.modal-content';
 const closeSaveModalButton = '.e2e-test-close-save-modal-button';
+const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
 
+// Photo Upload Modal.
 const storyPhotoBoxButton =
   'oppia-create-new-story-modal .e2e-test-photo-button';
 const chapterPhotoBoxButton =
@@ -34,39 +36,12 @@ const chapterPhotoBoxButton =
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 const photoUploadModal = 'edit-thumbnail-modal';
 
+// Topic and Skills Dashboard Page.
 const topicsTab = 'a.e2e-test-topics-tab';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
-
-const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
-
-const addStoryButton = 'button.e2e-test-create-story-button';
-const storyTitleField = 'input.e2e-test-new-story-title-field';
-const storyDescriptionField = 'textarea.e2e-test-new-story-description-field';
-const storyUrlFragmentField = 'input.e2e-test-new-story-url-fragment-field';
-const createStoryButton = 'button.e2e-test-confirm-story-creation-button';
-const saveStoryButton = 'button.e2e-test-save-story-button';
-const publishStoryButton = 'button.e2e-test-publish-story-button';
-const storyMetaTagInput = '.e2e-test-story-meta-tag-content-field';
-const unpublishStoryButton = 'button.e2e-test-unpublish-story-button';
-
-const addChapterButton = 'button.e2e-test-add-chapter-button';
-const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
-const chapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
-const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
-
 const mobileOptionsSelector = '.e2e-test-mobile-options-base';
 const mobileTopicSelector = 'div.e2e-test-mobile-topic-name a';
-
-const mobileStoryDropdown = '.e2e-test-story-dropdown';
-const mobileSaveStoryChangesDropdown =
-  'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
-const mobileSaveStoryChangesButton =
-  'div.navbar-mobile-options .e2e-test-mobile-save-changes';
-const mobilePublishStoryButton =
-  'div.navbar-mobile-options .e2e-test-mobile-publish-button';
-const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
 const skillTab = '.e2e-test-skills-tab';
-
 const skillEditBox = '.e2e-test-skill-edit-box';
 const mobileSkillsOption = '.e2e-test-mobile-skills-option';
 const unassignSkillButtonDesktop = '.e2e-test-unassign-skill-button';
@@ -77,14 +52,41 @@ const unassignTopicCheckbox = '.e2e-test-unassign-topic';
 const topicNameSpan = '.topic-name';
 const skillItemSelector = '.e2e-test-skill-item';
 const skillDescriptionSelector = '.e2e-test-skill-description';
-const questionTab = '.e2e-test-questions-tab';
-const toastMessageSelector = '.e2e-test-toast-message';
 const assignSkillButtonDesktop = '.e2e-test-assign-skill-to-topic-button';
 const assignSkillButtonMobile = '.e2e-test-mobile-assign-skill-to-topic-button';
 const topicNameSelector = '.e2e-test-topic-name-in-topic-select-modal';
 const confirmMoveButton = '.e2e-test-confirm-move-button';
 const mergeSkillsButtonMobile = '.e2e-test-mobile-merge-skills-button';
 const mergeSkillsButtonDesktop = '.e2e-test-merge-skills-button';
+
+// Story Creation Modal.
+const addStoryButton = 'button.e2e-test-create-story-button';
+const storyTitleField = 'input.e2e-test-new-story-title-field';
+const storyDescriptionField = 'textarea.e2e-test-new-story-description-field';
+const storyUrlFragmentField = 'input.e2e-test-new-story-url-fragment-field';
+const createStoryButton = 'button.e2e-test-confirm-story-creation-button';
+const saveStoryButton = 'button.e2e-test-save-story-button';
+const publishStoryButton = 'button.e2e-test-publish-story-button';
+const storyMetaTagInput = '.e2e-test-story-meta-tag-content-field';
+const unpublishStoryButton = 'button.e2e-test-unpublish-story-button';
+const mobileStoryDropdown = '.e2e-test-story-dropdown';
+const mobileSaveStoryChangesDropdown =
+  'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
+const mobileSaveStoryChangesButton =
+  'div.navbar-mobile-options .e2e-test-mobile-save-changes';
+const mobilePublishStoryButton =
+  'div.navbar-mobile-options .e2e-test-mobile-publish-button';
+
+// Chapter Creation Modal.
+const addChapterButton = 'button.e2e-test-add-chapter-button';
+const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
+const chapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
+const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
+const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
+
+// Question Editor.
+const questionTab = '.e2e-test-questions-tab';
+const toastMessageSelector = '.e2e-test-toast-message';
 const editQuestionButtons = '.e2e-test-edit-question-button';
 const linkOffIcon = '.link-off-icon';
 const removeQuestionConfirmationButton =
@@ -94,6 +96,12 @@ const questionTextInput = '.e2e-test-question-text-input';
 const questionData = '.question-data';
 const questionContentSelector = 'oppia-learner-view-card-top-content';
 const textInputInteractionField = '.e2e-test-description-box';
+const skillNameInputSelector = '.e2e-test-skill-name-input';
+const radioInnerCircleSelector = '.mat-radio-inner-circle';
+const confirmSkillSelectionButtonSelector =
+  '.e2e-test-confirm-skill-selection-button';
+const questionTextSelector = '.question-text';
+
 export class TopicManager extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -252,16 +260,32 @@ export class TopicManager extends BaseUser {
     await this.navigateToSkillTab();
 
     const skillItem = await this.selectSkill(skillName);
+    if (!skillItem) {
+      throw new Error(`Skill "${skillName}" not found`);
+    }
     await skillItem.click();
 
     await this.page.waitForSelector(skillOptions);
+    const skillOptionsElement = await this.page.$(skillOptions);
+    if (!skillOptionsElement) {
+      throw new Error(
+        `Skill options element not found for skill "${skillName}"`
+      );
+    }
     await this.clickOn(skillOptions);
 
     await this.page.waitForSelector(unassignSkillSelector);
+    const unassignSkillSelectorElement = await this.page.$(
+      unassignSkillSelector
+    );
+    if (!unassignSkillSelectorElement) {
+      throw new Error('Unassign skill selector not found');
+    }
     await this.clickOn(unassignSkillSelector);
 
     // Select the topic to unassign from.
     const topicLabels = await this.page.$$(unassignTopicLabel);
+    let topicFound = false;
     for (const topicLabel of topicLabels) {
       const labelTopicName = await topicLabel.$eval(
         topicNameSpan,
@@ -269,14 +293,23 @@ export class TopicManager extends BaseUser {
       );
       if (labelTopicName === topicName) {
         const checkbox = await topicLabel.$(unassignTopicCheckbox);
-        if (checkbox) {
-          await checkbox.click();
+        if (!checkbox) {
+          throw new Error(`Checkbox not found for topic "${topicName}"`);
         }
+        await checkbox.click();
+        topicFound = true;
         break;
       }
     }
+    if (!topicFound) {
+      throw new Error(`Topic "${topicName}" not found`);
+    }
 
     await this.page.waitForSelector(confirmSkillButton);
+    const confirmSkillButtonElement = await this.page.$(confirmSkillButton);
+    if (!confirmSkillButtonElement) {
+      throw new Error('Confirm skill button not found');
+    }
     await this.clickOn(confirmSkillButton);
   }
 
@@ -285,12 +318,26 @@ export class TopicManager extends BaseUser {
    * @param {string} skillName - The name of the skill to select.
    */
   async selectSkill(skillName: string): Promise<ElementHandle> {
+    await this.page.waitForSelector(skillItemSelector);
     const skillItems = await this.page.$$(skillItemSelector);
+
+    if (!skillItems || skillItems.length === 0) {
+      throw new Error('No skill items found');
+    }
+
     for (const skillItem of skillItems) {
-      const description = await skillItem.$eval(
-        skillDescriptionSelector,
-        el => el.textContent
+      const descriptionElement = await skillItem.$(skillDescriptionSelector);
+      if (!descriptionElement) {
+        throw new Error(
+          `Skill description element not found for skill "${skillName}"`
+        );
+      }
+
+      const description = await this.page.evaluate(
+        el => el.textContent,
+        descriptionElement
       );
+
       if (description === skillName) {
         return skillItem;
       }
@@ -311,7 +358,7 @@ export class TopicManager extends BaseUser {
    * Create questions for a skill.
    * @param {string} skillName - The name of the skill for which to create questions.
    */
-  async expectToastMeassageToBe(expectedMessage: string): Promise<void> {
+  async expectToastMassageToBe(expectedMessage: string): Promise<void> {
     await this.page.waitForSelector(toastMessageSelector, {visible: true});
     const actualMessage = await this.page.$eval(
       toastMessageSelector,
@@ -340,25 +387,44 @@ export class TopicManager extends BaseUser {
     await this.navigateToSkillTab();
 
     const skillItem = await this.selectSkill(skillName);
-
-    const skillOptionsElement = await skillItem.$(skillOptions);
-    if (skillOptionsElement) {
-      await skillOptionsElement.click();
+    if (!skillItem) {
+      throw new Error(`Skill "${skillName}" not found`);
     }
 
+    const skillOptionsElement = await skillItem.$(skillOptions);
+    if (!skillOptionsElement) {
+      throw new Error(
+        `Skill options element not found for skill "${skillName}"`
+      );
+    }
+    await skillOptionsElement.click();
+
     await this.page.waitForSelector(assignSkillButton);
+    const assignSkillButtonElement = await this.page.$(assignSkillButton);
+    if (!assignSkillButtonElement) {
+      throw new Error('Assign skill button not found');
+    }
     await this.clickOn(assignSkillButton);
 
     const topicNames = await this.page.$$(topicNameSelector);
+    let topicFound = false;
     for (const topic of topicNames) {
       const name = await topic.$eval('span', el => el.textContent);
       if (name === topicName) {
         await topic.click();
+        topicFound = true;
         break;
       }
     }
+    if (!topicFound) {
+      throw new Error(`Topic "${topicName}" not found`);
+    }
 
     await this.page.waitForSelector(confirmMoveButton);
+    const confirmMoveButtonElement = await this.page.$(confirmMoveButton);
+    if (!confirmMoveButtonElement) {
+      throw new Error('Confirm move button not found');
+    }
     await this.clickOn(confirmMoveButton);
   }
 
@@ -379,25 +445,59 @@ export class TopicManager extends BaseUser {
     await this.navigateToSkillTab();
 
     const skillItem1 = await this.selectSkill(skillName1);
-    const skillOptionsElement1 = await skillItem1.$(skillOptions);
-    if (skillOptionsElement1) {
-      await skillOptionsElement1.click();
+    if (!skillItem1) {
+      throw new Error(`Skill "${skillName1}" not found`);
     }
 
+    await this.page.waitForSelector(skillOptions);
+    const skillOptionsElement1 = await skillItem1.$(skillOptions);
+    if (!skillOptionsElement1) {
+      throw new Error(
+        `Skill options element not found for skill "${skillName1}"`
+      );
+    }
+    await skillOptionsElement1.click();
+
     const skillItem2 = await this.selectSkill(skillName2);
+    if (!skillItem2) {
+      throw new Error(`Skill "${skillName2}" not found`);
+    }
     await skillItem2.click();
 
     await this.page.waitForSelector(mergeSkillsButton);
+    const mergeSkillsButtonElement = await this.page.$(mergeSkillsButton);
+    if (!mergeSkillsButtonElement) {
+      throw new Error('Merge skills button not found');
+    }
     await this.clickOn(mergeSkillsButton);
 
-    await this.page.waitForSelector('.e2e-test-skill-name-input');
-    await this.page.type('.e2e-test-skill-name-input', skillName2);
+    await this.page.waitForSelector(skillNameInputSelector);
+    const skillNameInputSelectorElement = await this.page.$(
+      skillNameInputSelector
+    );
+    if (!skillNameInputSelectorElement) {
+      throw new Error('Skill name input selector not found');
+    }
+    // Searching by skill name.
+    await this.page.type(skillNameInputSelector, skillName2);
 
-    await this.page.waitForSelector('.mat-radio-inner-circle');
-    await this.clickOn('.mat-radio-inner-circle');
+    await this.page.waitForSelector(radioInnerCircleSelector);
+    const radioInnerCircleSelectorElement = await this.page.$(
+      radioInnerCircleSelector
+    );
+    if (!radioInnerCircleSelectorElement) {
+      throw new Error('Radio inner circle selector not found');
+    }
+    await this.clickOn(radioInnerCircleSelector);
 
-    await this.page.waitForSelector('.e2e-test-confirm-skill-selection-button');
-    await this.clickOn('.e2e-test-confirm-skill-selection-button');
+    await this.page.waitForSelector(confirmSkillSelectionButtonSelector);
+    const confirmSkillSelectionButtonSelectorElement = await this.page.$(
+      confirmSkillSelectionButtonSelector
+    );
+    if (!confirmSkillSelectionButtonSelectorElement) {
+      throw new Error('Confirm skill selection button selector not found');
+    }
+    await this.clickOn(confirmSkillSelectionButtonSelector);
   }
 
   /**
@@ -405,9 +505,12 @@ export class TopicManager extends BaseUser {
    * @param {string} questionText - The text of the question to delete.
    */
   async deleteQuestion(questionText: string): Promise<void> {
+    await this.page.waitForSelector(editQuestionButtons);
     const buttons = await this.page.$$(editQuestionButtons);
+    let questionFound = false;
+
     for (const button of buttons) {
-      const questionTextElement = await button.$('.question-text');
+      const questionTextElement = await button.$(questionTextSelector);
       if (questionTextElement) {
         const text = await questionTextElement.$eval(
           'span',
@@ -417,13 +520,28 @@ export class TopicManager extends BaseUser {
           const icon = await button.$(linkOffIcon);
           if (icon) {
             await icon.click();
+            questionFound = true;
             break;
+          } else {
+            throw new Error(
+              `Link off icon not found for question "${questionText}"`
+            );
           }
         }
       }
     }
 
+    if (!questionFound) {
+      throw new Error(`Question "${questionText}" not found`);
+    }
+
     await this.page.waitForSelector(removeQuestionConfirmationButton);
+    const removeQuestionConfirmationButtonElement = await this.page.$(
+      removeQuestionConfirmationButton
+    );
+    if (!removeQuestionConfirmationButtonElement) {
+      throw new Error('Remove question confirmation button not found');
+    }
     await this.clickOn(removeQuestionConfirmationButton);
   }
 
@@ -455,6 +573,11 @@ export class TopicManager extends BaseUser {
   async expectPreviewQuestionText(expectedText: string): Promise<void> {
     await this.page.waitForSelector(questionContentSelector);
     const questionContentElement = await this.page.$(questionContentSelector);
+
+    if (!questionContentElement) {
+      throw new Error('Question content element not found');
+    }
+
     const questionText = await this.page.evaluate(
       element => element.textContent,
       questionContentElement
