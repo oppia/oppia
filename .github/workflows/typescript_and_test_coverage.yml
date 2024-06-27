@@ -1,4 +1,4 @@
-name: End-to-End coverage and Typescript test
+name: Test coverage and Typescript test
 on:
   merge_group:
     types: [checks_requested]

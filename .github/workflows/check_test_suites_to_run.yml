@@ -13,6 +13,8 @@ jobs:
         os: [ubuntu-22.04]
     outputs:
       test_suites_to_run: ${{ steps.check_test_suites_to_run.outputs.test_suites_to_run }}
+    env:
+      SHOULD_OUTPUT_ALL_TESTS: ${{ github.event_name != 'pull_request' || vars.RUN_SUITES_ON_CHANGED_FILES == 'false' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,8 +37,7 @@ jobs:
           python -m scripts.check_ci_test_suites_to_run
           --github_head_ref="HEAD"
           --github_base_ref="origin/${{ github.event.pull_request.base.ref }}"
-        env:
-          SHOULD_OUTPUT_ALL_TESTS: ${{ github.event_name != 'pull_request' || vars.RUN_SUITES_ON_CHANGED_FILES == 'false' }}
+          ${{ env.SHOULD_OUTPUT_ALL_TESTS && '--output_all_tests' }}
       - name: Upload root files mapping as a github artifact
         uses: actions/upload-artifact@v3
         with:
