@@ -43,18 +43,16 @@ export class SubtopicViewerAuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Promise<boolean> {
-    return new Promise<boolean>((resolve) => {
+    return new Promise<boolean>(resolve => {
       this.accessValidationBackendApiService
         .validateAccessToSubtopicViewerPage(
           this.urlService.getClassroomUrlFragmentFromLearnerUrl(),
           this.urlService.getTopicUrlFragmentFromLearnerUrl(),
           this.urlService.getSubtopicUrlFragmentFromLearnerUrl()
         )
-        .then(
-          () => {
-            resolve(true);
-          }
-        )
+        .then(() => {
+          resolve(true);
+        })
         .catch(err => {
           this.router
             .navigate([
