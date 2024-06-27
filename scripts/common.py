@@ -247,6 +247,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'release-coordinator/flush-and-get-profile-of-redis-cache',
     'super-admin/edit-user-roles',
     'super-admin/load-dummy-data-in-dev-mode',
+    'super-admin/edit-platform-parameters',
     'translation-admin/add-and-remove-translation-rights',
     'topic-manager/create-and-delete-questions-in-skill-editor',
     'topic-manager/create-merge-assign-and-delete-skills',
