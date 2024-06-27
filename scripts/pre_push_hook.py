@@ -73,10 +73,10 @@ FRONTEND_TEST_CMDS: Final = [
     PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
 BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD: Final = [
     PYTHON_CMD, '-m', 'scripts.check_backend_associated_test_file']
-CI_PROTRACTOR_CHECK_CMDS: Final = [
-    PYTHON_CMD, '-m', 'scripts.check_e2e_tests_are_captured_in_ci']
 TYPESCRIPT_CHECKS_CMDS: Final = [
     PYTHON_CMD, '-m', 'scripts.run_typescript_checks']
+TESTS_ARE_CAPTURED_IN_CI_CHECK_CMDS: Final = [
+    PYTHON_CMD, '-m', 'scripts.check_tests_are_captured_in_ci']
 STRICT_TYPESCRIPT_CHECKS_CMDS: Final = [
     PYTHON_CMD, '-m', 'scripts.run_typescript_checks', '--strict_checks']
 GIT_IS_DIRTY_CMD: Final = 'git status --porcelain --untracked-files=no'
@@ -473,19 +473,23 @@ def does_diff_include_ts_files(diff_files: List[bytes]) -> bool:
     return False
 
 
-def does_diff_include_ci_config_or_js_files(diff_files: List[bytes]) -> bool:
-    """Returns true if diff includes CI config or Javascript files.
+def does_diff_include_ci_config_or_test_files(diff_files: List[bytes]) -> bool:
+    """Returns true if diff includes CI config or test files.
 
     Args:
         diff_files: list(bytes). List of files changed.
 
     Returns:
-        bool. Whether the diff contains changes in CI config or
-        Javascript files.
+        bool. Whether the diff contains changes in CI config or test files.
     """
 
     for file_path in diff_files:
-        if file_path.endswith(b'.js') or re.search(rb'e2e_.*\.yml', file_path):
+        if (
+            re.search(rb'ci-test-suite-configs/.*\.json', file_path) or
+            re.search(rb'wdio\.conf\.js', file_path) or
+            re.search(rb'webdriverio', file_path) or
+            re.search(rb'puppeteer-acceptance-tests', file_path)
+        ):
             return True
     return False
 
@@ -603,12 +607,13 @@ def main(args: Optional[List[str]] = None) -> None:
             if frontend_status != 0:
                 print('Push aborted due to failing frontend tests.')
                 sys.exit(1)
-            if does_diff_include_ci_config_or_js_files(files_to_lint):
+            if does_diff_include_ci_config_or_test_files(files_to_lint):
                 ci_check_status = run_script_and_get_returncode(
-                    CI_PROTRACTOR_CHECK_CMDS)
+                    TESTS_ARE_CAPTURED_IN_CI_CHECK_CMDS)
             if ci_check_status != 0:
                 print(
-                    'Push aborted due to failing e2e test configuration check.')
+                    'Push aborted due to failing tests are captured '
+                    'in ci check.')
                 sys.exit(1)
     return
 

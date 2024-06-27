@@ -17,10 +17,6 @@
       "module": "core/tests/webdriverio_desktop/additionalPlayerFeatures.js"
     },
     {
-      "name": "adminPage",
-      "module": "core/tests/webdriverio_desktop/adminPage.js"
-    },
-    {
       "name": "blogDashboard",
       "module": "core/tests/webdriverio_desktop/blogDashboard.js"
     },

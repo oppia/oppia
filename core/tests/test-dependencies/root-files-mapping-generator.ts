@@ -117,6 +117,11 @@ const MANUALLY_MAPPED_DEPENDENCIES: Record<string, string[]> = {
   ],
 };
 
+const LIGHTHOUSE_MODULES = [
+  '.lighthouserc-performance.js',
+  '.lighthouserc-accessibility.js',
+];
+
 const CI_TEST_SUITE_CONFIGS_DIRECTORY = path.resolve(
   ROOT_DIRECTORY,
   'core/tests/ci-test-suite-configs'
@@ -636,6 +641,7 @@ class RootFilesMappingGenerator {
     const validRootFiles: string[] = [
       ...this.pageModulesCoveredByRouteMapping,
       ...this.getTestSuiteModules(),
+      ...LIGHTHOUSE_MODULES,
     ];
     const rootFilesConfig = JSON.parse(
       fs.readFileSync(ROOT_FILES_CONFIG_FILE, 'utf-8')

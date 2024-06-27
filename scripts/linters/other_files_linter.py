@@ -75,6 +75,9 @@ WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT: Final = (
     'revert-web-wiki-updates.yml',
     'frontend_tests.yml'
 )
+JOBS_EXEMPT_FROM_MERGE_REQUIREMENT: Final = [
+    'check_test_suites_to_run'
+]
 
 THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
     {
@@ -327,7 +330,10 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         """
         jobs_without_merge = []
         for job, job_dict in workflow_dict['jobs'].items():
-            if MERGE_STEP not in job_dict['steps']:
+            if (
+                job not in JOBS_EXEMPT_FROM_MERGE_REQUIREMENT and
+                MERGE_STEP not in job_dict['steps']
+            ):
                 jobs_without_merge.append(job)
         return [
             '%s --> Job %s does not use the .github/actions/merge action.' % (
