@@ -3,217 +3,355 @@
   compilation, here are sme additional rules that can be added to the CSS files:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
-.oppia-classroom-search-container {
-  background-color: #d7d7d7;
-  bottom: 0;
-  padding-bottom: 10px;
+
+.oppia-classroom-page-container {
+  align-items: start;
+  background-color: #eeee;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  justify-content: center;
+  position: relative;
   width: 100vw;
 }
 
-.oppia-classroom-viewer-container {
-  text-align: left;
+.oppia-classroom-page-container .classroom-top {
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 195px;
 }
 
-.oppia-classroom-search-section .classroom-page-search-bar {
-  margin-left: -18px;
-}
-
-.oppia-classroom-details {
-  font-family: 'Roboto', Arial, sans-serif;
-  font-size: 0.95em;
-}
-
-.oppia-classroom-details .course-details {
-  margin-bottom: 4vh;
-}
-
-.oppia-classroom-details h2 {
-  color: #545454;
-}
-
-.oppia-classroom-details p {
-  line-height: 2;
-}
-
-.oppia-classroom-viewer-container,
-.oppia-classroom-search-section {
-  display: grid;
+.oppia-classroom-page-container .classroom-content-container {
+  align-items: start;
+  display: flex;
   justify-content: center;
-  margin-left: auto;
-  margin-right: auto;
-  width: 75vw;
+  width: 100vw;
 }
 
-.oppia-classroom-search-container .initial-help-text {
-  font-weight: 500;
-  padding-top: 2.5vh;
+.classroom-content-container .classroom-content {
+  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  justify-content: start;
+  padding-top: 32px;
+  width: 686px;
 }
 
-.classroom-page-help-text {
-  color: #01645c;
+.classroom-content-container .classroom-content .content-section {
+  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  justify-content: start;
+}
+
+.classroom-content-container .classroom-content .diagnostic-test-container {
+  align-items: start;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 686px;
+}
+
+.classroom-content-container .classroom-content .diagnostic-test-container .diagnostic-test-box {
+  align-items: flex-start;
+  background: #eef5fb;
+  border-radius: 4px;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 115px;
+  padding: 24px 36px;
+  width: 338px;
+}
+
+.diagnostic-test-container .diagnostic-test-box .diagnostic-test-info {
+  color: #3c3c3c;
   font-family: 'Roboto', Arial, sans-serif;
-  font-size: 1.2em;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  height: 43px;
+  letter-spacing: -0.02em;
+  line-height: 20px;
+  width: 266px;
 }
 
-.classroom-name {
-  color: #01645c;
+.diagnostic-test-container .diagnostic-test-box .diagnostic-test-info p {
+  color: #3c3c3c;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 20px;
 }
 
-.oppia-classroom-viewer-container .oppia-classroom-header {
-  color: #01645c;
+.diagnostic-test-container .diagnostic-test-box a {
+  color: #00645c;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 16px;
+  text-decoration: none;
+}
+
+.classroom-content-container .classroom-content .topic-tiles-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin-top: 18px;
+  width: 686px;
+}
+
+.classroom-content-container .classroom-content .topic-tiles-container .oppia-topic-summary-tile {
+  height: 220px;
+  width: 210px;
+}
+
+.classroom-content-container .classroom-content .content-section .classroom-content-heading {
+  color: #3c3c3c;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 38px;
+}
+
+.classroom-content-container .classroom-content .content-section .classroom-content-text {
+  color: #3c3c3c;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 20px;
+}
+
+.oppia-classroom-page-container .classroom-top .classroom-admin-banner {
+  align-items: center;
+  background-color: #015f9c ;
+  color: white;
+  display: flex;
+  justify-content: center;
+  padding: 4px;
+  position: absolute;
+  top: 0;
+  width: 100vw;
+}
+
+.oppia-classroom-page-container .breadcrumbs-container {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  width: 100%;
+}
+
+.breadcrumbs-container .classroom-breadcrumbs {
+  align-items: start;
+  color: #00645c;
+  display: flex;
+  flex-direction: column;
+  margin-top: 28px;
+  width: 686px;
+}
+
+.breadcrumbs-container .classroom-information-container {
+  align-items: start;
+  display: flex;
+  height: 120px;
+  justify-content: space-between;
+  margin-top: 14px;
+  width: 686px;
+}
+
+.breadcrumbs-container .classroom-information-container .classroom-text-container h3 {
+  color: #00645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  margin-bottom: 25px;
-  margin-top: 0;
-  padding-top: 66.5px;
-  text-align: left;
+  font-size: 22.6045px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 28px;
+  margin: 0;
 }
 
-.oppia-classroom-viewer-container .oppia-topic-summary-tiles {
-  display: grid;
-  grid-template-columns: 210px 210px 210px;
-  justify-content: space-evenly;
-  margin-bottom: 10vh;
-  margin-top: 40px;
-  overflow-y: auto;
-  row-gap: 24px;
+.breadcrumbs-container .classroom-information-container .classroom-text-container h1 {
+  color: #00645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 54px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 68px;
 }
 
-.oppia-topic-summary-tile {
-  margin: 0 12px;
+.breadcrumbs-container .classroom-breadcrumbs .desktop-breadcrumbs {
+  align-items: center;
+  display: flex;
+  gap: 4px;
 }
 
-.oppia-classroom-viewer-container .classroom-name {
-  font-size: 3em;
+.breadcrumbs-container .classroom-breadcrumbs .mobile-breadcrumbs {
+  display: none;
 }
-.oppia-classroom-viewer-container .classroom-header {
-  font-size: 1.2em;
+
+.classroom-breadcrumbs .mobile-breadcrumbs a,
+.classroom-breadcrumbs .desktop-breadcrumbs a,
+.classroom-breadcrumbs .mobile-breadcrumbs span,
+.classroom-breadcrumbs .desktop-breadcrumbs span {
+  color: #00645c;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 16px;
 }
-.oppia-classroom-viewer-container .oppia-classroom-banner {
-  height: auto;
-  margin-left: 25vw;
-  margin-top: -120px;
+
+.breadcrumbs-container .classroom-breadcrumbs .mobile-breadcrumbs i,
+.breadcrumbs-container .classroom-breadcrumbs .desktop-breadcrumbs i {
+  font-size: 13px;
+}
+
+.oppia-classroom-search-container {
+  align-items: center;
+  background-color: #d7d7d7;
+  display: flex;
+  flex-direction: column;
+  height: 140px;
+  justify-content: center;
+  margin-top: 52px;
+  padding: 10px 0;
+  width: 100vw;
+}
+
+.oppia-classroom-search-container .oppia-classroom-search-section {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.oppia-classroom-search-container .search-box-text-container {
+  align-items: start;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+  width: 100%;
+}
+
+.oppia-classroom-search-container .search-box-text-container .classroom-page-search-heading {
+  color: #00645c;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  margin: 0;
   text-align: center;
 }
-.oppia-classroom-banner-img {
-  height: auto;
-  max-width: 400px;
-  width: 15vw;
-}
-.oppia-classroom-page-guidance-tile-container {
-  display: flex;
-  justify-content: space-evenly;
-  margin: 20px 0;
-}
-.oppia-classroom-page-guidance-tile {
-  border: 1px solid;
-  border-radius: 10px;
-  margin: 10px;
-  padding: 20px;
-}
-.oppia-classroom-page-tile-button-text {
-  color: #094142;
-  text-transform: uppercase;
-}
-classroom-page .oppia-classroom-page-subheading-text {
-  font-size: 1em;
+
+.oppia-classroom-search-container .search-box-text-container .classroom-page-search-subheading {
+  color: #0a665f;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  text-align: center;
 }
 
-@media(max-width: 1150px) {
-  .oppia-topic-summary-tiles {
-    margin-bottom: 20vw;
-  }
-
-  .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
-    grid-template-columns: 180px 180px 180px;
-  }
-
-  .oppia-classroom-viewer-container,
-  .oppia-classroom-search-section {
-    width: 60vw;
-  }
-}
-
-@media (max-width: 880px) {
-  .oppia-classroom-viewer-container .classroom-header {
-    margin-top: -3vh;
-  }
-  .oppia-classroom-search-container .initial-help-text {
-    padding-top: 0.5vh;
-  }
-
-  .oppia-classroom-viewer-container {
-    width: 80vw;
-  }
-
-  .oppia-classroom-search-section {
-    text-align: center;
-    width: 95vw;
-  }
-
-  .oppia-classroom-search-bar-container {
-    display: flex;
-    justify-content: center;
+@media screen and (max-width: 768px) {
+  .breadcrumbs-container .classroom-breadcrumbs {
+    width: 90vw;
   }
 
   .oppia-classroom-search-container {
-    padding-bottom: 12vw;
+    height: 220px;
   }
 
-  .classroom-page-help-text {
-    font-size: 1em;
+  .breadcrumbs-container .classroom-breadcrumbs .mobile-breadcrumbs {
+    align-items: center;
+    display: flex;
+    gap: 4px;
   }
 
-  .oppia-classroom-viewer-container .oppia-classroom-banner {
-    margin-left: 12.5vw;
-    margin-top: -7vh;
-    width: 50vw;
+  .breadcrumbs-container .classroom-breadcrumbs .desktop-breadcrumbs {
+    display: none;
   }
-  .oppia-classroom-banner-img {
+
+  .classroom-content-container .classroom-content,
+  .breadcrumbs-container .classroom-breadcrumbs,
+  .breadcrumbs-container .classroom-information-container,
+  .classroom-content-container .classroom-content .topic-tiles-container,
+  .classroom-content-container .classroom-content .diagnostic-test-container {
+    width: 90vw;
+  }
+
+  .classroom-content-container .classroom-content .diagnostic-test-container {
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+
+  .classroom-content-container .classroom-content .diagnostic-test-container .diagnostic-test-box {
     width: 100%;
   }
-  .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
-    grid-template-columns: 150px 150px 150px;
-    margin-bottom: 5vh;
-    margin-top: 5vh;
+
+  .classroom-content-container .classroom-content .topic-tiles-container {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .breadcrumbs-container .classroom-information-container {
+    margin-top: 12px;
   }
 }
 
-@media screen and (max-width: 1806px) {
-  .oppia-classroom-details {
-    margin-top: 1vh;
-    padding-top: 1vh;
-  }
-}
-
-@media screen and (max-width: 1489px) {
-  .oppia-classroom-details {
-    margin-top: 2.4vh;
-    padding-top: 2.4vh;
-  }
-}
-
-@media screen and (max-width: 1321px) {
-  .oppia-classroom-details {
-    margin-top: 3.8vh;
-    padding-top: 3.8vh;
-  }
-}
-
-@media(max-width: 600px) {
-  .oppia-classroom-viewer-container {
-    width: 85vw;
+@media screen and (max-width: 498px) {
+  .classroom-content-container .classroom-content .topic-tiles-container .oppia-topic-summary-tile {
+    height: 157px;
+    width: 45%;
   }
 
-  .oppia-classroom-search-section {
-    width: 95vw;
+  .breadcrumbs-container .classroom-information-container .classroom-text-container h3 {
+    font-size: 18px;
+    font-style: normal;
+    line-height: 22px;
+  }
+  .breadcrumbs-container .classroom-information-container .classroom-text-container h1 {
+    font-size: 48px;
+    letter-spacing: -0.02em;
+    line-height: 36px;
+    margin-top: 10px;
   }
 
-  .oppia-classroom-details {
-    font-size: 0.8em;
+  .breadcrumbs-container .classroom-information-container .classroom-thumbnail-container img {
+    margin-right: 15px;
+    width: 70px;
   }
 
-  .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
-    display: grid;
-    grid-template-columns: 150px 150px;
+  .classroom-content-container .classroom-content .content-section .classroom-content-heading {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 120%;
   }
+
+  .classroom-content-container .classroom-content .topic-tiles-container {
+    row-gap: 52px;
+  }
+
+  .oppia-classroom-search-container {
+    height: 220px;
+  }
+  
+  .oppia-classroom-search-container .search-box-text-container {
+    align-items: center;
+  }
+
+  .oppia-classroom-search-container .oppia-classrooms-search-section .search-box-text-container {
+    align-items: center;
+  }
+
 }
