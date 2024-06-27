@@ -49,7 +49,7 @@ jobs:
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
       - name: Build Webpack
-        run: python -m scripts.build 
+        run: python -m scripts.build --prod_env
       - name: Zip build files
         # We avoid using ../ or absolute paths because unzip treats these as
         # security issues and will refuse to follow them.
@@ -91,6 +91,7 @@ jobs:
   #         - name: explorationStatisticsTab
   #         - name: explorationTranslationTab
   #         - name: extensions
+  #         - name: featureGating
   #         - name: feedbackUpdates
   #         - name: fileUploadExtensions
   #         - name: fileUploadFeatures
@@ -419,8 +420,6 @@ jobs:
         - name: (Artifact re-build) Build Webpack
           if: steps.download_artifact_1.outcome == 'failure'
           run: python -m scripts.build --prod_env
-        - name: Run Desktop Acceptance Test ${{ matrix.suite }} in dev mode
-          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }}
         - name: Run Desktop Acceptance Test ${{ matrix.suite }}
           run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env
         - name: Uploading generated test to angular module mapping as an artifact
