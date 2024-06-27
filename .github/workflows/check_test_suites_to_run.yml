@@ -37,7 +37,7 @@ jobs:
           python -m scripts.check_ci_test_suites_to_run
           --github_head_ref="HEAD"
           --github_base_ref="origin/${{ github.event.pull_request.base.ref }}"
-          ${{ env.SHOULD_OUTPUT_ALL_TESTS == true && '--output_all_test_suites' || '' }}
+          ${{ env.SHOULD_OUTPUT_ALL_TESTS == 'true' && '--output_all_test_suites' }}
       - name: Upload root files mapping as a github artifact
         uses: actions/upload-artifact@v3
         with:
