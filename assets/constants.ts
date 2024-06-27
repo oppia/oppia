@@ -7482,6 +7482,23 @@ export default {
     }
   },
 
+  "TOPIC_EDITOR": {
+    "ROUTE": "topic_editor/:topic_id",
+    "TITLE": "Topic Editor",
+    "META": [
+      {
+        "PROPERTY_TYPE": "itemprop",
+        "PROPERTY_VALUE": "description",
+        "CONTENT": "Edit and manage topics with the Topic Editor in Oppia."
+      },
+      {
+        "PROPERTY_TYPE": "itemprop",
+        "PROPERTY_VALUE": "og:description",
+        "CONTENT": "Edit and manage topics with the Topic Editor in Oppia."
+      }
+    ]
+  },
+
   "DEV_MODE": true,
   "EMULATOR_MODE": true,
   "ASSET_TYPE_AUDIO": "audio",
