@@ -23,7 +23,7 @@
     </div>
     <div class="classroom-information-container">
       <div class="classroom-text-container">
-        <h3>{{ 'I18N_CLASSROOM_HEADING' | translate:{ classroomName: classroomData.getName() } }}</h3>
+        <span>{{ 'I18N_CLASSROOM_HEADING' | translate:{ classroomName: classroomData.getName() } }}</span>
         <h1 *ngIf="!isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}">{{classroomData.getName()}}</h1>
         <h1 *ngIf="isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}">{{classroomTranslationKeys.name | translate}}</h1>
       </div>
@@ -76,9 +76,9 @@
   <div class="oppia-classroom-search-container">
     <div class="oppia-classroom-search-section">
       <div class="search-box-text-container">
-        <h3 class="classroom-page-search-heading initial-help-text">
+        <span class="classroom-page-search-heading initial-help-text">
           {{ 'I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING' | translate }}
-        </h3>
+        </span>
         <p class="classroom-page-search-subheading">
           {{ 'I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING' | translate }}
         </p>
