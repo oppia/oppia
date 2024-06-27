@@ -152,13 +152,6 @@ const routes: Route[] = [
       import('pages/about-page/about-page.module').then(m => m.AboutPageModule),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE,
-    loadChildren: () =>
-      import('pages/about-foundation-page/about-foundation-page.module').then(
-        m => m.AboutFoundationPageModule
-      ),
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
       .CONTRIBUTOR_DASHBOARD_ADMIN.ROUTE,
     loadChildren: () =>
