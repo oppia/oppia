@@ -12,7 +12,7 @@ on:
       - release-*
 
 jobs:
-  test_ci_coverage_and_typescript_tests:
+  e2e_acceptance_coverage_and_typescript_tests:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
