@@ -78,7 +78,6 @@ jobs:
           - name: blog
           - name: checkpointFeatures
           - name: classroomPage
-          - name: classroomPageFileUploadFeatures
           - name: collections
           - name: contributorDashboard
           - name: contributorAdminDashboard
