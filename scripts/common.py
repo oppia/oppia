@@ -227,7 +227,6 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/check-all-user-flow-of-parent-teacher',
     'logged-out-user/check-all-user-flow-of-partner',
     'logged-out-user/check-all-user-flow-of-volunteer',
-    'logged-out-user/click-all-buttons-on-about-foundation-page',
     'logged-out-user/click-all-buttons-on-about-page',
     'logged-out-user/click-all-buttons-on-contact-us-page',
     'logged-out-user/click-all-buttons-on-donation-thanks-page',
