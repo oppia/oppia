@@ -750,6 +750,14 @@
   }
 
 }
+
+.free-of-cost-panel,
+.free-of-cost-panel button, 
+.free-of-cost-panel .accordion-icon {
+  background-color: #00645c;
+  color: #fff;
+}
+
 .about-page .oppia-about-cta-button {
   border-radius: 4px;
   color: #fff;
@@ -945,7 +953,7 @@
 }
 
 .about-page .oppia-about-cta-volunteer {
-  padding: 48px 32px;
+  padding: 48px 16px;
 }
 
 .about-page .oppia-about-cta-volunteer-buttons-container {
@@ -1002,14 +1010,38 @@
   cursor: pointer;
 }
 
-.about-page .oppia-about-cta-section  .carousel-indicators {
+.about-page .oppia-about-cta-section .carousel-indicators {
   bottom: -72px;
-  gap: 16px;
+  gap: 0;
 }
 
 .about-page .oppia-about-cta-section .carousel-indicators li {
-  height: 16px;
-  width: 16px;
+  height: 12px;
+  width: 12px;
+}
+
+.about-page .oppia-cta-carousel-container {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
+.about-page .oppia-cta-carousel-control-prev-icon,
+.about-page .oppia-cta-carousel-control-next-icon {
+  color: #00645c;
+  font-size: 24px;
+}
+.about-page .oppia-cta-carousel-control-next-btn,
+.about-page .oppia-cta-carousel-control-prev-btn {
+  background-color: transparent;
+  padding: 0;
+}
+.about-page .oppia-cta-carousel-container button, 
+.about-page .oppia-cta-carousel-container button:focus,
+.about-page .oppia-cta-carousel-container button:hover,
+.about-page .oppia-cta-carousel-container button:active {
+  border: none;
+  outline: none;
 }
 
 @media only screen and (max-width: 769px) {
@@ -1052,12 +1084,21 @@
   }
   
   .about-page .oppia-about-cta-role-card {
-    min-height: 342px;
+    min-height: 356px;
     width: calc((100% - 8px) / 2);
   }
 
   .about-page .oppia-about-cta-volunteer-buttons-container {
     margin-top: 76px;
+  }
+
+  .about-page .oppia-about-cta-section .carousel-indicators li {
+    height: 8px;
+    width: 8px;
+  }
+
+  .about-page .oppia-cta-carousel-container {
+    gap: 8px;
   }
 }
 
@@ -1076,37 +1117,9 @@
     padding: 32px 15px;
   }
   .about-page .oppia-about-cta-role-card {
-    min-height: 356px;
+    min-height: 340px;
     padding: 24px 16px;
-    width: calc((100% - 56px) / 2);
-  }
-  .about-page .oppia-about-cta-section .carousel-indicators {
-    gap: 4px;
-  }
-  .about-page .oppia-about-cta-section .carousel-indicators li {
-    height: 8px;
-    width: 8px;
-  }
-  .about-page .oppia-about-cta-section .carousel-control-prev-icon {
-    background-image: url(/assets/images/icons/oppia-left-chevron-icon.svg);
-  }
-  .about-page .oppia-about-cta-section .carousel-control-next-icon {
-    background-image: url(/assets/images/icons/oppia-right-chevron-icon.svg);
-  }
-  .about-page .oppia-about-cta-section .carousel-control-prev-icon,
-  .about-page .oppia-about-cta-section .carousel-control-next-icon {
-    height: 29px;
-    width: 16px;
-  }
-  .about-page .oppia-about-cta-section .carousel-control-next,
-  .about-page .oppia-about-cta-section .carousel-control-prev {
-    opacity: 1;
-  }
-  .about-page .oppia-about-cta-section .carousel-control-next {
-    right: -35px;
-  }
-  .about-page .oppia-about-cta-section .carousel-control-prev {
-    left: -35px;
+    width: calc((100% - 8px) / 2);
   }
 }
 
@@ -1183,18 +1196,16 @@
     padding: 32px 16px;
   }
   .about-page .oppia-about-cta-role-card {
-    width: 84%;
+    min-height: 340px;
+    width: 100%;
   }
   .about-page .oppia-about-cta-volunteer-buttons-container {
     align-items: center;
     flex-direction: column;
     gap: 8px;
   }
-  .about-page .oppia-about-cta-section .carousel-control-next {
-    right: -14px;
-  }
-  .about-page .oppia-about-cta-section .carousel-control-prev {
-    left: -14px;
+  .about-page .about-page .oppia-cta-carousel-container {
+    gap: 6px;
   }
 }
 
@@ -1308,13 +1319,6 @@
   justify-content: start;
   line-height: 21.6px;
   padding: 12px 16px 20px 28px;
-}
-
-.free-of-cost-panel,
-.free-of-cost-panel button, 
-.free-of-cost-panel .accordion-icon {
-  background-color: #00645c;
-  color: #fff;
 }
 
 .about-page  .oppia-about-non-desktop-content {

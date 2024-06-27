@@ -16,13 +16,13 @@
  * @fileoverview Component for the about page.
  */
 
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit, OnDestroy, ViewChild} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {OppiaPlatformStatsData} from '../../oppia-platform-stats';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCarousel, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
 import {ThanksForDonatingModalComponent} from 'pages/donate-page/thanks-for-donating-modal.component';
@@ -41,6 +41,9 @@ import {AccordionPanelData} from './data.model';
   styleUrls: ['./about-page.component.css'],
 })
 export class AboutPageComponent implements OnInit, OnDestroy {
+  @ViewChild('volunteerCarousel') volunteerCarousel!: NgbCarousel;
+  @ViewChild('volunteerCarouselMobile') volunteerCarouselMobile!: NgbCarousel;
+
   featuresData: AccordionPanelData[] = [
     {
       title: 'I18N_ABOUT_PAGE_FEATURE_TITLE1',
@@ -170,7 +173,6 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     mobile: [[0], [1], [2], [3], [4]],
   };
   screenType!: 'desktop' | 'tablet' | 'mobile';
-  showNavigationArrowsForCarousel = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -214,7 +216,6 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     } else {
       this.screenType = 'desktop';
     }
-    this.showNavigationArrowsForCarousel = width < 641;
   }
 
   setPartnershipsFormLink(): void {
@@ -284,6 +285,22 @@ export class AboutPageComponent implements OnInit, OnDestroy {
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  moveCarouselToPreviousSlide(): void {
+    if (this.screenType === 'mobile') {
+      this.volunteerCarouselMobile.prev();
+    } else {
+      this.volunteerCarousel.prev();
+    }
+  }
+
+  moveCarouselToNextSlide(): void {
+    if (this.screenType === 'mobile') {
+      this.volunteerCarouselMobile.next();
+    } else {
+      this.volunteerCarousel.next();
+    }
   }
 
   ngOnDestroy(): void {
