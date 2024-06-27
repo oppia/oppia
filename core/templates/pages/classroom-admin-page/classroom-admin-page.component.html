@@ -182,7 +182,6 @@
                     <span class="topics-name">
                       <strong>{{ topicName }}</strong>
                     </span>
-
                     <div class="prerequisite-topics-container">
                       <div *ngIf="!classroomEditorMode">
                         <span *ngIf="getPrerequisiteLength(topicName) === 0">
@@ -563,6 +562,14 @@
   @media screen and (max-width: 768px) {
     .oppia-editor-card-with-avatar {
       margin-top: 20px;
+    }
+
+    .oppia-classroom-input-container span {
+      padding-left: 0;
+    }
+
+    .topic-dependency-container {
+      overflow: auto;
     }
   }
 </style>
