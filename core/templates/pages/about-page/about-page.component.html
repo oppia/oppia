@@ -167,10 +167,10 @@
         <div class="oppia-about-partnerships-card-bottom">
           <div class="oppia-about-partnerships-card-image-container">
             <picture class="oppia-about-partnerships-card-image">
-              <source type="image/webp" [srcset]="getImageSet(partner.imageUrl, 'webp', [1,1.5,2])">
-              <source type="image/png" [srcset]="getImageSet(partner.imageUrl, 'png', [1,1.5,2])">
+              <source type="image/webp" [srcset]="getImageSet(partner.imageUrl, 'webp', [1,1.5])">
+              <source type="image/png" [srcset]="getImageSet(partner.imageUrl, 'png', [1,1.5])">
               <img [src]="getStaticImageUrl( partner.imageUrl + '1x.png')"
-                   alt="Images of different organizations partnered with Oppia">
+                   alt="{{ 'Activities of ' + (partner.name | translate) + ' partnered with Oppia'}}">
             </picture>
           </div>
           <div class="oppia-about-partnerships-card-content">
@@ -187,10 +187,10 @@
           <div class="oppia-about-partnerships-card">
             <div class="oppia-about-partnerships-card-image-container">
               <picture class="oppia-about-partnerships-card-image">
-                <source type="image/webp" [srcset]="getImageSet(partner.imageUrl, 'webp', [1,1.5,2])">
-                <source type="image/png" [srcset]="getImageSet(partner.imageUrl, 'png', [1,1.5,2])">
+                <source type="image/webp" [srcset]="getImageSet(partner.imageUrl, 'webp', [1,1.5])">
+                <source type="image/png" [srcset]="getImageSet(partner.imageUrl, 'png', [1,1.5])">
                 <img [src]="getStaticImageUrl( partner.imageUrl + '1x.png')"
-                     alt="Images of different organizations partnered with Oppia">
+                     alt="{{ 'Activities of ' + (partner.name | translate) + ' partnered with Oppia'}}">
               </picture>
             </div>
             <div class="oppia-about-partnerships-card-content-container">
@@ -436,7 +436,7 @@
               </oppia-primary-button>
               <oppia-primary-button
                 buttonHref="/volunteer"
-                [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext']"
+                [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-volunteer-learn-more-desktop-button']"
                 buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
               </oppia-primary-button>
             </div>
@@ -495,7 +495,7 @@
                 </div>
                 <oppia-primary-button
                   buttonHref="/partnerships"
-                  [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext']"
+                  [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-partner-learn-more-desktop-button']"
                   buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
                 </oppia-primary-button>
               </div>
@@ -608,7 +608,7 @@
               </oppia-primary-button>
               <oppia-primary-button
                 buttonHref="/volunteer"
-                [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext']"
+                [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-volunteer-learn-more-mobile-button']"
                 buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
               </oppia-primary-button>
             </div>
@@ -669,7 +669,7 @@
                 </div>
                 <oppia-primary-button
                   buttonHref="/partnerships"
-                  [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext']"
+                  [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-partner-learn-more-mobile-button']"
                   buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
                 </oppia-primary-button>
               </div>

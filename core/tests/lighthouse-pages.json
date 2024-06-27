@@ -7,10 +7,6 @@
     "url": "http://localhost:8181/about",
     "page_module": "core/templates/pages/about-page/about-page.module.ts"
   },
-  "about-foundation": {
-    "url": "http://localhost:8181/about-foundation",
-    "page_module": "core/templates/pages/about-foundation-page/about-foundation-page.module.ts"
-  },
   "admin": {
     "url": "http://localhost:8181/admin",
     "page_module": "core/templates/pages/admin-page/admin-page.module.ts"

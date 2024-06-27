@@ -227,7 +227,7 @@ jobs:
         os: [ubuntu-22.04]
         shard:
           - name: 1
-            pages_to_run: splash,about,about-foundation,admin,blog-dashboard,community-library,contact,contributor-dashboard,creator-dashboard,creator-guidelines,delete-account,donate,email-dashboard,get-started,learner-dashboard,license,moderator
+            pages_to_run: splash,about,admin,blog-dashboard,community-library,contact,contributor-dashboard,creator-dashboard,creator-guidelines,delete-account,donate,email-dashboard,get-started,learner-dashboard,license,moderator
           - name: 2
             pages_to_run: preferences,privacy-policy,profile,signup,teach,topics-and-skills-dashboard,terms,thanks,volunteer,topic-viewer,story-viewer,classroom,exploration-editor,exploration-player,topic-editor,skill-editor,story-editor
     name: lighthouse (${{ matrix.os }}, ${{ matrix.shard.name }})
@@ -330,7 +330,6 @@ jobs:
             - logged-out-user/check-all-user-flow-of-parent-teacher
             - logged-out-user/check-all-user-flow-of-partner
             - logged-out-user/check-all-user-flow-of-volunteer
-            - logged-out-user/click-all-buttons-on-about-foundation-page
             - logged-out-user/click-all-buttons-on-about-page
             - logged-out-user/click-all-buttons-on-contact-us-page
             - logged-out-user/click-all-buttons-on-donation-thanks-page

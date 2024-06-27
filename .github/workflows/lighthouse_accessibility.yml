@@ -19,7 +19,7 @@ jobs:
         os: [ubuntu-22.04]
         shard:
           - name: 1
-            pages_to_run: splash,about,about-foundation,admin,blog-dashboard,community-library,contact,contributor-dashboard,creator-dashboard,creator-guidelines,delete-account,donate,email-dashboard,get-started,learner-dashboard,license,moderator
+            pages_to_run: splash,about,admin,blog-dashboard,community-library,contact,contributor-dashboard,creator-dashboard,creator-guidelines,delete-account,donate,email-dashboard,get-started,learner-dashboard,license,moderator
           - name: 2
             pages_to_run: preferences,privacy-policy,profile,signup,teach,topics-and-skills-dashboard,terms,thanks,volunteer,topic-viewer,story-viewer,classroom,exploration-editor,exploration-player,topic-editor,skill-editor,story-editor
     name: lighthouse_accessibility (${{ matrix.os }}, ${{ matrix.shard.name }})

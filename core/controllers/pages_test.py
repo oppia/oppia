@@ -32,11 +32,6 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
             '/credits', expected_status_int=302)
         self.assertIn('about', response.headers['location'])
 
-    def test_redirect_foundation(self) -> None:
-        response = self.get_html_response(
-            '/foundation', expected_status_int=302)
-        self.assertIn('about-foundation', response.headers['location'])
-
     def test_redirect_teach(self) -> None:
         response = self.get_html_response(
             '/participate', expected_status_int=302)

@@ -228,15 +228,6 @@ describe('Static Pages Tour', function () {
     );
   });
 
-  it('should visit the About the Oppia Foundation page', async function () {
-    await browser.url('/about-foundation');
-    await waitFor.pageToFullyLoad();
-    await waitFor.visibilityOf(
-      $('.e2e-test-about-foundation-page'),
-      'About Foundation page takes too long to appear'
-    );
-  });
-
   it('should visit the Privacy page', async function () {
     await browser.url('/privacy-policy');
     await waitFor.pageToFullyLoad();

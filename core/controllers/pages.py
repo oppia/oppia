@@ -47,18 +47,6 @@ class AboutRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         self.redirect('/about')
 
 
-class FoundationRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """A page that redirects to the separate Oppia Foundation site."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Handles GET requests."""
-        self.redirect(feconf.ABOUT_FOUNDATION_PAGE_URL)
-
-
 class TeachRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """A page that redirects to the main Teach page."""
 

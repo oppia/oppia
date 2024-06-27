@@ -223,7 +223,6 @@ URLS = [
     get_redirect_route(r'/splash', SplashRedirectPage),
     get_redirect_route(
         r'/internetconnectivityhandler', InternetConnectivityHandler),
-    get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),
     get_redirect_route(r'/site_guidelines', pages.TeachRedirectPage),

@@ -33,10 +33,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-about-page.spec.ts"
     },
     {
-      "name": "logged-out-user/click-all-buttons-on-about-foundation-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-about-foundation-page.spec.ts"
-    },
-    {
       "name": "logged-out-user/click-all-buttons-on-navbar",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-navbar.spec.ts"
     },
