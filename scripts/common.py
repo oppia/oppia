@@ -248,6 +248,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'super-admin/edit-user-roles',
     'super-admin/load-dummy-data-in-dev-mode',
     'translation-admin/add-and-remove-translation-rights',
+    'topic-manager/create-and-delete-questions-in-skill-editor',
+    'topic-manager/create-merge-assign-and-delete-skills',
     'voiceover-admin/add-voiceover-artist-to-an-exploration',
 ]
 
