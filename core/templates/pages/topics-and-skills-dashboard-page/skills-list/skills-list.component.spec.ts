@@ -481,7 +481,7 @@ describe('Skills List Component', () => {
     ).toHaveBeenCalledWith(true);
     expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
       'The skill has been assigned to the topic.',
-      1000
+      5000
     );
     mockNgbModal.success = false;
     componentInstance.assignSkillToTopic(

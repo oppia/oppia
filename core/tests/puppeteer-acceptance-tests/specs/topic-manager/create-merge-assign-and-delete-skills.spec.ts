@@ -36,8 +36,8 @@ describe('Topic Manager User Journey', function () {
     );
 
     curriculumAdmin.createTopic('Addition', 'add');
-    curriculumAdmin.createSkillInSkillsTab();
-    curriculumAdmin.createSkillInSkillsTab();
+    curriculumAdmin.createSkillForTopic('Skill 1', 'Addition');
+    curriculumAdmin.createSkillForTopic('Skill 2', 'Addition');
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
@@ -53,11 +53,11 @@ describe('Topic Manager User Journey', function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
       await topicManager.navigateToSkillTab();
 
-      await topicManager.assignSkillToTopic('New Skill', 'Addition');
-      await topicManager.expectSuccessMessage('Skill assigned successfully.');
-
       await topicManager.unassignSkillFromTopic('New Skill', 'Addition');
       await topicManager.expectSuccessMessage('Skill unassigned successfully.');
+
+      await topicManager.assignSkillToTopic('New Skill', 'Addition');
+      await topicManager.expectSuccessMessage('Skill assigned successfully.');
 
       await topicManager.mergeSkills('Skill 1', 'Skill 2');
       await topicManager.expectSuccessMessage('Skills merged successfully.');

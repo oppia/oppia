@@ -18,6 +18,7 @@
 
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
+import {ElementHandle} from 'puppeteer';
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
@@ -64,6 +65,21 @@ const mobileSaveStoryChangesButton =
 const mobilePublishStoryButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-button';
 const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
+const skillTab = '.e2e-test-skills-tab';
+
+const skillEditBox = '.e2e-test-skill-edit-box';
+const mobileSkillsOption = '.e2e-test-mobile-skills-option';
+const unassignSkillButtonDesktop = `.e2e-test-unassign-skill-button`;
+const unassignSkillButtonMobile = `.e2e-test-mobile-unassign-skill-button`;
+const confirmSkillButton = '.e2e-test-confirm-skill-button';
+const unassignTopicLabel = '.e2e-test-unassign-topic-label';
+const unassignTopicCheckbox = '.e2e-test-unassign-topic';
+const topicNameSpan = '.topic-name';
+
+const skillItemSelector = '.e2e-test-skill-item';
+const skillDescriptionSelector = '.e2e-test-skill-description';
+const questionTab = '.e2e-test-question-tab';
+const toastMessageSelector = '.e2e-test-toast-message';
 
 export class TopicManager extends BaseUser {
   /**
@@ -194,6 +210,101 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
+  }
+
+  /**
+   * Navigate to the skill tab.
+   */
+  async navigateToSkillTab(): Promise<void> {
+    await this.page.waitForSelector(skillTab);
+    await this.clickOn(skillTab);
+  }
+
+  /**
+   * Unassign a skill from a topic.
+   * @param {string} skillName - The name of the skill to unassign.
+   * @param {string} topicName - The name of the topic from which to unassign the skill.
+   */
+  async unassignSkillFromTopic(
+    skillName: string,
+    topicName: string
+  ): Promise<void> {
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const unassignSkillSelector = isMobileWidth
+      ? unassignSkillButtonMobile
+      : unassignSkillButtonDesktop;
+    const skillOptions = isMobileWidth ? mobileSkillsOption : skillEditBox;
+
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.navigateToSkillTab();
+
+    const skillItem = await this.selectSkill(skillName);
+    await skillItem.click();
+
+    await this.page.waitForSelector(skillOptions);
+    await this.clickOn(skillOptions);
+
+    await this.page.waitForSelector(unassignSkillSelector);
+    await this.clickOn(unassignSkillSelector);
+
+    // Select the topic to unassign from.
+    const topicLabels = await this.page.$$(unassignTopicLabel);
+    for (const topicLabel of topicLabels) {
+      const labelTopicName = await topicLabel.$eval(
+        topicNameSpan,
+        el => el.textContent
+      );
+      if (labelTopicName === topicName) {
+        const checkbox = await topicLabel.$(unassignTopicCheckbox);
+        if (checkbox) {
+          await checkbox.click();
+        }
+        break;
+      }
+    }
+
+    await this.page.waitForSelector(confirmSkillButton);
+    await this.clickOn(confirmSkillButton);
+  }
+
+  /**
+   * Select a skill from the list of skills.
+   * @param {string} skillName - The name of the skill to select.
+   */
+  async selectSkill(skillName: string): Promise<ElementHandle> {
+    const skillItems = await this.page.$$(skillItemSelector);
+    for (const skillItem of skillItems) {
+      const description = await skillItem.$eval(
+        skillDescriptionSelector,
+        el => el.textContent
+      );
+      if (description === skillName) {
+        return skillItem;
+      }
+    }
+
+    throw new Error(`Skill with name ${skillName} not found.`);
+  }
+
+  /**
+   * Navigate to the question editor tab.
+   */
+  async navigateToQuestionEditorTab(): Promise<void> {
+    await this.page.waitForSelector(questionTab);
+    await this.clickOn(questionTab);
+  }
+
+  /**
+   * Create questions for a skill.
+   * @param {string} skillName - The name of the skill for which to create questions.
+   */
+  async expectToastMeassageToBe(expectedMessage: string): Promise<void> {
+    await this.page.waitForSelector(toastMessageSelector, {visible: true});
+    const actualMessage = await this.page.$eval(
+      toastMessageSelector,
+      el => el.textContent
+    );
+    expect(actualMessage).toEqual(expectedMessage);
   }
 }
 

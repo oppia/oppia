@@ -19,7 +19,7 @@
       </th>
     </tr>
     <tr *ngFor="let skill of skillSummaries; index as idx"
-        class="list-item">
+        class="list-item e2e-test-skill-item">
       <td>
         {{ getSerialNumberForSkill(idx) }}.
       </td>
@@ -112,6 +112,12 @@
                   <div class="e2e-test-merge-skills-button">
                     <i class="fa fa-plus"></i>
                     <span>Merge Skill</span>
+                  </div>
+                </div>
+                <div class="unassign-skill-box e2e-test-mobile-unassign-skill-button" *ngIf="skill.topicNames.length" (click)="unassignSkill(skill.id)">
+                  <div>
+                    <i class="fa fa-minus"></i>
+                    <span>Unassign Skill</span>
                   </div>
                 </div>
                 <div class="delete-icon-box" (click)="deleteSkill(skill.id)">
