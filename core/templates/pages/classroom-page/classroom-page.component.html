@@ -24,7 +24,7 @@
     <div class="classroom-information-container">
       <div class="classroom-text-container">
         <h3>{{ 'I18N_CLASSROOM_HEADING' | translate:{ classroomName: classroomData.getName() } }}</h3>
-        <h1 *ngIf="!isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}">{{classroomData.getName()}}</h1>
+        <h1 *ngIf="!isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}" class="e2e-test-classroom-name">{{classroomData.getName()}}</h1>
         <h1 *ngIf="isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}">{{classroomTranslationKeys.name | translate}}</h1>
       </div>
       <div class="classroom-thumbnail-container">

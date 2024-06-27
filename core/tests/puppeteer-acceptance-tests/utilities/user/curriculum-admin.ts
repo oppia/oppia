@@ -186,6 +186,7 @@ const topicDependencyGraphDiv = '.e2e-test-topic-dependency-graph-container';
 const topicNode = '.e2e-test-topic-node';
 const closeTopicDependencyButton = '.e2e-test-close-topic-dependency-modal';
 const addTopicFormFieldInput = '.mat-input-element';
+const createNewTopicButton = '.e2e-test-create-topic-button';
 
 export class CurriculumAdmin extends BaseUser {
   /**
@@ -309,7 +310,7 @@ export class CurriculumAdmin extends BaseUser {
    * Create a topic in the topics-and-skills dashboard.
    */
   async createTopic(name: string, urlFragment: string): Promise<string> {
-    await this.clickOn('Create Topic');
+    await this.clickOn(createNewTopicButton);
     await this.type(topicNameField, name);
     await this.type(topicUrlFragmentField, urlFragment);
     await this.type(topicWebFragmentField, name);
@@ -1095,6 +1096,7 @@ export class CurriculumAdmin extends BaseUser {
     classroomName: string,
     urlFragment: string
   ): Promise<void> {
+    await this.navigateToClassroomAdminPage();
     await this.clickOn(createNewClassroomButton);
     await this.page.waitForSelector(createNewClassroomModal);
     await this.page.type(newClassroomNameInputFeild, classroomName);
