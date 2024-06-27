@@ -171,7 +171,19 @@
   width: 686px;
 }
 
-.breadcrumbs-container .classroom-information-container .classroom-text-container h3 {
+.classroom-breadcrumbs .mobile-breadcrumbs a,
+.classroom-breadcrumbs .desktop-breadcrumbs a,
+.classroom-breadcrumbs .mobile-breadcrumbs span,
+.classroom-breadcrumbs .desktop-breadcrumbs span {
+  color: #00645c;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.breadcrumbs-container .classroom-information-container .classroom-text-container span {
   color: #00645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 22.6045px;
@@ -198,18 +210,6 @@
 
 .breadcrumbs-container .classroom-breadcrumbs .mobile-breadcrumbs {
   display: none;
-}
-
-.classroom-breadcrumbs .mobile-breadcrumbs a,
-.classroom-breadcrumbs .desktop-breadcrumbs a,
-.classroom-breadcrumbs .mobile-breadcrumbs span,
-.classroom-breadcrumbs .desktop-breadcrumbs span {
-  color: #00645c;
-  font-family: 'Roboto', Arial, sans-serif;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 16px;
 }
 
 .breadcrumbs-container .classroom-breadcrumbs .mobile-breadcrumbs i,
@@ -315,7 +315,7 @@
     width: 45%;
   }
 
-  .breadcrumbs-container .classroom-information-container .classroom-text-container h3 {
+  .breadcrumbs-container .classroom-information-container .classroom-text-container span {
     font-size: 18px;
     font-style: normal;
     line-height: 22px;
