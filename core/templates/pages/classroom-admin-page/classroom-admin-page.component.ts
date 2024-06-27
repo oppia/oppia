@@ -382,6 +382,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.updateClassroomData(this.tempClassroomData.getClassroomId()).then(
       () => {
         this.classroomDataUnpublishInProgress = false;
+        this.openClassroomInViewerMode();
       }
     );
   }
@@ -401,8 +402,8 @@ export class ClassroomAdminPageComponent implements OnInit {
       return;
     }
     this.classroomDataSaveInProgress = true;
-    this.openClassroomInViewerMode();
     this.updateClassroomData(classroomId).then(() => {
+      this.openClassroomInViewerMode();
       this.classroomDataIsChanged = false;
     });
   }
@@ -771,12 +772,13 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   canSaveClassroom(): boolean {
     if (
-      this.tempClassroomData.getIsPublished() &&
-      this.validationErrors.length !== 0
+      (this.tempClassroomData.getIsPublished() &&
+        this.validationErrors.length !== 0) ||
+      this.saveClassroomValidationErrors.length !== 0
     ) {
       return false;
     }
-    return this.saveClassroomValidationErrors.length === 0;
+    return true;
   }
 
   getSaveClassroomValidationErrors(): string[] {
