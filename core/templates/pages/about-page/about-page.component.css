@@ -1133,7 +1133,7 @@
   .about-page .oppia-mobile-portrait-content.oppia-cta-accordion {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
   }
   .about-page .oppia-cta-accordion .card-body {
     border-bottom: 4px solid #eee;
