@@ -48,10 +48,7 @@ describe('Topic Manager User Journey', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to assign and unassign a skill to a topic, link and unlink skills to a question and merge skills',
-    // TODO(#20590): Once the issue is resolved, please ensure to add a check for
-    // this scenario (linking and unlinking a skill to a question) in the acceptance test.
-    // See: https://github.com/oppia/oppia/issues/20590
+    'should be able to assign and unassign a skill to a topic and merge skills',
     async function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
       await topicManager.navigateToSkillTab();

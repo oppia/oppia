@@ -48,8 +48,11 @@ describe('Topic Manager User Journey', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to open question editor, edit a question, manage skill associations, create and delete questions, and preview a question.',
+    'should be able to open question editor, edit a question, manage linking and unlinking skills with the questions, create and delete questions, and preview a question.',
     async function () {
+      // TODO(#20590): Once the issue is resolved, please ensure to add a check for
+      // this scenario (linking and unlinking a skill to a question) in the acceptance test.
+      // See: https://github.com/oppia/oppia/issues/20590
       await topicManager.navigateToTopicAndSkillsDashboardPage();
       await topicManager.openSkillEditor('Addition');
       await topicManager.navigateToQuestionEditorTab();
