@@ -177,13 +177,18 @@ export class ReleaseCoordinator extends BaseUser {
    */
   async enableFeatureFlag(featureName: string): Promise<void> {
     await this.goto(releaseCoordinatorUrl);
+
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavBar);
       await this.clickOn(mobileNavBar);
+      await this.page.waitForSelector(mobileFeaturesTab);
       await this.clickOn(mobileFeaturesTab);
     } else {
+      await this.page.waitForSelector(featuresTab);
       await this.clickOn(featuresTab);
     }
 
+    await this.page.waitForTimeout(10000);
     await this.page.waitForSelector(featureFlagDiv);
     const featureFlagIndex = await this.page.evaluate(
       (featureFlagDiv, featureName, featureFlagNameSelector) => {
@@ -200,32 +205,30 @@ export class ReleaseCoordinator extends BaseUser {
             return i;
           }
         }
+        throw new Error(`Feature flag: "${featureName}" not found.`);
       },
       featureFlagDiv,
       featureName,
       featureFlagNameSelector
     );
 
-    /**
-     * We enable the flag through the yes/no dropdown with this method because the event doesn't propagate
-     * otherwise and no further changes are made to the DOM, even though the option is selected.
-     */
+    await this.page.waitForSelector(
+      `.e2e-test-feature-flag-${featureFlagIndex} ${featureFlagOptionSelector}`
+    );
     await this.page.evaluate(
       (optionValue, selectElemSelector) => {
         const selectElem = document.querySelector(
           selectElemSelector
         ) as HTMLSelectElement | null;
         if (!selectElem) {
-          console.error('Select element not found');
-          return;
+          throw new Error('Select element not found');
         }
 
         const option = Array.from(selectElem.options).find(
           opt => opt.textContent?.trim() === optionValue
         ) as HTMLOptionElement | undefined;
         if (!option) {
-          console.error('Option not found');
-          return;
+          throw new Error('Option not found');
         }
 
         option.selected = true;
@@ -236,6 +239,9 @@ export class ReleaseCoordinator extends BaseUser {
       `.e2e-test-feature-flag-${featureFlagIndex} ${featureFlagOptionSelector}`
     );
 
+    await this.page.waitForSelector(
+      `.e2e-test-feature-flag-${featureFlagIndex} ${saveFeatureFlagButtonSelector}`
+    );
     await this.clickOn(
       `.e2e-test-feature-flag-${featureFlagIndex} ${saveFeatureFlagButtonSelector}`
     );
