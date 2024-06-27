@@ -27,6 +27,13 @@ import {IsNewLessonPlayerGuard} from 'pages/exploration-player-page/new-lesson-p
 // Otherwise pages will have false 404 status code.
 const routes: Route[] = [
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SUBTOPIC_VIEWER.ROUTE,
+    loadChildren: () =>
+      import('pages/subtopic-viewer-page/subtopic-viewer-page.module').then(
+        m => m.SubtopicViewerPageModule
+      ),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.ROUTE,
     loadChildren: () =>
       import('pages/admin-page/admin-page.module').then(m => m.AdminPageModule),
@@ -86,6 +93,14 @@ const routes: Route[] = [
     loadChildren: () =>
       import('pages/classroom-page/classroom-page.module').then(
         m => m.ClassroomPageModule
+      ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOMS.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import('pages/classrooms-page/classrooms-page.module').then(
+        m => m.ClassroomsPageModule
       ),
   },
   {

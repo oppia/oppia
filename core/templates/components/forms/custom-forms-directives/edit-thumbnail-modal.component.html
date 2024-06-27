@@ -15,10 +15,11 @@
             <li>Please ensure that the uploaded image is less than 100 KB.</li>
           </ul>
         </div>
-        <oppia-image-uploader (fileChanged)="onFileChanged($event)"
+        <oppia-image-receiver (fileChanged)="onFileChanged($event)"
                               [allowedImageFormats]="allowedImageFormats"
-                              [isBlogPostThumbnailUploader]="false">
-        </oppia-image-uploader>
+                              [maxImageSizeInKB]="100"
+                              >
+        </oppia-image-receiver>
       </div>
       <div class="oppia-form-error" *ngIf="invalidImageWarningIsShown">
         Please upload a valid SVG image.

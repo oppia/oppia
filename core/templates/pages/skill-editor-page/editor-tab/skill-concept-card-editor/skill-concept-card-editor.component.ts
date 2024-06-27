@@ -102,6 +102,10 @@ export class SkillConceptCardEditorComponent implements OnInit {
       this.skill,
       explanationObject
     );
+    this.bindableFieldsDict.displayedConceptCardExplanation = this.skill
+      .getConceptCard()
+      .getExplanation().html;
+    this.getConceptCardChange.emit();
   }
 
   onSaveDescription(): void {

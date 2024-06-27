@@ -13,7 +13,7 @@
         <ul class="dropdown-menu oppia-exploration-editor-tabs-dropdown" aria-labelledby="dropdownMenuButton">
           <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'uib-dropdown': countWarnings()}">
             <a href="#" ngbTooltip="Editor" placement="{{countWarnings() ? 'left' : 'bottom'}}" (click)="selectMainTab()"
-               class="oppia-exploration-editor-tabs-dropdown-element">
+               class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-main-tab">
               <i class="fa fa-pen oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Editor</span>
             </a>
@@ -23,7 +23,7 @@
               </span>
             </div>
           </li>
-          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'translation'}">
+          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-translation-tab" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'translation'}">
             <a href="#" ngbTooltip="Tmaterial-iconsmaterial-iconsranslations and Voiceovers" placement="bottom" (click)="selectTranslationTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
               <i class="fa fa-microphone oppia-mobile-exploration-editor-tabs-icon"></i>
@@ -119,11 +119,10 @@
         </div>
 
         <ul class="dropdown-menu" aria-labelledby="discardButtonPopup">
-<!-- The 'disabled' class is added when autosave is in progress. This disables user interactions with the discard button, preventing changes from being discarded before they are saved. -->
-          <div class="e2e-test-mobile-exploration-discard-tab" (click)="discardChanges()" [class.disabled]="autosaveIsInProgress">
+          <button class="btn btn-light e2e-test-mobile-exploration-discard-tab" (click)="discardChanges()" [disabled]="autosaveIsInProgress">
             <i class="fa fa-pen oppia-mobile-exploration-editor-tabs-icon"></i>
             Discard
-          </div>
+          </button>
           <div *ngIf="showPublishButton()" [ngClass]="{'disable-publish-button': !connectedToInternet || isExplorationLockedForEditing() || countWarnings()}">
             <button type="button" class="btn btn-light e2e-test-mobile-publish-button"
                     [ngClass]="{'btn-success': connectedToInternet && !isExplorationLockedForEditing() && !countWarnings()}"
@@ -155,11 +154,6 @@
   /* Overwrite the Bootstrap defaults. */
   .nav > li > a.oppia-editor-navbar-tab-anchor {
     padding: 15px 11px;
-  }
-  /* Ensures targeted styling only affects 'Discard Draft' tab. */
-  div.e2e-test-mobile-exploration-discard-tab.disabled {
-    opacity: 0.6;
-    pointer-events: none;
   }
   .oppia-exploration-open-threads-count {
     background-color: #4078c0;
