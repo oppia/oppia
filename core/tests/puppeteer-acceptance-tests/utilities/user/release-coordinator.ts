@@ -537,10 +537,9 @@ export class ReleaseCoordinator extends BaseUser {
    * @param {boolean} enabled - Expected status of the Dummy Handler.
    */
   async verifyDummyHandlerStatusInFeaturesTab(enabled: boolean): Promise<void> {
+    await this.page.waitForTimeout(10000);
     await this.navigateToReleaseCoordinatorPage();
     await this.navigateToFeaturesTab();
-
-    await this.page.waitForTimeout(60000);
     const dummyHandlerElement = await this.page.$(agDummyFeatureIndicator);
 
     if (enabled && !dummyHandlerElement) {
