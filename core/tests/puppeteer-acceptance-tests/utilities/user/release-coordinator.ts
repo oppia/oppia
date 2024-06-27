@@ -20,6 +20,7 @@ import puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import {path} from 'd3';
 
 // URLs.
 const releaseCoordinatorUrl = testConstants.URLs.ReleaseCoordinator;
@@ -546,6 +547,7 @@ export class ReleaseCoordinator extends BaseUser {
     await this.page.waitForTimeout(10000);
     await this.navigateToReleaseCoordinatorPage();
     await this.navigateToFeaturesTab();
+    await this.page.screenshot({path: 'screenshot.png'});
     const dummyHandlerElement = await this.page.$(agDummyFeatureIndicator);
 
     if (enabled && !dummyHandlerElement) {
