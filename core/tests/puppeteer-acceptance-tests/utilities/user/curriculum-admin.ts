@@ -22,7 +22,7 @@ import {showMessage} from '../common/show-message';
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
-const classroomBannerImgae = testConstants.data.classroomBannerImage;
+const classroomBannerImage = testConstants.data.classroomBannerImage;
 const classroomAdminUrl = testConstants.URLs.ClassroomAdmin;
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const baseURL = testConstants.URLs.BaseURL;
@@ -1130,7 +1130,7 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.clickOn(classroomBannerContainer);
     await this.page.waitForSelector(imageUploaderModal, {visible: true});
-    await this.uploadFile(classroomBannerImgae);
+    await this.uploadFile(classroomBannerImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadClassroomImageButton);
     await this.clickOn(saveClassroomButton);
@@ -1213,7 +1213,7 @@ export class CurriculumAdmin extends BaseUser {
     }
 
     if (!foundClassroom) {
-      throw new Error(`${classroomName} classroom do not exists.`);
+      throw new Error(`${classroomName} classroom does not exists.`);
     }
   }
 
@@ -1234,10 +1234,12 @@ export class CurriculumAdmin extends BaseUser {
     const topicNodes = await this.page.$$(topicNode);
 
     if (topicNodes.length === numberOfTopics) {
-      showMessage(`The ${classroomName} has ${numberOfTopics} topics.`);
+      showMessage(
+        `The ${classroomName} classroom has ${numberOfTopics} topics.`
+      );
     } else {
       throw new Error(
-        `${classroomName} have ${topicNodes.length} topics, expected ${numberOfTopics} topics.`
+        `${classroomName} classroom has ${topicNodes.length} topics, expected ${numberOfTopics} topics.`
       );
     }
 

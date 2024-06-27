@@ -61,7 +61,7 @@ describe('Curriculum Admin', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should create, publish and delete a classroom and then delete it.',
+    'should create, publish and delete a classroom.',
     async function () {
       await curriculumAdmin.navigateToClassroomAdminPage();
       await curriculumAdmin.expectNumberOfClassroomsToBe(0);
@@ -81,7 +81,7 @@ describe('Curriculum Admin', function () {
       );
 
       await loggedOutUser.navigateToClassroomPage('math');
-      await loggedOutUser.validateCurrentClassroomPage('Math');
+      await loggedOutUser.expectToBeOnClassroomPage('Math');
 
       await curriculumAdmin.deleteClassroom('Math');
       await curriculumAdmin.expectNumberOfClassroomsToBe(0);

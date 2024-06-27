@@ -234,6 +234,8 @@ const googleGroupSignUpLinkInTermsPage =
 
 const emailLinkSelector = '.oppia-contact-mail';
 
+const classroomNameHeading = '.classroom-name';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -2056,10 +2058,10 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * This function checks that user is on correct classroom page.
+   * This function verifies that the user is on the correct classroom page.
    */
-  async validateCurrentClassroomPage(classroomName: string): Promise<void> {
-    await this.page.waitForSelector('.classroom-name');
+  async expectToBeOnClassroomPage(classroomName: string): Promise<void> {
+    await this.page.waitForSelector(classroomNameHeading);
 
     const buttonText = await this.page.$eval(
       '.classroom-name',
@@ -2067,9 +2069,11 @@ export class LoggedOutUser extends BaseUser {
     );
 
     if (buttonText !== classroomName) {
-      throw new Error(`The ${classroomName} is not visible.`);
+      throw new Error(
+        `The ${classroomName} classroom name is not visible. URL: ${this.page.url()}`
+      );
     } else {
-      showMessage(`The ${classroomName} is visible.`);
+      showMessage(`The ${classroomName} classroom name is visible.`);
     }
   }
 }

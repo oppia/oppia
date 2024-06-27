@@ -243,7 +243,7 @@
                   <mat-form-field appearance="fill" class="topics-selector-form-field e2e-test-classroom-topics-modal">
                     <mat-label for="explorationCategory" class="d-block">Select a topic</mat-label>
                     <mat-select (selectionChange)="onNewTopicInputModelChange($event.value)" class="e2e-test-classroom-category-dropdown">
-                      <mat-option class="e2e-test-exploration-new-category-add">
+                      <mat-option class="e2e-test-classroom-new-topic-add">
                         <ngx-mat-select-search
                           ngModel
                           (ngModelChange)="filterTopicsByName($event)"
