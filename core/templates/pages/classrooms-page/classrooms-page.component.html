@@ -2,15 +2,15 @@
   <div class="breadcrumbs-container">
     <div class="classrooms-breadcrumbs">
       <div class="desktop-breadcrumbs">
-        <a href="/">Home</a>
+        <a href="/">{{ 'I18N_TOPNAV_HOME' | translate }}</a>
         <i class="fa fa-angle-right" *ngIf="!isLanguageRTL()"></i>
         <i class="fa fa-angle-left" *ngIf="isLanguageRTL()"></i>
-        <span>Classrooms</span>
+        <span>{{ 'I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT' | translate }}</span>
       </div>
       <div class="mobile-breadcrumbs">
         <i class="fa fa-angle-left" *ngIf="!isLanguageRTL()"></i>
         <i class="fa fa-angle-right" *ngIf="isLanguageRTL()"></i>
-        <a href="/">Back to Home</a>
+        <a href="/">{{ 'I18N_BACK_TO_HOME_TEXT' | translate }}</a>
       </div>
     </div>
   </div>

@@ -79,6 +79,11 @@ class ClassroomAccessValidationHandler(
         if not classroom:
             raise self.NotFoundException
 
+        if not classroom.is_published:
+            if self.user_id is None or not user_services.is_curriculum_admin(
+                self.user_id):
+                raise self.NotFoundException
+
 
 class ClassroomsPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]

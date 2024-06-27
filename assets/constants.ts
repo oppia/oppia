@@ -164,7 +164,8 @@ export default {
   // previous one is deleted.
   // TODO(#14645): Remove these keys once translation service is extended.
   "HACKY_TRANSLATION_KEYS": [
-    "I18N_CLASSROOM_MATH_TITLE",
+    "I18N_CLASSROOM_MATH_NAME",
+    "I18N_CLASSROOM_MATH_COURSE_DETAILS",
     "I18N_TOPIC_iX9kYCjnouWN_TITLE",
     "I18N_TOPIC_sWBXKH4PZcK6_TITLE",
     "I18N_TOPIC_C4fqwrvqWpRm_TITLE",

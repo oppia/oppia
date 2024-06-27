@@ -41,6 +41,8 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {ClassroomPageComponent} from './classroom-page.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {UserService} from 'services/user.service';
+import {UserInfo} from 'domain/user/user-info.model';
 
 class MockCapitalizePipe {
   transform(input: string): string {
@@ -77,6 +79,7 @@ describe('Classroom Page Component', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let translateService: TranslateService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
+  let userService: UserService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -91,6 +94,10 @@ describe('Classroom Page Component', () => {
         {
           provide: TranslateService,
           useClass: MockTranslateService,
+        },
+        UserService,
+        {
+          provide: UrlService,
         },
         {
           provide: PlatformFeatureService,
@@ -122,10 +129,7 @@ describe('Classroom Page Component', () => {
       AccessValidationBackendApiService
     );
     translateService = TestBed.inject(TranslateService);
-
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true
-    );
+    userService = TestBed.inject(UserService);
   });
 
   it('should create', () => {
@@ -184,10 +188,15 @@ describe('Classroom Page Component', () => {
     ];
 
     let classroomData = ClassroomData.createFromBackendData(
+      'mathid',
       'Math',
       topicSummaryDicts,
       'Course details',
-      'Topics covered'
+      'Topics covered',
+      'Learn math',
+      true,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'}
     );
     spyOn(
       accessValidationBackendApiService,
@@ -199,8 +208,13 @@ describe('Classroom Page Component', () => {
     ).and.returnValue(Promise.resolve(classroomData));
     spyOn(
       i18nLanguageCodeService,
-      'getClassroomTranslationKey'
-    ).and.returnValue('I18N_CLASSROOM_MATH_TITLE');
+      'getClassroomTranslationKeys'
+    ).and.returnValue({
+      name: 'I18N_CLASSROOM_MATH_NAME',
+      courseDetails: 'I18N_CLASSROOM_MATH_COURSE_DETAILS',
+      teaserText: 'I18N_CLASSROOM_MATH_TEASER_TEXT',
+      topicListIntro: 'I18N_CLASSROOM_MATH_TOPICS_LIST_INTRO',
+    });
     spyOn(
       i18nLanguageCodeService,
       'isHackyTranslationAvailable'
@@ -219,10 +233,7 @@ describe('Classroom Page Component', () => {
     ).toHaveBeenCalled();
     expect(component.classroomData).toEqual(classroomData);
     expect(component.classroomDisplayName).toEqual(classroomData.getName());
-    expect(component.classroomNameTranslationKey).toBe(
-      'I18N_CLASSROOM_MATH_TITLE'
-    );
-    expect(component.isHackyClassroomTranslationDisplayed()).toBe(true);
+    expect(component.isHackyClassroomTranslationDisplayed('name')).toBe(true);
     expect(component.setPageTitle).toHaveBeenCalled();
     expect(component.subscribeToOnLangChange).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
@@ -284,13 +295,13 @@ describe('Classroom Page Component', () => {
     component.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_CLASSROOM_PAGE_TITLE',
+      'I18N_CLASSROOM_MATH_NAME',
       {
         classroomName: 'dummy_name',
       }
     );
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_CLASSROOM_PAGE_TITLE'
+      'I18N_CLASSROOM_MATH_NAME'
     );
   });
 
@@ -308,5 +319,67 @@ describe('Classroom Page Component', () => {
     mockPlatformFeatureService.status.DiagnosticTest.isEnabled = true;
 
     expect(component.isDiagnosticTestFeatureFlagEnabled()).toBeTrue();
+  });
+
+  it('should show private classroom banner to curriculum admins', fakeAsync(() => {
+    let userInfo = {
+      isCurriculumAdmin: () => true,
+      isModerator: () => false,
+    } as UserInfo;
+    expect(component.showPrivateClassroomBanner).toBeFalse();
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfo)
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
+      'classroomUrlFragment'
+    );
+    let classroomData = ClassroomData.createFromBackendData(
+      'mathid',
+      'Math',
+      [],
+      'Course details',
+      'Topics covered',
+      'Learn math',
+      false,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'}
+    );
+
+    spyOn(
+      classroomBackendApiService,
+      'fetchClassroomDataAsync'
+    ).and.returnValue(Promise.resolve(classroomData));
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToClassroomPage'
+    ).and.returnValue(Promise.resolve());
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.showPrivateClassroomBanner).toBeTrue();
+  }));
+
+  it(
+    'should not get classroom translation keys if classroomTranslationKeys ' +
+      'if key is not present',
+    () => {
+      component.classroomTranslationKeys = {
+        name: 'I18N_CLASSROOM_MATH_NAME',
+        courseDetails: 'I18N_CLASSROOM_MATH_COURSE_DETAILS',
+        teaserText: 'I18N_CLASSROOM_MATH_TEASER_TEXT',
+        topicListIntro: 'I18N_CLASSROOM_MATH_TOPICS_LIST_INTRO',
+      };
+      expect(
+        component.isHackyClassroomTranslationDisplayed('tags')
+      ).toBeFalse();
+    }
+  );
+
+  it('should get RTL language status correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    expect(component.isLanguageRTL()).toBeTrue();
   });
 });

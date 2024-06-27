@@ -27,10 +27,16 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {ImageData} from 'pages/classroom-admin-page/existing-classroom.model';
 
 export interface ClassroomDataBackendDict {
+  classroom_id: string;
   name: string;
   topic_summary_dicts: CreatorTopicSummaryBackendDict[];
   course_details: string;
+  teaser_text: string;
   topic_list_intro: string;
+  is_published: boolean;
+  thumbnail_data: ImageData;
+  banner_data: ImageData;
+  public_classrooms_count: number;
 }
 
 interface ClassroomIdToClassroomNameBackendDict {
@@ -156,10 +162,16 @@ export class ClassroomBackendApiService {
       .then(
         response => {
           this.classroomData = ClassroomData.createFromBackendData(
+            response.classroom_id,
             response.name,
             response.topic_summary_dicts,
             response.course_details,
-            response.topic_list_intro
+            response.topic_list_intro,
+            response.teaser_text,
+            response.is_published,
+            response.thumbnail_data,
+            response.banner_data,
+            response.public_classrooms_count
           );
           if (successCallback) {
             successCallback(this.classroomData);
