@@ -51,6 +51,9 @@ describe('Partner', function () {
       // Navigating to About page via footer from home page.
       await loggedOutUser.clickOnAboutLinkInFooter();
 
+      // Opening the Impact report by clicking on the "View Impact Report" button on the About page.
+      await loggedOutUser.clickViewReportButtonInAboutPage();
+
       // Opening the Partnerships form by clicking on the "Parner with us" button of Partner tab on the About page.
       await loggedOutUser.clickPartnerWithUsButtonInAboutPage();
       // Opening the partnerships form by clicking the "Partner with us" button of Partner tab on the About page.
