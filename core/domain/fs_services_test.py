@@ -228,6 +228,23 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         # save attempt.
         self.assertEqual(saved_image_content, new_saved_image_content)
 
+    def test_validate_and_save_image(self) -> None:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
+            original_image_content = f.read()
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID)
+        self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
+        self.assertFalse(fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+        self.assertFalse(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
+        fs_services.validate_and_save_image(
+            original_image_content, self.FILENAME, 'image', 'exploration',
+            self.EXPLORATION_ID)
+        self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
+        self.assertTrue(fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+        self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
+
     def test_compress_image_on_prod_mode_with_small_image_size(self) -> None:
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
