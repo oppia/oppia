@@ -243,7 +243,6 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
-    'release-coordinator/edit-feature-rollout-configuration',
     'release-coordinator/run-a-beam-job-and-copy-the-output',
     'release-coordinator/update-promo-bar-message',
     'release-coordinator/flush-and-get-profile-of-redis-cache',
