@@ -56,22 +56,22 @@ export class StoryNodeTileComponent implements OnInit {
   @Input() topicUrlFragment!: string;
   @Input() classroomUrlFragment!: string;
   @Input() storyUrlFragment!: string;
-  thumbnailFilename: string;
-  thumbnailBgColor: string;
+  thumbnailFilename!: string | null;
+  thumbnailBgColor!: string | null;
   thumbnailUrl: string;
-  nodeId: string;
+  nodeId!: string;
   pathIconParameters: IconParametersArray[] = [];
   EXPLORE_PAGE_PREFIX = '/explore/';
-  explorationId: string;
-  expStates: StateObjectsBackendDict;
-  checkpointCount: number;
-  mostRecentlyReachedCheckpoint: string;
+  explorationId!: string | null;
+  expStates!: StateObjectsBackendDict;
+  checkpointCount!: number;
+  mostRecentlyReachedCheckpoint!: string;
   prevSessionStatesProgress: string[] = [];
   pinIdUrl: string;
   completedcheckpoints: number = 0;
   nodeDataLoaded = false;
   totalCheckpointLoaded = false;
-  checkpointStatusArray: string[];
+  checkpointStatusArray!: string[];
   resumeButtonActivate = false;
   constructor(
     private explorationEngineService: ExplorationEngineService,
