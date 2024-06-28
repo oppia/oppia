@@ -55,6 +55,9 @@ describe('Donor', function () {
       // Navigating to About page via footer from home page.
       await loggedOutUser.clickOnAboutLinkInFooter();
 
+      // Opening the Impact report by clicking on the "View Impact Report" button on the About page.
+      await loggedOutUser.clickViewReportButtonInAboutPage();
+
       await loggedOutUser.clickDonateButtonInAboutPage();
       // Here we assume that the user has successfully donated. Successful donation
       // redirects the user to the "Thanks for donating" page in the Oppia website.
