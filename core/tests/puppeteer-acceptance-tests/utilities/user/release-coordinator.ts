@@ -51,7 +51,7 @@ const jobInputField = '.mat-input-element';
 const jobOutputRowSelector = '.mat-row';
 const beamJobRunOutputSelector = '.beam-job-run-output';
 
-const agDummyFeatureIndicator = '.e2e-test-angular-dummy-feature-indicator';
+const agDummyFeatureIndicator = '.e2e-test-angular-dummy-handler-indicator';
 
 const navbarElementSelector = '.oppia-clickable-navbar-element';
 const promoBarToggleSelector = '#mat-slide-toggle-1';
