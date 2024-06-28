@@ -1,4 +1,4 @@
-name: End-to-End coverage and Typescript test
+name: Test coverage and Typescript test
 on:
   merge_group:
     types: [checks_requested]
@@ -12,7 +12,7 @@ on:
       - release-*
 
 jobs:
-  e2e_coverage_and_typescript_tests:
+  e2e_acceptance_coverage_and_typescript_tests:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
@@ -40,8 +40,8 @@ jobs:
       - uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         run: python -m scripts.install_chrome_for_ci
-      - name: Check that all e2e test files are captured in wdio.conf.js
-        run: python -m scripts.check_e2e_tests_are_captured_in_ci
+      - name: Check that test files are captured in CI
+        run: python -m scripts.check_tests_are_captured_in_ci
       - name: Run typescript tests
         run: python -m scripts.run_typescript_checks
       - name: Run typescript tests in strict mode

@@ -132,6 +132,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
     def test_get(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.save_new_valid_classroom(
+            classroom_id='test_id',
             topic_id_to_prerequisite_topic_ids={
                         self.public_topic_id_1: [],
                         self.private_topic_id: []
@@ -214,12 +215,18 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             'is_published': False
         }
         expected_dict = {
+            'classroom_id': 'test_id',
             'name': 'math',
             'topic_summary_dicts': [
                 public_topic_1_summary_dict, private_topic_summary_dict
             ],
             'course_details': 'Course details for classroom.',
-            'topic_list_intro': 'Topics covered for classroom'
+            'topic_list_intro': 'Topics covered for classroom',
+            'teaser_text': 'Teaser Text',
+            'thumbnail_data': dummy_thumbnail_data.to_dict(),
+            'banner_data': dummy_banner_data.to_dict(),
+            'is_published': True,
+            'public_classrooms_count': 1
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
