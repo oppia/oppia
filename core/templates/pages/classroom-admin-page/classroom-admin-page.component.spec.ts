@@ -1307,7 +1307,7 @@ describe('Classroom Admin Page component ', () => {
       response.classroomDict
     );
 
-    expect(component.validationErrors.length).toEqual(0);
+    expect(component.allValidationErrors.length).toEqual(0);
     expect(component.classroomDataPublishInProgress).toBeFalse();
     spyOn(component, 'updateClassroomData').and.returnValue(Promise.resolve());
     tick();
@@ -1333,7 +1333,7 @@ describe('Classroom Admin Page component ', () => {
     component.classroomDataIsChanged = false;
     component.updateClassroomField();
 
-    expect(component.validationErrors.length).toEqual(3);
+    expect(component.allValidationErrors.length).toEqual(3);
   });
 
   it('should not be able to save classroom due to validation errors', () => {

@@ -297,13 +297,13 @@
                            [diameter]="22">
               </mat-spinner>
             </button>
-            <span [matTooltip]="validationErrors.join('\n')"
+            <span [matTooltip]="allValidationErrors.join('\n')"
                   matTooltipClass="oppia-mat-tooltip-list"
                   [matTooltipDisabled]="false"
                   aria-label="List that shows issues preventing to publish a classroom"
                   >
               <button *ngIf="!tempClassroomData._isPublished"
-                      [disabled]="!(validationErrors.length === 0)"
+                      [disabled]="!(allValidationErrors.length === 0)"
                       class="btn btn-success publish-classroom-btn e2e-test-publish-classroom-btn"
                       (click)="publishClassroom()"
                   >
@@ -312,7 +312,7 @@
                              class="oppia-update-classroom-data-spinning-button"
                              [diameter]="22">
                 </mat-spinner>
-                <mat-icon *ngIf="validationErrors.length > 0" class="save-draft-button-warning">
+                <mat-icon *ngIf="allValidationErrors.length > 0" class="save-draft-button-warning">
                   warning
                 </mat-icon>
               </button>

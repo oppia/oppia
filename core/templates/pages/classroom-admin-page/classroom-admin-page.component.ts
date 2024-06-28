@@ -103,7 +103,7 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   topicsToClassroomRelation: TopicClassroomRelationDict[] = [];
   filteredTopicsToClassroomRelation: TopicClassroomRelationDict[] = [];
-  validationErrors: string[] = [];
+  allValidationErrors: string[] = [];
   saveClassroomValidationErrors: string[] = [];
 
   thumbnailParameters: ImageUploaderParameters = {
@@ -205,7 +205,7 @@ export class ClassroomAdminPageComponent implements OnInit {
           this.tempClassroomData,
           this.classroomData
         );
-        this.validationErrors =
+        this.allValidationErrors =
           this.classroomAdminDataService.getAllClassroomValidationErrors();
         this.saveClassroomValidationErrors =
           this.getSaveClassroomValidationErrors();
@@ -332,7 +332,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.tempClassroomData,
       this.classroomData
     );
-    this.validationErrors =
+    this.allValidationErrors =
       this.classroomAdminDataService.getAllClassroomValidationErrors();
     this.saveClassroomValidationErrors =
       this.getSaveClassroomValidationErrors();
@@ -771,19 +771,12 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   canSaveClassroom(): boolean {
-    if (
-      (this.tempClassroomData.getIsPublished() &&
-        this.validationErrors.length !== 0) ||
-      this.saveClassroomValidationErrors.length !== 0
-    ) {
-      return false;
-    }
-    return true;
+    return this.getSaveClassroomValidationErrors().length === 0;
   }
 
   getSaveClassroomValidationErrors(): string[] {
-    if (!this.canSaveClassroom()) {
-      return this.validationErrors;
+    if (this.tempClassroomData.getIsPublished()) {
+      return this.allValidationErrors;
     }
     return this.classroomAdminDataService.getSaveClassroomValidationErrors();
   }
