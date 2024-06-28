@@ -53,24 +53,34 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.save_new_valid_classroom()
+        self.save_new_valid_classroom(
+            'history', 'history', 'history', is_published=False
+        )
 
     def test_validation_returns_true_if_classroom_is_available(self) -> None:
-        self.login(self.EDITOR_EMAIL)
         self.get_html_response(
             '%s/can_access_classroom_page?classroom_url_fragment=%s' %
             (ACCESS_VALIDATION_HANDLER_PREFIX, 'math'))
 
     def test_validation_returns_false_if_classroom_doesnot_exists(self) -> None:
-        self.login(self.EDITOR_EMAIL)
         self.get_json(
             '%s/can_access_classroom_page?classroom_url_fragment=%s' %
             (ACCESS_VALIDATION_HANDLER_PREFIX, 'not_valid'),
             expected_status_int=404)
+
+    def test_validation_returns_false_if_classroom_is_private(self) -> None:
+        self.get_json(
+            '%s/can_access_classroom_page?classroom_url_fragment=%s' %
+            (ACCESS_VALIDATION_HANDLER_PREFIX, 'history'),
+            expected_status_int=404)
+
+    def test_validation_returns_true_if_curriculum_admin_visit_hidden_classroom(
+            self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/can_access_classroom_page?classroom_url_fragment=%s' %
+            (ACCESS_VALIDATION_HANDLER_PREFIX, 'history'))
 
 
 class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
