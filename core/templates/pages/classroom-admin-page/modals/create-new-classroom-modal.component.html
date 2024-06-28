@@ -7,11 +7,10 @@
   <div class="row new-classroom-input-data">
     <span class="col-lg-3 col-md-3 col-sm-3">Name</span>
     <div class="new-classroom-name-input">
-      <textarea [(ngModel)]="tempClassroom._name"
-                rows="1"
-                class="e2e-test-new-classroom-name"
-                (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroom, classroom)">
-      </textarea>
+      <input [(ngModel)]="tempClassroom._name"
+             rows="1"
+             class="e2e-test-new-classroom-name form-control required"
+             (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroom, classroom)">
       <p *ngIf="classroomAdminDataService.nameValidationError.length > 0" class="oppia-warning-text">
         {{ classroomAdminDataService.nameValidationError }}
       </p>
@@ -21,11 +20,10 @@
   <div class="row new-classroom-input-data">
     <span class="col-lg-3 col-md-3 col-sm-3">URL Fragment</span>
     <div class="new-classroom-name-input">
-      <textarea [(ngModel)]="tempClassroom._urlFragment"
-                rows="1"
-                class="e2e-test-new-classroom-url-fragment"
-                (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroom, classroom)">
-      </textarea>
+      <input [(ngModel)]="tempClassroom._urlFragment"
+             rows="1"
+             class="e2e-test-new-classroom-url-fragment form-control required"
+             (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroom, classroom)">
       <p *ngIf="classroomAdminDataService.urlValidationError.length > 0" class="oppia-warning-text">
         {{ classroomAdminDataService.urlValidationError }}
       </p>

@@ -200,22 +200,14 @@
                 </div>
               </div>
             </div>
-            <div class="topic-skill-filter-row">
+            <div class="topic-skill-filter-row" *ngIf="activeTab === TAB_NAME_TOPICS">
               <div class="topic-skill-filter-key">
                 <span>Classroom</span>
               </div>
               <div class="topic-skill-filter-value">
-                <div *ngIf="activeTab === TAB_NAME_TOPICS">
+                <div>
                   <oppia-filtered-choices-field class="e2e-test-select-classroom-dropdown"
                                                 [choices]="classrooms"
-                                                placeholder="Classrooms"
-                                                searchLabel="Search"
-                                                [(selection)]="filterObject.classroom"
-                                                (selectionChange)="applyFilters()">
-                  </oppia-filtered-choices-field>
-                </div>
-                <div *ngIf="activeTab === TAB_NAME_SKILLS">
-                  <oppia-filtered-choices-field [choices]="classrooms"
                                                 placeholder="Classrooms"
                                                 searchLabel="Search"
                                                 [(selection)]="filterObject.classroom"

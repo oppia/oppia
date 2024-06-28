@@ -348,7 +348,7 @@ export class ExistingClassroomData
 
   private getClassroomBannerValidationErrors(): string {
     let errorMsg = '';
-    if (this._thumbnail_data.filename === '') {
+    if (this._banner_data.filename === '') {
       errorMsg = 'The classroom banner should not be empty.';
     }
     return errorMsg;

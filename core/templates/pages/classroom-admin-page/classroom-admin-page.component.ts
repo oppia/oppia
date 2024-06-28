@@ -103,7 +103,8 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   topicsToClassroomRelation: TopicClassroomRelationDict[] = [];
   filteredTopicsToClassroomRelation: TopicClassroomRelationDict[] = [];
-  validationErrors: string[] = [];
+  allValidationErrors: string[] = [];
+  saveClassroomValidationErrors: string[] = [];
 
   thumbnailParameters: ImageUploaderParameters = {
     disabled: false,
@@ -128,6 +129,7 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   getEligibleTopicPrerequisites(currentTopicName: string): void {
     this.eligibleTopicNamesForPrerequisites = [];
+    this.tempEligibleTopicNamesForPrerequisites = [];
     this.prerequisiteInput = '';
     let topicNames = Object.keys(this.topicNameToPrerequisiteTopicNames);
 
@@ -185,6 +187,8 @@ export class ClassroomAdminPageComponent implements OnInit {
         );
 
         this.classroomDataIsChanged = false;
+        this.eligibleTopicNamesForPrerequisites = [];
+        this.tempEligibleTopicNamesForPrerequisites = [];
 
         this.existingClassroomNames = Object.values(
           this.classroomIdToClassroomName
@@ -204,8 +208,10 @@ export class ClassroomAdminPageComponent implements OnInit {
           this.tempClassroomData,
           this.classroomData
         );
-        this.validationErrors =
+        this.allValidationErrors =
           this.classroomAdminDataService.getAllClassroomValidationErrors();
+        this.saveClassroomValidationErrors =
+          this.getSaveClassroomValidationErrors();
         this.setTopicDependencyByTopicName(
           this.tempClassroomData.getTopicIdToPrerequisiteTopicId()
         );
@@ -329,8 +335,10 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.tempClassroomData,
       this.classroomData
     );
-    this.validationErrors =
+    this.allValidationErrors =
       this.classroomAdminDataService.getAllClassroomValidationErrors();
+    this.saveClassroomValidationErrors =
+      this.getSaveClassroomValidationErrors();
     const topicDependencyIsChanged =
       JSON.stringify(
         this.tempClassroomData.getTopicIdToPrerequisiteTopicId()
@@ -377,6 +385,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.updateClassroomData(this.tempClassroomData.getClassroomId()).then(
       () => {
         this.classroomDataUnpublishInProgress = false;
+        this.openClassroomInViewerMode();
       }
     );
   }
@@ -392,9 +401,12 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   saveClassroomData(classroomId: string): void {
+    if (!this.canSaveClassroom()) {
+      return;
+    }
     this.classroomDataSaveInProgress = true;
-    this.openClassroomInViewerMode();
     this.updateClassroomData(classroomId).then(() => {
+      this.openClassroomInViewerMode();
       this.classroomDataIsChanged = false;
     });
   }
@@ -761,7 +773,14 @@ export class ClassroomAdminPageComponent implements OnInit {
     );
   }
 
-  saveClassroomValidationErrors(): string[] {
+  canSaveClassroom(): boolean {
+    return this.getSaveClassroomValidationErrors().length === 0;
+  }
+
+  getSaveClassroomValidationErrors(): string[] {
+    if (this.tempClassroomData.getIsPublished()) {
+      return this.allValidationErrors;
+    }
     return this.classroomAdminDataService.getSaveClassroomValidationErrors();
   }
 
