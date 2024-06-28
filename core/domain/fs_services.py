@@ -407,6 +407,7 @@ def copy_images(
         destination_fs.copy(
             source_fs.assets_path, ('image/%s' % micro_image_filename))
 
+
 def validate_and_save_image(
     raw_image: bytes,
     filename: str,
@@ -436,6 +437,7 @@ def validate_and_save_image(
         filename, entity_type, entity_id, raw_image,
         filename_prefix, is_compressible
     )
+
 
 def get_static_asset_url(filepath: str) -> str:
     """Returns the URL for the static assets that differ between
