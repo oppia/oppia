@@ -24,6 +24,9 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {MatIconModule} from '@angular/material/icon';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {FullExpandAccordionComponent} from './accordion/full-expand-accordion.component';
 import {PrimaryButtonComponent} from '../../components/button-directives/primary-button.component';
 import {BarChartComponent} from './charts/bar-chart.component';
 import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
@@ -57,7 +60,6 @@ class MockTranslateService {
 describe('About Page', () => {
   let windowRef: MockWindowRef;
   let component: AboutPageComponent;
-  let siteAnalyticsService: SiteAnalyticsService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let translateService: TranslateService;
   let windowDimensionsService: WindowDimensionsService;
@@ -67,10 +69,11 @@ describe('About Page', () => {
   beforeEach(async () => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [NgbAccordionModule],
+      imports: [NgbAccordionModule, NgbModule, MatIconModule],
       declarations: [
         AboutPageComponent,
         MockTranslatePipe,
+        FullExpandAccordionComponent,
         PrimaryButtonComponent,
         BarChartComponent,
       ],
@@ -96,7 +99,6 @@ describe('About Page', () => {
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
-    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     component = aboutPageComponent.componentInstance;
 
@@ -217,6 +219,19 @@ describe('About Page', () => {
     }
   );
 
+  it('should ensure all items in featuresData array have panelIsCollapsed property as true', () => {
+    expect(
+      component.featuresData.every(item => item.panelIsCollapsed === true)
+    ).toBeTrue();
+  });
+
+  it('should toggle the panels at given index', () => {
+    component.expandPanel(1);
+    expect(component.featuresData[1].panelIsCollapsed).toBeFalse();
+    component.closePanel(1);
+    expect(component.featuresData[1].panelIsCollapsed).toBeTrue();
+  });
+
   it('should return correct static image url when calling getStaticImageUrl', () => {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image'
@@ -277,30 +292,5 @@ describe('About Page', () => {
     component.ngOnDestroy();
 
     expect(component.directiveSubscriptions.closed).toBe(true);
-  });
-
-  it('should register correct event on calling onClickBrowseLibraryButton', () => {
-    spyOn(
-      siteAnalyticsService,
-      'registerClickBrowseLibraryButtonEvent'
-    ).and.callThrough();
-
-    component.onClickBrowseLibraryButton();
-
-    expect(
-      siteAnalyticsService.registerClickBrowseLibraryButtonEvent
-    ).toHaveBeenCalledWith();
-  });
-
-  it('should register correct event on calling onClickVisitClassroomButton', () => {
-    spyOn(
-      siteAnalyticsService,
-      'registerClickVisitClassroomButtonEvent'
-    ).and.callThrough();
-    component.onClickVisitClassroomButton();
-
-    expect(
-      siteAnalyticsService.registerClickVisitClassroomButtonEvent
-    ).toHaveBeenCalledWith();
   });
 });

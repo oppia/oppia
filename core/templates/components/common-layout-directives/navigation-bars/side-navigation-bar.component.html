@@ -282,15 +282,6 @@
       </div>
     </li>
 
-    <li [ngClass]="{'active': currentUrl === '/about'}" class="oppia-sidebar-rows">
-      <a href="/about"
-         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE"
-         tabindex="-1"
-         class="e2e-mobile-test-sidebar-about-button text-uppercase">
-        <span >{{ 'I18N_SIDEBAR_ABOUT_LINK' | translate }}</span>
-      </a>
-    </li>
-
     <li class="oppia-sidebar-rows">
       <div (click)="togglegetinvolvedSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandable-button e2e-mobile-test-sidebar-expand-get-involved-menu">
         <span [ngClass]="{'oppia-sidebar-submenu-toggle': getinvolvedSubmenuIsShown}" class="text-uppercase">{{ 'I18N_SIDEBAR_GET_INVOLVED' | translate }}</span>
@@ -329,20 +320,36 @@
       </div>
     </li>
 
-    <li [ngClass]="{'active': currentUrl === '/about-foundation'}" class="oppia-sidebar-rows">
-      <a href="/about-foundation"
-         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
-         tabindex="-1"
-         class="e2e-mobile-test-sidebar-about-foundation-button text-uppercase">
-        <span >{{ 'I18N_SIDEBAR_ABOUT_OPPIA_FOUNDATION' | translate }}</span>
-      </a>
+    <li class="oppia-sidebar-rows">
+      <div (click)="toggleAboutSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandable-button e2e-mobile-test-sidebar-expand-about-menu">
+        <span [ngClass]="{'oppia-sidebar-submenu-toggle': aboutSubmenuIsShown}" class="text-uppercase">{{ 'I18N_SIDEBAR_ABOUT_LINK' | translate }}</span>
+        <i [ngClass]="{'oppia-sidebar-menu-icon-transition': aboutSubmenuIsShown}" class="fas fa-angle-down oppia-sidebar-expand-icon expand-icon">
+        </i>
+      </div>
+      <div [hidden]="!aboutSubmenuIsShown">
+        <div class="oppia-sidebar-submenu-upperborder">
+          <a tabindex="-1" href="/about" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE" class="e2e-mobile-test-sidebar-about-button">
+            <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_ABOUT_LINK' | translate }}</span>
+          </a>
+        </div>
+        <div class="oppia-sidebar-submenu-upperborder">
+          <a tabindex="-1" href="/teach" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE" class="e2e-mobile-test-sidebar-teach-button">
+            <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_TEACH' | translate }}</span>
+          </a>
+        </div>
+        <div class="oppia-sidebar-submenu-upperborder">
+          <a tabindex="-1" target="_blank" rel="noopener" [href]="IMPACT_REPORT_LINK" class="e2e-mobile-test-sidebar-impact-report-button">
+            <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_IMPACT_REPORT' | translate }}</span>
+          </a>
+        </div>
+      </div>
     </li>
 
     <li [ngClass]="{'active': currentUrl === '/donate'}" class="oppia-sidebar-rows">
       <a href="/donate"
          [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
          tabindex="-1"
-         class="e2e-mobile-test-donate-link text-uppercase">
+         class="e2e-test-navbar-donate-mobile-button text-uppercase">
         <span>{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
       </a>
     </li>

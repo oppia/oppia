@@ -49,7 +49,7 @@ describe('Parent/Teacher', function () {
       'and click on "Explore Lessons" button',
     async function () {
       // Navigating to "For Parent/Teacher page" via footer from home page.
-      await loggedOutUser.navigateToTeachPageViaFooter();
+      await loggedOutUser.clickOnForParentsSlashTeachersLinkInFooter();
       // Navigating to lessons/classroom page by clicking on the
       // "Explore Lessons" button on the "For Parent/Teacher" page.
       await loggedOutUser.clickExploreLessonsButtonInTeachPage();

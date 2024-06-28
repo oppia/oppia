@@ -32,6 +32,7 @@ import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 
 import './about-page.component.css';
+import {AccordionPanelData} from './data.model';
 
 @Component({
   selector: 'about-page',
@@ -39,28 +40,38 @@ import './about-page.component.css';
   styleUrls: ['./about-page.component.css'],
 })
 export class AboutPageComponent implements OnInit, OnDestroy {
-  features = [
+  featuresData: AccordionPanelData[] = [
     {
-      i18nDescription: 'I18N_ABOUT_PAGE_AUDIO_SUBTITLES_FEATURE',
-      imageFilename: '/about/cc.svg',
+      title: 'I18N_ABOUT_PAGE_FEATURE_TITLE1',
+      text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT1',
+      customPanelClassNames: ['feature-panel'],
+      customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
+      panelIsCollapsed: true,
     },
     {
-      i18nDescription: 'I18N_ABOUT_PAGE_LESSON_FEATURE',
-      imageFilename: '/about/lesson_icon.svg',
+      title: 'I18N_ABOUT_PAGE_FEATURE_TITLE2',
+      text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT2',
+      customPanelClassNames: ['feature-panel'],
+      customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
+      panelIsCollapsed: true,
     },
     {
-      i18nDescription: 'I18N_ABOUT_PAGE_MOBILE_FEATURE',
-      imageFilename: '/about/mobile_alt_solid.svg',
+      title: 'I18N_ABOUT_PAGE_FEATURE_TITLE2',
+      text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT2',
+      customPanelClassNames: ['feature-panel'],
+      customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
+      panelIsCollapsed: true,
     },
     {
-      i18nDescription: 'I18N_ABOUT_PAGE_WIFI_FEATURE',
-      imageFilename: '/about/wifi_solid.svg',
-    },
-    {
-      i18nDescription: 'I18N_ABOUT_PAGE_LANGUAGE_FEATURE',
-      imageFilename: '/about/language_icon.svg',
+      title: 'I18N_ABOUT_PAGE_FEATURE_TITLE3',
+      text: 'I18N_ABOUT_PAGE_FEATURE_SUBTEXT3',
+      customPanelClassNames: ['feature-panel'],
+      customTitleClassNames: ['feature-title', 'oppia-about-platform-subtext'],
+      panelIsCollapsed: true,
     },
   ];
+
+  partnersData = OppiaPlatformStatsData.OPPIA_PARTNERS_DATA;
 
   oppiaWebRawBarChartData: readonly {
     country: string;
@@ -87,6 +98,7 @@ export class AboutPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   partnershipsFormLink: string = '';
   volunteerFormLink = AppConstants.VOLUNTEER_FORM_LINK;
+  IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
   // Volunteer CTA is the default tab.
   selectedTabIndex = 1;
   volunteerRolesDetails = [
@@ -256,12 +268,12 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  onClickVisitClassroomButton(): void {
-    this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
+  expandPanel(index: number): void {
+    this.featuresData[index].panelIsCollapsed = false;
   }
 
-  onClickBrowseLibraryButton(): void {
-    this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
+  closePanel(index: number): void {
+    this.featuresData[index].panelIsCollapsed = true;
   }
 
   ngOnDestroy(): void {

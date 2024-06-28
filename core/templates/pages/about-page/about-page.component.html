@@ -1,46 +1,13 @@
 <div class="about-page e2e-test-about-page">
-  <div class="oppia-about-page-section-one">
-    <div class="oppia-about-page-section-one-right">
-      <picture class="oppia-about-study-image float-right">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/about/study.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/about/study.png')">
-        <img [src]="getStaticImageUrl('/about/study.png')" alt="about study image">
-      </picture>
-    </div>
-    <div class="oppia-about-page-section-one-left">
-      <h2 class="oppia-about-title oppia-about-section-title" [innerHTML]="'I18N_ABOUT_PAGE_TITLE_SECTION_ONE' | translate"></h2>
-      <p class="oppia-about-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_SECTION_ONE_CONTENT' | translate"></p>
-      <div class="oppia-about-button-container">
-        <oppia-primary-button class="e2e-test-about-page-browse-our-lessons-button"
-          buttonHref="/learn/math"
-          (onClickPrimaryButton)="onClickVisitClassroomButton()"
-          [customClasses]="['oppia-about-button', 'oppia-about-button-browse']"
-          buttonText="{{ 'I18N_ACTION_BROWSE_LESSONS' | translate }}">
-        </oppia-primary-button>
-      </div>
-      <div class="oppia-about-button-container">
-        <oppia-primary-button class="e2e-test-about-page-access-android-app-button"
-          buttonHref="/android"
-          [customClasses]="['oppia-about-button', 'oppia-about-button-browse']"
-          buttonText="{{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}">
-        </oppia-primary-button>
-      </div>
-    </div>
-  </div>
-  <div class="oppia-about-page-section-two oppia-about-section">
-    <div class="oppia-about-section-two-top oppia-about-fixed-section">
-      <div class="oppia-section-two-content">
-        <h3 class="oppia-about-title oppia-about-section-title" [innerHTML]="'I18N_ABOUT_PAGE_OUR_FEATURES' | translate"></h3>
-        <p class="oppia-about-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_OUR_FEATURES_CONTENT' | translate"></p>
-      </div>
-      <div class="oppia-about-icons">
-        <div class="oppia-about-features-container d-flex">
-          <div class="oppia-about-feature-description-container" *ngFor="let feature of features let i = index">
-            <img [src]="getStaticImageUrl(feature.imageFilename)" alt="{{feature.i18nDescription | translate}}" class="oppia-feature-icon">
-            <h4 class="oppia-about-feature-text" [innerHTML]="feature.i18nDescription | translate"></h4>
-          </div>
-        </div>
-      </div>
+
+  <div class="oppia-about-hero-section">
+    <div class="oppia-about-hero-section-content">
+      <h2 class="oppia-about-hero-title">
+        {{ 'I18N_ABOUT_PAGE_HERO_SECTION_TITLE' | translate }}
+      </h2>
+      <p class="oppia-about-hero-subtext">
+        {{ 'I18N_ABOUT_PAGE_HERO_SECTION_SUBTEXT' | translate }}
+      </p>
     </div>
   </div>
 
@@ -113,6 +80,139 @@
     </div>
   </div>
 
+  <div class="oppia-about-platform-section">
+    <div class="oppia-about-platform-section-left">
+      <p class="oppia-about-subtitle">
+        {{ 'I18N_ABOUT_PAGE_FEATURES' | translate }}
+      </p>
+
+      <div class="oppia-about-desktop-accordion-container">
+        <oppia-full-expand-accordion [accordionData]="featuresData" class="oppia-about-desktop-content"
+        [listContainerCustomClasses]="['oppia-about-features-list']">
+        </oppia-full-expand-accordion>
+      </div>
+
+      <div class="oppia-about-features-list oppia-about-non-desktop-content">
+        <div *ngFor="let panel of featuresData; let i = index"
+             class="oppia-about-accordion-item">
+          <button (click)="expandPanel(i)" *ngIf="featuresData[i].panelIsCollapsed"
+                  class="oppia-about-accordion-title-container"
+                  [ngClass]="panel.customTitleClassNames">
+            <p class="oppia-about-platform-subtext"> {{ panel.title | translate }} </p>
+            <mat-icon> add </mat-icon>
+          </button>
+          <div [(ngbCollapse)]="featuresData[i].panelIsCollapsed" [animation]="false" class="collapse-container panel-container"
+            [ngClass]="panel.customPanelClassNames">
+            <div class="oppia-about-accordion-title-container ">
+              <p class="oppia-about-accordion-panel-title oppia-about-platform-subtext"> {{ panel.title | translate }} </p>
+              <button (click)="closePanel(i)">
+                <mat-icon> remove </mat-icon>
+              </button>
+            </div>
+            <p class="oppia-about-platform-subtext"> {{ panel.text | translate }} </p>
+            <img *ngIf="panel.image" [src]="panel.image" >
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="oppia-about-platform-section-right">
+      <p class="oppia-about-title-new">
+        {{ 'I18N_ABOUT_PAGE_PLATFORM_SECTION_TITLE' | translate }}
+      </p>
+      <div class="oppia-about-platform-content">
+        <p class="oppia-about-platform-subtext">
+          {{ 'I18N_ABOUT_PAGE_PLATFORM_SECTION_SUBTEXT1' | translate }}
+        </p>
+        <p class="oppia-about-platform-subtext"
+           [innerHTML]="'I18N_ABOUT_PAGE_PLATFORM_SECTION_SUBTEXT2' | translate">
+        </p>
+      </div>
+      <div class="oppia-about-platform-button-container">
+        <oppia-primary-button
+          buttonHref="/learn/math"
+          [customClasses]="['oppia-about-platform-button', 'oppia-about-platform-subtext']"
+          buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate }}">
+        </oppia-primary-button>
+        <oppia-primary-button
+          buttonHref="/android"
+          [customClasses]="['oppia-about-platform-button', 'oppia-about-secondary-button', 'oppia-about-platform-subtext']"
+          buttonText="{{ 'I18N_ACTION_DOWNLOAD_ANDRIOD_APP' | translate }}">
+        </oppia-primary-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="oppia-about-partnerships-section">
+    <div class="oppia-about-partnerships-top">
+      <p class="oppia-about-title-new">
+        {{ 'I18N_ABOUT_PAGE_PARTNERSHIPS_SECTION_TITLE' | translate }}
+      </p>
+      <p class="oppia-about-section-subtext-new">
+        {{ 'I18N_ABOUT_PAGE_PARTNERSHIPS_SECTION_SUBTEXT1' | translate }}
+        <br>
+        {{ 'I18N_ABOUT_PAGE_PARTNERSHIPS_SECTION_SUBTEXT2' | translate }}
+      </p>
+    </div>
+    <div class="oppia-about-partnerships-cards-container-desktop">
+      <div class="oppia-about-partnerships-card" *ngFor="let partner of partnersData">
+        <div class="oppia-about-partnerships-card-top">
+          <p class="oppia-about-subtitle oppia-about-partnerships-card-title">
+            {{ partner.title | translate }}
+          </p>
+          <p class="oppia-about-section-subtext-new oppia-about-partnerships-card-label">
+            {{ partner.label | translate }}
+            <span>  {{ partner.name | translate }}</span>
+          </p>
+        </div>
+        <div class="oppia-about-partnerships-card-bottom">
+          <div class="oppia-about-partnerships-card-image-container">
+            <picture class="oppia-about-partnerships-card-image">
+              <source type="image/webp" [srcset]="getImageSet(partner.imageUrl, 'webp', [1,1.5])">
+              <source type="image/png" [srcset]="getImageSet(partner.imageUrl, 'png', [1,1.5])">
+              <img [src]="getStaticImageUrl( partner.imageUrl + '1x.png')"
+                   alt="{{ 'Activities of ' + (partner.name | translate) + ' partnered with Oppia'}}">
+            </picture>
+          </div>
+          <div class="oppia-about-partnerships-card-content">
+            <p class="oppia-about-section-subtext-new">
+              {{ partner.description | translate }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="oppia-about-partnerships-cards-container-tablet">
+      <ngb-carousel [interval]="8000" [showNavigationArrows]="false">
+        <ng-template ngbSlide *ngFor="let partner of partnersData">
+          <div class="oppia-about-partnerships-card">
+            <div class="oppia-about-partnerships-card-image-container">
+              <picture class="oppia-about-partnerships-card-image">
+                <source type="image/webp" [srcset]="getImageSet(partner.imageUrl, 'webp', [1,1.5])">
+                <source type="image/png" [srcset]="getImageSet(partner.imageUrl, 'png', [1,1.5])">
+                <img [src]="getStaticImageUrl( partner.imageUrl + '1x.png')"
+                     alt="{{ 'Activities of ' + (partner.name | translate) + ' partnered with Oppia'}}">
+              </picture>
+            </div>
+            <div class="oppia-about-partnerships-card-content-container">
+              <div class="oppia-about-partnerships-card-content">
+                <p class="oppia-about-subtitle oppia-about-partnerships-card-title">
+                  {{ partner.title | translate }}
+                </p>
+                <p class="oppia-about-section-subtext-new oppia-about-partnerships-card-label">
+                  {{ partner.label | translate }}
+                  <span>  {{ partner.name | translate }}</span>
+                </p>
+                <p class="oppia-about-section-subtext-new">
+                  {{ partner.description | translate }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </ngb-carousel>
+    </div>
+  </div>
+
   <div class="oppia-about-impact-section">
     <div class="oppia-about-impact-section-top">
       <p class="oppia-about-title-new">
@@ -175,12 +275,8 @@
 
     <div class="oppia-about-impact-charts-container">
       <div class="oppia-about-impact-chart-container">
-        <p class="oppia-about-section-subtext-new">
-          {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_TOP_10_COUNTRIES_TEXT' | translate }}
-          <br class="oppia-mobile-portrait-content" >
-          <span class="oppia-impact-section-grey-bg-text">
-            {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_OPPIA_WEBSITE' | translate }}
-          </span>
+        <p class="oppia-about-section-subtext-new"
+           [innerHTML]="'I18N_ABOUT_PAGE_IMPACT_SECTION_TOP_10_COUNTRIES_TEXT_WEBSITE' | translate">
         </p>
         <div class="oppia-about-impact-bar-chart-container">
           <oppia-bar-chart [ticks]="oppiaWebBarChartTicks"
@@ -193,12 +289,8 @@
         </div>
       </div>
       <div class="oppia-about-impact-chart-container">
-        <p class="oppia-about-section-subtext-new">
-          {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_TOP_10_COUNTRIES_TEXT' | translate }}
-          <br class="oppia-mobile-portrait-content">
-          <span class="oppia-impact-section-yellow-bg-text">
-            {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_OPPIA_ANDROID_APP' | translate }}
-          </span>
+        <p class="oppia-about-section-subtext-new"
+           [innerHTML]="'I18N_ABOUT_PAGE_IMPACT_SECTION_TOP_10_COUNTRIES_TEXT_ANDROID' | translate">
         </p>
         <div class="oppia-about-impact-bar-chart-container">
           <oppia-bar-chart [ticks]="oppiaAndroidBarChartTicks"
@@ -218,62 +310,13 @@
       </p>
       <div>
         <oppia-primary-button
-          buttonHref="https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view"
+          [buttonHref]="IMPACT_REPORT_LINK"
           [customClasses]="['oppia-about-impact-button']"
           buttonText="{{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_REPORT_BUTTON_TEXT' | translate }}">
         </oppia-primary-button>
       </div>
     </div>
 
-  </div>
-
-  <div class="oppia-about-page-section-four oppia-about-section">
-    <div class="oppia-section-four oppia-about-fixed-section">
-      <h2 class="oppia-about-learn-title-mobile oppia-about-section-title-mobile" [innerHTML]="'I18N_ABOUT_PAGE_LEARN_FROM' | translate"></h2>
-      <div class="oppia-about-image-right">
-        <picture class="oppia-about-lesson-image">
-          <source type="image/webp" [srcset]="getStaticImageUrl('/about/fraction_lesson.webp')">
-          <source type="image/png" [srcset]="getStaticImageUrl('/about/fraction_lesson.png')">
-          <img [src]="getStaticImageUrl('/about/fraction_lesson.png')" class="oppia-about-lesson-image" alt="lesson image">
-        </picture>
-      </div>
-      <div class="oppia-about-content-left">
-        <h2 class="oppia-about-learn-title oppia-about-section-title oppia-about-title-mobile-display-none" [innerHTML]="'I18N_ABOUT_PAGE_LEARN_FROM' | translate"></h2>
-        <p class="oppia-about-learn-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_LEARN_FROM_CONTENT' | translate"></p>
-        <div class="oppia-about-classroom-button-container">
-          <oppia-primary-button class="e2e-test-about-page-visit-classroom-button"
-                  buttonHref="/learn/math"
-                  (onClickPrimaryButton)="onClickVisitClassroomButton()"
-                  [customClasses]="['oppia-about-button', 'oppia-about-button-browse']"
-                  buttonText="{{ 'I18N_ACTION_VISIT_CLASSROOM' | translate }}">
-          </oppia-primary-button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="oppia-about-page-section-five oppia-about-section">
-    <div class="oppia-section-five oppia-about-fixed-section">
-      <h2 class="oppia-about-explore-lesson-title-mobile oppia-about-section-title-mobile" [innerHTML]="'I18N_ABOUT_PAGE_EXPLORE_LESSONS' | translate"></h2>
-      <div class="oppia-about-image-right">
-        <picture class="oppia-about-library-image">
-          <source type="image/webp" [srcset]="getStaticImageUrl('/about/library_layout.webp')">
-          <source type="image/png" [srcset]="getStaticImageUrl('/about/library_layout.png')">
-          <img [src]="getStaticImageUrl('/about/library_layout.png')" alt="library image">
-        </picture>
-      </div>
-      <div class="oppia-about-content-left">
-        <h2 class="oppia-about-explore-lesson-title oppia-about-section-title oppia-about-title-mobile-display-none" [innerHTML]="'I18N_ABOUT_PAGE_EXPLORE_LESSONS' | translate"></h2>
-        <p class="oppia-about-explore-lesson-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_EXPLORE_LESSONS_CONTENT' | translate"></p>
-        <div class="oppia-about-classroom-button-container">
-          <oppia-primary-button class="e2e-test-about-page-browse-library-button"
-                  buttonHref="/community-library"
-                  (onClickPrimaryButton)="onClickBrowseLibraryButton()"
-                  [customClasses]="['oppia-about-button', 'oppia-about-button-browse']"
-                  buttonText="{{ 'I18N_ACTION_BROWSE_LIBRARY' | translate }}">
-          </oppia-primary-button>
-        </div>
-      </div>
-    </div>
   </div>
 
   <div class="oppia-about-cta-section">
@@ -359,7 +402,7 @@
             <p class="oppia-about-cta-subtext center-aligned-text">
               {{ 'I18N_ABOUT_PAGE_CTA_VOLUNTEER_SUBTEXT' | translate }}
             </p>
-            <ngb-carousel *ngIf="volunteerRolesIndices[screenType].length > 1" [interval]="0" [showNavigationArrows]="showNavigationArrowsForCarousel" [wrap]="false">
+            <ngb-carousel *ngIf="volunteerRolesIndices[screenType].length > 1" [interval]="0" [showNavigationArrows]="showNavigationArrowsForCarousel">
               <ng-template ngbSlide *ngFor="let activeIndices of volunteerRolesIndices[screenType]">
                 <div class="oppia-about-cta-volunteer-roles">
                   <div class="oppia-about-cta-role-card" *ngFor="let roleIndex of activeIndices">
@@ -393,7 +436,7 @@
               </oppia-primary-button>
               <oppia-primary-button
                 buttonHref="/volunteer"
-                [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext']"
+                [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-volunteer-learn-more-desktop-button']"
                 buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
               </oppia-primary-button>
             </div>
@@ -452,7 +495,7 @@
                 </div>
                 <oppia-primary-button
                   buttonHref="/partnerships"
-                  [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext']"
+                  [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-partner-learn-more-desktop-button']"
                   buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
                 </oppia-primary-button>
               </div>
@@ -530,7 +573,7 @@
             <p class="oppia-about-cta-subtext center-aligned-text">
               {{ 'I18N_ABOUT_PAGE_CTA_VOLUNTEER_SUBTEXT' | translate }}
             </p>
-            <ngb-carousel *ngIf="volunteerRolesIndices[screenType].length > 1" [interval]="0" [wrap]="false">
+            <ngb-carousel *ngIf="volunteerRolesIndices[screenType].length > 1" [interval]="0">
               <ng-template ngbSlide *ngFor="let activeIndices of volunteerRolesIndices[screenType]">
                 <div class="oppia-about-cta-volunteer-roles">
                   <div class="oppia-about-cta-role-card" *ngFor="let roleIndex of activeIndices">
@@ -565,7 +608,7 @@
               </oppia-primary-button>
               <oppia-primary-button
                 buttonHref="/volunteer"
-                [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext']"
+                [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-volunteer-learn-more-mobile-button']"
                 buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
               </oppia-primary-button>
             </div>
@@ -626,7 +669,7 @@
                 </div>
                 <oppia-primary-button
                   buttonHref="/partnerships"
-                  [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext']"
+                  [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-partner-learn-more-mobile-button']"
                   buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
                 </oppia-primary-button>
               </div>

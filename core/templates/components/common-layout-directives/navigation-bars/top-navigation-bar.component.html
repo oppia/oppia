@@ -219,31 +219,30 @@
                  href="/about"
                  [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
                 <span class="link">
-                  {{'I18N_TOPNAV_ABOUT_OPPIA' | translate}}
+                  {{'I18N_TOPNAV_ABOUT' | translate}}
                 </span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-navbar-about-menu-about-foundation-button"
-                 href="/about-foundation"
-                 [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
+              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-navbar-about-menu-teach-button"
+                 href="/teach"
+                 [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">
-                  {{'I18N_TOPNAV_OPPIA_FOUNDATION' | translate}}
+                  {{'I18N_TOPNAV_TEACH' | translate}}
                 </span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-blog-link"
-                 [href]="getOppiaBlogUrl()"
-                 [target]="'_self'"
+              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-navbar-impact-report-button"
+                 [href]="IMPACT_REPORT_LINK"
+                 target="_blank"
                  (blur)="aboutDropdown.close()"
                  rel="noopener">
                 <span class="link">
-                  {{'I18N_TOPNAV_BLOG' | translate}}
+                  {{'I18N_TOPNAV_IMPACT_REPORT' | translate}}
                 </span>
-                <span class="fas fa-external-link-alt launch" ></span>
               </a>
             </li>
           </ul>
@@ -343,7 +342,7 @@
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_DONATE"
             class="nav-item e2e-test-about-oppia-list-item">
-          <a class="nav-link oppia-navbar-tab donate-tab e2e-test-navbar-donate-button"
+          <a class="nav-link oppia-navbar-tab donate-tab e2e-test-navbar-donate-desktop-button"
              tabindex="0"
              href="/donate"
              [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
