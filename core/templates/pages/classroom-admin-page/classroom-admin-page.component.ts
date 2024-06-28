@@ -129,6 +129,7 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   getEligibleTopicPrerequisites(currentTopicName: string): void {
     this.eligibleTopicNamesForPrerequisites = [];
+    this.tempEligibleTopicNamesForPrerequisites = [];
     this.prerequisiteInput = '';
     let topicNames = Object.keys(this.topicNameToPrerequisiteTopicNames);
 
@@ -186,6 +187,8 @@ export class ClassroomAdminPageComponent implements OnInit {
         );
 
         this.classroomDataIsChanged = false;
+        this.eligibleTopicNamesForPrerequisites = [];
+        this.tempEligibleTopicNamesForPrerequisites = [];
 
         this.existingClassroomNames = Object.values(
           this.classroomIdToClassroomName
