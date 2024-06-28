@@ -457,4 +457,4 @@ def get_static_asset_url(filepath: str) -> str:
             filepath
         )
     return 'https://storage.googleapis.com/%s-static/%s' % (
-        feconf.OPPIA_PROJECT_ID, filepath
+        feconf.OPPIA_PROJECT_ID, filepath)
