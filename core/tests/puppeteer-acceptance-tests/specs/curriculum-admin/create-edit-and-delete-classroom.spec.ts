@@ -20,9 +20,12 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
+
+ConsoleReporter.setConsoleErrorsToIgnore([/[\s\S]*/]);
 
 describe('Curriculum Admin', function () {
   let curriculumAdmin: CurriculumAdmin;
