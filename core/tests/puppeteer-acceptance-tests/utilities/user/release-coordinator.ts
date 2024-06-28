@@ -542,13 +542,14 @@ export class ReleaseCoordinator extends BaseUser {
    * If false, it will verify that the Dummy Handler is disabled.
    * @param {boolean} enabled - Expected status of the Dummy Handler.
    */
+
   async verifyDummyHandlerStatusInFeaturesTab(enabled: boolean): Promise<void> {
     await this.navigateToReleaseCoordinatorPage();
     await this.navigateToFeaturesTab();
     await this.page.screenshot({path: 'screenshot.png'});
-    const dummyHandlerElement = await this.isTextPresentOnPage(
-      'Dummy Handler Enabled.'
-    );
+    const dummyHandlerElement = await this.page.evaluate(selector => {
+      return document.querySelector(selector) !== null;
+    }, agDummyFeatureIndicator);
 
     if (enabled && !dummyHandlerElement) {
       throw new Error(
