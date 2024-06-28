@@ -358,7 +358,7 @@ export class TopicManager extends BaseUser {
    * Create questions for a skill.
    * @param {string} skillName - The name of the skill for which to create questions.
    */
-  async expectToastMassageToBe(expectedMessage: string): Promise<void> {
+  async expectToastMessageToBe(expectedMessage: string): Promise<void> {
     await this.page.waitForSelector(toastMessageSelector, {visible: true});
     const actualMessage = await this.page.$eval(
       toastMessageSelector,

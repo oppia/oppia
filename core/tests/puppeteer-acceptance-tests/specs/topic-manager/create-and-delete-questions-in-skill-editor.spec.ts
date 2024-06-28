@@ -58,7 +58,7 @@ describe('Topic Manager User Journey', function () {
       await topicManager.navigateToQuestionEditorTab();
 
       await topicManager.createQuestionsForSkill('Addition', 1);
-      await topicManager.expectToastMassageToBe(
+      await topicManager.expectToastMessageToBe(
         'Question created successfully.'
       );
 
@@ -70,7 +70,7 @@ describe('Topic Manager User Journey', function () {
 
       await topicManager.navigateToQuestionEditorTab();
       await topicManager.deleteQuestion(questionText);
-      await topicManager.expectToastMassageToBe(
+      await topicManager.expectToastMessageToBe(
         'Question deleted successfully.'
       );
     },
