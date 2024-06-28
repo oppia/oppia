@@ -208,6 +208,8 @@ const partnerLearnMoreDesktopButtonInAboutPage =
   '.e2e-test-about-page-partner-learn-more-desktop-button';
 const partnerLearnMoreMobileButtonInAboutPage =
   '.e2e-test-about-page-partner-learn-more-mobile-button';
+const impactReportButtonInAboutPage =
+  '.e2e-test-about-page-impact-report-button';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -1708,6 +1710,17 @@ export class LoggedOutUser extends BaseUser {
       }
       showMessage(`Activity with title ${expectedActivity} found as expected.`);
     }
+  }
+
+  /**
+   * Function to click the "View Report" button on the About Page
+   * and check if it opens the Impact Report.
+   */
+  async clickViewReportButtonInAboutPage(): Promise<void> {
+    await this.openExternalPdfLink(
+      impactReportButtonInAboutPage,
+      impactReportUrl
+    );
   }
 
   /**
