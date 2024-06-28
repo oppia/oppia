@@ -76,15 +76,20 @@ describe('ImageUploaderComponent', () => {
     component.imageUploaderParameters = imageUploaderParameters;
   });
 
-  it('should set uploaded and editable thumbnail on initialization', () => {
+  it('should set editable image on initialization', () => {
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     spyOn(contextService, 'getEntityId').and.returnValue('expId');
-    component.imageUploaderParameters.filename = 'thumbnail-1';
-
+    component.imageUploaderParameters.filename = 'image-filename';
+    component.imageUploaderParameters.imageName = 'Thumbnail';
     component.ngOnInit();
-
     expect(component.editableImageDataUrl).toBe(
-      '/assetsdevhandler/exploration/expId/assets/thumbnail/thumbnail-1'
+      '/assetsdevhandler/exploration/expId/assets/thumbnail/image-filename'
+    );
+
+    component.imageUploaderParameters.imageName = 'Banner';
+    component.ngOnInit();
+    expect(component.editableImageDataUrl).toBe(
+      '/assetsdevhandler/exploration/expId/assets/image/image-filename'
     );
   });
 
@@ -150,8 +155,7 @@ describe('ImageUploaderComponent', () => {
         'convertImageDataToImageFile'
       ).and.returnValue(new File([''], 'filename', {type: 'image/jpeg'}));
 
-      const updateFilenameSpy = spyOn(component.updateFilename, 'emit');
-      const updateBgColorSpy = spyOn(component.updateBgColor, 'emit');
+      const imageSaveSpy = spyOn(component.imageSave, 'emit');
 
       component.showImageUploaderModal();
       tick();
@@ -159,8 +163,7 @@ describe('ImageUploaderComponent', () => {
       expect(ngbModal.open).toHaveBeenCalledWith(ImageUploaderModalComponent, {
         backdrop: 'static',
       });
-      expect(updateFilenameSpy).toHaveBeenCalled();
-      expect(updateBgColorSpy).toHaveBeenCalledWith('#newcol');
+      expect(imageSaveSpy).toHaveBeenCalled();
     })
   );
 
@@ -230,14 +233,10 @@ describe('ImageUploaderComponent', () => {
     ).and.returnValue(null);
 
     const imageSaveSpy = spyOn(component.imageSave, 'emit');
-    const updateBgColorSpy = spyOn(component.updateBgColor, 'emit');
-    const updateFilenameSpy = spyOn(component.updateFilename, 'emit');
 
     component.showImageUploaderModal();
     tick();
 
     expect(imageSaveSpy).not.toHaveBeenCalled();
-    expect(updateBgColorSpy).not.toHaveBeenCalled();
-    expect(updateFilenameSpy).not.toHaveBeenCalled();
   }));
 });
