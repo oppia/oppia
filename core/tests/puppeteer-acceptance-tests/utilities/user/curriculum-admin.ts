@@ -1052,6 +1052,9 @@ export class CurriculumAdmin extends BaseUser {
    * Function for navigating to the classroom admin page.
    */
   async navigateToClassroomAdminPage(): Promise<void> {
+    if (this.page.url() === classroomAdminUrl) {
+      await this.reloadPage();
+    }
     await this.goto(classroomAdminUrl);
   }
 
@@ -1064,7 +1067,6 @@ export class CurriculumAdmin extends BaseUser {
     if (classroomTiles.length === 0) {
       throw new Error('No classrooms are present.');
     }
-
     let foundClassroom = false;
 
     for (let i = 0; i < classroomTiles.length; i++) {
@@ -1121,7 +1123,6 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(editClassroomTeaserTextInputFeild, teaserText);
     await this.page.type(editClassroomTopicListIntroInputFeild, topicListIntro);
     await this.page.type(editClassroomCourseDetailsInputFeild, courseDetails);
-
     await this.clickOn(classroomThumbnailContainer);
     await this.page.waitForSelector(imageUploaderModal, {visible: true});
     await this.uploadFile(curriculumAdminThumbnailImage);
@@ -1129,7 +1130,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(uploadClassroomImageButton);
     await this.page.waitForSelector(imageUploaderModal, {visible: false});
 
-    await this.page.waitForTimeout(1000);
+    await this.page.waitForTimeout(2000);
 
     await this.clickOn(classroomBannerContainer);
     await this.page.waitForSelector(imageUploaderModal, {visible: true});

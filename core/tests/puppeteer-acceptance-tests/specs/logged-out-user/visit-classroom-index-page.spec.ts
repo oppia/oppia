@@ -46,8 +46,6 @@ describe('Logged-out User', function () {
       'release_coordinator@example.com',
       [ROLES.RELEASE_COORDINATOR]
     );
-
-    await releaseCoordinator.enableFeatureFlag('enable_multiple_classrooms');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -62,6 +60,7 @@ describe('Logged-out User', function () {
   it(
     'should be redirected to a classroom page if we have 1 public classroom.',
     async function () {
+      await releaseCoordinator.enableFeatureFlag('enable_multiple_classrooms');
       await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
       await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
       await curriculumAdmin.createNewClassroom('Math', 'math');
