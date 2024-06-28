@@ -43,6 +43,14 @@ describe('Logged-out User in About page', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
+    'should open the Impact Report when the "View Report" button is clicked.',
+    async function () {
+      await loggedOutUser.clickViewReportButtonInAboutPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
     'should open the Volunteer form when the "Volunteer with Oppia" button ' +
       'is clicked.',
     async function () {

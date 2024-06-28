@@ -25,15 +25,17 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {MatIconModule} from '@angular/material/icon';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbAccordionModule,
+  NgbModal,
+  NgbModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import {FullExpandAccordionComponent} from './accordion/full-expand-accordion.component';
 import {PrimaryButtonComponent} from '../../components/button-directives/primary-button.component';
 import {BarChartComponent} from './charts/bar-chart.component';
 import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
 import {DonationBoxModalComponent} from '../donate-page/donation-box/donation-box-modal.component';
 import {ThanksForDonatingModalComponent} from '../donate-page/thanks-for-donating-modal.component';
 import {of} from 'rxjs';
@@ -101,10 +103,6 @@ describe('About Page', () => {
     const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     component = aboutPageComponent.componentInstance;
-
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true
-    );
   });
   beforeEach(() => {
     translateService = TestBed.inject(TranslateService);
@@ -154,18 +152,6 @@ describe('About Page', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(800);
     component.setScreenType();
     expect(component.screenType).toEqual('desktop');
-  });
-
-  it('should set showNavigationArrowsForCarousel to "false" if window width is greater than 640', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(641);
-    component.setScreenType();
-    expect(component.showNavigationArrowsForCarousel).toBeFalse();
-  });
-
-  it('should set showNavigationArrowsForCarousel to "true" if window width is lesser than 641', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(640);
-    component.setScreenType();
-    expect(component.showNavigationArrowsForCarousel).toBeTrue();
   });
 
   it('should obtain new form link whenever the selected language changes', () => {
@@ -280,6 +266,50 @@ describe('About Page', () => {
       size: 'xl',
       windowClass: 'donation-box-modal',
     });
+  });
+
+  it('should get the correct RTL status if the current language is RTL', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    expect(component.isLanguageRTL()).toBeTrue();
+  });
+
+  it('should get the correct RTL status if the current language is not RTL', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      false
+    );
+    expect(component.isLanguageRTL()).toBeFalse();
+  });
+
+  it('should move the correct volunteer carousel to the previous slide', () => {
+    component.volunteerCarouselMobile = jasmine.createSpyObj('NgbCarousel', [
+      'prev',
+    ]);
+    component.volunteerCarousel = jasmine.createSpyObj('NgbCarousel', ['prev']);
+
+    component.screenType = 'mobile';
+    component.moveCarouselToPreviousSlide();
+    expect(component.volunteerCarouselMobile.prev).toHaveBeenCalled();
+
+    component.screenType = 'desktop';
+    component.moveCarouselToPreviousSlide();
+    expect(component.volunteerCarousel.prev).toHaveBeenCalled();
+  });
+
+  it('should move the correct volunteer carousel to the next slide', () => {
+    component.volunteerCarouselMobile = jasmine.createSpyObj('NgbCarousel', [
+      'next',
+    ]);
+    component.volunteerCarousel = jasmine.createSpyObj('NgbCarousel', ['next']);
+
+    component.screenType = 'mobile';
+    component.moveCarouselToNextSlide();
+    expect(component.volunteerCarouselMobile.next).toHaveBeenCalled();
+
+    component.screenType = 'desktop';
+    component.moveCarouselToNextSlide();
+    expect(component.volunteerCarousel.next).toHaveBeenCalled();
   });
 
   it('should unsubscribe on component destruction', () => {
