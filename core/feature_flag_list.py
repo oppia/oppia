@@ -86,7 +86,6 @@ DEV_FEATURES_LIST = [
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
-    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -100,6 +99,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
+    FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -262,7 +262,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag activates the redesigned topic viewer page'
             'and makes it accessible to learners.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     )
 }
