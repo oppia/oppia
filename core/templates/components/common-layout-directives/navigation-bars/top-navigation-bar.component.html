@@ -235,7 +235,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-navbar-impact-report-button"
+              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link oppia-impact-report-btn e2e-test-navbar-impact-report-button"
                  [href]="IMPACT_REPORT_LINK"
                  target="_blank"
                  (blur)="aboutDropdown.close()"
@@ -243,6 +243,7 @@
                 <span class="link">
                   {{'I18N_TOPNAV_IMPACT_REPORT' | translate}}
                 </span>
+                <i class="fas fa-external-link-alt launch-icon"></i>
               </a>
             </li>
           </ul>
@@ -591,84 +592,82 @@
     z-index: 500;
   }
   @media only screen and (max-width: 335px) {
-  :lang(ar) .sinin {
-font-size: 0.5rem;
-padding: 0;
-position: relative;
-top: 2rem;
-  }
-  }
-
-    @media only screen and (max-width: 355px) {
-    .langbtn {
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 4px;
-    padding: 0;
-  }
-  .langi {
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 4px;
-    padding-left: 2px;
-  }
-   .langcd {
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 4px;
-    padding: 0;
-  }
-    .langbtnContainer {
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 4px;
-  }
-   .sinin {
-     margin-left: 0;
-     margin-right: 0;
-     margin-top: 3px;
-     padding: 3px;
-  }
-  :lang(ar) .langbtn {
-    height: 28px;
-    margin-top: 6px;
-    padding: 0;
-    position: relative;
-    top: 6.2rem;
-    width: 80px;
-  }
-  :lang(ar) .langi {
-    font-size: 1.2rem;
-    margin-left: 1rem;
-    margin-right: 0;
-    margin-top: 4px;
-    padding-left: 0;
-  }
-  :lang(ar) .langbtnContainer {
-    margin-left: 1rem;
-    margin-right: 0;
-    margin-top: 4px;
-  }
-  :lang(ar) .sinin {
-font-size: 1.2rem;
-padding: 0;
-position: relative;
-top: 3.4rem;
-  }
-  :lang(ar) .pfl {
-    position: relative;
-    top: 6rem;
-  }
-
+    :lang(ar) .sinin {
+      font-size: 0.5rem;
+      padding: 0;
+      position: relative;
+      top: 2rem;
     }
+  }
 
+  @media only screen and (max-width: 355px) {
+    .langbtn {
+      margin-left: 0;
+      margin-right: 0;
+      margin-top: 4px;
+      padding: 0;
+    }
+    .langi {
+      margin-left: 0;
+      margin-right: 0;
+      margin-top: 4px;
+      padding-left: 2px;
+    }
+    .langcd {
+      margin-left: 0;
+      margin-right: 0;
+      margin-top: 4px;
+      padding: 0;
+    }
+    .langbtnContainer {
+      margin-left: 0;
+      margin-right: 0;
+      margin-top: 4px;
+    }
+    .sinin {
+      margin-left: 0;
+      margin-right: 0;
+      margin-top: 3px;
+      padding: 3px;
+    }
+    :lang(ar) .langbtn {
+      height: 28px;
+      margin-top: 6px;
+      padding: 0;
+      position: relative;
+      top: 6.2rem;
+      width: 80px;
+    }
+    :lang(ar) .langi {
+      font-size: 1.2rem;
+      margin-left: 1rem;
+      margin-right: 0;
+      margin-top: 4px;
+      padding-left: 0;
+    }
+    :lang(ar) .langbtnContainer {
+      margin-left: 1rem;
+      margin-right: 0;
+      margin-top: 4px;
+    }
+    :lang(ar) .sinin {
+    font-size: 1.2rem;
+    padding: 0;
+    position: relative;
+    top: 3.4rem;
+    }
+    :lang(ar) .pfl {
+      position: relative;
+      top: 6rem;
+    }
+  }
 
   @media only screen and (max-width: 308px) {
-  :lang(ar) .langbtn {
-    margin-top: 6px;
-    padding: 0;
-    position: relative;
+    :lang(ar) .langbtn {
+      margin-top: 6px;
+      padding: 0;
+      position: relative;
+    }
   }
-}
 
 </style>
