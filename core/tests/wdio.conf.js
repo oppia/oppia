@@ -113,10 +113,6 @@ var suites = {
     './core/tests/webdriverio_desktop/extensions.js'
   ],
 
-  featureGating: [
-    './core/tests/webdriverio/featureGatingFlow.js'
-  ],
-
   feedbackUpdates: [
     './core/tests/webdriverio_desktop/feedbackUpdates.js'
   ],
