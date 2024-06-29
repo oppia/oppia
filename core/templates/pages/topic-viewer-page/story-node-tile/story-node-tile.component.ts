@@ -62,7 +62,7 @@ export class StoryNodeTileComponent implements OnInit {
   nodeId!: string;
   pathIconParameters: IconParametersArray[] = [];
   EXPLORE_PAGE_PREFIX = '/explore/';
-  explorationId!: string;
+  explorationId!: string | null;
   expStates!: StateObjectsBackendDict;
   checkpointCount!: number;
   mostRecentlyReachedCheckpoint!: string;
