@@ -20,11 +20,9 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
-const ROLES = testConstants.Roles;
 
 ConsoleReporter.setConsoleErrorsToIgnore([
   /http:\/\/localhost:8181\/access_validation_handler\/can_access_classrooms_page Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
@@ -32,15 +30,9 @@ ConsoleReporter.setConsoleErrorsToIgnore([
 
 describe('Logged-out User', function () {
   let loggedOutUser: LoggedOutUser;
-  let curriculumAdmin: CurriculumAdmin;
 
   beforeAll(async function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
-    curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm',
-      'curriculum_admin@example.com',
-      [ROLES.CURRICULUM_ADMIN]
-    );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
