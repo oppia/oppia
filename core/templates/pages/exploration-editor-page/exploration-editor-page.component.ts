@@ -460,12 +460,12 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   }
 
   populateEntityTranslationsWithDraftChanges(
-    draft_changes: ExplorationChange[] | null,
+    draftChanges: ExplorationChange[] | null,
     version: number
   ): void {
-    if (draft_changes !== null) {
-      for (let i in draft_changes) {
-        let changeDict = draft_changes[i];
+    if (draftChanges !== null) {
+      for (let i in draftChanges) {
+        let changeDict = draftChanges[i];
 
         if (changeDict.cmd === 'edit_translation') {
           // Create the entity translation objects first if they don't exist.

@@ -36,7 +36,6 @@ import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFacto
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {ChangeListService} from '../services/change-list.service';
 import {ContextService} from 'services/context.service';
-import {EntityBulkTranslationsBackendApiService} from '../services/entity-bulk-translations-backend-api.service';
 import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {FormsModule} from '@angular/forms';
@@ -54,7 +53,6 @@ describe('Modify Translations Modal Component', function () {
   let entityTranslationsService: EntityTranslationsService;
   let changeListService: ChangeListService;
   let contextService: ContextService;
-  let entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService;
   let ngbModal: NgbModal;
   let ngbActiveModal: NgbActiveModal;
   let translationLanguageService: TranslationLanguageService;
@@ -75,9 +73,6 @@ describe('Modify Translations Modal Component', function () {
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     changeListService = TestBed.inject(ChangeListService);
     contextService = TestBed.inject(ContextService);
-    entityBulkTranslationsBackendApiService = TestBed.inject(
-      EntityBulkTranslationsBackendApiService
-    );
     ngbModal = TestBed.inject(NgbModal);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     translationLanguageService = TestBed.inject(TranslationLanguageService);

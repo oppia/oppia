@@ -46,7 +46,6 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   explorationId!: string;
   explorationVersion!: number;
   contentTranslations: LanguageCodeToContentTranslations = {};
-  allExistingTranslationsHaveBeenRemoved: boolean = false;
   languageIsCheckedStatusDict: {
     [languageCode: string]: boolean;
   } = {};

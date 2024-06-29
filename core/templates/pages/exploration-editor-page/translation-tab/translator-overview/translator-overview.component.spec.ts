@@ -41,7 +41,6 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ContextService} from 'services/context.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {ChangeListService} from '../../services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
@@ -98,7 +97,6 @@ describe('Translator Overview component', () => {
   let routerService: RouterService;
   let entityTranslationsService: EntityTranslationsService;
   let entityVoiceoversService: EntityVoiceoversService;
-  let changeListService: ChangeListService;
   let windowRef: WindowRef;
   let entityTranslation: EntityTranslation;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
@@ -150,7 +148,6 @@ describe('Translator Overview component', () => {
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
-    changeListService = TestBed.inject(ChangeListService);
     windowRef = TestBed.inject(WindowRef);
     localStorageService = TestBed.inject(LocalStorageService);
 
