@@ -213,7 +213,7 @@ describe('Mark Translations As Needing Update Modal Component', () => {
     expect(dismissSpy).toHaveBeenCalled();
   });
 
-  it('should determine if content has displayable translations appropriately', () => {
+  it('should determine if content has displayable translations', () => {
     component.contentId = 'content1';
 
     expect(component.doesContentHaveDisplayableTranslations()).toBe(false);
