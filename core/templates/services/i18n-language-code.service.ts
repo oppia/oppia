@@ -19,6 +19,7 @@
 import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable, EventEmitter} from '@angular/core';
 import {AppConstants} from 'app.constants';
+import {ClassroomTranslationKeys} from 'pages/classroom-page/classroom-page.component';
 
 /**
  * Used to define if the translation key is type title or desciption.
@@ -100,12 +101,17 @@ export class I18nLanguageCodeService {
   // TODO(#14645): Remove this method when translation service is extended.
   /**
    * Takes classroom name as input, generates and returns the translation
-   * key based on that.
+   * keys based on that.
    * @param {string} classroomName - Name of the classroom.
    * @returns {string} - translation key for classroom name.
    */
-  getClassroomTranslationKey(classroomName: string): string {
-    return `I18N_CLASSROOM_${classroomName.toUpperCase()}_TITLE`;
+  getClassroomTranslationKeys(classroomName: string): ClassroomTranslationKeys {
+    return {
+      name: `I18N_CLASSROOM_${classroomName.toUpperCase()}_NAME`,
+      courseDetails: `I18N_CLASSROOM_${classroomName.toUpperCase()}_COURSE_DETAILS`,
+      teaserText: `I18N_CLASSROOM_${classroomName.toUpperCase()}_TEASER_TEXT`,
+      topicListIntro: `I18N_CLASSROOM_${classroomName.toUpperCase()}_TOPICS_LIST_INTRO`,
+    };
   }
 
   // TODO(#14645): Remove this method when translation service is extended.

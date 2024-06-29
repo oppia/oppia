@@ -259,6 +259,7 @@ ENTITY_TYPE_SKILL = 'skill'
 ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_USER = 'user'
+ENTITY_TYPE_CLASSROOM = 'classroom'
 
 DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN = 'main_question'
 DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP = 'backup_question'
@@ -420,7 +421,7 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # customization argument choices.
 INVALID_CONTENT_ID = 'invalid_content_id'
 # The default content text for the initial state of an exploration.
-DEFAULT_INIT_STATE_CONTENT_STR = ''
+DEFAULT_STATE_CONTENT_STR = ''
 
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
@@ -886,7 +887,6 @@ TASK_URL_DEFERRED = (
     '%s/deferredtaskshandler' % TASKQUEUE_URL_PREFIX)
 
 # TODO(sll): Add all other URLs here.
-ABOUT_FOUNDATION_PAGE_URL = '/about-foundation'
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
@@ -1080,6 +1080,11 @@ EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
 CLASSROOM_ID_TO_NAME_HANDLER_URL = '/classroom_id_to_name_handler'
 UNUSED_TOPICS_HANDLER_URL = '/unused_topics'
 NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
+NEW_CLASSROOM_HANDLER_URL = '/classroom_admin/create_new'
+TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL = (
+    '/topics_to_classrooms_relation'
+)
+ALL_CLASSROOMS_SUMMARY_HANDLER_URL = '/all_classrooms_summary'
 CLASSROOM_HANDLER_URL = '/classroom'
 CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
 CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
@@ -1668,6 +1673,8 @@ COMPOSITE_ENTITY_ID_TEMPLATE = '%s.%s.%d'
 ContentValueType = Union[str, List[str]]
 
 MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 10
+
+DEFAULT_CLASSROOM_PUBLICATION_STATUS = False
 
 
 class TranslatableEntityType(enum.Enum):

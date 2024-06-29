@@ -19,8 +19,9 @@
 
 export default {
   // The term 'staging' is used instead of the classroom url fragment field
-  // in the URL for topics that are not yet attached to a classroom.
+  // in the URL and classroom name for topics that are not yet attached to a classroom.
   "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
+  "CLASSROOM_NAME_FOR_UNATTACHED_TOPICS": "staging",
 
   // Acceptable URL schemes for links.
   "ACCEPTABLE_SCHEMES": ["https", ""],
@@ -163,7 +164,8 @@ export default {
   // previous one is deleted.
   // TODO(#14645): Remove these keys once translation service is extended.
   "HACKY_TRANSLATION_KEYS": [
-    "I18N_CLASSROOM_MATH_TITLE",
+    "I18N_CLASSROOM_MATH_NAME",
+    "I18N_CLASSROOM_MATH_COURSE_DETAILS",
     "I18N_TOPIC_iX9kYCjnouWN_TITLE",
     "I18N_TOPIC_sWBXKH4PZcK6_TITLE",
     "I18N_TOPIC_C4fqwrvqWpRm_TITLE",
@@ -416,6 +418,7 @@ export default {
 
   "ALLOWED_THUMBNAIL_BG_COLORS": {
     "chapter": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"],
+    "classroom": ["transparent", "#C8F5CD", "#AED2E9"],
     "topic": ["#C6DCDA"],
     "subtopic": ["#FFFFFF"],
     "story": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"]
@@ -6196,6 +6199,9 @@ export default {
   // 'math' is the 'classroom URL fragment'.
   "MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT": 20,
   "MAX_CHARS_IN_CLASSROOM_NAME": 39,
+  "MAX_CHARS_IN_CLASSROOM_TEASER_TEXT": 68,
+  "MAX_CHARS_IN_CLASSROOM_COURSE_DETAILS": 720,
+  "MAX_CHARS_IN_CLASSROOM_TOPIC_LIST_INTRO": 240,
   "MAX_CHARS_IN_TOPIC_NAME": 39,
   "MAX_CHARS_IN_ABBREV_TOPIC_NAME": 12,
   // This represents the maximum number of characters in the URL fragment for
@@ -6744,11 +6750,6 @@ export default {
         }
       ]
     },
-    "ABOUT_FOUNDATION": {
-      "ROUTE": "about-foundation",
-      "TITLE": "About the Oppia Foundation | Oppia",
-      "META": []
-    },
     "ERROR": {
       "ROUTE": "error",
       "TITLE": "I18N_ERROR_PAGE_ROOT_BROWSER_TAB_TITLE",
@@ -7204,6 +7205,24 @@ export default {
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
+        }
+      ]
+    },
+    "CLASSROOMS": {
+      "ROUTE": "learn",
+      "TITLE": "Oppia Classrooms",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
         }
       ]
     },

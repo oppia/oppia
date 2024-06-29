@@ -34,6 +34,7 @@ import {StoryNode} from 'domain/story/story-node.model';
 export class LessonCardComponent implements OnInit {
   @Input() story!: StorySummary | LearnerExplorationSummary | CollectionSummary;
   @Input() topic!: string;
+  @Input() lastCard!: boolean;
 
   desc!: string;
   imgColor!: string;
@@ -108,7 +109,7 @@ export class LessonCardComponent implements OnInit {
     this.progress = 0;
     this.title = explorationModel.title;
     this.lessonUrl = `/explore/${explorationModel.id}`;
-    this.lessonTopic = 'Community Lessons';
+    this.lessonTopic = 'Community Lesson';
   }
 
   getStorySummaryThumbnailUrl(filename: string, id: string): string {
