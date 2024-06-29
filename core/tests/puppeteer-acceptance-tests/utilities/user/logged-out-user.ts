@@ -1374,6 +1374,7 @@ export class LoggedOutUser extends BaseUser {
       partnershipsFormInPortugueseUrl,
       'Partnerships Google Form'
     );
+    await this.changeSiteLanguage('en');
   }
 
   /**
@@ -1381,6 +1382,19 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Partnerships Brochure.
    */
   async clickDownloadBrochureButtonInPartnershipsPage(): Promise<void> {
+    const buttonText = (await this.page.$eval(
+      brochureButtonInPartnershipsPage,
+      element => element.textContent
+    )) as string;
+    if (buttonText.trim() !== 'Download Brochure') {
+      throw new Error('The "Download Brochure" button does not exist!');
+    }
+
+    // Scroll into the view to make the button visible.
+    await this.page.$eval(brochureButtonInPartnershipsPage, element =>
+      element.scrollIntoView()
+    );
+
     await this.openExternalPdfLink(
       brochureButtonInPartnershipsPage,
       partnershipsBrochureUrl
