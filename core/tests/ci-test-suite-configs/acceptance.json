@@ -141,6 +141,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/run-a-beam-job-and-copy-the-output.spec.ts"
     },
     {
+      "name": "release-coordinator/edit-feature-rollout-configuration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/edit-feature-rollout-configuration.spec.ts"
+    },
+    {
       "name": "release-coordinator/flush-and-get-profile-of-redis-cache",
       "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/flush-and-get-profile-of-redis-cache.spec.ts"
     },
