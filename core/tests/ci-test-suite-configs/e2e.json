@@ -85,10 +85,6 @@
       "module": "core/tests/webdriverio_desktop/extensions.js"
     },
     {
-      "name": "featureGating",
-      "module": "core/tests/webdriverio/featureGatingFlow.js"
-    },
-    {
       "name": "feedbackUpdates",
       "module": "core/tests/webdriverio_desktop/feedbackUpdates.js"
     },
