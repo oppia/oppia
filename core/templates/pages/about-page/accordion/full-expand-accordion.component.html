@@ -10,7 +10,7 @@
           [ngClass]="panel.customTitleClassNames">
 
     <p> {{ panel.title | translate }} </p>
-    <mat-icon> add </mat-icon>
+    <i class="fas fa-plus accordion-icon"></i>
   </button>
 
 </div>
@@ -25,7 +25,7 @@
       {{ accordionData[activeIndex].title | translate }}
     </p>
     <button (click)="closePanel()">
-      <mat-icon> remove </mat-icon>
+      <i class="fas fa-minus accordion-icon"></i>
     </button>
   </div>
   <p> {{ accordionData[activeIndex].text | translate }} </p>

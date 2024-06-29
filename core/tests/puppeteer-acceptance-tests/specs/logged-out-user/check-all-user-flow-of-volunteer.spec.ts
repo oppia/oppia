@@ -53,6 +53,9 @@ describe('Volunteer', function () {
       // Navigating to About page via footer from home page.
       await loggedOutUser.clickOnAboutLinkInFooter();
 
+      // Opening the Impact report by clicking on the "View Impact Report" button on the About page.
+      await loggedOutUser.clickViewReportButtonInAboutPage();
+
       // Opening the Volunteer form by clicking on the "Volunteer with Oppia" button of Volunteer tab on the About page.
       await loggedOutUser.clickVolunteerWithOppiaButtonInAboutPage();
       // Navigating to the Volunteer page by clicking on the Learn More button of Volunteer tab.
