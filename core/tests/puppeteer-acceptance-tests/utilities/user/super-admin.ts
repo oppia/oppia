@@ -16,7 +16,7 @@
  * @fileoverview Super Admin users utility file.
  */
 
-import * as puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
