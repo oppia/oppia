@@ -85,7 +85,6 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
-    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE
 ]
 
@@ -100,6 +99,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
+    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -255,7 +255,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'The flag enables flow for multiple classrooms '
             'and makes the classrooms page available to learners.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE.value: (
