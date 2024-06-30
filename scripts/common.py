@@ -246,7 +246,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'release-coordinator/run-a-beam-job-and-copy-the-output',
     'release-coordinator/update-promo-bar-message',
     'release-coordinator/flush-and-get-profile-of-redis-cache',
-    'edit-feature-rollout-configuration',
+    'release-coordinator/edit-feature-rollout-configuration',
     'super-admin/edit-user-roles',
     'super-admin/load-dummy-data-in-dev-mode',
     'super-admin/edit-platform-parameters',
