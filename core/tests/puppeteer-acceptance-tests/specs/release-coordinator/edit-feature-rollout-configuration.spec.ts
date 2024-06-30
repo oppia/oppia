@@ -54,8 +54,6 @@ describe('Release Coordinator', function () {
         100
       );
       // Since the rollout percentage is 100, the Dummy Handler should be visible to all users.
-      await releaseCoordinator2.navigateToReleaseCoordinatorPage();
-      await releaseCoordinator2.navigateToFeaturesTab();
       await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(true);
 
       await releaseCoordinator1.editFeatureRolloutPercentage(
@@ -78,8 +76,6 @@ describe('Release Coordinator', function () {
         'dummy_feature_flag_for_e2e_tests'
       );
 
-      await releaseCoordinator2.navigateToReleaseCoordinatorPage();
-      await releaseCoordinator2.navigateToFeaturesTab();
       await releaseCoordinator2.verifyDummyHandlerStatusInFeaturesTab(true);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
