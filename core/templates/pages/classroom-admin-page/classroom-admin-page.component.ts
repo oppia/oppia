@@ -549,7 +549,7 @@ export class ClassroomAdminPageComponent implements OnInit {
             prerequisiteTopicNames.push(topicIdsToTopicName[topicId]);
           }
 
-          this.tempClassroomData._topicIdToTopicName = topicIdsToTopicName;
+          this.tempClassroomData.setTopicIdToTopicName(topicIdsToTopicName);
 
           this.topicNameToPrerequisiteTopicNames[currentTopicName] =
             prerequisiteTopicNames;
@@ -568,6 +568,9 @@ export class ClassroomAdminPageComponent implements OnInit {
           const topicName = topicIdToTopicName[topicId];
 
           this.topicIdsToTopicName[topicId] = topicName;
+          this.tempClassroomData.setTopicIdToTopicName(
+            this.topicIdsToTopicName
+          );
           this.tempClassroomData.addNewTopicId(topicId);
           this.topicNameToPrerequisiteTopicNames[topicName] = [];
           this.topicNames.push(topicName);
@@ -703,6 +706,8 @@ export class ClassroomAdminPageComponent implements OnInit {
 
         delete this.topicNameToPrerequisiteTopicNames[topicNameToDelete];
         delete this.topicIdsToTopicName[topicId];
+
+        this.tempClassroomData.setTopicIdToTopicName(this.topicIdsToTopicName);
 
         this.topicNames = Object.keys(this.topicNameToPrerequisiteTopicNames);
 
