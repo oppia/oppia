@@ -1,5 +1,5 @@
+<i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" [ngClass]="{'icon-move': mobileNavOptionsAreShown}" aria-label="Mobile navbar options" role="button"></i>
 <div class="navbar-mobile-container">
-  <i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" aria-label="Mobile navbar options" role="button"></i>
   <div class="navbar-mobile-options" *ngIf="mobileNavOptionsAreShown">
     <div class="exp-nav-dropdown-container">
       <div class="exp-nav-dropdown-content e2e-test-mobile-options-dropdown" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -241,9 +241,15 @@
     width: 100%;
     z-index: 1040;
   }
+  .show-mobile-navbar-icon {
+    display: none; 
+  }
   @media screen and (max-width: 600px) {
     .navbar-mobile-container {
       display: block;
+    }
+    .show-mobile-navbar-icon {
+      display: block; 
     }
   }
   .navbar-mobile-options {
@@ -261,6 +267,13 @@
     color: #000;
     font-size: 25px;
     padding: 10px;
+    position: fixed;
+    right: 0; 
+    bottom: 0; 
+    z-index: 1040;
+  }
+  .icon-move {
+    transform: translateY(-57px);
   }
   .exp-nav-dropdown-container {
     padding: 10px 0;
