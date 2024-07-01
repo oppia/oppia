@@ -115,6 +115,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     allowedBgColors: ['transparent'],
     allowedImageFormats: ['svg'],
     aspectRatio: '4:3',
+    previewImageUrl: '',
   };
   bannerParameters: ImageUploaderParameters = {
     disabled: false,
@@ -125,6 +126,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     allowedBgColors: ['transparent'],
     allowedImageFormats: ['png', 'jpeg'],
     aspectRatio: '2851:197',
+    previewImageUrl: '',
   };
 
   getEligibleTopicPrerequisites(currentTopicName: string): void {
@@ -281,6 +283,8 @@ export class ClassroomAdminPageComponent implements OnInit {
     thumbnailData: ImageData,
     bannerData: ImageData
   ): void {
+    this.thumbnailParameters.previewImageUrl = '';
+    this.bannerParameters.previewImageUrl = '';
     this.thumbnailParameters.filename = thumbnailData.filename;
     this.thumbnailParameters.bgColor = thumbnailData.bg_color;
     this.bannerParameters.filename = bannerData.filename;
