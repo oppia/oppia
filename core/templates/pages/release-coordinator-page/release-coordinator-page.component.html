@@ -20,7 +20,7 @@
       <h3>Flush the Memory Cache</h3>
       <div class="oppia-action-buttons-container">
         <button mat-raised-button color="primary" (click)="flushMemoryCache()">Flush Cache</button>
-        <button mat-raised-button color="primary" (click)="getMemoryCacheProfile()">Get Memory Cache Profile</button>
+        <button class="get-cache-profile-button" mat-raised-button color="primary" (click)="getMemoryCacheProfile()">Get Memory Cache Profile</button>
       </div>
       <div class="oppia-release-coordinator-page-cache-note">
         <i>
@@ -129,5 +129,12 @@
     border-color: #00376d;
     outline: 1px solid #00376d;
   }
-
+  @media (max-width: 600px) {
+    .get-cache-profile-button {
+      font-size: 1.2rem;
+      padding: 5px 10px;
+      white-space: normal;
+      line-height: 1.2;
+    }
+  }
 </style>

@@ -28,7 +28,6 @@ const releaseCoordinatorUrl = testConstants.URLs.ReleaseCoordinator;
 const copyOutputButton = '.e2e-test-copy-output-button';
 const startNewJobButton = '.job-start-button';
 const startNewJobConfirmationButton = '.e2e-test-start-new-job-button';
-const saveFeatureFlagButtonSelector = '.e2e-test-save-button';
 
 // Selectors for tabs.
 const splashUrl = testConstants.URLs.splash;
@@ -41,9 +40,8 @@ const mobileMiscTab = '.e2e-test-misc-tab-mobile';
 const mobileNavBar = '.e2e-test-navbar-dropdown-toggle';
 
 // Selectors for feature flags.
-const featureFlagDiv = '.e2e-test-feature-flag';
+const saveButtonSelector = '.e2e-test-save-button';
 const featureFlagNameSelector = '.e2e-test-feature-name';
-const featureFlagOptionSelector = '.e2e-test-value-selector';
 const rolloutPercentageInput = '.e2e-test-editor-int';
 
 // Selectors for jobs.
@@ -60,6 +58,8 @@ const actionStatusMessageSelector = '.e2e-test-status-message';
 const toastMessageSelector = '.toast-message';
 const memoryCacheProfileTableSelector = '.view-results-table';
 const featureFlagSelector = '.e2e-test-feature-flag';
+const enableFeatureSelector = '.e2e-test-value-selector';
+
 export class ReleaseCoordinator extends BaseUser {
   /**
    * Navigate to the release coordinator page.
@@ -129,13 +129,13 @@ export class ReleaseCoordinator extends BaseUser {
         await this.clickOn(featuresTab);
       }
 
-      await this.page.waitForSelector(featureFlagDiv);
-      const featureFlags = await this.page.$$(featureFlagDiv);
+      await this.page.waitForSelector(featureFlagNameSelector);
+      const featureFlags = await this.page.$$(featureFlagNameSelector);
 
       for (let i = 0; i < featureFlags.length; i++) {
-        await featureFlags[i].waitForSelector('.e2e-test-feature-name');
+        await featureFlags[i].waitForSelector(featureFlagNameSelector);
         const featureFlagNameElement = await featureFlags[i].$(
-          '.e2e-test-feature-name'
+          featureFlagNameSelector
         );
         const featureFlagName = await this.page.evaluate(
           element => element.textContent.trim(),
@@ -143,10 +143,10 @@ export class ReleaseCoordinator extends BaseUser {
         );
 
         if (featureFlagName === featureName) {
-          await featureFlags[i].waitForSelector('.e2e-test-editor-int');
-          const inputElement = await featureFlags[i].$('.e2e-test-editor-int');
+          await featureFlags[i].waitForSelector(rolloutPercentageInput);
+          const inputElement = await featureFlags[i].$(rolloutPercentageInput);
           if (inputElement) {
-            // Select all the text in the input field and delete it
+            // Select all the text in the input field and delete it.
             await inputElement.click({clickCount: 3});
             await this.page.keyboard.press('Backspace');
             await inputElement.type(percentage.toString());
@@ -156,8 +156,8 @@ export class ReleaseCoordinator extends BaseUser {
             );
           }
 
-          await featureFlags[i].waitForSelector('.e2e-test-save-button');
-          const saveButton = await featureFlags[i].$('.e2e-test-save-button');
+          await featureFlags[i].waitForSelector(saveButtonSelector);
+          const saveButton = await featureFlags[i].$(saveButtonSelector);
           if (saveButton) {
             await this.waitForElementToBeClickable(saveButton);
             await saveButton.click();
@@ -201,13 +201,13 @@ export class ReleaseCoordinator extends BaseUser {
         await this.clickOn(featuresTab);
       }
 
-      await this.page.waitForSelector(featureFlagDiv);
-      const featureFlags = await this.page.$$(featureFlagDiv);
+      await this.page.waitForSelector(featureFlagNameSelector);
+      const featureFlags = await this.page.$$(featureFlagNameSelector);
 
       for (let i = 0; i < featureFlags.length; i++) {
-        await featureFlags[i].waitForSelector('.e2e-test-feature-name');
+        await featureFlags[i].waitForSelector(featureFlagNameSelector);
         const featureFlagNameElement = await featureFlags[i].$(
-          '.e2e-test-feature-name'
+          featureFlagNameSelector
         );
         const featureFlagName = await this.page.evaluate(
           element => element.textContent.trim(),
@@ -215,10 +215,8 @@ export class ReleaseCoordinator extends BaseUser {
         );
 
         if (featureFlagName === featureName) {
-          await featureFlags[i].waitForSelector('.e2e-test-value-selector');
-          const selectElement = await featureFlags[i].$(
-            '.e2e-test-value-selector'
-          );
+          await featureFlags[i].waitForSelector(enableFeatureSelector);
+          const selectElement = await featureFlags[i].$(enableFeatureSelector);
           if (selectElement) {
             await selectElement.select('0: true');
           } else {
@@ -227,8 +225,8 @@ export class ReleaseCoordinator extends BaseUser {
             );
           }
 
-          await featureFlags[i].waitForSelector('.e2e-test-save-button');
-          const saveButton = await featureFlags[i].$('.e2e-test-save-button');
+          await featureFlags[i].waitForSelector(saveButtonSelector);
+          const saveButton = await featureFlags[i].$(saveButtonSelector);
           if (saveButton) {
             await this.waitForElementToBeClickable(saveButton);
             await saveButton.click();
