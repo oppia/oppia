@@ -2698,7 +2698,7 @@ class QuestionAdminRoleHandler(
 
         user_id = user_settings.user_id
         if (action == 'assign' and
-            not feconf.ROLE_ID_QUESTION_ADMIN in user_settings.roles):
+                not feconf.ROLE_ID_QUESTION_ADMIN in user_settings.roles):
             user_services.add_user_role(user_id, feconf.ROLE_ID_QUESTION_ADMIN)
 
         else:
