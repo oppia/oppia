@@ -1052,9 +1052,6 @@ export class CurriculumAdmin extends BaseUser {
    * Function for navigating to the classroom admin page.
    */
   async navigateToClassroomAdminPage(): Promise<void> {
-    if (this.page.url() === classroomAdminUrl) {
-      await this.reloadPage();
-    }
     await this.goto(classroomAdminUrl);
   }
 
@@ -1062,6 +1059,7 @@ export class CurriculumAdmin extends BaseUser {
    * Function for opening the classroom tile in edit mode.
    */
   async editClassroom(classroomName: string): Promise<void> {
+    await this.navigateToClassroomAdminPage();
     const classroomTiles = await this.page.$$(classroomTileSelector);
 
     if (classroomTiles.length === 0) {

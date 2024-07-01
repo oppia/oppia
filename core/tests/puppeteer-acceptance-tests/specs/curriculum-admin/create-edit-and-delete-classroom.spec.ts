@@ -66,7 +66,6 @@ describe('Curriculum Admin', function () {
   it(
     'should create, publish and delete a classroom.',
     async function () {
-      await curriculumAdmin.navigateToClassroomAdminPage();
       await curriculumAdmin.expectNumberOfClassroomsToBe(0);
       await curriculumAdmin.createNewClassroom('Math', 'math');
       await curriculumAdmin.expectNumberOfClassroomsToBe(1);
