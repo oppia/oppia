@@ -89,7 +89,7 @@
                       [(ngModel)]="tempClassroomData._teaserText"
                       (blur)="updateClassroomField()"
                       (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
-                      rows="1"
+                      rows="3"
                       class="classroom-field form-control e2e-test-update-classroom-teaser-text">
             </textarea>
           </div>
@@ -105,7 +105,7 @@
                       [(ngModel)]="tempClassroomData._topicListIntro"
                       (blur)="updateClassroomField()"
                       (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
-                      rows="1"
+                      rows="3"
                       class="classroom-field form-control e2e-test-update-classroom-topic-list-intro">
             </textarea>
           </div>
@@ -121,7 +121,7 @@
                       [(ngModel)]="tempClassroomData._courseDetails"
                       (blur)="updateClassroomField()"
                       (ngModelChange)="classroomAdminDataService.validateClassroom(tempClassroomData, classroomData)"
-                      rows="2"
+                      rows="3"
                       class="classroom-field form-control e2e-test-update-classroom-course-details">
             </textarea>
           </div>
@@ -146,7 +146,14 @@
 
           <div>
             <hr>
-            <p><strong>Topics and their prerequisites</strong></p>
+            <div class="topic-and-prerequisites-text-container">
+              <p><strong>Topics and their prerequisites</strong></p>
+              <button class="btn btn-secondary view-graph-button"
+                      (click)="viewGraph()"
+                      *ngIf="tempClassroomData.getTopicsCount() > 0">
+                View Graph
+              </button>
+            </div>
             <p class="topic-dependency-description">
               <em>
                 The prerequisite topics below are used to generate the diagnostic test.
@@ -175,7 +182,6 @@
                     <span class="topics-name">
                       <strong>{{ topicName }}</strong>
                     </span>
-
                     <div class="prerequisite-topics-container">
                       <div *ngIf="!classroomEditorMode">
                         <span *ngIf="getPrerequisiteLength(topicName) === 0">
@@ -275,11 +281,6 @@
           </div>
 
           <div *ngIf="classroomEditorMode" class="action-buttons">
-            <button class="btn btn-secondary view-graph-button"
-                    (click)="viewGraph()"
-                    *ngIf="tempClassroomData.getTopicsCount() > 0">
-              View Graph
-            </button>
             <button class="btn btn-secondary cancel-classroom-changes e2e-cancel-classroom-changes"
                     (click)="closeClassroomConfigEditor()"
                     [disabled]="classroomDataSaveInProgress">
@@ -296,13 +297,13 @@
                            [diameter]="22">
               </mat-spinner>
             </button>
-            <span [matTooltip]="validationErrors.join('\n')"
+            <span [matTooltip]="allValidationErrors.join('\n')"
                   matTooltipClass="oppia-mat-tooltip-list"
                   [matTooltipDisabled]="false"
                   aria-label="List that shows issues preventing to publish a classroom"
                   >
               <button *ngIf="!tempClassroomData._isPublished"
-                      [disabled]="!(validationErrors.length === 0)"
+                      [disabled]="!(allValidationErrors.length === 0)"
                       class="btn btn-success publish-classroom-btn e2e-test-publish-classroom-btn"
                       (click)="publishClassroom()"
                   >
@@ -311,25 +312,25 @@
                              class="oppia-update-classroom-data-spinning-button"
                              [diameter]="22">
                 </mat-spinner>
-                <mat-icon *ngIf="validationErrors.length > 0" class="save-draft-button-warning">
+                <mat-icon *ngIf="allValidationErrors.length > 0" class="save-draft-button-warning">
                   warning
                 </mat-icon>
               </button>
             </span>
-            <span [matTooltip]="(saveClassroomValidationErrors()).join('\n')"
+            <span [matTooltip]="(saveClassroomValidationErrors).join('\n')"
                   matTooltipClass="oppia-mat-tooltip-list"
                   [matTooltipDisabled]="false"
                   aria-label="List that shows issues preventing to save a classroom"
                   >
               <button class="btn btn-success save-classroom-changes e2e-test-save-classroom-config-button"
-                      [disabled]="!(classroomDataIsChanged && tempClassroomData.isClassroomDataValid())"
+                      [disabled]="!(classroomDataIsChanged && tempClassroomData.isClassroomDataValid() && saveClassroomValidationErrors.length === 0)"
                       (click)="saveClassroomData(classroom.key)">
                 <span *ngIf="!classroomDataSaveInProgress">Save</span>
                 <mat-spinner *ngIf="classroomDataSaveInProgress"
                              class="oppia-update-classroom-data-spinning-button"
                              [diameter]="22">
                 </mat-spinner>
-                <mat-icon *ngIf="saveClassroomValidationErrors().length > 0" class="save-draft-button-warning">
+                <mat-icon *ngIf="saveClassroomValidationErrors.length > 0" class="save-draft-button-warning">
                         warning
                 </mat-icon>
               </button>
@@ -453,10 +454,6 @@
   .save-classroom-changes {
     margin-top: 5px;
   }
-  .view-graph-button {
-    margin-right: 5px;
-    margin-top: 5px;
-  }
   .cancel-classroom-changes, .publish-classroom-btn {
     margin-right: 5px;
     margin-top: 5px;
@@ -554,9 +551,25 @@
     margin-left: 3px;
     z-index: 10;
   }
+
+  .topic-and-prerequisites-text-container {
+    align-items: start;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
   @media screen and (max-width: 768px) {
     .oppia-editor-card-with-avatar {
       margin-top: 20px;
+    }
+
+    .oppia-classroom-input-container span {
+      padding-left: 0;
+    }
+
+    .topic-dependency-container {
+      overflow: auto;
     }
   }
 </style>
