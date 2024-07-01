@@ -214,10 +214,6 @@ export class VoiceoverCardComponent implements OnInit {
           this.updateStatusGraph();
         }
       });
-    } else if (this.languageCode !== newLanguageCode) {
-      this.localStorageService.setLastSelectedLanguageAccentCode('');
-      this.languageAccentCode = '';
-      this.languageAccentCodeIsSelected = false;
     }
 
     this.languageCode = newLanguageCode;
