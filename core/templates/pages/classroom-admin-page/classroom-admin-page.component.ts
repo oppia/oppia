@@ -93,8 +93,6 @@ export class ClassroomAdminPageComponent implements OnInit {
   classroomViewerMode: boolean = false;
   classroomEditorMode: boolean = false;
   classroomDataSaveInProgress: boolean = false;
-  classroomDataPublishInProgress: boolean = false;
-  classroomDataUnpublishInProgress: boolean = false;
 
   newTopicCanBeAdded: boolean = false;
   topicWithGivenIdExists: boolean = true;
@@ -107,7 +105,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   saveClassroomValidationErrors: string[] = [];
 
   thumbnailParameters: ImageUploaderParameters = {
-    disabled: false,
+    disabled: true,
     maxImageSizeInKB: 100,
     imageName: 'Thumbnail',
     orientation: 'portrait',
@@ -118,7 +116,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     previewImageUrl: '',
   };
   bannerParameters: ImageUploaderParameters = {
-    disabled: false,
+    disabled: true,
     maxImageSizeInKB: 1024,
     imageName: 'Banner',
     orientation: 'landscape',
@@ -334,6 +332,9 @@ export class ClassroomAdminPageComponent implements OnInit {
     const classroomBannerIsChanged =
       this.tempClassroomData.getBannerData().filename !==
       this.classroomData.getBannerData().filename;
+    const classroomPublicationStatusIsChanged =
+      this.tempClassroomData.getIsPublished() !==
+      this.classroomData.getIsPublished();
 
     this.classroomAdminDataService.validateClassroom(
       this.tempClassroomData,
@@ -357,7 +358,8 @@ export class ClassroomAdminPageComponent implements OnInit {
       topicDependencyIsChanged ||
       classroomTeaserTextIsChanged ||
       classroomBannerIsChanged ||
-      classroomThumbnailIsChanged
+      classroomThumbnailIsChanged ||
+      classroomPublicationStatusIsChanged
     ) {
       this.classroomDataIsChanged = true;
     } else {
@@ -381,27 +383,6 @@ export class ClassroomAdminPageComponent implements OnInit {
       thumbnail_data: classroomDict.thumbnailData,
       banner_data: classroomDict.bannerData,
     };
-  }
-
-  unpublishClassroom(): void {
-    this.classroomDataUnpublishInProgress = true;
-    this.tempClassroomData.setIsPublished(false);
-    this.updateClassroomData(this.tempClassroomData.getClassroomId()).then(
-      () => {
-        this.classroomDataUnpublishInProgress = false;
-        this.openClassroomInViewerMode();
-      }
-    );
-  }
-
-  publishClassroom(): void {
-    this.classroomDataPublishInProgress = true;
-    this.tempClassroomData.setIsPublished(true);
-    this.updateClassroomData(this.tempClassroomData.getClassroomId()).then(
-      () => {
-        this.classroomDataPublishInProgress = false;
-      }
-    );
   }
 
   saveClassroomData(classroomId: string): void {
@@ -463,11 +444,15 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   openClassroomInEditorMode(): void {
+    this.thumbnailParameters.disabled = false;
+    this.bannerParameters.disabled = false;
     this.classroomViewerMode = false;
     this.classroomEditorMode = true;
   }
 
   openClassroomInViewerMode(): void {
+    this.thumbnailParameters.disabled = true;
+    this.bannerParameters.disabled = true;
     this.classroomViewerMode = true;
     this.classroomEditorMode = false;
   }
@@ -780,6 +765,13 @@ export class ClassroomAdminPageComponent implements OnInit {
         // clicked. No further action is needed.
       }
     );
+  }
+
+  togglePublicationStatus(): void {
+    this.tempClassroomData.setIsPublished(
+      !this.tempClassroomData.getIsPublished()
+    );
+    this.updateClassroomField();
   }
 
   canSaveClassroom(): boolean {
