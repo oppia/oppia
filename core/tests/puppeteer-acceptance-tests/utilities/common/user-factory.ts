@@ -29,9 +29,10 @@ import {
   ExplorationEditor,
 } from '../user/exploration-editor';
 import {CurriculumAdminFactory} from '../user/curriculum-admin';
-import {TopicManagerFactory} from '../user/topic-manager';
+import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 import {LoggedInUserFactory, LoggedInUser} from '../user/logged-in-user';
 import {ModeratorFactory} from '../user/moderator';
+import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
@@ -51,6 +52,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.MODERATOR]: ModeratorFactory,
+  [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
 } as const;
 
 /**
@@ -148,12 +150,14 @@ export class UserFactory {
     LoggedOutUser &
       LoggedInUser &
       ExplorationEditor &
+      TopicManager &
       MultipleRoleIntersection<TRoles>
   > {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
       LoggedOutUserFactory(),
       LoggedInUserFactory(),
       ExplorationEditorFactory(),
+      TopicManagerFactory(),
     ]);
     await user.openBrowser();
     await user.signUpNewUser(username, email);

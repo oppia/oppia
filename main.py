@@ -223,7 +223,6 @@ URLS = [
     get_redirect_route(r'/splash', SplashRedirectPage),
     get_redirect_route(
         r'/internetconnectivityhandler', InternetConnectivityHandler),
-    get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),
     get_redirect_route(r'/site_guidelines', pages.TeachRedirectPage),
@@ -236,6 +235,12 @@ URLS = [
         r'%s/can_access_classroom_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ClassroomAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_classrooms_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ClassroomsPageAccessValidationHandler
+    ),
 
     get_redirect_route(
         r'%s/can_access_collection_editor_page/<collection_id>' %
@@ -644,7 +649,6 @@ URLS = [
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
     get_redirect_route(r'/gallery', library.LibraryRedirectPage),
     get_redirect_route(r'/contribute', library.LibraryRedirectPage),
-    get_redirect_route(r'/learn', classroom.DefaultClassroomRedirectPage),
     get_redirect_route(r'/playtest', library.LibraryRedirectPage),
     get_redirect_route(
         feconf.EXPLORATION_SUMMARIES_DATA_URL,

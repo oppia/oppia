@@ -117,6 +117,11 @@ const MANUALLY_MAPPED_DEPENDENCIES: Record<string, string[]> = {
   ],
 };
 
+const LIGHTHOUSE_MODULES = [
+  '.lighthouserc-performance.js',
+  '.lighthouserc-accessibility.js',
+];
+
 const CI_TEST_SUITE_CONFIGS_DIRECTORY = path.resolve(
   ROOT_DIRECTORY,
   'core/tests/ci-test-suite-configs'
@@ -636,11 +641,12 @@ class RootFilesMappingGenerator {
     const validRootFiles: string[] = [
       ...this.pageModulesCoveredByRouteMapping,
       ...this.getTestSuiteModules(),
+      ...LIGHTHOUSE_MODULES,
     ];
     const rootFilesConfig = JSON.parse(
       fs.readFileSync(ROOT_FILES_CONFIG_FILE, 'utf-8')
     );
-    validRootFiles.push(...rootFilesConfig.VALID_ROOT_FILES);
+    validRootFiles.push(...rootFilesConfig.RUN_NO_TESTS_ROOT_FILES);
     validRootFiles.push(...rootFilesConfig.RUN_ALL_TESTS_ROOT_FILES);
     return validRootFiles;
   }
@@ -665,7 +671,7 @@ class RootFilesMappingGenerator {
       throw new Error(
         'The following invalid root files were found when generating ' +
           `the root files mapping:\n${invalidRootFiles.join('\n')}.\n` +
-          'Please add them to the VALID_ROOT_FILES or RUN_ALL_TESTS_ROOT_FILES ' +
+          'Please add them to the RUN_NO_TESTS_ROOT_FILES or RUN_ALL_TESTS_ROOT_FILES ' +
           'in the root files config at core/tests/root-files-config.json or ' +
           'ensure that they are a valid test suite module or page module. Please ' +
           'take a look at this wiki page if you need further clarification: ' +

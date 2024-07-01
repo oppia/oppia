@@ -75,6 +75,10 @@ import {VersionHistoryService} from './services/version-history.service';
 import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: boolean;
@@ -129,6 +133,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   currentVersion: number;
   areExplorationWarningsVisible: boolean;
   isModalOpenable: boolean = true;
+  modifyTranslationsFeatureFlagIsEnabled: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -137,6 +142,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private changeListService: ChangeListService,
     private contextService: ContextService,
     public editabilityService: EditabilityService,
+    private entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService,
     private entityTranslationsService: EntityTranslationsService,
     private explorationAutomaticTextToSpeechService: ExplorationAutomaticTextToSpeechService,
     private explorationCategoryService: ExplorationCategoryService,
@@ -165,6 +171,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private paramChangesObjectFactory: ParamChangesObjectFactory,
     private paramSpecsObjectFactory: ParamSpecsObjectFactory,
+    private platformFeatureService: PlatformFeatureService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private routerService: RouterService,
     private siteAnalyticsService: SiteAnalyticsService,
@@ -209,6 +216,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   // Called on page load.
   initExplorationPage(): Promise<void> {
     this.editabilityService.lockExploration(true);
+    this.modifyTranslationsFeatureFlagIsEnabled =
+      this.platformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled;
     return Promise.all([
       this.explorationDataService.getDataAsync((explorationId, lostChanges) => {
         if (!this.autosaveInfoModalsService.isModalOpen()) {
@@ -346,11 +355,84 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         }
       }
 
-      // Initialize changeList by draft changes if they exist.
+      if (this.modifyTranslationsFeatureFlagIsEnabled) {
+        this.entityBulkTranslationsBackendApiService
+          .fetchEntityBulkTranslationsAsync(
+            this.explorationId,
+            'exploration',
+            this.currentVersion
+          )
+          .then(response => {
+            for (let language in response) {
+              // Initialize the entity translation objects with the last published translations
+              // in order to compare translation changes made.
+              let languageTranslations =
+                response[language].translationMappingToBackendDict();
+              this.entityTranslationsService.languageCodeToLastPublishedEntityTranslations[
+                language
+              ] = EntityTranslation.createFromBackendDict({
+                entity_id: this.explorationId,
+                entity_type: 'exploration',
+                entity_version: response[language].entityVersion,
+                language_code: language,
+                translations: languageTranslations,
+              });
+
+              this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+                language
+              ] = EntityTranslation.createFromBackendDict({
+                entity_id: this.explorationId,
+                entity_type: 'exploration',
+                entity_version: response[language].entityVersion,
+                language_code: language,
+                translations: languageTranslations,
+              });
+            }
+          });
+      }
+
+      // Initialize changeList by draft changes if they exist,
+      // and initialize the entity translations by draft changes
+      // if they exist.
       if (explorationData.draft_changes !== null) {
         this.changeListService.loadAutosavedChangeList(
           explorationData.draft_changes
         );
+
+        for (let i in explorationData.draft_changes) {
+          let changeDict = explorationData.draft_changes[i];
+
+          if (changeDict.cmd === 'edit_translation') {
+            // Create the entity translation objects first if they don't exist.
+            if (
+              !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
+                changeDict.language_code
+              )
+            ) {
+              this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+                changeDict.language_code
+              ] = EntityTranslation.createFromBackendDict({
+                entity_id: this.explorationId,
+                entity_type: 'exploration',
+                entity_version: explorationData.version,
+                language_code: changeDict.language_code,
+                translations: {},
+              });
+            }
+
+            // Update the translations appropriately, via latest draft changes.
+            this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+              changeDict.language_code
+            ].updateTranslation(
+              changeDict.content_id,
+              TranslatedContent.createFromBackendDict(changeDict.translation)
+            );
+          } else if (changeDict.cmd === 'remove_translations') {
+            this.entityTranslationsService.removeAllTranslationsForContent(
+              changeDict.content_id
+            );
+          }
+        }
       }
 
       if (
