@@ -3048,20 +3048,20 @@ version: 1
                     url, params=params, expect_errors=True
                 )
 
-            elif http_method == 'POST':
-                response = self.testapp.post(
-                    url, params=params, expect_errors=True
-                )
+        if http_method == 'POST':
+            response = self.testapp.post(
+                url, params=params, expect_errors=True
+            )
 
-            elif http_method == 'PUT':
-                response = self.testapp.put(
-                    url, params=params, expect_errors=True
-                )
+        elif http_method == 'PUT':
+            response = self.testapp.put(
+                url, params=params, expect_errors=True
+            )
 
-            elif http_method == 'DELETE':
-                response = self.testapp.delete(
-                    url, params=params, expect_errors=True
-                )
+        elif http_method == 'DELETE':
+            response = self.testapp.delete(
+                url, params=params, expect_errors=True
+            )
 
         self.assertIn(response.status_int, expected_status_int_list)
 
