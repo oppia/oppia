@@ -99,6 +99,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
+    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
