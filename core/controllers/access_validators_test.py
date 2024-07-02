@@ -20,6 +20,7 @@ import datetime
 
 from core import feature_flag_list
 from core import feconf
+from core.constants import constants
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import rights_manager
@@ -52,24 +53,62 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.save_new_valid_classroom()
+        self.save_new_valid_classroom(
+            'history', 'history', 'history', is_published=False
+        )
 
     def test_validation_returns_true_if_classroom_is_available(self) -> None:
-        self.login(self.EDITOR_EMAIL)
         self.get_html_response(
             '%s/can_access_classroom_page?classroom_url_fragment=%s' %
             (ACCESS_VALIDATION_HANDLER_PREFIX, 'math'))
 
     def test_validation_returns_false_if_classroom_doesnot_exists(self) -> None:
-        self.login(self.EDITOR_EMAIL)
         self.get_json(
             '%s/can_access_classroom_page?classroom_url_fragment=%s' %
             (ACCESS_VALIDATION_HANDLER_PREFIX, 'not_valid'),
             expected_status_int=404)
+
+    def test_validation_returns_false_if_classroom_is_private(self) -> None:
+        self.get_json(
+            '%s/can_access_classroom_page?classroom_url_fragment=%s' %
+            (ACCESS_VALIDATION_HANDLER_PREFIX, 'history'),
+            expected_status_int=404)
+
+    def test_validation_returns_true_if_curriculum_admin_visit_hidden_classroom(
+            self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/can_access_classroom_page?classroom_url_fragment=%s' %
+            (ACCESS_VALIDATION_HANDLER_PREFIX, 'history'))
+
+
+class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
+
+    def test_validation_returns_false_if_multiple_classrooms_is_disabled(
+            self) -> None:
+        self.get_json(
+            '%s/can_access_classrooms_page' % ACCESS_VALIDATION_HANDLER_PREFIX,
+            expected_status_int=404)
+
+    @test_utils.enable_feature_flags(
+            [feature_flag_list.FeatureNames.ENABLE_MULTIPLE_CLASSROOMS])
+    def test_validation_returns_false_if_no_public_classrooms_are_present(
+            self) -> None:
+        with self.swap(constants, 'DEV_MODE', False):
+            self.get_json(
+                '%s/can_access_classrooms_page' % (
+                    ACCESS_VALIDATION_HANDLER_PREFIX),
+                expected_status_int=404
+            )
+
+    @test_utils.enable_feature_flags(
+            [feature_flag_list.FeatureNames.ENABLE_MULTIPLE_CLASSROOMS])
+    def test_validation_returns_true_if_we_have_public_classrooms(
+            self) -> None:
+        self.save_new_valid_classroom()
+        self.get_html_response(
+            '%s/can_access_classrooms_page' % ACCESS_VALIDATION_HANDLER_PREFIX)
 
 
 class CollectionViewerPageAccessValidationHandlerTests(
