@@ -31,6 +31,7 @@ import {
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {ExplorationObjectFactory} from 'domain/exploration/ExplorationObjectFactory';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {string} from 'mathjs';
 
 const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
 const CHECKPOINT_STATUS_COMPLETED = 'completed';
@@ -56,13 +57,13 @@ export class StoryNodeTileComponent implements OnInit {
   @Input() topicUrlFragment!: string;
   @Input() classroomUrlFragment!: string;
   @Input() storyUrlFragment!: string;
-  thumbnailFilename!: string | null;
-  thumbnailBgColor!: string | null;
+  thumbnailFilename!: string;
+  thumbnailBgColor!: string;
   thumbnailUrl: string = '';
   nodeId!: string;
   pathIconParameters: IconParametersArray[] = [];
   EXPLORE_PAGE_PREFIX = '/explore/';
-  explorationId!: string | null;
+  explorationId!: string;
   expStates!: StateObjectsBackendDict;
   checkpointCount!: number;
   mostRecentlyReachedCheckpoint!: string;
@@ -83,11 +84,11 @@ export class StoryNodeTileComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.thumbnailFilename = this.node.getThumbnailFilename();
-    this.thumbnailBgColor = this.node.getThumbnailBgColor();
+    this.thumbnailFilename = this.node.getThumbnailFilename() as string;
+    this.thumbnailBgColor = this.node.getThumbnailBgColor() as string;
     this.nodeId = this.node.getId();
     this.pathIconParameters = this.generatePathIconParameters();
-    this.explorationId = this.node.getExplorationId();
+    this.explorationId = this.node.getExplorationId() as string;
     let states: StateObjectsBackendDict;
     this.readOnlyExplorationBackendApiService
       .loadLatestExplorationAsync(
@@ -190,7 +191,7 @@ export class StoryNodeTileComponent implements OnInit {
     let iconParametersArray: IconParametersArray[] = [];
     this.thumbnailUrl = this.assetsBackendApiService.getThumbnailUrlForPreview(
       AppConstants.ENTITY_TYPE.STORY,
-      this.storyId,
+      this.storyId as string,
       this.thumbnailFilename
     );
     iconParametersArray.push({
