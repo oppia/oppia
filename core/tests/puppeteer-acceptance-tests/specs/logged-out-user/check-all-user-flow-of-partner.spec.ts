@@ -66,8 +66,6 @@ describe('Partner', function () {
 
       // Opening the partnerships form by clicking the "Partner with us" button at the top of the partnerships page.
       await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPage();
-      // Navigating back to partnerships page for the next test.
-      await loggedOutUser.navigateToPartnershipsPage();
       // Opening the partnerships form by clicking the "Partner with us" button at the bottom
       // of the partnerships page after changing the language to Portuguese.
       await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
