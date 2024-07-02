@@ -147,10 +147,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap, self.assertRaisesRegex(
             Exception,
-            'Error: Please set the git upstream.\n'
+            'Error: Please set the git upstream repository.\n'
             'To do that follow these steps:\n'
             '1. Run the command \'git remote -v\'\n'
-            '2a. If upstream is listed in the command output, then run the '
+            '2a. If \'upstream\' is listed in the command output, then run the '
             'command \'git remote set-url upstream '
             'https://github.com/oppia/oppia.git\'\n'
             '2b. If upstream is not listed in the command output, then run the '

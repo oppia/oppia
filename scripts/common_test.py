@@ -1397,7 +1397,7 @@ class CommonTests(test_utils.GenericTestBase):
         process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         def mock_popen( # pylint: disable=unused-argument
-            unused_cmd_tokens: List[str], stdout: int, stderr: int
+            cmd_tokens: List[str], stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:
             return process
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)

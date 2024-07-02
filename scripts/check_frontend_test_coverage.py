@@ -34,6 +34,8 @@ Checks the frontend test coverage.
 
 _PARSER.add_argument(
     '--files_to_check',
+    help='optional; if specified, only the files in this list will be checked '
+    'for coverage.',
     type=str
 )
 
@@ -165,12 +167,15 @@ def check_if_file_should_be_checked(
     file_path: str,
     files_to_check: Optional[List[str]] = None
 ) -> bool:
-    """Check if the file should be checked for coverage changes.
+    """Checks if a specific file should be checked based on the list of files
+    that should be checked for coverage changes.
 
     Args:
         file_path: str. The path of the file to check.
         files_to_check: list(str)|None. The list of files to check for
-            coverage changes.
+            coverage changes. If there is no files to check list provided,
+            then this function will return True, forcing all files to be
+            checked.
 
     Returns:
         bool. Whether the file should be checked for coverage changes.
@@ -179,7 +184,7 @@ def check_if_file_should_be_checked(
         return True
 
     for file_to_check in files_to_check:
-        file_to_check_name = os.path.split(file_to_check)[1]
+        _, file_to_check_name = os.path.split(file_to_check)
         if file_path in (file_to_check, file_to_check_name):
             return True
 

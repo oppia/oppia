@@ -73,11 +73,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.mypy_check_code = 0
         def mock_execute_mypy_checks() -> int:
             return self.mypy_check_code
-        self.does_diff_include_js_or_ts_files = False
-        def mock_does_diff_include_js_or_ts_files(
-            unused_diff_files: List[git_changes_utils.FileDiff]
-        ) -> bool:
-            return self.does_diff_include_js_or_ts_files
         self.does_diff_include_ts_files = False
         def mock_does_diff_include_ts_files(
             unused_diff_files: List[git_changes_utils.FileDiff]
@@ -115,9 +110,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook, 'start_linter', mock_start_linter)
         self.execute_mypy_checks_swap = self.swap(
             pre_push_hook, 'execute_mypy_checks', mock_execute_mypy_checks)
-        self.js_or_ts_swap = self.swap(
-            pre_push_hook, 'does_diff_include_js_or_ts_files',
-            mock_does_diff_include_js_or_ts_files)
         self.ts_swap = self.swap(
             pre_push_hook, 'does_diff_include_ts_files',
             mock_does_diff_include_ts_files)
@@ -304,16 +296,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.assertTrue(
             'pre-push hook file is now executable!' in self.print_arr)
 
-    def test_does_diff_include_js_or_ts_files_with_js_file(self) -> None:
-        self.assertTrue(
-            pre_push_hook.does_diff_include_js_or_ts_files(
-                [b'file1.js', b'file2.py']))
-
-    def test_does_diff_include_js_or_ts_files_with_no_file(self) -> None:
-        self.assertFalse(
-            pre_push_hook.does_diff_include_js_or_ts_files(
-                [b'file1.html', b'file2.py']))
-
     def test_does_diff_include_ts_files(self) -> None:
         self.assertTrue(
             pre_push_hook.does_diff_include_ts_files(
@@ -479,7 +461,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
             'associated test file.' in self.print_arr)
 
     def test_frontend_test_failure(self) -> None:
-        self.does_diff_include_js_or_ts_files = True
         def mock_run_script_and_get_returncode(script: List[str]) -> int:
             frontend_test_cmds = pre_push_hook.FRONTEND_TEST_CMDS.copy()
             frontend_test_cmds.append('--specs_to_run=files1.js,file2.ts')
@@ -499,7 +480,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.get_changed_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, get_js_or_ts_files_from_diff_swap:
-                    with self.js_or_ts_swap, self.start_linter_swap:
+                    with self.start_linter_swap:
                         with self.execute_mypy_checks_swap:
                             with run_script_and_get_returncode_swap:
                                 with self.assertRaisesRegex(SystemExit, '1'):
@@ -552,10 +533,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.get_changed_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with run_script_and_get_returncode_swap:
-                        with self.js_or_ts_swap:
-                            with self.execute_mypy_checks_swap:
-                                with self.swap_check_backend_python_libs:
-                                    pre_push_hook.main(args=[])
+                        with self.execute_mypy_checks_swap:
+                            with self.swap_check_backend_python_libs:
+                                pre_push_hook.main(args=[])
 
     def test_main_exits_when_mismatches_exist_in_backend_python_libs(
         self

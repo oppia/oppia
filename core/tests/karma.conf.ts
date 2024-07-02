@@ -9,6 +9,12 @@ if (argv.prodEnv) {
   generatedJs = 'third_party/generated/js/third_party.min.js';
 }
 
+// Here we are checking if the specs_to_run flag is provided or not. If it is
+// provided, we are splitting the comma separated string into an array of
+// strings. We are then creating a regex pattern to match the spec files
+// provided in the specs_to_run flag. We are then using this pattern to create
+// a context object which will be used in the webpack.ContextReplacementPlugin
+// to only run the spec files provided in the specs_to_run flag.
 var specsToRun = [];
 if (argv.specs_to_run !== undefined) {
   specsToRun = argv.specs_to_run.split(',');

@@ -66,10 +66,10 @@ def get_local_git_repository_remote_name() -> Optional[bytes]:
 
     if not remote_num:
         raise Exception(
-            'Error: Please set the git upstream.\n'
+            'Error: Please set the git upstream repository.\n'
             'To do that follow these steps:\n'
             '1. Run the command \'git remote -v\'\n'
-            '2a. If upstream is listed in the command output, then run the '
+            '2a. If \'upstream\' is listed in the command output, then run the '
             'command \'git remote set-url upstream '
             'https://github.com/oppia/oppia.git\'\n'
             '2b. If upstream is not listed in the command output, then run the '
@@ -82,8 +82,10 @@ def get_local_git_repository_remote_name() -> Optional[bytes]:
             'Warning: Please keep only one remote branch for oppia:develop.\n'
             'To do that follow these steps:\n'
             '1. Run the command \'git remote -v\'\n'
-            '2. If there are multiple remotes listed for upstream, then run '
-            'the command, \'git remote remove <remote_name>\' for all remotes '
+            '2. This command will list the remote references, there will be '
+            'multiple remotes listed for upstream, but we want to make sure '
+            'that there is only one main upstream remote. Please use the '
+            'command, \'git remote remove <remote_name>\' on all remotes '
             'that are not the main oppia repository.\n'
         )
         return None
@@ -172,8 +174,7 @@ def compare_to_remote(
             to be the same as the local branch.
 
     Returns:
-        list(FileDiff). List of FileDiffs that are modified, changed,
-        renamed or added but not deleted.
+        list(FileDiff). List of FileDiffs (tuple with name/status).
 
     Raises:
         ValueError. Raise ValueError if git command fails.
@@ -214,7 +215,9 @@ def get_refs() -> List[GitRef]:
     if not sys.stdin.isatty():
         # Git provides refs in STDIN.
         ref_list = [GitRef(*ref_str.split()) for ref_str in sys.stdin]
-    if len(ref_list) == 0:
+    # If git didn't provide refs or the refs are empty, use the current branch
+    # to get the refs.
+    if ref_list == []:
         current_branch = common.get_current_branch_name()
         encoded_stdout, encoded_stderr = common.start_subprocess_for_result(
             ['git', 'show-ref', current_branch])
@@ -226,7 +229,7 @@ def get_refs() -> List[GitRef]:
         local_sha, local_ref = local_ref_line.split()
         remote_sha, remote_ref = remote_ref_line.split()
         ref_list.append(GitRef(local_ref, local_sha, remote_ref, remote_sha))
-    if len(ref_list) > 0:
+    if ref_list != []:
         print('Ref list:')
         pprint.pprint(ref_list)
     return ref_list
@@ -235,7 +238,9 @@ def get_refs() -> List[GitRef]:
 def get_changed_files(
     ref_list: List[GitRef], remote: str
 ) -> Dict[str, Tuple[List[FileDiff], List[bytes]]]:
-    """Collect modified files and ACMRT files for each branch in ref_list.
+    """Collect diff files and ACMRT files for each branch in ref_list.
+    ACMRT files are files that are Added, Copied, Modified, Renamed, or
+    Type-changed.
 
     Parameter:
         ref_list: list of references to parse (provided by git in stdin)
@@ -260,18 +265,11 @@ def get_changed_files(
     # flag. Therefore we need to loop over the ref_list provided.
     for branch, _ in zip(branches, hashes):
         # Get the difference to remote/develop.
-        modified_files = compare_to_remote(
+        diff_files = compare_to_remote(
             remote, branch, remote_branch=get_parent_branch_name_for_diff())
-        acmrt_files = extract_acmrt_files_from_diff(modified_files)
-        collected_files[branch] = (modified_files, acmrt_files)
+        acmrt_files = extract_acmrt_files_from_diff(diff_files)
+        collected_files[branch] = (diff_files, acmrt_files)
 
-    for branch, (modified_files, acmrt_files) in collected_files.items():
-        if modified_files:
-            print('\nModified files in %s:' % branch)
-            pprint.pprint(modified_files)
-            print('\nFiles with ACMRT in %s:' % branch)
-            pprint.pprint(acmrt_files)
-            print('\n')
     return collected_files
 
 
@@ -279,12 +277,7 @@ def get_staged_files() -> List[bytes]:
     """Returns the list of staged files."""
     staged_files = git_diff_name_status()
     acmrt_staged_files = extract_acmrt_files_from_diff(staged_files)
-    if staged_files:
-        print('\nStaged files:')
-        pprint.pprint(staged_files)
-        print('\nFiles with ACMRT in staged files:')
-        pprint.pprint(acmrt_staged_files)
-        print('\n')
+
     return acmrt_staged_files
 
 

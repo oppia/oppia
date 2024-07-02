@@ -203,23 +203,6 @@ def install_hook() -> None:
         raise ValueError(err_chmod_cmd)
 
 
-def does_diff_include_js_or_ts_files(diff_files: List[bytes]) -> bool:
-    """Returns true if diff includes JavaScript or TypeScript files.
-
-    Args:
-        diff_files: list(bytes). List of files changed.
-
-    Returns:
-        bool. Whether the diff contains changes in any JavaScript or TypeScript
-        files.
-    """
-
-    for file_path in diff_files:
-        if file_path.endswith(b'.ts') or file_path.endswith(b'.js'):
-            return True
-    return False
-
-
 def does_diff_include_ts_files(diff_files: List[bytes]) -> bool:
     """Returns true if diff includes TypeScript files.
 
@@ -365,7 +348,9 @@ def main(args: Optional[List[str]] = None) -> None:
 
             frontend_status = 0
             ci_check_status = 0
-            if does_diff_include_js_or_ts_files(files_to_lint):
+            js_or_ts_files = git_changes_utils.get_js_or_ts_files_from_diff(
+                files_to_lint)
+            if js_or_ts_files:
                 js_or_ts_files = git_changes_utils.get_js_or_ts_files_from_diff(
                     files_to_lint)
                 frontend_test_cmds = FRONTEND_TEST_CMDS.copy()
