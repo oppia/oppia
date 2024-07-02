@@ -1052,7 +1052,9 @@ export class CurriculumAdmin extends BaseUser {
    * Function for navigating to the classroom admin page.
    */
   async navigateToClassroomAdminPage(): Promise<void> {
-    await this.goto(classroomAdminUrl);
+    await this.page.goto(classroomAdminUrl, {
+      waitUntil: ['networkidle2', 'load'],
+    });
   }
 
   /**
