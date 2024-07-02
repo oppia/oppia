@@ -1,5 +1,5 @@
 <div>
-  <ng-container *ngIf="!redesignFeatureFlag">
+  <ng-container *ngIf="!learnerDashboardRedesignFeatureFlag">
     <div tabindex="0" class="community-lessons-section" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
       <h1 class="lessons-title" [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION' | translate">
       </h1>
@@ -396,7 +396,7 @@
       </div>
     </div>
   </ng-container>
-  <div *ngIf="redesignFeatureFlag">
+  <div *ngIf="learnerDashboardRedesignFeatureFlag">
     <p class="oppia-learner-dash-greeting mt-4"> {{ 'I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_HEADING' | translate: {username: username} }} </p>
     <div tabindex="0" class="oppia-learner-dash-section">
       <p class="oppia-learner-dash-section-heading">{{ 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate }}</p>
