@@ -17,8 +17,18 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {
+  NgbActiveModal,
+  NgbModal,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
 import {ExplorationSaveModalComponent} from './exploration-save-modal.component';
 
 class MockActiveModal {
@@ -31,10 +41,23 @@ class MockActiveModal {
   }
 }
 
+class MockNgbModalRef {
+  componentInstance = {
+    showingTranslationChanges: false,
+    headers: {
+      leftPane: null,
+      rightPane: null,
+    },
+  };
+  result = Promise.resolve();
+}
+
 describe('Exploration Save Modal component', () => {
   let component: ExplorationSaveModalComponent;
   let fixture: ComponentFixture<ExplorationSaveModalComponent>;
   let isExplorationPrivate = true;
+  let ngbModal: NgbModal;
+  let ngbModalRef: MockNgbModalRef = new MockNgbModalRef();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -52,6 +75,7 @@ describe('Exploration Save Modal component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ExplorationSaveModalComponent);
     component = fixture.componentInstance;
+    ngbModal = TestBed.inject(NgbModal);
 
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'DiffNodeData'." We need to suppress this error because of the need
@@ -83,4 +107,18 @@ describe('Exploration Save Modal component', () => {
       expect(component.showDiff).toBe(false);
     }
   );
+
+  it('should show state diff modal for translation changes', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue(ngbModalRef as NgbModalRef);
+
+    component.showStateDiffModalForTranslations();
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(ngbModalRef.componentInstance.showingTranslationChanges).toBeTrue();
+    expect(ngbModalRef.componentInstance.headers).toEqual({
+      leftPane: 'Last saved',
+      rightPane: 'New changes',
+    });
+  }));
 });

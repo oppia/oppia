@@ -19,6 +19,7 @@
 
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var DiagnosticTestPage = function () {
   var startDiagnosticTestButton = $('.e2e-test-start-diagnostic-test');
@@ -37,11 +38,22 @@ var DiagnosticTestPage = function () {
   var classroomTileSelector = $('.e2e-test-classroom-tile');
   var editClassroomConfigButton = $('.e2e-test-edit-classroom-config-button');
   var addTopicToClassroomButton = $('.e2e-test-add-topic-to-classroom-button');
-  var addTopicToClassroomInput = $('.e2e-test-add-topic-to-classroom-input');
-  var submitTopicIdToClassroomButton = $(
-    '.e2e-test-submit-topic-id-to-classroom-button'
-  );
   var saveClassroomConfigButton = $('.e2e-test-save-classroom-config-button');
+  var classroomTopicDropdownElement = $('.e2e-test-classroom-topics-modal');
+  var updateClassroomTeaserTextInput = $(
+    '.e2e-test-update-classroom-teaser-text'
+  );
+  var updateClassroomTopicListIntroInput = $(
+    '.e2e-test-update-classroom-topic-list-intro'
+  );
+  var updateClassroomCourseDetailsInput = $(
+    '.e2e-test-update-classroom-course-details'
+  );
+  var publishClassroomButton = $('.e2e-test-publish-classroom-btn');
+  var thumbnailContainer = $('.e2e-test-thumbnail-container');
+  var topicThumbnailButton = $('.e2e-test-photo-button');
+  var bannerClickable = $('.e2e-test-classroom-banner-container');
+  var bannerCropper = $('.e2e-test-photo-crop .cropper-container');
 
   this.startDiagnosticTest = async function () {
     await action.click(
@@ -82,9 +94,15 @@ var DiagnosticTestPage = function () {
       newClassroomNameInput,
       'Create classroom config modal taking too long to disappear.'
     );
+    await this.updateClassroomData();
+    await action.click(
+      'Save classroom config button',
+      saveClassroomConfigButton
+    );
+    await action.click('Classroom config tile selector', classroomTileSelector);
   };
 
-  this.addTopicIdToClassroomConfig = async function (topicId, index) {
+  this.addTopicToClassroomConfig = async function (topicName) {
     await action.click('Classroom config tile selector', classroomTileSelector);
 
     await action.click(
@@ -97,21 +115,81 @@ var DiagnosticTestPage = function () {
       addTopicToClassroomButton
     );
 
-    await action.setValue(
-      'Add topic ID to classroom input',
-      addTopicToClassroomInput,
-      topicId
-    );
-
-    await action.click(
-      'Add topic ID to classroom submit button',
-      submitTopicIdToClassroomButton
-    );
+    await addTopicToClassroom(topicName);
+    await action.waitForAutosave();
 
     await action.click(
       'Save classroom config button',
       saveClassroomConfigButton
     );
+  };
+
+  this.updateClassroomData = async function () {
+    await action.click('Classroom config tile selector', classroomTileSelector);
+
+    await action.click(
+      'Edit classroom config button',
+      editClassroomConfigButton
+    );
+
+    await action.setValue(
+      'New classroom teaser text input',
+      updateClassroomTeaserTextInput,
+      'teaser text'
+    );
+
+    var teaserText = await action.getValue(
+      'Teaser text input element',
+      updateClassroomTeaserTextInput
+    );
+    expect(teaserText).toEqual('teaser text');
+
+    await action.setValue(
+      'New classroom course details input',
+      updateClassroomCourseDetailsInput,
+      'course details'
+    );
+
+    var courseDetailsText = await action.getValue(
+      'Course details input element',
+      updateClassroomCourseDetailsInput
+    );
+    expect(courseDetailsText).toEqual('course details');
+
+    await action.setValue(
+      'New classroom topic list intro input',
+      updateClassroomTopicListIntroInput,
+      'topic list intro'
+    );
+
+    var topicListIntroText = await action.getValue(
+      'Topic list intro input element',
+      updateClassroomTopicListIntroInput
+    );
+    expect(topicListIntroText).toEqual('topic list intro');
+
+    await workflow.submitImage(
+      topicThumbnailButton,
+      thumbnailContainer,
+      '../data/test_svg.svg',
+      false
+    );
+
+    await workflow.submitImage(
+      bannerClickable,
+      bannerCropper,
+      '../data/img.png',
+      false
+    );
+  };
+
+  this.publishClassroom = async function () {
+    await action.click(
+      'Edit classroom config button',
+      editClassroomConfigButton
+    );
+
+    await action.click('Publish classroom button', publishClassroomButton);
   };
 
   this.expectNumberOfRecommendedTopicsToBe = async function (count) {
@@ -130,6 +208,30 @@ var DiagnosticTestPage = function () {
     } else {
       expect(recommendedTopicSummaryTiles.length).toEqual(0);
     }
+  };
+
+  var addTopicToClassroom = async function (topicName) {
+    var containerLocator = '.e2e-test-classroom-category-dropdown';
+    var searchTopicInput = $('.e2e-test-exploration-new-category-add').$(
+      '.mat-select-search-input.mat-input-element'
+    );
+    var searchInputLocatorTextOption = $(
+      '.e2e-test-classroom-topic-selector-choice'
+    );
+
+    await action.click(
+      'Container Element',
+      classroomTopicDropdownElement.$(containerLocator)
+    );
+    await action.waitForAutosave();
+
+    await action.setValue(
+      'Dropdown Element Search',
+      searchTopicInput,
+      topicName
+    );
+
+    await action.click('Dropdown Element Select', searchInputLocatorTextOption);
   };
 };
 

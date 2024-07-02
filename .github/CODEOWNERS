@@ -202,7 +202,6 @@
 /Makefile @oppia/dev-workflow-reviewers
 /tox.ini @oppia/dev-workflow-reviewers
 /scripts/*.py @oppia/dev-workflow-reviewers
-/scripts/check_e2e_tests_are_captured_in_ci*.py @oppia/dev-workflow-reviewers
 /scripts/check_frontend_test_coverage*.py @oppia/dev-workflow-reviewers
 /scripts/install_prerequisites.sh @oppia/dev-workflow-reviewers
 /scripts/linters/ @oppia/dev-workflow-reviewers
@@ -649,7 +648,6 @@
 /core/templates/pages/teach-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/thanks-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/participation-playbook/ @oppia/lace-frontend-reviewers
-/core/templates/pages/about-foundation-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/volunteer-page/ @oppia/lace-frontend-reviewers
 
 

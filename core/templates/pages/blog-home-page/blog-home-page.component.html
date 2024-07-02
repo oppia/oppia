@@ -14,21 +14,19 @@
                             [maxSize]="2"
                             [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE"
                             [rotate]="true"
-                            (pageChange)="onPageChange()"
+                            (pageChange)="onPageChange($event)"
                             class="ml-auto e2e-test-pagination">
               <ng-template ngbPaginationPrevious >
                 <i class="fa fa-angle-left text-center w-100 e2e-test-pagination-prev-button align-middle"
-                   aria-hidden="true"
-                   (click)="onPageChange()">
+                   aria-hidden="true">
                 </i>
               </ng-template>
               <ng-template ngbPaginationNumber let-p>
-                <button class="pagination-button" (click)="onPageChange(p)">{{ p }}</button>
+                <button class="pagination-button">{{ p }}</button>
               </ng-template>
               <ng-template ngbPaginationNext>
                 <i class="fa fa-angle-right text-center w-100 e2e-test-pagination-next-button align-middle"
-                   aria-hidden="true"
-                   (click)="onPageChange()">
+                   aria-hidden="true">
                 </i>
               </ng-template>
             </ngb-pagination>
@@ -51,20 +49,16 @@
                             [(page)]="page"
                             [maxSize]="2"
                             [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH"
-                            (pageChange)="onPageChange()"
+                            (pageChange)="onPageChange($event)"
                             class="ml-auto text-center">
               <ng-template ngbPaginationPrevious>
                 <i class="fa fa-angle-left  align-middle"
-                   aria-hidden="true"
-                   (click)="onPageChange()"
-                   (disabled)="false">
+                   aria-hidden="true">
                 </i>
               </ng-template>
               <ng-template ngbPaginationNext>
                 <i class="fa fa-angle-right  align-middle"
-                   aria-hidden="true"
-                   (click)="onPageChange()"
-                   (disabled)="false">
+                   aria-hidden="true">
                 </i>
               </ng-template>
             </ngb-pagination>
@@ -153,16 +147,16 @@
                       [maxSize]="2"
                       [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE"
                       [rotate]="true"
-                      (pageChange)="onPageChange()"
+                      (pageChange)="onPageChange($event)"
                       class="ml-auto mr-auto">
         <ng-template ngbPaginationPrevious >
-          <i class="fa fa-angle-left text-center w-100" aria-hidden="true" (click)="onPageChange()"></i>
+          <i class="fa fa-angle-left text-center w-100" aria-hidden="true"></i>
         </ng-template>
         <ng-template ngbPaginationNumber let-p>
-          <button class="pagination-button" (click)="onPageChange(p)">{{ p }}</button>
+          <button class="pagination-button">{{ p }}</button>
         </ng-template>
         <ng-template ngbPaginationNext>
-          <i class="fa fa-angle-right text-center w-100" aria-hidden="true" (click)="onPageChange()"></i>
+          <i class="fa fa-angle-right text-center w-100" aria-hidden="true"></i>
         </ng-template>
       </ngb-pagination>
       <ngb-pagination *ngIf="searchPageIsActive"
@@ -170,7 +164,7 @@
                       [(page)]="page"
                       [maxSize]="2"
                       [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH"
-                      (pageChange)="onPageChange()"
+                      (pageChange)="onPageChange($event)"
                       class="ml-auto mr-auto text-center">
         <ng-template ngbPaginationPrevious>
           <i class="fa fa-angle-left align-middle" aria-hidden="true"></i>

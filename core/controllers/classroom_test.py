@@ -16,7 +16,11 @@
 
 from __future__ import annotations
 
+import json
+import os
+
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
@@ -24,8 +28,10 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
+import main
 
 from typing import Callable, Dict, Union
+import webtest
 
 dummy_thumbnail_data = classroom_config_domain.ImageData(
     'thumbnail.svg', 'transparent', 1000
@@ -126,6 +132,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
     def test_get(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.save_new_valid_classroom(
+            classroom_id='test_id',
             topic_id_to_prerequisite_topic_ids={
                         self.public_topic_id_1: [],
                         self.private_topic_id: []
@@ -208,12 +215,18 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             'is_published': False
         }
         expected_dict = {
+            'classroom_id': 'test_id',
             'name': 'math',
             'topic_summary_dicts': [
                 public_topic_1_summary_dict, private_topic_summary_dict
             ],
             'course_details': 'Course details for classroom.',
-            'topic_list_intro': 'Topics covered for classroom'
+            'topic_list_intro': 'Topics covered for classroom',
+            'teaser_text': 'Teaser Text',
+            'thumbnail_data': dummy_thumbnail_data.to_dict(),
+            'banner_data': dummy_banner_data.to_dict(),
+            'is_published': True,
+            'public_classrooms_count': 1
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -228,6 +241,7 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
 
     def setUp(self) -> None:
         super().setUp()
+        self.testapp = webtest.TestApp(main.app_without_context)
 
         self.physics_classroom_id = (
             classroom_config_services.get_new_classroom_id())
@@ -314,11 +328,31 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         self.physics_classroom_dict['name'] = 'Quantum physics'
+        self.physics_classroom_dict['thumbnail_data']['filename'] = 'update.svg'
+        self.physics_classroom_dict['banner_data']['filename'] = 'update.png'
 
-        self.put_json(
-            classroom_handler_url, {
-                'classroom_dict': self.physics_classroom_dict
-            }, csrf_token=csrf_token)
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None
+        ) as f:
+            raw_thumbnail_image = f.read()
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_banner_image = f.read()
+        params = {'payload': json.dumps({
+            'classroom_dict': self.physics_classroom_dict
+        })}
+        params['csrf_token'] = csrf_token
+        thumbnail = (
+            'thumbnail_image', 'thumbnail_filename1', raw_thumbnail_image)
+        banner = ('banner_image', 'banner_filename1', raw_banner_image)
+        self.testapp.put(
+                    classroom_handler_url,
+                    params=params, expect_errors=False,
+                    upload_files=[thumbnail, banner]
+        )
 
         self.logout()
 
@@ -341,10 +375,28 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
 
         self.physics_classroom_dict['name'] = 'Quantum physics'
 
-        response = self.put_json(
-            classroom_handler_url, {
-                'classroom_dict': self.physics_classroom_dict
-            }, csrf_token=csrf_token, expected_status_int=400)
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None
+        ) as f:
+            raw_thumbnail_image = f.read()
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_banner_image = f.read()
+        params = {'payload': json.dumps({
+            'classroom_dict': self.physics_classroom_dict
+        })}
+        params['csrf_token'] = csrf_token
+        thumbnail = (
+            'thumbnail_image', 'thumbnail_filename2', raw_thumbnail_image)
+        banner = ('banner_image', 'banner_filename2', raw_banner_image)
+        response = self._parse_json_response(self.testapp.put(
+                    classroom_handler_url,
+                    params=params, expect_errors=True,
+                    upload_files=[thumbnail, banner]
+        ), True)
 
         self.assertEqual(
             response['error'],
@@ -409,10 +461,28 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             self.public_topic_id_2: []
         }
 
-        response = self.put_json(
-            classroom_handler_url, {
-                'classroom_dict': self.physics_classroom_dict
-            }, csrf_token=csrf_token, expected_status_int=400)
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None
+        ) as f:
+            raw_thumbnail_image = f.read()
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_banner_image = f.read()
+        params = {'payload': json.dumps({
+            'classroom_dict': self.physics_classroom_dict
+        })}
+        params['csrf_token'] = csrf_token
+        thumbnail = (
+            'thumbnail_image', 'thumbnail_filename3', raw_thumbnail_image)
+        banner = ('banner_image', 'banner_filename3', raw_banner_image)
+        response = self._parse_json_response(self.testapp.put(
+                    classroom_handler_url,
+                    params=params, expect_errors=True,
+                    upload_files=[thumbnail, banner]
+        ), True)
 
         self.assertEqual(
             response['error'],

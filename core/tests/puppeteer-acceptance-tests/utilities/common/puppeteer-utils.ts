@@ -33,7 +33,9 @@ const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const acceptedBrowserAlerts = [
   '',
   'Changes that you made may not be saved.',
+  'This action is irreversible.',
   'This action is irreversible. Are you sure?',
+  'This action is irreversible. If you insist to proceed, please enter the commit message for the update',
 ];
 
 interface ClickDetails {
