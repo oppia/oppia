@@ -1,4 +1,4 @@
-<i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" [ngClass]="{'icon-move': mobileNavOptionsAreShown}" aria-label="Mobile navbar options" role="button"></i>
+<i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" [ngClass]="{'mobile-navbar-toggled': mobileNavOptionsAreShown}" aria-label="Mobile navbar options" role="button"></i>
 <div class="navbar-mobile-container">
   <div class="navbar-mobile-options" *ngIf="mobileNavOptionsAreShown">
     <div class="exp-nav-dropdown-container">
@@ -248,6 +248,7 @@
     border-top: 1.5px solid #000;
     bottom: 0;
     color: #000;
+    display: none;
     font-size: 25px;
     padding: 10px;
     position: fixed;
@@ -271,7 +272,7 @@
     flex-wrap: wrap;
     justify-content: space-evenly;
   }
-  .icon-move {
+  .mobile-navbar-toggled {
     transform: translateY(-57px);
   }
   .exp-nav-dropdown-container {
