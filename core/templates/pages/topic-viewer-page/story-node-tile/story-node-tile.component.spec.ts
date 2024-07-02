@@ -375,6 +375,7 @@ describe('StoryNodeTileComponent', () => {
     componentInstance.totalCheckpointLoaded = true;
     componentInstance.mostRecentlyReachedCheckpoint = 'Mid';
   }));
+
   it('should initialize component properties correctly', fakeAsync(() => {
     expect(mockStoryNode.getThumbnailFilename()).toEqual('thumbnail.png');
     expect(mockStoryNode.getThumbnailBgColor()).toEqual('#FFFFFF');
@@ -500,7 +501,7 @@ describe('StoryNodeTileComponent', () => {
     }
   );
 
-  it('should get the completed progress bard width', () => {
+  it('should get the completed progress bar width', () => {
     componentInstance.checkpointCount = 3;
     componentInstance.completedcheckpoints = 0;
     expect(componentInstance.getCompletedProgressBarWidth()).toEqual(0);

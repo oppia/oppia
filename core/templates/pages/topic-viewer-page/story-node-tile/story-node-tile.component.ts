@@ -31,7 +31,6 @@ import {
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {ExplorationObjectFactory} from 'domain/exploration/ExplorationObjectFactory';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {string} from 'mathjs';
 
 const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
 const CHECKPOINT_STATUS_COMPLETED = 'completed';
