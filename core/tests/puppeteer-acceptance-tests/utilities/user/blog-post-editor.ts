@@ -71,7 +71,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async createDraftBlogPostWithTitle(
     draftBlogPostTitle: string
-  ): Promise<void> {
+  ): Promise<string> {
     await this.addUserBioInBlogDashboard();
     await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
     await this.updateTitleTo(draftBlogPostTitle);
@@ -81,6 +81,10 @@ export class BlogPostEditor extends BaseUser {
 
     showMessage('Successfully created a draft blog post!');
     await this.goto(blogDashboardUrl);
+
+    const currentUrl = await this.page.url();
+    const blogId = currentUrl.split('/').pop() as string;
+    return blogId;
   }
 
   /**

@@ -250,6 +250,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'super-admin/edit-user-roles',
     'super-admin/load-dummy-data-in-dev-mode',
     'super-admin/edit-platform-parameters',
+    'super-admin/use-misc-tab-features',
     'translation-admin/add-and-remove-translation-rights',
     'voiceover-admin/add-voiceover-artist-to-an-exploration',
 ]
