@@ -46,7 +46,7 @@ const skillEditBox = '.e2e-test-skill-edit-box';
 const mobileSkillsOption = '.e2e-test-mobile-skills-option';
 const unassignSkillButtonDesktop = '.e2e-test-unassign-skill-button';
 const unassignSkillButtonMobile = '.e2e-test-mobile-unassign-skill-button';
-const confirmSkillButton = 'e2e-test-remove-question-confirmation-button';
+const confirmUnassignSkillButton = '.e2e-test-confirm-unassign-skill-button';
 const unassignTopicLabel = '.e2e-test-unassign-topic-label';
 const unassignTopicCheckbox = '.e2e-test-unassign-topic';
 const topicNameSpan = '.topic-name';
@@ -308,12 +308,14 @@ export class TopicManager extends BaseUser {
       throw new Error(`Topic "${topicName}" not found`);
     }
 
-    await this.page.waitForSelector(confirmSkillButton);
-    const confirmSkillButtonElement = await this.page.$(confirmSkillButton);
+    await this.page.waitForSelector(confirmUnassignSkillButton);
+    const confirmSkillButtonElement = await this.page.$(
+      confirmUnassignSkillButton
+    );
     if (!confirmSkillButtonElement) {
       throw new Error('Confirm skill button not found');
     }
-    await this.clickOn(confirmSkillButton);
+    await this.clickOn(confirmUnassignSkillButton);
   }
 
   /**
@@ -400,6 +402,7 @@ export class TopicManager extends BaseUser {
         `Skill options element not found for skill "${skillName}"`
       );
     }
+    await this.waitForElementToBeClickable(skillOptionsElement);
     await skillOptionsElement.click();
 
     await this.page.waitForSelector(assignSkillButton);
@@ -409,10 +412,11 @@ export class TopicManager extends BaseUser {
     }
     await this.clickOn(assignSkillButton);
 
+    await this.page.waitForSelector(topicNameSelector);
     const topicNames = await this.page.$$(topicNameSelector);
     let topicFound = false;
     for (const topic of topicNames) {
-      const name = await topic.$eval('span', el => el.textContent);
+      const name = await topic.evaluate(el => el.textContent);
       if (name === topicName) {
         await topic.click();
         topicFound = true;
