@@ -172,9 +172,8 @@ export class EditorNavigationComponent
     this.updateMobileNavIconPosition();
   }
 
-  updateMobileNavIconPosition() {
+  updateMobileNavIconPosition(): void {
     const navbarHeight = this.navbarMobileContainer.nativeElement.offsetHeight;
-    console.log(navbarHeight);
     const transformValue = this.mobileNavOptionsAreShown
       ? `translateY(-${navbarHeight}px)`
       : 'translateY(0)';
