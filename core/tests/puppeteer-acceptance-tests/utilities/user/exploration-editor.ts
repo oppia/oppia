@@ -1412,7 +1412,6 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.clickOn(modalSaveButton);
-    await this.clickOn(`.e2e-test-${languageCode}-translation-checkbox`);
     await this.clickOn(modifyTranslationsModalDoneButton);
     showMessage('Successfully updated translation from modal.');
   }

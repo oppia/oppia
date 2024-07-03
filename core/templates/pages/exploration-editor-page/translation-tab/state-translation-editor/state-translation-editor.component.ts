@@ -183,28 +183,16 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
     );
     this.activeWrittenTranslation = this
       .activeWrittenTranslation as TranslatedContent;
+    this.changeListService.editTranslation(
+      this.contentId,
+      this.languageCode,
+      this.activeWrittenTranslation
+    );
 
-    let previouslyTranslatedContent =
-      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
-        this.languageCode
-      ]?.getWrittenTranslation(this.contentId);
     let newTranslation = this.activeWrittenTranslation.translation;
 
-    // Check if a change to the translation actually exists, by verifying if the
-    // previous translation (if available) is not the same as the newly saved
-    // translation or if the new translation isn't empty in case a previous translation
-    // does not exist.
-    if (
-      (previouslyTranslatedContent &&
-        previouslyTranslatedContent.translation !== newTranslation) ||
-      (!previouslyTranslatedContent && newTranslation)
-    ) {
-      this.changeListService.editTranslation(
-        this.contentId,
-        this.languageCode,
-        this.activeWrittenTranslation
-      );
-
+    // Check if the new translation isn't empty.
+    if (newTranslation) {
       // Initialize the entity translation object if it doesn't exist.
       if (
         !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
@@ -224,6 +212,17 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
       this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         this.languageCode
       ].updateTranslation(this.contentId, this.activeWrittenTranslation);
+    } else {
+      // If the translation is blank, remove the existing translation appropriately.
+      if (
+        this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
+          this.languageCode
+        )
+      ) {
+        this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+          this.languageCode
+        ].removeTranslation(this.contentId);
+      }
     }
 
     this.translationStatusService.refresh();

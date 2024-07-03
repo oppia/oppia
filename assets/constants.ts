@@ -5139,11 +5139,11 @@ export default {
     "decimal_separator": ".",
     "ariaLabelInEnglish": "English"
   }, {
-    "code": "ar",
-    "description": "العربية (Arabic)",
-    "direction": "rtl",
-    "decimal_separator": ",",
-    "ariaLabelInEnglish": "Arabic"
+    "code": "ak",
+    "description": "Ákán (Akan)",
+    "direction": "ltr",
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Akan"
   }, {
     "code": "sq",
     "description": "shqip (Albanian)",
@@ -5156,6 +5156,12 @@ export default {
     "direction": "ltr",
     "decimal_separator": ".",
     "ariaLabelInEnglish": "Amharic"
+  }, {
+    "code": "ar",
+    "description": "العربية (Arabic)",
+    "direction": "rtl",
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Arabic"
   }, {
     "code": "az",
     "description": "Azeri (Azerbaijani)",
@@ -5174,6 +5180,12 @@ export default {
     "direction": "ltr",
     "decimal_separator": ".",
     "ariaLabelInEnglish": "Bangla"
+  }, {
+    "code": "ms",
+    "description": "بهاس ملايو (Bahasa Melayu)",
+    "direction": "ltr",
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Bahasa Melayu"
   }, {
     "code": "ca",
     "description": "català (Catalan)",
@@ -5205,11 +5217,23 @@ export default {
     "decimal_separator": ",",
     "ariaLabelInEnglish": "Danish"
   }, {
+    "code": "prs",
+    "description": "دری (Dari)",
+    "direction": "rtl",
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Dari"
+  }, {
     "code": "nl",
     "description": "Nederlands (Dutch)",
     "direction": "ltr",
     "decimal_separator": ",",
     "ariaLabelInEnglish": "Dutch"
+  }, {
+    "code": "ee",
+    "description": "Eʋegbe (Ewe)",
+    "direction": "ltr",
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Ewe"
   }, {
     "code": "fat",
     "description": "Fanti",
@@ -5252,6 +5276,12 @@ export default {
     "direction": "ltr",
     "decimal_separator": ",",
     "ariaLabelInEnglish": "Greek"
+  }, {
+    "code": "gaa",
+    "description": "Gã (Ga)",
+    "direction": "ltr",
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Ga"
   }, {
     "code": "ha",
     "description": "Harshen Hausa (Hausa)",
@@ -5361,17 +5391,17 @@ export default {
     "decimal_separator": ",",
     "ariaLabelInEnglish": "Polish"
   }, {
-    "code": "prs",
-    "description": "دری (Dari)",
-    "direction": "rtl",
-    "decimal_separator": ".",
-    "ariaLabelInEnglish": "Dari"
-  }, {
     "code": "pt",
     "description": "português (Portuguese)",
     "direction": "ltr",
     "decimal_separator": ",",
     "ariaLabelInEnglish": "Portuguese"
+  }, {
+    "code": "ps",
+    "description": "پښتو (Pashto)",
+    "direction": "rtl",
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Pashto"
   }, {
     "code": "ro",
     "description": "română (Romanian)",
@@ -5426,6 +5456,12 @@ export default {
     "direction": "ltr",
     "decimal_separator": ".",
     "ariaLabelInEnglish": "Tamil"
+  }, {
+    "code": "te",
+    "description": "తెలుగు (Telugu)",
+    "direction": "ltr",
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Telugu"
   }, {
     "code": "th",
     "description": "ภาษาไทย (Thai)",

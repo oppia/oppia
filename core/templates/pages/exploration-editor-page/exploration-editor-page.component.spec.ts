@@ -878,11 +878,15 @@ describe('Exploration editor page component', () => {
           },
         },
         {
+          cmd: 'mark_translations_needs_update',
+          content_id: 'content0',
+        },
+        {
           cmd: 'edit_translation',
           language_code: 'fr',
-          content_id: 'content4',
+          content_id: 'content0',
           translation: {
-            content_value: '<p>test content four</p>',
+            content_value: '',
             content_format: 'html',
             needs_update: false,
           },
@@ -890,6 +894,21 @@ describe('Exploration editor page component', () => {
         {
           cmd: 'remove_translations',
           content_id: 'content0',
+        },
+        {
+          cmd: 'edit_translation',
+          language_code: 'fr',
+          content_id: 'content0',
+          translation: {
+            content_value: '<p>new test content one</p>',
+            content_format: 'html',
+            needs_update: false,
+          },
+        },
+        {
+          cmd: 'mark_translation_needs_update_for_language',
+          content_id: 'content0',
+          language_code: 'fr',
         },
       ];
       mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled =
@@ -979,10 +998,10 @@ describe('Exploration editor page component', () => {
         entity_version: explorationData.version,
         language_code: 'fr',
         translations: {
-          content4: {
-            content_value: '<p>test content four</p>',
+          content0: {
+            content_value: '<p>new test content one</p>',
             content_format: 'html',
-            needs_update: false,
+            needs_update: true,
           },
         },
       });
@@ -1016,6 +1035,45 @@ describe('Exploration editor page component', () => {
       expect(
         entityTranslationsService.languageCodeToLastPublishedEntityTranslations
       ).toEqual(lastPublishedTranslations);
+
+      flush();
+      discardPeriodicTasks();
+    }));
+
+    it('should initialize only latest draft changes when feature flag is disabled', fakeAsync(() => {
+      spyOn(EntityTranslation, 'createFromBackendDict').and.callThrough();
+      let entityTranslation = EntityTranslation.createFromBackendDict({
+        entity_id: explorationId,
+        entity_type: 'exploration',
+        entity_version: explorationData.version,
+        language_code: 'fr',
+        translations: {
+          content0: {
+            content_value: '<p>new test content one</p>',
+            content_format: 'html',
+            needs_update: true,
+          },
+        },
+      });
+      mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled =
+        false;
+
+      expect(
+        entityTranslationsService.languageCodeToLastPublishedEntityTranslations
+      ).toEqual({});
+      expect(
+        entityTranslationsService.languageCodeToLatestEntityTranslations
+      ).toEqual({});
+
+      mockInitExplorationPageEmitter.emit();
+      tick();
+
+      expect(
+        entityTranslationsService.languageCodeToLastPublishedEntityTranslations
+      ).toEqual({});
+      expect(
+        entityTranslationsService.languageCodeToLatestEntityTranslations.fr
+      ).toEqual(entityTranslation);
 
       flush();
       discardPeriodicTasks();

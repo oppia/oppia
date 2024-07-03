@@ -27,6 +27,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {AppConstants} from 'app.constants';
 import {DiffNodeData} from 'components/version-diff-visualization/version-diff-visualization.component';
 import {StateDiffModalComponent} from './state-diff-modal.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-exploration-save-modal',
@@ -38,6 +39,7 @@ export class ExplorationSaveModalComponent extends ConfirmOrCancelModal {
   commitMessage: string = '';
   showDiff: boolean = false;
   MAX_COMMIT_MESSAGE_LENGTH = String(AppConstants.MAX_COMMIT_MESSAGE_LENGTH);
+  modifyTranslationsFeatureFlagIsEnabled: boolean = false;
 
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
@@ -47,9 +49,15 @@ export class ExplorationSaveModalComponent extends ConfirmOrCancelModal {
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private platformFeatureService: PlatformFeatureService
   ) {
     super(ngbActiveModal);
+  }
+
+  ngOnInit(): void {
+    this.modifyTranslationsFeatureFlagIsEnabled =
+      this.platformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled;
   }
 
   onClickToggleDiffButton(): void {

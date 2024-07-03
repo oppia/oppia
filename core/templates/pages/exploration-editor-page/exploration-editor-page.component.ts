@@ -79,6 +79,7 @@ import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFacto
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
 
 interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: boolean;
@@ -388,51 +389,26 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
                 translations: languageTranslations,
               });
             }
+            // Populate the entity translations with draft changes
+            // if they exist.
+            this.populateEntityTranslationsWithDraftChanges(
+              explorationData.draft_changes,
+              explorationData.version
+            );
           });
+      } else {
+        // Simply populate draft changes for the translation tab in case the feature flag is not enabled.
+        this.populateEntityTranslationsWithDraftChanges(
+          explorationData.draft_changes,
+          explorationData.version
+        );
       }
 
-      // Initialize changeList by draft changes if they exist,
-      // and initialize the entity translations by draft changes
-      // if they exist.
+      // Initialize changeList by draft changes if they exist.
       if (explorationData.draft_changes !== null) {
         this.changeListService.loadAutosavedChangeList(
           explorationData.draft_changes
         );
-
-        for (let i in explorationData.draft_changes) {
-          let changeDict = explorationData.draft_changes[i];
-
-          if (changeDict.cmd === 'edit_translation') {
-            // Create the entity translation objects first if they don't exist.
-            if (
-              !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
-                changeDict.language_code
-              )
-            ) {
-              this.entityTranslationsService.languageCodeToLatestEntityTranslations[
-                changeDict.language_code
-              ] = EntityTranslation.createFromBackendDict({
-                entity_id: this.explorationId,
-                entity_type: 'exploration',
-                entity_version: explorationData.version,
-                language_code: changeDict.language_code,
-                translations: {},
-              });
-            }
-
-            // Update the translations appropriately, via latest draft changes.
-            this.entityTranslationsService.languageCodeToLatestEntityTranslations[
-              changeDict.language_code
-            ].updateTranslation(
-              changeDict.content_id,
-              TranslatedContent.createFromBackendDict(changeDict.translation)
-            );
-          } else if (changeDict.cmd === 'remove_translations') {
-            this.entityTranslationsService.removeAllTranslationsForContent(
-              changeDict.content_id
-            );
-          }
-        }
       }
 
       if (
@@ -481,6 +457,64 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       this.stateEditorRefreshService.onRefreshStateEditor.emit();
       this.explorationEditorPageHasInitialized = true;
     });
+  }
+
+  populateEntityTranslationsWithDraftChanges(
+    draftChanges: ExplorationChange[] | null,
+    version: number
+  ): void {
+    if (draftChanges !== null) {
+      for (let i in draftChanges) {
+        let changeDict = draftChanges[i];
+
+        if (changeDict.cmd === 'edit_translation') {
+          // Create the entity translation objects first if they don't exist.
+          if (
+            !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
+              changeDict.language_code
+            )
+          ) {
+            this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+              changeDict.language_code
+            ] = EntityTranslation.createFromBackendDict({
+              entity_id: this.explorationId,
+              entity_type: 'exploration',
+              entity_version: version,
+              language_code: changeDict.language_code,
+              translations: {},
+            });
+          }
+
+          // Update the translations appropriately, via latest draft changes.
+          if (changeDict.translation.content_value) {
+            this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+              changeDict.language_code
+            ].updateTranslation(
+              changeDict.content_id,
+              TranslatedContent.createFromBackendDict(changeDict.translation)
+            );
+          } else {
+            this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+              changeDict.language_code
+            ].removeTranslation(changeDict.content_id);
+          }
+        } else if (changeDict.cmd === 'remove_translations') {
+          this.entityTranslationsService.removeAllTranslationsForContent(
+            changeDict.content_id
+          );
+        } else if (
+          changeDict.cmd === 'mark_translation_needs_update_for_language'
+        ) {
+          this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+            changeDict.language_code
+          ].markTranslationAsNeedingUpdate(changeDict.content_id);
+        } else if (changeDict.cmd === 'mark_translations_needs_update') {
+          this.entityTranslationsService.markAllTranslationsAsNeedingUpdate(
+            changeDict.content_id
+          );
+        }
+      }
+    }
   }
 
   getActiveTabName(): string {

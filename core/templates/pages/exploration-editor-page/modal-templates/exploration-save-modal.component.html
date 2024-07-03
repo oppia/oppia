@@ -12,10 +12,10 @@
       <textarea rows="3" cols="50" [maxlength]="MAX_COMMIT_MESSAGE_LENGTH" [(ngModel)]="commitMessage" class="oppia-commit-message-input e2e-test-commit-message-input"></textarea>
     </p>
     <button class="btn btn-secondary" (click)="onClickToggleDiffButton()">
-      <span *ngIf="!showDiff">Show Changes</span>
+      <span *ngIf="!showDiff">Show Lesson Changes</span>
       <span *ngIf="showDiff">Hide Changes</span>
     </button>
-    <button class="btn btn-secondary oppia-show-translation-changes" (click)="showStateDiffModalForTranslations()">
+    <button *ngIf="modifyTranslationsFeatureFlagIsEnabled" class="btn btn-secondary oppia-show-translation-changes" (click)="showStateDiffModalForTranslations()">
       <span>Show Translation Changes</span>
     </button>
     <oppia-version-diff-visualization *ngIf="showDiff"
