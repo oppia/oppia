@@ -71,7 +71,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async createDraftBlogPostWithTitle(
     draftBlogPostTitle: string
-  ): Promise<string> {
+  ): Promise<void> {
     await this.addUserBioInBlogDashboard();
     await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
     await this.updateTitleTo(draftBlogPostTitle);
@@ -81,10 +81,6 @@ export class BlogPostEditor extends BaseUser {
 
     showMessage('Successfully created a draft blog post!');
     await this.goto(blogDashboardUrl);
-
-    const currentUrl = await this.page.url();
-    const blogId = currentUrl.split('/').pop() as string;
-    return blogId;
   }
 
   /**
@@ -157,7 +153,7 @@ export class BlogPostEditor extends BaseUser {
    * This is a composite function that can be used when a straightforward, simple blog published is required.
    * This function publishes a blog post with given title.
    */
-  async publishNewBlogPost(newBlogPostTitle: string): Promise<void> {
+  async publishNewBlogPost(newBlogPostTitle: string): Promise<string> {
     await this.openBlogEditorPage();
     await this.uploadBlogPostThumbnailImage();
     await this.expectPublishButtonToBeDisabled();
@@ -165,9 +161,11 @@ export class BlogPostEditor extends BaseUser {
     await this.updateTitleTo(newBlogPostTitle);
     await this.updateBodyTextTo('test blog post body content');
     await this.selectTags('News', 'International');
+    const blogId = (await this.page.url().split('/').pop()) as string;
     await this.saveTheChanges();
 
     await this.publishTheBlogPost();
+    return blogId;
   }
 
   /**

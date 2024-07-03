@@ -42,6 +42,7 @@ const mobileNavBar = '.e2e-test-navbar-dropdown-toggle';
 // Selectors for feature flags.
 const saveButtonSelector = '.e2e-test-save-button';
 const featureFlagNameSelector = '.e2e-test-feature-name';
+const featureFlagDiv = '.e2e-test-feature-flag';
 const rolloutPercentageInput = '.e2e-test-editor-int';
 
 // Selectors for jobs.
@@ -129,8 +130,8 @@ export class ReleaseCoordinator extends BaseUser {
         await this.clickOn(featuresTab);
       }
 
-      await this.page.waitForSelector(featureFlagNameSelector);
-      const featureFlags = await this.page.$$(featureFlagNameSelector);
+      await this.page.waitForSelector(featureFlagDiv);
+      const featureFlags = await this.page.$$(featureFlagDiv);
 
       for (let i = 0; i < featureFlags.length; i++) {
         await featureFlags[i].waitForSelector(featureFlagNameSelector);
@@ -201,8 +202,8 @@ export class ReleaseCoordinator extends BaseUser {
         await this.clickOn(featuresTab);
       }
 
-      await this.page.waitForSelector(featureFlagNameSelector);
-      const featureFlags = await this.page.$$(featureFlagNameSelector);
+      await this.page.waitForSelector(featureFlagDiv);
+      const featureFlags = await this.page.$$(featureFlagDiv);
 
       for (let i = 0; i < featureFlags.length; i++) {
         await featureFlags[i].waitForSelector(featureFlagNameSelector);

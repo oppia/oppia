@@ -100,13 +100,13 @@ const blogPublishedOnInputSelector = '.e2e-test-blog-published-on-input';
 const updateBlogPostButtonSelector = '.e2e-test-update-blog-post-button';
 const rollbackExplorationButton = '.e2e-test-rollback-exploration-button';
 const explorationIdInputSelector = '.e2e-test-exploration-id-input';
-const sendTestMailButton = '.e2e-test-send-test-mail-button';
 const updateUserNameButtonSelector = '.e2e-test-update-username-button';
 const oldUserNameInputSelector = '.e2e-test-old-username-input';
 const newUserNameInputSelector = '.e2e-test-new-username-input';
 const getPendingDeletionRequestsCountButton =
   '.e2e-test-get-deletion-request-button';
-const explorationIdInput = '.e2e-test-exploration-id-input';
+const explorationIdToGetInteractionsInput =
+  '.e2e-test-exploration-id-to-get-interactions-input';
 const getInteractionsButton = '.e2e-test-get-interactions-button';
 const grantSuperAdminButtonSelector = '.e2e-test-grant-super-admin-button';
 const usernameToGrantPrivilegeInput = '.e2e-test-username-to-grant-input';
@@ -724,17 +724,27 @@ export class SuperAdmin extends BaseUser {
     await this.page.waitForSelector(actionStatusMessageSelector, {
       visible: true,
     });
-    const actualMessage = await this.page.$eval(
-      actionStatusMessageSelector,
-      el => el.textContent?.trim()
-    );
-    if (actualMessage === expectedMessage.trim()) {
-      showMessage('Action was successful.');
-      return;
+
+    try {
+      await this.page.waitForFunction(
+        (selector, expectedText) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.trim() === expectedText.trim();
+        },
+        {timeout: 5000},
+        actionStatusMessageSelector,
+        expectedMessage
+      );
+    } catch (error) {
+      const actualMessage = await this.page.$eval(
+        actionStatusMessageSelector,
+        el => el.textContent?.trim()
+      );
+
+      throw new Error(
+        `Text did not match within the specified time. Actual message: "${actualMessage}", expected message: "${expectedMessage}"`
+      );
     }
-    throw new Error(
-      `Action failed. Actual message: "${actualMessage}", expected message: "${expectedMessage}"`
-    );
   }
 
   /**
@@ -984,14 +994,6 @@ export class SuperAdmin extends BaseUser {
   }
 
   /**
-   * Sends a test mail to the admin.
-   */
-  async sendTestMailToAdmin(): Promise<void> {
-    await this.page.waitForSelector(sendTestMailButton);
-    await this.clickOn(sendTestMailButton);
-  }
-
-  /**
    * Updates the username of a user.
    * @param {string} oldUserName - The old username.
    * @param {string} newUserName - The new username.
@@ -1025,8 +1027,11 @@ export class SuperAdmin extends BaseUser {
   async getExplorationInteractions(
     explorationId: string | null
   ): Promise<void> {
-    await this.page.waitForSelector(explorationIdInput);
-    await this.type(explorationIdInput, explorationId as string);
+    await this.page.waitForSelector(explorationIdToGetInteractionsInput);
+    await this.type(
+      explorationIdToGetInteractionsInput,
+      explorationId as string
+    );
 
     await this.page.waitForSelector(getInteractionsButton);
     await this.clickOn(getInteractionsButton);

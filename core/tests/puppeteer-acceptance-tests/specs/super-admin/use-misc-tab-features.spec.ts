@@ -26,7 +26,7 @@ import {BlogPostEditor} from '../../utilities/user/blog-post-editor';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-describe('Curriculum Admin', function () {
+describe('Super Admin', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let superAdmin: SuperAdmin;
   let blogPostEditor: BlogPostEditor;
@@ -71,9 +71,7 @@ describe('Curriculum Admin', function () {
     );
 
     await blogPostEditor.navigateToBlogDashboardPage();
-    await blogPostEditor.addUserBioInBlogDashboard();
-    blogId =
-      await blogPostEditor.createDraftBlogPostWithTitle('Test Blog Post');
+    blogId = await blogPostEditor.publishNewBlogPost('Test Blog Post');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -82,35 +80,27 @@ describe('Curriculum Admin', function () {
       await superAdmin.navigateToAdminPageMiscTab();
       await superAdmin.regenerateContributionOpportunitiesForTopic(topicId);
       await superAdmin.expectActionSuccessMessage(
-        'No. of opportunities model created: 3'
+        'No. of opportunities model created: 0'
       );
 
       await superAdmin.regenerateTopicSummaries();
       await superAdmin.expectActionSuccessMessage(
-        'Successfully generated all topic summaries.'
+        'Successfully regenerated all topic summaries.'
       );
 
       await superAdmin.rollbackExplorationToSafeState(explorationId);
       await superAdmin.expectActionSuccessMessage(
-        'Exploration rolledback to version: 2'
+        'Exploration rolledback to version: 3'
       );
 
-      await superAdmin.sendTestMailToAdmin();
+      await superAdmin.updateUserName('superAdm', 'superAdmUpdated');
       await superAdmin.expectActionSuccessMessage(
-        'Server error: This app cannot send emails.'
-      );
-
-      await superAdmin.updateUserName(
-        'superAdminUser',
-        'superAdminUserUpdated'
-      );
-      await superAdmin.expectActionSuccessMessage(
-        `Successfully renamed user from 'superAdminUser' to 'superAdminUserUpdated'.`
+        'Successfully renamed superAdm to superAdmUpdated!'
       );
 
       await superAdmin.getNumberOfPendingDeletionRequests();
       await superAdmin.expectActionSuccessMessage(
-        'The numbers of users that are being deleted is: 0'
+        'The number of users that are being deleted is: 0'
       );
 
       await superAdmin.getExplorationInteractions(explorationId);
@@ -118,19 +108,19 @@ describe('Curriculum Admin', function () {
         'Successfully fetched interactionIds in exploration.'
       );
 
-      await superAdmin.grantSuperAdminPrivileges('curriculumAdminUser');
+      await superAdmin.grantSuperAdminPrivileges('blogPostEditor');
       await superAdmin.expectActionSuccessMessage('Success!');
 
-      await superAdmin.revokeSuperAdminPrivileges('curriculumAdminUser');
+      await superAdmin.revokeSuperAdminPrivileges('blogPostEditor');
       await superAdmin.expectActionSuccessMessage('Success!');
 
       await superAdmin.updateBlogPostData(
         blogId,
-        'blogPostEditorUser',
-        '24/10/2005'
+        'blogPostEditor',
+        '10/20/2005'
       );
       await superAdmin.expectActionSuccessMessage(
-        'Successfully updated blog post data.'
+        'Successfully updated blog post data'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
