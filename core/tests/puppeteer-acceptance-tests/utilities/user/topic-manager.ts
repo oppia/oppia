@@ -281,7 +281,9 @@ export class TopicManager extends BaseUser {
     if (!unassignSkillSelectorElement) {
       throw new Error('Unassign skill selector not found');
     }
-    await this.clickOn(unassignSkillSelector);
+    await this.waitForElementToBeClickable(unassignSkillSelectorElement);
+    await unassignSkillSelectorElement.click();
+    await this.page.screenshot({path: 'screenshot2.png'});
 
     // Select the topic to unassign from.
     const topicLabels = await this.page.$$(unassignTopicLabel);
@@ -291,6 +293,7 @@ export class TopicManager extends BaseUser {
         topicNameSpan,
         el => el.textContent
       );
+      console.log(labelTopicName, topicName);
       if (labelTopicName === topicName) {
         const checkbox = await topicLabel.$(unassignTopicCheckbox);
         if (!checkbox) {

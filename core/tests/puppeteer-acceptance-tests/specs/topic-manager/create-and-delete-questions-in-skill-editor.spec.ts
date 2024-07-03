@@ -30,14 +30,15 @@ describe('Topic Manager User Journey', function () {
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdmin',
+      'curriculumAdm',
       'curriculum_admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    curriculumAdmin.createTopic('Mathematics', 'math');
-    curriculumAdmin.createSkillForTopic('Addition', 'Mathematics');
-    curriculumAdmin.createSkillForTopic('Subtraction', 'Mathematics');
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.createTopic('Mathematics', 'math');
+    await curriculumAdmin.createSkillForTopic('Addition', 'Mathematics');
+    await curriculumAdmin.createSkillForTopic('Subtraction', 'Mathematics');
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
