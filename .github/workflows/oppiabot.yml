@@ -1,15 +1,15 @@
-# name: Oppiabot
+name: Oppiabot
 
-# on:
-#   merge_group:
-#     types: [checks_requested]
-#   issues:
-#     types:
-#       - labeled
-#   pull_request_target:
-#     branches:
-#       - develop
-#       - release-*
+on:
+  merge_group:
+    types: [checks_requested]
+  issues:
+    types:
+      - labeled
+  pull_request_target:
+    branches:
+      - develop
+      - release-*
 
 jobs:
   oppiabot:

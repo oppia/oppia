@@ -1,15 +1,15 @@
-# name: Lint Checks
-# on:
-#   merge_group:
-#     types: [checks_requested]
-#   push:
-#     branches:
-#       - develop
-#       - release-*
-#   pull_request:
-#     branches:
-#       - develop
-#       - release-*
+name: Lint Checks
+on:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
 
 jobs:
   lint:

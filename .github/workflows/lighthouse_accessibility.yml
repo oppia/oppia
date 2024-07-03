@@ -1,15 +1,15 @@
-# name: Lighthouse CI accessibility tests
-# on:
-#   merge_group:
-#     types: [checks_requested]
-#   push:
-#     branches:
-#       - develop
-#       - release-*
-#   pull_request:
-#     branches:
-#       - develop
-#       - release-*
+name: Lighthouse CI accessibility tests
+on:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
 
 jobs:
   lighthouse:
