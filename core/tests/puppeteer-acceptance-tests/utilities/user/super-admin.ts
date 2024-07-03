@@ -965,7 +965,7 @@ export class SuperAdmin extends BaseUser {
   async regenerateContributionOpportunitiesForTopic(
     topicId: string
   ): Promise<void> {
-    await this.page.waitForSelector(topicIdInputSelector);
+    await this.waitForElementToBeClickable(topicIdInputSelector);
     await this.type(topicIdInputSelector, topicId);
 
     await this.page.waitForSelector(regenerateOpportunitiesButton);
@@ -986,7 +986,7 @@ export class SuperAdmin extends BaseUser {
   async rollbackExplorationToSafeState(
     explorationId: string | null
   ): Promise<void> {
-    await this.page.waitForSelector(explorationIdInputSelector);
+    await this.waitForElementToBeClickable(explorationIdInputSelector);
     await this.type(explorationIdInputSelector, explorationId as string);
 
     await this.page.waitForSelector(rollbackExplorationButton);
@@ -1002,10 +1002,10 @@ export class SuperAdmin extends BaseUser {
     oldUserName: string,
     newUserName: string
   ): Promise<void> {
-    await this.page.waitForSelector(oldUserNameInputSelector);
+    await this.waitForElementToBeClickable(oldUserNameInputSelector);
     await this.type(oldUserNameInputSelector, oldUserName);
 
-    await this.page.waitForSelector(newUserNameInputSelector);
+    await this.waitForElementToBeClickable(newUserNameInputSelector);
     await this.type(newUserNameInputSelector, newUserName);
 
     await this.page.waitForSelector(updateUserNameButtonSelector);
@@ -1027,7 +1027,7 @@ export class SuperAdmin extends BaseUser {
   async getExplorationInteractions(
     explorationId: string | null
   ): Promise<void> {
-    await this.page.waitForSelector(explorationIdToGetInteractionsInput);
+    await this.waitForElementToBeClickable(explorationIdToGetInteractionsInput);
     await this.type(
       explorationIdToGetInteractionsInput,
       explorationId as string
@@ -1043,7 +1043,7 @@ export class SuperAdmin extends BaseUser {
    * @returns {Promise<void>}
    */
   async grantSuperAdminPrivileges(username: string): Promise<void> {
-    await this.page.waitForSelector(usernameToGrantPrivilegeInput);
+    await this.waitForElementToBeClickable(usernameToGrantPrivilegeInput);
     await this.type(usernameToGrantPrivilegeInput, username);
 
     await this.page.waitForSelector(grantSuperAdminButtonSelector);
@@ -1056,7 +1056,7 @@ export class SuperAdmin extends BaseUser {
    * @returns {Promise<void>}
    */
   async revokeSuperAdminPrivileges(username: string): Promise<void> {
-    await this.page.waitForSelector(usernameToRevokePrivilegeInput);
+    await this.waitForElementToBeClickable(usernameToRevokePrivilegeInput);
     await this.type(usernameToRevokePrivilegeInput, username);
 
     await this.page.waitForSelector(revokeSuperAdminButton);
@@ -1074,13 +1074,13 @@ export class SuperAdmin extends BaseUser {
     author: string,
     publishedOn: string
   ): Promise<void> {
-    await this.page.waitForSelector(blogIdInputSelector);
+    await this.waitForElementToBeClickable(blogIdInputSelector);
     await this.type(blogIdInputSelector, blogId);
 
-    await this.page.waitForSelector(blogAuthorInputSelector);
+    await this.waitForElementToBeClickable(blogAuthorInputSelector);
     await this.type(blogAuthorInputSelector, author);
 
-    await this.page.waitForSelector(blogPublishedOnInputSelector);
+    await this.waitForElementToBeClickable(blogPublishedOnInputSelector);
     await this.type(blogPublishedOnInputSelector, publishedOn);
 
     await this.page.waitForSelector(updateBlogPostButtonSelector);
