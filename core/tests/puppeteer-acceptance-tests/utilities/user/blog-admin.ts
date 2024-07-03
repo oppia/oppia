@@ -27,7 +27,7 @@ const blogEditorUsernameInput = 'input#label-target-form-reviewer-username';
 const maximumTagLimitInput = 'input#float-input';
 const blogAdminUrl = testConstants.URLs.BlogAdmin;
 
-const LABEL_FOR_SAVE_BUTTON = 'Save';
+const LABEL_FOR_SAVE_BUTTOON = 'Save';
 
 export class BlogAdmin extends BaseUser {
   /**
@@ -62,7 +62,7 @@ export class BlogAdmin extends BaseUser {
     await this.page.keyboard.press('Backspace');
 
     await this.type(maximumTagLimitInput, limit.toString());
-    await this.clickOn(LABEL_FOR_SAVE_BUTTON);
+    await this.clickOn(LABEL_FOR_SAVE_BUTTOON);
 
     showMessage(`Successfully updated the tag limit to ${limit}!`);
   }
