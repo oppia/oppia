@@ -144,7 +144,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
           this.translationReviewersCountByLanguage =
             response.translation_reviewers_count;
           this.questionReviewersCount = response.question_reviewers_count;
-
           this.languageChoices = AppConstants.SUPPORTED_AUDIO_LANGUAGES.map(
             languageItem => {
               return {

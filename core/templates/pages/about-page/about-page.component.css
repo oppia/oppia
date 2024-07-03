@@ -35,7 +35,7 @@
   color: #00645c;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 4.8rem;
-  line-height: 60px;
+  line-height: 50px;
   margin: 0;
 }
 
@@ -475,7 +475,7 @@
   width: 100%;
 }
 
-.about-page .oppia-impact-section-grey-bg-text, 
+.about-page .oppia-impact-section-grey-bg-text,
 .about-page .oppia-impact-section-yellow-bg-text {
   font-weight: 700;
   padding: 0 8px;
@@ -688,7 +688,7 @@
     gap: 0.8rem;
     width: 100%;
   }
-  
+
   .about-page .oppia-about-foundation-section-goal {
     padding: 3.2rem 3.2rem 3.2rem 1.6rem;
   }
@@ -752,7 +752,7 @@
 }
 
 .free-of-cost-panel,
-.free-of-cost-panel button, 
+.free-of-cost-panel button,
 .free-of-cost-panel .accordion-icon {
   background-color: #00645c;
   color: #fff;
@@ -1036,7 +1036,7 @@
   background-color: transparent;
   padding: 0;
 }
-.about-page .oppia-cta-carousel-container button, 
+.about-page .oppia-cta-carousel-container button,
 .about-page .oppia-cta-carousel-container button:focus,
 .about-page .oppia-cta-carousel-container button:hover,
 .about-page .oppia-cta-carousel-container button:active {
@@ -1061,7 +1061,7 @@
   .about-page .oppia-about-statement-type1 {
     width: calc((100% - 16px) / 2);
   }
-  
+
   .about-page .oppia-about-statement-type2 {
     width: 100%;
   }
@@ -1082,7 +1082,7 @@
     gap: 8px;
     justify-content: center;
   }
-  
+
   .about-page .oppia-about-cta-role-card {
     min-height: 356px;
     width: calc((100% - 8px) / 2);
@@ -1388,7 +1388,7 @@
   .about-page .oppia-about-accordion-item p {
     margin: 0;
   }
-  
+
   .about-page .oppia-about-accordion-panel-title {
     font-weight: 700;
   }
@@ -1414,7 +1414,7 @@
   }
 }
 @media only screen and (max-width: 641px) {
-  
+
   .about-page .oppia-about-platform-section {
     gap: 48px;
     padding: 0 40px 40px;
