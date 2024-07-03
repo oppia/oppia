@@ -182,8 +182,14 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             self.assertIsNone(
                 git_changes_utils.get_local_git_repository_remote_name())
         self.assertTrue(
-            'Warning: Please keep only one remote branch for '
-            'oppia:develop.\n' in self.print_arr)
+            'Warning: Please keep only one remote branch for oppia:develop.\n'
+            'To do that follow these steps:\n'
+            '1. Run the command \'git remote -v\'\n'
+            '2. This command will list the remote references, there will be '
+            'multiple remotes listed for upstream, but we want to make sure '
+            'that there is only one main upstream remote. Please use the '
+            'command, \'git remote remove <remote_name>\' on all remotes '
+            'that are not the main oppia repository.\n' in self.print_arr)
 
     def test_git_diff_name_status_without_error(self) -> None:
         def mock_start_subprocess_for_result(
