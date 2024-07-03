@@ -517,7 +517,7 @@ describe('Core exploration functionality', function () {
       // Test the flow.
       await explorationEditorMainTab.moveToState('Introduction');
       await explorationEditorPage.navigateToPreviewTab();
-      await explorationEditorPage.waitForPreviewTabToLoad();
+      // await explorationEditorPage.waitForPreviewTabToLoad();
       await explorationPlayerPage.submitAnswer('NumericInput', 1);
       await explorationPlayerPage.clickThroughToNextCard();
       await explorationPlayerPage.waitForLessonCompletionMessageToDisappear();

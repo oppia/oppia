@@ -446,7 +446,7 @@ describe('Full exploration editor', function () {
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorMainTab.deleteInteraction();
     await explorationEditorPage.navigateToPreviewTab();
-    await explorationEditorPage.waitForPreviewTabToLoad();
+    // await explorationEditorPage.waitForPreviewTabToLoad();
     await explorationEditorPage.navigateToMainTab();
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
