@@ -86,7 +86,8 @@ _PARSER.add_argument(
 )
 _PARSER.add_argument(
     '--specs_to_run',
-    help='optional; if specified, runs the specified test specs'
+    help='optional; if specified, runs the specified test specs. This '
+    'should be a comma-separated list of spec file paths.',
 )
 
 
@@ -127,6 +128,7 @@ def get_file_spec(file_path: str) -> str | None:
 
     Returns:
         str | None. The path of the spec file if it exists, otherwise None.
+        If the file is not a TypeScript or JavaScript file, None is returned.
     """
     if (
         file_path.endswith(('.spec.ts', '.spec.js', 'Spec.ts', 'Spec.js')) and
@@ -135,8 +137,7 @@ def get_file_spec(file_path: str) -> str | None:
         return file_path
 
     if file_path.endswith(('.ts', '.js')):
-        spec_file_path = file_path.replace('.ts', '.spec.ts').replace(
-            '.js', '.spec.js')
+        spec_file_path = '%s.spec%s' % (file_path[:-3], file_path[-3:])
         if os.path.exists(spec_file_path):
             return spec_file_path
 

@@ -35,19 +35,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        def mock_popen(  # pylint: disable=unused-argument
-            unused_cmd_tokens: List[str],
-            stdout: int = subprocess.PIPE,
-            stderr: int = subprocess.PIPE
-        ) -> subprocess.Popen[bytes]:
-            return process
         self.print_arr: List[str] = []
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
-        self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         def mock_get_js_or_ts_files_from_diff(
             unused_diff_files: List[git_changes_utils.FileDiff]
         ) -> List[str]:
@@ -206,7 +197,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                     'left', 'right', diff_filter='filter'),
                 [
                     git_changes_utils.FileDiff(status=b'M', name=b'file1'),
-                    git_changes_utils.FileDiff(status=b'A', name=b'file2')])
+                    git_changes_utils.FileDiff(status=b'A', name=b'file2')
+                ]
+            )
 
     def test_git_diff_name_status_with_error(self) -> None:
         def mock_start_subprocess_for_result(
@@ -222,6 +215,46 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ):
             git_changes_utils.git_diff_name_status(
                 'left', 'right', diff_filter='filter')
+
+    def test_git_diff_name_status_with_no_left_and_right(self) -> None:
+        def mock_start_subprocess_for_result(
+            cmd_tokens: List[str]
+        ) -> Tuple[bytes, None]:
+            if cmd_tokens == ['git', 'diff', '--name-status']:
+                return (b'M\tfile1\nA\tfile2', None)
+        subprocess_swap = self.swap(
+            common, 'start_subprocess_for_result',
+            mock_start_subprocess_for_result)
+
+        with subprocess_swap:
+            self.assertEqual(
+                git_changes_utils.git_diff_name_status(),
+                [
+                    git_changes_utils.FileDiff(status=b'M', name=b'file1'),
+                    git_changes_utils.FileDiff(status=b'A', name=b'file2')
+                ]
+            )
+
+    def test_git_diff_name_status_with_empty_left_should_error(self) -> None:
+        with self.assertRaisesRegex(
+            ValueError,
+            'Error: left should not be an empty string.'
+        ):
+            git_changes_utils.git_diff_name_status(left='')
+
+    def test_git_diff_name_status_with_empty_right_should_error(self) -> None:
+        with self.assertRaisesRegex(
+            ValueError,
+            'Error: right should not be an empty string.'
+        ):
+            git_changes_utils.git_diff_name_status(right='')
+
+    def test_git_diff_name_status_with_empty_diff_filter_should_error(self) -> None: # pylint: disable=line-too-long
+        with self.assertRaisesRegex(
+            ValueError,
+            'Error: diff_filter should not be an empty string.'
+        ):
+            git_changes_utils.git_diff_name_status(diff_filter='')
 
     def test_compare_to_remote(self) -> None:
         check_function_calls = {
@@ -380,7 +413,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                     ], 'remote'),
                 {'branch1': (['A:file1', 'M:file2'], ['file1', 'file2'])})
 
-    def test_get_staged_files(self) -> None:
+    def test_get_staged_acmrt_files(self) -> None:
         def mock_git_diff_name_status() -> List[git_changes_utils.FileDiff]:
             return [
                 git_changes_utils.FileDiff(status=b'M', name=b'file1'),
@@ -391,17 +424,17 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             mock_git_diff_name_status)
         with git_diff_swap:
             self.assertEqual(
-                git_changes_utils.get_staged_files(),
+                git_changes_utils.get_staged_acmrt_files(),
                 [b'file1', b'file2'])
 
-    def test_get_staged_files_with_no_files(self) -> None:
+    def test_get_staged_acmrt_files_with_no_files(self) -> None:
         def mock_git_diff_name_status() -> List[git_changes_utils.FileDiff]:
             return []
         git_diff_swap = self.swap(
             git_changes_utils, 'git_diff_name_status',
             mock_git_diff_name_status)
         with git_diff_swap:
-            self.assertEqual(git_changes_utils.get_staged_files(), [])
+            self.assertEqual(git_changes_utils.get_staged_acmrt_files(), [])
 
     def test_get_refs_with_stdin(self) -> None:
         temp_stdin_file = tempfile.NamedTemporaryFile().name

@@ -110,8 +110,15 @@ def git_diff_name_status(
         ValueError. Raise ValueError if git command fails.
     """
     git_cmd = ['git', 'diff', '--name-status']
+    if diff_filter == '':
+        raise ValueError(
+            'Error: diff_filter should not be an empty string.')
     if diff_filter:
         git_cmd.append('--diff-filter={}'.format(diff_filter))
+    if left == '':
+        raise ValueError('Error: left should not be an empty string.')
+    if right == '':
+        raise ValueError('Error: right should not be an empty string.')
     if left and right:
         git_cmd.extend([left, right])
         # Append -- to avoid conflicts between branch and directory name.
@@ -273,8 +280,8 @@ def get_changed_files(
     return collected_files
 
 
-def get_staged_files() -> List[bytes]:
-    """Returns the list of staged files."""
+def get_staged_acmrt_files() -> List[bytes]:
+    """Returns the list of staged ACMRT files."""
     staged_files = git_diff_name_status()
     acmrt_staged_files = extract_acmrt_files_from_diff(staged_files)
 
