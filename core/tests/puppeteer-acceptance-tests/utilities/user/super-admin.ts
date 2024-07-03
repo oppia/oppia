@@ -727,7 +727,7 @@ export class SuperAdmin extends BaseUser {
 
     try {
       await this.page.waitForFunction(
-        (selector, expectedText) => {
+        (selector: string, expectedText: string) => {
           const element = document.querySelector(selector);
           return element?.textContent?.trim() === expectedText.trim();
         },
