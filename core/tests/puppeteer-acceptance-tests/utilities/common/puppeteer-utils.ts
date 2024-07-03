@@ -436,7 +436,7 @@ export class BaseUser {
     selector: string,
     expectedUrl: string
   ): Promise<void> {
-    await this.page.waitForSelector(selector);
+    await this.page.waitForSelector(selector, {visible: true});
     const href = await this.page.$eval(selector, element =>
       element.getAttribute('href')
     );
