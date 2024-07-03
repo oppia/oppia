@@ -193,8 +193,7 @@ export class TopicManager extends BaseUser {
     }
   }
 
-  /**
-   * Create a chapter for a certain story.
+  /**   * Create a chapter for a certain story.
    */
   async createChapter(explorationId: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -283,7 +282,6 @@ export class TopicManager extends BaseUser {
     }
     await this.waitForElementToBeClickable(unassignSkillSelectorElement);
     await unassignSkillSelectorElement.click();
-    await this.page.screenshot({path: 'screenshot2.png'});
 
     // Select the topic to unassign from.
     const topicLabels = await this.page.$$(unassignTopicLabel);
@@ -369,7 +367,7 @@ export class TopicManager extends BaseUser {
       toastMessageSelector,
       el => el.textContent
     );
-    expect(actualMessage).toEqual(expectedMessage);
+    expect(actualMessage?.trim()).toEqual(expectedMessage);
   }
 
   /**
@@ -463,13 +461,8 @@ export class TopicManager extends BaseUser {
         `Skill options element not found for skill "${skillName1}"`
       );
     }
+    await this.waitForElementToBeClickable(skillOptionsElement1);
     await skillOptionsElement1.click();
-
-    const skillItem2 = await this.selectSkill(skillName2);
-    if (!skillItem2) {
-      throw new Error(`Skill "${skillName2}" not found`);
-    }
-    await skillItem2.click();
 
     await this.page.waitForSelector(mergeSkillsButton);
     const mergeSkillsButtonElement = await this.page.$(mergeSkillsButton);
@@ -486,7 +479,8 @@ export class TopicManager extends BaseUser {
       throw new Error('Skill name input selector not found');
     }
     // Searching by skill name.
-    await this.page.type(skillNameInputSelector, skillName2);
+    await this.waitForElementToBeClickable(skillNameInputSelector);
+    await this.type(skillNameInputSelector, skillName2);
 
     await this.page.waitForSelector(radioInnerCircleSelector);
     const radioInnerCircleSelectorElement = await this.page.$(
@@ -495,7 +489,9 @@ export class TopicManager extends BaseUser {
     if (!radioInnerCircleSelectorElement) {
       throw new Error('Radio inner circle selector not found');
     }
-    await this.clickOn(radioInnerCircleSelector);
+    await this.page.evaluate(selector => {
+      document.querySelector(selector).click();
+    }, radioInnerCircleSelector);
 
     await this.page.waitForSelector(confirmSkillSelectionButtonSelector);
     const confirmSkillSelectionButtonSelectorElement = await this.page.$(

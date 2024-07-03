@@ -23,6 +23,7 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
+const questionText = 'What is 2 + 2?';
 
 describe('Topic Manager User Journey', function () {
   let topicManager: TopicManager & CurriculumAdmin;
@@ -64,7 +65,6 @@ describe('Topic Manager User Journey', function () {
       );
 
       await topicManager.navigateToQuestionPreviewTab();
-      const questionText = 'What is 2 + 2?';
       await topicManager.previewQuestion(questionText);
       await topicManager.expectPreviewQuestionText(questionText);
       await topicManager.expectPreviewInteractionType('Multiple Choice');

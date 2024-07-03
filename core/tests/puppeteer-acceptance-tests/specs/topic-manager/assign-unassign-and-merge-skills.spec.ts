@@ -54,16 +54,25 @@ describe('Topic Manager User Journey', function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
       await topicManager.navigateToSkillTab();
 
+      // The skill is unassigned first because it was previously assigned during the setup phase in the beforeAll block.
       await topicManager.unassignSkillFromTopic('Addition', 'Mathematics');
       await topicManager.expectToastMessageToBe(
-        'Skill unassigned successfully.'
+        'The skill has been unassigned to the topic.'
       );
 
       await topicManager.assignSkillToTopic('Addition', 'Mathematics');
-      await topicManager.expectToastMessageToBe('Skill assigned successfully.');
+      await topicManager.expectToastMessageToBe(
+        'The skill has been assigned to the topic.'
+      );
+
+      // unassigning the skill from the topic because two skills assigned to some topic cannot be merged.
+      await topicManager.unassignSkillFromTopic('Subtraction', 'Mathematics');
+      await topicManager.expectToastMessageToBe(
+        'The skill has been unassigned to the topic.'
+      );
 
       await topicManager.mergeSkills('Addition', 'Subtraction');
-      await topicManager.expectToastMessageToBe('Skills merged successfully.');
+      await topicManager.expectToastMessageToBe('Merged Skills.');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
