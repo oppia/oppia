@@ -53,44 +53,44 @@ EXCLUDED_DIRECTORIES = [
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
-    'core/templates/directives/angular-html-bind.directive.ts',
     'core/templates/App.ts',
-    'core/templates/pages/Base.ts',
+    'core/templates/base-components/oppia-root.directive.ts',
     'core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts',
     'core/templates/components/ck-editor-helpers/'
         'ck-editor-4-widgets.initializer.ts',
-    'core/templates/pages/exploration-editor-page/services/'
-        'exploration-states.service.ts',
+    'core/templates/components/forms/custom-forms-directives/'
+    'object-editor.directive.ts',
+    'core/templates/components/state-directives/rule-editor/'
+    'rule-type-selector.directive.ts',
+    'core/templates/directives/angular-html-bind.directive.ts',
+    'core/templates/directives/mathjax-bind.directive.ts',
+    'core/templates/domain/question/question-update.service.ts',
     'core/templates/expressions/expression-interpolation.service.ts',
     'core/templates/google-analytics.initializer.ts',
+    'core/templates/pages/Base.ts',
+    'core/templates/pages/exploration-editor-page/services/'
+        'exploration-states.service.ts',
+    'core/templates/pages/exploration-editor-page/translation-tab/'
+        'services/voiceover-recording.service.ts',
     'core/templates/pages/exploration-player-page/services/'
         'learner-answer-info.service.ts',
-    'core/templates/directives/mathjax-bind.directive.ts',
-    'core/templates/components/forms/custom-forms-directives/'
-        'object-editor.directive.ts',
-    'extensions/interactions/MusicNotesInput/directives/'
-        'oppia-interactive-music-notes-input.component.ts',
-    'extensions/interactions/PencilCodeEditor/directives/'
-        'oppia-interactive-pencil-code-editor.component.ts',
-    'core/templates/base-components/oppia-root.directive.ts',
-    'extensions/classifiers/python-program.tokenizer.ts',
-    'core/templates/domain/question/question-update.service.ts',
-    # TODO(#16656): This file will be covered by angular migration team.
     'core/templates/pages/topic-editor-page/modal-templates/'
         'questions-list-select-skill-and-difficulty-modal.component.ts',
     # TODO(#16656): This file will be covered by angular migration team.
     'core/templates/pages/topic-editor-page/modal-templates/'
         'questions-opportunities-select-difficulty-modal.component.ts',
-    # TODO(#18390): Completely cover "rte-helper-modal.controller.ts".
+    # TODO(#16656): This file will be covered by angular migration team.
     'core/templates/services/rte-helper-modal.controller.ts',
-    'core/templates/components/state-directives/rule-editor/'
-        'rule-type-selector.directive.ts',
+    # TODO(#18390): Completely cover "rte-helper-modal.controller.ts".
     'core/templates/services/'
         'translation-file-hash-loader-backend-api.service.ts',
-    # Please don't try to cover `unit-test-utils.ajs.ts` file.
+    # Please don't try to cover unit-test-utils.ajs.ts file.
     'core/templates/tests/unit-test-utils.ajs.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/'
-        'services/voiceover-recording.service.ts',
+    'extensions/classifiers/python-program.tokenizer.ts',
+    'extensions/interactions/MusicNotesInput/directives/'
+        'oppia-interactive-music-notes-input.component.ts',
+    'extensions/interactions/PencilCodeEditor/directives/'
+        'oppia-interactive-pencil-code-editor.component.ts'
 ]
 
 
