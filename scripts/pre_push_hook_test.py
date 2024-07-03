@@ -81,7 +81,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
         self.does_diff_include_ci_config_or_test_files = False
         def mock_does_diff_include_ci_config_or_test_files(
-            unused_diff_files: List[pre_push_hook.FileDiff]
+            unused_diff_files: List[git_changes_utils.FileDiff]
         ) -> bool:
             return self.does_diff_include_ci_config_or_test_files
 

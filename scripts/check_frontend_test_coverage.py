@@ -53,33 +53,44 @@ EXCLUDED_DIRECTORIES = [
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
-    'angular-html-bind.directive.ts',
-    'App.ts',
-    'Base.ts',
-    'ck-editor-4-rte.component.ts',
-    'ck-editor-4-widgets.initializer.ts',
-    'exploration-states.service.ts',
-    'expression-interpolation.service.ts',
-    'google-analytics.initializer.ts',
-    'learner-answer-info.service.ts',
-    'mathjax-bind.directive.ts',
-    'object-editor.directive.ts',
-    'oppia-interactive-music-notes-input.component.ts',
-    'oppia-interactive-pencil-code-editor.component.ts',
-    'oppia-root.directive.ts',
-    'python-program.tokenizer.ts',
-    'question-update.service.ts',
+    'core/templates/directives/angular-html-bind.directive.ts',
+    'core/templates/App.ts',
+    'core/templates/pages/Base.ts',
+    'core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts',
+    'core/templates/components/ck-editor-helpers/'
+        'ck-editor-4-widgets.initializer.ts',
+    'core/templates/pages/exploration-editor-page/services/'
+        'exploration-states.service.ts',
+    'core/templates/expressions/expression-interpolation.service.ts',
+    'core/templates/google-analytics.initializer.ts',
+    'core/templates/pages/exploration-player-page/services/'
+        'learner-answer-info.service.ts',
+    'core/templates/directives/mathjax-bind.directive.ts',
+    'core/templates/components/forms/custom-forms-directives/'
+        'object-editor.directive.ts',
+    'extensions/interactions/MusicNotesInput/directives/'
+        'oppia-interactive-music-notes-input.component.ts',
+    'extensions/interactions/PencilCodeEditor/directives/'
+        'oppia-interactive-pencil-code-editor.component.ts',
+    'core/templates/base-components/oppia-root.directive.ts',
+    'extensions/classifiers/python-program.tokenizer.ts',
+    'core/templates/domain/question/question-update.service.ts',
     # TODO(#16656): This file will be covered by angular migration team.
-    'questions-list-select-skill-and-difficulty-modal.component.ts',
+    'core/templates/pages/topic-editor-page/modal-templates/'
+        'questions-list-select-skill-and-difficulty-modal.component.ts',
     # TODO(#16656): This file will be covered by angular migration team.
-    'questions-opportunities-select-difficulty-modal.component.ts',
+    'core/templates/pages/topic-editor-page/modal-templates/'
+        'questions-opportunities-select-difficulty-modal.component.ts',
     # TODO(#18390): Completely cover "rte-helper-modal.controller.ts".
-    'rte-helper-modal.controller.ts',
-    'rule-type-selector.directive.ts',
-    'translation-file-hash-loader-backend-api.service.ts',
+    'core/templates/services/rte-helper-modal.controller.ts',
+    'core/templates/components/state-directives/rule-editor/'
+        'rule-type-selector.directive.ts',
+    'core/templates/services/'
+        'translation-file-hash-loader-backend-api.service.ts',
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
-    'unit-test-utils.ajs.ts',
-    'voiceover-recording.service.ts',
+    'core/templates/tests/unit-test-utils.ajs.ts',
+    'core/templates/pages/exploration-editor-page/translation-tab/'
+        'services/voiceover-recording.service.ts',
 ]
 
 
@@ -183,10 +194,8 @@ def check_if_file_should_be_checked(
     if files_to_check is None:
         return True
 
-    for file_to_check in files_to_check:
-        _, file_to_check_name = os.path.split(file_to_check)
-        if file_path in (file_to_check, file_to_check_name):
-            return True
+    if file_path in files_to_check:
+        return True
 
     return False
 
@@ -216,19 +225,19 @@ def check_coverage_changes(
     errors = ''
 
     for stanza in stanzas:
-        file_name = stanza.file_name
-        if not check_if_file_should_be_checked(file_name, files_to_check):
+        file_path = stanza.file_path
+        if not check_if_file_should_be_checked(file_path, files_to_check):
             continue
         total_lines = stanza.total_lines
         covered_lines = stanza.covered_lines
         if any(fnmatch.fnmatch(
                 stanza.file_path, pattern) for pattern in EXCLUDED_DIRECTORIES):
             continue
-        if file_name not in remaining_denylisted_files:
+        if file_path not in remaining_denylisted_files:
             if total_lines != covered_lines:
                 errors += (
                     '\033[1m{}\033[0m seems to be not completely tested.'
-                    ' Make sure it\'s fully covered.\n'.format(file_name))
+                    ' Make sure it\'s fully covered.\n'.format(file_path))
         else:
             if total_lines == covered_lines:
                 errors += (
@@ -239,21 +248,21 @@ def check_coverage_changes(
                     ' make sure you\'ve followed the unit tests rules'
                     ' correctly on:'
                     ' https://github.com/oppia/oppia/wiki/Frontend'
-                    '-unit-tests-guide#rules\n'.format(file_name))
+                    '-unit-tests-guide#rules\n'.format(file_path))
 
-            remaining_denylisted_files.remove(file_name)
+            remaining_denylisted_files.remove(file_path)
 
     if remaining_denylisted_files:
-        for test_name in remaining_denylisted_files:
-            if not check_if_file_should_be_checked(test_name, files_to_check):
+        for test_path in remaining_denylisted_files:
+            if not check_if_file_should_be_checked(test_path, files_to_check):
                 continue
             errors += (
                 '\033[1m{}\033[0m is in the frontend test coverage'
                 ' denylist but it doesn\'t exist anymore. If you have'
                 ' renamed it, please make sure to remove the old file'
-                ' name and add the new file name in the denylist in'
+                ' path and add the new file path in the denylist in'
                 ' the file scripts/check_frontend_test_coverage.py.\n'
-                .format(test_name))
+                .format(test_path))
 
     if errors:
         print('------------------------------------')
@@ -277,7 +286,7 @@ def main(args: Optional[List[str]] = None) -> None:
     files_to_check = None
     if parsed_args.files_to_check:
         files_to_check = [
-            file_name.strip() for file_name in
+            file_path.strip() for file_path in
                 parsed_args.files_to_check.split(',')
         ]
     check_coverage_changes(files_to_check)
