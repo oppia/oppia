@@ -17,16 +17,7 @@
  * in editor.
  */
 
-import {
-  Component,
-  OnDestroy,
-  OnInit,
-  ElementRef,
-  ViewChild,
-  AfterViewInit,
-  AfterViewChecked,
-  Renderer2,
-} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
@@ -51,13 +42,7 @@ import {UserExplorationPermissionsService} from '../services/user-exploration-pe
   selector: 'oppia-editor-navigation',
   templateUrl: './editor-navigation.component.html',
 })
-export class EditorNavigationComponent
-  implements OnInit, OnDestroy, AfterViewInit, AfterViewChecked
-{
-  @ViewChild('navbarMobileContainer', {static: false})
-  navbarMobileContainer: ElementRef;
-  @ViewChild('mobileNavIcon', {static: false}) mobileNavIcon: ElementRef;
-
+export class EditorNavigationComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   autosaveIsInProgress: boolean = false;
   screenIsLarge: boolean = false;
@@ -81,7 +66,6 @@ export class EditorNavigationComponent
     private explorationWarningsService: ExplorationWarningsService,
     private internetConnectivityService: InternetConnectivityService,
     private ngbModal: NgbModal,
-    private renderer: Renderer2,
     private routerService: RouterService,
     private siteAnalyticsService: SiteAnalyticsService,
     private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
@@ -159,29 +143,8 @@ export class EditorNavigationComponent
       );
   }
 
-  ngAfterViewInit(): void {
-    this.updateMobileNavIconPosition();
-  }
-
-  ngAfterViewChecked(): void {
-    this.updateMobileNavIconPosition();
-  }
-
   toggleMobileNavOptions(): void {
     this.mobileNavOptionsAreShown = !this.mobileNavOptionsAreShown;
-    this.updateMobileNavIconPosition();
-  }
-
-  updateMobileNavIconPosition(): void {
-    const navbarHeight = this.navbarMobileContainer.nativeElement.offsetHeight;
-    const transformValue = this.mobileNavOptionsAreShown
-      ? `translateY(-${navbarHeight}px)`
-      : 'translateY(0)';
-    this.renderer.setStyle(
-      this.mobileNavIcon.nativeElement,
-      'transform',
-      transformValue
-    );
   }
 
   countWarnings(): number {
