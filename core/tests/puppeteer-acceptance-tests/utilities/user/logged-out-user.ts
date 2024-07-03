@@ -55,7 +55,6 @@ const OppiaAnnounceGoogleGroupUrl = testConstants.URLs.OppiaAnnounceGoogleGroup;
 const partnershipsBrochureUrl = testConstants.URLs.PartnershipsBrochure;
 const partnershipsFormInPortugueseUrl =
   testConstants.URLs.PartnershipsFormInPortuguese;
-const partnershipsFormShortUrl = testConstants.URLs.PartnershipsFormShortUrl;
 const partnershipsFormUrl = testConstants.URLs.PartnershipsForm;
 const partnershipsUrl = testConstants.URLs.Partnerships;
 const privacyPolicyUrl = testConstants.URLs.PrivacyPolicy;
@@ -64,21 +63,9 @@ const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
 const teachUrl = testConstants.URLs.Teach;
 const termsUrl = testConstants.URLs.Terms;
 const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
-const volunteerFormShortUrl = testConstants.URLs.VolunteerFormShortUrl;
 const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
-
-const allowedVolunteerFormUrls = [
-  volunteerFormUrl,
-  `${volunteerFormUrl}?usp=send_form`,
-  volunteerFormShortUrl,
-];
-const allowedPartnershipsFormUrls = [
-  partnershipsFormShortUrl,
-  partnershipsFormUrl,
-  `${partnershipsFormUrl}?usp=send_form`,
-];
 const impactReportUrl = testConstants.URLs.ImpactReportUrl;
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
@@ -1290,35 +1277,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click a button and check if it opens any of the allowedUrls
-   * in a new tab. Closes the tab afterwards. This function is useful when we try to
-   * verify Google Form URLs which changes in a short span of time.
-   */
-  private async clickLinkButtonToNewTabAndVerifyAllowedUrls(
-    button: string,
-    buttonName: string,
-    allowedUrls: string[],
-    expectedDestinationPageName: string
-  ): Promise<void> {
-    const pageTarget = this.page.target();
-    await this.clickOn(button);
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
-    const newTabPage = await newTarget.page();
-
-    expect(newTabPage).toBeDefined();
-    const newTabPageUrl = newTabPage?.url() as string;
-    if (!allowedUrls.includes(newTabPageUrl)) {
-      throw new Error(
-        `${buttonName} should open ${expectedDestinationPageName} page` +
-          `but it opens ${newTabPageUrl} instead.`
-      );
-    }
-    await newTabPage?.close();
-  }
-
-  /**
    * Function to change the site language to the given language code.
    * @param langCode - The language code to change the site language to. Example: 'pt-br', 'en'
    */
@@ -1343,13 +1301,10 @@ export class LoggedOutUser extends BaseUser {
    * The button is in the first section of the page.
    */
   async clickPartnerWithUsButtonInPartnershipsPage(): Promise<void> {
-    // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
-    // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
-    // control.So we need to check for all the 3 URLs as all of them are valid.
-    await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
+    await this.clickLinkButtonToNewTab(
       partnerWithUsButtonAtTheTopOfPartnershipsPage,
       'Partner With Us button at the bottom of the Partnerships page',
-      allowedPartnershipsFormUrls,
+      partnershipsFormUrl,
       'Partnerships Google Form'
     );
   }
@@ -1365,15 +1320,13 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.changeSiteLanguage(langCode);
 
-    // Here we are not verifying the 3 URLs as we did in the English version
-    // because we have put the direct translated Google Form URL in the page itself.
-    // Refer core/templates/pages/partnerships-page/partnerships-page.component.ts to see how it's done.
     await this.clickLinkButtonToNewTab(
       partnerWithUsButtonAtTheBottomOfPartnershipsPage,
       'Partner With Us button at the bottom of the Partnerships page',
       partnershipsFormInPortugueseUrl,
       'Partnerships Google Form'
     );
+    await this.changeSiteLanguage('en');
   }
 
   /**
@@ -1381,6 +1334,19 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Partnerships Brochure.
    */
   async clickDownloadBrochureButtonInPartnershipsPage(): Promise<void> {
+    const buttonText = (await this.page.$eval(
+      brochureButtonInPartnershipsPage,
+      element => element.textContent
+    )) as string;
+    if (buttonText.trim() !== 'Download Brochure') {
+      throw new Error('The "Download Brochure" button does not exist!');
+    }
+
+    // Scroll into the view to make the button visible.
+    await this.page.$eval(brochureButtonInPartnershipsPage, element =>
+      element.scrollIntoView()
+    );
+
     await this.openExternalPdfLink(
       brochureButtonInPartnershipsPage,
       partnershipsBrochureUrl
@@ -1432,14 +1398,10 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Volunteer form.
    */
   async clickApplyToVolunteerAtTheTopOfVolunteerPage(): Promise<void> {
-    // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
-    // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
-    // control.So we need to check for all the 3 URLs in the 'allowedVolunteerFormUrls' array
-    // as all of them are valid.
-    await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
+    await this.clickLinkButtonToNewTab(
       applyToVolunteerButtonAtTheTopOfVolunteerPage,
       'Apply To Volunteer at the top of the Volunteer page',
-      allowedVolunteerFormUrls,
+      volunteerFormUrl,
       'Volunteer Form'
     );
   }
@@ -1449,14 +1411,10 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Volunteer form.
    */
   async clickApplyToVolunteerAtTheBottomOfVolunteerPage(): Promise<void> {
-    // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
-    // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
-    // control.So we need to check for all the 3 URLs in the 'allowedVolunteerFormUrls' array
-    // as all of them are valid.
-    await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
+    await this.clickLinkButtonToNewTab(
       applyToVolunteerButtonAtTheBottomOfVolunteerPage,
       'Apply To Volunteer at the bottom of the Volunteer page',
-      allowedVolunteerFormUrls,
+      volunteerFormUrl,
       'Volunteer Form'
     );
   }
@@ -1731,14 +1689,10 @@ export class LoggedOutUser extends BaseUser {
     const volunteerWithOppiaButtonInAboutPage = this.isViewportAtMobileWidth()
       ? volunteerWithOppiaMobileButtonInAboutPage
       : volunteerWithOppiaDesktopButtonInAboutPage;
-    // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
-    // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
-    // control.So we need to check for all the 3 URLs in the 'allowedVolunteerFormUrls' array
-    // as all of them are valid.
-    await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
+    await this.clickLinkButtonToNewTab(
       volunteerWithOppiaButtonInAboutPage,
       'Apply To Volunteer at the top of the Volunteer page',
-      allowedVolunteerFormUrls,
+      volunteerFormUrl,
       'Volunteer Form'
     );
   }
@@ -1789,20 +1743,8 @@ export class LoggedOutUser extends BaseUser {
       ? partnerMobileTabInAboutPage
       : partnerDesktopTabInAboutPage;
 
-    const partnerWithUsButtonInAboutPage = this.isViewportAtMobileWidth()
-      ? partnerWithUsMobileButtonInAboutPage
-      : partnerWithUsDesktopButtonInAboutPage;
-
     await this.clickOn(partnerTab);
-    // The Google Form URL changes from the 1st to the 2nd and from 2nd to the
-    // 3rd in a short span of 500-1000 ms for it's own reasons which we can't
-    // control.So we need to check for all the 3 URLs as all of them are valid.
-    await this.clickLinkButtonToNewTabAndVerifyAllowedUrls(
-      partnerWithUsButtonInAboutPage,
-      'Partner With Us button at the bottom of the Partnerships page',
-      allowedPartnershipsFormUrls,
-      'Partnerships Google Form'
-    );
+    await this.clickLinkAnchorToNewTab('Partner with us', partnershipsFormUrl);
   }
 
   /**
@@ -1825,12 +1767,9 @@ export class LoggedOutUser extends BaseUser {
       : partnerWithUsDesktopButtonInAboutPage;
 
     await this.clickOn(partnerTab);
-    // Here we are not verifying the 3 URLs as we did in the English version
-    // because we have put the direct translated Google Form URL in the page itself.
-    // Refer core/templates/pages/partnerships-page/partnerships-page.component.ts to see how it's done.
     await this.clickLinkButtonToNewTab(
       partnerWithUsButtonInAboutPage,
-      'Partner With Us button at the bottom of the Partnerships page',
+      `Partner With Us button in About page, after changing the language to ${langCode},`,
       partnershipsFormInPortugueseUrl,
       'Partnerships Google Form'
     );
