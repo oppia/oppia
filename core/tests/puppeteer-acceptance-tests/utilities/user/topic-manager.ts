@@ -647,7 +647,10 @@ export class TopicManager extends BaseUser {
    * @returns {Promise<void>}
    */
   async expectFilteredSkills(expectedSkills: string[]): Promise<void> {
-    const skillElements = await this.page.$$('.e2e-test-skill-description');
+    const skillDescriptionSelector = '.e2e-test-skill-description';
+    await this.page.waitForSelector(skillDescriptionSelector);
+
+    const skillElements = await this.page.$$(skillDescriptionSelector);
     const skillDescriptions = await Promise.all(
       skillElements.map(element =>
         this.page.evaluate(el => el.textContent, element)
@@ -672,7 +675,10 @@ export class TopicManager extends BaseUser {
    * @param {string[]} expectedOrder - The expected order of skills.
    */
   async expectSkillsInOrder(expectedOrder: string[]): Promise<void> {
-    const skillElements = await this.page.$$('.e2e-test-skill-description');
+    const skillDescriptionSelector = '.e2e-test-skill-description';
+    await this.page.waitForSelector(skillDescriptionSelector);
+
+    const skillElements = await this.page.$$(skillDescriptionSelector);
     const skillDescriptions = await Promise.all(
       skillElements.map(element =>
         this.page.evaluate(el => el.textContent, element)
@@ -688,18 +694,33 @@ export class TopicManager extends BaseUser {
     showMessage('Skills are in the expected order.');
   }
 
+  /**
+   * Checks if the skill page changes after clicking the 'Next' button.
+   * @param {boolean} shouldChange - Indicates whether the page is expected to change.
+   */
   async checkIfSkillPageChangesAfterClickingNext(
     shouldChange: boolean
   ): Promise<void> {
+    const skillDescriptionContainer = '.e2e-test-skill-description';
+    const nextPageButton = '.e2e-test-next-page-button';
+
+    await this.page.waitForSelector(skillDescriptionContainer);
+
     const initialSkill = await this.page.$eval(
-      '.e2e-test-skill-description',
+      skillDescriptionContainer,
       skill => skill.textContent
     );
-    await this.clickOn('.e2e-test-next-page-button');
+
+    await this.page.waitForSelector(nextPageButton);
+    await this.page.click(nextPageButton);
+
+    await this.page.waitForSelector(skillDescriptionContainer);
+
     const finalSkill = await this.page.$eval(
-      '.e2e-test-skill-description',
+      skillDescriptionContainer,
       skill => skill.textContent
     );
+
     if (shouldChange && initialSkill === finalSkill) {
       throw new Error(
         'Expected the page to change when clicking the next page button, but it did not.'

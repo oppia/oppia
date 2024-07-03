@@ -32,7 +32,7 @@ describe('Topic Manager User Journey', function () {
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdmin',
+      'curriculumAdm',
       'curriculum_Admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
@@ -63,6 +63,7 @@ describe('Topic Manager User Journey', function () {
       throw new Error('Error publishing exploration successfully.');
     }
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
   it(
     'should create a topic, add a subtopic, story, and chapters to it.',
     async function () {
@@ -134,6 +135,7 @@ describe('Topic Manager User Journey', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
