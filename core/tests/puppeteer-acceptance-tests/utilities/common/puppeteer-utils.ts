@@ -33,7 +33,9 @@ const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const acceptedBrowserAlerts = [
   '',
   'Changes that you made may not be saved.',
+  'This action is irreversible.',
   'This action is irreversible. Are you sure?',
+  'This action is irreversible. If you insist to proceed, please enter the commit message for the update',
 ];
 
 interface ClickDetails {
@@ -434,7 +436,7 @@ export class BaseUser {
     selector: string,
     expectedUrl: string
   ): Promise<void> {
-    await this.page.waitForSelector(selector);
+    await this.page.waitForSelector(selector, {visible: true});
     const href = await this.page.$eval(selector, element =>
       element.getAttribute('href')
     );
