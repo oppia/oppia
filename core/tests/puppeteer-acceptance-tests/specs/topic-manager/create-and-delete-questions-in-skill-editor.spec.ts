@@ -39,7 +39,6 @@ describe('Topic Manager User Journey', function () {
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Mathematics', 'math');
     await curriculumAdmin.createSkillForTopic('Addition', 'Mathematics');
-    await curriculumAdmin.createSkillForTopic('Subtraction', 'Mathematics');
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',

@@ -273,7 +273,8 @@ export class TopicManager extends BaseUser {
         `Skill options element not found for skill "${skillName}"`
       );
     }
-    await this.clickOn(skillOptions);
+    await this.waitForElementToBeClickable(skillOptionsElement);
+    await skillOptionsElement.click();
 
     await this.page.waitForSelector(unassignSkillSelector);
     const unassignSkillSelectorElement = await this.page.$(
@@ -294,7 +295,6 @@ export class TopicManager extends BaseUser {
         topicNameSpan,
         el => el.textContent
       );
-      console.log(labelTopicName, topicName);
       if (labelTopicName === topicName) {
         const checkbox = await topicLabel.$(unassignTopicCheckbox);
         if (!checkbox) {
@@ -421,7 +421,8 @@ export class TopicManager extends BaseUser {
     if (!assignSkillButtonElement) {
       throw new Error('Assign skill button not found');
     }
-    await this.clickOn(assignSkillButton);
+    await this.waitForElementToBeClickable(assignSkillButtonElement);
+    await assignSkillButtonElement.click();
 
     await this.page.waitForSelector(topicNameSelector);
     const topicNames = await this.page.$$(topicNameSelector);
@@ -482,7 +483,8 @@ export class TopicManager extends BaseUser {
     if (!mergeSkillsButtonElement) {
       throw new Error('Merge skills button not found');
     }
-    await this.clickOn(mergeSkillsButton);
+    await this.waitForElementToBeClickable(mergeSkillsButtonElement);
+    await mergeSkillsButtonElement.click();
 
     await this.page.waitForSelector(skillNameInputSelector);
     const skillNameInputSelectorElement = await this.page.$(

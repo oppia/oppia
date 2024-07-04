@@ -65,7 +65,7 @@ describe('Topic Manager User Journey', function () {
         'The skill has been assigned to the topic.'
       );
 
-      // unassigning the skill from the topic because two skills assigned to some topic cannot be merged.
+      // Unassigning the skill from the topic because two skills assigned to some topic cannot be merged.
       await topicManager.unassignSkillFromTopic('Subtraction', 'Mathematics');
       await topicManager.expectToastMessageToBe(
         'The skill has been unassigned to the topic.'
