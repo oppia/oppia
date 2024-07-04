@@ -96,14 +96,19 @@ const removeQuestionConfirmationButton =
   '.e2e-test-remove-question-confirmation-button';
 const questionPreviewTab = '.e2e-test-question-preview-tab';
 const questionTextInput = '.e2e-test-question-text-input';
-const questionData = '.question-data';
-const questionContentSelector = 'oppia-learner-view-card-top-content';
-const textInputInteractionField = '.e2e-test-description-box';
+const questionContentSelector = '.e2e-test-conversation-content';
+const numericInputInteractionField = '.e2e-test-conversation-input';
 const skillNameInputSelector = '.e2e-test-skill-name-input';
 const radioInnerCircleSelector = '.mat-radio-inner-circle';
 const confirmSkillSelectionButtonSelector =
   '.e2e-test-confirm-skill-selection-button';
-const questionTextSelector = '.question-text';
+const questionTextSelector = '.e2e-test-question-text';
+
+const navigationDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
+const mobilePreviewTab = '.e2e-test-mobile-preview-tab';
+const mobileQuestionsTab = '.e2e-test-mobile-questions-tab';
+
+const mobileNavbarOptions = '.navbar-mobile-options';
 
 export class TopicManager extends BaseUser {
   /**
@@ -113,6 +118,51 @@ export class TopicManager extends BaseUser {
     await this.page.bringToFront();
     await this.page.waitForNetworkIdle();
     await this.goto(topicAndSkillsDashboardUrl);
+  }
+
+  /**
+   * Navigate to the question editor tab.
+   */
+  async navigateToQuestionEditorTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      if ((await this.page.$(mobileNavbarOptions)) === null) {
+        await this.clickOn(mobileOptionsSelector);
+      } else {
+        await this.clickOn(mobileOptionsSelector);
+        await this.clickOn(mobileOptionsSelector);
+      }
+
+      await this.page.waitForSelector(navigationDropdown);
+      const navDropdownElements = await this.page.$$(navigationDropdown);
+      await this.waitForElementToBeClickable(navDropdownElements[1]);
+      await this.page.evaluate(el => el.click(), navDropdownElements[1]);
+
+      await this.page.waitForSelector(mobileQuestionsTab);
+      await this.clickOn(mobileQuestionsTab);
+    } else {
+      await this.page.waitForSelector(questionTab);
+      await this.clickOn(questionTab);
+    }
+  }
+
+  /**
+   * Function to navigate to the question preview tab.
+   */
+  async navigateToQuestionPreviewTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsSelector);
+
+      await this.page.waitForSelector(navigationDropdown);
+      const navDropdownElements = await this.page.$$(navigationDropdown);
+      await this.waitForElementToBeClickable(navDropdownElements[1]);
+      await navDropdownElements[1].click();
+
+      await this.page.waitForSelector(mobilePreviewTab);
+      await this.clickOn(mobilePreviewTab);
+    } else {
+      await this.page.waitForSelector(questionPreviewTab);
+      await this.clickOn(questionPreviewTab);
+    }
   }
 
   /**
@@ -363,24 +413,29 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Navigate to the question editor tab.
-   */
-  async navigateToQuestionEditorTab(): Promise<void> {
-    await this.page.waitForSelector(questionTab);
-    await this.clickOn(questionTab);
-  }
-
-  /**
    * Create questions for a skill.
    * @param {string} skillName - The name of the skill for which to create questions.
    */
   async expectToastMessageToBe(expectedMessage: string): Promise<void> {
-    await this.page.waitForSelector(toastMessageSelector, {visible: true});
-    const actualMessage = await this.page.$eval(
-      toastMessageSelector,
-      el => el.textContent
-    );
-    expect(actualMessage?.trim()).toEqual(expectedMessage);
+    try {
+      await this.page.waitForFunction(
+        (selector: string, expectedText: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.trim() === expectedText.trim();
+        },
+        {timeout: 5000},
+        toastMessageSelector,
+        expectedMessage
+      );
+    } catch (error) {
+      const actualMessage = await this.page.$eval(toastMessageSelector, el =>
+        el.textContent?.trim()
+      );
+
+      throw new Error(
+        `Text did not match within the specified time. Actual message: "${actualMessage}", expected message: "${expectedMessage}"`
+      );
+    }
   }
 
   /**
@@ -523,52 +578,54 @@ export class TopicManager extends BaseUser {
    * @param {string} questionText - The text of the question to delete.
    */
   async deleteQuestion(questionText: string): Promise<void> {
-    await this.page.waitForSelector(editQuestionButtons);
-    const buttons = await this.page.$$(editQuestionButtons);
-    let questionFound = false;
+    try {
+      await this.page.waitForSelector(editQuestionButtons);
+      const buttons = await this.page.$$(editQuestionButtons);
+      if (!editQuestionButtons) {
+        throw new Error('Edit question buttons not found');
+      }
 
-    for (const button of buttons) {
-      const questionTextElement = await button.$(questionTextSelector);
-      if (questionTextElement) {
-        const text = await questionTextElement.$eval(
-          'span',
+      for (const button of buttons) {
+        await button.waitForSelector(questionTextSelector);
+        const text = await button.$eval(
+          questionTextSelector,
           el => el.textContent
         );
-        if (text === questionText) {
-          const icon = await button.$(linkOffIcon);
-          if (icon) {
-            await icon.click();
-            questionFound = true;
-            break;
-          } else {
-            throw new Error(
-              `Link off icon not found for question "${questionText}"`
-            );
-          }
+        if (text !== questionText) {
+          continue;
         }
+
+        await button.waitForSelector(linkOffIcon);
+        const deleteButton = await button.$(linkOffIcon);
+        if (!deleteButton) {
+          throw new Error(
+            `Link off icon not found for question "${questionText}"`
+          );
+        }
+
+        await this.waitForElementToBeClickable(deleteButton);
+        await deleteButton.click();
+
+        await this.page.waitForSelector(removeQuestionConfirmationButton);
+        const removeQuestionConfirmationButtonElement = await this.page.$(
+          removeQuestionConfirmationButton
+        );
+        if (!removeQuestionConfirmationButtonElement) {
+          throw new Error('Remove question confirmation button not found');
+        }
+
+        await this.waitForElementToBeClickable(
+          removeQuestionConfirmationButtonElement
+        );
+        await removeQuestionConfirmationButtonElement.click();
+        return;
       }
-    }
 
-    if (!questionFound) {
       throw new Error(`Question "${questionText}" not found`);
+    } catch (error) {
+      console.error(`Error deleting question: ${error.message}`);
+      throw error;
     }
-
-    await this.page.waitForSelector(removeQuestionConfirmationButton);
-    const removeQuestionConfirmationButtonElement = await this.page.$(
-      removeQuestionConfirmationButton
-    );
-    if (!removeQuestionConfirmationButtonElement) {
-      throw new Error('Remove question confirmation button not found');
-    }
-    await this.clickOn(removeQuestionConfirmationButton);
-  }
-
-  /**
-   * Function to navigate to the question preview tab.
-   */
-  async navigateToQuestionPreviewTab(): Promise<void> {
-    await this.page.waitForSelector(questionPreviewTab);
-    await this.clickOn(questionPreviewTab);
   }
 
   /**
@@ -576,12 +633,14 @@ export class TopicManager extends BaseUser {
    * @param {string} questionText - The text of the question to preview.
    */
   async previewQuestion(questionText: string): Promise<void> {
-    await this.page.waitForSelector(questionTextInput);
-    await this.page.type(questionTextInput, questionText);
-    await this.page.keyboard.press('Enter');
-
-    await this.page.waitForSelector(questionData);
-    await this.clickOn(questionData);
+    try {
+      await this.waitForElementToBeClickable(questionTextInput);
+      await this.type(questionTextInput, questionText);
+      await this.page.keyboard.press('Enter');
+    } catch (error) {
+      console.error(`Error previewing question: ${error.message}`);
+      throw error;
+    }
   }
 
   /**
@@ -589,22 +648,27 @@ export class TopicManager extends BaseUser {
    * @param {string} expectedText - The expected question text.
    */
   async expectPreviewQuestionText(expectedText: string): Promise<void> {
-    await this.page.waitForSelector(questionContentSelector);
-    const questionContentElement = await this.page.$(questionContentSelector);
+    try {
+      await this.page.waitForSelector(questionContentSelector);
+      const questionContentElement = await this.page.$(questionContentSelector);
 
-    if (!questionContentElement) {
-      throw new Error('Question content element not found');
-    }
+      if (!questionContentElement) {
+        throw new Error('Question content element not found');
+      }
 
-    const questionText = await this.page.evaluate(
-      element => element.textContent,
-      questionContentElement
-    );
-
-    if (questionText !== expectedText) {
-      throw new Error(
-        `Expected question text to be "${expectedText}", but it was "${questionText}"`
+      const questionText = await this.page.evaluate(
+        element => element.textContent,
+        questionContentElement
       );
+
+      if (questionText !== expectedText) {
+        throw new Error(
+          `Expected question text to be "${expectedText}", but it was "${questionText}"`
+        );
+      }
+    } catch (error) {
+      console.error(`Error in expectPreviewQuestionText: ${error.message}`);
+      throw error;
     }
   }
 
@@ -613,26 +677,30 @@ export class TopicManager extends BaseUser {
    * @param {string} expectedType - The expected interaction type.
    */
   async expectPreviewInteractionType(expectedType: string): Promise<void> {
-    let selector: string;
+    try {
+      let selector: string;
 
-    // Add cases for different interaction types here.
-    // For each case, set the selector to the corresponding element for that interaction type.
-    switch (expectedType) {
-      case 'Text Input':
-        selector = textInputInteractionField;
-        break;
-      // Add more cases as needed.
-      default:
-        throw new Error(`Unsupported interaction type: ${expectedType}`);
-    }
+      // Add cases for different interaction types here.
+      // For each case, set the selector to the corresponding element for that interaction type.
+      switch (expectedType) {
+        case 'Numeric Input':
+          selector = numericInputInteractionField;
+          break;
+        // Add more cases as needed.
+        default:
+          throw new Error(`Unsupported interaction type: ${expectedType}`);
+      }
 
-    await this.page.waitForSelector(selector);
-    const element = await this.page.$(selector);
-
-    if (!element) {
-      throw new Error(
-        `Expected to find element for interaction type "${expectedType}", but it was not found`
-      );
+      await this.page.waitForSelector(selector);
+      const element = await this.page.$(selector);
+      if (!element) {
+        throw new Error(
+          `Expected to find element for interaction type "${expectedType}", but it was not found`
+        );
+      }
+    } catch (error) {
+      console.error(`Error in expectPreviewInteractionType: ${error.message}`);
+      throw error;
     }
   }
 }

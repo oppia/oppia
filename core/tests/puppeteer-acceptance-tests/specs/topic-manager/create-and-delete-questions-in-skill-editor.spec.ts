@@ -23,7 +23,7 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
-const questionText = 'What is 2 + 2?';
+const questionText = 'Add 1+2';
 
 describe('Topic Manager User Journey', function () {
   let topicManager: TopicManager & CurriculumAdmin;
@@ -66,13 +66,11 @@ describe('Topic Manager User Journey', function () {
       await topicManager.navigateToQuestionPreviewTab();
       await topicManager.previewQuestion(questionText);
       await topicManager.expectPreviewQuestionText(questionText);
-      await topicManager.expectPreviewInteractionType('Multiple Choice');
+      await topicManager.expectPreviewInteractionType('Numeric Input');
 
       await topicManager.navigateToQuestionEditorTab();
       await topicManager.deleteQuestion(questionText);
-      await topicManager.expectToastMessageToBe(
-        'Question deleted successfully.'
-      );
+      await topicManager.expectToastMessageToBe('Question Removed');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
