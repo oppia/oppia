@@ -44,7 +44,7 @@ describe('Topic Manager User Journey', function () {
       'topicManager',
       'topic_manager@example.com',
       [ROLES.TOPIC_MANAGER],
-      ['Addition', 'Subtraction']
+      ['Addition']
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
