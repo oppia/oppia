@@ -31,6 +31,7 @@ const ccLicenseUrl = testConstants.URLs.CCLicense;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
+const classroomsPage = testConstants.URLs.ClassroomsPage;
 const desktopWatchAVideoUrl = testConstants.URLs.DesktopExternalLinkWatchAVideo;
 const donateUrl = testConstants.URLs.Donate;
 const electromagnetismUrl = testConstants.URLs.Electromagnetism;
@@ -214,6 +215,12 @@ const emailLinkSelector = '.oppia-contact-mail';
 const mobileDonateButtonOnDonatePage = '.donate-modal-button';
 const donateModalIframeSelector = '.e2e-test-donate-page-iframe';
 
+const classroomNameHeading = '.e2e-test-classroom-name';
+
+const errorPageHeading = '.e2e-test-error-page-heading';
+
+const classroomTileContainer = '.oppia-classroom-tile-container';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -307,6 +314,23 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToContactUsPage(): Promise<void> {
     await this.goto(contactUrl);
+  }
+
+  /**
+   * Function to navigate to the classroom page.
+   */
+  async navigateToClassroomPage(urlFragment: string): Promise<void> {
+    await this.goto(`${classroomsPage}/${urlFragment}`);
+  }
+
+  /**
+   * Function to navigate to the classrooms page.
+   */
+  async navigateToClassroomsPage(): Promise<void> {
+    if (this.page.url() === classroomsPage) {
+      await this.page.reload();
+    }
+    await this.goto(classroomsPage);
   }
 
   /**
@@ -1829,6 +1853,72 @@ export class LoggedOutUser extends BaseUser {
     } else {
       return;
     }
+  }
+
+  /**
+   * This function verifies that the user is on the correct classroom page.
+   */
+  async expectToBeOnClassroomPage(classroomName: string): Promise<void> {
+    await this.page.waitForSelector(classroomNameHeading);
+
+    const buttonText = await this.page.$eval(
+      classroomNameHeading,
+      element => (element as HTMLHeadElement).innerText
+    );
+
+    if (buttonText !== classroomName) {
+      throw new Error(
+        `The ${classroomName} classroom name is not visible. URL: ${this.page.url()}`
+      );
+    } else {
+      showMessage(`The ${classroomName} classroom name is visible.`);
+    }
+  }
+
+  /**
+   * This function verifies that the classroom cards in classrooms page.
+   */
+  async expectClassroomCountInClassroomsPageToBe(
+    classroomsCount: number
+  ): Promise<void> {
+    await this.page.waitForSelector(classroomTileContainer);
+    const classroomTiles = await this.page.$$(classroomTileContainer);
+
+    if (classroomTiles.length === classroomsCount) {
+      showMessage(
+        `${classroomsCount} classrooms are present in classrooms page.`
+      );
+    } else {
+      throw new Error(
+        `Expect ${classroomsCount} classrooms to be present in classrooms page, found: ${classroomTiles.length} classrooms.`
+      );
+    }
+  }
+
+  /**
+   * This function verifies that the user is on the correct classroom page.
+   */
+  async expectToBeOnErrorPage(statusCode: number): Promise<void> {
+    await this.page.waitForSelector(errorPageHeading);
+
+    const errorText = await this.page.$eval(
+      errorPageHeading,
+      element => (element as HTMLSpanElement).textContent
+    );
+
+    if (!errorText) {
+      throw new Error(`Error text is not visible. URL: ${this.page.url()}`);
+    }
+
+    const currentStatusCode = Number(errorText.split(' ')[1]);
+
+    if (currentStatusCode !== statusCode) {
+      throw new Error(
+        `Expected status code to be ${statusCode}, found: ${currentStatusCode}`
+      );
+    }
+
+    showMessage(`User is on error page with status code ${statusCode}.`);
   }
 }
 

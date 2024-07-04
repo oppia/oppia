@@ -120,7 +120,7 @@ export class TestToModulesMatcher {
    * Registers a URL and matches it with an Angular module.
    */
   public static registerUrl(url: string): void {
-    if (!url.startsWith(LOCALHOST_URL)) {
+    if (!url.startsWith(LOCALHOST_URL) || url.includes('/error')) {
       return;
     }
     const path = url.replace(LOCALHOST_URL, '');

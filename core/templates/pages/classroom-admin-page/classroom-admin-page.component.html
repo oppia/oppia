@@ -17,7 +17,7 @@
       <div *ngFor="let classroom of classroomIdToClassroomName | keyvalue">
         <div class="oppia-classroom-tile e2e-test-classroom-tile"
              (click)="getClassroomData(classroom.key)">
-          <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())">
+          <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())" class="e2e-test-classroom-tile-name">
             {{ classroom.value }}
           </span>
           <span *ngIf="classroomEditorMode && classroom.key === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length > 0" class="classroom-tile-name">
@@ -27,6 +27,7 @@
             [New Classroom]
           </span>
           <button mat-button matSuffix mat-icon-button
+                  class="e2e-test-delete-classroom-button"
                   aria-label="Clear"
                   *ngIf="!classroomEditorMode"
                   (click)="deleteClassroom(classroom.key); $event.stopPropagation()">
@@ -248,7 +249,7 @@
                   <mat-form-field appearance="fill" class="topics-selector-form-field e2e-test-classroom-topics-modal">
                     <mat-label for="explorationCategory" class="d-block">Select a topic</mat-label>
                     <mat-select (selectionChange)="onNewTopicInputModelChange($event.value)" class="e2e-test-classroom-category-dropdown">
-                      <mat-option class="e2e-test-exploration-new-category-add">
+                      <mat-option class="e2e-test-classroom-new-topic-add">
                         <ngx-mat-select-search
                           ngModel
                           (ngModelChange)="filterTopicsByName($event)"

@@ -17,6 +17,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked.spec.ts"
     },
     {
+      "name": "curriculum-admin/create-edit-and-delete-classroom",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-edit-and-delete-classroom.spec.ts"
+    },
+    {
       "name": "curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill",
       "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill.spec.ts"
     },
@@ -103,6 +107,10 @@
     {
       "name": "logged-out-user/click-all-buttons-on-donate-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-donate-page.spec.ts"
+    },
+    {
+      "name": "logged-out-user/visit-classroom-index-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/visit-classroom-index-page.spec.ts"
     },
     {
       "name": "moderator/edit-featured-activities-list",
