@@ -17,6 +17,7 @@
  */
 
 import {BaseUser} from '../common/puppeteer-utils';
+import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
 import {ElementHandle} from 'puppeteer';
 
@@ -50,8 +51,10 @@ const confirmUnassignSkillButton = '.e2e-test-confirm-unassign-skill-button';
 const unassignTopicLabel = '.e2e-test-unassign-topic-label';
 const unassignTopicCheckbox = '.e2e-test-unassign-topic';
 const topicNameSpan = '.topic-name';
-const skillItemSelector = '.e2e-test-skill-item';
-const skillDescriptionSelector = '.e2e-test-skill-description';
+const desktopSkillItemSelector = '.e2e-test-skill-item';
+const mobileSkillItemSelector = '.e2e-test-mobile-skill-item';
+const desktopSkillDescriptionSelector = '.e2e-test-skill-description';
+const mobileSkillDescriptionSelector = '.e2e-test-mobile-skill-name';
 const assignSkillButtonDesktop = '.e2e-test-assign-skill-to-topic-button';
 const assignSkillButtonMobile = '.e2e-test-mobile-assign-skill-to-topic-button';
 const topicNameSelector = '.e2e-test-topic-name-in-topic-select-modal';
@@ -262,10 +265,9 @@ export class TopicManager extends BaseUser {
     if (!skillItem) {
       throw new Error(`Skill "${skillName}" not found`);
     }
-    await skillItem.click();
 
-    await this.page.waitForSelector(skillOptions);
-    const skillOptionsElement = await this.page.$(skillOptions);
+    await skillItem.waitForSelector(skillOptions);
+    const skillOptionsElement = await skillItem.$(skillOptions);
     if (!skillOptionsElement) {
       throw new Error(
         `Skill options element not found for skill "${skillName}"`
@@ -284,6 +286,7 @@ export class TopicManager extends BaseUser {
     await unassignSkillSelectorElement.click();
 
     // Select the topic to unassign from.
+    await this.page.waitForSelector(unassignTopicLabel);
     const topicLabels = await this.page.$$(unassignTopicLabel);
     let topicFound = false;
     for (const topicLabel of topicLabels) {
@@ -321,6 +324,14 @@ export class TopicManager extends BaseUser {
    * @param {string} skillName - The name of the skill to select.
    */
   async selectSkill(skillName: string): Promise<ElementHandle> {
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const skillItemSelector = isMobileWidth
+      ? mobileSkillItemSelector
+      : desktopSkillItemSelector;
+    const skillDescriptionSelector = isMobileWidth
+      ? mobileSkillDescriptionSelector
+      : desktopSkillDescriptionSelector;
+
     await this.page.waitForSelector(skillItemSelector);
     const skillItems = await this.page.$$(skillItemSelector);
 
@@ -329,6 +340,7 @@ export class TopicManager extends BaseUser {
     }
 
     for (const skillItem of skillItems) {
+      await skillItem.waitForSelector(skillDescriptionSelector);
       const descriptionElement = await skillItem.$(skillDescriptionSelector);
       if (!descriptionElement) {
         throw new Error(
@@ -341,7 +353,8 @@ export class TopicManager extends BaseUser {
         descriptionElement
       );
 
-      if (description === skillName) {
+      if (description.trim() === skillName) {
+        showMessage(`Found skill with name ${skillName}`);
         return skillItem;
       }
     }
