@@ -124,6 +124,16 @@ export class EntityTranslationsService {
     );
   }
 
+  markAllTranslationsAsNeedingUpdate(contentId: string): void {
+    Object.keys(this.languageCodeToLatestEntityTranslations).forEach(
+      (language: string) => {
+        this.languageCodeToLatestEntityTranslations[
+          language
+        ].markTranslationAsNeedingUpdate(contentId);
+      }
+    );
+  }
+
   converBulkTranslationsToBackendDict(
     languageCodeToEntityTranslations: LanguageCodeToEntityTranslations
   ): LanguageCodeToEntityTranslationBackendDict {
