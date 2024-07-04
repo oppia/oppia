@@ -610,8 +610,7 @@ var ExplorationEditorMainTab = function () {
       stateContentDisplay,
       'State content display not showing up'
     );
-    // Wait for any text to be present to reduce flakes.
-    await waitFor.nonEmptyText('State content display', stateContentDisplay);
+
     await forms
       .expectRichText(stateContentDisplay)
       .toMatch(richTextInstructions);
