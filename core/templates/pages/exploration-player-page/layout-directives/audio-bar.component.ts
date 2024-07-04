@@ -62,7 +62,7 @@ export class AudioBarComponent {
   languageAccentCodesToDescriptions!: LanguageAccentToDescription;
   languageAccentDecriptions: string[] = [];
   selectedLanguageAccentDescription!: string;
-  voiceoverToBePlayed!: Voiceover;
+  voiceoverToBePlayed!: Voiceover | undefined;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -407,10 +407,10 @@ export class AudioBarComponent {
 
   loadAndPlayAudioTranslation(): void {
     this.audioLoadingIndicatorIsShown = true;
-    let audioTranslation = this.getVoiceoverInCurrentLanguage();
+    let audioTranslation = this.getVoiceoverInCurrentLanguage() as Voiceover;
 
     if (this.isVoiceoverContributionWithAccentEnabled()) {
-      audioTranslation = this.voiceoverToBePlayed;
+      audioTranslation = this.voiceoverToBePlayed as Voiceover;
     }
 
     if (audioTranslation) {

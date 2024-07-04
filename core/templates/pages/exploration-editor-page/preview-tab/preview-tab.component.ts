@@ -259,7 +259,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
         this.entityVoiceoversService.init(
           this.contextService.getExplorationId(),
           'exploration',
-          explorationData.version,
+          explorationData.version as number,
           explorationData.language_code
         );
 
