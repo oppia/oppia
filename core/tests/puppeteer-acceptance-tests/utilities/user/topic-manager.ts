@@ -88,7 +88,7 @@ const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
 
 // Question Editor.
-const questionTab = '.e2e-test-questions-tab';
+const desktopSkillQuestionTab = '.e2e-test-questions-tab';
 const toastMessageSelector = '.e2e-test-toast-message';
 const editQuestionButtons = '.e2e-test-edit-question-button';
 const linkOffIcon = '.link-off-icon';
@@ -106,9 +106,7 @@ const questionTextSelector = '.e2e-test-question-text';
 
 const navigationDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
 const mobilePreviewTab = '.e2e-test-mobile-preview-tab';
-const mobileQuestionsTab = '.e2e-test-mobile-questions-tab';
-
-const mobileNavbarOptions = '.navbar-mobile-options';
+const mobileSkillQuestionTab = '.e2e-test-mobile-questions-tab';
 
 export class TopicManager extends BaseUser {
   /**
@@ -124,24 +122,25 @@ export class TopicManager extends BaseUser {
    * Navigate to the question editor tab.
    */
   async navigateToQuestionEditorTab(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      if ((await this.page.$(mobileNavbarOptions)) === null) {
-        await this.clickOn(mobileOptionsSelector);
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const skillQuestionTab = isMobileWidth
+      ? mobileSkillQuestionTab
+      : desktopSkillQuestionTab;
+
+    if (isMobileWidth) {
+      const currentUrl = new URL(this.page.url());
+      const hashParts = currentUrl.hash.split('/');
+
+      if (hashParts.length > 1) {
+        hashParts[1] = 'questions';
       } else {
-        await this.clickOn(mobileOptionsSelector);
-        await this.clickOn(mobileOptionsSelector);
+        hashParts.push('questions');
       }
-
-      await this.page.waitForSelector(navigationDropdown);
-      const navDropdownElements = await this.page.$$(navigationDropdown);
-      await this.waitForElementToBeClickable(navDropdownElements[1]);
-      await this.page.evaluate(el => el.click(), navDropdownElements[1]);
-
-      await this.page.waitForSelector(mobileQuestionsTab);
-      await this.clickOn(mobileQuestionsTab);
+      currentUrl.hash = hashParts.join('/');
+      await this.goto(currentUrl.toString());
+      await this.page.reload({waitUntil: 'networkidle0'});
     } else {
-      await this.page.waitForSelector(questionTab);
-      await this.clickOn(questionTab);
+      await this.clickAndWaitForNavigation(skillQuestionTab);
     }
   }
 
@@ -161,7 +160,7 @@ export class TopicManager extends BaseUser {
       await this.clickOn(mobilePreviewTab);
     } else {
       await this.page.waitForSelector(questionPreviewTab);
-      await this.clickOn(questionPreviewTab);
+      await this.clickAndWaitForNavigation(questionPreviewTab);
     }
   }
 
@@ -476,8 +475,7 @@ export class TopicManager extends BaseUser {
     if (!assignSkillButtonElement) {
       throw new Error('Assign skill button not found');
     }
-    await this.waitForElementToBeClickable(assignSkillButtonElement);
-    await assignSkillButtonElement.click();
+    await this.page.evaluate(el => el.click(), assignSkillButtonElement);
 
     await this.page.waitForSelector(topicNameSelector);
     const topicNames = await this.page.$$(topicNameSelector);
