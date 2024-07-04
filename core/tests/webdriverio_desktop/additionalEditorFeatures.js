@@ -228,7 +228,7 @@ describe('Full exploration editor', function () {
         }
       );
       await explorationEditorMainTab.setInteraction('NumericInput');
-      // Check display of content & interaction in the editor. 
+      // Check display of content & interaction in the editor.
       await explorationEditorMainTab.expectInteractionToMatch('NumericInput');
 
       // Check deletion of groups.
