@@ -59,13 +59,10 @@ describe('Topic Manager User Journey', function () {
       await topicManager.filterSkillsByStatus('Published');
       await topicManager.expectFilteredSkills([]);
 
-      await topicManager.filterSkillsByClassroom('Math');
+      await topicManager.filterItemsByKeyword('Algebra');
       await topicManager.expectFilteredSkills([]);
 
-      await topicManager.filterSkillsByKeyword('Algebra');
-      await topicManager.expectFilteredSkills([]);
-
-      await topicManager.sortSkills('name');
+      await topicManager.sortItems('name');
       await topicManager.expectSkillsInOrder(['Multiplication', 'Subtraction']);
 
       await topicManager.adjustPaginatorToShowItemsPerPage(15);

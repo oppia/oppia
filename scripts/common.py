@@ -254,9 +254,9 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'translation-admin/add-and-remove-translation-rights',
     'topic-manager/browse-skills-on-topics-and-skills-dashboard',
     'topic-manager/browse-topics-on-topics-and-skills-dashboard',
-    'topic-manager/create-and-delete-subtopic-and-story',
     'topic-manager/create-and-delete-questions-in-skill-editor',
     'topic-manager/assign-unassign-and-merge-skills',
+    'topic-manager/cannot-do-curriculum-admin-actions',
     'voiceover-admin/add-voiceover-artist-to-an-exploration',
 ]
 

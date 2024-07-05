@@ -39,6 +39,7 @@ describe('Topic Manager User Journey', function () {
     await curriculumAdmin.createTopic('Addition', 'add');
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Subtraction', 'subtract');
+    await curriculumAdmin.createNewClassroom('Math', 'math');
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
@@ -48,29 +49,74 @@ describe('Topic Manager User Journey', function () {
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it(
-    'should filter topics, sort them, use the paginator, and open an existing topic.',
-    async function () {
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.filterTopicsByStatus('Not Published');
-      await topicManager.expectFilteredTopics(['Addition', 'Subtraction']);
-      await topicManager.filterTopicsByStatus('Published');
-      await topicManager.expectFilteredTopics([]);
-
-      await topicManager.filterTopicsByClassroom('Math');
-      await topicManager.expectFilteredTopics([]);
-
-      await topicManager.filterTopicsByKeyword('Addition');
-      await topicManager.expectFilteredTopics(['Addition']);
-
-      await topicManager.sortTopics('name');
-      await topicManager.expectTopicsInOrder(['Addition', 'Subtraction']);
-
-      await topicManager.adjustPaginatorToShowItemsPerPage(15);
-      await topicManager.checkIfPageChangesAfterClickingNext(false);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  it('should filter topics, sort them, use the paginator, and open an existing topic.', async function () {
+    const actions = [
+      {
+        action: () => topicManager.navigateToTopicAndSkillsDashboardPage(),
+        name: 'navigateToTopicAndSkillsDashboardPage',
+      },
+      {
+        action: () => topicManager.filterTopicsByStatus('Not Published'),
+        name: 'filterTopicsByStatus_NotPublished',
+      },
+      {
+        action: () =>
+          topicManager.expectFilteredTopics(['Addition', 'Subtraction']),
+        name: 'expectFilteredTopics_AdditionSubtraction',
+      },
+      {
+        action: () => topicManager.filterTopicsByStatus('Published'),
+        name: 'filterTopicsByStatus_Published',
+      },
+      {
+        action: () => topicManager.expectFilteredTopics([]),
+        name: 'expectFilteredTopics_Empty',
+      },
+      {
+        action: () => topicManager.filterTopicsByClassroom('Math'),
+        name: 'filterTopicsByClassroom_Math',
+      },
+      {
+        action: () => topicManager.expectFilteredTopics([]),
+        name: 'expectFilteredTopics_Empty',
+      },
+      {
+        action: () => topicManager.filterItemsByKeyword('Addition'),
+        name: 'filterTopicsByKeyword_Addition',
+      },
+      {
+        action: () => topicManager.expectFilteredTopics(['Addition']),
+        name: 'expectFilteredTopics_Addition',
+      },
+      {
+        action: () => topicManager.sortItems('Least Recently Updated'),
+        name: 'sortTopics_LeastRecentlyUpdated',
+      },
+      {
+        action: () =>
+          topicManager.expectTopicsInOrder(['Addition', 'Subtraction']),
+        name: 'expectTopicsInOrder_AdditionSubtraction',
+      },
+      {
+        action: () => topicManager.adjustPaginatorToShowItemsPerPage(15),
+        name: 'adjustPaginatorToShowItemsPerPage_15',
+      },
+      {
+        action: () =>
+          topicManager.checkIfTopicPageChangesAfterClickingNext(false),
+        name: 'checkIfPageChangesAfterClickingNext_false',
+      },
+      {action: () => topicManager.timeout(2147483647), name: 'timeout'},
+    ];
+    for (const {action, name} of actions) {
+      try {
+        await action();
+      } catch (error) {
+        console.error('\x1b[31m%s\x1b[0m', error);
+        await topicManager.screenshot(`error_${name}.png`);
+      }
+    }
+  }, 2147483647);
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

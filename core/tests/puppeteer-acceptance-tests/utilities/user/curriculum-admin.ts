@@ -217,6 +217,7 @@ const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
 const saveStoryButton = 'button.e2e-test-save-story-button';
 const mobileSaveStoryChangesButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-changes';
+const createNewTopicMobileButton = '.e2e-test-create-topic-mobile-button';
 export class CurriculumAdmin extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -339,7 +340,15 @@ export class CurriculumAdmin extends BaseUser {
    * Create a topic in the topics-and-skills dashboard.
    */
   async createTopic(name: string, urlFragment: string): Promise<string> {
-    await this.clickOn(createNewTopicButton);
+    await this.navigateToTopicAndSkillsDashboardPage();
+    const mobileTopicSelectorElement = await this.page.$(mobileTopicSelector);
+
+    if (!mobileTopicSelectorElement) {
+      await this.clickOn(createNewTopicButton);
+    } else if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(createNewTopicMobileButton);
+    }
+
     await this.type(topicNameField, name);
     await this.type(topicUrlFragmentField, urlFragment);
     await this.type(topicWebFragmentField, name);
@@ -1383,21 +1392,6 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.clickOn(closeTopicDependencyButton);
     await this.page.waitForSelector(topicDependencyGraphDiv, {visible: false});
-  }
-
-  async createSkill(skillName: string, reviewMaterial: string): Promise<void> {
-    await this.navigateToTopicAndSkillsDashboardPage();
-    await this.clickOn(skillsTab);
-    await this.clickOn('.e2e-test-create-skill-button-circle');
-    await this.type(skillDescriptionField, skillName);
-    await this.clickOn(skillReviewMaterialHeader);
-    await this.clickOn(richTextAreaField);
-    await this.type(
-      richTextAreaField,
-      `Review material text content for ${reviewMaterial}.`
-    );
-    await this.clickOn(confirmSkillCreationButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
   }
 }
 

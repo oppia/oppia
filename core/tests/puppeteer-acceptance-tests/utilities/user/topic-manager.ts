@@ -70,16 +70,10 @@ const storyDescriptionField = 'textarea.e2e-test-new-story-description-field';
 const storyUrlFragmentField = 'input.e2e-test-new-story-url-fragment-field';
 const createStoryButton = 'button.e2e-test-confirm-story-creation-button';
 const saveStoryButton = 'button.e2e-test-save-story-button';
-const publishStoryButton = 'button.e2e-test-publish-story-button';
 const storyMetaTagInput = '.e2e-test-story-meta-tag-content-field';
-const unpublishStoryButton = 'button.e2e-test-unpublish-story-button';
 const mobileStoryDropdown = '.e2e-test-story-dropdown';
-const mobileSaveStoryChangesDropdown =
-  'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
 const mobileSaveStoryChangesButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-changes';
-const mobilePublishStoryButton =
-  'div.navbar-mobile-options .e2e-test-mobile-publish-button';
 
 // Chapter Creation Modal.
 const addChapterButton = 'button.e2e-test-add-chapter-button';
@@ -123,6 +117,20 @@ const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
 const mobileSaveTopicButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
 const saveTopicButton = 'button.e2e-test-save-topic-button';
+
+const topicStatusDropdownSelector = '.e2e-test-select-topic-status-dropdown';
+const classroomDropdownSelector = '.e2e-test-select-classroom-dropdown';
+const keywordDropdownSelector = '.e2e-test-select-keyword-dropdown';
+const multiSelectionInputSelector = '.e2e-test-multi-selection-input';
+const sortDropdownSelector = '.e2e-test-select-sort-dropdown';
+const displayMobileFiltersButton = '.e2e-test-mobile-toggle-filter';
+const closeMobileFiltersButton = '.e2e-test-mobile-filter-close';
+const skillStatusDropdownSelector = '.e2e-test-select-skill-status-dropdown';
+const nextPageButtonSelector = '.e2e-test-mobile-next-page-button';
+const mobileSkillSelector = 'span.e2e-test-mobile-skill-name';
+const desktopSkillSelector = '.e2e-test-skill-description';
+const itemsPerPageDropdown = '.e2e-test-select-items-per-page-dropdown';
+const filterOptionSelector = '.mat-option-text';
 
 export class TopicManager extends BaseUser {
   /**
@@ -738,260 +746,48 @@ export class TopicManager extends BaseUser {
     }
   }
 
-  async verifySubtopicPresenceInTopic(
-    topicName: string,
-    subtopicName: string,
-    isPresent: boolean
-  ): Promise<void> {
-    await this.openTopicEditor(topicName);
-
-    const subtopicElements = await this.page.$$('.e2e-test-subtopic');
-    const subtopicNames = await Promise.all(
-      subtopicElements.map(element =>
-        this.page.evaluate(el => el.textContent, element)
-      )
-    );
-
-    const isSubtopicPresent = subtopicNames.includes(subtopicName);
-
-    if (isPresent && !isSubtopicPresent) {
-      throw new Error(
-        `Expected subtopic '${subtopicName}' to be present in topic '${topicName}', but it was not found.`
-      );
-    }
-
-    if (!isPresent && isSubtopicPresent) {
-      throw new Error(
-        `Expected subtopic '${subtopicName}' to be absent in topic '${topicName}', but it was found.`
-      );
-    }
-  }
-
-  /**
-   * Add a story with a chapter to a certain topic.
-   */
-  async addStoryWithChapterToTopic(
-    topicName: string,
-    storyTitle: string,
-    explorationId: string,
-    chapterTitle: string
-  ): Promise<void> {
-    const storyUrlFragment = storyTitle.replace(/\s+/g, '-').toLowerCase();
-
-    await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileStoryDropdown);
-    }
-    await this.clickOn(addStoryButton);
-    await this.type(storyTitleField, storyTitle);
-    await this.type(storyUrlFragmentField, storyUrlFragment);
-    await this.type(
-      storyDescriptionField,
-      `Story creation description for ${storyTitle}.`
-    );
-
-    await this.clickOn(storyPhotoBoxButton);
-    await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadPhotoButton);
-
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickOn(createStoryButton);
-
-    await this.page.waitForSelector(storyMetaTagInput);
-    await this.page.focus(storyMetaTagInput);
-    await this.page.type(storyMetaTagInput, 'meta');
-    await this.page.keyboard.press('Tab');
-
-    await this.createChapter(explorationId, chapterTitle);
-    await this.saveStoryDraft();
-  }
-
-  async verifyChapterPresenceInStory(
-    storyTitle: string,
-    chapterTitle: string,
-    isPresent: boolean
-  ): Promise<void> {
-    await this.openTopicEditor(storyTitle);
-    await this.clickOn(storyTitle);
-
-    const chapterElements = await this.page.$$('.e2e-test-chapter-title');
-    const chapterTitles = await Promise.all(
-      chapterElements.map(element =>
-        this.page.evaluate(el => el.textContent, element)
-      )
-    );
-
-    const isChapterPresent = chapterTitles.includes(chapterTitle);
-
-    if (isPresent && !isChapterPresent) {
-      throw new Error(
-        `Expected chapter '${chapterTitle}' to be present in story '${storyTitle}', but it was not found.`
-      );
-    }
-
-    if (!isPresent && isChapterPresent) {
-      throw new Error(
-        `Expected chapter '${chapterTitle}' to be absent in story '${storyTitle}', but it was found.`
-      );
-    }
-    showMessage('Chapter is present in the story');
-  }
-
-  async verifyStoryPresenceInTopic(
-    topicName: string,
-    storyTitle: string,
-    isPresent: boolean
-  ): Promise<void> {
-    await this.openTopicEditor(topicName);
-
-    const storyElements = await this.page.$$('.e2e-test-story-title');
-    const storyTitles = await Promise.all(
-      storyElements.map(element =>
-        this.page.evaluate(el => el.textContent, element)
-      )
-    );
-
-    const isStoryPresent = storyTitles.includes(storyTitle);
-
-    if (isPresent && !isStoryPresent) {
-      throw new Error(
-        `Expected story '${storyTitle}' to be present in topic '${topicName}', but it was not found.`
-      );
-    }
-
-    if (!isPresent && isStoryPresent) {
-      throw new Error(
-        `Expected story '${storyTitle}' to be absent in topic '${topicName}', but it was found.`
-      );
-    }
-    showMessage('Story is present in the topic');
-  }
-
-  async deleteChapterFromStory(storyName: string, chapterTitle: string) {
-    await this.openTopicEditor(storyName);
-    await this.clickOn(storyName);
-
-    const chapterElements = await this.page.$$('.e2e-test-chapter-title');
-    let chapterElement: puppeteer.ElementHandle<Element> | null = null;
-    for (const element of chapterElements) {
-      const title = await this.page.evaluate(el => el.textContent, element);
-      if (title === chapterTitle) {
-        chapterElement = element;
-        break;
-      }
-    }
-
-    if (!chapterElement) {
-      throw new Error(`Chapter with title ${chapterTitle} not found.`);
-    }
-
-    const editOptionsButton = await chapterElement.$('.e2e-test-edit-options');
-    if (!editOptionsButton) {
-      throw new Error('Edit options button not found.');
-    }
-
-    await editOptionsButton.click();
-    await this.page.waitForSelector('.chapter-option-box', {visible: true});
-    await this.clickOn('.chapter-option-box');
-
-    await this.page.waitForSelector('.e2e-test-confirm-delete-chapter-button', {
-      visible: true,
-    });
-    await this.clickOn('.e2e-test-confirm-delete-chapter-button');
-    await this.page.waitForSelector('.e2e-test-chapter-title', {hidden: true});
-  }
-
-  async deleteStoryFromTopic(topicName: string, storyTitle: string) {
-    await this.openTopicEditor(topicName);
-    const storyElements = await this.page.$$('.e2e-test-story-list-item');
-
-    let storyElement: puppeteer.ElementHandle<Element> | null = null;
-
-    for (const element of storyElements) {
-      const titleElement = await element.$('.e2e-test-story-title');
-      if (!titleElement) {
-        continue;
-      }
-      const title = await this.page.evaluate(
-        el => el.textContent,
-        titleElement
-      );
-      if (title === storyTitle) {
-        storyElement = element;
-        break;
-      }
-    }
-
-    if (!storyElement) {
-      throw new Error(`Story with title ${storyTitle} not found.`);
-    }
-
-    const deleteButton = await storyElement.$('.e2e-test-delete-story-button');
-    if (!deleteButton) {
-      throw new Error('Delete button not found.');
-    }
-
-    await deleteButton.click();
-
-    const confirmDeleteButton = await this.page.$(
-      '.e2e-test-confirm-story-deletion-button'
-    );
-    if (!confirmDeleteButton) {
-      throw new Error('Confirm delete button not found.');
-    }
-
-    await confirmDeleteButton.click();
-  }
-
-  async deleteSubtopicFromTopic(topicName: string, subtopicName: string) {
-    await this.openTopicEditor(topicName);
-    const subtopicElements = await this.page.$$('.subtopic-name-header');
-
-    let subtopicElement: puppeteer.ElementHandle<Element> | null = null;
-
-    for (const element of subtopicElements) {
-      const titleElement = await element.$('.e2e-test-subtopic');
-      if (!titleElement) {
-        continue;
-      }
-      const title = await this.page.evaluate(
-        el => el.textContent,
-        titleElement
-      );
-      if (title === subtopicName) {
-        subtopicElement = element;
-        break;
-      }
-    }
-
-    if (!subtopicElement) {
-      throw new Error(`Subtopic with title ${subtopicName} not found.`);
-    }
-
-    const showOptionsButton = await subtopicElement.$(
-      '.e2e-test-show-subtopic-options'
-    );
-    if (!showOptionsButton) {
-      throw new Error('Show options button not found.');
-    }
-
-    await showOptionsButton.click();
-
-    const deleteButton = await this.page.$('.e2e-test-delete-subtopic-button');
-    if (!deleteButton) {
-      throw new Error('Delete button not found.');
-    }
-
-    await deleteButton.click();
-  }
-
   /**
    * Filters topics by status.
    * @param {string} status - The status to filter by.
    */
   async filterTopicsByStatus(status: string): Promise<void> {
-    await this.selectOption('.e2e-test-select-status-dropdown', status);
+    try {
+      await this.navigateToTopicAndSkillsDashboardPage();
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(displayMobileFiltersButton);
+      }
+      await this.page.waitForSelector(topicStatusDropdownSelector);
+      await this.selectOption(topicStatusDropdownSelector, status);
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(closeMobileFiltersButton);
+      }
+      showMessage(`Filtered topics by status: ${status}`);
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
+  }
+
+  /**
+   * Filters skills by status.
+   * @param {string} status - The status to filter by.
+   */
+  async filterSkillsByStatus(status: string): Promise<void> {
+    try {
+      await this.navigateToTopicAndSkillsDashboardPage();
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(displayMobileFiltersButton);
+      }
+      await this.page.waitForSelector(skillStatusDropdownSelector);
+      await this.selectOption(skillStatusDropdownSelector, status);
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(closeMobileFiltersButton);
+      }
+      showMessage(`Filtered skill by status: ${status}`);
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
   }
 
   /**
@@ -999,23 +795,68 @@ export class TopicManager extends BaseUser {
    * @param {string} classroom - The classroom to filter by.
    */
   async filterTopicsByClassroom(classroom: string): Promise<void> {
-    await this.selectOption('.e2e-test-select-classroom-dropdown', classroom);
+    try {
+      await this.navigateToTopicAndSkillsDashboardPage();
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(displayMobileFiltersButton);
+      }
+      await this.page.waitForSelector(classroomDropdownSelector);
+      await this.selectOption(classroomDropdownSelector, classroom);
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(closeMobileFiltersButton);
+      }
+      showMessage(`Filtered topics by classroom: ${classroom}`);
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
   }
 
   /**
    * Filters topics by keyword.
    * @param {string} keyword - The keyword to filter by.
    */
-  async filterTopicsByKeyword(keyword: string): Promise<void> {
-    await this.selectOption('.e2e-test-select-keyword-dropdown', keyword);
+  async filterItemsByKeyword(keyword: string): Promise<void> {
+    try {
+      await this.navigateToTopicAndSkillsDashboardPage();
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(displayMobileFiltersButton);
+      }
+      await this.page.waitForSelector(keywordDropdownSelector);
+      await this.clickOn(keywordDropdownSelector);
+      await this.page.waitForSelector(multiSelectionInputSelector);
+      await this.type(multiSelectionInputSelector, keyword);
+      await this.page.keyboard.press('Enter');
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(closeMobileFiltersButton);
+      }
+      showMessage(`Filtered topics by keyword: ${keyword}`);
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
   }
 
   /**
    * Sorts topics by a given option.
    * @param {string} sortOption - The option to sort by.
    */
-  async sortTopics(sortOption: string): Promise<void> {
-    await this.selectOption('.e2e-test-select-sort-dropdown', sortOption);
+  async sortItems(sortOption: string): Promise<void> {
+    try {
+      await this.navigateToTopicAndSkillsDashboardPage();
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(displayMobileFiltersButton);
+      }
+      await this.page.waitForSelector(sortDropdownSelector);
+      await this.selectOption(sortDropdownSelector, sortOption);
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(closeMobileFiltersButton);
+      }
+      showMessage(`Sorted topics by: ${sortOption}`);
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
   }
 
   /**
@@ -1028,8 +869,22 @@ export class TopicManager extends BaseUser {
     optionText: string
   ): Promise<void> {
     await this.clickOn(selector);
-    await this.page.waitForSelector('.mat-option-text');
-    await this.clickOn(`.mat-option-text:contains(${optionText})`);
+    await this.page.waitForSelector(filterOptionSelector);
+
+    const optionElements = await this.page.$$(filterOptionSelector);
+
+    for (const optionElement of optionElements) {
+      const text = await this.page.evaluate(
+        el => el.textContent.trim(),
+        optionElement
+      );
+
+      if (text === optionText) {
+        await this.waitForElementToBeClickable(optionElement);
+        await optionElement.click();
+        break;
+      }
+    }
   }
 
   /**
@@ -1037,24 +892,46 @@ export class TopicManager extends BaseUser {
    * @param {string[]} expectedTopics - The expected topics.
    */
   async expectFilteredTopics(expectedTopics: string[]): Promise<void> {
-    const topicElements = await this.page.$$('.e2e-test-topic-name');
-    const topicNames = await Promise.all(
-      topicElements.map(element =>
-        this.page.evaluate(el => el.textContent, element)
-      )
-    );
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const topicNameSelector = isMobileViewport
+      ? mobileTopicSelector
+      : desktopTopicSelector;
+    try {
+      const topicElements = await this.page.$$(topicNameSelector);
 
-    const missingTopics = expectedTopics.filter(
-      topic => !topicNames.includes(topic)
-    );
+      if (expectedTopics.length === 0) {
+        if (topicElements.length !== 0) {
+          throw new Error('Expected no topics, but some were found.');
+        }
+        showMessage('No topics found, as expected.');
+        return;
+      }
 
-    if (missingTopics.length > 0) {
-      throw new Error(
-        `Expected topics ${missingTopics.join(', ')} to be present, but they were not found.`
+      if (!topicElements || topicElements.length === 0) {
+        throw new Error(`No elements found for selector ${topicNameSelector}`);
+      }
+
+      const topicNames = await Promise.all(
+        topicElements.map(element =>
+          this.page.evaluate(el => el.textContent.trim(), element)
+        )
       );
-    }
 
-    showMessage('Filtered topics match the expected topics.');
+      const missingTopics = expectedTopics.filter(
+        topic => !topicNames.includes(topic)
+      );
+
+      if (missingTopics.length > 0) {
+        throw new Error(
+          `Expected topics ${missingTopics.join(', ')} to be present, but they were not found.`
+        );
+      }
+
+      showMessage('Filtered topics match the expected topics.');
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
   }
 
   /**
@@ -1062,18 +939,27 @@ export class TopicManager extends BaseUser {
    * @param {string[]} expectedOrder - The expected order of topics.
    */
   async expectTopicsInOrder(expectedOrder: string[]): Promise<void> {
-    const topicElements = await this.page.$$('.e2e-test-topic-name');
-    const topicNames = await Promise.all(
-      topicElements.map(element =>
-        this.page.evaluate(el => el.textContent, element)
-      )
-    );
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const topicNameSelector = isMobileViewport
+      ? mobileTopicSelector
+      : desktopTopicSelector;
 
-    if (!topicNames.every((name, index) => name === expectedOrder[index])) {
-      throw new Error('Topics are not in the expected order.');
+    try {
+      await this.page.waitForSelector(topicNameSelector);
+      const topicElements = await this.page.$$(topicNameSelector);
+      const topicNames = await Promise.all(
+        topicElements.map(element =>
+          this.page.evaluate(el => el.textContent.trim(), element)
+        )
+      );
+      if (!topicNames.every((name, index) => name === expectedOrder[index])) {
+        throw new Error('Topics are not in the expected order.');
+      }
+      showMessage('Topics are in the expected order.');
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
     }
-
-    showMessage('Topics are in the expected order.');
   }
 
   /**
@@ -1081,75 +967,60 @@ export class TopicManager extends BaseUser {
    * @param {number} itemsPerPage - The number of items to show per page.
    */
   async adjustPaginatorToShowItemsPerPage(itemsPerPage: number): Promise<void> {
-    await this.selectOption(
-      '.e2e-test-select-items-per-page-dropdown',
-      itemsPerPage.toString()
-    );
-    showMessage(`Paginator adjusted to show ${itemsPerPage} items per page.`);
+    try {
+      await this.page.waitForSelector(itemsPerPageDropdown);
+      await this.select(itemsPerPageDropdown, itemsPerPage.toString());
+      showMessage(`Paginator adjusted to show ${itemsPerPage} items per page.`);
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
   }
 
-  async checkIfPageChangesAfterClickingNext(
+  /**
+   * Checks if the page changes after clicking the next button.
+   * @param shouldChange - A boolean indicating whether the page should change.
+   */
+  async checkIfTopicPageChangesAfterClickingNext(
     shouldChange: boolean
   ): Promise<void> {
-    const initialTopic = await this.page.$eval(
-      '.e2e-test-topic-name',
-      topic => topic.textContent
-    );
-    await this.clickOn('.e2e-test-next-page-button');
-    const finalTopic = await this.page.$eval(
-      '.e2e-test-topic-name',
-      topic => topic.textContent
-    );
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const topicNameSelector = isMobileViewport
+      ? mobileTopicSelector
+      : desktopTopicSelector;
+    try {
+      await this.page.waitForSelector(topicNameSelector);
+      const initialTopic = await this.page.$eval(
+        topicNameSelector,
+        topic => topic.textContent
+      );
 
-    if (shouldChange && initialTopic === finalTopic) {
-      throw new Error(
-        'Expected the page to change when clicking the next page button, but it did not.'
+      await this.page.waitForSelector(nextPageButtonSelector);
+      await this.clickOn(nextPageButtonSelector);
+
+      await this.page.waitForSelector(topicNameSelector);
+      const finalTopic = await this.page.$eval(
+        topicNameSelector,
+        topic => topic.textContent
       );
-    } else if (!shouldChange && initialTopic !== finalTopic) {
-      throw new Error(
-        'Expected the page not to change when clicking the next page button, but it did.'
+
+      if (shouldChange && initialTopic === finalTopic) {
+        throw new Error(
+          'Expected the page to change when clicking the next page button, but it did not.'
+        );
+      } else if (!shouldChange && initialTopic !== finalTopic) {
+        throw new Error(
+          'Expected the page not to change when clicking the next page button, but it did.'
+        );
+      }
+
+      showMessage(
+        'Page change status after clicking the next button is as expected.'
       );
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
     }
-    showMessage(
-      'Page changes as expected after clicking the next page button.'
-    );
-  }
-
-  /**
-   * Filters skills by status.
-   * @param {string} status - The status to filter by.
-   */
-  async filterSkillsByStatus(status: string): Promise<void> {
-    await this.clickOn('.e2e-test-select-skill-status-dropdown');
-    await this.clickOn(`option[value="${status}"]`);
-  }
-
-  /**
-   * Filters skills by classroom.
-   * @param {string} classroom - The classroom to filter by.
-   */
-  async filterSkillsByClassroom(classroom: string): Promise<void> {
-    await this.clickOn('.e2e-test-select-classroom-dropdown');
-    await this.clickOn(`option[value="${classroom}"]`);
-  }
-
-  /**
-   * Filters skills by keyword.
-   * @param {string} keyword - The keyword to filter by.
-   */
-  async filterSkillsByKeyword(keyword: string): Promise<void> {
-    await this.clickOn('.e2e-test-select-keyword-dropdown');
-    await this.page.type('.e2e-test-select-keyword-dropdown', keyword);
-    await this.page.keyboard.press('Enter');
-  }
-
-  /**
-   * Sorts skills by a given option.
-   * @param {string} sortOption - The option to sort by.
-   */
-  async sortSkills(sortOption: string): Promise<void> {
-    await this.clickOn('.e2e-test-select-sort-dropdown');
-    await this.clickOn(`option[value="${sortOption}"]`);
   }
 
   /**
@@ -1158,24 +1029,46 @@ export class TopicManager extends BaseUser {
    * @returns {Promise<void>}
    */
   async expectFilteredSkills(expectedSkills: string[]): Promise<void> {
-    const skillElements = await this.page.$$('.e2e-test-skill-description');
-    const skillDescriptions = await Promise.all(
-      skillElements.map(element =>
-        this.page.evaluate(el => el.textContent, element)
-      )
-    );
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const skillNameSelector = isMobileViewport
+      ? mobileSkillSelector
+      : desktopSkillSelector;
+    try {
+      const topicElements = await this.page.$$(skillNameSelector);
 
-    const missingSkills = expectedSkills.filter(
-      skill => !skillDescriptions.includes(skill)
-    );
+      if (expectedSkills.length === 0) {
+        if (topicElements.length !== 0) {
+          throw new Error('Expected no topics, but some were found.');
+        }
+        showMessage('No topics found, as expected.');
+        return;
+      }
 
-    if (missingSkills.length > 0) {
-      throw new Error(
-        `Expected skills ${missingSkills.join(', ')} to be present, but they were not found.`
+      if (!topicElements || topicElements.length === 0) {
+        throw new Error(`No elements found for selector ${skillNameSelector}`);
+      }
+
+      const topicNames = await Promise.all(
+        topicElements.map(element =>
+          this.page.evaluate(el => el.textContent.trim(), element)
+        )
       );
-    }
 
-    showMessage('Filtered skills match the expected skills.');
+      const missingTopics = expectedSkills.filter(
+        topic => !topicNames.includes(topic)
+      );
+
+      if (missingTopics.length > 0) {
+        throw new Error(
+          `Expected topics ${missingTopics.join(', ')} to be present, but they were not found.`
+        );
+      }
+
+      showMessage('Filtered topics match the expected topics.');
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
   }
 
   /**
@@ -1183,43 +1076,81 @@ export class TopicManager extends BaseUser {
    * @param {string[]} expectedOrder - The expected order of skills.
    */
   async expectSkillsInOrder(expectedOrder: string[]): Promise<void> {
-    const skillElements = await this.page.$$('.e2e-test-skill-description');
-    const skillDescriptions = await Promise.all(
-      skillElements.map(element =>
-        this.page.evaluate(el => el.textContent, element)
-      )
-    );
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const skillNameSelector = isMobileViewport
+      ? mobileSkillSelector
+      : desktopSkillSelector;
 
-    if (
-      !skillDescriptions.every((name, index) => name === expectedOrder[index])
-    ) {
-      throw new Error('Skills are not in the expected order.');
+    try {
+      await this.page.waitForSelector(skillNameSelector);
+      const topicElements = await this.page.$$(skillNameSelector);
+      const topicNames = await Promise.all(
+        topicElements.map(element =>
+          this.page.evaluate(el => el.textContent.trim(), element)
+        )
+      );
+      if (!topicNames.every((name, index) => name === expectedOrder[index])) {
+        throw new Error('Topics are not in the expected order.');
+      }
+      showMessage('Topics are in the expected order.');
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
     }
-
-    showMessage('Skills are in the expected order.');
   }
 
+  /**
+   * Checks if the page changes after clicking the next button.
+   * @param shouldChange - A boolean indicating whether the page should change.
+   */
   async checkIfSkillPageChangesAfterClickingNext(
     shouldChange: boolean
   ): Promise<void> {
-    const initialSkill = await this.page.$eval(
-      '.e2e-test-skill-description',
-      skill => skill.textContent
-    );
-    await this.clickOn('.e2e-test-next-page-button');
-    const finalSkill = await this.page.$eval(
-      '.e2e-test-skill-description',
-      skill => skill.textContent
-    );
-    if (shouldChange && initialSkill === finalSkill) {
-      throw new Error(
-        'Expected the page to change when clicking the next page button, but it did not.'
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const skillNameSelector = isMobileViewport
+      ? mobileSkillSelector
+      : desktopSkillSelector;
+    try {
+      await this.page.waitForSelector(skillNameSelector);
+      const initialTopic = await this.page.$eval(
+        skillNameSelector,
+        topic => topic.textContent
       );
-    } else if (!shouldChange && initialSkill !== finalSkill) {
-      throw new Error(
-        'Expected the page not to change when clicking the next page button, but it did.'
+
+      await this.page.waitForSelector(nextPageButtonSelector);
+      await this.clickOn(nextPageButtonSelector);
+
+      await this.page.waitForSelector(skillNameSelector);
+      const finalTopic = await this.page.$eval(
+        skillNameSelector,
+        topic => topic.textContent
       );
+
+      if (shouldChange && initialTopic === finalTopic) {
+        throw new Error(
+          'Expected the page to change when clicking the next page button, but it did not.'
+        );
+      } else if (!shouldChange && initialTopic !== finalTopic) {
+        throw new Error(
+          'Expected the page not to change when clicking the next page button, but it did.'
+        );
+      }
+
+      showMessage(
+        'Page change status after clicking the next button is as expected.'
+      );
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
     }
+  }
+
+  async screenshot(path: string) {
+    await this.page.screenshot({path: `${path}`});
+  }
+
+  async timeout(timeout: number) {
+    await this.page.waitForTimeout(timeout);
   }
 }
 
