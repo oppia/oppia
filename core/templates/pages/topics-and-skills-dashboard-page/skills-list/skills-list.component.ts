@@ -241,7 +241,7 @@ export class SkillsListComponent {
                 .then(() => {
                   let successToast =
                     'The skill has been assigned to the topic.';
-                  this.alertsService.addSuccessMessage(successToast, 1000);
+                  this.alertsService.addSuccessMessage(successToast);
                 });
             }
           }

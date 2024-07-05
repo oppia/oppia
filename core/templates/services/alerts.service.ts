@@ -158,7 +158,7 @@ export class AlertsService {
    */
   addSuccessMessage(message: string, timeoutMilliseconds?: number): void {
     if (timeoutMilliseconds === undefined) {
-      timeoutMilliseconds = 1500;
+      timeoutMilliseconds = 3000;
     }
     this.addMessage('success', message, timeoutMilliseconds);
   }

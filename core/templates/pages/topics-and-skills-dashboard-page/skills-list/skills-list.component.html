@@ -19,7 +19,7 @@
       </th>
     </tr>
     <tr *ngFor="let skill of skillSummaries; index as idx"
-        class="list-item">
+        class="list-item e2e-test-skill-item">
       <td>
         {{ getSerialNumberForSkill(idx) }}.
       </td>
@@ -68,19 +68,19 @@
             <div class="merge-skill-box" *ngIf="mergeableSkillSummaries.length > 0" (click)="mergeSkill(skill)">
               <div class="e2e-test-merge-skills-button">
                 <i class="fa fa-plus"></i>
-                <span>Merge Skill</span>
+                <span> Merge Skill </span>
               </div>
             </div>
             <div class="unassign-skill-box e2e-test-unassign-skill-button" *ngIf="skill.topicNames.length" (click)="unassignSkill(skill.id)">
               <div>
                 <i class="fa fa-minus"></i>
-                <span>Unassign Skill</span>
+                <span> Unassign Skill </span>
               </div>
             </div>
-            <div class="delete-icon-box e2e-test-delete-skill-button" (click)="deleteSkill(skill.id)">
-              <a *ngIf="userCanDeleteSkill">
+            <div *ngIf="userCanDeleteSkill" class="delete-icon-box e2e-test-delete-skill-button" (click)="deleteSkill(skill.id)">
+              <a>
                 <span class="fa fa-trash-alt"></span>
-                <span>Delete</span>
+                <span> Delete </span>
               </a>
             </div>
           </div>
@@ -89,7 +89,7 @@
     </tr>
   </table>
   <div class="skills-list-mobile e2e-test-mobile-skills-table">
-    <div *ngFor="let skill of skillSummaries; index as idx" class="skill-item">
+    <div *ngFor="let skill of skillSummaries; index as idx" class="skill-item e2e-test-mobile-skill-item">
       <div class="skill-item-header">
         <div class="skill-item-description-box">
           <div class="skill-item-description-name">
@@ -109,15 +109,21 @@
                   </span>
                 </div>
                 <div class="merge-skill-box" *ngIf="mergeableSkillSummaries.length > 0" (click)="mergeSkill(skill)">
-                  <div class="e2e-test-merge-skills-button">
+                  <div class="e2e-test-mobile-merge-skills-button">
                     <i class="fa fa-plus"></i>
-                    <span>Merge Skill</span>
+                    <span> Merge Skill </span>
                   </div>
                 </div>
-                <div class="delete-icon-box" (click)="deleteSkill(skill.id)">
-                  <span *ngIf="userCanDeleteSkill">
+                <div class="unassign-skill-box e2e-test-mobile-unassign-skill-button" *ngIf="skill.topicNames.length" (click)="unassignSkill(skill.id)">
+                  <div>
+                    <i class="fa fa-minus"></i>
+                    <span> Unassign Skill </span>
+                  </div>
+                </div>
+                <div *ngIf="userCanDeleteSkill" class="delete-icon-box" (click)="deleteSkill(skill.id)">
+                  <span>
                     <i class="fa fa-trash-alt e2e-test-mobile-delete-skill-button"></i>
-                    <span>Delete</span>
+                    <span> Delete </span>
                   </span>
                 </div>
               </div>
