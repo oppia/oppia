@@ -255,6 +255,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'topic-manager/browse-skills-on-topics-and-skills-dashboard',
     'topic-manager/browse-topics-on-topics-and-skills-dashboard',
     'topic-manager/create-and-delete-subtopic-and-story',
+    'topic-manager/create-and-delete-questions-in-skill-editor',
+    'topic-manager/assign-unassign-and-merge-skills',
     'voiceover-admin/add-voiceover-artist-to-an-exploration',
 ]
 
