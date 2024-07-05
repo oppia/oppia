@@ -35,14 +35,15 @@ describe('Topic Manager User Journey', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    curriculumAdmin.createTopic('Addition', 'add');
-    curriculumAdmin.createTopic('Subtraction', 'subtract');
+    curriculumAdmin.createTopic('Mathematics', 'math');
+    curriculumAdmin.createSkillForTopic('Subtraction', 'Mathematics');
+    curriculumAdmin.createSkillForTopic('Multiplication', 'Mathematics');
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topic_manager@example.com',
       [ROLES.TOPIC_MANAGER],
-      ['Addition', 'Subtraction']
+      'Addition'
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
@@ -51,7 +52,10 @@ describe('Topic Manager User Journey', function () {
     async function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
       await topicManager.filterSkillsByStatus('Unassigned');
-      await topicManager.expectFilteredSkills(['Test Skill 1', 'Test Skill 2']);
+      await topicManager.expectFilteredSkills([
+        'Multiplication',
+        'Subtraction',
+      ]);
       await topicManager.filterSkillsByStatus('Published');
       await topicManager.expectFilteredSkills([]);
 
@@ -62,7 +66,7 @@ describe('Topic Manager User Journey', function () {
       await topicManager.expectFilteredSkills([]);
 
       await topicManager.sortSkills('name');
-      await topicManager.expectSkillsInOrder(['Test Skill 1', 'Test Skill 2']);
+      await topicManager.expectSkillsInOrder(['Multiplication', 'Subtraction']);
 
       await topicManager.adjustPaginatorToShowItemsPerPage(15);
       await topicManager.checkIfSkillPageChangesAfterClickingNext(false);

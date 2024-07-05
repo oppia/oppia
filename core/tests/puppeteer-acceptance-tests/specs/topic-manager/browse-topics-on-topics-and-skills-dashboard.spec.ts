@@ -44,7 +44,7 @@ describe('Topic Manager User Journey', function () {
       'topicManager',
       'topic_manager@example.com',
       [ROLES.TOPIC_MANAGER],
-      ['Addition', 'Subtraction']
+      'Addition'
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
@@ -53,18 +53,18 @@ describe('Topic Manager User Journey', function () {
     async function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
       await topicManager.filterTopicsByStatus('Not Published');
-      await topicManager.expectFilteredTopics(['Test Topic 1', 'Test Topic 2']);
+      await topicManager.expectFilteredTopics(['Addition', 'Subtraction']);
       await topicManager.filterTopicsByStatus('Published');
       await topicManager.expectFilteredTopics([]);
 
       await topicManager.filterTopicsByClassroom('Math');
       await topicManager.expectFilteredTopics([]);
 
-      await topicManager.filterTopicsByKeyword('Algebra');
-      await topicManager.expectFilteredTopics([]);
+      await topicManager.filterTopicsByKeyword('Addition');
+      await topicManager.expectFilteredTopics(['Addition']);
 
       await topicManager.sortTopics('name');
-      await topicManager.expectTopicsInOrder(['Test Topic 1', 'Test Topic 2']);
+      await topicManager.expectTopicsInOrder(['Addition', 'Subtraction']);
 
       await topicManager.adjustPaginatorToShowItemsPerPage(15);
       await topicManager.checkIfPageChangesAfterClickingNext(false);

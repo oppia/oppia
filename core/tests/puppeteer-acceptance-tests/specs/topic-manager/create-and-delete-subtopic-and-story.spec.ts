@@ -26,7 +26,7 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Topic Manager User Journey', function () {
-  let curriculumAdm: CurriculumAdmin & ExplorationEditor;
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let topicManager: TopicManager;
   let explorationId: string | null;
 
@@ -43,7 +43,7 @@ describe('Topic Manager User Journey', function () {
       'topicManager',
       'topic_manager@example.com',
       [ROLES.TOPIC_MANAGER],
-      ['Addition']
+      'Addition'
     );
 
     await curriculumAdmin.navigateToCreatorDashboardPage();
