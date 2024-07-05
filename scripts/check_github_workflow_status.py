@@ -79,7 +79,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
     workflow_status = get_workflow_status(jobs)
 
-    print('Jobs: %s' % jobs)
+    print('Jobs: %s' % json.dumps(jobs, indent=4))
     print('Workflow Status: %s' % workflow_status.value)
 
     with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as f:
