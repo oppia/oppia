@@ -158,7 +158,7 @@
                 <input span *ngIf="tempClassroomData.getIsPublished()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" checked (click)="togglePublicationStatus()">
                 <input *ngIf="!tempClassroomData.getIsPublished()" type="checkbox" class="sr-only" (click)="togglePublicationStatus()" aria-label="Change classroom publication status">
                 <input span *ngIf="!tempClassroomData.getIsPublished()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" (click)="togglePublicationStatus()">
-                <label class="oppia-on-off-switch-label" for="edits-switch">
+                <label class="oppia-on-off-switch-label e2e-test-toggle-classroom-publication-status-btn" for="edits-switch">
                   <span class="oppia-on-off-switch-inner"></span>
                   <span class="oppia-on-off-switch-main"></span>
                 </label>

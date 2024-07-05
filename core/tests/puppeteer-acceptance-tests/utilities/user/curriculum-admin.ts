@@ -175,7 +175,8 @@ const imageUploaderModal = '.e2e-test-thumbnail-editor';
 const openTopicDropdownButton = '.e2e-test-add-topic-to-classroom-button';
 const topicDropDownFormFeild = '.e2e-test-classroom-category-dropdown';
 const topicSelector = '.e2e-test-classroom-topic-selector-choice';
-const publishClassroomButton = '.oppia-on-off-switch-label';
+const publishClassroomButton =
+  '.e2e-test-toggle-classroom-publication-status-btn';
 const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const classroomTileNameSpan = '.e2e-test-classroom-tile-name';
 const deleteClassroomButton = '.e2e-test-delete-classroom-button';
