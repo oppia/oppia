@@ -155,6 +155,18 @@
     {
       "name": "release-coordinator/update-promo-bar-message",
       "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/update-promo-bar-message.spec.ts"
+    },
+    {
+      "name": "topic-manager/browse-skills-on-topics-and-skills-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/browse-skills-on-topics-and-skills-dashboard.spec.ts"
+    },
+    {
+      "name": "topic-manager/browse-topics-on-topics-and-skills-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/browse-topics-on-topics-and-skills-dashboard.spec.ts"
+    },
+    {
+      "name": "topic-manager/create-and-delete-subtopic-and-story",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-delete-subtopic-and-story.spec.ts"
     }
   ]
 }

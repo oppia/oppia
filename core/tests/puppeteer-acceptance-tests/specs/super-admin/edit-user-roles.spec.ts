@@ -55,9 +55,11 @@ describe('Super Admin', function () {
         'guestUser1',
         ROLES.TOPIC_MANAGER
       );
-      await superAdmin.assignRoleToUser('guestUser1', ROLES.TOPIC_MANAGER, [
-        'Test Topic 1',
-      ]);
+      await superAdmin.assignRoleToUser(
+        'guestUser1',
+        ROLES.TOPIC_MANAGER,
+        'Test Topic 1'
+      );
       await superAdmin.expectUserToHaveRole('guestUser1', ROLES.TOPIC_MANAGER);
 
       await superAdmin.selectRole(ROLES.TOPIC_MANAGER);
