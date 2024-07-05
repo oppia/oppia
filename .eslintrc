@@ -75,6 +75,7 @@
         "additionalPlayerFeatures.js",
         "adminTabFeatures.js",
         "classroomPage.js",
+        "classroomPageFileUploadFeatures.js",
         "collections.js",
         "contributorDashboard.js",
         "coreEditorAndPlayerFeatures.js",

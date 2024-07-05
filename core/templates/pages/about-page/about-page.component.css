@@ -862,22 +862,6 @@
   width: 100%;
 }
 
-.about-page .oppia-about-cta-partners-image {
-  height: 76px;
-  width: 456px;
-}
-
-.about-page .oppia-about-cta-schools-image {
-  height: 94px;
-  width: 456px;
-}
-
-.about-page .oppia-about-cta-partners-image img,
-.about-page .oppia-about-cta-schools-image img {
-  height: 100%;
-  width: 100%;
-}
-
 .about-page .oppia-about-cta-title {
   color: #00645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
@@ -913,9 +897,7 @@
 
 .about-page .oppia-about-cta-logo-container {
   display: flex;
-  height: 60px;
   margin-bottom: 16px;
-  width: 160px;
 }
 
 .about-page .oppia-about-cta-donor-top-subtext1 {
@@ -1117,16 +1099,6 @@
 
   .about-page .oppia-cta-carousel-container {
     gap: 8px;
-  }
-
-  .about-page .oppia-about-cta-partners-image {
-    height: 100%;
-    width: 100%;
-  }
-  
-  .about-page .oppia-about-cta-schools-image {
-    height: 100%;
-    width: 100%;
   }
 }
 

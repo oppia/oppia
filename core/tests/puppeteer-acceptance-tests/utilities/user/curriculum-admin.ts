@@ -638,10 +638,6 @@ export class CurriculumAdmin extends BaseUser {
    * Check if the topic has been published successfully, by verifying
    * the status and the counts in the topics and skills dashboard.
    */
-  /**
-   * Check if the topic has been published successfully, by verifying
-   * the status and the counts in the topics and skills dashboard.
-   */
   async expectTopicToBePublishedInTopicsAndSkillsDashboard(
     topicName: string,
     expectedPublishedStoryCount: number,
@@ -1054,6 +1050,7 @@ export class CurriculumAdmin extends BaseUser {
           await skill.waitForSelector(skillListItemOptions, {visible: true});
           const editBox = await skill.$(skillListItemOptions);
           if (editBox) {
+            await this.waitForElementToBeClickable(editBox);
             await editBox.click();
             await this.page.waitForSelector(deleteSkillButton);
           } else {
