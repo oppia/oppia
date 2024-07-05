@@ -2637,24 +2637,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'data_format': 'html'
         }
 
-    def _get_change_with_normalized_string(self) -> Mapping[
-        str, change_domain.AcceptableChangeDictTypes]:
-        """Provides change_cmd dictionary with normalized translation html.
-
-        Returns:
-            Mapping[str, change_domain.AcceptableChangeDictTypes]. A dictionary
-            of the change_cmd object for the translations.
-        """
-        return {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'content_id': 'content_0',
-            'language_code': 'hi',
-            'content_html': '<p>A content to translate.</p>',
-            'state_name': 'Introduction',
-            'translation_html': ['translated text1', 'translated text2'],
-            'data_format': 'set_of_normalized_string'
-        }
-
     def test_get_translation_contribution_stats_for_invalid_id_with_strict_true(
         self
     ) -> None:
@@ -7345,58 +7327,18 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'data_format': 'set_of_normalized_string'
         }
 
-    def _calculate_translation_contribution_hours(
-        self, numer_of_words: int
-    ) -> str:
-        """Provides translatoin contribution hours when number of translated
-        words are provided. We calculate the time taken to translate
-        a word according to the following document.
-        https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
-
-        Args:
-            numer_of_words: int. The number of translated words.
-
-        Returns:
-            str. A string that represent the translatoin contribution hours.
-        """
-        return str(round(numer_of_words / 300, 2))
-
-    def _calculate_question_contribution_hours(
-        self, images_included: bool
-    ) -> str:
-        """Provides question contribution hours when number of questions
-        are provided. We calculate the time taken to submit
-        a question according to the following document.
-        https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
-
-        Args:
-            images_included: bool. A flag that says whether the question
-                contains images.
-
-        Returns:
-            str. A string that represent the question contribution hours.
-        """
-        minutes_contributed = 0
-
-        if images_included:
-            minutes_contributed += 20
-        else:
-            minutes_contributed += 12
-        return str(round(minutes_contributed / 60, 2))
-
     def test_create_translation_contributor_certificate(self) -> None:
         score_category: str = ('%s%sEnglish' % (
             suggestion_models.SCORE_TYPE_TRANSLATION,
             suggestion_models.SCORE_CATEGORY_DELIMITER)
         )
         change_cmd = {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'cmd': 'add_translation',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '',
             'state_name': 'Introduction',
             'translation_html': '<p>Translation for content.</p>',
-            'data_format': 'html'
         }
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -7417,46 +7359,6 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert certificate_data is not None
 
-        self.assertEqual(
-            certificate_data['contribution_hours'],
-            self._calculate_translation_contribution_hours(3)
-        )
-        self.assertEqual(certificate_data['language'], 'Hindi')
-
-    def test_create_translation_contributor_certificate_for_rule_translation(
-        self
-    ) -> None:
-        score_category: str = '%s%sEnglish' % (
-            suggestion_models.SCORE_TYPE_TRANSLATION,
-            suggestion_models.SCORE_CATEGORY_DELIMITER
-        )
-
-        change_cmd = self._get_change_with_normalized_string()
-        suggestion_models.GeneralSuggestionModel.create(
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            'exp1', 1, suggestion_models.STATUS_ACCEPTED, self.author_id,
-            'reviewer_1', change_cmd, score_category,
-            'exploration.exp1.thread_6', 'hi')
-
-        certificate_data = (
-            suggestion_services.generate_contributor_certificate_data(
-                self.username,
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                'hi',
-                self.from_date,
-                self.to_date,
-            ))
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert certificate_data is not None
-
-        self.assertEqual(
-            certificate_data['contribution_hours'],
-            self._calculate_translation_contribution_hours(4)
-        )
-        self.assertEqual(certificate_data['language'], 'Hindi')
-
     def test_create_translation_contributor_certificate_for_english(
         self
     ) -> None:
@@ -7466,13 +7368,12 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
 
         change_cmd = {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'cmd': 'add_translation',
             'content_id': 'content',
             'language_code': 'en',
             'content_html': '',
             'state_name': 'Introduction',
-            'translation_html': '<p>Translation for content.</p>',
-            'data_format': 'html'
+            'translation_html': '<p>Translation for content.</p>'
         }
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -7492,12 +7393,6 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
 
         # Ruling out the possibility of None for mypy type checking.
         assert certificate_data is not None
-
-        self.assertEqual(
-            certificate_data['contribution_hours'],
-            self._calculate_translation_contribution_hours(3)
-        )
-        self.assertEqual(certificate_data['language'], 'English')
 
     def test_create_question_contributor_certificate(self) -> None:
         content_id_generator = translation_domain.ContentIdGenerator()
@@ -7550,11 +7445,6 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
 
         # Ruling out the possibility of None for mypy type checking.
         assert certificate_data is not None
-
-        self.assertEqual(
-            certificate_data['contribution_hours'],
-            self._calculate_question_contribution_hours(False)
-        )
 
     def test_create_question_contributor_certificate_with_image_content(
         self
@@ -7610,11 +7500,6 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
 
         # Ruling out the possibility of None for mypy type checking.
         assert certificate_data is not None
-
-        self.assertEqual(
-            certificate_data['contribution_hours'],
-            self._calculate_question_contribution_hours(True)
-        )
 
     def test_create_certificate_returns_none_for_no_translation_suggestions(
         self

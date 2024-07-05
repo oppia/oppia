@@ -4015,34 +4015,21 @@ def _generate_translation_contributor_certificate_data(
     words_count = 0
     for model in suggestions:
         suggestion = get_suggestion_from_model(model)
-        suggestion_change = suggestion.change_cmd
-        data_is_list = (
-            translation_domain.TranslatableContentFormat
-            .is_data_format_list(suggestion_change.data_format)
+        # Retrieve the html content that is emphasized on the
+        # Contributor Dashboard pages. This content is what stands
+        # out for each suggestion when a user views a list of
+        # suggestions.
+        get_html_representing_suggestion = (
+            SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
+                suggestion.suggestion_type]
         )
-        if (
-                suggestion_change.cmd == 'add_written_translation' and
-                data_is_list
-        ):
-            words_count += sum(
-                len(item.split()) for item in suggestion_change.translation_html
-            )
-        else:
-            # Retrieve the html content that is emphasized on the
-            # Contributor Dashboard pages. This content is what stands
-            # out for each suggestion when a user views a list of
-            # suggestions.
-            get_html_representing_suggestion = (
-                SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
-                    suggestion.suggestion_type]
-            )
-            plain_text = _get_plain_text_from_html_content_string(
-                get_html_representing_suggestion(suggestion))
+        plain_text = _get_plain_text_from_html_content_string(
+            get_html_representing_suggestion(suggestion))
 
-            words = plain_text.split(' ')
-            words_without_empty_strings = [
-                word for word in words if word != '']
-            words_count += len(words_without_empty_strings)
+        words = plain_text.split(' ')
+        words_without_empty_strings = [
+            word for word in words if word != '']
+        words_count += len(words_without_empty_strings)
     # Go to the below link for more information about how we count hours
     # contributed.# Goto the below link for more information.
     # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing
