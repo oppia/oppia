@@ -212,7 +212,7 @@ var DiagnosticTestPage = function () {
 
   var addTopicToClassroom = async function (topicName) {
     var containerLocator = '.e2e-test-classroom-category-dropdown';
-    var searchTopicInput = $('.e2e-test-exploration-new-category-add').$(
+    var searchTopicInput = $('.e2e-test-classroom-new-topic-add').$(
       '.mat-select-search-input.mat-input-element'
     );
     var searchInputLocatorTextOption = $(
