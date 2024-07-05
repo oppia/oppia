@@ -320,4 +320,3 @@ exports.newTabToBeCreated = newTabToBeCreated;
 exports.urlRedirection = urlRedirection;
 exports.numberOfElementsToBe = numberOfElementsToBe;
 exports.clientSideRedirection = clientSideRedirection;
-exports.nonEmptyText = nonEmptyText;
