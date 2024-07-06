@@ -116,7 +116,10 @@ const sortDropdownSelector = '.e2e-test-select-sort-dropdown';
 const displayMobileFiltersButton = '.e2e-test-mobile-toggle-filter';
 const closeMobileFiltersButton = '.e2e-test-mobile-filter-close';
 const skillStatusDropdownSelector = '.e2e-test-select-skill-status-dropdown';
-const nextPageButtonSelector = '.e2e-test-mobile-next-page-button';
+const topicNextPageMobileButton = '.e2e-test-mobile-topics-next-page-button';
+const topicNextPageDesktopButton = '.e2e-test-topics-next-page-button';
+const skillsNextPageMobileButton = '.e2e-test-mobile-skills-next-page-button';
+const skillsNextPageDesktopButton = '.e2e-test-skills-next-page-button';
 const mobileSkillSelector = 'span.e2e-test-mobile-skill-name';
 const desktopSkillSelector = '.e2e-test-skill-description';
 const itemsPerPageDropdown = '.e2e-test-select-items-per-page-dropdown';
@@ -208,7 +211,12 @@ export class TopicManager extends BaseUser {
    * Function to navigate the skills tab in topics and skills dashboard.
    */
   async navigateToSkillsTab(): Promise<void> {
+    const skillSelector = this.isViewportAtMobileWidth()
+      ? mobileSkillSelector
+      : desktopSkillSelector;
+    await this.page.waitForSelector(skillsTab, {visible: true});
     await this.clickOn(skillsTab);
+    await this.page.waitForSelector(skillSelector, {visible: true});
   }
 
   /**
@@ -798,6 +806,7 @@ export class TopicManager extends BaseUser {
   async filterSkillsByStatus(status: string): Promise<void> {
     try {
       await this.navigateToTopicAndSkillsDashboardPage();
+      await this.navigateToSkillTab();
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(displayMobileFiltersButton);
       }
@@ -839,7 +848,7 @@ export class TopicManager extends BaseUser {
    * Filters topics by keyword.
    * @param {string} keyword - The keyword to filter by.
    */
-  async filterItemsByKeyword(keyword: string): Promise<void> {
+  async filterTopicsByKeyword(keyword: string): Promise<void> {
     try {
       await this.navigateToTopicAndSkillsDashboardPage();
       if (this.isViewportAtMobileWidth()) {
@@ -864,7 +873,7 @@ export class TopicManager extends BaseUser {
    * Sorts topics by a given option.
    * @param {string} sortOption - The option to sort by.
    */
-  async sortItems(sortOption: string): Promise<void> {
+  async sortTopics(sortOption: string): Promise<void> {
     try {
       await this.navigateToTopicAndSkillsDashboardPage();
       if (this.isViewportAtMobileWidth()) {
@@ -876,6 +885,55 @@ export class TopicManager extends BaseUser {
         await this.clickOn(closeMobileFiltersButton);
       }
       showMessage(`Sorted topics by: ${sortOption}`);
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
+  }
+
+  /**
+   * Filters skills by keyword.
+   * @param {string} keyword - The keyword to filter by.
+   */
+  async filterSkillsByKeyword(keyword: string): Promise<void> {
+    try {
+      await this.navigateToTopicAndSkillsDashboardPage();
+      await this.navigateToSkillTab();
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(displayMobileFiltersButton);
+      }
+      await this.page.waitForSelector(keywordDropdownSelector);
+      await this.clickOn(keywordDropdownSelector);
+      await this.page.waitForSelector(multiSelectionInputSelector);
+      await this.type(multiSelectionInputSelector, keyword);
+      await this.page.keyboard.press('Enter');
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(closeMobileFiltersButton);
+      }
+      showMessage(`Filtered skills by keyword: ${keyword}`);
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
+  }
+
+  /**
+   * Sorts skills by a given option.
+   * @param {string} sortOption - The option to sort by.
+   */
+  async sortSkills(sortOption: string): Promise<void> {
+    try {
+      await this.navigateToTopicAndSkillsDashboardPage();
+      await this.navigateToSkillTab();
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(displayMobileFiltersButton);
+      }
+      await this.page.waitForSelector(sortDropdownSelector);
+      await this.selectOption(sortDropdownSelector, sortOption);
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(closeMobileFiltersButton);
+      }
+      showMessage(`Sorted skills by: ${sortOption}`);
     } catch (error) {
       console.error(error.stack);
       throw error;
@@ -1011,6 +1069,9 @@ export class TopicManager extends BaseUser {
     const topicNameSelector = isMobileViewport
       ? mobileTopicSelector
       : desktopTopicSelector;
+    const nextPageButtonSelector = isMobileViewport
+      ? topicNextPageMobileButton
+      : topicNextPageDesktopButton;
     try {
       await this.page.waitForSelector(topicNameSelector);
       const initialTopic = await this.page.$eval(
@@ -1061,9 +1122,9 @@ export class TopicManager extends BaseUser {
 
       if (expectedSkills.length === 0) {
         if (topicElements.length !== 0) {
-          throw new Error('Expected no topics, but some were found.');
+          throw new Error('Expected no skills, but some were found.');
         }
-        showMessage('No topics found, as expected.');
+        showMessage('No skills found, as expected.');
         return;
       }
 
@@ -1083,11 +1144,11 @@ export class TopicManager extends BaseUser {
 
       if (missingTopics.length > 0) {
         throw new Error(
-          `Expected topics ${missingTopics.join(', ')} to be present, but they were not found.`
+          `Expected skill ${missingTopics.join(', ')} to be present, but they were not found.`
         );
       }
 
-      showMessage('Filtered topics match the expected topics.');
+      showMessage('Filtered skills match the expected skills.');
     } catch (error) {
       console.error(error.stack);
       throw error;
@@ -1113,9 +1174,9 @@ export class TopicManager extends BaseUser {
         )
       );
       if (!topicNames.every((name, index) => name === expectedOrder[index])) {
-        throw new Error('Topics are not in the expected order.');
+        throw new Error('Skills are not in the expected order.');
       }
-      showMessage('Topics are in the expected order.');
+      showMessage('Skills are in the expected order.');
     } catch (error) {
       console.error(error.stack);
       throw error;
@@ -1133,6 +1194,9 @@ export class TopicManager extends BaseUser {
     const skillNameSelector = isMobileViewport
       ? mobileSkillSelector
       : desktopSkillSelector;
+    const nextPageButtonSelector = isMobileViewport
+      ? skillsNextPageMobileButton
+      : skillsNextPageDesktopButton;
     try {
       await this.page.waitForSelector(skillNameSelector);
       const initialTopic = await this.page.$eval(
@@ -1336,8 +1400,7 @@ export class TopicManager extends BaseUser {
 
     await this.page.goto(topicAndSkillsDashboardUrl);
     await this.page.waitForSelector(skillsTab, {visible: true});
-    await this.clickOn(skillsTab);
-    await this.page.waitForSelector(skillSelector, {visible: true});
+    await this.navigateToSkillTab();
     await this.page.waitForSelector(skillListItemSelector, {visible: true});
 
     const skills = await this.page.$$(skillListItemSelector);

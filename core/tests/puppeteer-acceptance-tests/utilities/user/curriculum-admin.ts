@@ -341,11 +341,11 @@ export class CurriculumAdmin extends BaseUser {
    */
   async createTopic(name: string, urlFragment: string): Promise<string> {
     await this.navigateToTopicAndSkillsDashboardPage();
-    const mobileTopicSelectorElement = await this.page.$(mobileTopicSelector);
+    const TopicSelectorElement = await this.page.$(desktopTopicSelector);
 
-    if (!mobileTopicSelectorElement) {
+    if (!TopicSelectorElement || !this.isViewportAtMobileWidth()) {
       await this.clickOn(createNewTopicButton);
-    } else if (this.isViewportAtMobileWidth()) {
+    } else {
       await this.clickOn(createNewTopicMobileButton);
     }
 

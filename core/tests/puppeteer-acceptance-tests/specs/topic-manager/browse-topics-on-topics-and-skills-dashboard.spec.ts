@@ -40,7 +40,7 @@ describe('Topic Manager', function () {
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Subtraction', 'subtract');
     await curriculumAdmin.createNewClassroom('Math', 'math');
-    await curriculumAdmin.addTopicToClassroom('Addition', 'Math');
+    await curriculumAdmin.addTopicToClassroom('Math', 'Addition');
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
@@ -61,9 +61,9 @@ describe('Topic Manager', function () {
         await topicManager.expectFilteredTopics([]),
         await topicManager.filterTopicsByClassroom('Math'),
         await topicManager.expectFilteredTopics(['Addition']),
-        await topicManager.filterItemsByKeyword('Addition'),
+        await topicManager.filterTopicsByKeyword('Addition'),
         await topicManager.expectFilteredTopics(['Addition']),
-        await topicManager.sortItems('Least Recently Updated'),
+        await topicManager.sortTopics('Least Recently Updated'),
         await topicManager.expectTopicsInOrder(['Addition', 'Subtraction']),
         await topicManager.adjustPaginatorToShowItemsPerPage(15),
         await topicManager.checkIfTopicPageChangesAfterClickingNext(false);

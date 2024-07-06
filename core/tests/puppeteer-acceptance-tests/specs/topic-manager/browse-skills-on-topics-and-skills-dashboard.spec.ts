@@ -35,15 +35,15 @@ describe('Topic Manager', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    curriculumAdmin.createTopic('Mathematics', 'math');
-    curriculumAdmin.createSkillForTopic('Subtraction', 'Mathematics');
-    curriculumAdmin.createSkillForTopic('Multiplication', 'Mathematics');
+    await curriculumAdmin.createTopic('Mathematics', 'math');
+    await curriculumAdmin.createSkillForTopic('Subtraction', 'Mathematics');
+    await curriculumAdmin.createSkillForTopic('Multiplication', 'Mathematics');
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topic_manager@example.com',
       [ROLES.TOPIC_MANAGER],
-      'Addition'
+      'Mathematics'
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
@@ -53,26 +53,26 @@ describe('Topic Manager', function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
 
       await topicManager.filterSkillsByStatus('Unassigned');
+      // All the skills are already assigned as they were created for the topic in the setup.
+      await topicManager.expectFilteredSkills([]);
+
+      await topicManager.filterSkillsByStatus('Assigned');
       await topicManager.expectFilteredSkills([
         'Multiplication',
         'Subtraction',
       ]);
 
-      await topicManager.filterSkillsByStatus('Published');
-      await topicManager.expectFilteredSkills([]);
+      await topicManager.filterSkillsByKeyword('Multiplication');
+      await topicManager.expectFilteredSkills(['Multiplication']);
 
-      await topicManager.filterItemsByKeyword('Algebra');
-      await topicManager.expectFilteredSkills([]);
-
-      await topicManager.sortItems('Least Recently Updated');
-      await topicManager.expectSkillsInOrder(['Multiplication', 'Subtraction']);
+      await topicManager.sortSkills('Least Recently Updated');
+      await topicManager.expectSkillsInOrder(['Subtraction', 'Multiplication']);
 
       await topicManager.adjustPaginatorToShowItemsPerPage(15);
       await topicManager.checkIfSkillPageChangesAfterClickingNext(false);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
-
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
