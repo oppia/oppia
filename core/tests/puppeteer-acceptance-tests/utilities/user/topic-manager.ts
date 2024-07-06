@@ -1299,7 +1299,7 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * This function checks if the error page heading is "Error 404".
+   * This function checks if "Create Topic" button is present or not.
    */
   async expectCreateTopicButtonNotPresent(): Promise<void> {
     const isMobileViewport = this.isViewportAtMobileWidth();
@@ -1319,7 +1319,7 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * This function checks if create skill button is not present.
+   * This function checks if "Create Skill" button is not present.
    */
   async expectCreateSkillButtonNotPresent(): Promise<void> {
     const isMobileViewport = this.isViewportAtMobileWidth();
