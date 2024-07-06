@@ -64,14 +64,7 @@ const mergeSkillsButtonMobile = '.e2e-test-mobile-merge-skills-button';
 const mergeSkillsButtonDesktop = '.e2e-test-merge-skills-button';
 
 // Story Creation Modal.
-const addStoryButton = 'button.e2e-test-create-story-button';
-const storyTitleField = 'input.e2e-test-new-story-title-field';
-const storyDescriptionField = 'textarea.e2e-test-new-story-description-field';
-const storyUrlFragmentField = 'input.e2e-test-new-story-url-fragment-field';
-const createStoryButton = 'button.e2e-test-confirm-story-creation-button';
 const saveStoryButton = 'button.e2e-test-save-story-button';
-const storyMetaTagInput = '.e2e-test-story-meta-tag-content-field';
-const mobileStoryDropdown = '.e2e-test-story-dropdown';
 const mobileSaveStoryChangesButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-changes';
 
@@ -131,6 +124,7 @@ const mobileSkillSelector = 'span.e2e-test-mobile-skill-name';
 const desktopSkillSelector = '.e2e-test-skill-description';
 const itemsPerPageDropdown = '.e2e-test-select-items-per-page-dropdown';
 const filterOptionSelector = '.mat-option-text';
+const topicNameField = '.e2e-test-topic-name-field';
 
 export class TopicManager extends BaseUser {
   /**
@@ -1143,6 +1137,24 @@ export class TopicManager extends BaseUser {
       console.error(error.stack);
       throw error;
     }
+  }
+
+  async expectTopicNameFieldDisabled() {
+    await this.page.waitForSelector(topicNameField);
+    const topicNameFieldElement = await this.page.$(topicNameField);
+    if (!topicNameFieldElement) {
+      throw new Error('Topic name field not found');
+    }
+    const isDisabled = await this.page.evaluate(
+      el => el.disabled,
+      topicNameFieldElement
+    );
+    if (!isDisabled) {
+      throw new Error(
+        'Expected topic name field to be disabled, but it is not.'
+      );
+    }
+    showMessage('Topic name field is disabled as expected.');
   }
 
   async screenshot(path: string) {

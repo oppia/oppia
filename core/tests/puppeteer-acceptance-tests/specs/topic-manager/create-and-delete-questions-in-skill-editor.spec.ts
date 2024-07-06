@@ -55,6 +55,7 @@ describe('Topic Manager User Journey', function () {
       // this scenario (linking and unlinking a skill to a question) in the acceptance test.
       // See: https://github.com/oppia/oppia/issues/20590
       await topicManager.navigateToTopicAndSkillsDashboardPage();
+
       await topicManager.openSkillEditor('Addition');
       await topicManager.navigateToQuestionEditorTab();
 

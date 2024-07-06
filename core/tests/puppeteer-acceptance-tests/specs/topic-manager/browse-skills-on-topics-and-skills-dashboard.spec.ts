@@ -51,18 +51,20 @@ describe('Topic Manager User Journey', function () {
     'should filter skills, sort them, use the paginator, and open an existing skill.',
     async function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
+
       await topicManager.filterSkillsByStatus('Unassigned');
       await topicManager.expectFilteredSkills([
         'Multiplication',
         'Subtraction',
       ]);
+
       await topicManager.filterSkillsByStatus('Published');
       await topicManager.expectFilteredSkills([]);
 
       await topicManager.filterItemsByKeyword('Algebra');
       await topicManager.expectFilteredSkills([]);
 
-      await topicManager.sortItems('name');
+      await topicManager.sortItems('Least Recently Updated');
       await topicManager.expectSkillsInOrder(['Multiplication', 'Subtraction']);
 
       await topicManager.adjustPaginatorToShowItemsPerPage(15);
