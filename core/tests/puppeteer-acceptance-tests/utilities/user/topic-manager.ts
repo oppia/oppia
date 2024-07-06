@@ -15,12 +15,10 @@
 /**
  * @fileoverview Topic manager utility file.
  */
-
 import {BaseUser} from '../common/puppeteer-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
 import {ElementHandle} from 'puppeteer';
-import puppeteer from 'puppeteer';
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
@@ -31,8 +29,6 @@ const closeSaveModalButton = '.e2e-test-close-save-modal-button';
 const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
 
 // Photo Upload Modal.
-const storyPhotoBoxButton =
-  'oppia-create-new-story-modal .e2e-test-photo-button';
 const chapterPhotoBoxButton =
   '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
@@ -62,6 +58,7 @@ const topicNameSelector = '.e2e-test-topic-name-in-topic-select-modal';
 const confirmMoveButton = '.e2e-test-confirm-move-button';
 const mergeSkillsButtonMobile = '.e2e-test-mobile-merge-skills-button';
 const mergeSkillsButtonDesktop = '.e2e-test-merge-skills-button';
+const skillsTab = 'a.e2e-test-skills-tab';
 
 // Story Creation Modal.
 const saveStoryButton = 'button.e2e-test-save-story-button';
@@ -125,6 +122,24 @@ const desktopSkillSelector = '.e2e-test-skill-description';
 const itemsPerPageDropdown = '.e2e-test-select-items-per-page-dropdown';
 const filterOptionSelector = '.mat-option-text';
 const topicNameField = '.e2e-test-topic-name-field';
+const errorPageHeadingSelector = '.e2e-test-error-page-heading';
+const createNewTopicMobileButton = '.e2e-test-create-topic-mobile-button';
+const createNewTopicButton = '.e2e-test-create-topic-button';
+const createNewSkillMobileButton =
+  '.e2e-test-mobile-create-skill-button-secondary';
+const createNewSkillButton = '.e2e-test-create-skill-button-circle';
+const desktopTopicListItemSelector = '.list-item';
+const mobileTopicListItemSelector = '.topic-item';
+const desktopTopicListItemOptions = '.e2e-test-topic-edit-box';
+const mobileTopicListItemOptions = '.e2e-test-mobile-topic-edit-box';
+const desktopDeleteTopicButton = '.e2e-test-delete-topic-button';
+const mobileDeleteTopicButton = '.e2e-test-mobile-delete-topic-button';
+const desktopSkillListItemSelector = '.list-item';
+const mobileSkillListItemSelector = '.skill-item';
+const desktopSkillListItemOptions = '.e2e-test-skill-edit-box';
+const desktopDeleteSkillButton = '.e2e-test-delete-skill-button';
+const mobileSkillListItemOptions = '.e2e-test-mobile-skills-option';
+const mobileDeleteSkillButton = '.e2e-test-mobile-delete-skill-button';
 
 export class TopicManager extends BaseUser {
   /**
@@ -180,6 +195,20 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(questionPreviewTab);
       await this.clickAndWaitForNavigation(questionPreviewTab);
     }
+  }
+
+  /**
+   * Function to navigate to classroom admin page.
+   */
+  async navigateToClassroomAdminPage(): Promise<void> {
+    await this.goto(testConstants.URLs.ClassroomAdmin);
+  }
+
+  /**
+   * Function to navigate the skills tab in topics and skills dashboard.
+   */
+  async navigateToSkillsTab(): Promise<void> {
+    await this.clickOn(skillsTab);
   }
 
   /**
@@ -1139,30 +1168,203 @@ export class TopicManager extends BaseUser {
     }
   }
 
-  async expectTopicNameFieldDisabled() {
-    await this.page.waitForSelector(topicNameField);
-    const topicNameFieldElement = await this.page.$(topicNameField);
-    if (!topicNameFieldElement) {
-      throw new Error('Topic name field not found');
+  /**
+   * This function checks if the topic name field is disabled.
+   */
+  async expectTopicNameFieldDisabled(): Promise<void> {
+    try {
+      await this.page.waitForSelector(topicNameField);
+      const topicNameFieldElement = await this.page.$(topicNameField);
+      const isDisabled = await this.page.evaluate(
+        el => el.disabled,
+        topicNameFieldElement
+      );
+
+      if (!isDisabled) {
+        throw new Error(
+          'Expected topic name field to be disabled, but it is not.'
+        );
+      }
+
+      showMessage('Verified: Topic name field is disabled as expected.');
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
     }
-    const isDisabled = await this.page.evaluate(
-      el => el.disabled,
-      topicNameFieldElement
-    );
-    if (!isDisabled) {
+  }
+
+  /**
+   * This function checks if the error page heading is "Error 401".
+   */
+  async expectError401Unauthorized(): Promise<void> {
+    try {
+      await this.page.waitForSelector(errorPageHeadingSelector);
+      const errorPageHeadingElement = await this.page.$(
+        errorPageHeadingSelector
+      );
+      const errorPageHeadingText = await this.page.evaluate(
+        element => element.textContent,
+        errorPageHeadingElement
+      );
+      const trimmedErrorPageHeadingText = errorPageHeadingText.trim();
+
+      if (trimmedErrorPageHeadingText !== 'Error 401') {
+        throw new Error(
+          `Expected error page heading to be "Error 401", but got "${trimmedErrorPageHeadingText}"`
+        );
+      }
+
+      showMessage('Verified: Error 401 Unauthorized is displayed as expected.');
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
+  }
+
+  /**
+   * This function checks if the error page heading is "Error 404".
+   */
+  async expectCreateTopicButtonNotPresent(): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const createTopicButton = isMobileViewport
+      ? createNewTopicMobileButton
+      : createNewTopicButton;
+    try {
+      await this.page.waitForSelector(createTopicButton, {timeout: 5000});
+      showMessage('Create topic button is present');
+    } catch (error) {
+      console.error(error.stack);
       throw new Error(
-        'Expected topic name field to be disabled, but it is not.'
+        `Create topic button is present. Original error: ${error.message}`
       );
     }
-    showMessage('Topic name field is disabled as expected.');
   }
 
-  async screenshot(path: string) {
-    await this.page.screenshot({path: `${path}`});
+  /**
+   * This function checks if create skill button is not present.
+   */
+  async expectCreateSkillButtonNotPresent(): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const createSkillButton = isMobileViewport
+      ? createNewSkillMobileButton
+      : createNewSkillButton;
+    try {
+      await this.page.waitForSelector(createSkillButton, {timeout: 5000});
+      showMessage('Create skill button is present');
+    } catch (error) {
+      console.error(error.stack);
+      throw new Error(
+        `Create skill button is present. Original error: ${error.message}`
+      );
+    }
   }
 
-  async timeout(timeout: number) {
-    await this.page.waitForTimeout(timeout);
+  /**
+   * This function verifies the absence of the delete topic button for a given topic.
+   * @param {string} topicName - The name of the topic to check.
+   */
+  async verifyAbsenceOfDeleteTopicButtonInTopic(
+    topicName: string
+  ): Promise<void> {
+    await this.page.goto(topicAndSkillsDashboardUrl);
+
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const topicListItemSelector = isMobileWidth
+      ? mobileTopicListItemSelector
+      : desktopTopicListItemSelector;
+    const topicSelector = isMobileWidth
+      ? mobileTopicSelector
+      : desktopTopicSelector;
+    const topicListItemOptions = isMobileWidth
+      ? mobileTopicListItemOptions
+      : desktopTopicListItemOptions;
+    const deleteTopicButton = isMobileWidth
+      ? mobileDeleteTopicButton
+      : desktopDeleteTopicButton;
+
+    await this.page.waitForSelector(topicListItemSelector);
+
+    const topics = await this.page.$$(topicListItemSelector);
+    for (let topic of topics) {
+      const topicNameElement = await topic.$(topicSelector);
+      if (topicNameElement) {
+        const name: string = await (
+          await topicNameElement.getProperty('textContent')
+        ).jsonValue();
+
+        if (name.trim() === topicName) {
+          await this.page.waitForSelector(topicListItemOptions);
+          const editBox = await topic.$(topicListItemOptions);
+          if (editBox) {
+            await this.waitForElementToBeClickable(editBox);
+            await editBox.click();
+            await this.page.waitForSelector(deleteTopicButton);
+          } else {
+            throw new Error('Edit button not found');
+          }
+
+          const deleteButton = await topic.$(deleteTopicButton);
+          if (deleteButton) {
+            throw new Error('Delete button is available');
+          }
+        }
+      }
+    }
+    showMessage('Delete button is not available in the topic');
+  }
+
+  /**
+   * This function verifies the absence of the delete skill button for a given skill.
+   * @param {string} skillName - The name of the skill to check.
+   */
+  async verifyAbsenceOfDeleteSkillButtonInTopic(
+    skillName: string
+  ): Promise<void> {
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const skillSelector = isMobileWidth
+      ? mobileSkillSelector
+      : desktopSkillSelector;
+    const skillListItemSelector = isMobileWidth
+      ? mobileSkillListItemSelector
+      : desktopSkillListItemSelector;
+    const skillListItemOptions = isMobileWidth
+      ? mobileSkillListItemOptions
+      : desktopSkillListItemOptions;
+    const deleteSkillButton = isMobileWidth
+      ? mobileDeleteSkillButton
+      : desktopDeleteSkillButton;
+
+    await this.page.goto(topicAndSkillsDashboardUrl);
+    await this.page.waitForSelector(skillsTab, {visible: true});
+    await this.clickOn(skillsTab);
+    await this.page.waitForSelector(skillSelector, {visible: true});
+    await this.page.waitForSelector(skillListItemSelector, {visible: true});
+
+    const skills = await this.page.$$(skillListItemSelector);
+    for (let skill of skills) {
+      const skillNameElement = await skill.$(skillSelector);
+      if (skillNameElement) {
+        const name = await (
+          await skillNameElement.getProperty('textContent')
+        ).jsonValue();
+
+        if (name === `${skillName}`) {
+          await skill.waitForSelector(skillListItemOptions, {visible: true});
+          const editBox = await skill.$(skillListItemOptions);
+          if (editBox) {
+            await editBox.click();
+            await this.page.waitForSelector(deleteSkillButton);
+          } else {
+            throw new Error('Edit button not found');
+          }
+
+          const deleteButton = await skill.$(deleteSkillButton);
+          if (deleteButton) {
+            throw new Error('Delete skill button is available');
+          }
+        }
+      }
+    }
   }
 }
 

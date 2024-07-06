@@ -187,6 +187,7 @@ const topicNode = '.e2e-test-topic-node';
 const closeTopicDependencyButton = '.e2e-test-close-topic-dependency-modal';
 const addTopicFormFieldInput = '.mat-input-element';
 const createNewTopicButton = '.e2e-test-create-topic-button';
+const createNewTopicMobileButton = '.e2e-test-create-topic-mobile-button';
 
 const addStoryButton = 'button.e2e-test-create-story-button';
 const storyTitleField = 'input.e2e-test-new-story-title-field';
@@ -217,7 +218,6 @@ const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
 const saveStoryButton = 'button.e2e-test-save-story-button';
 const mobileSaveStoryChangesButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-changes';
-const createNewTopicMobileButton = '.e2e-test-create-topic-mobile-button';
 export class CurriculumAdmin extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.

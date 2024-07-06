@@ -25,7 +25,7 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 const questionText = 'Add 1+2';
 
-describe('Topic Manager User Journey', function () {
+describe('Topic Manager', function () {
   let topicManager: TopicManager & CurriculumAdmin;
   let curriculumAdmin: CurriculumAdmin;
 

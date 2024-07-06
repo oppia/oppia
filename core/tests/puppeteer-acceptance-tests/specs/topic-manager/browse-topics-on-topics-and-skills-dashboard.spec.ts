@@ -24,7 +24,7 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-describe('Topic Manager User Journey', function () {
+describe('Topic Manager', function () {
   let topicManager: TopicManager;
   let curriculumAdmin: CurriculumAdmin;
 
@@ -51,7 +51,7 @@ describe('Topic Manager User Journey', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should filter topics, sort them, use the paginator, and open an existing topic.',
+    'should be able to filter topics, sort them, use the paginator, and open an existing topic.',
     async function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage(),
         await topicManager.filterTopicsByStatus('Not Published'),
