@@ -210,7 +210,8 @@ def check_coverage_changes(
 
     Args:
         files_to_check: list(str)|None. The list of files to check for
-            coverage changes.
+            coverage changes. If there is no files to check list provided,
+            then this function will check all files.
 
     Raises:
         Exception. LCOV_FILE_PATH doesn't exist.

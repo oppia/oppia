@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import collections
-import pprint
 import subprocess
 import sys
 
@@ -66,14 +65,14 @@ def get_local_git_repository_remote_name() -> Optional[bytes]:
 
     if not remote_num:
         raise Exception(
-            'Error: Please set the git upstream repository.\n'
+            'Error: Please set the git \'upstream\' repository.\n'
             'To do that follow these steps:\n'
             '1. Run the command \'git remote -v\'\n'
             '2a. If \'upstream\' is listed in the command output, then run the '
             'command \'git remote set-url upstream '
             'https://github.com/oppia/oppia.git\'\n'
-            '2b. If upstream is not listed in the command output, then run the '
-            'command \'git remote add upstream '
+            '2b. If \'upstream\' is not listed in the command output, then run '
+            'the command \'git remote add upstream '
             'https://github.com/oppia/oppia.git\'\n'
         )
 
@@ -82,9 +81,9 @@ def get_local_git_repository_remote_name() -> Optional[bytes]:
             'Warning: Please keep only one remote branch for oppia:develop.\n'
             'To do that follow these steps:\n'
             '1. Run the command \'git remote -v\'\n'
-            '2. This command will list the remote references, there will be '
-            'multiple remotes listed for upstream, but we want to make sure '
-            'that there is only one main upstream remote. Please use the '
+            '2. This command will list the remote references. There will be '
+            'multiple remotes listed for \'upstream\', but we want to make sure'
+            ' that there is only one main \'upstream\' remote. Please use the '
             'command, \'git remote remove <remote_name>\' on all remotes '
             'that are not the main oppia repository.\n'
         )
@@ -107,7 +106,8 @@ def git_diff_name_status(
         list. List of FileDiffs (tuple with name/status).
 
     Raises:
-        ValueError. Raise ValueError if git command fails.
+        ValueError. Raise ValueError if git command fails or if invalid
+            arguments are provided.
     """
     git_cmd = ['git', 'diff', '--name-status']
     if diff_filter == '':
@@ -209,7 +209,10 @@ def get_parent_branch_name_for_diff() -> str:
 
 
 def extract_acmrt_files_from_diff(diff_files: List[FileDiff]) -> List[bytes]:
-    """Grab only files out of a list of FileDiffs that have a ACMRT status."""
+    """Grab only files out of a list of FileDiffs that have a ACMRT status.
+    ACMRT files are files that are Added, Copied, Modified, Renamed, or
+    Type-changed.
+    """
     if not diff_files:
         return []
     acmrt_files = [f.name for f in diff_files if f.status in b'ACMRT']
@@ -236,9 +239,6 @@ def get_refs() -> List[GitRef]:
         local_sha, local_ref = local_ref_line.split()
         remote_sha, remote_ref = remote_ref_line.split()
         ref_list.append(GitRef(local_ref, local_sha, remote_ref, remote_sha))
-    if ref_list != []:
-        print('Ref list:')
-        pprint.pprint(ref_list)
     return ref_list
 
 
@@ -255,7 +255,7 @@ def get_changed_files(
 
     Returns:
         dict. Dict mapping branch names to 2-tuples of the form (list of
-        changed files, list of ACMRT files).
+        changed files, list of changed files that are ACMRT).
     """
     if not ref_list:
         return {}

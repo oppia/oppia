@@ -138,14 +138,14 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap, self.assertRaisesRegex(
             Exception,
-            'Error: Please set the git upstream repository.\n'
+            'Error: Please set the git \'upstream\' repository.\n'
             'To do that follow these steps:\n'
             '1. Run the command \'git remote -v\'\n'
             '2a. If \'upstream\' is listed in the command output, then run the '
             'command \'git remote set-url upstream '
             'https://github.com/oppia/oppia.git\'\n'
-            '2b. If upstream is not listed in the command output, then run the '
-            'command \'git remote add upstream '
+            '2b. If \'upstream\' is not listed in the command output, then run '
+            'the command \'git remote add upstream '
             'https://github.com/oppia/oppia.git\'\n'):
             git_changes_utils.get_local_git_repository_remote_name()
 
@@ -176,9 +176,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             'Warning: Please keep only one remote branch for oppia:develop.\n'
             'To do that follow these steps:\n'
             '1. Run the command \'git remote -v\'\n'
-            '2. This command will list the remote references, there will be '
-            'multiple remotes listed for upstream, but we want to make sure '
-            'that there is only one main upstream remote. Please use the '
+            '2. This command will list the remote references. There will be '
+            'multiple remotes listed for \'upstream\', but we want to make sure'
+            ' that there is only one main \'upstream\' remote. Please use the '
             'command, \'git remote remove <remote_name>\' on all remotes '
             'that are not the main oppia repository.\n' in self.print_arr)
 
