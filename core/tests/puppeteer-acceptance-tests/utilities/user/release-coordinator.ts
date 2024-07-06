@@ -44,6 +44,8 @@ const saveButtonSelector = '.e2e-test-save-button';
 const featureFlagNameSelector = '.e2e-test-feature-name';
 const featureFlagDiv = '.e2e-test-feature-flag';
 const rolloutPercentageInput = '.e2e-test-editor-int';
+const featureFlagSelector = '.e2e-test-feature-flag';
+const enableFeatureSelector = '.e2e-test-value-selector';
 
 // Selectors for jobs.
 const jobInputField = '.mat-input-element';
@@ -58,8 +60,7 @@ const promoMessageInputSelector = '.mat-input-element';
 const actionStatusMessageSelector = '.e2e-test-status-message';
 const toastMessageSelector = '.toast-message';
 const memoryCacheProfileTableSelector = '.view-results-table';
-const featureFlagSelector = '.e2e-test-feature-flag';
-const enableFeatureSelector = '.e2e-test-value-selector';
+const getMemoryCacheProfileButton = '.e2e-test-get-memory-cache-profile-button';
 
 export class ReleaseCoordinator extends BaseUser {
   /**
@@ -341,7 +342,7 @@ export class ReleaseCoordinator extends BaseUser {
    * Clicks on the 'Get Memory Cache Profile' button and waits for the results table to appear.
    */
   async getMemoryCacheProfile(): Promise<void> {
-    await this.clickOn('Get Memory Cache Profile');
+    await this.clickOn(getMemoryCacheProfileButton);
     await this.page.waitForSelector(memoryCacheProfileTableSelector);
   }
 
