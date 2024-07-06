@@ -19,6 +19,7 @@ import {BaseUser} from '../common/puppeteer-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
 import {ElementHandle} from 'puppeteer';
+import puppeteer from 'puppeteer';
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
@@ -178,6 +179,14 @@ export class TopicManager extends BaseUser {
     } else {
       await this.clickAndWaitForNavigation(skillQuestionTab);
     }
+  }
+
+  /**
+   * Function to open the story editor page.
+   * @param {string} storyID - The Id of the story to open.
+   */
+  async openStoryEditor(storyID: string): Promise<void> {
+    await this.goto(`http://localhost:8181/story_editor/${storyID}`);
   }
 
   /**
@@ -978,6 +987,7 @@ export class TopicManager extends BaseUser {
       ? mobileTopicSelector
       : desktopTopicSelector;
     try {
+      await this.waitForPageToFullyLoad();
       const topicElements = await this.page.$$(topicNameSelector);
 
       if (expectedTopics.length === 0) {
@@ -1026,6 +1036,7 @@ export class TopicManager extends BaseUser {
       : desktopTopicSelector;
 
     try {
+      await this.waitForPageToFullyLoad();
       await this.page.waitForSelector(topicNameSelector);
       const topicElements = await this.page.$$(topicNameSelector);
       const topicNames = await Promise.all(
@@ -1118,6 +1129,7 @@ export class TopicManager extends BaseUser {
       ? mobileSkillSelector
       : desktopSkillSelector;
     try {
+      await this.waitForPageToFullyLoad();
       const topicElements = await this.page.$$(skillNameSelector);
 
       if (expectedSkills.length === 0) {
@@ -1166,6 +1178,7 @@ export class TopicManager extends BaseUser {
       : desktopSkillSelector;
 
     try {
+      await this.waitForPageToFullyLoad();
       await this.page.waitForSelector(skillNameSelector);
       const topicElements = await this.page.$$(skillNameSelector);
       const topicNames = await Promise.all(
@@ -1295,12 +1308,13 @@ export class TopicManager extends BaseUser {
       : createNewTopicButton;
     try {
       await this.page.waitForSelector(createTopicButton, {timeout: 5000});
-      showMessage('Create topic button is present');
+      throw new Error('Create topic button is present, which is not expected.');
     } catch (error) {
-      console.error(error.stack);
-      throw new Error(
-        `Create topic button is present. Original error: ${error.message}`
-      );
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        showMessage('Create topic button is not present as expected.');
+      } else {
+        throw error;
+      }
     }
   }
 
@@ -1314,12 +1328,13 @@ export class TopicManager extends BaseUser {
       : createNewSkillButton;
     try {
       await this.page.waitForSelector(createSkillButton, {timeout: 5000});
-      showMessage('Create skill button is present');
+      throw new Error('Create skill button is present, which is not expected.');
     } catch (error) {
-      console.error(error.stack);
-      throw new Error(
-        `Create skill button is present. Original error: ${error.message}`
-      );
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        showMessage('Create skill button is not present as expected.');
+      } else {
+        throw error;
+      }
     }
   }
 
@@ -1330,7 +1345,7 @@ export class TopicManager extends BaseUser {
   async verifyAbsenceOfDeleteTopicButtonInTopic(
     topicName: string
   ): Promise<void> {
-    await this.page.goto(topicAndSkillsDashboardUrl);
+    await this.goto(topicAndSkillsDashboardUrl);
 
     const isMobileWidth = this.isViewportAtMobileWidth();
     const topicListItemSelector = isMobileWidth
@@ -1362,7 +1377,6 @@ export class TopicManager extends BaseUser {
           if (editBox) {
             await this.waitForElementToBeClickable(editBox);
             await editBox.click();
-            await this.page.waitForSelector(deleteTopicButton);
           } else {
             throw new Error('Edit button not found');
           }
@@ -1381,9 +1395,11 @@ export class TopicManager extends BaseUser {
    * This function verifies the absence of the delete skill button for a given skill.
    * @param {string} skillName - The name of the skill to check.
    */
-  async verifyAbsenceOfDeleteSkillButtonInTopic(
+  async verifyAbsenceOfDeleteSkillButtonInSkill(
     skillName: string
   ): Promise<void> {
+    await this.goto(topicAndSkillsDashboardUrl);
+
     const isMobileWidth = this.isViewportAtMobileWidth();
     const skillSelector = isMobileWidth
       ? mobileSkillSelector
@@ -1398,25 +1414,26 @@ export class TopicManager extends BaseUser {
       ? mobileDeleteSkillButton
       : desktopDeleteSkillButton;
 
-    await this.page.goto(topicAndSkillsDashboardUrl);
     await this.page.waitForSelector(skillsTab, {visible: true});
     await this.navigateToSkillTab();
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(skillListItemSelector, {visible: true});
 
     const skills = await this.page.$$(skillListItemSelector);
     for (let skill of skills) {
       const skillNameElement = await skill.$(skillSelector);
       if (skillNameElement) {
-        const name = await (
+        const name: string = await (
           await skillNameElement.getProperty('textContent')
         ).jsonValue();
 
-        if (name === `${skillName}`) {
-          await skill.waitForSelector(skillListItemOptions, {visible: true});
+        if (name.trim() === `${skillName}`) {
+          await this.page.waitForSelector(skillListItemOptions, {
+            visible: true,
+          });
           const editBox = await skill.$(skillListItemOptions);
           if (editBox) {
             await editBox.click();
-            await this.page.waitForSelector(deleteSkillButton);
           } else {
             throw new Error('Edit button not found');
           }
@@ -1428,6 +1445,7 @@ export class TopicManager extends BaseUser {
         }
       }
     }
+    showMessage('Delete button is not available in the skill');
   }
 }
 

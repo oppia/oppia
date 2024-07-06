@@ -73,6 +73,7 @@ describe('Topic Manager', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

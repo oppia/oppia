@@ -20,13 +20,21 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
+// This error will arise, as in the test, the topic manager will try to access the classroom-admin page and story editor, which is not allowed to them.
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /Failed to load resource: the server responded with a status of 401 \(Unauthorized\)/,
+  /The platform feature service has not been initialized\./,
+]);
+
 describe('Topic Manager', function () {
   let topicManager: TopicManager;
   let curriculumAdmin: CurriculumAdmin;
+  let storyID: string;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -35,12 +43,16 @@ describe('Topic Manager', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    curriculumAdmin.createTopic('Addition', 'add');
-    curriculumAdmin.createSkillForTopic('Single Digit Addition', 'Addition');
+    await curriculumAdmin.createTopic('Addition', 'add');
+    await curriculumAdmin.createSkillForTopic(
+      'Single Digit Addition',
+      'Addition'
+    );
 
-    curriculumAdmin.createTopic('Subtraction', 'subtract');
-    curriculumAdmin.createSkillForTopic(
-      'Single Digit Subtraction',
+    await curriculumAdmin.createTopic('Subtraction', 'subtract');
+    storyID = await curriculumAdmin.createStory(
+      'Subtraction Story',
+      'story',
       'Subtraction'
     );
 
@@ -55,12 +67,15 @@ describe('Topic Manager', function () {
   it(
     'should not be able to edit topics and stories not owned.',
     async function () {
-      // Try to edit a topic not owned.
       await topicManager.navigateToTopicAndSkillsDashboardPage();
 
-      // Topic subtraction is not owned as the topic manager is only assigned with "Addition" topic.
       await topicManager.openTopicEditor('Subtraction');
+      // Topic "Subtraction" is not owned by the topic manager as it is not assigned to them during the setup.
       await topicManager.expectTopicNameFieldDisabled();
+
+      await topicManager.openStoryEditor(storyID);
+      // Story "Subtraction Story" belongs to the topic "Subtraction" which is not owned by the topic manager.
+      await topicManager.expectError401Unauthorized();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -68,23 +83,15 @@ describe('Topic Manager', function () {
   it(
     'should not be able to create and delete topics and skills.',
     async function () {
-      // Try to create a new topic.
       await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.expectCreateTopicButtonNotPresent();
 
-      // Try to delete a owned topic.
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
+      await topicManager.expectCreateTopicButtonNotPresent();
       await topicManager.verifyAbsenceOfDeleteTopicButtonInTopic('Addition');
 
-      // Try to create a new skill.
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
       await topicManager.navigateToSkillsTab();
-      await topicManager.expectCreateSkillButtonNotPresent();
 
-      // Try to delete a owned skill.
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.navigateToSkillsTab();
-      await topicManager.verifyAbsenceOfDeleteSkillButtonInTopic(
+      await topicManager.expectCreateSkillButtonNotPresent();
+      await topicManager.verifyAbsenceOfDeleteSkillButtonInSkill(
         'Single Digit Addition'
       );
     },
@@ -94,7 +101,6 @@ describe('Topic Manager', function () {
   it(
     'should not be able to access the classroom-admin page.',
     async function () {
-      // Try to access the classroom-admin page.
       await topicManager.navigateToClassroomAdminPage();
       await topicManager.expectError401Unauthorized();
     },

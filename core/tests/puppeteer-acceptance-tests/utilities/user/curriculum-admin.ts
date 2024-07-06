@@ -862,6 +862,45 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
+   * Creates a new story with the given title, URL fragment, and topic name.
+   * Note: This function only creates a story and does not add any chapters to it.
+   * @param {string} storyTitle - The title of the story.
+   * @param {string} storyUrlFragment - The URL fragment of the story.
+   * @param {string} topicName - The name of the topic.
+   */
+  async createStory(
+    storyTitle: string,
+    storyUrlFragment: string,
+    topicName: string
+  ): Promise<string> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileStoryDropdown);
+    }
+    await this.clickOn(addStoryButton);
+    await this.type(storyTitleField, storyTitle);
+    await this.type(storyUrlFragmentField, storyUrlFragment);
+    await this.type(
+      storyDescriptionField,
+      `Story creation description for ${storyTitle}.`
+    );
+
+    await this.clickOn(storyPhotoBoxButton);
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickAndWaitForNavigation(createStoryButton);
+
+    const url = new URL(this.page.url());
+    const pathSegments = url.pathname.split('/');
+    const storyId = pathSegments[pathSegments.length - 1];
+
+    return storyId;
+  }
+
+  /**
    * Create a chapter for a certain story.
    */
   async createChapter(explorationId: string): Promise<void> {
@@ -934,7 +973,7 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} topicName - The name of the topic to delete.
    */
   async deleteTopic(topicName: string): Promise<void> {
-    await this.page.goto(topicAndSkillsDashboardUrl);
+    await this.goto(topicAndSkillsDashboardUrl);
 
     const isMobileWidth = this.isViewportAtMobileWidth();
     const topicListItemSelector = isMobileWidth
@@ -1031,6 +1070,8 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} skillName - The name of the skill to delete.
    */
   async deleteSkill(skillName: string): Promise<void> {
+    await this.goto(topicAndSkillsDashboardUrl);
+
     const isMobileWidth = this.isViewportAtMobileWidth();
     const skillSelector = isMobileWidth
       ? mobileSkillSelector
@@ -1045,22 +1086,24 @@ export class CurriculumAdmin extends BaseUser {
       ? mobileDeleteSkillButton
       : desktopDeleteSkillButton;
 
-    await this.page.goto(topicAndSkillsDashboardUrl);
     await this.page.waitForSelector(skillsTab, {visible: true});
     await this.clickOn(skillsTab);
     await this.page.waitForSelector(skillSelector, {visible: true});
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(skillListItemSelector, {visible: true});
 
     const skills = await this.page.$$(skillListItemSelector);
     for (let skill of skills) {
       const skillNameElement = await skill.$(skillSelector);
       if (skillNameElement) {
-        const name = await (
+        const name: string = await (
           await skillNameElement.getProperty('textContent')
         ).jsonValue();
 
-        if (name === `${skillName}`) {
-          await skill.waitForSelector(skillListItemOptions, {visible: true});
+        if (name.trim() === `${skillName}`) {
+          await this.page.waitForSelector(skillListItemOptions, {
+            visible: true,
+          });
           const editBox = await skill.$(skillListItemOptions);
           if (editBox) {
             await editBox.click();
