@@ -223,7 +223,6 @@ URLS = [
     get_redirect_route(r'/splash', SplashRedirectPage),
     get_redirect_route(
         r'/internetconnectivityhandler', InternetConnectivityHandler),
-    get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),
     get_redirect_route(r'/site_guidelines', pages.TeachRedirectPage),
@@ -238,9 +237,25 @@ URLS = [
         access_validators.ClassroomAccessValidationHandler),
 
     get_redirect_route(
+        r'%s/can_access_classrooms_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ClassroomsPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
+        r'%s/can_access_collection_editor_page/<collection_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.CollectionEditorAccessValidationPage
+    ),
+    get_redirect_route(
         r'%s/can_access_blog_home_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.BlogHomePageAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>' % # pylint: disable=line-too-long
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.SubtopicViewerPageAccessValidationHandler),
 
     get_redirect_route(
         r'%s/can_access_blog_post_page' %
@@ -265,6 +280,12 @@ URLS = [
         r'%s/can_access_release_coordinator_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ReleaseCoordinatorAccessValidationHandler
+    ),
+
+    get_redirect_route(
+        r'%s/can_access_facilitator_dashboard_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.FacilitatorDashboardPageAccessValidationHandler
     ),
 
     get_redirect_route(
@@ -311,6 +332,9 @@ URLS = [
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
         r'/updateblogpostdatahandler', admin.UpdateBlogPostHandler),
+    get_redirect_route(
+        r'%s' % feconf.REGENERATE_TOPIC_SUMMARIES_URL,
+        admin.RegenerateTopicSummariesHandler),
     get_redirect_route(
         r'/contributionrightshandler/<category>',
         contributor_dashboard_admin.ContributionRightsHandler),
@@ -462,6 +486,15 @@ URLS = [
         r'%s' % feconf.NEW_CLASSROOM_ID_HANDLER_URL,
         classroom.NewClassroomIdHandler),
     get_redirect_route(
+        r'%s' % feconf.NEW_CLASSROOM_HANDLER_URL,
+        classroom.NewClassroomHandler),
+    get_redirect_route(
+        r'%s' % feconf.TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL,
+        classroom.TopicsToClassroomsRelationHandler),
+    get_redirect_route(
+        r'%s' % feconf.ALL_CLASSROOMS_SUMMARY_HANDLER_URL,
+        classroom.AllClassroomsSummaryHandler),
+    get_redirect_route(
         r'%s/<classroom_id>' % feconf.CLASSROOM_HANDLER_URL,
         classroom.ClassroomHandler),
     get_redirect_route(
@@ -488,6 +521,11 @@ URLS = [
         feconf.GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST,
         voiceover.GetSampleVoiceoversForGivenVoiceArtistHandler
     ),
+    get_redirect_route(
+        r'/entity_voiceovers_bulk_handler/<entity_type>/<entity_id>/'
+        r'<entity_version>/<language_code>',
+        voiceover.EntityVoiceoversBulkHandler
+    ),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
@@ -500,9 +538,6 @@ URLS = [
     get_redirect_route(
         r'%s/revision' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
-    get_redirect_route(
-        r'%s/revision/<subtopic_url_fragment>' %
-        feconf.TOPIC_VIEWER_URL_PREFIX, subtopic_viewer.SubtopicViewerPage),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
@@ -611,7 +646,6 @@ URLS = [
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
     get_redirect_route(r'/gallery', library.LibraryRedirectPage),
     get_redirect_route(r'/contribute', library.LibraryRedirectPage),
-    get_redirect_route(r'/learn', classroom.DefaultClassroomRedirectPage),
     get_redirect_route(r'/playtest', library.LibraryRedirectPage),
     get_redirect_route(
         feconf.EXPLORATION_SUMMARIES_DATA_URL,
@@ -813,6 +847,9 @@ URLS = [
         r'%s/<entity_type>/<entity_id>' %
         feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
         editor.LearnerAnswerInfoHandler),
+    get_redirect_route(
+        r'/entity_translations_bulk_handler/<entity_type>/<entity_id>/<entity_version>', # pylint: disable=line-too-long
+        editor.EntityTranslationsBulkHandler),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
@@ -880,10 +917,6 @@ URLS = [
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
         collection_viewer.CollectionDataHandler),
-
-    get_redirect_route(
-        r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
-        collection_editor.CollectionEditorPage),
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
         collection_editor.EditableCollectionDataHandler),
@@ -1111,9 +1144,6 @@ URLS = [
         r'/learner_group_learner_specific_progress_handler/<learner_group_id>',
         learner_group.LearnerGroupLearnerSpecificProgressHandler
     ),
-    get_redirect_route(
-        r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
-        learner_group.FacilitatorDashboardPage),
     get_redirect_route(
         r'/learner_group_search_learner_handler',
         learner_group.LearnerGroupSearchLearnerHandler),

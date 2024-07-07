@@ -40,6 +40,7 @@ export class ExplorationSaveAndPublishButtonsComponent
   directiveSubscriptions = new Subscription();
 
   isModalDisplayed: boolean = false;
+  autosaveIsInProgress: boolean;
   saveIsInProcess: boolean;
   publishIsInProcess: boolean;
   loadingDotsAreShown: boolean;
@@ -168,7 +169,6 @@ export class ExplorationSaveAndPublishButtonsComponent
       .finally(() => {
         this.publishIsInProcess = false;
         this.loadingDotsAreShown = false;
-        this.entityTranslationsService.reset();
       });
   }
 
@@ -185,7 +185,6 @@ export class ExplorationSaveAndPublishButtonsComponent
         () => {
           this.saveIsInProcess = false;
           this.loadingDotsAreShown = false;
-          this.entityTranslationsService.reset();
         },
         () => {}
       );
@@ -212,6 +211,14 @@ export class ExplorationSaveAndPublishButtonsComponent
             .then(permissions => {
               this.explorationCanBePublished = permissions.canPublish;
             });
+        }
+      )
+    );
+
+    this.directiveSubscriptions.add(
+      this.changeListService.autosaveInProgressEventEmitter.subscribe(
+        (autosaveInProgress: boolean) => {
+          this.autosaveIsInProgress = autosaveInProgress;
         }
       )
     );

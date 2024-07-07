@@ -26,7 +26,6 @@ export enum FeatureNames {
   DummyFeatureFlagForE2ETests = 'dummy_feature_flag_for_e2e_tests',
   EndChapterCelebration = 'end_chapter_celebration',
   CheckpointCelebration = 'checkpoint_celebration',
-  ContributorDashboardAccomplishments = 'contributor_dashboard_accomplishments',
   DiagnosticTest = 'diagnostic_test',
   SerialChapterLaunchCurriculumAdminView = 'serial_chapter_launch_curriculum_admin_view',
   SerialChapterLaunchLearnerView = 'serial_chapter_launch_learner_view',
@@ -37,8 +36,14 @@ export enum FeatureNames {
   LearnerGroupsAreEnabled = 'learner_groups_are_enabled',
   CdAdminDashboardNewUi = 'cd_admin_dashboard_new_ui',
   NewLessonPlayer = 'new_lesson_player',
+  AddVoiceoverWithAccent = 'add_voiceover_with_accent',
   CdAllowUndoingTranslationReview = 'cd_allow_undoing_translation_review',
+  EnableVoiceoverContribution = 'enable_voiceover_contribution',
   AutoUpdateExpVoiceArtistLink = 'auto_update_exp_voice_artist_link',
+  ExplorationEditorCanModifyTranslations = 'exploration_editor_can_modify_translations',
+  ExplorationEditorCanTagMisconceptions = 'exploration_editor_can_tag_misconceptions',
+  EnableMultipleClassrooms = 'enable_multiple_classrooms',
+  RedesignedTopicViewerPage = 'redesigned_topic_viewer_page',
 }
 
 export interface FeatureStatusSummaryBackendDict {

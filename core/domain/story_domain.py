@@ -588,7 +588,7 @@ class StoryNode:
             str. The new next node id.
         """
         current_number = StoryNode.get_number_from_node_id(node_id)
-        incremented_node_id = NODE_ID_PREFIX + str(current_number + 1)
+        incremented_node_id = '%s%s' % (NODE_ID_PREFIX, str(current_number + 1))
         return incremented_node_id
 
     @classmethod
@@ -763,11 +763,18 @@ class StoryNode:
             ValidationError. One or more attributes of the story node are
                 invalid.
         """
-        if self.exploration_id:
-            if not isinstance(self.exploration_id, str):
-                raise utils.ValidationError(
-                    'Expected exploration ID to be a string, received %s' %
-                    self.exploration_id)
+        if self.exploration_id is None:
+            raise utils.ValidationError(
+                'Expected exploration ID to not be None') 
+        if self.exploration_id and not isinstance(self.exploration_id, str):
+            raise utils.ValidationError(
+                'Expected exploration ID to be a string, received %s' %
+                self.exploration_id)
+        if self.exploration_id == '':
+            raise utils.ValidationError(
+                'Expected exploration ID to not be an empty string, '
+                'received %s' % self.exploration_id)
+
         if self.thumbnail_filename is not None:
             self.require_valid_thumbnail_filename(self.thumbnail_filename)
         if self.thumbnail_bg_color is not None and not (
@@ -785,10 +792,6 @@ class StoryNode:
                 self.thumbnail_size_in_bytes == 0):
             raise utils.ValidationError(
                 'Story node thumbnail size in bytes cannot be zero.')
-        if self.exploration_id == '':
-            raise utils.ValidationError(
-                'Expected exploration ID to not be an empty string, '
-                'received %s' % self.exploration_id)
 
         if not isinstance(self.outline, str):
             raise utils.ValidationError(
@@ -1126,6 +1129,28 @@ class StoryContents:
             if node.exploration_id is not None:
                 exp_ids.append(node.exploration_id)
         return exp_ids
+
+    def get_linked_exp_ids_of_published_nodes(self) -> List[str]:
+        """Returns a list of exploration ids linked to each published node of
+        story content.
+
+        Returns:
+            list(str). A list of exploration ids from published nodes.
+        """
+        return self.get_all_linked_exp_ids()[:self.get_published_node_count()]
+
+    def get_published_node_count(self) -> int:
+        """Returns the number of published nodes of story content.
+
+        Returns:
+            int. Number of published nodes.
+        """
+        published_node_count = 0
+        for node in self.nodes:
+            if node.status != constants.STORY_NODE_STATUS_PUBLISHED:
+                break
+            published_node_count += 1
+        return published_node_count
 
     def get_node_with_corresponding_exp_id(self, exp_id: str) -> StoryNode:
         """Returns the node object which corresponds to a given exploration ids.

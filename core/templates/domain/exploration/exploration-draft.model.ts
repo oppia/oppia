@@ -25,12 +25,15 @@ import {SubtitledHtmlBackendDict} from './subtitled-html.model';
 import {RecordedVoiceOverBackendDict} from './recorded-voiceovers.model';
 import {InteractionCustomizationArgsBackendDict} from 'interactions/customization-args-defs';
 import {TranslatedContentBackendDict} from './TranslatedContentObjectFactory';
+import {VoiceoverTypeToVoiceoversBackendDict} from './voiceover.model';
 
 export type ExplorationChange =
   | ExplorationChangeAddState
   | ExplorationChangeAddWrittenTranslation
   | ExplorationChangeMarkTranslationsNeedsUpdate
+  | ExplorationChangeMarkTranslationNeedsUpdateForLanguage
   | ExplorationChangeEditTranslation
+  | ExplorationChangeEditVoiceovers
   | ExplorationChangeRemoveTranslations
   | ExplorationChangeRenameState
   | ExplorationChangeDeleteState
@@ -42,6 +45,7 @@ export type ExplorationChange =
 
 export type ExplorationTranslationChange =
   | ExplorationChangeMarkTranslationsNeedsUpdate
+  | ExplorationChangeMarkTranslationNeedsUpdateForLanguage
   | ExplorationChangeEditTranslation
   | ExplorationChangeRemoveTranslations;
 
@@ -130,11 +134,24 @@ export interface ExplorationChangeMarkTranslationsNeedsUpdate {
   content_id: string;
 }
 
+export interface ExplorationChangeMarkTranslationNeedsUpdateForLanguage {
+  cmd: 'mark_translation_needs_update_for_language';
+  content_id: string;
+  language_code: string;
+}
+
 export interface ExplorationChangeEditTranslation {
   cmd: 'edit_translation';
   content_id: string;
   language_code: string;
   translation: TranslatedContentBackendDict;
+}
+
+export interface ExplorationChangeEditVoiceovers {
+  cmd: 'update_voiceovers';
+  content_id: string;
+  language_accent_code: string;
+  voiceovers: VoiceoverTypeToVoiceoversBackendDict;
 }
 
 export interface ExplorationChangeRemoveTranslations {

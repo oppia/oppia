@@ -40,7 +40,8 @@ export class LearnerTopicSummaryTileComponent implements OnInit {
   topicTitle!: string;
   thumbnailBgColor!: string;
   openInNewWindow = false;
-  @Input() featureFlag!: boolean;
+  @Input() redesignFeatureFlag!: boolean;
+  @Input() lastCard!: boolean;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,

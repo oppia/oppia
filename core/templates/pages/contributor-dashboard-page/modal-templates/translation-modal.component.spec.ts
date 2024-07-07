@@ -53,6 +53,7 @@ import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore
 import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 
 enum ExpansionTabType {
   CONTENT,
@@ -424,6 +425,34 @@ describe('Translation Modal Component', () => {
           type: 'unicode',
         },
       });
+    });
+
+    it('should utilize the modify translations opportunity when available', () => {
+      let translationContent = TranslatedContent.createFromBackendDict({
+        content_value: 'Current translated content.',
+        content_format: 'html',
+        needs_update: false,
+      });
+      component.modifyTranslationOpportunity = {
+        id: 'expId',
+        contentId: 'content_0',
+        heading: 'Update Translation',
+        subheading: 'Introduction',
+        textToTranslate: 'Current content in English.',
+        currentContentTranslation: translationContent,
+      };
+      component.opportunity = null;
+
+      component.ngOnInit();
+
+      expect(component.subheading).toBe('Introduction');
+      expect(component.heading).toBe('Update Translation');
+      expect(component.textToTranslate).toBe('Current content in English.');
+      expect(component.activeContentType).toBe('content');
+      expect(component.activeWrittenTranslation).toBe(
+        'Current translated content.'
+      );
+      expect(component.activeDataFormat).toBe('html');
     });
   });
 
@@ -873,5 +902,22 @@ describe('Translation Modal Component', () => {
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER
       );
     }));
+  });
+
+  it('should close modal and return the new translation when updating translated text', () => {
+    spyOn(activeModal, 'close');
+    spyOn(component, 'translatedTextCanBeSubmitted').and.returnValue(true);
+    component.activeWrittenTranslation = 'Test translation';
+    component.updateTranslatedText();
+
+    expect(activeModal.close).toHaveBeenCalledWith('Test translation');
+  });
+
+  it('should not close modal if new translated text cannot be submitted', () => {
+    spyOn(activeModal, 'close');
+    component.activeWrittenTranslation = 'Test translation';
+    component.updateTranslatedText();
+
+    expect(activeModal.close).not.toHaveBeenCalled();
   });
 });

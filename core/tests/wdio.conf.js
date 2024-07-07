@@ -65,10 +65,6 @@ var suites = {
     './core/tests/webdriverio_desktop/classroomPage.js'
   ],
 
-  classroomPageFileUploadFeatures: [
-    './core/tests/webdriverio_desktop/classroomPageFileUploadFeatures.js'
-  ],
-
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
   ],
@@ -115,10 +111,6 @@ var suites = {
 
   extensions: [
     './core/tests/webdriverio_desktop/extensions.js'
-  ],
-
-  featureGating: [
-    './core/tests/webdriverio/featureGatingFlow.js'
   ],
 
   feedbackUpdates: [
@@ -314,7 +306,9 @@ exports.config = {
   // Options to be passed to Jasmine.
   jasmineOpts: {
     // Default time to wait in ms before a test fails.
-    defaultTimeoutInterval: 1200000
+    defaultTimeoutInterval: 1200000,
+    // Option to stop execution of the suite after the first spec failure.
+    stopOnSpecFailure: true,
   },
 
 
