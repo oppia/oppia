@@ -60,7 +60,7 @@ const promoMessageInputSelector = '.mat-input-element';
 const actionStatusMessageSelector = '.e2e-test-status-message';
 const toastMessageSelector = '.toast-message';
 const memoryCacheProfileTableSelector = '.view-results-table';
-const getMemoryCacheProfileButton = '.e2e-test-get-memory-cache-profile-button';
+const getMemoryCacheProfileButton = '.e2e-test-get-memory-cache-profile';
 
 export class ReleaseCoordinator extends BaseUser {
   /**
@@ -342,7 +342,13 @@ export class ReleaseCoordinator extends BaseUser {
    * Clicks on the 'Get Memory Cache Profile' button and waits for the results table to appear.
    */
   async getMemoryCacheProfile(): Promise<void> {
-    await this.clickOn(getMemoryCacheProfileButton);
+    await this.page.waitForSelector(getMemoryCacheProfileButton, {
+      visible: true,
+    });
+    await this.waitForPageToFullyLoad();
+    await this.page.evaluate(selector => {
+      document.querySelector(selector).click();
+    }, getMemoryCacheProfileButton);
     await this.page.waitForSelector(memoryCacheProfileTableSelector);
   }
 
