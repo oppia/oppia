@@ -28,7 +28,6 @@ const releaseCoordinatorUrl = testConstants.URLs.ReleaseCoordinator;
 const copyOutputButton = '.e2e-test-copy-output-button';
 const startNewJobButton = '.job-start-button';
 const startNewJobConfirmationButton = '.e2e-test-start-new-job-button';
-const saveFeatureFlagButtonSelector = '.e2e-test-save-button';
 
 // Selectors for tabs.
 const splashUrl = testConstants.URLs.splash;
@@ -41,10 +40,12 @@ const mobileMiscTab = '.e2e-test-misc-tab-mobile';
 const mobileNavBar = '.e2e-test-navbar-dropdown-toggle';
 
 // Selectors for feature flags.
-const featureFlagDiv = '.e2e-test-feature-flag';
+const saveButtonSelector = '.e2e-test-save-button';
 const featureFlagNameSelector = '.e2e-test-feature-name';
-const featureFlagOptionSelector = '.e2e-test-value-selector';
+const featureFlagDiv = '.e2e-test-feature-flag';
 const rolloutPercentageInput = '.e2e-test-editor-int';
+const featureFlagSelector = '.e2e-test-feature-flag';
+const enableFeatureSelector = '.e2e-test-value-selector';
 
 // Selectors for jobs.
 const jobInputField = '.mat-input-element';
@@ -59,7 +60,8 @@ const promoMessageInputSelector = '.mat-input-element';
 const actionStatusMessageSelector = '.e2e-test-status-message';
 const toastMessageSelector = '.toast-message';
 const memoryCacheProfileTableSelector = '.view-results-table';
-const featureFlagSelector = '.e2e-test-feature-flag';
+const getMemoryCacheProfileButton = '.e2e-test-get-memory-cache-profile';
+
 export class ReleaseCoordinator extends BaseUser {
   /**
    * Navigate to the release coordinator page.
@@ -108,146 +110,148 @@ export class ReleaseCoordinator extends BaseUser {
   }
 
   /**
-   * Edit the rollout percentage for a feature.
+   * This function edits the rollout percentage for a specific feature flag.
+   * @param {string} featureName - The name of the feature flag to edit.
+   * @param {number} percentage - The rollout percentage to set for the feature flag.
    */
   async editFeatureRolloutPercentage(
     featureName: string,
     percentage: number
   ): Promise<void> {
-    await this.goto(releaseCoordinatorUrl);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavBar);
-      await this.clickOn(mobileFeaturesTab);
-    } else {
-      await this.clickOn(featuresTab);
-    }
+    try {
+      await this.goto(releaseCoordinatorUrl);
 
-    await this.page.waitForSelector(featureFlagDiv);
-    const featureFlagIndex = await this.page.evaluate(
-      (featureFlagDiv, featureName, featureFlagNameSelector) => {
-        const featureFlagDivs = Array.from(
-          document.querySelectorAll(featureFlagDiv)
+      if (this.isViewportAtMobileWidth()) {
+        await this.page.waitForSelector(mobileNavBar);
+        await this.clickOn(mobileNavBar);
+        await this.page.waitForSelector(mobileFeaturesTab);
+        await this.clickOn(mobileFeaturesTab);
+      } else {
+        await this.page.waitForSelector(featuresTab);
+        await this.clickOn(featuresTab);
+      }
+
+      await this.page.waitForSelector(featureFlagDiv);
+      const featureFlags = await this.page.$$(featureFlagDiv);
+
+      for (let i = 0; i < featureFlags.length; i++) {
+        await featureFlags[i].waitForSelector(featureFlagNameSelector);
+        const featureFlagNameElement = await featureFlags[i].$(
+          featureFlagNameSelector
+        );
+        const featureFlagName = await this.page.evaluate(
+          element => element.textContent.trim(),
+          featureFlagNameElement
         );
 
-        for (let i = 0; i < featureFlagDivs.length; i++) {
-          if (
-            featureFlagDivs[i]
-              .querySelector(featureFlagNameSelector)
-              ?.textContent?.trim() === featureName
-          ) {
-            return i;
+        if (featureFlagName === featureName) {
+          await featureFlags[i].waitForSelector(rolloutPercentageInput);
+          const inputElement = await featureFlags[i].$(rolloutPercentageInput);
+          if (inputElement) {
+            // Select all the text in the input field and delete it.
+            await inputElement.click({clickCount: 3});
+            await this.page.keyboard.press('Backspace');
+            await inputElement.type(percentage.toString());
+          } else {
+            throw new Error(
+              `Input field not found for feature flag: "${featureName}"`
+            );
           }
-        }
-      },
-      featureFlagDiv,
-      featureName,
-      featureFlagNameSelector
-    );
 
-    // Find the input field for rollout percentage and set its value to the specified percentage.
-    await this.page.waitForSelector(rolloutPercentageInput);
-    await this.page.evaluate(
-      (percentage, inputSelector) => {
-        const inputElem = document.querySelector(
-          inputSelector
-        ) as HTMLInputElement | null;
-        if (!inputElem) {
-          console.error('Input element not found');
+          await featureFlags[i].waitForSelector(saveButtonSelector);
+          const saveButton = await featureFlags[i].$(saveButtonSelector);
+          if (saveButton) {
+            await this.waitForElementToBeClickable(saveButton);
+            await saveButton.click();
+          } else {
+            throw new Error(
+              `Save button not found for feature flag: "${featureName}"`
+            );
+          }
+
+          showMessage(
+            `Feature flag: "${featureName}" rollout percentage has been set to ${percentage}%.`
+          );
           return;
         }
+      }
 
-        inputElem.value = percentage.toString();
-        const event = new Event('input', {bubbles: true});
-        inputElem.dispatchEvent(event);
-      },
-      percentage,
-      `.e2e-test-feature-flag-${featureFlagIndex} ${rolloutPercentageInput}`
-    );
-
-    await this.clickOn(
-      `.e2e-test-feature-flag-${featureFlagIndex} ${saveFeatureFlagButtonSelector}`
-    );
-    showMessage(
-      `Feature flag: "${featureName}" rollout percentage has been set to ${percentage}%.`
-    );
+      throw new Error(`Feature flag: "${featureName}" not found.`);
+    } catch (error) {
+      console.error(
+        `Failed to edit feature flag: "${featureName}". Error: ${error.message}`
+      );
+      throw error;
+    }
   }
 
   /**
-   * Enable specified feature flag from the release coordinator page.
+   * This function enables a specific feature flag.
+   * @param {string} featureName - The name of the feature flag to enable.
    */
   async enableFeatureFlag(featureName: string): Promise<void> {
-    await this.goto(releaseCoordinatorUrl);
+    try {
+      await this.goto(releaseCoordinatorUrl);
 
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileNavBar);
-      await this.clickOn(mobileNavBar);
-      await this.page.waitForSelector(mobileFeaturesTab);
-      await this.clickOn(mobileFeaturesTab);
-    } else {
-      await this.page.waitForSelector(featuresTab);
-      await this.clickOn(featuresTab);
-    }
+      if (this.isViewportAtMobileWidth()) {
+        await this.page.waitForSelector(mobileNavBar);
+        await this.clickOn(mobileNavBar);
+        await this.page.waitForSelector(mobileFeaturesTab);
+        await this.clickOn(mobileFeaturesTab);
+      } else {
+        await this.page.waitForSelector(featuresTab);
+        await this.clickOn(featuresTab);
+      }
 
-    await this.page.waitForTimeout(10000);
-    await this.page.waitForSelector(featureFlagDiv);
-    const featureFlagIndex = await this.page.evaluate(
-      (featureFlagDiv, featureName, featureFlagNameSelector) => {
-        const featureFlagDivs = Array.from(
-          document.querySelectorAll(featureFlagDiv)
+      await this.page.waitForSelector(featureFlagDiv);
+      const featureFlags = await this.page.$$(featureFlagDiv);
+
+      for (let i = 0; i < featureFlags.length; i++) {
+        await featureFlags[i].waitForSelector(featureFlagNameSelector);
+        const featureFlagNameElement = await featureFlags[i].$(
+          featureFlagNameSelector
+        );
+        const featureFlagName = await this.page.evaluate(
+          element => element.textContent.trim(),
+          featureFlagNameElement
         );
 
-        for (let i = 0; i < featureFlagDivs.length; i++) {
-          if (
-            featureFlagDivs[i]
-              .querySelector(featureFlagNameSelector)
-              ?.textContent?.trim() === featureName
-          ) {
-            return i;
+        if (featureFlagName === featureName) {
+          await featureFlags[i].waitForSelector(enableFeatureSelector);
+          const selectElement = await featureFlags[i].$(enableFeatureSelector);
+          if (selectElement) {
+            await selectElement.select('0: true');
+          } else {
+            throw new Error(
+              `Value selector not found for feature flag: "${featureName}"`
+            );
           }
+
+          await featureFlags[i].waitForSelector(saveButtonSelector);
+          const saveButton = await featureFlags[i].$(saveButtonSelector);
+          if (saveButton) {
+            await this.waitForElementToBeClickable(saveButton);
+            await saveButton.click();
+          } else {
+            throw new Error(
+              `Save button not found for feature flag: "${featureName}"`
+            );
+          }
+
+          showMessage(
+            `Feature flag: "${featureName}" has been enabled successfully.`
+          );
+          return;
         }
-        throw new Error(`Feature flag: "${featureName}" not found.`);
-      },
-      featureFlagDiv,
-      featureName,
-      featureFlagNameSelector
-    );
+      }
 
-    await this.page.waitForSelector(
-      `.e2e-test-feature-flag-${featureFlagIndex} ${featureFlagOptionSelector}`
-    );
-    await this.page.evaluate(
-      (optionValue, selectElemSelector) => {
-        const selectElem = document.querySelector(
-          selectElemSelector
-        ) as HTMLSelectElement | null;
-        if (!selectElem) {
-          throw new Error('Select element not found');
-        }
-
-        const option = Array.from(selectElem.options).find(
-          opt => opt.textContent?.trim() === optionValue
-        ) as HTMLOptionElement | undefined;
-        if (!option) {
-          throw new Error('Option not found');
-        }
-
-        option.selected = true;
-        const event = new Event('change', {bubbles: true});
-        selectElem.dispatchEvent(event);
-      },
-      'Yes',
-      `.e2e-test-feature-flag-${featureFlagIndex} ${featureFlagOptionSelector}`
-    );
-
-    await this.page.waitForSelector(
-      `.e2e-test-feature-flag-${featureFlagIndex} ${saveFeatureFlagButtonSelector}`
-    );
-    await this.clickOn(
-      `.e2e-test-feature-flag-${featureFlagIndex} ${saveFeatureFlagButtonSelector}`
-    );
-    showMessage(
-      `Feature flag: "${featureName}" has been enabled successfully.`
-    );
+      throw new Error(`Feature flag: "${featureName}" not found.`);
+    } catch (error) {
+      console.error(
+        `Failed to enable feature flag: "${featureName}". Error: ${error.message}`
+      );
+      throw error;
+    }
   }
 
   /**
@@ -338,7 +342,13 @@ export class ReleaseCoordinator extends BaseUser {
    * Clicks on the 'Get Memory Cache Profile' button and waits for the results table to appear.
    */
   async getMemoryCacheProfile(): Promise<void> {
-    await this.clickOn('Get Memory Cache Profile');
+    await this.page.waitForSelector(getMemoryCacheProfileButton, {
+      visible: true,
+    });
+    await this.waitForPageToFullyLoad();
+    await this.page.evaluate(selector => {
+      document.querySelector(selector).click();
+    }, getMemoryCacheProfileButton);
     await this.page.waitForSelector(memoryCacheProfileTableSelector);
   }
 
@@ -546,21 +556,21 @@ export class ReleaseCoordinator extends BaseUser {
   async verifyDummyHandlerStatusInFeaturesTab(enabled: boolean): Promise<void> {
     await this.navigateToReleaseCoordinatorPage();
     await this.navigateToFeaturesTab();
-    await this.page.screenshot({path: 'screenshot.png'});
-    const dummyHandlerElement = await this.page.evaluate(selector => {
-      return document.querySelector(selector) !== null;
-    }, agDummyFeatureIndicator);
 
-    if (enabled && !dummyHandlerElement) {
-      throw new Error(
-        'Dummy handler is expected to be enabled but it is disabled'
-      );
-    }
+    try {
+      await this.page.waitForSelector(agDummyFeatureIndicator, {timeout: 5000});
 
-    if (!enabled && dummyHandlerElement) {
-      throw new Error(
-        'Dummy handler is expected to be disabled but it is enabled'
-      );
+      if (!enabled) {
+        throw new Error(
+          'Dummy handler is expected to be disabled but it is enabled'
+        );
+      }
+    } catch (error) {
+      if (enabled) {
+        throw new Error(
+          'Dummy handler is expected to be enabled but it is disabled'
+        );
+      }
     }
 
     showMessage(
