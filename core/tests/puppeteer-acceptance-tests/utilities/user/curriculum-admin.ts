@@ -894,6 +894,8 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} skillName - The name of the skill to delete.
    */
   async deleteSkill(skillName: string): Promise<void> {
+    await this.goto(topicAndSkillsDashboardUrl);
+
     const isMobileWidth = this.isViewportAtMobileWidth();
     const skillSelector = isMobileWidth
       ? mobileSkillSelector
@@ -908,9 +910,9 @@ export class CurriculumAdmin extends BaseUser {
       ? mobileDeleteSkillButton
       : desktopDeleteSkillButton;
 
-    await this.page.goto(topicAndSkillsDashboardUrl);
     await this.page.waitForSelector(skillsTab, {visible: true});
     await this.clickOn(skillsTab);
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(skillSelector, {visible: true});
     await this.page.waitForSelector(skillListItemSelector, {visible: true});
 
@@ -918,15 +920,16 @@ export class CurriculumAdmin extends BaseUser {
     for (let skill of skills) {
       const skillNameElement = await skill.$(skillSelector);
       if (skillNameElement) {
-        const name = await (
+        const name: string = await (
           await skillNameElement.getProperty('textContent')
         ).jsonValue();
 
-        if (name === `${skillName}`) {
-          await skill.waitForSelector(skillListItemOptions, {visible: true});
+        if (name.trim() === `${skillName}`) {
+          await this.page.waitForSelector(skillListItemOptions, {
+            visible: true,
+          });
           const editBox = await skill.$(skillListItemOptions);
           if (editBox) {
-            await this.waitForElementToBeClickable(editBox);
             await editBox.click();
             await this.page.waitForSelector(deleteSkillButton);
           } else {
@@ -1052,9 +1055,9 @@ export class CurriculumAdmin extends BaseUser {
    * Function for navigating to the classroom admin page.
    */
   async navigateToClassroomAdminPage(): Promise<void> {
-    await this.page.goto(classroomAdminUrl, {
-      waitUntil: ['networkidle2', 'load'],
-    });
+    await this.page.bringToFront();
+    await this.page.waitForNetworkIdle();
+    await this.goto(classroomAdminUrl);
   }
 
   /**

@@ -105,7 +105,8 @@ export class AdminMiscTabComponent {
       .then(
         response => {
           this.setStatusMessage.emit(
-            'No. of opportunities model created: ' + response
+            'No. of opportunities model created: ' +
+              response.opportunities_count
           );
         },
         errorResponse => {
