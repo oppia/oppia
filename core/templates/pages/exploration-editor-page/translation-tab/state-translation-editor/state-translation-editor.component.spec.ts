@@ -34,6 +34,7 @@ import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFacto
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslationStatusService} from '../services/translation-status.service';
+import {ContextService} from 'services/context.service';
 
 class MockNgbModalRef {
   result: Promise<void> = Promise.resolve();
@@ -59,6 +60,7 @@ describe('State Translation Editor Component', () => {
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationStatusService: TranslationStatusService;
   let state: State;
+  let contextService: ContextService;
 
   let mockActiveLanguageChangedEventEmitter = new EventEmitter<void>();
   let mockActiveLanguageIdChangedEventEmitter = new EventEmitter<string>();
@@ -96,6 +98,7 @@ describe('State Translation Editor Component', () => {
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     translationStatusService = TestBed.inject(TranslationStatusService);
+    contextService = TestBed.inject(ContextService);
 
     state = stateObjectFactory.createDefaultState(
       '',
@@ -105,6 +108,8 @@ describe('State Translation Editor Component', () => {
     state.content.html = 'This is a html text1';
     spyOn(explorationStatesService, 'getState').and.returnValue(state);
 
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(contextService, 'getExplorationVersion').and.returnValue(5);
     spyOn(
       translationTabActiveContentIdService,
       'getActiveContentId'
@@ -125,7 +130,7 @@ describe('State Translation Editor Component', () => {
       translationTabActiveContentIdService,
       'onActiveContentIdChanged'
     ).and.returnValue(mockActiveLanguageIdChangedEventEmitter);
-    entityTranslationsService.languageCodeToEntityTranslations = {
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {
       hi: EntityTranslation.createFromBackendDict({
         entity_id: 'id',
         entity_type: 'type',
@@ -233,11 +238,34 @@ describe('State Translation Editor Component', () => {
 
     it('should add editTranslation changes to draft change list', () => {
       spyOn(changeListService, 'editTranslation');
+      (
+        translationLanguageService.getActiveLanguageCode as jasmine.Spy
+      ).and.returnValue('fr');
+      component.activeWrittenTranslation = TranslatedContent.createNew('html');
+      component.activeWrittenTranslation.translation = 'Test translation';
       component.onSaveTranslationButtonClicked();
       expect(changeListService.editTranslation).toHaveBeenCalled();
     });
 
-    it('should update the translation with edited translation', () => {});
+    it('should remove translation if edited translation is blank', () => {
+      spyOn(changeListService, 'editTranslation');
+      expect(
+        entityTranslationsService.languageCodeToLatestEntityTranslations.hi.translationMapping.hasOwnProperty(
+          'content1'
+        )
+      ).toBeTrue();
+
+      component.activeWrittenTranslation = TranslatedContent.createNew('html');
+      component.activeWrittenTranslation.translation = '';
+      component.onSaveTranslationButtonClicked();
+
+      expect(changeListService.editTranslation).toHaveBeenCalled();
+      expect(
+        entityTranslationsService.languageCodeToLatestEntityTranslations.hi.translationMapping.hasOwnProperty(
+          'content1'
+        )
+      ).toBeFalse();
+    });
 
     it('should refresh the translation status', () => {
       spyOn(translationStatusService, 'refresh');
@@ -335,6 +363,15 @@ describe('State Translation Editor Component', () => {
       expect(component.initEditor).toHaveBeenCalled();
     }
   );
+
+  it('should create new active translation if needed when initializing editor', () => {
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {};
+    component.dataFormat = 'html';
+    component.initEditor();
+    expect(component.activeWrittenTranslation).toEqual(
+      TranslatedContent.createNew('html')
+    );
+  });
 
   it('should save translation if translation editor is open', () => {
     component.translationEditorIsOpen = true;

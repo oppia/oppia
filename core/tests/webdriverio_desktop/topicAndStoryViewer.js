@@ -116,14 +116,13 @@ describe('Topic and Story viewer functionality', function () {
     await topicEditorPage.updateMetaTagContent('topic meta tag');
     await topicEditorPage.updatePageTitleFragment('topic page title');
     await topicEditorPage.saveTopic('Added thumbnail.');
-    var url = await browser.getUrl();
-    var topicId = url.split('/')[4].slice(0, -1);
     await general.closeCurrentTabAndSwitchTo(handle);
 
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
     await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
-    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
+    await diagnosticTestPage.addTopicToClassroomConfig('Topic TASV1');
+    await diagnosticTestPage.publishClassroom();
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill TASV1',

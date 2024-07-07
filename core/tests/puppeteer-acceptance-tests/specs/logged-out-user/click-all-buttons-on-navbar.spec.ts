@@ -46,23 +46,6 @@ describe('Logged-out User', function () {
   );
 
   it(
-    'should open About Foundation Url with The Oppia Foundation button ' +
-      'in About Menu on navbar',
-    async function () {
-      await loggedOutUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open Blog Url with Blog button in About Menu on navbar',
-    async function () {
-      await loggedOutUser.clickBlogButtonInAboutMenuOnNavbar();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
     'should open Partnerships Url with School and Organizations button ' +
       'in Get Involved menu on navbar',
     async function () {
@@ -101,6 +84,24 @@ describe('Logged-out User', function () {
     'should open Donate Url with Donate button on navbar',
     async function () {
       await loggedOutUser.clickDonateButtonOnNavbar();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should open teach page when the "For Parents/Teachers" button is clicked' +
+      'in About Menu on navbar',
+    async function () {
+      await loggedOutUser.clickTeachButtonInAboutMenuOnNavbar();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should open Impact Report when the "Impact Report" button is clicked' +
+      'in About Menu on navbar',
+    async function () {
+      await loggedOutUser.clickImpactReportButtonInAboutMenuOnNavbar();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

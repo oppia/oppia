@@ -88,14 +88,7 @@ describe('Contributor dashboard page', function () {
       'Topic description 1',
       false
     );
-    const URL = await browser.getUrl();
-    // Example URL: http://localhost:8181/topic_editor/jT9z3iLnFjsQ#/
-    const TOPIC_ID_URL_PART = URL.split('/')[4];
-    // We have to remove the ending "#".
-    const TOPIC_ID = TOPIC_ID_URL_PART.substring(
-      0,
-      TOPIC_ID_URL_PART.length - 1
-    );
+
     await workflow.createSkillAndAssignTopic(
       SKILL_DESCRIPTIONS[0],
       REVIEW_MATERIALS[0],
@@ -113,7 +106,8 @@ describe('Contributor dashboard page', function () {
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
     await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
-    await diagnosticTestPage.addTopicIdToClassroomConfig(TOPIC_ID, 0);
+    await diagnosticTestPage.addTopicToClassroomConfig(TOPIC_NAMES[0], 0);
+    await diagnosticTestPage.publishClassroom();
     await users.logout();
 
     await users.login(QUESTION_ADMIN_EMAIL);
