@@ -287,21 +287,55 @@ describe('Classroom Page Component', () => {
       expect(component.setPageTitle).toHaveBeenCalled();
     }
   );
-
-  it('should set new page title', () => {
+  it('should set classroom name as page title if translation is not available', () => {
+    component.classroomDisplayName = 'Science';
+    component.classroomTranslationKeys = {
+      name: 'I18N_CLASSROOM_SCIENCE_NAME',
+      courseDetails: 'I18N_CLASSROOM_SCIENCE_COURSE_DETAILS',
+      teaserText: 'I18N_CLASSROOM_SCIENCE_TEASER_TEXT',
+      topicListIntro: 'I18N_CLASSROOM_SCIENCE_TOPICS_LIST_INTRO',
+    };
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValue(false);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      true
+    );
     spyOn(translateService, 'instant').and.callThrough();
     spyOn(pageTitleService, 'setDocumentTitle');
-    component.classroomDisplayName = 'dummy_name';
+    component.setPageTitle();
+
+    expect(translateService.instant).not.toHaveBeenCalledWith(
+      'I18N_CLASSROOM_SCIENCE_NAME'
+    );
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith('Science');
+  });
+
+  it('should set classroom name according to the language', () => {
+    component.classroomDisplayName = 'Math';
+    spyOn(pageTitleService, 'setDocumentTitle');
+    component.classroomTranslationKeys = {
+      name: 'I18N_CLASSROOM_MATH_NAME',
+      courseDetails: 'I18N_CLASSROOM_MATH_COURSE_DETAILS',
+      teaserText: 'I18N_CLASSROOM_MATH_TEASER_TEXT',
+      topicListIntro: 'I18N_CLASSROOM_MATH_TOPICS_LIST_INTRO',
+    };
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValue(true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      false
+    );
+    spyOn(translateService, 'instant').and.callThrough();
     component.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_CLASSROOM_MATH_NAME',
-      {
-        classroomName: 'dummy_name',
-      }
+      'I18N_CLASSROOM_MATH_NAME'
     );
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_CLASSROOM_MATH_NAME'
+      translateService.instant('I18N_CLASSROOM_MATH_NAME')
     );
   });
 

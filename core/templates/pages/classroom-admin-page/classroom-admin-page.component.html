@@ -145,7 +145,28 @@
             </div>
           </div>
 
-          <div>
+          <div class="row oppia-classroom-input-container">
+            <span class="col-lg-3 col-md-3 col-sm-3">
+              <strong>Publication Status</strong>
+            </span>
+            <div>
+              <span *ngIf="classroomViewerMode">
+                {{ tempClassroomData.getIsPublished() ? 'Public' : 'Private' }}
+              </span>
+              <div class="oppia-on-off-switch" *ngIf="!classroomViewerMode">
+                <input *ngIf="tempClassroomData.getIsPublished()" type="checkbox" class="sr-only" aria-label="Change classroom publication status" checked (click)="togglePublicationStatus()">
+                <input span *ngIf="tempClassroomData.getIsPublished()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" checked (click)="togglePublicationStatus()">
+                <input *ngIf="!tempClassroomData.getIsPublished()" type="checkbox" class="sr-only" (click)="togglePublicationStatus()" aria-label="Change classroom publication status">
+                <input span *ngIf="!tempClassroomData.getIsPublished()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" (click)="togglePublicationStatus()">
+                <label class="oppia-on-off-switch-label e2e-test-toggle-classroom-publication-status-btn" for="edits-switch">
+                  <span class="oppia-on-off-switch-inner"></span>
+                  <span class="oppia-on-off-switch-main"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="topic-and-prerequisites-container">
             <hr>
             <div class="topic-and-prerequisites-text-container">
               <p><strong>Topics and their prerequisites</strong></p>
@@ -287,37 +308,6 @@
                     [disabled]="classroomDataSaveInProgress">
               Cancel
             </button>
-            <button *ngIf="tempClassroomData._isPublished"
-                    [disabled]="false"
-                    class="btn btn-secondary publish-classroom-btn e2e-unpublish-classroom-btn"
-                    (click)="unpublishClassroom()"
-                    >
-              <span *ngIf="!classroomDataUnpublishInProgress">Unpublish</span>
-              <mat-spinner *ngIf="classroomDataUnpublishInProgress"
-                           class="oppia-update-classroom-data-spinning-button"
-                           [diameter]="22">
-              </mat-spinner>
-            </button>
-            <span [matTooltip]="allValidationErrors.join('\n')"
-                  matTooltipClass="oppia-mat-tooltip-list"
-                  [matTooltipDisabled]="false"
-                  aria-label="List that shows issues preventing to publish a classroom"
-                  >
-              <button *ngIf="!tempClassroomData._isPublished"
-                      [disabled]="!(allValidationErrors.length === 0)"
-                      class="btn btn-success publish-classroom-btn e2e-test-publish-classroom-btn"
-                      (click)="publishClassroom()"
-                  >
-                <span *ngIf="!classroomDataPublishInProgress">Publish</span>
-                <mat-spinner *ngIf="classroomDataPublishInProgress"
-                             class="oppia-update-classroom-data-spinning-button"
-                             [diameter]="22">
-                </mat-spinner>
-                <mat-icon *ngIf="allValidationErrors.length > 0" class="save-draft-button-warning">
-                  warning
-                </mat-icon>
-              </button>
-            </span>
             <span [matTooltip]="(saveClassroomValidationErrors).join('\n')"
                   matTooltipClass="oppia-mat-tooltip-list"
                   [matTooltipDisabled]="false"
@@ -560,6 +550,21 @@
     justify-content: space-between;
     width: 100%;
   }
+
+  .oppia-on-off-switch-inner:before {
+    content: 'Public';
+    padding-left: 6px;
+  }
+
+  .oppia-on-off-switch-inner:after {
+    content: 'Private';
+    padding-right: 3px;
+  }
+
+  .oppia-on-off-switch-main {
+    right: 44px;
+  }
+
   @media screen and (max-width: 768px) {
     .oppia-editor-card-with-avatar {
       margin-top: 20px;
@@ -571,6 +576,20 @@
 
     .topic-dependency-container {
       overflow: auto;
+    }
+
+    .oppia-classroom-tile {
+      margin: 0;
+      width: 100%;
+    }
+
+    .classroom-details {
+      padding: 0;
+    }
+
+    .topic-and-prerequisites-container {
+      position: relative;
+      right: 18px;
     }
   }
 </style>
