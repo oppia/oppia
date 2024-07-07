@@ -63,6 +63,7 @@ export class AudioBarComponent {
   languageAccentDecriptions: string[] = [];
   selectedLanguageAccentDescription!: string;
   voiceoverToBePlayed!: Voiceover | undefined;
+  currentVoiceoverTime: number = 0;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -93,6 +94,7 @@ export class AudioBarComponent {
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.voiceoverPlayerService.onTranslationLanguageChanged.subscribe(() => {
+        this.audioPlayerService.stop();
         this.audioPlayerService.clear();
         this.voiceoverToBePlayed = undefined;
         this.setProgress({value: 0});
@@ -146,6 +148,10 @@ export class AudioBarComponent {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  ngAfterContentChecked(): void {
+    this.currentVoiceoverTime = this.audioPlayerService.getCurrentTime();
   }
 
   setProgress(val: {value: number}): void {
@@ -281,6 +287,7 @@ export class AudioBarComponent {
   }
 
   updateSelectedLanguageAccent(): void {
+    this.audioPlayerService.stop();
     this.audioPlayerService.clear();
     this.setProgress({value: 0});
     let languageAccentCode =

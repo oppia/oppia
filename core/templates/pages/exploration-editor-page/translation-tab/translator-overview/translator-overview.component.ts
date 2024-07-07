@@ -252,10 +252,15 @@ export class TranslatorOverviewComponent implements OnInit {
           voiceoverLanguages.languageAccentMasterList;
         this.languageCodesMapping = voiceoverLanguages.languageCodesMapping;
         this.updateLanguageAccentCodesDropdownOptions();
+        this.voiceoverPlayerService.languageAccentMasterList =
+          this.languageAccentMasterList;
         this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
           this.languageCode,
           this.entityVoiceoversService.getLanguageAccentCodes()
         );
+        this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+          this.updateLanguageAccentCodesDropdownOptions();
+        });
       });
   }
 
