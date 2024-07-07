@@ -30,6 +30,7 @@ import {
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap';
 import {ExplorationSaveModalComponent} from './exploration-save-modal.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockActiveModal {
   close(): void {
@@ -52,6 +53,14 @@ class MockNgbModalRef {
   result = Promise.resolve();
 }
 
+class MockPlatformFeatureService {
+  status = {
+    ExplorationEditorCanModifyTranslations: {
+      isEnabled: true,
+    },
+  };
+}
+
 describe('Exploration Save Modal component', () => {
   let component: ExplorationSaveModalComponent;
   let fixture: ComponentFixture<ExplorationSaveModalComponent>;
@@ -66,6 +75,10 @@ describe('Exploration Save Modal component', () => {
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
