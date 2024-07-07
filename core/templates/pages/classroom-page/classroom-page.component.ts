@@ -214,13 +214,14 @@ export class ClassroomPageComponent implements OnDestroy {
   }
 
   setPageTitle(): void {
-    let translatedTitle = this.translateService.instant(
-      'I18N_CLASSROOM_MATH_NAME',
-      {
-        classroomName: this.classroomDisplayName,
-      }
-    );
-    this.pageTitleService.setDocumentTitle(translatedTitle);
+    if (this.isHackyClassroomTranslationDisplayed('name')) {
+      let translatedTitle = this.translateService.instant(
+        this.classroomTranslationKeys.name
+      );
+      this.pageTitleService.setDocumentTitle(translatedTitle);
+    } else {
+      this.pageTitleService.setDocumentTitle(this.classroomDisplayName);
+    }
   }
 
   getStaticImageUrl(imagePath: string): string {
