@@ -2725,11 +2725,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.author_id, change_dict, 'description')
-        new_change_dict = self._get_change_with_normalized_string()
         latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
-            '1', 1, self.author_id, new_change_dict, 'description')
+            '1', 1, self.author_id, change_dict, 'description')
 
         change_dict_for_a_topic = (
             self._set_up_a_topic_and_stories_for_translations())
@@ -2840,11 +2839,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.author_id, change_dict, 'description')
-        new_change_dict = self._get_change_with_normalized_string()
         latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
-            '1', 1, self.author_id, new_change_dict, 'description')
+            '1', 1, self.author_id, change_dict, 'description')
         change_dict_for_a_topic = (
             self._set_up_a_topic_and_stories_for_translations())
         topic_suggestion = suggestion_services.create_suggestion(
@@ -3391,11 +3389,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 initial_suggestion.suggestion_id)
         )
         for i in range(1, 102):
-            common_change_dict = self._get_change_with_normalized_string()
             suggestion = suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
-                ('%s' % (i)), i, self.author_id, common_change_dict,
+                ('%s' % (i)), i, self.author_id, change_dict,
                 'description')
             suggestion_services.update_translation_contribution_stats_at_submission( # pylint: disable=line-too-long
                 suggestion_services.get_suggestion_by_id(
@@ -3422,11 +3419,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             100
         )
 
-        new_change_dict = self._get_change_with_normalized_string()
         latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
-            '102', 102, self.author_id, new_change_dict, 'description')
+            '102', 102, self.author_id, change_dict, 'description')
         suggestion_services.update_translation_contribution_stats_at_submission(
             suggestion_services.get_suggestion_by_id(
                 latest_suggestion.suggestion_id)
@@ -3474,11 +3470,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 initial_suggestion.suggestion_id)
         )
         for i in range(1, 102):
-            common_change_dict = self._get_change_with_normalized_string()
             suggestion = suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
-                ('%s' % (i)), i, self.author_id, common_change_dict,
+                ('%s' % (i)), i, self.author_id, change_dict,
                 'description')
             suggestion_services.update_translation_contribution_stats_at_submission( # pylint: disable=line-too-long
                 suggestion_services.get_suggestion_by_id(
@@ -3504,11 +3499,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             100
         )
 
-        new_change_dict = self._get_change_with_normalized_string()
         latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
-            '102', 102, self.author_id, new_change_dict, 'description')
+            '102', 102, self.author_id, change_dict, 'description')
         suggestion_services.update_translation_contribution_stats_at_submission(
             suggestion_services.get_suggestion_by_id(
                 latest_suggestion.suggestion_id)
