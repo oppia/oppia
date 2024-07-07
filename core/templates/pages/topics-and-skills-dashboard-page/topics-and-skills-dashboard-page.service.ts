@@ -82,7 +82,7 @@ export class TopicsAndSkillsDashboardPageService {
           filterObject.classroom ===
           TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_ONLY_CLASSROOMS
         ) {
-          return topic.classroom;
+          return !!topic.classroom;
         }
 
         return (
