@@ -187,7 +187,7 @@ describe('Audio Bar Component', () => {
     expect(currentTimeSpy).toHaveBeenCalledWith(100);
   });
 
-  it('should compute editor overflow after the view has changed', () => {
+  it('should set current voiceover time after the view has changed', () => {
     spyOn(audioPlayerService, 'getCurrentTime').and.returnValue(5);
 
     component.currentVoiceoverTime = 0;
