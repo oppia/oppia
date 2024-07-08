@@ -533,6 +533,7 @@ describe('Story editor state service', () => {
 
     storyEditorStateService.updateExistenceOfStoryUrlFragment(
       'test_url',
+      () => {},
       () => {}
     );
     tick(1000);
@@ -553,6 +554,7 @@ describe('Story editor state service', () => {
 
       storyEditorStateService.updateExistenceOfStoryUrlFragment(
         'test_url',
+        () => {},
         () => {}
       );
       tick(1000);
