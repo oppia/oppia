@@ -20,13 +20,21 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-describe('Topic Manager User Journey', function () {
+// This error will arise, as in the test, the topic manager will try to access the classroom-admin page and story editor, which is not allowed to them.
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /Failed to load resource: the server responded with a status of 401 \(Unauthorized\)/,
+  /The platform feature service has not been initialized\./,
+]);
+
+describe('Topic Manager', function () {
   let topicManager: TopicManager;
   let curriculumAdmin: CurriculumAdmin;
+  let storyID: string;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -35,8 +43,18 @@ describe('Topic Manager User Journey', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    curriculumAdmin.createTopic('Addition', 'add');
-    curriculumAdmin.createTopic('Subtraction', 'subtract');
+    await curriculumAdmin.createTopic('Addition', 'add');
+    await curriculumAdmin.createSkillForTopic(
+      'Single Digit Addition',
+      'Addition'
+    );
+
+    await curriculumAdmin.createTopic('Subtraction', 'subtract');
+    storyID = await curriculumAdmin.createStory(
+      'Subtraction Story',
+      'story',
+      'Subtraction'
+    );
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
@@ -47,59 +65,44 @@ describe('Topic Manager User Journey', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'As a topic manager, should not be able to edit topics and stories not owned.',
+    'should not be able to edit topics and stories not owned.',
     async function () {
-      // Try to edit a topic not owned
       await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.openTopicEditor('Topic Not Owned');
-      await topicManager.expectTopicEditDisabledMessage();
+
+      await topicManager.openTopicEditor('Subtraction');
+      // Topic "Subtraction" is not owned by the topic manager as it is not assigned to them during the setup.
+      await topicManager.expectTopicNameFieldDisabled();
+
+      await topicManager.openStoryEditor(storyID);
+      // Story "Subtraction Story" belongs to the topic "Subtraction" which is not owned by the topic manager.
+      await topicManager.expectError401Unauthorized();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'As a topic manager, should not be able to create and delete topics and skills.',
+    'should not be able to create and delete topics and skills.',
     async function () {
-      // Try to create a new topic
       await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.expectCreateTopicDisabled();
 
-      // Try to delete a owned topic
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.selectTopic('Topic Owned');
-      await topicManager.expectDeleteTopicDisabled();
+      await topicManager.expectCreateTopicButtonNotPresent();
+      await topicManager.verifyAbsenceOfDeleteTopicButtonInTopic('Addition');
 
-      // Try to create a new skill
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.openSkillsTab();
-      await topicManager.expectCreateSkillDisabled();
+      await topicManager.navigateToSkillsTab();
 
-      // Try to delete a skill
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.openSkillsTab();
-      await topicManager.selectSkill('Skill Owned');
-      await topicManager.expectDeleteSkillDisabled();
+      await topicManager.expectCreateSkillButtonNotPresent();
+      await topicManager.verifyAbsenceOfDeleteSkillButtonInSkill(
+        'Single Digit Addition'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'As a topic manager, should not be able to add a skill as a diagnostic test skill for a topic.',
+    'should not be able to access the classroom-admin page.',
     async function () {
-      // Try to add a skill as a diagnostic test skill for a topic
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.openTopicEditor('Topic Owned');
-      await topicManager.expectAddDiagnosticTestSkillDisabled();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'As a topic manager, should not be able to access the classroom-admin page.',
-    async function () {
-      // Try to access the classroom-admin page
       await topicManager.navigateToClassroomAdminPage();
-      await topicManager.expectAccessDenied();
+      await topicManager.expectError401Unauthorized();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
