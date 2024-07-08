@@ -29,13 +29,10 @@
              [ngClass]="{'is-invalid': editableUrlFragment && (!isUrlFragmentValid() || subtopicUrlFragmentExists)}"
              placeholder="Enter a url fragment for the subtopic."
              [(ngModel)]="editableUrlFragment" (change)="checkSubtopicExistence()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT}}">
-      <div
-          class="oppia-input-box-subtitle text-danger"
-          [hidden]="editableUrlFragment === '' || (isUrlFragmentValid() || subtopicUrlFragmentExists)"
-        >
-          <b>
-            Please use only lowercase letters, optionally separated by hyphen.
-          </b>
+      <div class="oppia-input-box-subtitle text-danger" [hidden]="editableUrlFragment === '' || (isUrlFragmentValid() || subtopicUrlFragmentExists)">
+        <b>
+          Please use only lowercase letters, optionally separated by hyphen.
+        </b>
       </div>
       <span class="oppia-input-box-subtitle">
         <em>

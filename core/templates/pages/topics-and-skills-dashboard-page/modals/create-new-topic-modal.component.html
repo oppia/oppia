@@ -32,10 +32,7 @@
              [maxlength]="MAX_CHARS_IN_TOPIC_URL_FRAGMENT"
              [ngClass]="{'invalid-field': topicUrlFragmentExists || !validUrlFragmentRegex.test(newlyCreatedTopic.urlFragment)}"
              (change)="onTopicUrlFragmentChange()">
-      <div
-        class="oppia-input-box-subtitle text-danger"
-        [hidden]="newlyCreatedTopic.urlFragment === '' || validUrlFragmentRegex.test(newlyCreatedTopic.urlFragment)"
-        >
+      <div class="oppia-input-box-subtitle text-danger" [hidden]="newlyCreatedTopic.urlFragment === '' || validUrlFragmentRegex.test(newlyCreatedTopic.urlFragment)">
         <b>
           Please use only lowercase letters, optionally separated by hyphen.
         </b>
