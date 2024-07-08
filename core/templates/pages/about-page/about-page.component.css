@@ -751,13 +751,6 @@
 
 }
 
-.free-of-cost-panel,
-.free-of-cost-panel button, 
-.free-of-cost-panel .accordion-icon {
-  background-color: #00645c;
-  color: #fff;
-}
-
 .about-page .oppia-about-cta-button {
   border-radius: 4px;
   color: #fff;
@@ -800,6 +793,10 @@
 
 .about-page .oppia-about-cta-tabs {
   background-color: #fff;
+}
+
+.about-page .oppia-cta-accordion {
+  display: none;
 }
 
 .about-page .mat-ink-bar {
@@ -864,12 +861,12 @@
 
 .about-page .oppia-about-cta-partners-image {
   height: 76px;
-  width: 456px;
+  max-width: 100%;
 }
 
 .about-page .oppia-about-cta-schools-image {
   height: 94px;
-  width: 456px;
+  max-width: 100%;
 }
 
 .about-page .oppia-about-cta-partners-image img,
@@ -1002,6 +999,7 @@
 .about-page .oppia-about-cta-role-card-head {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -1016,16 +1014,24 @@
   padding-left: 18px;
 }
 
-.about-page .oppia-about-cta-volunteer-circles {
+.feature-panel {
+  background-color: #eee;
+  border-radius: 5px;
   display: flex;
-  flex-direction: row;
-  gap: 16px;
-  justify-content: center;
-  margin-top: 32px;
+  flex-direction: column;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  gap: 40px;
+  justify-content: start;
+  line-height: 21.6px;
+  padding: 12px 16px 20px 28px;
 }
 
-.about-page .oppia-about-cta-volunteer-circle {
-  cursor: pointer;
+.free-of-cost-panel,
+.free-of-cost-panel button, 
+.free-of-cost-panel .accordion-icon {
+  background-color: #00645c;
+  color: #fff;
 }
 
 .about-page .oppia-about-cta-section .carousel-indicators {
@@ -1062,7 +1068,7 @@
   outline: none;
 }
 
-@media only screen and (max-width: 769px) {
+@media only screen and (max-width: 976px) {
   .about-page .oppia-about-cta-section {
     padding: 32px 48px;
   }
@@ -1118,19 +1124,9 @@
   .about-page .oppia-cta-carousel-container {
     gap: 8px;
   }
-
-  .about-page .oppia-about-cta-partners-image {
-    height: 100%;
-    width: 100%;
-  }
-  
-  .about-page .oppia-about-cta-schools-image {
-    height: 100%;
-    width: 100%;
-  }
 }
 
-@media only screen and (max-width: 641px) {
+@media only screen and (max-width: 768px) {
   .about-page .oppia-about-cta-subtext {
     font-size: 16px;
     line-height: 19.2px;
@@ -1151,14 +1147,23 @@
   }
 }
 
-@media only screen and (max-width: 376px) {
-  .about-page .oppia-mobile-portrait-content {
-    display: block;
+@media only screen and (max-width: 613px) {
+  .about-page .oppia-about-cta-partner {
+    padding: 48px 16px;
   }
-  .about-page .oppia-non-mobile-portrait-content {
+  .about-page .oppia-about-cta-partner-boxes-container {
+    flex-direction: column;
+  }
+  .about-page .oppia-about-cta-partner-box {
+    width: 100%;
+  }
+}
+
+@media only screen and (max-width: 581px) {
+  .about-page .oppia-about-cta-tabs {
     display: none;
   }
-  .about-page .oppia-mobile-portrait-content.oppia-cta-accordion {
+  .about-page .oppia-cta-accordion {
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -1211,20 +1216,11 @@
   .about-page .oppia-about-cta-donor {
     padding: 48px 16px;
   }
-  .about-page .oppia-about-cta-partner {
-    padding: 48px 16px;
-  }
-  .about-page .oppia-about-cta-partner-boxes-container {
-    flex-direction: column;
-  }
-  .about-page .oppia-about-cta-partner-box {
-    width: 100%;
-  }
   .about-page .oppia-about-cta-volunteer {
     padding: 32px 16px;
   }
   .about-page .oppia-about-cta-role-card {
-    min-height: 340px;
+    min-height: 300px;
     width: 100%;
   }
   .about-page .oppia-about-cta-volunteer-buttons-container {
@@ -1234,6 +1230,18 @@
   }
   .about-page .about-page .oppia-cta-carousel-container {
     gap: 6px;
+  }
+}
+
+@media only screen and (max-width: 510px) {
+  .about-page .oppia-about-cta-role-card {
+    min-height: 320px;
+  }
+}
+
+@media only screen and (max-width: 376px) {
+  .about-page .oppia-about-cta-role-card {
+    min-height: 356px;
   }
 }
 
@@ -1336,18 +1344,6 @@
   font-weight: 700;
 }
 
-.feature-panel {
-  background-color: #eee;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: column;
-  font-family: 'Roboto', Arial, sans-serif;
-  font-size: 18px;
-  gap: 40px;
-  justify-content: start;
-  line-height: 21.6px;
-  padding: 12px 16px 20px 28px;
-}
 
 .about-page  .oppia-about-non-desktop-content {
   display: none;

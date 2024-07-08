@@ -136,20 +136,20 @@ describe('About Page', () => {
     expect(component.setPartnershipsFormLink).toHaveBeenCalled();
   });
 
-  it('should set screen type to mobile when window width is less than or equal to 361', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(360);
+  it('should set screen type to mobile when window width is less than or equal to 580', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(580);
     component.setScreenType();
     expect(component.screenType).toEqual('mobile');
   });
 
-  it('should set screen type to tablet when window width is between 362 and 768', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(500);
+  it('should set screen type to tablet when window width is between 581 and 976', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(975);
     component.setScreenType();
     expect(component.screenType).toEqual('tablet');
   });
 
-  it('should set screen type to desktop when window width is greater than 768', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(800);
+  it('should set screen type to desktop when window width is greater than 975', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(976);
     component.setScreenType();
     expect(component.screenType).toEqual('desktop');
   });
