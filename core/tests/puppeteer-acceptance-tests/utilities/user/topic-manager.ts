@@ -1526,8 +1526,8 @@ export class TopicManager extends BaseUser {
     exampleExplanation: string
   ): Promise<void> {
     await this.clickOn(addWorkedExampleButton);
-    await this.type(exampleQuestionSelector, exampleQuestion);
-    await this.type(exampleExplanationSelector, exampleExplanation);
+    await this.type(rteSelector, exampleQuestion);
+    await this.type(rteSelector, exampleExplanation);
     await this.clickOn(saveWorkedExamplesButton);
   }
 
