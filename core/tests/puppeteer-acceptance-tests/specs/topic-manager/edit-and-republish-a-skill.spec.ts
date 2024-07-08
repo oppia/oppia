@@ -35,8 +35,15 @@ describe('Topic Manager User Journey', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    curriculumAdmin.createTopic('Addition', 'add');
-    curriculumAdmin.createSkillForTopic('Skill 1', 'Addition');
+    await curriculumAdmin.createTopic('Addition', 'add');
+    await curriculumAdmin.createSkillForTopic(
+      'Single Digit Addition',
+      'Addition'
+    );
+    await curriculumAdmin.createSkillForTopic(
+      'Double Digit Addition',
+      'Addition'
+    );
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
@@ -47,46 +54,49 @@ describe('Topic Manager User Journey', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to add and delete worked examples, add and delete misconceptions, manage prerequisite skills, edit rubrics, and publish the skill again.',
+    'should be able to update the concept card explanation(review material), add and delete worked examples,' +
+      'add delete misconceptions, manage prerequisite skills, edit rubrics, and publish the skill again.',
     async function () {
-      // Navigate to the topic and skills dashboard page
       await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.openSkillEditor('Skill 1');
-
-      // Make all the changes
-      await topicManager.addWorkedExample(
-        'Worked Example 1',
-        'Worked Example Explanation'
+      await topicManager.openSkillEditor('Double Digit Addition');
+      await topicManager.updateReviewMaterial(
+        'Review for Double Digit Addition.'
       );
-      await topicManager.deleteWorkedExample('Worked Example 1');
+
+      await topicManager.addWorkedExample('Add 2 and 3', '2+3=5.');
+      await topicManager.deleteWorkedExample('Add 2 and 3');
+
       await topicManager.addMisconception(
-        'Misconception 1',
-        'Misconception Explanation',
-        'Misconception Notes'
+        'Addition Misconception',
+        'Some might think 2+3=23.',
+        'The correct answer is 5.'
       );
-      await topicManager.deleteMisconception('Misconception 1');
-      await topicManager.addPrerequisiteSkill('Prerequisite Skill 1');
-      await topicManager.removePrerequisiteSkill('Prerequisite Skill 1');
-      await topicManager.updateRubric('New Rubric');
+      await topicManager.deleteMisconception('Addition Misconception');
 
-      // Save the changes
-      await topicManager.publishUpdatedSkill();
+      await topicManager.addPrerequisiteSkill('Single Digit Addition');
+      await topicManager.removePrerequisiteSkill('Counting');
 
-      // Verify the changes
-      await topicManager.openSkillEditor();
-      await topicManager.verifyWorkedExamplePresent('Worked Example 1', false);
-      await topicManager.verifyMisconceptionPresent('Misconception 1', false);
-      await topicManager.verifyPrerequisiteSkillPresent(
-        'Prerequisite Skill 1',
+      await topicManager.updateRubric('Easy', 'Student can add single digits.');
+
+      await topicManager.publishUpdatedSkill('Updated everything');
+
+      await topicManager.openSkillEditor('Double Digit Addition');
+
+      await topicManager.verifyWorkedExamplePresent('Add 2 and 3', false);
+      await topicManager.verifyMisconceptionPresent(
+        'Addition Misconception',
         false
       );
-      await topicManager.expectRubricToMatch('New Rubric');
+      await topicManager.verifyPrerequisiteSkillPresent('Counting', false);
+      await topicManager.expectRubricDifficultyAndExplanation(
+        'Easy',
+        'Student can add single digits.'
+      );
 
-      // Preview the concept card
-      await topicManager.previewConceptCard('New Concept Card Explanation');
-      await topicManager.expectConceptCardPreviewToMatch(
+      await topicManager.previewConceptCard();
+      await topicManager.expectConceptCardPreviewToHave(
         'title',
-        'New Concept Card Explanation'
+        'Review for Double Digit Addition.'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
