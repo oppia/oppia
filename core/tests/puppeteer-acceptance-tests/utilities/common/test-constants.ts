@@ -25,6 +25,7 @@ export default {
     AdminPage: 'http://localhost:8181/admin',
     AdminPageRolesTab: 'http://localhost:8181/admin#/roles',
     AdminPageActivitiesTab: 'http://localhost:8181/admin#/activities',
+    AdminPageMiscTab: 'http://localhost:8181/admin#/misc',
     AdminPagePlatformParametersTab:
       'http://localhost:8181/admin#/platform-parameters',
     Android: 'http://localhost:8181/android',
@@ -36,6 +37,7 @@ export default {
       'in-summer-school-0q6r28fzsrwc',
     CCLicense: 'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
     ClassroomAdmin: 'http://localhost:8181/classroom-admin',
+    ClassroomsPage: 'http://localhost:8181/learn',
     CommunityLibrary: 'http://localhost:8181/community-library',
     Contact: 'http://localhost:8181/contact',
     ContributorDashboard: 'http://localhost:8181/contributor-dashboard',
@@ -149,6 +151,10 @@ export default {
     curriculumAdminThumbnailImage: path.resolve(
       __dirname,
       '../../data/curriculum-admin-thumbnail.svg'
+    ),
+    classroomBannerImage: path.resolve(
+      __dirname,
+      '../../data/classroom-banner.png'
     ),
   },
   OppiaSocials: {
