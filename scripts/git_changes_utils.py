@@ -156,7 +156,9 @@ def check_file_inside_directory(file_path: str, directory_path: str) -> bool:
     file_path = os.path.abspath(file_path)
     directory_path = os.path.abspath(directory_path)
 
-    return os.path.commonpath([file_path, directory_path]) == directory_path
+    return bool(
+        os.path.commonpath([file_path, directory_path]) == directory_path
+    )
 
 
 def get_merge_base(branch: str, other_branch: str) -> str:

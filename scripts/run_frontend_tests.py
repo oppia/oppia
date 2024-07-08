@@ -199,7 +199,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 spec_file = get_file_spec(file_path)
                 if spec_file:
                     specs_to_run.add(spec_file)
-        staged_files = git_changes_utils.get_staged_files()
+        staged_files = git_changes_utils.get_staged_acmrt_files()
         staged_files_to_run = git_changes_utils.get_js_or_ts_files_from_diff(
             staged_files)
         for file_path in staged_files_to_run:

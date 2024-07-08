@@ -253,7 +253,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                     []
                 )
             }
-        def mock_get_staged_files() -> List[bytes]:
+        def mock_get_staged_acmrt_files() -> List[bytes]:
             return [b'file1.js', b'file2.ts', b'file3.ts']
         def mock_get_file_spec(file_path: str) -> Optional[str]:
             if file_path == 'file1.js':
@@ -271,8 +271,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         get_changed_files_swap = self.swap_with_checks(
             git_changes_utils, 'get_changed_files', mock_get_changed_files,
             expected_args=[(git_refs, 'remote')])
-        get_staged_files_swap = self.swap(
-            git_changes_utils, 'get_staged_files', mock_get_staged_files)
+        get_staged_acmrt_files_swap = self.swap(
+            git_changes_utils, 'get_staged_acmrt_files',
+            mock_get_staged_acmrt_files)
         get_file_spec_swap = self.swap(
             run_frontend_tests, 'get_file_spec', mock_get_file_spec)
 
@@ -280,7 +281,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage, get_remote_name_swap:
                     with get_refs_swap, get_changed_files_swap:
-                        with get_file_spec_swap, get_staged_files_swap:
+                        with get_file_spec_swap, get_staged_acmrt_files_swap:
                             run_frontend_tests.main(
                                 args=['--run_on_changed_files'])
 

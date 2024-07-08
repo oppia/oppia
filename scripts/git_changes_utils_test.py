@@ -222,6 +222,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ) -> Tuple[bytes, None]:
             if cmd_tokens == ['git', 'diff', '--name-status']:
                 return (b'M\tfile1\nA\tfile2', None)
+            return (b'', None)
         subprocess_swap = self.swap(
             common, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
