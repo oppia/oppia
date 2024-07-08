@@ -128,6 +128,7 @@ class ClassroomDataHandler(
             'topic_list_intro': classroom.topic_list_intro,
             'course_details': classroom.course_details,
             'name': classroom.name,
+            'url_fragment': classroom.url_fragment,
             'teaser_text': classroom.teaser_text,
             'is_published': classroom.is_published,
             'thumbnail_data': classroom.thumbnail_data.to_dict(),

@@ -29,6 +29,7 @@ import {ImageData} from 'pages/classroom-admin-page/existing-classroom.model';
 export interface ClassroomDataBackendDict {
   classroom_id: string;
   name: string;
+  url_fragment: string;
   topic_summary_dicts: CreatorTopicSummaryBackendDict[];
   course_details: string;
   teaser_text: string;
@@ -164,6 +165,7 @@ export class ClassroomBackendApiService {
           this.classroomData = ClassroomData.createFromBackendData(
             response.classroom_id,
             response.name,
+            response.url_fragment,
             response.topic_summary_dicts,
             response.course_details,
             response.topic_list_intro,

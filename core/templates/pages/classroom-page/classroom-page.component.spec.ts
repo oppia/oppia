@@ -190,6 +190,7 @@ describe('Classroom Page Component', () => {
     let classroomData = ClassroomData.createFromBackendData(
       'mathid',
       'Math',
+      'math',
       topicSummaryDicts,
       'Course details',
       'Topics covered',
@@ -271,7 +272,7 @@ describe('Classroom Page Component', () => {
       classroomBackendApiService.fetchClassroomDataAsync
     ).toHaveBeenCalled();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Failed to get dashboard data'
+      'Failed to get classroom data'
     );
   }));
 
@@ -370,6 +371,7 @@ describe('Classroom Page Component', () => {
     let classroomData = ClassroomData.createFromBackendData(
       'mathid',
       'Math',
+      'math',
       [],
       'Course details',
       'Topics covered',

@@ -77,6 +77,14 @@ export class TopicsAndSkillsDashboardPageService {
         if (filterObject.classroom === 'Unassigned' && !topic.classroom) {
           return true;
         }
+
+        if (
+          filterObject.classroom ===
+          TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_ONLY_CLASSROOMS
+        ) {
+          return !!topic.classroom;
+        }
+
         return (
           topic.classroom &&
           filterObject.classroom.toLowerCase() === topic.classroom.toLowerCase()

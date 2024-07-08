@@ -48,6 +48,12 @@ angular
 angular
   .module('oppia')
   .constant(
+    'TOPIC_FILTER_ONLY_CLASSROOMS',
+    TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_ONLY_CLASSROOMS
+  );
+angular
+  .module('oppia')
+  .constant(
     'SKILL_STATUS_OPTIONS',
     TopicsAndSkillsDashboardPageConstants.SKILL_STATUS_OPTIONS
   );

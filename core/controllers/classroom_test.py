@@ -217,6 +217,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         expected_dict = {
             'classroom_id': 'test_id',
             'name': 'math',
+            'url_fragment': 'math',
             'topic_summary_dicts': [
                 public_topic_1_summary_dict, private_topic_summary_dict
             ],
