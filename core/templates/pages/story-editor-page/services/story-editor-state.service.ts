@@ -410,9 +410,9 @@ export class StoryEditorStateService {
            * generated and causes server to respond with 400 error. Because
            * server also checks for reg-ex match.
            */
-          if (errorResponse.status !== 400) {
+          if (errorResponse?.status !== 400) {
             this.alertsService.addWarning(
-              errorResponse ||
+              errorResponse?.message ||
                 'There was an error when checking if the story url fragment ' +
                   'exists for another story.'
             );
