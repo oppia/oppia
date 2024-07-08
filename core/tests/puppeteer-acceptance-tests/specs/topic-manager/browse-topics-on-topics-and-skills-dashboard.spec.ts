@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes assigning and unassigning a skill to a topic, merging two skills and using filters to select a skill for merging.
+ * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes filtering topics by status, classroom, and keyword, sorting topics, using the paginator, and opening an existing topic.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -31,48 +31,42 @@ describe('Topic Manager', function () {
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
-      'curriculum_admin@example.com',
+      'curriculum_Admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdmin.createTopic('Mathematics', 'math');
-    await curriculumAdmin.createSkillForTopic('Addition', 'Mathematics');
-    await curriculumAdmin.createSkillForTopic('Subtraction', 'Mathematics');
+    await curriculumAdmin.createTopic('Addition', 'add');
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.createTopic('Subtraction', 'subtract');
+    await curriculumAdmin.createNewClassroom('Math', 'math');
+    await curriculumAdmin.addTopicToClassroom('Math', 'Addition');
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topic_manager@example.com',
       [ROLES.TOPIC_MANAGER],
-      'Mathematics'
+      'Addition'
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to assign and unassign a skill to a topic and merge skills',
+    'should be able to filter topics, sort them, use the paginator, and open an existing topic.',
     async function () {
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.navigateToSkillTab();
-
-      // The skill is unassigned first because it was previously assigned during the setup phase in the beforeAll block.
-      await topicManager.unassignSkillFromTopic('Addition', 'Mathematics');
-      await topicManager.expectToastMessageToBe(
-        'The skill has been unassigned to the topic.'
-      );
-
-      await topicManager.assignSkillToTopic('Addition', 'Mathematics');
-      await topicManager.expectToastMessageToBe(
-        'The skill has been assigned to the topic.'
-      );
-
-      // Unassigning the skill from the topic because two skills assigned to some topic cannot be merged.
-      await topicManager.unassignSkillFromTopic('Subtraction', 'Mathematics');
-      await topicManager.expectToastMessageToBe(
-        'The skill has been unassigned to the topic.'
-      );
-
-      await topicManager.mergeSkills('Addition', 'Subtraction');
-      await topicManager.expectToastMessageToBe('Merged Skills.');
+      await topicManager.navigateToTopicAndSkillsDashboardPage(),
+        await topicManager.filterTopicsByStatus('Not Published'),
+        await topicManager.expectFilteredTopics(['Addition', 'Subtraction']),
+        await topicManager.filterTopicsByStatus('Published'),
+        // No topics are published in the setup.
+        await topicManager.expectFilteredTopics([]),
+        await topicManager.filterTopicsByClassroom('Math'),
+        await topicManager.expectFilteredTopics(['Addition']),
+        await topicManager.filterTopicsByKeyword('Addition'),
+        await topicManager.expectFilteredTopics(['Addition']),
+        await topicManager.sortTopics('Least Recently Updated'),
+        await topicManager.expectTopicsInOrder(['Addition', 'Subtraction']),
+        await topicManager.adjustPaginatorToShowItemsPerPage(15),
+        await topicManager.checkIfTopicPageChangesAfterClickingNext(false);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
