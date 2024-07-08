@@ -752,7 +752,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
     showMessage('Exploration is saved successfully.');
-    await this.page.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   async publishExploration(): Promise<string | null> {
@@ -1058,7 +1058,7 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(mainTabButton);
     }
-    await this.page.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -1332,7 +1332,7 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Invalid content type: ${contentType}`);
     }
     await this.clickOn(saveTranslationButton);
-    await this.page.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -1344,7 +1344,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(modifyExistingTranslationsButton);
-    await this.page.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**

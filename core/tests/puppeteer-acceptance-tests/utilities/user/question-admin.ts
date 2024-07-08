@@ -74,7 +74,7 @@ export class QuestionAdmin extends BaseUser {
     );
     await this.clickOn(addContributionRightsSubmitButton);
 
-    await this.page.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -88,7 +88,7 @@ export class QuestionAdmin extends BaseUser {
     );
     await this.clickOn(addContributionRightsSubmitButton);
 
-    await this.page.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -102,7 +102,7 @@ export class QuestionAdmin extends BaseUser {
     );
     await this.clickOn(removeContributionRightsSubmitButton);
 
-    await this.page.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -116,7 +116,7 @@ export class QuestionAdmin extends BaseUser {
     );
     await this.clickOn(removeContributionRightsSubmitButton);
 
-    await this.page.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -130,7 +130,7 @@ export class QuestionAdmin extends BaseUser {
     );
     await this.clickOn(viewContributorSubmitButton);
 
-    await this.page.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
 
     await this.page.waitForSelector(viewRoleUserResult);
     const displayedUsersText = await this.page.$eval(
@@ -157,7 +157,7 @@ export class QuestionAdmin extends BaseUser {
     );
     await this.clickOn(viewContributorSubmitButton);
 
-    await this.page.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
 
     await this.page.waitForSelector(viewRoleUserResult);
     const displayedUsersText = await this.page.$eval(
@@ -184,7 +184,7 @@ export class QuestionAdmin extends BaseUser {
     await this.type(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
 
-    await this.page.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
 
     await this.page.waitForSelector(contribution);
     const contributionStatusForUser = await this.page.$eval(

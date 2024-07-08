@@ -180,7 +180,7 @@ export class SuperAdmin extends BaseUser {
         await allRoleElements[i].evaluate(element =>
           (element as HTMLElement).click()
         );
-        await this.page.waitForNetworkIdle();
+        await this.waitForPageToFullyLoad();
         if (role === topicManagerRole) {
           await this.selectTopicForTopicManagerRole(topicName as string);
         }
@@ -407,7 +407,7 @@ export class SuperAdmin extends BaseUser {
         }
         await this.waitForElementToBeClickable(reloadButton);
         await reloadButton.click();
-        await this.page.waitForNetworkIdle();
+        await this.waitForPageToFullyLoad();
         showMessage(`Reloaded exploration ${explorationName}`);
         return;
       }

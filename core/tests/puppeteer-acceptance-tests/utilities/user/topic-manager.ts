@@ -151,7 +151,7 @@ export class TopicManager extends BaseUser {
    */
   async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
     await this.page.bringToFront();
-    await this.page.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
     await this.goto(topicAndSkillsDashboardUrl);
   }
 

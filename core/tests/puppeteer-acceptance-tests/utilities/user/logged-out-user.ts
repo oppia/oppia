@@ -982,7 +982,7 @@ export class LoggedOutUser extends BaseUser {
   async clickForumLinkOnCreatorGuidelinesPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"forum")]');
     await Promise.all([this.page.waitForNavigation(), this.clickOn('forum')]);
-    await this.page.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
 
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
