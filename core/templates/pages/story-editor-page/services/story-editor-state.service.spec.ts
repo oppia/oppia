@@ -542,6 +542,43 @@ describe('Story editor state service', () => {
   }));
 
   it(
+    'should not show error when updation of story url fragment failed' +
+      'with 400 status code',
+    fakeAsync(() => {
+      let errorResponse = {
+        headers: {
+          normalizedNames: {},
+          lazyUpdate: null,
+        },
+        status: 400,
+        statusText: 'Bad Request',
+        url: '',
+        ok: false,
+        name: 'HttpErrorResponse',
+        message: 'Http failure response for test url: 400 Bad Request',
+        error: {
+          error: 'Error: Bad request to server',
+          status_code: 400,
+        },
+      };
+
+      spyOn(alertsService, 'addWarning');
+      spyOn(
+        fakeEditableStoryBackendApiService,
+        'doesStoryWithUrlFragmentExistAsync'
+      ).and.returnValue(Promise.reject(errorResponse));
+
+      storyEditorStateService.updateExistenceOfStoryUrlFragment(
+        'test_url',
+        () => {},
+        () => {}
+      );
+      tick();
+      expect(alertsService.addWarning).not.toHaveBeenCalled();
+    })
+  );
+
+  it(
     "should warn user when user updates the storie's URL to an URL" +
       ' that already exits',
     fakeAsync(() => {
