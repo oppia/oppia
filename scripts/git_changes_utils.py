@@ -17,13 +17,13 @@
 from __future__ import annotations
 
 import collections
+import os
 import subprocess
 import sys
 
 from scripts import common
 
 from typing import Dict, List, Optional, Tuple
-
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
@@ -143,6 +143,22 @@ def git_diff_name_status(
         raise ValueError(err)
 
 
+def check_file_inside_directory(file_path: str, directory_path: str) -> bool:
+    """Checks if a file is inside a directory.
+
+    Args:
+        file_path: str. The path to the file.
+        directory_path: str. The path to the directory.
+
+    Returns:
+        bool. Whether the file is inside the directory.
+    """
+    file_path = os.path.abspath(file_path)
+    directory_path = os.path.abspath(directory_path)
+
+    return os.path.commonpath([file_path, directory_path]) == directory_path
+
+
 def get_merge_base(branch: str, other_branch: str) -> str:
     """Returns the most-recent commit shared by both branches. Order doesn't
     matter.
@@ -184,7 +200,8 @@ def compare_to_remote(
         list(FileDiff). List of FileDiffs (tuple with name/status).
 
     Raises:
-        ValueError. Raise ValueError if git command fails.
+        ValueError. Raise ValueError if git command fails or if a git diff
+            file is not inside the oppia directory.
     """
     remote_branch = remote_branch if remote_branch else local_branch
     git_remote = '%s/%s' % (remote, remote_branch)
@@ -192,8 +209,17 @@ def compare_to_remote(
     common.start_subprocess_for_result(['git', 'pull', remote])
     # Only compare differences to the merge base of the local and remote
     # branches (what GitHub shows in the files tab of pull requests).
-    return git_diff_name_status(
+    file_diffs = git_diff_name_status(
         get_merge_base(git_remote, local_branch), local_branch)
+    for file_diff in file_diffs:
+        if not check_file_inside_directory(
+            file_diff.name.decode(), common.CURR_DIR
+        ):
+            raise ValueError(
+                'Error: The file %s is not inside the oppia directory.' % (
+                    file_diff.name.decode()))
+
+    return file_diffs
 
 
 def get_parent_branch_name_for_diff() -> str:

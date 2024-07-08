@@ -256,6 +256,16 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ):
             git_changes_utils.git_diff_name_status(diff_filter='')
 
+    def test_check_file_inside_directory_should_be_false(self) -> None:
+        self.assertFalse(
+            git_changes_utils.check_file_inside_directory(
+                '/usr/directory/test.py', '/usr/opensource/oppia'))
+
+    def test_check_file_inside_directory_should_be_true(self) -> None:
+        self.assertTrue(
+            git_changes_utils.check_file_inside_directory(
+                '/usr/opensource/oppia/test.py', '/usr/opensource/oppia'))
+
     def test_compare_to_remote(self) -> None:
         check_function_calls = {
             'start_subprocess_for_result_is_called': False,
@@ -267,15 +277,21 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             'git_diff_name_status_is_called': True,
             'get_merge_base_is_called': True,
         }
+        expected_file_diffs = [
+            git_changes_utils.FileDiff(
+                status=b'M', name=b'/usr/opensource/oppia/file1.py'),
+            git_changes_utils.FileDiff(
+                status=b'A', name=b'/usr/opensource/oppia/file2.py')
+        ]
         def mock_start_subprocess_for_result(
             unused_cmd_tokens: List[str]
         ) -> None:
             check_function_calls['start_subprocess_for_result_is_called'] = True
         def mock_git_diff_name_status(
             unused_left: str, unused_right: str
-        ) -> str:
+        ) -> List[git_changes_utils.FileDiff]:
             check_function_calls['git_diff_name_status_is_called'] = True
-            return 'Test'
+            return expected_file_diffs
         def mock_get_merge_base(unused_left: str, unused_right: str) -> str:
             check_function_calls['get_merge_base_is_called'] = True
             return 'Merge Base'
@@ -287,13 +303,57 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             mock_git_diff_name_status)
         get_merge_base_swap = self.swap(
             git_changes_utils, 'get_merge_base', mock_get_merge_base)
+        curr_dir_swap = self.swap(common, 'CURR_DIR', '/usr/opensource/oppia')
 
         with subprocess_swap, git_diff_swap, get_merge_base_swap:
-            self.assertEqual(
-                git_changes_utils.compare_to_remote('remote', 'local branch'),
-                'Test'
-            )
+            with curr_dir_swap:
+                self.assertEqual(
+                    git_changes_utils.compare_to_remote(
+                        'remote', 'local branch'),
+                    expected_file_diffs
+                )
         self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_compare_to_remote_with_file_not_in_oppia_directory_should_error(
+        self
+    ) -> None:
+        def mock_start_subprocess_for_result(
+            unused_cmd_tokens: List[str]
+        ) -> None:
+            pass
+
+        def mock_git_diff_name_status(
+            unused_left: str, unused_right: str
+        ) -> List[git_changes_utils.FileDiff]:
+            return [
+                git_changes_utils.FileDiff(
+                    status=b'A', name=b'/usr/opensource/oppia/file3.py'
+                ),
+                git_changes_utils.FileDiff(
+                    status=b'M', name=b'/usr/directory/file2.py'
+                )
+            ]
+
+        def mock_get_merge_base(unused_left: str, unused_right: str) -> str:
+            return 'Merge Base'
+        subprocess_swap = self.swap(
+            common, 'start_subprocess_for_result',
+            mock_start_subprocess_for_result)
+        git_diff_swap = self.swap(
+            git_changes_utils, 'git_diff_name_status',
+            mock_git_diff_name_status)
+        get_merge_base_swap = self.swap(
+            git_changes_utils, 'get_merge_base', mock_get_merge_base)
+        curr_dir_swap = self.swap(
+            common, 'CURR_DIR', '/usr/opensource/oppia')
+
+        with subprocess_swap, git_diff_swap, get_merge_base_swap:
+            with curr_dir_swap, self.assertRaisesRegex(
+                ValueError,
+                'Error: The file /usr/directory/file2.py is not inside the '
+                'oppia directory.'
+            ):
+                git_changes_utils.compare_to_remote('remote', 'local branch')
 
     def test_get_merge_base_reports_error(self) -> None:
         def mock_start_subprocess_for_result(
