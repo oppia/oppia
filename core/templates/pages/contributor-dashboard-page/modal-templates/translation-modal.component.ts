@@ -575,7 +575,7 @@ export class TranslationModalComponent {
     );
   }
 
-  suggestTranslatedText(): void {
+  translatedTextCanBeSubmitted(): boolean {
     if (!this.isSetOfStringDataFormat()) {
       const domParser = new DOMParser();
       const originalElements = domParser.parseFromString(
@@ -604,12 +604,19 @@ export class TranslationModalComponent {
         this.uploadingTranslation ||
         this.loadingData
       ) {
-        return;
+        return false;
       }
 
       if (this.hadCopyParagraphError) {
         this.hadCopyParagraphError = false;
       }
+    }
+    return true;
+  }
+
+  suggestTranslatedText(): void {
+    if (!this.translatedTextCanBeSubmitted()) {
+      return;
     }
 
     if (!this.uploadingTranslation && !this.loadingData) {
@@ -650,6 +657,9 @@ export class TranslationModalComponent {
     }
   }
   updateTranslatedText(): void {
+    if (!this.translatedTextCanBeSubmitted()) {
+      return;
+    }
     this.activeModal.close(this.activeWrittenTranslation);
   }
 }

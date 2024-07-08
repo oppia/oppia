@@ -1297,6 +1297,9 @@ describe('Classroom Admin Page component ', () => {
     const response = {
       classroomDict: {
         ...dummyClassroomDict,
+        topicIdToPrerequisiteTopicIds: {
+          id: [],
+        },
         isPublished: false,
       },
     };
@@ -1307,12 +1310,12 @@ describe('Classroom Admin Page component ', () => {
       response.classroomDict
     );
 
-    expect(component.validationErrors.length).toEqual(0);
-    expect(component.classroomDataPublishInProgress).toBeFalse();
+    expect(component.allValidationErrors.length).toEqual(0);
     spyOn(component, 'updateClassroomData').and.returnValue(Promise.resolve());
     tick();
 
-    component.publishClassroom();
+    component.togglePublicationStatus();
+    component.saveClassroomData();
     expect(component.updateClassroomData).toHaveBeenCalled();
   }));
 
@@ -1333,7 +1336,7 @@ describe('Classroom Admin Page component ', () => {
     component.classroomDataIsChanged = false;
     component.updateClassroomField();
 
-    expect(component.validationErrors.length).toEqual(3);
+    expect(component.allValidationErrors.length).toEqual(3);
   });
 
   it('should not be able to save classroom due to validation errors', () => {
@@ -1342,6 +1345,7 @@ describe('Classroom Admin Page component ', () => {
         ...dummyClassroomDict,
         name: '',
         urlFragment: '',
+        isPublished: false,
       },
     };
     component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
@@ -1352,7 +1356,31 @@ describe('Classroom Admin Page component ', () => {
     );
     component.updateClassroomField();
 
-    expect(component.saveClassroomValidationErrors().length).toEqual(2);
+    expect(component.saveClassroomValidationErrors.length).toEqual(2);
+  });
+
+  it('should not save a published classroom if user deletes some data', () => {
+    spyOn(component, 'updateClassroomData');
+    const response = {
+      classroomDict: {
+        ...dummyClassroomDict,
+        name: '',
+        urlFragment: '',
+        isPublished: true,
+        teaserText: '',
+      },
+    };
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.classroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.updateClassroomField();
+    component.saveClassroomData();
+
+    expect(component.canSaveClassroom()).toBeFalse();
+    expect(component.updateClassroomData).not.toHaveBeenCalled();
   });
 
   it('should be able to unpublish a published classroom', fakeAsync(() => {
@@ -1372,7 +1400,8 @@ describe('Classroom Admin Page component ', () => {
     spyOn(component, 'updateClassroomData').and.returnValue(Promise.resolve());
     tick();
 
-    component.unpublishClassroom();
+    component.togglePublicationStatus();
+    component.saveClassroomData();
     expect(component.updateClassroomData).toHaveBeenCalled();
   }));
 
