@@ -35,7 +35,7 @@
       </td>
       <td>
         <a (click)="deleteCanonicalStory(summary.getId())" tabindex="0" (keydown.enter)="deleteCanonicalStory(summary.getId())" aria-label="Delete story" class="list-summary text-center">
-          <span class="fas fa-trash-alt" *ngIf="topicRights.canEditTopic()"></span>
+          <span class="fas fa-trash-alt e2e-test-delete-story-button" *ngIf="topicRights.canEditTopic()"></span>
         </a>
       </td>
     </tr>
