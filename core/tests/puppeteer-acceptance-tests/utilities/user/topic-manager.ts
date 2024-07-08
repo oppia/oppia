@@ -145,10 +145,6 @@ const desktopDeleteSkillButton = '.e2e-test-delete-skill-button';
 const mobileSkillListItemOptions = '.e2e-test-mobile-skills-option';
 const mobileDeleteSkillButton = '.e2e-test-mobile-delete-skill-button';
 
-const skillsTab = 'a.e2e-test-skills-tab';
-const desktopSkillSelector = '.e2e-test-skill-description';
-const mobileSkillSelector = 'span.e2e-test-mobile-skill-name';
-
 export class TopicManager extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
