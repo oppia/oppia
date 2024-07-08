@@ -47,7 +47,7 @@ describe('Topic Manager User Journey', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to edit skill description and concept card explanation, add and delete worked examples, add and delete misconceptions, manage prerequisite skills, edit rubrics, and publish the topic again.',
+    'should be able to add and delete worked examples, add and delete misconceptions, manage prerequisite skills, edit rubrics, and publish the skill again.',
     async function () {
       // Navigate to the topic and skills dashboard page
       await topicManager.navigateToTopicAndSkillsDashboardPage();
