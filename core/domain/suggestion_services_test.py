@@ -72,9 +72,10 @@ if MYPY:  # pragma: no cover
 class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     """Test the functions in suggestion_services."""
 
-    score_category: str = (
-        suggestion_models.SCORE_TYPE_CONTENT +
-        suggestion_models.SCORE_CATEGORY_DELIMITER + 'Algebra')
+    score_category: str = ('%s%sAlgebra' % (
+        suggestion_models.SCORE_TYPE_CONTENT,
+        suggestion_models.SCORE_CATEGORY_DELIMITER)
+    )
 
     target_id: str = 'exp1'
     target_id_2: str = 'exp2'
@@ -1155,9 +1156,10 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
-    score_category: str = (
-        suggestion_models.SCORE_TYPE_TRANSLATION +
-        suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+    score_category: str = '%s%sEnglish' % (
+        suggestion_models.SCORE_TYPE_TRANSLATION,
+        suggestion_models.SCORE_CATEGORY_DELIMITER
+    )
 
     target_id_1: str = 'exp1'
     target_id_2: str = 'exp2'
@@ -2147,9 +2149,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     AUTHOR_EMAIL: Final = 'author@example.com'
 
-    score_category: str = (
-        suggestion_models.SCORE_TYPE_CONTENT +
-        suggestion_models.SCORE_CATEGORY_DELIMITER + 'Algebra')
+    score_category: str = ('%s%s%s' % (
+        suggestion_models.SCORE_TYPE_CONTENT,
+        suggestion_models.SCORE_CATEGORY_DELIMITER, 'Algebra')
+    )
 
     THREAD_ID: Final = 'exploration.exp1.thread_1'
 
@@ -4684,7 +4687,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': self.language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': translation_html,
             'data_format': 'html'
         }
@@ -4704,7 +4707,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
         question in the question suggestion.
         """
         with self.swap(
-            feconf, 'DEFAULT_INIT_STATE_CONTENT_STR', question_html_content):
+            feconf, 'DEFAULT_STATE_CONTENT_STR', question_html_content):
             content_id_generator = translation_domain.ContentIdGenerator()
             add_question_change_dict: Dict[
                 str, Union[str, float, question_domain.QuestionDict]
@@ -5407,7 +5410,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
             'data_format': 'html'
         }
@@ -6061,7 +6064,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
             'data_format': 'html'
         }
@@ -6635,7 +6638,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': self.language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
             'data_format': 'html'
         }
@@ -6966,7 +6969,7 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
             'data_format': 'html'
         }
@@ -7382,9 +7385,10 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         return str(round(minutes_contributed / 60, 2))
 
     def test_create_translation_contributor_certificate(self) -> None:
-        score_category: str = (
-            suggestion_models.SCORE_TYPE_TRANSLATION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        score_category: str = ('%s%sEnglish' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER)
+        )
         change_cmd = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'content_id': 'content',
@@ -7422,9 +7426,11 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
     def test_create_translation_contributor_certificate_for_rule_translation(
         self
     ) -> None:
-        score_category: str = (
-            suggestion_models.SCORE_TYPE_TRANSLATION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        score_category: str = '%s%sEnglish' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER
+        )
+
         change_cmd = self._get_change_with_normalized_string()
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -7454,9 +7460,11 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
     def test_create_translation_contributor_certificate_for_english(
         self
     ) -> None:
-        score_category: str = (
-            suggestion_models.SCORE_TYPE_TRANSLATION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        score_category: str = '%s%sEnglish' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER
+        )
+
         change_cmd = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'content_id': 'content',

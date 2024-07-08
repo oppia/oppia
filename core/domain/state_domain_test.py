@@ -2512,7 +2512,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id', '<p>some html</p>')
         subtitled_html.validate()
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected content id to be a string, ' +
+            utils.ValidationError, 'Expected content id to be a string, '
             'received 20'):
             with self.swap(subtitled_html, 'content_id', 20):
                 subtitled_html.validate()
@@ -2535,7 +2535,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id', 'some html string')
         subtitled_unicode.validate()
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected content id to be a string, ' +
+            utils.ValidationError, 'Expected content id to be a string, '
             'received 20'):
             with self.swap(subtitled_unicode, 'content_id', 20):
                 subtitled_unicode.validate()
@@ -2762,7 +2762,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected solicit_answer_details to be ' +
+            utils.ValidationError, 'Expected solicit_answer_details to be '
             'a boolean, received'):
             with self.swap(init_state, 'solicit_answer_details', 'abc'):
                 exploration.validate()
@@ -2772,7 +2772,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(init_state.interaction.id, 'Continue')
         exploration.validate()
         with self.assertRaisesRegex(
-            utils.ValidationError, 'The Continue interaction does not ' +
+            utils.ValidationError, 'The Continue interaction does not '
             'support soliciting answer details from learners.'):
             with self.swap(init_state, 'solicit_answer_details', True):
                 exploration.validate()
@@ -2796,7 +2796,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.linked_skill_id, None)
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected linked_skill_id to be ' +
+            utils.ValidationError, 'Expected linked_skill_id to be '
             'a str, received 12.'):
             with self.swap(init_state, 'linked_skill_id', 12):
                 exploration.validate()
@@ -2808,7 +2808,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected card_is_checkpoint to be ' +
+            utils.ValidationError, 'Expected card_is_checkpoint to be '
             'a boolean, received'):
             with self.swap(init_state, 'card_is_checkpoint', 'abc'):
                 exploration.validate()

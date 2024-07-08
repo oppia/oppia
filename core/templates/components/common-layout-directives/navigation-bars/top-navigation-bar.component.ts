@@ -69,7 +69,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() subheaderText!: string;
 
   DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
-  OPPIA_BLOG_URL = '/blog';
+  IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
   url!: URL;
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
@@ -378,10 +378,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  getOppiaBlogUrl(): string {
-    return this.OPPIA_BLOG_URL;
   }
 
   changeLanguage(languageCode: string): void {
