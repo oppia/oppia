@@ -1297,6 +1297,9 @@ describe('Classroom Admin Page component ', () => {
     const response = {
       classroomDict: {
         ...dummyClassroomDict,
+        topicIdToPrerequisiteTopicIds: {
+          id: [],
+        },
         isPublished: false,
       },
     };
@@ -1308,11 +1311,11 @@ describe('Classroom Admin Page component ', () => {
     );
 
     expect(component.allValidationErrors.length).toEqual(0);
-    expect(component.classroomDataPublishInProgress).toBeFalse();
     spyOn(component, 'updateClassroomData').and.returnValue(Promise.resolve());
     tick();
 
-    component.publishClassroom();
+    component.togglePublicationStatus();
+    component.saveClassroomData();
     expect(component.updateClassroomData).toHaveBeenCalled();
   }));
 
@@ -1397,7 +1400,8 @@ describe('Classroom Admin Page component ', () => {
     spyOn(component, 'updateClassroomData').and.returnValue(Promise.resolve());
     tick();
 
-    component.unpublishClassroom();
+    component.togglePublicationStatus();
+    component.saveClassroomData();
     expect(component.updateClassroomData).toHaveBeenCalled();
   }));
 

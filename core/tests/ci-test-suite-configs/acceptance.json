@@ -145,8 +145,16 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/edit-platform-parameters.spec.ts"
     },
     {
+      "name": "super-admin/use-misc-tab-features",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/use-misc-tab-features.spec.ts"
+    },
+    {
       "name": "release-coordinator/run-a-beam-job-and-copy-the-output",
       "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/run-a-beam-job-and-copy-the-output.spec.ts"
+    },
+    {
+      "name": "release-coordinator/edit-feature-rollout-configuration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/edit-feature-rollout-configuration.spec.ts"
     },
     {
       "name": "release-coordinator/flush-and-get-profile-of-redis-cache",

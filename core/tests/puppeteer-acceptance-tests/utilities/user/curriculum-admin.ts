@@ -175,7 +175,8 @@ const imageUploaderModal = '.e2e-test-thumbnail-editor';
 const openTopicDropdownButton = '.e2e-test-add-topic-to-classroom-button';
 const topicDropDownFormFeild = '.e2e-test-classroom-category-dropdown';
 const topicSelector = '.e2e-test-classroom-topic-selector-choice';
-const publishClassroomButton = '.e2e-test-publish-classroom-btn';
+const publishClassroomButton =
+  '.e2e-test-toggle-classroom-publication-status-btn';
 const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const classroomTileNameSpan = '.e2e-test-classroom-tile-name';
 const deleteClassroomButton = '.e2e-test-delete-classroom-button';
@@ -894,6 +895,8 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} skillName - The name of the skill to delete.
    */
   async deleteSkill(skillName: string): Promise<void> {
+    await this.goto(topicAndSkillsDashboardUrl);
+
     const isMobileWidth = this.isViewportAtMobileWidth();
     const skillSelector = isMobileWidth
       ? mobileSkillSelector
@@ -908,9 +911,9 @@ export class CurriculumAdmin extends BaseUser {
       ? mobileDeleteSkillButton
       : desktopDeleteSkillButton;
 
-    await this.page.goto(topicAndSkillsDashboardUrl);
     await this.page.waitForSelector(skillsTab, {visible: true});
     await this.clickOn(skillsTab);
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(skillSelector, {visible: true});
     await this.page.waitForSelector(skillListItemSelector, {visible: true});
 
@@ -918,15 +921,16 @@ export class CurriculumAdmin extends BaseUser {
     for (let skill of skills) {
       const skillNameElement = await skill.$(skillSelector);
       if (skillNameElement) {
-        const name = await (
+        const name: string = await (
           await skillNameElement.getProperty('textContent')
         ).jsonValue();
 
-        if (name === `${skillName}`) {
-          await skill.waitForSelector(skillListItemOptions, {visible: true});
+        if (name.trim() === `${skillName}`) {
+          await this.page.waitForSelector(skillListItemOptions, {
+            visible: true,
+          });
           const editBox = await skill.$(skillListItemOptions);
           if (editBox) {
-            await this.waitForElementToBeClickable(editBox);
             await editBox.click();
             await this.page.waitForSelector(deleteSkillButton);
           } else {
@@ -1052,9 +1056,9 @@ export class CurriculumAdmin extends BaseUser {
    * Function for navigating to the classroom admin page.
    */
   async navigateToClassroomAdminPage(): Promise<void> {
-    await this.page.goto(classroomAdminUrl, {
-      waitUntil: ['networkidle2', 'load'],
-    });
+    await this.page.bringToFront();
+    await this.page.waitForNetworkIdle();
+    await this.goto(classroomAdminUrl);
   }
 
   /**
@@ -1185,8 +1189,9 @@ export class CurriculumAdmin extends BaseUser {
   async publishClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
-
     await this.clickOn(publishClassroomButton);
+    await this.clickOn(saveClassroomButton);
+    showMessage(`Published ${classroomName} classroom.`);
   }
 
   /**
