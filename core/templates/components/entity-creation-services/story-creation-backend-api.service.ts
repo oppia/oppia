@@ -142,6 +142,7 @@ export class StoryCreationBackendApiService {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
         // No further action is needed.
+        this.alertsService.clearWarnings(); // clearing any validation error on modal close. #20593
       }
     );
   }
