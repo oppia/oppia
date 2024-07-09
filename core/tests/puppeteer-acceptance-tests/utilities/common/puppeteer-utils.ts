@@ -395,7 +395,7 @@ export class BaseUser {
    * This function types the text in the input field using its CSS selector.
    */
   async type(selector: string, text: string): Promise<void> {
-    await this.page.waitForSelector(selector);
+    await this.page.waitForSelector(selector, {visible: true});
     await this.page.type(selector, text);
   }
 
