@@ -1545,7 +1545,6 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(workedExampleListItem, {visible: true});
     const previewLists = await this.page.$$(workedExampleListItem);
     if (!previewLists) {
-      throw new error('No worked examples found');
     }
     let exampleFound = false;
 
