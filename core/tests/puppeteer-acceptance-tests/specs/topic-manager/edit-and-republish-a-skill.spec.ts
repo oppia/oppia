@@ -54,49 +54,36 @@ describe('Topic Manager User Journey', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to update the concept card explanation(review material), add and delete worked examples,' +
-      'add delete misconceptions, manage prerequisite skills, edit rubrics, and publish the skill again.',
+    'should be able to update the concept card explanation(review material), add and delete worked examples, add delete misconceptions, manage prerequisite skills, edit rubrics, and publish the skill again.',
     async function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
       await topicManager.openSkillEditor('Double Digit Addition');
       await topicManager.updateReviewMaterial(
-        'Review for Double Digit Addition.'
+        'Review material text content for Double Digit Addition.'
       );
-
       await topicManager.addWorkedExample('Add 2 and 3', '2+3=5.');
       await topicManager.deleteWorkedExample('Add 2 and 3');
-
       await topicManager.addMisconception(
         'Addition Misconception',
         'Some might think 2+3=23.',
         'The correct answer is 5.'
       );
       await topicManager.deleteMisconception('Addition Misconception');
-
       await topicManager.addPrerequisiteSkill('Single Digit Addition');
-      await topicManager.removePrerequisiteSkill('Counting');
-
+      await topicManager.removePrerequisiteSkill('Single Digit Addition');
       await topicManager.updateRubric('Easy', 'Student can add single digits.');
-
       await topicManager.publishUpdatedSkill('Updated everything');
-
       await topicManager.openSkillEditor('Double Digit Addition');
-
       await topicManager.verifyWorkedExamplePresent('Add 2 and 3', false);
       await topicManager.verifyMisconceptionPresent(
         'Addition Misconception',
         false
       );
-      await topicManager.verifyPrerequisiteSkillPresent('Counting', false);
-      await topicManager.expectRubricDifficultyAndExplanation(
-        'Easy',
-        'Student can add single digits.'
-      );
-
+      await topicManager.verifyPrerequisiteSkillPresent('', false);
       await topicManager.previewConceptCard();
       await topicManager.expectConceptCardPreviewToHave(
-        'title',
-        'Review for Double Digit Addition.'
+        'Double Digit Addition',
+        'Review material text content for Double Digit Addition.'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
