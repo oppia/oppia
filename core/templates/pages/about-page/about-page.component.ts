@@ -209,9 +209,9 @@ export class AboutPageComponent implements OnInit, OnDestroy {
 
   setScreenType(): void {
     const width = this.windowDimensionsService.getWidth();
-    if (width < 376) {
+    if (width < 581) {
       this.screenType = 'mobile';
-    } else if (width < 769) {
+    } else if (width < 976) {
       this.screenType = 'tablet';
     } else {
       this.screenType = 'desktop';

@@ -45,10 +45,6 @@ var suites = {
     './core/tests/webdriverio_desktop/additionalPlayerFeatures.js'
   ],
 
-  adminPage: [
-    './core/tests/webdriverio_desktop/adminTabFeatures.js'
-  ],
-
   blogDashboard: [
     './core/tests/webdriverio_desktop/blogDashboard.js'
   ],
@@ -63,10 +59,6 @@ var suites = {
 
   classroomPage: [
     './core/tests/webdriverio_desktop/classroomPage.js'
-  ],
-
-  classroomPageFileUploadFeatures: [
-    './core/tests/webdriverio_desktop/classroomPageFileUploadFeatures.js'
   ],
 
   collections: [
