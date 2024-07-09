@@ -144,23 +144,17 @@ export class InputResponsePairComponent {
     return shortAnswerHtml;
   }
 
-  isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
-  }
-
   getFeedbackAudioHighlightClass(): string {
     if (!this.isLastPair) {
       return '';
     }
     if (
-      this.isVoiceoverContributionWithAccentEnabled() &&
       this.voiceoverPlayerService.getActiveComponentName() ===
         AppConstants.COMPONENT_NAME_FEEDBACK &&
       this.audioPlayerService.isPlaying()
     ) {
       return ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS;
     } else if (
-      !this.isVoiceoverContributionWithAccentEnabled() &&
       this.audioTranslationManagerService.getCurrentComponentName() ===
         AppConstants.COMPONENT_NAME_FEEDBACK &&
       (this.audioPlayerService.isPlaying() ||

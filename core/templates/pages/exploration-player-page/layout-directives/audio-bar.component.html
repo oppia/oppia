@@ -49,15 +49,7 @@
           <span class="audio-controls-message">&zwnj;</span>
         </div>
         <div class="oppia-audio-header-select"
-             *ngIf="!isVoiceoverContributionWithAccentEnabled()">
-          <select class="audio-language-select e2e-test-audio-lang-select"
-                  [(ngModel)]="selectedLanguage.value"
-                  (change)="onNewLanguageSelected()">
-            <option *ngFor="let opt of languagesInExploration" [value]="opt.value">{{ opt.displayed }}</option>
-          </select>
-        </div>
-        <div class="oppia-audio-header-select"
-             *ngIf="isVoiceoverContributionWithAccentEnabled() && languageAccentDecriptions.length > 0">
+             *ngIf="languageAccentDecriptions.length > 0">
           <select class="audio-language-select e2e-test-audio-lang-select"
                   [(ngModel)]="selectedLanguageAccentDescription"
                   (change)="updateSelectedLanguageAccent()">

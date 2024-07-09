@@ -151,13 +151,7 @@ export class TranslationStatusService implements OnInit {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return this._getTranslationStatus(contentId);
     } else {
-      if (this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled) {
-        return this._getEntityVoiceoverStatus(contentId);
-      }
-      this.langCode = this.translationLanguageService.getActiveLanguageCode();
-      let recordedVoiceovers =
-        this.explorationStatesService.getRecordedVoiceoversMemento(stateName);
-      return this._getVoiceOverStatus(recordedVoiceovers, contentId);
+      return this._getEntityVoiceoverStatus(contentId);
     }
   }
 
@@ -167,11 +161,7 @@ export class TranslationStatusService implements OnInit {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return this._getTranslationStatus(contentId);
     } else {
-      if (this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled) {
-        return this._getEntityVoiceoverStatus(contentId);
-      }
-      let recordedVoiceovers = this.stateRecordedVoiceoversService.displayed;
-      return this._getVoiceOverStatus(recordedVoiceovers, contentId);
+      return this._getEntityVoiceoverStatus(contentId);
     }
   }
 
@@ -282,10 +272,7 @@ export class TranslationStatusService implements OnInit {
           );
         }
 
-        if (
-          this.translationTabActiveModeService.isVoiceoverModeActive() &&
-          this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled
-        ) {
+        if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
           this.stateWiseStatusColor[stateName] =
             this.getStateGraphColorInVoiceoverMode(
               allContentIds,

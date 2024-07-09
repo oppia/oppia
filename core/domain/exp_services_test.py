@@ -1290,8 +1290,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertFalse(
             exp_services.is_voiceover_change_list(not_voiceover_change_list))
 
-    @test_utils.enable_feature_flags(
-            [feature_flag_list.FeatureNames.ADD_VOICEOVER_WITH_ACCENT])
     def test_changes_in_voiceover_list_with_feature_flag_enabled(self) -> None:
         not_voiceover_change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_exploration_property',

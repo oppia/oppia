@@ -2853,22 +2853,9 @@ def is_voiceover_change_list(
         bool. Whether the change_list contains only the changes which are
         allowed for voice artist to do.
     """
-    voiceover_with_accent_feature_is_enabled = (
-        feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ADD_VOICEOVER_WITH_ACCENT.value,
-            None)
-    )
-
     for change in change_list:
-        if voiceover_with_accent_feature_is_enabled:
-            if change.cmd != exp_domain.CMD_UPDATE_VOICEOVERS:
-                return False
-        else:
-            if (
-                change.property_name !=
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
-            ):
-                return False
+        if change.cmd != exp_domain.CMD_UPDATE_VOICEOVERS:
+            return False
     return True
 
 

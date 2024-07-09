@@ -438,21 +438,15 @@ export class TutorCardComponent {
     return this.displayedCard.isInteractionInline();
   }
 
-  isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
-  }
-
   // This function returns null if audio is not available.
   getContentAudioHighlightClass(): string | null {
     if (
-      this.isVoiceoverContributionWithAccentEnabled() &&
       this.voiceoverPlayerService.getActiveComponentName() ===
         AppConstants.COMPONENT_NAME_CONTENT &&
       this.audioPlayerService.isPlaying()
     ) {
       return ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS;
     } else if (
-      !this.isVoiceoverContributionWithAccentEnabled() &&
       this.audioTranslationManagerService.getCurrentComponentName() ===
         AppConstants.COMPONENT_NAME_CONTENT &&
       (this.audioPlayerService.isPlaying() ||

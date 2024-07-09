@@ -94,46 +94,38 @@ export class ContentLanguageSelectorComponent implements OnInit {
       }
     }
 
-    if (this.isVoiceoverContributionWithAccentEnabled()) {
-      this.voiceoverBackendApiService
-        .fetchVoiceoverAdminDataAsync()
-        .then(response => {
-          this.voiceoverPlayerService.languageAccentMasterList =
-            response.languageAccentMasterList;
-          this.voiceoverPlayerService.languageCodesMapping =
-            response.languageCodesMapping;
+    this.voiceoverBackendApiService
+      .fetchVoiceoverAdminDataAsync()
+      .then(response => {
+        this.voiceoverPlayerService.languageAccentMasterList =
+          response.languageAccentMasterList;
+        this.voiceoverPlayerService.languageCodesMapping =
+          response.languageCodesMapping;
 
-          this.audioTranslationLanguageService.setCurrentAudioLanguageCode(
-            this.selectedLanguageCode
-          );
+        this.audioTranslationLanguageService.setCurrentAudioLanguageCode(
+          this.selectedLanguageCode
+        );
 
-          this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
-            this.selectedLanguageCode,
-            this.entityVoiceoversService.getLanguageAccentCodes()
-          );
+        this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
+          this.selectedLanguageCode,
+          this.entityVoiceoversService.getLanguageAccentCodes()
+        );
 
-          this.audioPreloaderService.kickOffAudioPreloader(
-            this.playerPositionService.getCurrentStateName()
-          );
-        });
-    }
-  }
-
-  isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
+        this.audioPreloaderService.kickOffAudioPreloader(
+          this.playerPositionService.getCurrentStateName()
+        );
+      });
   }
 
   onSelectLanguage(newLanguageCode: string): void {
-    if (this.isVoiceoverContributionWithAccentEnabled()) {
-      this.entityVoiceoversService.setLanguageCode(newLanguageCode);
+    this.entityVoiceoversService.setLanguageCode(newLanguageCode);
 
-      this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
-        this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
-          newLanguageCode,
-          this.entityVoiceoversService.getLanguageAccentCodes()
-        );
-      });
-    }
+    this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+      this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
+        newLanguageCode,
+        this.entityVoiceoversService.getLanguageAccentCodes()
+      );
+    });
 
     if (this.shouldPromptForRefresh()) {
       const modalRef = this.ngbModal.open(

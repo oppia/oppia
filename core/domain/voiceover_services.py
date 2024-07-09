@@ -734,13 +734,6 @@ def update_exploration_voice_artist_link_model(
         updated_exploration: Exploration. An instance of exploration class
             representing the latest version.
     """
-
-    if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.
-            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value,
-            None):
-        return
-
     is_voiceover_changes_made: bool = False
     for change in change_list:
         if (

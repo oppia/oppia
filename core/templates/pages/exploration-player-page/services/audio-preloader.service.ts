@@ -149,10 +149,6 @@ export class AudioPreloaderService {
     return audioFilenamesInBfsOrder;
   }
 
-  isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
-  }
-
   getAllContentIdsFromState(stateName: string): string[] | undefined {
     let state = this.exploration.states.getState(stateName);
     if (state !== undefined) {
