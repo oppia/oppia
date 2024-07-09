@@ -593,7 +593,7 @@ describe('Story Editor Component having three story nodes', () => {
   });
 
   it(
-    'should not call the getStroyWithUrlFragmentExists if url fragment' +
+    'should not call the getStoryWithUrlFragmentExists if url fragment' +
       'is not correct',
     () => {
       let storyUrlFragmentSpy = spyOn(
