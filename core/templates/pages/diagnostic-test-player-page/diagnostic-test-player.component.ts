@@ -21,10 +21,15 @@ import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {DiagnosticTestTopicTrackerModel} from './diagnostic-test-topic-tracker.model';
+import {ClassroomData} from 'domain/classroom/classroom-data.model';
 import {Subscription} from 'rxjs';
 import {DiagnosticTestPlayerStatusService} from './diagnostic-test-player-status.service';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {TranslateService} from '@ngx-translate/core';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {AppConstants} from 'app.constants';
+import {Router} from '@angular/router';
+import {LoaderService} from 'services/loader.service';
 
 @Component({
   selector: 'oppia-diagnostic-test-player',
@@ -35,22 +40,40 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   diagnosticTestTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
   diagnosticTestIsStarted: boolean = false;
   diagnosticTestIsFinished = false;
-  classroomUrlFragment: string = 'math';
+  classroomData!: ClassroomData;
+  classroomUrlFragment!: string;
   recommendedTopicSummaries: CreatorTopicSummary[] = [];
   recommendedTopicIds: string[] = [];
   progressPercentage: number = 0;
   componentSubscription = new Subscription();
-  classroomId: string = '';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private classroomBackendApiService: ClassroomBackendApiService,
     private translateService: TranslateService,
-    private diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService
+    private diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService,
+    private windowRef: WindowRef,
+    private router: Router,
+    private loaderService: LoaderService
   ) {}
 
   ngOnInit(): void {
+    this.loaderService.showLoadingScreen('Loading');
+
+    const searchParams = Object.fromEntries(
+      new URLSearchParams(this.windowRef.nativeWindow.location.search)
+    );
+
+    if (!searchParams.hasOwnProperty('classroom')) {
+      this.router.navigate([
+        `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+      ]);
+      return;
+    }
+
+    this.classroomUrlFragment = searchParams.classroom;
+
     this.preventPageUnloadEventService.addListener(() => {
       return this.diagnosticTestIsStarted && !this.diagnosticTestIsFinished;
     });
@@ -78,10 +101,17 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     );
 
     this.getProgressText();
+
     this.classroomBackendApiService
-      .getClassroomIdAsync(this.classroomUrlFragment)
-      .then(classroomId => {
-        this.classroomId = classroomId;
+      .fetchClassroomDataAsync(this.classroomUrlFragment)
+      .then(classroomData => {
+        this.classroomData = classroomData;
+        this.loaderService.hideLoadingScreen();
+      })
+      .catch(() => {
+        this.router.navigate([
+          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+        ]);
       });
   }
 
@@ -95,28 +125,19 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   }
 
   startDiagnosticTest(): void {
-    this.classroomBackendApiService
-      .getClassroomDataAsync(this.classroomId)
-      .then(response => {
-        this.diagnosticTestTopicTrackerModel =
-          new DiagnosticTestTopicTrackerModel(
-            response.classroomDict.topicIdToPrerequisiteTopicIds
-          );
-        this.diagnosticTestIsStarted = true;
-      });
+    this.diagnosticTestTopicTrackerModel = new DiagnosticTestTopicTrackerModel(
+      this.classroomData.getTopicIdToPrerequisiteTopicIds()
+    );
+    this.diagnosticTestIsStarted = true;
   }
 
   getRecommendedTopicSummaries(recommendedTopicIds: string[]): void {
-    this.classroomBackendApiService
-      .fetchClassroomDataAsync(this.classroomUrlFragment)
-      .then(classroomData => {
-        let topicSummaries: CreatorTopicSummary[] =
-          classroomData.getTopicSummaries();
-        this.recommendedTopicSummaries = topicSummaries.filter(topicSummary => {
-          return recommendedTopicIds.indexOf(topicSummary.getId()) !== -1;
-        });
-        this.diagnosticTestIsFinished = true;
+    this.recommendedTopicSummaries = this.classroomData
+      .getTopicSummaries()
+      .filter(topicSummary => {
+        return recommendedTopicIds.indexOf(topicSummary.getId()) !== -1;
       });
+    this.diagnosticTestIsFinished = true;
   }
 
   getTopicButtonText(topicName: string): string {

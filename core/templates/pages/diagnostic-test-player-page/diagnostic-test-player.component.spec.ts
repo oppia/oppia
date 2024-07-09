@@ -23,9 +23,9 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
+import {AppConstants} from 'app.constants';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {DiagnosticTestPlayerComponent} from './diagnostic-test-player.component';
-import {WindowRef} from 'services/contextual/window-ref.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {DiagnosticTestPlayerStatusService} from './diagnostic-test-player-status.service';
@@ -35,6 +35,8 @@ import {ClassroomData} from 'domain/classroom/classroom-data.model';
 import {DiagnosticTestTopicTrackerModel} from './diagnostic-test-topic-tracker.model';
 import {TranslateService} from '@ngx-translate/core';
 import {EventEmitter} from '@angular/core';
+import {Router} from '@angular/router';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 class MockTranslateService {
   instant(key: string, interpolateParams?: Object): string {
@@ -45,9 +47,23 @@ class MockTranslateService {
 class MockWindowRef {
   _window = {
     location: {
-      href: '',
-      reload: (val: boolean) => val,
+      _href: '',
+      search: '',
+      get href() {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      },
+      replace: (val: string) => {},
     },
+    gtag: () => {},
+    onhashchange: () => {},
+    addEventListener: (
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ) => {},
   };
 
   get nativeWindow() {
@@ -55,15 +71,73 @@ class MockWindowRef {
   }
 }
 
+class MockRouter {
+  navigate(commands: string[]): Promise<boolean> {
+    return Promise.resolve(true);
+  }
+}
+
+const topicData1: CreatorTopicSummary = new CreatorTopicSummary(
+  'dummy',
+  'addition',
+  3,
+  3,
+  3,
+  3,
+  1,
+  'en',
+  'dummy',
+  1,
+  1,
+  1,
+  1,
+  true,
+  true,
+  'math',
+  'public/img.webp',
+  'red',
+  'add',
+  1,
+  1,
+  [5, 4],
+  [3, 4]
+);
+const topicData2: CreatorTopicSummary = new CreatorTopicSummary(
+  'dummy2',
+  'division',
+  2,
+  2,
+  3,
+  3,
+  0,
+  'es',
+  'dummy2',
+  1,
+  1,
+  1,
+  1,
+  true,
+  true,
+  'math',
+  'public/img1.png',
+  'green',
+  'div',
+  1,
+  1,
+  [5, 4],
+  [3, 4]
+);
+
 describe('Diagnostic test player component', () => {
   let component: DiagnosticTestPlayerComponent;
   let fixture: ComponentFixture<DiagnosticTestPlayerComponent>;
-  let windowRef: MockWindowRef;
   let preventPageUnloadEventService: PreventPageUnloadEventService;
   let classroomBackendApiService: ClassroomBackendApiService;
   let translateService: TranslateService;
   let sessionCompleteEmitter = new EventEmitter<string[]>();
   let progressEmitter = new EventEmitter<number>();
+  let router: Router;
+  let windowRef: MockWindowRef;
 
   class MockDiagnosticTestPlayerStatusService {
     onDiagnosticTestSessionCompleted = sessionCompleteEmitter;
@@ -78,10 +152,7 @@ describe('Diagnostic test player component', () => {
       declarations: [DiagnosticTestPlayerComponent, MockTranslatePipe],
       providers: [
         PreventPageUnloadEventService,
-        {
-          provide: WindowRef,
-          useValue: windowRef,
-        },
+        {provide: WindowRef, useValue: windowRef},
         {
           provide: TranslateService,
           useClass: MockTranslateService,
@@ -90,9 +161,12 @@ describe('Diagnostic test player component', () => {
           provide: DiagnosticTestPlayerStatusService,
           useClass: MockDiagnosticTestPlayerStatusService,
         },
+        {provide: Router, useClass: MockRouter},
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
+
+    router = TestBed.inject(Router);
   });
 
   beforeEach(() => {
@@ -106,6 +180,7 @@ describe('Diagnostic test player component', () => {
   });
 
   it('should listen to page unload events after initialization', () => {
+    windowRef.nativeWindow.location.search = '?classroom=math';
     spyOn(preventPageUnloadEventService, 'addListener').and.callFake(
       (callback: () => boolean) => callback()
     );
@@ -118,6 +193,7 @@ describe('Diagnostic test player component', () => {
   });
 
   it("should be able to get Oppia's avatar image URL after initialization", () => {
+    windowRef.nativeWindow.location.search = '?classroom=math';
     spyOn(preventPageUnloadEventService, 'addListener');
 
     expect(component.OPPIA_AVATAR_IMAGE_URL).toEqual('');
@@ -129,15 +205,106 @@ describe('Diagnostic test player component', () => {
     expect(component.OPPIA_AVATAR_IMAGE_URL).toEqual(avatarImageLocation);
   });
 
+  it('should get classroomData after initialization', fakeAsync(() => {
+    windowRef.nativeWindow.location.search = '?classroom=math';
+
+    const response = new ClassroomData(
+      'id',
+      'math',
+      'math',
+      [topicData1, topicData2],
+      'dummy',
+      'dummy',
+      'dummy',
+      true,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1,
+      {
+        dummy: [],
+        dummy2: [],
+      }
+    );
+
+    spyOn(
+      classroomBackendApiService,
+      'fetchClassroomDataAsync'
+    ).and.returnValue(Promise.resolve(response));
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.classroomUrlFragment).toEqual('math');
+    expect(component.classroomData.getName()).toEqual('math');
+  }));
+
+  it('should redirect to the 404 page if the classroom is not present in the query parameters', fakeAsync(() => {
+    windowRef.nativeWindow.location.search = '?classroom=invalid';
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
+
+    spyOn(
+      classroomBackendApiService,
+      'fetchClassroomDataAsync'
+    ).and.returnValue(Promise.reject());
+
+    component.ngOnInit();
+    tick();
+
+    expect(navigateSpy).toHaveBeenCalledWith([
+      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+    ]);
+  }));
+
+  it('should redirect to the 404 page if the classroom url fragment is invalid', fakeAsync(() => {
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(navigateSpy).toHaveBeenCalledWith([
+      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+    ]);
+  }));
+
   it('should be able to subscribe event emitters after initialization', fakeAsync(() => {
+    windowRef.nativeWindow.location.search = '?classroom=math';
+    const response = new ClassroomData(
+      'id',
+      'math',
+      'math',
+      [topicData1, topicData2],
+      'dummy',
+      'dummy',
+      'dummy',
+      true,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1,
+      {
+        dummy: [],
+        dummy2: [],
+      }
+    );
+
+    spyOn(
+      classroomBackendApiService,
+      'fetchClassroomDataAsync'
+    ).and.returnValue(Promise.resolve(response));
+
+    component.ngOnInit();
+    tick();
+
     spyOn(preventPageUnloadEventService, 'addListener');
     spyOn(component, 'getRecommendedTopicSummaries');
     spyOn(component, 'getProgressText');
 
-    component.ngOnInit();
     sessionCompleteEmitter.emit(['recommendedTopicId']);
     progressEmitter.emit(20);
-    tick(200);
+    tick();
 
     expect(component.getRecommendedTopicSummaries).toHaveBeenCalledWith([
       'recommendedTopicId',
@@ -146,22 +313,8 @@ describe('Diagnostic test player component', () => {
     expect(component.getProgressText).toHaveBeenCalled();
   }));
 
-  it('should be able to get the math classroom ID after initialization', fakeAsync(() => {
-    spyOn(preventPageUnloadEventService, 'addListener');
-    spyOn(classroomBackendApiService, 'getClassroomIdAsync').and.returnValue(
-      Promise.resolve('mathClassroomId')
-    );
-    component.classroomUrlFragment = 'math';
-
-    expect(component.classroomId).toEqual('');
-
-    component.ngOnInit();
-    tick();
-
-    expect(component.classroomId).toEqual('mathClassroomId');
-  }));
-
   it('should be able to get the topic button text', () => {
+    windowRef.nativeWindow.location.search = '?classroom=math';
     let topicName = 'Fraction';
     spyOn(translateService, 'instant').and.callThrough();
 
@@ -174,6 +327,7 @@ describe('Diagnostic test player component', () => {
   });
 
   it('should be able to get the topic URL from the URL fragment', () => {
+    windowRef.nativeWindow.location.search = '?classroom=math';
     let topicUrlFragment = 'subtraction';
 
     expect(component.getTopicUrlFromUrlFragment(topicUrlFragment)).toEqual(
@@ -182,85 +336,43 @@ describe('Diagnostic test player component', () => {
   });
 
   it('should be able to get topic recommendations', fakeAsync(() => {
-    let cData1: CreatorTopicSummary = new CreatorTopicSummary(
-      'dummy',
-      'addition',
-      3,
-      3,
-      3,
-      3,
-      1,
-      'en',
-      'dummy',
-      1,
-      1,
-      1,
-      1,
-      true,
-      true,
-      'math',
-      'public/img.webp',
-      'red',
-      'add',
-      1,
-      1,
-      [5, 4],
-      [3, 4]
-    );
-    let cData2: CreatorTopicSummary = new CreatorTopicSummary(
-      'dummy2',
-      'division',
-      2,
-      2,
-      3,
-      3,
-      0,
-      'es',
-      'dummy2',
-      1,
-      1,
-      1,
-      1,
-      true,
-      true,
-      'math',
-      'public/img1.png',
-      'green',
-      'div',
-      1,
-      1,
-      [5, 4],
-      [3, 4]
-    );
-
-    let array: CreatorTopicSummary[] = [cData1, cData2];
-    let classroomData = new ClassroomData(
+    windowRef.nativeWindow.location.search = '?classroom=math';
+    const response = new ClassroomData(
       'id',
-      'test',
-      'test',
-      array,
+      'math',
+      'math',
+      [topicData1, topicData2],
       'dummy',
       'dummy',
       'dummy',
       true,
       {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
-      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'}
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1,
+      {
+        dummy: [],
+        dummy2: [],
+      }
     );
 
     spyOn(
       classroomBackendApiService,
       'fetchClassroomDataAsync'
-    ).and.returnValue(Promise.resolve(classroomData));
+    ).and.returnValue(Promise.resolve(response));
+
+    component.ngOnInit();
+    tick();
 
     expect(component.recommendedTopicSummaries).toEqual([]);
 
     component.getRecommendedTopicSummaries(['dummy']);
     tick();
 
-    expect(component.recommendedTopicSummaries).toEqual([cData1]);
+    expect(component.recommendedTopicSummaries).toEqual([topicData1]);
   }));
 
   it('should be able to set topic tracker model after starting diagnostic test', fakeAsync(() => {
+    windowRef.nativeWindow.location.search = '?classroom=math';
     // A linear graph with 3 nodes.
     const topicIdToPrerequisiteTopicIds = {
       topicId1: [],
@@ -272,20 +384,32 @@ describe('Diagnostic test player component', () => {
       topicIdToPrerequisiteTopicIds
     );
 
-    let response = {
-      classroomDict: {
-        classroomId: 'classroomId',
-        name: 'math',
-        urlFragment: 'math',
-        courseDetails: '',
-        topicListIntro: '',
-        topicIdToPrerequisiteTopicIds: topicIdToPrerequisiteTopicIds,
-      },
-    };
-
-    spyOn(classroomBackendApiService, 'getClassroomDataAsync').and.returnValue(
-      Promise.resolve(response)
+    const response = new ClassroomData(
+      'id',
+      'math',
+      'math',
+      [topicData1, topicData2],
+      'dummy',
+      'dummy',
+      'dummy',
+      true,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1,
+      {
+        topicId1: [],
+        topicId2: ['topicId1'],
+        topicId3: ['topicId2'],
+      }
     );
+
+    spyOn(
+      classroomBackendApiService,
+      'fetchClassroomDataAsync'
+    ).and.returnValue(Promise.resolve(response));
+
+    component.ngOnInit();
+    tick();
 
     expect(component.diagnosticTestTopicTrackerModel).toEqual(undefined);
 

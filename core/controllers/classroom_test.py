@@ -227,7 +227,11 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             'thumbnail_data': dummy_thumbnail_data.to_dict(),
             'banner_data': dummy_banner_data.to_dict(),
             'is_published': True,
-            'public_classrooms_count': 1
+            'public_classrooms_count': 1,
+            'topic_id_to_prerequisite_topic_ids': {
+                self.public_topic_id_1: [],
+                self.private_topic_id: []
+            }
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 

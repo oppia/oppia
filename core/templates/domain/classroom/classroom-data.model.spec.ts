@@ -66,7 +66,11 @@ describe('Classroom data model', () => {
       'Learn math',
       true,
       {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
-      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'}
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      0,
+      {
+        topicId: [],
+      }
     );
     expect(classroomData.getName()).toEqual('Math');
     expect(classroomData.getUrlFragment()).toEqual('math');

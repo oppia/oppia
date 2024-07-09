@@ -95,6 +95,7 @@ describe('Contribution Admin dashboard stats service', () => {
     topic_list_intro: 'Topics Covered',
     teaser_text: 'learn math',
     is_published: true,
+    public_classrooms_count: 1,
     thumbnail_data: {
       filename: 'thumbnail.svg',
       size_in_bytes: 100,
@@ -104,6 +105,9 @@ describe('Contribution Admin dashboard stats service', () => {
       filename: 'banner.png',
       size_in_bytes: 100,
       bg_color: 'transparent',
+    },
+    topic_id_to_prerequisite_topic_ids: {
+      topic1: [],
     },
   };
 
@@ -207,7 +211,9 @@ describe('Contribution Admin dashboard stats service', () => {
       responseDictionaries.teaser_text,
       responseDictionaries.is_published,
       responseDictionaries.thumbnail_data,
-      responseDictionaries.banner_data
+      responseDictionaries.banner_data,
+      responseDictionaries.public_classrooms_count,
+      responseDictionaries.topic_id_to_prerequisite_topic_ids
     );
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {

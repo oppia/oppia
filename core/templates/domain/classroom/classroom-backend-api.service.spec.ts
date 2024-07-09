@@ -87,6 +87,9 @@ describe('Classroom backend API service', function () {
     course_details: 'Course Details',
     topic_list_intro: 'Topics Covered',
     is_published: true,
+    topic_id_to_prerequisite_topic_ids: {
+      topicId: [],
+    },
     teaser_text: 'learn math',
     thumbnail_data: {
       filename: 'thumbnail.svg',
@@ -98,6 +101,7 @@ describe('Classroom backend API service', function () {
       size_in_bytes: 1000,
       bg_color: 'transparent',
     },
+    public_classrooms_count: 1,
   };
   let classroomBackendDict = {
     classroom_id: 'math_classroom_id',
@@ -139,7 +143,9 @@ describe('Classroom backend API service', function () {
       responseDictionaries.teaser_text,
       responseDictionaries.is_published,
       responseDictionaries.thumbnail_data,
-      responseDictionaries.banner_data
+      responseDictionaries.banner_data,
+      responseDictionaries.public_classrooms_count,
+      responseDictionaries.topic_id_to_prerequisite_topic_ids
     );
   });
 
