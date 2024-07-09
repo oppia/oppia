@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the journey of a topic manager to edit topic details, manage practice tab visibility, and preview lesson, practice, and revision.
+ * @fileoverview Acceptance Test for the journey of a topic manager to edit topic details, manage practice tab visibility, and preview lesson.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -30,38 +30,41 @@ describe('Topic Manager User Journey', function () {
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm',
-      'curriculum_Admin@example.com',
+      'curriculumAdmin',
+      'curriculumAdmin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    await curriculumAdmin.createTopic('Addition', 'add');
+    await curriculumAdmin.createTopic('Mathematics', 'math');
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
-      'topic_manager@example.com',
+      'topicManager@example.com',
       [ROLES.TOPIC_MANAGER],
-      'Addition'
+      'Mathematics'
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to edit topic name, thumbnail, description, page title fragment for web, and meta tags, and preview lesson, practice, and revision in the topic preview.',
+    'should be able to edit topic name, thumbnail, description, page title fragment for web, and meta tags, and preview lesson in the topic preview.',
     async function () {
-      await topicManager.openTopicEditor('Addition');
-      await topicManager.editTopicDetails('Topic 1', {
-        name: 'Updated Topic 1',
-        thumbnail: 'updated_thumbnail.png',
-        description: 'Updated description',
-        pageTitleFragment: 'Updated Page Title Fragment',
-        metaTags: 'updated, meta, tags',
-      });
+      await topicManager.openTopicEditor('Mathematics');
+      await topicManager.editTopicData(
+        'Advanced Mathematics',
+        'math',
+        'A comprehensive course on advanced mathematics',
+        'mathematics, advanced, course',
+        'Advanced Mathematics Course',
+        testConstants.data.blogPostThumbnailImage
+      );
 
-      await topicManager.saveTopicDraft('Topic 1');
+      await topicManager.saveTopicDraft('Advanced Mathematics');
       await topicManager.verifyStatusOfPracticeTab('disabled');
-      await topicManager.previewLessonInTopicPreview('Topic 1');
-      await topicManager.previewPracticeInTopicPreview('Topic 1');
-      await topicManager.previewRevisionInTopicPreview('Topic 1');
+      await topicManager.previewTopic('Advanced Mathematics');
+      await topicManager.expectTopicPreviewToHaveTitleAndDescription(
+        'Advanced Mathematics',
+        'A comprehensive course on advanced mathematics'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

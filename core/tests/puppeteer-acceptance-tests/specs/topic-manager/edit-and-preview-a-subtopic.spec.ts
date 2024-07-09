@@ -35,83 +35,56 @@ describe('Topic Manager User Journey', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    await curriculumAdmin.createTopic('Addition', 'add');
-    await curriculumAdmin.createSkillForTopic('One digit Addition', 'Addition');
+    await curriculumAdmin.createTopic('Mathematics', 'math');
+    await curriculumAdmin.createSkillForTopic(
+      'One digit Addition',
+      'Mathematics'
+    );
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topic_manager@example.com',
       [ROLES.TOPIC_MANAGER],
-      'Addition'
+      'Mathematics'
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it('should add a sub-topic to a topic, assign skills to the sub-topic, and change the assignments, open an existing sub-topic, modify its data and publish it again, and preview the sub-topic in the preview tab.', async function () {
-    const actions = [
-      {
-        action: () => topicManager.openTopicEditor('Addition'),
-        name: 'openTopicEditor',
-      },
-      {
-        action: () =>
-          topicManager.createSubtopicForTopic('Sub-Topic 1', 'Addition', ''),
-        name: 'createSubtopicForTopic',
-      },
-      {
-        action: () =>
-          topicManager.createSkillForTopic('Addition', 'Test Skill 2'),
-        name: 'createSkillForTopic',
-      },
-      {
-        action: () =>
-          topicManager.assignSkillToSubtopicInTopicEditor(
-            'Sub-Topic 1',
-            '',
-            ''
-          ),
-        name: 'assignSkillToSubtopicInTopicEditor',
-      },
-      {
-        action: () => topicManager.changeAssignments(),
-        name: 'changeAssignments',
-      },
-      {
-        action: () => topicManager.openSubtopicEditorOfTopic('Sub-Topic 1'),
-        name: 'openSubtopicEditorOfTopic',
-      },
-      {
-        action: () =>
-          topicManager.editSubTopicData('Sub-Topic 1', 'Updated Sub-Topic 1'),
-        name: 'editSubTopicData',
-      },
-      {
-        action: () => topicManager.saveSubTopicChanges(),
-        name: 'saveSubTopicChanges',
-      },
-      {
-        action: () => topicManager.navigateToSubtopicPreviewTab('Sub-Topic 1'),
-        name: 'navigateToSubtopicPreviewTab',
-      },
-      {
-        action: () =>
-          topicManager.expectPreviewSubtopicToHave(
-            'Updated Sub-Topic 1',
-            'Test Skill 2'
-          ),
-        name: 'expectPreviewSubtopicToHave',
-      },
-      {action: () => topicManager.timeout(2147483647)},
-    ];
+  it(
+    'should add a sub-topic to a topic, assign skills to the sub-topic, and change the assignments, open an existing sub-topic, modify its data and publish the topic again, and preview the sub-topic in the preview tab.',
+    async function () {
+      await topicManager.openTopicEditor('Mathematics');
 
-    for (const {action, name} of actions) {
-      try {
-        await action();
-      } catch (error) {
-        console.error('\x1b[31m%s\x1b[0m', error);
-        await topicManager.screenshot(`error_${name}.png`);
-      }
-    }
-  }, 2147483647);
+      await topicManager.createSubtopicForTopic(
+        'Addition',
+        'add',
+        'Mathematics'
+      );
+      await topicManager.createSkillForTopic('Addition', 'Test Skill 2');
+      await topicManager.assignSkillToSubtopicInTopicEditor(
+        'Sub-Topic 1',
+        '',
+        ''
+      );
+
+      // Subtopic name got updated in the statement below.
+      await topicManager.changeSubtopicAssignments('Add');
+      await topicManager.openSubtopicEditor('Add', 'Mathematics');
+      await topicManager.editSubTopicData(
+        'Addition',
+        'Add numbers',
+        'Subtopic to learn addition',
+        testConstants.data.curriculumAdminThumbnailImage
+      );
+      await topicManager.saveTopicDraft('Mathematics');
+
+      await topicManager.navigateToSubtopicPreviewTab();
+      await topicManager.expectPreviewSubtopicToHave(
+        'Addition',
+        'Subtopic to learn addition'
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
