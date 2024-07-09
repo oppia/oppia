@@ -19,18 +19,29 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {TopicManager} from '../../utilities/user/topic-manager';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Topic Manager User Journey', function () {
   let topicManager: TopicManager;
+  let curriculumAdmin: CurriculumAdmin;
 
   beforeAll(async function () {
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculum_Admin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
+
+    curriculumAdmin.createTopic('Addition', 'add');
+
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topic_manager@example.com',
-      [ROLES.TOPIC_MANAGER]
+      [ROLES.TOPIC_MANAGER],
+      ['Addition']
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
@@ -47,6 +58,8 @@ describe('Topic Manager User Journey', function () {
         metaTags: 'updated, meta, tags',
       });
 
+      await topicManager.saveTopicDraft('Topic 1');
+      await topicManager.verifyStatusOfPracticeTab('disabled');
       await topicManager.previewLessonInTopicPreview('Topic 1');
       await topicManager.previewPracticeInTopicPreview('Topic 1');
       await topicManager.previewRevisionInTopicPreview('Topic 1');

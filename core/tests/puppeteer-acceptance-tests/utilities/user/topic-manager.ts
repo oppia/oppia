@@ -71,6 +71,20 @@ const addChapterButton = 'button.e2e-test-add-chapter-button';
 const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
 const chapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
+
+const subtopicReassignHeader = 'div.subtopic-reassign-header';
+const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
+const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
+const subtopicUrlFragmentField =
+  'input.e2e-test-new-subtopic-url-fragment-field';
+const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
+const richTextAreaField = 'div.e2e-test-rte';
+const subtopicPhotoBoxButton =
+  '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
+const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
+const mobileSaveTopicButton =
+  'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
+const saveTopicButton = 'button.e2e-test-save-topic-button';
 const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
 
 // Question Editor.
@@ -93,21 +107,6 @@ const questionTextSelector = '.e2e-test-question-text';
 const navigationDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
 const mobilePreviewTab = '.e2e-test-mobile-preview-tab';
 const mobileSkillQuestionTab = '.e2e-test-mobile-questions-tab';
-
-const subtopicReassignHeader = 'div.subtopic-reassign-header';
-const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
-const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
-const subtopicUrlFragmentField =
-  'input.e2e-test-new-subtopic-url-fragment-field';
-const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
-const richTextAreaField = 'div.e2e-test-rte';
-const subtopicPhotoBoxButton =
-  '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
-const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
-
-const mobileSaveTopicButton =
-  'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
-const saveTopicButton = 'button.e2e-test-save-topic-button';
 
 const topicStatusDropdownSelector = '.e2e-test-select-topic-status-dropdown';
 const classroomDropdownSelector = '.e2e-test-select-classroom-dropdown';

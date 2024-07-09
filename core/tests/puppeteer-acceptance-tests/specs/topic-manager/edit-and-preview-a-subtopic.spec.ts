@@ -29,42 +29,45 @@ describe('Topic Manager User Journey', function () {
   let curriculumAdmin: CurriculumAdmin;
 
   beforeAll(async function () {
-    topicManager = await UserFactory.createNewUser(
-      'topicManager',
-      'topic_manager@example.com',
-      [ROLES.TOPIC_MANAGER]
-    );
-
     curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdmin',
+      'curriculumAdm',
       'curriculum_Admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    curriculumAdmin.createSkill('Test Skill 1', 'Mathematics');
-    curriculumAdmin.createSkill('Test Skill 2', 'Mathematics');
+    curriculumAdmin.createTopic('Addition', 'add');
+    curriculumAdmin.createSkillForTopic('Addition', 'Test Skill 1');
+
+    topicManager = await UserFactory.createNewUser(
+      'topicManager',
+      'topic_manager@example.com',
+      [ROLES.TOPIC_MANAGER],
+      ['Addition']
+    );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should add a sub-topic to a topic, assign skills to the sub-topic, change the assignments and re-publish the topic, open an existing sub-topic, modify its data and publish it again, and preview the sub-topic in the preview tab.',
     async function () {
       await topicManager.navigateToTopicDashboardPage();
-      await topicManager.addSubTopic('Sub-Topic 1');
-      await topicManager.assignSkillsToSubTopic('Sub-Topic 1', [
-        'Test Skill 1',
-        'Test Skill 2',
-      ]);
-      await topicManager.changeAssignmentsAndPublishTopic();
+      await topicManager.createSubtopicForTopic('Sub-Topic 1', 'Addition', '');
+      await topicManager.createSkillForTopic('Addition', 'Test Skill 2')
+      await topicManager.assignSkillToSubtopicInTopicEditor('Sub-Topic 1', '', '')
 
+      await topicManager.changeAssignments();
       await topicManager.openExistingSubTopic('Sub-Topic 1');
-      await topicManager.modifySubTopicData(
+      await topicManager.editSubTopicData(
         'Sub-Topic 1',
         'Updated Sub-Topic 1'
       );
-      await topicManager.publishSubTopic();
 
-      await topicManager.previewSubTopicInPreviewTab('Sub-Topic 1');
-    },
+      await topicManager.saveSubTopicChanges();
+      await topicManager.navigateToSubtopicPreviewTab('Sub-Topic 1');
+      await topicManager.expectPreviewSubtopicToMatchData(
+        title: 'Updated Sub-Topic 1',
+        skillDescription: 'Test Skill 2'
+      );
+
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
