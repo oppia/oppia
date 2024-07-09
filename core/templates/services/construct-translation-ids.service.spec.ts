@@ -35,9 +35,11 @@ describe('Construct Translation Ids Service', () => {
   });
 
   it('should get classroom title id', () => {
-    expect(ctis.getClassroomTitleId('math')).toBe('I18N_CLASSROOM_MATH_TITLE');
+    expect(ctis.getClassroomTitleId('math')).toBe('I18N_CLASSROOM_MATH_NAME');
 
-    expect(ctis.getClassroomTitleId('')).toBe('I18N_CLASSROOM__TITLE');
+    expect(ctis.getClassroomTitleId('science')).toBe(
+      'I18N_CLASSROOM_SCIENCE_NAME'
+    );
   });
 
   it('should get syllabus type title id', () => {

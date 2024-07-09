@@ -101,7 +101,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             self.classroom.thumbnail_data, self.dummy_thumbnail_data
         )
         self.assertEqual(self.classroom.banner_data, self.dummy_banner_data)
-        self.classroom.validate()
+        self.classroom.validate(strict=True)
 
     def test_from_dict_method(self) -> None:
         classroom = classroom_config_domain.Classroom.from_dict(
@@ -148,7 +148,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'Expected ID of the classroom to be a string, received: 1.')
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
@@ -161,13 +161,13 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'Expected name of the classroom to be a string, received: 1.')
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
         self.classroom.name = ''
         error_msg = 'Name field should not be empty'
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
         self.classroom.name = 'Long classroom name' * 5
         error_msg = (
@@ -175,7 +175,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             '%s.' % self.classroom.name)
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
@@ -190,13 +190,13 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
         self.classroom.url_fragment = ''
         error_msg = 'Url fragment field should not be empty'
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
         self.classroom.url_fragment = 'long-url-fragment' * 2
         error_msg = (
@@ -204,7 +204,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'received %s.' % self.classroom.url_fragment)
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
@@ -216,13 +216,13 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
         self.classroom.teaser_text = ''
         error_msg = 'teaser_text field should not be empty'
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
         self.classroom.teaser_text = 'long-teaser-text' * 10
         error_msg = (
@@ -235,7 +235,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
@@ -248,13 +248,13 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
         self.classroom.topic_list_intro = ''
         error_msg = 'topic_list_intro field should not be empty'
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
         self.classroom.topic_list_intro = 'a' * 241
         error_msg = (
@@ -267,7 +267,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
@@ -280,13 +280,13 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
         self.classroom.course_details = ''
         error_msg = 'course_details field should not be empty'
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
         self.classroom.course_details = 'a' * 721
         error_msg = (
@@ -299,7 +299,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
@@ -314,7 +314,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
@@ -327,7 +327,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
     def test_cycle_between_topic_id_and_prerequisites_should_raise_exception(
         self
@@ -345,7 +345,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
         self.classroom.topic_id_to_prerequisite_topic_ids = {
             'topic_id_1': ['topic_id_2', 'topic_id_3'],
@@ -361,7 +361,13 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
+
+        error_msg = 'A classroom should have at least one topic.'
+        self.classroom.topic_id_to_prerequisite_topic_ids = {}
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom.validate(strict=True)
 
     def test_valid_topic_id_to_prerequisite_topic_ids_graph(self) -> None:
         # Test valid graph 1.
@@ -370,7 +376,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'topic_id_2': ['topic_id_1'],
             'topic_id_3': ['topic_id_2']
         }
-        self.classroom.validate()
+        self.classroom.validate(strict=True)
 
         # Test valid graph 2.
         self.classroom.topic_id_to_prerequisite_topic_ids = {
@@ -379,25 +385,21 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'topic_id_3': ['topic_id_1', 'topic_id_2'],
             'topic_id_4': []
         }
-        self.classroom.validate()
+        self.classroom.validate(strict=True)
 
         # Test valid graph 3.
-        self.classroom.topic_id_to_prerequisite_topic_ids = {}
-        self.classroom.validate()
-
-        # Test valid graph 4.
         self.classroom.topic_id_to_prerequisite_topic_ids = {
             'topic_id_1': []
         }
-        self.classroom.validate()
+        self.classroom.validate(strict=True)
 
-        # Test valid graph 5.
+        # Test valid graph 4.
         self.classroom.topic_id_to_prerequisite_topic_ids = {
             'topic_id_1': [],
             'topic_id_2': ['topic_id_1'],
             'topic_id_3': ['topic_id_2', 'topic_id_1']
         }
-        self.classroom.validate()
+        self.classroom.validate(strict=True)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
@@ -410,7 +412,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
@@ -422,7 +424,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'received: 1.')
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
     def test_invalid_thumbnail_bg_color_should_raise_exception(self) -> None:
         error_msg = 'thumbnail_bg_color field should not be empty'
@@ -430,7 +432,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'valid_thumbnail.svg', '', 1000)
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
         error_msg = (
             'Classroom thumbnail background color #FFFF is not supported.'
@@ -438,7 +440,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         self.classroom.thumbnail_data.bg_color = '#FFFF'
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
     def test_invalid_banner_bg_color_should_raise_exception(self) -> None:
         error_msg = 'banner_bg_color field should not be empty'
@@ -446,7 +448,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'valid_banner.png', '', 1000)
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
         error_msg = (
             'Classroom banner background color #FFFF is not supported.'
@@ -454,7 +456,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         self.classroom.banner_data.bg_color = '#FFFF'
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
     def test_invalid_banner_filename_should_raise_exception(self) -> None:
         error_msg = (
@@ -464,7 +466,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'invalid_banner', 'transparent', 1000)
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
         error_msg = (
             'banner_filename field should not be empty'
         )
@@ -472,7 +474,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             '', 'transparent', 1000)
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
     def test_invalid_thumbnail_filename_should_raise_exception(self) -> None:
         error_msg = (
@@ -482,7 +484,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'invalid_thumbnail.png', 'transparent', 1000)
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
         error_msg = (
             'thumbnail_filename field should not be empty'
         )
@@ -490,7 +492,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             '', 'transparent', 1000)
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
-            self.classroom.validate()
+            self.classroom.validate(strict=True)
 
 
 class ImageDomainTests(test_utils.GenericTestBase):

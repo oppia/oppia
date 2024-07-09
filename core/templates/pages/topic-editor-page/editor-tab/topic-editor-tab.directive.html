@@ -167,7 +167,7 @@
               </span>
               <em *ngIf="!isAssignedToAClassroom()">No classroom assigned</em>
               <div *ngIf="isAssignedToAClassroom()" class="oppia-input-box-subtitle">
-                <em>To change the assigned classroom, please contact one of the curriculum admins:</em><br>
+                <em>To change the assigned classroom, please contact one of the curriculum admins:</em>
                 <em *ngFor="let username of curriculumAdminUsernames; let last = last">
                   {{ username }}<ng-container *ngIf="!last">, </ng-container>
                 </em>
