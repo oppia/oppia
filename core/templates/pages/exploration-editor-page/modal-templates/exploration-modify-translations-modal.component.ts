@@ -17,17 +17,23 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ContextService} from 'services/context.service';
-import {EntityBulkTranslationsBackendApiService} from '../services/entity-bulk-translations-backend-api.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {ChangeListService} from '../services/change-list.service';
+import {
+  ModifyTranslationOpportunity,
+  TranslationModalComponent,
+} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
+import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 
 interface LanguageCodeToContentTranslations {
-  [language_code: string]: TranslatedContent;
+  [languageCode: string]: TranslatedContent;
 }
 
 @Component({
@@ -36,18 +42,26 @@ interface LanguageCodeToContentTranslations {
 })
 export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   @Input() contentId!: string;
+  @Input() contentValue!: string;
   explorationId!: string;
   explorationVersion!: number;
   contentTranslations: LanguageCodeToContentTranslations = {};
-  allExistingTranslationsHaveBeenRemoved: boolean = false;
+  languageIsCheckedStatusDict: {
+    [languageCode: string]: boolean;
+  } = {};
+  translationsHaveLoaded: boolean = false;
+  interactionId?: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
+    private ngbModal: NgbModal,
     private contextService: ContextService,
-    private entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService,
     private languageUtilService: LanguageUtilService,
     private entityTranslationsService: EntityTranslationsService,
-    private changeListService: ChangeListService
+    private changeListService: ChangeListService,
+    private translationLanguageService: TranslationLanguageService,
+    private stateEditorService: StateEditorService,
+    private stateInteractionIdService: StateInteractionIdService
   ) {
     super(ngbActiveModal);
   }
@@ -56,56 +70,93 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     this.explorationId = this.contextService.getExplorationId();
     this.explorationVersion =
       this.contextService.getExplorationVersion() as number;
+    this.interactionId = this.stateInteractionIdService.savedMemento;
 
     // Populate the content translations via latest draft changes first,
     // in order to get the most recently updated translations.
     for (let language in this.entityTranslationsService
-      .languageCodeToEntityTranslations) {
+      .languageCodeToLatestEntityTranslations) {
       let translationContent =
-        this.entityTranslationsService.languageCodeToEntityTranslations[
+        this.entityTranslationsService.languageCodeToLatestEntityTranslations[
           language
         ].getWrittenTranslation(this.contentId);
       if (translationContent) {
         this.contentTranslations[language] = translationContent;
       }
     }
+    this.updateTranslationDisplayContent();
+  }
 
-    this.allExistingTranslationsHaveBeenRemoved = this.changeListService
-      .getTranslationChangeList()
-      .some(changeDict => {
-        return (
-          changeDict.cmd === 'remove_translations' &&
-          changeDict.content_id === this.contentId
+  updateTranslationDisplayContent(): void {
+    Object.keys(this.contentTranslations).forEach(languageCode => {
+      this.languageIsCheckedStatusDict[languageCode] = false;
+    });
+    this.translationsHaveLoaded = true;
+  }
+
+  openTranslationEditor(languageCode: string): void {
+    const modalRef = this.ngbModal.open(TranslationModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+    });
+    this.translationLanguageService.setActiveLanguageCode(languageCode);
+
+    const modifyTranslationOpportunity: ModifyTranslationOpportunity = {
+      id: this.explorationId,
+      contentId: this.contentId,
+      heading: this.stateEditorService.getActiveStateName() || '',
+      subheading: 'Update Translation',
+      textToTranslate: this.contentValue,
+      currentContentTranslation: this.contentTranslations[languageCode],
+      interactionId: this.interactionId,
+    };
+    modalRef.componentInstance.modifyTranslationOpportunity =
+      modifyTranslationOpportunity;
+
+    modalRef.result.then(result => {
+      if (result) {
+        this.contentTranslations[languageCode].translation = result;
+        this.languageIsCheckedStatusDict[languageCode] = true;
+      }
+    });
+  }
+
+  confirm(): void {
+    for (let language in this.contentTranslations) {
+      if (this.languageIsCheckedStatusDict[language] === true) {
+        const updatedTranslatedContent = new TranslatedContent(
+          this.contentTranslations[language].translation,
+          this.contentTranslations[language].dataFormat,
+          false
         );
-      });
-
-    // Populate the content translations via published translations from the backend.
-    // These translations are used for a language when the published translations are
-    // the latest translations available.
-    if (!this.allExistingTranslationsHaveBeenRemoved) {
-      this.entityBulkTranslationsBackendApiService
-        .fetchEntityBulkTranslationsAsync(
-          this.explorationId,
-          'exploration',
-          this.explorationVersion
-        )
-        .then(response => {
-          for (let language in response) {
-            let languageTranslations = response[language].translationMapping;
-            if (
-              this.contentId in languageTranslations &&
-              !this.contentTranslations[language]
-            ) {
-              let translationDict = languageTranslations[this.contentId];
-              this.contentTranslations[language] = new TranslatedContent(
-                translationDict.translation,
-                translationDict.dataFormat,
-                translationDict.needsUpdate
-              );
-            }
-          }
-        });
+        this.changeListService.editTranslation(
+          this.contentId,
+          language,
+          updatedTranslatedContent
+        );
+        this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+          language
+        ].updateTranslation(this.contentId, updatedTranslatedContent);
+      } else {
+        const updatedTranslatedContent = new TranslatedContent(
+          this.contentTranslations[language].translation,
+          this.contentTranslations[language].dataFormat,
+          true
+        );
+        this.changeListService.markTranslationAsNeedingUpdateForLanguage(
+          this.contentId,
+          language
+        );
+        this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+          language
+        ].updateTranslation(this.contentId, updatedTranslatedContent);
+      }
     }
+    this.ngbActiveModal.close();
+  }
+
+  cancel(): void {
+    this.ngbActiveModal.dismiss();
   }
 
   getLanguageName(languageCode: string): string {

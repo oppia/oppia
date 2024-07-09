@@ -22,10 +22,12 @@ export default {
   URLs: {
     BaseURL: 'http://localhost:8181',
     About: 'http://localhost:8181/about',
-    AboutFoundation: 'http://localhost:8181/about-foundation',
     AdminPage: 'http://localhost:8181/admin',
     AdminPageRolesTab: 'http://localhost:8181/admin#/roles',
     AdminPageActivitiesTab: 'http://localhost:8181/admin#/activities',
+    AdminPageMiscTab: 'http://localhost:8181/admin#/misc',
+    AdminPagePlatformParametersTab:
+      'http://localhost:8181/admin#/platform-parameters',
     Android: 'http://localhost:8181/android',
     Blog: 'http://localhost:8181/blog',
     BlogAdmin: 'http://localhost:8181/blog-admin',
@@ -35,6 +37,7 @@ export default {
       'in-summer-school-0q6r28fzsrwc',
     CCLicense: 'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
     ClassroomAdmin: 'http://localhost:8181/classroom-admin',
+    ClassroomsPage: 'http://localhost:8181/learn',
     CommunityLibrary: 'http://localhost:8181/community-library',
     Contact: 'http://localhost:8181/contact',
     ContributorDashboard: 'http://localhost:8181/contributor-dashboard',
@@ -62,6 +65,8 @@ export default {
     Electromagnetism: 'https://www.oppia.org/collection/wqCTKpKA0LBe',
     GetStarted: 'http://localhost:8181/get-started',
     Home: 'http://localhost:8181/',
+    ImpactReportUrl:
+      'https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view',
     LearnerDashboard: 'http://localhost:8181/learner-dashboard',
     Login: 'http://localhost:8181/login',
     Logout: 'http://localhost:8181/logout',
@@ -146,6 +151,10 @@ export default {
     curriculumAdminThumbnailImage: path.resolve(
       __dirname,
       '../../data/curriculum-admin-thumbnail.svg'
+    ),
+    classroomBannerImage: path.resolve(
+      __dirname,
+      '../../data/classroom-banner.png'
     ),
   },
   OppiaSocials: {
