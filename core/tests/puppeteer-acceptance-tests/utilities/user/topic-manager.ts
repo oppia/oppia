@@ -1446,6 +1446,16 @@ export class TopicManager extends BaseUser {
     }
     showMessage('Delete button is not available in the skill');
   }
+
+  async changeSubtopicAssignments() {}
+
+  async timeout(time) {
+    await this.page.waitForTimeout(time);
+  }
+
+  async screenshot(path) {
+    await this.page.screenshot(path);
+  }
 }
 
 export let TopicManagerFactory = (): TopicManager => new TopicManager();

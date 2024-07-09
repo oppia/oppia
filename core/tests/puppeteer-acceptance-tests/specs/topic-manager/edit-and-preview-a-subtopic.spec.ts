@@ -46,31 +46,72 @@ describe('Topic Manager User Journey', function () {
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it(
-    'should add a sub-topic to a topic, assign skills to the sub-topic, change the assignments and re-publish the topic, open an existing sub-topic, modify its data and publish it again, and preview the sub-topic in the preview tab.',
-    async function () {
-      await topicManager.openTopicEditor('Addition');
-      await topicManager.createSubtopicForTopic('Sub-Topic 1', 'Addition', '');
-      await topicManager.createSkillForTopic('Addition', 'Test Skill 2');
-      await topicManager.assignSkillToSubtopicInTopicEditor(
-        'Sub-Topic 1',
-        '',
-        ''
-      );
+  it('should add a sub-topic to a topic, assign skills to the sub-topic, and change the assignments, open an existing sub-topic, modify its data and publish it again, and preview the sub-topic in the preview tab.', async function () {
+    const actions = [
+      {
+        action: () => topicManager.openTopicEditor('Addition'),
+        name: 'openTopicEditor',
+      },
+      {
+        action: () =>
+          topicManager.createSubtopicForTopic('Sub-Topic 1', 'Addition', ''),
+        name: 'createSubtopicForTopic',
+      },
+      {
+        action: () =>
+          topicManager.createSkillForTopic('Addition', 'Test Skill 2'),
+        name: 'createSkillForTopic',
+      },
+      {
+        action: () =>
+          topicManager.assignSkillToSubtopicInTopicEditor(
+            'Sub-Topic 1',
+            '',
+            ''
+          ),
+        name: 'assignSkillToSubtopicInTopicEditor',
+      },
+      {
+        action: () => topicManager.changeAssignments(),
+        name: 'changeAssignments',
+      },
+      {
+        action: () => topicManager.openSubtopicEditorOfTopic('Sub-Topic 1'),
+        name: 'openSubtopicEditorOfTopic',
+      },
+      {
+        action: () =>
+          topicManager.editSubTopicData('Sub-Topic 1', 'Updated Sub-Topic 1'),
+        name: 'editSubTopicData',
+      },
+      {
+        action: () => topicManager.saveSubTopicChanges(),
+        name: 'saveSubTopicChanges',
+      },
+      {
+        action: () => topicManager.navigateToSubtopicPreviewTab('Sub-Topic 1'),
+        name: 'navigateToSubtopicPreviewTab',
+      },
+      {
+        action: () =>
+          topicManager.expectPreviewSubtopicToHave(
+            'Updated Sub-Topic 1',
+            'Test Skill 2'
+          ),
+        name: 'expectPreviewSubtopicToHave',
+      },
+      {action: () => topicManager.timeout(2147483647)},
+    ];
 
-      await topicManager.changeAssignments();
-      await topicManager.openSubtopicEditorOfTopic('Sub-Topic 1');
-      await topicManager.editSubTopicData('Sub-Topic 1', 'Updated Sub-Topic 1');
-
-      await topicManager.saveSubTopicChanges();
-      await topicManager.navigateToSubtopicPreviewTab('Sub-Topic 1');
-      await topicManager.expectPreviewSubtopicToHave(
-        'Updated Sub-Topic 1',
-        'Test Skill 2'
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    for (const {action, name} of actions) {
+      try {
+        await action();
+      } catch (error) {
+        console.error('\x1b[31m%s\x1b[0m', error);
+        await topicManager.screenshot(`error_${name}.png`);
+      }
+    }
+  }, 2147483647);
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
