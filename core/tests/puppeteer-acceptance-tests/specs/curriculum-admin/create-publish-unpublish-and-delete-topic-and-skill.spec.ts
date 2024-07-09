@@ -77,6 +77,7 @@ describe('Curriculum Admin', function () {
       await curriculumAdmin.publishDraftTopic('Test Topic 1');
       await curriculumAdmin.expectTopicToBePublishedInTopicsAndSkillsDashboard(
         'Test Topic 1',
+        0,
         1,
         1
       );

@@ -59,19 +59,19 @@ describe('Logged-out User in Partnerships page', function () {
   );
 
   it(
-    'should open the Partnerships form when the "Partner with us" button is clicked at the bottom.',
+    'should open the Partnerships Brochure when the "Download Brochure" button is clicked.',
     async function () {
-      await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
-        'pt-br'
-      );
+      await loggedOutUser.clickDownloadBrochureButtonInPartnershipsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should open the Partnerships Brochure when the "Download Brochure" button is clicked.',
+    'should open the Partnerships form when the "Partner with us" button is clicked at the bottom.',
     async function () {
-      await loggedOutUser.clickDownloadBrochureButtonInPartnershipsPage();
+      await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
+        'pt-br'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

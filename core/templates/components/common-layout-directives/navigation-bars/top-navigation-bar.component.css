@@ -15,7 +15,7 @@
 }
 .oppia-top-navigation-bar .launch {
   font-size: 12px;
-  margin-left: 90px;
+  margin-left: 30px;
 }
 
 .oppia-top-navigation-bar .underline:hover,
@@ -508,6 +508,11 @@
   font-size: 11px;
   font-weight: bold;
   position: absolute;
+}
+.oppia-top-navigation-bar .oppia-impact-report-btn {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
 }
 @media screen and (max-width: 880px) {
   .oppia-top-navigation-bar .oppia-logo-wide {
