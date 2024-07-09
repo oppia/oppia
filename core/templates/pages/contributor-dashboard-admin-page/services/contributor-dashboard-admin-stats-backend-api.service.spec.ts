@@ -89,6 +89,7 @@ describe('Contribution Admin dashboard stats service', () => {
   let responseDictionaries = {
     classroom_id: 'mathid',
     name: 'Math',
+    url_fragment: 'math',
     topic_summary_dicts: [firstTopicSummaryDict, secondTopicSummaryDict],
     course_details: 'Course Details',
     topic_list_intro: 'Topics Covered',
@@ -199,6 +200,7 @@ describe('Contribution Admin dashboard stats service', () => {
     sampleClassroomDataObject = ClassroomData.createFromBackendData(
       responseDictionaries.classroom_id,
       responseDictionaries.name,
+      responseDictionaries.url_fragment,
       responseDictionaries.topic_summary_dicts,
       responseDictionaries.course_details,
       responseDictionaries.topic_list_intro,
