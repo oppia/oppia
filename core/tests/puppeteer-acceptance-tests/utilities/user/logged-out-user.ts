@@ -31,6 +31,7 @@ const ccLicenseUrl = testConstants.URLs.CCLicense;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
+const classroomsPage = testConstants.URLs.ClassroomsPage;
 const desktopWatchAVideoUrl = testConstants.URLs.DesktopExternalLinkWatchAVideo;
 const donateUrl = testConstants.URLs.Donate;
 const electromagnetismUrl = testConstants.URLs.Electromagnetism;
@@ -99,13 +100,13 @@ const footerPrivacyPolicyLink = 'a.e2e-test-privacy-policy-link';
 const footerCommunityLibraryLink = 'a.e2e-test-community-library-link';
 const footerContactUsLink = 'a.e2e-test-contact-link';
 
-const oppiaYouTubeLinkIcon = '.oppia-youtube-follow';
-const oppiaFacebookLinkIcon = '.oppia-facebook-follow';
-const oppiaInstagramLinkIcon = '.oppia-instagram-follow';
-const oppiaTwitterLinkIcon = '.oppia-twitter-follow';
-const oppiaGithubLinkIcon = '.oppia-github-follow';
-const oppiaLinkedInLinkIcon = '.oppia-linkedin-follow';
-const oppiaAndroidAppButton = '.oppia-android-app-button';
+const oppiaYouTubeLinkIcon = '.e2e-test-oppia-youtube-follow';
+const oppiaFacebookLinkIcon = '.e2e-test-oppia-facebook-follow';
+const oppiaInstagramLinkIcon = '.e2e-test-oppia-instagram-follow';
+const oppiaTwitterLinkIcon = '.e2e-test-oppia-twitter-follow';
+const oppiaGithubLinkIcon = '.e2e-test-oppia-github-follow';
+const oppiaLinkedInLinkIcon = '.e2e-test-oppia-linkedin-follow';
+const oppiaAndroidAppButton = '.e2e-test-oppia-android-app';
 
 const watchAVideoButton =
   'a.e2e-test-thanks-for-donating-page-watch-a-video-button';
@@ -214,6 +215,12 @@ const emailLinkSelector = '.oppia-contact-mail';
 const mobileDonateButtonOnDonatePage = '.donate-modal-button';
 const donateModalIframeSelector = '.e2e-test-donate-page-iframe';
 
+const classroomNameHeading = '.e2e-test-classroom-name';
+
+const errorPageHeading = '.e2e-test-error-page-heading';
+
+const classroomTileContainer = '.oppia-classroom-tile-container';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -307,6 +314,23 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToContactUsPage(): Promise<void> {
     await this.goto(contactUrl);
+  }
+
+  /**
+   * Function to navigate to the classroom page.
+   */
+  async navigateToClassroomPage(urlFragment: string): Promise<void> {
+    await this.goto(`${classroomsPage}/${urlFragment}`);
+  }
+
+  /**
+   * Function to navigate to the classrooms page.
+   */
+  async navigateToClassroomsPage(): Promise<void> {
+    if (this.page.url() === classroomsPage) {
+      await this.page.reload();
+    }
+    await this.goto(classroomsPage);
   }
 
   /**
@@ -1094,7 +1118,7 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Click the speficed social icon and checks it's destination.
+   * Click the specified social icon and checks it's destination.
    *
    * Due to the somewhat unpredictable behaviors of these external sites,
    * such as sometimes redirecting to log-in pages,
@@ -1107,10 +1131,14 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.page.waitForSelector(socialIconSelector);
     const pageTarget = this.page.target();
-    await this.page.click(socialIconSelector);
+    await this.clickOn(socialIconSelector);
+    await this.waitForPageToFullyLoad();
     const newTarget = await this.browserObject.waitForTarget(
       target => target.opener() === pageTarget
     );
+    if (!newTarget) {
+      throw new Error('No new tab opened.');
+    }
     const newTabPage = await newTarget.page();
 
     expect(newTabPage).toBeDefined();
@@ -1326,6 +1354,7 @@ export class LoggedOutUser extends BaseUser {
       partnershipsFormInPortugueseUrl,
       'Partnerships Google Form'
     );
+    await this.changeSiteLanguage('en');
   }
 
   /**
@@ -1333,6 +1362,19 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Partnerships Brochure.
    */
   async clickDownloadBrochureButtonInPartnershipsPage(): Promise<void> {
+    const buttonText = (await this.page.$eval(
+      brochureButtonInPartnershipsPage,
+      element => element.textContent
+    )) as string;
+    if (buttonText.trim() !== 'Download Brochure') {
+      throw new Error('The "Download Brochure" button does not exist!');
+    }
+
+    // Scroll into the view to make the button visible.
+    await this.page.$eval(brochureButtonInPartnershipsPage, element =>
+      element.scrollIntoView()
+    );
+
     await this.openExternalPdfLink(
       brochureButtonInPartnershipsPage,
       partnershipsBrochureUrl
@@ -1815,6 +1857,72 @@ export class LoggedOutUser extends BaseUser {
     } else {
       return;
     }
+  }
+
+  /**
+   * This function verifies that the user is on the correct classroom page.
+   */
+  async expectToBeOnClassroomPage(classroomName: string): Promise<void> {
+    await this.page.waitForSelector(classroomNameHeading);
+
+    const buttonText = await this.page.$eval(
+      classroomNameHeading,
+      element => (element as HTMLHeadElement).innerText
+    );
+
+    if (buttonText !== classroomName) {
+      throw new Error(
+        `The ${classroomName} classroom name is not visible. URL: ${this.page.url()}`
+      );
+    } else {
+      showMessage(`The ${classroomName} classroom name is visible.`);
+    }
+  }
+
+  /**
+   * This function verifies that the classroom cards in classrooms page.
+   */
+  async expectClassroomCountInClassroomsPageToBe(
+    classroomsCount: number
+  ): Promise<void> {
+    await this.page.waitForSelector(classroomTileContainer);
+    const classroomTiles = await this.page.$$(classroomTileContainer);
+
+    if (classroomTiles.length === classroomsCount) {
+      showMessage(
+        `${classroomsCount} classrooms are present in classrooms page.`
+      );
+    } else {
+      throw new Error(
+        `Expect ${classroomsCount} classrooms to be present in classrooms page, found: ${classroomTiles.length} classrooms.`
+      );
+    }
+  }
+
+  /**
+   * This function verifies that the user is on the correct classroom page.
+   */
+  async expectToBeOnErrorPage(statusCode: number): Promise<void> {
+    await this.page.waitForSelector(errorPageHeading);
+
+    const errorText = await this.page.$eval(
+      errorPageHeading,
+      element => (element as HTMLSpanElement).textContent
+    );
+
+    if (!errorText) {
+      throw new Error(`Error text is not visible. URL: ${this.page.url()}`);
+    }
+
+    const currentStatusCode = Number(errorText.split(' ')[1]);
+
+    if (currentStatusCode !== statusCode) {
+      throw new Error(
+        `Expected status code to be ${statusCode}, found: ${currentStatusCode}`
+      );
+    }
+
+    showMessage(`User is on error page with status code ${statusCode}.`);
   }
 }
 
