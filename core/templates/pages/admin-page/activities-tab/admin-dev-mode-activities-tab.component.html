@@ -166,6 +166,36 @@
   </mat-card>
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+    <div class="container">
+      <h3>Generate dummy suggestion questions (only question admins)</h3>
+      <span class="row">
+        <label for="label-target-suggestion-questions-to-generate">Number of suggestion questions to generate</label>
+        <input class="form-control form-inline oppia-form-inline"
+               [(ngModel)]="numDummySuggestionQuesToGenerate"
+               placeholder="Suggestion questions to generate" type="number" min="0"
+               id="label-target-suggestion-questions-to-generate">
+
+        <label for="label-target-skill-selection">Select skill for suggestion questions</label>
+        <select id="label-target-skill-selection" class="form-control" (change)="selectedOption=$event.target.value">
+          <option selected [value]="''">Choose...</option>
+          <option *ngFor=" let skill of skillList; let i = index" [value]="i">{{skill.description}}</option>
+        </select>
+
+        <p class="instruction">Note: To generate question, first generate skills and assign yourself
+           question admin role and permission to suggest questions through contributor admin dashboard.
+        </p>
+
+        <button type="button"
+                class="btn btn-primary oppia-generate-exploration-text"
+                (click)="generateDummySuggestionQuestions(selectedOption)"
+                [disabled]="!numDummySuggestionQuesToGenerate || !selectedOption">
+          Generate Suggestion Questions
+        </button>
+      </span>
+    </div>
+  </mat-card>
+
+  <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
     <div class="container ml-0">
       <h3>Generate dummy blog post.</h3>
       <div class="row" *ngFor="let title of DUMMY_BLOG_POST_TITLES">

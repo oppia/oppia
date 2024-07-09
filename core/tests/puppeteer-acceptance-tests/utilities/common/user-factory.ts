@@ -28,7 +28,10 @@ import {
   ExplorationEditorFactory,
   ExplorationEditor,
 } from '../user/exploration-editor';
-import {CurriculumAdminFactory} from '../user/curriculum-admin';
+import {
+  CurriculumAdmin,
+  CurriculumAdminFactory,
+} from '../user/curriculum-admin';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 import {LoggedInUserFactory, LoggedInUser} from '../user/logged-in-user';
 import {ModeratorFactory} from '../user/moderator';
@@ -114,7 +117,7 @@ export class UserFactory {
   >(
     user: TUser,
     roles: TRoles,
-    topics: string[] = []
+    topic: string = ''
   ): Promise<TUser & MultipleRoleIntersection<TRoles>> {
     for (const role of roles) {
       if (superAdminInstance === null) {
@@ -132,7 +135,7 @@ export class UserFactory {
           await superAdminInstance.assignRoleToUser(
             user.username,
             ROLES.TOPIC_MANAGER,
-            topics
+            topic
           );
           break;
         default:
@@ -154,12 +157,13 @@ export class UserFactory {
     username: string,
     email: string,
     roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>,
-    topics: string[] = []
+    topic: string = ''
   ): Promise<
     LoggedOutUser &
       LoggedInUser &
       ExplorationEditor &
       TopicManager &
+      CurriculumAdmin &
       MultipleRoleIntersection<TRoles>
   > {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
@@ -167,13 +171,14 @@ export class UserFactory {
       LoggedInUserFactory(),
       ExplorationEditorFactory(),
       TopicManagerFactory(),
+      CurriculumAdminFactory(),
     ]);
 
     await user.openBrowser();
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
 
-    return await UserFactory.assignRolesToUser(user, roles, topics);
+    return await UserFactory.assignRolesToUser(user, roles, topic);
   };
 
   /**

@@ -24,7 +24,11 @@ import {
   tick,
   fakeAsync,
 } from '@angular/core/testing';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbActiveModal,
+  NgbModal,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ModifyTranslationsModalComponent} from './exploration-modify-translations-modal.component';
 import {EntityTranslationsService} from 'services/entity-translations.services';
@@ -32,7 +36,16 @@ import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFacto
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {ChangeListService} from '../services/change-list.service';
 import {ContextService} from 'services/context.service';
-import {EntityBulkTranslationsBackendApiService} from '../services/entity-bulk-translations-backend-api.service';
+import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {FormsModule} from '@angular/forms';
+import {ModifyTranslationOpportunity} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
+
+class MockNgbModalRef {
+  componentInstance = {
+    modifyTranslationOpportunity: ModifyTranslationOpportunity,
+  };
+}
 
 describe('Modify Translations Modal Component', function () {
   let component: ModifyTranslationsModalComponent;
@@ -40,11 +53,14 @@ describe('Modify Translations Modal Component', function () {
   let entityTranslationsService: EntityTranslationsService;
   let changeListService: ChangeListService;
   let contextService: ContextService;
-  let entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService;
+  let ngbModal: NgbModal;
+  let ngbActiveModal: NgbActiveModal;
+  let translationLanguageService: TranslationLanguageService;
+  let stateEditorService: StateEditorService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [FormsModule, HttpClientTestingModule],
       declarations: [ModifyTranslationsModalComponent],
       providers: [NgbActiveModal],
       schemas: [NO_ERRORS_SCHEMA],
@@ -57,16 +73,17 @@ describe('Modify Translations Modal Component', function () {
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     changeListService = TestBed.inject(ChangeListService);
     contextService = TestBed.inject(ContextService);
-    entityBulkTranslationsBackendApiService = TestBed.inject(
-      EntityBulkTranslationsBackendApiService
-    );
+    ngbModal = TestBed.inject(NgbModal);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    translationLanguageService = TestBed.inject(TranslationLanguageService);
+    stateEditorService = TestBed.inject(StateEditorService);
 
-    entityTranslationsService.languageCodeToEntityTranslations = {
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {
       hi: EntityTranslation.createFromBackendDict({
         entity_id: 'expId',
         entity_type: 'exploration',
         entity_version: 5,
-        language_code: 'fr',
+        language_code: 'hi',
         translations: {
           content1: {
             content_value: 'This is text one.',
@@ -86,31 +103,6 @@ describe('Modify Translations Modal Component', function () {
         },
       }),
     };
-    spyOn(
-      entityBulkTranslationsBackendApiService,
-      'fetchEntityBulkTranslationsAsync'
-    ).and.returnValue(
-      Promise.resolve({
-        hi: {
-          entityId: 'entity1',
-          entityType: 'exploration',
-          entityVersion: 5,
-          languageCode: 'hi',
-          translationMapping: {
-            content1: {
-              translation: '<p>This is content 1.</p>',
-              dataFormat: 'html',
-              needsUpdate: true,
-            },
-            content4: {
-              translation: '<p>This is content 4.</p>',
-              dataFormat: 'html',
-              needsUpdate: false,
-            },
-          },
-        },
-      })
-    );
   });
 
   it('should check component is initialized', () => {
@@ -135,25 +127,19 @@ describe('Modify Translations Modal Component', function () {
         hi: expectedTranslation,
       });
     }));
-
-    it('should use published translations when changes do not exist', fakeAsync(() => {
-      spyOn(contextService, 'getExplorationId').and.returnValue('expId');
-      let expectedTranslation = TranslatedContent.createFromBackendDict({
-        content_value: '<p>This is content 4.</p>',
-        content_format: 'html',
-        needs_update: false,
-      });
-      expect(component.contentTranslations).toEqual({});
-
-      component.contentId = 'content4';
-      component.ngOnInit();
-      tick();
-
-      expect(component.contentTranslations).toEqual({
-        hi: expectedTranslation,
-      });
-    }));
   });
+
+  it('should initialize the languageIsCheckedStatusDict properly', fakeAsync(() => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    component.contentId = 'content1';
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.languageIsCheckedStatusDict).toEqual({
+      hi: false,
+    });
+  }));
 
   it('should handle translations being removed', () => {
     spyOn(contextService, 'getExplorationId').and.returnValue('expId');
@@ -173,5 +159,130 @@ describe('Modify Translations Modal Component', function () {
   it('should get language name from language code', () => {
     const languageCode = 'en';
     expect(component.getLanguageName(languageCode)).toBe('English');
+  });
+
+  it('should update translations from response of translation editor modal', fakeAsync(() => {
+    const testTranslation = 'New test translation in Hindi';
+    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: MockNgbModalRef,
+      result: Promise.resolve(testTranslation),
+    } as NgbModalRef);
+
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+      'Introduction'
+    );
+    spyOn(translationLanguageService, 'setActiveLanguageCode');
+
+    component.contentId = 'content1';
+    component.ngOnInit();
+    tick();
+
+    component.openTranslationEditor('hi');
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(
+      translationLanguageService.setActiveLanguageCode
+    ).toHaveBeenCalledWith('hi');
+    expect(component.contentTranslations.hi.translation).toEqual(
+      testTranslation
+    );
+  }));
+
+  it('should add changes to the change list for checked translations', fakeAsync(() => {
+    const testTranslation = 'Test translation 2 in Hindi';
+    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: MockNgbModalRef,
+      result: Promise.resolve(testTranslation),
+    } as NgbModalRef);
+    spyOn(changeListService, 'editTranslation');
+
+    let changedTranslation = TranslatedContent.createFromBackendDict({
+      content_value: testTranslation,
+      content_format: 'html',
+      needs_update: false,
+    });
+
+    component.contentId = 'content1';
+    component.ngOnInit();
+    tick();
+
+    component.openTranslationEditor('hi');
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.contentTranslations.hi.translation).toEqual(
+      testTranslation
+    );
+
+    component.languageIsCheckedStatusDict = {
+      hi: true,
+    };
+    component.confirm();
+
+    expect(changeListService.editTranslation).toHaveBeenCalledWith(
+      component.contentId,
+      'hi',
+      changedTranslation
+    );
+  }));
+
+  it('should mark as needing update in the change list for unchecked translations', fakeAsync(() => {
+    const testTranslation = 'Test translation 2 in Hindi';
+    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: MockNgbModalRef,
+      result: Promise.resolve(testTranslation),
+    } as NgbModalRef);
+    spyOn(changeListService, 'markTranslationAsNeedingUpdateForLanguage');
+
+    component.contentId = 'content1';
+    component.ngOnInit();
+    tick();
+
+    component.openTranslationEditor('hi');
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.contentTranslations.hi.translation).toEqual(
+      testTranslation
+    );
+
+    component.languageIsCheckedStatusDict = {
+      hi: false,
+    };
+    component.confirm();
+
+    expect(
+      changeListService.markTranslationAsNeedingUpdateForLanguage
+    ).toHaveBeenCalledWith(component.contentId, 'hi');
+  }));
+
+  it('should dismiss the modal when cancel is called', () => {
+    spyOn(ngbActiveModal, 'dismiss');
+    component.cancel();
+
+    expect(ngbActiveModal.dismiss).toHaveBeenCalled();
+  });
+
+  it('should update displayed translation content of modal', () => {
+    component.contentId = 'content1';
+    component.contentTranslations = {
+      hi: TranslatedContent.createFromBackendDict({
+        content_value: 'This text will need an update.',
+        content_format: 'html',
+        needs_update: false,
+      }),
+    };
+    expect(component.translationsHaveLoaded).toBeFalse();
+
+    component.updateTranslationDisplayContent();
+
+    expect(component.languageIsCheckedStatusDict).toEqual({
+      hi: false,
+    });
+    expect(component.translationsHaveLoaded).toBeTrue();
   });
 });
