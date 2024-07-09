@@ -1281,7 +1281,6 @@ export class ConversationSkinComponent {
         nextCard,
         refreshInteraction,
         feedbackHtml,
-        feedbackAudioTranslations,
         refresherExplorationId,
         missingPrerequisiteSkillId,
         remainOnCurrentCard,
@@ -1371,11 +1370,11 @@ export class ConversationSkinComponent {
             AppConstants.COMPONENT_NAME_FEEDBACK
           );
 
-          this.audioPlayerService.onAutoplayAudio.emit({
-            audioTranslations: feedbackAudioTranslations,
-            html: feedbackHtml,
-            componentName: AppConstants.COMPONENT_NAME_FEEDBACK,
-          });
+          // this.audioPlayerService.onAutoplayAudio.emit({
+          //   audioTranslations: feedbackAudioTranslations,
+          //   html: feedbackHtml,
+          //   componentName: AppConstants.COMPONENT_NAME_FEEDBACK,
+          // });
 
           if (remainOnCurrentCard) {
             this.giveFeedbackAndStayOnCurrentCard(
@@ -1613,7 +1612,6 @@ export class ConversationSkinComponent {
         StateCard.createNewCard(
           null,
           this.conceptCard.getExplanation().html,
-          null,
           null,
           null,
           null,

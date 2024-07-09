@@ -188,10 +188,13 @@ export class TranslationStatusService implements OnInit {
         let stateNeedsUpdate = false;
         let noTranslationCount = 0;
         let noVoiceoverCount = 0;
-        let recordedVoiceovers =
-          this.explorationStatesService.getRecordedVoiceoversMemento(stateName);
+        // let recordedVoiceovers =
+        //   this.explorationStatesService.getRecordedVoiceoversMemento(stateName);
+        // let allContentIds = recordedVoiceovers.getAllContentIds();
 
-        let allContentIds = recordedVoiceovers.getAllContentIds();
+        let allContentIds =
+          this.explorationStatesService.getAllContentIdsByStateName(stateName);
+
         let interactionId =
           this.explorationStatesService.getInteractionIdMemento(stateName);
         // This is used to prevent users from adding unwanted hints audio, as
@@ -366,8 +369,11 @@ export class TranslationStatusService implements OnInit {
   }
 
   _getAvailableContentIds(): string[] {
-    let recordedVoiceovers = this.stateRecordedVoiceoversService.displayed;
-    return recordedVoiceovers.getAllContentIds();
+    let stateName = this.stateEditorService.getActiveStateName();
+
+    return this.explorationStatesService.getAllContentIdsByStateName(stateName);
+    // let recordedVoiceovers = this.stateRecordedVoiceoversService.displayed;
+    // return recordedVoiceovers.getAllContentIds();
   }
 
   _getActiveStateComponentNeedsUpdateStatus(componentName: string): boolean {

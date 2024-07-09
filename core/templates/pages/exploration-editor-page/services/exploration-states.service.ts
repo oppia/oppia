@@ -294,22 +294,22 @@ export class ExplorationStatesService {
     this.changeListService.markTranslationsAsNeedingUpdate(contentId);
     let stateName = this.stateEditorService.getActiveStateName();
     let state = this.getState(stateName);
-    let recordedVoiceovers = state.recordedVoiceovers;
-    if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
-      recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(contentId);
-      this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
-    }
+    // let recordedVoiceovers = state.recordedVoiceovers;
+    // if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+    //   recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(contentId);
+    //   this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
+    // }
   }
 
   removeTranslationAndVoiceover(contentId: string): void {
     this.changeListService.removeTranslations(contentId);
     let stateName = this.stateEditorService.getActiveStateName();
     let state = this.getState(stateName);
-    let recordedVoiceovers = state.recordedVoiceovers;
-    if (recordedVoiceovers.hasVoiceovers(contentId)) {
-      recordedVoiceovers.voiceoversMapping[contentId] = {};
-      this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
-    }
+    // let recordedVoiceovers = state.recordedVoiceovers;
+    // if (recordedVoiceovers.hasVoiceovers(contentId)) {
+    //   recordedVoiceovers.voiceoversMapping[contentId] = {};
+    //   this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
+    // }
     this.entityTranslationsService.removeAllTranslationsForContent(contentId);
   }
 
@@ -517,12 +517,6 @@ export class ExplorationStatesService {
           newContentIds,
           oldContentIds
         );
-        contentIdsToDelete.forEach(contentId => {
-          newStateData.recordedVoiceovers.deleteContentId(contentId);
-        });
-        contentIdsToAdd.forEach(contentId => {
-          newStateData.recordedVoiceovers.addContentId(contentId);
-        });
       }
       let propertyRef = newStateData;
       for (let i = 0; i < accessorList.length - 1; i++) {
@@ -587,6 +581,10 @@ export class ExplorationStatesService {
 
   getStates(): States {
     return cloneDeep(this._states);
+  }
+
+  getAllContentIdsByStateName(stateName: string) {
+    return this._states.getState(stateName).getAllContentIds();
   }
 
   getStateNames(): string[] {

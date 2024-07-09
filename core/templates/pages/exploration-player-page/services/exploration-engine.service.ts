@@ -315,7 +315,6 @@ export class ExplorationEngineService {
       questionHtml,
       interactionHtml,
       interaction,
-      initialState.recordedVoiceovers,
       initialState.content.contentId,
       this.audioTranslationLanguageService
     );
@@ -409,12 +408,12 @@ export class ExplorationEngineService {
       this.exploration.setInitialStateName(this.initStateName);
       this.visitedStateNames = [this.exploration.getInitialState().name];
       this.initParams(this.manualParamChanges);
-      this.audioTranslationLanguageService.init(
-        this.exploration.getAllVoiceoverLanguageCodes(),
-        null,
-        this.exploration.getLanguageCode(),
-        explorationDict.auto_tts_enabled
-      );
+      // this.audioTranslationLanguageService.init(
+      //   this.exploration.getAllVoiceoverLanguageCodes(),
+      //   null,
+      //   this.exploration.getLanguageCode(),
+      //   explorationDict.auto_tts_enabled
+      // );
       this.audioPreloaderService.init(this.exploration);
       this.audioPreloaderService.kickOffAudioPreloader(this.initStateName);
       this._loadInitialState(successCallback);
@@ -422,12 +421,12 @@ export class ExplorationEngineService {
       this.visitedStateNames.push(this.exploration.getInitialState().name);
       this.version = explorationVersion;
       this.initParams([]);
-      this.audioTranslationLanguageService.init(
-        this.exploration.getAllVoiceoverLanguageCodes(),
-        preferredAudioLanguage,
-        this.exploration.getLanguageCode(),
-        autoTtsEnabled
-      );
+      // this.audioTranslationLanguageService.init(
+      //   this.exploration.getAllVoiceoverLanguageCodes(),
+      //   preferredAudioLanguage,
+      //   this.exploration.getLanguageCode(),
+      //   autoTtsEnabled
+      // );
       this.audioPreloaderService.init(this.exploration);
       this.audioPreloaderService.kickOffAudioPreloader(
         this.exploration.getInitialState().name
@@ -508,7 +507,6 @@ export class ExplorationEngineService {
       nextCard: StateCard,
       refreshInteraction: boolean,
       feedbackHtml: string,
-      feedbackAudioTranslations: BindableVoiceovers,
       refresherExplorationId: string,
       missingPrerequisiteSkillId: string,
       remainOnCurrentCard: boolean,
@@ -526,7 +524,6 @@ export class ExplorationEngineService {
     this.answerIsBeingProcessed = true;
     let oldStateName: string = this.playerTranscriptService.getLastStateName();
     let oldState: State = this.exploration.getState(oldStateName);
-    let recordedVoiceovers: RecordedVoiceovers = oldState.recordedVoiceovers;
     let oldStateCard: StateCard = this.playerTranscriptService.getLastCard();
     let classificationResult: AnswerClassificationResult =
       this.answerClassificationService.getMatchingClassificationResult(
@@ -592,8 +589,7 @@ export class ExplorationEngineService {
       [oldParams]
     );
     let feedbackContentId: string = outcome.feedback.contentId;
-    let feedbackAudioTranslations: BindableVoiceovers =
-      recordedVoiceovers.getBindableVoiceovers(feedbackContentId);
+
     if (feedbackHtml === null) {
       this.answerIsBeingProcessed = false;
       this.alertsService.addWarning('Feedback content should not be empty.');
@@ -655,7 +651,6 @@ export class ExplorationEngineService {
       questionHtml,
       nextInteractionHtml,
       this.exploration.getInteraction(this.nextStateName),
-      this.exploration.getState(this.nextStateName).recordedVoiceovers,
       this.exploration.getState(this.nextStateName).content.contentId,
       this.audioTranslationLanguageService
     );
@@ -670,7 +665,6 @@ export class ExplorationEngineService {
       nextCard,
       refreshInteraction,
       feedbackHtml,
-      feedbackAudioTranslations,
       refresherExplorationId,
       missingPrerequisiteSkillId,
       onSameCard,
@@ -726,7 +720,6 @@ export class ExplorationEngineService {
       questionHtmlIfStuck,
       nextInteractionIfStuckHtml,
       this.exploration.getInteraction(this.nextStateIfStuckName),
-      this.exploration.getState(this.nextStateIfStuckName).recordedVoiceovers,
       this.exploration.getState(this.nextStateIfStuckName).content.contentId,
       this.audioTranslationLanguageService
     );
@@ -763,7 +756,6 @@ export class ExplorationEngineService {
       contentHtml,
       interactionHtml,
       this.exploration.getInteraction(stateName),
-      this.exploration.getState(stateName).recordedVoiceovers,
       this.exploration.getState(stateName).content.contentId,
       this.audioTranslationLanguageService
     );

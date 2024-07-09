@@ -105,37 +105,37 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
   ): void {
     let stateName = this.stateEditorService.getActiveStateName() as string;
     let state = this.explorationStatesService.getState(stateName);
-    let recordedVoiceovers = state.recordedVoiceovers;
-    let availableAudioLanguages =
-      recordedVoiceovers.getLanguageCodes(contentId);
-    if (availableAudioLanguages.indexOf(languageCode) !== -1) {
-      let voiceover = recordedVoiceovers.getVoiceover(contentId, languageCode);
-      if (voiceover.needsUpdate) {
-        return;
-      }
+    // let recordedVoiceovers = state.recordedVoiceovers;
+    // let availableAudioLanguages =
+    //   recordedVoiceovers.getLanguageCodes(contentId);
+    // if (availableAudioLanguages.indexOf(languageCode) !== -1) {
+    //   let voiceover = recordedVoiceovers.getVoiceover(contentId, languageCode);
+    //   if (voiceover.needsUpdate) {
+    //     return;
+    //   }
 
-      this.ngbModal
-        .open(MarkAudioAsNeedingUpdateModalComponent, {
-          backdrop: 'static',
-        })
-        .result.then(
-          () => {
-            recordedVoiceovers.toggleNeedsUpdateAttribute(
-              contentId,
-              languageCode
-            );
-            this.explorationStatesService.saveRecordedVoiceovers(
-              stateName,
-              recordedVoiceovers
-            );
-          },
-          () => {
-            // Note to developers:
-            // This callback is triggered when the Cancel button is clicked.
-            // No further action is needed.
-          }
-        );
-    }
+    //   this.ngbModal
+    //     .open(MarkAudioAsNeedingUpdateModalComponent, {
+    //       backdrop: 'static',
+    //     })
+    //     .result.then(
+    //       () => {
+    //         recordedVoiceovers.toggleNeedsUpdateAttribute(
+    //           contentId,
+    //           languageCode
+    //         );
+    //         this.explorationStatesService.saveRecordedVoiceovers(
+    //           stateName,
+    //           recordedVoiceovers
+    //         );
+    //       },
+    //       () => {
+    //         // Note to developers:
+    //         // This callback is triggered when the Cancel button is clicked.
+    //         // No further action is needed.
+    //       }
+    //     );
+    // }
   }
 
   isEditable(): boolean {

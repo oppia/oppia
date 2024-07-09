@@ -200,16 +200,8 @@ export class Exploration extends BaseTranslatableObject {
     return this.getState(stateName).content.html;
   }
 
-  getAllVoiceovers(languageCode: string): VoiceoverObjectsDict {
-    return this.states.getAllVoiceovers(languageCode);
-  }
-
   getLanguageCode(): string {
     return this.languageCode;
-  }
-
-  getAllVoiceoverLanguageCodes(): string[] {
-    return this.states.getAllVoiceoverLanguageCodes();
   }
 }
 

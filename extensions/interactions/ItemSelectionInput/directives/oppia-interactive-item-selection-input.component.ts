@@ -55,7 +55,6 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
   selectionCount!: number;
   userSelections!: Record<string, boolean>;
   displayedCard!: StateCard;
-  recordedVoiceovers!: RecordedVoiceovers;
   COMPONENT_NAME_RULE_INPUT!: string;
   displayCheckboxes: boolean = false;
   newQuestion: boolean = false;
@@ -105,8 +104,6 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
       this.playerPositionService.getDisplayedCardIndex()
     );
     if (this.displayedCard) {
-      this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
-
       // Combine labels for voiceover.
       let combinedChoiceLabels = '';
       for (const choiceLabel of this.choices) {
@@ -115,13 +112,6 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
             choiceLabel
           );
       }
-
-      // Say the choices aloud if autoplay is enabled.
-      this.audioTranslationManagerService.setSequentialAudioTranslations(
-        this.recordedVoiceovers.getBindableVoiceovers(this.getContentId()),
-        combinedChoiceLabels,
-        this.COMPONENT_NAME_RULE_INPUT
-      );
     }
 
     this.displayCheckboxes = this.maxAllowableSelectionCount > 1;

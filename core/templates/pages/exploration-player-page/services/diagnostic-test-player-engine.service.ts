@@ -459,7 +459,6 @@ export class DiagnosticTestPlayerEngineService {
       questionHtml,
       interactionHtml as string,
       interaction,
-      stateData.recordedVoiceovers,
       stateData.content.contentId as string,
       this.audioTranslationLanguageService
     );

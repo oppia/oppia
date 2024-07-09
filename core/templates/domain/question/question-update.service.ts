@@ -121,12 +121,6 @@ export class QuestionUpdateService {
       newContentIds,
       oldContentIds
     );
-    contentIdsToDelete.forEach(contentId => {
-      newState.recordedVoiceovers.deleteContentId(contentId);
-    });
-    contentIdsToAdd.forEach(contentId => {
-      newState.recordedVoiceovers.addContentId(contentId);
-    });
   }
 
   setQuestionLanguageCode(question: Question, newLanguageCode: string): void {

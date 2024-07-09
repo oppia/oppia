@@ -44,7 +44,6 @@ export class DisplaySolutionModalComponent {
   solution!: Solution;
   solutionContentId!: string;
   displayedCard!: StateCard;
-  recordedVoiceovers!: RecordedVoiceovers;
   interaction!: Interaction;
   shortAnswerHtml!: ShortAnswerResponse;
   solutionExplanationHtml!: string;
@@ -64,13 +63,6 @@ export class DisplaySolutionModalComponent {
     this.solutionContentId = this.solution.explanation.contentId as string;
     this.displayedCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex()
-    );
-    this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
-
-    this.audioTranslationManagerService.setSecondaryAudioTranslations(
-      this.recordedVoiceovers.getBindableVoiceovers(this.solutionContentId),
-      this.solution.explanation.html,
-      this.COMPONENT_NAME_SOLUTION
     );
 
     this.audioPlayerService.onAutoplayAudio.emit();

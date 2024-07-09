@@ -50,7 +50,6 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   answer;
   displayedCard!: StateCard;
   errorMessageI18nKey: string = '';
-  recordedVoiceovers!: RecordedVoiceovers;
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
@@ -121,8 +120,6 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
       this.playerPositionService.getDisplayedCardIndex()
     );
     if (this.displayedCard) {
-      this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
-
       // Combine labels for voiceover.
       let combinedChoiceLabels = '';
       for (const choice of this.choices) {
@@ -131,14 +128,6 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
             choice.choice.html
           );
       }
-      // Say the choices aloud if autoplay is enabled.
-      this.audioTranslationManagerService.setSequentialAudioTranslations(
-        this.recordedVoiceovers.getBindableVoiceovers(
-          this.choices[0].choice.contentId
-        ),
-        combinedChoiceLabels,
-        this.COMPONENT_NAME_RULE_INPUT
-      );
     }
 
     this.answer = null;

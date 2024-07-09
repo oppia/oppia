@@ -135,7 +135,6 @@ export class QuestionPlayerEngineService {
       questionHtml,
       interactionHtml,
       interaction,
-      initialState.recordedVoiceovers,
       initialState.content.contentId,
       this.audioTranslationLanguageService
     );
@@ -250,7 +249,6 @@ export class QuestionPlayerEngineService {
       nextCard: StateCard,
       refreshInteraction: boolean,
       feedbackHtml: string,
-      feedbackAudioTranslations: BindableVoiceovers,
       refresherExplorationId,
       missingPrerequisiteSkillId,
       remainOnCurrentCard: boolean,
@@ -269,7 +267,6 @@ export class QuestionPlayerEngineService {
     const answerString = answer as string;
     this.setAnswerIsBeingProcessed(true);
     const oldState = this.getCurrentStateData();
-    const recordedVoiceovers = oldState.recordedVoiceovers;
     const classificationResult =
       this.answerClassificationService.getMatchingClassificationResult(
         null,
@@ -296,8 +293,6 @@ export class QuestionPlayerEngineService {
     };
     const feedbackHtml = this.makeFeedback(outcome.feedback.html, [oldParams]);
     const feedbackContentId = outcome.feedback.contentId;
-    const feedbackAudioTranslations =
-      recordedVoiceovers.getBindableVoiceovers(feedbackContentId);
     if (feedbackHtml === null) {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Feedback content should not be empty.');
@@ -348,7 +343,6 @@ export class QuestionPlayerEngineService {
         questionHtml,
         nextInteractionHtml,
         this.getNextStateData().interaction,
-        this.getNextStateData().recordedVoiceovers,
         this.getNextStateData().content.contentId,
         this.audioTranslationLanguageService
       );
@@ -357,7 +351,6 @@ export class QuestionPlayerEngineService {
       nextCard,
       refreshInteraction,
       feedbackHtml,
-      feedbackAudioTranslations,
       null,
       null,
       onSameCard,

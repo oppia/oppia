@@ -411,7 +411,6 @@ export class TutorCardComponent {
     if (!this.conceptCardIsBeingShown) {
       this.interactionInstructions =
         this.displayedCard.getInteractionInstructions();
-      this.contentAudioTranslations = this.displayedCard.getVoiceovers();
 
       this.voiceoverPlayerService.setActiveVoiceover(
         this.displayedCard.contentId
@@ -488,13 +487,6 @@ export class TutorCardComponent {
     return (
       !this.isIframed && !this.explorationPlayerStateService.isInQuestionMode()
     );
-  }
-
-  isContentAudioTranslationAvailable(): boolean {
-    if (this.conceptCardIsBeingShown) {
-      return false;
-    }
-    return this.displayedCard.isContentAudioTranslationAvailable();
   }
 
   isCurrentCardAtEndOfTranscript(): boolean {
