@@ -248,12 +248,17 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'release-coordinator/run-a-beam-job-and-copy-the-output',
     'release-coordinator/update-promo-bar-message',
     'release-coordinator/flush-and-get-profile-of-redis-cache',
+    'release-coordinator/edit-feature-rollout-configuration',
     'super-admin/edit-user-roles',
     'super-admin/load-dummy-data-in-dev-mode',
     'super-admin/edit-platform-parameters',
+    'super-admin/use-misc-tab-features',
     'translation-admin/add-and-remove-translation-rights',
+    'topic-manager/browse-skills-on-topics-and-skills-dashboard',
+    'topic-manager/browse-topics-on-topics-and-skills-dashboard',
     'topic-manager/create-and-delete-questions-in-skill-editor',
     'topic-manager/assign-unassign-and-merge-skills',
+    'topic-manager/cannot-do-curriculum-admin-actions',
     'voiceover-admin/add-voiceover-artist-to-an-exploration',
 ]
 

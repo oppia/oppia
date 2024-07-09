@@ -25,6 +25,7 @@ import {ImageData} from 'pages/classroom-admin-page/existing-classroom.model';
 export class ClassroomData {
   _classroom_id: string;
   _name: string;
+  _urlFragment: string;
   _topicSummaries: CreatorTopicSummary[];
   _courseDetails: string;
   _topicListIntro: string;
@@ -37,6 +38,7 @@ export class ClassroomData {
   constructor(
     classroomId: string,
     name: string,
+    urlFragment: string,
     topicSummaries: CreatorTopicSummary[],
     courseDetails: string,
     topicListIntro: string,
@@ -48,6 +50,7 @@ export class ClassroomData {
   ) {
     this._classroom_id = classroomId;
     this._name = name;
+    this._urlFragment = urlFragment;
     this._topicSummaries = topicSummaries;
     this._courseDetails = courseDetails;
     this._topicListIntro = topicListIntro;
@@ -61,6 +64,7 @@ export class ClassroomData {
   static createFromBackendData(
     classroomId: string,
     name: string,
+    urlFragment: string,
     topicSummaryDicts: CreatorTopicSummaryBackendDict[],
     courseDetails: string,
     topicListIntro: string,
@@ -76,6 +80,7 @@ export class ClassroomData {
     return new ClassroomData(
       classroomId,
       name,
+      urlFragment,
       topicSummaries,
       courseDetails,
       topicListIntro,
@@ -89,6 +94,10 @@ export class ClassroomData {
 
   getName(): string {
     return this._name;
+  }
+
+  getUrlFragment(): string {
+    return this._urlFragment;
   }
 
   getTopicSummaries(): CreatorTopicSummary[] {
