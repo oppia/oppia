@@ -15,7 +15,6 @@
 /**
  * @fileoverview Topic manager utility file.
  */
-import {error} from 'console';
 import {BaseUser} from '../common/puppeteer-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
@@ -1545,6 +1544,7 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(workedExampleListItem, {visible: true});
     const previewLists = await this.page.$$(workedExampleListItem);
     if (!previewLists) {
+      throw new Error('No worked examples found');
     }
     let exampleFound = false;
 
