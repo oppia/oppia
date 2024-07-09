@@ -61,25 +61,31 @@ describe('Topic Manager User Journey', function () {
       await topicManager.updateReviewMaterial(
         'Review material text content for Double Digit Addition.'
       );
+
       await topicManager.addWorkedExample('Add 2 and 3', '2+3=5.');
       await topicManager.deleteWorkedExample('Add 2 and 3');
+
       await topicManager.addMisconception(
         'Addition Misconception',
         'Some might think 2+3=23.',
         'The correct answer is 5.'
       );
       await topicManager.deleteMisconception('Addition Misconception');
+
       await topicManager.addPrerequisiteSkill('Single Digit Addition');
       await topicManager.removePrerequisiteSkill('Single Digit Addition');
+
       await topicManager.updateRubric('Easy', 'Student can add single digits.');
       await topicManager.publishUpdatedSkill('Updated everything');
       await topicManager.openSkillEditor('Double Digit Addition');
+
       await topicManager.verifyWorkedExamplePresent('Add 2 and 3', false);
       await topicManager.verifyMisconceptionPresent(
         'Addition Misconception',
         false
       );
       await topicManager.verifyPrerequisiteSkillPresent('', false);
+
       await topicManager.previewConceptCard();
       await topicManager.expectConceptCardPreviewToHave(
         'Double Digit Addition',
