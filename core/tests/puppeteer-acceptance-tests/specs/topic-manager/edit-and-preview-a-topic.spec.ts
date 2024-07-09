@@ -35,21 +35,20 @@ describe('Topic Manager User Journey', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    curriculumAdmin.createTopic('Addition', 'add');
+    await curriculumAdmin.createTopic('Addition', 'add');
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topic_manager@example.com',
       [ROLES.TOPIC_MANAGER],
-      ['Addition']
+      'Addition'
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to edit topic name, thumbnail, description, page title fragment for web, and meta tags, enable or disable the practice tab to learners, and preview lesson, practice, and revision in the topic preview.',
+    'should be able to edit topic name, thumbnail, description, page title fragment for web, and meta tags, and preview lesson, practice, and revision in the topic preview.',
     async function () {
-      await topicManager.navigateToTopicDashboardPage();
-      await topicManager.openTopicEditor('Topic 1');
+      await topicManager.openTopicEditor('Addition');
       await topicManager.editTopicDetails('Topic 1', {
         name: 'Updated Topic 1',
         thumbnail: 'updated_thumbnail.png',
