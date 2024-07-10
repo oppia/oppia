@@ -334,7 +334,6 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(stateEditSelector);
-    await this.waitForElementToBeClickable(stateContentInputField);
     await this.type(stateContentInputField, `${content}`);
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
@@ -917,7 +916,8 @@ export class ExplorationEditor extends BaseUser {
         break;
       case 'Text Input':
         await this.clickOn(addResponseOptionButton);
-        await this.type(textInputInteractionOption, answer);
+        await this.page.waitForSelector(textInputInteractionOption);
+        await this.page.type(textInputInteractionOption, answer);
         break;
       // Add cases for other interaction types here
       // case 'otherInteractionType':

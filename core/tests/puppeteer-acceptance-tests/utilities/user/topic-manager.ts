@@ -74,9 +74,11 @@ const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 
 const subtopicReassignHeader = 'div.subtopic-reassign-header';
 const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
-const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
-const subtopicUrlFragmentField =
+const newSubtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
+const subtopicTitleField = '.e2e-test-subtopic-title-field';
+const newSubtopicUrlFragmentField =
   'input.e2e-test-new-subtopic-url-fragment-field';
+const subtopicUrlFragmentField = '.e2e-test-subtopic-url-fragment-field';
 const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
 const richTextAreaField = 'div.e2e-test-rte';
 const subtopicPhotoBoxButton =
@@ -84,6 +86,8 @@ const subtopicPhotoBoxButton =
 const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
 const mobileSaveTopicButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
+const mobileNavbarDropdown =
+  'div.navbar-mobile-options .e2e-test-mobile-navbar-dropdown';
 const saveTopicButton = 'button.e2e-test-save-topic-button';
 const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
 
@@ -186,17 +190,19 @@ const practiceTabToggle = '.e2e-test-toggle-practice-tab';
 const topicPreviewTitleSelector = '.e2e-test-preview-topic-title';
 const topicPreviewDescriptionSelector = '.e2e-test-preview-topic-description';
 const reassignSkillButton = '.e2e-test-reassign-skill-button';
-const editIcon = '.edit-icon-style';
+const editIcon = '.subtopic-header';
 const renameSubtopicField = '.e2e-test-rename-subtopic-field';
 const saveReassignments = '.e2e-test-save-reassignments';
 const saveRearrangeSkills = '.e2e-test-save-rearrange-skills';
 const subtopicCardHeader = '.subtopic-name-card-header';
-const testSubtopic = '.e2e-test-subtopic';
-const navbarTabIcon = '.navbar-tab-icon';
+const testSubtopicTitleSelector = '.e2e-test-subtopic';
+const topicPreviewTab = '.e2e-test-topic-preview-button';
 const contentTitle = '.content-title';
-const htmlContent = 'html-content';
+const htmlContent = '.html-content';
 const topicTableSelector = '.e2e-test-topics-table';
-
+const subtopicAssignmentContainer = '.subtopics-container';
+const editSubtopicExplanationSelector = '.e2e-test-edit-html-content';
+const topicMobilePreviewTab = '.e2e-test-mobile-preview-tab';
 export class TopicManager extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -618,7 +624,6 @@ export class TopicManager extends BaseUser {
       throw new Error('Skill name input selector not found');
     }
     // Searching by skill name.
-    await this.waitForElementToBeClickable(skillNameInputSelector);
     await this.type(skillNameInputSelector, skillName2);
 
     await this.page.waitForSelector(radioInnerCircleSelector);
@@ -703,7 +708,6 @@ export class TopicManager extends BaseUser {
    */
   async previewQuestion(questionText: string): Promise<void> {
     try {
-      await this.waitForElementToBeClickable(questionTextInput);
       await this.type(questionTextInput, questionText);
       await this.page.keyboard.press('Enter');
     } catch (error) {
@@ -786,8 +790,8 @@ export class TopicManager extends BaseUser {
       await this.clickOn(subtopicReassignHeader);
     }
     await this.clickOn(addSubtopicButton);
-    await this.type(subtopicTitleField, title);
-    await this.type(subtopicUrlFragmentField, urlFragment);
+    await this.type(newSubtopicTitleField, title);
+    await this.type(newSubtopicUrlFragmentField, urlFragment);
 
     await this.clickOn(subtopicDescriptionEditorToggle);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
@@ -1659,9 +1663,7 @@ export class TopicManager extends BaseUser {
     feedback: string
   ): Promise<void> {
     await this.clickOn(addButtonSelector);
-    await this.waitForElementToBeClickable(nameFieldSelector);
     await this.type(nameFieldSelector, misconceptionName);
-    await this.waitForElementToBeClickable(rteSelector);
     await this.type(rteSelector, notes);
     const rteElements = await this.page.$$(rteSelector);
     await rteElements[1].type(feedback);
@@ -1770,7 +1772,6 @@ export class TopicManager extends BaseUser {
   async updateReviewMaterial(updatedMaterial: string): Promise<void> {
     try {
       await this.clickOn(editConceptCardSelector);
-      await this.waitForElementToBeClickable(rteSelector);
       await this.clearAllTextFrom(rteSelector);
       await this.type(rteSelector, updatedMaterial);
       await this.clickOn(saveConceptCardSelector);
@@ -1788,7 +1789,6 @@ export class TopicManager extends BaseUser {
   async addPrerequisiteSkill(skillName: string): Promise<void> {
     try {
       await this.clickOn('+ ADD PREREQUISITE SKILL');
-      await this.waitForElementToBeClickable(skillNameInputSelector);
       await this.type(skillNameInputSelector, skillName);
 
       await this.page.waitForSelector(radioInnerCircleSelector);
@@ -1936,7 +1936,6 @@ export class TopicManager extends BaseUser {
     await this.select(selectRubricDifficultySelector, difficultyValue);
     await this.waitForPageToFullyLoad();
     await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
-    await this.waitForElementToBeClickable(rteSelector);
     await this.type(rteSelector, explanation);
     await this.clickOn(saveRubricExplanationButton);
   }
@@ -1959,7 +1958,6 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(commitMessageInputSelector, {
       visible: true,
     });
-    await this.waitForElementToBeClickable(commitMessageInputSelector);
     await this.type(commitMessageInputSelector, updateMessage);
     await this.page.waitForSelector(closeSaveModalButtonSelector, {
       visible: true,
@@ -2023,22 +2021,41 @@ export class TopicManager extends BaseUser {
   /**
    * Changes the subtopic assignments.
    */
-  async changeSubtopicAssignments(newSubtopicName: string): Promise<void> {
+  async changeSubtopicAssignments(
+    newSubtopicName: string,
+    topicName: string
+  ): Promise<void> {
+    // Subtopic assignment is not available in mobile viewport.
+    if (this.isViewportAtMobileWidth()) {
+      return;
+    }
+
     try {
       await this.page.waitForSelector(reassignSkillButton);
-      await this.page.click(reassignSkillButton);
+      await this.clickOn(reassignSkillButton);
 
+      await this.page.waitForSelector(subtopicAssignmentContainer, {
+        visible: true,
+      });
       await this.page.waitForSelector(editIcon);
-      await this.page.click(editIcon);
+      await this.waitForPageToFullyLoad();
+      await this.page.evaluate(selector => {
+        document.querySelector(selector).click();
+      }, editIcon);
 
       await this.page.waitForSelector(renameSubtopicField);
-      await this.page.type(renameSubtopicField, newSubtopicName);
+      await this.type(renameSubtopicField, newSubtopicName);
 
       await this.page.waitForSelector(saveReassignments);
-      await this.page.click(saveReassignments);
+      await this.clickOn(saveReassignments);
 
       await this.page.waitForSelector(saveRearrangeSkills);
-      await this.page.click(saveRearrangeSkills);
+      await this.clickOn(saveRearrangeSkills);
+
+      await this.page.waitForSelector(subtopicAssignmentContainer, {
+        hidden: true,
+      });
+      await this.saveTopicDraft(topicName);
     } catch (error) {
       const newError = new Error(
         `Failed to change subtopic assignments. Original error: ${error.message}`
@@ -2058,21 +2075,26 @@ export class TopicManager extends BaseUser {
     topicName: string
   ): Promise<void> {
     await this.openTopicEditor(topicName);
-
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('Subtopics');
+    }
     try {
+      await this.page.waitForSelector(subtopicCardHeader);
       const subtopicElements = await this.page.$$(subtopicCardHeader);
       for (let i = 0; i < subtopicElements.length; i++) {
         const element = subtopicElements[i];
-        const textContent = await this.page.evaluate(
-          el => el.textContent,
-          element
-        );
-        if (
-          textContent.includes(testSubtopic) &&
-          textContent.includes(subtopicName)
-        ) {
-          await element.click();
-          break;
+        await this.page.waitForSelector(testSubtopicTitleSelector);
+        const titleElement = await element.$(testSubtopicTitleSelector);
+        if (titleElement) {
+          const titleTextContent = await this.page.evaluate(
+            el => el.textContent,
+            titleElement
+          );
+          if (titleTextContent.includes(subtopicName)) {
+            await this.waitForElementToBeClickable(titleElement);
+            await titleElement.click();
+            break;
+          }
         }
       }
     } catch (error) {
@@ -2082,17 +2104,20 @@ export class TopicManager extends BaseUser {
     }
   }
 
-  async editSubTopicData(
+  async editSubTopicDetails(
     title: string,
     urlFragment: string,
     explanation: string,
     thumbnail: string
   ): Promise<void> {
+    await this.clearAllTextFrom(subtopicTitleField);
     await this.type(subtopicTitleField, title);
+    await this.clearAllTextFrom(subtopicUrlFragmentField);
     await this.type(subtopicUrlFragmentField, urlFragment);
 
-    await this.clickOn(subtopicDescriptionEditorToggle);
+    await this.clickOn(editSubtopicExplanationSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.clearAllTextFrom(richTextAreaField);
     await this.type(richTextAreaField, explanation);
 
     await this.clickOn(subtopicPhotoBoxButton);
@@ -2107,12 +2132,19 @@ export class TopicManager extends BaseUser {
   /**
    * Navigates to the subtopic preview tab.
    */
-  async navigateToSubtopicPreviewTab(): Promise<void> {
-    await this.page.waitForSelector(navbarTabIcon);
-    const previewTabButtons = await this.page.$$(navbarTabIcon);
-    const previewTabButton = previewTabButtons[1];
-    await this.waitForElementToBeClickable(previewTabButton[1]);
-    await previewTabButton[1].click();
+  async navigateToSubtopicPreviewTab(
+    subtopicName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openSubtopicEditor(subtopicName, topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOn(topicMobilePreviewTab);
+    } else {
+      await this.page.waitForSelector(topicPreviewTab);
+      await this.clickOn(topicPreviewTab);
+    }
   }
 
   /**
@@ -2153,7 +2185,7 @@ export class TopicManager extends BaseUser {
    * @param {string} metaTags - The meta tags of the topic.
    * @param {string} thumbnail - The thumbnail of the topic.
    */
-  async editTopicData(
+  async editTopicDetails(
     topicName: string,
     urlFragment: string,
     description: string,
@@ -2213,15 +2245,16 @@ export class TopicManager extends BaseUser {
    * Opens the topic editor for a given topic and previews it by clicking on the third navbar-tab-icon.
    * @param {string} topicName - The name of the topic to be opened in the topic editor.
    */
-  async previewTopic(topicName: string): Promise<void> {
+  async navigateToTopicPreviewTopic(topicName: string): Promise<void> {
     await this.openTopicEditor(topicName);
-    await this.page.waitForSelector(navbarTabIcon);
-    const navbarTabIcons = await this.page.$$(navbarTabIcon);
-    if (navbarTabIcons.length < 3) {
-      throw new Error('Less than 3 navbar options found.');
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOn(topicMobilePreviewTab);
+    } else {
+      await this.page.waitForSelector(topicPreviewTab);
+      await this.clickOn(topicPreviewTab);
     }
-    await this.waitForElementToBeClickable(navbarTabIcons[2]);
-    await navbarTabIcons[2].click();
   }
 
   /**

@@ -59,17 +59,16 @@ describe('Topic Manager User Journey', function () {
         'add',
         'Mathematics'
       );
-      await topicManager.createSkillForTopic('Addition', 'Test Skill 2');
       await topicManager.assignSkillToSubtopicInTopicEditor(
-        'Sub-Topic 1',
-        '',
-        ''
+        'One digit Addition',
+        'Addition',
+        'Mathematics'
       );
+      // This statement updates then name of the subtopic.
+      await topicManager.changeSubtopicAssignments('Add', 'Mathematics');
 
-      // Subtopic name got updated in the statement below.
-      await topicManager.changeSubtopicAssignments('Add');
       await topicManager.openSubtopicEditor('Add', 'Mathematics');
-      await topicManager.editSubTopicData(
+      await topicManager.editSubTopicDetails(
         'Addition',
         'Add numbers',
         'Subtopic to learn addition',
@@ -77,10 +76,10 @@ describe('Topic Manager User Journey', function () {
       );
       await topicManager.saveTopicDraft('Mathematics');
 
-      await topicManager.navigateToSubtopicPreviewTab();
+      await topicManager.navigateToSubtopicPreviewTab('Add', 'Mathematics');
       await topicManager.expectPreviewSubtopicToHave(
         'Addition',
-        'Subtopic to learn addition'
+        'Subtopic creation description text for Addition'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
