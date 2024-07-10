@@ -553,33 +553,35 @@ export class BaseUser {
     testPath: string,
     newPage?: Page
   ): Promise<void> {
-    if (process.env.MOBILE !== 'true') {
-      try {
-        const currentPage =
-          typeof newPage !== 'undefined' ? newPage : this.page;
-        await currentPage.mouse.move(0, 0);
-        // To wait for all images to load and the page to be stable.
-        await currentPage.waitForTimeout(5000);
+    try {
+      const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
+      await currentPage.mouse.move(0, 0);
+      // To wait for all images to load and the page to be stable.
+      await currentPage.waitForTimeout(5000);
 
-        /* If currentPage includes a background banner, which are randomly selected from a set of four,
-         * then the percentage to trigger a failure is 0.03 (3%) for the randomness of the banner.
-         * Otherwise, the percentage is 0.003 (0.3%) for the randomness of the page that are small enough to be ignored
-         */
-        expect(await currentPage.screenshot()).toMatchImageSnapshot({
-          failureThreshold: (await currentPage.$(backgroundBanner))
-            ? 0.03
-            : 0.003,
-          failureThresholdType: 'percent',
-          customSnapshotIdentifier: imageName,
-          customSnapshotsDir: path.join(testPath, '/golden_screenshots'),
-          storeReceivedOnFailure: true,
-        });
-        if (typeof newPage !== 'undefined') {
-          await newPage.close();
-        }
-      } catch (e) {
-        throw new Error(e);
+      /* If currentPage includes a background banner, which are randomly selected from a set of four,
+       * then the percentage to trigger a failure is 0.03 (3%) for the randomness of the banner.
+       * Otherwise, the percentage is 0.003 (0.3%) for the randomness of the page that are small enough to be ignored
+       */
+      expect(await currentPage.screenshot()).toMatchImageSnapshot({
+        failureThreshold: (await currentPage.$(backgroundBanner))
+          ? 0.03
+          : 0.003,
+        failureThresholdType: 'percent',
+        customSnapshotIdentifier: imageName,
+        customSnapshotsDir: path.join(
+          testPath,
+          process.env.MOBILE
+            ? '/mobile_golden_screenshots'
+            : '/desktop_golden_screenshots'
+        ),
+        storeReceivedOnFailure: true,
+      });
+      if (typeof newPage !== 'undefined') {
+        await newPage.close();
       }
+    } catch (e) {
+      throw new Error(e);
     }
   }
 }
