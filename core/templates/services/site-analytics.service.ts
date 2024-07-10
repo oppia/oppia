@@ -66,13 +66,9 @@ export class SiteAnalyticsService {
 
   // The srcElement refers to the element on the page that is clicked.
   registerStartLoginEvent(srcElement: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'LoginButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname + ' ' + srcElement
-    );
     this._sendEventToGoogleAnalytics('login', {
       source_element: srcElement,
+      page_path: this.windowRef.nativeWindow.location.pathname,
     });
   }
 
@@ -89,12 +85,9 @@ export class SiteAnalyticsService {
   }
 
   registerClickBrowseLessonsButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'BrowseLessonsButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
-    this._sendEventToGoogleAnalytics('discovery_browse_lessons');
+    this._sendEventToGoogleAnalytics('discovery_browse_lessons', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickHomePageStartLearningButtonEvent(): void {
@@ -106,107 +99,79 @@ export class SiteAnalyticsService {
   }
 
   registerClickGuideParentsButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'GuideParentsButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('guide_parents_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickTipforParentsButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'TipforParentsButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('tip_for_parents_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickExploreLessonsButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ExploreLessonsButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('explore_lessons_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickStartLearningButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'StartLearningButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('start_learning_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickStartContributingButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'StartContributingButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('start_contributing_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickStartTeachingButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'StartTeachingButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('start_teaching_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickVisitClassroomButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ClassroomButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('classroom_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickBrowseLibraryButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'BrowseLibraryButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('browse_library_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerGoToDonationSiteEvent(donationSiteName: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'GoToDonationSite',
-      'click',
-      donationSiteName
-    );
+    this._sendEventToGoogleAnalytics('go_to_donation_site', {
+      donation_site_name: donationSiteName,
+    });
   }
 
   registerApplyToTeachWithOppiaEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ApplyToTeachWithOppia',
-      'click',
-      ''
-    );
+    this._sendEventToGoogleAnalytics('apply_to_teach_with_oppia', {});
   }
 
   registerClickCreateExplorationButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'CreateExplorationButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('create_exploration_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerCreateNewExplorationEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'NewExploration',
-      'create',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('create_new_exploration', {
+      exploration_id: explorationId,
+    });
   }
 
   registerCreateNewExplorationInCollectionEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'NewExplorationFromCollection',
-      'create',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('create_new_exploration_in_collection', {
+      exploration_id: explorationId,
+    });
   }
 
   registerCreateNewCollectionEvent(collectionId: string): void {

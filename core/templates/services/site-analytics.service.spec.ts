@@ -63,9 +63,9 @@ describe('Site Analytics Service', () => {
       const element = 'LoginEventButton';
       sas.registerStartLoginEvent(element);
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
-        event_category: 'LoginButton',
-        event_label: pathname + ' LoginEventButton',
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'login', {
+        source_element: 'LoginEventButton',
+        page_path: pathname,
       });
     });
 
@@ -80,28 +80,37 @@ describe('Site Analytics Service', () => {
     it('should register click browse lessons event', () => {
       sas.registerClickBrowseLessonsButtonEvent();
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
-        event_category: 'BrowseLessonsButton',
-        event_label: pathname,
-      });
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'discovery_browse_lessons',
+        {
+          page_path: pathname,
+        }
+      );
     });
 
     it('should register click start learning button event', () => {
       sas.registerClickStartLearningButtonEvent();
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
-        event_category: 'StartLearningButton',
-        event_label: pathname,
-      });
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'start_learning_button_click',
+        {
+          page_path: pathname,
+        }
+      );
     });
 
     it('should register click start contributing button event', () => {
       sas.registerClickStartContributingButtonEvent();
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
-        event_category: 'StartContributingButton',
-        event_label: pathname,
-      });
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'start_contributing_button_click',
+        {
+          page_path: pathname,
+        }
+      );
     });
 
     it('should register go to donation site event', () => {
@@ -126,28 +135,33 @@ describe('Site Analytics Service', () => {
     it('should register click create exploration button event', () => {
       sas.registerClickCreateExplorationButtonEvent();
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
-        event_category: 'CreateExplorationButton',
-        event_label: pathname,
-      });
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'create_exploration_button_click',
+        {
+          page_path: pathname,
+        }
+      );
     });
 
     it('should register create new exploration event', () => {
       sas.registerCreateNewExplorationEvent(explorationId);
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'create', {
-        event_category: 'NewExploration',
-        event_label: explorationId,
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'create_new_exploration', {
+        exploration_id: explorationId,
       });
     });
 
     it('should register create new exploration in collection event', () => {
       sas.registerCreateNewExplorationInCollectionEvent(explorationId);
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'create', {
-        event_category: 'NewExplorationFromCollection',
-        event_label: explorationId,
-      });
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'create_new_exploration_in_collection',
+        {
+          exploration_id: explorationId,
+        }
+      );
     });
 
     it('should register new collection event', () => {
@@ -582,13 +596,11 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register classroom page viewed', () => {
-      spyOn(sas, '_sendEventToLegacyGoogleAnalytics');
+      spyOn(sas, '_sendEventToGoogleAnalytics');
 
       sas.registerClassroomPageViewed();
-      expect(sas._sendEventToLegacyGoogleAnalytics).toHaveBeenCalledWith(
-        'ClassroomEngagement',
-        'impression',
-        'ViewClassroom'
+      expect(sas._sendEventToGoogleAnalytics).toHaveBeenCalledWith(
+        'view_classroom'
       );
     });
 
