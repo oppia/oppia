@@ -240,10 +240,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the Thanks for Donating page.
    */
   async navigateToThanksForDonatingPage(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.page.goto(thanksForDonatingUrl),
-    ]);
+    await this.goto(thanksForDonatingUrl);
   }
 
   /**
@@ -342,16 +339,15 @@ export class LoggedOutUser extends BaseUser {
     expectedDestinationPageUrl: string,
     expectedDestinationPageName: string
   ): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      this.clickOn(button),
-    ]);
+    await this.clickAndWaitForNavigation(button);
 
-    expect(this.page.url())
-      .withContext(
+    try {
+      expect(this.page.url()).toBe(expectedDestinationPageUrl);
+    } catch (e) {
+      throw new Error(
         `${buttonName} should open the ${expectedDestinationPageName} page`
-      )
-      .toBe(expectedDestinationPageUrl);
+      );
+    }
   }
 
   /**
@@ -370,8 +366,11 @@ export class LoggedOutUser extends BaseUser {
     );
     const newTabPage = await newTarget.page();
     expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
-    await newTabPage?.close();
+    if (newTabPage === null) {
+      throw new Error(`The ${anchorInnerText} link did not open a new tab`);
+    }
+    expect(newTabPage.url()).toBe(expectedDestinationPageUrl);
+    await newTabPage.close();
   }
 
   /**
@@ -390,14 +389,13 @@ export class LoggedOutUser extends BaseUser {
       target => target.opener() === pageTarget
     );
     const newTabPage = await newTarget.page();
-
-    expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url())
-      .withContext(
+    if (newTabPage === null) {
+      throw new Error(
         `${buttonName} should open the ${expectedDestinationPageName} page`
-      )
-      .toBe(expectedDestinationPageUrl);
-    await newTabPage?.close();
+      );
+    }
+    expect(newTabPage.url()).toBe(expectedDestinationPageUrl);
+    await newTabPage.close();
   }
 
   /**
@@ -627,10 +625,7 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error('The Watch A Video button does not exist!');
     }
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(watchAVideoButton),
-    ]);
+    await this.clickAndWaitForNavigation(watchAVideoButton);
 
     const url = this.getCurrentUrlWithoutParameters();
     const expectedWatchAVideoUrl = this.isViewportAtMobileWidth()
@@ -658,10 +653,8 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Read our blog') {
       throw new Error('The Read Our Blog button does not exist!');
     }
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(readOurBlogButton),
-    ]);
+    await this.clickAndWaitForNavigation(readOurBlogButton);
+
     if (this.page.url() !== blogUrl) {
       throw new Error(
         `The Read Our Blog button should open the Blog page,
@@ -779,10 +772,7 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the Forum page using the oppia website footer.
    */
   async clickOnForumLinkInFooter(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      await this.clickOn(footerForumlink),
-    ]);
+    await this.clickAndWaitForNavigation(footerForumlink);
 
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
@@ -911,10 +901,11 @@ export class LoggedOutUser extends BaseUser {
       target => target.opener() === pageTarget
     );
     const newTabPage = await newTarget.page();
-    await newTabPage?.waitForNetworkIdle();
-
-    expect(newTabPage?.url()).toContain(googleSignUpUrl);
-    await newTabPage?.close();
+    if (newTabPage === null) {
+      throw new Error(`The "create on here" link did not open a new tab`);
+    }
+    expect(newTabPage.url()).toBe(googleSignUpUrl);
+    await newTabPage.close();
   }
 
   /**
@@ -968,10 +959,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForXPath(
       '//a[contains(text(),"discover more ways to get involved")]'
     );
-    await Promise.all([
-      this.page.waitForNavigation(),
-      await this.clickOn('discover more ways to get involved'),
-    ]);
+    await this.clickAndWaitForNavigation('discover more ways to get involved');
 
     expect(this.page.url()).toBe(contactUrl);
   }

@@ -755,7 +755,7 @@ def managed_acceptance_tests_server(
             subprocess is sent.
 
     Yields:
-        psutil.Process. The jasmine testing process.
+        psutil.Process. The jest testing process.
 
     Raises:
         Exception. The suite_name is not in the list of the acceptance tests
@@ -769,6 +769,7 @@ def managed_acceptance_tests_server(
     os.environ['SPEC_NAME'] = suite_name
     os.environ['PROD_ENV'] = 'true' if prod_env else 'false'
 
+    """
     nodemodules_jasmine_bin_path = os.path.join(
         common.NODE_MODULES_PATH, '.bin', 'jasmine')
     puppeteer_acceptance_tests_dir_path = os.path.join(
@@ -788,6 +789,14 @@ def managed_acceptance_tests_server(
         nodemodules_jasmine_bin_path,
         '--config="%s"' % jasmine_config_file_path,
         '%s' % os.path.join(specs_dir_path, suite_name_with_extension)
+    ]"""
+
+    nodemodules_jest_bin_path = os.path.join(
+        common.NODE_MODULES_PATH, '.bin', 'jest')
+
+    acceptance_tests_args = [
+        nodemodules_jest_bin_path, suite_name,
+        '--config=./core/tests/puppeteer-acceptance-tests/jest.config.js'
     ]
 
     # OK to use shell=True here because we are passing string literals,

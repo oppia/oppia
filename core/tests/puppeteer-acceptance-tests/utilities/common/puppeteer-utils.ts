@@ -23,6 +23,12 @@ import {ConsoleReporter} from './console-reporter';
 import {TestToModulesMatcher} from '../../../test-dependencies/test-to-modules-matcher';
 import {showMessage} from './show-message';
 
+var path = require('path');
+
+import {toMatchImageSnapshot} from 'jest-image-snapshot';
+expect.extend({toMatchImageSnapshot});
+const backgroundBanner = '.oppia-background-image';
+
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
 
@@ -531,6 +537,50 @@ export class BaseUser {
    */
   async waitForPageToFullyLoad(): Promise<void> {
     await this.page.waitForFunction('document.readyState === "complete"');
+  }
+
+  /**
+   * This function takes a screenshot of the page.
+   * If there's no parameter for newPage, it checks this.page instead of newPage.
+   * If there's no image with the given filename, it stores the screenshot with the given filename in the folder __image_snapshots__
+   * Otherwise, it compares the screenshot with the image named as the given string to check if they match.
+   * If they don't match, it generates an image in the folder __diff_output__ to show the difference.
+   * @param {string} imageName - The name for the image
+   * @param {Page|undefined} newPage - The page to take screenshot from,
+   */
+  async expectScreenshotToMatch(
+    imageName: string,
+    testPath: string,
+    newPage?: Page
+  ): Promise<void> {
+    if (process.env.MOBILE !== 'true') {
+      try {
+        const currentPage =
+          typeof newPage !== 'undefined' ? newPage : this.page;
+        await currentPage.mouse.move(0, 0);
+        // To wait for all images to load and the page to be stable.
+        await currentPage.waitForTimeout(5000);
+
+        /* If currentPage includes a background banner, which are randomly selected from a set of four,
+         * then the percentage to trigger a failure is 0.03 (3%) for the randomness of the banner.
+         * Otherwise, the percentage is 0.003 (0.3%) for the randomness of the page that are small enough to be ignored
+         */
+        expect(await currentPage.screenshot()).toMatchImageSnapshot({
+          failureThreshold: (await currentPage.$(backgroundBanner))
+            ? 0.03
+            : 0.003,
+          failureThresholdType: 'percent',
+          customSnapshotIdentifier: imageName,
+          customSnapshotsDir: path.join(testPath, '/golden_screenshots'),
+          storeReceivedOnFailure: true,
+        });
+        if (typeof newPage !== 'undefined') {
+          await newPage.close();
+        }
+      } catch (e) {
+        throw new Error(e);
+      }
+    }
   }
 }
 

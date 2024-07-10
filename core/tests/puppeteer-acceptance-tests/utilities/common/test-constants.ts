@@ -146,7 +146,7 @@ export default {
   data: {
     blogPostThumbnailImage: path.resolve(
       __dirname,
-      '../../data/blog-post-thumbnail.svg'
+      '../../data/blog-post-thumbnail.png'
     ),
     curriculumAdminThumbnailImage: path.resolve(
       __dirname,
