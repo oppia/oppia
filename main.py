@@ -276,7 +276,7 @@ URLS = [
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TopicEditorAccessValidationHandler
     ),
-    
+
     get_redirect_route(
         r'%s/does_profile_exist/<username>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,

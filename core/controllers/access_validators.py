@@ -551,6 +551,7 @@ class TopicEditorAccessValidationHandler(
             }
         }
     }
+    
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_any_topic_editor

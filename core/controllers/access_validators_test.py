@@ -725,6 +725,7 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         )
         self.logout()
 
+
 class TopicEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Checks the access to the topic editor page and its rendering."""
 
@@ -787,6 +788,7 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     #         ), expected_status_int=404
     #     )
     #     self.logout()
+
 
 class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
     """Test for collection editor page access validation"""
