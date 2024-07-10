@@ -20,13 +20,15 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Topic Manager', function () {
   let topicManager: TopicManager;
-  let curriculumAdmin: CurriculumAdmin;
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
+  let explorationId: string | null;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -35,9 +37,30 @@ describe('Topic Manager', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
+    await curriculumAdmin.navigateToCreatorDashboardPage();
+    await curriculumAdmin.navigateToExplorationEditorPage();
+    await curriculumAdmin.dismissWelcomeModal();
+    await curriculumAdmin.createMinimalExploration(
+      'Test Exploration',
+      'End Exploration'
+    );
+    await curriculumAdmin.saveExplorationDraft();
+    explorationId = await curriculumAdmin.publishExplorationWithMetadata(
+      'Test Exploration Title 1',
+      'Test Exploration Goal',
+      'Algebra'
+    );
+    if (!explorationId) {
+      throw new Error('Error publishing exploration successfully.');
+    }
+
     await curriculumAdmin.createTopic('Mathematics', 'math');
     await curriculumAdmin.createSkillForTopic('Subtraction', 'Mathematics');
     await curriculumAdmin.createSkillForTopic('Multiplication', 'Mathematics');
+    await curriculumAdmin.createAndPublishStoryWithChapter(
+      'storyNaem',
+      'storyurl'
+    );
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
@@ -50,22 +73,15 @@ describe('Topic Manager', function () {
   it('should be able to modify chapter details, preview the chapter card, add skills, and save the changes.', async function () {
     await topicManager.navigateToTopicAndSkillsDashboardPage();
 
-    // Modify/update title, description, thumbnail image and chapter outline in the chapter editor.
-    await topicManager.modifyChapterTitle('New Chapter Title');
-    await topicManager.modifyChapterDescription('New Chapter Description');
-    await topicManager.modifyChapterThumbnailImage('path/to/new/image.png');
-    await topicManager.modifyChapterOutline('New Chapter Outline');
+    await topicManager.openChapterEditorFromStory('New Chapter Title');
+    await topicManager.editChapterDetails('New Chapter Description');
 
-    // Preview the chapter card.
-    await topicManager.previewChapterCard();
-
-    // Add acquired and prerequisite skills.
     await topicManager.addAcquiredSkill('New Acquired Skill');
     await topicManager.addPrerequisiteSkill('New Prerequisite Skill');
 
-    // Save the changes.
+    await topicManager.previewChapterCard();
+
     await topicManager.saveChanges();
-    await topicManager.timeout(2147483647);
   }, 2147483647);
 
   afterAll(async function () {

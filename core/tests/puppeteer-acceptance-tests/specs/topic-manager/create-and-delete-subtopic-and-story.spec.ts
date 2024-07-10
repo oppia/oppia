@@ -27,7 +27,7 @@ const ROLES = testConstants.Roles;
 
 describe('Topic Manager', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
-  let topicManager: TopicManager;
+  let topicManager: TopicManager & CurriculumAdmin;
   let explorationId: string | null;
 
   beforeAll(async function () {
