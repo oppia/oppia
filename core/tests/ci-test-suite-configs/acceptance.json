@@ -183,6 +183,10 @@
     {
       "name": "topic-manager/cannot-do-curriculum-admin-actions",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/cannot-do-curriculum-admin-actions.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-and-republish-a-skill",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-republish-a-skill.spec.ts"
     }
   ]
 }
