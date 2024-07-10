@@ -259,6 +259,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'topic-manager/create-and-delete-questions-in-skill-editor',
     'topic-manager/assign-unassign-and-merge-skills',
     'topic-manager/cannot-do-curriculum-admin-actions',
+    'topic-manager/edit-and-republish-a-skill',
     'voiceover-admin/add-voiceover-artist-to-an-exploration',
 ]
 
