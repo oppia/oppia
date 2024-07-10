@@ -49,7 +49,9 @@ var DiagnosticTestPage = function () {
   var updateClassroomCourseDetailsInput = $(
     '.e2e-test-update-classroom-course-details'
   );
-  var publishClassroomButton = $('.e2e-test-publish-classroom-btn');
+  var publishClassroomButton = $(
+    '.e2e-test-toggle-classroom-publication-status-btn'
+  );
   var thumbnailContainer = $('.e2e-test-thumbnail-container');
   var topicThumbnailButton = $('.e2e-test-photo-button');
   var bannerClickable = $('.e2e-test-classroom-banner-container');
@@ -190,6 +192,7 @@ var DiagnosticTestPage = function () {
     );
 
     await action.click('Publish classroom button', publishClassroomButton);
+    await action.click('Save classroom button', saveClassroomConfigButton);
   };
 
   this.expectNumberOfRecommendedTopicsToBe = async function (count) {
@@ -212,7 +215,7 @@ var DiagnosticTestPage = function () {
 
   var addTopicToClassroom = async function (topicName) {
     var containerLocator = '.e2e-test-classroom-category-dropdown';
-    var searchTopicInput = $('.e2e-test-exploration-new-category-add').$(
+    var searchTopicInput = $('.e2e-test-classroom-new-topic-add').$(
       '.mat-select-search-input.mat-input-element'
     );
     var searchInputLocatorTextOption = $(
