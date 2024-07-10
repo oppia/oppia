@@ -85,7 +85,7 @@
              *ngIf="showSkillEditOptions">
           <div class="skill-nav-dropdown-option"
                (click)="saveChanges()">
-            <i class="fas fa-save navbar-tab-icon"></i>
+            <i class="fas fa-save navbar-tab-icon e2e-test-mobile-save-skill-changes"></i>
             <span>Save Changes</span>
           </div>
         </div>
@@ -97,7 +97,7 @@
               ({{getChangeListCount()}})
             </span>
           </div>
-          <div class="skill-nav-dropdown-icon"
+          <div class="skill-nav-dropdown-icon e2e-test-mobile-toggle-skill-nav-dropdown-icon"
                (click)="toggleSkillEditOptions()">
             <i class="fa fa-caret-down"></i>
           </div>

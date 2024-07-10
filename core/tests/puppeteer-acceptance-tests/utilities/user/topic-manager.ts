@@ -144,6 +144,40 @@ const desktopSkillListItemOptions = '.e2e-test-skill-edit-box';
 const desktopDeleteSkillButton = '.e2e-test-delete-skill-button';
 const mobileSkillListItemOptions = '.e2e-test-mobile-skills-option';
 const mobileDeleteSkillButton = '.e2e-test-mobile-delete-skill-button';
+const workedExampleSelector =
+  '.oppia-skill-concept-card-preview-list .e2e-test-worked-example-title';
+const misconceptionTitleSelector =
+  '.oppia-skill-misconception-card-preview-list .e2e-test-worked-example-title';
+const misconceptionTitleElement = '.e2e-test-worked-example-title';
+const skillPrerequisiteTitleSelector = '.skill-prerequisite-link';
+const skillDescriptionCardSelector = '.skill-description-card';
+const skillPrerequisiteLinkSelector = '.skill-prerequisite-link';
+const removeSkillIconSelector = '.remove-skill-icon';
+const misconceptionDeleteButtonSelector = '.e2e-test-delete-example-button';
+const saveOrPublishSkillSelector = '.e2e-test-save-or-publish-skill';
+const commitMessageInputSelector = '.e2e-test-commit-message-input';
+const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
+const skillPreviewModalTitleSelector = '.skill-preview-modal-title';
+const skillPreviewModalContentSelector = '.skill-preview-modal-content';
+const selectRubricDifficultySelector = '.e2e-test-select-rubric-difficulty';
+const rteSelector = '.e2e-test-rte';
+const saveRubricExplanationButton = '.e2e-test-save-rubric-explanation-button';
+const editConceptCardSelector = '.e2e-test-edit-concept-card';
+const saveConceptCardSelector = '.e2e-test-save-concept-card';
+const addButtonSelector = '.e2e-test-add-misconception-modal-button';
+const nameFieldSelector = '.e2e-test-misconception-name-field';
+const saveMisconceptionButton = '.e2e-test-confirm-add-misconception-button';
+const saveWorkedExamplesButton = '.e2e-test-save-worked-example-button';
+const addWorkedExampleButton = '.e2e-test-add-worked-example';
+const workedExampleListItem = '.oppia-skill-concept-card-preview-list';
+const workedExampleTitleElement = '.e2e-test-worked-example-title';
+const workedExampleDeleteButton = '.e2e-test-delete-example-button';
+const misconceptionListSelector =
+  '.oppia-skill-misconception-card-preview-list';
+const confirmDeleteWorkedExampleButton =
+  '.e2e-test-confirm-delete-worked-example-button';
+const confirmDeleteMisconceptionButton =
+  '.e2e-test-confirm-delete-misconception-button';
 
 export class TopicManager extends BaseUser {
   /**
@@ -1446,6 +1480,526 @@ export class TopicManager extends BaseUser {
       }
     }
     showMessage('Delete button is not available in the skill');
+  }
+
+  /**
+   * Open the skill editor page for a skill.
+   */
+  async openSkillEditor(skillName: string): Promise<void> {
+    const skillSelector = this.isViewportAtMobileWidth()
+      ? mobileSkillSelector
+      : desktopSkillSelector;
+    await this.page.bringToFront();
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.clickOn(skillsTab);
+    await this.page.waitForSelector(skillSelector, {visible: true});
+
+    await Promise.all([
+      this.page.evaluate(
+        (skillSelector, skillName) => {
+          const skillDivs = Array.from(
+            document.querySelectorAll(skillSelector)
+          );
+          const skillDivToSelect = skillDivs.find(
+            element => element?.textContent.trim() === skillName
+          ) as HTMLElement;
+          if (skillDivToSelect) {
+            skillDivToSelect.click();
+          } else {
+            throw new Error('Cannot open skill editor page.');
+          }
+        },
+        skillSelector,
+        skillName
+      ),
+      this.page.waitForNavigation(),
+    ]);
+  }
+
+  /**
+   * Adds a worked example to the topic.
+   * @param {string} exampleQuestion - The question part of the worked example.
+   * @param {string} exampleExplanation - The explanation part of the worked example.
+   */
+  async addWorkedExample(
+    exampleQuestion: string,
+    exampleExplanation: string
+  ): Promise<void> {
+    await this.openAllMobileDropdownsInSkillEditor();
+    await this.waitForPageToFullyLoad();
+    await this.clickOn(addWorkedExampleButton);
+    await this.type(rteSelector, exampleQuestion);
+    const rteElements = await this.page.$$(rteSelector);
+    await this.waitForElementToBeClickable(rteElements[1]);
+    await rteElements[1].type(exampleExplanation);
+    await this.clickOn(saveWorkedExamplesButton);
+  }
+
+  /**
+   * Deletes a worked example from the topic.
+   * @param {string} exampleQuestion - The question part of the worked example to delete.
+   */
+  async deleteWorkedExample(exampleQuestion: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(workedExampleListItem, {visible: true});
+    const previewLists = await this.page.$$(workedExampleListItem);
+    if (!previewLists) {
+      throw new Error('No worked examples found');
+    }
+    let exampleFound = false;
+
+    for (const previewList of previewLists) {
+      await this.page.waitForSelector(workedExampleTitleElement, {
+        visible: true,
+      });
+      const titleElement = await previewList.$(workedExampleTitleElement);
+      if (titleElement) {
+        const title = await this.page.evaluate(
+          el => el.textContent,
+          titleElement
+        );
+        if (title.trim() === exampleQuestion) {
+          await this.page.waitForSelector(workedExampleDeleteButton, {
+            visible: true,
+          });
+          const deleteButton = await previewList.$(workedExampleDeleteButton);
+          if (deleteButton) {
+            await this.waitForElementToBeClickable(deleteButton);
+            await deleteButton.click();
+            await this.waitForPageToFullyLoad();
+            await this.clickOn(confirmDeleteWorkedExampleButton);
+            exampleFound = true;
+            break;
+          }
+        }
+      }
+    }
+    if (!exampleFound) {
+      throw new Error(
+        `Worked example with question "${exampleQuestion}" not found.`
+      );
+    }
+  }
+
+  /**
+   * Verifies if a worked example is present on the page.
+   * @param {string} workedExample - The title of the worked example to verify.
+   * @param {boolean} isPresent - Whether the worked example is expected to be present.
+   */
+  async verifyWorkedExamplePresent(
+    workedExample: string,
+    isPresent: boolean
+  ): Promise<void> {
+    await this.openAllMobileDropdownsInSkillEditor();
+
+    try {
+      await this.page.waitForSelector(workedExampleSelector, {
+        timeout: 5000,
+        visible: true,
+      });
+      const workedExamples = await this.page.$$(workedExampleSelector);
+
+      for (const example of workedExamples) {
+        const title = await this.page.evaluate(el => el.textContent, example);
+        if (title.trim() === workedExample) {
+          if (!isPresent) {
+            throw new Error(
+              `The worked example ${workedExample} is present, which was not expected`
+            );
+          }
+          return;
+        }
+      }
+
+      if (isPresent) {
+        throw new Error(
+          `The worked example ${workedExample} is not present, which was expected`
+        );
+      }
+    } catch (error) {
+      if (isPresent) {
+        throw new Error(
+          `The worked example ${workedExample} is not present, which was expected`
+        );
+      }
+    }
+
+    showMessage(
+      `The worked example is ${isPresent ? '' : 'not'} present as expected.`
+    );
+  }
+
+  /**
+   * Adds a misconception to the topic.
+   * @param {string} misconceptionName - The name of the misconception to add.
+   * @param {string} notes - The notes for question creators to understand how handling this misconception is useful for the skill being tested.
+   * @param {string} feedback - The feedback for the misconception to add.
+   */
+  async addMisconception(
+    misconceptionName: string,
+    notes: string,
+    feedback: string
+  ): Promise<void> {
+    await this.clickOn(addButtonSelector);
+    await this.waitForElementToBeClickable(nameFieldSelector);
+    await this.type(nameFieldSelector, misconceptionName);
+    await this.waitForElementToBeClickable(rteSelector);
+    await this.type(rteSelector, notes);
+    const rteElements = await this.page.$$(rteSelector);
+    await rteElements[1].type(feedback);
+    await this.clickOn(saveMisconceptionButton);
+  }
+
+  /**
+   * Verifies if a misconception is present on the page.
+   * @param {string} misconceptionName - The name of the misconception to verify.
+   * @param {boolean} isPresent - Whether the misconception is expected to be present.
+   */
+  async verifyMisconceptionPresent(
+    misconceptionName: string,
+    isPresent: boolean
+  ): Promise<void> {
+    try {
+      await this.page.waitForSelector(misconceptionTitleSelector, {
+        timeout: 5000,
+        visible: true,
+      });
+      const misconceptions = await this.page.$$(misconceptionTitleSelector);
+
+      for (const misconception of misconceptions) {
+        const title = await this.page.evaluate(
+          el => el.textContent,
+          misconception
+        );
+        if (title.trim() === misconceptionName) {
+          if (!isPresent) {
+            throw new Error(
+              `The misconception ${misconceptionName} is present, which was not expected`
+            );
+          }
+          return;
+        }
+      }
+
+      if (isPresent) {
+        throw new Error(
+          `The misconception ${misconceptionName} is not present, which was expected`
+        );
+      }
+    } catch (error) {
+      if (isPresent) {
+        throw new Error(
+          `The misconception ${misconceptionName} is not present, which was expected`
+        );
+      }
+    }
+
+    showMessage(
+      `The misconception is ${isPresent ? '' : 'not'} present as expected.`
+    );
+  }
+
+  /**
+   * Deletes a misconception.
+   * @param {string} misconceptionName - The name of the misconception to delete.
+   */
+  async deleteMisconception(misconceptionName: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(misconceptionListSelector, {visible: true});
+    const misconceptionLists = await this.page.$$(misconceptionListSelector);
+    let misconceptionFound = false;
+
+    for (const misconceptionList of misconceptionLists) {
+      await this.page.waitForSelector(misconceptionTitleElement, {
+        visible: true,
+      });
+      const titleElement = await misconceptionList.$(misconceptionTitleElement);
+      if (titleElement) {
+        const title = await this.page.evaluate(
+          el => el.textContent,
+          titleElement
+        );
+        if (title.trim() === misconceptionName) {
+          await this.page.waitForSelector(misconceptionDeleteButtonSelector, {
+            visible: true,
+          });
+          const deleteButton = await misconceptionList.$(
+            misconceptionDeleteButtonSelector
+          );
+          if (deleteButton) {
+            await this.waitForElementToBeClickable(deleteButton);
+            await deleteButton.click();
+            await this.waitForPageToFullyLoad();
+            await this.clickOn(confirmDeleteMisconceptionButton);
+            misconceptionFound = true;
+            break;
+          } else {
+            throw new Error('Misconception delete button not found.');
+          }
+        }
+      }
+    }
+
+    if (!misconceptionFound) {
+      throw new Error(`The misconception ${misconceptionName} was not found`);
+    }
+  }
+
+  /**
+   * Updates the review material.
+   * @param {string} updatedMaterial - The updated review material.
+   */
+  async updateReviewMaterial(updatedMaterial: string): Promise<void> {
+    try {
+      await this.clickOn(editConceptCardSelector);
+      await this.waitForElementToBeClickable(rteSelector);
+      await this.clearAllTextFrom(rteSelector);
+      await this.type(rteSelector, updatedMaterial);
+      await this.clickOn(saveConceptCardSelector);
+      showMessage('Updated review material');
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  /**
+   * Adds a prerequisite skill.
+   * @param {string} skillName - The name of the skill to add.
+   */
+  async addPrerequisiteSkill(skillName: string): Promise<void> {
+    try {
+      await this.clickOn('+ ADD PREREQUISITE SKILL');
+      await this.waitForElementToBeClickable(skillNameInputSelector);
+      await this.type(skillNameInputSelector, skillName);
+
+      await this.page.waitForSelector(radioInnerCircleSelector);
+      const radioInnerCircleSelectorElement = await this.page.$(
+        radioInnerCircleSelector
+      );
+      if (!radioInnerCircleSelectorElement) {
+        throw new Error('Radio inner circle selector not found');
+      }
+      await this.waitForPageToFullyLoad();
+      await this.page.evaluate(selector => {
+        document.querySelector(selector).click();
+      }, radioInnerCircleSelector);
+
+      await this.page.waitForSelector(confirmSkillSelectionButtonSelector);
+      const confirmSkillSelectionButtonSelectorElement = await this.page.$(
+        confirmSkillSelectionButtonSelector
+      );
+      if (!confirmSkillSelectionButtonSelectorElement) {
+        throw new Error('Confirm skill selection button selector not found');
+      }
+      await this.clickOn(confirmSkillSelectionButtonSelector);
+      showMessage(`Added prerequisite skill: ${skillName}`);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  /**
+   * Removes a prerequisite skill.
+   * @param {string} skillName - The name of the skill to remove.
+   */
+  async removePrerequisiteSkill(skillName: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(skillDescriptionCardSelector, {
+        visible: true,
+      });
+      const skillCards = await this.page.$$(skillDescriptionCardSelector);
+
+      for (const skillCard of skillCards) {
+        const skillLink = await skillCard.$(skillPrerequisiteLinkSelector);
+        const skillText = await this.page.evaluate(
+          el => el.textContent,
+          skillLink
+        );
+
+        if (skillText === skillName) {
+          await this.page.waitForSelector(removeSkillIconSelector, {
+            visible: true,
+          });
+          const removeIcon = await skillCard.$(removeSkillIconSelector);
+          if (removeIcon) {
+            await this.waitForElementToBeClickable(removeIcon);
+            await removeIcon.click();
+            showMessage(`Removed prerequisite skill: ${skillName}`);
+            return;
+          }
+        }
+      }
+
+      throw new Error(`The skill ${skillName} was not found`);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  /**
+   * Verifies if a prerequisite skill is present on the page.
+   * @param {string} skillName - The name of the skill to verify.
+   * @param {boolean} isPresent - Whether the skill is expected to be present.
+   */
+  async verifyPrerequisiteSkillPresent(
+    skillName: string,
+    isPresent: boolean
+  ): Promise<void> {
+    try {
+      await this.page.waitForSelector(skillPrerequisiteTitleSelector, {
+        timeout: 5000,
+      });
+      const skillCards = await this.page.$$(skillPrerequisiteTitleSelector);
+
+      for (const skillCard of skillCards) {
+        const skillLink = await skillCard.$(skillPrerequisiteTitleSelector);
+        const skillText = await this.page.evaluate(
+          el => el.textContent,
+          skillLink
+        );
+
+        if (skillText.trim() === skillName) {
+          if (!isPresent) {
+            throw new Error(
+              `The skill ${skillName} is present, which was not expected`
+            );
+          }
+          return;
+        }
+      }
+
+      if (isPresent) {
+        throw new Error(
+          `The skill ${skillName} is not present, which was expected`
+        );
+      }
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        if (isPresent) {
+          throw new Error(
+            `The skill ${skillName} is not present, which was expected`
+          );
+        }
+      } else {
+        throw error;
+      }
+    }
+
+    showMessage(
+      `The prerequisite skill is ${isPresent ? '' : 'not'} present as expected.`
+    );
+  }
+
+  /**
+   * Updates a rubric.
+   * @param {string} difficulty - The difficulty level to update.
+   * @param {string} explanation - The explanation to update.
+   */
+  async updateRubric(difficulty: string, explanation: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    let difficultyValue: string;
+    switch (difficulty) {
+      case 'Easy':
+        difficultyValue = '0';
+        break;
+      case 'Medium':
+        difficultyValue = '1';
+        break;
+      case 'Hard':
+        difficultyValue = '2';
+        break;
+      default:
+        throw new Error(`Unknown difficulty: ${difficulty}`);
+    }
+    await this.waitForElementToBeClickable(selectRubricDifficultySelector);
+    await this.select(selectRubricDifficultySelector, difficultyValue);
+    await this.waitForPageToFullyLoad();
+    await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
+    await this.waitForElementToBeClickable(rteSelector);
+    await this.type(rteSelector, explanation);
+    await this.clickOn(saveRubricExplanationButton);
+  }
+
+  /**
+   * Publishes an updated skill.
+   * @param {string} updateMessage - The update message.
+   */
+  async publishUpdatedSkill(updateMessage: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      return;
+    } else {
+      await this.waitForPageToFullyLoad();
+      await this.page.waitForSelector(saveOrPublishSkillSelector, {
+        visible: true,
+      });
+      await this.clickOn(saveOrPublishSkillSelector);
+    }
+
+    await this.page.waitForSelector(commitMessageInputSelector, {
+      visible: true,
+    });
+    await this.waitForElementToBeClickable(commitMessageInputSelector);
+    await this.type(commitMessageInputSelector, updateMessage);
+    await this.page.waitForSelector(closeSaveModalButtonSelector, {
+      visible: true,
+    });
+    await this.clickOn(closeSaveModalButtonSelector);
+    await this.expectToastMessageToBe('Changes Saved.');
+    showMessage('Skill updated successful');
+  }
+
+  /**
+   * Previews a concept card.
+   */
+  async previewConceptCard(): Promise<void> {
+    await this.clickOn(' Preview Concept Card ');
+  }
+
+  /**
+   * Verifies if a concept card preview has the expected skill name and review material.
+   * @param {string} skillName - The expected skill name.
+   * @param {string} reviewMaterial - The expected review material.
+   */
+  async expectConceptCardPreviewToHave(
+    skillName: string,
+    reviewMaterial: string
+  ): Promise<void> {
+    await this.page.waitForSelector(skillPreviewModalTitleSelector, {
+      visible: true,
+    });
+    const titleElement = await this.page.$(skillPreviewModalTitleSelector);
+    const title = await this.page.evaluate(el => el.textContent, titleElement);
+
+    if (title.trim() !== skillName) {
+      throw new Error(
+        `Expected skill name to be ${skillName} but found ${title}`
+      );
+    }
+
+    await this.page.waitForSelector(skillPreviewModalContentSelector, {
+      visible: true,
+    });
+    const contentElement = await this.page.$(skillPreviewModalContentSelector);
+    const content = await this.page.evaluate(
+      el => el.textContent,
+      contentElement
+    );
+
+    if (content.trim() !== reviewMaterial) {
+      throw new Error(
+        `Expected review material to be "${reviewMaterial}" but found "${content}"`
+      );
+    }
+  }
+
+  private async openAllMobileDropdownsInSkillEditor(): Promise<void> {
+    await this.clickOn('Worked Examples');
+    await this.clickOn('Misconceptions');
+    await this.clickOn(' Prerequisite Skills ');
+    await this.clickOn('Rubrics');
   }
 }
 

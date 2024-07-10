@@ -42,7 +42,7 @@
 </style>
 <div class="oppia-example-header-block" [ngClass]="{'left-padding': !disableSorting}">
   <div class="oppia-example-header">
-    <span *ngIf="!isActive" [attr.title]="shortSummary">
+    <span *ngIf="!isActive" [attr.title]="shortSummary" class="e2e-test-worked-example-title">
       {{ shortSummary }}
       <span *ngIf="numItems > 1" class="badge badge-primary position-relative oppia-num-items-badge">
         +{{numItems - 1 }}
