@@ -769,28 +769,6 @@ def managed_acceptance_tests_server(
     os.environ['SPEC_NAME'] = suite_name
     os.environ['PROD_ENV'] = 'true' if prod_env else 'false'
 
-    """
-    nodemodules_jasmine_bin_path = os.path.join(
-        common.NODE_MODULES_PATH, '.bin', 'jasmine')
-    puppeteer_acceptance_tests_dir_path = os.path.join(
-        common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
-    puppeteer_build_dir_path = os.path.join(
-        puppeteer_acceptance_tests_dir_path, 'build')
-    puppeteer_acceptance_tests_build_dir_path = os.path.join(
-        puppeteer_build_dir_path, 'puppeteer-acceptance-tests')
-    specs_dir_path = os.path.join(
-        puppeteer_acceptance_tests_build_dir_path, 'specs')
-    jasmine_config_file_path = os.path.join(
-        puppeteer_acceptance_tests_dir_path, 'jasmine.json')
-
-    suite_name_with_extension = '%s.spec.js' % suite_name
-
-    acceptance_tests_args = [
-        nodemodules_jasmine_bin_path,
-        '--config="%s"' % jasmine_config_file_path,
-        '%s' % os.path.join(specs_dir_path, suite_name_with_extension)
-    ]"""
-
     nodemodules_jest_bin_path = os.path.join(
         common.NODE_MODULES_PATH, '.bin', 'jest')
 
