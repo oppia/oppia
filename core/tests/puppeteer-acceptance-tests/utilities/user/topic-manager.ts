@@ -1447,6 +1447,10 @@ export class TopicManager extends BaseUser {
     }
     showMessage('Delete button is not available in the skill');
   }
+
+  async timeout(time) {
+    await this.page.waitForTimeout(time);
+  }
 }
 
 export let TopicManagerFactory = (): TopicManager => new TopicManager();
