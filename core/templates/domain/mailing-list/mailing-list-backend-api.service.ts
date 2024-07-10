@@ -27,6 +27,7 @@ export interface MailingListReturnStatusData {
 export interface MailingListPayload {
   email: string;
   name: string | null;
+  tag?: string; // Optional tag property added for subscription
 }
 
 @Injectable({
@@ -54,17 +55,36 @@ export class MailingListBackendApiService {
     });
   }
 
+  async isEmailSubscribed(email: string): Promise<boolean> {
+    // Implementation to check if the email is already subscribed
+    return this.http
+      .get<{isSubscribed: boolean}>(`/checkemailsubscription?email=${encodeURIComponent(email)}`)
+      .toPromise()
+      .then(response => response.isSubscribed)
+      .catch(error => {
+        console.error('Error checking email subscription:', error);
+        throw error;
+      });
+  }
+
   async subscribeUserToMailingList(
     email: string,
     name: string | null,
     tag: string
   ): Promise<boolean> {
-    let payload = {
-      email: email,
-      tag: tag,
-      name: name,
-    };
-    return this._putRequestAsync('/mailinglistsubscriptionhandler', payload);
+    // First, check if the email is already subscribed
+    const isSubscribed = await this.isEmailSubscribed(email);
+    if (isSubscribed) {
+      console.log('Email is already subscribed.');
+      return false;
+    } else {
+      let payload = {
+        email: email,
+        tag: tag,
+        name: name,
+      };
+      return this._putRequestAsync('/mailinglistsubscriptionhandler', payload);
+    }
   }
 }
 
