@@ -477,7 +477,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         20) Creates new BlogPostModel and BlogPostRightsModel.
         21) Creates a TranslationContributionStatsModel.
         22) Creates new LearnerGroupModel and LearnerGroupsUserModel.
-        23) Creates a VoiceArtistMetadataModel.
         """
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
@@ -973,11 +972,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'en': 'en-US',
             'hi': 'hi-IN'
         }
-        # Setup for VoiceArtistMetadataModel.
-        voiceover_models.VoiceArtistMetadataModel.create_model(
-            voice_artist_id=self.USER_ID_1,
-            language_code_to_accent=language_code_to_accent
-        )
 
         # Set-up for AppFeedbackReportModel scrubbed by user.
         report_id = '%s.%s.%s' % (

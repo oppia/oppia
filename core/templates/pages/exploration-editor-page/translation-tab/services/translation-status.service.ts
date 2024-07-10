@@ -207,6 +207,7 @@ export class TranslationStatusService implements OnInit {
               // required.
               (
                 contentId.startsWith('default_outcome_') ||
+                contentId.startsWith('default_outcome') ||
                 contentIdToRemove.indexOf(contentId) > 0
               )
             );
