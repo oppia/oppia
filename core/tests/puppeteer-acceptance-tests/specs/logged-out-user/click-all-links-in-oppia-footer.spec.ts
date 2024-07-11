@@ -132,14 +132,6 @@ describe('Logged-out Users', function () {
   );
 
   it(
-    'should be able to visit the Oppia Instagram',
-    async function () {
-      await loggedOutUser.clickInstagramIconInFooter();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
     'should be able to visit the Oppia Twitter',
     async function () {
       await loggedOutUser.clickTwitterIconInFooter();

@@ -197,6 +197,10 @@ describe('Topic and Skill dashboard page service', () => {
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1, topic2, topic3]);
 
+    filterOptions.classroom = 'All Classrooms';
+    filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
+    expect(filteredArray).toEqual(topicsArray);
+
     filterOptions.sort = ETopicSortOptions.IncreasingCreatedOn;
     filterOptions.classroom = 'Math';
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
