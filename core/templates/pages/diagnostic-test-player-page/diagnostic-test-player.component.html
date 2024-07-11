@@ -1,7 +1,7 @@
 <div class="diagnostic-test-container">
   <div class="oppia-diagnostic-test-page-header">
     <button class="btn oppia-back-to-classroom-button">
-      <a class="oppia-anchor-tag-under-button" [href]="'/learn' + classroomUrlFragment">
+      <a class="oppia-anchor-tag-under-button" [href]="'/learn/' + classroomUrlFragment">
         <span>
           <i class="fas fa-thin fa-arrow-left oppia-vcenter" aria-hidden="true"></i>
         </span>
@@ -97,7 +97,7 @@
         </p>
         <div class="oppia-classroom-button-container">
           <button class="btn oppia-goto-classroom-button">
-            <a class="oppia-anchor-tag-under-button" [href]="'/learn' + classroomUrlFragment">
+            <a class="oppia-anchor-tag-under-button" [href]="'/learn/' + classroomUrlFragment">
               {{ 'I18N_DIAGNOSTIC_TEST_RESULT_GO_TO_CLASSROOM_BUTTON_TEXT' | translate }}
             </a>
           </button>

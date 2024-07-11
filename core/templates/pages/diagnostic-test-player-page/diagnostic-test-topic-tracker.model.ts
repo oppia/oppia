@@ -20,7 +20,10 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-import {TopicIdToPrerequisiteTopicIds} from 'pages/classroom-admin-page/existing-classroom.model';
+
+export interface TopicIdToRelatedTopicIds {
+  [topicId: string]: string[];
+}
 
 export class DiagnosticTestTopicTrackerModel {
   // The list of pending topic IDs from which the next topic can be selected
@@ -35,19 +38,19 @@ export class DiagnosticTestTopicTrackerModel {
   // The dependency among topics is represented in a form of a dict with
   // topic ID as key and a list of immediate parent topic IDs as value.
   // Example graph: A --> B --> C, here, the prerequisite of C is only B.
-  private _topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds;
+  private _topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds;
 
   // A dict with topic ID as key and a list of ancestor topic IDs as value.
   // Example graph: A --> B --> C, therefore the ancestors of C are both
   // A and B.
-  private _topicIdToAncestorTopicIds: TopicIdToPrerequisiteTopicIds;
+  private _topicIdToAncestorTopicIds: TopicIdToRelatedTopicIds;
 
   // A dict with topic ID as key and a list of successor topic IDs as value.
   // Example graph: A --> B --> C, here the successors of A are B, C, and the
   // successor of B is only C.
-  private _topicIdToSuccessorTopicIds: TopicIdToPrerequisiteTopicIds;
+  private _topicIdToSuccessorTopicIds: TopicIdToRelatedTopicIds;
 
-  constructor(topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds) {
+  constructor(topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds) {
     this._failedTopicIds = [];
     this._topicIdToAncestorTopicIds = {};
     this._topicIdToSuccessorTopicIds = {};
@@ -73,7 +76,7 @@ export class DiagnosticTestTopicTrackerModel {
     return this._topicIdToAncestorTopicIds[topicId];
   }
 
-  getTopicIdToAncestorTopicIds(): TopicIdToPrerequisiteTopicIds {
+  getTopicIdToAncestorTopicIds(): TopicIdToRelatedTopicIds {
     return this._topicIdToAncestorTopicIds;
   }
 
@@ -81,11 +84,11 @@ export class DiagnosticTestTopicTrackerModel {
     return this._topicIdToSuccessorTopicIds[topicId];
   }
 
-  getTopicIdToSuccessorTopicIds(): TopicIdToPrerequisiteTopicIds {
+  getTopicIdToSuccessorTopicIds(): TopicIdToRelatedTopicIds {
     return this._topicIdToSuccessorTopicIds;
   }
 
-  getTopicIdToPrerequisiteTopicIds(): TopicIdToPrerequisiteTopicIds {
+  getTopicIdToPrerequisiteTopicIds(): TopicIdToRelatedTopicIds {
     return this._topicIdToPrerequisiteTopicIds;
   }
 
@@ -126,14 +129,14 @@ export class DiagnosticTestTopicTrackerModel {
   }
 
   _generateTopicIdToChildTopicId(
-    topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
-  ): TopicIdToPrerequisiteTopicIds {
+    topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds
+  ): TopicIdToRelatedTopicIds {
     // The method generates a dict with topic ID as the key and its immediate
     // successor topic IDs as value. The successor's list is generated using
     // the prerequisite dependency graph.
     // Example: A -> B -> C, here the topic ID to child topic IDs dict will
     // look like: {A: [B], B: [C], C: []}.
-    let topicIdToChildTopicId: TopicIdToPrerequisiteTopicIds = {};
+    let topicIdToChildTopicId: TopicIdToRelatedTopicIds = {};
 
     for (let topicId in topicIdToPrerequisiteTopicIds) {
       topicIdToChildTopicId[topicId] = [];
@@ -154,7 +157,7 @@ export class DiagnosticTestTopicTrackerModel {
     // the prerequisite dependency graph.
     // Example: A -> B -> C, here the topic ID to successor topic IDs dict will
     // look like: {A: [B, C], B: [C], C: []}.
-    let topicIdToChildTopicId: TopicIdToPrerequisiteTopicIds =
+    let topicIdToChildTopicId: TopicIdToRelatedTopicIds =
       this._generateTopicIdToChildTopicId(this._topicIdToPrerequisiteTopicIds);
 
     for (let topicId in topicIdToChildTopicId) {
