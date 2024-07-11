@@ -173,7 +173,8 @@ class TopicPageDataHandlerTests(
                 self.skill_id_1: 'Skill Description 1',
                 self.skill_id_2: 'Skill Description 2'
             },
-            'practice_tab_is_displayed': False
+            'practice_tab_is_displayed': False,
+            'classroom_name': None
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 

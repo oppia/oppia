@@ -4,10 +4,12 @@
       <div class="oppia-topic-viewer-breadcrumbs">
         <div class="desktop-breadcrumbs">
           <a href="/">{{ 'I18N_TOPNAV_HOME' | translate }}</a>
-          <i class="fa fa-angle-right" *ngIf="!isLanguageRTL()"></i>
-          <i class="fa fa-angle-left" *ngIf="isLanguageRTL()"></i>
-          <a [href]="'/learn/' + classroomName" *ngIf="!isHackyClassroomNameTranslationDisplayed()">{{ classroomName }}</a>
-          <a [href]="'/learn/' + classroomName" *ngIf="isHackyClassroomNameTranslationDisplayed()">{{ classroomNameTranslationKey | translate }}</a>
+          <div class="classroom-name-container" *ngIf="classroomName">
+            <i class="fa fa-angle-right" *ngIf="!isLanguageRTL()"></i>
+            <i class="fa fa-angle-left" *ngIf="isLanguageRTL()"></i>
+            <a [href]="'/learn/' + classroomName" *ngIf="!isHackyClassroomNameTranslationDisplayed()">{{ classroomName }}</a>
+            <a [href]="'/learn/' + classroomName" *ngIf="isHackyClassroomNameTranslationDisplayed()">{{ classroomNameTranslationKey | translate }}</a>
+          </div>
           <i class="fa fa-angle-right" *ngIf="!isLanguageRTL()"></i>
           <i class="fa fa-angle-left" *ngIf="isLanguageRTL()"></i>
           <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
@@ -20,7 +22,8 @@
         <div class="mobile-breadcrumbs">
           <i class="fa fa-angle-left" *ngIf="!isLanguageRTL()"></i>
           <i class="fa fa-angle-right" *ngIf="isLanguageRTL()"></i>
-          <a [href]="'/learn/' + classroomName" [innerHTML]="'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomName}"></a>
+          <a [href]="'/learn/' + classroomName" [innerHTML]="'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomName}" *ngIf="classroomName"></a>
+          <a href="/learn" *ngIf="!classroomName">{{ 'I18N_BACK_TO_CLASSROOMS' | translate }}</a>
         </div>
       </div>
       <h1 class="tab-title" tabindex="0">

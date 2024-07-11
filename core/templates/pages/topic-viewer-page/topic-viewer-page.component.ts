@@ -49,7 +49,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
   canonicalStorySummaries: StorySummary[] = [];
   topicUrlFragment: string = '';
   classroomUrlFragment: string = '';
-  classroomName: string = '';
+  classroomName: string | null = '';
   topicIsLoading: boolean = true;
   topicId: string = '';
   topicName: string = '';

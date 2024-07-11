@@ -49,7 +49,7 @@ export interface ReadOnlyTopicBackendDict {
   practice_tab_is_displayed: boolean;
   meta_tag_content: string;
   page_title_fragment_for_web: string;
-  classroom_name: string;
+  classroom_name: string | null;
 }
 
 export class ReadOnlyTopic {
@@ -65,7 +65,7 @@ export class ReadOnlyTopic {
   _practiceTabIsDisplayed: boolean;
   _metaTagContent: string;
   _pageTitleFragmentForWeb: string;
-  _classroomName: string;
+  _classroomName: string | null;
 
   constructor(
     topicName: string,
@@ -80,7 +80,7 @@ export class ReadOnlyTopic {
     practiceTabIsDisplayed: boolean,
     metaTagContent: string,
     pageTitleFragmentForWeb: string,
-    classroomName: string
+    classroomName: string | null
   ) {
     this._topicName = topicName;
     this._topicId = topicId;
@@ -145,7 +145,7 @@ export class ReadOnlyTopic {
     return this._pageTitleFragmentForWeb;
   }
 
-  getClassroomName(): string {
+  getClassroomName(): string | null {
     return this._classroomName;
   }
 }

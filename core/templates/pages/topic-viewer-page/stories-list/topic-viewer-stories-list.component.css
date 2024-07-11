@@ -43,6 +43,12 @@ stories-list .oppia-topic-viewer-breadcrumbs .desktop-breadcrumbs {
   gap: 4px;
 }
 
+stories-list .oppia-topic-viewer-breadcrumbs .desktop-breadcrumbs .classroom-name-container {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+}
+
 stories-list .oppia-topic-viewer-breadcrumbs .mobile-breadcrumbs {
   display: none;
 }

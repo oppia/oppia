@@ -114,6 +114,18 @@ describe('Topic Viewer Stories List Component', () => {
     expect(component.isHackyClassroomNameTranslationDisplayed()).toBe(true);
   });
 
+  it('should not return the classroom name i18n key if the topic is not assigned to any classroom', () => {
+    component.classroomName = null;
+    spyOn(i18nLanguageCodeService, 'getClassroomTranslationKeys');
+
+    component.ngOnInit();
+
+    expect(
+      i18nLanguageCodeService.getClassroomTranslationKeys
+    ).not.toHaveBeenCalled();
+    expect(component.isHackyClassroomNameTranslationDisplayed()).toBeFalse();
+  });
+
   it('should check if the view is tablet or not', () => {
     var widthSpy = spyOn(windowDimensionsService, 'getWidth');
     widthSpy.and.returnValue(730);

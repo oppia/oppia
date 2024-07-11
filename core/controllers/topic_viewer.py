@@ -186,6 +186,12 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             'practice_tab_is_displayed': topic.practice_tab_is_displayed,
             'meta_tag_content': topic.meta_tag_content,
             'page_title_fragment_for_web': topic.page_title_fragment_for_web,
-            'classroom_name': classroom_name
+            'classroom_name': (
+                None if (
+                    classroom_name
+                    ==
+                    str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)
+                ) else classroom_name
+            )
         })
         self.render_json(self.values)
