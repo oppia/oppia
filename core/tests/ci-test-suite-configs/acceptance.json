@@ -145,8 +145,16 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/edit-platform-parameters.spec.ts"
     },
     {
+      "name": "super-admin/use-misc-tab-features",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/use-misc-tab-features.spec.ts"
+    },
+    {
       "name": "release-coordinator/run-a-beam-job-and-copy-the-output",
       "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/run-a-beam-job-and-copy-the-output.spec.ts"
+    },
+    {
+      "name": "release-coordinator/edit-feature-rollout-configuration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/edit-feature-rollout-configuration.spec.ts"
     },
     {
       "name": "release-coordinator/flush-and-get-profile-of-redis-cache",
@@ -157,12 +165,28 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/update-promo-bar-message.spec.ts"
     },
     {
+      "name": "topic-manager/browse-skills-on-topics-and-skills-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/browse-skills-on-topics-and-skills-dashboard.spec.ts"
+    },
+    {
+      "name": "topic-manager/browse-topics-on-topics-and-skills-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/browse-topics-on-topics-and-skills-dashboard.spec.ts"
+    },
+    {
       "name": "topic-manager/create-and-delete-questions-in-skill-editor",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-delete-questions-in-skill-editor.spec.ts"
     },
     {
       "name": "topic-manager/assign-unassign-and-merge-skills",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/assign-unassign-and-merge-skills.spec.ts"
+    },
+    {
+      "name": "topic-manager/cannot-do-curriculum-admin-actions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/cannot-do-curriculum-admin-actions.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-and-republish-a-skill",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-republish-a-skill.spec.ts"
     }
   ]
 }

@@ -170,7 +170,8 @@
               <source type="image/webp" [srcset]="getImageSet(partner.imageUrl, 'webp', [1.5])">
               <source type="image/png" [srcset]="getImageSet(partner.imageUrl, 'png', [1.5])">
               <img [src]="getStaticImageUrl( partner.imageUrl + '15x.png')"
-                   alt="{{ 'Activities of ' + (partner.name | translate) + ' partnered with Oppia'}}">
+                   alt="{{ 'Activities of ' + (partner.name | translate) + ' partnered with Oppia'}}"
+                   loading="lazy">
             </picture>
           </div>
           <div>
@@ -202,7 +203,8 @@
                 <source type="image/webp" [srcset]="getImageSet(partner.imageUrl, 'webp', [1.5])">
                 <source type="image/png" [srcset]="getImageSet(partner.imageUrl, 'png', [1.5])">
                 <img [src]="getStaticImageUrl( partner.imageUrl + '15x.png')"
-                     alt="{{ 'Activities of ' + (partner.name | translate) + ' partnered with Oppia'}}">
+                     alt="{{ 'Activities of ' + (partner.name | translate) + ' partnered with Oppia'}}"
+                     loading="lazy">
               </picture>
             </div>
           </div>
@@ -338,7 +340,7 @@
       </p>
     </div>
 
-    <div class="oppia-about-cta-tabs oppia-non-mobile-portrait-content">
+    <div class="oppia-about-cta-tabs">
       <mat-tab-group [(selectedIndex)]="selectedTabIndex" mat-align-tabs="center" mat-stretch-tabs dynamicHeight disablePagination="true">
         <mat-tab>
           <ng-template mat-tab-label>
@@ -523,7 +525,7 @@
       </mat-tab-group>
     </div>
 
-    <ngb-accordion #acc="ngbAccordion" class="oppia-mobile-portrait-content oppia-cta-accordion" [closeOthers]="true" [animation]="false" activeIds="ngb-panel-1">
+    <ngb-accordion #acc="ngbAccordion" class="oppia-cta-accordion" [closeOthers]="true" [animation]="false" activeIds="ngb-panel-1">
       <ngb-panel>
         <ng-template ngbPanelHeader let-opened="opened">
           <button ngbPanelToggle class="btn oppia-cta-accordion-toggle-btn">

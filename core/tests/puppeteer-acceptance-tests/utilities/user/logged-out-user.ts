@@ -100,13 +100,13 @@ const footerPrivacyPolicyLink = 'a.e2e-test-privacy-policy-link';
 const footerCommunityLibraryLink = 'a.e2e-test-community-library-link';
 const footerContactUsLink = 'a.e2e-test-contact-link';
 
-const oppiaYouTubeLinkIcon = '.oppia-youtube-follow';
-const oppiaFacebookLinkIcon = '.oppia-facebook-follow';
-const oppiaInstagramLinkIcon = '.oppia-instagram-follow';
-const oppiaTwitterLinkIcon = '.oppia-twitter-follow';
-const oppiaGithubLinkIcon = '.oppia-github-follow';
-const oppiaLinkedInLinkIcon = '.oppia-linkedin-follow';
-const oppiaAndroidAppButton = '.oppia-android-app-button';
+const oppiaYouTubeLinkIcon = '.e2e-test-oppia-youtube-follow';
+const oppiaFacebookLinkIcon = '.e2e-test-oppia-facebook-follow';
+const oppiaInstagramLinkIcon = '.e2e-test-oppia-instagram-follow';
+const oppiaTwitterLinkIcon = '.e2e-test-oppia-twitter-follow';
+const oppiaGithubLinkIcon = '.e2e-test-oppia-github-follow';
+const oppiaLinkedInLinkIcon = '.e2e-test-oppia-linkedin-follow';
+const oppiaAndroidAppButton = '.e2e-test-oppia-android-app';
 
 const watchAVideoButton =
   'a.e2e-test-thanks-for-donating-page-watch-a-video-button';
@@ -1118,7 +1118,7 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Click the speficed social icon and checks it's destination.
+   * Click the specified social icon and checks it's destination.
    *
    * Due to the somewhat unpredictable behaviors of these external sites,
    * such as sometimes redirecting to log-in pages,
@@ -1131,10 +1131,14 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.page.waitForSelector(socialIconSelector);
     const pageTarget = this.page.target();
-    await this.page.click(socialIconSelector);
+    await this.clickOn(socialIconSelector);
+    await this.waitForPageToFullyLoad();
     const newTarget = await this.browserObject.waitForTarget(
       target => target.opener() === pageTarget
     );
+    if (!newTarget) {
+      throw new Error('No new tab opened.');
+    }
     const newTabPage = await newTarget.page();
 
     expect(newTabPage).toBeDefined();
