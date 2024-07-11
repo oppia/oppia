@@ -1116,7 +1116,8 @@ export class TopicManager extends BaseUser {
   async adjustPaginatorToShowItemsPerPage(itemsPerPage: number): Promise<void> {
     try {
       await this.page.waitForSelector(itemsPerPageDropdown);
-      await this.select(itemsPerPageDropdown, itemsPerPage.toString());
+      await this.page.waitForSelector(itemsPerPageDropdown);
+      await this.page.select(itemsPerPageDropdown, itemsPerPage.toString());
       showMessage(`Paginator adjusted to show ${itemsPerPage} items per page.`);
     } catch (error) {
       console.error(error.stack);
