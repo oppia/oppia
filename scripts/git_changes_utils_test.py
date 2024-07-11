@@ -181,8 +181,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             ' want to make sure that there is only one main \'upstream\' remote'
             ' that uses the url https://github.com/oppia/oppia.git. Please use '
             'the command, \'git remote remove <remote_name>\' on all remotes '
-            'that have the same url as the upstream remote.\n'
-                in self.print_arr)
+            'that have the url https://github.com/oppia/oppia.git except for '
+            'the main \'upstream\' remote.\n' in self.print_arr)
 
     def test_git_diff_name_status_without_error(self) -> None:
         def mock_start_subprocess_for_result(

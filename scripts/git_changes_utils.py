@@ -86,7 +86,8 @@ def get_local_git_repository_remote_name() -> Optional[bytes]:
             ' want to make sure that there is only one main \'upstream\' remote'
             ' that uses the url https://github.com/oppia/oppia.git. Please use '
             'the command, \'git remote remove <remote_name>\' on all remotes '
-            'that have the same url as the upstream remote.\n'
+            'that have the url https://github.com/oppia/oppia.git except for '
+            'the main \'upstream\' remote.\n'
         )
         return None
     return remote_name
