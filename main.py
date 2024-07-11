@@ -656,9 +656,10 @@ URLS = [
 
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
-    get_redirect_route(
+    get_redirect_route( 
         r'/mailinglistsubscriptionhandler',
         profile.MailingListSubscriptionHandler),
+    get_redirect_route(r'checkemailsubscription', profile.CheckEmailSubscription), # New Changes
     get_redirect_route(
         r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
         profile.BulkEmailWebhookEndpoint),
