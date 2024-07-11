@@ -195,7 +195,7 @@ const renameSubtopicField = '.e2e-test-rename-subtopic-field';
 const saveReassignments = '.e2e-test-save-reassignments';
 const saveRearrangeSkills = '.e2e-test-save-rearrange-skills';
 const subtopicCardHeader = '.subtopic-name-card-header';
-const testSubtopicTitleSelector = '.e2e-test-subtopic';
+const subtopicTitleSelector = '.e2e-test-subtopic';
 const topicPreviewTab = '.e2e-test-topic-preview-button';
 const contentTitle = '.content-title';
 const htmlContent = '.html-content';
@@ -210,11 +210,20 @@ const storyDescriptionField = 'selector.storyDescriptionField';
 const storyPhotoBoxButton = 'selector.storyPhotoBoxButton';
 const createStoryButton = 'selector.createStoryButton';
 const storyMetaTagInput = 'selector.storyMetaTagInput';
-const mobileSaveStoryChangesDropdown =
-  'selector.mobileSaveStoryChangesDropdown';
-const mobilePublishStoryButton = 'selector.mobilePublishStoryButton';
-const publishStoryButton = 'selector.publishStoryButton';
-const unpublishStoryButton = 'selector.unpublishStoryButton';
+const storyTitleSelector = '.e2e-test-story-title';
+const chapterTitleSelector = '.e2e-test-chapter-title';
+const chapterDescriptionField = '.e2e-test-add-chapter-description';
+const showChapterPreviewButton = '.show-chapter-preview-button';
+const titleSelector = '.oppia-thumbnail-preview-title';
+const descriptionSelector = '.oppia-thumbnail-preview-description';
+const optionsSelector = '.e2e-test-show-subtopic-options';
+const deleteSubtopicButtonSelector = '.e2e-test-delete-subtopic-button';
+const storyListItemSelector = '.e2e-test-story-list-item';
+const deleteStoryButtonSelector = '.e2e-test-delete-story-button';
+const confirmStoryDeletionButton = '. e2e-test-confirm-story-deletion-button';
+const editOptionsSelector = '.e2e-test-edit-options';
+const deleteChapterButtonSelector = '.e2e-test-delete-chapter-button';
+const storyEditorNodeSelector = '.story-editor-node';
 
 export class TopicManager extends BaseUser {
   /**
@@ -591,6 +600,36 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Filters skills by name and selects the first matching skill.
+   *
+   * @param {string} skillName - The name of the skill to select.
+   */
+  async filterAndSelectSkill(skillName: string): Promise<void> {
+    // Searching by skill name.
+    await this.type(skillNameInputSelector, skillName);
+
+    await this.page.waitForSelector(radioInnerCircleSelector);
+    const radioInnerCircleSelectorElement = await this.page.$(
+      radioInnerCircleSelector
+    );
+    if (!radioInnerCircleSelectorElement) {
+      throw new Error('Radio inner circle selector not found');
+    }
+    await this.page.evaluate(selector => {
+      document.querySelector(selector).click();
+    }, radioInnerCircleSelector);
+
+    await this.page.waitForSelector(confirmSkillSelectionButtonSelector);
+    const confirmSkillSelectionButtonSelectorElement = await this.page.$(
+      confirmSkillSelectionButtonSelector
+    );
+    if (!confirmSkillSelectionButtonSelectorElement) {
+      throw new Error('Confirm skill selection button selector not found');
+    }
+    await this.clickOn(confirmSkillSelectionButtonSelector);
+  }
+
+  /**
    * Function to merge two skills with the given names.
    * @param {string} skillName1 - The name of the first skill to merge.
    * @param {string} skillName2 - The name of the second skill to merge.
@@ -637,27 +676,7 @@ export class TopicManager extends BaseUser {
       throw new Error('Skill name input selector not found');
     }
     // Searching by skill name.
-    await this.type(skillNameInputSelector, skillName2);
-
-    await this.page.waitForSelector(radioInnerCircleSelector);
-    const radioInnerCircleSelectorElement = await this.page.$(
-      radioInnerCircleSelector
-    );
-    if (!radioInnerCircleSelectorElement) {
-      throw new Error('Radio inner circle selector not found');
-    }
-    await this.page.evaluate(selector => {
-      document.querySelector(selector).click();
-    }, radioInnerCircleSelector);
-
-    await this.page.waitForSelector(confirmSkillSelectionButtonSelector);
-    const confirmSkillSelectionButtonSelectorElement = await this.page.$(
-      confirmSkillSelectionButtonSelector
-    );
-    if (!confirmSkillSelectionButtonSelectorElement) {
-      throw new Error('Confirm skill selection button selector not found');
-    }
-    await this.clickOn(confirmSkillSelectionButtonSelector);
+    await this.filterAndSelectSkill(skillName2);
   }
 
   /**
@@ -2097,8 +2116,8 @@ export class TopicManager extends BaseUser {
       const subtopicElements = await this.page.$$(subtopicCardHeader);
       for (let i = 0; i < subtopicElements.length; i++) {
         const element = subtopicElements[i];
-        await this.page.waitForSelector(testSubtopicTitleSelector);
-        const titleElement = await element.$(testSubtopicTitleSelector);
+        await this.page.waitForSelector(subtopicTitleSelector);
+        const titleElement = await element.$(subtopicTitleSelector);
         if (titleElement) {
           const titleTextContent = await this.page.evaluate(
             el => el.textContent,
@@ -2320,6 +2339,14 @@ export class TopicManager extends BaseUser {
     }
   }
 
+  /**
+   * Creates a new story with a chapter and saves it.
+   * @param {string} storyTitle - The title of the story.
+   * @param {string} storyUrlFragment - The URL fragment of the story.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {string | null} explorationId - The ID of the exploration associated with the chapter.
+   * @param {string} topicName - The name of the topic associated with the story.
+   */
   async createAndSaveStoryWithChapter(
     storyTitle: string,
     storyUrlFragment: string,
@@ -2358,12 +2385,39 @@ export class TopicManager extends BaseUser {
 
   /**
    * Opens the story editor for a given story and topic.
+   *
    * @param {string} storyName - The name of the story.
    * @param {string} topicName - The name of the topic.
-   * @returns {Promise<void>}
    */
   async openStoryEditor(storyName: string, topicName: string): Promise<void> {
-    await this.openTopicEditor(topicName);
+    try {
+      await this.openTopicEditor(topicName);
+
+      await this.page.waitForSelector(storyTitleSelector);
+      const storyTitles = await this.page.$$(storyTitleSelector);
+
+      for (const titleElement of storyTitles) {
+        const title = await this.page.evaluate(
+          el => el.textContent.trim(),
+          titleElement
+        );
+
+        if (title === storyName) {
+          await titleElement.click();
+          return;
+        }
+      }
+
+      throw new Error(
+        `Story with name ${storyName} not found in topic ${topicName}.`
+      );
+    } catch (error) {
+      const newError = new Error(
+        `Failed to open story editor for story ${storyName} in topic ${topicName}: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
   }
 
   /**
@@ -2371,65 +2425,432 @@ export class TopicManager extends BaseUser {
    * @param {string} chapterName - The name of the chapter.
    * @param {string} storyName - The name of the story.
    * @param {string} topicName - The name of the topic.
-   * @returns {Promise<void>}
    */
   async openChapterEditor(
     chapterName: string,
     storyName: string,
     topicName: string
   ): Promise<void> {
-    await this.openStoryEditor(storyName, topicName);
+    try {
+      await this.openStoryEditor(storyName, topicName);
+
+      await this.page.waitForSelector(chapterTitleSelector);
+      const chapterTitles = await this.page.$$(chapterTitleSelector);
+
+      for (const titleElement of chapterTitles) {
+        const title = await this.page.evaluate(
+          el => el.textContent.trim(),
+          titleElement
+        );
+
+        if (title === chapterName) {
+          await titleElement.click();
+          return;
+        }
+      }
+
+      throw new Error(
+        `Chapter with name ${chapterName} not found in story ${storyName} and topic ${topicName}.`
+      );
+    } catch (error) {
+      const newError = new Error(
+        `Failed to open chapter editor for chapter ${chapterName} in story ${storyName} and topic ${topicName}: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
   }
 
   /**
    * Edits the details of a chapter.
    * @param {string} chapterName - The name of the chapter.
    * @param {string} description - The description of the chapter.
-   * @param {string} explorationID - The ID of the exploration.
+   * @param {string} explorationId - The ID of the exploration.
    * @param {string} thumbnailImage - The thumbnail image of the chapter.
-   * @returns {Promise<void>}
    */
   async editChapterDetails(
     chapterName: string,
     description: string,
-    explorationID: string,
+    explorationId: string,
     thumbnailImage: string
-  ): Promise<void> {}
+  ): Promise<void> {
+    await this.type(chapterTitleField, chapterName);
+    await this.type(chapterDescriptionField, description);
+    await this.type(chapterExplorationIdField, explorationId);
+
+    await this.clickOn(chapterPhotoBoxButton);
+    await this.uploadFile(thumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createChapterButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+  }
 
   /**
    * Previews the chapter card.
    * @returns {Promise<void>}
    */
-  async previewChapterCard(): Promise<void> {}
+  async previewChapterCard(): Promise<void> {
+    await this.clickOn(showChapterPreviewButton);
+  }
 
   /**
    * Expects the chapter preview to have a certain name and explanation.
    * @param {string} chapterName - The name of the chapter.
    * @param {string} explanation - The explanation of the chapter.
-   * @returns {Promise<void>}
    */
-  async expectChapterPreviewToHave(chapterName: string, explanation: string) {}
+
+  async expectChapterPreviewToHave(
+    chapterName: string,
+    explanation: string
+  ): Promise<void> {
+    try {
+      await this.page.waitForSelector(titleSelector);
+      await this.page.waitForSelector(descriptionSelector);
+
+      const titleElement = await this.page.$(titleSelector);
+      const descriptionElement = await this.page.$(descriptionSelector);
+
+      const title = await this.page.evaluate(
+        el => el.textContent.trim(),
+        titleElement
+      );
+      const description = await this.page.evaluate(
+        el => el.textContent.trim(),
+        descriptionElement
+      );
+
+      if (title !== chapterName) {
+        throw new Error(
+          `Expected title to be ${chapterName} but found ${title}`
+        );
+      }
+
+      if (description !== explanation) {
+        throw new Error(
+          `Expected description to be ${explanation} but found ${description}`
+        );
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to validate chapter preview: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
 
   /**
    * Assigns an acquired skill.
    * @param {string} skillName - The name of the skill.
    * @returns {Promise<void>}
    */
-  async assignAcquiredSkill(skillName: string): Promise<void> {}
+  async assignAcquiredSkill(skillName: string): Promise<void> {
+    await this.clickOn('.+ ADD ACQUIRED SKILL');
+    await this.filterAndSelectSkill(skillName);
+  }
 
   /**
    * Assigns a prerequisite skill.
    * @param {string} skillName - The name of the skill.
-   * @returns {Promise<void>}
    */
-  async assignPrerequisiteSkill(skillName): Promise<void> {}
-
-  async timeout(time) {
-    await this.page.waitForTimeout(time);
+  async assignPrerequisiteSkill(skillName: string): Promise<void> {
+    await this.clickOn('+ ADD PREREQUISITE SKILL');
+    await this.filterAndSelectSkill(skillName);
   }
 
-  async screenshot(path) {
-    await this.page.screenshot({path: `${path}`});
+  /**
+   * Verifies the presence of a subtopic in a topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} topicName - The name of the topic.
+   * @param {boolean} shouldExist - Whether the subtopic should exist.
+   */
+  /**
+   * Verifies the presence of a subtopic in a topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} topicName - The name of the topic.
+   * @param {boolean} shouldExist - Whether the subtopic should exist.
+   */
+  async verifySubtopicPresenceInTopic(
+    subtopicName: string,
+    topicName: string,
+    shouldExist: boolean
+  ): Promise<void> {
+    try {
+      await this.openTopicEditor(topicName);
+      await this.page.waitForSelector(subtopicTitleSelector);
+      const subtopics = await this.page.$$(subtopicTitleSelector);
+
+      for (const subtopicElement of subtopics) {
+        const subtopic = await this.page.evaluate(
+          el => el.textContent.trim(),
+          subtopicElement
+        );
+
+        if (subtopic === subtopicName) {
+          if (!shouldExist) {
+            throw new Error(
+              `Subtopic ${subtopicName} exists in topic ${topicName}, but it shouldn't.`
+            );
+          }
+          return;
+        }
+      }
+
+      if (shouldExist) {
+        throw new Error(
+          `Subtopic ${subtopicName} not found in topic ${topicName}, but it should exist.`
+        );
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify subtopic presence in topic: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Verifies the presence of a story in a topic.
+   * @param {string} storyName - The name of the story.
+   * @param {string} topicName - The name of the topic.
+   * @param {boolean} shouldExist - Whether the story should exist.
+   */
+  /**
+   * Verifies the presence of a story in a topic.
+   * @param {string} storyName - The name of the story.
+   * @param {string} topicName - The name of the topic.
+   * @param {boolean} shouldExist - Whether the story should exist.
+   */
+  async verifyStoryPresenceInTopic(
+    storyName: string,
+    topicName: string,
+    shouldExist: boolean
+  ): Promise<void> {
+    try {
+      await this.openTopicEditor(topicName);
+      await this.page.waitForSelector(storyTitleSelector);
+      const stories = await this.page.$$(storyTitleSelector);
+
+      for (const storyElement of stories) {
+        const story = await this.page.evaluate(
+          el => el.textContent.trim(),
+          storyElement
+        );
+
+        if (story === storyName) {
+          if (!shouldExist) {
+            throw new Error(
+              `Story ${storyName} exists in topic ${topicName}, but it shouldn't.`
+            );
+          }
+          return;
+        }
+      }
+
+      if (shouldExist) {
+        throw new Error(
+          `Story ${storyName} not found in topic ${topicName}, but it should exist.`
+        );
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify story presence in topic: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Verifies the presence of a chapter in a story.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {string} storyName - The name of the story.
+   * @param {boolean} shouldExist - Whether the chapter should exist.
+   */
+  async verifyChapterPresenceInStory(
+    chapterName: string,
+    storyName: string,
+    topicName: string,
+    shouldExist: boolean
+  ): Promise<void> {
+    try {
+      await this.openStoryEditor(storyName, topicName);
+
+      await this.page.waitForSelector(chapterTitleSelector);
+      const chapters = await this.page.$$(chapterTitleSelector);
+
+      for (const chapterElement of chapters) {
+        const chapter = await this.page.evaluate(
+          el => el.textContent.trim(),
+          chapterElement
+        );
+
+        if (chapter === chapterName) {
+          if (!shouldExist) {
+            throw new Error(
+              `Chapter ${chapterName} exists in story ${storyName} of topic ${topicName}, but it shouldn't.`
+            );
+          }
+          return;
+        }
+      }
+
+      if (shouldExist) {
+        throw new Error(
+          `Chapter ${chapterName} not found in story ${storyName} of topic ${topicName}, but it should exist.`
+        );
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify chapter presence in story: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Deletes a chapter from a story.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {string} storyName - The name of the story.
+   */
+  async deleteChapterFromStory(
+    chapterName: string,
+    storyName: string,
+    topicName: string
+  ): Promise<void> {
+    try {
+      await this.openStoryEditor(storyName, topicName);
+
+      await this.page.waitForSelector(storyEditorNodeSelector);
+      const storyEditorNodes = await this.page.$$(storyEditorNodeSelector);
+
+      for (const storyEditorNode of storyEditorNodes) {
+        const chapter = await storyEditorNode.$eval(chapterTitleSelector, el =>
+          el.textContent ? el.textContent.trim() : ''
+        );
+
+        if (chapter === chapterName) {
+          const editOptionsButton =
+            await storyEditorNode.$(editOptionsSelector);
+          if (editOptionsButton) {
+            await editOptionsButton.click();
+            await storyEditorNode.waitForSelector(deleteChapterButtonSelector);
+            const deleteButton = await storyEditorNode.$(
+              deleteChapterButtonSelector
+            );
+            if (deleteButton) {
+              await deleteButton.click();
+              return;
+            }
+          }
+        }
+      }
+
+      throw new Error(
+        `Chapter ${chapterName} not found in story ${storyName} of topic ${topicName}.`
+      );
+    } catch (error) {
+      const newError = new Error(
+        `Failed to delete chapter from story: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Deletes a story from a topic.
+   * @param {string} storyName - The name of the story.
+   * @param {string} topicName - The name of the topic.
+   */
+  async deleteStoryFromTopic(
+    storyName: string,
+    topicName: string
+  ): Promise<void> {
+    try {
+      await this.openTopicEditor(topicName);
+
+      await this.page.waitForSelector(storyListItemSelector);
+      const storyListItems = await this.page.$$(storyListItemSelector);
+
+      for (const storyListItem of storyListItems) {
+        const storyTitleElement = await storyListItem.$(storyTitleSelector);
+        if (storyTitleElement) {
+          const storyTitle = await storyTitleElement.evaluate(
+            el => el.textContent?.trim() || ''
+          );
+          if (storyTitle === storyName) {
+            const deleteButton = await storyListItem.$(
+              deleteStoryButtonSelector
+            );
+            if (deleteButton) {
+              await this.waitForElementToBeClickable(deleteButton);
+              await deleteButton.click();
+              await this.clickOn(confirmStoryDeletionButton);
+              return;
+            }
+          }
+        }
+      }
+
+      throw new Error(`Story ${storyName} not found in topic ${topicName}.`);
+    } catch (error) {
+      const newError = new Error(`Failed to delete story from topic: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Deletes a subtopic from a topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} topicName - The name of the topic.
+   */
+  async deleteSubtopicFromTopic(
+    subtopicName: string,
+    topicName: string
+  ): Promise<void> {
+    try {
+      await this.openTopicEditor(topicName);
+
+      await this.page.waitForSelector(subtopicCardHeader);
+      const subtopics = await this.page.$$(subtopicCardHeader);
+
+      for (const subtopic of subtopics) {
+        const subtopicTitle = await subtopic.$eval(
+          subtopicTitleSelector,
+          el => el.textContent?.trim() || ''
+        );
+
+        if (subtopicTitle === subtopicName) {
+          const optionsButton = await subtopic.$(optionsSelector);
+          if (optionsButton) {
+            await optionsButton.click();
+            await subtopic.waitForSelector(deleteSubtopicButtonSelector);
+            const deleteButton = await subtopic.$(deleteSubtopicButtonSelector);
+            if (deleteButton) {
+              await deleteButton.click();
+              return;
+            }
+          }
+        }
+      }
+
+      throw new Error(
+        `Subtopic ${subtopicName} not found in topic ${topicName}.`
+      );
+    } catch (error) {
+      const newError = new Error(
+        `Failed to delete subtopic from topic: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
   }
 }
 

@@ -37,15 +37,6 @@ describe('Topic Manager', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    await curriculumAdmin.createTopic('Algebra', 'algebra');
-
-    topicManager = await UserFactory.createNewUser(
-      'topicManager',
-      'topicManager1@example.com',
-      [ROLES.TOPIC_MANAGER],
-      'Algebra'
-    );
-
     await curriculumAdmin.navigateToCreatorDashboardPage();
     await curriculumAdmin.navigateToExplorationEditorPage();
     await curriculumAdmin.dismissWelcomeModal();
@@ -68,6 +59,13 @@ describe('Topic Manager', function () {
     await curriculumAdmin.createSkillForTopic('Advanced Algebra', 'Algebra');
 
     ('Basic Algebra');
+
+    topicManager = await UserFactory.createNewUser(
+      'topicManager',
+      'topicManager1@example.com',
+      [ROLES.TOPIC_MANAGER],
+      'Algebra'
+    );
     await topicManager.createAndSaveStoryWithChapter(
       'Algebra Story 1',
       'algebraStory1',
@@ -82,82 +80,45 @@ describe('Topic Manager', function () {
       explorationId,
       'Algebra'
     );
-  }, 2147483647);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it('should be able to modify chapter details, preview the chapter card, add skills, and save the changes.', async function () {
-    const actions = [
-      {
-        action: () => topicManager.navigateToTopicAndSkillsDashboardPage(),
-        name: 'navigateToTopicAndSkillsDashboardPage',
-      },
-      {
-        action: () =>
-          topicManager.openChapterEditor(
-            'Introduction to Algebra',
-            'Algebra Story',
-            'Algebra'
-          ),
-        name: 'openChapterEditorFromStory',
-      },
-      {
-        action: () =>
-          topicManager.editChapterDetails(
-            'Intro to Algebra',
-            'Introductory chapter on Algebra',
-            explorationId as string,
-            testConstants.data.curriculumAdminThumbnailImage
-          ),
-        name: 'editChapterDetails',
-      },
-      {
-        action: () => topicManager.assignAcquiredSkill('Basic Algebra'),
-        name: 'addAcquiredSkill',
-      },
-      {action: () => topicManager.saveStoryDraft(), name: 'saveChanges'},
+  it(
+    'should be able to modify chapter details, preview the chapter card, add skills, and save the changes.',
+    async function () {
+      await topicManager.navigateToTopicAndSkillsDashboardPage();
 
-      {
-        action: () => topicManager.previewChapterCard(),
-        name: 'previewChapterCard',
-      },
-      {
-        action: () =>
-          topicManager.expectChapterPreviewToHave(
-            'Intro to Algebra',
-            'Introductory chapter on Algebra'
-          ),
-        name: 'previewChapterCard',
-      },
+      await topicManager.openChapterEditor(
+        'Introduction to Algebra',
+        'Algebra Story',
+        'Algebra'
+      );
+      await topicManager.editChapterDetails(
+        'Intro to Algebra',
+        'Introductory chapter on Algebra',
+        explorationId as string,
+        testConstants.data.curriculumAdminThumbnailImage
+      );
+      await topicManager.assignAcquiredSkill('Basic Algebra');
+      await topicManager.saveStoryDraft();
+
+      await topicManager.previewChapterCard();
+      await topicManager.expectChapterPreviewToHave(
+        'Intro to Algebra',
+        'Introductory chapter on Algebra'
+      );
 
       // Opening second chapter in chapter editor to add prerequisite skill as it only can be added if the skill is acquired in previous chapters, which is acquired in the chapter above.
-      {
-        action: () =>
-          topicManager.openChapterEditor(
-            'Advanced Algebra',
-            'Algebra story 2',
-            'Algebra'
-          ),
-        name: 'openChapterEditorFromStory',
-      },
-      {
-        action: () => topicManager.addPrerequisiteSkill('Basic Algebra'),
-        name: 'editChapterDetails',
-      },
-      {
-        action: () => topicManager.assignAcquiredSkill('Advanced Algebra'),
-        name: 'addAcquiredSkill',
-      },
-      {action: () => topicManager.saveStoryDraft(), name: 'saveChanges'},
-    ];
-
-    for (const {action, name} of actions) {
-      try {
-        await action();
-      } catch (error) {
-        console.error('\x1b[31m%s\x1b[0m', error);
-        await topicManager.screenshot(`error_${name}.png`);
-      }
-    }
-  }, 2147483647);
+      await topicManager.openChapterEditor(
+        'Advanced Algebra',
+        'Algebra story 2',
+        'Algebra'
+      );
+      await topicManager.addPrerequisiteSkill('Basic Algebra');
+      await topicManager.assignAcquiredSkill('Advanced Algebra');
+      await topicManager.saveStoryDraft();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

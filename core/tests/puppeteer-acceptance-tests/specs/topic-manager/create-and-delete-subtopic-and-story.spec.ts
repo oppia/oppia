@@ -39,13 +39,6 @@ describe('Topic Manager', function () {
 
     await curriculumAdmin.createTopic('Addition', 'add');
 
-    topicManager = await UserFactory.createNewUser(
-      'topicManager',
-      'topic_manager@example.com',
-      [ROLES.TOPIC_MANAGER],
-      'Addition'
-    );
-
     await curriculumAdmin.navigateToCreatorDashboardPage();
     await curriculumAdmin.navigateToExplorationEditorPage();
     await curriculumAdmin.dismissWelcomeModal();
@@ -62,6 +55,13 @@ describe('Topic Manager', function () {
     if (!explorationId) {
       throw new Error('Error publishing exploration successfully.');
     }
+
+    topicManager = await UserFactory.createNewUser(
+      'topicManager',
+      'topic_manager@example.com',
+      [ROLES.TOPIC_MANAGER],
+      'Addition'
+    );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -69,34 +69,37 @@ describe('Topic Manager', function () {
     async function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
       await topicManager.createSubtopicForTopic(
-        'Test Topic 1',
         'Test Subtopic 1',
-        'test-subtopic-one'
+        'test-subtopic-one',
+        'Test Topic 1'
       );
-      // Verify the subtopic is present in the topic
+      // Verify the subtopic is present in the topic.
       await topicManager.verifySubtopicPresenceInTopic(
-        'Test Topic 1',
         'Test Subtopic 1',
+        'Test Topic 1',
         true
       );
 
-      await topicManager.addStoryWithChapterToTopic(
-        'Test Topic 1',
+      await topicManager.createAndSaveStoryWithChapter(
         'Test Story 1',
-        '',
-        ''
-      );
-      // Verify the chapter is present in the story
-      await topicManager.verifyChapterPresenceInStory(
-        'Test Topic 1',
-        'Test Story 1',
-        true
+        'test-story-one',
+        'Test Chapter 1',
+        explorationId,
+        'Test Topic 1'
       );
 
-      // Verify the story is present in the topic
+      // Verify the story is present in the topic.
       await topicManager.verifyStoryPresenceInTopic(
-        'Test Topic 1',
         'Test Story 1',
+        'Test Topic 1',
+        true
+      );
+
+      // Verify the chapter is present in the story.
+      await topicManager.verifyChapterPresenceInStory(
+        'Test Chapter 1',
+        'Test Story 1',
+        'Test Topic 1',
         true
       );
     },
@@ -106,30 +109,35 @@ describe('Topic Manager', function () {
   it(
     'should delete a chapter from a story, delete the story from a topic, and delete the subtopic from a topic.',
     async function () {
-      await topicManager.deleteChapterFromStory('Test Topic 1', 'Test Story 1');
-      // Verify the chapter is not present in the story
-      await topicManager.verifyChapterPresenceInStory(
-        'Test Topic 1',
+      await topicManager.deleteChapterFromStory(
+        'Test Chapter 1',
         'Test Story 1',
+        'Test Topic 1'
+      );
+      // Verify the chapter is not present in the story.
+      await topicManager.verifyChapterPresenceInStory(
+        'Test Chapter 1',
+        'Test Story 1',
+        'Test Topic 1',
         false
       );
 
-      await topicManager.deleteStoryFromTopic('Test Topic 1', 'Test Story 1');
-      // Verify the story is not present in the topic
+      await topicManager.deleteStoryFromTopic('Test Story 1', 'Test Topic 1');
+      // Verify the story is not present in the topic.
       await topicManager.verifyStoryPresenceInTopic(
-        'Test Topic 1',
         'Test Story 1',
+        'Test Topic 1',
         false
       );
 
       await topicManager.deleteSubtopicFromTopic(
-        'Test Topic 1',
-        'Test Subtopic 1'
-      );
-      // Verify the subtopic is not present in the topic
-      await topicManager.verifySubtopicPresenceInTopic(
-        'Test Topic 1',
         'Test Subtopic 1',
+        'Test Topic 1'
+      );
+      // Verify the subtopic is not present in the topic.
+      await topicManager.verifySubtopicPresenceInTopic(
+        'Test Subtopic 1',
+        'Test Topic 1',
         false
       );
     },
