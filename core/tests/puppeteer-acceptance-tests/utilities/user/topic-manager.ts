@@ -2223,6 +2223,9 @@ export class TopicManager extends BaseUser {
    * @param {string} expectedStatus - The expected status of the practice tab.
    */
   async verifyStatusOfPracticeTab(expectedStatus: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('Subtopics');
+    }
     try {
       const practiceTab = await this.page.$(practiceTabToggle);
       if (practiceTab === null) {
@@ -2242,7 +2245,11 @@ export class TopicManager extends BaseUser {
         );
       }
     } catch (error) {
-      console.error(`Failed to verify status of practice tab: ${error}`);
+      const newError = new Error(
+        `Failed to verify status of practice tab: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
     }
   }
 
