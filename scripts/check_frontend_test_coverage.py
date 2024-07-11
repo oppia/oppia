@@ -59,9 +59,9 @@ NOT_FULLY_COVERED_FILENAMES = [
     'core/templates/components/ck-editor-helpers/'
         'ck-editor-4-widgets.initializer.ts',
     'core/templates/components/forms/custom-forms-directives/'
-    'object-editor.directive.ts',
+        'object-editor.directive.ts',
     'core/templates/components/state-directives/rule-editor/'
-    'rule-type-selector.directive.ts',
+        'rule-type-selector.directive.ts',
     'core/templates/directives/angular-html-bind.directive.ts',
     'core/templates/directives/mathjax-bind.directive.ts',
     'core/templates/domain/question/question-update.service.ts',

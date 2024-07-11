@@ -230,6 +230,17 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                         run_frontend_tests.main(
                             args=['--specs_to_run', 'invalid.ts'])
 
+    def test_frontend_tests_with_specs_to_run_no_specs_found_allow_no_spec(
+        self
+    ) -> None:
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage:
+                    with self.assertRaisesRegex(SystemExit, '0'):
+                        run_frontend_tests.main(
+                            args=['--specs_to_run', 'invalid.ts',
+                                  '--allow_no_spec'])
+
     def test_frontend_tests_with_run_on_changed_files(self) -> None:
         git_refs = [git_changes_utils.GitRef(
             'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1')]
@@ -257,11 +268,11 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             return [b'file1.js', b'file2.ts', b'file3.ts']
         def mock_get_file_spec(file_path: str) -> Optional[str]:
             if file_path == 'file1.js':
-                return 'file1.js'
+                return 'file1.spec.js'
             if file_path == 'file2.ts':
-                return 'file2.ts'
+                return 'file2.spec.ts'
             if file_path == 'file3.ts':
-                return 'file3.ts'
+                return 'file3.spec.ts'
             return None
         get_remote_name_swap = self.swap(
             git_changes_utils, 'get_local_git_repository_remote_name',
@@ -289,7 +300,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
-            '--specs_to_run=file1.js,file2.ts,file3.ts']
+            '--specs_to_run=file1.spec.js,file2.spec.ts,file3.spec.ts']
         self.assertIn(cmd, self.cmd_token_list)
 
     def test_frontend_tests_with_run_on_changed_files_no_remote(self) -> None:
