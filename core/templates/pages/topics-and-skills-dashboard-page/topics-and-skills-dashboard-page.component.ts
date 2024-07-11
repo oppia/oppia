@@ -93,7 +93,9 @@ export class TopicsAndSkillsDashboardPageComponent {
   skillPageNumber: number = 0;
   lastSkillPage: number = 0;
   itemsPerPageChoice: number[] = [10, 15, 20];
-  classrooms: string[] = [];
+  classrooms: string[] = [
+    TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_ONLY_CLASSROOMS,
+  ];
   sortOptions: string[] = [];
   statusOptions: (ETopicPublishedOptions | ETopicStatusOptions)[] = [];
   displayedTopicSummaries: CreatorTopicSummary[] = [];
@@ -419,7 +421,8 @@ export class TopicsAndSkillsDashboardPageComponent {
           this.initSkillDashboard();
           this.focusManagerService.setFocus('createSkillBtn');
         }
-        this.classrooms = response.allClassroomNames;
+
+        this.classrooms.push(...response.allClassroomNames);
       });
   }
 }

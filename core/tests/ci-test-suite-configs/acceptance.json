@@ -17,6 +17,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked.spec.ts"
     },
     {
+      "name": "curriculum-admin/create-edit-and-delete-classroom",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-edit-and-delete-classroom.spec.ts"
+    },
+    {
       "name": "curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill",
       "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill.spec.ts"
     },
@@ -105,6 +109,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-donate-page.spec.ts"
     },
     {
+      "name": "logged-out-user/visit-classroom-index-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/visit-classroom-index-page.spec.ts"
+    },
+    {
       "name": "moderator/edit-featured-activities-list",
       "module": "core/tests/puppeteer-acceptance-tests/specs/moderator/edit-featured-activities-list.spec.ts"
     },
@@ -137,8 +145,16 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/edit-platform-parameters.spec.ts"
     },
     {
+      "name": "super-admin/use-misc-tab-features",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/use-misc-tab-features.spec.ts"
+    },
+    {
       "name": "release-coordinator/run-a-beam-job-and-copy-the-output",
       "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/run-a-beam-job-and-copy-the-output.spec.ts"
+    },
+    {
+      "name": "release-coordinator/edit-feature-rollout-configuration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/edit-feature-rollout-configuration.spec.ts"
     },
     {
       "name": "release-coordinator/flush-and-get-profile-of-redis-cache",
@@ -147,6 +163,30 @@
     {
       "name": "release-coordinator/update-promo-bar-message",
       "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/update-promo-bar-message.spec.ts"
+    },
+    {
+      "name": "topic-manager/browse-skills-on-topics-and-skills-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/browse-skills-on-topics-and-skills-dashboard.spec.ts"
+    },
+    {
+      "name": "topic-manager/browse-topics-on-topics-and-skills-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/browse-topics-on-topics-and-skills-dashboard.spec.ts"
+    },
+    {
+      "name": "topic-manager/create-and-delete-questions-in-skill-editor",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-delete-questions-in-skill-editor.spec.ts"
+    },
+    {
+      "name": "topic-manager/assign-unassign-and-merge-skills",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/assign-unassign-and-merge-skills.spec.ts"
+    },
+    {
+      "name": "topic-manager/cannot-do-curriculum-admin-actions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/cannot-do-curriculum-admin-actions.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-and-republish-a-skill",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-republish-a-skill.spec.ts"
     }
   ]
 }

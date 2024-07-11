@@ -59,6 +59,7 @@ describe('Classroom data model', () => {
     let classroomData = ClassroomData.createFromBackendData(
       'mathid',
       'Math',
+      'math',
       topicSummaryDicts,
       'Course Details',
       'Topics Covered',
@@ -68,6 +69,7 @@ describe('Classroom data model', () => {
       {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'}
     );
     expect(classroomData.getName()).toEqual('Math');
+    expect(classroomData.getUrlFragment()).toEqual('math');
     expect(classroomData.getCourseDetails()).toEqual('Course Details');
     expect(classroomData.getTopicListIntro()).toEqual('Topics Covered');
     expect(classroomData.getTopicSummaries()[0]).toEqual(
