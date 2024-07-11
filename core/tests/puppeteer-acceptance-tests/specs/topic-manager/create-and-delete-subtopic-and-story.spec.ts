@@ -53,7 +53,7 @@ describe('Topic Manager', function () {
       'Algebra'
     );
     if (!explorationId) {
-      throw new Error('Error publishing exploration successfully.');
+      throw new Error('Error in publishing exploration.');
     }
 
     topicManager = await UserFactory.createNewUser(

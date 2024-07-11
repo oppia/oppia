@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes filtering skills by status, classroom, and keyword, sorting skills, using the paginator, and opening an existing skill.
+ * @fileoverview Acceptance Test for the journey of a topic manager. It includes modifying chapter details,
+ *  previewing the chapter card, adding acquired and prerequisite skills, and save the changes.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -51,7 +52,7 @@ describe('Topic Manager', function () {
       'Algebra'
     );
     if (!explorationId) {
-      throw new Error('Error publishing exploration successfully.');
+      throw new Error('Error in publishing exploration');
     }
 
     await curriculumAdmin.createTopic('Algebra', 'algebra');
