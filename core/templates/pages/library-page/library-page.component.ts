@@ -16,12 +16,15 @@
  * @fileoverview Data and component for the Oppia contributors' library page.
  */
 
-import {Component} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
 import {AppConstants} from 'app.constants';
-import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {
+  ClassroomBackendApiService,
+  ClassroomSummaryDict,
+} from 'domain/classroom/classroom-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -38,7 +41,7 @@ import {
   LibraryPageBackendApiService,
   SummaryDict,
 } from './services/library-page-backend-api.service';
-
+import {NgbCarousel} from '@ng-bootstrap/ng-bootstrap';
 import './library-page.component.css';
 
 interface MobileLibraryGroupProperties {
@@ -52,6 +55,8 @@ interface MobileLibraryGroupProperties {
   styleUrls: ['./library-page.component.css'],
 })
 export class LibraryPageComponent {
+  @ViewChild('classroomsCarousel') classroomsCarousel!: NgbCarousel;
+
   possibleBannerFilenames: string[] = [
     'banner1.svg',
     'banner2.svg',
@@ -91,6 +96,9 @@ export class LibraryPageComponent {
   libraryWindowIsNarrow!: boolean;
   mobileLibraryGroupsProperties!: MobileLibraryGroupProperties[];
   pageMode!: string;
+  classroomSummaries: ClassroomSummaryDict[] = [];
+  publicClassroomsCount: number = 0;
+  classroomCarouselIndex: number = 0;
 
   constructor(
     private loggerService: LoggerService,
@@ -474,6 +482,66 @@ export class LibraryPageComponent {
         this.libraryWindowIsNarrow =
           this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx;
       });
+
+    this.classroomBackendApiService
+      .getAllClassroomsSummaryAsync()
+      .then(data => {
+        this.classroomSummaries = data;
+
+        for (let i = 0; i < this.classroomSummaries.length; i++) {
+          if (this.classroomSummaries[i].is_published) {
+            this.publicClassroomsCount += 1;
+          }
+        }
+      });
+  }
+
+  moveCarouselToPreviousSlide(): void {
+    this.classroomCarouselIndex -= 1;
+    this.classroomsCarousel.prev();
+  }
+
+  moveCarouselToNextSlide(): void {
+    this.classroomCarouselIndex += 1;
+    this.classroomsCarousel.next();
+  }
+
+  getClassroomChunkIndices(length: number): number[] {
+    const chunkSize = 3;
+    const numChunks = Math.ceil(length / chunkSize);
+    return Array(numChunks)
+      .fill(0)
+      .map((_, index) => index);
+  }
+
+  getClassroomsForChunk(
+    classroomSummaries: any[],
+    chunkIndex: number
+  ): ClassroomSummaryDict[] {
+    const chunkSize = 3;
+    const start = chunkIndex * chunkSize;
+    const end = start + chunkSize;
+    return classroomSummaries.slice(start, end);
+  }
+
+  showNextClassroomChunkButton(): boolean {
+    const numberOfClassroomSlides = this.getClassroomChunkIndices(
+      this.classroomSummaries.length
+    ).length;
+    if (
+      this.publicClassroomsCount <= 3 ||
+      this.classroomCarouselIndex === numberOfClassroomSlides - 1
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  showPreviousClassroomChunkButton(): boolean {
+    if (this.publicClassroomsCount <= 3 || this.classroomCarouselIndex === 0) {
+      return false;
+    }
+    return true;
   }
 
   ngOnDestroy(): void {
