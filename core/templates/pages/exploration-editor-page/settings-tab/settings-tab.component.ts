@@ -114,6 +114,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   explorationIsLinkedToStory: boolean = false;
   isSuperAdmin: boolean = false;
+  invalidTag: boolean = false;
   ROLES = [
     {
       name: 'Manager (can edit permissions)',
@@ -186,6 +187,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
   add(event: MatChipInputEvent): void {
     const value = (event.value || '').trim();
+    let tagRegex = new RegExp(AppConstants.TAG_REGEX);
 
     // Add our explorationTags.
     if (value) {
@@ -194,7 +196,10 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
         (this.explorationTagsService.displayed as []).length < 10
       ) {
         if (
-          (this.explorationTagsService.displayed as string[]).includes(value)
+          (this.explorationTagsService.displayed as string[]).includes(
+            value.toLowerCase()
+          ) ||
+          !value.match(tagRegex)
         ) {
           // Clear the input value.
           event.input.value = '';
@@ -204,6 +209,8 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
         this.explorationTags.push(value.toLowerCase());
       }
     }
+
+    this.invalidTag = event.input.value == '';
 
     // Clear the input value.
     event.input.value = '';
