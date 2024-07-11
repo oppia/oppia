@@ -24,6 +24,8 @@ import {NgbCarouselConfig} from '@ng-bootstrap/ng-bootstrap';
 import {VolunteerPageComponent} from './volunteer-page.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PageTitleService} from 'services/page-title.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 class MockTranslateService {
@@ -36,6 +38,9 @@ class MockTranslateService {
 describe('Volunteer page', () => {
   let translateService: TranslateService;
   let pageTitleService: PageTitleService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let windowDimensionsService: WindowDimensionsService;
+
   beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [VolunteerPageComponent, MockTranslatePipe],
@@ -47,6 +52,13 @@ describe('Volunteer page', () => {
           useClass: MockTranslateService,
         },
         PageTitleService,
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            getResizeEvent: () => of(resizeEvent),
+            getWidth: () => 0,
+          },
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -61,6 +73,7 @@ describe('Volunteer page', () => {
     component = volunteerPageComponent.componentInstance;
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
 
   it('should successfully instantiate the component from beforeEach block', () => {
@@ -120,5 +133,115 @@ describe('Volunteer page', () => {
     component.ngOnDestroy();
 
     expect(component.directiveSubscriptions.closed).toBe(true);
+  });
+
+  it('should increment activeTabGroupIndex', () => {
+    component.activeTabGroupIndex = 0;
+    component.tabGroups = {
+      desktop: [[0, 1, 2, 3, 4]],
+      tablet: [
+        [0, 1, 2],
+        [3, 4],
+      ],
+      mobile: [[0, 1], [2, 3], [4]],
+      smallMobile: [[0], [1], [2], [3], [4]],
+    };
+    component.screenType = 'desktop';
+
+    component.incrementTabGroupIndex();
+
+    expect(component.activeTabGroupIndex).toBe(1);
+  });
+
+  it('should not increment activeTabGroupIndex past the end', () => {
+    component.activeTabGroupIndex = 2;
+    component.tabGroups = {
+      desktop: [[0, 1, 2, 3, 4]],
+      tablet: [
+        [0, 1, 2],
+        [3, 4],
+      ],
+      mobile: [[0, 1], [2, 3], [4]],
+      smallMobile: [[0], [1], [2], [3], [4]],
+    };
+    component.screenType = 'desktop';
+
+    component.incrementTabGroupIndex();
+
+    expect(component.activeTabGroupIndex).toBe(2);
+  });
+
+  it('should decrement activeTabGroupIndex', () => {
+    component.activeTabGroupIndex = 1;
+    component.tabGroups = {
+      desktop: [[0, 1, 2, 3, 4]],
+      tablet: [
+        [0, 1, 2],
+        [3, 4],
+      ],
+      mobile: [[0, 1], [2, 3], [4]],
+      smallMobile: [[0], [1], [2], [3], [4]],
+    };
+    component.screenType = 'desktop';
+
+    component.decrementTabGroupIndex();
+
+    expect(component.activeTabGroupIndex).toBe(0);
+  });
+
+  it('should not decrement activeTabGroupIndex past the start', () => {
+    component.activeTabGroupIndex = 0;
+    component.tabGroups = {
+      desktop: [[0, 1, 2, 3, 4]],
+      tablet: [
+        [0, 1, 2],
+        [3, 4],
+      ],
+      mobile: [[0, 1], [2, 3], [4]],
+      smallMobile: [[0], [1], [2], [3], [4]],
+    };
+    component.screenType = 'desktop';
+
+    component.decrementTabGroupIndex();
+
+    expect(component.activeTabGroupIndex).toBe(0);
+  });
+
+  it('should get the correct RTL status if the current language is RTL', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    expect(component.isLanguageRTL()).toBeTrue();
+  });
+
+  it('should get the correct RTL status if the current language is not RTL', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      false
+    );
+    expect(component.isLanguageRTL()).toBeFalse();
+  });
+
+  it('should set screen type to mobile when window width is less than 440', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(360);
+    component.setScreenType();
+    expect(component.screenType).toEqual('smallMobile');
+  });
+
+  it('should set screen type to mobile when window width is less than 641', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(640);
+    component.setScreenType();
+    expect(component.screenType).toEqual('mobile');
+  });
+
+  it('should set screen type to tablet when window width is between 362 and 768', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(500);
+    component.setScreenType();
+    expect(component.screenType).toEqual('tablet');
+  });
+
+  it('should set screen type to desktop when window width is greater than 768', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(800);
+    component.setScreenType();
+    expect(component.screenType).toEqual('desktop');
   });
 });

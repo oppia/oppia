@@ -24,6 +24,8 @@ import {Subscription} from 'rxjs';
 
 import {PageTitleService} from 'services/page-title.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {AppConstants} from 'app.constants';
 
 @Component({
@@ -72,11 +74,110 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
     caption: {content: string; name: string; type: string}[];
   };
 
+  volunteerExpectations = [
+    'Commit to at least 5 hours per week',
+    'Attend mandatory team meetings',
+    'Reply to emails within 2 days',
+    'Have the ability to collaborate using Google Docs/Sheets.',
+  ];
+
+  growthSkills = [
+    {
+      title: 'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET1_HEADING',
+      skills: [
+        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET1_SKILL1',
+        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET1_SKILL2',
+        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET1_SKILL3',
+        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET1_SKILL4',
+      ],
+    },
+    {
+      title: 'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET2_HEADING',
+      skills: [
+        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET2_SKILL1',
+        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET2_SKILL2',
+        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET2_SKILL3',
+        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET2_SKILL4',
+        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET2_SKILL5',
+      ],
+    },
+  ];
+
+  developmentSkills = [
+    {
+      title: 'I18N_VOLUNTEER_PAGE_SKILLS_DEVELOPMENT_SET1_HEADING',
+      skills: [
+        'I18N_VOLUNTEER_PAGE_SKILLS_DEVELOPMENT_SET1_SKILL1',
+        'I18N_VOLUNTEER_PAGE_SKILLS_DEVELOPMENT_SET1_SKILL2',
+        'I18N_VOLUNTEER_PAGE_SKILLS_DEVELOPMENT_SET1_SKILL3',
+        'I18N_VOLUNTEER_PAGE_SKILLS_DEVELOPMENT_SET1_SKILL4',
+      ],
+    },
+  ];
+
+  artAndDesignSkills = [
+    {
+      title: 'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_HEADING',
+      skills: [
+        'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_SKILL1',
+        'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_SKILL2',
+        'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_SKILL3',
+      ],
+    },
+  ];
+
+  translationSkills = [
+    {
+      title: 'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_HEADING',
+      skills: [
+        'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_SKILL1',
+        'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_SKILL2',
+        'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_SKILL3',
+      ],
+    },
+    {
+      title: 'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_HEADING',
+      skills: [
+        'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL1',
+        'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL2',
+        'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL3',
+        'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL4',
+      ],
+    },
+  ];
+
+  lessonCreationSkills = [
+    {
+      title: 'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_HEADING',
+      skills: [
+        'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL1',
+        'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL2',
+        'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL3',
+        'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL4',
+      ],
+    },
+  ];
+
+  screenType!: 'desktop' | 'tablet' | 'mobile' | 'smallMobile';
+  activeTabGroupIndex = 0;
+  tabGroups = {
+    desktop: [[0, 1, 2, 3, 4]],
+    tablet: [
+      [0, 1, 2],
+      [3, 4],
+    ],
+    mobile: [[0, 1], [2, 3], [4]],
+    smallMobile: [[0], [1], [2], [3], [4]],
+  };
+  selectedIndex = 0;
+
   constructor(
     private pageTitleService: PageTitleService,
     private urlInterpolationService: UrlInterpolationService,
     private ngbCarouselConfig: NgbCarouselConfig,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private windowDimensionsService: WindowDimensionsService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   getWebpExtendedName(fileName: string): string {
@@ -100,6 +201,14 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
+
+    this.setScreenType();
+    this.directiveSubscriptions.add(
+      this.windowDimensionsService.getResizeEvent().subscribe(() => {
+        this.setScreenType();
+      })
+    );
+
     this.bannerImgPath = '/volunteer/banner.webp';
     this.footerImgPath = '/volunteer/footer.webp';
     this.mobBannerImgPath = '/volunteer/mob.webp';
@@ -338,6 +447,39 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
     this.ngbCarouselConfig.keyboard = true;
     this.ngbCarouselConfig.pauseOnHover = true;
     this.ngbCarouselConfig.pauseOnFocus = true;
+  }
+
+  setScreenType(): void {
+    const width = this.windowDimensionsService.getWidth();
+    if (width < 440) {
+      this.screenType = 'smallMobile';
+    } else if (width < 641) {
+      this.screenType = 'mobile';
+    } else if (width < 769) {
+      this.screenType = 'tablet';
+    } else {
+      this.screenType = 'desktop';
+    }
+    this.activeTabGroupIndex = 0;
+  }
+
+  incrementTabGroupIndex(): void {
+    if (
+      this.activeTabGroupIndex !==
+      this.tabGroups[this.screenType].length - 1
+    ) {
+      this.activeTabGroupIndex++;
+    }
+  }
+
+  decrementTabGroupIndex(): void {
+    if (this.activeTabGroupIndex !== 0) {
+      this.activeTabGroupIndex--;
+    }
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   ngOnDestroy(): void {
