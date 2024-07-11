@@ -2207,8 +2207,6 @@ class GenericTestBase(AppEngineTestBase):
     VOICE_ARTIST_USERNAME: Final = 'voiceartist'
     VOICEOVER_ADMIN_EMAIL: Final = 'voiceoveradm@example.com'
     VOICEOVER_ADMIN_USERNAME: Final = 'voiceoveradm'
-    QUESTION_ADMIN_EMAIL: Final = 'questionadm@example.com'
-    QUESTION_ADMIN_USERNAME: Final = 'questionadm'
     VIEWER_EMAIL: Final = 'viewer@example.com'
     VIEWER_USERNAME: Final = 'viewer'
     NEW_USER_EMAIL: Final = 'new.user@example.com'
