@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {ReadOnlySubtopicPageData} from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
@@ -107,10 +106,3 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'subtopicViewerNavbarBreadcrumb',
-    downgradeComponent({component: SubtopicViewerNavbarBreadcrumbComponent})
-  );

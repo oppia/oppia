@@ -275,7 +275,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': self.language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': self.default_translation_html,
             'data_format': 'html'
         }
@@ -477,7 +477,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': self.language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': self.default_translation_html,
             'data_format': 'html'
         }
@@ -498,7 +498,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': 'hi',
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': self.default_translation_html,
             'data_format': 'html'
         }
@@ -529,7 +529,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
             with self.testapp_swap:
                 self.get_json(
-                    '/cron/mail/reviewers/new_cont' +
+                    '/cron/mail/reviewers/new_cont'
                     'ributor_dashboard_suggestions')
 
             mock_send.assert_not_called()
@@ -584,7 +584,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
             with self.testapp_swap:
                 self.get_json(
-                    '/cron/mail/reviewers/new_contr' +
+                    '/cron/mail/reviewers/new_contr'
                     'ibutor_dashboard_suggestions')
 
             mock_send.assert_not_called()
@@ -609,7 +609,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
             with self.testapp_swap:
                 self.get_json(
-                    '/cron/mail/reviewers/new_cont' +
+                    '/cron/mail/reviewers/new_cont'
                     'ributor_dashboard_suggestions')
             mock_send.assert_called_once_with(
                 {'en': [self.reviewer_id]},
@@ -642,7 +642,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             )
             with self.testapp_swap:
                 self.get_json(
-                    '/cron/mail/reviewers/new_contr' +
+                    '/cron/mail/reviewers/new_contr'
                     'ibutor_dashboard_suggestions')
             mock_send.assert_called_once_with(
                 {'en': []},
@@ -667,7 +667,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
             with self.testapp_swap:
                 self.get_json(
-                    '/cron/mail/reviewers/new_contr' +
+                    '/cron/mail/reviewers/new_contr'
                     'ibutor_dashboard_suggestions')
 
             mock_send.assert_called_once_with(
@@ -694,7 +694,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': 'content_0',
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'content_html': feconf.DEFAULT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
             'data_format': 'html'
         }

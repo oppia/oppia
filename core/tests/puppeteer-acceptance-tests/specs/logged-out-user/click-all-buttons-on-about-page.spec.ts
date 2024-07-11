@@ -43,51 +43,44 @@ describe('Logged-out User in About page', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should open Math Classroom page with the Browse Our Lessons button.',
+    'should open the Impact Report when the "View Report" button is clicked.',
     async function () {
-      await loggedOutUser.clickBrowseOurLessonsButtonInAboutPage();
+      await loggedOutUser.clickViewReportButtonInAboutPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should open Android page with the Access Android App button.',
+    'should open the Volunteer form when the "Volunteer with Oppia" button ' +
+      'is clicked.',
     async function () {
-      await loggedOutUser.clickAccessAndroidAppButtonInAboutPage();
+      await loggedOutUser.clickVolunteerWithOppiaButtonInAboutPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should open Math Classroom page with the Visit Classroom button.',
+    'should open the donorbox when the "Donate" button is clicked',
     async function () {
-      await loggedOutUser.clickVisitClassroomButtonInAboutPage();
+      await loggedOutUser.clickDonateButtonInAboutPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should open Community Library page with the Browse Library button.',
+    'should open the Partnerships form when the "Partner with us" button is clicked',
     async function () {
-      await loggedOutUser.clickBrowseLibraryButtonInAboutPage();
+      await loggedOutUser.clickPartnerWithUsButtonInAboutPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should open the Sign-in page when the Create Lessons button is clicked by a logged-out user',
+    'should open the translated Partnerships form when the "Partner with us" button is clicked after the language change',
     async function () {
-      // The Contributor Dashboard is not accessible to logged-out users.
-      // Therefore, clicking the Create Lessons button will redirect the user to the Sign-in page.
-      await loggedOutUser.clickCreateLessonsButtonInAboutPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open Math Classroom page with the Explore Lessons button.',
-    async function () {
-      await loggedOutUser.clickExploreLessonsButtonInAboutPage();
+      await loggedOutUser.clickPartnerWithUsButtonInAboutPageInGivenLanguage(
+        'pt-br'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
