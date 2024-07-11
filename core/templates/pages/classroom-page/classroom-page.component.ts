@@ -160,7 +160,7 @@ export class ClassroomPageComponent implements OnDestroy {
                 ) {
                   let firstTopic = classroomData.getTopicSummaries()[0].name;
                   this.firstTopicUrl =
-                    '/learn/math/' +
+                    `/learn/${classroomData.getUrlFragment()}/` +
                     classroomData.getTopicSummaries()[0].urlFragment;
 
                   this.beginWithFirstTopicButtonText =
@@ -191,7 +191,7 @@ export class ClassroomPageComponent implements OnDestroy {
                     errorResponse.status
                   ) !== -1
                 ) {
-                  this.alertsService.addWarning('Failed to get dashboard data');
+                  this.alertsService.addWarning('Failed to get classroom data');
                 }
               }
             );

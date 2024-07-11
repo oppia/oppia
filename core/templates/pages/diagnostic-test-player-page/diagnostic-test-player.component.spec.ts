@@ -237,6 +237,7 @@ describe('Diagnostic test player component', () => {
     let classroomData = new ClassroomData(
       'id',
       'test',
+      'test',
       array,
       'dummy',
       'dummy',
