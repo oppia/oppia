@@ -82,10 +82,11 @@ def get_local_git_repository_remote_name() -> Optional[bytes]:
             'To do that follow these steps:\n'
             '1. Run the command \'git remote -v\'\n'
             '2. This command will list the remote references. There will be '
-            'multiple remotes listed for \'upstream\', but we want to make sure'
-            ' that there is only one main \'upstream\' remote. Please use the '
-            'command, \'git remote remove <remote_name>\' on all remotes '
-            'that are not the main oppia repository.\n'
+            'multiple remotes with the main oppia github reopsitory url, but we'
+            ' want to make sure that there is only one main \'upstream\' remote'
+            ' that uses the url https://github.com/oppia/oppia.git. Please use '
+            'the command, \'git remote remove <remote_name>\' on all remotes '
+            'that have the same url as the upstream remote.\n'
         )
         return None
     return remote_name
