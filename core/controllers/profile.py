@@ -259,6 +259,32 @@ class MailingListSubscriptionHandler(
         status = user_services.add_user_to_mailing_list(email, tag, name=name)
         self.render_json({'status': status})
 
+class CheckEmailSubscription(): # New Changes
+    print("CheckEmailSubscription");
+    # """Checks if the email is subscribed to the mailing list."""
+
+    # URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    # HANDLER_ARGS_SCHEMAS = {
+    #     'GET': {
+    #         'email': {
+    #             'schema': {
+    #                 'type': 'basestring',
+    #                 'validators': [{
+    #                     'id': 'is_regex_matched',
+    #                     'regex_pattern': constants.EMAIL_REGEX
+    #                 }]
+    #             }
+    #         }
+    #     }
+    # }
+
+    # @acl_decorators.open_access
+    # def get(self) -> None:
+    #     """Handles GET request."""
+    #     assert self.normalized_request is not None
+    #     email = self.normalized_request['email']
+    #     is_subscribed = user_services.check_if_email_is_subscribed(email)
+    #     self.render_json({'is_subscribed': is_subscribed})
 
 class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides data for the preferences page."""
