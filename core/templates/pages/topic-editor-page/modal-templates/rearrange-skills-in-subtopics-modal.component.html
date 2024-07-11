@@ -73,12 +73,12 @@
             </div>
           </div>
           <div *ngIf="subtopic.getId() === selectedSubtopicId">
-            <input type="text" [(ngModel)]="editableName" maxlength="{{maxCharsInSubtopicTitle}}">
+            <input type="text" class="e2e-test-rename-subtopic-field" [(ngModel)]="editableName" maxlength="{{maxCharsInSubtopicTitle}}">
             <button class="btn btn-secondary"
                     (click)="editNameOfSubtopicWithId(null)">
               Cancel
             </button>
-            <button class="btn btn-primary"
+            <button class="btn btn-primary e2e-test-save-reassignments"
                     (click)="updateSubtopicTitle(subtopic.getId())">
               Save
             </button>

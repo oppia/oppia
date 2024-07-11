@@ -187,6 +187,14 @@
     {
       "name": "topic-manager/edit-and-republish-a-skill",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-republish-a-skill.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-and-preview-a-subtopic",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-preview-a-subtopic.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-and-preview-a-topic",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-preview-a-topic.spec.ts"
     }
   ]
 }
