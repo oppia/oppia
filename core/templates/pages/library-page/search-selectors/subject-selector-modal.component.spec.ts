@@ -134,7 +134,7 @@ describe('subject-selector-modal component', () => {
     expect(component.selectionDetails).toEqual(selectionDetailsStub);
   });
 
-  it('should initialize', () => {
+  it('should be able to initialize component', () => {
     component.ngOnInit();
     expect(component.tempSelectionDetails).toEqual(selectionDetailsStub);
   });

@@ -258,7 +258,7 @@ describe('Search bar component', () => {
     spyOn(component, 'updateSelectionDetails');
     spyOn(component, 'refreshSearchBarLabels');
     component.toggleSelection('categories', 'Algorithms');
-    expect(component.updateSelectionDetails).toHaveBeenCalled();
+    expect(component.updateSelectionDetails).toHaveBeenCalledWith('categories');
     expect(component.refreshSearchBarLabels).toHaveBeenCalled();
   });
 

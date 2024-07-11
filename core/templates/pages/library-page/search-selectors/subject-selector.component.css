@@ -11,6 +11,16 @@
   margin-right: 20px;
 }
 
+.filter-container {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-right: 20px;
+  padding: 20px;
+  width: 100%;
+}
+
 .filter-box {
   background-color: white;
   border: 2px solid #8f8f8f;
@@ -70,13 +80,43 @@
 
 @media (max-width: 1720px) {
   .filter-box mat-checkbox {
-    width: 100%;
+    max-width: 200px;
+  }
+
+  .filter-box {
+    max-width: 220px;
   }
 }
 
-@media (max-width: 1720px) {
-  .filter-box mat-checkbox {
+@media (max-width: 1600px) {
+  .filter-box {
     max-width: 200px;
+  }
+}
+
+@media (max-width: 1440px) {
+  .filter-box {
+    max-width: 170px;
+  }
+}
+
+@media (max-width: 1300px) {
+  .filter-box {
+    max-width: 140px;
+  }
+
+  .oppia-checkbox {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 1162px) {
+  .filter-box {
+    max-width: 140px;
+  }
+
+  .oppia-checkbox {
+    font-size: 14px;
   }
 }
 
@@ -86,9 +126,15 @@
   }
 }
 
+@media (max-width: 766px) {
+  .filter-box {
+    max-height: 150px;
+    max-width: 100px;
+  }
+}
+
 @media (max-width: 727px) {
   .filter-box mat-checkbox {
     max-width: 100px;
   }
-
 }
