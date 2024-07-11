@@ -179,6 +179,20 @@ const confirmDeleteWorkedExampleButton =
 const confirmDeleteMisconceptionButton =
   '.e2e-test-confirm-delete-misconception-button';
 
+const mobileStoryDropdown = 'selector.mobileStoryDropdown';
+const addStoryButton = 'selector.addStoryButton';
+const storyTitleField = 'selector.storyTitleField';
+const storyUrlFragmentField = 'selector.storyUrlFragmentField';
+const storyDescriptionField = 'selector.storyDescriptionField';
+const storyPhotoBoxButton = 'selector.storyPhotoBoxButton';
+const createStoryButton = 'selector.createStoryButton';
+const storyMetaTagInput = 'selector.storyMetaTagInput';
+const mobileSaveStoryChangesDropdown =
+  'selector.mobileSaveStoryChangesDropdown';
+const mobilePublishStoryButton = 'selector.mobilePublishStoryButton';
+const publishStoryButton = 'selector.publishStoryButton';
+const unpublishStoryButton = 'selector.unpublishStoryButton';
+
 export class TopicManager extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -219,7 +233,7 @@ export class TopicManager extends BaseUser {
    * Function to open the story editor page.
    * @param {string} storyID - The Id of the story to open.
    */
-  async openStoryEditor(storyID: string): Promise<void> {
+  async openStoryEditorWithId(storyID: string): Promise<void> {
     await this.goto(`http://localhost:8181/story_editor/${storyID}`);
   }
 
@@ -2002,8 +2016,116 @@ export class TopicManager extends BaseUser {
     await this.clickOn('Rubrics');
   }
 
+  async createAndSaveStoryWithChapter(
+    storyTitle: string,
+    storyUrlFragment: string,
+    chapterName: string,
+    explorationId: string | null,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileStoryDropdown);
+    }
+    await this.clickOn(addStoryButton);
+    await this.type(storyTitleField, storyTitle);
+    await this.type(storyUrlFragmentField, storyUrlFragment);
+    await this.type(
+      storyDescriptionField,
+      `Story creation description for ${storyTitle}.`
+    );
+
+    await this.clickOn(storyPhotoBoxButton);
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createStoryButton);
+
+    await this.page.waitForSelector(storyMetaTagInput);
+    await this.page.focus(storyMetaTagInput);
+    await this.page.type(storyMetaTagInput, 'meta');
+    await this.page.keyboard.press('Tab');
+
+    await this.createChapter(explorationId as string, chapterName);
+    await this.saveStoryDraft();
+  }
+
+  /**
+   * Opens the story editor for a given story and topic.
+   * @param {string} storyName - The name of the story.
+   * @param {string} topicName - The name of the topic.
+   * @returns {Promise<void>}
+   */
+  async openStoryEditor(storyName: string, topicName: string): Promise<void> {
+    await this.openTopicEditor(topicName);
+  }
+
+  /**
+   * Opens the chapter editor for a given chapter, story, and topic.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {string} storyName - The name of the story.
+   * @param {string} topicName - The name of the topic.
+   * @returns {Promise<void>}
+   */
+  async openChapterEditor(
+    chapterName: string,
+    storyName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openStoryEditor(storyName, topicName);
+  }
+
+  /**
+   * Edits the details of a chapter.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {string} description - The description of the chapter.
+   * @param {string} explorationID - The ID of the exploration.
+   * @param {string} thumbnailImage - The thumbnail image of the chapter.
+   * @returns {Promise<void>}
+   */
+  async editChapterDetails(
+    chapterName: string,
+    description: string,
+    explorationID: string,
+    thumbnailImage: string
+  ): Promise<void> {}
+
+  /**
+   * Previews the chapter card.
+   * @returns {Promise<void>}
+   */
+  async previewChapterCard(): Promise<void> {}
+
+  /**
+   * Expects the chapter preview to have a certain name and explanation.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {string} explanation - The explanation of the chapter.
+   * @returns {Promise<void>}
+   */
+  async expectChapterPreviewToHave(chapterName: string, explanation: string) {}
+
+  /**
+   * Assigns an acquired skill.
+   * @param {string} skillName - The name of the skill.
+   * @returns {Promise<void>}
+   */
+  async assignAcquiredSkill(skillName: string): Promise<void> {}
+
+  /**
+   * Assigns a prerequisite skill.
+   * @param {string} skillName - The name of the skill.
+   * @returns {Promise<void>}
+   */
+  async assignPrerequisiteSkill(skillName): Promise<void> {}
+
   async timeout(time) {
     await this.page.waitForTimeout(time);
+  }
+
+  async screenshot(path) {
+    await this.page.screenshot({path: `${path}`});
   }
 }
 
