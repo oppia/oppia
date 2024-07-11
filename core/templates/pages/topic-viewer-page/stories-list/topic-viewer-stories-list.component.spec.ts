@@ -109,9 +109,9 @@ describe('Topic Viewer Stories List Component', () => {
 
     component.ngOnInit();
 
-    expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
-    expect(component.isHackyTopicDescTranslationDisplayed()).toBe(true);
-    expect(component.isHackyClassroomNameTranslationDisplayed()).toBe(true);
+    expect(component.isHackyTopicNameTranslationDisplayed()).toBeTrue();
+    expect(component.isHackyTopicDescTranslationDisplayed()).toBeTrue();
+    expect(component.isHackyClassroomNameTranslationDisplayed()).toBeTrue();
   });
 
   it('should not return the classroom name i18n key if the topic is not assigned to any classroom', () => {
@@ -136,6 +136,9 @@ describe('Topic Viewer Stories List Component', () => {
   });
 
   it('should get RTL language status correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      true
+    );
     expect(component.isLanguageRTL()).toBeTrue();
   });
 });
