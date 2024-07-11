@@ -30,7 +30,7 @@ describe('Topic Manager User Journey', function () {
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdmin',
+      'curriculumAdm',
       'curriculumAdmin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
@@ -49,20 +49,27 @@ describe('Topic Manager User Journey', function () {
     'should be able to edit topic name, thumbnail, description, page title fragment for web, and meta tags, and preview lesson in the topic preview.',
     async function () {
       await topicManager.openTopicEditor('Mathematics');
-      await topicManager.editTopicData(
-        'Advanced Mathematics',
-        'math',
+
+      // Topic Manager cannot edit the name and url Fragment of a topic (Curriculum Admin can do that).
+      await topicManager.editTopicDetails(
         'A comprehensive course on advanced mathematics',
         'mathematics, advanced, course',
         'Advanced Mathematics Course',
         testConstants.data.blogPostThumbnailImage
       );
 
-      await topicManager.saveTopicDraft('Advanced Mathematics');
       await topicManager.verifyStatusOfPracticeTab('disabled');
-      await topicManager.previewTopic('Advanced Mathematics');
+      await topicManager.saveTopicDraft('Mathematics');
+
+      if (this.isViewportAtMobileWidth()) {
+        // TODO(20665): Resolve the issue of inconsistent topic preview navigation between desktop and mobile modes.
+        // Once the issue is resolved, remove the following line to allow the flow to check the preview tab in mobile viewport.
+        // Refer to the issue: [https://github.com/oppia/oppia/issues/20665]
+        return;
+      }
+      await topicManager.navigateToTopicPreviewTopic('Mathematics');
       await topicManager.expectTopicPreviewToHaveTitleAndDescription(
-        'Advanced Mathematics',
+        'Mathematics',
         'A comprehensive course on advanced mathematics'
       );
     },

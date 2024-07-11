@@ -888,7 +888,8 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     switch (interactionType) {
       case 'Number Input':
-        await this.type(floatFormInput, answer);
+        await this.page.waitForSelector(floatFormInput);
+        await this.page.type(floatFormInput, answer);
         break;
       case 'Multiple Choice':
         await this.clickOn(multipleChoiceResponseDropdown);
@@ -1108,7 +1109,8 @@ export class ExplorationEditor extends BaseUser {
       case 'text':
       case 'number':
       case 'float':
-        await this.type(floatFormInput, answer);
+        await this.page.waitForSelector(floatFormInput);
+        await this.page.type(floatFormInput, answer);
         break;
       default:
         throw new Error(`Unsupported input type: ${inputType}`);

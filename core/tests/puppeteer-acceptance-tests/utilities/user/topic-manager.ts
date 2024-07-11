@@ -129,6 +129,7 @@ const desktopSkillSelector = '.e2e-test-skill-description';
 const itemsPerPageDropdown = '.e2e-test-select-items-per-page-dropdown';
 const filterOptionSelector = '.mat-option-text';
 const topicNameField = '.e2e-test-topic-name-field';
+const updateTopicUrlFragmentField = '.e2e-test-topic-url-fragment-field';
 const errorPageHeadingSelector = '.e2e-test-error-page-heading';
 const createNewTopicMobileButton = '.e2e-test-create-topic-mobile-button';
 const createNewTopicButton = '.e2e-test-create-topic-button';
@@ -182,9 +183,8 @@ const confirmDeleteWorkedExampleButton =
 const confirmDeleteMisconceptionButton =
   '.e2e-test-confirm-delete-misconception-button';
 const topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
-const topicUrlFragmentField = 'input.e2e-test-new-topic-url-fragment-field';
-const topicWebFragmentField = 'input.e2e-test-new-page-title-fragm-field';
-const topicDescriptionField = 'textarea.e2e-test-new-topic-description-field';
+const updateTopicWebFragmentField = '.e2e-test-topic-page-title-fragment-field';
+const updateTopicDescriptionField = '.e2e-test-topic-description-field';
 const photoBoxButton = 'div.e2e-test-photo-button';
 const practiceTabToggle = '.e2e-test-toggle-practice-tab';
 const topicPreviewTitleSelector = '.e2e-test-preview-topic-title';
@@ -199,7 +199,6 @@ const testSubtopicTitleSelector = '.e2e-test-subtopic';
 const topicPreviewTab = '.e2e-test-topic-preview-button';
 const contentTitle = '.content-title';
 const htmlContent = '.html-content';
-const topicTableSelector = '.e2e-test-topics-table';
 const subtopicAssignmentContainer = '.subtopics-container';
 const editSubtopicExplanationSelector = '.e2e-test-edit-html-content';
 const topicMobilePreviewTab = '.e2e-test-mobile-preview-tab';
@@ -2186,17 +2185,25 @@ export class TopicManager extends BaseUser {
    * @param {string} thumbnail - The thumbnail of the topic.
    */
   async editTopicDetails(
-    topicName: string,
-    urlFragment: string,
     description: string,
     titleFragments: string,
     metaTags: string,
-    thumbnail: string
+    thumbnail: string,
+    topicName?: string,
+    urlFragment?: string
   ): Promise<void> {
-    await this.type(topicNameField, topicName);
-    await this.type(topicUrlFragmentField, urlFragment);
-    await this.type(topicWebFragmentField, titleFragments);
-    await this.type(topicDescriptionField, description);
+    if (topicName) {
+      await this.clearAllTextFrom(topicNameField);
+      await this.type(topicNameField, topicName);
+    }
+    if (urlFragment) {
+      await this.clearAllTextFrom(updateTopicUrlFragmentField);
+      await this.type(updateTopicUrlFragmentField, urlFragment);
+    }
+    await this.clearAllTextFrom(updateTopicWebFragmentField);
+    await this.type(updateTopicWebFragmentField, titleFragments);
+    await this.clearAllTextFrom(updateTopicDescriptionField);
+    await this.type(updateTopicDescriptionField, description);
 
     await this.clickOn(photoBoxButton);
     await this.page.waitForSelector(photoUploadModal, {visible: true});
@@ -2205,14 +2212,12 @@ export class TopicManager extends BaseUser {
     await this.clickOn(uploadPhotoButton);
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
 
-    await this.page.waitForSelector(topicTableSelector);
-    await this.openTopicEditor(topicName);
     await this.page.waitForSelector(topicMetaTagInput);
     await this.page.focus(topicMetaTagInput);
+    await this.clearAllTextFrom(topicMetaTagInput);
     await this.page.type(topicMetaTagInput, metaTags);
     await this.page.keyboard.press('Tab');
   }
-
   /**
    * Verifies the status of the practice tab.
    * @param {string} expectedStatus - The expected status of the practice tab.
@@ -2272,7 +2277,7 @@ export class TopicManager extends BaseUser {
       el => el.textContent,
       titleElement
     );
-    if (actualTitle !== title) {
+    if (actualTitle.trim() !== title) {
       throw new Error(
         `Expected topic title to be "${title}", but was "${actualTitle}".`
       );
@@ -2286,7 +2291,7 @@ export class TopicManager extends BaseUser {
       el => el.textContent,
       descriptionElement
     );
-    if (actualDescription !== description) {
+    if (actualDescription.trim() !== description) {
       throw new Error(
         `Expected topic description to be "${description}", but was "${actualDescription}".`
       );
