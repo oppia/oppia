@@ -65,7 +65,7 @@ export class MailingListBackendApiService {
       .then(response => response.status)
       .catch(error => {
         console.error('Error checking email subscription:', error);
-        throw error;
+        return false; // Return false if there's an error checking the subscription
       });
   }
 
