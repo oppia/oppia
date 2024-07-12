@@ -15,6 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - uses: ./.github/actions/merge
       - name: Count merged PRs
         uses: actions/github-script@v6
         with:
