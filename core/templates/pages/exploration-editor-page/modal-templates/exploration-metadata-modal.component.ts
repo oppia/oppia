@@ -62,6 +62,7 @@ export class ExplorationMetadataModalComponent
   explorationTags: string[] = [];
   filteredChoices: CategoryChoices[] = [];
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
+  tagIsInvalid: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -117,6 +118,7 @@ export class ExplorationMetadataModalComponent
         ) {
           // Clear the input value.
           event.input.value = '';
+          this.tagIsInvalid = true;
           return;
         }
 
@@ -126,6 +128,7 @@ export class ExplorationMetadataModalComponent
 
     // Clear the input value.
     event.input.value = '';
+    this.tagIsInvalid = false;
 
     this.explorationTagsService.displayed = this.explorationTags;
   }

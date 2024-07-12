@@ -114,7 +114,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   explorationIsLinkedToStory: boolean = false;
   isSuperAdmin: boolean = false;
-  invalidTag: boolean = false;
+  tagIsInvalid: boolean = false;
   ROLES = [
     {
       name: 'Manager (can edit permissions)',
@@ -203,6 +203,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
         ) {
           // Clear the input value.
           event.input.value = '';
+          this.tagIsInvalid = true;
           return;
         }
 
@@ -210,10 +211,9 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.invalidTag = event.input.value == '';
-
     // Clear the input value.
     event.input.value = '';
+    this.tagIsInvalid = false;
 
     this.explorationTagsService.displayed = this.explorationTags;
 
