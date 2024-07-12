@@ -15,7 +15,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - uses: ./.github/actions/merge
       - name: Count merged PRs
         uses: actions/github-script@v6
         with:
@@ -24,7 +23,10 @@ jobs:
             const author = context.payload.pull_request.user.login;
             const repo = context.repo.repo;
             const owner = context.repo.owner;
-
+            
+            console.log(`Fetching PR author: ${author}`);
+            console.log(`Repository: ${owner}/${repo}`);
+            
             const { data } = await github.rest.search.issuesAndPullRequests({
               q: `repo:${owner}/${repo} type:pr state:closed author:${author}`
             });
@@ -52,7 +54,7 @@ jobs:
               `Since you've merged two PRs, you might be eligible to join the Oppia dev team as a collaborator. If you'd like to do that, please fill in [this form](https://forms.gle/NxPjimCMqsSTNUgu5). Thanks!\n\n` +
               `Developer onboarding lead : ${mention}`;
             }
-            
+            console.log(`Message: ${message}`);
             if(prCount === 1 || prCount === 2){
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
