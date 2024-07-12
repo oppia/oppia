@@ -58,11 +58,11 @@ export class MailingListBackendApiService {
   async isEmailSubscribed(email: string): Promise<boolean> {
     // Implementation to check if the email is already subscribed
     return this.http
-      .get<{isSubscribed: boolean}>(
+      .get<MailingListReturnStatusData>(
         `/checkemailsubscription?email=${encodeURIComponent(email)}`
       )
       .toPromise()
-      .then(response => response.isSubscribed)
+      .then(response => response.status)
       .catch(error => {
         console.error('Error checking email subscription:', error);
         throw error;
