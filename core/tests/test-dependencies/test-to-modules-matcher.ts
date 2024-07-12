@@ -223,7 +223,7 @@ export class TestToModulesMatcher {
     fs.mkdirSync(path.dirname(this.goldenFilePath), {recursive: true});
     fs.writeFileSync(
       this.goldenFilePath,
-      this.collectedModules.sort().join('\n')
+      this.collectedModules.sort().join('\n') + '\n'
     );
     if (missingGoldenFileModules.length > 0) {
       throw new Error(
