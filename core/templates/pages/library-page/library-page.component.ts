@@ -55,7 +55,7 @@ interface MobileLibraryGroupProperties {
   styleUrls: ['./library-page.component.css'],
 })
 export class LibraryPageComponent {
-  @ViewChild('classroomsCarousel') classroomsCarousel!: NgbCarousel;
+  @ViewChild('classroomCarousel') classroomCarousel!: NgbCarousel;
 
   possibleBannerFilenames: string[] = [
     'banner1.svg',
@@ -339,12 +339,11 @@ export class LibraryPageComponent {
 
     this.classroomBackendApiService
       .getAllClassroomsSummaryAsync()
-      .then(data => {
-        this.classroomSummaries = data;
-
-        for (let i = 0; i < this.classroomSummaries.length; i++) {
-          if (this.classroomSummaries[i].is_published) {
+      .then(classroomSummaries => {
+        for (let i = 0; i < classroomSummaries.length; i++) {
+          if (classroomSummaries[i].is_published) {
             this.publicClassroomsCount += 1;
+            this.classroomSummaries.push(classroomSummaries[i]);
           }
         }
       });
@@ -498,12 +497,12 @@ export class LibraryPageComponent {
 
   moveCarouselToPreviousSlide(): void {
     this.classroomCarouselIndex -= 1;
-    this.classroomsCarousel.prev();
+    this.classroomCarousel.prev();
   }
 
   moveCarouselToNextSlide(): void {
     this.classroomCarouselIndex += 1;
-    this.classroomsCarousel.next();
+    this.classroomCarousel.next();
   }
 
   getClassroomChunkIndices(length: number): number[] {

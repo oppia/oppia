@@ -831,7 +831,7 @@ describe('Library Page Component', () => {
   }));
 
   it('should handle more than 3 classrooms correctly in the classroom carousel', () => {
-    componentInstance.classroomsCarousel = mockNgbCarousel as NgbCarousel;
+    componentInstance.classroomCarousel = mockNgbCarousel as NgbCarousel;
     componentInstance.classroomSummaries = [...dummyClassroomSummaries];
     componentInstance.publicClassroomsCount =
       componentInstance.classroomSummaries.length;
@@ -869,7 +869,7 @@ describe('Library Page Component', () => {
   });
 
   it('should handle less than 3 classrooms correctly in the classroom carousel', () => {
-    componentInstance.classroomsCarousel = mockNgbCarousel as NgbCarousel;
+    componentInstance.classroomCarousel = mockNgbCarousel as NgbCarousel;
     componentInstance.classroomSummaries = dummyClassroomSummaries.slice(0, 3);
     componentInstance.publicClassroomsCount =
       componentInstance.classroomSummaries.length;

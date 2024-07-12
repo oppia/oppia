@@ -14,11 +14,12 @@
       </ng-container>
     </div>
     <div class="classrooms-carousel" *ngIf="publicClassroomsCount > 2">
-      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn" (click)="moveCarouselToPreviousSlide()" *ngIf="showPreviousClassroomChunkButton()">
+      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn" (click)="moveCarouselToPreviousSlide()"
+              [ngClass]="{'show-change-classroom-chunk-btn': showPreviousClassroomChunkButton(), 'hide-change-classroom-chunk-btn': !showPreviousClassroomChunkButton()}">
         <i class="fa fa-angle-left"></i>
       </button>
       <div class="carousel-container">
-        <ngb-carousel #classroomsCarousel [interval]="0" [showNavigationArrows]="false" [showNavigationIndicators]="publicClassroomsCount > 3">
+        <ngb-carousel #classroomCarousel [interval]="0" [showNavigationArrows]="false" [showNavigationIndicators]="publicClassroomsCount > 3">
           <ng-container *ngFor="let chunkIndex of getClassroomChunkIndices(classroomSummaries.length)">
             <ng-template ngbSlide>
               <div class="classrooms-card-container">
@@ -34,7 +35,8 @@
           </ng-container>
         </ngb-carousel>
       </div>
-      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn" (click)="moveCarouselToNextSlide()" *ngIf="showNextClassroomChunkButton()">
+      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn" (click)="moveCarouselToNextSlide()"
+              [ngClass]="{'show-change-classroom-chunk-btn': showNextClassroomChunkButton(), 'hide-change-classroom-chunk-btn': !showNextClassroomChunkButton()}">
         <i class="fa fa-angle-right"></i>
       </button>
       <button class="mobile-carousel-btn mobile-prev-btn" (click)="moveCarouselToPreviousSlide()" *ngIf="showPreviousClassroomChunkButton()">

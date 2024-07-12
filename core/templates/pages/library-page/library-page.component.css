@@ -322,6 +322,14 @@ oppia-library-page .classrooms-carousel .mobile-carousel-btn {
   display: none;
 }
 
+oppia-library-page .show-change-classroom-chunk-btn {
+  display: flex;
+}
+
+oppia-library-page .hide-change-classroom-chunk-btn {
+  visibility: hidden;
+}
+
 @media (min-width: 630px) {
   .oppia-library-h1 {
     font-size: 2.5em;
@@ -502,7 +510,8 @@ oppia-library-page .classrooms-carousel .mobile-carousel-btn {
 
 @media only screen and (max-width: 416px) {
   oppia-library-page .classroom-cards-wrapper {
-    height: 366px;
+    height: 358px;
+    padding-top: 2px;
   }
 
   oppia-library-page .classroom-cards-text-container {
