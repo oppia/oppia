@@ -379,6 +379,7 @@ oppia-library-page .classrooms-carousel .mobile-carousel-btn {
   }
 
   oppia-library-page .individual-classroom-cards {
+    gap: 8px;
     margin-left: 0;
   }
 
@@ -499,7 +500,7 @@ oppia-library-page .classrooms-carousel .mobile-carousel-btn {
   }
 }
 
-@media only screen and (max-width: 412px) {
+@media only screen and (max-width: 416px) {
   oppia-library-page .classroom-cards-wrapper {
     height: 366px;
   }

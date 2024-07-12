@@ -79,9 +79,10 @@
     gap: 24px;
   }
 
-  @media only screen and (max-width: 575px) {
-    .oppia-classroom-card-container .classroom-content {
-      justify-content: space-around;
+  @media only screen and (max-width: 1024px) {
+    .classroom-card-big {
+      height: 216px;
+      width: 192px;
     }
   }
 
@@ -110,10 +111,16 @@
     }
   }
 
-  @media only screen and (max-width: 412px) {
+  @media only screen and (max-width: 575px) {
+    .oppia-classroom-card-container .classroom-content {
+      justify-content: space-around;
+    }
+  }
+
+  @media only screen and (max-width: 416px) {
     .classroom-card-big {
-      height: 142px;
-      width: 140px;
+      height: 100px;
+      width: 100px;
     }
 
     .classroom-card-small {

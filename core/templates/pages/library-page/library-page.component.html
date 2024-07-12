@@ -5,11 +5,13 @@
       <p>{{ 'I18N_BROWSE_LESSONS_TEXT' | translate }}</p>
     </div>
     <div class="individual-classroom-cards" *ngIf="publicClassroomsCount >= 1 && publicClassroomsCount <= 2">
-      <oppia-classroom-card
-        *ngFor="let classroomSummary of classroomSummaries; let i = index"
-        [classroomSummary]="classroomSummary"
-        [usedInCarousel]="false">
-      </oppia-classroom-card>
+      <ng-container *ngFor="let classroomSummary of classroomSummaries">
+        <oppia-classroom-card
+          *ngIf="someCondition(classroomSummary)"
+          [classroomSummary]="classroomSummary"
+          [usedInCarousel]="false">
+        </oppia-classroom-card>
+      </ng-container>
     </div>
     <div class="classrooms-carousel" *ngIf="publicClassroomsCount > 2">
       <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn" (click)="moveCarouselToPreviousSlide()" *ngIf="showPreviousClassroomChunkButton()">
@@ -20,11 +22,13 @@
           <ng-container *ngFor="let chunkIndex of getClassroomChunkIndices(classroomSummaries.length)">
             <ng-template ngbSlide>
               <div class="classrooms-card-container">
-                <oppia-classroom-card
-                  *ngFor="let classroomSummary of getClassroomsForChunk(classroomSummaries, chunkIndex); let i = index"
-                  [classroomSummary]="classroomSummary"
-                  [usedInCarousel]="true">
-                </oppia-classroom-card>
+                <ng-container *ngFor="let classroomSummary of getClassroomsForChunk(classroomSummaries, chunkIndex); let i = index">
+                  <oppia-classroom-card
+                    *ngIf="classroomSummary.is_published"
+                    [classroomSummary]="classroomSummary"
+                    [usedInCarousel]="true">
+                  </oppia-classroom-card>
+                </ng-container>
               </div>
             </ng-template>
           </ng-container>
