@@ -337,6 +337,18 @@ export class LibraryPageComponent {
       }
     );
 
+    this.classroomBackendApiService
+      .getAllClassroomsSummaryAsync()
+      .then(data => {
+        this.classroomSummaries = data;
+
+        for (let i = 0; i < this.classroomSummaries.length; i++) {
+          if (this.classroomSummaries[i].is_published) {
+            this.publicClassroomsCount += 1;
+          }
+        }
+      });
+
     // Keeps track of the index of the left-most visible card of each
     // group.
     this.leftmostCardIndices = [];
@@ -481,18 +493,6 @@ export class LibraryPageComponent {
 
         this.libraryWindowIsNarrow =
           this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx;
-      });
-
-    this.classroomBackendApiService
-      .getAllClassroomsSummaryAsync()
-      .then(data => {
-        this.classroomSummaries = data;
-
-        for (let i = 0; i < this.classroomSummaries.length; i++) {
-          if (this.classroomSummaries[i].is_published) {
-            this.publicClassroomsCount += 1;
-          }
-        }
       });
   }
 
