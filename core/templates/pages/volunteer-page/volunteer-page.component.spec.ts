@@ -35,8 +35,8 @@ class MockTranslateService {
     return key;
   }
 }
-// eslint-disable-next-line
-fdescribe('Volunteer page', () => {
+
+describe('Volunteer page', () => {
   let translateService: TranslateService;
   let pageTitleService: PageTitleService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
