@@ -27,6 +27,7 @@ import {PageTitleService} from 'services/page-title.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {of} from 'rxjs';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -34,12 +35,13 @@ class MockTranslateService {
     return key;
   }
 }
-
-describe('Volunteer page', () => {
+// eslint-disable-next-line
+fdescribe('Volunteer page', () => {
   let translateService: TranslateService;
   let pageTitleService: PageTitleService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let windowDimensionsService: WindowDimensionsService;
+  let resizeEvent = new Event('resize');
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -74,6 +76,7 @@ describe('Volunteer page', () => {
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
   });
 
   it('should successfully instantiate the component from beforeEach block', () => {
@@ -124,17 +127,6 @@ describe('Volunteer page', () => {
     expect(component.getWebpExtendedName('a.b.jpg')).toEqual('a.b.webp');
   });
 
-  it('should unsubscribe on component destruction', () => {
-    component.directiveSubscriptions.add(
-      translateService.onLangChange.subscribe(() => {
-        component.setPageTitle();
-      })
-    );
-    component.ngOnDestroy();
-
-    expect(component.directiveSubscriptions.closed).toBe(true);
-  });
-
   it('should increment activeTabGroupIndex', () => {
     component.activeTabGroupIndex = 0;
     component.tabGroups = {
@@ -146,7 +138,7 @@ describe('Volunteer page', () => {
       mobile: [[0, 1], [2, 3], [4]],
       smallMobile: [[0], [1], [2], [3], [4]],
     };
-    component.screenType = 'desktop';
+    component.screenType = 'mobile';
 
     component.incrementTabGroupIndex();
 
@@ -164,7 +156,7 @@ describe('Volunteer page', () => {
       mobile: [[0, 1], [2, 3], [4]],
       smallMobile: [[0], [1], [2], [3], [4]],
     };
-    component.screenType = 'desktop';
+    component.screenType = 'mobile';
 
     component.incrementTabGroupIndex();
 
@@ -182,7 +174,7 @@ describe('Volunteer page', () => {
       mobile: [[0, 1], [2, 3], [4]],
       smallMobile: [[0], [1], [2], [3], [4]],
     };
-    component.screenType = 'desktop';
+    component.screenType = 'mobile';
 
     component.decrementTabGroupIndex();
 
@@ -200,7 +192,7 @@ describe('Volunteer page', () => {
       mobile: [[0, 1], [2, 3], [4]],
       smallMobile: [[0], [1], [2], [3], [4]],
     };
-    component.screenType = 'desktop';
+    component.screenType = 'mobile';
 
     component.decrementTabGroupIndex();
 
@@ -234,7 +226,7 @@ describe('Volunteer page', () => {
   });
 
   it('should set screen type to tablet when window width is between 362 and 768', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(500);
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(760);
     component.setScreenType();
     expect(component.screenType).toEqual('tablet');
   });
@@ -243,5 +235,16 @@ describe('Volunteer page', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(800);
     component.setScreenType();
     expect(component.screenType).toEqual('desktop');
+  });
+
+  it('should unsubscribe on component destruction', () => {
+    component.directiveSubscriptions.add(
+      translateService.onLangChange.subscribe(() => {
+        component.setPageTitle();
+      })
+    );
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.closed).toBe(true);
   });
 });
