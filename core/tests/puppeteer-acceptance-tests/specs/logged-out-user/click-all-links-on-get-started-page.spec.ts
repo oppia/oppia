@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users
+ * @fileoverview Acceptance Test for checking if logged-out users
  * can open all the links on the "Get Started" page.
  */
 
@@ -23,88 +23,74 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-in Users', function () {
-  let testUser: LoggedOutUser;
+describe('Logged-out Users on Get Stared page', function () {
+  let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com'
-    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
+  beforeEach(async function () {
+    await loggedOutUser.navigateToGetStartedPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to navigate to the Get Started page using the footer',
+    'should be able to use the "create one here" link',
     async function () {
-      await testUser.navigateToAboutFoundationPage();
-      await testUser.navigateToGetStartedPageViaFooter();
+      await loggedOutUser.clickCreateOneHereLinkOnGetStartedPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  describe('on the Get Started page', function () {
-    beforeEach(async function () {
-      await testUser.navigateToGetStartedPage();
-    }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  it(
+    'should be able to use the "Welcome to Oppia" link',
+    async function () {
+      await loggedOutUser.clickWelcomeToOppiaLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "create one here" link',
-      async function () {
-        await testUser.clickCreateOneHereLinkInGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use the "Get Electrified!" link',
+    async function () {
+      await loggedOutUser.clickGetElectrifiedLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "Welcome to Oppia" link',
-      async function () {
-        await testUser.clickWelcomeToOppiaLinkInGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use the "Programming with Carla" link',
+    async function () {
+      await loggedOutUser.clickProgrammingWithCarlaLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "Get Electrified!" link',
-      async function () {
-        await testUser.clickGetElectrifiedLinkInGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use "in our user documentation" link',
+    async function () {
+      await loggedOutUser.clickInOurUserDocumentationLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "Programming with Carla" link',
-      async function () {
-        await testUser.clickProgrammingWithCarlaLinkInGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use the "embed it in your own web page" link',
+    async function () {
+      await loggedOutUser.clickEmbedItInYourOwnWebPageLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use "in our user documentation" link',
-      async function () {
-        await testUser.clickInOurUserDocumentationLinkInGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use the "discover more ways to get involved" link',
+    async function () {
+      await loggedOutUser.clickDiscoverMoreWaysToGetInvolvedLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "embed it in your own web page" link',
-      async function () {
-        await testUser.clickEmbedItInYourOwnWebPageLinkInGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
-
-    it(
-      'should be able to use the "discover more ways to get involved" link',
-      async function () {
-        await testUser.clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
-
-    afterAll(async function () {
-      await UserFactory.closeAllBrowsers();
-    });
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
   });
 });

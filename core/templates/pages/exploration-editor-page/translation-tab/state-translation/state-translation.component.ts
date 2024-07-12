@@ -134,6 +134,10 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       .isEnabled;
   }
 
+  isVoiceoverContributionWithAccentEnabled(): boolean {
+    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
+  }
+
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return subtitledHtml.html;
@@ -141,7 +145,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
     let langCode = this.translationLanguageService.getActiveLanguageCode();
     if (
-      !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+      !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         langCode
       )
     ) {
@@ -149,7 +153,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     }
 
     let translationContent =
-      this.entityTranslationsService.languageCodeToEntityTranslations[
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         langCode
       ].getWrittenTranslation(subtitledHtml.contentId);
     if (!translationContent) {
@@ -166,7 +170,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
     let langCode = this.translationLanguageService.getActiveLanguageCode();
     if (
-      !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+      !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         langCode
       )
     ) {
@@ -174,7 +178,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     }
 
     let translationContent =
-      this.entityTranslationsService.languageCodeToEntityTranslations[
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         langCode
       ].getWrittenTranslation(SubtitledUnicode.contentId);
     if (!translationContent) {
@@ -278,7 +282,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     if (!this.translationTabActiveModeService.isVoiceoverModeActive()) {
       let langCode = this.translationLanguageService.getActiveLanguageCode();
       const entityTranslations =
-        this.entityTranslationsService.languageCodeToEntityTranslations[
+        this.entityTranslationsService.languageCodeToLatestEntityTranslations[
           langCode
         ];
       if (entityTranslations) {
@@ -728,9 +732,9 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         'Translation needs update ' +
         'to match text. Please re-translate the content.';
     }
-    this.isDisabled(this.activeTab) || !this.activeTab
+    this.isDisabled(this.activatedTabId) || !this.activatedTabId
       ? this.onTabClick(this.TAB_ID_CONTENT)
-      : this.onTabClick(this.activeTab);
+      : this.onTabClick(this.activatedTabId);
 
     this.updateTranslatedContent();
   }

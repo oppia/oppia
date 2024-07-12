@@ -17,7 +17,12 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {
+  async,
+  ComponentFixture,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from 'modules/material.module';
@@ -42,6 +47,12 @@ describe('Admin dev mode activities tab', () => {
     demoExplorationIds: ['expId'],
     demoExplorations: [['0', 'welcome.yaml']],
     demoCollections: [['collectionId']],
+    skillList: [
+      {
+        id: 'Fg6LbD9h2Eg4',
+        description: 'Skill1',
+      },
+    ],
   } as AdminPageData;
   let mockConfirmResult: (val: boolean) => void;
 
@@ -371,6 +382,50 @@ describe('Admin dev mode activities tab', () => {
     );
   });
 
+  describe('.generateDummyTranslationOpportunities', () => {
+    it('should generate dummy translation opportunities', waitForAsync(() => {
+      component.numDummyTranslationOpportunitiesToGenerate = 2;
+
+      spyOn(
+        adminBackendApiService,
+        'generateDummyTranslationOpportunitiesAsync'
+      ).and.returnValue(Promise.resolve());
+      spyOn(component.setStatusMessage, 'emit');
+      component.generateDummyTranslationOpportunities();
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Processing...'
+      );
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Dummy translation opportunities (explorations) generated successfully.'
+        );
+      });
+    }));
+
+    it('should show error message when dummy translation opportunities are not generated', waitForAsync(() => {
+      spyOn(
+        adminBackendApiService,
+        'generateDummyTranslationOpportunitiesAsync'
+      ).and.returnValue(
+        Promise.reject('Dummy translation opportunities not generated.')
+      );
+      spyOn(component.setStatusMessage, 'emit');
+      component.generateDummyTranslationOpportunities();
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Processing...'
+      );
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Server error: Dummy translation opportunities not generated.'
+        );
+      });
+    }));
+  });
+
   describe('.generateDummyBlogPost', () => {
     it('should generate dummy blog post', async(() => {
       spyOn(
@@ -560,6 +615,127 @@ describe('Admin dev mode activities tab', () => {
         );
       });
     }));
+  });
+
+  describe('.generateDummyExploration', () => {
+    it(
+      'should not generate dummy exploration if publish count is greater' +
+        'than generate count',
+      () => {
+        let adminBackendSpy = spyOn(
+          adminBackendApiService,
+          'generateDummyExplorationsAsync'
+        );
+
+        component.numDummyExpsToPublish = 2;
+        component.numDummyExpsToGenerate = 1;
+
+        spyOn(component.setStatusMessage, 'emit');
+
+        component.generateDummyExplorations();
+
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Publish count should be less than or equal to generate count'
+        );
+        expect(adminBackendSpy).not.toHaveBeenCalled();
+      }
+    );
+
+    it('should generate dummy explorations', async(() => {
+      component.numDummyExpsToPublish = 1;
+      component.numDummyExpsToGenerate = 2;
+
+      spyOn(
+        adminBackendApiService,
+        'generateDummyExplorationsAsync'
+      ).and.returnValue(Promise.resolve());
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.generateDummyExplorations();
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Processing...'
+      );
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Dummy explorations generated successfully.'
+        );
+      });
+    }));
+
+    it('should show error message when dummy explorations are not generated', async(() => {
+      component.numDummyExpsToPublish = 2;
+      component.numDummyExpsToGenerate = 2;
+
+      spyOn(
+        adminBackendApiService,
+        'generateDummyExplorationsAsync'
+      ).and.returnValue(Promise.reject('Dummy explorations not generated.'));
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.generateDummyExplorations();
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Processing...'
+      );
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Server error: Dummy explorations not generated.'
+        );
+      });
+    }));
+  });
+
+  describe('.generateDummySuggestionQuestions', () => {
+    it('should generate dummy suggestion questions', async () => {
+      spyOn(
+        adminBackendApiService,
+        'generateDummySuggestionQuestionsAsync'
+      ).and.returnValue(Promise.resolve());
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.numDummySuggestionQuesToGenerate = 2;
+
+      component.generateDummySuggestionQuestions('0');
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Processing...'
+      );
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Dummy suggestion questions generated successfully.'
+        );
+      });
+    });
+
+    it(
+      'should show error message when dummy suggestion questions' +
+        'are not generated',
+      async () => {
+        spyOn(
+          adminBackendApiService,
+          'generateDummySuggestionQuestionsAsync'
+        ).and.returnValue(
+          Promise.reject('Dummy suggestion questions not generated.')
+        );
+        spyOn(component.setStatusMessage, 'emit');
+
+        component.numDummySuggestionQuesToGenerate = 2;
+
+        component.generateDummySuggestionQuestions('0');
+
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Processing...'
+        );
+        fixture.whenStable().then(() => {
+          expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+            'Server error: Dummy suggestion questions not generated.'
+          );
+        });
+      }
+    );
   });
 
   describe('.reloadCollection', () => {
