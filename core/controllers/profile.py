@@ -259,7 +259,17 @@ class MailingListSubscriptionHandler(
         status = user_services.add_user_to_mailing_list(email, tag, name=name)
         self.render_json({'status': status})
 
-class CheckEmailSubscription(): # New Changes
+class CheckEmailSubscriptionHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of CheckEmailSubscriptionHandler's
+    normalized_request dictionary.
+    """
+    email: str
+
+class CheckEmailSubscription(
+    base.BaseHandler[
+        CheckEmailSubscriptionHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+): # New Changes
     """Checks if the email is subscribed to the mailing list."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -280,10 +290,20 @@ class CheckEmailSubscription(): # New Changes
     @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET request."""
-        assert self.normalized_request is not None
-        email = self.normalized_payload['email']
-        is_subscribed = user_services.check_if_email_is_subscribed(email)
-        self.render_json({'is_subscribed': is_subscribed})
+        try:
+            logging.info(f"Incoming request: {self.request}")
+            assert self.normalized_request is not None
+            email = self.normalized_payload['email']
+            logging.info(f"Received email for subscription check: {email}")
+            status = user_services.check_if_email_is_subscribed(email)
+            logging.info(f"Subscription status for {email}: {status}")
+            self.render_json({'status': status})
+        except KeyError as e:
+            logging.error(f"Missing key in normalized payload: {e}")
+            self.render_json({'error': f"Missing key: {str(e)}"})
+        except Exception as e:
+            logging.error(f"Error in CheckEmailSubscription handler: {e}")
+            self.render_json({'error': str(e)})
 
 class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides data for the preferences page."""
