@@ -2,8 +2,8 @@
   [ngClass]="{'classroom-card-big': !usedInCarousel, 'classroom-card-small': usedInCarousel}">
   <a [href]="getClassroomUrl()" class="classroom-content" [ngClass]="{'classroom-content-big': !usedInCarousel, 'classroom-content-small': usedInCarousel}">
     <img alt="Classroom thumbnail image" class="classroom-thumbnail"
-      [ngClass]="{'classroom-thumbnail-big': !usedInCarousel, 'classroom-thumbnail-small': usedInCarousel}"
-      [src]="classroomThumbnailUrl">
+         [ngClass]="{'classroom-thumbnail-big': !usedInCarousel, 'classroom-thumbnail-small': usedInCarousel}"
+         [src]="classroomThumbnailUrl">
     <div class="classroom-text-container">
       <h3 class="classroom-name">{{getName()}}</h3>
     </div>
@@ -99,7 +99,7 @@
       height: 142px;
       width: 140px;
     }
-  
+
     .classroom-content .classroom-thumbnail-small {
       bottom: 10px;
       position: relative;
@@ -122,12 +122,12 @@
     }
 
     .classroom-content .classroom-thumbnail-small {
+      bottom: 0;
       height: 52px;
       scale: 1.4;
       width: 52px;
-      bottom: 0;
     }
-    
+
     .classroom-name {
       font-size: 12px;
     }

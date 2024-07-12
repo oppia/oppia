@@ -515,7 +515,7 @@ export class LibraryPageComponent {
   }
 
   getClassroomsForChunk(
-    classroomSummaries: any[],
+    classroomSummaries: ClassroomSummaryDict[],
     chunkIndex: number
   ): ClassroomSummaryDict[] {
     const chunkSize = 3;

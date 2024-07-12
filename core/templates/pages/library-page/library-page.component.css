@@ -219,7 +219,7 @@ oppia-library-page .classroom-cards-wrapper {
   background-color: #eef5fb;
   display: flex;
   height: 344px;
-  justify-content: center;  
+  justify-content: center;
 }
 
 oppia-library-page .classroom-cards-wrapper .classroom-cards-inner-container {
@@ -238,7 +238,7 @@ oppia-library-page .classroom-cards-wrapper .classroom-cards-inner-container .cl
   height: 184px;
   justify-content: space-between;
   padding-bottom: 24px;
-  width: 260px;  
+  width: 260px;
 }
 
 oppia-library-page .classroom-cards-text-container h1 {
@@ -255,31 +255,31 @@ oppia-library-page .classroom-cards-text-container p {
 
 oppia-library-page .classroom-cards-wrapper .classroom-cards-inner-container .classrooms-carousel {
   align-items: center;
+  display: flex;
   gap: 4px;
   height: 184px;
-  display: flex;
   justify-content: center;
   width: 520px;
 }
 
 oppia-library-page .individual-classroom-cards {
-  margin-left: 38px;
+  align-items: center;
   display: flex;
   flex-direction: row;
-  align-items: center;
   gap: 22px;
+  margin-left: 38px;
 }
 
 oppia-library-page .classrooms-carousel .classrooms-carousel-change-slide-btn {
-  display: flex;
   align-items: center;
+  background: white;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.25);
+  display: flex;
+  height: 48px;
   justify-content: center;
   width: 20px;
-  height: 48px;
-  background: #FFFFFF;
-  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
-  border-radius: 4px;
-  border: none;
 }
 
 oppia-library-page .classrooms-carousel .classrooms-carousel-change-slide-btn i {
@@ -297,6 +297,8 @@ oppia-library-page .classrooms-card-container {
 oppia-library-page .classrooms-carousel .carousel-indicators li {
   background-color: gray;
   border-radius: 50%;
+  height: 8px;
+  width: 8px;
 }
 
 oppia-library-page .classrooms-carousel .carousel-indicators li.active {
@@ -306,11 +308,6 @@ oppia-library-page .classrooms-carousel .carousel-indicators li.active {
 oppia-library-page .classrooms-carousel .carousel-indicators {
   bottom: -40px;
   gap: 0;
-}
-
-oppia-library-page .classrooms-carousel .carousel-indicators li {
-  height: 8px;
-  width: 8px;
 }
 
 .oppia-library-no-exploration-groups {
@@ -395,6 +392,12 @@ oppia-library-page .classrooms-carousel .mobile-carousel-btn {
 
   oppia-library-page .classrooms-carousel .carousel-indicators {
     bottom: -14px;
+    display: flex;
+    justify-content: center;
+    left: 50%;
+    margin: 0;
+    transform: translateX(-50%);
+    width: fit-content;
   }
 
   oppia-library-page .classrooms-carousel {
@@ -412,7 +415,7 @@ oppia-library-page .classrooms-carousel .mobile-carousel-btn {
     padding: 0;
     position: absolute;
     width: auto;
-    z-index: 1;    
+    z-index: 1;
   }
 
   oppia-library-page .classrooms-carousel .mobile-prev-btn {
@@ -423,22 +426,8 @@ oppia-library-page .classrooms-carousel .mobile-carousel-btn {
     right: calc(50% - 50px);
   }
 
-  oppia-library-page .classrooms-carousel .carousel-indicators {
-    bottom: -14px;
-    display: flex;
-    justify-content: center;
-    left: 50%;
-    margin: 0;
-    transform: translateX(-50%);
-    width: fit-content;    
-  }
-
   oppia-library-page .classrooms-carousel .carousel-indicators li {
     margin: 0 4px;
-  }
-
-  oppia-library-page .classrooms-carousel .desktop-carousel-btn {
-    display: none;
   }
 }
 @media (max-width: 727px) {
