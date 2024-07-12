@@ -1,4 +1,4 @@
-<div class="classroom-cards-wrapper">
+<div class="classroom-cards-wrapper" *ngIf="publicClassroomsCount > 0">
   <div class="classroom-cards-inner-container">
     <div class="classroom-cards-text-container">
       <h1>{{ 'I18N_COMMUNITY_LIBRARY_PAGE_CLASSROOMS_HINT_TEXT' | translate }}</h1>
@@ -7,7 +7,7 @@
     <div class="individual-classroom-cards" *ngIf="publicClassroomsCount >= 1 && publicClassroomsCount <= 2">
       <ng-container *ngFor="let classroomSummary of classroomSummaries">
         <oppia-classroom-card
-          *ngIf="someCondition(classroomSummary)"
+          *ngIf="classroomSummary.is_published"
           [classroomSummary]="classroomSummary"
           [usedInCarousel]="false">
         </oppia-classroom-card>
@@ -22,7 +22,7 @@
           <ng-container *ngFor="let chunkIndex of getClassroomChunkIndices(classroomSummaries.length)">
             <ng-template ngbSlide>
               <div class="classrooms-card-container">
-                <ng-container *ngFor="let classroomSummary of getClassroomsForChunk(classroomSummaries, chunkIndex); let i = index">
+                <ng-container *ngFor="let classroomSummary of getClassroomsForChunk(classroomSummaries, chunkIndex)">
                   <oppia-classroom-card
                     *ngIf="classroomSummary.is_published"
                     [classroomSummary]="classroomSummary"
