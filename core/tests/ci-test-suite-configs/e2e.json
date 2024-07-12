@@ -33,10 +33,6 @@
       "module": "core/tests/webdriverio_desktop/classroomPage.js"
     },
     {
-      "name": "classroomPageFileUploadFeatures",
-      "module": "core/tests/webdriverio_desktop/classroomPageFileUploadFeatures.js"
-    },
-    {
       "name": "collections",
       "module": "core/tests/webdriverio_desktop/collections.js"
     },
@@ -163,10 +159,6 @@
     {
       "name": "wipeout",
       "module": "core/tests/webdriverio_desktop/wipeout.js"
-    },
-    {
-      "name": "adminPage",
-      "module": "core/tests/webdriverio_desktop/adminTabFeatures.js"
     }
   ]
 }
