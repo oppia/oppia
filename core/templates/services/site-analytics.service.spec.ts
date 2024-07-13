@@ -82,7 +82,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith(
         'event',
-        'discovery_browse_lessons',
+        'browse_lessons_button_click',
         {
           page_path: pathname,
         }

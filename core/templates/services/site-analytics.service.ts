@@ -75,7 +75,7 @@ export class SiteAnalyticsService {
   }
 
   registerClickBrowseLessonsButtonEvent(): void {
-    this._sendEventToGoogleAnalytics('discovery_browse_lessons', {
+    this._sendEventToGoogleAnalytics('browse_lessons_button_click', {
       page_path: this.windowRef.nativeWindow.location.pathname,
     });
   }
