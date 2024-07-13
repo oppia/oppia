@@ -677,6 +677,7 @@
   .volunteer-page .mat-tab-labels {
     display: flex;
     gap: 12px;
+    padding: 4px 0;
   }
 
   .volunteer-page .mat-tab-header {
@@ -1075,12 +1076,15 @@
       font-size: 16px;
       line-height: 19.2px;
     }
+    .volunteer-page  .oppia-volunteer-tabs .carousel-caption {
+      top: 320px;
+    }
+  }
+
+  @media screen and (max-width: 641px) and (min-width: 441px) {
     .volunteer-page .oppia-volunteer-tabs ngb-carousel img {
       height: 368px;
       width: 100%;
-    }
-    .volunteer-page  .oppia-volunteer-tabs .carousel-caption {
-      top: 320px;
     }
   }
 
@@ -1139,21 +1143,21 @@
       margin-right: 0;
     }
 
+    .oppia-volunteer-tabs ngb-carousel {
+      width: 300px;
+    }
+
     .volunteer-page .oppia-volunteer-tabs ngb-carousel p {
       font-size: 13px;
       line-height: 15.6px;
     }
 
     .volunteer-page .oppia-volunteer-tabs ngb-carousel .oppia-carousel-wrapper {
-      height: 430px;
+      height: 440px;
     }
 
     .volunteer-page .oppia-volunteer-tabs .carousel-caption {
       top: 210px;
-    }
-
-    .volunteer-page .oppia-volunteer-tabs ngb-carousel img {
-      height: 210px;
     }
 
     .oppia-volunteer-footer {
