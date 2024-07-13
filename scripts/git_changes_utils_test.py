@@ -70,7 +70,13 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 return process_for_upstream_url
             else:
                 return process_for_remote
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen,
+            expected_args=[
+                (['git', 'remote'],),
+                ([b'git', b'config', b'--get', b'remote.origin.url'],),
+                ([b'git', b'config', b'--get', b'remote.upstream.url'],)
+            ])
         with popen_swap:
             self.assertEqual(
                 git_changes_utils.get_local_git_repository_remote_name(),
@@ -91,7 +97,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
 
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen,
+            expected_args=[(['git', 'remote'],)])
         with popen_swap, self.assertRaisesRegex(ValueError, 'test_oppia_error'):
             git_changes_utils.get_local_git_repository_remote_name()
 
@@ -117,7 +125,12 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         communicate_swap = self.swap(
             process_for_remote_url, 'communicate', mock_communicate
         )
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen,
+            expected_args=[
+                (['git', 'remote'],),
+                ([b'git', b'config', b'--get', b'remote.origin.url'],)
+            ])
         with communicate_swap:
             with popen_swap:
                 with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
@@ -131,7 +144,13 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_for_remote
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen,
+            expected_args=[
+                (['git', 'remote'],),
+                ([b'git', b'config', b'--get', b'remote..url'],)
+            ]
+        )
         with popen_swap, self.assertRaisesRegex(
             Exception,
             'Error: Please set the git \'upstream\' repository.\n'
@@ -168,7 +187,14 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 return process_for_upstream_url
             else:
                 return process_for_remote
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen,
+            expected_args=[
+                (['git', 'remote'],),
+                ([b'git', b'config', b'--get', b'remote.origin.url'],),
+                ([b'git', b'config', b'--get', b'remote.upstream.url'],)
+            ]
+        )
         with popen_swap, self.print_swap:
             self.assertIsNone(
                 git_changes_utils.get_local_git_repository_remote_name())
@@ -212,15 +238,19 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str]
         ) -> Tuple[str, str]:
             return ('M\tfile1\nA\tfile2', 'test_oppia_error')
-        subprocess_swap = self.swap(
+        subprocess_swap = self.swap_with_checks(
             common, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result)
+            mock_start_subprocess_for_result,
+            expected_args=[
+                (['git', 'diff', '--name-status', 'left', 'right', '--'],)
+            ]
+        )
 
         with subprocess_swap, self.assertRaisesRegex(
             ValueError, 'test_oppia_error'
         ):
             git_changes_utils.git_diff_name_status(
-                'left', 'right', diff_filter='filter')
+                'left', 'right')
 
     def test_git_diff_name_status_with_no_left_and_right(self) -> None:
         def mock_start_subprocess_for_result(
@@ -336,14 +366,17 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
 
         def mock_get_merge_base(unused_left: str, unused_right: str) -> str:
             return 'Merge Base'
-        subprocess_swap = self.swap(
+        subprocess_swap = self.swap_with_checks(
             common, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result)
-        git_diff_swap = self.swap(
+            mock_start_subprocess_for_result,
+            expected_args=[(['git', 'pull', 'remote'],)])
+        git_diff_swap = self.swap_with_checks(
             git_changes_utils, 'git_diff_name_status',
-            mock_git_diff_name_status)
-        get_merge_base_swap = self.swap(
-            git_changes_utils, 'get_merge_base', mock_get_merge_base)
+            mock_git_diff_name_status,
+            expected_args=[('Merge Base', 'local branch')])
+        get_merge_base_swap = self.swap_with_checks(
+            git_changes_utils, 'get_merge_base', mock_get_merge_base,
+            expected_args=[('remote/local branch', 'local branch')])
         curr_dir_swap = self.swap(
             common, 'CURR_DIR', '/usr/opensource/oppia')
 
@@ -360,9 +393,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str]
         ) -> Tuple[None, str]:
             return None, 'Test'
-        subprocess_swap = self.swap(
+        subprocess_swap = self.swap_with_checks(
             common, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result)
+            mock_start_subprocess_for_result,
+            expected_args=[(['git', 'merge-base', 'A', 'B'],)])
 
         with subprocess_swap, self.assertRaisesRegex(ValueError, 'Test'):
             git_changes_utils.get_merge_base('A', 'B')
@@ -447,8 +481,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
 
         get_branch_swap = self.swap(
             common, 'get_current_branch_name', mock_get_branch)
-        compare_to_remote_swap = self.swap(
-            git_changes_utils, 'compare_to_remote', mock_compare_to_remote)
+        compare_to_remote_swap = self.swap_with_checks(
+            git_changes_utils, 'compare_to_remote', mock_compare_to_remote,
+            expected_args=[('remote', 'branch1')])
         extract_files_swap = self.swap(
             git_changes_utils, 'extract_acmrt_files_from_diff',
             mock_extract_acmrt_files_from_diff)
