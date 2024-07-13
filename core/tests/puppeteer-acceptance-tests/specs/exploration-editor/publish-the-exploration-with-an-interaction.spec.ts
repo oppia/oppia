@@ -24,15 +24,13 @@ import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-const INTRODUCTION_CARD_CONTENT: string =
-  'This exploration is for publishing an exploration with an interaction.';
+const INTRODUCTION_CARD_CONTENT: string = 'Test Question';
 
 enum INTERACTION_TYPES {
-  CONTINUE_BUTTON = 'Continue Button',
   END_EXPLORATION = 'End Exploration',
 }
 enum CARD_NAME {
-  FINAL_CARD = 'Final Card',
+  LAST_CARD = 'Last Card',
 }
 
 describe('Exploration Creator', function () {
@@ -62,13 +60,13 @@ describe('Exploration Creator', function () {
       await explorationEditor.navigateToExplorationEditorPage();
       await explorationEditor.dismissWelcomeModal();
       await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
-      await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await explorationEditor.addImageInteraction();
+      await explorationEditor.editDefaultResponseFeedback('Wrong.');
 
+      await explorationEditor.addHintToState('Initial coordinate');
       // Add a new card with an end interaction.
-      await explorationEditor.viewOppiaResponses();
-      await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
-      await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-      await explorationEditor.updateCardContent('It is final card');
+      await explorationEditor.navigateToCard(CARD_NAME.LAST_CARD);
+      await explorationEditor.updateCardContent('Congratulations!');
       await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
       await explorationEditor.saveExplorationDraft();
