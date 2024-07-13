@@ -121,7 +121,7 @@ export class BaseUser {
               'Mobile/15A372 Safari/604.1'
           );
         } else {
-          this.page.setViewport({width: 1920, height: 1080});
+          this.page.setViewport({width: 1200, height: 800});
         }
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
@@ -396,6 +396,7 @@ export class BaseUser {
    */
   async type(selector: string, text: string): Promise<void> {
     await this.page.waitForSelector(selector, {visible: true});
+    await this.waitForElementToBeClickable(selector);
     await this.page.type(selector, text);
   }
 
@@ -404,6 +405,7 @@ export class BaseUser {
    */
   async select(selector: string, option: string): Promise<void> {
     await this.page.waitForSelector(selector);
+    await this.waitForElementToBeClickable(selector);
     await this.page.select(selector, option);
   }
 
