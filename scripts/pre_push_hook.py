@@ -65,7 +65,8 @@ OPPIA_PARENT_DIR: Final = os.path.join(
     FILE_DIR, os.pardir, os.pardir, os.pardir
 )
 FRONTEND_TEST_CMDS: Final = [
-    PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
+    PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage',
+    '--allow_no_spec']
 BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD: Final = [
     PYTHON_CMD, '-m', 'scripts.check_backend_associated_test_file']
 TYPESCRIPT_CHECKS_CMDS: Final = [

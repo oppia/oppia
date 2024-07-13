@@ -189,14 +189,18 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str]
         ) -> Tuple[bytes, None]:
             return (b'M\tfile1\nA\tfile2', None)
-        subprocess_swap = self.swap(
+        subprocess_swap = self.swap_with_checks(
             common, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result)
+            mock_start_subprocess_for_result,
+            expected_args=[
+                (['git', 'diff', '--name-status', 'left', 'right', '--'],)
+            ]
+        )
 
         with subprocess_swap:
             self.assertEqual(
                 git_changes_utils.git_diff_name_status(
-                    'left', 'right', diff_filter='filter'),
+                    'left', 'right'),
                 [
                     git_changes_utils.FileDiff(status=b'M', name=b'file1'),
                     git_changes_utils.FileDiff(status=b'A', name=b'file2')
@@ -220,14 +224,14 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
 
     def test_git_diff_name_status_with_no_left_and_right(self) -> None:
         def mock_start_subprocess_for_result(
-            cmd_tokens: List[str]
+            unused_cmd_tokens: List[str]
         ) -> Tuple[bytes, None]:
-            if cmd_tokens == ['git', 'diff', '--name-status']:
-                return (b'M\tfile1\nA\tfile2', None)
-            return (b'', None)
-        subprocess_swap = self.swap(
+            return (b'M\tfile1\nA\tfile2', None)
+        subprocess_swap = self.swap_with_checks(
             common, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result)
+            mock_start_subprocess_for_result,
+            expected_args=[(['git', 'diff', '--name-status'],)]
+        )
 
         with subprocess_swap:
             self.assertEqual(
@@ -252,7 +256,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ):
             git_changes_utils.git_diff_name_status(right='')
 
-    def test_git_diff_name_status_with_empty_diff_filter_should_error(self) -> None: # pylint: disable=line-too-long
+    def test_git_diff_name_status_with_empty_filter_should_error(self) -> None:
         with self.assertRaisesRegex(
             ValueError,
             'Error: diff_filter should not be an empty string.'
@@ -270,16 +274,6 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 '/usr/opensource/oppia/test.py', '/usr/opensource/oppia'))
 
     def test_compare_to_remote(self) -> None:
-        check_function_calls = {
-            'start_subprocess_for_result_is_called': False,
-            'git_diff_name_status_is_called': False,
-            'get_merge_base_is_called': False,
-        }
-        expected_check_function_calls = {
-            'start_subprocess_for_result_is_called': True,
-            'git_diff_name_status_is_called': True,
-            'get_merge_base_is_called': True,
-        }
         expected_file_diffs = [
             git_changes_utils.FileDiff(
                 status=b'M', name=b'/usr/opensource/oppia/file1.py'),
@@ -289,23 +283,27 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         def mock_start_subprocess_for_result(
             unused_cmd_tokens: List[str]
         ) -> None:
-            check_function_calls['start_subprocess_for_result_is_called'] = True
+            pass
         def mock_git_diff_name_status(
             unused_left: str, unused_right: str
         ) -> List[git_changes_utils.FileDiff]:
-            check_function_calls['git_diff_name_status_is_called'] = True
             return expected_file_diffs
         def mock_get_merge_base(unused_left: str, unused_right: str) -> str:
-            check_function_calls['get_merge_base_is_called'] = True
             return 'Merge Base'
-        subprocess_swap = self.swap(
+        subprocess_swap = self.swap_with_checks(
             common, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result)
-        git_diff_swap = self.swap(
+            mock_start_subprocess_for_result,
+            expected_args=[
+                (['git', 'pull', 'remote'],)
+            ]
+        )
+        git_diff_swap = self.swap_with_checks(
             git_changes_utils, 'git_diff_name_status',
-            mock_git_diff_name_status)
-        get_merge_base_swap = self.swap(
-            git_changes_utils, 'get_merge_base', mock_get_merge_base)
+            mock_git_diff_name_status,
+            expected_args=[('Merge Base', 'local branch')])
+        get_merge_base_swap = self.swap_with_checks(
+            git_changes_utils, 'get_merge_base', mock_get_merge_base,
+            expected_args=[('remote/local branch', 'local branch')])
         curr_dir_swap = self.swap(common, 'CURR_DIR', '/usr/opensource/oppia')
 
         with subprocess_swap, git_diff_swap, get_merge_base_swap:
@@ -315,7 +313,6 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                         'remote', 'local branch'),
                     expected_file_diffs
                 )
-        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_compare_to_remote_with_file_not_in_oppia_directory_should_error(
         self
@@ -371,25 +368,17 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             git_changes_utils.get_merge_base('A', 'B')
 
     def test_get_merge_base_returns_merge_base(self) -> None:
-        check_function_calls = {
-            'start_subprocess_for_result_is_called': False,
-        }
-        expected_check_function_calls = {
-            'start_subprocess_for_result_is_called': True,
-        }
         def mock_start_subprocess_for_result(
             unused_cmd_tokens: List[str]
         ) -> Tuple[bytes, None]:
-            check_function_calls['start_subprocess_for_result_is_called'] = True
             return b'Test', None
-        subprocess_swap = self.swap(
+        subprocess_swap = self.swap_with_checks(
             common, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result)
+            mock_start_subprocess_for_result,
+            expected_args=[(['git', 'merge-base', 'A', 'B'],)])
 
         with subprocess_swap:
             self.assertEqual(git_changes_utils.get_merge_base('A', 'B'), 'Test')
-
-        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_extract_acmrt_files_with_empty_file_diffs(self) -> None:
         self.assertEqual(
@@ -500,18 +489,19 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             self.assertEqual(git_changes_utils.get_staged_acmrt_files(), [])
 
     def test_get_refs_with_stdin(self) -> None:
-        temp_stdin_file = tempfile.NamedTemporaryFile().name
-        with utils.open_file(temp_stdin_file, 'w') as f:
-            f.write('local_ref local_sha1 remote_ref remote_sha1')
-        with utils.open_file(temp_stdin_file, 'r') as f:
-            with self.swap(sys, 'stdin', f):
-                self.assertEqual(
-                    git_changes_utils.get_refs(),
-                    [
-                        git_changes_utils.GitRef(
-                            local_ref='local_ref', local_sha1='local_sha1',
-                            remote_ref='remote_ref', remote_sha1='remote_sha1'
-                        )])
+        with tempfile.NamedTemporaryFile() as temp_stdin_file:
+            with utils.open_file(temp_stdin_file.name, 'w') as f:
+                f.write('local_ref local_sha1 remote_ref remote_sha1')
+            with utils.open_file(temp_stdin_file.name, 'r') as f:
+                with self.swap(sys, 'stdin', f):
+                    self.assertEqual(
+                        git_changes_utils.get_refs(),
+                        [
+                            git_changes_utils.GitRef(
+                                local_ref='local_ref', local_sha1='local_sha1',
+                                remote_ref='remote_ref',
+                                remote_sha1='remote_sha1'
+                            )])
 
     def test_get_refs_without_stdin_should_use_current_branch(self) -> None:
         def mock_get_branch() -> str:
