@@ -41,7 +41,7 @@ import {
   LibraryPageBackendApiService,
   SummaryDict,
 } from './services/library-page-backend-api.service';
-import {NgbCarousel} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCarousel, NgbSlideEvent} from '@ng-bootstrap/ng-bootstrap';
 import './library-page.component.css';
 
 interface MobileLibraryGroupProperties {
@@ -495,14 +495,19 @@ export class LibraryPageComponent {
       });
   }
 
-  moveCarouselToPreviousSlide(): void {
+  moveClassroomCarouselToPreviousSlide(): void {
     this.classroomCarouselIndex -= 1;
     this.classroomCarousel.prev();
   }
 
-  moveCarouselToNextSlide(): void {
+  moveClassroomCarouselToNextSlide(): void {
     this.classroomCarouselIndex += 1;
     this.classroomCarousel.next();
+  }
+
+  onClassroomNavigationIndicatorClicked(slideEvent: NgbSlideEvent): void {
+    // Extract numeric index from slide id (format: 'ngb-slide-{index}')
+    this.classroomCarouselIndex = parseInt(slideEvent.current.split('-')[2]);
   }
 
   getClassroomChunkIndices(length: number): number[] {

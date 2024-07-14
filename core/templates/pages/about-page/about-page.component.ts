@@ -287,7 +287,7 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
-  moveCarouselToPreviousSlide(): void {
+  moveClassroomCarouselToPreviousSlide(): void {
     if (this.screenType === 'mobile') {
       this.volunteerCarouselMobile.prev();
     } else {
@@ -295,7 +295,7 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  moveCarouselToNextSlide(): void {
+  moveClassroomCarouselToNextSlide(): void {
     if (this.screenType === 'mobile') {
       this.volunteerCarouselMobile.next();
     } else {

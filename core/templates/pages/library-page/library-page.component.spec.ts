@@ -50,7 +50,11 @@ import {
   LibraryPageBackendApiService,
 } from './services/library-page-backend-api.service';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
-import {NgbCarousel} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbCarousel,
+  NgbSlideEvent,
+  NgbSlideEventDirection,
+} from '@ng-bootstrap/ng-bootstrap';
 
 class MockWindowRef {
   nativeWindow = {
@@ -836,6 +840,13 @@ describe('Library Page Component', () => {
     componentInstance.publicClassroomsCount =
       componentInstance.classroomSummaries.length;
 
+    const mockSlideEvent: NgbSlideEvent = {
+      current: 'ngb-slide-0',
+      paused: false,
+      prev: '',
+      direction: 'left' as NgbSlideEventDirection,
+    };
+
     expect(
       componentInstance.getClassroomChunkIndices(
         componentInstance.classroomSummaries.length
@@ -857,12 +868,17 @@ describe('Library Page Component', () => {
     expect(componentInstance.showNextClassroomChunkButton()).toBe(true);
     expect(componentInstance.showPreviousClassroomChunkButton()).toBe(false);
 
-    componentInstance.moveCarouselToNextSlide();
+    componentInstance.moveClassroomCarouselToNextSlide();
     expect(componentInstance.classroomCarouselIndex).toEqual(1);
+
+    componentInstance.onClassroomNavigationIndicatorClicked(mockSlideEvent);
+    expect(componentInstance.classroomCarouselIndex).toEqual(0);
+
+    componentInstance.moveClassroomCarouselToNextSlide();
     expect(componentInstance.showNextClassroomChunkButton()).toBe(false);
     expect(componentInstance.showPreviousClassroomChunkButton()).toBe(true);
 
-    componentInstance.moveCarouselToPreviousSlide();
+    componentInstance.moveClassroomCarouselToPreviousSlide();
     expect(componentInstance.classroomCarouselIndex).toEqual(0);
     expect(componentInstance.showNextClassroomChunkButton()).toBe(true);
     expect(componentInstance.showPreviousClassroomChunkButton()).toBe(false);
