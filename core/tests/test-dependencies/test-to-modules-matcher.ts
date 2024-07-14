@@ -177,6 +177,7 @@ export class TestToModulesMatcher {
       }
       page.on('framenavigated', async (frame: Frame) => {
         const url = frame.url();
+        console.log(url);
         TestToModulesMatcher.registerUrl(url);
       });
     });

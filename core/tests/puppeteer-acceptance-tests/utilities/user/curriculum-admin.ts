@@ -253,6 +253,7 @@ export class CurriculumAdmin extends BaseUser {
       `${confirmSkillCreationButton}:not([disabled])`
     );
     await this.clickOn(confirmSkillCreationButton);
+    console.log(this.page.frames());
     await this.page.bringToFront();
   }
 
