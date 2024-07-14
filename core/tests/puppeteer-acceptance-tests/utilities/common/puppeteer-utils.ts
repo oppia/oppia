@@ -362,14 +362,14 @@ export class BaseUser {
   /**
    * This function retrieves the text content of a specified element.
    */
-  async getElementText(selector: string): Promise<string> {
-    await this.page.waitForSelector(selector);
+  async getElementTextContent(selector: string): Promise<string> {
+    await this.page.waitForSelector(selector, {visible: true});
     const element = await this.page.$(selector);
     if (element === null) {
       throw new Error(`No element found for the selector: ${selector}`);
     }
     const textContent = await this.page.evaluate(el => el.textContent, element);
-    return textContent ?? '';
+    return textContent.trim() ?? '';
   }
 
   /**
@@ -529,10 +529,56 @@ export class BaseUser {
   }
 
   /**
-   * Waits for the page to fully load by checking the document's ready state.
+   * Waits for the static assets on the page to load.
+   */
+  async waitForStaticAssetsLoad(): Promise<void> {
+    await this.page.waitForFunction('document.readyState === "complete"');
+  }
+
+  /**
+   * Waits for the page to fully load by checking the document's ready state and waiting for the respective HTML to load completely.
    */
   async waitForPageToFullyLoad(): Promise<void> {
     await this.page.waitForFunction('document.readyState === "complete"');
+    await this.waitTillHTMLRendered(this.page);
+  }
+
+  /**
+   * This function waits until a page is fully rendered.
+   * It does so via checking every second if the size of the HTML content of the page is stable.
+   * If the size is stable for at least 3 checks, it considers the page fully rendered.
+   * If the size is not stable within the timeout, it stops checking.
+   * @param {Page} page - The page to wait for.
+   * @param {number} timeout - The maximum amount of time to wait, in milliseconds. Default is 30000.
+   */
+  private async waitTillHTMLRendered(
+    page: Page,
+    timeout: number = 30000
+  ): Promise<void> {
+    const checkDurationMsecs = 1000;
+    const maxChecks = timeout / checkDurationMsecs;
+    let lastHTMLSize = 0;
+    let checkCounts = 1;
+    let countStableSizeIterations = 0;
+    const minStableSizeIterations = 3;
+
+    while (checkCounts++ <= maxChecks) {
+      let html = await page.content();
+      let currentHTMLSize = html.length;
+
+      if (lastHTMLSize !== 0 && currentHTMLSize === lastHTMLSize) {
+        countStableSizeIterations++;
+      } else {
+        countStableSizeIterations = 0;
+      }
+      if (countStableSizeIterations >= minStableSizeIterations) {
+        showMessage('Page rendered fully.');
+        break;
+      }
+
+      lastHTMLSize = currentHTMLSize;
+      await page.waitForTimeout(checkDurationMsecs);
+    }
   }
 }
 
