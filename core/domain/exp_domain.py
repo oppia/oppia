@@ -5132,7 +5132,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         for state_dict in states_dict.items():
             state_dict['inapplicable_skill_misconception_ids'] = []
-        states_dict = state_domain.State
 
         return states_dict
 
