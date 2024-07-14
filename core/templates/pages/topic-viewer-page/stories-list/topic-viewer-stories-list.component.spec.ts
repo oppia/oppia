@@ -48,7 +48,6 @@ describe('Topic Viewer Stories List Component', () => {
     component.topicId = 'topicId';
     component.classroomName = 'math';
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
