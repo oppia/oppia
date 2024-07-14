@@ -513,10 +513,6 @@ URLS = [
         voiceover.VoiceoverLanguageCodesMappingHandler
     ),
     get_redirect_route(
-        r'%s' % feconf.VOICE_ARTIST_METADATA_HANDLER,
-        voiceover.VoiceArtistMetadataHandler
-    ),
-    get_redirect_route(
         r'/entity_voiceovers_bulk_handler/<entity_type>/<entity_id>/'
         r'<entity_version>/<language_code>',
         voiceover.EntityVoiceoversBulkHandler

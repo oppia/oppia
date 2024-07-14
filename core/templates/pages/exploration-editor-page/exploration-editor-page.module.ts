@@ -57,8 +57,6 @@ import {ReassignRoleConfirmationModalComponent} from './settings-tab/templates/r
 import {ModeratorUnpublishExplorationModalComponent} from './settings-tab/templates/moderator-unpublish-exploration-modal.component';
 import {TransferExplorationOwnershipModalComponent} from './settings-tab/templates/transfer-exploration-ownership-modal.component';
 import {HelpModalComponent} from './modal-templates/help-modal.component';
-import {DeleteAudioTranslationModalComponent} from './translation-tab/modal-templates/delete-audio-translation-modal.component';
-import {TranslationTabBusyModalComponent} from './translation-tab/modal-templates/translation-tab-busy-modal.component';
 import {ConfirmDeleteStateModalComponent} from './editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 import {PreviewSetParametersModalComponent} from './preview-tab/templates/preview-set-parameters-modal.component';
 import {CheckRevertExplorationModalComponent} from './history-tab/modal-templates/check-revert-exploration-modal.component';
@@ -91,7 +89,6 @@ import {ExplorationEditorTabComponent} from './editor-tab/exploration-editor-tab
 import {ExplorationSaveAndPublishButtonsComponent} from './exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component';
 import {ExplorationSavePromptModalComponent} from './modal-templates/exploration-save-prompt-modal.component';
 import {AddAudioTranslationModalComponent} from './translation-tab/modal-templates/add-audio-translation-modal.component';
-import {AudioTranslationBarComponent} from './translation-tab/audio-translation-bar/audio-translation-bar.component';
 import {VoiceoverCardComponent} from './translation-tab/voiceover-card/voiceover-card.component';
 import {StateTranslationEditorComponent} from './translation-tab/state-translation-editor/state-translation-editor.component';
 import {StateTranslationComponent} from './translation-tab/state-translation/state-translation.component';
@@ -152,8 +149,6 @@ import {ModifyTranslationsModalComponent} from './modal-templates/exploration-mo
     CheckRevertExplorationModalComponent,
     RevertExplorationModalComponent,
     WelcomeTranslationModalComponent,
-    DeleteAudioTranslationModalComponent,
-    TranslationTabBusyModalComponent,
     ExplorationMetadataDiffModalComponent,
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
@@ -179,7 +174,6 @@ import {ModifyTranslationsModalComponent} from './modal-templates/exploration-mo
     StateStatsModalComponent,
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
-    AudioTranslationBarComponent,
     VoiceoverCardComponent,
     StateTranslationEditorComponent,
     StateVersionHistoryModalComponent,
@@ -221,8 +215,6 @@ import {ModifyTranslationsModalComponent} from './modal-templates/exploration-mo
     CheckRevertExplorationModalComponent,
     RevertExplorationModalComponent,
     WelcomeTranslationModalComponent,
-    DeleteAudioTranslationModalComponent,
-    TranslationTabBusyModalComponent,
     ExplorationMetadataDiffModalComponent,
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
@@ -248,7 +240,6 @@ import {ModifyTranslationsModalComponent} from './modal-templates/exploration-mo
     StateStatsModalComponent,
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
-    AudioTranslationBarComponent,
     VoiceoverCardComponent,
     StateTranslationEditorComponent,
     StateVersionHistoryModalComponent,
