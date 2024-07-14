@@ -5130,7 +5130,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Converts from v55 to v56. Version 56 adds an
         inapplicable_skill_misconception_ids list to the state.
         """
-        for state_dict in states_dict.items():
+        for _, state_dict in states_dict.items():
             state_dict['inapplicable_skill_misconception_ids'] = []
 
         return states_dict
