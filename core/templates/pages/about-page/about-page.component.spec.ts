@@ -289,11 +289,11 @@ describe('About Page', () => {
     component.volunteerCarousel = jasmine.createSpyObj('NgbCarousel', ['prev']);
 
     component.screenType = 'mobile';
-    component.moveClassroomCarouselToPreviousSlide();
+    component.moveCarouselToPreviousSlide();
     expect(component.volunteerCarouselMobile.prev).toHaveBeenCalled();
 
     component.screenType = 'desktop';
-    component.moveClassroomCarouselToPreviousSlide();
+    component.moveCarouselToPreviousSlide();
     expect(component.volunteerCarousel.prev).toHaveBeenCalled();
   });
 
@@ -304,11 +304,11 @@ describe('About Page', () => {
     component.volunteerCarousel = jasmine.createSpyObj('NgbCarousel', ['next']);
 
     component.screenType = 'mobile';
-    component.moveClassroomCarouselToNextSlide();
+    component.moveCarouselToNextSlide();
     expect(component.volunteerCarouselMobile.next).toHaveBeenCalled();
 
     component.screenType = 'desktop';
-    component.moveClassroomCarouselToNextSlide();
+    component.moveCarouselToNextSlide();
     expect(component.volunteerCarousel.next).toHaveBeenCalled();
   });
 
