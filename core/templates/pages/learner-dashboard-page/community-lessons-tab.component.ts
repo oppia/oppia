@@ -59,6 +59,8 @@ export class CommunityLessonsTabComponent {
   @Input() collectionPlaylist!: CollectionSummary[];
   @Input() subscriptionsList!: ProfileSummary[];
   @Input() completedToIncompleteCollections!: string[];
+  @Input() learnerDashboardRedesignFeatureFlag!: boolean;
+  @Input() username!: string;
   selectedSection!: string;
   noCommunityLessonActivity: boolean = false;
   noPlaylistActivity: boolean = false;
