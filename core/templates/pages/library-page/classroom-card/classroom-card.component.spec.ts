@@ -21,14 +21,15 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {ClassroomCardComponent} from './classroom-card.component';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 describe('ClassroomCardComponent', () => {
   let component: ClassroomCardComponent;
   let fixture: ComponentFixture<ClassroomCardComponent>;
-
   let abas: AssetsBackendApiService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
-  const dummyClassroomSummary = {
+  const dummyClassroomData = {
     classroom_id: 'mathclassroom',
     name: 'math',
     url_fragment: 'math',
@@ -49,8 +50,8 @@ describe('ClassroomCardComponent', () => {
     fixture = TestBed.createComponent(ClassroomCardComponent);
     component = fixture.componentInstance;
     abas = TestBed.inject(AssetsBackendApiService);
-
-    component.classroomSummary = dummyClassroomSummary;
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    component.classroomSummary = dummyClassroomData;
   });
 
   it('should set component properties on initialization', () => {
@@ -59,7 +60,7 @@ describe('ClassroomCardComponent', () => {
     );
     component.ngOnInit();
     expect(component.classroomThumbnailUrl).toBe('/thumbnail/thumbnail.svg');
-    expect(component.classroomSummary).toEqual(dummyClassroomSummary);
+    expect(component.classroomSummary).toEqual(dummyClassroomData);
   });
 
   it('should get classroom data', () => {
@@ -71,5 +72,36 @@ describe('ClassroomCardComponent', () => {
     expect(component.classroomThumbnailUrl).toBe('/thumbnail/thumbnail.svg');
     expect(component.getName()).toBe('math');
     expect(component.getClassroomUrl()).toBe('/learn/math');
+  });
+
+  it('should show translated classroom name if translation key is present', () => {
+    component.classroomSummary = dummyClassroomData;
+    component.classroomSummary.name = null;
+    expect(component.isHackyClassroomNameTranslationDisplayed()).toBeFalse();
+
+    component.classroomSummary.name = 'math';
+    spyOn(
+      i18nLanguageCodeService,
+      'getClassroomTranslationKeys'
+    ).and.returnValue({
+      name: 'I18N_CLASSROOM_MATH_NAME',
+      courseDetails: 'I18N_CLASSROOM_MATH_COURSE_DETAILS',
+      teaserText: 'I18N_CLASSROOM_MATH_TEASER_TEXT',
+      topicListIntro: 'I18N_CLASSROOM_MATH_TOPICS_LIST_INTRO',
+    });
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValue(true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      false
+    );
+
+    component.ngOnInit();
+
+    expect(component.classroomNameTranslationKey).toEqual(
+      'I18N_CLASSROOM_MATH_NAME'
+    );
+    expect(component.isHackyClassroomNameTranslationDisplayed()).toBeTrue();
   });
 });

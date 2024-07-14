@@ -5,7 +5,8 @@
          [ngClass]="{'classroom-thumbnail-big': !usedInCarousel, 'classroom-thumbnail-small': usedInCarousel}"
          [src]="classroomThumbnailUrl">
     <div class="classroom-text-container">
-      <h3 class="classroom-name">{{getName()}}</h3>
+      <h3 class="classroom-name" *ngIf="!isHackyClassroomNameTranslationDisplayed()">{{ getName() }}</h3>
+      <h3 class="classroom-name" *ngIf="isHackyClassroomNameTranslationDisplayed()">{{ classroomNameTranslationKey | translate }}</h3>
     </div>
   </a>
 </div>

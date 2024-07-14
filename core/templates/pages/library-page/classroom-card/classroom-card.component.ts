@@ -20,6 +20,7 @@ import {Component, Input} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {ClassroomSummaryDict} from 'domain/classroom/classroom-backend-api.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-classroom-card',
@@ -32,8 +33,12 @@ export class ClassroomCardComponent {
   @Input() classroomSummary!: ClassroomSummaryDict;
   @Input() usedInCarousel!: boolean;
   classroomThumbnailUrl!: string;
+  classroomNameTranslationKey!: string;
 
-  constructor(private assetsBackendApiService: AssetsBackendApiService) {}
+  constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private assetsBackendApiService: AssetsBackendApiService
+  ) {}
 
   getName(): string {
     return this.classroomSummary.name;
@@ -43,6 +48,17 @@ export class ClassroomCardComponent {
     return `/learn/${this.classroomSummary.url_fragment}`;
   }
 
+  isHackyClassroomNameTranslationDisplayed(): boolean {
+    if (!this.classroomSummary.name) {
+      return false;
+    }
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.classroomNameTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
   ngOnInit(): void {
     this.classroomThumbnailUrl =
       this.assetsBackendApiService.getThumbnailUrlForPreview(
@@ -50,5 +66,12 @@ export class ClassroomCardComponent {
         this.classroomSummary.classroom_id,
         this.classroomSummary.thumbnail_filename
       );
+
+    if (this.classroomSummary.name) {
+      this.classroomNameTranslationKey =
+        this.i18nLanguageCodeService.getClassroomTranslationKeys(
+          this.classroomSummary.name
+        ).name;
+    }
   }
 }
