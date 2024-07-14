@@ -453,4 +453,9 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   .oppia-learner-dash-sidebar_position {
     max-height: 100%;
   }
+
+  .oppia-learner-dash-tab {
+    width: 1216px;
+  }
+
 }

@@ -15,7 +15,8 @@
   <div class="d-flex card-display-content-container pb-1 mb-n1" #cards>
     <ng-content></ng-content>
   </div>
-  <!--TODO(#18384): Implement view more for progress tab-->
+  <!--TODO(#18384): Implement view more for progress tab (styling)-->
+  <!--TODO(#18384): Hide when there's enough space for all cards etc-->
   <button *ngIf="!tabType.includes('home')" class="align-self-end card-display-more-button mt-4">
     {{ 'I18N_LEARNER_DASHBOARD_CARD_DISPLAY_BUTTON' | translate }}
     <span class="fas fa-chevron-down ml-2"></span>
