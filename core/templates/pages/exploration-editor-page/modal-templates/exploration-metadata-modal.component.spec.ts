@@ -203,7 +203,7 @@ describe('Exploration Metadata Modal Component', () => {
         component.explorationTags = [];
         explorationTagsService.displayed = [];
 
-        //When user try to enter special characters
+        // When user try to enter special characters.
         component.add({
           value: '!@#$%^&*()',
           input: {
@@ -214,7 +214,7 @@ describe('Exploration Metadata Modal Component', () => {
 
         expect(explorationTagsService.displayed).toEqual([]);
 
-        // When user try to enter numbers
+        // When user try to enter numbers.
         component.add({
           value: '1234567890',
           input: {

@@ -433,7 +433,7 @@ describe('Settings Tab Component', () => {
       spyOn(component, 'saveExplorationTags').and.stub();
       explorationTagsService.displayed = [];
 
-      // When user try to enter special character
+      // When user try to enter special character.
       component.add({
         value: '!@#$%^&*()',
         input: {
@@ -444,7 +444,7 @@ describe('Settings Tab Component', () => {
 
       expect(explorationTagsService.displayed).toEqual([]);
 
-      // When user try to enter numbers
+      // When user try to enter numbers.
       component.add({
         value: '1234567890',
         input: {
