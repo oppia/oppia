@@ -165,12 +165,36 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/update-promo-bar-message.spec.ts"
     },
     {
+      "name": "topic-manager/browse-skills-on-topics-and-skills-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/browse-skills-on-topics-and-skills-dashboard.spec.ts"
+    },
+    {
+      "name": "topic-manager/browse-topics-on-topics-and-skills-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/browse-topics-on-topics-and-skills-dashboard.spec.ts"
+    },
+    {
       "name": "topic-manager/create-and-delete-questions-in-skill-editor",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-delete-questions-in-skill-editor.spec.ts"
     },
     {
       "name": "topic-manager/assign-unassign-and-merge-skills",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/assign-unassign-and-merge-skills.spec.ts"
+    },
+    {
+      "name": "topic-manager/cannot-do-curriculum-admin-actions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/cannot-do-curriculum-admin-actions.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-and-republish-a-skill",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-republish-a-skill.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-and-preview-a-subtopic",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-preview-a-subtopic.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-and-preview-a-topic",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-preview-a-topic.spec.ts"
     }
   ]
 }

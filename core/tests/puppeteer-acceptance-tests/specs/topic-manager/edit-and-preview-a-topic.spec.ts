@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes assigning and unassigning a skill to a topic, merging two skills and using filters to select a skill for merging.
+ * @fileoverview Acceptance Test for the journey of a topic manager to edit topic details, manage practice tab visibility, and preview lesson.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -24,55 +24,54 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-describe('Topic Manager', function () {
+describe('Topic Manager User Journey', function () {
   let topicManager: TopicManager;
   let curriculumAdmin: CurriculumAdmin;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
-      'curriculum_admin@example.com',
+      'curriculumAdmin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Mathematics', 'math');
-    await curriculumAdmin.createSkillForTopic('Addition', 'Mathematics');
-    await curriculumAdmin.createSkillForTopic('Subtraction', 'Mathematics');
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
-      'topic_manager@example.com',
+      'topicManager@example.com',
       [ROLES.TOPIC_MANAGER],
       'Mathematics'
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to assign and unassign a skill to a topic and merge skills',
+    'should be able to edit topic name, thumbnail, description, page title fragment for web, and meta tags, and preview lesson in the topic preview.',
     async function () {
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.navigateToSkillTab();
+      await topicManager.openTopicEditor('Mathematics');
 
-      // The skill is unassigned first because it was previously assigned during the setup phase in the beforeAll block.
-      await topicManager.unassignSkillFromTopic('Addition', 'Mathematics');
-      await topicManager.expectToastMessageToBe(
-        'The skill has been unassigned to the topic.'
+      // Topic Manager cannot edit the name and url Fragment of a topic (Curriculum Admin can do that).
+      await topicManager.editTopicDetails(
+        'A comprehensive course on advanced mathematics',
+        'mathematics, advanced, course',
+        'Advanced Mathematics Course',
+        testConstants.data.blogPostThumbnailImage
       );
 
-      await topicManager.assignSkillToTopic('Addition', 'Mathematics');
-      await topicManager.expectToastMessageToBe(
-        'The skill has been assigned to the topic.'
-      );
+      await topicManager.verifyStatusOfPracticeTab('disabled');
+      await topicManager.saveTopicDraft('Mathematics');
 
-      // Unassigning the skill from the topic because two skills assigned to some topic cannot be merged.
-      await topicManager.unassignSkillFromTopic('Subtraction', 'Mathematics');
-      await topicManager.expectToastMessageToBe(
-        'The skill has been unassigned to the topic.'
+      if (process.env.MOBILE === 'true') {
+        // TODO(20665): Resolve the issue of inconsistent topic preview navigation between desktop and mobile modes.
+        // Once the issue is resolved, remove the following line to allow the flow to check the preview tab in mobile viewport.
+        // Refer to the issue: [https://github.com/oppia/oppia/issues/20665]
+        return;
+      }
+      await topicManager.navigateToTopicPreviewTopic('Mathematics');
+      await topicManager.expectTopicPreviewToHaveTitleAndDescription(
+        'Mathematics',
+        'A comprehensive course on advanced mathematics'
       );
-
-      await topicManager.mergeSkills('Addition', 'Subtraction');
-      await topicManager.expectToastMessageToBe('Merged Skills.');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
