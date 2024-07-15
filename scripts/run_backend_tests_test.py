@@ -24,6 +24,7 @@ import os
 import socket
 import subprocess
 import sys
+import tempfile
 import threading
 
 from core import feconf
@@ -34,7 +35,7 @@ from scripts import concurrent_task_utils
 from scripts import install_third_party_libs
 from scripts import servers
 
-from typing import Callable, Final, List, Tuple
+from typing import Callable, Dict, Final, List, Tuple
 
 TEST_RUNNER_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'gae_suite.py'
@@ -369,28 +370,83 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        task = concurrent_task_utils.create_task(
+        task1 = concurrent_task_utils.create_task(
             test_function, False, self.semaphore, name='test'
         )
-        task.finished = True
-        task_output = ['Ran 9 tests in 1.234s', '100']
-        task_result = concurrent_task_utils.TaskResult(
-            'task1', False, task_output, task_output)
-        task.task_results.append(task_result)
+        task1.finished = True
+        task1_output = ['Ran 9 tests in 1.234s', '100']
+        task1_result = concurrent_task_utils.TaskResult(
+            'task1', False, task1_output, task1_output)
+        task1.task_results.append(task1_result)
 
-        tasks = [task]
+        task2 = concurrent_task_utils.create_task(
+            test_function, False, self.semaphore, name='test'
+        )
+        task2.finished = True
+        task2_output = ['Ran 9 tests in 2.542s', '100']
+        task2_result = concurrent_task_utils.TaskResult(
+            'task2', False, task2_output, task2_output)
+        task2.task_results.append(task2_result)
+
+        tasks = [task1, task2]
         task_to_taskspec = {}
-        test_target = 'scripts.new_script.py'
+        test1_target = 'scripts.new_script_one_test.py'
+        task2_target = 'scripts.new_script_two_test.py'
         task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec(
-            test_target, True)
+            test1_target, True)
+        task_to_taskspec[tasks[1]] = run_backend_tests.TestingTaskSpec(
+            task2_target, True)
 
         with self.print_swap:
-            run_backend_tests.check_test_results(
+            _, _, _, time_report = run_backend_tests.check_test_results(
                 tasks, task_to_taskspec)
 
+        self.assertEqual(
+            time_report,
+            {
+                'scripts.new_script_one_test.py': 1.234,
+                'scripts.new_script_two_test.py': 2.542
+            }
+        )
         self.assertIn(
-            'SUCCESS   %s: 9 tests (1.2 secs)' % test_target,
+            'SUCCESS   %s: 9 tests (1.2 secs)' % test1_target,
             self.print_arr)
+        self.assertIn(
+            'SUCCESS   %s: 9 tests (2.5 secs)' % task2_target,
+            self.print_arr)
+
+    def test_successful_test_run_with_generate_time_report_flag(self) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import run_backend_tests
+        expected_time_report = {
+            'scripts.new_script_one_test.py': 1.234,
+            'scripts.new_script_two_test.py': 2.542
+        }
+        swap_check_results = self.swap(
+            run_backend_tests, 'check_test_results',
+            lambda *unused_args, **unused_kwargs: (
+                100, 0, 0, expected_time_report)
+        )
+        swap_check_coverage = self.swap(
+            run_backend_tests, 'check_coverage',
+            lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00)
+        )
+        time_report_temp_file = tempfile.NamedTemporaryFile('w+')
+        time_report_path = time_report_temp_file.name
+        swap_time_report_path = self.swap(
+            run_backend_tests, 'TIME_REPORT_PATH', time_report_path)
+
+        with self.swap_execute_task, swap_check_coverage:
+            with self.swap_cloud_datastore_emulator, swap_check_results:
+                with swap_time_report_path, self.swap_redis_server:
+                    run_backend_tests.main(
+                        args=['--generate_time_report'])
+        loaded_time_report: Dict[str, float] = {}
+        for line in time_report_temp_file.readlines():
+            test_target, time_taken = line.split(':')
+            loaded_time_report[test_target] = float(time_taken)
+        self.assertEqual(loaded_time_report, expected_time_report)
+        time_report_temp_file.close()
 
     def test_test_failed_due_to_error_in_parsing_coverage_report(self) -> None:
         with self.swap_install_third_party_libs:
@@ -463,7 +519,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             from scripts import run_backend_tests
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0))
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
         swapcheck_coverage = self.swap(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00))
@@ -484,7 +540,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             from scripts import run_backend_tests
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0))
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
         swapcheck_coverage = self.swap(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00))
@@ -507,7 +563,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             from scripts import run_backend_tests
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0))
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
         swapcheck_coverage = self.swap(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00))
@@ -530,7 +586,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             from scripts import run_backend_tests
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (0, 0, 0))
+            lambda *unused_args, **unused_kwargs: (0, 0, 0, {}))
         swapcheck_coverage = self.swap(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00))
@@ -549,7 +605,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             from scripts import run_backend_tests
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0))
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
         swapcheck_coverage = self.swap(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 98.00))
@@ -575,7 +631,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             concurrent_task_utils, 'execute_tasks', mock_execute_tasks)
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0))
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
 
         with self.swap_execute_task, self.swap_redis_server, swap_check_results:
             with self.swap_cloud_datastore_emulator, self.assertRaisesRegex(
@@ -588,7 +644,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             from scripts import run_backend_tests
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 2, 0))
+            lambda *unused_args, **unused_kwargs: (100, 2, 0, {}))
 
         with self.swap_execute_task, self.swap_redis_server, swap_check_results:
             with self.swap_cloud_datastore_emulator, self.print_swap:
@@ -615,7 +671,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             concurrent_task_utils, 'execute_tasks', mock_execute)
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0))
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
         swap_check_coverage = self.swap(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00))
@@ -636,7 +692,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             from scripts import run_backend_tests
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0))
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
         swap_check_coverage = self.swap(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00))
