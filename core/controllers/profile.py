@@ -264,6 +264,7 @@ class CheckEmailSubscription(
 ): # New Changes
     """Checks if the email is subscribed to the mailing list."""
 
+
     URL_PATH_ARGS_SCHEMAS = {
         'email': {
             'schema': {
