@@ -99,15 +99,23 @@ describe('Logged-out User', function () {
 
       // Access the top-rated page at /community-library/top-rated, which shows explorations with high ratings.
       await loggedOutUser.navigateToTopRatedPage();
-      await loggedOutUser.expectTopRatedExplorationsToBePresent();
+      await loggedOutUser.expectTopRatedExplorationsInOrder([
+        'Test Exploration Title 2',
+        'Test Exploration Title 1',
+      ]);
 
       // Visit the recently published explorations page at /community-library/recently-published.
       await loggedOutUser.navigateToRecentlyPublishedPage();
-      await loggedOutUser.expectRecentlyPublishedExplorationsToBePresent();
+      await loggedOutUser.expectRecentlyPublishedExplorationsInOrder([
+        'Test Exploration Title 2',
+        'Test Exploration Title 1',
+      ]);
 
       // View the ratings on an exploration once a minimum number of ratings have been submitted.
-      await loggedOutUser.selectExplorationToView();
-      await loggedOutUser.expectExplorationRatingsToBeVisible();
+      await loggedOutUser.expectExplorationToHaveRating(
+        '4',
+        'Test Exploration Title 1'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
