@@ -48,13 +48,20 @@ jobs:
         run: pip install coverage configparser
       - name: Run backend test shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --generate_coverage_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --generate_coverage_report --generate_time_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
         with:
           message: "A backend test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+      - name: Upload time report
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ format('backend_test_time_shard_{0}.txt', matrix.shard) }}
+          path: backend_test_time_report.txt
+          retention-days: 1
       - name: Upload coverage report
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: actions/upload-artifact@v3
