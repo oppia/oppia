@@ -217,7 +217,7 @@ export class UrlInterpolationService {
    */
   getStaticCopyrightedImageUrl(imagePath: string): string {
     this.validateResourcePath(imagePath);
-    return this._getCompleteUrl('/assets', '/copyrighted-images' + imagePath);
+    return '/assets' + '/copyrighted-images' + imagePath;
   }
 
   /**
