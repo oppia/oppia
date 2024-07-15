@@ -52,10 +52,10 @@ describe('Release Coordinator', function () {
         'totalKeysStored',
       ]);
 
-      // Since the cache is flushed, the total keys stored should be less than 10.
+      // Since the cache is flushed, the total keys stored should be less than 60.
       // But, not necessarily 0, as there could be some keys stored in the cache
-      // while fetching the profile.
-      await releaseCoordinator.expectTotalKeysStoredToBeLessThan(10);
+      // while fetching the profile, for example platform params.
+      await releaseCoordinator.expectTotalKeysStoredToBeLessThan(60);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
