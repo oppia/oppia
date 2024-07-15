@@ -90,7 +90,7 @@ _LOAD_TESTS_DIR: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'load_tests'
 )
 TIME_REPORT_PATH: Final = os.path.join(
-    os.getcwd(), 'backend_test_times_report.txt'
+    os.getcwd(), 'backend_test_time_report.txt'
 )
 
 _PARSER: Final = argparse.ArgumentParser(
