@@ -48,6 +48,7 @@ export class SkillSelectorComponent implements OnInit {
   @Input() categorizedSkills!: CategorizedSkills;
   @Input() untriagedSkillSummaries!: SkillSummary[];
   @Input() allowSkillsFromOtherTopics!: boolean;
+  @Input() skillIdsToExclude!: { [key: string]: boolean };
   @Output() selectedSkillIdChange: EventEmitter<string> = new EventEmitter();
   currCategorizedSkills!: CategorizedSkills;
   selectedSkill!: string;
@@ -200,7 +201,9 @@ export class SkillSelectorComponent implements OnInit {
   }
 
   searchInUntriagedSkillSummaries(searchText: string): SkillSummary[] {
-    let skills: string[] = this.untriagedSkillSummaries.map(val => {
+    let skills: string[] = this.untriagedSkillSummaries
+    .filter(val => !this.skillIdsToExclude.hasOwnProperty(val.id))
+    .map(val => {
       return val.description;
     });
     let filteredSkills = this.filterForMatchingSubstringPipe.transform(

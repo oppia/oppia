@@ -410,7 +410,9 @@ describe('SkillSelectorComponent', () => {
           skill_model_last_updated: 124444,
         }),
       ];
-
+      component.skillIdsToExclude = {
+        1: true,
+      };
       expect(
         component.searchInUntriagedSkillSummaries('skill summary 2')
       ).toEqual([
@@ -427,4 +429,57 @@ describe('SkillSelectorComponent', () => {
       ]);
     }
   );
+  it('should search in untriaged skill summaries and not return already' +
+    ' added prerequisite skills or selected skill', () => {
+    component.untriagedSkillSummaries = [
+      SkillSummary.createFromBackendDict({
+        id: '1',
+        description: 'This is untriaged skill summary 1',
+        language_code: '',
+        version: 1,
+        misconception_count: 2,
+        worked_examples_count: 2,
+        skill_model_created_on: 121212,
+        skill_model_last_updated: 124444
+      }),
+      SkillSummary.createFromBackendDict({
+        id: '2',
+        description: 'This is untriaged skill summary 2',
+        language_code: '',
+        version: 1,
+        misconception_count: 2,
+        worked_examples_count: 2,
+        skill_model_created_on: 121212,
+        skill_model_last_updated: 124444
+      }),
+      SkillSummary.createFromBackendDict({
+        id: '3',
+        description: 'This is untriaged skill summary 3',
+        language_code: '',
+        version: 1,
+        misconception_count: 2,
+        worked_examples_count: 2,
+        skill_model_created_on: 121212,
+        skill_model_last_updated: 124444
+      })
+    ];
+    component.skillIdsToExclude = {
+      1: true,
+      2: true,
+    };
+
+    expect(component.searchInUntriagedSkillSummaries(
+      '')).toEqual([
+      SkillSummary.createFromBackendDict({
+        id: '3',
+        description: 'This is untriaged skill summary 3',
+        language_code: '',
+        version: 1,
+        misconception_count: 2,
+        worked_examples_count: 2,
+        skill_model_created_on: 121212,
+        skill_model_last_updated: 124444
+      })
+    ]);
+  });
 });
