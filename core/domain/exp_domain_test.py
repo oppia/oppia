@@ -2769,7 +2769,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ):
             self.new_exploration.validate(strict=True)
 
-    # TODO(bhenning): The validation tests below should be split into separate
+    # TODO(#20377): The validation tests below should be split into separate
     # unit tests. Also, all validation errors should be covered in the tests.
     def test_validation(self) -> None:
         """Test validation of explorations."""
@@ -12653,7 +12653,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'objective': feconf.DEFAULT_EXPLORATION_OBJECTIVE,
             'states': {
                 feconf.DEFAULT_INIT_STATE_NAME: _get_default_state_dict(
-                    feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+                    feconf.DEFAULT_STATE_CONTENT_STR,
                     feconf.DEFAULT_INIT_STATE_NAME, True, content_id_generator),
                 second_state_name: _get_default_state_dict(
                     '', second_state_name, False, content_id_generator),

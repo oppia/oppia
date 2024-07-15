@@ -21,13 +21,20 @@ import {Injectable} from '@angular/core';
 import {downgradeInjectable} from '@angular/upgrade/static';
 import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
 import {State} from 'domain/state/StateObjectFactory';
+import {
+  EntityTranslationsService,
+  LanguageCodeToEntityTranslations,
+} from 'services/entity-translations.services';
 import {YamlService} from 'services/yaml.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HistoryTabYamlConversionService {
-  constructor(private yamlService: YamlService) {}
+  constructor(
+    private yamlService: YamlService,
+    private entityTranslationService: EntityTranslationsService
+  ) {}
 
   getYamlStringFromStateOrMetadata(
     entity: (State | ExplorationMetadata) | null
@@ -39,6 +46,33 @@ export class HistoryTabYamlConversionService {
       setTimeout(() => {
         if (entity) {
           resolve(this.yamlService.stringify(entity.toBackendDict()));
+        } else {
+          resolve('');
+        }
+      }, 200);
+    });
+  }
+
+  getYamlStringFromTranslations(
+    languageCodeToEntityTranslations: LanguageCodeToEntityTranslations | null
+  ): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      // Note: the timeout is needed or the string will be sent
+      // before codemirror has fully loaded and will not be
+      // displayed. This causes issues with the e2e tests.
+      setTimeout(() => {
+        if (languageCodeToEntityTranslations) {
+          const sortedBulkTranslations: LanguageCodeToEntityTranslations =
+            this.entityTranslationService.sortBulkTranslationsByLanguageCode(
+              languageCodeToEntityTranslations
+            );
+          resolve(
+            this.yamlService.stringify(
+              this.entityTranslationService.converBulkTranslationsToBackendDict(
+                sortedBulkTranslations
+              )
+            )
+          );
         } else {
           resolve('');
         }

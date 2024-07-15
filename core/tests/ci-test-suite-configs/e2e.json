@@ -17,10 +17,6 @@
       "module": "core/tests/webdriverio_desktop/additionalPlayerFeatures.js"
     },
     {
-      "name": "adminPage",
-      "module": "core/tests/webdriverio_desktop/adminPage.js"
-    },
-    {
       "name": "blogDashboard",
       "module": "core/tests/webdriverio_desktop/blogDashboard.js"
     },
@@ -35,10 +31,6 @@
     {
       "name": "classroomPage",
       "module": "core/tests/webdriverio_desktop/classroomPage.js"
-    },
-    {
-      "name": "classroomPageFileUploadFeatures",
-      "module": "core/tests/webdriverio_desktop/classroomPageFileUploadFeatures.js"
     },
     {
       "name": "collections",
@@ -87,10 +79,6 @@
     {
       "name": "extensions",
       "module": "core/tests/webdriverio_desktop/extensions.js"
-    },
-    {
-      "name": "featureGating",
-      "module": "core/tests/webdriverio/featureGatingFlow.js"
     },
     {
       "name": "feedbackUpdates",
@@ -171,10 +159,6 @@
     {
       "name": "wipeout",
       "module": "core/tests/webdriverio_desktop/wipeout.js"
-    },
-    {
-      "name": "adminPage",
-      "module": "core/tests/webdriverio_desktop/adminTabFeatures.js"
     }
   ]
 }

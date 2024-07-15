@@ -2695,7 +2695,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
                 outcome.
         """
         # Id of the destination state.
-        # TODO(sll): Check that this state actually exists.
+        # TODO(#20411): Check that this state actually exists.
         self.dest = dest
         # An optional destination state to redirect the learner to
         # strengthen their concepts corresponding to a particular card.
@@ -4320,8 +4320,7 @@ class State(translation_domain.BaseTranslatableObject):
         Returns:
             State. The corresponding State domain object.
         """
-        content_html = (
-            feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
+        content_html = feconf.DEFAULT_STATE_CONTENT_STR
 
         recorded_voiceovers = RecordedVoiceovers({})
         recorded_voiceovers.add_content_id_for_voiceover(
