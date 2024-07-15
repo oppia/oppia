@@ -253,12 +253,15 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'super-admin/load-dummy-data-in-dev-mode',
     'super-admin/edit-platform-parameters',
     'super-admin/use-misc-tab-features',
+    'topic-manager/edit-and-preview-a-subtopic',
+    'topic-manager/edit-and-preview-a-topic',
     'translation-admin/add-and-remove-translation-rights',
     'topic-manager/browse-skills-on-topics-and-skills-dashboard',
     'topic-manager/browse-topics-on-topics-and-skills-dashboard',
     'topic-manager/create-and-delete-questions-in-skill-editor',
     'topic-manager/assign-unassign-and-merge-skills',
     'topic-manager/cannot-do-curriculum-admin-actions',
+    'topic-manager/edit-and-republish-a-skill',
     'voiceover-admin/add-voiceover-artist-to-an-exploration',
 ]
 
