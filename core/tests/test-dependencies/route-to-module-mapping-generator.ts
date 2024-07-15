@@ -74,7 +74,7 @@ const MANUAL_ROUTE_TO_MODULE_MAPPING: Map<Route, string> = new Map([
     {
       path: 'topics-and-skills-dashboard',
     },
-    'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.import.ts',
+    'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.module.ts',
   ],
   [
     {

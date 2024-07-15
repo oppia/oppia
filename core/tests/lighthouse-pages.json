@@ -85,7 +85,7 @@
   },
   "topics-and-skills-dashboard": {
     "url": "http://localhost:8181/topics-and-skills-dashboard",
-    "page_module": "core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.import.ts"
+    "page_module": "core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.module.ts"
   },
   "terms": {
     "url": "http://localhost:8181/terms",
