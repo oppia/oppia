@@ -209,17 +209,17 @@ const privacyPolicyLinkInTermsPage = '.e2e-test-privacy-policy-link';
 const ccLicenseLinkInTermsPage = '.e2e-test-cc-license-link';
 const googleGroupSignUpLinkInTermsPage =
   '.e2e-test-oppia-announce-google-group-link';
-
 const emailLinkSelector = '.oppia-contact-mail';
-
 const mobileDonateButtonOnDonatePage = '.donate-modal-button';
 const donateModalIframeSelector = '.e2e-test-donate-page-iframe';
-
 const classroomNameHeading = '.e2e-test-classroom-name';
-
 const errorPageHeading = '.e2e-test-error-page-heading';
-
 const classroomTileContainer = '.oppia-classroom-tile-container';
+
+const floatFormInput = '.e2e-test-float-form-input';
+const nextCardButton = '.e2e-test-next-card-button';
+const submitAnswerButton = '.e2e-test-submit-answer-button';
+const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 
 export class LoggedOutUser extends BaseUser {
   /**
@@ -1923,6 +1923,77 @@ export class LoggedOutUser extends BaseUser {
     }
 
     showMessage(`User is on error page with status code ${statusCode}.`);
+  }
+
+  /**
+   * Function to navigate to the next card in the preview tab.
+   */
+  async continueToNextCard(): Promise<void> {
+    await this.clickOn(nextCardButton);
+  }
+
+  /**
+   * Function to submit an answer to a form input field.
+   *
+   * This function first determines the type of the input field in the DOM using the getInputType function.
+   * Currently, it only supports 'text', 'number', and 'float' input types. If the input type is anything else, it throws an error.
+   * @param {string} answer - The answer to submit.
+   */
+  async submitAnswer(answer: string): Promise<void> {
+    await this.waitForElementToBeClickable(floatFormInput);
+    const inputType = await this.getInputType(floatFormInput);
+
+    switch (inputType) {
+      case 'text':
+      case 'number':
+      case 'float':
+        await this.page.waitForSelector(floatFormInput);
+        await this.page.type(floatFormInput, answer);
+        break;
+      default:
+        throw new Error(`Unsupported input type: ${inputType}`);
+    }
+
+    await this.clickOn(submitAnswerButton);
+  }
+
+  /**
+   * Function to Get the type of an input field in the DOM.
+   * @param {string} selector - The CSS selector for the input field.
+   */
+  async getInputType(selector: string): Promise<string> {
+    const inputField = await this.page.$(selector);
+    if (!inputField) {
+      throw new Error(`Input field not found for selector: ${selector}`);
+    }
+    const inputType = (await (
+      await inputField.getProperty('type')
+    ).jsonValue()) as string;
+    return inputType;
+  }
+
+  /**
+   * Function to verify if the exploration is completed via checking the toast message.
+   * @param {string} message - The expected toast message.
+   */
+  async expectExplorationCompletionToastMessage(
+    message: string
+  ): Promise<void> {
+    await this.page.waitForSelector(explorationCompletionToastMessage, {
+      visible: true,
+    });
+    const element = await this.page.$(explorationCompletionToastMessage);
+    const toastMessage = await this.page.evaluate(
+      element => element.textContent,
+      element
+    );
+    if (!toastMessage || !toastMessage.includes(message)) {
+      throw new Error('Exploration did not complete successfully');
+    }
+    showMessage('Exploration has completed successfully');
+    await this.page.waitForSelector(explorationCompletionToastMessage, {
+      hidden: true,
+    });
   }
 
   async timeout(time) {

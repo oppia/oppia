@@ -25,6 +25,18 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
+const INTRODUCTION_CARD_CONTENT: string =
+  'This exploration will test your understanding of negative numbers.';
+enum INTERACTION_TYPES {
+  CONTINUE_BUTTON = 'Continue Button',
+  NUMERIC_INPUT = 'Number Input',
+  END_EXPLORATION = 'End Exploration',
+}
+enum CARD_NAME {
+  INTRODUCTION = 'Introduction',
+  TEST_QUESTION = 'Test Question',
+  FINAL_CARD = 'Final Card',
+}
 
 describe('Logged-out User', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
@@ -43,10 +55,38 @@ describe('Logged-out User', function () {
     await curriculumAdmin.navigateToCreatorDashboardPage();
     await curriculumAdmin.navigateToExplorationEditorPage();
     await curriculumAdmin.dismissWelcomeModal();
-    await curriculumAdmin.createMinimalExploration(
-      'Test Exploration',
-      'End Exploration'
+    await curriculumAdmin.updateCardContent(INTRODUCTION_CARD_CONTENT);
+    await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+
+    // Add a new card with a question.
+    await curriculumAdmin.viewOppiaResponses();
+    await curriculumAdmin.directLearnersToNewCard('Test Question');
+    await curriculumAdmin.saveExplorationDraft();
+
+    // Navigate to the new card and update its content.
+    await curriculumAdmin.navigateToCard(CARD_NAME.TEST_QUESTION);
+    await curriculumAdmin.updateCardContent(
+      'Enter a negative number greater than -100.'
     );
+    await curriculumAdmin.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    await curriculumAdmin.addResponseToTheInteraction(
+      INTERACTION_TYPES.NUMERIC_INPUT,
+      '-99',
+      'Prefect!',
+      CARD_NAME.FINAL_CARD,
+      true
+    );
+    await curriculumAdmin.saveExplorationDraft();
+
+    // Navigate to the final card and update its content.
+    await curriculumAdmin.navigateToCard(CARD_NAME.FINAL_CARD);
+    await curriculumAdmin.updateCardContent(
+      'We have practiced negative numbers.'
+    );
+    await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+
+    // Navigate back to the introduction card and save the draft.
+    await curriculumAdmin.navigateToCard(CARD_NAME.INTRODUCTION);
     await curriculumAdmin.saveExplorationDraft();
     explorationId = await curriculumAdmin.publishExplorationWithMetadata(
       'Test Exploration Title 1',
@@ -103,12 +143,23 @@ describe('Logged-out User', function () {
       await loggedOutUser.navigateToClassroomPage('math');
       await loggedOutUser.expectTopicsToBePresent(['Algebra']);
 
-      await loggedOutUser.useSearchBarToFindTopics('Algebra');
+      await loggedOutUser.searchForTopicInSearchBar('Algebra');
       await loggedOutUser.selectTopicToLearn('Algebra');
 
-      await loggedOutUser.selectChapterWithStoryToPlay();
+      await loggedOutUser.selectChapterWithinStoryToLearn();
+      // Playing the exploration linked with the chapter selected
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.submitAnswer('-40');
+      await loggedOutUser.continueToNextCard();
 
+      // Check the completion message and restart the exploration.
+      await loggedOutUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
+
+      await loggedOutUser.returnToTopicPageAfterCompletingExploration();
       await loggedOutUser.navigateToRevisionTab();
+      // Review cards are the subtopic that are created in the topic.
       await loggedOutUser.selectReviewCardToLearn();
       await loggedOutUser.expectReviewCardToHaveContent();
     },
