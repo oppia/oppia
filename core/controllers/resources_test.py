@@ -968,7 +968,7 @@ class FaviconHandlerTest(test_utils.GenericTestBase):
 
     def test_redirect_to_assetsstatic(self) -> None:
         response = self.get_html_response(
-            '/assets/favicon.ico', expected_status_int=302)
+            '/favicon.ico', expected_status_int=302)
         self.assertEqual(
             'http://localhost:8181/assetsstatic/favicon.ico',
             response.headers['location']
@@ -980,7 +980,7 @@ class RobotsTxtHandlerTest(test_utils.GenericTestBase):
 
     def test_redirect_to_assetsstatic(self) -> None:
         response = self.get_html_response(
-            '/assets/robots.txt', expected_status_int=302)
+            '/robots.txt', expected_status_int=302)
         self.assertEqual(
             'http://localhost:8181/assetsstatic/robots.txt',
             response.headers['location']

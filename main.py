@@ -1284,8 +1284,8 @@ URLS.extend((
 
 # Add URLs to static resources that differ between deployments.
 URLS.extend((
-    get_redirect_route('/assets/favicon.ico', resources.FaviconHandler),
-    get_redirect_route('/assets/robots.txt', resources.RobotsTxtHandler),
+    get_redirect_route('/favicon.ico', resources.FaviconHandler),
+    get_redirect_route('/robots.txt', resources.RobotsTxtHandler),
     get_redirect_route(
         '/assets/copyrighted-images/<folder>/<filename>',
         resources.CopyrightImagesHandler
