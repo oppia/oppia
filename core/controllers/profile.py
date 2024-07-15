@@ -259,11 +259,19 @@ class MailingListSubscriptionHandler(
         status = user_services.add_user_to_mailing_list(email, tag, name=name)
         self.render_json({'status': status})
 
+class CheckEmailSubscriptionNormalizedRequestDict(TypedDict):
+    """Dict representation of CheckEmailSubscription's
+    normalized_request dictionary.
+    """
+
+    email: str
+
 class CheckEmailSubscription(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
+    base.BaseHandler[Dict[str, str], CheckEmailSubscriptionNormalizedRequestDict]
 ): # New Changes
     """Checks if the email is subscribed to the mailing list."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {
         'email': {
@@ -276,6 +284,7 @@ class CheckEmailSubscription(
             }
         }
     }
+    
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
@@ -283,12 +292,11 @@ class CheckEmailSubscription(
         """Handles GET request."""
         try:
             assert self.normalized_request is not None
-            emailExists = self.normalized_request[email]
-            # Handle the case when the email does not exist in the database.
-            if emailExists:
+            emailExists = user_services.get_user_settings_from_email(email)
+            status = False
+            # Handle the case when the email exist in the database.
+            if emailExists is not None:
                 status = True
-            else:
-                status = False
             self.render_json({'status': status})
         except KeyError as e:
             logging.error(f"Missing key in normalized payload: {e}")
