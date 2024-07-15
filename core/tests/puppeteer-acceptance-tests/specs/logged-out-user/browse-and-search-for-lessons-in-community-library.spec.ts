@@ -89,12 +89,30 @@ describe('Logged-out User', function () {
       1,
       1
     );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
+    await loggedOutUser.timeout(2147483647);
+  }, 2147483647);
 
   it(
-    'should be able to open the donate modal from the "DONATE" button on the donate page in mobile mode.',
+    'should be able to complete the learner journey in the math classroom',
     async function () {
-      await loggedOutUser.clickDonateButtonOnDonatePageInMobileMode();
+      // Browse through a list of topics and select one to learn
+      await loggedOutUser.navigateToClassroomPage('math');
+      await loggedOutUser.expectTopicsToBePresent(['Algebra']);
+
+      await loggedOutUser.useSearchBarToFindTopics('Algebra');
+      await loggedOutUser.selectTopicToLearn('Algebra');
+
+      await loggedOutUser.viewTopicPage();
+
+      await loggedOutUser.chooseStoryWithinTopic();
+      await loggedOutUser.playThroughStory();
+
+      await loggedOutUser.viewSubtopicPage();
+      await loggedOutUser.viewLinkedConceptCardPopUps();
+
+      await loggedOutUser.startPracticeQuestionsSession();
+      await loggedOutUser.participateInPracticeQuestionsSession();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

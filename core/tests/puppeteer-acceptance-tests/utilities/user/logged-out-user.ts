@@ -1924,6 +1924,14 @@ export class LoggedOutUser extends BaseUser {
 
     showMessage(`User is on error page with status code ${statusCode}.`);
   }
+
+  async timeout(time) {
+    await this.page.waitForTimeout(time);
+  }
+
+  async screenshot(path) {
+    await this.page.screenshot({path: `${path}`});
+  }
 }
 
 export let LoggedOutUserFactory = (): LoggedOutUser => new LoggedOutUser();
