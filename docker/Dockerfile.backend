@@ -35,6 +35,11 @@ RUN wget -O /app/vm_deps/gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/cha
     ./google-cloud-sdk/bin/gcloud components install beta cloud-datastore-emulator app-engine-python app-engine-python-extras && \
     rm gcloud-sdk.tar.gz
 
+# Install DSAdmin
+WORKDIR /app
+RUN curl -L https://github.com/remko/dsadmin/releases/download/v0.20.0/dsadmin-v0.20.0-linux-amd64.tar.gz | tar -xzvf -
+
+
 WORKDIR /app/oppia
 
 ENV BUF_LINUX_FILES="buf-Linux-x86_64 protoc-gen-buf-check-lint-Linux-x86_64 protoc-gen-buf-check-breaking-Linux-x86_64" \
