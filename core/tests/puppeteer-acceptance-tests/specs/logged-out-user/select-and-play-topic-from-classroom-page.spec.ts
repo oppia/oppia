@@ -13,8 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if all buttons on the
- * "Donate" page can be clicked by logged-out users.
+ * @fileoverview Acceptance Test for the learner journey in the math classroom.
+ * The test includes:
+ * - Setup: Creation of exploration, topic, subtopic, skill, story, and classroom by a curriculum admin.
+ * - User Journey: Navigation to classroom, selection of topic, completion of exploration, and review of a card by a logged-out user.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -133,9 +135,7 @@ describe('Logged-out User', function () {
     await curriculumAdmin.createNewClassroom('math', '/math');
     await curriculumAdmin.addTopicToClassroom('math', 'Test Topic 1');
     await curriculumAdmin.publishClassroom('math');
-
-    await loggedOutUser.timeout(2147483647);
-  }, 2147483647);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to complete the learner journey in the math classroom',
@@ -143,7 +143,6 @@ describe('Logged-out User', function () {
       await loggedOutUser.navigateToClassroomPage('math');
       await loggedOutUser.expectTopicsToBePresent(['Algebra']);
 
-      await loggedOutUser.searchForTopicInSearchBar('Algebra');
       await loggedOutUser.selectTopicToLearn('Algebra');
 
       await loggedOutUser.selectChapterWithinStoryToLearn();
