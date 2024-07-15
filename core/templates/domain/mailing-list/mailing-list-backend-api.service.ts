@@ -41,13 +41,6 @@ export class MailingListBackendApiService {
     payload: MailingListPayload
   ): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      // Check if the email key is present in the payload
-      if (!payload.email) {
-        console.error('Email key is missing in the payload.');
-        reject('Email key is missing.');
-        return;
-      }
-
       this.http
         .put<MailingListReturnStatusData>(handlerUrl, payload)
         .toPromise()
@@ -56,13 +49,7 @@ export class MailingListBackendApiService {
             resolve(response.status);
           },
           errorResponse => {
-            // Handle 500 server error
-            if (errorResponse.status === 500) {
-              console.error('Server error:', errorResponse);
-              reject('Server error occurred.');
-            } else {
-              reject(errorResponse.error.error);
-            }
+            reject(errorResponse.error.error);
           }
         );
     });
@@ -78,7 +65,7 @@ export class MailingListBackendApiService {
       .then(response => response.status)
       .catch(error => {
         console.error('Error checking email subscription:', error);
-        throw error;
+        return false; // Return false if there's an error checking the subscription
       });
   }
 
