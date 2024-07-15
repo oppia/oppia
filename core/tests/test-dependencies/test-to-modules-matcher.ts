@@ -170,7 +170,7 @@ export class TestToModulesMatcher {
    * URLs with Angular modules.
    */
   public static registerPuppeteerBrowser(browser: Browser): void {
-    browser.on('targetchanged', async (target: Target) => {
+    browser.on('targetcreated', async (target: Target) => {
       const page = await target.page();
       if (!page) {
         return;
