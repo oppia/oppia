@@ -58,7 +58,6 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
     from mypy_imports import topic_models
     from mypy_imports import user_models
-    from mypy_imports import voiceover_models
 
 (
     app_feedback_report_models,
@@ -1310,7 +1309,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_platform_parameter_sm,
             'user_auth_details': expected_user_auth_details,
             'user_email_preferences': expected_user_email_preferences,
-            'voice_artist_metadata': expected_voice_artist_data
         }
 
         # Perform export and compare.
@@ -2187,7 +2185,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'blog_post': expected_blog_post_data,
             'blog_post_rights': expected_blog_post_rights,
             'blog_author_details': expected_blog_author_details,
-            'voice_artist_metadata': expected_language_code_to_accent
         }
 
         with utils.open_file(
