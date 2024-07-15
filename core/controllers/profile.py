@@ -259,44 +259,35 @@ class MailingListSubscriptionHandler(
         status = user_services.add_user_to_mailing_list(email, tag, name=name)
         self.render_json({'status': status})
 
-class CheckEmailSubscriptionHandlerNormalizedPayloadDict(TypedDict):
-    """Dict representation of CheckEmailSubscriptionHandler's
-    normalized_request dictionary.
-    """
-    email: str
-
 class CheckEmailSubscription(
-    base.BaseHandler[
-        CheckEmailSubscriptionHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
 ): # New Changes
     """Checks if the email is subscribed to the mailing list."""
 
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'email': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': constants.EMAIL_REGEX
-                    }]
-                }
+    URL_PATH_ARGS_SCHEMAS = {
+        'email': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.EMAIL_REGEX
+                }]
             }
         }
     }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
-    def get(self) -> None:
+    def get(self, email) -> None:
         """Handles GET request."""
         try:
-            logging.info(f"Incoming request: {self.request}")
             assert self.normalized_request is not None
-            email = self.normalized_payload['email']
-            logging.info(f"Received email for subscription check: {email}")
-            status = user_services.check_if_email_is_subscribed(email)
-            logging.info(f"Subscription status for {email}: {status}")
+            emailExists = self.normalized_request[email]
+            # Handle the case when the email does not exist in the database.
+            if emailExists:
+                status = True
+            else:
+                status = False
             self.render_json({'status': status})
         except KeyError as e:
             logging.error(f"Missing key in normalized payload: {e}")
