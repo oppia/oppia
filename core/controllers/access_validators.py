@@ -554,8 +554,6 @@ class TopicEditorPageAccessValidationHandler(
             )
 
 
-
-
 class CollectionEditorAccessValidationPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
