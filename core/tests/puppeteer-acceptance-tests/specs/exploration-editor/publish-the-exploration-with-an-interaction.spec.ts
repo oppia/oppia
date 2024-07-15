@@ -16,7 +16,6 @@
  * @fileoverview Acceptance Test for publishing an exploration with an interaction.
  */
 
-import {showMessage} from '../../utilities/common/show-message';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
@@ -43,13 +42,11 @@ describe('Exploration Creator', function () {
       'explorationEditor',
       'exploration_editor@example.com'
     );
-    showMessage('explorationEditor has signed up successfully.');
 
     explorationVisitor = await UserFactory.createNewUser(
       'explorationVisitor',
       'exploration_visitor@example.com'
     );
-    showMessage('explorationVisitor has signed up successfully.');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
