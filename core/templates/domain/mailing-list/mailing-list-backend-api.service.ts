@@ -19,6 +19,7 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {downgradeInjectable} from '@angular/upgrade/static';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 export interface MailingListReturnStatusData {
   status: boolean;
@@ -34,7 +35,10 @@ export interface MailingListPayload {
   providedIn: 'root',
 })
 export class MailingListBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private http: HttpClient
+  ) {}
 
   private async _putRequestAsync(
     handlerUrl: string,
@@ -58,14 +62,19 @@ export class MailingListBackendApiService {
   async isEmailSubscribed(email: string): Promise<boolean> {
     // Implementation to check if the email is already subscribed
     return this.http
-      .get<MailingListReturnStatusData>(
-        `/checkemailsubscription?email=${encodeURIComponent(email)}`
+      .get<{status: boolean}>(
+        this.urlInterpolationService.interpolateUrl(
+          '/checkemailsubscription/<email>',
+          {
+            email: email,
+          }
+        )
       )
       .toPromise()
       .then(response => response.status)
       .catch(error => {
         console.error('Error checking email subscription:', error);
-        return false; // Return false if there's an error checking the subscription
+        throw error;
       });
   }
 
