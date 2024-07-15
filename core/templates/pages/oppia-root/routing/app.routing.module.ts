@@ -96,6 +96,14 @@ const routes: Route[] = [
       ),
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOMS.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import('pages/classrooms-page/classrooms-page.module').then(
+        m => m.ClassroomsPageModule
+      ),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CURRICULUM_ADMIN.ROUTE,
     loadChildren: () =>
       import('pages/classroom-admin-page/classroom-admin-page.module').then(
@@ -142,13 +150,6 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE,
     loadChildren: () =>
       import('pages/about-page/about-page.module').then(m => m.AboutPageModule),
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE,
-    loadChildren: () =>
-      import('pages/about-foundation-page/about-foundation-page.module').then(
-        m => m.AboutFoundationPageModule
-      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
@@ -414,14 +415,6 @@ const routes: Route[] = [
       import('pages/blog-post-page/blog-post-page.module').then(
         m => m.BlogPostPageModule
       ),
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_EDITOR.ROUTE,
-    loadChildren: () =>
-      import('pages/topic-editor-page/topic-editor-page.module').then(
-        m => m.TopicEditorPageModule
-      ),
-    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOICEOVER_ADMIN.ROUTE,

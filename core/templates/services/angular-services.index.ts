@@ -284,6 +284,7 @@ import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service
 import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { ClassroomsPageAuthGuard } from '../pages/classrooms-page/classrooms-page-auth.guard';
 import { InternetConnectivityService } from 'services/internet-connectivity.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { ContextService } from 'services/context.service';
@@ -449,7 +450,6 @@ import { ClassroomAdminAuthGuard } from 'pages/classroom-admin-page/classroom-ad
 import { VoiceoverBackendApiService } from
   'domain/voiceover/voiceover-backend-api.service';
 import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
-import { TopicEditorAccessGuard } from 'pages/topic-editor-page/topic-editor-access.guard';
 import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
@@ -489,7 +489,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['AutosaveInfoModalsService', AutosaveInfoModalsService],
   ['BackgroundMaskService', BackgroundMaskService],
   ['BlogAdminAuthGuard', BlogAdminAuthGuard],
-  ['TopicEditorAccessGuard', TopicEditorAccessGuard],
   ['BlogAdminBackendApiService', BlogAdminBackendApiService],
   ['BlogAdminDataService', BlogAdminDataService],
   ['BlogDashboardBackendApiService', BlogDashboardBackendApiService],
@@ -562,6 +561,7 @@ export const angularServices: [string, Type<{}>][] = [
     DragAndDropSortInputValidationService],
   ['EditabilityService', EditabilityService],
   ['EditLearnerGroupPageAuthGuard', EditLearnerGroupPageAuthGuard],
+  ['ClassroomsPageAuthGuard', ClassroomsPageAuthGuard],
   ['CreateLearnerGroupPageAuthGuard', CreateLearnerGroupPageAuthGuard],
   ['EditableCollectionBackendApiService', EditableCollectionBackendApiService],
   ['EditableExplorationBackendApiService',
@@ -880,7 +880,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['TopicEditorStateService', TopicEditorStateService],
   ['TopicRightsBackendApiService', TopicRightsBackendApiService],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],
-  ['TopiEditorAccessGuard', TopicEditorAccessGuard],
   ['TopicUpdateService', TopicUpdateService],
   ['TopicsAndSkillsDashboardBackendApiService',
     TopicsAndSkillsDashboardBackendApiService],

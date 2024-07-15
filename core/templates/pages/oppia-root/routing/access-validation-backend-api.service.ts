@@ -73,6 +73,9 @@ export class AccessValidationBackendApiService {
     '/access_validation_handler/' +
     'can_access_collection_editor_page/<collection_id>';
 
+  CLASSROOMS_PAGE_ACCESS_VALIDATION =
+    '/access_validation_handler/can_access_classrooms_page';
+
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
@@ -102,6 +105,12 @@ export class AccessValidationBackendApiService {
           classroom_url_fragment: classroomUrlFragment,
         },
       })
+      .toPromise();
+  }
+
+  validateAccessToClassroomsPage(): Promise<void> {
+    return this.http
+      .get<void>(this.CLASSROOMS_PAGE_ACCESS_VALIDATION)
       .toPromise();
   }
 
@@ -217,7 +226,7 @@ export class AccessValidationBackendApiService {
 
     return this.http.get<void>(url).toPromise();
   }
-  
+
   validateAccessCollectionEditorPage(collectionId: string): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this.COLLECTION_EDITOR_PAGE_ACCESS_VALIDATOR,
