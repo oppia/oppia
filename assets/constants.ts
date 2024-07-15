@@ -7456,6 +7456,22 @@ export default {
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
         }
       ]
+    },
+    "TOPIC_EDITOR": {
+      "ROUTE": "topic_editor/:topic_id",
+      "TITLE": "Topic Editor",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Edit and manage topics with the Topic Editor in Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Edit and manage topics with the Topic Editor in Oppia."
+        }
+      ]
     }
   },
 
