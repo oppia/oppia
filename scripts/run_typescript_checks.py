@@ -106,7 +106,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/contributor-dashboard-page/contributor-dashboard-page.constants.ajs.spec.ts',
     'core/templates/pages/contributor-dashboard-page/contributor-dashboard-page.import.ts',
     'core/templates/pages/contributor-dashboard-page/services/translate-text.service.ts',
-    'core/templates/pages/creator-dashboard-page/creator-dashboard-page.import.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/exploration-editor-tab.component.spec.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/exploration-editor-tab.component.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/graph-directives/state-graph-visualization.component.ts',
