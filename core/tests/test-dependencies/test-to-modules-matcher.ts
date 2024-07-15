@@ -179,8 +179,9 @@ export class TestToModulesMatcher {
       page.on('request', async request => {
         const frame = request.frame();
         if (!frame) {
-          if (request.interceptResolutionState().action === 'already-handled')
+          if (request.interceptResolutionState().action === 'already-handled') {
             return;
+          }
           request.continue();
           return;
         }
@@ -189,8 +190,9 @@ export class TestToModulesMatcher {
           const url = request.url();
           TestToModulesMatcher.registerUrl(url);
         }
-        if (request.interceptResolutionState().action === 'already-handled')
+        if (request.interceptResolutionState().action === 'already-handled') {
           return;
+        }
         request.continue();
       });
     });
