@@ -69,6 +69,7 @@ STATE_PROPERTY_PARAM_CHANGES: Final = 'param_changes'
 STATE_PROPERTY_CONTENT: Final = 'content'
 STATE_PROPERTY_SOLICIT_ANSWER_DETAILS: Final = 'solicit_answer_details'
 STATE_PROPERTY_CARD_IS_CHECKPOINT: Final = 'card_is_checkpoint'
+DEPRECATED_STATE_PROPERTY_RECORDED_VOICEOVERS: Final = 'recorded_voiceovers'
 DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS: Final = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID: Final = 'widget_id'
 DEPRECATED_STATE_PROPERTY_NEXT_CONTENT_ID_INDEX: Final = 'next_content_id_index'
@@ -6380,6 +6381,15 @@ class ExplorationChangeMergeVerifier:
                 current_exp_states = (
                     current_exploration.states[state_name])
                 if (change.property_name ==
+                        STATE_PROPERTY_CONTENT):
+                    if (old_exp_states.content.html ==
+                            current_exp_states.content.html):
+                        if (STATE_PROPERTY_CONTENT not in
+                                self.changed_translations[state_name]):
+                            change_is_mergeable = True
+                    if not self.changed_properties[state_name]:
+                        change_is_mergeable = True
+                elif (change.property_name ==
                       STATE_PROPERTY_INTERACTION_ID):
                     if (old_exp_states.interaction.id ==
                             current_exp_states.interaction.id):

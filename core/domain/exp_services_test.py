@@ -1259,38 +1259,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertIn(self.voice_artist_id, contributer_ids)
 
     def test_is_voiceover_change_list(self) -> None:
-        recorded_voiceovers_dict = {
-            'voiceovers_mapping': {
-                'content': {
-                    'en': {
-                        'filename': 'filename3.mp3',
-                        'file_size_bytes': 3000,
-                        'needs_update': False,
-                        'duration_secs': 42.43
-                    }
-                },
-                'default_outcome': {},
-                'ca_placeholder_0': {}
-            }
-        }
-        change_list_voiceover = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': 'State 1',
-            'new_value': recorded_voiceovers_dict
-        })]
-        self.assertTrue(
-            exp_services.is_voiceover_change_list(change_list_voiceover))
-        not_voiceover_change_list = [exp_domain.ExplorationChange({
-            'cmd': 'edit_exploration_property',
-            'property_name': 'title',
-            'new_value': 'New title'
-        })]
-        self.assertFalse(
-            exp_services.is_voiceover_change_list(not_voiceover_change_list))
-
-    def test_changes_in_voiceover_list_with_feature_flag_enabled(self) -> None:
         not_voiceover_change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_exploration_property',
             'property_name': 'title',
