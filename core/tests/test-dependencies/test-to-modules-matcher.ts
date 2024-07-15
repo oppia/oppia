@@ -180,7 +180,7 @@ export class TestToModulesMatcher {
         const url = frame.url();
         TestToModulesMatcher.registerUrl(url);
       });
-    }
+    };
     browser.on('targetcreated', registerTarget);
     browser.on('targetchanged', registerTarget);
   }
