@@ -16,23 +16,23 @@
  * @fileoverview Component for the skills list viewer.
  */
 
-import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {MergeSkillModalComponent} from 'components/skill-selector/merge-skill-modal.component';
-import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
-import {AugmentedSkillSummary} from 'domain/skill/augmented-skill-summary.model';
-import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
-import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
-import {SkillSummary} from 'domain/skill/skill-summary.model';
-import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
-import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
-import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {Subscription} from 'rxjs';
-import {AlertsService} from 'services/alerts.service';
-import {AssignSkillToTopicModalComponent} from '../modals/assign-skill-to-topic-modal.component';
-import {DeleteSkillModalComponent} from '../modals/delete-skill-modal.component';
+import { Component, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
+import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
+import { AugmentedSkillSummary } from 'domain/skill/augmented-skill-summary.model';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { SkillSummary } from 'domain/skill/skill-summary.model';
+import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { Subscription } from 'rxjs';
+import { AlertsService } from 'services/alerts.service';
+import { AssignSkillToTopicModalComponent } from '../modals/assign-skill-to-topic-modal.component';
+import { DeleteSkillModalComponent } from '../modals/delete-skill-modal.component';
 import {
   TopicAssignmentsSummary,
   UnassignSkillFromTopicsModalComponent,
@@ -84,7 +84,7 @@ export class SkillsListComponent {
     private editableTopicBackendApiService: EditableTopicBackendApiService,
     private skillBackendApiService: SkillBackendApiService,
     private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService
-  ) {}
+  ) { }
 
   getSkillEditorUrl(skillId: string): string {
     let SKILL_EDITOR_URL_TEMPLATE: string = '/skill_editor/<skill_id>#/';
@@ -141,7 +141,7 @@ export class SkillsListComponent {
           // No further action is needed.
         }
       )
-      .then(() => {});
+      .then(() => { });
   }
 
   unassignSkill(skillId: string): void {
@@ -153,7 +153,7 @@ export class SkillsListComponent {
     );
     modalRef.componentInstance.skillId = skillId;
     modalRef.result.then(
-      (topicsToUnassign: {[key: string]: TopicAssignmentsSummary}) => {
+      (topicsToUnassign: { [key: string]: TopicAssignmentsSummary }) => {
         for (let topic in topicsToUnassign) {
           let changeList: BackendChangeObject[] = [];
           if (topicsToUnassign[topic].subtopicId) {
@@ -332,5 +332,5 @@ angular
   .module('oppia')
   .directive(
     'oppiaSkillsList',
-    downgradeComponent({component: SkillsListComponent})
+    downgradeComponent({ component: SkillsListComponent })
   );

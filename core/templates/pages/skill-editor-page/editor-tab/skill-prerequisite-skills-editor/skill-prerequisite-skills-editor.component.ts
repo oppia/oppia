@@ -16,24 +16,24 @@
  * @fileoverview Component for the skill prerequisite skills editor.
  */
 
-import {CategorizedSkills} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import {GroupedSkillSummaries} from 'pages/skill-editor-page/services/skill-editor-state.service';
-import {SkillSummary} from 'domain/skill/skill-summary.model';
-import {SelectSkillModalComponent} from 'components/skill-selector/select-skill-modal.component';
-import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {Skill} from 'domain/skill/SkillObjectFactory';
-import {SkillUpdateService} from 'domain/skill/skill-update.service';
-import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
-import {AlertsService} from 'services/alerts.service';
+import { CategorizedSkills } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { GroupedSkillSummaries } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { SkillSummary } from 'domain/skill/skill-summary.model';
+import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Skill } from 'domain/skill/SkillObjectFactory';
+import { SkillUpdateService } from 'domain/skill/skill-update.service';
+import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { AlertsService } from 'services/alerts.service';
 import {
   TopicsAndSkillsDashboardBackendApiService,
   TopicsAndSkillDashboardData,
 } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
-import {Subscription} from 'rxjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'oppia-skill-prerequisite-skills-editor',
@@ -61,7 +61,7 @@ export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
     private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
     private windowDimensionsService: WindowDimensionsService,
     private ngbModal: NgbModal
-  ) {}
+  ) { }
 
   removeSkillId(skillId: string): void {
     this.skillUpdateService.deletePrerequisiteSkill(this.skill, skillId);
