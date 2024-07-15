@@ -25,7 +25,7 @@ import {
   UrlSegmentGroup,
   Route,
 } from '@angular/router';
-import {Browser, Target} from 'puppeteer';
+import {Browser, Frame, Target} from 'puppeteer';
 import {getRouteToModuleMapping} from './route-to-module-mapping-generator';
 import {glob} from 'glob';
 
@@ -175,25 +175,9 @@ export class TestToModulesMatcher {
       if (!page) {
         return;
       }
-      await page.setRequestInterception(true);
-      page.on('request', async request => {
-        const frame = request.frame();
-        if (!frame) {
-          if (request.interceptResolutionState().action === 'already-handled') {
-            return;
-          }
-          request.continue();
-          return;
-        }
-        const parentFrame = frame.parentFrame();
-        if (request.isNavigationRequest() && parentFrame === null) {
-          const url = request.url();
-          TestToModulesMatcher.registerUrl(url);
-        }
-        if (request.interceptResolutionState().action === 'already-handled') {
-          return;
-        }
-        request.continue();
+      page.on('framenavigated', async (frame: Frame) => {
+        const url = frame.url();
+        TestToModulesMatcher.registerUrl(url);
       });
     });
   }
