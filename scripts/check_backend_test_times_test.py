@@ -131,14 +131,14 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
             self.sorted_backend_test_times
         )
         sorted_backend_test_times_message = (
-            'BACKEND TEST TIMES SORTED BY TIME:\n'
+            '\033[1mBACKEND TEST TIMES SORTED BY TIME:\033[0m\n'
             'test_six: 1.1 SECONDS\ntest_five: 1.2 SECONDS\n'
             'test_seven: 1.3 SECONDS\ntest_ten: 1.4 SECONDS\n'
             'test_two: 1.4 SECONDS\ntest_eight: 1.5 SECONDS\n'
             'test_nine: 1.6 SECONDS\ntest_three: 1.7 SECONDS\n'
             'test_one: 1.8 SECONDS\ntest_four: 2.3 SECONDS\n'
             'test_eleven: 164.4 SECONDS\n'
-            'BACKEND TEST TIMES OVER 150.0 SECONDS:\n'
+            '\033[1mBACKEND TEST TIMES OVER 150.0 SECONDS:\033[0m\n'
             'test_eleven: 164.4 SECONDS'
         )
         self.assertEqual(
