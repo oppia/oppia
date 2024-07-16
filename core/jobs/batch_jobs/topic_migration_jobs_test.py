@@ -97,6 +97,7 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
             id=self.TOPIC_1_ID,
             topic_is_published=False
         )
+
         first_topic_rights_model.commit(
             feconf.SYSTEM_COMMITTER_ID,
             'Create topic rights',
