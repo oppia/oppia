@@ -4227,6 +4227,7 @@ version: 1
         assert state.interaction.default_outcome is not None
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
+        state.inapplicable_skill_misconception_ids = None
         return state
 
     def save_new_valid_classroom(

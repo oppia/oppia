@@ -53,7 +53,7 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.STATE_DICT_IN_V56 = {
+        self.STATE_DICT_IN_V52 = {
             'content': {'content_id': 'content', 'html': ''},
             'param_changes': [],
             'interaction': {
@@ -107,8 +107,7 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
             'classifier_model_id': None,
             'card_is_checkpoint': False,
             'solicit_answer_details': False,
-            'next_content_id_index': 2,
-            'inapplicable_skill_misconception_ids': None
+            'next_content_id_index': 2
         }
         self.exp_1 = self.create_model(
             exp_models.ExplorationModel,
@@ -121,11 +120,11 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
             tags=['Topic'],
             blurb='blurb',
             author_notes='author notes',
-            states_schema_version=56,
+            states_schema_version=52,
             param_specs={},
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
-            states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_DICT_IN_V56},
+            states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_DICT_IN_V52},
         )
         self.put_multi([self.exp_1])
 
@@ -334,7 +333,7 @@ class AuditMigrateSuggestionJobTests(job_test_utils.JobTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.STATE_DICT_IN_V56 = {
+        self.STATE_DICT_IN_V52 = {
             'content': {'content_id': 'content', 'html': ''},
             'param_changes': [],
             'interaction': {
@@ -388,8 +387,7 @@ class AuditMigrateSuggestionJobTests(job_test_utils.JobTestBase):
             'classifier_model_id': None,
             'card_is_checkpoint': False,
             'solicit_answer_details': False,
-            'next_content_id_index': 2,
-            'inapplicable_skill_misconception_ids': None
+            'next_content_id_index': 2
         }
         self.exp_1 = self.create_model(
             exp_models.ExplorationModel,
@@ -402,11 +400,11 @@ class AuditMigrateSuggestionJobTests(job_test_utils.JobTestBase):
             tags=['Topic'],
             blurb='blurb',
             author_notes='author notes',
-            states_schema_version=56,
+            states_schema_version=52,
             param_specs={},
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
-            states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_DICT_IN_V56},
+            states={feconf.DEFAULT_INIT_STATE_NAME: self.STATE_DICT_IN_V52},
         )
         self.put_multi([self.exp_1])
 
