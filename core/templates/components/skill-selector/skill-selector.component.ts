@@ -16,18 +16,18 @@
  * @fileoverview Controller for the skill-selector component.
  */
 
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ShortSkillSummary } from 'core/templates/domain/skill/short-skill-summary.model';
-import { SkillSummary } from 'core/templates/domain/skill/skill-summary.model';
-import { CategorizedSkills } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
+import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {ShortSkillSummary} from 'core/templates/domain/skill/short-skill-summary.model';
+import {SkillSummary} from 'core/templates/domain/skill/skill-summary.model';
+import {CategorizedSkills} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {FilterForMatchingSubstringPipe} from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import cloneDeep from 'lodash/cloneDeep';
-import { GroupedSkillSummaries } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { UserService } from 'services/user.service';
+import {GroupedSkillSummaries} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {UserService} from 'services/user.service';
 
 interface SubTopicFilterDict {
-  [topicName: string]: { subTopicName: string; checked: boolean }[];
+  [topicName: string]: {subTopicName: string; checked: boolean}[];
 }
 
 @Component({
@@ -48,12 +48,12 @@ export class SkillSelectorComponent implements OnInit {
   @Input() categorizedSkills!: CategorizedSkills;
   @Input() untriagedSkillSummaries!: SkillSummary[];
   @Input() allowSkillsFromOtherTopics!: boolean;
-  @Input() skillIdsToExclude!: { [key: string]: boolean };
+  @Input() skillIdsToExclude!: {[key: string]: boolean};
   @Output() selectedSkillIdChange: EventEmitter<string> = new EventEmitter();
   currCategorizedSkills!: CategorizedSkills;
   selectedSkill!: string;
   skillFilterText: string = '';
-  topicFilterList: { topicName: string; checked: boolean }[] = [];
+  topicFilterList: {topicName: string; checked: boolean}[] = [];
   subTopicFilterDict: SubTopicFilterDict = {};
   initialSubTopicFilterDict: SubTopicFilterDict = {};
   userCanEditSkills: boolean = false;
@@ -61,7 +61,7 @@ export class SkillSelectorComponent implements OnInit {
   constructor(
     private filterForMatchingSubstringPipe: FilterForMatchingSubstringPipe,
     private userService: UserService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.currCategorizedSkills = this.categorizedSkills;
@@ -117,7 +117,7 @@ export class SkillSelectorComponent implements OnInit {
       for (var i = 0; i < subTopics.length; i++) {
         if (subTopics[i].checked) {
           if (!updatedSkillsDict.hasOwnProperty(topicName)) {
-            updatedSkillsDict[topicName] = { uncategorized: [] };
+            updatedSkillsDict[topicName] = {uncategorized: []};
           }
           let tempCategorizedSkills: CategorizedSkills = this.categorizedSkills;
           let subTopicName: string = subTopics[i].subTopicName;
@@ -233,5 +233,5 @@ angular
   .module('oppia')
   .directive(
     'oppiaSkillSelector',
-    downgradeComponent({ component: SkillSelectorComponent })
+    downgradeComponent({component: SkillSelectorComponent})
   );
