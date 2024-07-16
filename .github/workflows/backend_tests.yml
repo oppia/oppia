@@ -158,27 +158,27 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: backend_test_time_shard_1
-          path: backend_test_times/backend_test_time_1.txt
+          path: backend_test_time_reports/backend_test_time_1.txt
       - name: Download time report for shard 2
         uses: actions/download-artifact@v3
         with:
           name: backend_test_time_shard_2
-          path: backend_test_times/backend_test_time_2.txt
+          path: backend_test_time_reports/backend_test_time_2.txt
       - name: Download time report for shard 3
         uses: actions/download-artifact@v3
         with:
           name: backend_test_time_shard_3
-          path: backend_test_times/backend_test_time_3.txt
+          path: backend_test_time_reports/backend_test_time_3.txt
       - name: Download time report for shard 4
         uses: actions/download-artifact@v3
         with:
           name: backend_test_time_shard_4
-          path: backend_test_times/backend_test_time_4.txt
+          path: backend_test_time_reports/backend_test_time_4.txt
       - name: Download time report for shard 5
         uses: actions/download-artifact@v3
         with:
           name: backend_test_time_shard_5
-          path: backend_test_times/backend_test_time_5.txt
+          path: backend_test_time_reports/backend_test_time_5.txt
       - name: Check test times
         run: python -m scripts.check_backend_test_times
         shell: bash
