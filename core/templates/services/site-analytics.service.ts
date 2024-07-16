@@ -44,9 +44,6 @@ export class SiteAnalyticsService {
     }
   }
 
-  // For definitions of the various arguments, please see:
-  // https://developers.google.com/analytics/devguides/collection/analyticsjs/events
-
   _sendEventToGoogleAnalytics(
     eventName: string,
     eventParameters: Object = {}
