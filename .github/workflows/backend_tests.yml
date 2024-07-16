@@ -182,6 +182,7 @@ jobs:
       - name: Move time reports from artifact folders to backend_test_time_reports folder
         shell: bash
         run: |
+          mkdir -p backend_test_time_reports
           for i in {1..5}; do cp backend_test_time_reports_artifacts/backend_test_time_$i/backend_test_time_report.txt backend_test_time_reports/backend_test_time_report_$i.txt; done
       - name: Check test times
         run: python -m scripts.check_backend_test_times
