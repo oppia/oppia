@@ -56,7 +56,6 @@ jobs:
           message: "A backend test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
       - name: Upload time report
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: actions/upload-artifact@v3
         with:
           name: ${{ format('backend_test_time_shard_{0}.txt', matrix.shard) }}
@@ -145,3 +144,48 @@ jobs:
         with:
           message: "Backend coverage checks failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+  check_backend_test_times:
+    name: Check backend test times
+    needs: run_tests
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.15'
+          architecture: 'x64'
+      - name: Download time report for shard 1
+        uses: actions/download-artifact@v3
+        with:
+          name: backend_test_time_shard_1
+          path: backend_test_times/backend_test_time_1.txt
+      - name: Download time report for shard 2
+        uses: actions/download-artifact@v3
+        with:
+          name: backend_test_time_shard_2
+          path: backend_test_times/backend_test_time_2.txt
+      - name: Download time report for shard 3
+        uses: actions/download-artifact@v3
+        with:
+          name: backend_test_time_shard_3
+          path: backend_test_times/backend_test_time_3.txt
+      - name: Download time report for shard 4
+        uses: actions/download-artifact@v3
+        with:
+          name: backend_test_time_shard_4
+          path: backend_test_times/backend_test_time_4.txt
+      - name: Download time report for shard 5
+        uses: actions/download-artifact@v3
+        with:
+          name: backend_test_time_shard_5
+          path: backend_test_times/backend_test_time_5.txt
+      - name: Check test times
+        run: python -m scripts.check_backend_test_times
+        shell: bash
+      - name: Upload test times artifact
+        if: ${{ github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend_test_times
+          path: backend_test_times.txt
+          retention-days: 7
