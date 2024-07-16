@@ -132,6 +132,7 @@ export default {
     TOPIC_MANAGER: 'topic manager',
     MODERATOR: 'moderator',
     RELEASE_COORDINATOR: 'release coordinator',
+    COLLECTION_EDITOR: 'collection editor',
   } as const,
 
   BlogRights: {

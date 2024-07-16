@@ -22,14 +22,15 @@ import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {CollectionEditor} from '../../utilities/user/collection-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
+  let CollectionEditor: CollectionEditor;
   let loggedOutUser: LoggedOutUser;
-  let loggedInUser: LoggedInUser;
   let explorationId1: string | null;
   let explorationId2: string | null;
 
@@ -39,11 +40,13 @@ describe('Logged-out User', function () {
       'exploration_editor@example.com'
     );
 
-    loggedOutUser = await UserFactory.createLoggedOutUser();
-    loggedInUser = await UserFactory.createNewUser(
-      'testLearner',
-      'test_user@example.com'
+    CollectionEditor = await UserFactory.createNewUser(
+      'collectionEditor',
+      'collection_editor@example.com',
+      [ROLES.COLLECTION_EDITOR]
     );
+
+    loggedOutUser = await UserFactory.createLoggedOutUser();
 
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorPage();
@@ -81,45 +84,40 @@ describe('Logged-out User', function () {
       throw new Error('Error in publishing the second exploration');
     }
 
-    loggedOutUser.playExploration(explorationId1);
-    loggedOutUser.rateExploration('4');
-
-    loggedOutUser.playExploration(explorationId2);
-    loggedOutUser.rateExploration('5');
+    await CollectionEditor.navigateToCollectionEditor();
+    await CollectionEditor.createCollection(explorationId1, explorationId2);
+    await CollectionEditor.publishCollection();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to navigate and interact with the community library',
+    'should be able to navigate and interact with the community library to find and play collections',
     async function () {
+      // Search 'collections' to find all the collections from the search bar.
       await loggedOutUser.navigateToCommunityLibraryPage();
-      await loggedOutUser.searchForLessonInSearchBar('Algebra');
-      await loggedOutUser.filterLessonsByCategories(['Algebra']);
-      await loggedOutUser.filterLessonsByLanguage(['English']);
-      await loggedOutUser.expectSearchResultsToBePresent('Algebra');
+      await loggedOutUser.searchForLessonInSearchBar('Collections');
+      await loggedOutUser.expectSearchResultToContain('Collections');
 
-      // Access the top-rated page at /community-library/top-rated, which shows explorations with high ratings.
-      await loggedOutUser.navigateToTopRatedPage();
-      await loggedOutUser.expectTopRatedExplorationsInOrder([
-        'Test Exploration Title 2',
-        'Test Exploration Title 1',
-      ]);
+      // Visit the collection player by selecting one of the collections.
+      await loggedOutUser.selectAndOpenCollection('Test Collection');
 
-      // Visit the recently published explorations page at /community-library/recently-published.
-      await loggedOutUser.navigateToRecentlyPublishedPage();
-      await loggedOutUser.expectRecentlyPublishedExplorationsInOrder([
-        'Test Exploration Title 2',
-        'Test Exploration Title 1',
-      ]);
+      // See the "collection story path" diagram, can see info about individual exploration via hovering onto the explorations in the diagram.
+      await loggedOutUser.viewCollectionStoryPath();
+      await loggedOutUser.hoverOverExplorationInDiagram('Test Exploration 1');
+      await loggedOutUser.expectExplorationPreviewUponHovering();
 
-      // View the ratings on an exploration once a minimum number of ratings have been submitted.
-      await loggedOutUser.expectExplorationToHaveRating(
-        '4',
-        'Test Exploration Title 1'
+      // Share the collection.
+      await loggedOutUser.shareCollection('facebook');
+      await loggedOutUser.shareCollection('twitter');
+      await loggedOutUser.shareCollection('google classroom');
+
+      // Play any exploration in the collection.
+      await loggedOutUser.selctAndOpenExplorationPlayer('Test Exploration');
+      await loggedOutUser.expectExplorationCompletionToastMessage(
+        'Congratulations! You have completed the exploration.'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
-
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

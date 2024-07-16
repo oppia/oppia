@@ -36,6 +36,7 @@ import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 import {LoggedInUserFactory, LoggedInUser} from '../user/logged-in-user';
 import {ModeratorFactory} from '../user/moderator';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
+import {CollectionEditorFactory} from '../user/collection-editor';
 import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
@@ -56,6 +57,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.MODERATOR]: ModeratorFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
+  [ROLES.COLLECTION_EDITOR]: CollectionEditorFactory,
 } as const;
 
 /**
