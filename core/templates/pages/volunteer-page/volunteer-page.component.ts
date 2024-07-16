@@ -74,89 +74,18 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
     caption: {content: string; name: string; type: string}[];
   };
 
-  volunteerExpectations = [
-    'Commit to at least 5 hours per week',
-    'Attend mandatory team meetings',
-    'Reply to emails within 2 days',
-    'Have the ability to collaborate using Google Docs/Sheets.',
-  ];
+  volunteerExpectations = AppConstants.VOLUNTEER_EXPECTATIONS;
 
-  growthSkills = [
-    {
-      title: 'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET1_HEADING',
-      skills: [
-        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET1_SKILL1',
-        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET1_SKILL2',
-        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET1_SKILL3',
-        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET1_SKILL4',
-      ],
-    },
-    {
-      title: 'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET2_HEADING',
-      skills: [
-        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET2_SKILL1',
-        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET2_SKILL2',
-        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET2_SKILL3',
-        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET2_SKILL4',
-        'I18N_VOLUNTEER_PAGE_SKILLS_GROWTH_SET2_SKILL5',
-      ],
-    },
-  ];
+  growthSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.GROWTH;
 
-  developmentSkills = [
-    {
-      title: 'I18N_VOLUNTEER_PAGE_SKILLS_DEVELOPMENT_SET1_HEADING',
-      skills: [
-        'I18N_VOLUNTEER_PAGE_SKILLS_DEVELOPMENT_SET1_SKILL1',
-        'I18N_VOLUNTEER_PAGE_SKILLS_DEVELOPMENT_SET1_SKILL2',
-        'I18N_VOLUNTEER_PAGE_SKILLS_DEVELOPMENT_SET1_SKILL3',
-        'I18N_VOLUNTEER_PAGE_SKILLS_DEVELOPMENT_SET1_SKILL4',
-      ],
-    },
-  ];
+  developmentSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.DEVELOPMENT;
 
-  artAndDesignSkills = [
-    {
-      title: 'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_HEADING',
-      skills: [
-        'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_SKILL1',
-        'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_SKILL2',
-        'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_SKILL3',
-      ],
-    },
-  ];
+  artAndDesignSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.ART_AND_DESIGN;
 
-  translationSkills = [
-    {
-      title: 'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_HEADING',
-      skills: [
-        'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_SKILL1',
-        'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_SKILL2',
-        'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_SKILL3',
-      ],
-    },
-    {
-      title: 'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_HEADING',
-      skills: [
-        'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL1',
-        'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL2',
-        'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL3',
-        'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL4',
-      ],
-    },
-  ];
+  translationSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.TRANSLATION;
 
-  lessonCreationSkills = [
-    {
-      title: 'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_HEADING',
-      skills: [
-        'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL1',
-        'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL2',
-        'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL3',
-        'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL4',
-      ],
-    },
-  ];
+  lessonCreationSkills =
+    AppConstants.VOLUNTEER_PREFERRED_SKILLS.LESSON_CREATION;
 
   screenType!: 'desktop' | 'tablet' | 'mobile' | 'smallMobile';
   activeTabGroupIndex = 0;
