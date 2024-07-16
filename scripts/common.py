@@ -243,7 +243,6 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/click-all-buttons-on-donate-page',
     'logged-out-user/visit-classroom-index-page',
     'logged-out-user/browse-and-search-for-lessons-in-community-library',
-    'logged-out-user/search-for-and-start-playing-a-collection',
     'logged-out-user/select-and-play-topic-from-math-classroom',
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
