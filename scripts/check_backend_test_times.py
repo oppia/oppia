@@ -73,7 +73,8 @@ def get_sorted_backend_test_times_from_reports() -> List[BackendTestDict]:
                     {'test_name': test_name, 'test_time': float(test_time)}
                 )
     return sorted(
-        backend_test_times, key=lambda test: test['test_time']
+        backend_test_times,
+        key=lambda test: (test['test_time'], test['test_name'])
     )
 
 
