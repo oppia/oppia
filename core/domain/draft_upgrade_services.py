@@ -306,7 +306,6 @@ class DraftUpgradeUtil:
                 })
         return draft_change_list
 
-
     @classmethod
     def _convert_states_v55_dict_to_v56_dict(
         cls, draft_change_list: List[exp_domain.ExplorationChange]
@@ -327,7 +326,6 @@ class DraftUpgradeUtil:
                 completed.
         """
         return draft_change_list
-
 
     @classmethod
     def _convert_states_v54_dict_to_v55_dict(

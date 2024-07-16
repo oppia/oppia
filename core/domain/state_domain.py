@@ -3675,7 +3675,9 @@ class State(translation_domain.BaseTranslatableObject):
         self.linked_skill_id = linked_skill_id
         self.solicit_answer_details = solicit_answer_details
         self.card_is_checkpoint = card_is_checkpoint
-        self.inapplicable_skill_misconception_ids = inapplicable_skill_misconception_ids
+        self.inapplicable_skill_misconception_ids = (
+            inapplicable_skill_misconception_ids
+        )
 
     def get_translatable_contents_collection(
         self,
@@ -4271,7 +4273,9 @@ class State(translation_domain.BaseTranslatableObject):
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
             'solicit_answer_details': self.solicit_answer_details,
             'card_is_checkpoint': self.card_is_checkpoint,
-            'inapplicable_skill_misconception_ids': self.inapplicable_skill_misconception_ids
+            'inapplicable_skill_misconception_ids': (
+                self.inapplicable_skill_misconception_ids
+            )
         }
 
     # TODO(#16467): Remove `validate` argument after validating all Question
