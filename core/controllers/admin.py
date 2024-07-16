@@ -196,8 +196,9 @@ SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict({
                     'content_0': {}
                 }
             },
-        'solicit_answer_details': False,
-        'card_is_checkpoint': True,
+            'solicit_answer_details': False,
+            'card_is_checkpoint': True,
+            'inapplicable_skill_misconception_ids': None
         }
     },
     'version': 3

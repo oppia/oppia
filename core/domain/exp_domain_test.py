@@ -12610,6 +12610,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 translation_domain.ContentType.DEFAULT_OUTCOME)
             return {
                 'linked_skill_id': None,
+                'inapplicable_skill_misconception_ids': None,
                 'classifier_model_id': None,
                 'content': {
                     'content_id': content_id_for_content,
