@@ -83,16 +83,16 @@ def main() -> None:
     """Checks the backend test times by combining all backend time reports."""
     sorted_backend_test_times = get_sorted_backend_test_times_from_reports()
 
-    print('BACKEND TEST TIMES SORTED BY TIME:\n')
+    print('BACKEND TEST TIMES SORTED BY TIME:')
     for backend_test in sorted_backend_test_times:
-        print('%s: %s\n' % (
+        print('%s: %s SECONDS' % (
             backend_test['test_name'], backend_test['test_time']))
 
-    print('BACKEND TEST TIMES OVER %s seconds:\n' % (
+    print('BACKEND TEST TIMES OVER %s SECONDS:' % (
         LONG_BACKEND_TEST_TIME_THRESHOLD))
     for backend_test in sorted_backend_test_times:
         if backend_test['test_time'] > LONG_BACKEND_TEST_TIME_THRESHOLD:
-            print('%s: %s\n' % (
+            print('%s: %s SECONDS' % (
                 backend_test['test_name'], backend_test['test_time']))
 
     with open(
