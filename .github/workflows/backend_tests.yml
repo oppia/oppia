@@ -180,7 +180,7 @@ jobs:
           name: backend_test_time_shard_5
           path: backend_test_time_reports/backend_test_time_5.txt
       - name: List directories
-        run: ls -la
+        run: ls -la backend_test_time_reports
         shell: bash
       - name: Check test times
         run: python -m scripts.check_backend_test_times
