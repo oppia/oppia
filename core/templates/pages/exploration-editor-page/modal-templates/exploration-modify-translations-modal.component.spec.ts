@@ -100,6 +100,11 @@ describe('Modify Translations Modal Component', function () {
             content_format: 'html',
             needs_update: false,
           },
+          rule1: {
+            content_value: 'Rule 1',
+            content_format: 'set_of_unicode_string',
+            needs_update: false,
+          },
         },
       }),
     };
@@ -139,6 +144,19 @@ describe('Modify Translations Modal Component', function () {
     expect(component.languageIsCheckedStatusDict).toEqual({
       hi: false,
     });
+  }));
+
+  it('should determine if data format is set of strings', fakeAsync(() => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    component.contentId = 'content1';
+    component.ngOnInit();
+
+    expect(component.isSetOfStringDataFormat()).toBeFalse();
+
+    component.contentId = 'rule1';
+    component.ngOnInit();
+
+    expect(component.isSetOfStringDataFormat()).toBeTrue();
   }));
 
   it('should handle translations being removed', () => {
