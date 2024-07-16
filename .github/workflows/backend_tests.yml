@@ -58,7 +58,7 @@ jobs:
       - name: Upload time report
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ format('backend_test_time_shard_{0}.txt', matrix.shard) }}
+          name: ${{ format('backend_test_time_shard_{0}', matrix.shard) }}
           path: backend_test_time_report.txt
           retention-days: 1
       - name: Upload coverage report
