@@ -158,30 +158,31 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: backend_test_time_shard_1
-          path: backend_test_time_reports/backend_test_time_1.txt
+          path: backend_test_time_reports_artifacts/backend_test_time_1
       - name: Download time report for shard 2
         uses: actions/download-artifact@v3
         with:
           name: backend_test_time_shard_2
-          path: backend_test_time_reports/backend_test_time_2.txt
+          path: backend_test_time_reports_artifacts/backend_test_time_2
       - name: Download time report for shard 3
         uses: actions/download-artifact@v3
         with:
           name: backend_test_time_shard_3
-          path: backend_test_time_reports/backend_test_time_3.txt
+          path: backend_test_time_reports_artifacts/backend_test_time_3
       - name: Download time report for shard 4
         uses: actions/download-artifact@v3
         with:
           name: backend_test_time_shard_4
-          path: backend_test_time_reports/backend_test_time_4.txt
+          path: backend_test_time_reports_artifacts/backend_test_time_4
       - name: Download time report for shard 5
         uses: actions/download-artifact@v3
         with:
           name: backend_test_time_shard_5
-          path: backend_test_time_reports/backend_test_time_5.txt
-      - name: List directories
-        run: ls -la backend_test_time_reports
+          path: backend_test_time_reports_artifacts/backend_test_time_5
+      - name: Move time reports from artifact folders to backend_test_time_reports folder
         shell: bash
+        run: |
+          for i in {1..5}; do cp backend_test_time_reports_artifacts/backend_test_time_$i/backend_test_time_report.txt backend_test_time_reports/backend_test_time_report_$i.txt; done
       - name: Check test times
         run: python -m scripts.check_backend_test_times
         shell: bash
