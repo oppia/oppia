@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import builtins
 import os
 import tempfile
 
@@ -37,6 +38,11 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
         backend_test_time_report_three = os.path.join(
             self.backend_test_time_reports_directory.name, 'report_three.txt')
 
+        self.print_arr: list[str] = []
+        def mock_print(msg: str) -> None:
+            self.print_arr.append(msg)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
+
         with open(backend_test_time_report_one, 'w', encoding='utf-8') as f:
             f.write('test_one:1.8\n')
             f.write('test_two:1.4\n')
@@ -51,7 +57,8 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
         with open(backend_test_time_report_three, 'w', encoding='utf-8') as f:
             f.write('test_eight:1.5\n')
             f.write('test_nine:1.6\n')
-            f.write('test_ten:1.4')
+            f.write('test_ten:1.4\n')
+            f.write('test_eleven:164.4')
 
         self.backend_test_time_reports_swap = self.swap(
             check_backend_test_times, 'BACKEND_TEST_TIME_REPORTS_DIRECTORY',
@@ -67,7 +74,8 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
             {'test_name': 'test_nine', 'test_time': 1.6},
             {'test_name': 'test_three', 'test_time': 1.7},
             {'test_name': 'test_one', 'test_time': 1.8},
-            {'test_name': 'test_four', 'test_time': 2.3}
+            {'test_name': 'test_four', 'test_time': 2.3},
+            {'test_name': 'test_eleven', 'test_time': 164.4}
         ]
 
     def tearDown(self) -> None:
@@ -109,7 +117,8 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
             backend_test_times_temp_file.name
         )
         with self.backend_test_time_reports_swap, backend_test_times_file_swap:
-            check_backend_test_times.main()
+            with self.print_swap:
+                check_backend_test_times.main()
         sorted_backend_test_times_from_file = []
         for line in backend_test_times_temp_file.readlines():
             test_name, test_time = line.strip().split(':')
@@ -121,4 +130,14 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
             sorted_backend_test_times_from_file,
             self.sorted_backend_test_times
         )
+        sorted_backend_test_times_message = (
+            'BACKEND TEST TIMES SORTED BY TIME:\n'
+            'test_six: 1.1\ntest_five: 1.2\ntest_seven: 1.3\ntest_ten: 1.4\n'
+            'test_two: 1.4\ntest_eight: 1.5\ntest_nine: 1.6\ntest_three: 1.7\n'
+            'test_one: 1.8\ntest_four: 2.3\ntest_eleven: 164.4\n'
+            'BACKEND TEST TIMES OVER 150.0 seconds:\n'
+            'test_eleven: 164.4\n'
+        )
+        self.assertEqual(
+            sorted_backend_test_times_message, ''.join(self.print_arr))
         backend_test_times_temp_file.close()

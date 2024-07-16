@@ -26,6 +26,7 @@ BACKEND_TEST_TIME_REPORTS_DIRECTORY: Final = os.path.join(
 BACKEND_TEST_TIMES_FILE: Final = os.path.join(
     os.getcwd(), 'backend_test_times.txt'
 )
+LONG_BACKEND_TEST_TIME_THRESHOLD: Final = 150.0
 
 
 class BackendTestDict(TypedDict):
@@ -81,6 +82,19 @@ def get_sorted_backend_test_times_from_reports() -> List[BackendTestDict]:
 def main() -> None:
     """Checks the backend test times by combining all backend time reports."""
     sorted_backend_test_times = get_sorted_backend_test_times_from_reports()
+
+    print('BACKEND TEST TIMES SORTED BY TIME:\n')
+    for backend_test in sorted_backend_test_times:
+        print('%s: %s\n' % (
+            backend_test['test_name'], backend_test['test_time']))
+
+    print('BACKEND TEST TIMES OVER %s seconds:\n' % (
+        LONG_BACKEND_TEST_TIME_THRESHOLD))
+    for backend_test in sorted_backend_test_times:
+        if backend_test['test_time'] > LONG_BACKEND_TEST_TIME_THRESHOLD:
+            print('%s: %s\n' % (
+                backend_test['test_name'], backend_test['test_time']))
+
     with open(
         BACKEND_TEST_TIMES_FILE, 'w', encoding='utf-8'
     ) as backend_test_times_file:
