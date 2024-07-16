@@ -3653,6 +3653,9 @@ class State(translation_domain.BaseTranslatableObject):
                 this state.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
+            inapplicable_skill_misconception_ids: list[str] or None. The list of
+                misconception IDs associated with the linked skill that are
+                inapplicable for this state.
         """
         # The content displayed to the reader in this state.
         self.content = content
