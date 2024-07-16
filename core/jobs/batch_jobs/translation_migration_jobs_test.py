@@ -40,7 +40,7 @@ if MYPY:
     models.Names.EXPLORATION, models.Names.TRANSLATION
 ])
 
-STATE_DICT_IN_V56 = {
+STATE_DICT_IN_V52 = {
     'content': {
         'content_id': 'content',
         'html': 'Content for the state'
@@ -183,8 +183,7 @@ STATE_DICT_IN_V56 = {
     'classifier_model_id': None,
     'card_is_checkpoint': False,
     'solicit_answer_details': False,
-    'next_content_id_index': 2,
-    'inapplicable_skill_misconception_ids': None
+    'next_content_id_index': 2
 }
 
 
@@ -213,11 +212,11 @@ class EntityTranslationsModelGenerationOneOffJobTests(
             tags=['Topic'],
             blurb='blurb',
             author_notes='author notes',
-            states_schema_version=56,
+            states_schema_version=52,
             param_specs={},
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
-            states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V56},
+            states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         commit_cmd = exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_CREATE_NEW,
@@ -324,11 +323,11 @@ class AuditEntityTranslationsModelGenerationOneOffJobTests(
             tags=['Topic'],
             blurb='blurb',
             author_notes='author notes',
-            states_schema_version=56,
+            states_schema_version=52,
             param_specs={},
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
-            states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V56},
+            states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         commit_cmd = exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_CREATE_NEW,

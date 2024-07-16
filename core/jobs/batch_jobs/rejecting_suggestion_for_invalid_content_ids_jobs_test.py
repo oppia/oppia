@@ -36,7 +36,7 @@ if MYPY: # pragma: no cover
     models.Names.EXPLORATION, models.Names.SUGGESTION
 ])
 
-STATE_DICT_IN_V56 = {
+STATE_DICT_IN_V52 = {
     'content': {'content_id': 'content', 'html': ''},
     'param_changes': [],
     'interaction': {
@@ -87,8 +87,7 @@ STATE_DICT_IN_V56 = {
     'classifier_model_id': None,
     'card_is_checkpoint': False,
     'solicit_answer_details': False,
-    'next_content_id_index': 2,
-    'inapplicable_skill_misconception_ids': None
+    'next_content_id_index': 2
 }
 
 TRANSLATION_HTML = (
@@ -133,11 +132,11 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
             author_notes='author notes',
             # The exact schema version isn't too important here; we just
             # conveniently had the test data set up for this version already.
-            states_schema_version=56,
+            states_schema_version=52,
             param_specs={},
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
-            states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V56},
+            states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         self.put_multi([self.exp_1])
 
@@ -223,11 +222,11 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
             tags=['Topic'],
             blurb='blurb',
             author_notes='author notes',
-            states_schema_version=56,
+            states_schema_version=52,
             param_specs={},
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
-            states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V56},
+            states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         self.put_multi([self.exp_2])
 
