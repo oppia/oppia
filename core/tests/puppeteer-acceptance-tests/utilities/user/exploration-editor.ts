@@ -333,7 +333,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
@@ -862,7 +862,7 @@ export class ExplorationEditor extends BaseUser {
       this.clickOn(confirmDiscardButton),
       this.page.waitForNavigation({waitUntil: 'networkidle0'}),
     ]);
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsButton);
       await this.clickOn(basicSettingsDropdown);
