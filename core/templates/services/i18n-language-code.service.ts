@@ -207,8 +207,9 @@ export class I18nLanguageCodeService {
 
   isClassroomnNameTranslationAvailable(classroomName: string): boolean {
     return (
-      this.isHackyTranslationAvailable(classroomName) &&
-      !this.isCurrentLanguageEnglish()
+      this.isHackyTranslationAvailable(
+        this.getClassroomTranslationKeys(classroomName).name
+      ) && !this.isCurrentLanguageEnglish()
     );
   }
 }
