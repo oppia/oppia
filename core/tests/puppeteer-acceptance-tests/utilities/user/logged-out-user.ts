@@ -230,6 +230,13 @@ const languageFilterDropdownToggler =
 const searchResultsSelector = '.e2e-test-exp-summary-tile-objective';
 const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
 const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
+const topicNameInTheClassroomSelector = '.e2e-test-topic-name';
+const storyTitleSelector = '.e2e-test-story-title-in-topic-page';
+const chapterTitleSelector = '.e2e-test-chapter-title';
+const oppiaTopicTitleSelector = '.oppia-topic-title';
+const topicPageLessonTabSelector = '.e2e-test-revision-tab-link';
+const subTopicTitleInLessTabSelector = '.subtopic-title';
+const reviewCardTitleSelector = '.oppia-subtopic-title';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -2191,6 +2198,199 @@ export class LoggedOutUser extends BaseUser {
     } catch (error) {
       const newError = new Error(
         `Failed to check rating of exploration: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Checks if a list of topics are present.
+   * @param {string[]} expectedTopicNames - The names of the topics to check for.
+   */
+  async expectTopicsToBePresent(expectedTopicNames: string[]): Promise<void> {
+    try {
+      const topicNames = await this.page.$$(topicNameInTheClassroomSelector);
+      const topicNameTexts = await Promise.all(
+        topicNames.map(name => this.page.evaluate(el => el.textContent, name))
+      );
+
+      for (const expectedName of expectedTopicNames) {
+        if (!topicNameTexts.includes(expectedName)) {
+          throw new Error(`Topic "${expectedName}" not found in topic names.`);
+        }
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to check for topics: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Selects and opens a topic by its name.
+   * @param {string} topicName - The name of the topic to select and open.
+   */
+  async selectAndOpenTopic(topicName: string): Promise<void> {
+    const topicNameSelector = '.e2e-test-topic-name';
+
+    try {
+      const topicNames = await this.page.$$(topicNameSelector);
+      for (const name of topicNames) {
+        const nameText = await this.page.evaluate(el => el.textContent, name);
+        if (nameText === topicName) {
+          await name.click();
+          return;
+        }
+      }
+
+      throw new Error(`Topic "${topicName}" not found in topic names.`);
+    } catch (error) {
+      const newError = new Error(`Failed to select and open topic: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Selects and opens a chapter within a story to learn.
+   * @param {string} chapterName - The name of the chapter to select and open.
+   * @param {string} storyName - The name of the story containing the chapter.
+   */
+  async selectChapterWithinStoryToLearn(
+    chapterName: string,
+    storyName: string
+  ): Promise<void> {
+    try {
+      const storyTitles = await this.page.$$(storyTitleSelector);
+      for (const title of storyTitles) {
+        const titleText = await this.page.evaluate(el => el.textContent, title);
+        if (titleText === storyName) {
+          await Promise.all([
+            this.page.waitForNavigation({waitUntil: ['networkidle2', 'load']}),
+            title.click(),
+          ]);
+
+          const chapterTitles = await this.page.$$(chapterTitleSelector);
+          for (const chapter of chapterTitles) {
+            const chapterText = await this.page.evaluate(
+              el => el.textContent,
+              chapter
+            );
+            if (chapterText === chapterName) {
+              await Promise.all([
+                this.page.waitForNavigation({
+                  waitUntil: ['networkidle2', 'load'],
+                }),
+                chapter.click(),
+              ]);
+              return;
+            }
+          }
+
+          throw new Error(
+            `Chapter "${chapterName}" not found in story "${storyName}".`
+          );
+        }
+      }
+
+      throw new Error(`Story "${storyName}" not found in story titles.`);
+    } catch (error) {
+      const newError = new Error(
+        `Failed to select and open chapter within story: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Navigates back to the topic page after completing an exploration.
+   */
+  async returnToTopicPageAfterCompletingExploration() {
+    await this.clickOn(oppiaTopicTitleSelector);
+  }
+
+  /**
+   * Navigates to the revision tab on the topic page.
+   */
+  async navigateToRevisionTab() {
+    await this.clickOn(topicPageLessonTabSelector);
+  }
+
+  /**
+   * Selects a review card based on the subtopic name.
+   * @param subtopicName - The name of the subtopic to select.
+   */
+  /**
+   * Selects a review card based on the subtopic name.
+   * @param {string} subtopicName - The name of the subtopic to select.
+   * @param {puppeteer.Page} page - The Puppeteer page object.
+   * @throws {Error} When the subtopic cannot be found or clicked.
+   */
+  async selectReviewCardToLearn(subtopicName: string) {
+    try {
+      const subtopicElements = await this.page.$$(
+        subTopicTitleInLessTabSelector
+      );
+
+      for (let i = 0; i < subtopicElements.length; i++) {
+        const innerText = await this.page.evaluate(
+          el => el.innerText,
+          subtopicElements[i]
+        );
+
+        if (innerText === subtopicName) {
+          await subtopicElements[i].click();
+          return;
+        }
+      }
+
+      throw new Error(`No subtopic found with the name: ${subtopicName}`);
+    } catch (error) {
+      const newError = new Error(`Failed to select review card: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Verifies if the review card has the expected title and description.
+   * @param {string} reviewCardTitle - The expected title of the review card.
+   * @param {string} reviewCardDescription - The expected description of the review card.
+   */
+  async expectReviewCardToHaveContent(
+    reviewCardTitle: string,
+    reviewCardDescription: string
+  ) {
+    try {
+      const titleElement = await this.page.$(reviewCardTitleSelector);
+
+      // Get the innerText of the title element
+      const titleText = await this.page.evaluate(
+        el => el.innerText,
+        titleElement
+      );
+
+      if (titleText !== reviewCardTitle) {
+        throw new Error(
+          `Expected review card title to be ${reviewCardTitle}, but found ${titleText}`
+        );
+      }
+
+      const isDescriptionPresent = await this.isTextPresentOnPage(
+        reviewCardDescription,
+        page
+      );
+
+      if (!isDescriptionPresent) {
+        throw new Error(
+          `Expected review card description to be present on the page, but it was not found`
+        );
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify content of review card: ${error}`
       );
       newError.stack = error.stack;
       throw newError;

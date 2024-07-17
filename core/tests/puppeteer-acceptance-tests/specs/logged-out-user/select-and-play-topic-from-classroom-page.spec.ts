@@ -119,7 +119,6 @@ describe('Logged-out User', function () {
     );
 
     await curriculumAdmin.publishDraftTopic('Test Topic 1');
-    await loggedOutUser.timeout(2147483647);
     await curriculumAdmin.createAndPublishStoryWithChapter(
       'Test Story 1',
       'test-story-one',
@@ -136,7 +135,7 @@ describe('Logged-out User', function () {
     await curriculumAdmin.createNewClassroom('math', '/math');
     await curriculumAdmin.addTopicToClassroom('math', 'Test Topic 1');
     await curriculumAdmin.publishClassroom('math');
-  }, 2147483647);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to complete the learner journey in the math classroom',
@@ -144,9 +143,12 @@ describe('Logged-out User', function () {
       await loggedOutUser.navigateToClassroomPage('math');
       await loggedOutUser.expectTopicsToBePresent(['Algebra']);
 
-      await loggedOutUser.selectTopicToLearn('Algebra');
+      await loggedOutUser.selectAndOpenTopic('Algebra');
 
-      await loggedOutUser.selectChapterWithinStoryToLearn();
+      await loggedOutUser.selectChapterWithinStoryToLearn(
+        'test chapter 1',
+        'test Story 1'
+      );
       // Playing the exploration linked with the chapter selected.
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.submitAnswer('-40');
@@ -157,11 +159,15 @@ describe('Logged-out User', function () {
         'Congratulations for completing this lesson!'
       );
 
+      // Returning to the topic page from the exploration player itself.
       await loggedOutUser.returnToTopicPageAfterCompletingExploration();
       await loggedOutUser.navigateToRevisionTab();
       // Review cards are the subtopic that are created in the topic.
-      await loggedOutUser.selectReviewCardToLearn();
-      await loggedOutUser.expectReviewCardToHaveContent();
+      await loggedOutUser.selectReviewCardToLearn('Test Subtopic 1');
+      await loggedOutUser.expectReviewCardToHaveContent(
+        'Test Subtopic 1',
+        'test-subtopic-one'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

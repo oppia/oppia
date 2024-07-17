@@ -34,7 +34,7 @@
   <div class="oppia-story-title" dir="auto" *ngIf="!checkTabletView()">
     <strong class="title-text">
       <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">
-        <span *ngIf="!isHackyStoryTitleTranslationDisplayed()">
+        <span *ngIf="!isHackyStoryTitleTranslationDisplayed()" class="e2e-test-story-title-in-topic-page">
           {{ storyTitle }}
         </span>
         <span *ngIf="isHackyStoryTitleTranslationDisplayed()">

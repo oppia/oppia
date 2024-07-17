@@ -112,7 +112,7 @@ describe('Logged-out User', function () {
 
       // View the ratings on an exploration once a minimum number of ratings have been submitted.
       await loggedOutUser.expectExplorationToHaveRating(
-        '4',
+        4,
         'Test Exploration Title 1'
       );
     },
