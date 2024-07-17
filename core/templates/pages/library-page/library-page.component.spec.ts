@@ -865,8 +865,10 @@ describe('Library Page Component', () => {
         1
       )
     ).toEqual(componentInstance.classroomSummaries.slice(3));
-    expect(componentInstance.showNextClassroomChunkButton()).toBe(true);
-    expect(componentInstance.showPreviousClassroomChunkButton()).toBe(false);
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(true);
+    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
+      false
+    );
 
     componentInstance.moveClassroomCarouselToNextSlide();
     expect(componentInstance.classroomCarouselIndex).toEqual(1);
@@ -875,13 +877,17 @@ describe('Library Page Component', () => {
     expect(componentInstance.classroomCarouselIndex).toEqual(0);
 
     componentInstance.moveClassroomCarouselToNextSlide();
-    expect(componentInstance.showNextClassroomChunkButton()).toBe(false);
-    expect(componentInstance.showPreviousClassroomChunkButton()).toBe(true);
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(false);
+    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
+      true
+    );
 
     componentInstance.moveClassroomCarouselToPreviousSlide();
     expect(componentInstance.classroomCarouselIndex).toEqual(0);
-    expect(componentInstance.showNextClassroomChunkButton()).toBe(true);
-    expect(componentInstance.showPreviousClassroomChunkButton()).toBe(false);
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(true);
+    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
+      false
+    );
   });
 
   it('should handle less than 3 classrooms correctly in the classroom carousel', () => {
@@ -889,7 +895,9 @@ describe('Library Page Component', () => {
     componentInstance.classroomSummaries = dummyClassroomSummaries.slice(0, 3);
     componentInstance.publicClassroomsCount =
       componentInstance.classroomSummaries.length;
-    expect(componentInstance.showNextClassroomChunkButton()).toBe(false);
-    expect(componentInstance.showPreviousClassroomChunkButton()).toBe(false);
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(false);
+    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
+      false
+    );
   });
 });

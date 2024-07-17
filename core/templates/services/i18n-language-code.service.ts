@@ -204,6 +204,13 @@ export class I18nLanguageCodeService {
   get onPreferredLanguageCodesLoaded(): EventEmitter<string[]> {
     return this._preferredLanguageCodesLoadedEventEmitter;
   }
+
+  isClassroomnNameTranslationAvailable(classroomName: string): boolean {
+    return (
+      this.isHackyTranslationAvailable(classroomName) &&
+      !this.isCurrentLanguageEnglish()
+    );
+  }
 }
 
 angular

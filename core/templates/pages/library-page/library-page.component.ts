@@ -528,7 +528,7 @@ export class LibraryPageComponent {
     return classroomSummaries.slice(start, end);
   }
 
-  showNextClassroomChunkButton(): boolean {
+  shouldShowNextClassroomChunkButton(): boolean {
     const numberOfClassroomSlides = this.getClassroomChunkIndices(
       this.classroomSummaries.length
     ).length;

@@ -52,10 +52,8 @@ export class ClassroomCardComponent {
     if (!this.classroomSummary.name) {
       return false;
     }
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.classroomNameTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    return this.i18nLanguageCodeService.isClassroomnNameTranslationAvailable(
+      this.classroomSummary.name
     );
   }
 

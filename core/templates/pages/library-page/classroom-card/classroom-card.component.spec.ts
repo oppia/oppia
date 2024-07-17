@@ -91,7 +91,7 @@ describe('ClassroomCardComponent', () => {
     });
     spyOn(
       i18nLanguageCodeService,
-      'isHackyTranslationAvailable'
+      'isClassroomnNameTranslationAvailable'
     ).and.returnValue(true);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
       false
