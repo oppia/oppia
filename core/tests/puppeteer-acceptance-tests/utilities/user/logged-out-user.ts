@@ -1132,7 +1132,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(socialIconSelector);
     const pageTarget = this.page.target();
     await this.clickOn(socialIconSelector);
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     const newTarget = await this.browserObject.waitForTarget(
       target => target.opener() === pageTarget
     );
