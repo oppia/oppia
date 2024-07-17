@@ -90,14 +90,14 @@ describe('Logged-out User', function () {
     // Navigate back to the introduction card and save the draft.
     await curriculumAdmin.navigateToCard(CARD_NAME.INTRODUCTION);
     await curriculumAdmin.saveExplorationDraft();
-    // explorationId = await curriculumAdmin.publishExplorationWithMetadata(
-    //   'Test Exploration Title 1',
-    //   'Test Exploration Goal',
-    //   'Algebra'
-    // );
-    // if (!explorationId) {
-    //   throw new Error('Error publishing exploration successfully.');
-    // }
+    explorationId = await curriculumAdmin.publishExplorationWithMetadata(
+      'Test Exploration Title 1',
+      'Test Exploration Goal',
+      'Algebra'
+    );
+    if (!explorationId) {
+      throw new Error('Error publishing exploration successfully.');
+    }
 
     await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
     await curriculumAdmin.createSubtopicForTopic(
@@ -147,7 +147,7 @@ describe('Logged-out User', function () {
       await loggedOutUser.selectTopicToLearn('Algebra');
 
       await loggedOutUser.selectChapterWithinStoryToLearn();
-      // Playing the exploration linked with the chapter selected
+      // Playing the exploration linked with the chapter selected.
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.submitAnswer('-40');
       await loggedOutUser.continueToNextCard();

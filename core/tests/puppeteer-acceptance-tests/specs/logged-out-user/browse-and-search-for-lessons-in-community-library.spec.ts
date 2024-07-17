@@ -81,10 +81,10 @@ describe('Logged-out User', function () {
     }
 
     loggedInUser.playExploration(explorationId1);
-    loggedInUser.rateExploration('4');
+    loggedInUser.rateExploration(4, 'great', false);
 
     loggedInUser.playExploration(explorationId2);
-    loggedInUser.rateExploration('5');
+    loggedInUser.rateExploration(5, 'great', false);
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -94,7 +94,7 @@ describe('Logged-out User', function () {
       await loggedOutUser.searchForLessonInSearchBar('Algebra');
       await loggedOutUser.filterLessonsByCategories(['Algebra']);
       await loggedOutUser.filterLessonsByLanguage(['English']);
-      await loggedOutUser.expectSearchResultsToBePresent('Algebra');
+      await loggedOutUser.expectSearchResultsToContain('Algebra');
 
       // Access the top-rated page at /community-library/top-rated, which shows explorations with high ratings.
       await loggedOutUser.navigateToTopRatedPage();

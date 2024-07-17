@@ -220,6 +220,12 @@ const floatFormInput = '.e2e-test-float-form-input';
 const nextCardButton = '.e2e-test-next-card-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
+const searchInputSelector = '.e2e-test-search-input';
+const categoryFilterDropdownToggler = '.e2e-test-search-bar-dropdown-toggle';
+const filterOptionsSelector = '.e2e-test-deselected';
+const languageFilterDropdownToggler =
+  '.oppia-search-bar-dropdown-toggle-button';
+const searchResultsSelector = '.e2e-test-exp-summary-tile-objective';
 
 export class LoggedOutUser extends BaseUser {
   /**
@@ -333,6 +339,12 @@ export class LoggedOutUser extends BaseUser {
     await this.goto(classroomsPage);
   }
 
+  /**
+   *  Function to navigate to the community library page.
+   */
+  async navigateToCommunityLibraryPage(): Promise<void> {
+    await this.goto(communityLibraryUrl);
+  }
   /**
    * Function to click a button and check if it opens the expected destination.
    */
@@ -1996,12 +2008,102 @@ export class LoggedOutUser extends BaseUser {
     });
   }
 
-  async timeout(time) {
-    await this.page.waitForTimeout(time);
+  /**
+   * Searches for a lesson in the search bar present in the community library.
+   * @param {string} lessonName - The name of the lesson to search for.
+   */
+  async searchForLessonInSearchBar(lessonName: string): Promise<void> {
+    await this.clickOn(searchInputSelector);
+    await this.type(searchInputSelector, lessonName);
+
+    await this.page.keyboard.press('Enter');
   }
 
-  async screenshot(path) {
-    await this.page.screenshot({path: `${path}`});
+  /**
+   * Filters lessons by multiple categories.
+   * @param {string[]} categoryNames - The names of the categories to filter by.
+   */
+  async filterLessonsByCategories(categoryNames: string[]): Promise<void> {
+    try {
+      await this.clickOn(categoryFilterDropdownToggler);
+
+      const deselectedCategories = await this.page.$$(filterOptionsSelector);
+      for (const category of deselectedCategories) {
+        const categoryText = await this.page.evaluate(
+          el => el.textContent,
+          category
+        );
+        if (categoryNames.includes(categoryText)) {
+          await category.click();
+        }
+      }
+
+      await this.clickOn(searchInputSelector);
+      await this.page.keyboard.press('Enter');
+    } catch (error) {
+      const newError = new Error(
+        `Failed to filter lessons by categories: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Filters lessons by multiple languages.
+   * @param {string[]} languageNames - The names of the languages to filter by.
+   */
+  async filterLessonsByLanguage(languageNames: string[]): Promise<void> {
+    try {
+      await this.clickOn(languageFilterDropdownToggler);
+
+      const deselectedLanguages = await this.page.$$(filterOptionsSelector);
+      for (const language of deselectedLanguages) {
+        const languageText = await this.page.evaluate(
+          el => el.textContent,
+          language
+        );
+        if (languageNames.includes(languageText)) {
+          await language.click();
+        }
+      }
+
+      await this.clickOn(searchInputSelector);
+      await this.page.keyboard.press('Enter');
+    } catch (error) {
+      const newError = new Error(
+        `Failed to filter lessons by languages: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Checks if the search results contain a specific result.
+   * @param {string} searchResult - The search result to check for.
+   */
+  async expectSearchResultsToContain(searchResult: string): Promise<void> {
+    try {
+      const searchResults = await this.page.$$(searchResultsSelector);
+      for (const result of searchResults) {
+        const resultText = await this.page.evaluate(
+          el => el.querySelector('span').textContent,
+          result
+        );
+        if (resultText === searchResult) {
+          return;
+        }
+      }
+
+      throw new Error(
+        `Search result "${searchResult}" not found in search results.`
+      );
+    } catch (error) {
+      const newError = new Error(`Failed to check search results: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
   }
 }
 

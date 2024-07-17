@@ -111,10 +111,7 @@ export class LoggedInUser extends BaseUser {
    * @param {string} explorationId - The ID of the exploration to play.
    */
   async playExploration(explorationId: string): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      this.page.goto(`${baseUrl}/explore/${explorationId}`),
-    ]);
+    this.goto(`${baseUrl}/explore/${explorationId}`);
   }
 
   /**

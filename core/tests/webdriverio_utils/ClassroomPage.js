@@ -18,7 +18,6 @@
  */
 
 var waitFor = require('./waitFor.js');
-var action = require('./action.js');
 
 var ClassroomPage = function () {
   var topicSummaryTile = $('.e2e-test-topic-summary-tile');
