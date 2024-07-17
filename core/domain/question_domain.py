@@ -1829,8 +1829,8 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted question_state_dict.
         """
 
-        # Version 56 only adds data for the `Exploration` object and make
-        # no changes to the `Question` object.
+        question_state_dict['inapplicable_skill_misconception_ids'] = None
+
         return question_state_dict
 
     @classmethod
