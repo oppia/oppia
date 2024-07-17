@@ -460,8 +460,8 @@
   font-weight: 700;
   height: 44px;
   line-height: 21.6px;
+  min-width: 240px;
   padding: 10px;
-  width: 240px;
 }
 
 .about-page .oppia-about-impact-charts-container {
@@ -757,8 +757,8 @@
   font-weight: 700;
   height: 44px;
   margin: 0;
+  min-width: 240px;
   padding: 10px;
-  width: 240px;
 }
 
 .about-page .oppia-about-cta-link {
@@ -1267,8 +1267,8 @@
   height: 44px;
   letter-spacing: normal;
   margin: 0;
+  min-width: 252px;
   padding: 10px;
-  width: 252px;
 }
 
 .about-page .oppia-about-secondary-button {
