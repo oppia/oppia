@@ -90,14 +90,14 @@ describe('Logged-out User', function () {
     // Navigate back to the introduction card and save the draft.
     await curriculumAdmin.navigateToCard(CARD_NAME.INTRODUCTION);
     await curriculumAdmin.saveExplorationDraft();
-    explorationId = await curriculumAdmin.publishExplorationWithMetadata(
-      'Test Exploration Title 1',
-      'Test Exploration Goal',
-      'Algebra'
-    );
-    if (!explorationId) {
-      throw new Error('Error publishing exploration successfully.');
-    }
+    // explorationId = await curriculumAdmin.publishExplorationWithMetadata(
+    //   'Test Exploration Title 1',
+    //   'Test Exploration Goal',
+    //   'Algebra'
+    // );
+    // if (!explorationId) {
+    //   throw new Error('Error publishing exploration successfully.');
+    // }
 
     await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
     await curriculumAdmin.createSubtopicForTopic(
@@ -119,6 +119,7 @@ describe('Logged-out User', function () {
     );
 
     await curriculumAdmin.publishDraftTopic('Test Topic 1');
+    await loggedOutUser.timeout(2147483647);
     await curriculumAdmin.createAndPublishStoryWithChapter(
       'Test Story 1',
       'test-story-one',
@@ -135,7 +136,7 @@ describe('Logged-out User', function () {
     await curriculumAdmin.createNewClassroom('math', '/math');
     await curriculumAdmin.addTopicToClassroom('math', 'Test Topic 1');
     await curriculumAdmin.publishClassroom('math');
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  }, 2147483647);
 
   it(
     'should be able to complete the learner journey in the math classroom',

@@ -117,8 +117,8 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/browse-and-search-for-lessons-in-community-library.spec.ts"
     },
     {
-      "name": "logged-out-user/select-and-play-topic-from-math-classroom",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/select-and-play-topic-from-math-classroom.spec.ts"
+      "name": "logged-out-user/select-and-play-topic-from-classroom-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/select-and-play-topic-from-classroom-page.spec.ts"
     },
     {
       "name": "moderator/edit-featured-activities-list",
