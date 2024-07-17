@@ -27,6 +27,12 @@ const explorationCard = '.e2e-test-exploration-dashboard-card';
 const baseUrl = testConstants.URLs.BaseURL;
 const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
 const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
+const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
+const ratingStarSelector = '.e2e-test-rating-star';
+const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
+const anonymousCheckboxSelector = '.e2e-test-stay-anonymous-checkbox';
+const submitButtonSelector = '.e2e-test-exploration-feedback-submit-btn';
+const submittedMessageSelector = '.e2e-test-rating-submitted-message';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -130,6 +136,52 @@ export class LoggedInUser extends BaseUser {
       showMessage('Feedback submitted successfully');
     } catch (error) {
       throw new Error('Feedback was not successfully submitted');
+    }
+  }
+
+  /**
+   * Rates an exploration by clicking on the rating stars, providing feedback, and optionally staying anonymous.
+   *
+   * @param {number} rating - The rating to give to the exploration.
+   * @param {string} feedback - The feedback to provide for the exploration.
+   * @param {boolean} stayAnonymous - Whether to stay anonymous or not.
+   */
+  async rateExploration(
+    rating: number,
+    feedback: string,
+    stayAnonymous: boolean
+  ): Promise<void> {
+    try {
+      await this.page.waitForSelector(ratingsHeaderSelector);
+      const ratingStars = await this.page.$$(ratingStarSelector);
+      await this.waitForElementToBeClickable(ratingStars[rating - 1]);
+      await ratingStars[rating - 1].click();
+
+      await this.type(feedbackTextareaSelector, feedback);
+      if (stayAnonymous) {
+        await this.clickOn(anonymousCheckboxSelector);
+      }
+
+      await this.clickOn(submitButtonSelector);
+
+      // Wait for the submitted message to appear and check its text.
+      await this.page.waitForSelector(submittedMessageSelector);
+      const submittedMessageElement = await this.page.$(
+        submittedMessageSelector
+      );
+      const submittedMessageText = await this.page.evaluate(
+        el => el.innerText,
+        submittedMessageElement
+      );
+      if (submittedMessageText !== 'Thank you for the feedback!') {
+        throw new Error(
+          `Unexpected submitted message text: ${submittedMessageText}`
+        );
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to rate exploration: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
     }
   }
 }
