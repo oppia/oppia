@@ -269,8 +269,7 @@ export class SvgEditorComponent implements OnInit {
   isDiagramCreated(): boolean {
     // This function checks if any shape has been created or not.
     return Boolean(
-      !this.isUserDrawing() &&
-        this.diagramStatus === this.STATUS_EDITING &&
+      this.diagramStatus === this.STATUS_EDITING &&
         this.canvas &&
         this.canvas.getObjects().length > 0
     );
