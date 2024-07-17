@@ -4669,6 +4669,7 @@ states:
     content:
       content_id: content_0
       html: ''
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4699,6 +4700,7 @@ states:
     content:
       content_id: content_2
       html: ''
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4751,6 +4753,7 @@ states:
     content:
       content_id: content
       html: ''
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups:
       - outcome:
@@ -4813,6 +4816,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4837,6 +4841,7 @@ states:
     content:
       content_id: content
       html: ''
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6857,7 +6862,156 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT: Final = YAML_CONTENT_V59
+    YAML_CONTENT_V61: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 61
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    inapplicable_skill_misconception_ids: null
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 6
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: (untitled state)
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    inapplicable_skill_misconception_ids: null
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    inapplicable_skill_misconception_ids: null
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+        catchMisspellings:
+          value: false
+      default_outcome:
+        dest: END
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 56
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT: Final = YAML_CONTENT_V61
 
     def test_load_from_v46_with_item_selection_input_interaction(self) -> None:
         """Tests the migration of ItemSelectionInput rule inputs."""
@@ -6991,7 +7145,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -6999,6 +7153,7 @@ states:
     content:
       content_id: content_0
       html: ''
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups:
       - outcome:
@@ -7068,6 +7223,7 @@ states:
     content:
       content_id: content_6
       html: <p>Congratulations, you have finished!</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -7084,7 +7240,7 @@ states:
       voiceovers_mapping:
         content_6: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: Title
 version: 0
@@ -7238,7 +7394,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7246,6 +7402,7 @@ states:
     content:
       content_id: content_0
       html: ''
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups:
       - outcome:
@@ -7325,6 +7482,7 @@ states:
     content:
       content_id: content_6
       html: <p>Congratulations, you have finished!</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -7341,7 +7499,7 @@ states:
       voiceovers_mapping:
         content_6: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: Title
 version: 0
@@ -7456,7 +7614,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7464,6 +7622,7 @@ states:
     content:
       content_id: content_0
       html: ''
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -7499,6 +7658,7 @@ states:
     content:
       content_id: content_3
       html: <p>Congratulations, you have finished!</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -7515,7 +7675,7 @@ states:
       voiceovers_mapping:
         content_3: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: Title
 version: 0
@@ -7650,7 +7810,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -7658,6 +7818,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups:
       - outcome:
@@ -7707,6 +7868,7 @@ states:
     content:
       content_id: content_3
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -7723,7 +7885,7 @@ states:
       voiceovers_mapping:
         content_3: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -7906,7 +8068,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -7954,6 +8116,7 @@ states:
         alt-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
         caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
         filepath-with-value=\&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]"></oppia-noninteractive-tabs>     '
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -7994,6 +8157,7 @@ states:
     content:
       content_id: content_3
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -8013,7 +8177,7 @@ states:
       voiceovers_mapping:
         content_3: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -8152,7 +8316,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8160,6 +8324,7 @@ states:
     content:
       content_id: content_0
       html: <p>Continue and End interaction validation</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -8205,6 +8370,7 @@ states:
     content:
       content_id: content_3
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -8224,7 +8390,7 @@ states:
       voiceovers_mapping:
         content_3: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -8337,7 +8503,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8345,6 +8511,7 @@ states:
     content:
       content_id: content_0
       html: <p>Continue and End interaction validation</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -8380,6 +8547,7 @@ states:
     content:
       content_id: content_3
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -8399,7 +8567,7 @@ states:
       voiceovers_mapping:
         content_3: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -8730,7 +8898,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8738,6 +8906,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups:
       - outcome:
@@ -8850,6 +9019,7 @@ states:
     content:
       content_id: content_6
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -8866,7 +9036,7 @@ states:
       voiceovers_mapping:
         content_6: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -9147,7 +9317,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9155,6 +9325,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups:
       - outcome:
@@ -9276,6 +9447,7 @@ states:
     content:
       content_id: content_7
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -9292,7 +9464,7 @@ states:
       voiceovers_mapping:
         content_7: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -9442,7 +9614,7 @@ next_content_id_index: 5
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9450,6 +9622,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups:
       - outcome:
@@ -9512,6 +9685,7 @@ states:
     content:
       content_id: content_4
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -9528,7 +9702,7 @@ states:
       voiceovers_mapping:
         content_4: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -9731,7 +9905,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9739,6 +9913,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups:
       - outcome:
@@ -9821,6 +9996,7 @@ states:
     content:
       content_id: content_7
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -9837,7 +10013,7 @@ states:
       voiceovers_mapping:
         content_7: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -10035,7 +10211,7 @@ next_content_id_index: 10
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10043,6 +10219,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups:
       - outcome:
@@ -10147,6 +10324,7 @@ states:
     content:
       content_id: content_9
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -10163,7 +10341,7 @@ states:
       voiceovers_mapping:
         content_9: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -10385,7 +10563,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10393,6 +10571,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups:
       - outcome:
@@ -10464,6 +10643,7 @@ states:
     content:
       content_id: content_6
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -10480,7 +10660,7 @@ states:
       voiceovers_mapping:
         content_6: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -10645,7 +10825,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10653,6 +10833,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups:
       - outcome:
@@ -10720,6 +10901,7 @@ states:
     content:
       content_id: content_7
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -10736,7 +10918,7 @@ states:
       voiceovers_mapping:
         content_7: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -10873,7 +11055,7 @@ next_content_id_index: 6
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10881,6 +11063,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups:
       - outcome:
@@ -10941,6 +11124,7 @@ states:
     content:
       content_id: content_5
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -10957,7 +11141,7 @@ states:
       voiceovers_mapping:
         content_5: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -11210,7 +11394,7 @@ next_content_id_index: 9
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11218,6 +11402,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups:
       - outcome:
@@ -11307,6 +11492,7 @@ states:
     content:
       content_id: content_8
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -11323,7 +11509,7 @@ states:
       voiceovers_mapping:
         content_8: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -12177,7 +12363,7 @@ next_content_id_index: 15
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12185,6 +12371,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups:
       - outcome:
@@ -12337,6 +12524,7 @@ states:
     content:
       content_id: content_14
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -12353,7 +12541,7 @@ states:
       voiceovers_mapping:
         content_14: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -12488,7 +12676,7 @@ next_content_id_index: 6
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12496,6 +12684,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups:
       - outcome:
@@ -12557,6 +12746,7 @@ states:
     content:
       content_id: content_5
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -12573,7 +12763,7 @@ states:
       voiceovers_mapping:
         content_5: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0

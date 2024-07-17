@@ -76,7 +76,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                     'html': '<p>Unicode Characters 😍😍😍😍</p>'
                 },
                 'linked_skill_id': None,
-                'inapplicable_skill_misconception_ids': None,
                 'interaction': {
                     'hints': [{
                         'hint_content': {
