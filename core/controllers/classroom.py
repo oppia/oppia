@@ -134,10 +134,7 @@ class ClassroomDataHandler(
             'thumbnail_data': classroom.thumbnail_data.to_dict(),
             'banner_data': classroom.banner_data.to_dict(),
             'public_classrooms_count': public_classrooms_count,
-            'classroom_id': classroom.classroom_id,
-            'topic_id_to_prerequisite_topic_ids': (
-                classroom.topic_id_to_prerequisite_topic_ids
-            )
+            'classroom_id': classroom.classroom_id
         })
         self.render_json(self.values)
 

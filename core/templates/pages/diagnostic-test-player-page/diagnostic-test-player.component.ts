@@ -30,6 +30,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {AppConstants} from 'app.constants';
 import {Router} from '@angular/router';
 import {LoaderService} from 'services/loader.service';
+import {AlertsService} from 'services/alerts.service';
 
 @Component({
   selector: 'oppia-diagnostic-test-player',
@@ -46,6 +47,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   recommendedTopicIds: string[] = [];
   progressPercentage: number = 0;
   componentSubscription = new Subscription();
+  disableStartTestButton: boolean = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -55,7 +57,8 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     private diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService,
     private windowRef: WindowRef,
     private router: Router,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private alertsService: AlertsService
   ) {}
 
   ngOnInit(): void {
@@ -106,12 +109,21 @@ export class DiagnosticTestPlayerComponent implements OnInit {
       .fetchClassroomDataAsync(this.classroomUrlFragment)
       .then(classroomData => {
         this.classroomData = classroomData;
-        this.loaderService.hideLoadingScreen();
       })
-      .catch(() => {
-        this.router.navigate([
-          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
-        ]);
+      .catch(error => {
+        this.disableStartTestButton = true;
+        if (error.status === 500) {
+          this.router.navigate([
+            `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/500`,
+          ]);
+        } else {
+          this.alertsService.addWarning(
+            'Failed to get classroom data. The URL fragment is invalid, or the classroom does not exist.'
+          );
+        }
+      })
+      .finally(() => {
+        this.loaderService.hideLoadingScreen();
       });
   }
 
@@ -125,13 +137,26 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   }
 
   startDiagnosticTest(): void {
-    this.diagnosticTestTopicTrackerModel = new DiagnosticTestTopicTrackerModel(
-      this.classroomData.getTopicIdToPrerequisiteTopicIds()
-    );
-    this.diagnosticTestIsStarted = true;
+    this.classroomBackendApiService
+      .getClassroomDataAsync(this.classroomData.getClassroomId())
+      .then(response => {
+        this.diagnosticTestTopicTrackerModel =
+          new DiagnosticTestTopicTrackerModel(
+            response.classroomDict.topicIdToPrerequisiteTopicIds
+          );
+        this.diagnosticTestIsStarted = true;
+      })
+      .catch(() => {
+        this.disableStartTestButton = true;
+        this.alertsService.addWarning('Failed to start the test.');
+      });
   }
 
   getRecommendedTopicSummaries(recommendedTopicIds: string[]): void {
+    if (!this.classroomData) {
+      this.recommendedTopicSummaries = [];
+      return;
+    }
     this.recommendedTopicSummaries = this.classroomData
       .getTopicSummaries()
       .filter(topicSummary => {

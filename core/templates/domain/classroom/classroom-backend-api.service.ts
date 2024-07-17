@@ -25,7 +25,6 @@ import {ClassroomData} from 'domain/classroom/classroom-data.model';
 import {CreatorTopicSummaryBackendDict} from 'domain/topic/creator-topic-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ImageData} from 'pages/classroom-admin-page/existing-classroom.model';
-import {TopicIdToPrerequisiteTopicIds} from 'pages/classroom-admin-page/existing-classroom.model';
 
 export interface ClassroomDataBackendDict {
   classroom_id: string;
@@ -39,7 +38,6 @@ export interface ClassroomDataBackendDict {
   thumbnail_data: ImageData;
   banner_data: ImageData;
   public_classrooms_count: number;
-  topic_id_to_prerequisite_topic_ids: TopicIdToPrerequisiteTopicIds;
 }
 
 interface ClassroomIdToClassroomNameBackendDict {
@@ -175,8 +173,7 @@ export class ClassroomBackendApiService {
             response.is_published,
             response.thumbnail_data,
             response.banner_data,
-            response.public_classrooms_count,
-            response.topic_id_to_prerequisite_topic_ids
+            response.public_classrooms_count
           );
           if (successCallback) {
             successCallback(this.classroomData);

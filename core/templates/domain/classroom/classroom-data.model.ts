@@ -21,7 +21,6 @@ import {
   CreatorTopicSummaryBackendDict,
 } from 'domain/topic/creator-topic-summary.model';
 import {ImageData} from 'pages/classroom-admin-page/existing-classroom.model';
-import {TopicIdToPrerequisiteTopicIds} from 'pages/classroom-admin-page/existing-classroom.model';
 
 export class ClassroomData {
   _classroom_id: string;
@@ -35,7 +34,6 @@ export class ClassroomData {
   _thumbnailData: ImageData;
   _bannerData: ImageData;
   _publicClassroomsCount: number;
-  _topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds;
 
   constructor(
     classroomId: string,
@@ -48,8 +46,7 @@ export class ClassroomData {
     isPublished: boolean,
     thumbnailData: ImageData,
     bannerData: ImageData,
-    publicClassroomsCount: number,
-    topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
+    publicClassroomsCount: number
   ) {
     this._classroom_id = classroomId;
     this._name = name;
@@ -62,7 +59,6 @@ export class ClassroomData {
     this._thumbnailData = thumbnailData;
     this._bannerData = bannerData;
     this._publicClassroomsCount = publicClassroomsCount;
-    this._topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
   }
 
   static createFromBackendData(
@@ -76,8 +72,7 @@ export class ClassroomData {
     isPublished: boolean,
     thumbnailData: ImageData,
     bannerData: ImageData,
-    publicClassroomsCount: number,
-    topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
+    publicClassroomsCount: number
   ): ClassroomData {
     let topicSummaries = topicSummaryDicts.map(summaryDict => {
       return CreatorTopicSummary.createFromBackendDict(summaryDict);
@@ -93,8 +88,7 @@ export class ClassroomData {
       isPublished,
       thumbnailData,
       bannerData,
-      publicClassroomsCount,
-      topicIdToPrerequisiteTopicIds
+      publicClassroomsCount
     );
   }
 
@@ -140,9 +134,5 @@ export class ClassroomData {
 
   getClassroomId(): string {
     return this._classroom_id;
-  }
-
-  getTopicIdToPrerequisiteTopicIds(): TopicIdToPrerequisiteTopicIds {
-    return this._topicIdToPrerequisiteTopicIds;
   }
 }

@@ -198,10 +198,7 @@ describe('Classroom Page Component', () => {
       true,
       {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
       {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
-      0,
-      {
-        topicId: {},
-      }
+      1
     );
     spyOn(
       accessValidationBackendApiService,
@@ -383,10 +380,7 @@ describe('Classroom Page Component', () => {
       false,
       {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
       {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
-      0,
-      {
-        topicId: {},
-      }
+      1
     );
 
     spyOn(

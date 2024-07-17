@@ -87,9 +87,6 @@ describe('Classroom backend API service', function () {
     course_details: 'Course Details',
     topic_list_intro: 'Topics Covered',
     is_published: true,
-    topic_id_to_prerequisite_topic_ids: {
-      topicId: [],
-    },
     teaser_text: 'learn math',
     thumbnail_data: {
       filename: 'thumbnail.svg',
@@ -144,8 +141,7 @@ describe('Classroom backend API service', function () {
       responseDictionaries.is_published,
       responseDictionaries.thumbnail_data,
       responseDictionaries.banner_data,
-      responseDictionaries.public_classrooms_count,
-      responseDictionaries.topic_id_to_prerequisite_topic_ids
+      responseDictionaries.public_classrooms_count
     );
   });
 
