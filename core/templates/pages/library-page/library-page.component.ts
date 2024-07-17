@@ -541,7 +541,7 @@ export class LibraryPageComponent {
     return true;
   }
 
-  showPreviousClassroomChunkButton(): boolean {
+  shouldShowPreviousClassroomChunkButton(): boolean {
     if (this.publicClassroomsCount <= 3 || this.classroomCarouselIndex === 0) {
       return false;
     }
