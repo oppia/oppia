@@ -29,6 +29,8 @@ const creatorDashboardCreateModeUrl =
 const blogUrl = testConstants.URLs.Blog;
 const ccLicenseUrl = testConstants.URLs.CCLicense;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
+const recentlyPublishedExplorationsPageUrl =
+  testConstants.URLs.recentlyPublishedExplorations;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
 const classroomsPage = testConstants.URLs.ClassroomsPage;
@@ -226,7 +228,8 @@ const filterOptionsSelector = '.e2e-test-deselected';
 const languageFilterDropdownToggler =
   '.oppia-search-bar-dropdown-toggle-button';
 const searchResultsSelector = '.e2e-test-exp-summary-tile-objective';
-
+const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
+const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -2101,6 +2104,94 @@ export class LoggedOutUser extends BaseUser {
       );
     } catch (error) {
       const newError = new Error(`Failed to check search results: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Navigates to the top rated explorations page from the community library.
+   */
+  async navigateToTopRatedPage() {
+    await this.navigateToCommunityLibraryPage();
+    await this.clickAndWaitForNavigation('Top-Rated Explorations');
+  }
+
+  /**
+   * Checks if the top rated explorations are in a specific order.
+   * @param {string[]} expectedOrder - The expected order of the top rated explorations.
+   */
+  async expectExplorationsInOrder(expectedOrder: string[]): Promise<void> {
+    try {
+      const explorationTitles = await this.page.$$(explorationTitleSelector);
+      for (let i = 0; i < explorationTitles.length; i++) {
+        const titleText = await this.page.evaluate(
+          el => el.querySelector('span > span').textContent,
+          explorationTitles[i]
+        );
+        if (titleText !== expectedOrder[i]) {
+          throw new Error(
+            `Exploration at position ${i} is "${titleText}", but expected "${expectedOrder[i]}".`
+          );
+        }
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to check order explorations: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Navigates to the page recently published explorations page.
+   */
+  async navigateToRecentlyPublishedPage() {
+    await this.goto(recentlyPublishedExplorationsPageUrl);
+  }
+
+  /**
+   * Checks if an exploration has a specific rating.
+   *
+   * @param {number} expectedRating - The expected rating of the exploration.
+   * @param {string} expectedExplorationName - The name of the exploration to check.
+   */
+  async expectExplorationToHaveRating(
+    expectedRating: number,
+    expectedExplorationName: string
+  ): Promise<void> {
+    try {
+      const explorationTitles = await this.page.$$(explorationTitleSelector);
+      for (const title of explorationTitles) {
+        const titleText = await this.page.evaluate(
+          el => el.querySelector('span > span').textContent,
+          title
+        );
+        if (titleText === expectedExplorationName) {
+          // If the exploration name matches, fetch the rating and check if it matches the expected rating.
+          const ratingElement = await title.$(explorationRatingSelector);
+          const ratingText = await this.page.evaluate(
+            el => el.querySelector('span:nth-child(2)').textContent,
+            ratingElement
+          );
+          const rating = parseFloat(ratingText);
+          if (rating !== expectedRating) {
+            throw new Error(
+              `Rating for exploration "${expectedExplorationName}" is ${rating}, but expected ${expectedRating}.`
+            );
+          }
+          return;
+        }
+      }
+
+      throw new Error(
+        `Exploration "${expectedExplorationName}" not found in exploration titles.`
+      );
+    } catch (error) {
+      const newError = new Error(
+        `Failed to check rating of exploration: ${error}`
+      );
       newError.stack = error.stack;
       throw newError;
     }

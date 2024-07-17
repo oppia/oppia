@@ -98,14 +98,14 @@ describe('Logged-out User', function () {
 
       // Access the top-rated page at /community-library/top-rated, which shows explorations with high ratings.
       await loggedOutUser.navigateToTopRatedPage();
-      await loggedOutUser.expectTopRatedExplorationsInOrder([
+      await loggedOutUser.expectExplorationsInOrder([
         'Test Exploration Title 2',
         'Test Exploration Title 1',
       ]);
 
       // Visit the recently published explorations page at /community-library/recently-published.
       await loggedOutUser.navigateToRecentlyPublishedPage();
-      await loggedOutUser.expectRecentlyPublishedExplorationsInOrder([
+      await loggedOutUser.expectExplorationsInOrder([
         'Test Exploration Title 2',
         'Test Exploration Title 1',
       ]);
