@@ -318,7 +318,8 @@ export class TopicManager extends BaseUser {
     ]);
   }
 
-  /**   * Create a chapter for a certain story.
+  /**
+   * Create a chapter for a certain story.
    */
   async createChapter(
     explorationId: string,

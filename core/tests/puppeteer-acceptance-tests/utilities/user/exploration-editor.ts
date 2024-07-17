@@ -34,7 +34,6 @@ const saveChangesButton = 'button.e2e-test-save-changes';
 const mathInteractionsTab = '.e2e-test-interaction-tab-math';
 const closeResponseModalButton = '.e2e-test-close-add-response-modal';
 
-// Settings Tab elements.
 const settingsTab = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
 const explorationTitleSelector = '.e2e-test-exploration-title-input';
@@ -143,7 +142,6 @@ const modalSaveButton = '.e2e-test-save-button';
 const modifyTranslationsModalDoneButton =
   '.e2e-test-modify-translations-done-button';
 
-// For mobile.
 const mobileSettingsBar = 'li.e2e-test-mobile-settings-button';
 const mobileChangesDropdown = 'div.e2e-test-mobile-changes-dropdown';
 const mobileSaveChangesButton =
@@ -165,7 +163,6 @@ const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
 const explorationControlsSettingsDropdown =
   'h3.e2e-test-controls-bar-settings-container';
 
-// Preview tab elements.
 const nextCardButton = '.e2e-test-next-card-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const previewRestartButton = '.e2e-test-preview-restart-button';
@@ -178,6 +175,18 @@ const subscriberCard = '.e2e-test-subscription-card';
 const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
 const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
 
+const responseCrossSelector = '.oppia-response-cross';
+const rteSelector = '.e2e-test-rte';
+const destinationSelectorDropdown = '.e2e-test-destination-selector-dropdown';
+const destinationWhenStuckSelectorDropdown =
+  '.e2e-test-destination-when-stuck-selector-dropdown';
+
+const LABEL_FOR_OPPIA_RESPONSE_TO_WRONG_ANSWERS = 'Oppia tells the learner...';
+const LABEL_FOR_SAVE_FEEDBACK_BUTTON = 'Save Feedback';
+const LABEL_FOR_SAVE_DESTINATION_BUTTON = 'Save Destination';
+const LABEL_FOR_DIRECT_TO_CARD_WHEN_STUCK =
+  '(Optional) If the learner is really stuck, direct them to ... ';
+const LABEL_FOR_DIRECT_TO_CARD = 'And afterwards, directs the learner to ... ';
 export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to creator dashboard page.
@@ -939,7 +948,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} destination - The destination state for the response.
    * @param {boolean} responseIsCorrect - Whether the response is marked as correct.
    */
-  async addResponseToTheInteraction(
+  async addResponsesToTheInteraction(
     interactionType: string,
     answer: string,
     feedback: string,
@@ -1000,6 +1009,39 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(responseModalHeaderSelector, {
       hidden: true,
     });
+  }
+
+  /**
+   * Adds Oppia responses for wrong answers.
+   * @param {string} oppiaMsg - The message to be displayed by Oppia.
+   * @param {string} [directToCard] - The card to direct to (optional).
+   * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
+   */
+  async addOppiaResponsesForWrongAnswers(
+    oppiaMsg: string,
+    directToCard?: string,
+    directToCardWhenStuck?: string
+  ): Promise<void> {
+    await this.clickOn(responseCrossSelector);
+    await this.clickOn(LABEL_FOR_OPPIA_RESPONSE_TO_WRONG_ANSWERS);
+    await this.clickOn(rteSelector);
+    await this.page.type(rteSelector, oppiaMsg);
+    await this.clickOn(LABEL_FOR_SAVE_FEEDBACK_BUTTON);
+
+    if (directToCard) {
+      await this.clickOn(LABEL_FOR_DIRECT_TO_CARD);
+      await this.page.select(destinationSelectorDropdown, directToCard);
+      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+    }
+
+    if (directToCardWhenStuck) {
+      await this.clickOn(LABEL_FOR_DIRECT_TO_CARD_WHEN_STUCK);
+      await this.page.select(
+        destinationWhenStuckSelectorDropdown,
+        directToCardWhenStuck
+      );
+      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+    }
   }
 
   /**

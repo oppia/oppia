@@ -23,6 +23,9 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+enum INTERACTION_TYPES {
+  END_EXPLORATION = 'End Exploration',
+}
 
 describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
@@ -40,23 +43,23 @@ describe('Logged-out User', function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
     loggedInUser = await UserFactory.createNewUser(
-      'testLearner',
-      'test_user@example.com'
+      'loggedInUser',
+      'logged_in_user@example.com'
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorPage();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.createMinimalExploration(
-      'Test Exploration 1',
-      'End Exploration 1'
+      'Introduction to Algebra',
+      INTERACTION_TYPES.END_EXPLORATION
     );
     await explorationEditor.saveExplorationDraft();
 
     explorationId1 = await explorationEditor.publishExplorationWithMetadata(
-      'Test Exploration Title 1',
-      'Test Exploration Goal 1',
-      'Algebra 1'
+      'Algebra I',
+      'Learn the basics of Algebra',
+      'Algebra'
     );
     if (!explorationId1) {
       throw new Error('Error in publishing the first exploration');
@@ -66,55 +69,52 @@ describe('Logged-out User', function () {
     await explorationEditor.navigateToExplorationEditorPage();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.createMinimalExploration(
-      'Test Exploration 2',
-      'End Exploration 2'
+      'Advanced Algebra',
+      INTERACTION_TYPES.END_EXPLORATION
     );
     await explorationEditor.saveExplorationDraft();
 
     explorationId2 = await explorationEditor.publishExplorationWithMetadata(
-      'Test Exploration Title 2',
-      'Test Exploration Goal 2',
-      'Algebra 2'
+      'Algebra II',
+      'Learn advanced Algebra',
+      'Algebra'
     );
     if (!explorationId2) {
       throw new Error('Error in publishing the second exploration');
     }
 
     loggedInUser.playExploration(explorationId1);
-    loggedInUser.rateExploration(4, 'great', false);
+    loggedInUser.rateExploration(4, 'Great introduction to Algebra', false);
 
     loggedInUser.playExploration(explorationId2);
-    loggedInUser.rateExploration(5, 'great', false);
+    loggedInUser.rateExploration(5, 'Excellent advanced Algebra course', false);
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to navigate and interact with the community library',
     async function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
-      await loggedOutUser.searchForLessonInSearchBar('Algebra');
+      await loggedOutUser.searchForLessonInSearchBar('Algebra II');
       await loggedOutUser.filterLessonsByCategories(['Algebra']);
       await loggedOutUser.filterLessonsByLanguage(['English']);
-      await loggedOutUser.expectSearchResultsToContain('Algebra');
+      await loggedOutUser.expectSearchResultsToContain('Algebra II');
 
       // Access the top-rated page at /community-library/top-rated, which shows explorations with high ratings.
       await loggedOutUser.navigateToTopRatedPage();
       await loggedOutUser.expectExplorationsInOrder([
-        'Test Exploration Title 2',
-        'Test Exploration Title 1',
+        'Algebra II',
+        'Algebra I',
       ]);
 
       // Visit the recently published explorations page at /community-library/recently-published.
       await loggedOutUser.navigateToRecentlyPublishedPage();
       await loggedOutUser.expectExplorationsInOrder([
-        'Test Exploration Title 2',
-        'Test Exploration Title 1',
+        'Algebra I',
+        'Algebra II',
       ]);
 
       // View the ratings on an exploration once a minimum number of ratings have been submitted.
-      await loggedOutUser.expectExplorationToHaveRating(
-        4,
-        'Test Exploration Title 1'
-      );
+      await loggedOutUser.expectExplorationToHaveRating(4, 'Algebra I');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

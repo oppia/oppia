@@ -2119,7 +2119,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates to the top rated explorations page from the community library.
    */
-  async navigateToTopRatedPage() {
+  async navigateToTopRatedPage(): Promise<void> {
     await this.navigateToCommunityLibraryPage();
     await this.clickAndWaitForNavigation('Top-Rated Explorations');
   }
@@ -2154,7 +2154,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates to the page recently published explorations page.
    */
-  async navigateToRecentlyPublishedPage() {
+  async navigateToRecentlyPublishedPage(): Promise<void> {
     await this.goto(recentlyPublishedExplorationsPageUrl);
   }
 
@@ -2307,14 +2307,14 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates back to the topic page after completing an exploration.
    */
-  async returnToTopicPageAfterCompletingExploration() {
+  async returnToTopicPageAfterCompletingExploration(): Promise<void> {
     await this.clickOn(oppiaTopicTitleSelector);
   }
 
   /**
    * Navigates to the revision tab on the topic page.
    */
-  async navigateToRevisionTab() {
+  async navigateToRevisionTab(): Promise<void> {
     await this.clickOn(topicPageLessonTabSelector);
   }
 
@@ -2328,7 +2328,7 @@ export class LoggedOutUser extends BaseUser {
    * @param {puppeteer.Page} page - The Puppeteer page object.
    * @throws {Error} When the subtopic cannot be found or clicked.
    */
-  async selectReviewCardToLearn(subtopicName: string) {
+  async selectReviewCardToLearn(subtopicName: string): Promise<void> {
     try {
       const subtopicElements = await this.page.$$(
         subTopicTitleInLessTabSelector
@@ -2362,11 +2362,11 @@ export class LoggedOutUser extends BaseUser {
   async expectReviewCardToHaveContent(
     reviewCardTitle: string,
     reviewCardDescription: string
-  ) {
+  ): Promise<void> {
     try {
       const titleElement = await this.page.$(reviewCardTitleSelector);
 
-      // Get the innerText of the title element
+      // Get the innerText of the title element.
       const titleText = await this.page.evaluate(
         el => el.innerText,
         titleElement
@@ -2379,13 +2379,12 @@ export class LoggedOutUser extends BaseUser {
       }
 
       const isDescriptionPresent = await this.isTextPresentOnPage(
-        reviewCardDescription,
-        page
+        reviewCardDescription
       );
 
       if (!isDescriptionPresent) {
         throw new Error(
-          `Expected review card description to be present on the page, but it was not found`
+          'Expected review card description to be present on the page, but it was not found'
         );
       }
     } catch (error) {

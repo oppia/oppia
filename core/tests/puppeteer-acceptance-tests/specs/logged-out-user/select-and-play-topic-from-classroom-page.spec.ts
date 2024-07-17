@@ -27,8 +27,7 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
-const INTRODUCTION_CARD_CONTENT: string =
-  'This exploration will test your understanding of negative numbers.';
+
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
   NUMERIC_INPUT = 'Number Input',
@@ -48,7 +47,7 @@ describe('Logged-out User', function () {
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
-      'curriculum_Admin@example.com',
+      'curriculumAdmin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
 
@@ -57,27 +56,29 @@ describe('Logged-out User', function () {
     await curriculumAdmin.navigateToCreatorDashboardPage();
     await curriculumAdmin.navigateToExplorationEditorPage();
     await curriculumAdmin.dismissWelcomeModal();
-    await curriculumAdmin.updateCardContent(INTRODUCTION_CARD_CONTENT);
+    await curriculumAdmin.updateCardContent('Introduction to Algebra');
     await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
 
     // Add a new card with a question.
     await curriculumAdmin.viewOppiaResponses();
-    await curriculumAdmin.directLearnersToNewCard('Test Question');
+    await curriculumAdmin.directLearnersToNewCard('Algebra Basics');
     await curriculumAdmin.saveExplorationDraft();
 
     // Navigate to the new card and update its content.
-    await curriculumAdmin.navigateToCard(CARD_NAME.TEST_QUESTION);
+    await curriculumAdmin.navigateToCard('Algebra Basics');
     await curriculumAdmin.updateCardContent(
       'Enter a negative number greater than -100.'
     );
     await curriculumAdmin.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
-    await curriculumAdmin.addResponseToTheInteraction(
+    await curriculumAdmin.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
       '-99',
-      'Prefect!',
+      'Perfect!',
       CARD_NAME.FINAL_CARD,
       true
     );
+    await curriculumAdmin.addOppiaResponsesForWrongAnswers('Wrong, try again!');
+
     await curriculumAdmin.saveExplorationDraft();
 
     // Navigate to the final card and update its content.
@@ -88,67 +89,69 @@ describe('Logged-out User', function () {
     await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
     // Navigate back to the introduction card and save the draft.
-    await curriculumAdmin.navigateToCard(CARD_NAME.INTRODUCTION);
+    await curriculumAdmin.navigateToCard('Introduction to Algebra');
     await curriculumAdmin.saveExplorationDraft();
     explorationId = await curriculumAdmin.publishExplorationWithMetadata(
-      'Test Exploration Title 1',
-      'Test Exploration Goal',
+      'Algebra Basics',
+      'Learn the basics of Algebra',
       'Algebra'
     );
     if (!explorationId) {
       throw new Error('Error publishing exploration successfully.');
     }
 
-    await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
+    await curriculumAdmin.createTopic('Algebra I', 'algebra-one');
     await curriculumAdmin.createSubtopicForTopic(
-      'Test Subtopic 1',
-      'test-subtopic-one',
-      'Test Topic 1'
+      'Negative Numbers',
+      'negative-numbers',
+      'Algebra I'
     );
 
-    await curriculumAdmin.createSkillForTopic('Test Skill 1', 'Test Topic 1');
-    await curriculumAdmin.createQuestionsForSkill('Test Skill 1', 3);
+    await curriculumAdmin.createSkillForTopic('Negative Numbers', 'Algebra I');
+    await curriculumAdmin.createQuestionsForSkill('Negative Numbers', 3);
     await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
-      'Test Skill 1',
-      'Test Subtopic 1',
-      'Test Topic 1'
+      'Negative Numbers',
+      'Negative Numbers',
+      'Algebra I'
     );
     await curriculumAdmin.addSkillToDiagnosticTest(
-      'Test Skill 1',
-      'Test Topic 1'
+      'Negative Numbers',
+      'Algebra I'
     );
 
-    await curriculumAdmin.publishDraftTopic('Test Topic 1');
+    await curriculumAdmin.publishDraftTopic('Algebra I');
     await curriculumAdmin.createAndPublishStoryWithChapter(
-      'Test Story 1',
-      'test-story-one',
+      'Algebra Story',
+      'algebra-story',
+      'Understanding Negative Numbers',
       explorationId,
-      'Test Topic 1'
+      'Algebra I'
     );
     await curriculumAdmin.expectTopicToBePublishedInTopicsAndSkillsDashboard(
-      'Test Topic 1',
+      'Algebra I',
       1,
       1,
       1
     );
 
-    await curriculumAdmin.createNewClassroom('math', '/math');
-    await curriculumAdmin.addTopicToClassroom('math', 'Test Topic 1');
-    await curriculumAdmin.publishClassroom('math');
+    await curriculumAdmin.createNewClassroom('Math', '/math');
+    await curriculumAdmin.addTopicToClassroom('Math', 'Algebra I');
+    await curriculumAdmin.publishClassroom('Math');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to complete the learner journey in the math classroom',
     async function () {
       await loggedOutUser.navigateToClassroomPage('math');
-      await loggedOutUser.expectTopicsToBePresent(['Algebra']);
+      await loggedOutUser.expectTopicsToBePresent(['Algebra I']);
 
-      await loggedOutUser.selectAndOpenTopic('Algebra');
+      await loggedOutUser.selectAndOpenTopic('Algebra I');
 
       await loggedOutUser.selectChapterWithinStoryToLearn(
-        'test chapter 1',
-        'test Story 1'
+        'Algebra Story',
+        'Understanding Negative Numbers'
       );
+
       // Playing the exploration linked with the chapter selected.
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.submitAnswer('-40');
@@ -163,10 +166,10 @@ describe('Logged-out User', function () {
       await loggedOutUser.returnToTopicPageAfterCompletingExploration();
       await loggedOutUser.navigateToRevisionTab();
       // Review cards are the subtopic that are created in the topic.
-      await loggedOutUser.selectReviewCardToLearn('Test Subtopic 1');
+      await loggedOutUser.selectReviewCardToLearn('Negative Numbers');
       await loggedOutUser.expectReviewCardToHaveContent(
-        'Test Subtopic 1',
-        'test-subtopic-one'
+        'Negative Numbers',
+        'Subtopic creation description text for Negative Numbers'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
