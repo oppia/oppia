@@ -23,6 +23,7 @@ import {error} from 'console';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
+const imageToUpload = testConstants.data.blogPostThumbnailImage;
 
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
@@ -88,6 +89,9 @@ const mainTabButton = '.e2e-test-main-tab';
 const mobileMainTabButton = '.e2e-test-mobile-main-tab';
 const stateEditSelector = '.e2e-test-state-edit-content';
 const stateContentInputField = 'div.e2e-test-rte';
+const uploadImageButton = '.e2e-test-upload-image';
+const useTheUploadImageButton = '.e2e-test-use-image';
+const imageRegionSelector = '.e2e-test-svg';
 const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
 const addNewResponseButton = '.e2e-test-add-new-response';
 const floatFormInput = '.e2e-test-float-form-input';
@@ -423,6 +427,62 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(closeResponseModalButton, {visible: true});
     await this.clickOn(closeResponseModalButton);
     showMessage(`${interactionToAdd} interaction has been added successfully.`);
+  }
+
+  /**
+   * Adds an Image interaction to the current exploration.
+   */
+  async addImageInteraction(): Promise<void> {
+    await this.clickOn(addInteractionButton);
+    await this.clickOn('Image Region');
+    await this.clickOn(uploadImageButton);
+    await this.uploadFile(imageToUpload);
+    await this.clickOn(useTheUploadImageButton);
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector('.btn-danger', {visible: true});
+
+    // Select area of image by clicking and dragging.
+    const imageElement = await this.page.$(imageRegionSelector);
+
+    if (imageElement) {
+      const box = await imageElement.boundingBox();
+
+      if (box) {
+        // Calculate the start and end coordinates for a selection area. The selection starts from a point located at 25% from the top-left corner (both horizontally and vertically) and extends to a point located at 75% from the top-left corner (both horizontally and vertically).This effectively selects the central 50% area of the element.
+        const startX = box.x + box.width * 0.25;
+        const startY = box.y + box.height * 0.25;
+        const endX = box.x + box.width * 0.75;
+        const endY = box.y + box.height * 0.75;
+
+        // Click and drag to select an area.
+        await this.page.mouse.move(startX, startY);
+        await this.page.mouse.down();
+
+        // Add steps for smooth dragging.
+        await this.page.mouse.move(endX, endY, {steps: 10});
+
+        await this.page.mouse.up();
+      } else {
+        console.error('Unable to get bounding box for image element.');
+      }
+    } else {
+      console.error('Image element not found.');
+    }
+
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    // The '/' value is used to select the 'a new card called' option
+    // in the dropdown.
+    await this.select(destinationCardSelector, '/');
+    await this.type(addStateInput, 'Last Card');
+    await this.clickOn(addNewResponseButton);
+    await this.clickOn(correctAnswerInTheGroupSelector);
+
+    showMessage('Image interaction has been added successfully.');
   }
 
   /**

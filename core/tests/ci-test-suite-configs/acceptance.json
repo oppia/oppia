@@ -33,6 +33,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/create-exploration-and-change-basic-settings.spec.ts"
     },
     {
+      "name": "exploration-editor/publish-the-exploration-with-an-interaction",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/publish-the-exploration-with-an-interaction.spec.ts"
+    },
+    {
       "name": "exploration-editor/save-draft-publish-and-discard-the-changes",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/save-draft-publish-and-discard-the-changes.spec.ts"
     },
