@@ -462,7 +462,7 @@ describe('Settings Tab Component', () => {
     explorationTagsService.displayed = [];
 
     component.add({
-      value: 'tag-one',
+      value: 'tagone',
       input: {
         value: '',
       },
@@ -470,7 +470,7 @@ describe('Settings Tab Component', () => {
     tick();
 
     component.add({
-      value: 'tag-two',
+      value: 'tagtwo',
       input: {
         value: '',
       },
@@ -478,7 +478,7 @@ describe('Settings Tab Component', () => {
     tick();
 
     component.add({
-      value: 'tag-three',
+      value: 'tagthree',
       input: {
         value: '',
       },
@@ -486,9 +486,9 @@ describe('Settings Tab Component', () => {
     tick();
 
     expect(explorationTagsService.displayed).toEqual([
-      'tag-one',
-      'tag-two',
-      'tag-three',
+      'tagone',
+      'tagtwo',
+      'tagthree',
     ]);
   }));
 

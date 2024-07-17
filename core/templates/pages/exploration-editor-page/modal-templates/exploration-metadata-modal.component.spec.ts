@@ -231,7 +231,7 @@ describe('Exploration Metadata Modal Component', () => {
       explorationTagsService.displayed = [];
 
       component.add({
-        value: 'tag-one',
+        value: 'tagone',
         input: {
           value: '',
         },
@@ -239,7 +239,7 @@ describe('Exploration Metadata Modal Component', () => {
       tick();
 
       component.add({
-        value: 'tag-two',
+        value: 'tagtwo',
         input: {
           value: '',
         },
@@ -247,7 +247,7 @@ describe('Exploration Metadata Modal Component', () => {
       tick();
 
       component.add({
-        value: 'tag-three',
+        value: 'tagthree',
         input: {
           value: '',
         },
@@ -255,9 +255,9 @@ describe('Exploration Metadata Modal Component', () => {
       tick();
 
       expect(explorationTagsService.displayed).toEqual([
-        'tag-one',
-        'tag-two',
-        'tag-three',
+        'tagone',
+        'tagtwo',
+        'tagthree',
       ]);
     }));
 
