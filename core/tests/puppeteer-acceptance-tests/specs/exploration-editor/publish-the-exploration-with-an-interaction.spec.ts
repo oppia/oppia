@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for saving drafts, publishing, and discarding changes.
+ * @fileoverview Acceptance Test for publishing an exploration with an interaction.
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -22,8 +22,14 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+
+const INTRODUCTION_CARD_CONTENT: string = 'Test Question';
+
 enum INTERACTION_TYPES {
   END_EXPLORATION = 'End Exploration',
+}
+enum CARD_NAME {
+  LAST_CARD = 'Last Card',
 }
 
 describe('Exploration Creator', function () {
@@ -46,18 +52,24 @@ describe('Exploration Creator', function () {
   it(
     'should draft, discard and publish the changes',
     async function () {
+      // Navigate to the creator dashboard and create a new exploration.
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.navigateToExplorationEditorPage();
       await explorationEditor.dismissWelcomeModal();
+      await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
+      await explorationEditor.addImageInteraction();
+      await explorationEditor.editDefaultResponseFeedback('Wrong.');
 
-      await explorationEditor.createMinimalExploration(
-        'Exploration intro text',
-        INTERACTION_TYPES.END_EXPLORATION
-      );
+      await explorationEditor.addHintToState('Initial coordinate');
+      // Add a new card with an end interaction.
+      await explorationEditor.navigateToCard(CARD_NAME.LAST_CARD);
+      await explorationEditor.updateCardContent('Congratulations!');
+      await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
       await explorationEditor.saveExplorationDraft();
+
       explorationId = await explorationEditor.publishExplorationWithMetadata(
-        'Old Title',
+        'Publish with an interaction',
         'This is the goal of exploration.',
         'Algebra'
       );
@@ -65,16 +77,6 @@ describe('Exploration Creator', function () {
       await explorationVisitor.expectExplorationToBeAccessibleByUrl(
         explorationId
       );
-
-      await explorationEditor.navigateToSettingsTab();
-
-      await explorationEditor.updateTitleTo('New Title');
-      await explorationEditor.discardCurrentChanges();
-      await explorationEditor.expectTitleToBe('Old Title');
-
-      await explorationEditor.updateTitleTo('New Title');
-      await explorationEditor.saveExplorationDraft();
-      await explorationEditor.expectTitleToBe('New Title');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
