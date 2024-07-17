@@ -31,6 +31,10 @@ import {
 import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {
+  TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+  TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
+} from 'domain/exploration/WrittenTranslationObjectFactory';
 
 interface LanguageCodeToContentTranslations {
   [languageCode: string]: TranslatedContent;
@@ -163,5 +167,15 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     return this.languageUtilService.getContentLanguageDescription(
       languageCode
     ) as string;
+  }
+
+  isSetOfStringDataFormat(): boolean {
+    const activeDataFormat =
+      this.contentTranslations[Object.keys(this.contentTranslations)[0]]
+        .dataFormat;
+    return (
+      activeDataFormat === TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING ||
+      activeDataFormat === TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
+    );
   }
 }
