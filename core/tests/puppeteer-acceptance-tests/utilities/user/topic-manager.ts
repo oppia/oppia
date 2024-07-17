@@ -316,6 +316,7 @@ export class TopicManager extends BaseUser {
       ),
       this.page.waitForNavigation(),
     ]);
+    await this.waitForStaticAssetsToLoad();
   }
 
   /**   * Create a chapter for a certain story.
@@ -2075,6 +2076,7 @@ export class TopicManager extends BaseUser {
     topicName: string
   ): Promise<void> {
     await this.openTopicEditor(topicName);
+    await this.page.waitForSelector(subtopicReassignHeader);
     let elementToClick = await this.page.$(subtopicReassignHeader);
     if (this.isViewportAtMobileWidth() && elementToClick) {
       await elementToClick.click();
