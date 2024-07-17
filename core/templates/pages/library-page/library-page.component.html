@@ -15,6 +15,7 @@
     </div>
     <div class="classrooms-carousel" *ngIf="publicClassroomsCount > 2">
       <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn" (click)="moveClassroomCarouselToPreviousSlide()"
+              aria-label="Previous Slide"
               [ngClass]="{'show-change-classroom-chunk-btn': shouldShowPreviousClassroomChunkButton(), 'hide-change-classroom-chunk-btn': !shouldShowPreviousClassroomChunkButton()}">
         <i class="fa fa-angle-left"></i>
       </button>
@@ -41,13 +42,22 @@
         </ngb-carousel>
       </div>
       <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn" (click)="moveClassroomCarouselToNextSlide()"
+              aria-label="Previous Slide"
               [ngClass]="{'show-change-classroom-chunk-btn': shouldShowNextClassroomChunkButton(), 'hide-change-classroom-chunk-btn': !shouldShowNextClassroomChunkButton()}">
         <i class="fa fa-angle-right"></i>
       </button>
-      <button class="mobile-carousel-btn mobile-prev-btn" (click)="moveClassroomCarouselToPreviousSlide()" *ngIf="shouldShowPreviousClassroomChunkButton()">
+      <button class="mobile-carousel-btn mobile-prev-btn"
+              (click)="moveClassroomCarouselToPreviousSlide()"
+              *ngIf="shouldShowPreviousClassroomChunkButton()"
+              aria-label="Next Slide"
+      >
         <i class="fa fa-angle-left"></i>
       </button>
-      <button class="mobile-carousel-btn mobile-next-btn" (click)="moveClassroomCarouselToNextSlide()" *ngIf="shouldShowNextClassroomChunkButton()">
+      <button class="mobile-carousel-btn mobile-next-btn"
+              (click)="moveClassroomCarouselToNextSlide()"
+              *ngIf="shouldShowNextClassroomChunkButton()"
+              aria-label="Next Slide"
+      >
         <i class="fa fa-angle-right"></i>
       </button>
     </div>
