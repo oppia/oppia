@@ -62,17 +62,3 @@ def add_or_update_user_status(
         'provider\'s db to %s. Cannot access API, since this is a dev '
         'environment.' % (user_email, can_receive_email_updates))
     return True
-
-def check_if_email_is_subscribed(email: str):
-    """Checks if the email is subscribed to the bulk email list.
-
-    Args:
-        email: str. Email id of the user.
-
-    Returns:
-        bool. True to mock successful user creation.
-    """
-    logging.info(
-        'Checking if email ID %s is subscribed to the bulk email list. Cannot '
-        'access API, since this is a dev environment.' % email)
-    return True
