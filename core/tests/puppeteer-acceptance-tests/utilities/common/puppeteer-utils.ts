@@ -539,6 +539,8 @@ export class BaseUser {
    * Waits for the page to fully load by checking the document's ready state and waiting for the respective
    * HTML to load completely.
    *
+   * Caution: Using this function multiple times in the same test can increase the test execution time,
+   * as it waits for the page to fully load.
    */
   async waitForPageToFullyLoad(): Promise<void> {
     await this.page.waitForFunction('document.readyState === "complete"');
