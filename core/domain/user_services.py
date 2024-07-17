@@ -1614,6 +1614,7 @@ def add_user_to_mailing_list(
     return bulk_email_services.add_or_update_user_status(
         email, merge_fields, tag, can_receive_email_updates=True)
 
+
 def update_email_preferences(
     user_id: str,
     can_receive_email_updates: bool,
