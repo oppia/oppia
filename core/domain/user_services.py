@@ -1614,20 +1614,6 @@ def add_user_to_mailing_list(
     return bulk_email_services.add_or_update_user_status(
         email, merge_fields, tag, can_receive_email_updates=True)
 
-def check_if_email_is_subscribed(
-    email: str,
-) -> bool:
-    """Checks if the given email is subscribed to the bulk email provider.
-
-    Args:
-        email: str. Email of the user.
-
-    Returns:
-        bool. Whether the email is subscribed to the bulk email provider or not.
-    """
-    return bulk_email_services.check_if_email_is_subscribed(email)
-
-
 def update_email_preferences(
     user_id: str,
     can_receive_email_updates: bool,
