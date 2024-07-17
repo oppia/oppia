@@ -770,7 +770,7 @@ export class CurriculumAdmin extends BaseUser {
    * Function to navigate to exploration settings tab
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavToggelbutton);
       await this.clickOn(mobileOptionsDropdown);
@@ -786,7 +786,7 @@ export class CurriculumAdmin extends BaseUser {
    * Note: This action requires Curriculum Admin role.
    */
   async deleteExplorationPermanently(): Promise<void> {
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     await this.clickOn(deleteExplorationButton);
     await this.clickOn(confirmDeletionButton);
   }
@@ -1089,7 +1089,6 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.page.waitForSelector(skillsTab, {visible: true});
     await this.clickOn(skillsTab);
-    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(skillSelector, {visible: true});
     await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(skillListItemSelector, {visible: true});
