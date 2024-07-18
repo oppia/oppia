@@ -80,7 +80,7 @@ describe('Welcome Translation Modal Component', function () {
       siteAnalyticsService.registerTutorialModalOpenEvent
     ).toHaveBeenCalledWith(explorationId);
     expect(component.translationWelcomeImgUrl).toBe(
-      '/assets/images/general/editor_welcome.svg'
+      '/assets/copyrighted-images/general/editor_welcome.svg'
     );
   });
 });

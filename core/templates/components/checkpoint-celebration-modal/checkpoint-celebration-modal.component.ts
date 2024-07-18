@@ -100,9 +100,10 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.explorationId = this.contextService.getExplorationId();
-    this.oppiaAvatarImageUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/avatar/oppia_avatar_100px.svg'
-    );
+    this.oppiaAvatarImageUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/avatar/oppia_avatar_100px.svg'
+      );
     this.readOnlyExplorationBackendApiService
       .fetchExplorationAsync(this.explorationId, null)
       .then(response => {
