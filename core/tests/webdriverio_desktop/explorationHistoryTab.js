@@ -121,104 +121,108 @@ describe('Exploration history', function () {
         highlighted: false,
       },
       6: {
-        text: 'interaction:',
+        text: 'inapplicable_skill_misconception_ids: null',
         highlighted: false,
       },
       7: {
+        text: 'interaction:',
+        highlighted: false,
+      },
+      8: {
         text: '  answer_groups: []',
         highlighted: true,
       },
-      8: {
+      9: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: true,
       },
-      9: {
+      10: {
         text: '  customization_args: {}',
         highlighted: true,
       },
-      10: {
+      11: {
         text: '  default_outcome:',
         highlighted: true,
       },
       // Note that highlighting *underneath* a line is still considered a
       // highlight.
-      11: {
+      12: {
         text: '    dest: ' + general.FIRST_STATE_DEFAULT_NAME,
         highlighted: true,
       },
-      12: {
+      13: {
         text: '    dest_if_really_stuck: null',
         highlighted: false,
       },
-      13: {
+      14: {
         text: '    feedback:',
         highlighted: false,
       },
-      14: {
+      15: {
         text: "      html: ''",
         highlighted: false,
       },
-      15: {
+      16: {
         text: '      content_id: default_outcome_1',
         highlighted: false,
       },
-      16: {
+      17: {
         text: '    labelled_as_correct: false',
         highlighted: false,
       },
-      17: {
+      18: {
         text: '    param_changes: []',
         highlighted: false,
       },
-      18: {
+      19: {
         text: '    refresher_exploration_id: null',
         highlighted: false,
       },
-      19: {
+      20: {
         text: '    missing_prerequisite_skill_id: null',
         highlighted: false,
       },
-      20: {
+      21: {
         text: '  hints: []',
         highlighted: false,
       },
-      21: {
+      22: {
         text: '  id: null',
         highlighted: true,
       },
-      22: {
+      23: {
         text: '  solution: null',
         highlighted: false,
       },
-      23: {
+      24: {
         text: 'param_changes: []',
         highlighted: false,
       },
-      24: {
+      25: {
         text: 'recorded_voiceovers:',
         highlighted: false,
       },
-      25: {
+      26: {
         text: '  voiceovers_mapping:',
         highlighted: false,
       },
-      26: {
+      27: {
         text: '    content_0: {}',
         highlighted: false,
       },
-      27: {
+      28: {
         text: '    default_outcome_1: {}',
         highlighted: true,
       },
-      28: {
+      29: {
         text: 'solicit_answer_details: false',
         highlighted: false,
       },
-      29: {
+      30: {
         text: 'card_is_checkpoint: true',
         highlighted: false,
       },
-      30: {
+      31: {
         text: '',
         highlighted: false,
       },
@@ -246,178 +250,182 @@ describe('Exploration history', function () {
         highlighted: false,
       },
       6: {
-        text: 'interaction:',
+        text: 'inapplicable_skill_misconception_ids: null',
         highlighted: false,
       },
       7: {
+        text: 'interaction:',
+        highlighted: false,
+      },
+      8: {
         text: '  answer_groups:',
         highlighted: true,
       },
-      8: {
+      9: {
         text: '    - rule_specs:',
         highlighted: true,
       },
-      9: {
+      10: {
         text: '        - rule_type: Equals',
         highlighted: true,
       },
-      10: {
+      11: {
         text: '          inputs:',
         highlighted: true,
       },
-      11: {
+      12: {
         text: '            x: 6',
         highlighted: true,
       },
-      12: {
+      13: {
         text: '      outcome:',
         highlighted: true,
       },
-      13: {
+      14: {
         text: '        dest: second',
         highlighted: true,
       },
-      14: {
+      15: {
         text: '        dest_if_really_stuck: null',
         highlighted: true,
       },
-      15: {
+      16: {
         text: '        feedback:',
         highlighted: true,
       },
-      16: {
+      17: {
         text: "          html: ''",
         highlighted: true,
       },
-      17: {
+      18: {
         text: '          content_id: feedback_2',
         highlighted: true,
       },
-      18: {
+      19: {
         text: '        labelled_as_correct: false',
         highlighted: true,
       },
-      19: {
+      20: {
         text: '        param_changes: []',
         highlighted: true,
       },
-      20: {
+      21: {
         text: '        refresher_exploration_id: null',
         highlighted: true,
       },
-      21: {
+      22: {
         text: '        missing_prerequisite_skill_id: null',
         highlighted: true,
       },
-      22: {
+      23: {
         text: '      training_data: []',
         highlighted: true,
       },
-      23: {
+      24: {
         text: '      tagged_skill_misconception_id: null',
         highlighted: true,
       },
-      24: {
+      25: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: true,
       },
-      25: {
+      26: {
         text: '  customization_args:',
         highlighted: true,
       },
-      26: {
+      27: {
         text: '    requireNonnegativeInput:',
         highlighted: true,
       },
-      27: {
+      28: {
         text: '      value: false',
         highlighted: true,
       },
-      28: {
+      29: {
         text: '  default_outcome:',
         highlighted: true,
       },
-      29: {
+      30: {
         text: '    dest: first',
         highlighted: true,
       },
-      30: {
+      31: {
         text: '    dest_if_really_stuck: null',
         highlighted: false,
       },
-      31: {
+      32: {
         text: '    feedback:',
         highlighted: false,
       },
-      32: {
+      33: {
         text: "      html: ''",
         highlighted: false,
       },
-      33: {
+      34: {
         text: '      content_id: default_outcome_1',
         highlighted: false,
       },
-      34: {
+      35: {
         text: '    labelled_as_correct: false',
         highlighted: false,
       },
-      35: {
+      36: {
         text: '    param_changes: []',
         highlighted: false,
       },
-      36: {
+      37: {
         text: '    refresher_exploration_id: null',
         highlighted: false,
       },
-      37: {
+      38: {
         text: '    missing_prerequisite_skill_id: null',
         highlighted: false,
       },
-      38: {
+      39: {
         text: '  hints: []',
         highlighted: false,
       },
-      39: {
+      40: {
         text: '  id: NumericInput',
         highlighted: true,
       },
-      40: {
+      41: {
         text: '  solution: null',
         highlighted: false,
       },
-      41: {
+      42: {
         text: 'param_changes: []',
         highlighted: false,
       },
-      42: {
+      43: {
         text: 'recorded_voiceovers:',
         highlighted: false,
       },
-      43: {
+      44: {
         text: '  voiceovers_mapping:',
         highlighted: false,
       },
-      44: {
+      45: {
         text: '    content_0: {}',
         highlighted: false,
       },
-      45: {
+      46: {
         text: '    default_outcome_1: {}',
         highlighted: true,
       },
-      46: {
+      47: {
         text: '    feedback_2: {}',
         highlighted: true,
       },
-      47: {
+      48: {
         text: 'solicit_answer_details: false',
         highlighted: false,
       },
-      48: {
+      49: {
         text: 'card_is_checkpoint: true',
         highlighted: false,
       },
-      49: {
+      50: {
         text: '',
         highlighted: false,
       },
@@ -429,6 +437,7 @@ describe('Exploration history', function () {
       '  content_id: content_3\n' +
       'classifier_model_id: null\n' +
       'linked_skill_id: null\n' +
+      'inapplicable_skill_misconception_ids: null\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
       '  confirmed_unclassified_answers: []\n' +
