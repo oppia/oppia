@@ -121,109 +121,109 @@ describe('Exploration history', function () {
         highlighted: false,
       },
       6: {
-        text: 'inapplicable_skill_misconception_ids: null',
-        highlighted: false,
-      },
-      7: {
         text: 'interaction:',
         highlighted: false,
       },
-      8: {
+      7: {
         text: '  answer_groups: []',
         highlighted: true,
       },
-      9: {
+      8: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: true,
       },
-      10: {
+      9: {
         text: '  customization_args: {}',
         highlighted: true,
       },
-      11: {
+      10: {
         text: '  default_outcome:',
         highlighted: true,
       },
       // Note that highlighting *underneath* a line is still considered a
       // highlight.
-      12: {
+      11: {
         text: '    dest: ' + general.FIRST_STATE_DEFAULT_NAME,
         highlighted: true,
       },
-      13: {
+      12: {
         text: '    dest_if_really_stuck: null',
         highlighted: false,
       },
-      14: {
+      13: {
         text: '    feedback:',
         highlighted: false,
       },
-      15: {
+      14: {
         text: "      html: ''",
         highlighted: false,
       },
-      16: {
+      15: {
         text: '      content_id: default_outcome_1',
         highlighted: false,
       },
-      17: {
+      16: {
         text: '    labelled_as_correct: false',
         highlighted: false,
       },
-      18: {
+      17: {
         text: '    param_changes: []',
         highlighted: false,
       },
-      19: {
+      18: {
         text: '    refresher_exploration_id: null',
         highlighted: false,
       },
-      20: {
+      19: {
         text: '    missing_prerequisite_skill_id: null',
         highlighted: false,
       },
-      21: {
+      20: {
         text: '  hints: []',
         highlighted: false,
       },
-      22: {
+      21: {
         text: '  id: null',
         highlighted: true,
       },
-      23: {
+      22: {
         text: '  solution: null',
         highlighted: false,
       },
-      24: {
+      23: {
         text: 'param_changes: []',
         highlighted: false,
       },
-      25: {
+      24: {
         text: 'recorded_voiceovers:',
         highlighted: false,
       },
-      26: {
+      25: {
         text: '  voiceovers_mapping:',
         highlighted: false,
       },
-      27: {
+      26: {
         text: '    content_0: {}',
         highlighted: false,
       },
-      28: {
+      27: {
         text: '    default_outcome_1: {}',
         highlighted: true,
       },
-      29: {
+      28: {
         text: 'solicit_answer_details: false',
         highlighted: false,
       },
-      30: {
+      29: {
         text: 'card_is_checkpoint: true',
         highlighted: false,
       },
-      31: {
+      30: {
         text: '',
+        highlighted: false,
+      },
+      31: {
+        text: 'inapplicable_skill_misconception_ids: null',
         highlighted: false,
       },
     };
@@ -250,183 +250,183 @@ describe('Exploration history', function () {
         highlighted: false,
       },
       6: {
-        text: 'inapplicable_skill_misconception_ids: null',
-        highlighted: false,
-      },
-      7: {
         text: 'interaction:',
         highlighted: false,
       },
-      8: {
+      7: {
         text: '  answer_groups:',
         highlighted: true,
       },
-      9: {
+      8: {
         text: '    - rule_specs:',
         highlighted: true,
       },
-      10: {
+      9: {
         text: '        - rule_type: Equals',
         highlighted: true,
       },
-      11: {
+      10: {
         text: '          inputs:',
         highlighted: true,
       },
-      12: {
+      11: {
         text: '            x: 6',
         highlighted: true,
       },
-      13: {
+      12: {
         text: '      outcome:',
         highlighted: true,
       },
-      14: {
+      13: {
         text: '        dest: second',
         highlighted: true,
       },
-      15: {
+      14: {
         text: '        dest_if_really_stuck: null',
         highlighted: true,
       },
-      16: {
+      15: {
         text: '        feedback:',
         highlighted: true,
       },
-      17: {
+      16: {
         text: "          html: ''",
         highlighted: true,
       },
-      18: {
+      17: {
         text: '          content_id: feedback_2',
         highlighted: true,
       },
-      19: {
+      18: {
         text: '        labelled_as_correct: false',
         highlighted: true,
       },
-      20: {
+      19: {
         text: '        param_changes: []',
         highlighted: true,
       },
-      21: {
+      20: {
         text: '        refresher_exploration_id: null',
         highlighted: true,
       },
-      22: {
+      21: {
         text: '        missing_prerequisite_skill_id: null',
         highlighted: true,
       },
-      23: {
+      22: {
         text: '      training_data: []',
         highlighted: true,
       },
-      24: {
+      23: {
         text: '      tagged_skill_misconception_id: null',
         highlighted: true,
       },
-      25: {
+      24: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: true,
       },
-      26: {
+      25: {
         text: '  customization_args:',
         highlighted: true,
       },
-      27: {
+      26: {
         text: '    requireNonnegativeInput:',
         highlighted: true,
       },
-      28: {
+      27: {
         text: '      value: false',
         highlighted: true,
       },
-      29: {
+      28: {
         text: '  default_outcome:',
         highlighted: true,
       },
-      30: {
+      29: {
         text: '    dest: first',
         highlighted: true,
       },
-      31: {
+      30: {
         text: '    dest_if_really_stuck: null',
         highlighted: false,
       },
-      32: {
+      31: {
         text: '    feedback:',
         highlighted: false,
       },
-      33: {
+      32: {
         text: "      html: ''",
         highlighted: false,
       },
-      34: {
+      33: {
         text: '      content_id: default_outcome_1',
         highlighted: false,
       },
-      35: {
+      34: {
         text: '    labelled_as_correct: false',
         highlighted: false,
       },
-      36: {
+      35: {
         text: '    param_changes: []',
         highlighted: false,
       },
-      37: {
+      36: {
         text: '    refresher_exploration_id: null',
         highlighted: false,
       },
-      38: {
+      37: {
         text: '    missing_prerequisite_skill_id: null',
         highlighted: false,
       },
-      39: {
+      38: {
         text: '  hints: []',
         highlighted: false,
       },
-      40: {
+      39: {
         text: '  id: NumericInput',
         highlighted: true,
       },
-      41: {
+      40: {
         text: '  solution: null',
         highlighted: false,
       },
-      42: {
+      41: {
         text: 'param_changes: []',
         highlighted: false,
       },
-      43: {
+      42: {
         text: 'recorded_voiceovers:',
         highlighted: false,
       },
-      44: {
+      43: {
         text: '  voiceovers_mapping:',
         highlighted: false,
       },
-      45: {
+      44: {
         text: '    content_0: {}',
         highlighted: false,
       },
-      46: {
+      45: {
         text: '    default_outcome_1: {}',
         highlighted: true,
       },
-      47: {
+      46: {
         text: '    feedback_2: {}',
         highlighted: true,
       },
-      48: {
+      47: {
         text: 'solicit_answer_details: false',
         highlighted: false,
       },
-      49: {
+      48: {
         text: 'card_is_checkpoint: true',
         highlighted: false,
       },
-      50: {
+      49: {
         text: '',
+        highlighted: false,
+      },
+      50: {
+        text: 'inapplicable_skill_misconception_ids: null',
         highlighted: false,
       },
     };
@@ -437,7 +437,6 @@ describe('Exploration history', function () {
       '  content_id: content_3\n' +
       'classifier_model_id: null\n' +
       'linked_skill_id: null\n' +
-      'inapplicable_skill_misconception_ids: null\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
       '  confirmed_unclassified_answers: []\n' +
@@ -467,6 +466,7 @@ describe('Exploration history', function () {
       '    ca_buttonText_5: {}\n' +
       'solicit_answer_details: false\n' +
       'card_is_checkpoint: false\n' +
+      'inapplicable_skill_misconception_ids: null\n' +
       '';
 
     var expectedHistoryStates = [
