@@ -237,6 +237,7 @@ const oppiaTopicTitleSelector = '.oppia-topic-title';
 const topicPageLessonTabSelector = '.e2e-test-revision-tab-link';
 const subTopicTitleInLessTabSelector = '.subtopic-title';
 const reviewCardTitleSelector = '.oppia-subtopic-title';
+const topicNameSelector = '.e2e-test-topic-name';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -2232,8 +2233,6 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} topicName - The name of the topic to select and open.
    */
   async selectAndOpenTopic(topicName: string): Promise<void> {
-    const topicNameSelector = '.e2e-test-topic-name';
-
     try {
       const topicNames = await this.page.$$(topicNameSelector);
       for (const name of topicNames) {
@@ -2320,13 +2319,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Selects a review card based on the subtopic name.
-   * @param subtopicName - The name of the subtopic to select.
-   */
-  /**
-   * Selects a review card based on the subtopic name.
    * @param {string} subtopicName - The name of the subtopic to select.
-   * @param {puppeteer.Page} page - The Puppeteer page object.
-   * @throws {Error} When the subtopic cannot be found or clicked.
    */
   async selectReviewCardToLearn(subtopicName: string): Promise<void> {
     try {
