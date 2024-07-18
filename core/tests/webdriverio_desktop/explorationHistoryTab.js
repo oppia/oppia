@@ -614,7 +614,7 @@ describe('Exploration history', function () {
       'tags: []\n' +
       "blurb: ''\n" +
       "author_notes: ''\n" +
-      'states_schema_version: 55\n' +
+      'states_schema_version: 56\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +
@@ -630,7 +630,7 @@ describe('Exploration history', function () {
       'tags: []\n' +
       "blurb: ''\n" +
       "author_notes: ''\n" +
-      'states_schema_version: 55\n' +
+      'states_schema_version: 56\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +
