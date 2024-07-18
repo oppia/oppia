@@ -216,6 +216,7 @@ export class UserFactory {
     let user = new LoggedOutUser();
     await user.openBrowser();
     await user.page.goto(testConstants.URLs.Home);
+    await user.waitForPageToFullyLoad();
     await user.clickOn(cookieBannerAcceptButton);
     activeUsers.push(user);
     return user;
