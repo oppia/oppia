@@ -753,6 +753,7 @@ title: Old Title
     def test_converts_exp_model_with_default_states_schema_version(
         self
     ) -> None:
+        self.maxDiff = None
         exploration = exp_fetchers.get_exploration_by_id(self.OLD_EXP_ID)
         self.assertEqual(
             exploration.states_schema_version,
@@ -806,6 +807,7 @@ title: Old Title
         """
         exp_id: str = 'exp_id2'
         end_state_name: str = 'End'
+        self.maxDiff = None
 
         # Create an exploration with an old states schema version.
         swap_states_schema_41 = self.swap(

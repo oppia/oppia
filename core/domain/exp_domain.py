@@ -1601,7 +1601,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             state.card_is_checkpoint = sdict['card_is_checkpoint']
 
-            state.inapplicable_skill_misconception_ids = sdict['inapplicable_skill_misconception_ids']
+            state.inapplicable_skill_misconception_ids = (
+                sdict['inapplicable_skill_misconception_ids'])
 
             exploration.states[state_name] = state
 
