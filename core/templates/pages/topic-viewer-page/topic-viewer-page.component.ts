@@ -49,6 +49,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
   canonicalStorySummaries: StorySummary[] = [];
   topicUrlFragment: string = '';
   classroomUrlFragment: string = '';
+  classroomName: string | null = '';
   topicIsLoading: boolean = true;
   topicId: string = '';
   topicName: string = '';
@@ -97,6 +98,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
           this.topicName = readOnlyTopic.getTopicName();
           this.topicDescription = readOnlyTopic.getTopicDescription();
           this.pageTitleFragment = readOnlyTopic.getPageTitleFragmentForWeb();
+          this.classroomName = readOnlyTopic.getClassroomName();
 
           // The onLangChange event is initially fired before the topic is
           // loaded. Hence the first setpageTitle() call needs to made

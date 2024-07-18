@@ -23,6 +23,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import classroom_config_services
 from core.domain import email_manager
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_services
@@ -168,6 +169,10 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             for skill_id in all_skill_ids:
                 degrees_of_mastery[skill_id] = None
 
+        classroom_name = (
+            classroom_config_services.get_classroom_name_for_topic_id(
+                topic.id))
+
         self.values.update({
             'topic_id': topic.id,
             'topic_name': topic.name,
@@ -180,6 +185,13 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             'skill_descriptions': skill_descriptions,
             'practice_tab_is_displayed': topic.practice_tab_is_displayed,
             'meta_tag_content': topic.meta_tag_content,
-            'page_title_fragment_for_web': topic.page_title_fragment_for_web
+            'page_title_fragment_for_web': topic.page_title_fragment_for_web,
+            'classroom_name': (
+                None if (
+                    classroom_name
+                    ==
+                    str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)
+                ) else classroom_name
+            )
         })
         self.render_json(self.values)

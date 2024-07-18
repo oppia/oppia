@@ -46,8 +46,8 @@ describe('Topic Viewer Stories List Component', () => {
     component.topicName = 'Topic Name';
     component.topicDescription = 'Topic Description';
     component.topicId = 'topicId';
+    component.classroomName = 'math';
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
@@ -59,6 +59,16 @@ describe('Topic Viewer Stories List Component', () => {
       'I18N_TOPIC_123abcd_TITLE',
       'I18N_TOPIC_123abcd_DESCRIPTION'
     );
+    spyOn(
+      i18nLanguageCodeService,
+      'getClassroomTranslationKeys'
+    ).and.returnValue({
+      name: 'I18N_CLASSROOM_MATH_NAME',
+      courseDetails: 'I18N_CLASSROOM_MATH_COURSE_DETAILS',
+      teaserText: 'I18N_CLASSROOM_MATH_TEASER_TEXT',
+      topicListIntro: 'I18N_CLASSROOM_MATH_TOPICS_LIST_INTRO',
+    });
+
     expect(component).toBeDefined();
 
     component.ngOnInit();
@@ -67,26 +77,52 @@ describe('Topic Viewer Stories List Component', () => {
     expect(component.topicDescTranslationKey).toBe(
       'I18N_TOPIC_123abcd_DESCRIPTION'
     );
+    expect(component.classroomNameTranslationKey).toBe(
+      'I18N_CLASSROOM_MATH_NAME'
+    );
   });
 
-  it('should check if topic name, desc translation is displayed correctly', () => {
+  it('should check if topic name, desc translation and classroom name is displayed correctly', () => {
     spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValues(
       'I18N_TOPIC_123abcd_TITLE',
       'I18N_TOPIC_123abcd_DESCRIPTION'
     );
     spyOn(
       i18nLanguageCodeService,
+      'getClassroomTranslationKeys'
+    ).and.returnValue({
+      name: 'I18N_CLASSROOM_MATH_NAME',
+      courseDetails: 'I18N_CLASSROOM_MATH_COURSE_DETAILS',
+      teaserText: 'I18N_CLASSROOM_MATH_TEASER_TEXT',
+      topicListIntro: 'I18N_CLASSROOM_MATH_TOPICS_LIST_INTRO',
+    });
+    spyOn(
+      i18nLanguageCodeService,
       'isHackyTranslationAvailable'
-    ).and.returnValues(true, true);
+    ).and.returnValues(true, true, true);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValues(
+      false,
       false,
       false
     );
 
     component.ngOnInit();
 
-    expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
-    expect(component.isHackyTopicDescTranslationDisplayed()).toBe(true);
+    expect(component.isHackyTopicNameTranslationDisplayed()).toBeTrue();
+    expect(component.isHackyTopicDescTranslationDisplayed()).toBeTrue();
+    expect(component.isHackyClassroomNameTranslationDisplayed()).toBeTrue();
+  });
+
+  it('should not return the classroom name i18n key if the topic is not assigned to any classroom', () => {
+    component.classroomName = null;
+    spyOn(i18nLanguageCodeService, 'getClassroomTranslationKeys');
+
+    component.ngOnInit();
+
+    expect(
+      i18nLanguageCodeService.getClassroomTranslationKeys
+    ).not.toHaveBeenCalled();
+    expect(component.isHackyClassroomNameTranslationDisplayed()).toBeFalse();
   });
 
   it('should check if the view is tablet or not', () => {
@@ -96,5 +132,12 @@ describe('Topic Viewer Stories List Component', () => {
 
     widthSpy.and.returnValue(800);
     expect(component.checkTabletView()).toBe(false);
+  });
+
+  it('should get RTL language status correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      true
+    );
+    expect(component.isLanguageRTL()).toBeTrue();
   });
 });
