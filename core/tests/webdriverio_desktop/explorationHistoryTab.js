@@ -219,11 +219,11 @@ describe('Exploration history', function () {
         highlighted: false,
       },
       30: {
-        text: '',
+        text: 'inapplicable_skill_misconception_ids: null',
         highlighted: false,
       },
       31: {
-        text: 'inapplicable_skill_misconception_ids: null',
+        text: '',
         highlighted: false,
       },
     };
@@ -422,11 +422,11 @@ describe('Exploration history', function () {
         highlighted: false,
       },
       49: {
-        text: '',
+        text: 'inapplicable_skill_misconception_ids: null',
         highlighted: false,
       },
       50: {
-        text: 'inapplicable_skill_misconception_ids: null',
+        text: '',
         highlighted: false,
       },
     };
