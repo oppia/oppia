@@ -20,19 +20,7 @@ if (argv.specs_to_run !== undefined) {
   specsToRun = argv.specs_to_run.split(',');
 }
 
-const SPEC_PATTERNS = [
-  /((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(component|controller|directive|service|Factory)\.ts$)/,
-  /(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)/,
-  /(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)/,
-  /(?<!puppeteer-acceptance-tests.*\.spec\.ts)/,
-  /(?<!@nodelib.*\.spec\.ts)/,
-  /(?<!openapi3-ts.*\.spec\.ts)/,
-  /(?<!(valid|invalid)[_-][\w\d.\-]*\.ts)/,
-];
-
-const SPECS_PATTERN = new RegExp(
-  SPEC_PATTERNS.map(pattern => pattern.source).join('')
-);
+const SPECS_PATTERN = /^(?!.*(puppeteer-acceptance-tests|((valid|invalid)[_-][\w\d.\-])|@nodelib|openapi3-ts)).*((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(component|controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)/;
 
 let context = SPECS_PATTERN;
 if (argv.specs_to_run !== undefined) {
