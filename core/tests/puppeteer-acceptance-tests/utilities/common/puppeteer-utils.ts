@@ -121,7 +121,7 @@ export class BaseUser {
               'Mobile/15A372 Safari/604.1'
           );
         } else {
-          this.page.setViewport({width: 1200, height: 800});
+          this.page.setViewport({width: 1920, height: 1080});
         }
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
@@ -531,12 +531,16 @@ export class BaseUser {
   /**
    * Waits for the static assets on the page to load.
    */
-  async waitForStaticAssetsLoad(): Promise<void> {
+  async waitForStaticAssetsToLoad(): Promise<void> {
     await this.page.waitForFunction('document.readyState === "complete"');
   }
 
   /**
-   * Waits for the page to fully load by checking the document's ready state and waiting for the respective HTML to load completely.
+   * Waits for the page to fully load by checking the document's ready state and waiting for the respective
+   * HTML to load completely.
+   *
+   * Caution: Using this function multiple times in the same test can increase the test execution time,
+   * as it waits for the page to fully load.
    */
   async waitForPageToFullyLoad(): Promise<void> {
     await this.page.waitForFunction('document.readyState === "complete"');
