@@ -606,7 +606,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             # representing the exploration set to the testing environment cache
             # is the same as the string set to the cache in the development
             # environment.
-            self.maxDiff = None
             for key, value in id_value_mapping.items():
                 self.assertEqual(key, 'exploration:0:%s' % exploration_id)
                 self.assertEqual(

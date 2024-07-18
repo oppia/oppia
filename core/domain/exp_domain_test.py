@@ -4669,7 +4669,7 @@ states:
     content:
       content_id: content_0
       html: ''
-    inapplicable_skill_misconception_ids: []
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4700,7 +4700,7 @@ states:
     content:
       content_id: content_2
       html: ''
-    inapplicable_skill_misconception_ids: []
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
