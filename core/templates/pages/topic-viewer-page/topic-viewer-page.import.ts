@@ -41,8 +41,4 @@ require('App.ts');
 require('base-components/base-content.component.ts');
 require('base-components/oppia-root.directive.ts');
 
-require(
-  'pages/topic-viewer-page/navbar-breadcrumb/' +
-    'topic-viewer-navbar-breadcrumb.component.ts'
-);
 require('pages/topic-viewer-page/topic-viewer-page.component.ts');

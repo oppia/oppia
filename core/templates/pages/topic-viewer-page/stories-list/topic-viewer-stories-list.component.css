@@ -37,6 +37,39 @@ stories-list .mat-card-margin-desktop {
   margin-top: 10em;
 }
 
+stories-list .oppia-topic-viewer-breadcrumbs .desktop-breadcrumbs {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+}
+
+stories-list .oppia-topic-viewer-breadcrumbs .desktop-breadcrumbs .classroom-name-container {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+}
+
+stories-list .oppia-topic-viewer-breadcrumbs .mobile-breadcrumbs {
+  display: none;
+}
+ 
+stories-list .oppia-topic-viewer-breadcrumbs .mobile-breadcrumbs a,
+stories-list .oppia-topic-viewer-breadcrumbs .desktop-breadcrumbs a,
+stories-list .oppia-topic-viewer-breadcrumbs .mobile-breadcrumbs span,
+stories-list .oppia-topic-viewer-breadcrumbs .desktop-breadcrumbs span {
+  color: #00645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 15px;
+}
+
+stories-list .oppia-topic-viewer-breadcrumbs .mobile-breadcrumbs i,
+stories-list .oppia-topic-viewer-breadcrumbs .desktop-breadcrumbs i {
+  font-size: 13px;
+}
+
 @media(max-width: 1024px) {
   stories-list .oppia-stories-list-container .oppia-page-card {
     width: 80vw;
@@ -50,6 +83,16 @@ stories-list .mat-card-margin-desktop {
 
   stories-list .story-info-container {
     padding-top: 0;
+  }
+
+  stories-list .oppia-topic-viewer-breadcrumbs .desktop-breadcrumbs {
+    display: none;
+  }
+  
+  stories-list .oppia-topic-viewer-breadcrumbs .mobile-breadcrumbs {
+    align-items: center;
+    display: flex;
+    gap: 4px;
   }
 }
 

@@ -103,6 +103,7 @@ describe('Learner view info component', () => {
         practice_tab_is_displayed: false,
         meta_tag_content: 'content',
         page_title_fragment_for_web: 'title',
+        classroom_name: 'math',
       } as ReadOnlyTopicBackendDict)
     );
 

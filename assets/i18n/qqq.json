@@ -244,6 +244,7 @@
 	"I18N_ATTRIBUTION_PRINT_STEP_TWO": "Step two of attributing Oppia in Print",
 	"I18N_ATTRIBUTION_PRINT_TITLE": "Title of the attribution section that explains how to attribute Oppia in Print",
 	"I18N_ATTRIBUTION_TITLE": "Title of the modal that lists the various ways in which Oppia can be attributed.",
+	"I18N_BACK_TO_CLASSROOM": "Text which we show in topic viewer page mobile breadcrumbs to redirect to the classroom page.",
 	"I18N_BACK_TO_CLASSROOMS": "Text which we show in classroom page mobile breadcrumbs if we have more than one public classrooms.",
 	"I18N_BACK_TO_HOME_TEXT": "Text displayed in breadcrumbs - shown in the top left corner.",
 	"I18N_BLOG_AUTHOR_PROFILE_PAGE_BREADCRUMB": "Text displayed in the Blog Author Profile Page. - Text shown in the top left corner of the nav bar.",
