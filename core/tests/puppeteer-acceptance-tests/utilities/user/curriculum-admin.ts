@@ -821,6 +821,7 @@ export class CurriculumAdmin extends BaseUser {
   async createAndPublishStoryWithChapter(
     storyTitle: string,
     storyUrlFragment: string,
+    chapterTitle: string,
     explorationId: string,
     topicName: string
   ): Promise<void> {
@@ -849,7 +850,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(storyMetaTagInput, 'meta');
     await this.page.keyboard.press('Tab');
 
-    await this.createChapter(explorationId);
+    await this.createChapter(chapterTitle, explorationId);
     await this.saveStoryDraft();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileSaveStoryChangesDropdown);
@@ -904,12 +905,15 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Create a chapter for a certain story.
    */
-  async createChapter(explorationId: string): Promise<void> {
+  async createChapter(
+    chapterTitle: string,
+    explorationId: string
+  ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileAddChapterDropdown);
     }
     await this.clickOn(addChapterButton);
-    await this.type(chapterTitleField, 'Test Chapter 1');
+    await this.type(chapterTitleField, chapterTitle);
     await this.type(chapterExplorationIdField, explorationId);
 
     await this.clickOn(chapterPhotoBoxButton);
@@ -1437,6 +1441,10 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.clickOn(closeTopicDependencyButton);
     await this.page.waitForSelector(topicDependencyGraphDiv, {visible: false});
+  }
+
+  async timeout(time) {
+    await this.page.waitForTimeout(time);
   }
 }
 
