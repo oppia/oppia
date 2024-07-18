@@ -44,8 +44,8 @@ export class SearchResultsComponent {
     private userService: UserService
   ) {}
 
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticAssetUrl(imagePath);
+  getStaticCopyrightedImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticCopyrightedImageUrl(imagePath);
   }
 
   onRedirectToLogin(destinationUrl: string): boolean {
