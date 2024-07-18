@@ -77,7 +77,11 @@ def main(args: Optional[List[str]] = None) -> None:
 
     jobs: Dict[str, GithubJobDict] = json.loads(parsed_args.jobs) or {}
 
+    for job_name, job in jobs.items():
+        print('Job \'%s\' status: %s' % (job_name, job['result']))
+
     workflow_status = get_workflow_status(jobs)
+    print('Workflow status: %s' % workflow_status.value)
 
     with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as f:
         print(f'WORKFLOW_STATUS={workflow_status.value}', file=f)
