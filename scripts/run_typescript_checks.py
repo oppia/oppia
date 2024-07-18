@@ -189,7 +189,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/topic-editor-page/topic-editor-page.component.ts',
     'core/templates/pages/topic-editor-page/topic-editor-page.import.ts',
     'core/templates/pages/topic-viewer-page/topic-viewer-page.import.ts',
-    'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.import.ts',
     'core/templates/services/UpgradedServices.ts',
     'core/templates/services/angular-services.index.ts',
     'core/templates/services/exploration-improvements-task-registry.service.ts',
