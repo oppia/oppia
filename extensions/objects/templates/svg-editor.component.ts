@@ -275,10 +275,6 @@ export class SvgEditorComponent implements OnInit {
     );
   }
 
-  isUserDrawing(): boolean {
-    return Boolean(this.canvas && this.drawMode !== this.DRAW_MODE_NONE);
-  }
-
   private getTrustedResourceUrlForSvgFileName(svgFileName: string): {
     safeUrl: SafeResourceUrl | string;
     unsafeUrl: string;
