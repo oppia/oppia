@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import image_services
 from core.domain import image_validation_services
 from core.platform import models
@@ -436,3 +437,26 @@ def validate_and_save_image(
         filename, entity_type, entity_id, raw_image,
         filename_prefix, is_compressible
     )
+
+
+def get_static_asset_url(filepath: str) -> str:
+    """Returns the URL for the static assets that differ between
+    deployment.
+
+    Args:
+        filepath: str. The filepath to the file for which the URL
+            should be returned.
+
+    Returns:
+        str. The URL of the file.
+    """
+    if constants.EMULATOR_MODE:
+        # By using assetsstatic the app returns the requested
+        # files in assets folder by that it bypasses
+        # the handlers that call this method, thus preventing
+        # loop.
+        return 'http://localhost:8181/assetsstatic/%s' % (
+            filepath
+        )
+    return 'https://storage.googleapis.com/%s-static/%s' % (
+        feconf.OPPIA_PROJECT_ID, filepath)

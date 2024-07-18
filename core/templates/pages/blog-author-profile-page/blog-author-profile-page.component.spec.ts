@@ -43,6 +43,7 @@ import {
   BlogPostSummary,
   BlogPostSummaryBackendDict,
 } from 'domain/blog/blog-post-summary.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AlertsService} from 'services/alerts.service';
 import {UserService} from 'services/user.service';
 // This throws "TS2307". We need to
@@ -67,6 +68,7 @@ describe('Blog home page component', () => {
   let alertsService: AlertsService;
   let windowDimensionsService: WindowDimensionsService;
   let urlService: UrlService;
+  let urlInterpolationService: UrlInterpolationService;
   let loaderService: LoaderService;
   let blogHomePageBackendApiService: BlogHomePageBackendApiService;
   let blogAuthorProfilePageDataObject: BlogAuthorProfilePageData;
@@ -122,6 +124,7 @@ describe('Blog home page component', () => {
       BlogHomePageBackendApiService
     );
     urlService = TestBed.inject(UrlService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     loaderService = TestBed.inject(LoaderService);
     userService = TestBed.inject(UserService);
     blogPostSummaryObject =
@@ -375,5 +378,14 @@ describe('Blog home page component', () => {
     expect(component.isSmallScreenViewActive()).toBe(true);
     windowWidthSpy.and.returnValue(1028);
     expect(component.isSmallScreenViewActive()).toBe(false);
+  });
+
+  it('should get static asset image url', () => {
+    spyOn(
+      urlInterpolationService,
+      'getStaticCopyrightedImageUrl'
+    ).and.returnValue('image_url');
+
+    expect(component.getStaticCopyrightedImageUrl('url')).toBe('image_url');
   });
 });

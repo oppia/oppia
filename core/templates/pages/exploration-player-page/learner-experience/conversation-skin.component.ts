@@ -272,7 +272,7 @@ export class ConversationSkinComponent {
     this.loaderService.showLoadingScreen('Loading');
 
     this.OPPIA_AVATAR_IMAGE_URL =
-      this.urlInterpolationService.getStaticImageUrl(
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
 

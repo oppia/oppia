@@ -10,9 +10,13 @@
         <br>
         <div class="oppia-float-left">
           <picture>
-            <source type="image/webp" [srcset]="getStaticImageUrl('/general/donate.webp')">
-            <source type="image/png" [srcset]="getStaticImageUrl('/general/donate.png')">
-            <img [src]="getStaticImageUrl('/general/donate.png')" alt="Otter holding a gift" class="oppia-otter-image">
+            <source type="image/webp"
+                    [srcset]="getStaticCopyrightedImageUrl('/general/donate.webp')">
+            <source type="image/png"
+                    [srcset]="getStaticCopyrightedImageUrl('/general/donate.png')">
+            <img [src]="getStaticCopyrightedImageUrl('/general/donate.png')"
+                 alt="Otter holding a gift"
+                 class="oppia-otter-image">
           </picture>
         </div>
         <div class="oppia-float-right">

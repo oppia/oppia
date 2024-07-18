@@ -14,14 +14,6 @@ inbound_services:
 default_expiration: "10m"
 handlers:
 # PRODUCTION STATIC
-- url: /favicon.ico
-  static_files: assets/favicon.ico
-  upload: assets/favicon.ico
-  secure: always
-- url: /robots.txt
-  static_files: assets/robots.txt
-  upload: assets/robots.txt
-  secure: always
 - url: /sitemap.xml
   static_files: assets/sitemap.xml
   upload: assets/sitemap.xml
@@ -49,7 +41,56 @@ handlers:
   static_dir: dist/
   secure: always
   expiration: "0"
-- url: /assets
+- url: /assets/audio
+  static_dir: assets/audio
+  secure: always
+  http_headers:
+    # This is replaced by a specific origin when doing a deployment.
+    Access-Control-Allow-Origin: "*"
+  expiration: "0"
+- url: /assets/i18n
+  static_dir: assets/i18n
+  secure: always
+  http_headers:
+    # This is replaced by a specific origin when doing a deployment.
+    Access-Control-Allow-Origin: "*"
+  expiration: "0"
+- url: /assets/overrides/guppy
+  static_dir: assets/overrides/guppy
+  secure: always
+  http_headers:
+    # This is replaced by a specific origin when doing a deployment.
+    Access-Control-Allow-Origin: "*"
+  expiration: "0"
+- url: /assets/pages
+  static_dir: assets/pages
+  secure: always
+  http_headers:
+    # This is replaced by a specific origin when doing a deployment.
+    Access-Control-Allow-Origin: "*"
+  expiration: "0"
+- url: /assets/scripts
+  static_dir: assets/scripts
+  secure: always
+  http_headers:
+    # This is replaced by a specific origin when doing a deployment.
+    Access-Control-Allow-Origin: "*"
+  expiration: "0"
+- url: /assets/svg_diagram_editor
+  static_dir: assets/svg_diagram_editor
+  secure: always
+  http_headers:
+    # This is replaced by a specific origin when doing a deployment.
+    Access-Control-Allow-Origin: "*"
+  expiration: "0"
+- url: /assets/images
+  static_dir: assets/images
+  secure: always
+  http_headers:
+    # This is replaced by a specific origin when doing a deployment.
+    Access-Control-Allow-Origin: "*"
+  expiration: "0"
+- url: /assetsstatic
   static_dir: assets
   secure: always
   http_headers:

@@ -65,10 +65,10 @@
          class="posts-display-heading text-center">
       <picture>
         <source type="image/webp"
-                [srcset]="getStaticImageUrl('/images/general/no_explorations_found.webp')">
+                [srcset]="getStaticCopyrightedImageUrl('/general/no_explorations_found.webp')">
         <source type="image/png"
-                [srcset]="getStaticImageUrl('/images/general/no_explorations_found.png')">
-        <img [src]="getStaticImageUrl('/general/no_explorations_found.png')">
+                [srcset]="getStaticCopyrightedImageUrl('/general/no_explorations_found.png')">
+        <img [src]="getStaticCopyrightedImageUrl('/general/no_explorations_found.png')">
       </picture>
       {{ 'I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND' | translate }}
     </div>
