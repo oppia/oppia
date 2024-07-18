@@ -504,7 +504,7 @@ states:
     content:
       content_id: content_0
       html: <p>Congratulations, you have finished!</p>
-    inapplicable_skill_misconception_ids: null
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -527,7 +527,7 @@ states:
     content:
       content_id: content_1
       html: ''
-    inapplicable_skill_misconception_ids: null
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
