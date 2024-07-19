@@ -175,18 +175,18 @@ const subscriberCard = '.e2e-test-subscription-card';
 const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
 const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
 
-const responseCrossSelector = '.oppia-response-cross';
+const incorrectResponseIconSelector = '.e2e-test-incorrect-response-icon';
 const rteSelector = '.e2e-test-rte';
 const destinationSelectorDropdown = '.e2e-test-destination-selector-dropdown';
 const destinationWhenStuckSelectorDropdown =
   '.e2e-test-destination-when-stuck-selector-dropdown';
+const outcomeDestWhenStuckSelector =
+  '.protractor-test-open-outcome-dest-if-stuck-editor';
 
-const LABEL_FOR_OPPIA_RESPONSE_TO_WRONG_ANSWERS = 'Oppia tells the learner...';
-const LABEL_FOR_SAVE_FEEDBACK_BUTTON = 'Save Feedback';
-const LABEL_FOR_SAVE_DESTINATION_BUTTON = 'Save Destination';
+const LABEL_FOR_SAVE_FEEDBACK_BUTTON = ' Save Feedback ';
+const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 const LABEL_FOR_DIRECT_TO_CARD_WHEN_STUCK =
   '(Optional) If the learner is really stuck, direct them to ... ';
-const LABEL_FOR_DIRECT_TO_CARD = 'And afterwards, directs the learner to ... ';
 export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to creator dashboard page.
@@ -255,7 +255,7 @@ export class ExplorationEditor extends BaseUser {
    * This is a composite function that can be used when a straightforward, simple exploration published is required.
    * @param {string} title - The title of the exploration.
    * @param {string} goal - The goal of the exploration.
-   * @param {string} category - The category of the exploration.
+   * @param {string} category - The category of the exploration.,
    */
   async publishExplorationWithMetadata(
     title: string,
@@ -1022,20 +1022,28 @@ export class ExplorationEditor extends BaseUser {
     directToCard?: string,
     directToCardWhenStuck?: string
   ): Promise<void> {
-    await this.clickOn(responseCrossSelector);
-    await this.clickOn(LABEL_FOR_OPPIA_RESPONSE_TO_WRONG_ANSWERS);
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(incorrectResponseIconSelector, {
+      visible: true,
+    });
+    const incorrectResponseIcon = await this.page.$(
+      incorrectResponseIconSelector
+    );
+    await incorrectResponseIcon?.click();
+    await this.page.screenshot({path: 'screenshot.png'});
+    await this.clickOn(openOutcomeFeedBackEditor);
     await this.clickOn(rteSelector);
-    await this.page.type(rteSelector, oppiaMsg);
+    await this.type(rteSelector, oppiaMsg);
     await this.clickOn(LABEL_FOR_SAVE_FEEDBACK_BUTTON);
 
     if (directToCard) {
-      await this.clickOn(LABEL_FOR_DIRECT_TO_CARD);
+      await this.clickOn(openOutcomeDestButton);
       await this.page.select(destinationSelectorDropdown, directToCard);
       await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
     }
 
     if (directToCardWhenStuck) {
-      await this.clickOn(LABEL_FOR_DIRECT_TO_CARD_WHEN_STUCK);
+      await this.clickOn(outcomeDestWhenStuckSelector);
       await this.page.select(
         destinationWhenStuckSelectorDropdown,
         directToCardWhenStuck

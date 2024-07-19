@@ -28,21 +28,11 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-enum INTERACTION_TYPES {
-  CONTINUE_BUTTON = 'Continue Button',
-  NUMERIC_INPUT = 'Number Input',
-  END_EXPLORATION = 'End Exploration',
-}
-enum CARD_NAME {
-  INTRODUCTION = 'Introduction',
-  TEST_QUESTION = 'Test Question',
-  FINAL_CARD = 'Final Card',
-}
-
 describe('Logged-out User', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let loggedOutUser: LoggedOutUser;
-  let explorationId: string | null;
+  let explorationId1: string | null;
+  let explorationId2: string | null;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -53,53 +43,15 @@ describe('Logged-out User', function () {
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
-    await curriculumAdmin.navigateToCreatorDashboardPage();
-    await curriculumAdmin.navigateToExplorationEditorPage();
-    await curriculumAdmin.dismissWelcomeModal();
-    await curriculumAdmin.updateCardContent('Introduction to Algebra');
-    await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    explorationId1 =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'negative-numbers'
+      );
 
-    // Add a new card with a question.
-    await curriculumAdmin.viewOppiaResponses();
-    await curriculumAdmin.directLearnersToNewCard('Algebra Basics');
-    await curriculumAdmin.saveExplorationDraft();
-
-    // Navigate to the new card and update its content.
-    await curriculumAdmin.navigateToCard('Algebra Basics');
-    await curriculumAdmin.updateCardContent(
-      'Enter a negative number greater than -100.'
-    );
-    await curriculumAdmin.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
-    await curriculumAdmin.addResponsesToTheInteraction(
-      INTERACTION_TYPES.NUMERIC_INPUT,
-      '-99',
-      'Perfect!',
-      CARD_NAME.FINAL_CARD,
-      true
-    );
-    await curriculumAdmin.timeout(2147483647);
-    await curriculumAdmin.addOppiaResponsesForWrongAnswers('Wrong, try again!');
-
-    await curriculumAdmin.saveExplorationDraft();
-
-    // Navigate to the final card and update its content.
-    await curriculumAdmin.navigateToCard(CARD_NAME.FINAL_CARD);
-    await curriculumAdmin.updateCardContent(
-      'We have practiced negative numbers.'
-    );
-    await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-
-    // Navigate back to the introduction card and save the draft.
-    await curriculumAdmin.navigateToCard('Introduction to Algebra');
-    await curriculumAdmin.saveExplorationDraft();
-    explorationId = await curriculumAdmin.publishExplorationWithMetadata(
-      'Algebra Basics',
-      'Learn the basics of Algebra',
-      'Algebra'
-    );
-    if (!explorationId) {
-      throw new Error('Error publishing exploration successfully.');
-    }
+    explorationId2 =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'positive-numbers'
+      );
 
     await curriculumAdmin.createTopic('Algebra I', 'algebra-one');
     await curriculumAdmin.createSubtopicForTopic(
@@ -109,12 +61,13 @@ describe('Logged-out User', function () {
     );
 
     await curriculumAdmin.createSkillForTopic('Negative Numbers', 'Algebra I');
-    await curriculumAdmin.createQuestionsForSkill('Negative Numbers', 3);
+    await curriculumAdmin.createQuestionsForSkill('Negative Numbers', 10);
     await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
       'Negative Numbers',
       'Negative Numbers',
       'Algebra I'
     );
+    // await curriculumAdmin.enablePracticeTabForSkill('Negative Numbers');
     await curriculumAdmin.addSkillToDiagnosticTest(
       'Negative Numbers',
       'Algebra I'
@@ -125,17 +78,24 @@ describe('Logged-out User', function () {
       'Algebra Story',
       'algebra-story',
       'Understanding Negative Numbers',
-      explorationId,
+      explorationId1 as string,
       'Algebra I'
     );
-    await curriculumAdmin.expectTopicToBePublishedInTopicsAndSkillsDashboard(
-      'Algebra I',
-      1,
-      1,
-      1
+    await curriculumAdmin.createAndPublishStoryWithChapter(
+      'Algebra Story',
+      'algebra-story',
+      'Understanding Positive Numbers',
+      explorationId2 as string,
+      'Algebra I'
     );
 
-    await curriculumAdmin.createNewClassroom('Math', '/math');
+    await curriculumAdmin.createNewClassroom('Math', 'math');
+    await curriculumAdmin.updateClassroom(
+      'Math',
+      'Teaser text',
+      'Course details',
+      'Topic list intro'
+    );
     await curriculumAdmin.addTopicToClassroom('Math', 'Algebra I');
     await curriculumAdmin.publishClassroom('Math');
     await curriculumAdmin.timeout(2147483647);
@@ -166,7 +126,7 @@ describe('Logged-out User', function () {
       );
 
       // Load the next chapter upon clicking the “Next chapter” card on the last state
-      await loggedOutUser.loadNextChapteFromLastState();
+      await loggedOutUser.loadNextChapterFromLastState();
 
       // Load the practice session page upon clicking the practice session card on the last state
       await loggedOutUser.loadPracticeSessionFromLastState();
