@@ -588,7 +588,7 @@ export class CkEditor4RteComponent
     this.subscriptions.unsubscribe();
   }
 
-  trimTextNodes(node: Node): void {
+  trimTextNoes(node: Node): void {
     if (node.nodeType === Node.TEXT_NODE) {
       node.nodeValue = node.nodeValue.trim();
     } else {
