@@ -47,7 +47,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   recommendedTopicIds: string[] = [];
   progressPercentage: number = 0;
   componentSubscription = new Subscription();
-  disableStartTestButton: boolean = false;
+  isStartTestButtonDisabled: boolean = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -111,7 +111,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
         this.classroomData = classroomData;
       })
       .catch(error => {
-        this.disableStartTestButton = true;
+        this.isStartTestButtonDisabled = true;
         if (error.status === 500) {
           this.router.navigate([
             `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/500`,
@@ -147,7 +147,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
         this.diagnosticTestIsStarted = true;
       })
       .catch(() => {
-        this.disableStartTestButton = true;
+        this.isStartTestButtonDisabled = true;
         this.alertsService.addWarning('Failed to start the test.');
       });
   }

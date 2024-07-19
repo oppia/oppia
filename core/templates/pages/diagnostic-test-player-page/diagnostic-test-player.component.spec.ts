@@ -414,7 +414,7 @@ describe('Diagnostic test player component', () => {
   }));
 
   it('should not start diagnostic test if there is error while fetching classroom data', fakeAsync(() => {
-    expect(component.disableStartTestButton).toBeFalse();
+    expect(component.isStartTestButtonDisabled).toBeFalse();
     component.classroomData = dummyClassroomData;
 
     spyOn(classroomBackendApiService, 'getClassroomDataAsync').and.returnValue(
@@ -424,6 +424,6 @@ describe('Diagnostic test player component', () => {
     component.startDiagnosticTest();
     tick();
 
-    expect(component.disableStartTestButton).toBeTrue();
+    expect(component.isStartTestButtonDisabled).toBeTrue();
   }));
 });
