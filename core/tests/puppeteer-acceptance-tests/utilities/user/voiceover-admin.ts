@@ -49,7 +49,7 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to navigate to exploration settings tab.
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavToggelbutton);
       await this.clickOn(mobileOptionsDropdown);
