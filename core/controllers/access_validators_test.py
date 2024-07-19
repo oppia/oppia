@@ -24,9 +24,9 @@ from core.constants import constants
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import rights_manager
+from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
-from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
