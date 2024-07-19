@@ -170,7 +170,8 @@ export class TestToModulesMatcher {
    * URLs with Angular modules.
    */
   public static registerPuppeteerBrowser(browser: Browser): void {
-    browser.on('targetchanged', async (target: Target) => {
+    const registerTarget = async (target: Target) => {
+      TestToModulesMatcher.registerUrl(target.url());
       const page = await target.page();
       if (!page) {
         return;
@@ -179,7 +180,9 @@ export class TestToModulesMatcher {
         const url = frame.url();
         TestToModulesMatcher.registerUrl(url);
       });
-    });
+    };
+    browser.on('targetcreated', registerTarget);
+    browser.on('targetchanged', registerTarget);
   }
 
   /**
@@ -223,7 +226,7 @@ export class TestToModulesMatcher {
     fs.mkdirSync(path.dirname(this.goldenFilePath), {recursive: true});
     fs.writeFileSync(
       this.goldenFilePath,
-      this.collectedModules.sort().join('\n')
+      this.collectedModules.sort().join('\n') + '\n'
     );
     if (missingGoldenFileModules.length > 0) {
       throw new Error(
