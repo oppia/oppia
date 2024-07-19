@@ -238,7 +238,7 @@ export class ContributorDashboardPageComponent implements OnInit {
       // TODO(#13015): Remove use of unknown as a type.
     } as unknown as ContributorDashboardTabsDetails;
     this.OPPIA_AVATAR_IMAGE_URL =
-      this.urlInterpolationService.getStaticImageUrl(
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
