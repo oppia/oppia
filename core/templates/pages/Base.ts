@@ -13,7 +13,6 @@
 // limitations under the License.
 
 require('services/sidebar-status.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/csrf-token.service.ts');
 require('services/contextual/document-attribute-customization.service.ts');
@@ -33,7 +32,6 @@ angular.module('oppia').controller('Base', [
   'CsrfTokenService',
   'DocumentAttributeCustomizationService',
   'LoaderService',
-  'UrlInterpolationService',
   'SUPPORTED_SITE_LANGUAGES',
   function (
     $rootScope,
@@ -41,13 +39,9 @@ angular.module('oppia').controller('Base', [
     CsrfTokenService,
     DocumentAttributeCustomizationService,
     LoaderService,
-    UrlInterpolationService,
     SUPPORTED_SITE_LANGUAGES
   ) {
     var ctrl = this;
-    $scope.getAssetUrl = function (path) {
-      return UrlInterpolationService.getFullStaticAssetUrl(path);
-    };
 
     ctrl.$onInit = function () {
       $scope.currentLang = 'en';
