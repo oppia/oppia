@@ -59,7 +59,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ format('backend_test_time_shard_{0}', matrix.shard) }}
-          path: backend_test_time_report.txt
+          path: backend_test_time_report.json
           retention-days: 1
       - name: Upload coverage report
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
@@ -183,7 +183,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p backend_test_time_reports
-          for i in {1..5}; do cp backend_test_time_reports_artifacts/backend_test_time_$i/backend_test_time_report.txt backend_test_time_reports/backend_test_time_report_$i.txt; done
+          for i in {1..5}; do cp backend_test_time_reports_artifacts/backend_test_time_$i/backend_test_time_report.json backend_test_time_reports/backend_test_time_report_$i.json; done
       - name: Check test times
         run: python -m scripts.check_backend_test_times
         shell: bash

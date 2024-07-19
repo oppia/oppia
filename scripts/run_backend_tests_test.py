@@ -35,7 +35,7 @@ from scripts import concurrent_task_utils
 from scripts import install_third_party_libs
 from scripts import servers
 
-from typing import Callable, Dict, Final, List, Tuple
+from typing import Callable, Final, List, Tuple
 
 TEST_RUNNER_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'gae_suite.py'
@@ -441,10 +441,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 with swap_time_report_path, self.swap_redis_server:
                     run_backend_tests.main(
                         args=['--generate_time_report'])
-        loaded_time_report: Dict[str, float] = {}
-        for line in time_report_temp_file.readlines():
-            test_target, time_taken = line.split(':')
-            loaded_time_report[test_target] = float(time_taken)
+        loaded_time_report = json.loads(time_report_temp_file.read())
         self.assertEqual(loaded_time_report, expected_time_report)
         time_report_temp_file.close()
 

@@ -90,7 +90,7 @@ _LOAD_TESTS_DIR: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'load_tests'
 )
 TIME_REPORT_PATH: Final = os.path.join(
-    os.getcwd(), 'backend_test_time_report.txt'
+    os.getcwd(), 'backend_test_time_report.json'
 )
 
 _PARSER: Final = argparse.ArgumentParser(
@@ -560,8 +560,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
     if parsed_args.generate_time_report:
         with utils.open_file(TIME_REPORT_PATH, 'w') as time_report_file:
-            for test_target, time_taken in time_report.items():
-                time_report_file.write('%s:%s\n' % (test_target, time_taken))
+            time_report_file.write(json.dumps(time_report, indent=4))
 
     print('')
     print('Done!')

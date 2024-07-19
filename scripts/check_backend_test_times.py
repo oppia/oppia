@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 
 from typing import Final, List, TypedDict
@@ -68,8 +69,10 @@ def get_sorted_backend_test_times_from_reports() -> List[BackendTestDict]:
                 backend_test_time_report_file
             ), 'r', encoding='utf-8'
         ) as backend_test_time_report:
-            for line in backend_test_time_report.readlines():
-                test_name, test_time = line.strip().split(':')
+            loaded_backend_test_times = json.loads(
+                backend_test_time_report.read()
+            )
+            for test_name, test_time in loaded_backend_test_times.items():
                 backend_test_times.append(
                     {'test_name': test_name, 'test_time': float(test_time)}
                 )

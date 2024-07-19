@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import builtins
+import json
 import os
 import tempfile
 
@@ -32,11 +33,11 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
         self.backend_test_time_reports_directory = (
             tempfile.TemporaryDirectory())
         backend_test_time_report_one = os.path.join(
-            self.backend_test_time_reports_directory.name, 'report_one.txt')
+            self.backend_test_time_reports_directory.name, 'report_one.json')
         backend_test_time_report_two = os.path.join(
-            self.backend_test_time_reports_directory.name, 'report_two.txt')
+            self.backend_test_time_reports_directory.name, 'report_two.json')
         backend_test_time_report_three = os.path.join(
-            self.backend_test_time_reports_directory.name, 'report_three.txt')
+            self.backend_test_time_reports_directory.name, 'report_three.json')
 
         self.print_arr: list[str] = []
         def mock_print(msg: str) -> None:
@@ -44,21 +45,27 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
         with open(backend_test_time_report_one, 'w', encoding='utf-8') as f:
-            f.write('test_one:1.8\n')
-            f.write('test_two:1.4\n')
-            f.write('test_three:1.7\n')
-            f.write('test_four:2.3')
+            f.write(json.dumps({
+                'test_one': 1.8,
+                'test_two': 1.4,
+                'test_three': 1.7,
+                'test_four': 2.3
+            }))
 
         with open(backend_test_time_report_two, 'w', encoding='utf-8') as f:
-            f.write('test_five:1.2\n')
-            f.write('test_six:1.1\n')
-            f.write('test_seven:1.3')
+            f.write(json.dumps({
+                'test_five': 1.2,
+                'test_six': 1.1,
+                'test_seven': 1.3
+            }))
 
         with open(backend_test_time_report_three, 'w', encoding='utf-8') as f:
-            f.write('test_eight:1.5\n')
-            f.write('test_nine:1.6\n')
-            f.write('test_ten:1.4\n')
-            f.write('test_eleven:164.4')
+            f.write(json.dumps({
+                'test_eight': 1.5,
+                'test_nine': 1.6,
+                'test_ten': 1.4,
+                'test_eleven': 164.4
+            }))
 
         self.backend_test_time_reports_swap = self.swap(
             check_backend_test_times, 'BACKEND_TEST_TIME_REPORTS_DIRECTORY',
