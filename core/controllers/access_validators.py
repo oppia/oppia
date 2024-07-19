@@ -560,4 +560,4 @@ class StoryEditorAccessValidationHandler(
             unused_story_id: str. The unused story ID.
         """
         pass
-    
+
