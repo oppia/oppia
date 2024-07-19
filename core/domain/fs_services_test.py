@@ -397,3 +397,23 @@ class FileSystemClassifierDataTests(test_utils.GenericTestBase):
         self.assertFalse(self.fs.isfile(filepath))
         fs_services.delete_classifier_data('exp_id', 'job_id_2')
         self.assertFalse(self.fs.isfile(filepath))
+
+
+class GetStaticAssetUrlTests(test_utils.GenericTestBase):
+    """Unit tests for get_static_asset_url."""
+
+    def test_function_returns_correct_url_for_emulator_mode(self) -> None:
+        with self.swap(constants, 'EMULATOR_MODE', True):
+            self.assertEqual(
+                fs_services.get_static_asset_url('robots.txt'),
+                'http://localhost:8181/assetsstatic/robots.txt'
+            )
+
+    def test_function_returns_correct_url_for_non_emulator_mode(self) -> None:
+        with self.swap(constants, 'EMULATOR_MODE', False):
+            with self.swap(feconf, 'OPPIA_PROJECT_ID', 'project-id'):
+                self.assertEqual(
+                    fs_services.get_static_asset_url('test/image.png'),
+                    'https://storage.googleapis.com/project-id-static/'
+                    'test/image.png'
+                )
