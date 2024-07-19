@@ -99,7 +99,7 @@ export class AccessValidationBackendApiService {
     subtopicUrlFragment: string
   ): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
-      this.SUBTOPIC_VIEWER_PAGE_PAGE_ACCESS_VALIDATOR,
+      this.SUBTOPIC_VIEWER_PAGE_ACCESS_VALIDATOR,
       {
         classroom_url_fragment: classroomUrlFragment,
         topic_url_fragment: topicUrlFragment,
