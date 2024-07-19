@@ -506,40 +506,47 @@ def get_all_user_groups() -> Dict[str, List[str]]:
     """
     user_group_models: List[user_models.UserGroupModel] = list(
         user_models.UserGroupModel.get_all())
-    user_group_models_dict: Dict[str, List[str]] = {}
+    user_group_models_list = []
     for user_group_model in user_group_models:
-        user_group_models_dict[user_group_model.id] = list(
+        user_group_models_dict: Dict[str, List[str]] = {}
+        user_group_models_dict['user_group_name'] = user_group_model.id
+        user_group_models_dict['users'] = list(
             user_group_model.users)
-    return user_group_models_dict
+        user_group_models_list.append(user_group_models_dict)
+    return user_group_models_list
 
 
-def update_user_groups(updated_user_groups: Dict[str, List[str]]) -> None:
-    """Updates the user groups.
+def delete_user_group(user_group_to_delete: str) -> None:
+    """"""
+    try:
+        user_models.UserGroupModel.get(
+            user_group_to_delete, strict=False).delete()
+    except Exception as e:
+        raise Exception(
+            'Deleting user group failed with the following error - %s', e)
 
-    Args:
-        updated_user_groups: Dict[str, List[str]]. The user-group values that
-            needs to be updated.
-    """
-    for user_group_model_name, users in updated_user_groups.items():
+
+def update_user_group(
+    user_group_name: str,
+    user_group_users: List[str],
+    old_user_group_name: str
+) -> None:
+    """"""
+    if old_user_group_name == user_group_name:
         user_group_model = user_models.UserGroupModel.get(
-            user_group_model_name, strict=False)
+            user_group_name, strict=False)
         if user_group_model is None:
             user_models.UserGroupModel(
-                id=user_group_model_name, users=users).put()
+                id=old_user_group_name, users=user_group_users).put()
         else:
-            user_group_model.users = users
+            user_group_model.users = user_group_users
             user_group_model.update_timestamps()
             user_group_model.put()
-    # Delete UserGroup models.
-    all_existing_user_groups: List[
-        user_models.UserGroupModel] = list(
-            user_models.UserGroupModel.get_all()
-        )
-    user_models_to_delete = []
-    for existing_user_group in all_existing_user_groups:
-        if existing_user_group.id not in updated_user_groups.keys():
-            user_models_to_delete.append(existing_user_group)
-    user_models.UserGroupModel.delete_multi(user_models_to_delete)
+    else:
+        user_models.UserGroupModel.get(
+            old_user_group_name, strict=False).delete()
+        user_models.UserGroupModel(
+            id=user_group_name, users=user_group_users).put()
 
 
 def get_user_roles_from_id(user_id: str) -> List[str]:

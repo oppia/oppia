@@ -18,6 +18,7 @@
 
 import {ENTER} from '@angular/cdk/keycodes';
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Output,
@@ -29,13 +30,16 @@ import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import {Subscription} from 'rxjs';
 
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminPageConstants} from '../admin-page.constants';
 import {AdminTaskManagerService} from '../services/admin-task-manager.service';
+import {DeleteUserGroupConfirmModalComponent} from '../modals/delete-user-group-confirm-modal/delete-user-group-confirm-modal.component';
 import {LoaderService} from 'services/loader.service';
+import {UserGroup} from 'domain/admin/user-group.model';
 
 @Component({
   selector: 'oppia-admin-misc-tab',
@@ -80,34 +84,49 @@ export class AdminMiscTabComponent {
   loadingMessage: string = '';
   newUserGroupName: string = '';
   separatorKeysCodes: number[] = [ENTER];
-  userGroupToUsersMapBackup: Record<string, string[]> = {};
-  userGroupsToUsers: Record<string, string[]> = {};
+  userGroupsBackup: Map<string, UserGroup>;
+  userGroups: UserGroup[] = [];
   userGroupIdsToDetailsShowRecord: Record<string, boolean> = {};
   allUsersUsernames: string[] = [];
   userInUserGroupValidationError: string = '';
   userGroupValidationError: string = '';
+  userGroupSaveError: string = '';
+  userGroupInEditMode: boolean = false;
+  oldUserGroupNameToNewUserGroupNameRecord: Record<string, string> = {};
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
     private adminDataService: AdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
+    private cdr: ChangeDetectorRef,
+    private ngbModal: NgbModal,
     private windowRef: WindowRef,
     private loaderService: LoaderService
   ) {}
 
   async fetchUserGroupData(): Promise<void> {
     const data = await this.adminDataService.getDataAsync();
-    this.userGroupsToUsers = data.userGroups;
+    this.userGroups = data.userGroups;
     this.allUsersUsernames = data.allUsersUsernames;
-    this.userGroupToUsersMapBackup = cloneDeep(this.userGroupsToUsers);
-    for (let userGroup in this.userGroupsToUsers) {
-      this.userGroupIdsToDetailsShowRecord[userGroup] = false;
+    this.userGroupsBackup = new Map(
+      this.userGroups.map(
+        userGroup => [userGroup.userGroupName, cloneDeep(userGroup)])
+    );
+    for (let userGroup of this.userGroups) {
+      this.userGroupIdsToDetailsShowRecord[userGroup.userGroupName] = false;
+      this.oldUserGroupNameToNewUserGroupNameRecord[
+        userGroup.userGroupName] = userGroup.userGroupName;
     }
     this.loaderService.hideLoadingScreen();
   }
 
   toggleUserGroupDetailsSection(userGroupId: string): void {
     let currentValue = this.userGroupIdsToDetailsShowRecord[userGroupId];
+    if (currentValue === false && this.userGroupInEditMode === true) {
+      this.userGroupSaveError = (
+        'Please save or cancel the changes before editing other user group.');
+      return;
+    }
     this.userGroupIdsToDetailsShowRecord[userGroupId] =
       currentValue === true ? false : true;
     for (let useGroup in this.userGroupIdsToDetailsShowRecord) {
@@ -116,69 +135,153 @@ export class AdminMiscTabComponent {
       }
       this.userGroupIdsToDetailsShowRecord[useGroup] = false;
     }
+    this.userGroupInEditMode = false;
+    this.cdr.detectChanges();
+  }
+
+  setUserGroupInEditMode(): void {
+    this.userGroupInEditMode = true;
   }
 
   deleteUserGroup(userGroupId: string): void {
-    delete this.userGroupsToUsers[userGroupId];
-    delete this.userGroupIdsToDetailsShowRecord[userGroupId];
-  }
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      DeleteUserGroupConfirmModalComponent,
+      {
+        backdrop: 'static',
+      }
+    );
+    modalRef.result.then(
+      () => {
+        this.setStatusMessage.emit('Updating UserGroups...');
 
-  removeUserFromUserGroup(userGroupId: string, username: string): void {
-    let usersOfSelectedUserGroup: string[] =
-      this.userGroupsToUsers[userGroupId];
-    this.userGroupsToUsers[userGroupId] = usersOfSelectedUserGroup.filter(
-      obj => obj !== username
+        this.adminTaskManagerService.startTask();
+        this.adminBackendApiService
+          .deleteUserGroupAsync(userGroupId)
+          .then(
+            () => {
+              this.setStatusMessage.emit('UserGroups successfully updated.');
+              this.userGroups = this.userGroups.filter(
+                userGroup => userGroup.userGroupName !== userGroupId);
+              delete this.userGroups[userGroupId];
+              delete this.userGroupIdsToDetailsShowRecord[userGroupId];
+              delete this.oldUserGroupNameToNewUserGroupNameRecord[userGroupId];
+              this.userGroupsBackup.delete(userGroupId);
+              this.userGroupSaveError = '';
+              this.userGroupInEditMode = false;
+              this.cdr.detectChanges();
+              this.adminTaskManagerService.finishTask();
+            },
+            errorResponse => {
+              this.setStatusMessage.emit(`Server error: ${errorResponse}`);
+              this.adminTaskManagerService.finishTask();
+            }
+          );
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is
+        // clicked. No further action is needed.
+      }
     );
   }
 
-  addUserToUserGroup(event: {value: string}, userGroupId: string): void {
+  removeUserFromUserGroup(userGroup: UserGroup, username: string): void {
+    userGroup.users = userGroup.users.filter(obj => obj !== username);
+  }
+
+  addUserToUserGroup(event: {value: string}, userGroup: UserGroup): void {
     this.userInUserGroupValidationError = '';
     const value = (event.value || '').trim();
     if (!value || value === '') {
       return;
     }
 
-    if (this.userGroupsToUsers[userGroupId].includes(value)) {
-      this.userInUserGroupValidationError = `The user '${value}' already exists in the user group '${userGroupId}'.`;
+    if (userGroup.users.includes(value)) {
+      this.userInUserGroupValidationError = (
+        `The user '${value}' already exists in the ` +
+        `user group '${userGroup.userGroupName}'.`
+      );
       return;
     }
     if (!this.allUsersUsernames.includes(value)) {
-      this.userInUserGroupValidationError = `The user with username '${value}' does not exists.`;
+      this.userInUserGroupValidationError = (
+        `The user with username '${value}' does not exists.`);
       return;
     }
-    this.userGroupsToUsers[userGroupId].push(value);
+    userGroup.users.push(value);
     this.userInputToAddUserToGroup.nativeElement.value = '';
   }
 
   addUserGroup(): void {
-    if (this.newUserGroupName.trim() in this.userGroupsToUsers) {
+    const trimmedUserGroupName = this.newUserGroupName.trim();
+    if (trimmedUserGroupName in this.userGroups) {
       this.userGroupValidationError = '';
-      this.userGroupValidationError = `The user group '${this.newUserGroupName}' already exists.`;
+      this.userGroupValidationError = (
+        `The user group '${this.newUserGroupName}' already exists.`);
       return;
     }
 
-    if (this.newUserGroupName.trim() !== '') {
-      this.userGroupsToUsers[this.newUserGroupName.trim()] = [];
-      this.userGroupIdsToDetailsShowRecord[this.newUserGroupName.trim()] =
-        false;
-      this.newUserGroupName = '';
+    if (trimmedUserGroupName !== '') {
+      this.adminBackendApiService
+        .updateUserGroupAsync(
+          trimmedUserGroupName,
+          [],
+          trimmedUserGroupName
+        )
+        .then(
+          () => {
+            this.setStatusMessage.emit('UserGroup added.');
+            let newUserGroup = new UserGroup(trimmedUserGroupName, []);
+            this.userGroups.push(newUserGroup);
+            this.userGroupIdsToDetailsShowRecord[trimmedUserGroupName] = false;
+            this.userGroupsBackup.set(
+              trimmedUserGroupName, cloneDeep(newUserGroup));
+            this.oldUserGroupNameToNewUserGroupNameRecord[
+              trimmedUserGroupName] = trimmedUserGroupName;
+            this.newUserGroupName = '';
+            this.cdr.detectChanges();
+          },
+          errorResponse => {
+            this.setStatusMessage.emit(`Server error: ${errorResponse}`);
+          }
+        );
     }
   }
 
   onUserGroupUserInputChange(): void {
     this.userInUserGroupValidationError = '';
+    this.userGroupSaveError = '';
   }
 
   onUserGroupInputChange(): void {
     this.userGroupValidationError = '';
   }
 
-  areUserGroupsUpdated(): boolean {
-    return !isEqual(this.userGroupsToUsers, this.userGroupToUsersMapBackup);
+  isUserGroupUpdated(
+    userGroup: UserGroup, newUserGroupName: string
+  ): boolean {
+    if (userGroup.userGroupName !== newUserGroupName) {
+      return true;
+    }
+
+    return !isEqual(
+      userGroup.users,
+      this.userGroupsBackup.get(userGroup.userGroupName).users
+    );
   }
 
-  updateUserGroups(): void {
-    if (!this.areUserGroupsUpdated()) {
+  updateUserGroup(userGroup: UserGroup, newUserGroupName: string): void {
+    if (!this.isUserGroupUpdated(userGroup, newUserGroupName)) {
+      return;
+    }
+
+    if (
+      userGroup.userGroupName !== newUserGroupName &&
+      newUserGroupName in this.oldUserGroupNameToNewUserGroupNameRecord
+    ) {
+      this.userGroupSaveError = '';
+      this.userGroupSaveError = (
+        `User group with name ${newUserGroupName} already exists.`);
       return;
     }
 
@@ -193,35 +296,62 @@ export class AdminMiscTabComponent {
 
     this.adminTaskManagerService.startTask();
     this.adminBackendApiService
-      .updateUserGroupsAsync(this.userGroupsToUsers)
+      .updateUserGroupAsync(
+        newUserGroupName,
+        userGroup.users,
+        userGroup.userGroupName
+      )
       .then(
         () => {
           this.setStatusMessage.emit('UserGroups successfully updated.');
-          this.userGroupToUsersMapBackup = cloneDeep(this.userGroupsToUsers);
+          if (userGroup.userGroupName !== newUserGroupName) {
+            this.oldUserGroupNameToNewUserGroupNameRecord[
+              newUserGroupName] = newUserGroupName;
+            delete this.oldUserGroupNameToNewUserGroupNameRecord[
+              userGroup.userGroupName];
+            this.userGroupIdsToDetailsShowRecord[newUserGroupName] = false;
+            delete this.userGroupIdsToDetailsShowRecord[
+              userGroup.userGroupName];
+            this.userGroupsBackup.set(newUserGroupName, cloneDeep(userGroup));
+            this.userGroupsBackup.delete(userGroup.userGroupName);
+            userGroup.userGroupName = newUserGroupName;
+          }
+          this.userGroupsBackup.set(userGroup.userGroupName, cloneDeep(userGroup));
+
+          this.userGroupSaveError = '';
+          this.userGroupInEditMode = false;
+          this.cdr.detectChanges();
           this.adminTaskManagerService.finishTask();
         },
         errorResponse => {
           this.setStatusMessage.emit(`Server error: ${errorResponse}`);
+          this.userGroupSaveError = '';
           this.adminTaskManagerService.finishTask();
         }
       );
   }
 
-  resetUserGroups(): void {
-    if (this.areUserGroupsUpdated()) {
+  resetUserGroup(userGroup: UserGroup, newUserGroupName: string): void {
+    if (this.isUserGroupUpdated(userGroup, newUserGroupName)) {
       if (
         !this.windowRef.nativeWindow.confirm(
           'This will revert all changes you made. Are you sure?'
         )
       ) {
+        this.userGroupInEditMode = true;
         return;
       }
-      this.userGroupsToUsers = cloneDeep(this.userGroupToUsersMapBackup);
-      this.userGroupIdsToDetailsShowRecord = {};
-      for (let userGroup in this.userGroupsToUsers) {
-        this.userGroupIdsToDetailsShowRecord[userGroup] = false;
-      }
+      let backup = this.userGroupsBackup.get(userGroup.userGroupName);
+      userGroup.userGroupName = backup.userGroupName;
+      userGroup.users = backup.users;
+      this.oldUserGroupNameToNewUserGroupNameRecord[
+        userGroup.userGroupName] = userGroup.userGroupName;
+      this.userGroupSaveError = '';
+      this.userInUserGroupValidationError = '';
+      this.userGroupValidationError = '';
+      this.cdr.detectChanges();
     }
+    this.userGroupInEditMode = false;
   }
 
   clearSearchIndex(): void {

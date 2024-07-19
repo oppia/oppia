@@ -321,42 +321,93 @@
 <mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Update UserGroups</h3>
   <div>
-    <div *ngFor="let userGroup of userGroupIdsToDetailsShowRecord | keyvalue">
-      <div class="oppia-user-group" (click)="toggleUserGroupDetailsSection(userGroup.key)">
-        {{ userGroup.key }}
+    <div *ngFor="let userGroup of userGroups">
+      <div *ngIf="!(userGroupInEditMode && userGroupIdsToDetailsShowRecord[userGroup.userGroupName])"
+           class="oppia-user-group"
+           (click)="toggleUserGroupDetailsSection(userGroup.userGroupName)">
+        {{ oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName] }}
+      </div>
+      <div *ngIf="userGroupInEditMode && userGroupIdsToDetailsShowRecord[userGroup.userGroupName]"
+           class="oppia-user-group">
+        <input placeholder="{{ oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName] }}"
+               type="text"
+               value="{{ oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName] }}"
+               [(ngModel)]="oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName]">
         <button mat-button matSuffix mat-icon-button
                 aria-label="Clear"
-                (click)="deleteUserGroup(userGroup.key)">
+                (click)="deleteUserGroup(userGroup.userGroupName); $event.stopPropagation()">
           <mat-icon matListIcon>close</mat-icon>
         </button>
       </div>
-      <div class="user-group-details" *ngIf="userGroup.value">
+      <div class="user-group-details" *ngIf="userGroupIdsToDetailsShowRecord[userGroup.userGroupName]">
+        <div *ngIf="!userGroupInEditMode">
+          <i class="material-icons oppia-edit-icon"
+             title="Edit User Group"
+             (click)="setUserGroupInEditMode()">
+            &#xE254;
+          </i>
+        </div>
         <div class="row">
           <div class="col-2">Users:</div>
           <div class="col-10">
-            <mat-chip-list #chipList aria-label="Users Associated With The User Group" tabindex="0">
-              <mat-chip *ngFor="let user of userGroupsToUsers[userGroup.key]"
-                        [selectable]="true"
-                        [removable]="true"
-                        (removed)="removeUserFromUserGroup(userGroup.key, user)">
-                <ng-container>
-                  <span tabindex="0" [attr.aria-label]="user+', selected'">{{ user }}</span>
-                </ng-container>
-                <button class="oppia-cancel-button" role="button" tabindex="0" matChipRemove aria-label=". Remove">
-                  <mat-icon class="oppia-cancel-button-text">cancel</mat-icon>
-                </button>
-              </mat-chip>
-              <input placeholder="Add Username"
-                     #userInputToAddUserToGroup
-                     [matChipInputFor]="chipList"
-                     [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                     (matChipInputTokenEnd)="addUserToUserGroup($event, userGroup.key)"
-                     (input)="onUserGroupUserInputChange()">
-            </mat-chip-list>
-            <p *ngIf="userInUserGroupValidationError.length > 0"
-               class="oppia-warning-text">
-              {{ userInUserGroupValidationError }}
-            </p>
+            <div *ngIf="!userGroupInEditMode">
+              <span *ngIf="userGroup.users.length == 0">
+                <em>No users, click on edit button to add.</em>
+              </span>
+              <mat-chip-list #chipList aria-label="Users Associated With The User Group" tabindex="0">
+                <mat-chip *ngFor="let user of userGroup.users"
+                          [selectable]="false"
+                          [removable]="false">
+                  <ng-container>
+                    <span tabindex="0" [attr.aria-label]="user+', selected'">{{ user }}</span>
+                  </ng-container>
+                </mat-chip>
+              </mat-chip-list>
+            </div>
+            <div *ngIf="userGroupInEditMode">
+              <mat-chip-list #chipList aria-label="Users Associated With The User Group" tabindex="0">
+                <mat-chip *ngFor="let user of userGroup.users"
+                          [selectable]="true"
+                          [removable]="true"
+                          (removed)="removeUserFromUserGroup(userGroup, user)">
+                  <ng-container>
+                    <span tabindex="0" [attr.aria-label]="user+', selected'">{{ user }}</span>
+                  </ng-container>
+                  <button class="oppia-cancel-button" role="button" tabindex="0" matChipRemove aria-label=". Remove">
+                    <mat-icon class="oppia-cancel-button-text">cancel</mat-icon>
+                  </button>
+                </mat-chip>
+                <input placeholder="Add Username"
+                       #userInputToAddUserToGroup
+                       [matChipInputFor]="chipList"
+                       [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                       (matChipInputTokenEnd)="addUserToUserGroup($event, userGroup)"
+                       (input)="onUserGroupUserInputChange()">
+              </mat-chip-list>
+              <p *ngIf="userInUserGroupValidationError.length > 0"
+                 class="oppia-warning-text">
+                {{ userInUserGroupValidationError }}
+              </p>
+              <p *ngIf="userGroupSaveError.length > 0"
+                class="oppia-warning-text">
+               {{ userGroupSaveError }}
+             </p>
+            </div>
+          </div>
+        </div>
+        <hr *ngIf="userGroupInEditMode">
+        <div *ngIf="userGroupInEditMode" class="row justify-content-end">
+          <div class="col-auto">
+            <button class="btn btn-success save-user-group-btn"
+                    (click)="updateUserGroup(userGroup, oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName])">
+              Save
+            </button>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-secondary cancel-user-group-changes"
+                    (click)="resetUserGroup(userGroup, oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName])">
+              Cancel
+            </button>
           </div>
         </div>
       </div>
@@ -368,7 +419,9 @@
            [(ngModel)]="newUserGroupName"
            [ngModelOptions]="{standalone: true}"
            (ngModelChange)="onUserGroupInputChange()">
-    <button (click)="addUserGroup()">
+    <button class="btn oppia-add-new-user-group-btn"
+            (click)="addUserGroup()"
+            [disabled]="userGroupInEditMode">
       + Add New UserGroup
     </button>
     <p *ngIf="userGroupValidationError.length > 0"
@@ -376,17 +429,31 @@
       {{ userGroupValidationError }}
     </p>
   </div>
-  <div class="row">
-    <div class="col-1">
-      <button (click)="updateUserGroups()">Save</button>
-    </div>
-    <div class="col-1">
-      <button (click)="resetUserGroups()">Reset</button>
-    </div>
-  </div>
 </mat-card>
 
 <style>
+  /* .cancel-user-group-changes, .save-user-group-btn {
+    margin-right: 5px;
+    margin-top: 5px;
+  } */
+  .oppia-add-new-user-group-btn {
+    background-color: #00645c;
+    color: #fff;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 12px;
+    margin-left: 10px;
+  }
+   .oppia-add-user-group {
+    margin-top: 30px;
+   }
+  .oppia-edit-icon {
+    cursor: pointer;
+    font-size: 16px;
+    position: absolute;
+    right: 10%;
+    -webkit-transition: all 200ms;
+    transition: all 200ms;
+  }
   .oppia-warning-text {
     color: #f00;
     font-size: 0.8em;
@@ -402,10 +469,10 @@
     padding: 10px;
     width: 94%;
   }
-  .oppia-add-user-group {
+  /* .oppia-add-user-group {
     margin: 10px 20px;
     padding: 10px;
-  }
+  } */
   .user-group-details {
     margin: 10px 20px;
     padding: 0 15px;

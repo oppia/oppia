@@ -38,6 +38,7 @@ import {OppiaAdminProdModeActivitiesTabComponent} from './activities-tab/admin-p
 import {AdminMiscTabComponent} from './misc-tab/admin-misc-tab.component';
 import {AdminRolesTabComponent} from './roles-tab/admin-roles-tab.component';
 import {AdminPageComponent} from './admin-page.component';
+import {DeleteUserGroupConfirmModalComponent} from './modals/delete-user-group-confirm-modal/delete-user-group-confirm-modal.component';
 
 @NgModule({
   imports: [
@@ -67,6 +68,7 @@ import {AdminPageComponent} from './admin-page.component';
     AdminPlatformParametersTabComponent,
     AdminPageRootComponent,
     TranslationCoordinatorRoleEditorModalComponent,
+    DeleteUserGroupConfirmModalComponent,
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
@@ -77,6 +79,7 @@ import {AdminPageComponent} from './admin-page.component';
     AdminDevModeActivitiesTabComponent,
     TopicManagerRoleEditorModalComponent,
     TranslationCoordinatorRoleEditorModalComponent,
+    DeleteUserGroupConfirmModalComponent,
   ],
 })
 export class AdminPageModule {}
