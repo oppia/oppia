@@ -23,6 +23,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component';
+import {EntityTranslationsService} from 'services/entity-translations.services';
 
 @Component({
   selector: 'oppia-mark-translations-as-needing-update-modal',
@@ -39,7 +40,8 @@ export class MarkTranslationsAsNeedingUpdateModalComponent extends ConfirmOrCanc
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private ngbModal: NgbModal,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private entityTranslationsService: EntityTranslationsService
   ) {
     super(ngbActiveModal);
   }
@@ -55,22 +57,41 @@ export class MarkTranslationsAsNeedingUpdateModalComponent extends ConfirmOrCanc
   }
 
   openModifyTranslationsModal(): void {
-    const modalRef = this.ngbModal.open(ModifyTranslationsModalComponent, {
-      backdrop: 'static',
-      windowClass: 'oppia-modify-translations-modal',
-    });
-    modalRef.componentInstance.contentId = this.contentId;
-    modalRef.componentInstance.contentValue = this.contentValue;
-    modalRef.result.then(
-      result => {
-        this.ngbActiveModal.close();
-      },
-      () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
+    if (this.doesContentHaveDisplayableTranslations()) {
+      const modalRef = this.ngbModal.open(ModifyTranslationsModalComponent, {
+        backdrop: 'static',
+        windowClass: 'oppia-modify-translations-modal',
+      });
+      modalRef.componentInstance.contentId = this.contentId;
+      modalRef.componentInstance.contentValue = this.contentValue;
+      modalRef.result.then(
+        result => {
+          this.ngbActiveModal.close();
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
+    } else {
+      this.ngbActiveModal.close();
+    }
+  }
+
+  doesContentHaveDisplayableTranslations(): boolean {
+    // Check if at least one translation is editable by lesson creator.
+    for (let language in this.entityTranslationsService
+      .languageCodeToLatestEntityTranslations) {
+      let translationContent =
+        this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+          language
+        ].getWrittenTranslation(this.contentId);
+      if (translationContent && !translationContent.needsUpdate) {
+        return true;
       }
-    );
+    }
+    return false;
   }
 
   removeTranslations(): void {

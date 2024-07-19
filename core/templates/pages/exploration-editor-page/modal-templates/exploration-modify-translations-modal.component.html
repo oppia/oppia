@@ -3,12 +3,12 @@
 </div>
 <div class="modal-body">
   <p>
-    *Please update any translations below which are easy to update, and tick the ones you're
+    Please update any translations below which are easy to update, and tick the ones you're
     confident about. Those translations will be saved and shown directly to learners as soon
     as you save the pending changes to the exploration.
   </p>
-  <p>Any translations that don't have a check mark will be sent for re-translation.</p>
-  <div *ngIf="translationsHaveLoaded && contentHasDisplayableTranslations && (contentTranslations | keyvalue).length > 0" class="content-translations-container">
+  <p class="modify-translations-modal-text">Any translations that don't have a check mark will be sent for re-translation.</p>
+  <div *ngIf="translationsHaveLoaded && (contentTranslations | keyvalue).length > 0" class="content-translations-container">
     <form #form="ngForm">
       <div *ngFor="let item of contentTranslations | keyvalue">
         <div *ngIf="item.value.needsUpdate === false" class="content-translation-block">
@@ -26,8 +26,17 @@
             <i class="fas fa-pencil-alt e2e-test-{{ item.key }}-translation-edit" (click)="openTranslationEditor(item.key)"></i>
           </div>
           <div class="content-translation-value e2e-test-translation-{{ item.key }}">
-            <oppia-rte-output-display [rteString]="item.value.translation" class="translations-rte-output-display">
+            <oppia-rte-output-display *ngIf="activeDataFormat === 'html' || activeDataFormat === 'unicode'"
+                                      [rteString]="item.value.translation"
+                                      class="translations-rte-output-display">
             </oppia-rte-output-display>
+            <div *ngIf="isSetOfStringDataFormat()">
+              <ul role="tablist">
+                <li *ngFor="let ruleContent of item.value.translation">
+                  {{ ruleContent }}
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -35,9 +44,6 @@
   </div>
   <div *ngIf="!translationsHaveLoaded">
     <p class="translations-status-text">Please wait. Fetching translations...</p>
-  </div>
-  <div *ngIf="translationsHaveLoaded && !contentHasDisplayableTranslations">
-    <p class="translations-status-text">No available translations found.</p>
   </div>
 </div>
 <div class="modal-footer">
@@ -59,14 +65,27 @@
   }
 
   .modal-body {
+    padding: 0;
+  }
+
+  .modal-body > p {
     padding: 24px;
+    padding-bottom: 0;
+  }
+
+  .modal-body .modify-translations-modal-text {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+    margin-bottom: 0;
+    padding-bottom: 18px;
+    padding-top: 0;
   }
 
   .modal-body .content-translations-container {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
-    border-top: 1px solid rgba(0, 0, 0, 0.5);
+    margin-right: 1rem;
     max-height: 330px;
     overflow-y: auto;
+    padding-bottom: 0;
+    padding-left: 24px;
     padding-right: 8px;
     padding-top: 14px;
   }
@@ -142,12 +161,15 @@
   }
 
   .modal-body p.translations-status-text {
-    border-top: 1px solid rgba(0, 0, 0, 0.5);
     color: #333;
     font-size: 18px;
     font-weight: 500;
     padding: 12px;
     text-align: center;
+  }
+
+  .modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.5);
   }
 
   .modal-footer button {

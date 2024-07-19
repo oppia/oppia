@@ -23,6 +23,7 @@ import {error} from 'console';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
+const imageToUpload = testConstants.data.blogPostThumbnailImage;
 
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
@@ -30,6 +31,8 @@ const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
+const mathInteractionsTab = '.e2e-test-interaction-tab-math';
+const closeResponseModalButton = '.e2e-test-close-add-response-modal';
 
 // Settings Tab elements.
 const settingsTab = 'a.e2e-test-exploration-settings-tab';
@@ -86,6 +89,9 @@ const mainTabButton = '.e2e-test-main-tab';
 const mobileMainTabButton = '.e2e-test-mobile-main-tab';
 const stateEditSelector = '.e2e-test-state-edit-content';
 const stateContentInputField = 'div.e2e-test-rte';
+const uploadImageButton = '.e2e-test-upload-image';
+const useTheUploadImageButton = '.e2e-test-use-image';
+const imageRegionSelector = '.e2e-test-svg';
 const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
 const addNewResponseButton = '.e2e-test-add-new-response';
 const floatFormInput = '.e2e-test-float-form-input';
@@ -279,6 +285,22 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Fetches the exploration ID from the current URL of the exploration editor page.
+   * The exploration ID is the string after '/create/' in the URL.
+   */
+  async getExplorationId(): Promise<string> {
+    const url = await this.page.url();
+    const match = url.match(/\/create\/(.*?)(\/|#)/);
+    if (!match) {
+      throw new Error(
+        'Exploration ID not found in the URL' +
+          'Ensure you are on the exploration editor page.'
+      );
+    }
+    return match[1];
+  }
+
+  /**
    * Function to dismiss welcome modal.
    */
   async dismissWelcomeModal(): Promise<void> {
@@ -311,12 +333,11 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
     await this.clickOn(stateEditSelector);
-    await this.waitForElementToBeClickable(stateContentInputField);
     await this.type(stateContentInputField, `${content}`);
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
@@ -389,6 +410,79 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(textInputField);
     await this.type(textInputField, content);
     await this.clickOn(saveInteractionButton);
+  }
+
+  /**
+   * Adds a math interaction to the current exploration.
+   * @param {string} interactionToAdd - The interaction type to add to the exploration.
+   */
+  async addMathInteraction(interactionToAdd: string): Promise<void> {
+    await this.clickOn(addInteractionButton);
+    await this.clickOn(mathInteractionsTab);
+    await this.clickOn(` ${interactionToAdd} `);
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+    await this.page.waitForSelector(closeResponseModalButton, {visible: true});
+    await this.clickOn(closeResponseModalButton);
+    showMessage(`${interactionToAdd} interaction has been added successfully.`);
+  }
+
+  /**
+   * Adds an Image interaction to the current exploration.
+   */
+  async addImageInteraction(): Promise<void> {
+    await this.clickOn(addInteractionButton);
+    await this.clickOn('Image Region');
+    await this.clickOn(uploadImageButton);
+    await this.uploadFile(imageToUpload);
+    await this.clickOn(useTheUploadImageButton);
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector('.btn-danger', {visible: true});
+
+    // Select area of image by clicking and dragging.
+    const imageElement = await this.page.$(imageRegionSelector);
+
+    if (imageElement) {
+      const box = await imageElement.boundingBox();
+
+      if (box) {
+        // Calculate the start and end coordinates for a selection area. The selection starts from a point located at 25% from the top-left corner (both horizontally and vertically) and extends to a point located at 75% from the top-left corner (both horizontally and vertically).This effectively selects the central 50% area of the element.
+        const startX = box.x + box.width * 0.25;
+        const startY = box.y + box.height * 0.25;
+        const endX = box.x + box.width * 0.75;
+        const endY = box.y + box.height * 0.75;
+
+        // Click and drag to select an area.
+        await this.page.mouse.move(startX, startY);
+        await this.page.mouse.down();
+
+        // Add steps for smooth dragging.
+        await this.page.mouse.move(endX, endY, {steps: 10});
+
+        await this.page.mouse.up();
+      } else {
+        console.error('Unable to get bounding box for image element.');
+      }
+    } else {
+      console.error('Image element not found.');
+    }
+
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    // The '/' value is used to select the 'a new card called' option
+    // in the dropdown.
+    await this.select(destinationCardSelector, '/');
+    await this.type(addStateInput, 'Last Card');
+    await this.clickOn(addNewResponseButton);
+    await this.clickOn(correctAnswerInTheGroupSelector);
+
+    showMessage('Image interaction has been added successfully.');
   }
 
   /**
@@ -768,7 +862,7 @@ export class ExplorationEditor extends BaseUser {
       this.clickOn(confirmDiscardButton),
       this.page.waitForNavigation({waitUntil: 'networkidle0'}),
     ]);
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsButton);
       await this.clickOn(basicSettingsDropdown);
@@ -800,31 +894,41 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - The name of the card to navigate to.
    */
   async navigateToCard(cardName: string): Promise<void> {
-    let elements;
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileStateGraphResizeButton);
+    try {
+      let elements;
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(mobileStateGraphResizeButton);
+      }
+
+      await this.page.waitForSelector(stateNodeSelector);
+      elements = await this.page.$$(stateNodeSelector);
+
+      const cardNames = await Promise.all(
+        elements.map(element =>
+          element.$eval('tspan', node => node.textContent)
+        )
+      );
+      // The card name is suffixed with a space to match the format in the UI.
+      const cardIndex = cardNames.indexOf(cardName + ' ');
+
+      if (cardIndex === -1) {
+        throw new Error(`Card name ${cardName} not found in the graph.`);
+      }
+
+      if (this.isViewportAtMobileWidth()) {
+        await elements[cardIndex + elements.length / 2].click();
+      } else {
+        await elements[cardIndex].click();
+      }
+
+      await this.page.waitForNetworkIdle({idleTime: 700});
+    } catch (error) {
+      const newError = new Error(
+        `Error navigating to card ${cardName}: ${error.message}`
+      );
+      newError.stack = error.stack;
+      throw newError;
     }
-
-    await this.page.waitForSelector(stateNodeSelector);
-    elements = await this.page.$$(stateNodeSelector);
-
-    const cardNames = await Promise.all(
-      elements.map(element => element.$eval('tspan', node => node.textContent))
-    );
-    // The card name is suffixed with a space to match the format in the UI.
-    const cardIndex = cardNames.indexOf(cardName + ' ');
-
-    if (cardIndex === -1) {
-      throw new Error(`Card name ${cardName} not found in the graph.`);
-    }
-
-    if (this.isViewportAtMobileWidth()) {
-      await elements[cardIndex + elements.length / 2].click();
-    } else {
-      await elements[cardIndex].click();
-    }
-
-    await this.page.waitForNetworkIdle({idleTime: 700});
   }
 
   /**
@@ -844,12 +948,9 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     switch (interactionType) {
       case 'Number Input':
-        await this.type(floatFormInput, answer);
+        await this.page.waitForSelector(floatFormInput);
+        await this.page.type(floatFormInput, answer);
         break;
-      // Add cases for other interaction types here
-      // case 'otherInteractionType':
-      //   await this.type(otherFormInput, answer);
-      //   break;
       case 'Multiple Choice':
         await this.clickOn(multipleChoiceResponseDropdown);
         await this.page.waitForSelector(multipleChoiceResponseOption, {
@@ -876,8 +977,13 @@ export class ExplorationEditor extends BaseUser {
         break;
       case 'Text Input':
         await this.clickOn(addResponseOptionButton);
-        await this.type(textInputInteractionOption, answer);
+        await this.page.waitForSelector(textInputInteractionOption);
+        await this.page.type(textInputInteractionOption, answer);
         break;
+      // Add cases for other interaction types here
+      // case 'otherInteractionType':
+      //   await this.type(otherFormInput, answer);
+      //   break;
       default:
         throw new Error(`Unsupported interaction type: ${interactionType}`);
     }
@@ -1063,7 +1169,8 @@ export class ExplorationEditor extends BaseUser {
       case 'text':
       case 'number':
       case 'float':
-        await this.type(floatFormInput, answer);
+        await this.page.waitForSelector(floatFormInput);
+        await this.page.type(floatFormInput, answer);
         break;
       default:
         throw new Error(`Unsupported input type: ${inputType}`);
@@ -1367,7 +1474,6 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.clickOn(modalSaveButton);
-    await this.clickOn(`.e2e-test-${languageCode}-translation-checkbox`);
     await this.clickOn(modifyTranslationsModalDoneButton);
     showMessage('Successfully updated translation from modal.');
   }

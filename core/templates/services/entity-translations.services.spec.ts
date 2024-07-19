@@ -24,6 +24,7 @@ import {
 } from 'domain/translation/EntityTranslationObjectFactory';
 import {EntityTranslationBackendApiService} from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import {EntityTranslationsService} from './entity-translations.services';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 
 describe('Entity translations service', () => {
   let entityTranslationsService: EntityTranslationsService;
@@ -188,6 +189,23 @@ describe('Entity translations service', () => {
       entityTranslationsService.languageCodeToLatestEntityTranslations.fr
         .translationMapping
     ).not.toContain('hint_0');
+  });
+
+  it('should mark all translations as needing update for given content', () => {
+    entityTranslationsService.languageCodeToLatestEntityTranslations.fr =
+      entityTranslation;
+
+    entityTranslationsService.markAllTranslationsAsNeedingUpdate('hint_0');
+    expect(
+      entityTranslationsService.languageCodeToLatestEntityTranslations.fr
+        .translationMapping.hint_0
+    ).toEqual(
+      TranslatedContent.createFromBackendDict({
+        content_format: 'html',
+        content_value: '<p>fr hint</p>',
+        needs_update: true,
+      })
+    );
   });
 
   it('should return backend dict for LanguageCodeToEntityTranslation objects', () => {
