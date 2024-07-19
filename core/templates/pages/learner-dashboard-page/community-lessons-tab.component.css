@@ -309,3 +309,22 @@
     left: 595px;
   }
 }
+
+.oppia-learner-dash-greeting {
+  color: #00645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 32px;
+}
+
+.oppia-learner-dash-section {
+  background-color: #fff;
+  border-radius: .25em;
+  margin-bottom: 16px;
+  padding: 16px;
+}
+
+.oppia-learner-dash-section-heading {
+  color: #205d86;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 24px;
+}

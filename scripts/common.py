@@ -221,6 +221,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'exploration-editor/create-exploration-and-change-basic-settings',
     'exploration-editor/modify-translations-through-modal',
     'exploration-editor/load-complete-and-restart-exploration-preview',
+    'exploration-editor/publish-the-exploration-with-an-interaction',
     'exploration-editor/save-draft-publish-and-discard-the-changes',
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
@@ -253,6 +254,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'super-admin/load-dummy-data-in-dev-mode',
     'super-admin/edit-platform-parameters',
     'super-admin/use-misc-tab-features',
+    'topic-manager/edit-and-preview-a-subtopic',
+    'topic-manager/edit-and-preview-a-topic',
     'translation-admin/add-and-remove-translation-rights',
     'topic-manager/browse-skills-on-topics-and-skills-dashboard',
     'topic-manager/browse-topics-on-topics-and-skills-dashboard',

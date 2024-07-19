@@ -82,7 +82,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     });
 
     this.OPPIA_AVATAR_IMAGE_URL =
-      this.urlInterpolationService.getStaticImageUrl(
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
 
