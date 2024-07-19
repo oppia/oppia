@@ -44,19 +44,6 @@ export class SiteAnalyticsService {
     }
   }
 
-  // For definitions of the various arguments, please see:
-  // https://developers.google.com/analytics/devguides/collection/analyticsjs/events
-  _sendEventToLegacyGoogleAnalytics(
-    eventCategory: string,
-    eventAction: string,
-    eventLabel: string
-  ): void {
-    this.windowRef.nativeWindow.gtag('event', eventAction, {
-      event_category: eventCategory,
-      event_label: eventLabel,
-    });
-  }
-
   _sendEventToGoogleAnalytics(
     eventName: string,
     eventParameters: Object = {}
@@ -66,13 +53,9 @@ export class SiteAnalyticsService {
 
   // The srcElement refers to the element on the page that is clicked.
   registerStartLoginEvent(srcElement: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'LoginButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname + ' ' + srcElement
-    );
     this._sendEventToGoogleAnalytics('login', {
       source_element: srcElement,
+      page_path: this.windowRef.nativeWindow.location.pathname,
     });
   }
 
@@ -89,12 +72,9 @@ export class SiteAnalyticsService {
   }
 
   registerClickBrowseLessonsButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'BrowseLessonsButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
-    this._sendEventToGoogleAnalytics('discovery_browse_lessons');
+    this._sendEventToGoogleAnalytics('browse_lessons_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickHomePageStartLearningButtonEvent(): void {
@@ -106,337 +86,247 @@ export class SiteAnalyticsService {
   }
 
   registerClickGuideParentsButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'GuideParentsButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('guide_parents_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickTipforParentsButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'TipforParentsButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('tip_for_parents_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickExploreLessonsButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ExploreLessonsButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('explore_lessons_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickStartLearningButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'StartLearningButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('start_learning_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickStartContributingButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'StartContributingButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('start_contributing_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickStartTeachingButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'StartTeachingButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('start_teaching_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickVisitClassroomButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ClassroomButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('classroom_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerClickBrowseLibraryButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'BrowseLibraryButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('browse_library_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerGoToDonationSiteEvent(donationSiteName: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'GoToDonationSite',
-      'click',
-      donationSiteName
-    );
+    this._sendEventToGoogleAnalytics('go_to_donation_site', {
+      donation_site_name: donationSiteName,
+    });
   }
 
   registerApplyToTeachWithOppiaEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ApplyToTeachWithOppia',
-      'click',
-      ''
-    );
+    this._sendEventToGoogleAnalytics('apply_to_teach_with_oppia', {});
   }
 
   registerClickCreateExplorationButtonEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'CreateExplorationButton',
-      'click',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('create_exploration_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerCreateNewExplorationEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'NewExploration',
-      'create',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('create_new_exploration', {
+      exploration_id: explorationId,
+    });
   }
 
   registerCreateNewExplorationInCollectionEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'NewExplorationFromCollection',
-      'create',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('create_new_exploration_in_collection', {
+      exploration_id: explorationId,
+    });
   }
 
   registerCreateNewCollectionEvent(collectionId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'NewCollection',
-      'create',
-      collectionId
-    );
+    this._sendEventToGoogleAnalytics('create_new_collection', {
+      collection_id: collectionId,
+    });
   }
 
   registerCommitChangesToPrivateExplorationEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'CommitToPrivateExploration',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('commit_changes_to_private_exploration', {
+      exploration_id: explorationId,
+    });
   }
 
   registerShareExplorationEvent(network: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      network,
-      'share',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('share_exploration', {
+      network: network,
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerShareCollectionEvent(network: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      network,
-      'share',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('share_collection', {
+      network: network,
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerShareBlogPostEvent(network: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      network,
-      'share',
-      this.windowRef.nativeWindow.location.pathname
-    );
+    this._sendEventToGoogleAnalytics('share_blog_post', {
+      network: network,
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
   }
 
   registerOpenEmbedInfoEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'EmbedInfoModal',
-      'open',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('open_embed_info_modal', {
+      exploration_id: explorationId,
+    });
   }
 
   registerCommitChangesToPublicExplorationEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'CommitToPublicExploration',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('commit_changes_to_public_exploration', {
+      exploration_id: explorationId,
+    });
   }
 
-  // Metrics for tutorial on first creating exploration.
   registerTutorialModalOpenEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'TutorialModalOpen',
-      'open',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('tutorial_modal_open', {
+      exploration_id: explorationId,
+    });
   }
 
   registerDeclineTutorialModalEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'DeclineTutorialModal',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('decline_tutorial_modal', {
+      exploration_id: explorationId,
+    });
   }
 
   registerAcceptTutorialModalEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'AcceptTutorialModal',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('accept_tutorial_modal', {
+      exploration_id: explorationId,
+    });
   }
 
-  // Metrics for visiting the help center.
   registerClickHelpButtonEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ClickHelpButton',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('click_help_button', {
+      exploration_id: explorationId,
+    });
   }
 
   registerVisitHelpCenterEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'VisitHelpCenter',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('visit_help_center', {
+      exploration_id: explorationId,
+    });
   }
 
   registerOpenTutorialFromHelpCenterEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'OpenTutorialFromHelpCenter',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('open_tutorial_from_help_center', {
+      exploration_id: explorationId,
+    });
   }
 
-  // Metrics for exiting the tutorial.
   registerSkipTutorialEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'SkipTutorial',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('skip_tutorial', {
+      exploration_id: explorationId,
+    });
   }
 
   registerFinishTutorialEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'FinishTutorial',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('finish_tutorial', {
+      exploration_id: explorationId,
+    });
   }
-
-  // Metrics for first time editor use.
   registerEditorFirstEntryEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'FirstEnterEditor',
-      'open',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('editor_first_entry', {
+      exploration_id: explorationId,
+    });
   }
 
   registerFirstOpenContentBoxEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'FirstOpenContentBox',
-      'open',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('first_open_content_box', {
+      exploration_id: explorationId,
+    });
   }
 
   registerFirstSaveContentEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'FirstSaveContent',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('first_save_content', {
+      exploration_id: explorationId,
+    });
   }
 
   registerFirstClickAddInteractionEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'FirstClickAddInteraction',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('first_click_add_interaction', {
+      exploration_id: explorationId,
+    });
   }
 
   registerFirstSelectInteractionTypeEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'FirstSelectInteractionType',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('first_select_interaction_type', {
+      exploration_id: explorationId,
+    });
   }
 
   registerFirstSaveInteractionEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'FirstSaveInteraction',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('first_save_interaction', {
+      exploration_id: explorationId,
+    });
   }
 
   registerFirstSaveRuleEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'FirstSaveRule',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('first_save_rule', {
+      exploration_id: explorationId,
+    });
   }
 
   registerFirstCreateSecondStateEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'FirstCreateSecondState',
-      'create',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('first_create_second_state', {
+      exploration_id: explorationId,
+    });
   }
 
-  // Metrics for publishing explorations.
   registerSavePlayableExplorationEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'SavePlayableExploration',
-      'save',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('save_playable_exploration', {
+      exploration_id: explorationId,
+    });
   }
 
   registerOpenPublishExplorationModalEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'PublishExplorationModal',
-      'open',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('open_publish_exploration_modal', {
+      exploration_id: explorationId,
+    });
   }
 
   registerPublishExplorationEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'PublishExploration',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('publish_exploration', {
+      exploration_id: explorationId,
+    });
   }
 
   registerVisitOppiaFromIframeEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'VisitOppiaFromIframe',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('visit_oppia_from_iframe', {
+      exploration_id: explorationId,
+    });
   }
 
   registerNewCard(cardNum: number, explorationId: string): void {
     if (cardNum <= 10 || cardNum % 10 === 0) {
-      this._sendEventToLegacyGoogleAnalytics(
-        'PlayerNewCard',
-        'click',
-        cardNum.toString()
-      );
       this._sendEventToGoogleAnalytics('new_card_load', {
         exploration_id: explorationId,
         card_number: cardNum,
@@ -483,107 +373,86 @@ export class SiteAnalyticsService {
   }
 
   registerOpenCollectionFromLandingPageEvent(collectionId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'OpenFractionsFromLandingPage',
-      'click',
-      collectionId
-    );
+    this._sendEventToGoogleAnalytics('open_fractions_from_landing_page', {
+      collection_id: collectionId,
+    });
   }
 
   registerSaveRecordedAudioEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'SaveRecordedAudio',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('save_recorded_audio', {
+      exploration_id: explorationId,
+    });
   }
 
   registerStartAudioRecordingEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'StartAudioRecording',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('start_audio_recording', {
+      exploration_id: explorationId,
+    });
   }
 
   registerUploadAudioEvent(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'UploadRecordedAudio',
-      'click',
-      explorationId
-    );
+    this._sendEventToGoogleAnalytics('upload_recorded_audio', {
+      exploration_id: explorationId,
+    });
   }
 
-  // Contributor Dashboard Events.
   registerContributorDashboardSuggestEvent(contributionType: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ContributorDashboardSuggest',
-      'click',
-      contributionType
-    );
+    this._sendEventToGoogleAnalytics('contributor_dashboard_suggest', {
+      contribution_type: contributionType,
+    });
   }
 
   registerContributorDashboardSubmitSuggestionEvent(
     contributionType: string
   ): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ContributorDashboardSubmitSuggestion',
-      'click',
-      contributionType
+    this._sendEventToGoogleAnalytics(
+      'contributor_dashboard_submit_suggestion',
+      {
+        contribution_type: contributionType,
+      }
     );
   }
 
   registerContributorDashboardViewSuggestionForReview(
     contributionType: string
   ): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ContributorDashboardViewSuggestionForReview',
-      'click',
-      contributionType
+    this._sendEventToGoogleAnalytics(
+      'contributor_dashboard_view_suggestion_for_review',
+      {
+        contribution_type: contributionType,
+      }
     );
   }
 
   registerContributorDashboardAcceptSuggestion(contributionType: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ContributorDashboardAcceptSuggestion',
-      'click',
-      contributionType
+    this._sendEventToGoogleAnalytics(
+      'contributor_dashboard_accept_suggestion',
+      {
+        contribution_type: contributionType,
+      }
     );
   }
 
   registerContributorDashboardRejectSuggestion(contributionType: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ContributorDashboardRejectSuggestion',
-      'click',
-      contributionType
+    this._sendEventToGoogleAnalytics(
+      'contributor_dashboard_reject_suggestion',
+      {
+        contribution_type: contributionType,
+      }
     );
   }
 
   registerLessonActiveUse(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ActiveUserStartAndSawCards',
-      'engage',
-      ''
-    );
+    this._sendEventToGoogleAnalytics('active_user_start_and_saw_cards', {});
   }
 
   registerStartExploration(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'PlayerStartExploration',
-      'engage',
-      explorationId
-    );
     this._sendEventToGoogleAnalytics('lesson_started', {
       exploration_id: explorationId,
     });
   }
 
   registerFinishExploration(explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'PlayerFinishExploration',
-      'engage',
-      explorationId
-    );
     this._sendEventToGoogleAnalytics('lesson_completed', {
       exploration_id: explorationId,
     });
@@ -669,27 +538,15 @@ export class SiteAnalyticsService {
   }
 
   registerClassroomHeaderClickEvent(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ClassroomEngagement',
-      'click',
-      'ClickOnClassroom'
-    );
+    this._sendEventToGoogleAnalytics('click_on_classroom', {});
   }
 
   registerClassroomPageViewed(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ClassroomEngagement',
-      'impression',
-      'ViewClassroom'
-    );
+    this._sendEventToGoogleAnalytics('view_classroom', {});
   }
 
   registerAccountDeletion(): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'OnboardingEngagement',
-      'delete',
-      'AccountDeletion'
-    );
+    this._sendEventToGoogleAnalytics('account_deletion', {});
   }
 
   registerAnswerSubmitted(
