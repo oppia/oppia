@@ -24,7 +24,10 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
   providedIn: 'root',
 })
 export class AccessValidationBackendApiService {
-  SUBTOPIC_VIEWER_PAGE_PAGE_ACCESS_VALIDATOR =
+  STORY_EDITOR_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_story_editor_page/<story_id>';
+
+  SUBTOPIC_VIEWER_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>';
 
   CLASSROOM_PAGE_ACCESS_VALIDATOR =
@@ -78,6 +81,17 @@ export class AccessValidationBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
+
+  validateAccessToStoryEditorPage(storyId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.STORY_EDITOR_PAGE_ACCESS_VALIDATOR,
+      {
+        story_id: storyId,
+      }
+    );
+
+    return this.http.get<void>(url).toPromise();
+  }
 
   validateAccessToSubtopicViewerPage(
     classroomUrlFragment: string,

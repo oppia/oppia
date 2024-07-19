@@ -16,7 +16,6 @@
  * @fileoverview Service to handle navigation in story editor page.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable, EventEmitter} from '@angular/core';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -98,10 +97,3 @@ export class StoryEditorNavigationService {
     return this._activeTabIsSwitchedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StoryEditorNavigationService',
-    downgradeInjectable(StoryEditorNavigationService)
-  );

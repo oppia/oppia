@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {Story} from 'domain/story/story.model';
@@ -91,10 +90,3 @@ export class StoryEditorNavbarBreadcrumbComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaStoryEditorNavbarBreadcrumb',
-    downgradeComponent({component: StoryEditorNavbarBreadcrumbComponent})
-  );

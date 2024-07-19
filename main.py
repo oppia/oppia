@@ -247,6 +247,13 @@ URLS = [
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.CollectionEditorAccessValidationPage
     ),
+
+    get_redirect_route(
+        r'%s/can_access_story_editor_page/<story_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.StoryEditorAccessValidationHandler
+    ),
+
     get_redirect_route(
         r'%s/can_access_blog_home_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
@@ -982,9 +989,6 @@ URLS = [
         r'%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
         skill_mastery.SubtopicMasteryDataHandler),
 
-    get_redirect_route(
-        r'%s/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
-        story_editor.StoryEditorPage),
     get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_EDITOR_DATA_URL_PREFIX,
         story_editor.EditableStoryDataHandler),
