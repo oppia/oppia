@@ -42,7 +42,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         def mock_popen(  # pylint: disable=unused-argument
-            unused_cmd_tokens: List[str],
+            cmd_tokens: List[str],
             stdout: int = subprocess.PIPE,
             stderr: int = subprocess.PIPE
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
@@ -64,7 +64,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'Output'
         self.linter_code = 0
@@ -133,7 +133,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_has_uncommitted_files(self) -> None:
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'file1'
         check_output_swap = self.swap(
