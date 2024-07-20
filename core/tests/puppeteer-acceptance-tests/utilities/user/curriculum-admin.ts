@@ -43,7 +43,7 @@ const subtopicPhotoBoxButton =
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 const photoUploadModal = 'edit-thumbnail-modal';
 
-const createQuestionButton = 'div.e2e-test-create-question';
+const createQuestionButton = '.e2e-test-create-question-button ';
 const removeQuestionConfirmationButton =
   '.e2e-test-remove-question-confirmation-button';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
@@ -219,6 +219,7 @@ const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
 const saveStoryButton = 'button.e2e-test-save-story-button';
 const mobileSaveStoryChangesButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-changes';
+const enablePracticeTabToLearnersButton = '.e2e-test-toggle-practice-tab';
 export class CurriculumAdmin extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -257,22 +258,49 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
+   * Navigate to the question editor tab present in the skills tab.
+   */
+  async navigateToSkillQuestionEditorTab(): Promise<void> {
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const skillQuestionTab = isMobileWidth
+      ? mobileSkillQuestionTab
+      : desktopSkillQuestionTab;
+
+    if (isMobileWidth) {
+      const currentUrl = new URL(this.page.url());
+      const hashParts = currentUrl.hash.split('/');
+
+      if (hashParts.length > 1) {
+        hashParts[1] = 'questions';
+      } else {
+        hashParts.push('questions');
+      }
+      currentUrl.hash = hashParts.join('/');
+      await this.goto(currentUrl.toString());
+      await this.page.reload({waitUntil: 'networkidle0'});
+    } else {
+      await this.clickAndWaitForNavigation(skillQuestionTab);
+    }
+  }
+
+  /**
    * Add any number of questions to a particular skill.
    */
   async createQuestionsForSkill(
     skillName: string,
     questionCount: number
   ): Promise<void> {
+    await this.openSkillEditor(skillName);
+    await this.navigateToSkillQuestionEditorTab();
     for (let i = 0; i < questionCount; i++) {
-      await this.addBasicAlgebraQuestionToSkill(skillName);
+      await this.addBasicAlgebraQuestionToSkill();
     }
   }
 
   /**
    * Create a basic algebra question in the skill editor page.
    */
-  async addBasicAlgebraQuestionToSkill(skillName: string): Promise<void> {
-    await this.openSkillEditor(skillName);
+  async addBasicAlgebraQuestionToSkill(): Promise<void> {
     await this.clickOn(createQuestionButton);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
@@ -795,15 +823,18 @@ export class CurriculumAdmin extends BaseUser {
    * Function to dismiss welcome modal
    */
   async dismissWelcomeModal(): Promise<void> {
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      visible: true,
-    });
-    await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      hidden: true,
-    });
-
-    showMessage('Tutorial pop is closed.');
+    try {
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        visible: true,
+      });
+      await this.clickOn(dismissWelcomeModalSelector);
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        hidden: true,
+      });
+      showMessage('Tutorial pop-up closed successfully.');
+    } catch (error) {
+      showMessage(`welcome modal not found: ${error.message}`);
+    }
   }
 
   /**
@@ -852,6 +883,31 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.createChapter(chapterTitle, explorationId);
     await this.saveStoryDraft();
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileSaveStoryChangesDropdown);
+      await this.page.waitForSelector(mobilePublishStoryButton);
+      await this.clickOn(mobilePublishStoryButton);
+    } else {
+      await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
+      await this.clickOn(publishStoryButton);
+      await this.page.waitForSelector(unpublishStoryButton, {visible: true});
+    }
+  }
+
+  /**
+   * Function to open the story editor page.
+   * @param {string} storyID - The Id of the story to open.
+   */
+  async openStoryEditor(storyID: string): Promise<void> {
+    await this.goto(`http://localhost:8181/story_editor/${storyID}`);
+  }
+
+  /**
+   * Function to publish a story.
+   * @param {string} storyId - The Id of the story to publish.
+   */
+  async publishDraftStory(storyId): Promise<void> {
+    await this.openStoryEditor(storyId);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileSaveStoryChangesDropdown);
       await this.page.waitForSelector(mobilePublishStoryButton);
@@ -1230,6 +1286,12 @@ export class CurriculumAdmin extends BaseUser {
         error.stack
       );
     }
+  }
+
+  async showPracticeTabToLearner(topicName: string) {
+    await this.openTopicEditor(topicName);
+    await this.clickOn(enablePracticeTabToLearnersButton);
+    await this.saveTopicDraft(topicName);
   }
 
   /**

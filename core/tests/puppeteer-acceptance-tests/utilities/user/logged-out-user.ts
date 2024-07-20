@@ -222,21 +222,10 @@ const nextCardButton = '.e2e-test-next-card-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 const searchInputSelector = '.e2e-test-search-input';
-const categoryFilterDropdownToggler = '.e2e-test-search-bar-dropdown-toggle';
-const filterOptionsSelector = '.e2e-test-deselected';
-const languageFilterDropdownToggler =
-  '.oppia-search-bar-dropdown-toggle-button';
-const searchResultsSelector = '.e2e-test-exp-summary-tile-objective';
-const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
-const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
-const topicNameInTheClassroomSelector = '.e2e-test-topic-name';
 const storyTitleSelector = '.e2e-test-story-title-in-topic-page';
 const chapterTitleSelector = '.e2e-test-chapter-title';
-const oppiaTopicTitleSelector = '.oppia-topic-title';
-const topicPageLessonTabSelector = '.e2e-test-revision-tab-link';
-const subTopicTitleInLessTabSelector = '.subtopic-title';
-const reviewCardTitleSelector = '.oppia-subtopic-title';
 const topicNameSelector = '.e2e-test-topic-name';
+const nextLessonButton = '.e2e-test-next-lesson-button';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -2096,6 +2085,20 @@ export class LoggedOutUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Loads the next chapter from the last state of an exploration.
+   */
+  async loadNextChapterFromLastState(): Promise<void> {
+    await this.clickOn(nextLessonButton);
+  }
+
+  /**
+   * Returns to the story from the last state of an exploration.
+   */
+  async returnToStoryFromLastState(): Promise<void> {
+    await this.clickOn('Return to Story');
   }
 }
 

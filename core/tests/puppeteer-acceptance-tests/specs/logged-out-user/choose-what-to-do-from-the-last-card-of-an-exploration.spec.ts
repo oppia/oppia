@@ -34,6 +34,7 @@ describe('Logged-out User', function () {
   let loggedOutUser: LoggedOutUser;
   let explorationId1: string | null;
   let explorationId2: string | null;
+  let storyId: string;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -74,21 +75,23 @@ describe('Logged-out User', function () {
       'Algebra I'
     );
 
-    await curriculumAdmin.publishDraftTopic('Algebra I');
-    await curriculumAdmin.createAndPublishStoryWithChapter(
-      'Algebra Story',
-      'algebra-story',
+    await curriculumAdmin.showPracticeTabToLearner('Negative Numbers');
+    storyId = await curriculumAdmin.createStory(
+      'Algebra Story 1',
+      'algebra-story-one',
+      'Understanding Negative Numbers'
+    );
+    await curriculumAdmin.createChapter(
       'Understanding Negative Numbers',
-      explorationId1 as string,
-      'Algebra I'
+      explorationId1 as string
     );
-    await curriculumAdmin.createAndPublishStoryWithChapter(
-      'Algebra Story',
-      'algebra-story',
+    await curriculumAdmin.createChapter(
       'Understanding Positive Numbers',
-      explorationId2 as string,
-      'Algebra I'
+      explorationId2 as string
     );
+
+    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.publishDraftStory(storyId);
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
     await curriculumAdmin.updateClassroom(
@@ -106,9 +109,8 @@ describe('Logged-out User', function () {
     'should be able to navigate through the learner journey from the last state of an exploration',
     async function () {
       await loggedOutUser.navigateToClassroomPage('math');
-      await loggedOutUser.expectTopicsToBePresent(['Algebra I']);
-      await loggedOutUser.selectAndOpenTopic('Algebra I');
 
+      await loggedOutUser.selectAndOpenTopic('Algebra I');
       await loggedOutUser.selectChapterWithinStoryToLearn(
         'Algebra Story',
         'Understanding Negative Numbers'
@@ -119,11 +121,13 @@ describe('Logged-out User', function () {
         'Congratulations for completing this lesson!'
       );
 
-      await loggedOutUser.loadNextChapterFromLastState();
-
-      await loggedOutUser.loadPracticeSessionFromLastState();
-
       await loggedOutUser.returnToStoryFromLastState();
+
+      await loggedOutUser.selectChapterWithinStoryToLearn(
+        'Algebra Story',
+        'Understanding Negative Numbers'
+      );
+      await loggedOutUser.loadNextChapterFromLastState();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
