@@ -185,8 +185,6 @@ const outcomeDestWhenStuckSelector =
 
 const LABEL_FOR_SAVE_FEEDBACK_BUTTON = ' Save Feedback ';
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
-const LABEL_FOR_DIRECT_TO_CARD_WHEN_STUCK =
-  '(Optional) If the learner is really stuck, direct them to ... ';
 export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to creator dashboard page.
@@ -313,14 +311,18 @@ export class ExplorationEditor extends BaseUser {
    * Function to dismiss welcome modal.
    */
   async dismissWelcomeModal(): Promise<void> {
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      visible: true,
-    });
-    await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      hidden: true,
-    });
-    showMessage('Tutorial pop-up closed successfully.');
+    try {
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        visible: true,
+      });
+      await this.clickOn(dismissWelcomeModalSelector);
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        hidden: true,
+      });
+      showMessage('Tutorial pop-up closed successfully.');
+    } catch (error) {
+      showMessage(`welcome modal not found: ${error.message}`);
+    }
   }
 
   /**

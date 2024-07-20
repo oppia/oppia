@@ -13,10 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the learner journey in the math classroom.
- * The test includes:
+ * @fileoverview End-to-end tests for the learner's journey from the last state/card of an exploration.
+ * The tests include:
  * - Setup: Creation of exploration, topic, subtopic, skill, story, and classroom by a curriculum admin.
- * - User Journey: Navigation to classroom, selection of topic, completion of exploration, and review of a card by a logged-out user.
+ * - User Journey: Navigation to classroom, selection of topic, completion of exploration by a logged-out user.
+ * - Loading the next chapter, loading the practice session page, and returning to the story from the last state of an exploration.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -104,34 +105,24 @@ describe('Logged-out User', function () {
   it(
     'should be able to navigate through the learner journey from the last state of an exploration',
     async function () {
-      // Navigate to the math classroom and select a topic
       await loggedOutUser.navigateToClassroomPage('math');
       await loggedOutUser.expectTopicsToBePresent(['Algebra I']);
       await loggedOutUser.selectAndOpenTopic('Algebra I');
 
-      // Select a chapter within the story to learn
       await loggedOutUser.selectChapterWithinStoryToLearn(
         'Algebra Story',
         'Understanding Negative Numbers'
       );
 
-      // Play the exploration linked with the chapter selected
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.submitAnswer('-40');
-      await loggedOutUser.continueToNextCard();
-
-      // Check the completion message and restart the exploration
+      // Since the exploration has only one state, the learner should see the last state of the exploration immediately after selecting the chapter.
       await loggedOutUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
 
-      // Load the next chapter upon clicking the “Next chapter” card on the last state
       await loggedOutUser.loadNextChapterFromLastState();
 
-      // Load the practice session page upon clicking the practice session card on the last state
       await loggedOutUser.loadPracticeSessionFromLastState();
 
-      // Return to the story from the last state
       await loggedOutUser.returnToStoryFromLastState();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

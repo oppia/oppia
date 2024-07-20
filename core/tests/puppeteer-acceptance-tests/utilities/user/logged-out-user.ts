@@ -211,16 +211,32 @@ const googleGroupSignUpLinkInTermsPage =
   '.e2e-test-oppia-announce-google-group-link';
 
 const emailLinkSelector = '.oppia-contact-mail';
-
 const mobileDonateButtonOnDonatePage = '.donate-modal-button';
 const donateModalIframeSelector = '.e2e-test-donate-page-iframe';
-
 const classroomNameHeading = '.e2e-test-classroom-name';
-
 const errorPageHeading = '.e2e-test-error-page-heading';
-
 const classroomTileContainer = '.oppia-classroom-tile-container';
 
+const floatFormInput = '.e2e-test-float-form-input';
+const nextCardButton = '.e2e-test-next-card-button';
+const submitAnswerButton = '.e2e-test-submit-answer-button';
+const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
+const searchInputSelector = '.e2e-test-search-input';
+const categoryFilterDropdownToggler = '.e2e-test-search-bar-dropdown-toggle';
+const filterOptionsSelector = '.e2e-test-deselected';
+const languageFilterDropdownToggler =
+  '.oppia-search-bar-dropdown-toggle-button';
+const searchResultsSelector = '.e2e-test-exp-summary-tile-objective';
+const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
+const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
+const topicNameInTheClassroomSelector = '.e2e-test-topic-name';
+const storyTitleSelector = '.e2e-test-story-title-in-topic-page';
+const chapterTitleSelector = '.e2e-test-chapter-title';
+const oppiaTopicTitleSelector = '.oppia-topic-title';
+const topicPageLessonTabSelector = '.e2e-test-revision-tab-link';
+const subTopicTitleInLessTabSelector = '.subtopic-title';
+const reviewCardTitleSelector = '.oppia-subtopic-title';
+const topicNameSelector = '.e2e-test-topic-name';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -1923,6 +1939,163 @@ export class LoggedOutUser extends BaseUser {
     }
 
     showMessage(`User is on error page with status code ${statusCode}.`);
+  }
+
+  /**
+   * Function to navigate to the next card in the preview tab.
+   */
+  async continueToNextCard(): Promise<void> {
+    await this.clickOn(nextCardButton);
+  }
+
+  /**
+   * Function to submit an answer to a form input field.
+   *
+   * This function first determines the type of the input field in the DOM using the getInputType function.
+   * Currently, it only supports 'text', 'number', and 'float' input types. If the input type is anything else, it throws an error.
+   * @param {string} answer - The answer to submit.
+   */
+  async submitAnswer(answer: string): Promise<void> {
+    await this.waitForElementToBeClickable(floatFormInput);
+    const inputType = await this.getInputType(floatFormInput);
+
+    switch (inputType) {
+      case 'text':
+      case 'number':
+      case 'float':
+        await this.page.waitForSelector(floatFormInput);
+        await this.page.type(floatFormInput, answer);
+        break;
+      default:
+        throw new Error(`Unsupported input type: ${inputType}`);
+    }
+
+    await this.clickOn(submitAnswerButton);
+  }
+
+  /**
+   * Function to Get the type of an input field in the DOM.
+   * @param {string} selector - The CSS selector for the input field.
+   */
+  async getInputType(selector: string): Promise<string> {
+    const inputField = await this.page.$(selector);
+    if (!inputField) {
+      throw new Error(`Input field not found for selector: ${selector}`);
+    }
+    const inputType = (await (
+      await inputField.getProperty('type')
+    ).jsonValue()) as string;
+    return inputType;
+  }
+
+  /**
+   * Function to verify if the exploration is completed via checking the toast message.
+   * @param {string} message - The expected toast message.
+   */
+  async expectExplorationCompletionToastMessage(
+    message: string
+  ): Promise<void> {
+    await this.page.waitForSelector(explorationCompletionToastMessage, {
+      visible: true,
+    });
+    const element = await this.page.$(explorationCompletionToastMessage);
+    const toastMessage = await this.page.evaluate(
+      element => element.textContent,
+      element
+    );
+    if (!toastMessage || !toastMessage.includes(message)) {
+      throw new Error('Exploration did not complete successfully');
+    }
+    showMessage('Exploration has completed successfully');
+    await this.page.waitForSelector(explorationCompletionToastMessage, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Searches for a lesson in the search bar present in the community library.
+   * @param {string} lessonName - The name of the lesson to search for.
+   */
+  async searchForLessonInSearchBar(lessonName: string): Promise<void> {
+    await this.clickOn(searchInputSelector);
+    await this.type(searchInputSelector, lessonName);
+
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Selects and opens a topic by its name.
+   * @param {string} topicName - The name of the topic to select and open.
+   */
+  async selectAndOpenTopic(topicName: string): Promise<void> {
+    try {
+      const topicNames = await this.page.$$(topicNameSelector);
+      for (const name of topicNames) {
+        const nameText = await this.page.evaluate(el => el.textContent, name);
+        if (nameText === topicName) {
+          await name.click();
+          return;
+        }
+      }
+
+      throw new Error(`Topic "${topicName}" not found in topic names.`);
+    } catch (error) {
+      const newError = new Error(`Failed to select and open topic: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Selects and opens a chapter within a story to learn.
+   * @param {string} chapterName - The name of the chapter to select and open.
+   * @param {string} storyName - The name of the story containing the chapter.
+   */
+  async selectChapterWithinStoryToLearn(
+    chapterName: string,
+    storyName: string
+  ): Promise<void> {
+    try {
+      const storyTitles = await this.page.$$(storyTitleSelector);
+      for (const title of storyTitles) {
+        const titleText = await this.page.evaluate(el => el.textContent, title);
+        if (titleText === storyName) {
+          await Promise.all([
+            this.page.waitForNavigation({waitUntil: ['networkidle2', 'load']}),
+            title.click(),
+          ]);
+
+          const chapterTitles = await this.page.$$(chapterTitleSelector);
+          for (const chapter of chapterTitles) {
+            const chapterText = await this.page.evaluate(
+              el => el.textContent,
+              chapter
+            );
+            if (chapterText === chapterName) {
+              await Promise.all([
+                this.page.waitForNavigation({
+                  waitUntil: ['networkidle2', 'load'],
+                }),
+                chapter.click(),
+              ]);
+              return;
+            }
+          }
+
+          throw new Error(
+            `Chapter "${chapterName}" not found in story "${storyName}".`
+          );
+        }
+      }
+
+      throw new Error(`Story "${storyName}" not found in story titles.`);
+    } catch (error) {
+      const newError = new Error(
+        `Failed to select and open chapter within story: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
   }
 }
 
