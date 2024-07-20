@@ -271,6 +271,34 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 ]
             )
 
+    def test_git_diff_name_status_with_diff_filter(self) -> None:
+        def mock_start_subprocess_for_result(
+            unused_cmd_tokens: List[str]
+        ) -> Tuple[bytes, None]:
+            return (b'M\tfile1\nA\tfile2', None)
+        subprocess_swap = self.swap_with_checks(
+            common, 'start_subprocess_for_result',
+            mock_start_subprocess_for_result,
+            expected_args=[
+                (
+                    [
+                        'git', 'diff', '--name-status', 'left', 'right',
+                        '--diff_filter=filter'
+                    ],
+                )
+            ]
+        )
+
+        with subprocess_swap:
+            self.assertEqual(
+                git_changes_utils.git_diff_name_status(
+                    'left', 'right', 'filter'),
+                [
+                    git_changes_utils.FileDiff(status=b'M', name=b'file1'),
+                    git_changes_utils.FileDiff(status=b'A', name=b'file2')
+                ]
+            )
+
     def test_git_diff_name_status_with_empty_left_should_error(self) -> None:
         with self.assertRaisesRegex(
             ValueError,
