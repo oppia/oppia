@@ -148,10 +148,8 @@ const visitClassroomDesktopButtonInTeachPage =
   '.e2e-test-teach-page-visit-classroom-desktop-button';
 const visitClassroomMobileButtonInTeachPage =
   '.e2e-test-teach-page-visit-classroom-mobile-button';
-const exploreLessonsDesktopButtonInTeachPage =
-  '.e2e-test-teach-page-explore-lessons-desktop-button';
-const exploreLessonsMobileButtonInTeachPage =
-  '.e2e-test-teach-page-explore-lessons-mobile-button';
+const exploreLessonsButtonInTeachPage =
+  '.e2e-test-teach-page-explore-lessons-button';
 const browseLibraryDesktopButtonInTeachPage =
   '.e2e-test-teach-page-browse-library-desktop-button';
 const browseLibraryMobileButtonInTeachPage =
@@ -1293,9 +1291,6 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Math Classroom page.
    */
   async clickExploreLessonsButtonInTeachPage(): Promise<void> {
-    const exploreLessonsButtonInTeachPage = this.isViewportAtMobileWidth()
-      ? exploreLessonsMobileButtonInTeachPage
-      : exploreLessonsDesktopButtonInTeachPage;
     await this.clickButtonToNavigateToNewPage(
       exploreLessonsButtonInTeachPage,
       'Explore Lessons button',
