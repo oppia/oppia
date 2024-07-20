@@ -18,9 +18,11 @@
  */
 
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var ClassroomPage = function () {
   var topicSummaryTile = $('.e2e-test-topic-summary-tile');
+  var launchDiagnosticTestPageButton = $('.e2e-test-take-diagnostic-test');
 
   this.get = async function (classroomName) {
     await browser.url('/learn/' + classroomName);
@@ -39,6 +41,13 @@ var ClassroomPage = function () {
       let actualCount = await $$('.e2e-test-topic-summary-tile').length;
       expect(actualCount).toEqual(0);
     }
+  };
+
+  this.launchDiagnosticTestPage = async function () {
+    await action.click(
+      'Launch diagnostic test page button',
+      launchDiagnosticTestPageButton
+    );
   };
 };
 
