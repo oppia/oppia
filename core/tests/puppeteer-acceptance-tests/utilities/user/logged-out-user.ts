@@ -230,6 +230,13 @@ const lessonTitleInCommunityLibrarySelector =
   '.e2e-test-exp-summary-tile-title';
 const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
 const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
+const generateAttributionSelector = '.e2e-test-generate-attribution';
+const attributionHtmlSectionSelector = 'attribution-html-section';
+const attributionHtmlCodeSelector = '.attribution-html-code';
+const attributionPrintTextSelector = '.attribution-print-text';
+const shareExplorationButtonSelector = '.e2e-test-share-exploration-button';
+const iconAccessibilityLabelSelector = '.oppia-icon-accessibility-label';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -2181,6 +2188,86 @@ export class LoggedOutUser extends BaseUser {
 
     if (!dialogAppeared) {
       throw new Error('Expected a dialog to appear, but it did not.');
+    }
+  }
+
+  /**
+   * Generates attribution
+   */
+  async generateAttribution(): Promise<void> {
+    await this.page.waitForSelector(generateAttributionSelector, {
+      visible: true,
+    });
+    await this.clickOn(generateAttributionSelector);
+
+    await this.page.waitForSelector(attributionHtmlSectionSelector, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Checks if the HTML string is present in the HTML section.
+   * @param {string} htmlString - The HTML string to check for.
+   */
+  async expectHtmlStringInHtmlSection(htmlString: string): Promise<void> {
+    const attributionHtmlCodeElement = await this.page.$(
+      attributionHtmlCodeSelector
+    );
+    const attributionHtmlCode = await this.page.evaluate(
+      el => el.innerHTML,
+      attributionHtmlCodeElement
+    );
+
+    if (!attributionHtmlCode.includes(htmlString)) {
+      throw new Error(`HTML string not found in the HTML section.`);
+    }
+  }
+
+  /**
+   * Checks if the text string is present in the print text.
+   * @param {string} textString - The text string to check for.
+   */
+  async expectAttributionInPrint(textString: string): Promise<void> {
+    await this.page.waitForSelector(attributionPrintTextSelector, {
+      visible: true,
+    });
+
+    const attributionPrintTextElement = await this.page.$(
+      attributionPrintTextSelector
+    );
+    const attributionPrintText = await this.page.evaluate(
+      el => el.textContent,
+      attributionPrintTextElement
+    );
+
+    if (!attributionPrintText.includes(textString)) {
+      throw new Error(`Text string not found in the print text.`);
+    }
+  }
+
+  /**
+   * Shares the exploration.
+   * @param {string} platform - The platform to share the exploration on.
+   */
+  async shareExploration(platform: string): Promise<void> {
+    await this.page.waitForSelector(shareExplorationButtonSelector, {
+      visible: true,
+    });
+    await this.clickOn(shareExplorationButtonSelector);
+    await this.page.waitForSelector(iconAccessibilityLabelSelector, {
+      visible: true,
+    });
+
+    const iconAccessibilityLabels = await this.page.$$(
+      iconAccessibilityLabelSelector
+    );
+
+    for (const label of iconAccessibilityLabels) {
+      const labelText = await this.page.evaluate(el => el.textContent, label);
+      if (labelText.includes(platform)) {
+        await label.click();
+        break;
+      }
     }
   }
 }

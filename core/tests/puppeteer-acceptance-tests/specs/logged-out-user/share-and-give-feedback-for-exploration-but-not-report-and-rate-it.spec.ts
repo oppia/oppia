@@ -25,6 +25,7 @@ import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {tree} from 'd3';
+import {log} from 'console';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 enum INTERACTION_TYPES {
@@ -123,8 +124,10 @@ describe('Logged-out User', function () {
       //  A dialog should appear when the user tries to hit the browser back button informing them that they will lose progress if they go back.
       await loggedOutUser.hitBrowserBackButtonAndHandleDialog(true);
 
-      await loggedOutUser.generateAttributionAndShare();
-      await loggedOutUser.shareExploration();
+      await loggedOutUser.generateAttribution();
+      await loggedOutUser.shareExploration('Facebook');
+      await loggedOutUser.shareExploration('Twitter');
+      await loggedOutUser.shareExploration('Google Classroom');
 
       // Giving feedback after completing the exploration.
       await loggedOutUser.giveFeedback('This is a great lesson!');
