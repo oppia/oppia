@@ -535,7 +535,7 @@ class CollectionEditorAccessValidationPage(
         pass
 
 
-class StoryEditorAccessValidationHandler(
+class StoryEditorAccessValidationHandlerPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """The editor page for a single story."""
 

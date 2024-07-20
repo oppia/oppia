@@ -251,7 +251,7 @@ URLS = [
     get_redirect_route(
         r'%s/can_access_story_editor_page/<story_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
-        access_validators.StoryEditorAccessValidationHandler
+        access_validators.StoryEditorAccessValidationHandlerPage
     ),
 
     get_redirect_route(
