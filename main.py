@@ -223,7 +223,6 @@ URLS = [
     get_redirect_route(r'/splash', SplashRedirectPage),
     get_redirect_route(
         r'/internetconnectivityhandler', InternetConnectivityHandler),
-    get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),
     get_redirect_route(r'/site_guidelines', pages.TeachRedirectPage),
@@ -1281,6 +1280,16 @@ URLS.extend((
         tasks.FeedbackThreadStatusChangeEmailHandler),
     get_redirect_route(
         r'%s' % feconf.TASK_URL_DEFERRED, tasks.DeferredTasksHandler),
+))
+
+# Add URLs to static resources that differ between deployments.
+URLS.extend((
+    get_redirect_route('/favicon.ico', resources.FaviconHandler),
+    get_redirect_route('/robots.txt', resources.RobotsTxtHandler),
+    get_redirect_route(
+        '/assets/copyrighted-images/<folder>/<filename>',
+        resources.CopyrightImagesHandler
+    ),
 ))
 
 # 404 error handler (Needs to be at the end of the URLS list).

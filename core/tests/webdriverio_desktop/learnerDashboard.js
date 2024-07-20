@@ -241,13 +241,12 @@ describe('Learner dashboard functionality', function () {
       await storyEditorPage.returnToTopic();
       await topicEditorPage.expectStoryPublicationStatusToBe('Yes', 0);
 
-      var url = await browser.getUrl();
-      var topicId = url.split('/')[4].slice(0, -1);
       await general.closeCurrentTabAndSwitchTo(handle);
       await browser.url('/classroom-admin/');
       await waitFor.pageToFullyLoad();
       await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
-      await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
+      await diagnosticTestPage.addTopicToClassroomConfig(TOPIC_NAME);
+      await diagnosticTestPage.publishClassroom();
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
       await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
@@ -349,12 +348,10 @@ describe('Learner dashboard functionality', function () {
         TOPIC_DESCRIPTION,
         false
       );
-      var url = await browser.getUrl();
-      var topicId = url.split('/')[4].slice(0, -1);
       await general.closeCurrentTabAndSwitchTo(handle);
       await browser.url('/classroom-admin/');
       await waitFor.pageToFullyLoad();
-      await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
+      await diagnosticTestPage.addTopicToClassroomConfig(TOPIC_NAME);
 
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);

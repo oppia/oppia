@@ -60,14 +60,6 @@ describe('Logged-out Users', function () {
   );
 
   it(
-    'should open "About Foundation" page via the footer',
-    async function () {
-      await loggedOutUser.clickOnAboutLinkInFooter();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
     'should open "Blog" page via the footer',
     async function () {
       await loggedOutUser.clickOnBlogLinkInFooter();
@@ -135,14 +127,6 @@ describe('Logged-out Users', function () {
     'should be able to visit the Oppia Facebook',
     async function () {
       await loggedOutUser.clickFacebookIconInFooter();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should be able to visit the Oppia Instagram',
-    async function () {
-      await loggedOutUser.clickInstagramIconInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

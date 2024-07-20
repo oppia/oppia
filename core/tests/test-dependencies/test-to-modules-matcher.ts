@@ -120,7 +120,7 @@ export class TestToModulesMatcher {
    * Registers a URL and matches it with an Angular module.
    */
   public static registerUrl(url: string): void {
-    if (!url.startsWith(LOCALHOST_URL)) {
+    if (!url.startsWith(LOCALHOST_URL) || url.includes('/error')) {
       return;
     }
     const path = url.replace(LOCALHOST_URL, '');
@@ -170,7 +170,8 @@ export class TestToModulesMatcher {
    * URLs with Angular modules.
    */
   public static registerPuppeteerBrowser(browser: Browser): void {
-    browser.on('targetchanged', async (target: Target) => {
+    const registerTarget = async (target: Target) => {
+      TestToModulesMatcher.registerUrl(target.url());
       const page = await target.page();
       if (!page) {
         return;
@@ -179,7 +180,9 @@ export class TestToModulesMatcher {
         const url = frame.url();
         TestToModulesMatcher.registerUrl(url);
       });
-    });
+    };
+    browser.on('targetcreated', registerTarget);
+    browser.on('targetchanged', registerTarget);
   }
 
   /**
@@ -220,18 +223,18 @@ export class TestToModulesMatcher {
       .filter(module => !this.collectedModules.includes(module))
       .sort();
 
-    const generatedGoldenFilePath = this.goldenFilePath.replace(
-      '.txt',
-      '-generated.txt'
+    fs.mkdirSync(path.dirname(this.goldenFilePath), {recursive: true});
+    fs.writeFileSync(
+      this.goldenFilePath,
+      this.collectedModules.sort().join('\n') + '\n'
     );
-    fs.mkdirSync(path.dirname(generatedGoldenFilePath), {recursive: true});
-    fs.writeFileSync(generatedGoldenFilePath, this.collectedModules.join('\n'));
     if (missingGoldenFileModules.length > 0) {
       throw new Error(
         'The following Angular modules are missing from the golden file ' +
           `at the path ${this.goldenFilePath}:\n${missingGoldenFileModules.join('\n')}.\n` +
           'Please add them to the golden file or copy and paste the uploaded github artifact ' +
-          'into the golden file location.'
+          'into the golden file location. If the test was run locally, the golden file has ' +
+          'been updated with the collected modules automatically.'
       );
     }
     if (extraGoldenFileModules.length > 0) {
@@ -239,15 +242,16 @@ export class TestToModulesMatcher {
         'The following Angular modules are extra in the golden file ' +
           `at the path ${this.goldenFilePath}:\n${extraGoldenFileModules.join('\n')}\n` +
           'Please remove them from the golden file or copy and paste the uploaded github artifact ' +
-          'into the golden file location.'
+          'into the golden file location. If the test was run locally, the golden file has ' +
+          'been updated with the collected modules automatically.'
       );
     }
-
     if (!this.isArraySorted(goldenFileModules)) {
       throw new Error(
         `The modules in the golden file at the path ${this.goldenFilePath} is not sorted. ` +
           'Please ensure that the modules are sorted in ascending order. The sorted modules are:\n' +
-          goldenFileModules.sort().join('\n')
+          `${this.collectedModules.sort().join('\n')}. If the test was run locally, the golden file ` +
+          'has been updated with the collected modules automatically.'
       );
     }
   }
