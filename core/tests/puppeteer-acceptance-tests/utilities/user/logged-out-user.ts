@@ -226,6 +226,10 @@ const storyTitleSelector = '.e2e-test-story-title-in-topic-page';
 const chapterTitleSelector = '.e2e-test-chapter-title';
 const topicNameSelector = '.e2e-test-topic-name';
 const nextLessonButton = '.e2e-test-next-lesson-button';
+const lessonTitleInCommunityLibrarySelector =
+  '.e2e-test-exp-summary-tile-title';
+const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
+const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -2099,6 +2103,85 @@ export class LoggedOutUser extends BaseUser {
    */
   async returnToStoryFromLastState(): Promise<void> {
     await this.clickOn('Return to Story');
+  }
+
+  /**
+   * Selects a lesson in the search results.
+   * @param {string} lessonName - The name of the lesson to select.
+   */
+  async selectLessonInSearchResults(lessonName: string): Promise<void> {
+    try {
+      const explorationTitles = await this.page.$$(
+        lessonTitleInCommunityLibrarySelector
+      );
+      for (const title of explorationTitles) {
+        const titleText = await this.page.evaluate(
+          el => el.querySelector('span > span').textContent,
+          title
+        );
+        if (titleText === lessonName) {
+          await this.waitForElementToBeClickable(title);
+          await title.click();
+          return;
+        }
+      }
+
+      throw new Error(
+        `Lesson "${lessonName}" not found in exploration titles.`
+      );
+    } catch (error) {
+      const newError = new Error(`Failed to select lesson: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Gives feedback on the exploration.
+   * @param {string} feedback - The feedback to give on the exploration.
+   */
+  async giveFeedback(feedback: string): Promise<void> {
+    await this.page.waitForSelector('nav-options', {visible: true});
+    await this.clickOn(feedbackPopupSelector);
+    await this.page.waitForSelector(feedbackTextarea, {visible: true});
+    await this.type(feedbackTextarea, feedback);
+    await this.clickOn('Submit');
+
+    try {
+      await this.page.waitForFunction(
+        'document.querySelector(".oppia-feedback-popup-container") !== null',
+        {timeout: 5000}
+      );
+      showMessage('Feedback submitted successfully');
+    } catch (error) {
+      throw new Error('Feedback was not successfully submitted');
+    }
+  }
+
+  /**
+   * Navigates back to the previous page and either accepts or rejects any dialog that appears based on the provided parameter.
+   * Throws an error if no dialog appears.
+   * @param {boolean} acceptDialog - If true, the dialog will be accepted. If false, the dialog will be dismissed.
+   */
+  async hitBrowserBackButtonAndHandleDialog(
+    acceptDialog: boolean
+  ): Promise<void> {
+    await this.page.goBack();
+
+    let dialogAppeared = false;
+    this.page.once('dialog', async dialog => {
+      dialogAppeared = true;
+      // If a dialog has appeared, either accept or dismiss it based on the provided parameter.
+      if (acceptDialog) {
+        await dialog.accept();
+      } else {
+        await dialog.dismiss();
+      }
+    });
+
+    if (!dialogAppeared) {
+      throw new Error('Expected a dialog to appear, but it did not.');
+    }
   }
 }
 

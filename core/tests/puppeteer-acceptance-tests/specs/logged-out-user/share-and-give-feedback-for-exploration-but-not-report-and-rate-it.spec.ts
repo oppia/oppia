@@ -24,7 +24,7 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {log} from 'console';
+import {tree} from 'd3';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 enum INTERACTION_TYPES {
@@ -111,19 +111,23 @@ describe('Logged-out User', function () {
       await loggedOutUser.selectLessonInSearchResults('Algebra I');
 
       await loggedOutUser.continueToNextCard();
-      await loggedOutUser.giveFeedbackForState();
+
+      // Giving feedback before completing the exploration.
+      await loggedOutUser.giveFeedback('This state is very informative!');
       await loggedOutUser.submitAnswer('-40');
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
 
-      await loggedOutUser.hitBrowserBackButtonAndConfirm();
+      //  A dialog should appear when the user tries to hit the browser back button informing them that they will lose progress if they go back.
+      await loggedOutUser.hitBrowserBackButtonAndHandleDialog(true);
 
       await loggedOutUser.generateAttributionAndShare();
       await loggedOutUser.shareExploration();
 
-      await loggedOutUser.giveFeedbackForExploration();
+      // Giving feedback after completing the exploration.
+      await loggedOutUser.giveFeedback('This is a great lesson!');
 
       await loggedOutUser.expectReportOptionsNotAvailable();
       await loggedOutUser.expectRateOptionsNotAvailable();
