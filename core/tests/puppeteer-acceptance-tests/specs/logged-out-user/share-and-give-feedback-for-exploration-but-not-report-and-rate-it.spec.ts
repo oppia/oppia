@@ -125,9 +125,10 @@ describe('Logged-out User', function () {
       await loggedOutUser.hitBrowserBackButtonAndHandleDialog(true);
 
       await loggedOutUser.generateAttribution();
+      await loggedOutUser.expectAttributionInHtmlSectionToBe('');
+      await loggedOutUser.expectAttributionInPrintToBe('');
       await loggedOutUser.shareExploration('Facebook');
       await loggedOutUser.shareExploration('Twitter');
-      await loggedOutUser.shareExploration('Google Classroom');
 
       // Giving feedback after completing the exploration.
       await loggedOutUser.giveFeedback('This is a great lesson!');

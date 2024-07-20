@@ -236,6 +236,8 @@ const attributionHtmlCodeSelector = '.attribution-html-code';
 const attributionPrintTextSelector = '.attribution-print-text';
 const shareExplorationButtonSelector = '.e2e-test-share-exploration-button';
 const iconAccessibilityLabelSelector = '.oppia-icon-accessibility-label';
+const reportExplorationButtonSelector = '.e2e-test-report-exploration-button';
+const rateOptionsSelector = '.conversation-skin-final-ratings';
 
 export class LoggedOutUser extends BaseUser {
   /**
@@ -2209,7 +2211,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the HTML string is present in the HTML section.
    * @param {string} htmlString - The HTML string to check for.
    */
-  async expectHtmlStringInHtmlSection(htmlString: string): Promise<void> {
+  async expectAttributionInHtmlSectionToBe(htmlString: string): Promise<void> {
     const attributionHtmlCodeElement = await this.page.$(
       attributionHtmlCodeSelector
     );
@@ -2227,7 +2229,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the text string is present in the print text.
    * @param {string} textString - The text string to check for.
    */
-  async expectAttributionInPrint(textString: string): Promise<void> {
+  async expectAttributionInPrintToBe(textString: string): Promise<void> {
     await this.page.waitForSelector(attributionPrintTextSelector, {
       visible: true,
     });
@@ -2268,6 +2270,27 @@ export class LoggedOutUser extends BaseUser {
         await label.click();
         break;
       }
+    }
+  }
+  /**
+   * Checks if the report exploration button is not available.
+   */
+  async expectReportOptionsNotAvailable(): Promise<void> {
+    const reportExplorationButton = await this.page.$(
+      reportExplorationButtonSelector
+    );
+    if (reportExplorationButton !== null) {
+      throw new Error(`Report exploration button found.`);
+    }
+  }
+
+  /**
+   * Checks if the rate options are not available.
+   */
+  async expectRateOptionsNotAvailable(): Promise<void> {
+    const rateOptions = await this.page.$(rateOptionsSelector);
+    if (rateOptions !== null) {
+      throw new Error(`Rate options found.`);
     }
   }
 }
