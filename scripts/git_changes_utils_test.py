@@ -282,8 +282,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             expected_args=[
                 (
                     [
-                        'git', 'diff', '--name-status', 'left', 'right',
-                        '--diff_filter=filter'
+                        'git', 'diff', '--name-status', '--diff-filter=filter',
+                        'left', 'right', '--'
                     ],
                 )
             ]
