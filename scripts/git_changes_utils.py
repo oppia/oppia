@@ -155,12 +155,11 @@ def check_file_inside_directory(file_path: str, directory_path: str) -> bool:
     Returns:
         bool. Whether the file is inside the directory.
     """
-    file_path = os.path.abspath(file_path)
-    directory_path = os.path.abspath(directory_path)
+    abs_file_path: str = os.path.abspath(file_path)
+    abs_directory_path: str = os.path.abspath(directory_path)
+    common_path: str = os.path.commonpath([abs_file_path, abs_directory_path])
 
-    return bool(
-        os.path.commonpath([file_path, directory_path]) == directory_path
-    )
+    return common_path == abs_directory_path
 
 
 def get_merge_base(branch: str, other_branch: str) -> str:
