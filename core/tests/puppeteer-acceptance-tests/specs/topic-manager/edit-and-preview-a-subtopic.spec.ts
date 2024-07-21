@@ -77,7 +77,7 @@ describe('Topic Manager User Journey', function () {
       await topicManager.saveTopicDraft('Mathematics');
 
       await topicManager.navigateToSubtopicPreviewTab('Add', 'Mathematics');
-      await topicManager.expectPreviewSubtopicToHave(
+      await topicManager.expectSubtopicPreviewToHave(
         'Addition',
         'Subtopic creation description text for Addition'
       );
