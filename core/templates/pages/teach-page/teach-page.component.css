@@ -55,9 +55,9 @@
   font-weight: 700;
   letter-spacing: normal;
   line-height: 21.6px;
+  max-width: 100%;
   min-height: 44px;
   min-width: 240px;
-  max-width: 100%;
   padding: 10px;
 }
 
@@ -99,8 +99,8 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 48px 32px;
   max-width: 58%;
+  padding: 48px 32px;
 }
 
 .teach-page .oppia-teach-hero-subtext {
@@ -156,10 +156,10 @@
 }
 
 .teach-page .oppia-teach-creators-carousel {
-  -ms-overflow-style: none;
   display: flex;
   gap: 32px;
   margin: 24px 0 32px;
+  -ms-overflow-style: none;
   overflow-x: scroll;
   scrollbar-width: none;
 }
@@ -218,8 +218,8 @@
 
 .teach-page .oppia-teach-creators-arrows-container {
   display: flex;
-  justify-content: center;
   gap: 16px;
+  justify-content: center;
   margin-top: 32px;
   padding: 24px 0;
 }
@@ -233,19 +233,6 @@
   color: #b7bbbf;
 }
 
-.teach-page .oppia-teach-creators-arrows-container button {
-  background-color: #fff;
-  height: 40px;
-  width: 40px;
-}
-
-.teach-page .oppia-teach-creators-arrows-container button,
-.teach-page .oppia-teach-creators-arrows-container button:active,
-.teach-page .oppia-teach-creators-arrows-container button:focus,
-.teach-page .oppia-teach-creators-arrows-container button:hover {
-  border: none;
-  outline: none;
-}
 
 .teach-page .oppia-teach-outcomes-section {
   background-color: #e3f1f1;
@@ -364,10 +351,26 @@
   background-color: transparent;
   padding: 24px;
 }
+
+.teach-page .oppia-teach-creators-arrows-container button {
+  background-color: #fff;
+  border: none;
+  height: 40px;
+  outline: none;
+  width: 40px;
+}
+
 .teach-page .oppia-teach-testimonials-container > button,
 .teach-page .oppia-teach-testimonials-container > button:active,
 .teach-page .oppia-teach-testimonials-container > button:focus,
 .teach-page .oppia-teach-testimonials-container > button:hover {
+  border: none;
+  outline: none;
+}
+
+.teach-page .oppia-teach-creators-arrows-container button:active,
+.teach-page .oppia-teach-creators-arrows-container button:focus,
+.teach-page .oppia-teach-creators-arrows-container button:hover {
   border: none;
   outline: none;
 }
@@ -481,8 +484,8 @@
     padding: 32px 48px;
   }
   .teach-page .oppia-teach-hero-box {
-    padding: 32px;
     max-width: 64%;
+    padding: 32px;
   }
   .teach-page .oppia-teach-hero-subtext {
     font-size: 1.6rem;

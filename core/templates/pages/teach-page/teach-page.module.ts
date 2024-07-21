@@ -23,7 +23,6 @@ import {TeachPageRootComponent} from './teach-page-root.component';
 import {CommonModule} from '@angular/common';
 import {TeachPageRoutingModule} from './teach-page-routing.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {PrimaryButtonComponent} from '../../components/button-directives/primary-button.component';
 
 @NgModule({
   imports: [
