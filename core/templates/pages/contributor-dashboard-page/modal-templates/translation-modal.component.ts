@@ -52,6 +52,7 @@ import {
 // @ts-ignore
 import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -76,6 +77,15 @@ export interface TranslationOpportunity {
   inReviewCount: number;
   totalCount: number;
   translationsCount: number;
+}
+export interface ModifyTranslationOpportunity {
+  id: string;
+  contentId: string;
+  heading: string;
+  subheading: string;
+  textToTranslate: string;
+  currentContentTranslation: TranslatedContent;
+  interactionId?: string;
 }
 export interface HTMLSchema {
   type: string;
@@ -115,6 +125,7 @@ export class TranslationModalComponent {
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() opportunity!: TranslationOpportunity;
+  @Input() modifyTranslationOpportunity!: ModifyTranslationOpportunity;
   activeDataFormat!: string;
   activeWrittenTranslation: string | string[] = '';
   activeContentType!: string;
@@ -196,27 +207,53 @@ export class TranslationModalComponent {
   ngOnInit(): void {
     this.activeLanguageCode =
       this.translationLanguageService.getActiveLanguageCode();
-    // We need to set the context here so that the rte fetches
-    // images for the given ENTITY_TYPE and targetId.
-    this.contextService.setCustomEntityContext(
-      AppConstants.ENTITY_TYPE.EXPLORATION,
-      this.opportunity.id
-    );
-    this.subheading = this.opportunity.subheading;
-    this.heading = this.opportunity.heading;
+    this.subheading = this.opportunity
+      ? this.opportunity.subheading
+      : this.modifyTranslationOpportunity.subheading;
+    this.heading = this.opportunity
+      ? this.opportunity.heading
+      : this.modifyTranslationOpportunity.heading;
     this.contextService.setImageSaveDestinationToLocalStorage();
     this.languageDescription =
       this.translationLanguageService.getActiveLanguageDescription();
-    this.translateTextService.init(
-      this.opportunity.id,
-      this.translationLanguageService.getActiveLanguageCode(),
-      () => {
-        const translatableItem = this.translateTextService.getTextToTranslate();
-        this.updateActiveState(translatableItem);
-        ({more: this.moreAvailable} = translatableItem);
-        this.loadingData = false;
-      }
-    );
+
+    if (!this.modifyTranslationOpportunity) {
+      // We need to set the context here so that the rte fetches
+      // images for the given ENTITY_TYPE and targetId.
+      this.contextService.setCustomEntityContext(
+        AppConstants.ENTITY_TYPE.EXPLORATION,
+        this.opportunity.id
+      );
+
+      this.translateTextService.init(
+        this.opportunity.id,
+        this.translationLanguageService.getActiveLanguageCode(),
+        () => {
+          const translatableItem =
+            this.translateTextService.getTextToTranslate();
+          this.updateActiveState(translatableItem);
+          ({more: this.moreAvailable} = translatableItem);
+          this.loadingData = false;
+        }
+      );
+    } else {
+      // Initialize the translation modal with the "modify translation" opportunity
+      // in case it was called from the exploration editor page for modifying
+      // a particular translation.
+      this.textToTranslate = this.modifyTranslationOpportunity.textToTranslate;
+      const contentType =
+        this.modifyTranslationOpportunity.contentId.split('_')[0];
+      this.activeContentType = this.getFormattedContentType(
+        contentType,
+        this.modifyTranslationOpportunity.interactionId
+      );
+      this.activeWrittenTranslation =
+        this.modifyTranslationOpportunity.currentContentTranslation.translation;
+      this.activeDataFormat =
+        this.modifyTranslationOpportunity.currentContentTranslation.dataFormat;
+      this.loadingData = false;
+    }
+
     this.userService
       .getUserContributionRightsDataAsync()
       .then(userContributionRights => {
@@ -538,7 +575,7 @@ export class TranslationModalComponent {
     );
   }
 
-  suggestTranslatedText(): void {
+  translatedTextCanBeSubmitted(): boolean {
     if (!this.isSetOfStringDataFormat()) {
       const domParser = new DOMParser();
       const originalElements = domParser.parseFromString(
@@ -567,12 +604,19 @@ export class TranslationModalComponent {
         this.uploadingTranslation ||
         this.loadingData
       ) {
-        return;
+        return false;
       }
 
       if (this.hadCopyParagraphError) {
         this.hadCopyParagraphError = false;
       }
+    }
+    return true;
+  }
+
+  suggestTranslatedText(): void {
+    if (!this.translatedTextCanBeSubmitted()) {
+      return;
     }
 
     if (!this.uploadingTranslation && !this.loadingData) {
@@ -611,6 +655,12 @@ export class TranslationModalComponent {
       this.contextService.resetImageSaveDestination();
       this.close();
     }
+  }
+  updateTranslatedText(): void {
+    if (!this.translatedTextCanBeSubmitted()) {
+      return;
+    }
+    this.activeModal.close(this.activeWrittenTranslation);
   }
 }
 

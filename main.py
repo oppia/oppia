@@ -223,7 +223,6 @@ URLS = [
     get_redirect_route(r'/splash', SplashRedirectPage),
     get_redirect_route(
         r'/internetconnectivityhandler', InternetConnectivityHandler),
-    get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),
     get_redirect_route(r'/site_guidelines', pages.TeachRedirectPage),
@@ -236,6 +235,12 @@ URLS = [
         r'%s/can_access_classroom_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ClassroomAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_classrooms_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ClassroomsPageAccessValidationHandler
+    ),
 
     get_redirect_route(
         r'%s/can_access_collection_editor_page/<collection_id>' %
@@ -481,6 +486,15 @@ URLS = [
         r'%s' % feconf.NEW_CLASSROOM_ID_HANDLER_URL,
         classroom.NewClassroomIdHandler),
     get_redirect_route(
+        r'%s' % feconf.NEW_CLASSROOM_HANDLER_URL,
+        classroom.NewClassroomHandler),
+    get_redirect_route(
+        r'%s' % feconf.TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL,
+        classroom.TopicsToClassroomsRelationHandler),
+    get_redirect_route(
+        r'%s' % feconf.ALL_CLASSROOMS_SUMMARY_HANDLER_URL,
+        classroom.AllClassroomsSummaryHandler),
+    get_redirect_route(
         r'%s/<classroom_id>' % feconf.CLASSROOM_HANDLER_URL,
         classroom.ClassroomHandler),
     get_redirect_route(
@@ -632,7 +646,6 @@ URLS = [
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
     get_redirect_route(r'/gallery', library.LibraryRedirectPage),
     get_redirect_route(r'/contribute', library.LibraryRedirectPage),
-    get_redirect_route(r'/learn', classroom.DefaultClassroomRedirectPage),
     get_redirect_route(r'/playtest', library.LibraryRedirectPage),
     get_redirect_route(
         feconf.EXPLORATION_SUMMARIES_DATA_URL,
@@ -1267,6 +1280,16 @@ URLS.extend((
         tasks.FeedbackThreadStatusChangeEmailHandler),
     get_redirect_route(
         r'%s' % feconf.TASK_URL_DEFERRED, tasks.DeferredTasksHandler),
+))
+
+# Add URLs to static resources that differ between deployments.
+URLS.extend((
+    get_redirect_route('/favicon.ico', resources.FaviconHandler),
+    get_redirect_route('/robots.txt', resources.RobotsTxtHandler),
+    get_redirect_route(
+        '/assets/copyrighted-images/<folder>/<filename>',
+        resources.CopyrightImagesHandler
+    ),
 ))
 
 # 404 error handler (Needs to be at the end of the URLS list).

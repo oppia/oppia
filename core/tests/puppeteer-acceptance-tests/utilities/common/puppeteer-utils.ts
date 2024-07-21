@@ -16,16 +16,11 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, {
-  Page,
-  Frame,
-  Browser,
-  Viewport,
-  ElementHandle,
-} from 'puppeteer';
+import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
+import {TestToModulesMatcher} from '../../../test-dependencies/test-to-modules-matcher';
 import {showMessage} from './show-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
@@ -38,7 +33,9 @@ const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const acceptedBrowserAlerts = [
   '',
   'Changes that you made may not be saved.',
+  'This action is irreversible.',
   'This action is irreversible. Are you sure?',
+  'This action is irreversible. If you insist to proceed, please enter the commit message for the update',
 ];
 
 interface ClickDetails {
@@ -78,6 +75,7 @@ export class BaseUser {
 
     const headless = process.env.HEADLESS === 'true';
     const mobile = process.env.MOBILE === 'true';
+    const specName = process.env.SPEC_NAME;
     /**
      * Here we are disabling the site isolation trials because it is causing
      * tests to fail while running in non headless mode (see
@@ -99,6 +97,12 @@ export class BaseUser {
         this.startTimeInMilliseconds = Date.now();
         this.browserObject = browser;
         ConsoleReporter.trackConsoleMessagesInBrowser(browser);
+        if (!mobile) {
+          TestToModulesMatcher.setGoldenFilePath(
+            `core/tests/test-modules-mappings/acceptance/${specName}.txt`
+          );
+          TestToModulesMatcher.registerPuppeteerBrowser(browser);
+        }
         this.page = await browser.newPage();
 
         if (mobile) {
@@ -131,6 +135,16 @@ export class BaseUser {
       });
 
     return this.page;
+  }
+
+  /**
+   * Checks if the application is in development mode.
+   * @returns {Promise<boolean>} Returns true if the application is in development mode,
+   * false otherwise.
+   */
+  async isInProdMode(): Promise<boolean> {
+    const prodMode = process.env.PROD_ENV === 'true';
+    return prodMode;
   }
 
   /**
@@ -346,28 +360,6 @@ export class BaseUser {
   }
 
   /**
-   * Clicks an element on the page.
-   * @param {Page | Frame | ElementHandle} context - The Puppeteer context, usually a Page or Frame.
-   * @param {string} selector - The CSS selector of the element to click.
-   */
-  async clickElement(
-    context: Page | Frame | ElementHandle,
-    selector: string
-  ): Promise<void> {
-    const element = await context.$(selector);
-    if (!element) {
-      throw new Error(`Element ${selector} not found`);
-    }
-    await this.waitForElementToBeClickable(element);
-
-    try {
-      await element.click();
-    } catch (error) {
-      throw new Error(`Failed to click on element ${selector}`);
-    }
-  }
-
-  /**
    * This function retrieves the text content of a specified element.
    */
   async getElementText(selector: string): Promise<string> {
@@ -381,8 +373,8 @@ export class BaseUser {
   }
 
   /**
-   * This function checks if a particular text exists on the current page.
-   * @param {string} text - The text to check for.
+   * Checks if a given word is present on the page.
+   * @param {string} word - The word to check.
    */
   async isTextPresentOnPage(text: string): Promise<boolean> {
     const pageContent = await this.page.content();
@@ -403,7 +395,8 @@ export class BaseUser {
    * This function types the text in the input field using its CSS selector.
    */
   async type(selector: string, text: string): Promise<void> {
-    await this.page.waitForSelector(selector);
+    await this.page.waitForSelector(selector, {visible: true});
+    await this.waitForElementToBeClickable(selector);
     await this.page.type(selector, text);
   }
 
@@ -412,6 +405,7 @@ export class BaseUser {
    */
   async select(selector: string, option: string): Promise<void> {
     await this.page.waitForSelector(selector);
+    await this.waitForElementToBeClickable(selector);
     await this.page.select(selector, option);
   }
 
@@ -444,7 +438,7 @@ export class BaseUser {
     selector: string,
     expectedUrl: string
   ): Promise<void> {
-    await this.page.waitForSelector(selector);
+    await this.page.waitForSelector(selector, {visible: true});
     const href = await this.page.$eval(selector, element =>
       element.getAttribute('href')
     );
@@ -535,10 +529,60 @@ export class BaseUser {
   }
 
   /**
-   * Waits for the page to fully load by checking the document's ready state.
+   * Waits for the static assets on the page to load.
+   */
+  async waitForStaticAssetsToLoad(): Promise<void> {
+    await this.page.waitForFunction('document.readyState === "complete"');
+  }
+
+  /**
+   * Waits for the page to fully load by checking the document's ready state and waiting for the respective
+   * HTML to load completely.
+   *
+   * Caution: Using this function multiple times in the same test can increase the test execution time,
+   * as it waits for the page to fully load.
    */
   async waitForPageToFullyLoad(): Promise<void> {
     await this.page.waitForFunction('document.readyState === "complete"');
+    await this.waitTillHTMLRendered(this.page);
+  }
+
+  /**
+   * This function waits until a page is fully rendered.
+   * It does so via checking every second if the size of the HTML content of the page is stable.
+   * If the size is stable for at least 3 checks, it considers the page fully rendered.
+   * If the size is not stable within the timeout, it stops checking.
+   * @param {Page} page - The page to wait for.
+   * @param {number} timeout - The maximum amount of time to wait, in milliseconds. Default is 30000.
+   */
+  private async waitTillHTMLRendered(
+    page: Page,
+    timeout: number = 30000
+  ): Promise<void> {
+    const checkDurationMsecs = 1000;
+    const maxChecks = timeout / checkDurationMsecs;
+    let lastHTMLSize = 0;
+    let checkCounts = 1;
+    let countStableSizeIterations = 0;
+    const minStableSizeIterations = 3;
+
+    while (checkCounts++ <= maxChecks) {
+      let html = await page.content();
+      let currentHTMLSize = html.length;
+
+      if (lastHTMLSize !== 0 && currentHTMLSize === lastHTMLSize) {
+        countStableSizeIterations++;
+      } else {
+        countStableSizeIterations = 0;
+      }
+      if (countStableSizeIterations >= minStableSizeIterations) {
+        showMessage('Page rendered fully.');
+        break;
+      }
+
+      lastHTMLSize = currentHTMLSize;
+      await page.waitForTimeout(checkDurationMsecs);
+    }
   }
 }
 

@@ -1,0 +1,1 @@
+core/templates/pages/classrooms-page/classrooms-page.module.ts

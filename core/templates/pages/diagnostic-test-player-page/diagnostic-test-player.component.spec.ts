@@ -122,7 +122,8 @@ describe('Diagnostic test player component', () => {
 
     expect(component.OPPIA_AVATAR_IMAGE_URL).toEqual('');
 
-    const avatarImageLocation = '/assets/images/avatar/oppia_avatar_100px.svg';
+    const avatarImageLocation =
+      '/assets/copyrighted-images/avatar/oppia_avatar_100px.svg';
 
     component.ngOnInit();
 
@@ -234,7 +235,18 @@ describe('Diagnostic test player component', () => {
     );
 
     let array: CreatorTopicSummary[] = [cData1, cData2];
-    let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
+    let classroomData = new ClassroomData(
+      'id',
+      'test',
+      'test',
+      array,
+      'dummy',
+      'dummy',
+      'dummy',
+      true,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'}
+    );
 
     spyOn(
       classroomBackendApiService,
