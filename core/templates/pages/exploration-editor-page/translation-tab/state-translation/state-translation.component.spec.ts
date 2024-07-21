@@ -423,48 +423,6 @@ describe('State translation component', () => {
         ).toHaveBeenCalledWith('content_1', 'html');
       });
 
-      it('should get disabled voiceover contribution feature flag data', () => {
-        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-          EnableVoiceoverContribution: {
-            isEnabled: false,
-          },
-        } as FeatureStatusChecker);
-
-        expect(component.isVoiceoverContributionEnabled()).toBeFalse();
-      });
-
-      it('should get enabled voiceover contribution feature flag data', () => {
-        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-          EnableVoiceoverContribution: {
-            isEnabled: true,
-          },
-        } as FeatureStatusChecker);
-
-        expect(component.isVoiceoverContributionEnabled()).toBeTrue();
-      });
-
-      it('should disable voiceover with accent feature flag data', () => {
-        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-          AddVoiceoverWithAccent: {
-            isEnabled: false,
-          },
-        } as FeatureStatusChecker);
-
-        expect(
-          component.isVoiceoverContributionWithAccentEnabled()
-        ).toBeFalse();
-      });
-
-      it('should enable voiceover with accent feature flag data', () => {
-        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-          AddVoiceoverWithAccent: {
-            isEnabled: true,
-          },
-        } as FeatureStatusChecker);
-
-        expect(component.isVoiceoverContributionWithAccentEnabled()).toBeTrue();
-      });
-
       it(
         'should get customization argument translatable customization' +
           ' arguments',

@@ -178,10 +178,6 @@ export class TranslationStatusService implements OnInit {
         let stateNeedsUpdate = false;
         let noTranslationCount = 0;
         let noVoiceoverCount = 0;
-        // let recordedVoiceovers =
-        //   this.explorationStatesService.getRecordedVoiceoversMemento(stateName);
-        // let allContentIds = recordedVoiceovers.getAllContentIds();
-
         let allContentIds =
           this.explorationStatesService.getAllContentIdsByStateName(stateName);
 
@@ -360,8 +356,6 @@ export class TranslationStatusService implements OnInit {
     let stateName = this.stateEditorService.getActiveStateName();
 
     return this.explorationStatesService.getAllContentIdsByStateName(stateName);
-    // let recordedVoiceovers = this.stateRecordedVoiceoversService.displayed;
-    // return recordedVoiceovers.getAllContentIds();
   }
 
   _getActiveStateComponentNeedsUpdateStatus(componentName: string): boolean {

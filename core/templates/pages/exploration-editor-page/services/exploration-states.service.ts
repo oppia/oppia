@@ -584,7 +584,8 @@ export class ExplorationStatesService {
   }
 
   getAllContentIdsByStateName(stateName: string) {
-    return this._states.getState(stateName).getAllContentIds();
+    let allContentIds = this._states.getState(stateName).getAllContentIds();
+    return allContentIds.filter(contentId => contentId !== undefined);
   }
 
   getStateNames(): string[] {
@@ -739,21 +740,6 @@ export class ExplorationStatesService {
 
   saveSolution(stateName: string, newSolution: SubtitledHtml): void {
     this.saveStateProperty(stateName, 'solution', newSolution);
-  }
-
-  getRecordedVoiceoversMemento(stateName: string): RecordedVoiceovers {
-    return this.getStatePropertyMemento(stateName, 'recorded_voiceovers');
-  }
-
-  saveRecordedVoiceovers(
-    stateName: string,
-    newRecordedVoiceovers: RecordedVoiceovers
-  ): void {
-    this.saveStateProperty(
-      stateName,
-      'recorded_voiceovers',
-      newRecordedVoiceovers
-    );
   }
 
   getSolicitAnswerDetailsMemento(stateName: string): boolean {

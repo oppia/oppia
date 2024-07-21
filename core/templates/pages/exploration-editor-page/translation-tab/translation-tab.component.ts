@@ -84,13 +84,6 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     this.stateTutorialFirstTimeService.initTranslation(
       this.contextService.getExplorationId()
     );
-    let stateName = this.stateEditorService.getActiveStateName();
-    if (stateName) {
-      this.stateRecordedVoiceoversService.init(
-        stateName,
-        this.explorationStatesService.getRecordedVoiceoversMemento(stateName)
-      );
-    }
     this.showTranslationTabSubDirectives = true;
     this.translationTabActiveModeService.activateVoiceoverMode();
     this.loaderService.hideLoadingScreen();

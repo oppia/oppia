@@ -22,6 +22,7 @@ import {downgradeInjectable} from '@angular/upgrade/static';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 
 export interface LanguageAccentCodeToEntityVoiceovers {
   [languageAccentCode: string]: EntityVoiceovers;
@@ -39,7 +40,10 @@ export class EntityVoiceoversService {
   public languageAccentCodeToEntityVoiceovers: LanguageAccentCodeToEntityVoiceovers =
     {};
 
-  constructor(private voiceoverBackendApiService: VoiceoverBackendApiService) {}
+  constructor(
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private changeListService: ChangeListService
+  ) {}
 
   init(
     entityId: string,
@@ -152,6 +156,36 @@ export class EntityVoiceoversService {
     }
 
     return contentIdToVoiceovers;
+  }
+
+  checkVoiceoverWithGivenContentIdIsAvailable(contentId: string): boolean {
+    for (let languageAccentCode in this.languageAccentCodeToEntityVoiceovers) {
+      let entityVoiceovers =
+        this.languageAccentCodeToEntityVoiceovers[languageAccentCode];
+      if (contentId in entityVoiceovers.voiceoversMapping) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  markVoiceoversWithGivenContentIdAsStale(contentId: string): void {
+    for (let languageAccentCode in this.languageAccentCodeToEntityVoiceovers) {
+      let entityVoiceovers =
+        this.languageAccentCodeToEntityVoiceovers[languageAccentCode];
+      if (contentId in entityVoiceovers.voiceoversMapping) {
+        let manualVoiceover =
+          entityVoiceovers.voiceoversMapping[contentId].manual;
+
+        manualVoiceover.needsUpdate = true;
+
+        this.changeListService.editVoiceovers(contentId, languageAccentCode, {
+          manual: (manualVoiceover as Voiceover).toBackendDict(),
+        });
+
+        this.addEntityVoiceovers(languageAccentCode, entityVoiceovers);
+      }
+    }
   }
 }
 

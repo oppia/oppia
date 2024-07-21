@@ -156,12 +156,6 @@ describe('Question update service', function () {
           id: 'TextInput',
         },
         linked_skill_id: null,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
         solicit_answer_details: false,
       };
 
@@ -223,12 +217,6 @@ describe('Question update service', function () {
           id: 'TextInput',
         },
         linked_skill_id: null,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
         solicit_answer_details: false,
       };
 
