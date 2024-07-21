@@ -50,9 +50,10 @@ export class PostPublishModalComponent
   }
 
   ngOnInit(): void {
-    this.congratsImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/general/congrats.svg'
-    );
+    this.congratsImgUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/general/congrats.svg'
+      );
     this.explorationId = this.contextService.getExplorationId();
     this.explorationLinkCopied = false;
     this.explorationLink =
