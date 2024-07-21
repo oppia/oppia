@@ -197,7 +197,8 @@ describe('Classroom Page Component', () => {
       'Learn math',
       true,
       {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
-      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'}
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1
     );
     spyOn(
       accessValidationBackendApiService,
@@ -378,7 +379,8 @@ describe('Classroom Page Component', () => {
       'Learn math',
       false,
       {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
-      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'}
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1
     );
 
     spyOn(
