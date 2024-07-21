@@ -47,41 +47,14 @@ describe('Logged-out User', function () {
       'logged_in_user@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.createMinimalExploration(
-      'Introduction to Algebra',
-      INTERACTION_TYPES.END_EXPLORATION
-    );
-    await explorationEditor.saveExplorationDraft();
-
-    explorationId1 = await explorationEditor.publishExplorationWithMetadata(
-      'Algebra I',
-      'Learn the basics of Algebra',
-      'Algebra'
-    );
-    if (!explorationId1) {
-      throw new Error('Error in publishing the first exploration');
-    }
-
-    await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.createMinimalExploration(
-      'Advanced Algebra',
-      INTERACTION_TYPES.END_EXPLORATION
-    );
-    await explorationEditor.saveExplorationDraft();
-
-    explorationId2 = await explorationEditor.publishExplorationWithMetadata(
-      'Algebra II',
-      'Learn advanced Algebra',
-      'Algebra'
-    );
-    if (!explorationId2) {
-      throw new Error('Error in publishing the second exploration');
-    }
+    explorationId1 =
+      await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
+        'Algebra I'
+      );
+    explorationId2 =
+      await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
+        'Algebra II'
+      );
 
     loggedInUser.playExploration(explorationId1);
     loggedInUser.rateExploration(4, 'Great introduction to Algebra', false);

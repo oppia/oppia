@@ -1442,6 +1442,61 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(closeTopicDependencyButton);
     await this.page.waitForSelector(topicDependencyGraphDiv, {visible: false});
   }
+
+  /**
+   * Creates and publishes a topic with a subtopic and skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} skillName - The name of the skill.
+   */
+  async createAndPublishTopic(
+    topicName: string,
+    subtopicName: string,
+    skillName: string
+  ) {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(' ', '-')
+    );
+    await this.createSubtopicForTopic(
+      subtopicName,
+      subtopicName.toLowerCase().replace(' ', '-'),
+      topicName
+    );
+
+    await this.createSkillForTopic(skillName, topicName);
+    await this.createQuestionsForSkill(skillName, 3);
+    await this.assignSkillToSubtopicInTopicEditor(
+      skillName,
+      subtopicName,
+      topicName
+    );
+    await this.addSkillToDiagnosticTest(skillName, topicName);
+
+    await this.publishDraftTopic(topicName);
+  }
+
+  /**
+   * Creates, updates, and publishes a new classroom with a topic.
+   * @param {string} classroomName - The name of the classroom.
+   * @param {string} urlFragment - The URL fragment for the classroom.
+   * @param {string} topicToBeAssigned - The name of the topic to be assigned to the classroom.
+   */
+  async createAndPublishClassroom(
+    classroomName: string,
+    urlFragment: string,
+    topicToBeAssigned: string
+  ) {
+    await this.createNewClassroom(classroomName, urlFragment);
+    await this.updateClassroom(
+      classroomName,
+      'Teaser text',
+      'Course details',
+      'Topic list intro'
+    );
+    await this.addTopicToClassroom(classroomName, topicToBeAssigned);
+    await this.publishClassroom(classroomName);
+  }
 }
 
 export let CurriculumAdminFactory = (): CurriculumAdmin =>

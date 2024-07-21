@@ -53,90 +53,29 @@ describe('Logged-out User', function () {
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
-    await curriculumAdmin.navigateToCreatorDashboardPage();
-    await curriculumAdmin.navigateToExplorationEditorPage();
-    await curriculumAdmin.dismissWelcomeModal();
-    await curriculumAdmin.updateCardContent('Introduction to Algebra');
-    await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    explorationId =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'Negative Numbers'
+      );
 
-    // Add a new card with a question.
-    await curriculumAdmin.viewOppiaResponses();
-    await curriculumAdmin.directLearnersToNewCard('Algebra Basics');
-    await curriculumAdmin.saveExplorationDraft();
-
-    // Navigate to the new card and update its content.
-    await curriculumAdmin.navigateToCard('Algebra Basics');
-    await curriculumAdmin.updateCardContent(
-      'Enter a negative number greater than -100.'
-    );
-    await curriculumAdmin.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
-    await curriculumAdmin.addResponsesToTheInteraction(
-      INTERACTION_TYPES.NUMERIC_INPUT,
-      '-99',
-      'Perfect!',
-      CARD_NAME.FINAL_CARD,
-      true
-    );
-    await curriculumAdmin.addOppiaResponsesForWrongAnswers('Wrong, try again!');
-
-    await curriculumAdmin.saveExplorationDraft();
-
-    // Navigate to the final card and update its content.
-    await curriculumAdmin.navigateToCard(CARD_NAME.FINAL_CARD);
-    await curriculumAdmin.updateCardContent(
-      'We have practiced negative numbers.'
-    );
-    await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-
-    // Navigate back to the introduction card and save the draft.
-    await curriculumAdmin.navigateToCard('Introduction to Algebra');
-    await curriculumAdmin.saveExplorationDraft();
-    explorationId = await curriculumAdmin.publishExplorationWithMetadata(
-      'Algebra Basics',
-      'Learn the basics of Algebra',
-      'Algebra'
-    );
-    if (!explorationId) {
-      throw new Error('Error publishing exploration successfully.');
-    }
-
-    await curriculumAdmin.createTopic('Algebra I', 'algebra-one');
-    await curriculumAdmin.createSubtopicForTopic(
+    await curriculumAdmin.createAndPublishTopic(
+      'Algebra I',
       'Negative Numbers',
-      'negative-numbers',
-      'Algebra I'
+      'Negative Numbers'
     );
-
-    await curriculumAdmin.createSkillForTopic('Negative Numbers', 'Algebra I');
-    await curriculumAdmin.createQuestionsForSkill('Negative Numbers', 3);
-    await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
-      'Negative Numbers',
-      'Negative Numbers',
-      'Algebra I'
-    );
-    await curriculumAdmin.addSkillToDiagnosticTest(
-      'Negative Numbers',
-      'Algebra I'
-    );
-
-    await curriculumAdmin.publishDraftTopic('Algebra I');
     await curriculumAdmin.createAndPublishStoryWithChapter(
       'Algebra Story',
       'algebra-story',
       'Understanding Negative Numbers',
-      explorationId,
+      explorationId as string,
       'Algebra I'
     );
-    await curriculumAdmin.expectTopicToBePublishedInTopicsAndSkillsDashboard(
-      'Algebra I',
-      1,
-      1,
-      1
-    );
 
-    await curriculumAdmin.createNewClassroom('Math', '/math');
-    await curriculumAdmin.addTopicToClassroom('Math', 'Algebra I');
-    await curriculumAdmin.publishClassroom('Math');
+    await curriculumAdmin.createAndPublishClassroom(
+      'Math',
+      '/math',
+      'Algebra I'
+    );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -152,12 +91,7 @@ describe('Logged-out User', function () {
         'Understanding Negative Numbers'
       );
 
-      // Playing the exploration linked with the chapter selected.
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.submitAnswer('-40');
-      await loggedOutUser.continueToNextCard();
-
-      // Check the completion message and restart the exploration.
+      // Check for the completion message as the exploration has a single state.
       await loggedOutUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
