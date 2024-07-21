@@ -212,7 +212,7 @@ describe('Contributor dashboard page', () => {
       expect(translationTopicService.setActiveTopicName).toHaveBeenCalled();
       expect(component.activeTabName).toBe('myContributionTab');
       expect(component.OPPIA_AVATAR_IMAGE_URL).toBe(
-        '/assets/images/avatar/oppia_avatar_100px.svg'
+        '/assets/copyrighted-images/avatar/oppia_avatar_100px.svg'
       );
       expect(component.profilePicturePngDataUrl).toEqual(
         'default-image-url-png'
