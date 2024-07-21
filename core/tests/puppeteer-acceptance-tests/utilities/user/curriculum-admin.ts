@@ -906,7 +906,7 @@ export class CurriculumAdmin extends BaseUser {
    * Function to publish a story.
    * @param {string} storyId - The Id of the story to publish.
    */
-  async publishDraftStory(storyId): Promise<void> {
+  async publishDraftStory(storyId: string): Promise<void> {
     await this.openStoryEditor(storyId);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileSaveStoryChangesDropdown);
@@ -1288,7 +1288,7 @@ export class CurriculumAdmin extends BaseUser {
     }
   }
 
-  async showPracticeTabToLearner(topicName: string) {
+  async showPracticeTabToLearner(topicName: string): Promise<void> {
     await this.openTopicEditor(topicName);
     await this.clickOn(enablePracticeTabToLearnersButton);
     await this.saveTopicDraft(topicName);
@@ -1503,10 +1503,6 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.clickOn(closeTopicDependencyButton);
     await this.page.waitForSelector(topicDependencyGraphDiv, {visible: false});
-  }
-
-  async timeout(time) {
-    await this.page.waitForTimeout(time);
   }
 }
 
