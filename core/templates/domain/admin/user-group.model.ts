@@ -16,33 +16,24 @@
  * @fileoverview Frontend Model for User Group.
  */
 
-  export interface UserGroupBackendDict {
-    user_group_name: string;
-    users: string[];
+export interface UserGroupBackendDict {
+  user_group_name: string;
+  users: string[];
+}
+
+/**
+ * Frontend domain object representation of user groups.
+ */
+export class UserGroup {
+  userGroupName: string;
+  users: string[];
+
+  constructor(userGroupName: string, users: string[]) {
+    this.userGroupName = userGroupName;
+    this.users = users;
   }
 
-  /**
-   * Frontend domain object representation of user groups.
-   */
-  export class UserGroup {
-    userGroupName: string;
-    users: string[];
-
-    constructor(
-      userGroupName: string,
-      users: string[]
-    ) {
-      this.userGroupName = userGroupName;
-      this.users = users;
-    }
-
-    static createFromBackendDict(
-      backendDict: UserGroupBackendDict
-    ): UserGroup {
-      return new UserGroup(
-        backendDict.user_group_name,
-        backendDict.users
-      );
-    }
+  static createFromBackendDict(backendDict: UserGroupBackendDict): UserGroup {
+    return new UserGroup(backendDict.user_group_name, backendDict.users);
   }
-  
+}

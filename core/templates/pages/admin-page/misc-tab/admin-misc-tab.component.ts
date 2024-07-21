@@ -84,7 +84,7 @@ export class AdminMiscTabComponent {
   loadingMessage: string = '';
   newUserGroupName: string = '';
   separatorKeysCodes: number[] = [ENTER];
-  userGroupsBackup: Map<string, UserGroup>;
+  userGroupsBackup!: Map<string, UserGroup>;
   userGroups: UserGroup[] = [];
   userGroupIdsToDetailsShowRecord: Record<string, boolean> = {};
   allUsersUsernames: string[] = [];
@@ -109,13 +109,15 @@ export class AdminMiscTabComponent {
     this.userGroups = data.userGroups;
     this.allUsersUsernames = data.allUsersUsernames;
     this.userGroupsBackup = new Map(
-      this.userGroups.map(
-        userGroup => [userGroup.userGroupName, cloneDeep(userGroup)])
+      this.userGroups.map(userGroup => [
+        userGroup.userGroupName,
+        cloneDeep(userGroup),
+      ])
     );
     for (let userGroup of this.userGroups) {
       this.userGroupIdsToDetailsShowRecord[userGroup.userGroupName] = false;
-      this.oldUserGroupNameToNewUserGroupNameRecord[
-        userGroup.userGroupName] = userGroup.userGroupName;
+      this.oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName] =
+        userGroup.userGroupName;
     }
     this.loaderService.hideLoadingScreen();
   }
@@ -123,8 +125,8 @@ export class AdminMiscTabComponent {
   toggleUserGroupDetailsSection(userGroupId: string): void {
     let currentValue = this.userGroupIdsToDetailsShowRecord[userGroupId];
     if (currentValue === false && this.userGroupInEditMode === true) {
-      this.userGroupSaveError = (
-        'Please save or cancel the changes before editing other user group.');
+      this.userGroupSaveError =
+        'Please save or cancel the changes before editing other user group.';
       return;
     }
     this.userGroupIdsToDetailsShowRecord[userGroupId] =
@@ -152,30 +154,27 @@ export class AdminMiscTabComponent {
     );
     modalRef.result.then(
       () => {
-        this.setStatusMessage.emit('Updating UserGroups...');
-
         this.adminTaskManagerService.startTask();
-        this.adminBackendApiService
-          .deleteUserGroupAsync(userGroupId)
-          .then(
-            () => {
-              this.setStatusMessage.emit('UserGroups successfully updated.');
-              this.userGroups = this.userGroups.filter(
-                userGroup => userGroup.userGroupName !== userGroupId);
-              delete this.userGroups[userGroupId];
-              delete this.userGroupIdsToDetailsShowRecord[userGroupId];
-              delete this.oldUserGroupNameToNewUserGroupNameRecord[userGroupId];
-              this.userGroupsBackup.delete(userGroupId);
-              this.userGroupSaveError = '';
-              this.userGroupInEditMode = false;
-              this.cdr.detectChanges();
-              this.adminTaskManagerService.finishTask();
-            },
-            errorResponse => {
-              this.setStatusMessage.emit(`Server error: ${errorResponse}`);
-              this.adminTaskManagerService.finishTask();
-            }
-          );
+        this.adminBackendApiService.deleteUserGroupAsync(userGroupId).then(
+          () => {
+            this.setStatusMessage.emit('UserGroups successfully deleted.');
+            this.userGroups = this.userGroups.filter(
+              userGroup => userGroup.userGroupName !== userGroupId
+            );
+            delete this.userGroups[userGroupId];
+            delete this.userGroupIdsToDetailsShowRecord[userGroupId];
+            delete this.oldUserGroupNameToNewUserGroupNameRecord[userGroupId];
+            this.userGroupsBackup.delete(userGroupId);
+            this.userGroupSaveError = '';
+            this.userGroupInEditMode = false;
+            this.cdr.detectChanges();
+            this.adminTaskManagerService.finishTask();
+          },
+          errorResponse => {
+            this.setStatusMessage.emit(`Server error: ${errorResponse}`);
+            this.adminTaskManagerService.finishTask();
+          }
+        );
       },
       () => {
         // Note to developers:
@@ -197,15 +196,13 @@ export class AdminMiscTabComponent {
     }
 
     if (userGroup.users.includes(value)) {
-      this.userInUserGroupValidationError = (
+      this.userInUserGroupValidationError =
         `The user '${value}' already exists in the ` +
-        `user group '${userGroup.userGroupName}'.`
-      );
+        `user group '${userGroup.userGroupName}'.`;
       return;
     }
     if (!this.allUsersUsernames.includes(value)) {
-      this.userInUserGroupValidationError = (
-        `The user with username '${value}' does not exists.`);
+      this.userInUserGroupValidationError = `The user with username '${value}' does not exists.`;
       return;
     }
     userGroup.users.push(value);
@@ -214,20 +211,19 @@ export class AdminMiscTabComponent {
 
   addUserGroup(): void {
     const trimmedUserGroupName = this.newUserGroupName.trim();
-    if (trimmedUserGroupName in this.userGroups) {
+    if (
+      this.userGroups.some(
+        userGroup => userGroup.userGroupName === trimmedUserGroupName
+      )
+    ) {
       this.userGroupValidationError = '';
-      this.userGroupValidationError = (
-        `The user group '${this.newUserGroupName}' already exists.`);
+      this.userGroupValidationError = `The user group '${this.newUserGroupName}' already exists.`;
       return;
     }
 
     if (trimmedUserGroupName !== '') {
       this.adminBackendApiService
-        .updateUserGroupAsync(
-          trimmedUserGroupName,
-          [],
-          trimmedUserGroupName
-        )
+        .updateUserGroupAsync(trimmedUserGroupName, [], trimmedUserGroupName)
         .then(
           () => {
             this.setStatusMessage.emit('UserGroup added.');
@@ -235,9 +231,12 @@ export class AdminMiscTabComponent {
             this.userGroups.push(newUserGroup);
             this.userGroupIdsToDetailsShowRecord[trimmedUserGroupName] = false;
             this.userGroupsBackup.set(
-              trimmedUserGroupName, cloneDeep(newUserGroup));
+              trimmedUserGroupName,
+              cloneDeep(newUserGroup)
+            );
             this.oldUserGroupNameToNewUserGroupNameRecord[
-              trimmedUserGroupName] = trimmedUserGroupName;
+              trimmedUserGroupName
+            ] = trimmedUserGroupName;
             this.newUserGroupName = '';
             this.cdr.detectChanges();
           },
@@ -257,9 +256,7 @@ export class AdminMiscTabComponent {
     this.userGroupValidationError = '';
   }
 
-  isUserGroupUpdated(
-    userGroup: UserGroup, newUserGroupName: string
-  ): boolean {
+  isUserGroupUpdated(userGroup: UserGroup, newUserGroupName: string): boolean {
     if (userGroup.userGroupName !== newUserGroupName) {
       return true;
     }
@@ -280,8 +277,7 @@ export class AdminMiscTabComponent {
       newUserGroupName in this.oldUserGroupNameToNewUserGroupNameRecord
     ) {
       this.userGroupSaveError = '';
-      this.userGroupSaveError = (
-        `User group with name ${newUserGroupName} already exists.`);
+      this.userGroupSaveError = `User group with name ${newUserGroupName} already exists.`;
       return;
     }
 
@@ -305,18 +301,23 @@ export class AdminMiscTabComponent {
         () => {
           this.setStatusMessage.emit('UserGroups successfully updated.');
           if (userGroup.userGroupName !== newUserGroupName) {
-            this.oldUserGroupNameToNewUserGroupNameRecord[
-              newUserGroupName] = newUserGroupName;
+            this.oldUserGroupNameToNewUserGroupNameRecord[newUserGroupName] =
+              newUserGroupName;
             delete this.oldUserGroupNameToNewUserGroupNameRecord[
-              userGroup.userGroupName];
+              userGroup.userGroupName
+            ];
             this.userGroupIdsToDetailsShowRecord[newUserGroupName] = false;
             delete this.userGroupIdsToDetailsShowRecord[
-              userGroup.userGroupName];
+              userGroup.userGroupName
+            ];
             this.userGroupsBackup.set(newUserGroupName, cloneDeep(userGroup));
             this.userGroupsBackup.delete(userGroup.userGroupName);
             userGroup.userGroupName = newUserGroupName;
           }
-          this.userGroupsBackup.set(userGroup.userGroupName, cloneDeep(userGroup));
+          this.userGroupsBackup.set(
+            userGroup.userGroupName,
+            cloneDeep(userGroup)
+          );
 
           this.userGroupSaveError = '';
           this.userGroupInEditMode = false;
@@ -344,8 +345,8 @@ export class AdminMiscTabComponent {
       let backup = this.userGroupsBackup.get(userGroup.userGroupName);
       userGroup.userGroupName = backup.userGroupName;
       userGroup.users = backup.users;
-      this.oldUserGroupNameToNewUserGroupNameRecord[
-        userGroup.userGroupName] = userGroup.userGroupName;
+      this.oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName] =
+        userGroup.userGroupName;
       this.userGroupSaveError = '';
       this.userInUserGroupValidationError = '';
       this.userGroupValidationError = '';

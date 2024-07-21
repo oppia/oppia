@@ -25,9 +25,10 @@ import {
   tick,
 } from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
 import {AdminPageData} from 'domain/admin/admin-backend-api.service';
-import {UserGroup} from 'domain/admin/user-group.model'
+import {UserGroup} from 'domain/admin/user-group.model';
 import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -78,25 +79,26 @@ describe('Admin misc tab component ', () => {
 
   let statusMessageSpy: jasmine.Spy;
   let confirmSpy: jasmine.Spy;
+  let ngbModal: NgbModal;
 
   const adminPageData: AdminPageData = {
     userGroups: [
       UserGroup.createFromBackendDict({
         user_group_name: 'UserGroup1',
-        users: ['User1', 'User2', 'User3']
+        users: ['User1', 'User2', 'User3'],
       }),
       UserGroup.createFromBackendDict({
         user_group_name: 'UserGroup2',
-        users: ['User4', 'User5']
+        users: ['User4', 'User5'],
       }),
       UserGroup.createFromBackendDict({
         user_group_name: 'UserGroup3',
-        users: ['User6', 'User7', 'User8']
+        users: ['User6', 'User7', 'User8'],
       }),
       UserGroup.createFromBackendDict({
         user_group_name: 'UserGroup9',
-        users: ['User12', 'User13']
-      })
+        users: ['User12', 'User13'],
+      }),
     ],
     allUsersUsernames: [
       'User1',
@@ -134,6 +136,7 @@ describe('Admin misc tab component ', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminMiscTabComponent);
+    ngbModal = TestBed.inject(NgbModal);
     component = fixture.componentInstance;
   });
 
@@ -921,30 +924,44 @@ describe('Admin misc tab component ', () => {
       expect(component.userGroupValidationError).toEqual('');
     }));
 
+    it('should set user group in edit mode', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+
+      expect(component.userGroupInEditMode).toBeFalse();
+      component.setUserGroupInEditMode();
+      expect(component.userGroupInEditMode).toBeTrue();
+    }));
+
     describe('when clicking on save button to update user groups ', () => {
       it('should be same when no changes are present', fakeAsync(() => {
         component.ngOnInit();
         tick();
 
-        expect(component.userGroups[0].users).toEqual(
-          ['User1', 'User2', 'User3']);
+        expect(component.userGroups[0].users).toEqual([
+          'User1',
+          'User2',
+          'User3',
+        ]);
         component.updateUserGroup(component.userGroups[0], 'UserGroup1');
-        expect(component.userGroups[0].users).toEqual(
-          ['User1', 'User2', 'User3']);
+        expect(component.userGroups[0].users).toEqual([
+          'User1',
+          'User2',
+          'User3',
+        ]);
       }));
 
-      it('should not update user group name when it already exists',
-        fakeAsync(() => {
-          component.ngOnInit();
-          tick();
+      it('should not update user group name when it already exists', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
 
-          expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
-          component.updateUserGroup(component.userGroups[0], 'UserGroup2');
-          expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
-          expect(component.userGroupSaveError).toEqual(
-            'User group with name UserGroup2 already exists.');
-        }
-      ));
+        expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
+        component.updateUserGroup(component.userGroups[0], 'UserGroup2');
+        expect(component.userGroups[0].userGroupName).toEqual('UserGroup1');
+        expect(component.userGroupSaveError).toEqual(
+          'User group with name UserGroup2 already exists.'
+        );
+      }));
 
       it('should not update if a task is still running in the queue', fakeAsync(() => {
         component.ngOnInit();
@@ -980,7 +997,9 @@ describe('Admin misc tab component ', () => {
         } as ElementRef;
 
         component.addUserToUserGroup(
-          {value: 'User10'}, component.userGroups[0]);
+          {value: 'User10'},
+          component.userGroups[0]
+        );
         component.updateUserGroup(component.userGroups[0], 'UserGroup1');
         tick();
 
@@ -1024,7 +1043,9 @@ describe('Admin misc tab component ', () => {
         } as ElementRef;
 
         component.addUserToUserGroup(
-          {value: 'User10'}, component.userGroups[0]);
+          {value: 'User10'},
+          component.userGroups[0]
+        );
         component.updateUserGroup(component.userGroups[0], 'UserGroup1');
         tick();
 
@@ -1060,9 +1081,16 @@ describe('Admin misc tab component ', () => {
         component.ngOnInit();
         tick();
         confirmSpy.and.returnValue(false);
+        component.userInputToAddUserToGroup = {
+          nativeElement: {
+            value: '',
+          },
+        } as ElementRef;
 
         component.addUserToUserGroup(
-          {value: 'User10'}, component.userGroups[0]);
+          {value: 'User10'},
+          component.userGroups[0]
+        );
         component.resetUserGroup(component.userGroups[0], 'UserGroup1');
         expect(component.userGroups[0].users.includes('User10')).toBeTrue();
 
@@ -1092,7 +1120,9 @@ describe('Admin misc tab component ', () => {
 
         expect(component.userGroups[0].users.includes('User11')).toBeFalse();
         component.addUserToUserGroup(
-          {value: 'User11'}, component.userGroups[0]);
+          {value: 'User11'},
+          component.userGroups[0]
+        );
         expect(component.userGroups[0].users.includes('User11')).toBeTrue();
 
         component.removeUserFromUserGroup(component.userGroups[0], 'User11');
@@ -1124,7 +1154,8 @@ describe('Admin misc tab component ', () => {
         } as ElementRef;
 
         expect(component.userInUserGroupValidationError.length > 0).toBeFalse();
-        component.addUserToUserGroup({value: 'User'}, 'UserGroup1');
+        component.addUserToUserGroup({value: 'User'}, component.userGroups[0]);
+        expect(component.userGroups[0].users.includes('User')).toBeFalse();
         expect(component.userInUserGroupValidationError.length > 0).toBeTrue();
       }));
     });
@@ -1132,19 +1163,74 @@ describe('Admin misc tab component ', () => {
     it('should remove the selected user group when requested', fakeAsync(() => {
       component.ngOnInit();
       tick();
+
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {},
+        result: Promise.resolve(),
+      } as NgbModalRef);
+      spyOn(adminBackendApiService, 'deleteUserGroupAsync').and.returnValue(
+        Promise.resolve()
+      );
       component.deleteUserGroup('UserGroup3');
 
-      expect('UserGroup3' in component.userGroupsToUsers).toBeFalse();
+      expect(
+        component.userGroups.some(userGroup => userGroup.name === 'UserGroup3')
+      ).toBeFalse();
+    }));
+
+    it('should not be removed when clicked on cancel button', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {},
+        result: Promise.reject(),
+      } as NgbModalRef);
+      spyOn(adminBackendApiService, 'deleteUserGroupAsync').and.returnValue(
+        Promise.resolve()
+      );
+      component.deleteUserGroup('UserGroup1');
+
+      expect(
+        component.userGroups.some(
+          userGroup => userGroup.userGroupName === 'UserGroup1'
+        )
+      ).toBeTrue();
+    }));
+
+    it('should not be removed in case of backend error', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {},
+        result: Promise.resolve(),
+      } as NgbModalRef);
+      let deleteUserGroupSpy = spyOn(
+        adminBackendApiService,
+        'deleteUserGroupAsync'
+      ).and.rejectWith('Internal Server Error.');
+
+      component.deleteUserGroup('UserGroup1');
+      tick();
+
+      expect(deleteUserGroupSpy).toHaveBeenCalled();
+      expect(
+        component.userGroups.some(
+          userGroup => userGroup.userGroupName === 'UserGroup1'
+        )
+      ).toBeTrue();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Server error: Internal Server Error.'
+      );
     }));
 
     it('should remove user from user group when requested', fakeAsync(() => {
       component.ngOnInit();
       tick();
-      component.removeUserFromUserGroup('UserGroup2', 'User5');
+      component.removeUserFromUserGroup(component.userGroups[1], 'User5');
 
-      expect(
-        component.userGroupsToUsers.UserGroup2.includes('User5')
-      ).toBeFalse();
+      expect(component.userGroups[1].users.includes('User5')).toBeFalse();
     }));
 
     it('should toggle the user group detail section', fakeAsync(() => {
@@ -1152,10 +1238,26 @@ describe('Admin misc tab component ', () => {
       tick();
 
       expect(component.userGroupIdsToDetailsShowRecord.UserGroup1).toBeFalse();
-
       component.toggleUserGroupDetailsSection('UserGroup1');
       expect(component.userGroupIdsToDetailsShowRecord.UserGroup1).toBeTrue();
+
+      component.toggleUserGroupDetailsSection('UserGroup1');
     }));
+
+    it(
+      'should display error when trying to toggle other user ' +
+        'group in edit mode',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+
+        component.toggleUserGroupDetailsSection('UserGroup1');
+        component.setUserGroupInEditMode();
+        component.toggleUserGroupDetailsSection('UserGroup2');
+
+        expect(component.userGroupSaveError.length > 0).toBeTrue();
+      })
+    );
 
     describe('when adding a new user group', () => {
       it('should not update when user group already exists', fakeAsync(() => {
@@ -1175,17 +1277,50 @@ describe('Admin misc tab component ', () => {
         component.newUserGroupName = '';
         component.addUserGroup();
 
-        expect('' in component.userGroupsToUsers).toBeFalse();
+        expect(
+          component.userGroups.some(userGroup => userGroup.userGroupName === '')
+        ).toBeFalse();
       }));
 
       it('should update the user groups', fakeAsync(() => {
         component.ngOnInit();
         tick();
+        spyOn(adminBackendApiService, 'updateUserGroupAsync').and.returnValue(
+          Promise.resolve()
+        );
 
         component.newUserGroupName = 'UserGroup8';
         component.addUserGroup();
 
-        expect('UserGroup8' in component.userGroupsToUsers).toBeTrue();
+        expect(
+          component.userGroups.some(
+            userGroup => userGroup.userGroupName === 'UserGroup8'
+          )
+        ).toBeFalse();
+      }));
+
+      it('should fail in case of backend error', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+
+        let updateUserGroupSpy = spyOn(
+          adminBackendApiService,
+          'updateUserGroupAsync'
+        ).and.rejectWith('Internal Server Error.');
+
+        component.newUserGroupName = 'UserGroup10';
+        component.addUserGroup();
+        tick();
+
+        expect(updateUserGroupSpy).toHaveBeenCalled();
+        expect(
+          component.userGroups.some(
+            userGroup => userGroup.userGroupName === 'UserGroup10'
+          )
+        ).toBeFalse();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
       }));
     });
   });

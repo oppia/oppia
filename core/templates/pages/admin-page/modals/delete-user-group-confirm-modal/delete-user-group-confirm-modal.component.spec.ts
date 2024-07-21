@@ -16,7 +16,7 @@
  * @fileoverview Tests for delete user group confirmation modal.
  */
 
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {DeleteUserGroupConfirmModalComponent} from './delete-user-group-confirm-modal.component';
 
@@ -28,10 +28,9 @@ describe('DeleteUserGroupConfirmModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DeleteUserGroupConfirmModalComponent ],
+      declarations: [DeleteUserGroupConfirmModalComponent],
       providers: [NgbActiveModal],
-    })
-    .compileComponents();
+    }).compileComponents();
   });
 
   beforeEach(() => {

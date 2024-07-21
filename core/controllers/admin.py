@@ -236,7 +236,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     blog_post_title: Optional[str]
     user_group_name: Optional[str]
     user_group_users: Optional[List[str]]
-    old_user_group_name: Optional[bool]
+    old_user_group_name: Optional[str]
     user_group_to_delete: Optional[str]
     default_value: Dict[str, parameter_domain.PlatformDataTypes]
 

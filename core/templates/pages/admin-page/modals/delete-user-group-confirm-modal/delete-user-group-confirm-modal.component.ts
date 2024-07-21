@@ -23,10 +23,9 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 @Component({
   selector: 'app-delete-user-group-confirm-modal',
   templateUrl: './delete-user-group-confirm-modal.component.html',
-  styleUrls: ['./delete-user-group-confirm-modal.component.scss']
+  styleUrls: ['./delete-user-group-confirm-modal.component.scss'],
 })
 export class DeleteUserGroupConfirmModalComponent extends ConfirmOrCancelModal {
-
   constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
@@ -34,5 +33,4 @@ export class DeleteUserGroupConfirmModalComponent extends ConfirmOrCancelModal {
   close(): void {
     this.ngbActiveModal.close();
   }
-
 }

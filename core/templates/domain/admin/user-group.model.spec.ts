@@ -18,14 +18,14 @@
 
 import {UserGroup} from 'domain/admin/user-group.model';
 
-  describe('UserGroupModel', () => {
-    it('should create an instance from a backend dict.', () => {
-      const userGroup = UserGroup.createFromBackendDict({
-        user_group_name: 'user group name',
-        users: ['user1', 'user2']
-      });
-
-      expect(userGroup.userGroupName).toEqual('user group name');
-      expect(userGroup.users).toEqual(['user1', 'user2']);
+describe('UserGroupModel', () => {
+  it('should create an instance from a backend dict.', () => {
+    const userGroup = UserGroup.createFromBackendDict({
+      user_group_name: 'user group name',
+      users: ['user1', 'user2'],
     });
+
+    expect(userGroup.userGroupName).toEqual('user group name');
+    expect(userGroup.users).toEqual(['user1', 'user2']);
   });
+});

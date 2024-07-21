@@ -34,10 +34,7 @@ import {
   SkillSummaryBackendDict,
 } from 'domain/skill/skill-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {
-  UserGroup,
-  UserGroupBackendDict,
-} from 'domain/admin/user-group.model';
+import {UserGroup, UserGroupBackendDict} from 'domain/admin/user-group.model';
 
 export interface UserRolesBackendResponse {
   roles: string[];
@@ -436,7 +433,7 @@ export class AdminBackendApiService {
     let payload = {
       user_group_name: userGroupName,
       user_group_users: userGroupUsers,
-      old_user_group_name: oldUserGroupName
+      old_user_group_name: oldUserGroupName,
     };
     return this._postRequestAsync(
       AdminPageConstants.ADMIN_HANDLER_URL,
