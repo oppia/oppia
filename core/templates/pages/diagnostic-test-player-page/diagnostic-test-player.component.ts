@@ -110,17 +110,11 @@ export class DiagnosticTestPlayerComponent implements OnInit {
       .then(classroomData => {
         this.classroomData = classroomData;
       })
-      .catch(error => {
+      .catch(() => {
         this.isStartTestButtonDisabled = true;
-        if (error.status === 500) {
-          this.router.navigate([
-            `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/500`,
-          ]);
-        } else {
-          this.alertsService.addWarning(
-            'Failed to get classroom data. The URL fragment is invalid, or the classroom does not exist.'
-          );
-        }
+        this.alertsService.addWarning(
+          'Failed to get classroom data. The URL fragment is invalid, or the classroom does not exist.'
+        );
       })
       .finally(() => {
         this.loaderService.hideLoadingScreen();

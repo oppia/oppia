@@ -252,31 +252,6 @@ describe('Diagnostic test player component', () => {
     ]);
   }));
 
-  it('should redirect to the 500 page if an internal server error occurs', fakeAsync(() => {
-    windowRef.nativeWindow.location.search = '?classroom=invalid';
-    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
-      Promise.resolve(true)
-    );
-
-    spyOn(
-      classroomBackendApiService,
-      'fetchClassroomDataAsync'
-    ).and.returnValue(
-      Promise.reject(
-        new HttpErrorResponse({
-          status: 500,
-        })
-      )
-    );
-
-    component.ngOnInit();
-    tick();
-
-    expect(navigateSpy).toHaveBeenCalledWith([
-      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/500`,
-    ]);
-  }));
-
   it('should show an alert if the classroom url fragment is invalid', fakeAsync(() => {
     windowRef.nativeWindow.location.search = '?classroom=mathtwo';
     spyOn(alertsService, 'addWarning');
