@@ -13,21 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests for the learner's journey from the last state/card of an exploration.
- * The tests include:
- * - Setup: Creation of exploration, topic, subtopic, skill, story, and classroom by a curriculum admin.
- * - User Journey: Navigation to classroom, selection of topic, completion of exploration by a logged-out user.
- * - Loading the next chapter, loading the practice session page, and returning to the story from the last state of an exploration.
+ * @fileoverview Acceptance test to cover learner journey for an exploration that includes sharing of the exploration, generation of attribution, giving feedback, and not be able to report or rate the exploration
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {tree} from 'd3';
-import {log} from 'console';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+
+const EXPLORATION_ATTRIBUTION_HTML = explorationId =>
+  `<a href="http://localhost:8181/explore/${explorationId}#">Oppia</a> // <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY SA 4.0</a>`;
+const EXPLORATION_ATTRIBUTION_PRINT =
+  '"Algebra Basics" by curriculumAdm. Oppia. http://localhost:8181/explore/csF0uHZ4zEp0#';
+
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
   NUMERIC_INPUT = 'Number Input',
@@ -104,7 +104,7 @@ describe('Logged-out User', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to navigate through the learner journey from the last state of an exploration, share the exploration, give feedback, and not be able to report or rate the exploration',
+    'should be able to generate attribution, share the exploration, give feedback, and not be able to report or rate the exploration',
     async function () {
       await loggedOutUser.navigateToCommunitylibrary();
 
@@ -125,10 +125,16 @@ describe('Logged-out User', function () {
       await loggedOutUser.hitBrowserBackButtonAndHandleDialog(true);
 
       await loggedOutUser.generateAttribution();
-      await loggedOutUser.expectAttributionInHtmlSectionToBe('');
-      await loggedOutUser.expectAttributionInPrintToBe('');
+      await loggedOutUser.expectAttributionInHtmlSectionToBe(
+        EXPLORATION_ATTRIBUTION_HTML(explorationId)
+      );
+      await loggedOutUser.expectAttributionInPrintToBe(
+        EXPLORATION_ATTRIBUTION_PRINT
+      );
+
       await loggedOutUser.shareExploration('Facebook');
       await loggedOutUser.shareExploration('Twitter');
+      ('');
 
       // Giving feedback after completing the exploration.
       await loggedOutUser.giveFeedback('This is a great lesson!');

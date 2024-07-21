@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests for the learner's journey from the last state/card of an exploration.
+ * @fileoverview Acceptance tests for the learner's journey from the last state/card of an exploration.
  * The tests include:
  * - Setup: Creation of exploration, topic, subtopic, skill, story, and classroom by a curriculum admin.
  * - User Journey: Navigation to classroom, selection of topic, completion of exploration by a logged-out user.
@@ -102,11 +102,10 @@ describe('Logged-out User', function () {
     );
     await curriculumAdmin.addTopicToClassroom('Math', 'Algebra I');
     await curriculumAdmin.publishClassroom('Math');
-    await curriculumAdmin.timeout(2147483647);
-  }, 2147483647);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to navigate through the learner journey from the last state of an exploration',
+    'should be able to return to the respective story and load the next chapter form the last state of an exploration',
     async function () {
       await loggedOutUser.navigateToClassroomPage('math');
 
