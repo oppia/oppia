@@ -61,5 +61,4 @@ def add_or_update_user_status(
         'Updated status of email ID %s\'s bulk email preference in the service '
         'provider\'s db to %s. Cannot access API, since this is a dev '
         'environment.' % (user_email, can_receive_email_updates))
-    
     return True
