@@ -176,7 +176,7 @@ describe('Logged-out User', function () {
       await loggedOutUser.submitAnswer('1/5');
       await loggedOutUser.submitAnswer('1/6');
       await loggedOutUser.viewPreviousResponses();
-      await loggedOutUser.expectToSeeAllPreviousResponses();
+      await loggedOutUser.verifyNumberOfPreviousResponsesDisplayed(5);
 
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.submitAnswer('0.5');

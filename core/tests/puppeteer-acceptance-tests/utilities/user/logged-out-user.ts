@@ -244,6 +244,8 @@ const feedbackSelector = 'e2e-test-conversation-feedback-latest';
 const previousCardButton = '.e2e-test-back-button';
 const hintButtonSelector = 'e2e-test-view-hint';
 const gotItButtonSelector = 'e2e-test-learner-got-it-button';
+const responsesDropdownSelector = '.conversation-skin-responses-dropdown-text';
+const responseSelector = 'oppia-learner-response-display';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -2221,12 +2223,12 @@ export class LoggedOutUser extends BaseUser {
       attributionHtmlCodeSelector
     );
     const attributionHtmlCode = await this.page.evaluate(
-      el => el.innerHTML,
+      el => el.textContent,
       attributionHtmlCodeElement
     );
 
     if (!attributionHtmlCode.includes(htmlString)) {
-      throw new Error(`HTML string not found in the HTML section.`);
+      throw new Error('HTML string not found in the HTML section.');
     }
   }
 
@@ -2248,7 +2250,7 @@ export class LoggedOutUser extends BaseUser {
     );
 
     if (!attributionPrintText.includes(textString)) {
-      throw new Error(`Text string not found in the print text.`);
+      throw new Error('Text string not found in the print text.');
     }
   }
 
@@ -2285,7 +2287,7 @@ export class LoggedOutUser extends BaseUser {
       reportExplorationButtonSelector
     );
     if (reportExplorationButton !== null) {
-      throw new Error(`Report exploration button found.`);
+      throw new Error('Report exploration button found.');
     }
   }
 
@@ -2295,7 +2297,7 @@ export class LoggedOutUser extends BaseUser {
   async expectRateOptionsNotAvailable(): Promise<void> {
     const rateOptions = await this.page.$(rateOptionsSelector);
     if (rateOptions !== null) {
-      throw new Error(`Rate options found.`);
+      throw new Error('Rate options found.');
     }
   }
 
@@ -2308,7 +2310,7 @@ export class LoggedOutUser extends BaseUser {
       showMessage('Checkpoint modal found.');
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
-        const newError = new Error(`Checkpoint modal not found.`);
+        const newError = new Error('Checkpoint modal not found.');
         newError.stack = error.stack;
         throw newError;
       }
@@ -2336,7 +2338,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the previous card in an exploration.
    */
-  async navigateBackToPreviousCard() {
+  async navigateBackToPreviousCard(): Promise<void> {
     await this.clickOn(previousCardButton);
   }
 
@@ -2366,6 +2368,31 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(gotItButtonSelector, {visible: true});
     await this.clickOn(gotItButtonSelector);
     await this.page.waitForSelector(gotItButtonSelector, {hidden: true});
+  }
+
+  /**
+   * Function to view previous responses in a state.
+   * This function clicks on the responses dropdown selector to display previous responses.
+   */
+  async viewPreviousResponses(): Promise<void> {
+    await this.clickOn(responsesDropdownSelector);
+  }
+
+  /**
+   * Function to verify the number of previous responses displayed.
+   * @param {number} expectedNumberOfResponses - The expected number of responses.
+   */
+  async verifyNumberOfPreviousResponsesDisplayed(
+    expectedNumberOfResponses: number
+  ): Promise<void> {
+    await this.page.waitForSelector(responseSelector);
+
+    const responseElements = await this.page.$$(responseSelector);
+    if (responseElements.length !== expectedNumberOfResponses) {
+      throw new Error(
+        `Expected ${expectedNumberOfResponses} responses, but got ${responseElements.length}.`
+      );
+    }
   }
 }
 
