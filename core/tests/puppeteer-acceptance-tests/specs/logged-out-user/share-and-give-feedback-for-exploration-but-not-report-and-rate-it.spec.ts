@@ -76,9 +76,7 @@ describe('Logged-out User', function () {
       CARD_NAME.FINAL_CARD,
       true
     );
-    await explorationEditor.addOppiaResponsesForWrongAnswers(
-      'Wrong, try again!'
-    );
+    await explorationEditor.editDefaultResponseFeedback('Wrong, try again!');
 
     await explorationEditor.saveExplorationDraft();
 
@@ -106,7 +104,7 @@ describe('Logged-out User', function () {
   it(
     'should be able to generate attribution, share the exploration, give feedback, and not be able to report or rate the exploration',
     async function () {
-      await loggedOutUser.navigateToCommunitylibrary();
+      await loggedOutUser.navigateToCommunityLibraryPage();
 
       await loggedOutUser.searchForLessonInSearchBar('Algebra I');
       await loggedOutUser.selectLessonInSearchResults('Algebra I');

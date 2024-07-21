@@ -16,6 +16,7 @@
  * @fileoverview Logged-out users utility file.
  */
 
+import puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -238,7 +239,11 @@ const shareExplorationButtonSelector = '.e2e-test-share-exploration-button';
 const iconAccessibilityLabelSelector = '.oppia-icon-accessibility-label';
 const reportExplorationButtonSelector = '.e2e-test-report-exploration-button';
 const rateOptionsSelector = '.conversation-skin-final-ratings';
-
+const checkpointModalSelector = '.lesson-info-tooltip-add-ons';
+const feedbackSelector = 'e2e-test-conversation-feedback-latest';
+const previousCardButton = '.e2e-test-back-button';
+const hintButtonSelector = 'e2e-test-view-hint';
+const gotItButtonSelector = 'e2e-test-learner-got-it-button';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -295,7 +300,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates to the community library page.
    */
-  async navigateToCommunitylibrary(): Promise<void> {
+  async navigateToCommunityLibraryPage(): Promise<void> {
     await this.page.goto(communityLibraryUrl);
   }
 
@@ -2292,6 +2297,75 @@ export class LoggedOutUser extends BaseUser {
     if (rateOptions !== null) {
       throw new Error(`Rate options found.`);
     }
+  }
+
+  /*
+   * Function to verify if the checkpoint modal appears on the screen.
+   */
+  async verifyCheckpointModalAppears(): Promise<void> {
+    try {
+      await this.page.waitForSelector(checkpointModalSelector, {visible: true});
+      showMessage('Checkpoint modal found.');
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        const newError = new Error(`Checkpoint modal not found.`);
+        newError.stack = error.stack;
+        throw newError;
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Function to verify if the latest Oppia feedback matches the expected feedback.
+   * @param {string} expectedFeedback - The expected feedback.
+   */
+  async expectOppiaFeedbackToBe(expectedFeedback: string): Promise<void> {
+    await this.page.waitForSelector(feedbackSelector);
+    const feedbackText = await this.page.$eval(
+      `${feedbackSelector} > p`,
+      element => element.textContent
+    );
+    if (feedbackText !== expectedFeedback) {
+      throw new Error(
+        `Expected feedback to be '${expectedFeedback}', but got '${feedbackText}'.`
+      );
+    }
+  }
+
+  /**
+   * Function to navigate to the previous card in an exploration.
+   */
+  async navigateBackToPreviousCard() {
+    await this.clickOn(previousCardButton);
+  }
+
+  /**
+   * Function to verify if the page does not have any input fields.
+   */
+  async verifyCannotAnswerPreviouslyAnsweredQuestion(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    const hasInputFields = await this.page.$('input');
+    if (hasInputFields) {
+      throw new Error('The page should not have any input fields.');
+    }
+  }
+
+  /**
+   * Function to use a hint.
+   */
+  async useHint(): Promise<void> {
+    await this.page.waitForSelector(hintButtonSelector);
+    await this.clickOn(hintButtonSelector);
+  }
+
+  /**
+   * Function to close the hint modal.
+   */
+  async closeHintModal(): Promise<void> {
+    await this.page.waitForSelector(gotItButtonSelector, {visible: true});
+    await this.clickOn(gotItButtonSelector);
+    await this.page.waitForSelector(gotItButtonSelector, {hidden: true});
   }
 }
 

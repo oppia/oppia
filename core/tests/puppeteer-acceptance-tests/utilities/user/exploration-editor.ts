@@ -175,15 +175,12 @@ const subscriberCard = '.e2e-test-subscription-card';
 const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
 const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
 
-const incorrectResponseIconSelector = '.e2e-test-incorrect-response-icon';
-const rteSelector = '.e2e-test-rte';
 const destinationSelectorDropdown = '.e2e-test-destination-selector-dropdown';
 const destinationWhenStuckSelectorDropdown =
   '.e2e-test-destination-when-stuck-selector-dropdown';
 const outcomeDestWhenStuckSelector =
   '.protractor-test-open-outcome-dest-if-stuck-editor';
 
-const LABEL_FOR_SAVE_FEEDBACK_BUTTON = ' Save Feedback ';
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
   /**
@@ -1014,29 +1011,21 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Adds Oppia responses for wrong answers.
-   * @param {string} oppiaMsg - The message to be displayed by Oppia.
+   * Function to add feedback for default responses of a state interaction.
+   * @param {string} defaultResponseFeedback - The feedback for the default responses.
    * @param {string} [directToCard] - The card to direct to (optional).
    * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
    */
-  async addOppiaResponsesForWrongAnswers(
-    oppiaMsg: string,
+  async editDefaultResponseFeedback(
+    defaultResponseFeedback: string,
     directToCard?: string,
     directToCardWhenStuck?: string
   ): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
-    await this.page.waitForSelector(incorrectResponseIconSelector, {
-      visible: true,
-    });
-    const incorrectResponseIcon = await this.page.$(
-      incorrectResponseIconSelector
-    );
-    await incorrectResponseIcon?.click();
-    await this.page.screenshot({path: 'screenshot.png'});
+    await this.clickOn(defaultFeedbackTab);
     await this.clickOn(openOutcomeFeedBackEditor);
-    await this.clickOn(rteSelector);
-    await this.type(rteSelector, oppiaMsg);
-    await this.clickOn(LABEL_FOR_SAVE_FEEDBACK_BUTTON);
+    await this.clickOn(stateContentInputField);
+    await this.type(stateContentInputField, `${defaultResponseFeedback}`);
+    await this.clickOn(saveOutcomeFeedbackButton);
 
     if (directToCard) {
       await this.clickOn(openOutcomeDestButton);
@@ -1052,20 +1041,6 @@ export class ExplorationEditor extends BaseUser {
       );
       await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
     }
-  }
-
-  /**
-   * Function to add feedback for default responses of a state interaction.
-   * @param {string} defaultResponseFeedback - The feedback for the default responses.
-   */
-  async editDefaultResponseFeedback(
-    defaultResponseFeedback: string
-  ): Promise<void> {
-    await this.clickOn(defaultFeedbackTab);
-    await this.clickOn(openOutcomeFeedBackEditor);
-    await this.clickOn(stateContentInputField);
-    await this.type(stateContentInputField, `${defaultResponseFeedback}`);
-    await this.clickOn(saveOutcomeFeedbackButton);
   }
 
   /**

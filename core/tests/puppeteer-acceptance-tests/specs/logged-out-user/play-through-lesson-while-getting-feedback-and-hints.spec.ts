@@ -29,11 +29,16 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
   NUMERIC_INPUT = 'Number Input',
+  FRACTION_INPUT = 'Fraction Input',
+  MULTIPLE_CHOICE = 'Multiple Choice',
   END_EXPLORATION = 'End Exploration',
 }
+
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',
   ALGEBRA_BASICS = 'Algebra Basics',
+  FRACTION_CONVERSION = 'Fraction Conversion',
+  MULTIPLE_CHOICE_QUESTION = 'Multiple Choice Question',
   FINAL_CARD = 'Final Card',
 }
 
@@ -56,26 +61,67 @@ describe('Logged-out User', function () {
     await explorationEditor.updateCardContent('Introduction to Algebra');
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
 
-    // Add a new card with a question.
+    // Add a new card with a basic algebra problem.
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard(CARD_NAME.ALGEBRA_BASICS);
     await explorationEditor.saveExplorationDraft();
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.ALGEBRA_BASICS);
-    await explorationEditor.updateCardContent(
-      'Enter a negative number greater than -100.'
-    );
+    await explorationEditor.updateCardContent('Solve the equation 2x = 10.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
-      '-99',
+      '5',
       'Perfect!',
+      CARD_NAME.FRACTION_CONVERSION,
+      true
+    );
+    await explorationEditor.editDefaultResponseFeedback('Wrong, try again!');
+
+    await explorationEditor.saveExplorationDraft();
+
+    // Navigate to the new card and add a fraction conversion problem.
+    await explorationEditor.navigateToCard(CARD_NAME.FRACTION_CONVERSION);
+    await explorationEditor.updateCardContent('Express 50% as a fraction.');
+    await explorationEditor.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
+    await explorationEditor.addResponsesToTheInteraction(
+      INTERACTION_TYPES.FRACTION_INPUT,
+      '1/2',
+      'Correct!',
+      CARD_NAME.MULTIPLE_CHOICE_QUESTION,
+      true
+    );
+    await explorationEditor.editDefaultResponseFeedback(
+      'Incorrect, try again!',
+      undefined,
+      CARD_NAME.MULTIPLE_CHOICE_QUESTION
+    );
+    await explorationEditor.addHintToState(
+      'Remember that 50% is the same as 1/2.'
+    );
+    await explorationEditor.addSolutionToState(
+      '1/2',
+      'The fraction 1/2 is equivalent to 50%.'
+    );
+
+    await explorationEditor.saveExplorationDraft();
+
+    // Navigate to the new card and add a multiple choice question.
+    await explorationEditor.navigateToCard(CARD_NAME.MULTIPLE_CHOICE_QUESTION);
+    await explorationEditor.updateCardContent(
+      'Which of the following is equivalent to 1/2?'
+    );
+    await explorationEditor.addInteraction(INTERACTION_TYPES.MULTIPLE_CHOICE);
+    await explorationEditor.addResponsesToTheInteraction(
+      INTERACTION_TYPES.MULTIPLE_CHOICE,
+      '0.5',
+      'Correct!',
       CARD_NAME.FINAL_CARD,
       true
     );
-    await explorationEditor.addOppiaResponsesForWrongAnswers(
-      'Wrong, try again!'
+    await explorationEditor.editDefaultResponseFeedback(
+      'Incorrect, try again!'
     );
 
     await explorationEditor.saveExplorationDraft();
@@ -83,7 +129,7 @@ describe('Logged-out User', function () {
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.updateCardContent(
-      'We have practiced negative numbers.'
+      'Congratulations! You have completed the exploration.'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
@@ -104,31 +150,39 @@ describe('Logged-out User', function () {
   it(
     'should simulate a learner journey where a user interacts with different interactions, views rich-text components, receives feedback, navigates through cards, uses concept cards and hints, views previous responses, and reaches a checkpoint',
     async function () {
-      await loggedOutUser.visitCommunityLibrary();
+      await loggedOutUser.navigateToCommunityLibraryPage();
 
-      await loggedOutUser.searchForLesson('Algebra I');
-      await loggedOutUser.selectLessonFromResults('Algebra I');
-
-      await loggedOutUser.interactWithInteraction();
-      await loggedOutUser.viewRichTextComponents();
-
-      await loggedOutUser.submitAnswer('-40');
-      await loggedOutUser.viewOppiaFeedback();
-
-      await loggedOutUser.navigateBackToPreviousCard();
-      await loggedOutUser.useHint();
-
-      await loggedOutUser.viewPreviousResponses();
-      await loggedOutUser.verifyCannotAnswerPreviouslyAnsweredQuestion();
-
-      if (await loggedOutUser.isStuck()) {
-        await loggedOutUser.navigateToHelpCard();
-      }
+      await loggedOutUser.searchForLessonInSearchBar('Algebra Basics');
+      await loggedOutUser.selectLessonInSearchResults('Algebra Basics');
 
       await loggedOutUser.continueToNextCard();
-
       await loggedOutUser.verifyCheckpointModalAppears();
-      await loggedOutUser.verifyCompletionToastMessage(
+      await loggedOutUser.submitAnswer('5');
+      await loggedOutUser.expectOppiaFeedbackToBe('Perfect!');
+
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.navigateBackToPreviousCard();
+      await loggedOutUser.verifyCannotAnswerPreviouslyAnsweredQuestion();
+      await loggedOutUser.continueToNextCard();
+
+      // Wrong answer is submitted to test the feedback response and get hint option.
+      await loggedOutUser.submitAnswer('1/4');
+      await loggedOutUser.useHint();
+      await loggedOutUser.closeHintModal();
+
+      // Again wrong answer is submitted number of times to to get stuck and navigate to help card.
+      await loggedOutUser.submitAnswer('1/3');
+      await loggedOutUser.submitAnswer('1/4');
+      await loggedOutUser.submitAnswer('1/5');
+      await loggedOutUser.submitAnswer('1/6');
+      await loggedOutUser.viewPreviousResponses();
+      await loggedOutUser.expectToSeeAllPreviousResponses();
+
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.submitAnswer('0.5');
+      await loggedOutUser.expectOppiaFeedbackToBe('Correct!');
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
     },
