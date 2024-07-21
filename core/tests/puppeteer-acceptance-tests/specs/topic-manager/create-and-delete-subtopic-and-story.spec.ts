@@ -71,12 +71,12 @@ describe('Topic Manager', function () {
       await topicManager.createSubtopicForTopic(
         'Test Subtopic 1',
         'test-subtopic-one',
-        'Test Topic 1'
+        'Addition'
       );
       // Verify the subtopic is present in the topic.
       await topicManager.verifySubtopicPresenceInTopic(
         'Test Subtopic 1',
-        'Test Topic 1',
+        'Addition',
         true
       );
 
@@ -85,13 +85,13 @@ describe('Topic Manager', function () {
         'test-story-one',
         'Test Chapter 1',
         explorationId,
-        'Test Topic 1'
+        'Addition'
       );
 
       // Verify the story is present in the topic.
       await topicManager.verifyStoryPresenceInTopic(
         'Test Story 1',
-        'Test Topic 1',
+        'Addition',
         true
       );
 
@@ -99,7 +99,7 @@ describe('Topic Manager', function () {
       await topicManager.verifyChapterPresenceInStory(
         'Test Chapter 1',
         'Test Story 1',
-        'Test Topic 1',
+        'Addition',
         true
       );
     },
@@ -112,32 +112,29 @@ describe('Topic Manager', function () {
       await topicManager.deleteChapterFromStory(
         'Test Chapter 1',
         'Test Story 1',
-        'Test Topic 1'
+        'Addition'
       );
       // Verify the chapter is not present in the story.
       await topicManager.verifyChapterPresenceInStory(
         'Test Chapter 1',
         'Test Story 1',
-        'Test Topic 1',
+        'Addition',
         false
       );
 
-      await topicManager.deleteStoryFromTopic('Test Story 1', 'Test Topic 1');
+      await topicManager.deleteStoryFromTopic('Test Story 1', 'Addition');
       // Verify the story is not present in the topic.
       await topicManager.verifyStoryPresenceInTopic(
         'Test Story 1',
-        'Test Topic 1',
+        'Addition',
         false
       );
 
-      await topicManager.deleteSubtopicFromTopic(
-        'Test Subtopic 1',
-        'Test Topic 1'
-      );
+      await topicManager.deleteSubtopicFromTopic('Test Subtopic 1', 'Addition');
       // Verify the subtopic is not present in the topic.
       await topicManager.verifySubtopicPresenceInTopic(
         'Test Subtopic 1',
-        'Test Topic 1',
+        'Addition',
         false
       );
     },
