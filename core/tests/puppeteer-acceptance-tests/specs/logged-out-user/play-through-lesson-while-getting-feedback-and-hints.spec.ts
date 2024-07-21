@@ -13,11 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests for the learner's journey from the last state/card of an exploration.
+ * @fileoverview Acceptance tests for the learner's journey through an exploration.
  * The tests include:
- * - Setup: Creation of exploration, topic, subtopic, skill, story, and classroom by a curriculum admin.
- * - User Journey: Navigation to classroom, selection of topic, completion of exploration by a logged-out user.
- * - Loading the next chapter, loading the practice session page, and returning to the story from the last state of an exploration.
+ * - Setup: Creation of exploration by an exploration editor.
+ * - User Journey: Navigation to the exploration, interaction with different types of questions, receiving feedback, using hints, viewing previous responses, and reaching a checkpoint by a logged-out user.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -148,7 +147,7 @@ describe('Logged-out User', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should simulate a learner journey where a user interacts with different interactions, views rich-text components, receives feedback, navigates through cards, uses concept cards and hints, views previous responses, and reaches a checkpoint',
+    'should be able to interact with different interactions,receive feedback, navigates through cards, uses concept cards and hints, views previous responses, and reaches a checkpoint',
     async function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
 
