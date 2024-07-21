@@ -326,4 +326,8 @@ export const AppConstants = {
     'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
   IMPACT_REPORT_LINK:
     'https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view',
+  PARENTS_TEACHERS_PDF_GUIDE_LINK:
+    'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
+  TEACHER_STORY_TAGGED_BLOGS_LINK:
+    'https://www.oppia.org/blog/search/find?q=&tags=(%22Teacher%20story%22)',
 } as const;

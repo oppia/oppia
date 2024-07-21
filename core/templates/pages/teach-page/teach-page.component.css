@@ -83,6 +83,10 @@
   background-color: #005240;
 }
 
+.teach-page .rtl-flip {
+  transform: scaleX(-1);
+}
+
 .teach-page .oppia-teach-hero-section {
   align-items: end;
   background-image: url("/assets/images/teach/banner.webp");
@@ -137,10 +141,12 @@
 }
 
 .teach-page .oppia-teach-tips-guide-box {
+  align-items: start;
   background-color: #e3f1f1;
 }
 
 .teach-page .oppia-teach-tips-blog-box {
+  align-items: start;
   border: 2px solid #eee;
 }
 
@@ -173,12 +179,7 @@
   flex-direction: column;
   flex-shrink: 0;
   gap: 8px;
-  opacity: 0.8;
   width: 240px;
-}
-
-.teach-page .oppia-teach-creators-carousel-item:hover {
-  opacity: 1;
 }
 
 .teach-page .oppia-teach-creators-carousel-item-header {
@@ -199,6 +200,7 @@
 }
 
 .teach-page .oppia-teach-creators-carousel-item-image img {
+  opacity: 0.8;
   width: 100%;
 }
 
@@ -414,6 +416,10 @@
 
 .teach-page .oppia-teach-matthew-image img {
   width: 100%;
+}
+
+.teach-page .oppia-teach-creators-carousel-item-image img:hover {
+  opacity: 1;
 }
 
 .teach-page .oppia-teach-features-right .oppia-teach-subtitle {
@@ -735,6 +741,7 @@
   }
   .teach-page .oppia-teach-testimonial-top {
     gap: 8px;
+    min-height: 100px;
   }
   .teach-page .oppia-teach-testimonial-left {
     width: 32%;

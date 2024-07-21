@@ -62,8 +62,11 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('creatorsCarouselContainer')
   creatorsCarouselContainer!: ElementRef;
   @ViewChild('testimonialsCarousel') testimonialsCarousel!: NgbCarousel;
+  parentsTeachersPdfGuideLink = AppConstants.PARENTS_TEACHERS_PDF_GUIDE_LINK;
+  teacherStoryTaggedBlogsLink = AppConstants.TEACHER_STORY_TAGGED_BLOGS_LINK;
   classroomUrlFragment!: string;
   classroomUrl!: string;
+  androidUrl = `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.ROUTE}`;
   displayedTestimonialId!: number;
   libraryUrl!: string;
   testimonials: readonly Testimonial[] = [];
@@ -217,7 +220,8 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.creatorsCarouselLeftArrowIsDisabled = scrollLeft === 0;
     this.creatorsCarouselRightArrowIsDisabled =
-      scrollLeft === scrollWidth - clientWidth;
+      Math.abs(scrollLeft) === Math.abs(scrollWidth - clientWidth);
+    // Here, the absolute value is used to accomodate the RTL UI logic.
   }
 
   moveTestimonialCarouselToPreviousSlide(): void {

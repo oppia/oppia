@@ -24,7 +24,7 @@
           {{ 'I18N_TEACH_PAGE_TIPS_GUIDE_CONTENT' | translate }}
         </p>
         <oppia-primary-button
-          [buttonHref]=""
+          [buttonHref]="parentsTeachersPdfGuideLink"
           [customClasses]="['oppia-teach-btn']"
           buttonText="{{ 'I18N_TEACH_PAGE_TIPS_GUIDE_BUTTON' | translate }}">
         </oppia-primary-button>
@@ -37,7 +37,7 @@
           {{ 'I18N_TEACH_PAGE_TIPS_BLOG_CONTENT' | translate }}
         </p>
         <oppia-primary-button
-          [buttonHref]=""
+          [buttonHref]="teacherStoryTaggedBlogsLink"
           [customClasses]="['oppia-teach-btn','oppia-teach-secondary-btn']"
           buttonText="{{ 'I18N_TEACH_PAGE_TIPS_BLOG_BUTTON' | translate }}">
         </oppia-primary-button>
@@ -56,7 +56,11 @@
           <p class="oppia-teach-subtext">{{ creatorsData[index].country | translate  }}</p>
         </div>
         <div class="oppia-teach-creators-carousel-item-image">
-          <img [src]="getStaticImageUrl(creatorsData[index].imagePngUrl)" alt="{{ creatorsData[index].name  | translate }}">
+          <picture>
+            <source type="image/webp" [srcset]="getStaticImageUrl(creatorsData[index].imageWebpUrl)">
+            <source type="image/png" [srcset]="getStaticImageUrl(creatorsData[index].imagePngUrl)">
+            <img [src]="getStaticImageUrl(creatorsData[index].imagePngUrl)" alt="{{ creatorsData[index].name  | translate }}">
+          </picture>
           <p class="oppia-teach-subtext">
             {{ creatorsData[index].role | translate  }}
           </p>
@@ -71,15 +75,19 @@
     <div class="oppia-teach-creators-arrows-container">
       <button (click)="showPreviousCreators()"
               [disabled]="creatorsCarouselLeftArrowIsDisabled">
-        <i class="fas fa-chevron-left"
-           [ngClass]="{'oppia-disabled-icon': creatorsCarouselLeftArrowIsDisabled}">
+        <i class="fas"
+           [ngClass]="{'oppia-disabled-icon': creatorsCarouselLeftArrowIsDisabled,
+           'fa-chevron-left': !isLanguageRTL(), 'fa-chevron-right': isLanguageRTL()}">
         </i>
+        <span class="sr-only">Previous</span>
       </button>
       <button (click)="showNextCreators()"
               [disabled]="creatorsCarouselRightArrowIsDisabled">
-        <i class="fas fa-chevron-right"
-           [ngClass]="{'oppia-disabled-icon': creatorsCarouselRightArrowIsDisabled}">
+        <i class="fas"
+           [ngClass]="{'oppia-disabled-icon': creatorsCarouselRightArrowIsDisabled,
+           'fa-chevron-right': !isLanguageRTL(), 'fa-chevron-left': isLanguageRTL()}">
         </i>
+        <span class="sr-only">Next</span>
       </button>
     </div>
   </div>
@@ -207,6 +215,7 @@
       <div class="oppia-teach-features">
         <div class="oppia-teach-feature">
           <img class="oppia-teach-feature-icon"
+               [ngClass]="{'rtl-flip': isLanguageRTL()}"
                [src]="getStaticImageUrl('/teach/flower-bullet-1.webp')"
                alt="Illustration of first bullet point">
           <p class="oppia-teach-feature-text">
@@ -215,16 +224,18 @@
         </div>
         <div class="oppia-teach-feature">
           <img class="oppia-teach-feature-icon"
+               [ngClass]="{'rtl-flip': isLanguageRTL()}"
                [src]="getStaticImageUrl('/teach/flower-bullet-2.webp')"
-               alt="Illustration of first bullet point">
+               alt="Illustration of second bullet point">
           <p class="oppia-teach-feature-text">
             {{ 'I18N_TEACH_BENEFITS_TWO' | translate }}
           </p>
         </div>
         <div class="oppia-teach-feature">
           <img class="oppia-teach-feature-icon"
+               [ngClass]="{'rtl-flip': isLanguageRTL()}"
                [src]="getStaticImageUrl('/teach/flower-bullet-3.webp')"
-               alt="Illustration of first bullet point">
+               alt="Illustration of third bullet point">
           <p class="oppia-teach-feature-text">
             {{ 'I18N_TEACH_BENEFITS_THREE' | translate }}
           </p>
@@ -239,12 +250,12 @@
     </p>
     <div class="oppia-teach-cta-buttons-container">
       <oppia-primary-button
-        [buttonHref]=""
-        [customClasses]="['oppia-teach-btn', 'e2e-test-teach-page-explore-lessons-mobile-button']"
+        [buttonHref]="classroomUrl"
+        [customClasses]="['oppia-teach-btn', 'e2e-test-teach-page-explore-lessons-button']"
         buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate }}">
       </oppia-primary-button>
       <oppia-primary-button
-        [buttonHref]=""
+        [buttonHref]="androidUrl"
         [customClasses]="['oppia-teach-btn', 'oppia-teach-secondary-btn']"
         buttonText="{{ 'I18N_ACTION_DOWNLOAD_ANDRIOD_APP' | translate }}">
       </oppia-primary-button>
