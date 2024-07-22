@@ -1392,3 +1392,17 @@ class CommonTests(test_utils.GenericTestBase):
                 lambda port: port == common.GAE_PORT_FOR_E2E_TESTING))
 
             self.assertTrue(common.is_oppia_server_already_running())
+
+    def test_start_subprocess_for_result(self) -> None:
+        process = subprocess.Popen(
+            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        def mock_popen( # pylint: disable=unused-argument
+            cmd_tokens: List[str], stdout: int, stderr: int
+        ) -> subprocess.Popen[bytes]:
+            return process
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+
+        with popen_swap:
+            self.assertEqual(
+                common.start_subprocess_for_result(['cmd']),
+                (b'test\n', b''))
