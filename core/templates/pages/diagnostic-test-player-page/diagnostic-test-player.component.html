@@ -1,7 +1,7 @@
 <div class="diagnostic-test-container">
   <div class="oppia-diagnostic-test-page-header">
     <button class="btn oppia-back-to-classroom-button">
-      <a class="oppia-anchor-tag-under-button" href="/learn/math">
+      <a class="oppia-anchor-tag-under-button" [href]="'/learn/' + classroomUrlFragment">
         <span>
           <i class="fas fa-thin fa-arrow-left oppia-vcenter" aria-hidden="true"></i>
         </span>
@@ -20,8 +20,8 @@
         <img class="oppia-otter-image" [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
       </div>
       <div>
-        <p class="oppia-test-introduction-text">
-          <span translate="I18N_DIAGNOSTIC_TEST_INTRO_TEXT_1"></span>
+        <p class="oppia-test-introduction-text" *ngIf="classroomData">
+          <span>{{ 'I18N_DIAGNOSTIC_TEST_INTRO_TEXT_1' | translate:{ classroomName: classroomData.getName()} }}</span>
         </p>
         <p class="oppia-test-introduction-text">
           <span translate="I18N_DIAGNOSTIC_TEST_INTRO_TEXT_2"></span>
@@ -30,6 +30,7 @@
     </div>
     <button class="btn oppia-diagnostic-test-start-button e2e-test-start-diagnostic-test"
             (click)="startDiagnosticTest()"
+            [disabled]="isStartTestButtonDisabled"
             translate="I18N_DIAGNOSTIC_TEST_START_BUTTON">
     </button>
   </mat-card>
@@ -89,15 +90,15 @@
             {{ 'I18N_DIAGNOSTIC_TEST_RESULT_HEADER_TEXT' | translate }}
           </h3>
         </div>
-        <p class="oppia-recommendation-card-text">
-          {{ 'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_1_FOR_NO_TOPIC' | translate }}
+        <p class="oppia-recommendation-card-text" *ngIf="classroomData">
+          {{ 'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_1_FOR_NO_TOPIC' | translate:{ classroomName: classroomData.getName()} }}
         </p>
         <p class="oppia-recommendation-card-text">
           {{ 'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_2_FOR_NO_TOPIC' | translate }}
         </p>
         <div class="oppia-classroom-button-container">
           <button class="btn oppia-goto-classroom-button">
-            <a class="oppia-anchor-tag-under-button" href="/learn/math">
+            <a class="oppia-anchor-tag-under-button" [href]="'/learn/' + classroomUrlFragment">
               {{ 'I18N_DIAGNOSTIC_TEST_RESULT_GO_TO_CLASSROOM_BUTTON_TEXT' | translate }}
             </a>
           </button>
