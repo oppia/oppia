@@ -23,9 +23,6 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
-enum INTERACTION_TYPES {
-  END_EXPLORATION = 'End Exploration',
-}
 
 describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
