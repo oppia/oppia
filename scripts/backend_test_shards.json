@@ -402,6 +402,7 @@
         "core.jobs.batch_jobs.suggestion_edit_state_content_deletion_jobs_test",
         "scripts.check_ci_test_suites_to_run_test",
         "scripts.check_tests_are_captured_in_ci_test",
-        "scripts.check_github_workflow_status_test"
+        "scripts.check_github_workflow_status_test",
+        "scripts.check_backend_test_times_test"
     ]
 }
