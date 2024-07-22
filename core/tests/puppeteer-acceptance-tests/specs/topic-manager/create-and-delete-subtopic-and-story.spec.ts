@@ -73,7 +73,7 @@ describe('Topic Manager', function () {
         'Addition'
       );
 
-      await topicManager.addChapter('test chapter 1', explorationId as string);
+      await topicManager.addChapter('Test Chapter 1', explorationId as string);
       await topicManager.saveStoryDraft();
 
       // Verify the story is present in the topic.

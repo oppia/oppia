@@ -2430,6 +2430,9 @@ export class TopicManager extends BaseUser {
 
         if (title === storyName) {
           await titleElement.click();
+          await this.page.waitForNavigation({
+            waitUntil: ['load', 'networkidle0'],
+          });
           return;
         }
       }
@@ -2569,7 +2572,7 @@ export class TopicManager extends BaseUser {
           await titleElement.click();
           showMessage(`Chapter ${chapterName} opened in chapter editor.`);
 
-          // Collapsing all the collapsible card in the mobile viewport.
+          // Collapsing all the collapsible card of chapter editor in the mobile viewport.
           if (this.isViewportAtMobileWidth()) {
             await this.page.waitForSelector(
               mobileCollapsibleCardHeaderSelector
