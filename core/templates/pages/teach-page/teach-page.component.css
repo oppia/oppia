@@ -271,7 +271,10 @@
 }
 
 .teach-page .oppia-teach-lesson-right {
+  align-items: start;
   background-color: #e3f1f1;
+  display: flex;
+  flex-direction: column;
   padding: 24px 48px;
   width: 46%;
 }
