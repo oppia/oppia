@@ -10,11 +10,8 @@
   width: 100%;
 }
 
-.collapse-container button,
-.collapse-container button:active,
-.collapse-container button:hover {
-  border: none;
-  outline: none;
+.collapse-container button {
+  background-color: transparent;
 }
 
 .collapse-container p {

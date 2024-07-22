@@ -92,6 +92,50 @@
     </div>
   </div>
 
+  <div class="oppia-teach-lesson-section">
+    <div class="oppia-teach-lesson-top">
+      <p class="oppia-teach-subtitle">
+        Lessons made by the Oppia team
+      </p>
+      <p class="oppia-teach-heading">
+        Tested and verified lessons
+      </p>
+      <p class="oppia-teach-subtext">
+        In the Classroom, discover lessons reviewed by teachers and experts. Classroom lessons help build foundational skills, allowing learners to tackle more advanced concepts in a subject later on.
+      </p>
+    </div>
+    <div class="oppia-teach-lesson-bottom">
+      <div class="oppia-teach-lesson-left">
+        <p class="oppia-teach-heading">
+          The lesson creation process
+        </p>
+        <div class="oppia-teach-accordion-container">
+          <oppia-full-expand-accordion [accordionData]="lessonCreationData"
+          [listContainerCustomClasses]="['oppia-teach-lesson-list']">
+          </oppia-full-expand-accordion>
+        </div>
+      </div>
+      <div class="oppia-teach-lesson-right">
+        <p class="oppia-teach-subheading">
+          Check our lessons available here
+        </p>
+        <div class="oppia-teach-lesson-image">
+          <picture>
+            <source type="image/webp" [srcset]="getStaticImageUrl('/teach/oppia-math-classroom-page.webp')">
+            <source type="image/png" [srcset]="getStaticImageUrl('/teach/oppia-math-classroom-page.png')">
+            <img [src]="getStaticImageUrl('/teach/oppia-math-classroom-page.png')"
+                 alt="Oppia Math classroom page">
+          </picture>
+        </div>
+        <oppia-primary-button
+          [buttonHref]="classroomUrl"
+          [customClasses]="['oppia-teach-btn']"
+          buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate }}">
+        </oppia-primary-button>
+      </div>
+    </div>
+  </div>
+
   <div class="oppia-teach-outcomes-section">
     <div class="oppia-teach-outcomes-left">
       <p class="oppia-teach-title">

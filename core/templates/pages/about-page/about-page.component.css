@@ -1060,6 +1060,19 @@
   background-color: transparent;
   padding: 0;
 }
+
+.feature-panel button,
+.oppia-about-features-list button,
+.feature-panel button:active,
+.feature-panel button:focus,
+.feature-panel button:hover,
+.oppia-about-features-list button:active,
+.oppia-about-features-list button:focus,
+.oppia-about-features-list button:hover {
+  border: none;
+  outline: none;
+}
+
 .about-page .oppia-cta-carousel-container button, 
 .about-page .oppia-cta-carousel-container button:focus,
 .about-page .oppia-cta-carousel-container button:hover,

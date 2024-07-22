@@ -23,6 +23,7 @@ import {TeachPageRootComponent} from './teach-page-root.component';
 import {CommonModule} from '@angular/common';
 import {TeachPageRoutingModule} from './teach-page-routing.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {FullExpandAccordionComponent} from 'pages/about-page/accordion/full-expand-accordion.component';
 
 @NgModule({
   imports: [
@@ -31,7 +32,11 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     TeachPageRoutingModule,
     NgbModule,
   ],
-  declarations: [TeachPageComponent, TeachPageRootComponent],
+  declarations: [
+    TeachPageComponent,
+    TeachPageRootComponent,
+    FullExpandAccordionComponent,
+  ],
   entryComponents: [TeachPageComponent, TeachPageRootComponent],
 })
 export class TeachPageModule {}

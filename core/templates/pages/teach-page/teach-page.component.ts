@@ -36,6 +36,7 @@ import {UserService} from 'services/user.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {Subscription} from 'rxjs';
 import {NgbCarousel} from '@ng-bootstrap/ng-bootstrap';
+import {AccordionPanelData} from 'pages/about-page/data.model';
 
 import './teach-page.component.css';
 
@@ -73,6 +74,54 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
   isWindowNarrow: boolean = false;
   userIsLoggedIn: boolean = false;
   directiveSubscriptions = new Subscription();
+  lessonCreationData: AccordionPanelData[] = [
+    {
+      title: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_1_TITLE',
+      text: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_1_TEXT',
+      customPanelClassNames: ['oppia-teach-lesson-panel'],
+      customTitleClassNames: ['oppia-teach-lesson-panel-title'],
+      image: '/teach/skill-tree-image',
+      altText: 'Skill tree image',
+      panelIsCollapsed: true,
+    },
+    {
+      title: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_2_TITLE',
+      text: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_2_TEXT',
+      customPanelClassNames: ['oppia-teach-lesson-panel'],
+      customTitleClassNames: ['oppia-teach-lesson-panel-title'],
+      image: '/teach/skill-table-image',
+      altText: 'Skill table image',
+      panelIsCollapsed: true,
+    },
+    {
+      title: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_3_TITLE',
+      text: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_3_TEXT',
+      customPanelClassNames: ['oppia-teach-lesson-panel'],
+      customTitleClassNames: ['oppia-teach-lesson-panel-title'],
+      panelIsCollapsed: true,
+    },
+    {
+      title: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_4_TITLE',
+      text: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_4_TEXT',
+      customPanelClassNames: ['oppia-teach-lesson-panel'],
+      customTitleClassNames: ['oppia-teach-lesson-panel-title'],
+      panelIsCollapsed: true,
+    },
+    {
+      title: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_5_TITLE',
+      text: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_5_TEXT',
+      customPanelClassNames: ['oppia-teach-lesson-panel'],
+      customTitleClassNames: ['oppia-teach-lesson-panel-title'],
+      panelIsCollapsed: true,
+    },
+    {
+      title: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_6_TITLE',
+      text: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_6_TEXT',
+      customPanelClassNames: ['oppia-teach-lesson-panel'],
+      customTitleClassNames: ['oppia-teach-lesson-panel-title'],
+      panelIsCollapsed: true,
+    },
+  ];
   creatorsData = AppConstants.LESSON_CREATORS_DATA_TEACH_PAGE;
   screenType!: 'desktop' | 'tablet' | 'mobile';
   creatorsIndicesObject = {
