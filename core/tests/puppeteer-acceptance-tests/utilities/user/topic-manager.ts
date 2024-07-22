@@ -1877,8 +1877,10 @@ export class TopicManager extends BaseUser {
       if (elements.length < 2) {
         throw new Error('Did not find 2 "add prerequisite" button.');
       }
+      await this.waitForElementToBeClickable(elements[1]);
       await elements[1].click();
     } else {
+      await this.waitForElementToBeClickable(elements[0]);
       await elements[0].click();
     }
     await this.filterAndSelectSkill(skillName);
@@ -2428,9 +2430,6 @@ export class TopicManager extends BaseUser {
 
         if (title === storyName) {
           await titleElement.click();
-          await this.page.waitForNavigation({
-            waitUntil: ['load', 'networkidle0'],
-          });
           return;
         }
       }
@@ -2732,6 +2731,7 @@ export class TopicManager extends BaseUser {
       await this.waitForElementToBeClickable(elements[1]);
       await elements[1].click();
     } else {
+      await this.waitForElementToBeClickable(elements[0]);
       await elements[0].click();
     }
     await this.filterAndSelectSkill(skillName);

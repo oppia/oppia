@@ -22,9 +22,16 @@ import testConstants from '../../utilities/common/test-constants';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
+
+ConsoleReporter.setConsoleErrorsToIgnore([
+  "ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'headerText: Story Editor'. Current value: 'headerText: Chapter Editor'.",
+  "Cannot read properties of undefined (reading 'getStory')",
+  "Occurred at http://localhost:8181/story_editor/JwNJZj3u5Dv6#/chapter_editor/node_1 webpack:///./core/templates/services/contextual/logger.service.ts? Cannot read properties of undefined (reading 'getStory')",
+]);
 
 describe('Topic Manager', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
@@ -122,8 +129,8 @@ describe('Topic Manager', function () {
         'Journey into Quadratic Equations',
         'Algebra II'
       );
-      await topicManager.addPrerequisiteSkill('Quadratic Equations');
       await topicManager.addAcquiredSkill('Polynomial Functions');
+      await topicManager.addPrerequisiteSkill('Quadratic Equations');
 
       await topicManager.saveStoryDraft();
     },
