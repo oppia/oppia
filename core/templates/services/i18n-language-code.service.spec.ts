@@ -176,4 +176,30 @@ describe('I18nLanguageCodeService', () => {
       mockPreferredLanguageCodesLoadedEventEmitter
     );
   });
+
+  it('should get classroom name translation key', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      false
+    );
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValue(true);
+    expect(
+      i18nLanguageCodeService.isClassroomnNameTranslationAvailable('math')
+    ).toBeTrue();
+  });
+
+  it('should not get classroom name translation key', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      false
+    );
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValue(false);
+    expect(
+      i18nLanguageCodeService.isClassroomnNameTranslationAvailable('math')
+    ).toBeFalse();
+  });
 });
