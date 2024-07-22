@@ -75,6 +75,7 @@
 	"I18N_ANDROID_PAGE_NAME_FIELD_LABEL": "Nome (facoltativo)",
 	"I18N_ANDROID_PAGE_REVIEWS_REVIEW_3": "Molto buono per l'apprendimento, molto esplicativo e con esercizi.",
 	"I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT": "Iscriviti",
+	"I18N_BACK_TO_CLASSROOM": "Torna a <[classroomName]>",
 	"I18N_BLOG_DASHBOARD_AUTHOR_BIO_EXPLAIN_TEXT": "Aggiungi una breve descrizione su di te. Tieni presente che tutto ciò che scrivi qui verrà mostrato al pubblico.",
 	"I18N_BLOG_DASHBOARD_AUTHOR_BIO_HEADING": "Biografia",
 	"I18N_BLOG_DASHBOARD_AUTHOR_DETAILS_EDITOR_HEADING": "Aggiungi il tuo nome autore e biografia",
