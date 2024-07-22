@@ -50,6 +50,11 @@
       </div>
     </div>
   </div>
+
+  <div *ngIf="!voiceoversAreLoaded">
+    <p>Loading...</p>
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
 </mat-card>
 
 <style>
