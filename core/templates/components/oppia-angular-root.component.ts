@@ -233,26 +233,30 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       {
         propertyType: 'name',
         propertyValue: 'msapplication-square310x310logo',
-        content: this.getAssetUrl(
+        content: this.urlInterpolationService.getStaticCopyrightedImageUrl(
           '/assets/images/logo/msapplication-large.png'
         ),
       },
       {
         propertyType: 'name',
         propertyValue: 'msapplication-wide310x150logo',
-        content: this.getAssetUrl('/assets/images/logo/msapplication-wide.png'),
+        content: this.urlInterpolationService.getStaticCopyrightedImageUrl(
+          '/assets/images/logo/msapplication-wide.png'
+        ),
       },
       {
         propertyType: 'name',
         propertyValue: 'msapplication-square150x150logo',
-        content: this.getAssetUrl(
+        content: this.urlInterpolationService.getStaticCopyrightedImageUrl(
           '/assets/images/logo/msapplication-square.png'
         ),
       },
       {
         propertyType: 'name',
         propertyValue: 'msapplication-square70x70logo',
-        content: this.getAssetUrl('/assets/images/logo/msapplication-tiny.png'),
+        content: this.urlInterpolationService.getStaticCopyrightedImageUrl(
+          '/assets/images/logo/msapplication-tiny.png'
+        ),
       },
       {
         propertyType: 'property',
@@ -276,9 +280,5 @@ export class OppiaAngularRootComponent implements AfterViewInit {
 
     // This emit triggers ajs to start its app.
     this.initialized.emit();
-  }
-
-  getAssetUrl(path: string): string {
-    return this.urlInterpolationService.getFullStaticAssetUrl(path);
   }
 }

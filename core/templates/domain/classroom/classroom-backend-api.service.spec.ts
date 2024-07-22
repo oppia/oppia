@@ -82,6 +82,7 @@ describe('Classroom backend API service', function () {
   let responseDictionaries = {
     classroom_id: 'mathid',
     name: 'Math',
+    url_fragment: 'math',
     topic_summary_dicts: [firstTopicSummaryDict, secondTopicSummaryDict],
     course_details: 'Course Details',
     topic_list_intro: 'Topics Covered',
@@ -97,6 +98,7 @@ describe('Classroom backend API service', function () {
       size_in_bytes: 1000,
       bg_color: 'transparent',
     },
+    public_classrooms_count: 1,
   };
   let classroomBackendDict = {
     classroom_id: 'math_classroom_id',
@@ -131,13 +133,15 @@ describe('Classroom backend API service', function () {
     sampleClassroomDataObject = ClassroomData.createFromBackendData(
       responseDictionaries.classroom_id,
       responseDictionaries.name,
+      responseDictionaries.url_fragment,
       responseDictionaries.topic_summary_dicts,
       responseDictionaries.course_details,
       responseDictionaries.topic_list_intro,
       responseDictionaries.teaser_text,
       responseDictionaries.is_published,
       responseDictionaries.thumbnail_data,
-      responseDictionaries.banner_data
+      responseDictionaries.banner_data,
+      responseDictionaries.public_classrooms_count
     );
   });
 

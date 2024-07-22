@@ -36,7 +36,7 @@ from urllib import request as urlrequest
 from core import feconf
 from scripts import servers
 
-from typing import Dict, Final, Generator, List, Optional, Union
+from typing import Dict, Final, Generator, List, Optional, Tuple, Union
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
@@ -217,9 +217,11 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-editor/create-and-publish-a-blog-post-with-required-details',
     'blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked',
     'curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill',
+    'curriculum-admin/create-edit-and-delete-classroom',
     'exploration-editor/create-exploration-and-change-basic-settings',
     'exploration-editor/modify-translations-through-modal',
     'exploration-editor/load-complete-and-restart-exploration-preview',
+    'exploration-editor/publish-the-exploration-with-an-interaction',
     'exploration-editor/save-draft-publish-and-discard-the-changes',
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
@@ -240,16 +242,27 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/click-all-links-on-privacy-policy-page',
     'logged-out-user/click-all-links-on-terms-page',
     'logged-out-user/click-all-buttons-on-donate-page',
+    'logged-out-user/visit-classroom-index-page',
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
     'release-coordinator/run-a-beam-job-and-copy-the-output',
     'release-coordinator/update-promo-bar-message',
     'release-coordinator/flush-and-get-profile-of-redis-cache',
+    'release-coordinator/edit-feature-rollout-configuration',
     'super-admin/edit-user-roles',
     'super-admin/load-dummy-data-in-dev-mode',
     'super-admin/edit-platform-parameters',
+    'super-admin/use-misc-tab-features',
+    'topic-manager/edit-and-preview-a-subtopic',
+    'topic-manager/edit-and-preview-a-topic',
     'translation-admin/add-and-remove-translation-rights',
+    'topic-manager/browse-skills-on-topics-and-skills-dashboard',
+    'topic-manager/browse-topics-on-topics-and-skills-dashboard',
+    'topic-manager/create-and-delete-questions-in-skill-editor',
+    'topic-manager/assign-unassign-and-merge-skills',
+    'topic-manager/cannot-do-curriculum-admin-actions',
+    'topic-manager/edit-and-republish-a-skill',
     'voiceover-admin/add-voiceover-artist-to-an-exploration',
 ]
 
@@ -1005,3 +1018,11 @@ def is_oppia_server_already_running() -> bool:
                 'Exiting.' % port)
             return True
     return False
+
+
+def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
+    """Starts subprocess and returns (stdout, stderr)."""
+    task = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = task.communicate()
+    return out, err

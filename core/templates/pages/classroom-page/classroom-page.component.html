@@ -1,4 +1,4 @@
-<div class="oppia-classroom-page-container">
+<div class="oppia-classroom-page-container" *ngIf="classroomData">
   <div class="classroom-top breadcrumbs-container" aria-label="Classroom banner" [style.background-image]="'url(' + classroomBanner + ')'">
     <div *ngIf="showPrivateClassroomBanner"
          class="classroom-admin-banner"
@@ -24,8 +24,8 @@
     <div class="classroom-information-container">
       <div class="classroom-text-container">
         <span>{{ 'I18N_CLASSROOM_HEADING' | translate:{ classroomName: classroomData.getName() } }}</span>
-        <h1 *ngIf="!isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}">{{classroomData.getName()}}</h1>
-        <h1 *ngIf="isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}">{{classroomTranslationKeys.name | translate}}</h1>
+        <h1 *ngIf="!isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}" class="e2e-test-classroom-name">{{classroomData.getName()}}</h1>
+        <h1 *ngIf="isHackyClassroomTranslationDisplayed('name')" [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left'}" class="e2e-test-classroom-name">{{classroomTranslationKeys.name | translate}}</h1>
       </div>
       <div class="classroom-thumbnail-container">
         <img class="classroom-thumbnail" alt="Classroom thumbnail image" [src]="classroomThumbnail">
@@ -48,7 +48,7 @@
       <div *ngIf="isDiagnosticTestFeatureFlagEnabled()" class="content-section diagnostic-test-container">
         <div class="diagnostic-test-box">
           <div class="diagnostic-test-info">
-            <h4>{{ 'I18N_CLASSROOM_PAGE_NEW_TO_MATH_HEADING' | translate }}?</h4>
+            <h4>{{ 'I18N_CLASSROOM_PAGE_NEW_TO_MATH_HEADING' | translate }}</h4>
             <p>{{ beginWithFirstTopicButtonText }}</p>
           </div>
           <a [href]="firstTopicUrl">{{ 'I18N_START_FIRST_CLASSROOM_TOPIC' | translate }}</a>
@@ -58,7 +58,7 @@
             <h4>{{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_HEADING' | translate }}</h4>
             <p>{{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_MATH_TEXT' | translate }}</p>
           </div>
-          <a href="/diagnostic-test-player" class="e2e-test-take-diagnostic-test">{{ 'I18N_CLASSROOM_PAGE_QUIZ_TEST_BUTTON' | translate }}</a>
+          <a [routerLink]="['/diagnostic-test-player']" [queryParams]="{ classroom: classroomData.getUrlFragment() }" class="e2e-test-take-diagnostic-test">{{ 'I18N_CLASSROOM_PAGE_QUIZ_TEST_BUTTON' | translate }}</a>
         </div>
       </div>
       <div class="topic-tiles-container">
