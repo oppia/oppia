@@ -29,6 +29,8 @@ import {ActivityTilesInfinityGridComponent} from './search-results/activity-tile
 import {SearchResultsComponent} from './search-results/search-results.component';
 import {CommonModule} from '@angular/common';
 import {LibraryPageRoutingModule} from './library-page-routing.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {ClassroomCardComponent} from './classroom-card/classroom-card.component';
 
 @NgModule({
   imports: [
@@ -36,6 +38,7 @@ import {LibraryPageRoutingModule} from './library-page-routing.module';
     SharedComponentsModule,
     InfiniteScrollModule,
     LibraryPageRoutingModule,
+    NgbModule,
   ],
   declarations: [
     LearnerPlaylistModalComponent,
@@ -44,6 +47,7 @@ import {LibraryPageRoutingModule} from './library-page-routing.module';
     ActivityTilesInfinityGridComponent,
     LibraryPageComponent,
     LibraryPageRootComponent,
+    ClassroomCardComponent,
   ],
   entryComponents: [
     LearnerPlaylistModalComponent,
@@ -52,6 +56,7 @@ import {LibraryPageRoutingModule} from './library-page-routing.module';
     ActivityTilesInfinityGridComponent,
     LibraryPageComponent,
     LibraryPageRootComponent,
+    ClassroomCardComponent,
   ],
 })
 export class LibraryPageModule {}

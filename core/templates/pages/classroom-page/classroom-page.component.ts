@@ -100,7 +100,7 @@ export class ClassroomPageComponent implements OnDestroy {
           thumbnailFilename
         )
       : this.urlInterpolationService.getStaticImageUrl(
-          '/classrooms/default-classroom-thumbnail.svg'
+          '/classroom/default-classroom-thumbnail.svg'
         );
 
     this.classroomBanner = bannerFilename
@@ -110,7 +110,7 @@ export class ClassroomPageComponent implements OnDestroy {
           bannerFilename
         )
       : this.urlInterpolationService.getStaticImageUrl(
-          '/classrooms/default-classroom-background.png'
+          '/classroom/default-classroom-background.png'
         );
   }
 
