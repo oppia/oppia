@@ -180,7 +180,7 @@ export class SuperAdmin extends BaseUser {
         await allRoleElements[i].evaluate(element =>
           (element as HTMLElement).click()
         );
-        await this.waitForPageToFullyLoad();
+        await this.waitForStaticAssetsToLoad();
         if (role === topicManagerRole) {
           await this.selectTopicForTopicManagerRole(topicName as string);
         }

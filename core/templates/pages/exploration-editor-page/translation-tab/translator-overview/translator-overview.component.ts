@@ -41,6 +41,7 @@ import {
   VoiceoverBackendApiService,
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {LocalStorageService} from 'services/local-storage.service';
+import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 
 @Component({
   selector: 'oppia-translator-overview',
@@ -85,7 +86,8 @@ export class TranslatorOverviewComponent implements OnInit {
     private platformFeatureService: PlatformFeatureService,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
     private localStorageService: LocalStorageService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private voiceoverPlayerService: VoiceoverPlayerService
   ) {}
 
   canShowTabModeSwitcher(): boolean {
@@ -250,6 +252,15 @@ export class TranslatorOverviewComponent implements OnInit {
           voiceoverLanguages.languageAccentMasterList;
         this.languageCodesMapping = voiceoverLanguages.languageCodesMapping;
         this.updateLanguageAccentCodesDropdownOptions();
+        this.voiceoverPlayerService.languageAccentMasterList =
+          this.languageAccentMasterList;
+        this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
+          this.languageCode,
+          this.entityVoiceoversService.getLanguageAccentCodes()
+        );
+        this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+          this.updateLanguageAccentCodesDropdownOptions();
+        });
       });
   }
 
