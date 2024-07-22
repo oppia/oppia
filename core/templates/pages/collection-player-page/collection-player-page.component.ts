@@ -114,6 +114,10 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  getStaticCopyrightedImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticCopyrightedImageUrl(imagePath);
+  }
+
   togglePreviewCard(): void {
     this.explorationCardIsShown = !this.explorationCardIsShown;
   }

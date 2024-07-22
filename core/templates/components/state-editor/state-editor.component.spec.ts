@@ -158,7 +158,7 @@ describe('State Editor Component', () => {
     component.ngOnInit();
 
     expect(component.oppiaBlackImgUrl).toBe(
-      '/assets/images/avatar/oppia_avatar_100px.svg'
+      '/assets/copyrighted-images/avatar/oppia_avatar_100px.svg'
     );
     expect(component.currentStateIsTerminal).toBe(false);
     expect(component.conceptCardIsShown).toBe(true);
