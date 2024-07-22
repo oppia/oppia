@@ -353,6 +353,7 @@
         "scripts.linters.warranted_angular_security_bypasses_test",
         "scripts.create_expression_parser_test",
         "scripts.run_frontend_tests_test",
+        "scripts.git_changes_utils_test",
         "scripts.check_backend_associated_test_file_test",
         "scripts.run_custom_eslint_tests_test",
         "scripts.run_presubmit_checks_test",
