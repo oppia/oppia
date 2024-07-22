@@ -5132,6 +5132,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
     ) -> Dict[str, state_domain.StateDict]:
         """Converts from v55 to v56. Version 56 adds an
         inapplicable_skill_misconception_ids list to the state.
+
+        Returns:
+            states_dict: Dict[str, state_domain.StateDict]. The converted
+            v56 state dictionary.
         """
         for _, state_dict in states_dict.items():
             state_dict['inapplicable_skill_misconception_ids'] = []
