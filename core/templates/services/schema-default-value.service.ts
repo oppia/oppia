@@ -109,7 +109,7 @@ export class SchemaDefaultValueService {
     private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory
   ) {}
 
-  // TODO(sll): Rewrite this to take validators into account, so that
+  // TODO(#20448): Rewrite this to take validators into account, so that
   // we always start with a valid value.
   getDefaultValue(schema: Schema): SchemaDefaultValue {
     const schemaIsSubtitledHtml =
