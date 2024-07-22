@@ -108,7 +108,7 @@
     "postcss-html": "^1.3.0",
     "prettier": "^3.2.5",
     "protoc-gen-ts": "^0.3.4",
-    "puppeteer": "^13.0.0",
+    "puppeteer": "^22.13.1",
     "puppeteer-screen-recorder": "2.1.2",
     "reflect-metadata": "^0.1.12",
     "rtlcss": "^3.5.0",
