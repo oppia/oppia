@@ -1471,7 +1471,7 @@ export class CurriculumAdmin extends BaseUser {
     topicName: string,
     subtopicName: string,
     skillName: string
-  ) {
+  ): Promise<void> {
     await this.createTopic(
       topicName,
       topicName.toLowerCase().replace(' ', '-')
@@ -1504,7 +1504,7 @@ export class CurriculumAdmin extends BaseUser {
     classroomName: string,
     urlFragment: string,
     topicToBeAssigned: string
-  ) {
+  ): Promise<void> {
     await this.createNewClassroom(classroomName, urlFragment);
     await this.updateClassroom(
       classroomName,

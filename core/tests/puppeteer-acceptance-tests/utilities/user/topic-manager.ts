@@ -41,7 +41,6 @@ const topicsTab = 'a.e2e-test-topics-tab';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
 const mobileOptionsSelector = '.e2e-test-mobile-options-base';
 const mobileTopicSelector = 'div.e2e-test-mobile-topic-name a';
-const skillTab = '.e2e-test-skills-tab';
 const skillEditBox = '.e2e-test-skill-edit-box';
 const mobileSkillsOption = '.e2e-test-mobile-skills-option';
 const unassignSkillButtonDesktop = '.e2e-test-unassign-skill-button';
@@ -377,7 +376,7 @@ export class TopicManager extends BaseUser {
         topicNameSelector,
         topicName
       ),
-      this.page.waitForNavigation(),
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
     ]);
     await this.waitForStaticAssetsToLoad();
   }
@@ -2232,6 +2231,7 @@ export class TopicManager extends BaseUser {
     try {
       await this.openTopicEditor(topicName);
       await this.waitForStaticAssetsToLoad();
+
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(subtopicReassignHeader);
       }
@@ -2409,6 +2409,7 @@ export class TopicManager extends BaseUser {
         if (elements.length < 4) {
           throw new Error('Not enough collapsible cards found');
         }
+        // 4th collapsible card is for stories.
         await elements[3].click();
       }
 
@@ -2456,6 +2457,7 @@ export class TopicManager extends BaseUser {
     try {
       await this.openTopicEditor(topicName);
       await this.waitForStaticAssetsToLoad();
+
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(mobileStoryDropdown);
       }
@@ -2767,6 +2769,7 @@ export class TopicManager extends BaseUser {
     try {
       await this.openStoryEditor(storyName, topicName);
       await this.waitForStaticAssetsToLoad();
+
       const addChapterButtonElement = await this.page.$(addChapterButton);
       if (!addChapterButtonElement) {
         const mobileChapterCollapsibleCardElement = await this.page.$(
@@ -2879,14 +2882,6 @@ export class TopicManager extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
-  }
-
-  async timeout(time) {
-    await this.page.waitForTimeout(time);
-  }
-
-  async screenshot(path) {
-    await this.page.screenshot({path: `${path}`});
   }
 }
 
