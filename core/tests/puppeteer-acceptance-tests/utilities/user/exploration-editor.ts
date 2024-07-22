@@ -304,14 +304,19 @@ export class ExplorationEditor extends BaseUser {
    * Function to dismiss welcome modal.
    */
   async dismissWelcomeModal(): Promise<void> {
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      visible: true,
-    });
-    await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      hidden: true,
-    });
-    showMessage('Tutorial pop-up closed successfully.');
+    try {
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+      await this.clickOn(dismissWelcomeModalSelector);
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        hidden: true,
+      });
+      showMessage('Tutorial pop-up closed successfully.');
+    } catch (error) {
+      showMessage(`welcome modal not found: ${error.message}`);
+    }
   }
 
   /**

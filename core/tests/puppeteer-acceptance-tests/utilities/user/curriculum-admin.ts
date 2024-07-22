@@ -778,7 +778,7 @@ export class CurriculumAdmin extends BaseUser {
     } else {
       await this.clickOn(explorationSettingsTab);
     }
-    showMessage('Navigation to settings tab is successfull.');
+    showMessage('Navigation to settings tab is successful.');
   }
 
   /**
@@ -795,15 +795,19 @@ export class CurriculumAdmin extends BaseUser {
    * Function to dismiss welcome modal
    */
   async dismissWelcomeModal(): Promise<void> {
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      visible: true,
-    });
-    await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      hidden: true,
-    });
-
-    showMessage('Tutorial pop is closed.');
+    try {
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+      await this.clickOn(dismissWelcomeModalSelector);
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        hidden: true,
+      });
+      showMessage('Tutorial pop-up closed successfully.');
+    } catch (error) {
+      showMessage(`welcome modal not found: ${error.message}`);
+    }
   }
 
   /**
@@ -821,6 +825,7 @@ export class CurriculumAdmin extends BaseUser {
   async createAndPublishStoryWithChapter(
     storyTitle: string,
     storyUrlFragment: string,
+    chapterName: string,
     explorationId: string,
     topicName: string
   ): Promise<void> {
@@ -849,7 +854,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(storyMetaTagInput, 'meta');
     await this.page.keyboard.press('Tab');
 
-    await this.createChapter(explorationId);
+    await this.addChapter(explorationId, chapterName);
     await this.saveStoryDraft();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileSaveStoryChangesDropdown);
@@ -869,7 +874,7 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} storyUrlFragment - The URL fragment of the story.
    * @param {string} topicName - The name of the topic.
    */
-  async createStory(
+  async addStoryToTopic(
     storyTitle: string,
     storyUrlFragment: string,
     topicName: string
@@ -894,6 +899,11 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickAndWaitForNavigation(createStoryButton);
 
+    await this.page.waitForSelector(storyMetaTagInput);
+    await this.page.focus(storyMetaTagInput);
+    await this.page.type(storyMetaTagInput, 'meta');
+    await this.page.keyboard.press('Tab');
+
     const url = new URL(this.page.url());
     const pathSegments = url.pathname.split('/');
     const storyId = pathSegments[pathSegments.length - 1];
@@ -904,12 +914,15 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Create a chapter for a certain story.
    */
-  async createChapter(explorationId: string): Promise<void> {
+  async addChapter(chapterName: string, explorationId: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileAddChapterDropdown);
+      const addChapterButtonElement = await this.page.$(addChapterButton);
+      if (!addChapterButtonElement) {
+        await this.clickOn(mobileAddChapterDropdown);
+      }
     }
     await this.clickOn(addChapterButton);
-    await this.type(chapterTitleField, 'Test Chapter 1');
+    await this.type(chapterTitleField, chapterName);
     await this.type(chapterExplorationIdField, explorationId);
 
     await this.clickOn(chapterPhotoBoxButton);
@@ -1437,6 +1450,61 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.clickOn(closeTopicDependencyButton);
     await this.page.waitForSelector(topicDependencyGraphDiv, {visible: false});
+  }
+
+  /**
+   * Creates and publishes a topic with a subtopic and skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} skillName - The name of the skill.
+   */
+  async createAndPublishTopic(
+    topicName: string,
+    subtopicName: string,
+    skillName: string
+  ) {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(' ', '-')
+    );
+    await this.createSubtopicForTopic(
+      subtopicName,
+      subtopicName.toLowerCase().replace(' ', '-'),
+      topicName
+    );
+
+    await this.createSkillForTopic(skillName, topicName);
+    await this.createQuestionsForSkill(skillName, 3);
+    await this.assignSkillToSubtopicInTopicEditor(
+      skillName,
+      subtopicName,
+      topicName
+    );
+    await this.addSkillToDiagnosticTest(skillName, topicName);
+
+    await this.publishDraftTopic(topicName);
+  }
+
+  /**
+   * Creates, updates, and publishes a new classroom with a topic.
+   * @param {string} classroomName - The name of the classroom.
+   * @param {string} urlFragment - The URL fragment for the classroom.
+   * @param {string} topicToBeAssigned - The name of the topic to be assigned to the classroom.
+   */
+  async createAndPublishClassroom(
+    classroomName: string,
+    urlFragment: string,
+    topicToBeAssigned: string
+  ) {
+    await this.createNewClassroom(classroomName, urlFragment);
+    await this.updateClassroom(
+      classroomName,
+      'Teaser text',
+      'Course details',
+      'Topic list intro'
+    );
+    await this.addTopicToClassroom(classroomName, topicToBeAssigned);
+    await this.publishClassroom(classroomName);
   }
 }
 

@@ -50,7 +50,7 @@ describe('Topic Manager', function () {
     );
 
     await curriculumAdmin.createTopic('Subtraction', 'subtract');
-    storyID = await curriculumAdmin.createStory(
+    storyID = await curriculumAdmin.addStoryToTopic(
       'Subtraction Story',
       'story',
       'Subtraction'

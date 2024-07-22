@@ -30,7 +30,8 @@ const closeSaveModalButton = '.e2e-test-close-save-modal-button';
 const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
 
 // Photo Upload Modal.
-const chapterPhotoBoxButton =
+const chapterPhotoBoxButton = '.e2e-test-photo-button';
+const newChapterPhotoBoxButton =
   '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 const photoUploadModal = 'edit-thumbnail-modal';
@@ -68,8 +69,10 @@ const mobileSaveStoryChangesButton =
 
 // Chapter Creation Modal.
 const addChapterButton = 'button.e2e-test-add-chapter-button';
-const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
-const chapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
+const newChapterTitleField = 'input.e2e-test-new-chapter-title-field';
+const chapterTitleField = '.e2e-test-chapter-title-field';
+const newChapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
+const chapterExplorationIdField = '.e2e-test-exploration-id-input';
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 
 const subtopicReassignHeader = 'div.subtopic-reassign-header';
@@ -202,14 +205,6 @@ const htmlContent = '.html-content';
 const subtopicAssignmentContainer = '.subtopics-container';
 const editSubtopicExplanationSelector = '.e2e-test-edit-html-content';
 const topicMobilePreviewTab = '.e2e-test-mobile-preview-tab';
-const mobileStoryDropdown = 'selector.mobileStoryDropdown';
-const addStoryButton = 'selector.addStoryButton';
-const storyTitleField = 'selector.storyTitleField';
-const storyUrlFragmentField = 'selector.storyUrlFragmentField';
-const storyDescriptionField = 'selector.storyDescriptionField';
-const storyPhotoBoxButton = 'selector.storyPhotoBoxButton';
-const createStoryButton = 'selector.createStoryButton';
-const storyMetaTagInput = 'selector.storyMetaTagInput';
 const storyTitleSelector = '.e2e-test-story-title';
 const chapterTitleSelector = '.e2e-test-chapter-title';
 const chapterDescriptionField = '.e2e-test-add-chapter-description';
@@ -224,7 +219,12 @@ const confirmStoryDeletionButton = '. e2e-test-confirm-story-deletion-button';
 const editOptionsSelector = '.e2e-test-edit-options';
 const deleteChapterButtonSelector = '.e2e-test-delete-chapter-button';
 const storyEditorNodeSelector = '.story-editor-node';
-
+const resetChapterThumbnailButton = '.e2e-test-thumbnail-reset-button';
+const saveExplorationIDButton = '.e2e-test-exploration-id-save-button';
+const storiesMobileCollapsibleCardHeader =
+  '.e2e-test-mobile-stories-collapsible-card-header';
+const mobileCollapsibleCardHeaderSelector =
+  '.oppia-mobile-collapsible-card-header';
 export class TopicManager extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -1869,35 +1869,8 @@ export class TopicManager extends BaseUser {
    * @param {string} skillName - The name of the skill to add.
    */
   async addPrerequisiteSkill(skillName: string): Promise<void> {
-    try {
-      await this.clickOn('+ ADD PREREQUISITE SKILL');
-      await this.type(skillNameInputSelector, skillName);
-
-      await this.page.waitForSelector(radioInnerCircleSelector);
-      const radioInnerCircleSelectorElement = await this.page.$(
-        radioInnerCircleSelector
-      );
-      if (!radioInnerCircleSelectorElement) {
-        throw new Error('Radio inner circle selector not found');
-      }
-      await this.waitForStaticAssetsToLoad();
-      await this.page.evaluate(selector => {
-        document.querySelector(selector).click();
-      }, radioInnerCircleSelector);
-
-      await this.page.waitForSelector(confirmSkillSelectionButtonSelector);
-      const confirmSkillSelectionButtonSelectorElement = await this.page.$(
-        confirmSkillSelectionButtonSelector
-      );
-      if (!confirmSkillSelectionButtonSelectorElement) {
-        throw new Error('Confirm skill selection button selector not found');
-      }
-      await this.clickOn(confirmSkillSelectionButtonSelector);
-      showMessage(`Added prerequisite skill: ${skillName}`);
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
+    await this.clickOn('+ ADD PREREQUISITE SKILL');
+    await this.filterAndSelectSkill(skillName);
   }
 
   /**
@@ -2396,50 +2369,6 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Creates a new story with a chapter and saves it.
-   * @param {string} storyTitle - The title of the story.
-   * @param {string} storyUrlFragment - The URL fragment of the story.
-   * @param {string} chapterName - The name of the chapter.
-   * @param {string | null} explorationId - The ID of the exploration associated with the chapter.
-   * @param {string} topicName - The name of the topic associated with the story.
-   */
-  async createAndSaveStoryWithChapter(
-    storyTitle: string,
-    storyUrlFragment: string,
-    chapterName: string,
-    explorationId: string | null,
-    topicName: string
-  ): Promise<void> {
-    await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileStoryDropdown);
-    }
-    await this.clickOn(addStoryButton);
-    await this.type(storyTitleField, storyTitle);
-    await this.type(storyUrlFragmentField, storyUrlFragment);
-    await this.type(
-      storyDescriptionField,
-      `Story creation description for ${storyTitle}.`
-    );
-
-    await this.clickOn(storyPhotoBoxButton);
-    await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadPhotoButton);
-
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickOn(createStoryButton);
-
-    await this.page.waitForSelector(storyMetaTagInput);
-    await this.page.focus(storyMetaTagInput);
-    await this.page.type(storyMetaTagInput, 'meta');
-    await this.page.keyboard.press('Tab');
-
-    await this.createChapter(explorationId as string, chapterName);
-    await this.saveStoryDraft();
-  }
-
-  /**
    * Save a story as a curriculum admin.
    */
   async saveStoryDraft(): Promise<void> {
@@ -2467,6 +2396,14 @@ export class TopicManager extends BaseUser {
   async openStoryEditor(storyName: string, topicName: string): Promise<void> {
     try {
       await this.openTopicEditor(topicName);
+      if (this.isViewportAtMobileWidth()) {
+        const storiesCollapsibleCardHeader = await this.page.$(
+          storiesMobileCollapsibleCardHeader
+        );
+        if (storiesCollapsibleCardHeader) {
+          storiesCollapsibleCardHeader.click();
+        }
+      }
 
       await this.page.waitForSelector(storyTitleSelector);
       const storyTitles = await this.page.$$(storyTitleSelector);
@@ -2597,6 +2534,9 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     try {
       await this.openStoryEditor(storyName, topicName);
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(mobileAddChapterDropdown);
+      }
 
       await this.page.waitForSelector(chapterTitleSelector);
       const chapterTitles = await this.page.$$(chapterTitleSelector);
@@ -2609,6 +2549,7 @@ export class TopicManager extends BaseUser {
 
         if (title === chapterName) {
           await titleElement.click();
+          showMessage(`Chapter ${chapterName} opened in chapter editor.`);
           return;
         }
       }
@@ -2628,18 +2569,18 @@ export class TopicManager extends BaseUser {
   /**
    * Create a chapter for a certain story.
    */
-  async createChapter(
-    explorationId: string,
-    chapterName: string
-  ): Promise<void> {
+  async addChapter(chapterName: string, explorationId: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileAddChapterDropdown);
+      const addChapterButtonElement = await this.page.$(addChapterButton);
+      if (!addChapterButtonElement) {
+        await this.clickOn(mobileAddChapterDropdown);
+      }
     }
     await this.clickOn(addChapterButton);
-    await this.type(chapterTitleField, chapterName);
-    await this.type(chapterExplorationIdField, explorationId);
+    await this.type(newChapterTitleField, chapterName);
+    await this.type(newChapterExplorationIdField, explorationId);
 
-    await this.clickOn(chapterPhotoBoxButton);
+    await this.clickOn(newChapterPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
@@ -2662,26 +2603,43 @@ export class TopicManager extends BaseUser {
     explorationId: string,
     thumbnailImage: string
   ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
+      const elements = await this.page.$$(mobileCollapsibleCardHeaderSelector);
+      if (elements.length < 5) {
+        throw new Error('Not enough elements collapsible headers found,');
+      }
+      await elements[2].click();
+      await elements[3].click();
+      await elements[4].click();
+    }
+
+    await this.clearAllTextFrom(chapterTitleField);
     await this.type(chapterTitleField, chapterName);
     await this.type(chapterDescriptionField, description);
+
+    await this.clearAllTextFrom(chapterExplorationIdField);
     await this.type(chapterExplorationIdField, explorationId);
+    await this.clickOn(saveExplorationIDButton);
 
     await this.clickOn(chapterPhotoBoxButton);
+    await this.clickOn(resetChapterThumbnailButton);
     await this.uploadFile(thumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickOn(createChapterButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
   }
 
   /**
    * Previews the chapter card.
-   * @returns {Promise<void>}
    */
   async previewChapterCard(): Promise<void> {
-    await this.clickOn(showChapterPreviewButton);
+    const elementHandle = await this.page.waitForSelector(
+      showChapterPreviewButton
+    );
+    if (!elementHandle) {
+      throw new Error('Chapter preview button not found');
+    }
+    await elementHandle.click();
   }
 
   /**
@@ -2735,17 +2693,8 @@ export class TopicManager extends BaseUser {
    * @param {string} skillName - The name of the skill.
    * @returns {Promise<void>}
    */
-  async assignAcquiredSkill(skillName: string): Promise<void> {
+  async addAcquiredSkill(skillName: string): Promise<void> {
     await this.clickOn('+ ADD ACQUIRED SKILL');
-    await this.filterAndSelectSkill(skillName);
-  }
-
-  /**
-   * Assigns a prerequisite skill.
-   * @param {string} skillName - The name of the skill.
-   */
-  async assignPrerequisiteSkill(skillName: string): Promise<void> {
-    await this.clickOn('+ ADD PREREQUISITE SKILL');
     await this.filterAndSelectSkill(skillName);
   }
 

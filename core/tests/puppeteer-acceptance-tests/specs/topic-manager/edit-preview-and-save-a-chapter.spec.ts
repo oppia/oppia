@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the journey of a topic manager. It includes modifying chapter details,
- *  previewing the chapter card, adding acquired and prerequisite skills, and save the changes.
+ * @fileoverview Acceptance Test for a journey of topic manager. It includes modifying chapter details,
+ *  previewing the chapter card, adding acquired and prerequisite skills, and saving the changes.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -27,9 +27,11 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Topic Manager', function () {
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let topicManager: TopicManager;
-  let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
-  let explorationId: string | null;
+  let explorationId1: string | null;
+  let explorationId2: string | null;
+  let explorationId3: string | null;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -38,48 +40,55 @@ describe('Topic Manager', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    await curriculumAdmin.navigateToCreatorDashboardPage();
-    await curriculumAdmin.navigateToExplorationEditorPage();
-    await curriculumAdmin.dismissWelcomeModal();
-    await curriculumAdmin.createMinimalExploration(
-      'Algebra Basics',
-      'End Exploration'
-    );
-    await curriculumAdmin.saveExplorationDraft();
-    explorationId = await curriculumAdmin.publishExplorationWithMetadata(
-      'Algebra Basics',
-      'Learn the basics of Algebra',
-      'Algorithms'
-    );
-    if (!explorationId) {
-      throw new Error('Error in publishing exploration');
-    }
+    explorationId1 =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'Exploring Quadratic Equations'
+      );
 
-    await curriculumAdmin.createTopic('Algebra', 'algebra');
-    await curriculumAdmin.createSkillForTopic('Basic Algebra', 'Algebra');
-    await curriculumAdmin.createSkillForTopic('Advanced Algebra', 'Algebra');
+    explorationId2 =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'Understanding Polynomial Functions'
+      );
+
+    explorationId3 =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'Exploring Advance Equations'
+      );
+
+    await curriculumAdmin.createTopic('Algebra II', 'algebra-ii');
+
+    await curriculumAdmin.createSkillForTopic(
+      'Quadratic Equations',
+      'Algebra II'
+    );
+    await curriculumAdmin.createSkillForTopic(
+      'Polynomial Functions',
+      'Algebra II'
+    );
+
+    await curriculumAdmin.addStoryToTopic(
+      'Journey into Quadratic Equations',
+      'journey-into-quadratic-equations',
+      'Algebra II'
+    );
+    await curriculumAdmin.addChapter(
+      'Quadratic Equations Basics',
+      explorationId1 as string
+    );
+    await curriculumAdmin.addChapter(
+      'Introduction to Polynomial Functions',
+      explorationId2 as string
+    );
+    await curriculumAdmin.saveStoryDraft();
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topicManager1@example.com',
       [ROLES.TOPIC_MANAGER],
-      'Algebra'
+      'Algebra II'
     );
-    await topicManager.createAndSaveStoryWithChapter(
-      'Algebra Story 1',
-      'algebraStory1',
-      'Introduction to Algebra',
-      explorationId,
-      'Algebra'
-    );
-    await topicManager.createAndSaveStoryWithChapter(
-      'Algebra Story 2',
-      'algebraStory2',
-      'Advanced Algebra',
-      explorationId,
-      'Algebra'
-    );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+    // Setup is taking longer than the Default timeout of 300000 ms.
+  }, 360000);
 
   it('should be able to modify chapter details, preview the chapter card, add skills, and save the changes.', async function () {
     const actions = [
@@ -90,25 +99,25 @@ describe('Topic Manager', function () {
       {
         action: () =>
           topicManager.openChapterEditor(
-            'Introduction to Algebra',
-            'Algebra Story',
-            'Algebra'
+            'Quadratic Equations Basics',
+            'Journey into Quadratic Equations',
+            'Algebra II'
           ),
-        name: 'openChapterEditor_IntroductionToAlgebra',
+        name: 'openChapterEditor_QuadraticEquationsBasics',
       },
       {
         action: () =>
           topicManager.editChapterDetails(
-            'Intro to Algebra',
-            'Introductory chapter on Algebra',
-            explorationId as string,
+            'Intro to Quadratic Equations',
+            'Introductory chapter on Quadratic Equations',
+            explorationId3 as string,
             testConstants.data.curriculumAdminThumbnailImage
           ),
-        name: 'editChapterDetails_IntroToAlgebra',
+        name: 'editChapterDetails_IntroToQuadraticEquations',
       },
       {
-        action: () => topicManager.assignAcquiredSkill('Basic Algebra'),
-        name: 'assignAcquiredSkill_BasicAlgebra',
+        action: () => topicManager.addAcquiredSkill('Quadratic Equations'),
+        name: 'assignAcquiredSkill_QuadraticEquations',
       },
       {action: () => topicManager.saveStoryDraft(), name: 'saveStoryDraft'},
       {
@@ -118,28 +127,29 @@ describe('Topic Manager', function () {
       {
         action: () =>
           topicManager.expectChapterPreviewToHave(
-            'Intro to Algebra',
-            'Introductory chapter on Algebra'
+            'Intro to Quadratic Equations',
+            'Introductory chapter on Quadratic Equations'
           ),
-        name: 'expectChapterPreviewToHave_IntroToAlgebra',
+        name: 'expectChapterPreviewToHave_IntroToQuadraticEquations',
       },
+
       // Opening second chapter in chapter editor to add prerequisite skill as it only can be added if the skill is acquired in previous chapters, which is acquired in the chapter above.
       {
         action: () =>
           topicManager.openChapterEditor(
-            'Advanced Algebra',
-            'Algebra story 2',
-            'Algebra'
+            'Introduction to Polynomial Functions',
+            'Journey into Quadratic Equations',
+            'Algebra II'
           ),
-        name: 'openChapterEditor_AdvancedAlgebra',
+        name: 'openChapterEditor_IntroductionToPolynomialFunctions',
       },
       {
-        action: () => topicManager.addPrerequisiteSkill('Basic Algebra'),
-        name: 'addPrerequisiteSkill_BasicAlgebra',
+        action: () => topicManager.addPrerequisiteSkill('Quadratic Equations'),
+        name: 'addPrerequisiteSkill_QuadraticEquations',
       },
       {
-        action: () => topicManager.assignAcquiredSkill('Advanced Algebra'),
-        name: 'assignAcquiredSkill_AdvancedAlgebra',
+        action: () => topicManager.addAcquiredSkill('Polynomial Functions'),
+        name: 'assignAcquiredSkill_PolynomialFunctions',
       },
       {action: () => topicManager.saveStoryDraft(), name: 'saveStoryDraft'},
       {action: () => topicManager.timeout(2147483647), name: 'timeout'},

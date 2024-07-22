@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes creating a subtopic, story, adding chapters to it, publishing it, unpublishing and deleting a story, and deleting subtopics and chapters.
+ * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes creating a subtopic, story, adding chapters to it, and deleting the story, subtopics and chapters.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -37,24 +37,11 @@ describe('Topic Manager', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
+    explorationId =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'test exploration 1'
+      );
     await curriculumAdmin.createTopic('Addition', 'add');
-
-    await curriculumAdmin.navigateToCreatorDashboardPage();
-    await curriculumAdmin.navigateToExplorationEditorPage();
-    await curriculumAdmin.dismissWelcomeModal();
-    await curriculumAdmin.createMinimalExploration(
-      'Test Exploration',
-      'End Exploration'
-    );
-    await curriculumAdmin.saveExplorationDraft();
-    explorationId = await curriculumAdmin.publishExplorationWithMetadata(
-      'Test Exploration Title 1',
-      'Test Exploration Goal',
-      'Algebra'
-    );
-    if (!explorationId) {
-      throw new Error('Error in publishing exploration.');
-    }
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
@@ -80,13 +67,14 @@ describe('Topic Manager', function () {
         true
       );
 
-      await topicManager.createAndSaveStoryWithChapter(
+      await topicManager.addStoryToTopic(
         'Test Story 1',
         'test-story-one',
-        'Test Chapter 1',
-        explorationId,
         'Addition'
       );
+
+      await topicManager.addChapter('test chapter 1', explorationId as string);
+      await topicManager.saveStoryDraft();
 
       // Verify the story is present in the topic.
       await topicManager.verifyStoryPresenceInTopic(
