@@ -221,8 +221,8 @@ const deleteChapterButtonSelector = '.e2e-test-delete-chapter-button';
 const storyEditorNodeSelector = '.story-editor-node';
 const resetChapterThumbnailButton = '.e2e-test-thumbnail-reset-button';
 const saveExplorationIDButton = '.e2e-test-exploration-id-save-button';
-const storiesMobileCollapsibleCardHeader =
-  '.e2e-test-mobile-stories-collapsible-card-header';
+const addPrerequisiteSkillButton = '.e2e-test-add-prerequisite-skill';
+const addAcquiredSkillButton = '.e2e-test-add-acquired-skill';
 const mobileCollapsibleCardHeaderSelector =
   '.oppia-mobile-collapsible-card-header';
 export class TopicManager extends BaseUser {
@@ -1869,7 +1869,18 @@ export class TopicManager extends BaseUser {
    * @param {string} skillName - The name of the skill to add.
    */
   async addPrerequisiteSkill(skillName: string): Promise<void> {
-    await this.clickOn('+ ADD PREREQUISITE SKILL');
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(addPrerequisiteSkillButton);
+    const elements = await this.page.$$(addPrerequisiteSkillButton);
+
+    if (this.isViewportAtMobileWidth()) {
+      if (elements.length < 2) {
+        throw new Error('Did not find 2 "add prerequisite" button.');
+      }
+      await elements[1].click();
+    } else {
+      await elements[0].click();
+    }
     await this.filterAndSelectSkill(skillName);
   }
 
@@ -2397,12 +2408,13 @@ export class TopicManager extends BaseUser {
     try {
       await this.openTopicEditor(topicName);
       if (this.isViewportAtMobileWidth()) {
-        const storiesCollapsibleCardHeader = await this.page.$(
-          storiesMobileCollapsibleCardHeader
+        const elements = await this.page.$$(
+          mobileCollapsibleCardHeaderSelector
         );
-        if (storiesCollapsibleCardHeader) {
-          storiesCollapsibleCardHeader.click();
+        if (elements.length < 4) {
+          throw new Error('Not enough collapsible cards found');
         }
+        await elements[3].click();
       }
 
       await this.page.waitForSelector(storyTitleSelector);
@@ -2416,6 +2428,9 @@ export class TopicManager extends BaseUser {
 
         if (title === storyName) {
           await titleElement.click();
+          await this.page.waitForNavigation({
+            waitUntil: ['load', 'networkidle0'],
+          });
           return;
         }
       }
@@ -2534,8 +2549,12 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     try {
       await this.openStoryEditor(storyName, topicName);
-      if (this.isViewportAtMobileWidth()) {
-        await this.clickOn(mobileAddChapterDropdown);
+      const addChapterButtonElement = await this.page.$(addChapterButton);
+      if (!addChapterButtonElement) {
+        const mobileAddChapterDropdownElement = await this.page.$(
+          mobileAddChapterDropdown
+        );
+        mobileAddChapterDropdownElement?.click();
       }
 
       await this.page.waitForSelector(chapterTitleSelector);
@@ -2550,6 +2569,22 @@ export class TopicManager extends BaseUser {
         if (title === chapterName) {
           await titleElement.click();
           showMessage(`Chapter ${chapterName} opened in chapter editor.`);
+
+          // Collapsing all the collapsible card in the mobile viewport.
+          if (this.isViewportAtMobileWidth()) {
+            await this.page.waitForSelector(
+              mobileCollapsibleCardHeaderSelector
+            );
+            const elements = await this.page.$$(
+              mobileCollapsibleCardHeaderSelector
+            );
+            if (elements.length < 5) {
+              throw new Error('Not enough elements collapsible headers found,');
+            }
+            await elements[2].click();
+            await elements[3].click();
+            await elements[4].click();
+          }
           return;
         }
       }
@@ -2603,17 +2638,6 @@ export class TopicManager extends BaseUser {
     explorationId: string,
     thumbnailImage: string
   ): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
-      const elements = await this.page.$$(mobileCollapsibleCardHeaderSelector);
-      if (elements.length < 5) {
-        throw new Error('Not enough elements collapsible headers found,');
-      }
-      await elements[2].click();
-      await elements[3].click();
-      await elements[4].click();
-    }
-
     await this.clearAllTextFrom(chapterTitleField);
     await this.type(chapterTitleField, chapterName);
     await this.type(chapterDescriptionField, description);
@@ -2694,7 +2718,22 @@ export class TopicManager extends BaseUser {
    * @returns {Promise<void>}
    */
   async addAcquiredSkill(skillName: string): Promise<void> {
-    await this.clickOn('+ ADD ACQUIRED SKILL');
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(addAcquiredSkillButton);
+    const elements = await this.page.$$(addAcquiredSkillButton);
+    if (elements.length < 2) {
+      throw new Error('Add Acquired skill button not found.');
+    }
+
+    if (this.isViewportAtMobileWidth()) {
+      if (elements.length < 2) {
+        throw new Error('Did not find 2 "Add Acquired Skill" buttons');
+      }
+      await this.waitForElementToBeClickable(elements[1]);
+      await elements[1].click();
+    } else {
+      await elements[0].click();
+    }
     await this.filterAndSelectSkill(skillName);
   }
 

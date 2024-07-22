@@ -90,79 +90,45 @@ describe('Topic Manager', function () {
     // Setup is taking longer than the Default timeout of 300000 ms.
   }, 360000);
 
-  it('should be able to modify chapter details, preview the chapter card, add skills, and save the changes.', async function () {
-    const actions = [
-      {
-        action: () => topicManager.navigateToTopicAndSkillsDashboardPage(),
-        name: 'navigateToTopicAndSkillsDashboardPage',
-      },
-      {
-        action: () =>
-          topicManager.openChapterEditor(
-            'Quadratic Equations Basics',
-            'Journey into Quadratic Equations',
-            'Algebra II'
-          ),
-        name: 'openChapterEditor_QuadraticEquationsBasics',
-      },
-      {
-        action: () =>
-          topicManager.editChapterDetails(
-            'Intro to Quadratic Equations',
-            'Introductory chapter on Quadratic Equations',
-            explorationId3 as string,
-            testConstants.data.curriculumAdminThumbnailImage
-          ),
-        name: 'editChapterDetails_IntroToQuadraticEquations',
-      },
-      {
-        action: () => topicManager.addAcquiredSkill('Quadratic Equations'),
-        name: 'assignAcquiredSkill_QuadraticEquations',
-      },
-      {action: () => topicManager.saveStoryDraft(), name: 'saveStoryDraft'},
-      {
-        action: () => topicManager.previewChapterCard(),
-        name: 'previewChapterCard',
-      },
-      {
-        action: () =>
-          topicManager.expectChapterPreviewToHave(
-            'Intro to Quadratic Equations',
-            'Introductory chapter on Quadratic Equations'
-          ),
-        name: 'expectChapterPreviewToHave_IntroToQuadraticEquations',
-      },
+  it(
+    'should be able to modify chapter details, preview the chapter card, add skills, and save the changes.',
+    async function () {
+      await topicManager.navigateToTopicAndSkillsDashboardPage();
+      await topicManager.openChapterEditor(
+        'Quadratic Equations Basics',
+        'Journey into Quadratic Equations',
+        'Algebra II'
+      );
+
+      await topicManager.editChapterDetails(
+        'Intro to Quadratic Equations',
+        'Introductory chapter on Quadratic Equations',
+        explorationId3 as string,
+        testConstants.data.curriculumAdminThumbnailImage
+      );
+      await topicManager.addAcquiredSkill('Quadratic Equations');
+
+      await topicManager.saveStoryDraft();
+
+      await topicManager.previewChapterCard();
+      await topicManager.expectChapterPreviewToHave(
+        'Intro to Quadratic Equations',
+        'Introductory chapter on Quadratic Equations'
+      );
 
       // Opening second chapter in chapter editor to add prerequisite skill as it only can be added if the skill is acquired in previous chapters, which is acquired in the chapter above.
-      {
-        action: () =>
-          topicManager.openChapterEditor(
-            'Introduction to Polynomial Functions',
-            'Journey into Quadratic Equations',
-            'Algebra II'
-          ),
-        name: 'openChapterEditor_IntroductionToPolynomialFunctions',
-      },
-      {
-        action: () => topicManager.addPrerequisiteSkill('Quadratic Equations'),
-        name: 'addPrerequisiteSkill_QuadraticEquations',
-      },
-      {
-        action: () => topicManager.addAcquiredSkill('Polynomial Functions'),
-        name: 'assignAcquiredSkill_PolynomialFunctions',
-      },
-      {action: () => topicManager.saveStoryDraft(), name: 'saveStoryDraft'},
-      {action: () => topicManager.timeout(2147483647), name: 'timeout'},
-    ];
-    for (const {action, name} of actions) {
-      try {
-        await action();
-      } catch (error) {
-        console.error('\x1b[31m%s\x1b[0m', error);
-        await topicManager.screenshot(`error_${name}.png`);
-      }
-    }
-  }, 2147483647);
+      await topicManager.openChapterEditor(
+        'Introduction to Polynomial Functions',
+        'Journey into Quadratic Equations',
+        'Algebra II'
+      );
+      await topicManager.addPrerequisiteSkill('Quadratic Equations');
+      await topicManager.addAcquiredSkill('Polynomial Functions');
+
+      await topicManager.saveStoryDraft();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
