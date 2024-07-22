@@ -5133,6 +5133,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Converts from v55 to v56. Version 56 adds an
         inapplicable_skill_misconception_ids list to the state.
 
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
         Returns:
             states_dict: Dict[str, state_domain.StateDict]. The converted
             v56 state dictionary.
