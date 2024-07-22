@@ -511,6 +511,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickOn(createSubtopicButton);
     await this.saveTopicDraft(topicName);
+    showMessage(`Subtopic ${title} is created.`);
   }
 
   /**
@@ -903,10 +904,12 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.focus(storyMetaTagInput);
     await this.page.type(storyMetaTagInput, 'meta');
     await this.page.keyboard.press('Tab');
+    await this.saveStoryDraft();
 
     const url = new URL(this.page.url());
     const pathSegments = url.pathname.split('/');
     const storyId = pathSegments[pathSegments.length - 1];
+    showMessage(`Story ${storyTitle} is created.`);
 
     return storyId;
   }
@@ -933,14 +936,20 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickOn(createChapterButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
+    showMessage(`Chapter ${chapterName} is created.`);
   }
 
   /**
-   * Save a story curriculum admin.
+   * Save a story.
    */
   async saveStoryDraft(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileOptionsSelector);
+      const isMobileSaveButtonVisible = await this.isElementVisible(
+        mobileSaveStoryChangesButton
+      );
+      if (!isMobileSaveButtonVisible) {
+        await this.clickOn(mobileOptionsSelector);
+      }
       await this.clickOn(mobileSaveStoryChangesButton);
     } else {
       await this.clickOn(saveStoryButton);

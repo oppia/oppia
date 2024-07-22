@@ -529,6 +529,18 @@ export class BaseUser {
   }
 
   /**
+   * Checks if an element is visible on the page.
+   */
+  async isElementVisible(selector: string): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(selector, {visible: true, timeout: 1000});
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * Waits for the static assets on the page to load.
    */
   async waitForStaticAssetsToLoad(): Promise<void> {

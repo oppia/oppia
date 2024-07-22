@@ -76,23 +76,18 @@ const chapterExplorationIdField = '.e2e-test-exploration-id-input';
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 
 const subtopicReassignHeader = 'div.subtopic-reassign-header';
-const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
-const newSubtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
 const subtopicTitleField = '.e2e-test-subtopic-title-field';
-const newSubtopicUrlFragmentField =
-  'input.e2e-test-new-subtopic-url-fragment-field';
+('input.e2e-test-new-subtopic-url-fragment-field');
 const subtopicUrlFragmentField = '.e2e-test-subtopic-url-fragment-field';
-const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
 const richTextAreaField = 'div.e2e-test-rte';
 const subtopicPhotoBoxButton =
   '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
-const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
 const mobileSaveTopicButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
 const mobileNavbarDropdown =
   'div.navbar-mobile-options .e2e-test-mobile-navbar-dropdown';
 const saveTopicButton = 'button.e2e-test-save-topic-button';
-const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
+const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
 
 // Question Editor.
 const desktopSkillQuestionTab = '.e2e-test-questions-tab';
@@ -215,7 +210,7 @@ const optionsSelector = '.e2e-test-show-subtopic-options';
 const deleteSubtopicButtonSelector = '.e2e-test-delete-subtopic-button';
 const storyListItemSelector = '.e2e-test-story-list-item';
 const deleteStoryButtonSelector = '.e2e-test-delete-story-button';
-const confirmStoryDeletionButton = '. e2e-test-confirm-story-deletion-button';
+const confirmStoryDeletionButton = '.e2e-test-confirm-story-deletion-button';
 const editOptionsSelector = '.e2e-test-edit-options';
 const deleteChapterButtonSelector = '.e2e-test-delete-chapter-button';
 const storyEditorNodeSelector = '.story-editor-node';
@@ -225,6 +220,9 @@ const addPrerequisiteSkillButton = '.e2e-test-add-prerequisite-skill';
 const addAcquiredSkillButton = '.e2e-test-add-acquired-skill';
 const mobileCollapsibleCardHeaderSelector =
   '.oppia-mobile-collapsible-card-header';
+const mobileStoryDropdown = '.e2e-test-story-dropdown';
+const confirmDeleteChapterButton = '.e2e-test-confirm-delete-chapter-button';
+
 export class TopicManager extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -2087,40 +2085,6 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Create a subtopic as a topic manager
-   */
-  async createSubtopicForTopic(
-    title: string,
-    urlFragment: string,
-    topicName: string
-  ): Promise<void> {
-    await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(subtopicReassignHeader);
-    }
-    await this.clickOn(addSubtopicButton);
-    await this.type(newSubtopicTitleField, title);
-    await this.type(newSubtopicUrlFragmentField, urlFragment);
-
-    await this.clickOn(subtopicDescriptionEditorToggle);
-    await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(
-      richTextAreaField,
-      `Subtopic creation description text for ${title}`
-    );
-
-    await this.clickOn(subtopicPhotoBoxButton);
-    await this.page.waitForSelector(photoUploadModal, {visible: true});
-    await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadPhotoButton);
-
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickOn(createSubtopicButton);
-    await this.saveTopicDraft(topicName);
-  }
-
-  /**
    * Opens the subtopic editor for a given subtopic and topic.
    * @param {string} subtopicName - The name of the subtopic to open.
    * @param {string} topicName - The name of the topic that contains the subtopic.
@@ -2130,11 +2094,13 @@ export class TopicManager extends BaseUser {
     topicName: string
   ): Promise<void> {
     await this.openTopicEditor(topicName);
+
     await this.page.waitForSelector(subtopicReassignHeader);
     let elementToClick = await this.page.$(subtopicReassignHeader);
     if (this.isViewportAtMobileWidth() && elementToClick) {
       await elementToClick.click();
     }
+
     try {
       await this.page.waitForSelector(subtopicCardHeader);
       const subtopicElements = await this.page.$$(subtopicCardHeader);
@@ -2205,6 +2171,11 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     try {
       await this.openTopicEditor(topicName);
+      await this.waitForStaticAssetsToLoad();
+
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(subtopicReassignHeader);
+      }
 
       await this.page.waitForSelector(subtopicCardHeader);
       const subtopics = await this.page.$$(subtopicCardHeader);
@@ -2216,13 +2187,19 @@ export class TopicManager extends BaseUser {
         );
 
         if (subtopicTitle === subtopicName) {
+          await subtopic.waitForSelector(optionsSelector);
           const optionsButton = await subtopic.$(optionsSelector);
           if (optionsButton) {
+            await this.waitForElementToBeClickable(optionsButton);
             await optionsButton.click();
             await subtopic.waitForSelector(deleteSubtopicButtonSelector);
             const deleteButton = await subtopic.$(deleteSubtopicButtonSelector);
             if (deleteButton) {
+              await this.waitForElementToBeClickable(deleteButton);
               await deleteButton.click();
+              showMessage(
+                `Subtopic ${subtopicName} deleted from the topic ${topicName}.`
+              );
               return;
             }
           }
@@ -2254,7 +2231,11 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     try {
       await this.openTopicEditor(topicName);
-      await this.page.waitForSelector(subtopicTitleSelector);
+      await this.waitForStaticAssetsToLoad();
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(subtopicReassignHeader);
+      }
+
       const subtopics = await this.page.$$(subtopicTitleSelector);
 
       for (const subtopicElement of subtopics) {
@@ -2269,6 +2250,9 @@ export class TopicManager extends BaseUser {
               `Subtopic ${subtopicName} exists in topic ${topicName}, but it shouldn't.`
             );
           }
+          showMessage(
+            `Subtopic ${subtopicName} is ${shouldExist ? 'found' : 'not found'} in topic ${topicName}, as expected.`
+          );
           return;
         }
       }
@@ -2278,6 +2262,10 @@ export class TopicManager extends BaseUser {
           `Subtopic ${subtopicName} not found in topic ${topicName}, but it should exist.`
         );
       }
+
+      showMessage(
+        `Subtopic ${subtopicName} is ${shouldExist ? 'found' : 'not found'} in topic ${topicName}, as expected.`
+      );
     } catch (error) {
       const newError = new Error(
         `Failed to verify subtopic presence in topic: ${error}`
@@ -2386,7 +2374,12 @@ export class TopicManager extends BaseUser {
    */
   async saveStoryDraft(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileOptionsSelector);
+      const isMobileSaveButtonVisible = await this.isElementVisible(
+        mobileSaveStoryChangesButton
+      );
+      if (!isMobileSaveButtonVisible) {
+        await this.clickOn(mobileOptionsSelector);
+      }
       await this.clickOn(mobileSaveStoryChangesButton);
     } else {
       await this.clickOn(saveStoryButton);
@@ -2462,7 +2455,11 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     try {
       await this.openTopicEditor(topicName);
-      await this.page.waitForSelector(storyTitleSelector);
+      await this.waitForStaticAssetsToLoad();
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(mobileStoryDropdown);
+      }
+
       const stories = await this.page.$$(storyTitleSelector);
 
       for (const storyElement of stories) {
@@ -2477,6 +2474,9 @@ export class TopicManager extends BaseUser {
               `Story ${storyName} exists in topic ${topicName}, but it shouldn't.`
             );
           }
+          showMessage(
+            `Story ${storyName} is ${shouldExist ? 'found' : 'not found'} in topic ${topicName}, as expected.`
+          );
           return;
         }
       }
@@ -2486,6 +2486,9 @@ export class TopicManager extends BaseUser {
           `Story ${storyName} not found in topic ${topicName}, but it should exist.`
         );
       }
+      showMessage(
+        `Story ${storyName} is ${shouldExist ? 'found' : 'not found'} in topic ${topicName}, as expected.`
+      );
     } catch (error) {
       const newError = new Error(
         `Failed to verify story presence in topic: ${error}`
@@ -2506,6 +2509,11 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     try {
       await this.openTopicEditor(topicName);
+      await this.waitForStaticAssetsToLoad();
+
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(mobileStoryDropdown);
+      }
 
       await this.page.waitForSelector(storyListItemSelector);
       const storyListItems = await this.page.$$(storyListItemSelector);
@@ -2524,6 +2532,9 @@ export class TopicManager extends BaseUser {
               await this.waitForElementToBeClickable(deleteButton);
               await deleteButton.click();
               await this.clickOn(confirmStoryDeletionButton);
+              showMessage(
+                `Story ${storyName} deleted from the topic ${topicName}.`
+              );
               return;
             }
           }
@@ -2553,10 +2564,10 @@ export class TopicManager extends BaseUser {
       await this.openStoryEditor(storyName, topicName);
       const addChapterButtonElement = await this.page.$(addChapterButton);
       if (!addChapterButtonElement) {
-        const mobileAddChapterDropdownElement = await this.page.$(
-          mobileAddChapterDropdown
+        const mobileChapterCollapsibleCardElement = await this.page.$(
+          mobileChapterCollapsibleCard
         );
-        mobileAddChapterDropdownElement?.click();
+        mobileChapterCollapsibleCardElement?.click();
       }
 
       await this.page.waitForSelector(chapterTitleSelector);
@@ -2610,7 +2621,7 @@ export class TopicManager extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       const addChapterButtonElement = await this.page.$(addChapterButton);
       if (!addChapterButtonElement) {
-        await this.clickOn(mobileAddChapterDropdown);
+        await this.clickOn(mobileChapterCollapsibleCard);
       }
     }
     await this.clickOn(addChapterButton);
@@ -2625,6 +2636,7 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickOn(createChapterButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
+    showMessage(`Chapter ${chapterName} is created.`);
   }
 
   /**
@@ -2754,8 +2766,15 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     try {
       await this.openStoryEditor(storyName, topicName);
+      await this.waitForStaticAssetsToLoad();
+      const addChapterButtonElement = await this.page.$(addChapterButton);
+      if (!addChapterButtonElement) {
+        const mobileChapterCollapsibleCardElement = await this.page.$(
+          mobileChapterCollapsibleCard
+        );
+        mobileChapterCollapsibleCardElement?.click();
+      }
 
-      await this.page.waitForSelector(chapterTitleSelector);
       const chapters = await this.page.$$(chapterTitleSelector);
 
       for (const chapterElement of chapters) {
@@ -2770,6 +2789,9 @@ export class TopicManager extends BaseUser {
               `Chapter ${chapterName} exists in story ${storyName} of topic ${topicName}, but it shouldn't.`
             );
           }
+          showMessage(
+            `Chapter ${chapterName} is ${shouldExist ? 'found' : 'not found'} in story ${storyName}, as expected.`
+          );
           return;
         }
       }
@@ -2779,6 +2801,9 @@ export class TopicManager extends BaseUser {
           `Chapter ${chapterName} not found in story ${storyName} of topic ${topicName}, but it should exist.`
         );
       }
+      showMessage(
+        `Chapter ${chapterName} is ${shouldExist ? 'found' : 'not found'} in story ${storyName}, as expected.`
+      );
     } catch (error) {
       const newError = new Error(
         `Failed to verify chapter presence in story: ${error}`
@@ -2800,6 +2825,15 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     try {
       await this.openStoryEditor(storyName, topicName);
+      await this.waitForStaticAssetsToLoad();
+
+      const addChapterButtonElement = await this.page.$(addChapterButton);
+      if (!addChapterButtonElement) {
+        const mobileChapterCollapsibleCardElement = await this.page.$(
+          mobileChapterCollapsibleCard
+        );
+        mobileChapterCollapsibleCardElement?.click();
+      }
 
       await this.page.waitForSelector(storyEditorNodeSelector);
       const storyEditorNodes = await this.page.$$(storyEditorNodeSelector);
@@ -2810,16 +2844,25 @@ export class TopicManager extends BaseUser {
         );
 
         if (chapter === chapterName) {
+          await storyEditorNode.waitForSelector(editOptionsSelector);
           const editOptionsButton =
             await storyEditorNode.$(editOptionsSelector);
           if (editOptionsButton) {
+            await this.waitForElementToBeClickable(editOptionsButton);
             await editOptionsButton.click();
+
             await storyEditorNode.waitForSelector(deleteChapterButtonSelector);
             const deleteButton = await storyEditorNode.$(
               deleteChapterButtonSelector
             );
             if (deleteButton) {
+              await this.waitForElementToBeClickable(deleteButton);
               await deleteButton.click();
+              await this.clickOn(confirmDeleteChapterButton);
+
+              showMessage(
+                `Chapter ${chapterName} deleted from the story ${storyName}.`
+              );
               return;
             }
           }

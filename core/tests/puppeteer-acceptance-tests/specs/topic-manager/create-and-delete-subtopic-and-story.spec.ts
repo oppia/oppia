@@ -21,14 +21,22 @@ import testConstants from '../../utilities/common/test-constants';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'headerText: Story Editor'. Current value: 'headerText: Chapter Editor'./,
+  /Cannot read properties of undefined \(reading 'getStory'\)/,
+  /Occurred at http:\/\/localhost:8181\/story_editor\/.*\/#\/chapter_editor\/node_1 webpack:\/\/\/\..* Cannot read properties of undefined \(reading 'getStory'\)/,
+]);
+
 describe('Topic Manager', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let topicManager: TopicManager & CurriculumAdmin;
-  let explorationId: string | null;
+  let explorationId1: string | null;
+  let explorationId2: string | null;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -37,10 +45,15 @@ describe('Topic Manager', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    explorationId =
+    explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'test exploration 1'
       );
+    explorationId2 =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'test exploration 2'
+      );
+
     await curriculumAdmin.createTopic('Addition', 'add');
 
     topicManager = await UserFactory.createNewUser(
@@ -72,8 +85,9 @@ describe('Topic Manager', function () {
         'test-story-one',
         'Addition'
       );
-
-      await topicManager.addChapter('Test Chapter 1', explorationId as string);
+      // Creating 2 chapter in the story so that we can test delete the second one (cannot delete the first chapter).
+      await topicManager.addChapter('Test Chapter 1', explorationId1 as string);
+      await topicManager.addChapter('Test Chapter 2', explorationId2 as string);
       await topicManager.saveStoryDraft();
 
       // Verify the story is present in the topic.
@@ -94,67 +108,41 @@ describe('Topic Manager', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it('should delete a chapter from a story, delete the story from a topic, and delete the subtopic from a topic.', async function () {
-    const actions = [
-      {
-        action: () =>
-          topicManager.deleteChapterFromStory(
-            'Test Chapter 1',
-            'Test Story 1',
-            'Addition'
-          ),
-        name: 'deleteChapterFromStory',
-      },
-      {
-        action: () =>
-          topicManager.verifyChapterPresenceInStory(
-            'Test Chapter 1',
-            'Test Story 1',
-            'Addition',
-            false
-          ),
-        name: 'verifyChapterPresenceInStory',
-      },
-      {
-        action: () =>
-          topicManager.deleteStoryFromTopic('Test Story 1', 'Addition'),
-        name: 'deleteStoryFromTopic',
-      },
-      {
-        action: () =>
-          topicManager.verifyStoryPresenceInTopic(
-            'Test Story 1',
-            'Addition',
-            false
-          ),
-        name: 'verifyStoryPresenceInTopic',
-      },
-      {
-        action: () =>
-          topicManager.deleteSubtopicFromTopic('Test Subtopic 1', 'Addition'),
-        name: 'deleteSubtopicFromTopic',
-      },
-      {
-        action: () =>
-          topicManager.verifySubtopicPresenceInTopic(
-            'Test Subtopic 1',
-            'Addition',
-            false
-          ),
-        name: 'verifySubtopicPresenceInTopic',
-      },
-      {action: () => topicManager.timeout(2147483647)},
-    ];
-    for (const {action, name} of actions) {
-      try {
-        await action();
-      } catch (error) {
-        console.error('\x1b[31m%s\x1b[0m', error);
-        await topicManager.screenshot(`error_${name}.png`);
-      }
-    }
-  }, 2147483647);
+  it(
+    'should delete a chapter from a story, delete the story from a topic, and delete the subtopic from a topic.',
+    async function () {
+      await topicManager.deleteChapterFromStory(
+        'Test Chapter 2',
+        'Test Story 1',
+        'Addition'
+      );
+      await topicManager.saveStoryDraft();
+      // Deleting 2nd chapter since topic manager cannot delete the first chapter.
+      await topicManager.verifyChapterPresenceInStory(
+        'Test Chapter 2',
+        'Test Story 1',
+        'Addition',
+        false
+      );
 
+      await topicManager.deleteStoryFromTopic('Test Story 1', 'Addition');
+      await topicManager.saveTopicDraft('Addition');
+      await topicManager.verifyStoryPresenceInTopic(
+        'Test Story 1',
+        'Addition',
+        false
+      );
+
+      await topicManager.deleteSubtopicFromTopic('Test Subtopic 1', 'Addition');
+      await topicManager.saveTopicDraft('Addition');
+      await topicManager.verifySubtopicPresenceInTopic(
+        'Test Subtopic 1',
+        'Addition',
+        false
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
