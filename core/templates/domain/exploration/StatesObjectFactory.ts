@@ -56,7 +56,7 @@ export class States {
     return this._states[stateName];
   }
 
-  // TODO(tjiang11): Remove getStateObjects() and replace calls
+  // TODO(#20441): Remove getStateObjects() and replace calls
   // with an object to represent data to be manipulated inside
   // ExplorationDiffService.
 
