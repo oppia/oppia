@@ -111,7 +111,7 @@ export class LoggedInUser extends BaseUser {
    * @param {string} explorationId - The ID of the exploration to play.
    */
   async playExploration(explorationId: string | null): Promise<void> {
-    this.goto(`${baseUrl}/explore/${explorationId as string}`);
+    await this.goto(`${baseUrl}/explore/${explorationId as string}`);
   }
 
   /**

@@ -73,7 +73,7 @@ describe('Logged-out User', function () {
 
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
-      '/math',
+      'math',
       'Algebra I'
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);

@@ -2028,6 +2028,7 @@ export class LoggedOutUser extends BaseUser {
     await this.type(searchInputSelector, lessonName);
 
     await this.page.keyboard.press('Enter');
+    await this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']});
   }
 
   /**
@@ -2038,6 +2039,7 @@ export class LoggedOutUser extends BaseUser {
     try {
       await this.clickOn(categoryFilterDropdownToggler);
 
+      await this.page.waitForSelector(filterOptionsSelector);
       const deselectedCategories = await this.page.$$(filterOptionsSelector);
       for (const category of deselectedCategories) {
         const categoryText = await this.page.evaluate(
@@ -2051,6 +2053,7 @@ export class LoggedOutUser extends BaseUser {
 
       await this.clickOn(searchInputSelector);
       await this.page.keyboard.press('Enter');
+      await this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']});
     } catch (error) {
       const newError = new Error(
         `Failed to filter lessons by categories: ${error}`
@@ -2068,6 +2071,7 @@ export class LoggedOutUser extends BaseUser {
     try {
       await this.clickOn(languageFilterDropdownToggler);
 
+      await this.page.waitForSelector(filterOptionsSelector);
       const deselectedLanguages = await this.page.$$(filterOptionsSelector);
       for (const language of deselectedLanguages) {
         const languageText = await this.page.evaluate(
@@ -2081,6 +2085,7 @@ export class LoggedOutUser extends BaseUser {
 
       await this.clickOn(searchInputSelector);
       await this.page.keyboard.press('Enter');
+      await this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']});
     } catch (error) {
       const newError = new Error(
         `Failed to filter lessons by languages: ${error}`
