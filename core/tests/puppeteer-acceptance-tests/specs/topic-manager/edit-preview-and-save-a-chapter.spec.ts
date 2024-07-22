@@ -28,9 +28,9 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 ConsoleReporter.setConsoleErrorsToIgnore([
-  "ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'headerText: Story Editor'. Current value: 'headerText: Chapter Editor'.",
-  "Cannot read properties of undefined (reading 'getStory')",
-  "Occurred at http://localhost:8181/story_editor/JwNJZj3u5Dv6#/chapter_editor/node_1 webpack:///./core/templates/services/contextual/logger.service.ts? Cannot read properties of undefined (reading 'getStory')",
+  /ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'headerText: Story Editor'. Current value: 'headerText: Chapter Editor'./,
+  /Cannot read properties of undefined \(reading 'getStory'\)/,
+  /Occurred at http:\/\/localhost:8181\/story_editor\/.*\/#\/chapter_editor\/node_1 webpack:\/\/\/\..* Cannot read properties of undefined \(reading 'getStory'\)/,
 ]);
 
 describe('Topic Manager', function () {

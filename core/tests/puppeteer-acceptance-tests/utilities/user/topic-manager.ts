@@ -2720,7 +2720,7 @@ export class TopicManager extends BaseUser {
    * @returns {Promise<void>}
    */
   async addAcquiredSkill(skillName: string): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(addAcquiredSkillButton);
     const elements = await this.page.$$(addAcquiredSkillButton);
     if (elements.length < 2) {

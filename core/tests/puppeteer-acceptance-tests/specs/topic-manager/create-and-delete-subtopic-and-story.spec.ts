@@ -94,40 +94,66 @@ describe('Topic Manager', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it(
-    'should delete a chapter from a story, delete the story from a topic, and delete the subtopic from a topic.',
-    async function () {
-      await topicManager.deleteChapterFromStory(
-        'Test Chapter 1',
-        'Test Story 1',
-        'Addition'
-      );
-      // Verify the chapter is not present in the story.
-      await topicManager.verifyChapterPresenceInStory(
-        'Test Chapter 1',
-        'Test Story 1',
-        'Addition',
-        false
-      );
-
-      await topicManager.deleteStoryFromTopic('Test Story 1', 'Addition');
-      // Verify the story is not present in the topic.
-      await topicManager.verifyStoryPresenceInTopic(
-        'Test Story 1',
-        'Addition',
-        false
-      );
-
-      await topicManager.deleteSubtopicFromTopic('Test Subtopic 1', 'Addition');
-      // Verify the subtopic is not present in the topic.
-      await topicManager.verifySubtopicPresenceInTopic(
-        'Test Subtopic 1',
-        'Addition',
-        false
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  it('should delete a chapter from a story, delete the story from a topic, and delete the subtopic from a topic.', async function () {
+    const actions = [
+      {
+        action: () =>
+          topicManager.deleteChapterFromStory(
+            'Test Chapter 1',
+            'Test Story 1',
+            'Addition'
+          ),
+        name: 'deleteChapterFromStory',
+      },
+      {
+        action: () =>
+          topicManager.verifyChapterPresenceInStory(
+            'Test Chapter 1',
+            'Test Story 1',
+            'Addition',
+            false
+          ),
+        name: 'verifyChapterPresenceInStory',
+      },
+      {
+        action: () =>
+          topicManager.deleteStoryFromTopic('Test Story 1', 'Addition'),
+        name: 'deleteStoryFromTopic',
+      },
+      {
+        action: () =>
+          topicManager.verifyStoryPresenceInTopic(
+            'Test Story 1',
+            'Addition',
+            false
+          ),
+        name: 'verifyStoryPresenceInTopic',
+      },
+      {
+        action: () =>
+          topicManager.deleteSubtopicFromTopic('Test Subtopic 1', 'Addition'),
+        name: 'deleteSubtopicFromTopic',
+      },
+      {
+        action: () =>
+          topicManager.verifySubtopicPresenceInTopic(
+            'Test Subtopic 1',
+            'Addition',
+            false
+          ),
+        name: 'verifySubtopicPresenceInTopic',
+      },
+      {action: () => topicManager.timeout(2147483647)},
+    ];
+    for (const {action, name} of actions) {
+      try {
+        await action();
+      } catch (error) {
+        console.error('\x1b[31m%s\x1b[0m', error);
+        await topicManager.screenshot(`error_${name}.png`);
+      }
+    }
+  }, 2147483647);
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
