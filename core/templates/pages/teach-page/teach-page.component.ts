@@ -218,11 +218,19 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.screenType === 'desktop') {
       const scrollWidth =
         this.creatorsCarouselContainer.nativeElement.scrollWidth;
-      this.renderer.setProperty(
-        this.creatorsCarouselContainer.nativeElement,
-        'scrollLeft',
-        scrollWidth
-      );
+      if (!this.isLanguageRTL()) {
+        this.renderer.setProperty(
+          this.creatorsCarouselContainer.nativeElement,
+          'scrollLeft',
+          scrollWidth
+        );
+      } else {
+        this.renderer.setProperty(
+          this.creatorsCarouselContainer.nativeElement,
+          'scrollLeft',
+          -scrollWidth
+        );
+      }
       this.toggleCreatorsCarouselArrowsDisablityStatusDesktop();
     } else {
       if (
