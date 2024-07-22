@@ -536,7 +536,8 @@ class CollectionEditorAccessValidationPage(
 
 
 class StoryEditorAccessValidationHandlerPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The editor page for a single story."""
 
     URL_PATH_ARGS_SCHEMAS = {
