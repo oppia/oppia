@@ -816,7 +816,7 @@ class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     def test_access_story_editor_page_with_curriculum_admin(
             self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_html_response(
+        self.get_json(
             '%s/can_access_story_editor_page/%s' % (
                 ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id),
                 expected_status_int=200)
