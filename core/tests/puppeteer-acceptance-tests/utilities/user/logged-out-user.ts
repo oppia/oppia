@@ -230,7 +230,6 @@ const languageFilterDropdownToggler =
 const searchResultsSelector = '.e2e-test-exp-summary-tile-objective';
 const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
 const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
-const topicNameInTheClassroomSelector = '.e2e-test-topic-name';
 const storyTitleSelector = '.e2e-test-story-title-in-topic-page';
 const chapterTitleSelector = '.e2e-test-chapter-title';
 const oppiaTopicTitleSelector = '.oppia-topic-title';
@@ -2216,13 +2215,16 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectTopicsToBePresent(expectedTopicNames: string[]): Promise<void> {
     try {
-      const topicNames = await this.page.$$(topicNameInTheClassroomSelector);
+      await this.page.waitForSelector(topicNameSelector);
+      const topicNames = await this.page.$$(topicNameSelector);
       const topicNameTexts = await Promise.all(
-        topicNames.map(name => this.page.evaluate(el => el.textContent, name))
+        topicNames.map(name =>
+          this.page.evaluate(el => el.textContent.trim(), name)
+        )
       );
 
       for (const expectedName of expectedTopicNames) {
-        if (!topicNameTexts.includes(expectedName)) {
+        if (!topicNameTexts.includes(expectedName.trim())) {
           throw new Error(`Topic "${expectedName}" not found in topic names.`);
         }
       }
@@ -2239,11 +2241,19 @@ export class LoggedOutUser extends BaseUser {
    */
   async selectAndOpenTopic(topicName: string): Promise<void> {
     try {
+      await this.page.waitForSelector(topicNameSelector);
       const topicNames = await this.page.$$(topicNameSelector);
       for (const name of topicNames) {
-        const nameText = await this.page.evaluate(el => el.textContent, name);
-        if (nameText === topicName) {
-          await name.click();
+        const nameText = await this.page.evaluate(
+          el => el.textContent.trim(),
+          name
+        );
+        if (nameText === topicName.trim()) {
+          await Promise.all([
+            this.page.waitForNavigation({waitUntil: ['networkidle2', 'load']}),
+            this.waitForElementToBeClickable(name),
+            name.click(),
+          ]);
           return;
         }
       }
@@ -2268,24 +2278,29 @@ export class LoggedOutUser extends BaseUser {
     try {
       const storyTitles = await this.page.$$(storyTitleSelector);
       for (const title of storyTitles) {
-        const titleText = await this.page.evaluate(el => el.textContent, title);
-        if (titleText === storyName) {
+        const titleText = await this.page.evaluate(
+          el => el.textContent.trim(),
+          title
+        );
+        if (titleText === storyName.trim()) {
           await Promise.all([
             this.page.waitForNavigation({waitUntil: ['networkidle2', 'load']}),
+            this.waitForElementToBeClickable(title),
             title.click(),
           ]);
 
           const chapterTitles = await this.page.$$(chapterTitleSelector);
           for (const chapter of chapterTitles) {
             const chapterText = await this.page.evaluate(
-              el => el.textContent,
+              el => el.textContent.trim(),
               chapter
             );
-            if (chapterText === chapterName) {
+            if (chapterText === chapterName.trim()) {
               await Promise.all([
                 this.page.waitForNavigation({
                   waitUntil: ['networkidle2', 'load'],
                 }),
+                this.waitForElementToBeClickable(chapter),
                 chapter.click(),
               ]);
               return;
@@ -2319,7 +2334,10 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the revision tab on the topic page.
    */
   async navigateToRevisionTab(): Promise<void> {
-    await this.clickOn(topicPageLessonTabSelector);
+    const topicPageRevisionTabSelectorElement = await this.page.$(
+      topicPageLessonTabSelector
+    );
+    await topicPageRevisionTabSelectorElement?.click();
   }
 
   /**
@@ -2338,7 +2356,8 @@ export class LoggedOutUser extends BaseUser {
           subtopicElements[i]
         );
 
-        if (innerText === subtopicName) {
+        if (innerText.trim() === subtopicName) {
+          await this.waitForElementToBeClickable(subtopicElements[i]);
           await subtopicElements[i].click();
           return;
         }
@@ -2370,7 +2389,7 @@ export class LoggedOutUser extends BaseUser {
         titleElement
       );
 
-      if (titleText !== reviewCardTitle) {
+      if (titleText.trim() !== reviewCardTitle) {
         throw new Error(
           `Expected review card title to be ${reviewCardTitle}, but found ${titleText}`
         );
@@ -2392,6 +2411,14 @@ export class LoggedOutUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  async timeout(time) {
+    await this.page.waitForTimeout(time);
+  }
+
+  async screenshot(path) {
+    await this.page.screenshot({path: `${path}`});
   }
 }
 

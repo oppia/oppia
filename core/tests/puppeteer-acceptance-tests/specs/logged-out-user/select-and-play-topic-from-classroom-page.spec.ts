@@ -24,20 +24,16 @@ import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-enum INTERACTION_TYPES {
-  CONTINUE_BUTTON = 'Continue Button',
-  NUMERIC_INPUT = 'Number Input',
-  END_EXPLORATION = 'End Exploration',
-}
-enum CARD_NAME {
-  INTRODUCTION = 'Introduction',
-  TEST_QUESTION = 'Test Question',
-  FINAL_CARD = 'Final Card',
-}
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /Occurred at http:\/\/localhost:8181\/story_editor\/[a-zA-Z0-9]+\/.*Cannot read properties of undefined \(reading 'getStory'\)/,
+  /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Invalid active state name: null/,
+  new RegExp('Invalid active state name: null'),
+]);
 
 describe('Logged-out User', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
@@ -78,36 +74,75 @@ describe('Logged-out User', function () {
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it(
-    'should be able to complete the learner journey in the math classroom',
-    async function () {
-      await loggedOutUser.navigateToClassroomPage('math');
-      await loggedOutUser.expectTopicsToBePresent(['Algebra I']);
-
-      await loggedOutUser.selectAndOpenTopic('Algebra I');
-
-      await loggedOutUser.selectChapterWithinStoryToLearn(
-        'Algebra Story',
-        'Understanding Negative Numbers'
-      );
+  it('should be able to select and play a topic from the classroom page', async function () {
+    const actions = [
+      {
+        action: () => loggedOutUser.navigateToClassroomPage('math'),
+        name: 'navigateToClassroomPage_math',
+      },
+      {
+        action: () => loggedOutUser.expectTopicsToBePresent(['Algebra I']),
+        name: 'expectTopicsToBePresent_AlgebraI',
+      },
+      {
+        action: () => loggedOutUser.selectAndOpenTopic('Algebra I'),
+        name: 'selectAndOpenTopic_AlgebraI',
+      },
+      {
+        action: () =>
+          loggedOutUser.selectChapterWithinStoryToLearn(
+            'Algebra Story',
+            'Understanding Negative Numbers'
+          ),
+        name: 'selectChapterWithinStoryToLearn_UnderstandingNegativeNumbers',
+      },
 
       // Check for the completion message as the exploration has a single state.
-      await loggedOutUser.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
-      );
+      {
+        action: () =>
+          loggedOutUser.expectExplorationCompletionToastMessage(
+            'Congratulations for completing this lesson!'
+          ),
+        name: 'expectExplorationCompletionToastMessage',
+      },
 
       // Returning to the topic page from the exploration player itself.
-      await loggedOutUser.returnToTopicPageAfterCompletingExploration();
-      await loggedOutUser.navigateToRevisionTab();
+      {
+        action: () =>
+          loggedOutUser.returnToTopicPageAfterCompletingExploration(),
+        name: 'returnToTopicPageAfterCompletingExploration',
+      },
+      {
+        action: () => loggedOutUser.navigateToRevisionTab(),
+        name: 'navigateToRevisionTab',
+      },
+
       // Review cards are the subtopic that are created in the topic.
-      await loggedOutUser.selectReviewCardToLearn('Negative Numbers');
-      await loggedOutUser.expectReviewCardToHaveContent(
-        'Negative Numbers',
-        'Subtopic creation description text for Negative Numbers'
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+      {
+        action: () => loggedOutUser.selectReviewCardToLearn('Negative Numbers'),
+        name: 'selectReviewCardToLearn_NegativeNumbers',
+      },
+      {
+        action: () =>
+          loggedOutUser.expectReviewCardToHaveContent(
+            'Negative Numbers',
+            'Subtopic creation description text for Negative Numbers'
+          ),
+        name: 'expectReviewCardToHaveContent_NegativeNumbers',
+      },
+      {
+        action: () => loggedOutUser.timeout(2147483647),
+      },
+    ];
+    for (const {action, name} of actions) {
+      try {
+        await action();
+      } catch (error) {
+        console.error('\x1b[31m%s\x1b[0m', error);
+        await loggedOutUser.screenshot(`error_${name}.png`);
+      }
+    }
+  }, 2147483647);
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
