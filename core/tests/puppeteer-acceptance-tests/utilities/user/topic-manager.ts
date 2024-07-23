@@ -2275,7 +2275,6 @@ export class TopicManager extends BaseUser {
       const subtopics = await this.page.$$(subtopicTitleSelector);
 
       for (const subtopicElement of subtopics) {
-        await this.waitForPageToFullyLoad();
         const subtopic = await this.page.evaluate(
           el => el.textContent.trim(),
           subtopicElement
@@ -2502,7 +2501,6 @@ export class TopicManager extends BaseUser {
       const stories = await this.page.$$(storyTitleSelector);
 
       for (const storyElement of stories) {
-        await this.waitForPageToFullyLoad();
         const story = await this.page.evaluate(
           el => el.textContent.trim(),
           storyElement
@@ -2822,7 +2820,6 @@ export class TopicManager extends BaseUser {
       const chapters = await this.page.$$(chapterTitleSelector);
 
       for (const chapterElement of chapters) {
-        await this.waitForPageToFullyLoad();
         const chapter = await this.page.evaluate(
           el => el.textContent.trim(),
           chapterElement
