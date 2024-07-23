@@ -165,9 +165,11 @@ export class PlatformFeatureService {
    * Clears results from the sessionStorage, if any.
    */
   private clearSavedResults(): void {
-    this.windowRef.nativeWindow.sessionStorage.removeItem(
-      PlatformFeatureService.SESSION_STORAGE_KEY
-    );
+    if (this.windowRef.nativeWindow.sessionStorage) {
+      this.windowRef.nativeWindow.sessionStorage.removeItem(
+        PlatformFeatureService.SESSION_STORAGE_KEY
+      );
+    }
   }
 }
 
