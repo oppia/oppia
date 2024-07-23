@@ -5139,7 +5139,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 State domain object.
 
         Returns:
-            states_dict: Dict[str, state_domain.StateDict]. The converted
+            Dict[str, state_domain.StateDict]. The converted
             v56 state dictionary.
         """
         for _, state_dict in states_dict.items():
