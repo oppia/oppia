@@ -3294,7 +3294,6 @@ solicit_answer_details: false
 
     def test_export_by_versions(self) -> None:
         """Test export_to_dict() for different versions."""
-        self.maxDiff = None
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id)
         content_id_generator = translation_domain.ContentIdGenerator(
@@ -8112,8 +8111,6 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
     """Tests for ensuring creation, deletion and updation of version history
     data is carried out correctly.
     """
-
-    maxDiff = None
 
     def setUp(self) -> None:
         super().setUp()
