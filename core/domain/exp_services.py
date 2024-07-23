@@ -64,6 +64,7 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
+from core.domain import translation_fetchers
 from core.domain import translation_services
 from core.domain import user_domain
 from core.domain import user_services
@@ -85,12 +86,13 @@ if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
     from mypy_imports import user_models
 
-(base_models, exp_models, stats_models, user_models) = (
+(base_models, exp_models, stats_models, user_models, translation_models) = (
     models.Registry.import_models([
         models.Names.BASE_MODEL,
         models.Names.EXPLORATION,
         models.Names.STATISTICS,
-        models.Names.USER
+        models.Names.USER,
+        models.Names.TRANSLATION,
     ])
 )
 
@@ -2576,7 +2578,27 @@ def revert_exploration(
             revert_to_version
         )
     )
-    datastore_services.put_multi(exp_issues_models_to_put)
+
+    # Revert translations.
+    reverted_translations = (
+        translation_fetchers.get_all_entity_translations_for_entity(
+            feconf.TranslatableEntityType.EXPLORATION,
+            exploration_id,
+            revert_to_version,
+        )
+    )
+    new_translation_models = [
+        translation_models.EntityTranslationsModel.create_new(
+            translation.entity_type,
+            translation.entity_id,
+            current_version + 1,
+            translation.language_code,
+            translation.to_dict()['translations'],
+        )
+        for translation in reverted_translations
+    ]
+    datastore_services.put_multi(
+        exp_issues_models_to_put + new_translation_models)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
