@@ -1582,6 +1582,7 @@
 	"I18N_TEACH_BENEFITS_TITLE": "Title displayed in the benefits section on the splash page.",
 	"I18N_TEACH_BENEFITS_TWO": "The second benefit, shown in the splash page, of using Oppia.",
 	"I18N_TEACH_PAGE_ACTION_START_LEARNING": "Button details below heading for Teach Page -Start Learning",
+	"I18N_TEACH_PAGE_BREADCRUMB": "Text displayed in the breadcrumb of the teach page.",
 	"I18N_TEACH_PAGE_CLASSROOM_BUTTON": "Text on Button in classroom section in Oppia's Teach Page",
 	"I18N_TEACH_PAGE_CLASSROOM_CONTENT": "Content in classroom section in Oppia's Teach Page.",
 	"I18N_TEACH_PAGE_CLASSROOM_TITLE": "Title in classroom section in Oppia's Teach Page.",
