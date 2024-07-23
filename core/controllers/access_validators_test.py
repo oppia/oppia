@@ -807,17 +807,17 @@ class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             subtopics=[], next_subtopic_id=1)
 
     def test_access_story_editor_page_without_logging_in(self) -> None:
-        self.get_json(
+        self.get_html_response(
             '%s/can_access_story_editor_page/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id
-            ), expected_status_int=401
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.story_id
+            ), expected_status_int=302
         )
 
     def test_access_story_editor_page_with_curriculum_admin(
             self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_json(
+        self.get_html_response(
             '%s/can_access_story_editor_page/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id),
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.story_id),
                 expected_status_int=200)
         self.logout()
