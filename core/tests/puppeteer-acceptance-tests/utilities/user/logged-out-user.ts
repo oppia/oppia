@@ -230,13 +230,16 @@ const languageFilterDropdownToggler =
 const searchResultsSelector = '.e2e-test-exp-summary-tile-objective';
 const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
 const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
-const storyTitleSelector = '.e2e-test-story-title-in-topic-page';
+const desktopStoryTitleSelector = '.e2e-test-story-title-in-topic-page';
+const mobileStoryTitleSelector = '.e2e-test-mobile-story-title';
 const chapterTitleSelector = '.e2e-test-chapter-title';
 const oppiaTopicTitleSelector = '.oppia-topic-title';
 const topicPageLessonTabSelector = '.e2e-test-revision-tab-link';
 const subTopicTitleInLessTabSelector = '.subtopic-title';
 const reviewCardTitleSelector = '.oppia-subtopic-title';
 const topicNameSelector = '.e2e-test-topic-name';
+const loginPromptContainer = '.story-viewer-login-container';
+const NavbarBackButton = '.oppia-navbar-back-button';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -2275,6 +2278,11 @@ export class LoggedOutUser extends BaseUser {
     chapterName: string,
     storyName: string
   ): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const storyTitleSelector = isMobileViewport
+      ? mobileStoryTitleSelector
+      : desktopStoryTitleSelector;
+
     try {
       const storyTitles = await this.page.$$(storyTitleSelector);
       for (const title of storyTitles) {
@@ -2284,10 +2292,16 @@ export class LoggedOutUser extends BaseUser {
         );
         if (titleText.trim() === storyName.trim()) {
           await Promise.all([
-            this.page.waitForNavigation({waitUntil: ['networkidle2', 'load']}),
+            this.page.waitForNavigation({waitUntil: ['networkidle0', 'load']}),
             this.waitForElementToBeClickable(title),
             title.click(),
           ]);
+
+          const isLoginPromptContainerPresent =
+            await this.page.$(loginPromptContainer);
+          if (isLoginPromptContainerPresent) {
+            await this.clickOn('SKIP');
+          }
 
           const chapterTitles = await this.page.$$(chapterTitleSelector);
           for (const chapter of chapterTitles) {
@@ -2298,7 +2312,7 @@ export class LoggedOutUser extends BaseUser {
             if (chapterText.trim().includes(chapterName.trim())) {
               await Promise.all([
                 this.page.waitForNavigation({
-                  waitUntil: ['networkidle2', 'load'],
+                  waitUntil: ['networkidle0', 'load'],
                 }),
                 this.waitForElementToBeClickable(chapter),
                 chapter.click(),
@@ -2327,6 +2341,10 @@ export class LoggedOutUser extends BaseUser {
    * Navigates back to the topic page after completing an exploration.
    */
   async returnToTopicPageAfterCompletingExploration(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickAndWaitForNavigation('Return to Story');
+      await this.clickAndWaitForNavigation(NavbarBackButton);
+    }
     await this.clickAndWaitForNavigation(oppiaTopicTitleSelector);
   }
 
@@ -2358,8 +2376,13 @@ export class LoggedOutUser extends BaseUser {
         );
 
         if (innerText.trim() === subtopicName) {
-          await this.waitForElementToBeClickable(subtopicElements[i]);
-          await subtopicElements[i].click();
+          await Promise.all([
+            this.page.waitForNavigation({
+              waitUntil: ['networkidle0', 'load'],
+            }),
+            this.waitForElementToBeClickable(subtopicElements[i]),
+            subtopicElements[i].click(),
+          ]);
           return;
         }
       }

@@ -72,7 +72,8 @@ describe('Logged-out User', function () {
       'math',
       'Algebra I'
     );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+    // Setup taking longer than 300000ms.
+  }, 420000);
 
   it('should be able to select and play a topic from the classroom page', async function () {
     const actions = [
