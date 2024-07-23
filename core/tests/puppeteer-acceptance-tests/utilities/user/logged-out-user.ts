@@ -2282,7 +2282,7 @@ export class LoggedOutUser extends BaseUser {
           el => el.textContent.trim(),
           title
         );
-        if (titleText === storyName.trim()) {
+        if (titleText.trim() === storyName.trim()) {
           await Promise.all([
             this.page.waitForNavigation({waitUntil: ['networkidle2', 'load']}),
             this.waitForElementToBeClickable(title),
@@ -2295,7 +2295,7 @@ export class LoggedOutUser extends BaseUser {
               el => el.textContent.trim(),
               chapter
             );
-            if (chapterText === chapterName.trim()) {
+            if (chapterText.trim().includes(chapterName.trim())) {
               await Promise.all([
                 this.page.waitForNavigation({
                   waitUntil: ['networkidle2', 'load'],
@@ -2327,13 +2327,14 @@ export class LoggedOutUser extends BaseUser {
    * Navigates back to the topic page after completing an exploration.
    */
   async returnToTopicPageAfterCompletingExploration(): Promise<void> {
-    await this.clickOn(oppiaTopicTitleSelector);
+    await this.clickAndWaitForNavigation(oppiaTopicTitleSelector);
   }
 
   /**
    * Navigates to the revision tab on the topic page.
    */
   async navigateToRevisionTab(): Promise<void> {
+    await this.page.waitForSelector(topicPageLessonTabSelector);
     const topicPageRevisionTabSelectorElement = await this.page.$(
       topicPageLessonTabSelector
     );

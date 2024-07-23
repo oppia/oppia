@@ -91,8 +91,8 @@ describe('Logged-out User', function () {
       {
         action: () =>
           loggedOutUser.selectChapterWithinStoryToLearn(
-            'Algebra Story',
-            'Understanding Negative Numbers'
+            'Understanding Negative Numbers',
+            'Algebra Story'
           ),
         name: 'selectChapterWithinStoryToLearn_UnderstandingNegativeNumbers',
       },
@@ -134,6 +134,7 @@ describe('Logged-out User', function () {
         action: () => loggedOutUser.timeout(2147483647),
       },
     ];
+
     for (const {action, name} of actions) {
       try {
         await action();
