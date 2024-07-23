@@ -293,7 +293,7 @@ export class StateEditorService {
   }
 
   getInapplicableSkillMisconceptionIds(): string[] {
-    return this.inapplicableSkillMisconceptionIds;
+    return this.inapplicableSkillMisconceptionIds || [];
   }
 
   isCurrentSolutionValid(): boolean {

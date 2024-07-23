@@ -493,6 +493,16 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     }
   }
 
+  saveInapplicableSkillMisconceptionIds(displayedValue: string[]): void {
+    this.stateEditorService.setInapplicableSkillMisconceptionIds(
+      cloneDeep(displayedValue)
+    );
+    this.explorationStatesService.saveInapplicableSkillMisconceptionIds(
+      this.stateEditorService.getActiveStateName(),
+      displayedValue
+    );
+  }
+
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.stateEditorRefreshService.onRefreshStateEditor.subscribe(() => {

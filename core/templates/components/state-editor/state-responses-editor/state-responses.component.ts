@@ -790,7 +790,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       this.stateEditorService.onStateEditorInitialized.subscribe(() => {
         this.misconceptionsBySkill =
           this.stateEditorService.getMisconceptionsBySkill();
-
+        this.inapplicableSkillMisconceptionIds =
+          this.stateEditorService.getInapplicableSkillMisconceptionIds();
         this.containsOptionalMisconceptions = Object.values(
           this.misconceptionsBySkill
         ).some((misconceptions: Misconception[]) =>
@@ -803,7 +804,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       this.stateEditorService.onUpdateMisconceptions.subscribe(() => {
         this.misconceptionsBySkill =
           this.stateEditorService.getMisconceptionsBySkill();
-
         this.containsOptionalMisconceptions = Object.values(
           this.misconceptionsBySkill
         ).some((misconceptions: Misconception[]) =>
