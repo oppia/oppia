@@ -394,16 +394,37 @@ describe('Teach Page', () => {
       .toHaveBeenCalled;
   });
 
-  it('should set scrollLeft to 0 for desktop', () => {
+  it('should set scrollLeft to scroll width for desktop for non RTL screen', () => {
     component.ngOnInit();
     component.ngAfterViewInit();
     component.screenType = 'desktop';
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      false
+    );
     spyOn(renderer, 'setProperty');
     component.showNextCreators();
     expect(renderer.setProperty).toHaveBeenCalledWith(
       jasmine.any(Object),
       'scrollLeft',
-      1000
+      component.creatorsCarouselContainer.nativeElement.scrollWidth
+    );
+    expect(component.toggleCreatorsCarouselArrowsDisablityStatusDesktop)
+      .toHaveBeenCalled;
+  });
+
+  it('should set scrollLeft to (-ve) of scroll width for desktop for RTL screen', () => {
+    component.ngOnInit();
+    component.ngAfterViewInit();
+    component.screenType = 'desktop';
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    spyOn(renderer, 'setProperty');
+    component.showNextCreators();
+    expect(renderer.setProperty).toHaveBeenCalledWith(
+      jasmine.any(Object),
+      'scrollLeft',
+      -component.creatorsCarouselContainer.nativeElement.scrollWidth
     );
     expect(component.toggleCreatorsCarouselArrowsDisablityStatusDesktop)
       .toHaveBeenCalled;
