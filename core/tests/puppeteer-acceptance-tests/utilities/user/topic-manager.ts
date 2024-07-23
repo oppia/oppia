@@ -1862,7 +1862,7 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Adds a prerequisite skill.
+   * Adds a prerequisite skill to a chapter in chapter editor.
    * @param {string} skillName - The name of the skill to add.
    */
   async addPrerequisiteSkill(skillName: string): Promise<void> {
@@ -1881,6 +1881,42 @@ export class TopicManager extends BaseUser {
       await elements[0].click();
     }
     await this.filterAndSelectSkill(skillName);
+  }
+
+  /**
+   * Adds a prerequisite skill to a skill in skill chapter.
+   * @param {string} skillName - The name of the skill to add.
+   */
+  async addPrerequisiteSkillInSkillEditor(skillName: string): Promise<void> {
+    try {
+      await this.clickOn('+ ADD PREREQUISITE SKILL');
+      await this.type(skillNameInputSelector, skillName);
+
+      await this.page.waitForSelector(radioInnerCircleSelector);
+      const radioInnerCircleSelectorElement = await this.page.$(
+        radioInnerCircleSelector
+      );
+      if (!radioInnerCircleSelectorElement) {
+        throw new Error('Radio inner circle selector not found');
+      }
+      await this.waitForStaticAssetsToLoad();
+      await this.page.evaluate(selector => {
+        document.querySelector(selector).click();
+      }, radioInnerCircleSelector);
+
+      await this.page.waitForSelector(confirmSkillSelectionButtonSelector);
+      const confirmSkillSelectionButtonSelectorElement = await this.page.$(
+        confirmSkillSelectionButtonSelector
+      );
+      if (!confirmSkillSelectionButtonSelectorElement) {
+        throw new Error('Confirm skill selection button selector not found');
+      }
+      await this.clickOn(confirmSkillSelectionButtonSelector);
+      showMessage(`Added prerequisite skill: ${skillName}`);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   /**
