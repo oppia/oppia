@@ -47,6 +47,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ExplorationDataService} from '../services/exploration-data.service';
 import {NumberAttemptsService} from 'pages/exploration-player-page/services/number-attempts.service';
 import {RouterService} from '../services/router.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
 class MockNgbModalRef {
   componentInstance!: {
@@ -83,6 +84,7 @@ describe('Preview Tab Component', () => {
   let mockUpdateActiveStateIfInEditorEventEmitter = new EventEmitter();
   let mockPlayerStateChangeEventEmitter = new EventEmitter();
   let numberAttemptsService: NumberAttemptsService;
+  let entityVoiceoversService: EntityVoiceoversService;
 
   let getUnsetParametersInfo: jasmine.Spy;
   let explorationId = 'exp1';
@@ -194,6 +196,8 @@ describe('Preview Tab Component', () => {
 
     ngbModal = TestBed.inject(NgbModal);
     contextService = TestBed.inject(ContextService);
+    entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
+
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     getUnsetParametersInfo = spyOn(
       parameterMetadataService,
@@ -239,6 +243,7 @@ describe('Preview Tab Component', () => {
       componentInstance: new MockNgbModalRef(),
       result: Promise.resolve(),
     } as NgbModalRef);
+    spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.resolveTo();
 
     component.ngOnInit();
     tick();
@@ -271,6 +276,7 @@ describe('Preview Tab Component', () => {
       componentInstance: new MockNgbModalRef(),
       result: Promise.resolve(),
     } as NgbModalRef);
+    spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.resolveTo();
 
     component.ngOnInit();
     tick();
