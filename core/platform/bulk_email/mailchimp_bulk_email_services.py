@@ -315,3 +315,20 @@ def add_or_update_user_status(
         logging.error('Mailchimp error prevented email signup: %s', error)
         return False
     return True
+
+def isEmailSubscribed(user_email: str) -> bool:
+    client = _get_mailchimp_class()
+    if not client:
+        return False
+    subscriber_hash = _get_subscriber_hash(user_email)
+
+    try:
+        client.lists.members.get(
+            feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash)
+        return True  # Email is subscribed
+    except mailchimpclient.MailChimpError as mailchimp_err:
+        error_message = ast.literal_eval(str(mailchimp_err))
+        if error_message['status'] == 404:
+            return False # Email is not subscribed
+        else:
+            raise mailchimp_err
