@@ -2055,7 +2055,6 @@ export class LoggedOutUser extends BaseUser {
 
       await this.clickOn(searchInputSelector);
       await this.page.keyboard.press('Enter');
-      await this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']});
     } catch (error) {
       const newError = new Error(
         `Failed to filter lessons by categories: ${error}`
@@ -2087,7 +2086,6 @@ export class LoggedOutUser extends BaseUser {
 
       await this.clickOn(searchInputSelector);
       await this.page.keyboard.press('Enter');
-      await this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']});
     } catch (error) {
       const newError = new Error(
         `Failed to filter lessons by languages: ${error}`

@@ -25,9 +25,8 @@ import {LoggedInUser} from '../../utilities/user/logged-in-user';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-out User', function () {
-  let explorationEditor: ExplorationEditor;
+  let explorationEditor: ExplorationEditor & LoggedInUser;
   let loggedOutUser: LoggedOutUser;
-  let loggedInUser: LoggedInUser;
   let explorationId1: string | null;
   let explorationId2: string | null;
 
@@ -39,11 +38,6 @@ describe('Logged-out User', function () {
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
-    loggedInUser = await UserFactory.createNewUser(
-      'loggedInUser',
-      'logged_in_user@example.com'
-    );
-
     explorationId1 =
       await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
         'Algebra I'
@@ -53,11 +47,11 @@ describe('Logged-out User', function () {
         'Algebra II'
       );
 
-    loggedInUser.playExploration(explorationId1);
-    loggedInUser.rateExploration(4, 'Great introduction to Algebra', false);
+    await explorationEditor.playExploration(explorationId1);
+    await explorationEditor.rateExploration(4, 'Great introduction to Algebra', false);
 
-    loggedInUser.playExploration(explorationId2);
-    loggedInUser.rateExploration(5, 'Excellent advanced Algebra course', false);
+    await explorationEditor.playExploration(explorationId2);
+    await explorationEditor.rateExploration(5, 'Excellent advanced Algebra course', false);
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
