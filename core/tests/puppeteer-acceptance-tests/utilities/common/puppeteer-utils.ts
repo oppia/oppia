@@ -533,7 +533,7 @@ export class BaseUser {
    */
   async isElementVisible(selector: string): Promise<boolean> {
     try {
-      await this.page.waitForSelector(selector, {visible: true, timeout: 1000});
+      await this.page.waitForSelector(selector, {visible: true, timeout: 3000});
       return true;
     } catch {
       return false;

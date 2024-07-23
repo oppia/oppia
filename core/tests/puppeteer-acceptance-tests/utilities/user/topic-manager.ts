@@ -2625,6 +2625,7 @@ export class TopicManager extends BaseUser {
    */
   async addChapter(chapterName: string, explorationId: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.waitForStaticAssetsToLoad();
       const addChapterButtonElement = await this.page.$(addChapterButton);
       if (!addChapterButtonElement) {
         await this.clickOn(mobileChapterCollapsibleCard);
@@ -2772,15 +2773,14 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     try {
       await this.openStoryEditor(storyName, topicName);
-      await this.waitForStaticAssetsToLoad();
 
-      const addChapterButtonElement = await this.page.$(addChapterButton);
-      if (!addChapterButtonElement) {
+      if (this.isViewportAtMobileWidth()) {
+        await this.page.waitForSelector(mobileChapterCollapsibleCard);
         const mobileChapterCollapsibleCardElement = await this.page.$(
           mobileChapterCollapsibleCard
         );
         mobileChapterCollapsibleCardElement?.click();
-        await this.waitForStaticAssetsToLoad();
+        await this.waitForPageToFullyLoad();
       }
 
       const chapters = await this.page.$$(chapterTitleSelector);
@@ -2838,10 +2838,12 @@ export class TopicManager extends BaseUser {
 
       const addChapterButtonElement = await this.page.$(addChapterButton);
       if (!addChapterButtonElement) {
+        await this.page.waitForSelector(mobileChapterCollapsibleCard);
         const mobileChapterCollapsibleCardElement = await this.page.$(
           mobileChapterCollapsibleCard
         );
         mobileChapterCollapsibleCardElement?.click();
+        await this.waitForStaticAssetsToLoad();
       }
 
       await this.page.waitForSelector(storyEditorNodeSelector);
