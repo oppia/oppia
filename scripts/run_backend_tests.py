@@ -89,6 +89,9 @@ SHARDS_WIKI_LINK: Final = (
 _LOAD_TESTS_DIR: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'load_tests'
 )
+TIME_REPORT_PATH: Final = os.path.join(
+    os.getcwd(), 'backend_test_time_report.json'
+)
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
@@ -114,6 +117,11 @@ _EXCLUSIVE_GROUP.add_argument(
 _PARSER.add_argument(
     '--generate_coverage_report',
     help='optional; if specified, generates a coverage report',
+    action='store_true')
+_PARSER.add_argument(
+    '--generate_time_report',
+    help='optional; if specified, generates a report which shows the '
+        'time taken by each test',
     action='store_true')
 _PARSER.add_argument(
     '--ignore_coverage',
@@ -312,12 +320,13 @@ def check_shards_match_tests(include_load_tests: bool = True) -> str:
 def check_test_results(
     tasks: List[concurrent_task_utils.TaskThread],
     task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec],
-) -> Tuple[int, int, int]:
+) -> Tuple[int, int, int, Dict[str, float]]:
     """Run tests and parse coverage reports."""
     # Check we ran all tests as expected.
     total_count = 0
     total_errors = 0
     total_failures = 0
+    time_report: Dict[str, float] = {}
     for task in tasks:
         test_count = 0
         spec = task_to_taskspec[task]
@@ -375,6 +384,7 @@ def check_test_results(
                     )
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
+                time_report[spec.test_target] = test_time
                 print(
                     'SUCCESS   %s: %d tests (%.1f secs)' %
                     (spec.test_target, test_count, test_time))
@@ -384,7 +394,7 @@ def check_test_results(
                     'Task output:\n%s' % task.task_results[0].get_report()[0])
         total_count += test_count
 
-    return total_count, total_errors, total_failures
+    return total_count, total_errors, total_failures, time_report
 
 
 def main(args: Optional[List[str]] = None) -> None:
@@ -479,7 +489,7 @@ def main(args: Optional[List[str]] = None) -> None:
     print('+------------------+')
     print('')
 
-    total_count, total_errors, total_failures = check_test_results(
+    total_count, total_errors, total_failures, time_report = check_test_results(
         tasks, task_to_taskspec)
 
     print('')
@@ -547,6 +557,10 @@ def main(args: Optional[List[str]] = None) -> None:
         if (coverage != 100
                 and not parsed_args.ignore_coverage):
             raise Exception('Backend test coverage is not 100%')
+
+    if parsed_args.generate_time_report:
+        with utils.open_file(TIME_REPORT_PATH, 'w') as time_report_file:
+            time_report_file.write(json.dumps(time_report, indent=4))
 
     print('')
     print('Done!')
