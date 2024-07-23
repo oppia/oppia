@@ -131,9 +131,9 @@ describe('Logged-out User', function () {
           ),
         name: 'expectReviewCardToHaveContent_NegativeNumbers',
       },
-      {
-        action: () => loggedOutUser.timeout(2147483647),
-      },
+      // {
+      //   action: () => loggedOutUser.timeout(2147483647),
+      // },
     ];
 
     for (const {action, name} of actions) {

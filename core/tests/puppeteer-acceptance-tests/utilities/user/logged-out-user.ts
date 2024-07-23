@@ -227,7 +227,7 @@ const categoryFilterDropdownToggler = '.e2e-test-search-bar-dropdown-toggle';
 const filterOptionsSelector = '.e2e-test-deselected';
 const languageFilterDropdownToggler =
   '.oppia-search-bar-dropdown-toggle-button';
-const searchResultsSelector = '.e2e-test-exp-summary-tile-objective';
+const searchResultsSelector = '.e2e-test-exp-summary-tile-title';
 const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
 const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
 const desktopStoryTitleSelector = '.e2e-test-story-title-in-topic-page';
@@ -2070,7 +2070,11 @@ export class LoggedOutUser extends BaseUser {
    */
   async filterLessonsByLanguage(languageNames: string[]): Promise<void> {
     try {
-      await this.clickOn(languageFilterDropdownToggler);
+      await this.page.waitForSelector(languageFilterDropdownToggler);
+      const languageFilterDropdownTogglerElement = await this.page.$(
+        languageFilterDropdownToggler
+      );
+      await languageFilterDropdownTogglerElement?.click();
 
       await this.page.waitForSelector(filterOptionsSelector);
       const deselectedLanguages = await this.page.$$(filterOptionsSelector);
@@ -2099,22 +2103,37 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the search results contain a specific result.
    * @param {string} searchResult - The search result to check for.
    */
-  async expectSearchResultsToContain(searchResult: string): Promise<void> {
+  async expectSearchResultsToContain(
+    searchResultsExpected: string[]
+  ): Promise<void> {
     try {
-      const searchResults = await this.page.$$(searchResultsSelector);
-      for (const result of searchResults) {
-        const resultText = await this.page.evaluate(
-          el => el.querySelector('span').textContent,
-          result
-        );
-        if (resultText === searchResult) {
-          return;
+      if (searchResultsExpected.length === 0) {
+        await this.waitForStaticAssetsToLoad();
+        const searchResultsElements = await this.page.$$(searchResultsSelector);
+        if (searchResultsElements.length !== 0) {
+          throw new Error('No search results expected, but some were found.');
         }
-      }
+      } else {
+        await this.page.waitForSelector(searchResultsSelector);
+        const searchResultsElements = await this.page.$$(searchResultsSelector);
+        const searchResults = await Promise.all(
+          searchResultsElements.map(result =>
+            this.page.evaluate(
+              el => el.querySelector('span').textContent.trim(),
+              result
+            )
+          )
+        );
 
-      throw new Error(
-        `Search result "${searchResult}" not found in search results.`
-      );
+        for (const resultExpected of searchResultsExpected) {
+          if (!searchResults.includes(resultExpected)) {
+            throw new Error(
+              `Search result "${resultExpected}" not found in search results.`
+            );
+          }
+        }
+        showMessage('All expected search results found in search results.');
+      }
     } catch (error) {
       const newError = new Error(`Failed to check search results: ${error}`);
       newError.stack = error.stack;
@@ -2136,13 +2155,14 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectExplorationsInOrder(expectedOrder: string[]): Promise<void> {
     try {
+      await this.page.waitForSelector(explorationTitleSelector);
       const explorationTitles = await this.page.$$(explorationTitleSelector);
       for (let i = 0; i < explorationTitles.length; i++) {
         const titleText = await this.page.evaluate(
           el => el.querySelector('span > span').textContent,
           explorationTitles[i]
         );
-        if (titleText !== expectedOrder[i]) {
+        if (titleText.trim() !== expectedOrder[i]) {
           throw new Error(
             `Exploration at position ${i} is "${titleText}", but expected "${expectedOrder[i]}".`
           );
@@ -2175,14 +2195,16 @@ export class LoggedOutUser extends BaseUser {
     expectedExplorationName: string
   ): Promise<void> {
     try {
+      await this.page.waitForSelector(explorationTitleSelector);
       const explorationTitles = await this.page.$$(explorationTitleSelector);
       for (const title of explorationTitles) {
         const titleText = await this.page.evaluate(
           el => el.querySelector('span > span').textContent,
           title
         );
-        if (titleText === expectedExplorationName) {
+        if (titleText.trim() === expectedExplorationName) {
           // If the exploration name matches, fetch the rating and check if it matches the expected rating.
+          await this.page.waitForSelector(explorationRatingSelector);
           const ratingElement = await title.$(explorationRatingSelector);
           const ratingText = await this.page.evaluate(
             el => el.querySelector('span:nth-child(2)').textContent,

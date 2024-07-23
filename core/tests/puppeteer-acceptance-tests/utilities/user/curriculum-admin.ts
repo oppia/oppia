@@ -865,6 +865,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(publishStoryButton);
       await this.page.waitForSelector(unpublishStoryButton, {visible: true});
     }
+    await this.page.waitForNetworkIdle();
   }
 
   /**

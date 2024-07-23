@@ -1288,7 +1288,8 @@ export class ExplorationEditor extends BaseUser {
    * Function for creating an exploration with only EndExploration interaction with given title.
    */
   async createAndPublishAMinimalExplorationWithTitle(
-    title: string
+    title: string,
+    category: string = 'Algebra'
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
@@ -1301,7 +1302,7 @@ export class ExplorationEditor extends BaseUser {
     return await this.publishExplorationWithMetadata(
       title,
       'This is Goal here.',
-      'Algebra'
+      category
     );
   }
 
