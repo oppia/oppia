@@ -36,7 +36,7 @@ from urllib import request as urlrequest
 from core import feconf
 from scripts import servers
 
-from typing import Dict, Final, Generator, List, Optional, Union
+from typing import Dict, Final, Generator, List, Optional, Tuple, Union
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
@@ -221,6 +221,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'exploration-editor/create-exploration-and-change-basic-settings',
     'exploration-editor/modify-translations-through-modal',
     'exploration-editor/load-complete-and-restart-exploration-preview',
+    'exploration-editor/publish-the-exploration-with-an-interaction',
     'exploration-editor/save-draft-publish-and-discard-the-changes',
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
@@ -1017,3 +1018,11 @@ def is_oppia_server_already_running() -> bool:
                 'Exiting.' % port)
             return True
     return False
+
+
+def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
+    """Starts subprocess and returns (stdout, stderr)."""
+    task = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = task.communicate()
+    return out, err

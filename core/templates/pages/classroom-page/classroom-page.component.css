@@ -263,6 +263,10 @@
   text-align: center;
 }
 
+.breadcrumbs-container .classroom-information-container .classroom-thumbnail-container .classroom-thumbnail {
+  width: 120px;
+}
+
 @media screen and (max-width: 768px) {
   .breadcrumbs-container .classroom-breadcrumbs {
     width: 90vw;
@@ -327,7 +331,7 @@
     margin-top: 10px;
   }
 
-  .breadcrumbs-container .classroom-information-container .classroom-thumbnail-container img {
+  .breadcrumbs-container .classroom-information-container .classroom-thumbnail-container .classroom-thumbnail {
     margin-right: 15px;
     width: 70px;
   }

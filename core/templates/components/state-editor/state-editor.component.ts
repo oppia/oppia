@@ -185,9 +185,10 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.oppiaBlackImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/avatar/oppia_avatar_100px.svg'
-    );
+    this.oppiaBlackImgUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/avatar/oppia_avatar_100px.svg'
+      );
     this.currentStateIsTerminal = false;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.interactionIdIsSet = false;
