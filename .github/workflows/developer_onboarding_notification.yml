@@ -39,18 +39,18 @@ jobs:
           script: |
             const prCount = parseInt(process.env.PR_COUNT);
             const author = process.env.AUTHOR;
-            const mention = '@HardikGoyal2003';
+            const mention = 'HardikGoyal2003';
             const prNumber = context.payload.pull_request.number;
             
             let message;
             if (prCount === 1) {
               message = `Thanks @${author}, and congratulations on your first PR to Oppia! 🎉 🥳\n` +
               `Feel free to take up a second issue if you'd like to help out more!\n\n` +
-              `Developer onboarding lead : ${mention}`;
+              `Developer onboarding lead : @${mention}`;
             } else if (prCount === 2) {
               message = `@${author} Congratulations on your second merged PR to Oppia! 🎉 🥳\n` +
               `Since you've merged two PRs, you might be eligible to join the Oppia dev team as a collaborator. If you'd like to do that, please fill in [this form](https://forms.gle/NxPjimCMqsSTNUgu5). Thanks!\n\n` +
-              `Developer onboarding lead : ${mention}`;
+              `Developer onboarding lead : @${mention}`;
             }
 
             if (prCount === 1 || prCount === 2) {
