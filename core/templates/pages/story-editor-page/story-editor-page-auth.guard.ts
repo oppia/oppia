@@ -51,7 +51,7 @@ export class StoryEditorPageAuthGuard implements CanActivate {
           resolve(true);
         })
         .catch(err => {
-          let statusCode = err ? err.error.status_code : 401;
+          let statusCode = 401;
           this.router
             .navigate([
               `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/${statusCode}`,
