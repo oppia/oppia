@@ -72,7 +72,6 @@ import {OutcomeEditorComponent} from './state-directives/outcome-editor/outcome-
 import {OutcomeFeedbackEditorComponent} from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import {OnScreenKeyboardComponent} from './on-screen-keyboard/on-screen-keyboard.component';
 import {RubricsEditorComponent} from './rubrics-editor/rubrics-editor.component';
-import {CreateNewSkillModalComponent} from 'pages/topics-and-skills-dashboard-page/modals/create-new-skill-modal.component';
 import {CreateActivityModalComponent} from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import {UploadActivityModalComponent} from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 import {ThumbnailUploaderComponent} from './forms/custom-forms-directives/thumbnail-uploader.component';
@@ -251,7 +250,6 @@ import {DirectivesModule} from 'directives/directives.module';
     ConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
-    CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
     DeleteAnswerGroupModalComponent,
@@ -385,7 +383,6 @@ import {DirectivesModule} from 'directives/directives.module';
     ConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
-    CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
     DeleteHintModalComponent,
@@ -540,7 +537,6 @@ import {DirectivesModule} from 'directives/directives.module';
     ConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
-    CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
     DeleteAnswerGroupModalComponent,

@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {SubtopicPageContents} from 'domain/topic/subtopic-page-contents.model';
 import {SubtopicPage} from 'domain/topic/subtopic-page.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
@@ -114,10 +113,3 @@ export class SubtopicPreviewTab {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSubtopicPreviewTab',
-  downgradeComponent({
-    component: SubtopicPreviewTab,
-  }) as angular.IDirectiveFactory
-);
