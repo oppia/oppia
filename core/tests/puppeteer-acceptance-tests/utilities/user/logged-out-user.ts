@@ -2075,12 +2075,15 @@ export class LoggedOutUser extends BaseUser {
    * @param {string[]} languageNames - The names of the languages to filter by.
    */
   async filterLessonsByLanguage(languageNames: string[]): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.waitForPageToFullyLoad();
+    }
     await this.page.waitForSelector(languageFilterDropdownToggler);
     const languageFilterDropdownTogglerElement = await this.page.$(
       languageFilterDropdownToggler
     );
     await languageFilterDropdownTogglerElement?.click();
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
 
     await this.page.waitForSelector(selectedFilterOptionsSelector);
     const selectedElements = await this.page.$$(selectedFilterOptionsSelector);
