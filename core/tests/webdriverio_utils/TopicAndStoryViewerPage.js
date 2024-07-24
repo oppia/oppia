@@ -69,16 +69,6 @@ var TopicAndStoryViewerPage = function () {
     await waitFor.pageToFullyLoad();
   };
 
-  this.goToNextChapterFromRecommendations = async function () {
-    await action.click('Next chapter button', nextChapterButton);
-    await waitFor.pageToFullyLoad();
-  };
-
-  this.goToPracticeSessionFromRecommendations = async function () {
-    await action.click('Start practice button', startPracticeButton);
-    await waitFor.pageToFullyLoad();
-  };
-
   this.dismissSignUpSection = async function () {
     await action.click(
       "Don't show me again button",
@@ -102,38 +92,6 @@ var TopicAndStoryViewerPage = function () {
     );
     var lessonUncompletedIcons = await lessonUncompletedIconsSelector();
     expect(lessonUncompletedIcons.length).toEqual(count);
-  };
-
-  this.waitForConversationSkinCardsContainer = async function () {
-    await waitFor.visibilityOf(
-      conversationSkinCardsContainer,
-      'Conversation skin cards container takes too long to be visible.'
-    );
-  };
-
-  this.waitForSignUpSection = async function () {
-    await waitFor.visibilityOf(
-      endChapterSignUpSection,
-      'Sign up section takes too long to be visible.'
-    );
-  };
-
-  this.waitForSignUpSectionToDisappear = async function () {
-    await waitFor.invisibilityOf(
-      endChapterSignUpSection,
-      'Sign up section takes too long to disappear.'
-    );
-  };
-
-  this.waitForPracticeTabContainer = async function () {
-    await waitFor.visibilityOf(
-      practicetabContainer,
-      'Practice tab container takes too long to be visible.'
-    );
-  };
-
-  this.waitForPracticeSessionContainer = async function () {
-    await waitFor.presenceOf(practiceSessionContainer);
   };
 };
 

@@ -1438,6 +1438,28 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(closeTopicDependencyButton);
     await this.page.waitForSelector(topicDependencyGraphDiv, {visible: false});
   }
+
+  /**
+   * Creates, updates, and publishes a new classroom with a topic.
+   * @param {string} classroomName - The name of the classroom.
+   * @param {string} urlFragment - The URL fragment for the classroom.
+   * @param {string} topicToBeAssigned - The name of the topic to be assigned to the classroom.
+   */
+  async createAndPublishClassroom(
+    classroomName: string,
+    urlFragment: string,
+    topicToBeAssigned: string
+  ): Promise<void> {
+    await this.createNewClassroom(classroomName, urlFragment);
+    await this.updateClassroom(
+      classroomName,
+      'Teaser text',
+      'Course details',
+      'Topic list intro'
+    );
+    await this.addTopicToClassroom(classroomName, topicToBeAssigned);
+    await this.publishClassroom(classroomName);
+  }
 }
 
 export let CurriculumAdminFactory = (): CurriculumAdmin =>
