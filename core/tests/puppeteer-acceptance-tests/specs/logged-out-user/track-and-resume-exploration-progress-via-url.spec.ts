@@ -47,7 +47,7 @@ describe('Logged-out User', function () {
 );
 
 it(
-    'should be able to check progress, answer states, generate and use progress URL in the exploration player according to CUJ v2 doc ',
+    'should be able to check progress, answer states, generate and use progress URL in the exploration player.',
     async function () {
         await loggedOutUser.navigateToExplorationPlayer();
 
