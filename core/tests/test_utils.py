@@ -2724,7 +2724,7 @@ version: 1
             self.assertEqual(response.status_int, 200)
 
     def signup_superadmin_user(self) -> None:
-        """Signs up a superadmin user. Must be called at the end of setUp().""" 
+        """Signs up a superadmin user. Must be called at the end of setUp()."""
         self.signup(self.SUPER_ADMIN_EMAIL, self.SUPER_ADMIN_USERNAME)
 
     def add_user_role(self, username: str, user_role: str) -> None:
