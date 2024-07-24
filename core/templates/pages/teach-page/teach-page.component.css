@@ -597,9 +597,84 @@
   }
 }
 
-@media only screen and (min-width: 769px) {
+@media only screen and (min-width: 922px) {
   .teach-page .oppia-teach-testimonials-container > button {
     display: none;
+  }
+}
+
+@media only screen and (max-width: 1051px) {
+  .teach-page .oppia-teach-features-section {
+    gap: 32px;
+    padding: 0 48px;
+  }
+  .teach-page .oppia-teach-features-left {
+    margin: 0;
+    width: 66%;
+  }
+  .teach-page .oppia-teach-features-right .oppia-teach-subtitle {
+    margin: 0 0 16px 48px;
+  }
+  .teach-page .oppia-teach-features {
+    width: 100%;
+  }
+  .teach-page .oppia-teach-feature-text {
+    font-size: 1.6rem;
+    line-height: 22.4px;
+  }
+}
+
+@media only screen and (max-width: 976px) {
+  .teach-page .oppia-teach-lesson-bottom {
+    flex-direction: column;
+    gap: 48px;
+  }
+  .teach-page .oppia-teach-lesson-left {
+    width: 100%;
+  }
+  .teach-page .oppia-teach-lesson-right {
+    background-color: #fff;
+    padding: 0;
+    width: 100%;
+  }
+}
+
+@media only screen and (max-width: 922px) {
+  .teach-page .oppia-teach-testimonials-section {
+    padding: 0 0 80px;
+  }
+  .teach-page .oppia-teach-testimonials-section .oppia-teach-subtitle {
+    margin-bottom: 16px;
+    padding-left: 48px;
+  }
+  .teach-page .oppia-teach-testimonials-section .carousel-indicators {
+    bottom: -36px;
+    gap: 0;
+  }
+  .teach-page .oppia-teach-testimonials-section .carousel-indicators li {
+    height: 8px;
+    width: 8px;
+  }
+  .teach-page .oppia-teach-testimonials-container {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    padding: 48px 16px 52px;
+  }
+  .teach-page .oppia-teach-testimonial-top {
+    gap: 24px;
+    min-height: 163px;
+  }
+  .teach-page .oppia-teach-testimonial-left {
+    width: 27%;
+  }
+  .teach-page .oppia-teach-testimonial-right {
+    padding-bottom: 0;
+    width: calc(73% - 34px);
+  }
+  .teach-page .oppia-teach-testimonial {
+    padding: 0;
   }
 }
 
@@ -680,18 +755,6 @@
     line-height: 21.6px;
     margin: 8px 0;
   }
-  .teach-page .oppia-teach-lesson-bottom {
-    flex-direction: column;
-    gap: 48px;
-  }
-  .teach-page .oppia-teach-lesson-left {
-    width: 100%;
-  }
-  .teach-page .oppia-teach-lesson-right {
-    background-color: #fff;
-    padding: 0;
-    width: 100%;
-  }
   .teach-page .oppia-teach-lesson-image {
     margin: 16px 0 32px;
   }
@@ -715,60 +778,6 @@
   .teach-page .oppia-teach-outcomes-charts-container {
     gap: 32px;
     justify-content: start;
-  }
-  .teach-page .oppia-teach-testimonials-section {
-    padding: 0 0 80px;
-  }
-  .teach-page .oppia-teach-testimonials-section .oppia-teach-subtitle {
-    margin-bottom: 16px;
-    padding-left: 48px;
-  }
-  .teach-page .oppia-teach-testimonials-section .carousel-indicators {
-    bottom: -36px;
-    gap: 0;
-  }
-  .teach-page .oppia-teach-testimonials-section .carousel-indicators li {
-    height: 8px;
-    width: 8px;
-  }
-  .teach-page .oppia-teach-testimonials-container {
-    align-items: center;
-    display: flex;
-    flex-direction: row;
-    gap: 16px;
-    padding: 48px 16px 52px;
-  }
-  .teach-page .oppia-teach-testimonial-top {
-    gap: 24px;
-    min-height: 163px;
-  }
-  .teach-page .oppia-teach-testimonial-left {
-    width: 27%;
-  }
-  .teach-page .oppia-teach-testimonial-right {
-    padding-bottom: 0;
-    width: calc(73% - 34px);
-  }
-  .teach-page .oppia-teach-testimonial {
-    padding: 0;
-  }
-  .teach-page .oppia-teach-features-section {
-    gap: 32px;
-    padding: 0 48px;
-  }
-  .teach-page .oppia-teach-features-left {
-    margin: 0;
-    width: 66%;
-  }
-  .teach-page .oppia-teach-features-right .oppia-teach-subtitle {
-    margin: 0 0 16px 48px;
-  }
-  .teach-page .oppia-teach-features {
-    width: 100%;
-  }
-  .teach-page .oppia-teach-feature-text {
-    font-size: 1.6rem;
-    line-height: 22.4px;
   }
   .teach-page .oppia-teach-cta-section .oppia-teach-btn {
     min-width: 240px;
@@ -869,7 +878,7 @@
   }
 }
 
-@media only screen and (max-width: 361px) {
+@media only screen and (max-width: 553px) {
   .teach-page .oppia-teach-title {
     font-size: 2rem;
     line-height: 27px;
@@ -1013,5 +1022,12 @@
   .teach-page .oppia-teach-lesson-section .oppia-teach-btn,
   .teach-page .oppia-teach-cta-section .oppia-teach-btn {
     width: 100%;
+  }
+}
+
+@media only screen and (max-width: 324px) {
+  .teach-page .oppia-teach-btn {
+    max-width: 100%;
+    min-width: 0;
   }
 }
