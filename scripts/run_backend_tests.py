@@ -432,10 +432,10 @@ def main(args: Optional[List[str]] = None) -> None:
             stack.enter_context(
                 servers.managed_cloud_datastore_emulator(clear_datastore=True))
             stack.enter_context(servers.managed_redis_server())
-        all_test_targets: List[str] = []
         if parsed_args.test_targets:
             test_targets = parsed_args.test_targets.split(',')
             for test_target in test_targets:
+                all_test_targets = []
                 if '/' in test_target:
                     raise Exception(
                         'The delimiter in each test_target should be a dot (.)')
