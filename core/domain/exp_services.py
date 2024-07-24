@@ -84,6 +84,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import stats_models
+    from mypy_imports import translation_models
     from mypy_imports import user_models
 
 (base_models, exp_models, stats_models, user_models, translation_models) = (
@@ -2587,7 +2588,7 @@ def revert_exploration(
             revert_to_version,
         )
     )
-    new_translation_models = [
+    new_translation_models: List[base_models.BaseModel] = [
         translation_models.EntityTranslationsModel.create_new(
             translation.entity_type,
             translation.entity_id,
