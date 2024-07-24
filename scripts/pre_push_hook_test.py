@@ -504,7 +504,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             unused_diff_files: List[git_changes_utils.FileDiff]
         ) -> List[str]:
             return [
-                'test.file1_test', 'test.file2_test', 'test.file3_test'
+                'test.file1_test', 'test.file2_test'
             ]
         run_script_and_get_returncode_swap = self.swap(
             pre_push_hook, 'run_script_and_get_returncode',
@@ -512,20 +512,15 @@ class PrePushHookTests(test_utils.GenericTestBase):
         get_python_dot_test_files_from_diff_swap = self.swap(
             git_changes_utils, 'get_python_dot_test_files_from_diff',
             mock_get_python_dot_test_files_from_diff)
-        excluded_backend_tests_swap = self.swap(
-            pre_push_hook, 'EXCLUDED_BACKEND_TESTS', ['test.file3_test'])
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.get_changed_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with get_python_dot_test_files_from_diff_swap:
                         with self.execute_mypy_checks_swap:
                             with run_script_and_get_returncode_swap:
-                                with excluded_backend_tests_swap:
-                                    with self.assertRaisesRegex(
-                                        SystemExit, '1'
-                                    ):
-                                        with self.swap_check_backend_python_libs: # pylint: disable=line-too-long
-                                            pre_push_hook.main(args=[])
+                                with self.assertRaisesRegex(SystemExit, '1'):
+                                    with self.swap_check_backend_python_libs:
+                                        pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing backend tests.' in self.print_arr)
 

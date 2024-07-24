@@ -72,6 +72,7 @@ install_third_party_libs.main()
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import git_changes_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 TEST_RUNNER_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'gae_suite.py'
@@ -136,6 +137,12 @@ _PARSER.add_argument(
     '--verbose',
     help='optional; if specified, display the output of the tests being run',
     action='store_true')
+_PARSER.add_argument(
+    '--run_on_changed_files',
+    help='optional; if specified, runs the backend tests on the files '
+    'that were changed in the current branch',
+    action='store_true'
+)
 
 
 def run_shell_cmd(
@@ -223,7 +230,8 @@ def get_all_test_targets_from_path(
     paths = []
     excluded_dirs = [
         '.git', 'third_party', 'node_modules', 'venv',
-        'core/tests/data', 'core/tests/build_sources']
+        'core/tests/data', 'core/tests/build_sources',
+        '.direnv']
     for root in os.listdir(base_path):
         if any(s in root for s in excluded_dirs):
             continue
@@ -424,8 +432,8 @@ def main(args: Optional[List[str]] = None) -> None:
             stack.enter_context(
                 servers.managed_cloud_datastore_emulator(clear_datastore=True))
             stack.enter_context(servers.managed_redis_server())
+        all_test_targets: List[str] = []
         if parsed_args.test_targets:
-            all_test_targets: List[str] = []
             test_targets = parsed_args.test_targets.split(',')
             for test_target in test_targets:
                 if '/' in test_target:
@@ -463,6 +471,30 @@ def main(args: Optional[List[str]] = None) -> None:
                 raise Exception(validation_error)
             all_test_targets = get_all_test_targets_from_shard(
                 parsed_args.test_shard)
+        elif parsed_args.run_on_changed_files:
+            remote = git_changes_utils.get_local_git_repository_remote_name()
+            if not remote:
+                sys.exit('Error: No remote repository found.')
+            refs = git_changes_utils.get_refs()
+            collected_files = git_changes_utils.get_changed_files(
+                refs, remote.decode('utf-8'))
+            test_targets_from_changed_files = set()
+            for _, (_, acmrt_files) in collected_files.items():
+                if not acmrt_files:
+                    continue
+
+                test_targets_from_changed_files.update(
+                    git_changes_utils.get_python_dot_test_files_from_diff(
+                        acmrt_files
+                    )
+                )
+            staged_files = git_changes_utils.get_staged_acmrt_files()
+            test_targets_from_changed_files.update(
+                git_changes_utils.get_python_dot_test_files_from_diff(
+                    staged_files
+                )
+            )
+            all_test_targets = list(test_targets_from_changed_files)
         else:
             include_load_tests = not parsed_args.exclude_load_tests
             all_test_targets = get_all_test_targets_from_path(

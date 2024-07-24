@@ -67,7 +67,7 @@ OPPIA_PARENT_DIR: Final = os.path.join(
 FRONTEND_TEST_CMDS: Final = [
     PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
 BACKEND_TEST_CMDS: Final = [
-    PYTHON_CMD, '-m', 'scripts.run_backend_tests', '--generate_coverage_report']
+    PYTHON_CMD, '-m', 'scripts.run_backend_tests']
 BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD: Final = [
     PYTHON_CMD, '-m', 'scripts.check_backend_associated_test_file']
 TYPESCRIPT_CHECKS_CMDS: Final = [
@@ -77,9 +77,6 @@ TESTS_ARE_CAPTURED_IN_CI_CHECK_CMDS: Final = [
 STRICT_TYPESCRIPT_CHECKS_CMDS: Final = [
     PYTHON_CMD, '-m', 'scripts.run_typescript_checks', '--strict_checks']
 GIT_IS_DIRTY_CMD: Final = 'git status --porcelain --untracked-files=no'
-EXCLUDED_BACKEND_TESTS: Final = [
-    'scripts.run_backend_tests_test'
-]
 
 
 class ChangedBranch:
@@ -379,14 +376,10 @@ def main(args: Optional[List[str]] = None) -> None:
                     files_to_lint
                 )
             )
-            filtered_python_test_files = [
-                test_file for test_file in python_test_files
-                if test_file not in EXCLUDED_BACKEND_TESTS
-            ]
-            if filtered_python_test_files:
+            if python_test_files:
                 backend_test_cmds = BACKEND_TEST_CMDS.copy()
                 backend_test_cmds.append(
-                    '--test_targets=%s' % ','.join(filtered_python_test_files))
+                    '--test_targets=%s' % ','.join(python_test_files))
                 backend_status = run_script_and_get_returncode(
                     backend_test_cmds)
             if backend_status != 0:
