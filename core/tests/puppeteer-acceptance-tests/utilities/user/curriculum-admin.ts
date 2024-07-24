@@ -865,7 +865,6 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(publishStoryButton);
       await this.page.waitForSelector(unpublishStoryButton, {visible: true});
     }
-    await this.page.waitForNetworkIdle();
   }
 
   /**
@@ -1450,39 +1449,6 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Creates and publishes a topic with a subtopic and skill.
-   * @param {string} topicName - The name of the topic.
-   * @param {string} subtopicName - The name of the subtopic.
-   * @param {string} skillName - The name of the skill.
-   */
-  async createAndPublishTopic(
-    topicName: string,
-    subtopicName: string,
-    skillName: string
-  ) {
-    await this.createTopic(
-      topicName,
-      topicName.toLowerCase().replace(' ', '-')
-    );
-    await this.createSubtopicForTopic(
-      subtopicName,
-      subtopicName.toLowerCase().replace(' ', '-'),
-      topicName
-    );
-
-    await this.createSkillForTopic(skillName, topicName);
-    await this.createQuestionsForSkill(skillName, 3);
-    await this.assignSkillToSubtopicInTopicEditor(
-      skillName,
-      subtopicName,
-      topicName
-    );
-    await this.addSkillToDiagnosticTest(skillName, topicName);
-
-    await this.publishDraftTopic(topicName);
-  }
-
-  /**
    * Creates, updates, and publishes a new classroom with a topic.
    * @param {string} classroomName - The name of the classroom.
    * @param {string} urlFragment - The URL fragment for the classroom.
@@ -1492,7 +1458,7 @@ export class CurriculumAdmin extends BaseUser {
     classroomName: string,
     urlFragment: string,
     topicToBeAssigned: string
-  ) {
+  ): Promise<void> {
     await this.createNewClassroom(classroomName, urlFragment);
     await this.updateClassroom(
       classroomName,

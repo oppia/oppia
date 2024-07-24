@@ -34,9 +34,8 @@ ConsoleReporter.setConsoleErrorsToIgnore([
   /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Invalid active state name: null/,
   new RegExp('Invalid active state name: null'),
   /Occurred at http:\/\/localhost:8181\/.*Failed to load resource: net::ERR_NETWORK_CHANGED/,
-  /Occurred at http:\/\/localhost:8181\/story_editor\/[a-zA-Z0-9]+\/.*Cannot read properties of undefined \(reading 'getStory'\)/,
-  /Occurred at http:\/\/localhost:8181\/.*Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
   /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE\.NotSameOrigin/,
+  'the server responded with a status of 404 (Not Found)',
 ]);
 
 describe('Logged-out User', function () {
@@ -58,22 +57,36 @@ describe('Logged-out User', function () {
         'Negative Numbers'
       );
 
-    await curriculumAdmin.createAndPublishTopic(
-      'Algebra I',
+    await curriculumAdmin.createTopic('Algebra I', 'algebra-one');
+    await curriculumAdmin.createSubtopicForTopic(
       'Negative Numbers',
-      'Negative Numbers'
+      'negative-numbers',
+      'Algebra I'
     );
+    await curriculumAdmin.createSkillForTopic('Negative Numbers', 'Algebra I');
+    await curriculumAdmin.createQuestionsForSkill('Negative Numbers', 3);
+    await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
+      'Negative Numbers',
+      'Negative Numbers',
+      'Algebra I'
+    );
+    await curriculumAdmin.addSkillToDiagnosticTest(
+      'Negative Numbers',
+      'Algebra I'
+    );
+    await curriculumAdmin.publishDraftTopic('Algebra I');
+
+    await curriculumAdmin.createAndPublishClassroom(
+      'Math',
+      'math',
+      'Algebra I'
+    );
+
     await curriculumAdmin.createAndPublishStoryWithChapter(
       'Algebra Story',
       'algebra-story',
       'Understanding Negative Numbers',
       explorationId as string,
-      'Algebra I'
-    );
-
-    await curriculumAdmin.createAndPublishClassroom(
-      'Math',
-      'math',
       'Algebra I'
     );
     // Setup taking longer than 300000ms.

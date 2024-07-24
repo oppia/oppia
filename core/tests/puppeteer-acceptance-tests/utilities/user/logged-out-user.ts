@@ -2088,7 +2088,7 @@ export class LoggedOutUser extends BaseUser {
         el => el.textContent.trim(),
         element
       );
-      // deselecting english language.
+      // Deselecting english language.
       if (elementText.trim() === 'English') {
         await this.waitForElementToBeClickable(element);
         await element.click();
