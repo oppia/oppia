@@ -97,14 +97,14 @@ _PARSER: Final = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder:
     python -m scripts.run_backend_tests
-IMPORTANT: Only one of --test_path,  --test_target, and --test_shard
+IMPORTANT: Only one of --test_path,  --test_targets, and --test_shard
 should be specified.
 """)
 
 _EXCLUSIVE_GROUP: Final = _PARSER.add_mutually_exclusive_group()
 _EXCLUSIVE_GROUP.add_argument(
-    '--test_target',
-    help='optional dotted module name of the test(s) to run',
+    '--test_targets',
+    help='optional comma-separated dotted module names of the test(s) to run',
     type=str)
 _EXCLUSIVE_GROUP.add_argument(
     '--test_path',
@@ -418,35 +418,44 @@ def main(args: Optional[List[str]] = None) -> None:
 
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
-    if parsed_args.test_target and '/' in parsed_args.test_target:
-        raise Exception('The delimiter in test_target should be a dot (.)')
 
     with contextlib.ExitStack() as stack:
         if not feconf.OPPIA_IS_DOCKERIZED:
             stack.enter_context(
                 servers.managed_cloud_datastore_emulator(clear_datastore=True))
             stack.enter_context(servers.managed_redis_server())
-        if parsed_args.test_target:
-            # Check if target either ends with '_test' which means a path to
-            # a test file has been provided or has '_test.' in it which means
-            # a path to a particular test class or a method in a test file has
-            # been provided. If the path provided does not exist, error is
-            # raised when we try to execute the tests.
-            if (
-                parsed_args.test_target.endswith('_test')
-                or '_test.' in parsed_args.test_target
-            ):
-                all_test_targets = [parsed_args.test_target]
-            else:
-                print('')
-                print('------------------------------------------------------')
-                print(
-                    'WARNING : test_target flag should point to the test file.')
-                print('------------------------------------------------------')
-                print('')
-                time.sleep(3)
-                print('Redirecting to its corresponding test file...')
-                all_test_targets = [parsed_args.test_target + '_test']
+        if parsed_args.test_targets:
+            all_test_targets: List[str] = []
+            test_targets = parsed_args.test_targets.split(',')
+            for test_target in test_targets:
+                if '/' in test_target:
+                    raise Exception(
+                        'The delimiter in each test_target should be a dot (.)')
+                # Check if target either ends with '_test' which means a path to
+                # a test file has been provided or has '_test.' in it which
+                # means a path to a particular test class or a method in a test
+                # file has been provided. If the path provided does not exist,
+                # error is raised when we try to execute the tests.
+                if (
+                    test_target.endswith('_test')
+                    or '_test.' in test_target
+                ):
+                    all_test_targets.append(test_target)
+                else:
+                    print('')
+                    print(
+                        '-----------------------------------------------'
+                        '-------')
+                    print(
+                        'WARNING : test_target flag should point to the '
+                        'test file.')
+                    print(
+                        '-----------------------------------------------'
+                        '-------')
+                    print('')
+                    time.sleep(3)
+                    print('Redirecting to its corresponding test file...')
+                    all_test_targets.append(test_target + '_test')
         elif parsed_args.test_shard:
             validation_error = check_shards_match_tests(
                 include_load_tests=True)

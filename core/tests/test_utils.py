@@ -35,6 +35,7 @@ import re
 import string
 from types import TracebackType
 import unittest
+import uuid
 
 from core import feature_flag_list
 from core import feconf
@@ -2174,8 +2175,9 @@ class GenericTestBase(AppEngineTestBase):
     # can override the following class-level constant.
     AUTO_CREATE_DEFAULT_SUPERADMIN_USER: bool = True
 
-    SUPER_ADMIN_EMAIL: Final = 'tmpsuperadmin@example.com'
-    SUPER_ADMIN_USERNAME: Final = 'tmpsuperadm1n'
+    SUPER_ADMIN_EMAIL: Final = (
+        f'tmpsuperadm1n{uuid.uuid4().hex[:6]}@example.com')
+    SUPER_ADMIN_USERNAME: str = f'tmpsuperadm1n{uuid.uuid4().hex[:6]}'
 
     # Dummy strings representing user attributes. Note that it is up to the
     # individual test to actually register these users as editors, admins, etc.
@@ -2722,7 +2724,7 @@ version: 1
             self.assertEqual(response.status_int, 200)
 
     def signup_superadmin_user(self) -> None:
-        """Signs up a superadmin user. Must be called at the end of setUp()."""
+        """Signs up a superadmin user. Must be called at the end of setUp().""" 
         self.signup(self.SUPER_ADMIN_EMAIL, self.SUPER_ADMIN_USERNAME)
 
     def add_user_role(self, username: str, user_role: str) -> None:

@@ -17,8 +17,8 @@
 from __future__ import annotations
 
 import builtins
+import os
 import subprocess
-
 import sys
 import tempfile
 
@@ -617,3 +617,87 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             git_changes_utils.get_js_or_ts_files_from_diff(
                 [b'file1.html', b'file2.py', b'file3.py']),
             [])
+
+    def test_get_python_dot_test_files_from_diff_with_test_file(
+        self
+    ) -> None:
+        def mock_os_path_exists(path: str) -> bool:
+            if path in ['test/file1_test.py']:
+                return True
+            return False
+        os_path_exists_swap = self.swap_with_checks(
+            os.path, 'exists', mock_os_path_exists, expected_args=[
+                ('test/file1_test.py',),
+                ('test/file2_test.py',),
+                ('test/file3_test.py',)
+            ])
+        with os_path_exists_swap:
+            self.assertEqual(
+                git_changes_utils.get_python_dot_test_files_from_diff(
+                    [
+                        b'test/file1_test.py',
+                        b'test/file2.py',
+                        b'test/file3.py'
+                    ]
+                ),
+                set(['test.file1_test']))
+
+    def test_get_python_dot_test_files_from_diff_with_no_test_file(
+        self
+    ) -> None:
+        os_path_exists_swap = self.swap(
+            os.path, 'exists', lambda _: False)
+        with os_path_exists_swap:
+            self.assertEqual(
+                git_changes_utils.get_python_dot_test_files_from_diff(
+                    [
+                        b'test/file1.py',
+                        b'test/file2.py',
+                        b'test/file3.py'
+                    ]
+                ),
+                set())
+
+    def test_get_python_dot_test_files_from_diff_with_existing_test_file(
+        self
+    ) -> None:
+        def mock_os_path_exists(path: str) -> bool:
+            if path in ['test/file1_test.py', 'test/file2_test.py']:
+                return True
+            return False
+        os_path_exists_swap = self.swap_with_checks(
+            os.path, 'exists', mock_os_path_exists, expected_args=[
+                ('test/file1_test.py',),
+                ('test/file2_test.py',),
+                ('test/file3_test.py',)
+            ]
+        )
+
+        with os_path_exists_swap:
+            self.assertEqual(
+                git_changes_utils.get_python_dot_test_files_from_diff(
+                    [
+                        b'test/file1.py',
+                        b'test/file2.py',
+                        b'test/file3.py']),
+                set(['test.file1_test', 'test.file2_test']))
+
+    def test_get_python_dot_test_files_from_diff_with_non_existing_test_file(
+        self
+    ) -> None:
+        os_path_exists_swap = self.swap_with_checks(
+            os.path, 'exists', lambda _: False, expected_args=[
+                ('test/file1_test.py',),
+                ('test/file2_test.py',),
+                ('test/file3_test.py',)
+            ]
+        )
+
+        with os_path_exists_swap:
+            self.assertEqual(
+                git_changes_utils.get_python_dot_test_files_from_diff(
+                    [
+                        b'test/file1.py',
+                        b'test/file2.py',
+                        b'test/file3.py']),
+                set())
