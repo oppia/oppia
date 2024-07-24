@@ -1015,47 +1015,6 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Adds Oppia responses for wrong answers.
-   * @param {string} oppiaMsg - The message to be displayed by Oppia.
-   * @param {string} [directToCard] - The card to direct to (optional).
-   * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
-   */
-  async addOppiaResponsesForWrongAnswers(
-    oppiaMsg: string,
-    directToCard?: string,
-    directToCardWhenStuck?: string
-  ): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
-    await this.page.waitForSelector(incorrectResponseIconSelector, {
-      visible: true,
-    });
-    const incorrectResponseIcon = await this.page.$(
-      incorrectResponseIconSelector
-    );
-    await incorrectResponseIcon?.click();
-    await this.page.screenshot({path: 'screenshot.png'});
-    await this.clickOn(openOutcomeFeedBackEditor);
-    await this.clickOn(rteSelector);
-    await this.type(rteSelector, oppiaMsg);
-    await this.clickOn(LABEL_FOR_SAVE_FEEDBACK_BUTTON);
-
-    if (directToCard) {
-      await this.clickOn(openOutcomeDestButton);
-      await this.page.select(destinationSelectorDropdown, directToCard);
-      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
-    }
-
-    if (directToCardWhenStuck) {
-      await this.clickOn(outcomeDestWhenStuckSelector);
-      await this.page.select(
-        destinationWhenStuckSelectorDropdown,
-        directToCardWhenStuck
-      );
-      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
-    }
-  }
-
-  /**
    * Function to add feedback for default responses of a state interaction.
    * @param {string} defaultResponseFeedback - The feedback for the default responses.
    */

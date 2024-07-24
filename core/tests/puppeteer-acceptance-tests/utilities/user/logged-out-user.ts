@@ -2071,7 +2071,7 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Filters lessons by multiple languages.
+   * Filters lessons by multiple languages and deselect the already selected English language.
    * @param {string[]} languageNames - The names of the languages to filter by.
    */
   async filterLessonsByLanguage(languageNames: string[]): Promise<void> {
@@ -2126,7 +2126,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Checks if the search results contain a specific result.
-   * @param {string} searchResult - The search result to check for.
+   * @param {string[]} searchResultsExpected - The search result to check for.
    */
   async expectSearchResultsToContain(
     searchResultsExpected: string[]
