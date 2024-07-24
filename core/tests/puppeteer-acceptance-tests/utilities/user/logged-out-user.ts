@@ -2080,6 +2080,7 @@ export class LoggedOutUser extends BaseUser {
       languageFilterDropdownToggler
     );
     await languageFilterDropdownTogglerElement?.click();
+    await this.waitForStaticAssetsToLoad();
 
     await this.page.waitForSelector(selectedFilterOptionsSelector);
     const selectedElements = await this.page.$$(selectedFilterOptionsSelector);
@@ -2090,7 +2091,6 @@ export class LoggedOutUser extends BaseUser {
       );
       // Deselecting english language.
       if (elementText.trim() === 'English') {
-        await this.waitForElementToBeClickable(element);
         await element.click();
       }
     }
