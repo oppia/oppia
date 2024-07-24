@@ -316,6 +316,7 @@ export class TopicManager extends BaseUser {
       ),
       this.page.waitForNavigation(),
     ]);
+    await this.waitForStaticAssetsToLoad();
   }
 
   /**   * Create a chapter for a certain story.
@@ -1042,7 +1043,7 @@ export class TopicManager extends BaseUser {
       ? mobileTopicSelector
       : desktopTopicSelector;
     try {
-      await this.waitForPageToFullyLoad();
+      await this.waitForStaticAssetsToLoad();
       const topicElements = await this.page.$$(topicNameSelector);
 
       if (expectedTopics.length === 0) {
@@ -1091,7 +1092,7 @@ export class TopicManager extends BaseUser {
       : desktopTopicSelector;
 
     try {
-      await this.waitForPageToFullyLoad();
+      await this.waitForStaticAssetsToLoad();
       await this.page.waitForSelector(topicNameSelector);
       const topicElements = await this.page.$$(topicNameSelector);
       const topicNames = await Promise.all(
@@ -1185,7 +1186,7 @@ export class TopicManager extends BaseUser {
       ? mobileSkillSelector
       : desktopSkillSelector;
     try {
-      await this.waitForPageToFullyLoad();
+      await this.waitForStaticAssetsToLoad();
       const topicElements = await this.page.$$(skillNameSelector);
 
       if (expectedSkills.length === 0) {
@@ -1234,7 +1235,7 @@ export class TopicManager extends BaseUser {
       : desktopSkillSelector;
 
     try {
-      await this.waitForPageToFullyLoad();
+      await this.waitForStaticAssetsToLoad();
       await this.page.waitForSelector(skillNameSelector);
       const topicElements = await this.page.$$(skillNameSelector);
       const topicNames = await Promise.all(
@@ -1472,7 +1473,7 @@ export class TopicManager extends BaseUser {
 
     await this.page.waitForSelector(skillsTab, {visible: true});
     await this.navigateToSkillTab();
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(skillListItemSelector, {visible: true});
 
     const skills = await this.page.$$(skillListItemSelector);
@@ -1548,7 +1549,7 @@ export class TopicManager extends BaseUser {
     exampleExplanation: string
   ): Promise<void> {
     await this.openAllMobileDropdownsInSkillEditor();
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     await this.clickOn(addWorkedExampleButton);
     await this.type(rteSelector, exampleQuestion);
     const rteElements = await this.page.$$(rteSelector);
@@ -1562,7 +1563,7 @@ export class TopicManager extends BaseUser {
    * @param {string} exampleQuestion - The question part of the worked example to delete.
    */
   async deleteWorkedExample(exampleQuestion: string): Promise<void> {
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(workedExampleListItem, {visible: true});
     const previewLists = await this.page.$$(workedExampleListItem);
     if (!previewLists) {
@@ -1588,7 +1589,7 @@ export class TopicManager extends BaseUser {
           if (deleteButton) {
             await this.waitForElementToBeClickable(deleteButton);
             await deleteButton.click();
-            await this.waitForPageToFullyLoad();
+            await this.waitForStaticAssetsToLoad();
             await this.clickOn(confirmDeleteWorkedExampleButton);
             exampleFound = true;
             break;
@@ -1724,7 +1725,7 @@ export class TopicManager extends BaseUser {
    * @param {string} misconceptionName - The name of the misconception to delete.
    */
   async deleteMisconception(misconceptionName: string): Promise<void> {
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(misconceptionListSelector, {visible: true});
     const misconceptionLists = await this.page.$$(misconceptionListSelector);
     let misconceptionFound = false;
@@ -1749,7 +1750,7 @@ export class TopicManager extends BaseUser {
           if (deleteButton) {
             await this.waitForElementToBeClickable(deleteButton);
             await deleteButton.click();
-            await this.waitForPageToFullyLoad();
+            await this.waitForStaticAssetsToLoad();
             await this.clickOn(confirmDeleteMisconceptionButton);
             misconceptionFound = true;
             break;
@@ -1798,7 +1799,7 @@ export class TopicManager extends BaseUser {
       if (!radioInnerCircleSelectorElement) {
         throw new Error('Radio inner circle selector not found');
       }
-      await this.waitForPageToFullyLoad();
+      await this.waitForStaticAssetsToLoad();
       await this.page.evaluate(selector => {
         document.querySelector(selector).click();
       }, radioInnerCircleSelector);
@@ -1917,7 +1918,7 @@ export class TopicManager extends BaseUser {
    * @param {string} explanation - The explanation to update.
    */
   async updateRubric(difficulty: string, explanation: string): Promise<void> {
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     let difficultyValue: string;
     switch (difficulty) {
       case 'Easy':
@@ -1934,7 +1935,7 @@ export class TopicManager extends BaseUser {
     }
     await this.waitForElementToBeClickable(selectRubricDifficultySelector);
     await this.select(selectRubricDifficultySelector, difficultyValue);
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
     await this.type(rteSelector, explanation);
     await this.clickOn(saveRubricExplanationButton);
@@ -1948,7 +1949,7 @@ export class TopicManager extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       return;
     } else {
-      await this.waitForPageToFullyLoad();
+      await this.waitForStaticAssetsToLoad();
       await this.page.waitForSelector(saveOrPublishSkillSelector, {
         visible: true,
       });
@@ -2038,7 +2039,7 @@ export class TopicManager extends BaseUser {
         visible: true,
       });
       await this.page.waitForSelector(editIcon);
-      await this.waitForPageToFullyLoad();
+      await this.waitForStaticAssetsToLoad();
       await this.page.evaluate(selector => {
         document.querySelector(selector).click();
       }, editIcon);
@@ -2075,8 +2076,10 @@ export class TopicManager extends BaseUser {
     topicName: string
   ): Promise<void> {
     await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn('Subtopics');
+    await this.page.waitForSelector(subtopicReassignHeader);
+    let elementToClick = await this.page.$(subtopicReassignHeader);
+    if (this.isViewportAtMobileWidth() && elementToClick) {
+      await elementToClick.click();
     }
     try {
       await this.page.waitForSelector(subtopicCardHeader);

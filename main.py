@@ -1282,6 +1282,16 @@ URLS.extend((
         r'%s' % feconf.TASK_URL_DEFERRED, tasks.DeferredTasksHandler),
 ))
 
+# Add URLs to static resources that differ between deployments.
+URLS.extend((
+    get_redirect_route('/favicon.ico', resources.FaviconHandler),
+    get_redirect_route('/robots.txt', resources.RobotsTxtHandler),
+    get_redirect_route(
+        '/assets/copyrighted-images/<folder>/<filename>',
+        resources.CopyrightImagesHandler
+    ),
+))
+
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
