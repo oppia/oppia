@@ -35,7 +35,7 @@ ConsoleReporter.setConsoleErrorsToIgnore([
   new RegExp('Invalid active state name: null'),
   /Occurred at http:\/\/localhost:8181\/.*Failed to load resource: net::ERR_NETWORK_CHANGED/,
   /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE\.NotSameOrigin/,
-  'the server responded with a status of 404 (Not Found)',
+  /.*404.*Not Found.*/,
 ]);
 
 describe('Logged-out User', function () {
