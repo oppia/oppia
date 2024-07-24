@@ -174,17 +174,6 @@ const subscriberTabButton = '.e2e-test-subscription-tab';
 const subscriberCard = '.e2e-test-subscription-card';
 const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
 const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
-
-const incorrectResponseIconSelector = '.e2e-test-incorrect-response-icon';
-const rteSelector = '.e2e-test-rte';
-const destinationSelectorDropdown = '.e2e-test-destination-selector-dropdown';
-const destinationWhenStuckSelectorDropdown =
-  '.e2e-test-destination-when-stuck-selector-dropdown';
-const outcomeDestWhenStuckSelector =
-  '.protractor-test-open-outcome-dest-if-stuck-editor';
-
-const LABEL_FOR_SAVE_FEEDBACK_BUTTON = ' Save Feedback ';
-const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to creator dashboard page.
