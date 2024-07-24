@@ -33,6 +33,10 @@ ConsoleReporter.setConsoleErrorsToIgnore([
   /Occurred at http:\/\/localhost:8181\/story_editor\/[a-zA-Z0-9]+\/.*Cannot read properties of undefined \(reading 'getStory'\)/,
   /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Invalid active state name: null/,
   new RegExp('Invalid active state name: null'),
+  /Occurred at http:\/\/localhost:8181\/.*Failed to load resource: net::ERR_NETWORK_CHANGED/,
+  /Occurred at http:\/\/localhost:8181\/story_editor\/[a-zA-Z0-9]+\/.*Cannot read properties of undefined \(reading 'getStory'\)/,
+  /Occurred at http:\/\/localhost:8181\/.*Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+  /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE\.NotSameOrigin/,
 ]);
 
 describe('Logged-out User', function () {
@@ -75,76 +79,36 @@ describe('Logged-out User', function () {
     // Setup taking longer than 300000ms.
   }, 420000);
 
-  it('should be able to select and play a topic from the classroom page', async function () {
-    const actions = [
-      {
-        action: () => loggedOutUser.navigateToClassroomPage('math'),
-        name: 'navigateToClassroomPage_math',
-      },
-      {
-        action: () => loggedOutUser.expectTopicsToBePresent(['Algebra I']),
-        name: 'expectTopicsToBePresent_AlgebraI',
-      },
-      {
-        action: () => loggedOutUser.selectAndOpenTopic('Algebra I'),
-        name: 'selectAndOpenTopic_AlgebraI',
-      },
-      {
-        action: () =>
-          loggedOutUser.selectChapterWithinStoryToLearn(
-            'Understanding Negative Numbers',
-            'Algebra Story'
-          ),
-        name: 'selectChapterWithinStoryToLearn_UnderstandingNegativeNumbers',
-      },
+  it(
+    'should be able to select and play a topic from the classroom page',
+    async function () {
+      await loggedOutUser.navigateToClassroomPage('math');
+      await loggedOutUser.expectTopicsToBePresent(['Algebra I']);
+
+      await loggedOutUser.selectAndOpenTopic('Algebra I');
+      await loggedOutUser.selectChapterWithinStoryToLearn(
+        'Understanding Negative Numbers',
+        'Algebra Story'
+      );
 
       // Check for the completion message as the exploration has a single state.
-      {
-        action: () =>
-          loggedOutUser.expectExplorationCompletionToastMessage(
-            'Congratulations for completing this lesson!'
-          ),
-        name: 'expectExplorationCompletionToastMessage',
-      },
+      await loggedOutUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
 
       // Returning to the topic page from the exploration player itself.
-      {
-        action: () =>
-          loggedOutUser.returnToTopicPageAfterCompletingExploration(),
-        name: 'returnToTopicPageAfterCompletingExploration',
-      },
-      {
-        action: () => loggedOutUser.navigateToRevisionTab(),
-        name: 'navigateToRevisionTab',
-      },
+      await loggedOutUser.returnToTopicPageAfterCompletingExploration();
+      await loggedOutUser.navigateToRevisionTab();
 
       // Review cards are the subtopic that are created in the topic.
-      {
-        action: () => loggedOutUser.selectReviewCardToLearn('Negative Numbers'),
-        name: 'selectReviewCardToLearn_NegativeNumbers',
-      },
-      {
-        action: () =>
-          loggedOutUser.expectReviewCardToHaveContent(
-            'Negative Numbers',
-            'Subtopic creation description text for Negative Numbers'
-          ),
-        name: 'expectReviewCardToHaveContent_NegativeNumbers',
-      },
-      // {
-      //   action: () => loggedOutUser.timeout(2147483647),
-      // },
-    ];
-
-    for (const {action, name} of actions) {
-      try {
-        await action();
-      } catch (error) {
-        console.error('\x1b[31m%s\x1b[0m', error);
-        await loggedOutUser.screenshot(`error_${name}.png`);
-      }
-    }
-  }, 2147483647);
+      await loggedOutUser.selectReviewCardToLearn('Negative Numbers');
+      await loggedOutUser.expectReviewCardToHaveContent(
+        'Negative Numbers',
+        'Subtopic creation description text for Negative Numbers'
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

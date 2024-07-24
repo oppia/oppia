@@ -224,10 +224,11 @@ const submitAnswerButton = '.e2e-test-submit-answer-button';
 const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 const searchInputSelector = '.e2e-test-search-input';
 const categoryFilterDropdownToggler = '.e2e-test-search-bar-dropdown-toggle';
-const filterOptionsSelector = '.e2e-test-deselected';
+const unselectedFilterOptionsSelector = '.e2e-test-deselected';
+const selectedFilterOptionsSelector = '.e2e-test-selected';
 const languageFilterDropdownToggler =
   '.oppia-search-bar-dropdown-toggle-button';
-const searchResultsSelector = '.e2e-test-exp-summary-tile-title';
+const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
 const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
 const desktopStoryTitleSelector = '.e2e-test-story-title-in-topic-page';
@@ -240,6 +241,7 @@ const reviewCardTitleSelector = '.oppia-subtopic-title';
 const topicNameSelector = '.e2e-test-topic-name';
 const loginPromptContainer = '.story-viewer-login-container';
 const NavbarBackButton = '.oppia-navbar-back-button';
+const lessonCardSelector = '.e2e-test-exploration-dashboard-card';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -2038,30 +2040,34 @@ export class LoggedOutUser extends BaseUser {
    * @param {string[]} categoryNames - The names of the categories to filter by.
    */
   async filterLessonsByCategories(categoryNames: string[]): Promise<void> {
-    try {
-      await this.clickOn(categoryFilterDropdownToggler);
+    await this.clickOn(categoryFilterDropdownToggler);
+    await this.waitForStaticAssetsToLoad();
 
-      await this.page.waitForSelector(filterOptionsSelector);
-      const deselectedCategories = await this.page.$$(filterOptionsSelector);
-      for (const category of deselectedCategories) {
-        const categoryText = await this.page.evaluate(
-          el => el.textContent,
-          category
-        );
-        if (categoryNames.includes(categoryText)) {
-          await category.click();
-        }
-      }
+    await this.page.waitForSelector(unselectedFilterOptionsSelector);
+    const filterOptions = await this.page.$$(unselectedFilterOptionsSelector);
+    let foundMatch = false;
 
-      await this.clickOn(searchInputSelector);
-      await this.page.keyboard.press('Enter');
-    } catch (error) {
-      const newError = new Error(
-        `Failed to filter lessons by categories: ${error}`
+    for (const option of filterOptions) {
+      const optionText = await this.page.evaluate(
+        el => el.textContent.trim(),
+        option
       );
-      newError.stack = error.stack;
-      throw newError;
+
+      if (categoryNames.includes(optionText.trim())) {
+        foundMatch = true;
+        await this.waitForElementToBeClickable(option);
+        await option.click();
+      }
     }
+
+    if (!foundMatch) {
+      throw new Error(
+        `No match found for categories: ${categoryNames.join(', ')}`
+      );
+    }
+
+    await this.clickOn(searchInputSelector);
+    await this.page.keyboard.press('Enter');
   }
 
   /**
@@ -2069,34 +2075,53 @@ export class LoggedOutUser extends BaseUser {
    * @param {string[]} languageNames - The names of the languages to filter by.
    */
   async filterLessonsByLanguage(languageNames: string[]): Promise<void> {
-    try {
-      await this.page.waitForSelector(languageFilterDropdownToggler);
-      const languageFilterDropdownTogglerElement = await this.page.$(
-        languageFilterDropdownToggler
-      );
-      await languageFilterDropdownTogglerElement?.click();
+    await this.page.waitForSelector(languageFilterDropdownToggler);
+    const languageFilterDropdownTogglerElement = await this.page.$(
+      languageFilterDropdownToggler
+    );
+    await languageFilterDropdownTogglerElement?.click();
 
-      await this.page.waitForSelector(filterOptionsSelector);
-      const deselectedLanguages = await this.page.$$(filterOptionsSelector);
-      for (const language of deselectedLanguages) {
-        const languageText = await this.page.evaluate(
-          el => el.textContent,
-          language
-        );
-        if (languageNames.includes(languageText)) {
-          await language.click();
-        }
+    await this.page.waitForSelector(selectedFilterOptionsSelector);
+    const selectedElements = await this.page.$$(selectedFilterOptionsSelector);
+    for (const element of selectedElements) {
+      const elementText = await this.page.evaluate(
+        el => el.textContent.trim(),
+        element
+      );
+      // deselecting english language.
+      if (elementText.trim() === 'English') {
+        await this.waitForElementToBeClickable(element);
+        await element.click();
       }
-
-      await this.clickOn(searchInputSelector);
-      await this.page.keyboard.press('Enter');
-    } catch (error) {
-      const newError = new Error(
-        `Failed to filter lessons by languages: ${error}`
-      );
-      newError.stack = error.stack;
-      throw newError;
     }
+
+    await this.page.waitForSelector(unselectedFilterOptionsSelector);
+    const deselectedLanguages = await this.page.$$(
+      unselectedFilterOptionsSelector
+    );
+    let foundMatch = false;
+
+    for (const language of deselectedLanguages) {
+      const languageText = await this.page.evaluate(
+        el => el.textContent,
+        language
+      );
+
+      if (languageNames.includes(languageText.trim())) {
+        foundMatch = true;
+        await this.waitForElementToBeClickable(language);
+        await language.click();
+      }
+    }
+
+    if (!foundMatch) {
+      throw new Error(
+        `No match found for languages: ${languageNames.join(', ')}`
+      );
+    }
+
+    await this.clickOn(searchInputSelector);
+    await this.page.keyboard.press('Enter');
   }
 
   /**
@@ -2108,20 +2133,21 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     try {
       if (searchResultsExpected.length === 0) {
-        await this.waitForStaticAssetsToLoad();
-        const searchResultsElements = await this.page.$$(searchResultsSelector);
+        await this.waitForPageToFullyLoad();
+        const searchResultsElements = await this.page.$$(
+          lessonCardTitleSelector
+        );
         if (searchResultsElements.length !== 0) {
           throw new Error('No search results expected, but some were found.');
         }
       } else {
-        await this.page.waitForSelector(searchResultsSelector);
-        const searchResultsElements = await this.page.$$(searchResultsSelector);
+        await this.page.waitForSelector(lessonCardTitleSelector);
+        const searchResultsElements = await this.page.$$(
+          lessonCardTitleSelector
+        );
         const searchResults = await Promise.all(
           searchResultsElements.map(result =>
-            this.page.evaluate(
-              el => el.querySelector('span').textContent.trim(),
-              result
-            )
+            this.page.evaluate(el => el.textContent.trim(), result)
           )
         );
 
@@ -2144,7 +2170,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates to the top rated explorations page from the community library.
    */
-  async navigateToTopRatedPage(): Promise<void> {
+  async navigateToTopRatedLessonsPage(): Promise<void> {
     await this.navigateToCommunityLibraryPage();
     await this.clickAndWaitForNavigation('Top-Rated Explorations');
   }
@@ -2153,7 +2179,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the top rated explorations are in a specific order.
    * @param {string[]} expectedOrder - The expected order of the top rated explorations.
    */
-  async expectExplorationsInOrder(expectedOrder: string[]): Promise<void> {
+  async expectLessonsInOrder(expectedOrder: string[]): Promise<void> {
     try {
       await this.page.waitForSelector(explorationTitleSelector);
       const explorationTitles = await this.page.$$(explorationTitleSelector);
@@ -2164,7 +2190,7 @@ export class LoggedOutUser extends BaseUser {
         );
         if (titleText.trim() !== expectedOrder[i]) {
           throw new Error(
-            `Exploration at position ${i} is "${titleText}", but expected "${expectedOrder[i]}".`
+            `Exploration at position ${i} is "${titleText.trim()}", but expected "${expectedOrder[i]}".`
           );
         }
       }
@@ -2180,7 +2206,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates to the page recently published explorations page.
    */
-  async navigateToRecentlyPublishedPage(): Promise<void> {
+  async navigateToRecentlyPublishedLessonsPage(): Promise<void> {
     await this.goto(recentlyPublishedExplorationsPageUrl);
   }
 
@@ -2190,36 +2216,39 @@ export class LoggedOutUser extends BaseUser {
    * @param {number} expectedRating - The expected rating of the exploration.
    * @param {string} expectedExplorationName - The name of the exploration to check.
    */
-  async expectExplorationToHaveRating(
+  async expectLessonsToHaveRating(
     expectedRating: number,
     expectedExplorationName: string
   ): Promise<void> {
     try {
-      await this.page.waitForSelector(explorationTitleSelector);
-      const explorationTitles = await this.page.$$(explorationTitleSelector);
-      for (const title of explorationTitles) {
+      await this.page.waitForSelector(lessonCardSelector);
+      const cards = await this.page.$$(lessonCardSelector);
+      for (const card of cards) {
+        await card.waitForSelector(lessonCardTitleSelector);
+        const titleElement = await card.$(lessonCardTitleSelector);
         const titleText = await this.page.evaluate(
-          el => el.querySelector('span > span').textContent,
-          title
+          el => el.textContent.trim(),
+          titleElement
         );
-        if (titleText.trim() === expectedExplorationName) {
-          // If the exploration name matches, fetch the rating and check if it matches the expected rating.
-          await this.page.waitForSelector(explorationRatingSelector);
-          const ratingElement = await title.$(explorationRatingSelector);
-          const ratingText = await this.page.evaluate(
-            el => el.querySelector('span:nth-child(2)').textContent,
-            ratingElement
-          );
-          const rating = parseFloat(ratingText);
-          if (rating !== expectedRating) {
-            throw new Error(
-              `Rating for exploration "${expectedExplorationName}" is ${rating}, but expected ${expectedRating}.`
+        if (titleText === expectedExplorationName) {
+          await card.waitForSelector(explorationRatingSelector);
+          const ratingElement = await card.$(explorationRatingSelector);
+          if (ratingElement) {
+            const ratingSpan = await ratingElement.$('span:nth-child(2)');
+            const ratingText = await this.page.evaluate(
+              el => el.textContent.trim(),
+              ratingSpan
             );
+            const rating = parseFloat(ratingText);
+            if (rating !== expectedRating) {
+              throw new Error(
+                `Rating for exploration "${expectedExplorationName}" is ${rating}, but expected ${expectedRating}.`
+              );
+            }
+            return;
           }
-          return;
         }
       }
-
       throw new Error(
         `Exploration "${expectedExplorationName}" not found in exploration titles.`
       );
@@ -2364,8 +2393,9 @@ export class LoggedOutUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickAndWaitForNavigation('Return to Story');
       await this.clickAndWaitForNavigation(NavbarBackButton);
+    } else {
+      await this.clickAndWaitForNavigation(oppiaTopicTitleSelector);
     }
-    await this.clickAndWaitForNavigation(oppiaTopicTitleSelector);
   }
 
   /**
@@ -2455,14 +2485,6 @@ export class LoggedOutUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
-  }
-
-  async timeout(time) {
-    await this.page.waitForTimeout(time);
-  }
-
-  async screenshot(path) {
-    await this.page.screenshot({path: `${path}`});
   }
 }
 

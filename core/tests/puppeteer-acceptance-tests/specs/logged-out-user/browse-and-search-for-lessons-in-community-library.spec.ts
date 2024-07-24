@@ -54,83 +54,47 @@ describe('Logged-out User', function () {
       'Excellent advanced Algebra course',
       false
     );
+
+    await explorationEditor.playExploration(explorationId2);
+    await explorationEditor.rateExploration(
+      4,
+      'Excellent advanced Algebra course',
+      false
+    );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it('should be able to browse and search for lessons and see the rating of lessons in the community library', async function () {
-    const actions = [
-      {
-        action: () => loggedOutUser.navigateToCommunityLibraryPage(),
-        name: 'navigateToCommunityLibraryPage',
-      },
-      {
-        action: () => loggedOutUser.searchForLessonInSearchBar('Algebra II'),
-        name: 'searchForLessonInSearchBar_AlgebraII',
-      },
-      {
-        action: () =>
-          loggedOutUser.expectSearchResultsToContain([
-            'Algebra I',
-            'Algebra II',
-          ]),
-        name: 'expectSearchResultsToContain_AlgebraII',
-      },
-      {
-        action: () => loggedOutUser.filterLessonsByCategories(['Algorithm']),
-        name: 'filterLessonsByCategories_Algebra',
-      },
-      {
-        action: () =>
-          loggedOutUser.expectSearchResultsToContain(['Algebra II']),
-        name: 'expectSearchResultsToContain_AlgebraII',
-      },
-      {
-        action: () => loggedOutUser.filterLessonsByLanguage(['Aken']),
-        name: 'filterLessonsByLanguage_English',
-      },
-      {
-        action: () => loggedOutUser.expectSearchResultsToContain([]),
-        name: 'expectSearchResultsToContain_AlgebraII',
-      },
-      // Access the top-rated page at /community-library/top-rated, which shows explorations with high ratings.
-      {
-        action: () => loggedOutUser.navigateToTopRatedPage(),
-        name: 'navigateToTopRatedPage',
-      },
-      {
-        action: () =>
-          loggedOutUser.expectExplorationsInOrder(['Algebra II', 'Algebra I']),
-        name: 'expectExplorationsInOrder_AlgebraII_AlgebraI',
-      },
-      // Visit the recently published explorations page at /community-library/recently-published.
-      {
-        action: () => loggedOutUser.navigateToRecentlyPublishedPage(),
-        name: 'navigateToRecentlyPublishedPage',
-      },
-      {
-        action: () =>
-          loggedOutUser.expectExplorationsInOrder(['Algebra I', 'Algebra II']),
-        name: 'expectExplorationsInOrder_AlgebraI_AlgebraII',
-      },
-      // View the ratings on an exploration once a minimum number of ratings have been submitted.
-      {
-        action: () =>
-          loggedOutUser.expectExplorationToHaveRating(4, 'Algebra I'),
-        name: 'expectExplorationToHaveRating_4_AlgebraI',
-      },
-      {
-        action: () => loggedOutUser.timeout(2147483647),
-      },
-    ];
+  it(
+    'should be able to browse and search for lessons and see the rating of lessons in the community library',
+    async function () {
+      await loggedOutUser.navigateToCommunityLibraryPage();
 
-    for (const {action, name} of actions) {
-      try {
-        await action();
-      } catch (error) {
-        console.error('\x1b[31m%s\x1b[0m', error);
-        await loggedOutUser.screenshot(`error_${name}.png`);
-      }
-    }
-  }, 2147483647);
+      await loggedOutUser.searchForLessonInSearchBar('Algebra II');
+      await loggedOutUser.expectSearchResultsToContain([
+        'Algebra I',
+        'Algebra II',
+      ]);
+
+      await loggedOutUser.filterLessonsByCategories(['Algorithms']);
+      await loggedOutUser.expectSearchResultsToContain(['Algebra II']);
+
+      await loggedOutUser.filterLessonsByLanguage(['Ákán']);
+      // No lessons are created in the Ákán language.
+      await loggedOutUser.expectSearchResultsToContain([]);
+
+      // Access the top-rated page at /community-library/top-rated, which shows explorations with high ratings.
+      await loggedOutUser.navigateToTopRatedLessonsPage();
+      await loggedOutUser.expectLessonsInOrder(['Algebra I', 'Algebra II']);
+
+      // Visit the recently published explorations page at /community-library/recently-published.
+      await loggedOutUser.navigateToRecentlyPublishedLessonsPage();
+      await loggedOutUser.expectLessonsInOrder(['Algebra II', 'Algebra I']);
+
+      // View the ratings on an exploration once a minimum number of ratings have been submitted.
+      await loggedOutUser.expectLessonsToHaveRating(5, 'Algebra I');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
