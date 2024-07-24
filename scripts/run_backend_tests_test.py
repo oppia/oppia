@@ -32,10 +32,11 @@ from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts import concurrent_task_utils
+from scripts import git_changes_utils
 from scripts import install_third_party_libs
 from scripts import servers
 
-from typing import Callable, Final, List, Tuple
+from typing import Callable, Dict, Final, List, Set, Tuple
 
 TEST_RUNNER_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'gae_suite.py'
@@ -500,18 +501,19 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             run_backend_tests.main(
                 args=['--test_path', 'scripts.run_backend_tests'])
 
-    def test_invalid_delimiter_in_test_target_argument_throws_error(
+    def test_invalid_delimiter_in_test_targets_argument_throws_error(
             self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
         with self.assertRaisesRegex(
-            Exception, r'The delimiter in test_target should be a dot \(\.\)'
+            Exception,
+            r'The delimiter in each test_target should be a dot \(\.\)'
         ):
             run_backend_tests.main(
-                args=['--test_target', 'scripts/run_backend_tests'])
+                args=['--test_targets', 'scripts/run_backend_tests'])
 
-    def test_invalid_test_target_message_is_displayed_correctly(self) -> None:
+    def test_invalid_test_targets_message_is_displayed_correctly(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
         swap_check_results = self.swap(
@@ -524,7 +526,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             with self.swap_cloud_datastore_emulator, swap_check_results:
                 with self.print_swap:
                     run_backend_tests.main(
-                        args=['--test_target', 'scripts.run_backend_tests.py'])
+                        args=['--test_targets', 'scripts.run_backend_tests.py'])
 
         self.assertIn(
             'WARNING : test_target flag should point to the test file.',
@@ -532,7 +534,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'Redirecting to its corresponding test file...', self.print_arr)
 
-    def test_invalid_test_target_message_is_displayed_docker(self) -> None:
+    def test_invalid_test_targets_message_is_displayed_docker(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
         swap_check_results = self.swap(
@@ -546,7 +548,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 with self.swap_cloud_datastore_emulator, swap_check_results:
                     with self.print_swap, self.swap_redis_server:
                         run_backend_tests.main(
-                            args=['--test_target',
+                            args=['--test_targets',
                                   'scripts.run_backend_tests.py'])
 
         self.assertIn(
@@ -594,7 +596,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     Exception, 'WARNING: No tests were run.'
                 ):
                     run_backend_tests.main(
-                        args=['--test_target', 'scripts.run_backend_tests_test']
+                        args=[
+                            '--test_targets',
+                            'scripts.run_backend_tests_test'
+                        ]
                     )
 
     def test_incomplete_overall_backend_coverage_throws_error(self) -> None:
@@ -673,7 +678,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00))
 
-        args = ['--test_target', test_target, '--generate_coverage_report']
+        args = ['--test_targets', test_target, '--generate_coverage_report']
         with self.print_swap:
             with swap_check_coverage, self.swap_redis_server, swap_execute_task:
                 with self.swap_cloud_datastore_emulator, swap_check_results:
@@ -681,6 +686,46 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(executed_tasks), 1)
         self.assertEqual(executed_tasks[0].name, test_target)
+        self.assertIn('All tests passed.', self.print_arr)
+        self.assertIn('Done!', self.print_arr)
+
+    def test_multiple_tests_in_test_targets_argument_is_run_successfully(
+        self
+    ) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import run_backend_tests
+
+        executed_tasks = []
+        test_targets = (
+            'scripts.test_file_test.NewTestFileTests.test_for_something,'
+            'scripts.test_file_test.NewTestFileTests.test_for_something_else'
+        )
+
+        def mock_execute(
+            tasks: List[concurrent_task_utils.TaskThread], *_: str
+        ) -> None:
+            for task in tasks:
+                executed_tasks.append(task)
+
+        swap_execute_task = self.swap(
+            concurrent_task_utils, 'execute_tasks', mock_execute)
+        swap_check_results = self.swap(
+            run_backend_tests, 'check_test_results',
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
+        swap_check_coverage = self.swap(
+            run_backend_tests, 'check_coverage',
+            lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00))
+
+        args = ['--test_targets', test_targets, '--generate_coverage_report']
+        with self.print_swap:
+            with swap_check_coverage, self.swap_redis_server, swap_execute_task:
+                with self.swap_cloud_datastore_emulator, swap_check_results:
+                    run_backend_tests.main(args=args)
+
+        self.assertEqual(len(executed_tasks), 2)
+        self.assertEqual(
+            executed_tasks[0].name, test_targets.split(',', maxsplit=1)[0])
+        self.assertEqual(executed_tasks[1].name, test_targets.split(',')[1])
         self.assertIn('All tests passed.', self.print_arr)
         self.assertIn('Done!', self.print_arr)
 
@@ -894,3 +939,119 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         self.assertIn('Task result', results[0].messages)
         self.assertEqual(len(results[0].messages), 1)
+
+    def test_backend_tests_with_run_on_changed_files(self) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import run_backend_tests
+        git_refs = [git_changes_utils.GitRef(
+            'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1')]
+        def mock_get_remote_name() -> bytes:
+            return b'remote'
+        def mock_get_refs() -> List[git_changes_utils.GitRef]:
+            return git_refs
+        def mock_get_changed_files(
+            unused_refs: List[git_changes_utils.GitRef],
+            unused_remote_name: str
+        ) -> Dict[str, Tuple[List[git_changes_utils.FileDiff], List[bytes]]]:
+            return {
+                'branch1': (
+                    [git_changes_utils.FileDiff('M', b'test/file1.py'),
+                     git_changes_utils.FileDiff('M', b'file2.ts'),
+                     git_changes_utils.FileDiff('M', b'test/file3.py')],
+                    [b'test/file1.py', b'file2.ts', b'test/file3.py']
+                ),
+                'branch2': (
+                    [],
+                    []
+                )
+            }
+        def mock_get_staged_acmrt_files() -> List[bytes]:
+            return [
+                b'test/file1.py',
+                b'file2.ts',
+                b'test/file3.py',
+                b'test/file4.py'
+            ]
+        def mock_get_python_dot_test_files_from_diff(
+            diff_files: List[bytes]
+        ) -> Set[str]:
+            if diff_files == [
+                b'test/file1.py',
+                b'file2.ts',
+                b'test/file3.py'
+            ]:
+                return {
+                    'scripts.file1_test.py',
+                    'scripts.file3_test.py'
+                }
+            elif diff_files == [
+                b'test/file1.py',
+                b'file2.ts',
+                b'test/file3.py',
+                b'test/file4.py'
+            ]:
+                return {
+                    'scripts.file1_test.py',
+                    'scripts.file3_test.py',
+                    'scripts.file4_test.py'
+                }
+            return set()
+        get_remote_name_swap = self.swap(
+            git_changes_utils, 'get_local_git_repository_remote_name',
+            mock_get_remote_name)
+        get_refs_swap = self.swap(
+            git_changes_utils, 'get_refs', mock_get_refs)
+        get_changed_files_swap = self.swap_with_checks(
+            git_changes_utils, 'get_changed_files', mock_get_changed_files,
+            expected_args=[(git_refs, 'remote')])
+        get_staged_acmrt_files_swap = self.swap(
+            git_changes_utils, 'get_staged_acmrt_files',
+            mock_get_staged_acmrt_files)
+        get_python_dot_test_files_from_diff_swap = self.swap_with_checks(
+            git_changes_utils, 'get_python_dot_test_files_from_diff',
+            mock_get_python_dot_test_files_from_diff,
+            expected_args=[
+                (
+                    [
+                        b'test/file1.py',
+                        b'file2.ts',
+                        b'test/file3.py'
+                    ],
+                ),
+                (
+                    [
+                        b'test/file1.py',
+                        b'file2.ts',
+                        b'test/file3.py',
+                        b'test/file4.py'
+                    ],
+                )
+            ]
+        )
+        swap_check_results = self.swap(
+            run_backend_tests, 'check_test_results',
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
+        swap_check_coverage = self.swap(
+            run_backend_tests, 'check_coverage',
+            lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00))
+        with self.swap_execute_task, swap_check_coverage, get_refs_swap:
+            with self.swap_cloud_datastore_emulator, swap_check_results:
+                with self.swap_redis_server, get_remote_name_swap:
+                    with get_changed_files_swap, get_staged_acmrt_files_swap:
+                        with get_python_dot_test_files_from_diff_swap:
+                            run_backend_tests.main(
+                                args=['--run_on_changed_files'])
+
+    def test_backend_tests_with_run_on_changed_files_no_remote(self) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import run_backend_tests
+        def mock_get_remote_name() -> bytes:
+            return b''
+        get_remote_name_swap = self.swap(
+            git_changes_utils, 'get_local_git_repository_remote_name',
+            mock_get_remote_name)
+
+        with get_remote_name_swap, self.assertRaisesRegex(
+            SystemExit, 'Error: No remote repository found.'
+        ):
+            run_backend_tests.main(args=['--run_on_changed_files'])
