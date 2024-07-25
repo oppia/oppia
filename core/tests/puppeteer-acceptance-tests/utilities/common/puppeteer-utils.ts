@@ -138,7 +138,7 @@ export class BaseUser {
   }
 
   /**
-   * Checks if the application is in development mode.
+   * Checks if the application is in production mode.
    * @returns {Promise<boolean>} Returns true if the application is in development mode,
    * false otherwise.
    */
@@ -595,6 +595,15 @@ export class BaseUser {
       lastHTMLSize = currentHTMLSize;
       await page.waitForTimeout(checkDurationMsecs);
     }
+  }
+
+  /**
+   * Creates a new tab in the browser and switches to it.
+   */
+  async createAndSwitchToNewTab() {
+    const newPage = await this.browserObject.newPage();
+    await newPage.bringToFront();
+    return newPage;
   }
 }
 
