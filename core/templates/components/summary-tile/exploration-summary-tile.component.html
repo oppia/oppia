@@ -25,7 +25,8 @@
         <span class="activity-title e2e-test-exp-summary-tile-title">
           <span *ngIf="isWindowLarge">
             <span *ngIf="!isHackyExpTitleTranslationDisplayed()"
-                  [attr.aria-label]="'exploration title:' + explorationTitle + '.'">
+                  [attr.aria-label]="'exploration title:' + explorationTitle + '.'"
+                  class="e2e-test-exploration-tile-title">
               {{ explorationTitle | truncate:40 }}
             </span>
             <span *ngIf="isHackyExpTitleTranslationDisplayed()"

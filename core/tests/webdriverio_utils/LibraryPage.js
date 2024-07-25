@@ -51,7 +51,6 @@ var LibraryPage = function () {
   var categorySelector = forms.MultiSelectEditor(
     $('.e2e-test-search-bar-category-selector')
   );
-  var expSummaryTileRatingLocator = '.e2e-test-exp-summary-tile-rating';
   var expSummaryTileObjectiveLocator = '.e2e-test-exp-summary-tile-objective';
   var languageSelector = forms.MultiSelectEditor(
     $('.e2e-test-search-bar-language-selector')
@@ -231,19 +230,6 @@ var LibraryPage = function () {
       elems[0].$(expSummaryTileObjectiveLocator)
     );
     return explorationObjective;
-  };
-
-  this.expectExplorationRatingToEqual = async function (name, ratingValue) {
-    var elems = await _getExplorationElements(name);
-    await waitFor.visibilityOf(
-      elems[0],
-      'Rating card takes too long to appear'
-    );
-    var explorationRatingValue = await action.getText(
-      'Exp Summary Tile',
-      elems[0].$(expSummaryTileRatingLocator)
-    );
-    expect(explorationRatingValue).toBe(ratingValue);
   };
 
   this.clickCreateActivity = async function () {
