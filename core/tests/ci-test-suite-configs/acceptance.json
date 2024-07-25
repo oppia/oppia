@@ -117,6 +117,14 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/visit-classroom-index-page.spec.ts"
     },
     {
+      "name": "logged-out-user/browse-and-search-for-lessons-in-community-library",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/browse-and-search-for-lessons-in-community-library.spec.ts"
+    },
+    {
+      "name": "logged-out-user/select-and-play-topic-from-classroom-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/select-and-play-topic-from-classroom-page.spec.ts"
+    },
+    {
       "name": "moderator/edit-featured-activities-list",
       "module": "core/tests/puppeteer-acceptance-tests/specs/moderator/edit-featured-activities-list.spec.ts"
     },

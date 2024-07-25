@@ -29,6 +29,8 @@ const creatorDashboardCreateModeUrl =
 const blogUrl = testConstants.URLs.Blog;
 const ccLicenseUrl = testConstants.URLs.CCLicense;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
+const recentlyPublishedExplorationsPageUrl =
+  testConstants.URLs.recentlyPublishedExplorations;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
 const classroomsPage = testConstants.URLs.ClassroomsPage;
@@ -209,18 +211,37 @@ const privacyPolicyLinkInTermsPage = '.e2e-test-privacy-policy-link';
 const ccLicenseLinkInTermsPage = '.e2e-test-cc-license-link';
 const googleGroupSignUpLinkInTermsPage =
   '.e2e-test-oppia-announce-google-group-link';
-
 const emailLinkSelector = '.oppia-contact-mail';
-
 const mobileDonateButtonOnDonatePage = '.donate-modal-button';
 const donateModalIframeSelector = '.e2e-test-donate-page-iframe';
-
 const classroomNameHeading = '.e2e-test-classroom-name';
-
 const errorPageHeading = '.e2e-test-error-page-heading';
-
 const classroomTileContainer = '.oppia-classroom-tile-container';
 
+const floatFormInput = '.e2e-test-float-form-input';
+const nextCardButton = '.e2e-test-next-card-button';
+const submitAnswerButton = '.e2e-test-submit-answer-button';
+const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
+const searchInputSelector = '.e2e-test-search-input';
+const categoryFilterDropdownToggler = '.e2e-test-search-bar-dropdown-toggle';
+const unselectedFilterOptionsSelector = '.e2e-test-deselected';
+const selectedFilterOptionsSelector = '.e2e-test-selected';
+const languageFilterDropdownToggler =
+  '.oppia-search-bar-dropdown-toggle-button';
+const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
+const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
+const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
+const desktopStoryTitleSelector = '.e2e-test-story-title-in-topic-page';
+const mobileStoryTitleSelector = '.e2e-test-mobile-story-title';
+const chapterTitleSelector = '.e2e-test-chapter-title';
+const oppiaTopicTitleSelector = '.oppia-topic-title';
+const topicPageLessonTabSelector = '.e2e-test-revision-tab-link';
+const subTopicTitleInLessTabSelector = '.subtopic-title';
+const reviewCardTitleSelector = '.oppia-subtopic-title';
+const topicNameSelector = '.e2e-test-topic-name';
+const loginPromptContainer = '.story-viewer-login-container';
+const NavbarBackButton = '.oppia-navbar-back-button';
+const lessonCardSelector = '.e2e-test-exploration-dashboard-card';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -333,6 +354,12 @@ export class LoggedOutUser extends BaseUser {
     await this.goto(classroomsPage);
   }
 
+  /**
+   *  Function to navigate to the community library page.
+   */
+  async navigateToCommunityLibraryPage(): Promise<void> {
+    await this.goto(communityLibraryUrl);
+  }
   /**
    * Function to click a button and check if it opens the expected destination.
    */
@@ -1923,6 +1950,544 @@ export class LoggedOutUser extends BaseUser {
     }
 
     showMessage(`User is on error page with status code ${statusCode}.`);
+  }
+
+  /**
+   * Function to navigate to the next card in the preview tab.
+   */
+  async continueToNextCard(): Promise<void> {
+    await this.clickOn(nextCardButton);
+  }
+
+  /**
+   * Function to submit an answer to a form input field.
+   *
+   * This function first determines the type of the input field in the DOM using the getInputType function.
+   * Currently, it only supports 'text', 'number', and 'float' input types. If the input type is anything else, it throws an error.
+   * @param {string} answer - The answer to submit.
+   */
+  async submitAnswer(answer: string): Promise<void> {
+    await this.waitForElementToBeClickable(floatFormInput);
+    const inputType = await this.getInputType(floatFormInput);
+
+    switch (inputType) {
+      case 'text':
+      case 'number':
+      case 'float':
+        await this.page.waitForSelector(floatFormInput);
+        await this.page.type(floatFormInput, answer);
+        break;
+      default:
+        throw new Error(`Unsupported input type: ${inputType}`);
+    }
+
+    await this.clickOn(submitAnswerButton);
+  }
+
+  /**
+   * Function to Get the type of an input field in the DOM.
+   * @param {string} selector - The CSS selector for the input field.
+   */
+  async getInputType(selector: string): Promise<string> {
+    const inputField = await this.page.$(selector);
+    if (!inputField) {
+      throw new Error(`Input field not found for selector: ${selector}`);
+    }
+    const inputType = (await (
+      await inputField.getProperty('type')
+    ).jsonValue()) as string;
+    return inputType;
+  }
+
+  /**
+   * Function to verify if the exploration is completed via checking the toast message.
+   * @param {string} message - The expected toast message.
+   */
+  async expectExplorationCompletionToastMessage(
+    message: string
+  ): Promise<void> {
+    await this.page.waitForSelector(explorationCompletionToastMessage, {
+      visible: true,
+    });
+    const element = await this.page.$(explorationCompletionToastMessage);
+    const toastMessage = await this.page.evaluate(
+      element => element.textContent,
+      element
+    );
+    if (!toastMessage || !toastMessage.includes(message)) {
+      throw new Error('Exploration did not complete successfully');
+    }
+    showMessage('Exploration has completed successfully');
+    await this.page.waitForSelector(explorationCompletionToastMessage, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Searches for a lesson in the search bar present in the community library.
+   * @param {string} lessonName - The name of the lesson to search for.
+   */
+  async searchForLessonInSearchBar(lessonName: string): Promise<void> {
+    await this.clickOn(searchInputSelector);
+    await this.type(searchInputSelector, lessonName);
+
+    await this.page.keyboard.press('Enter');
+    await this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']});
+  }
+
+  /**
+   * Filters lessons by multiple categories.
+   * @param {string[]} categoryNames - The names of the categories to filter by.
+   */
+  async filterLessonsByCategories(categoryNames: string[]): Promise<void> {
+    await this.clickOn(categoryFilterDropdownToggler);
+    await this.waitForStaticAssetsToLoad();
+
+    await this.page.waitForSelector(unselectedFilterOptionsSelector);
+    const filterOptions = await this.page.$$(unselectedFilterOptionsSelector);
+    let foundMatch = false;
+
+    for (const option of filterOptions) {
+      const optionText = await this.page.evaluate(
+        el => el.textContent.trim(),
+        option
+      );
+
+      if (categoryNames.includes(optionText.trim())) {
+        foundMatch = true;
+        await this.waitForElementToBeClickable(option);
+        await option.click();
+      }
+    }
+
+    if (!foundMatch) {
+      throw new Error(
+        `No match found for categories: ${categoryNames.join(', ')}`
+      );
+    }
+
+    await this.clickOn(searchInputSelector);
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Filters lessons by multiple languages and deselect the already selected English language.
+   * @param {string[]} languageNames - The names of the languages to filter by.
+   */
+  async filterLessonsByLanguage(languageNames: string[]): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.waitForPageToFullyLoad();
+    }
+    await this.page.waitForSelector(languageFilterDropdownToggler);
+    const languageFilterDropdownTogglerElement = await this.page.$(
+      languageFilterDropdownToggler
+    );
+    await languageFilterDropdownTogglerElement?.click();
+    await this.waitForStaticAssetsToLoad();
+
+    await this.page.waitForSelector(selectedFilterOptionsSelector);
+    const selectedElements = await this.page.$$(selectedFilterOptionsSelector);
+    for (const element of selectedElements) {
+      const elementText = await this.page.evaluate(
+        el => el.textContent.trim(),
+        element
+      );
+      // Deselecting english language.
+      if (elementText === 'English') {
+        await element.click();
+      }
+    }
+
+    await this.page.waitForSelector(unselectedFilterOptionsSelector);
+    const deselectedLanguages = await this.page.$$(
+      unselectedFilterOptionsSelector
+    );
+    let foundMatch = false;
+
+    for (const language of deselectedLanguages) {
+      const languageText = await this.page.evaluate(
+        el => el.textContent,
+        language
+      );
+
+      if (languageNames.includes(languageText.trim())) {
+        foundMatch = true;
+        await this.waitForElementToBeClickable(language);
+        await language.click();
+      }
+    }
+
+    if (!foundMatch) {
+      throw new Error(
+        `No match found for languages: ${languageNames.join(', ')}`
+      );
+    }
+
+    await this.clickOn(searchInputSelector);
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Checks if the search results contain a specific result.
+   * @param {string[]} searchResultsExpected - The search result to check for.
+   */
+  async expectSearchResultsToContain(
+    searchResultsExpected: string[]
+  ): Promise<void> {
+    try {
+      if (searchResultsExpected.length === 0) {
+        await this.waitForPageToFullyLoad();
+        const searchResultsElements = await this.page.$$(
+          lessonCardTitleSelector
+        );
+        if (searchResultsElements.length !== 0) {
+          throw new Error('No search results expected, but some were found.');
+        }
+      } else {
+        await this.page.waitForSelector(lessonCardTitleSelector);
+        const searchResultsElements = await this.page.$$(
+          lessonCardTitleSelector
+        );
+        const searchResults = await Promise.all(
+          searchResultsElements.map(result =>
+            this.page.evaluate(el => el.textContent.trim(), result)
+          )
+        );
+
+        for (const resultExpected of searchResultsExpected) {
+          if (!searchResults.includes(resultExpected)) {
+            throw new Error(
+              `Search result "${resultExpected}" not found in search results.`
+            );
+          }
+        }
+        showMessage('All expected search results found in search results.');
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to check search results: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Navigates to the top rated explorations page from the community library.
+   */
+  async navigateToTopRatedLessonsPage(): Promise<void> {
+    await this.navigateToCommunityLibraryPage();
+    await this.clickAndWaitForNavigation('Top-Rated Explorations');
+  }
+
+  /**
+   * Checks if the top rated explorations are in a specific order.
+   * @param {string[]} expectedOrder - The expected order of the top rated explorations.
+   */
+  async expectLessonsInOrder(expectedOrder: string[]): Promise<void> {
+    try {
+      await this.page.waitForSelector(explorationTitleSelector);
+      const explorationTitles = await this.page.$$(explorationTitleSelector);
+      for (let i = 0; i < explorationTitles.length; i++) {
+        const titleText = await this.page.evaluate(
+          el => el.querySelector('span > span').textContent,
+          explorationTitles[i]
+        );
+        if (titleText.trim() !== expectedOrder[i]) {
+          throw new Error(
+            `Exploration at position ${i} is "${titleText.trim()}", but expected "${expectedOrder[i]}".`
+          );
+        }
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to check order explorations: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Navigates to the page recently published explorations page.
+   */
+  async navigateToRecentlyPublishedLessonsPage(): Promise<void> {
+    await this.goto(recentlyPublishedExplorationsPageUrl);
+  }
+
+  /**
+   * Checks if an exploration has a specific rating.
+   *
+   * @param {number} expectedRating - The expected rating of the exploration.
+   * @param {string} expectedExplorationName - The name of the exploration to check.
+   */
+  async expectLessonsToHaveRating(
+    expectedRating: number,
+    expectedExplorationName: string
+  ): Promise<void> {
+    try {
+      await this.page.waitForSelector(lessonCardSelector);
+      const cards = await this.page.$$(lessonCardSelector);
+      for (const card of cards) {
+        await card.waitForSelector(lessonCardTitleSelector);
+        const titleElement = await card.$(lessonCardTitleSelector);
+        const titleText = await this.page.evaluate(
+          el => el.textContent.trim(),
+          titleElement
+        );
+        if (titleText === expectedExplorationName) {
+          await card.waitForSelector(explorationRatingSelector);
+          const ratingElement = await card.$(explorationRatingSelector);
+          if (ratingElement) {
+            const ratingSpan = await ratingElement.$('span:nth-child(2)');
+            const ratingText = await this.page.evaluate(
+              el => el.textContent.trim(),
+              ratingSpan
+            );
+            const rating = parseFloat(ratingText);
+            if (rating !== expectedRating) {
+              throw new Error(
+                `Rating for exploration "${expectedExplorationName}" is ${rating}, but expected ${expectedRating}.`
+              );
+            }
+            return;
+          }
+        }
+      }
+      throw new Error(
+        `Exploration "${expectedExplorationName}" not found in exploration titles.`
+      );
+    } catch (error) {
+      const newError = new Error(
+        `Failed to check rating of exploration: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Checks if a list of topics are present.
+   * @param {string[]} expectedTopicNames - The names of the topics to check for.
+   */
+  async expectTopicsToBePresent(expectedTopicNames: string[]): Promise<void> {
+    try {
+      await this.page.waitForSelector(topicNameSelector);
+      const topicNames = await this.page.$$(topicNameSelector);
+      const topicNameTexts = await Promise.all(
+        topicNames.map(name =>
+          this.page.evaluate(el => el.textContent.trim(), name)
+        )
+      );
+
+      for (const expectedName of expectedTopicNames) {
+        if (!topicNameTexts.includes(expectedName.trim())) {
+          throw new Error(`Topic "${expectedName}" not found in topic names.`);
+        }
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to check for topics: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Selects and opens a topic by its name.
+   * @param {string} topicName - The name of the topic to select and open.
+   */
+  async selectAndOpenTopic(topicName: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(topicNameSelector);
+      const topicNames = await this.page.$$(topicNameSelector);
+      for (const name of topicNames) {
+        const nameText = await this.page.evaluate(
+          el => el.textContent.trim(),
+          name
+        );
+        if (nameText === topicName.trim()) {
+          await Promise.all([
+            this.page.waitForNavigation({waitUntil: ['networkidle2', 'load']}),
+            this.waitForElementToBeClickable(name),
+            name.click(),
+          ]);
+          return;
+        }
+      }
+
+      throw new Error(`Topic "${topicName}" not found in topic names.`);
+    } catch (error) {
+      const newError = new Error(`Failed to select and open topic: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Selects and opens a chapter within a story to learn.
+   * @param {string} chapterName - The name of the chapter to select and open.
+   * @param {string} storyName - The name of the story containing the chapter.
+   */
+  async selectChapterWithinStoryToLearn(
+    chapterName: string,
+    storyName: string
+  ): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const storyTitleSelector = isMobileViewport
+      ? mobileStoryTitleSelector
+      : desktopStoryTitleSelector;
+
+    try {
+      const storyTitles = await this.page.$$(storyTitleSelector);
+      for (const title of storyTitles) {
+        const titleText = await this.page.evaluate(
+          el => el.textContent.trim(),
+          title
+        );
+        if (titleText.trim() === storyName.trim()) {
+          await Promise.all([
+            this.page.waitForNavigation({waitUntil: ['networkidle0', 'load']}),
+            this.waitForElementToBeClickable(title),
+            title.click(),
+          ]);
+
+          const isLoginPromptContainerPresent =
+            await this.page.$(loginPromptContainer);
+          if (isLoginPromptContainerPresent) {
+            await this.clickOn('SKIP');
+          }
+
+          const chapterTitles = await this.page.$$(chapterTitleSelector);
+          for (const chapter of chapterTitles) {
+            const chapterText = await this.page.evaluate(
+              el => el.textContent.trim(),
+              chapter
+            );
+            if (chapterText.trim().includes(chapterName.trim())) {
+              await Promise.all([
+                this.page.waitForNavigation({
+                  waitUntil: ['networkidle0', 'load'],
+                }),
+                this.waitForElementToBeClickable(chapter),
+                chapter.click(),
+              ]);
+              return;
+            }
+          }
+
+          throw new Error(
+            `Chapter "${chapterName}" not found in story "${storyName}".`
+          );
+        }
+      }
+
+      throw new Error(`Story "${storyName}" not found in story titles.`);
+    } catch (error) {
+      const newError = new Error(
+        `Failed to select and open chapter within story: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Navigates back to the topic page after completing an exploration.
+   */
+  async returnToTopicPageAfterCompletingExploration(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickAndWaitForNavigation('Return to Story');
+      await this.clickAndWaitForNavigation(NavbarBackButton);
+    } else {
+      await this.clickAndWaitForNavigation(oppiaTopicTitleSelector);
+    }
+  }
+
+  /**
+   * Navigates to the revision tab on the topic page.
+   */
+  async navigateToRevisionTab(): Promise<void> {
+    await this.page.waitForSelector(topicPageLessonTabSelector);
+    const topicPageRevisionTabSelectorElement = await this.page.$(
+      topicPageLessonTabSelector
+    );
+    await topicPageRevisionTabSelectorElement?.click();
+  }
+
+  /**
+   * Selects a review card based on the subtopic name.
+   * @param {string} subtopicName - The name of the subtopic to select.
+   */
+  async selectReviewCardToLearn(subtopicName: string): Promise<void> {
+    try {
+      const subtopicElements = await this.page.$$(
+        subTopicTitleInLessTabSelector
+      );
+
+      for (let i = 0; i < subtopicElements.length; i++) {
+        const innerText = await this.page.evaluate(
+          el => el.innerText,
+          subtopicElements[i]
+        );
+
+        if (innerText.trim() === subtopicName) {
+          await Promise.all([
+            this.page.waitForNavigation({
+              waitUntil: ['networkidle0', 'load'],
+            }),
+            this.waitForElementToBeClickable(subtopicElements[i]),
+            subtopicElements[i].click(),
+          ]);
+          return;
+        }
+      }
+
+      throw new Error(`No subtopic found with the name: ${subtopicName}`);
+    } catch (error) {
+      const newError = new Error(`Failed to select review card: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Verifies if the review card has the expected title and description.
+   * @param {string} reviewCardTitle - The expected title of the review card.
+   * @param {string} reviewCardDescription - The expected description of the review card.
+   */
+  async expectReviewCardToHaveContent(
+    reviewCardTitle: string,
+    reviewCardDescription: string
+  ): Promise<void> {
+    try {
+      const titleElement = await this.page.$(reviewCardTitleSelector);
+
+      // Get the innerText of the title element.
+      const titleText = await this.page.evaluate(
+        el => el.innerText,
+        titleElement
+      );
+
+      if (titleText.trim() !== reviewCardTitle) {
+        throw new Error(
+          `Expected review card title to be ${reviewCardTitle}, but found ${titleText}`
+        );
+      }
+
+      const isDescriptionPresent = await this.isTextPresentOnPage(
+        reviewCardDescription
+      );
+
+      if (!isDescriptionPresent) {
+        throw new Error(
+          'Expected review card description to be present on the page, but it was not found'
+        );
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify content of review card: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
   }
 }
 
