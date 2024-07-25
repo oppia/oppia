@@ -21,8 +21,6 @@ import testConstants from '../common/test-constants';
 import {ElementHandle} from 'puppeteer';
 import puppeteer from 'puppeteer';
 
-const curriculumAdminThumbnailImage =
-  testConstants.data.curriculumAdminThumbnailImage;
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 
 const modalDiv = 'div.modal-content';
@@ -31,8 +29,6 @@ const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
 
 // Photo Upload Modal.
 const chapterPhotoBoxButton = '.e2e-test-photo-button';
-const newChapterPhotoBoxButton =
-  '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 const photoUploadModal = 'edit-thumbnail-modal';
 
