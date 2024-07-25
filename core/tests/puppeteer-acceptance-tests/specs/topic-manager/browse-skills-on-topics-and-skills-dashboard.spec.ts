@@ -66,7 +66,10 @@ describe('Topic Manager', function () {
       await topicManager.expectFilteredSkills(['Multiplication']);
 
       await topicManager.sortSkills('Least Recently Updated');
-      await topicManager.expectSkillsInOrder(['Subtraction', 'Multiplication']);
+      await topicManager.expectFilteredSkillsInOrder([
+        'Subtraction',
+        'Multiplication',
+      ]);
 
       await topicManager.adjustPaginatorToShowItemsPerPage(15);
       await topicManager.checkIfSkillPageChangesAfterClickingNext(false);

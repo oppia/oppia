@@ -207,6 +207,14 @@
     {
       "name": "topic-manager/edit-and-preview-a-topic",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-preview-a-topic.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-preview-and-save-a-chapter",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-preview-and-save-a-chapter.spec.ts"
+    },
+    {
+      "name": "topic-manager/create-and-delete-subtopic-and-story",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-delete-subtopic-and-story.spec.ts"
     }
   ]
 }

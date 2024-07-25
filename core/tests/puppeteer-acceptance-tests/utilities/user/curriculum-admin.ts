@@ -208,17 +208,17 @@ const mobilePublishStoryButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-button';
 
 const addChapterButton = 'button.e2e-test-add-chapter-button';
-const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
-const chapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
-const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
-const chapterPhotoBoxButton =
-  '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
-
-const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
 
 const saveStoryButton = 'button.e2e-test-save-story-button';
 const mobileSaveStoryChangesButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-changes';
+const newChapterTitleField = 'input.e2e-test-new-chapter-title-field';
+const newChapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
+const newChapterPhotoBoxButton =
+  '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
+const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
+const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
+
 export class CurriculumAdmin extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -511,6 +511,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickOn(createSubtopicButton);
     await this.saveTopicDraft(topicName);
+    showMessage(`Subtopic ${title} is created.`);
   }
 
   /**
@@ -854,7 +855,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(storyMetaTagInput, 'meta');
     await this.page.keyboard.press('Tab');
 
-    await this.createChapter(chapterTitle, explorationId);
+    await this.addChapter(chapterTitle, explorationId);
     await this.saveStoryDraft();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileSaveStoryChangesDropdown);
@@ -874,7 +875,7 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} storyUrlFragment - The URL fragment of the story.
    * @param {string} topicName - The name of the topic.
    */
-  async createStory(
+  async addStoryToTopic(
     storyTitle: string,
     storyUrlFragment: string,
     topicName: string
@@ -899,9 +900,17 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickAndWaitForNavigation(createStoryButton);
 
+    await this.page.waitForSelector(storyMetaTagInput);
+    await this.page.focus(storyMetaTagInput);
+    await this.page.type(storyMetaTagInput, 'meta');
+    await this.page.keyboard.press('Tab');
+    await this.saveStoryDraft();
+
     const url = new URL(this.page.url());
     const pathSegments = url.pathname.split('/');
     const storyId = pathSegments[pathSegments.length - 1];
+    showMessage(`Story ${storyTitle} is created.`);
+    await this.page.waitForNetworkIdle();
 
     return storyId;
   }
@@ -909,18 +918,19 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Create a chapter for a certain story.
    */
-  async createChapter(
-    chapterTitle: string,
-    explorationId: string
-  ): Promise<void> {
+  async addChapter(chapterName: string, explorationId: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileAddChapterDropdown);
+      await this.waitForStaticAssetsToLoad();
+      const addChapterButtonElement = await this.page.$(addChapterButton);
+      if (!addChapterButtonElement) {
+        await this.clickOn(mobileChapterCollapsibleCard);
+      }
     }
     await this.clickOn(addChapterButton);
-    await this.type(chapterTitleField, chapterTitle);
-    await this.type(chapterExplorationIdField, explorationId);
+    await this.type(newChapterTitleField, chapterName);
+    await this.type(newChapterExplorationIdField, explorationId);
 
-    await this.clickOn(chapterPhotoBoxButton);
+    await this.clickOn(newChapterPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
@@ -928,14 +938,20 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickOn(createChapterButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
+    showMessage(`Chapter ${chapterName} is created.`);
   }
 
   /**
-   * Save a story curriculum admin.
+   * Save a story.
    */
   async saveStoryDraft(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileOptionsSelector);
+      const isMobileSaveButtonVisible = await this.isElementVisible(
+        mobileSaveStoryChangesButton
+      );
+      if (!isMobileSaveButtonVisible) {
+        await this.clickOn(mobileOptionsSelector);
+      }
       await this.clickOn(mobileSaveStoryChangesButton);
     } else {
       await this.clickOn(saveStoryButton);
@@ -1446,6 +1462,39 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.clickOn(closeTopicDependencyButton);
     await this.page.waitForSelector(topicDependencyGraphDiv, {visible: false});
+  }
+
+  /**
+   * Creates and publishes a topic with a subtopic and skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} skillName - The name of the skill.
+   */
+  async createAndPublishTopic(
+    topicName: string,
+    subtopicName: string,
+    skillName: string
+  ): Promise<void> {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(' ', '-')
+    );
+    await this.createSubtopicForTopic(
+      subtopicName,
+      subtopicName.toLowerCase().replace(' ', '-'),
+      topicName
+    );
+
+    await this.createSkillForTopic(skillName, topicName);
+    await this.createQuestionsForSkill(skillName, 3);
+    await this.assignSkillToSubtopicInTopicEditor(
+      skillName,
+      subtopicName,
+      topicName
+    );
+    await this.addSkillToDiagnosticTest(skillName, topicName);
+
+    await this.publishDraftTopic(topicName);
   }
 
   /**
