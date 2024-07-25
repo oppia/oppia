@@ -38,6 +38,7 @@ import {UserService} from 'services/user.service';
 import {UserInfo} from 'domain/user/user-info.model';
 import {SidebarStatusService} from 'services/sidebar-status.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 
 class MockWindowRef {
   nativeWindow = {
@@ -69,6 +70,7 @@ describe('Side Navigation Bar Component', () => {
   beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
       imports: [
         HttpClientModule,
         HttpClientTestingModule,
