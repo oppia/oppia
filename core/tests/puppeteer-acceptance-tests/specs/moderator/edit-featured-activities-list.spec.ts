@@ -68,7 +68,7 @@ describe('Moderator', function () {
   it(
     'should be able to feature and unfeature activities',
     async function () {
-      await LoggedOutUser.navigateToCommunitylibrary();
+      await LoggedOutUser.navigateToCommunityLibrary();
 
       // Expect to see no featured activities as nothing is featured yet.
       await LoggedOutUser.expectToViewFeaturedActivities([]);

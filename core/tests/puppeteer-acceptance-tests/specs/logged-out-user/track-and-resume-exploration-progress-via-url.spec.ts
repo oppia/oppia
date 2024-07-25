@@ -49,20 +49,21 @@ describe('Logged-out User', function () {
 it(
     'should be able to check progress, answer states, generate and use progress URL in the exploration player.',
     async function () {
-        await loggedOutUser.navigateToExplorationPlayer();
-
+        await loggedOutUser.navigateToCommunityLibrary();
+        await loggedOutUser.selectAndPlayLessson();
+  
         await loggedOutUser.checkLessonInfoModal();
+        await loggedOutUser.checkProgressUrlModalButtons();
+        await loggedOutUser.checkProgressUrlValidityInfo();
         await loggedOutUser.reloadPage();
 
         await loggedOutUser.tryToReturnToMostRecentCheckpoint();
         await loggedOutUser.tryToAnswerPreviouslyAnsweredState();
 
         await loggedOutUser.tryToGenerateProgressUrlBeforeFirstCheckpoint();
-        await loggedOutUser.reachFirstCheckpoint();
-        await loggedOutUser.generateProgressUrlAfterFirstCheckpoint();
+        await loggedOutUser.submitAnswer();
+        await loggedOutUser.generateProgressUrl();
 
-        await loggedOutUser.checkProgressUrlModalButtons();
-        await loggedOutUser.checkProgressUrlValidityInfo();
 
         const progressUrl = await loggedOutUser.copyProgressUrl();
         await loggedOutUser.startExplorationUsingProgressUrl(progressUrl);
