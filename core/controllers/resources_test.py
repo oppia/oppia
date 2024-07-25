@@ -958,6 +958,45 @@ class ValueGeneratorHandlerTests(test_utils.GenericTestBase):
     def test_html_response(self) -> None:
         copier_id = 'Copier'
         response = self.get_html_response(
-            '/value_generator_handler/' + copier_id
+            '/value_generator_handler/%s' % copier_id
         )
         self.assertIn(b'<object-editor [objType]="objType"', response.body)
+
+
+class FaviconHandlerTest(test_utils.GenericTestBase):
+    """Test for the FaviconHandler."""
+
+    def test_redirect_to_assetsstatic(self) -> None:
+        response = self.get_html_response(
+            '/favicon.ico', expected_status_int=302)
+        self.assertEqual(
+            'http://localhost:8181/assetsstatic/favicon.ico',
+            response.headers['location']
+        )
+
+
+class RobotsTxtHandlerTest(test_utils.GenericTestBase):
+    """Test for the RobotsTxtHandler."""
+
+    def test_redirect_to_assetsstatic(self) -> None:
+        response = self.get_html_response(
+            '/robots.txt', expected_status_int=302)
+        self.assertEqual(
+            'http://localhost:8181/assetsstatic/robots.txt',
+            response.headers['location']
+        )
+
+
+class CopyrightImagesHandlerTest(test_utils.GenericTestBase):
+    """Test for the CopyrightImagesHandler."""
+
+    def test_redirect_to_assetsstatic(self) -> None:
+        response = self.get_html_response(
+            '/assets/copyrighted-images/general/mascot.svg',
+            expected_status_int=302
+        )
+        self.assertEqual(
+            'http://localhost:8181/assetsstatic/copyrighted-images/'
+            'general/mascot.svg',
+            response.headers['location']
+        )

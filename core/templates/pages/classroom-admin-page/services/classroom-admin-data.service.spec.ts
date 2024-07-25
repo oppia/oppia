@@ -22,6 +22,31 @@ import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {ExistingClassroomData} from '../existing-classroom.model';
 
+const dummyThumbnailData = {
+  filename: 'thumbnail.svg',
+  bg_color: 'transparent',
+  size_in_bytes: 1000,
+};
+
+const dummyBannerData = {
+  filename: 'banner.png',
+  bg_color: 'transparent',
+  size_in_bytes: 1000,
+};
+
+let existingClassroom = new ExistingClassroomData(
+  'classroomID',
+  'physics',
+  'physics',
+  'Curated math foundations course.',
+  'Learn math through fun stories!',
+  'Start from the basics with our first topic.',
+  {},
+  true,
+  dummyThumbnailData,
+  dummyBannerData
+);
+
 describe('Classroom Admin Data Service', () => {
   let classroomAdminDataService: ClassroomAdminDataService;
   let classroomBackendApiService: ClassroomBackendApiService;
@@ -42,8 +67,12 @@ describe('Classroom Admin Data Service', () => {
       'math',
       'math',
       'Curated math foundations course.',
+      'Learn math through fun stories!',
       'Start from the basics with our first topic.',
-      {}
+      {},
+      true,
+      dummyThumbnailData,
+      dummyBannerData
     );
   });
 
@@ -103,15 +132,6 @@ describe('Classroom Admin Data Service', () => {
 
   it('should be able to call setClassroomValidityFlag method from the model', () => {
     spyOn(classroomData, 'setClassroomValidityFlag');
-
-    let existingClassroom = new ExistingClassroomData(
-      'classroomID',
-      'physics',
-      'physics',
-      'Curated math foundations course.',
-      'Start from the basics with our first topic.',
-      {}
-    );
     classroomAdminDataService.existingClassroomNames = ['chemistry', 'physics'];
 
     classroomAdminDataService.validateClassroom(
@@ -122,13 +142,44 @@ describe('Classroom Admin Data Service', () => {
     expect(classroomData.setClassroomValidityFlag).toHaveBeenCalled();
   });
 
-  it('should be able to reinitialize name and URL variables', () => {
+  it('should return all validation errors', () => {
+    let tempClassroom = new ExistingClassroomData(
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      {},
+      true,
+      {...dummyThumbnailData, filename: ''},
+      {...dummyBannerData, filename: ''}
+    );
+    classroomAdminDataService.validateClassroom(
+      tempClassroom,
+      existingClassroom
+    );
+    expect(
+      classroomAdminDataService.getAllClassroomValidationErrors().length
+    ).toEqual(9);
+    expect(
+      classroomAdminDataService.getSaveClassroomValidationErrors().length
+    ).toEqual(2);
+  });
+
+  it('should be able to reinitialize validation errors', () => {
     classroomAdminDataService.nameValidationError = 'Name error';
     classroomAdminDataService.urlValidationError = 'URL error';
+    classroomAdminDataService.topicsGraphValidationError = 'Topics graph error';
+    classroomAdminDataService.classroomValidationErrors = ['Erro1', 'Error2'];
 
     classroomAdminDataService.reinitializeErrorMsgs();
 
     expect(classroomAdminDataService.nameValidationError).toEqual('');
     expect(classroomAdminDataService.urlValidationError).toEqual('');
+    expect(classroomAdminDataService.topicsGraphValidationError).toEqual('');
+    expect(classroomAdminDataService.classroomValidationErrors.length).toEqual(
+      0
+    );
   });
 });

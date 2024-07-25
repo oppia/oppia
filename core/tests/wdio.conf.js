@@ -45,10 +45,6 @@ var suites = {
     './core/tests/webdriverio_desktop/additionalPlayerFeatures.js'
   ],
 
-  adminPage: [
-    './core/tests/webdriverio_desktop/adminTabFeatures.js'
-  ],
-
   blogDashboard: [
     './core/tests/webdriverio_desktop/blogDashboard.js'
   ],
@@ -59,14 +55,6 @@ var suites = {
 
   checkpointFeatures: [
     './core/tests/webdriverio_desktop/checkpointFeatures.js'
-  ],
-
-  classroomPage: [
-    './core/tests/webdriverio_desktop/classroomPage.js'
-  ],
-
-  classroomPageFileUploadFeatures: [
-    './core/tests/webdriverio_desktop/classroomPageFileUploadFeatures.js'
   ],
 
   collections: [
@@ -117,10 +105,6 @@ var suites = {
     './core/tests/webdriverio_desktop/extensions.js'
   ],
 
-  featureGating: [
-    './core/tests/webdriverio/featureGatingFlow.js'
-  ],
-
   feedbackUpdates: [
     './core/tests/webdriverio_desktop/feedbackUpdates.js'
   ],
@@ -139,10 +123,6 @@ var suites = {
 
   learnerDashboard: [
     './core/tests/webdriverio_desktop/learnerDashboard.js'
-  ],
-
-  library: [
-    './core/tests/webdriverio/libraryFlow.js'
   ],
 
   navigation: [

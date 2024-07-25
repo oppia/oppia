@@ -189,9 +189,10 @@ def create_suggestion(
     if target_type == feconf.ENTITY_TYPE_EXPLORATION:
         exploration = exp_fetchers.get_exploration_by_id(target_id)
     if suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
-        score_category = (
-            suggestion_models.SCORE_TYPE_CONTENT +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        score_category = ('%s%s%s' % (
+            suggestion_models.SCORE_TYPE_CONTENT,
+            suggestion_models.SCORE_CATEGORY_DELIMITER, exploration.category
+            ))
         # Suggestions of this type do not have an associated language code,
         # since they are not queryable by language.
         language_code = None
@@ -204,9 +205,10 @@ def create_suggestion(
             )
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        score_category = (
-            suggestion_models.SCORE_TYPE_TRANSLATION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        score_category = ('%s%s%s' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER, exploration.category)
+        )
         # The language code of the translation, used for querying purposes.
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(change_cmd['language_code'], str)
@@ -225,9 +227,10 @@ def create_suggestion(
             author_id, None, change_cmd, score_category, language_code, False,
             datetime.datetime.utcnow(), datetime.datetime.utcnow())
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
-        score_category = (
-            suggestion_models.SCORE_TYPE_QUESTION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
+        score_category = ('%s%s%s' % (
+            suggestion_models.SCORE_TYPE_QUESTION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER, target_id)
+        )
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(change_cmd['question_dict'], dict)
         # Here we use cast because we are narrowing down the type from
@@ -3916,7 +3919,7 @@ def generate_contributor_certificate_data(
     language_code: Optional[str],
     from_date: datetime.datetime,
     to_date: datetime.datetime
-) -> suggestion_registry.ContributorCertificateInfoDict:
+) -> Optional[suggestion_registry.ContributorCertificateInfoDict]:
     """Returns data to generate the certificate.
 
     Args:
@@ -3931,7 +3934,8 @@ def generate_contributor_certificate_data(
             contributions were created.
 
     Returns:
-        ContributorCertificateInfoDict. Data to generate the certificate.
+        ContributorCertificateInfoDict|None. Data to generate the certificate,
+        or None if no data is found.
 
     Raises:
         Exception. The suggestion type is invalid.
@@ -3955,7 +3959,7 @@ def generate_contributor_certificate_data(
     else:
         raise Exception('The suggestion type is invalid.')
 
-    return data.to_dict()
+    return data.to_dict() if data is not None else None
 
 
 def _generate_translation_contributor_certificate_data(
@@ -3963,7 +3967,7 @@ def _generate_translation_contributor_certificate_data(
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     user_id: str
-) -> suggestion_registry.ContributorCertificateInfo:
+) -> Optional[suggestion_registry.ContributorCertificateInfo]:
     """Returns data to generate translation submitter certificate.
 
     Args:
@@ -3976,8 +3980,8 @@ def _generate_translation_contributor_certificate_data(
         user_id: str. The user ID of the contributor.
 
     Returns:
-        ContributorCertificateInfo. Data to generate translation submitter
-        certificate.
+        ContributorCertificateInfo|None. Data to generate translation submitter
+        certificate, or None if no data is found.
 
     Raises:
         Exception. The language is invalid.
@@ -4045,8 +4049,7 @@ def _generate_translation_contributor_certificate_data(
     hours_contributed = round(words_count / 300, 2)
 
     if words_count == 0:
-        raise Exception(
-            'There are no contributions for the given time range.')
+        return None
 
     return suggestion_registry.ContributorCertificateInfo(
         from_date.strftime('%d %b %Y'), to_date.strftime('%d %b %Y'),
@@ -4058,7 +4061,7 @@ def _generate_question_contributor_certificate_data(
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     user_id: str
-) -> suggestion_registry.ContributorCertificateInfo:
+) -> Optional[suggestion_registry.ContributorCertificateInfo]:
     """Returns data to generate question submitter certificate.
 
     Args:
@@ -4069,8 +4072,8 @@ def _generate_question_contributor_certificate_data(
         user_id: str. The user ID of the contributor.
 
     Returns:
-        ContributorCertificateInfo. Data to generate question submitter
-        certificate.
+        ContributorCertificateInfo|None. Data to generate question submitter
+        certificate, or None if no data is found.
 
     Raises:
         Exception. The suggestion type given to generate the certificate is
@@ -4110,8 +4113,7 @@ def _generate_question_contributor_certificate_data(
     hours_contributed = round(minutes_contributed / 60, 2)
 
     if minutes_contributed == 0:
-        raise Exception(
-            'There are no contributions for the given time range.')
+        return None
 
     return suggestion_registry.ContributorCertificateInfo(
         from_date.strftime('%d %b %Y'), to_date.strftime('%d %b %Y'),

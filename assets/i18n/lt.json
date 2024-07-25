@@ -14,7 +14,6 @@
 	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_1": "„Oppia“ misija – padėti kiekvienam efektyviai ir maloniai išmokti visko, ko nori.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE": "Paskelbti ir bendrinti",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE_TEXT": "savo kūrinius su bendruomene.",
-	"I18N_ABOUT_PAGE_AUDIO_SUBTITLES_FEATURE": "Garso subtitrai",
 	"I18N_ABOUT_PAGE_BREADCRUMB": "Apie",
 	"I18N_ABOUT_PAGE_CREDITS_TAB_HEADING": "Kreditai",
 	"I18N_ABOUT_PAGE_TITLE": "Apie | Oppia",
@@ -176,6 +175,5 @@
 	"I18N_PREFERENCES_SUBSCRIBED_CREATORS": "Kūrėjai, kuriuos prenumeruojate",
 	"I18N_SUBSCRIBE_BUTTON_TEXT": "Prenumeruoti",
 	"I18N_TOPNAV_GET_INVOLVED": "Įsitraukite",
-	"I18N_TOPNAV_OPPIA_FOUNDATION": "Oppia Fondas",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Nutraukti prenumeratą"
 }

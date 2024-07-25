@@ -28,12 +28,20 @@ import {
   ExplorationEditorFactory,
   ExplorationEditor,
 } from '../user/exploration-editor';
-import {CurriculumAdminFactory} from '../user/curriculum-admin';
+import {
+  CurriculumAdmin,
+  CurriculumAdminFactory,
+} from '../user/curriculum-admin';
+import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 import {LoggedInUserFactory, LoggedInUser} from '../user/logged-in-user';
+import {ModeratorFactory} from '../user/moderator';
+import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
+const cookieBannerAcceptButton =
+  'button.e2e-test-oppia-cookie-banner-accept-button';
 
 /**
  * Mapping of user roles to their respective function class.
@@ -45,6 +53,9 @@ const USER_ROLE_MAPPING = {
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
+  [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
+  [ROLES.MODERATOR]: ModeratorFactory,
+  [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
 } as const;
 
 /**
@@ -105,7 +116,8 @@ export class UserFactory {
     TRoles extends (keyof typeof USER_ROLE_MAPPING)[],
   >(
     user: TUser,
-    roles: TRoles
+    roles: TRoles,
+    topic: string = ''
   ): Promise<TUser & MultipleRoleIntersection<TRoles>> {
     for (const role of roles) {
       if (superAdminInstance === null) {
@@ -117,6 +129,13 @@ export class UserFactory {
           await superAdminInstance.assignUserToRoleFromBlogAdminPage(
             user.username,
             BLOG_RIGHTS.BLOG_POST_EDITOR
+          );
+          break;
+        case ROLES.TOPIC_MANAGER:
+          await superAdminInstance.assignRoleToUser(
+            user.username,
+            ROLES.TOPIC_MANAGER,
+            topic
           );
           break;
         default:
@@ -137,23 +156,29 @@ export class UserFactory {
   >(
     username: string,
     email: string,
-    roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
+    roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>,
+    topic: string = ''
   ): Promise<
     LoggedOutUser &
       LoggedInUser &
       ExplorationEditor &
+      TopicManager &
+      CurriculumAdmin &
       MultipleRoleIntersection<TRoles>
   > {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
       LoggedOutUserFactory(),
       LoggedInUserFactory(),
       ExplorationEditorFactory(),
+      TopicManagerFactory(),
+      CurriculumAdminFactory(),
     ]);
+
     await user.openBrowser();
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
 
-    return await UserFactory.assignRolesToUser(user, roles);
+    return await UserFactory.assignRolesToUser(user, roles, topic);
   };
 
   /**
@@ -183,6 +208,19 @@ export class UserFactory {
     return superAdminInstance;
   };
 
+  /**
+   * This function creates a new instance of a LoggedOutUser, opens a browser for that user,
+   * navigates to the home page, adds the user to the activeUsers array, and returns the user.
+   */
+  static createLoggedOutUser = async function (): Promise<LoggedOutUser> {
+    let user = new LoggedOutUser();
+    await user.openBrowser();
+    await user.page.goto(testConstants.URLs.Home);
+    await user.waitForPageToFullyLoad();
+    await user.clickOn(cookieBannerAcceptButton);
+    activeUsers.push(user);
+    return user;
+  };
   /**
    * This function closes all the browsers opened by different users.
    */

@@ -13,13 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for Exploration Creator and Exploration Manager
+ * @fileoverview Acceptance Test for creating and modifying an exploration on/via the settings tab.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
-import {showMessage} from '../../utilities/common/show-message';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
@@ -33,12 +32,7 @@ enum INTERACTION_TYPES {
 // After deleting the exploration, if we want to access the exploration with the
 // URL, then these errors can arise. So, we ignore these errors.
 // Using regex because each time the exploration ID will be different.
-ConsoleReporter.setConsoleErrorsToIgnore([
-  /HttpErrorResponse:.*404 Not Found/,
-  /Error: Could not find the resource http:\/\/localhost:8181\/explorehandler\/features\/[a-zA-Z0-9]+\.?/,
-  /Could not find the resource http:\/\/localhost:8181\/createhandler\/permissions\/[a-zA-Z0-9]+\.?/,
-  /http:\/\/localhost:8181\/build\/webpack_bundles\/exploration_editor\.[a-f0-9]+\.bundle\.js/,
-]);
+ConsoleReporter.setConsoleErrorsToIgnore([/.*404.*Not Found.*/]);
 
 describe('Exploration Creator', function () {
   let explorationEditor: ExplorationEditor;
@@ -51,41 +45,35 @@ describe('Exploration Creator', function () {
       'explorationEditor',
       'exploration_editor@example.com'
     );
-    showMessage('explorationEditor is signed up successfully.');
 
     voiceoverAdmin = await UserFactory.createNewUser(
       'voiceoverAdm',
       'voiceover_admin@example.com',
       [ROLES.VOICEOVER_ADMIN]
     );
-    showMessage('Voiceover admin is signed up successfully.');
 
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
-    showMessage('Curriculum admin is signed up successfully.');
 
     const guestUser1 = await UserFactory.createNewUser(
       'guestUser1',
       'guest_user1@example.com'
     );
-    showMessage('guestUser1 is signed up successfully.');
     await guestUser1.closeBrowser();
 
     const guestUser2 = await UserFactory.createNewUser(
       'guestUser2',
       'guest_user2@example.com'
     );
-    showMessage('guestUser2 is signed up successfully.');
     await guestUser2.closeBrowser();
 
     const guestUser3 = await UserFactory.createNewUser(
       'guestUser3',
       'guest_user3@example.com'
     );
-    showMessage('guestUser3 is signed up successfully.');
     await guestUser3.closeBrowser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
@@ -98,7 +86,7 @@ describe('Exploration Creator', function () {
 
       await explorationEditor.dismissWelcomeModal();
 
-      await explorationEditor.createExplorationWithMinimumContent(
+      await explorationEditor.createMinimalExploration(
         'Exploration intro text',
         INTERACTION_TYPES.END_EXPLORATION
       );
