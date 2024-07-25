@@ -587,7 +587,7 @@ export class BaseUser {
   /**
    * Creates a new tab in the browser and switches to it.
    */
-  async createAndSwitchToNewTab() {
+  async createAndSwitchToNewTab(): Promise<puppeteer.Page> {
     const newPage = await this.browserObject.newPage();
     await newPage.bringToFront();
     return newPage;
