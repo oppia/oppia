@@ -260,4 +260,43 @@ describe('Side Navigation Bar Component', () => {
       componentInstance.isHackyTopicTitleTranslationDisplayed(0);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
   });
+
+  it('should register About header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    componentInstance.navigateToAboutPage();
+
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith('About');
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
+  });
+
+  it('should register Volunteer header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    componentInstance.navigateToVolunteerPage();
+
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith('Volunteer');
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/volunteer');
+  });
+
+  it('should register Teach header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    componentInstance.navigateToTeachPage();
+
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith('Teach');
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/teach');
+  });
 });

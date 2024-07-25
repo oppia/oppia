@@ -129,6 +129,7 @@
         </div>
         <oppia-primary-button
           [buttonHref]="classroomUrl"
+          (onClickPrimaryButton)="onClickExploreLessonsButton()"
           [customClasses]="['oppia-teach-btn']"
           buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate }}">
         </oppia-primary-button>
@@ -295,11 +296,13 @@
     <div class="oppia-teach-cta-buttons-container">
       <oppia-primary-button
         [buttonHref]="classroomUrl"
+        (onClickPrimaryButton)="onClickExploreLessonsButton()"
         [customClasses]="['oppia-teach-btn', 'e2e-test-teach-page-explore-lessons-button']"
         buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate }}">
       </oppia-primary-button>
       <oppia-primary-button
         [buttonHref]="androidUrl"
+        (onClickPrimaryButton)="onClickDownloadAndroidAppButton()"
         [customClasses]="['oppia-teach-btn', 'oppia-teach-secondary-btn']"
         buttonText="{{ 'I18N_ACTION_DOWNLOAD_ANDRIOD_APP' | translate }}">
       </oppia-primary-button>

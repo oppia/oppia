@@ -540,6 +540,21 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     );
   }
 
+  navigateToAboutPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent('About');
+    this.windowRef.nativeWindow.location.href = '/about';
+  }
+
+  navigateToVolunteerPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent('Volunteer');
+    this.windowRef.nativeWindow.location.href = '/volunteer';
+  }
+
+  navigateToTeachPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent('Teach');
+    this.windowRef.nativeWindow.location.href = '/teach';
+  }
+
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
