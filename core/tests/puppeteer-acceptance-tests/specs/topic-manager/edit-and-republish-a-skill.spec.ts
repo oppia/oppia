@@ -72,7 +72,9 @@ describe('Topic Manager User Journey', function () {
       );
       await topicManager.deleteMisconception('Addition Misconception');
 
-      await topicManager.addPrerequisiteSkill('Single Digit Addition');
+      await topicManager.addPrerequisiteSkillInSkillEditor(
+        'Single Digit Addition'
+      );
       await topicManager.removePrerequisiteSkill('Single Digit Addition');
 
       await topicManager.updateRubric('Easy', 'Student can add single digits.');

@@ -138,7 +138,7 @@ export class BaseUser {
   }
 
   /**
-   * Checks if the application is in development mode.
+   * Checks if the application is in production mode.
    * @returns {Promise<boolean>} Returns true if the application is in development mode,
    * false otherwise.
    */
@@ -516,6 +516,18 @@ export class BaseUser {
   }
 
   /**
+   * Checks if an element is visible on the page.
+   */
+  async isElementVisible(selector: string): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(selector, {visible: true, timeout: 3000});
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * Waits for the static assets on the page to load.
    */
   async waitForStaticAssetsToLoad(): Promise<void> {
@@ -570,6 +582,15 @@ export class BaseUser {
       lastHTMLSize = currentHTMLSize;
       await page.waitForTimeout(checkDurationMsecs);
     }
+  }
+
+  /**
+   * Creates a new tab in the browser and switches to it.
+   */
+  async createAndSwitchToNewTab(): Promise<puppeteer.Page> {
+    const newPage = await this.browserObject.newPage();
+    await newPage.bringToFront();
+    return newPage;
   }
 }
 
