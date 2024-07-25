@@ -17,7 +17,7 @@
  */
 import {Component, ElementRef, Input, ViewChild} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
-
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 @Component({
   selector: 'oppia-card-display',
   templateUrl: './card-display.component.html',
@@ -33,6 +33,13 @@ export class CardDisplayComponent {
   currentShift: number = 0;
   maxShifts: number = 0;
   lastShift: number = 0;
+  isLanguageRTL: boolean = false;
+
+  constructor(private I18nLanguageCodeService: I18nLanguageCodeService) {}
+
+  ngOnInit(): void {
+    this.isLanguageRTL = this.I18nLanguageCodeService.isCurrentLanguageRTL();
+  }
 
   getMaxShifts(width: number): number {
     return this.numCards - Math.floor(width / this.cardWidth);
@@ -48,9 +55,10 @@ export class CardDisplayComponent {
 
     if (allCards !== null) {
       if (this.currentShift > num) {
-        allCards.scrollLeft -= this.shiftLeft();
+        allCards.scrollLeft -= (this.isLanguageRTL ? -1 : 1) * this.shiftLeft();
       } else {
-        allCards.scrollLeft += this.shiftRight(num);
+        allCards.scrollLeft +=
+          (this.isLanguageRTL ? -1 : 1) * this.shiftRight(num);
       }
     }
     this.currentShift = num;
