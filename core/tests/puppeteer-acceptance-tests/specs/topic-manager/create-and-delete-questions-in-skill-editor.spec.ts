@@ -57,7 +57,7 @@ describe('Topic Manager', function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
 
       await topicManager.openSkillEditor('Addition');
-      await topicManager.navigateToQuestionEditorTab();
+      await topicManager.navigateToSkillQuestionEditorTab();
 
       await topicManager.createQuestionsForSkill('Addition', 1);
       await topicManager.expectToastMessageToBe(
@@ -69,7 +69,7 @@ describe('Topic Manager', function () {
       await topicManager.expectPreviewQuestionText(questionText);
       await topicManager.expectPreviewInteractionType('Numeric Input');
 
-      await topicManager.navigateToQuestionEditorTab();
+      await topicManager.navigateToSkillQuestionEditorTab();
       await topicManager.deleteQuestion(questionText);
       await topicManager.expectToastMessageToBe('Question Removed');
     },
