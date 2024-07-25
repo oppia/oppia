@@ -68,11 +68,8 @@ const mobileSaveStoryChangesButton =
 
 // Chapter Creation Modal.
 const addChapterButton = 'button.e2e-test-add-chapter-button';
-const newChapterTitleField = 'input.e2e-test-new-chapter-title-field';
 const chapterTitleField = '.e2e-test-chapter-title-field';
-const newChapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
 const chapterExplorationIdField = '.e2e-test-exploration-id-input';
-const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 
 const subtopicReassignHeader = 'div.subtopic-reassign-header';
 const subtopicTitleField = '.e2e-test-subtopic-title-field';
@@ -2652,32 +2649,6 @@ export class TopicManager extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
-  }
-
-  /**
-   * Create a chapter for a certain story.
-   */
-  async addChapter(chapterName: string, explorationId: string): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.waitForStaticAssetsToLoad();
-      const addChapterButtonElement = await this.page.$(addChapterButton);
-      if (!addChapterButtonElement) {
-        await this.clickOn(mobileChapterCollapsibleCard);
-      }
-    }
-    await this.clickOn(addChapterButton);
-    await this.type(newChapterTitleField, chapterName);
-    await this.type(newChapterExplorationIdField, explorationId);
-
-    await this.clickOn(newChapterPhotoBoxButton);
-    await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadPhotoButton);
-
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickOn(createChapterButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
-    showMessage(`Chapter ${chapterName} is created.`);
   }
 
   /**

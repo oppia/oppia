@@ -208,17 +208,17 @@ const mobilePublishStoryButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-button';
 
 const addChapterButton = 'button.e2e-test-add-chapter-button';
-const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
-const chapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
-const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
-const chapterPhotoBoxButton =
-  '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
-
-const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
 
 const saveStoryButton = 'button.e2e-test-save-story-button';
 const mobileSaveStoryChangesButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-changes';
+const newChapterTitleField = 'input.e2e-test-new-chapter-title-field';
+const newChapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
+const newChapterPhotoBoxButton =
+  '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
+const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
+const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
+
 export class CurriculumAdmin extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -826,7 +826,7 @@ export class CurriculumAdmin extends BaseUser {
   async createAndPublishStoryWithChapter(
     storyTitle: string,
     storyUrlFragment: string,
-    chapterName: string,
+    chapterTitle: string,
     explorationId: string,
     topicName: string
   ): Promise<void> {
@@ -855,7 +855,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(storyMetaTagInput, 'meta');
     await this.page.keyboard.press('Tab');
 
-    await this.addChapter(explorationId, chapterName);
+    await this.addChapter(chapterTitle, explorationId);
     await this.saveStoryDraft();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileSaveStoryChangesDropdown);
@@ -920,16 +920,17 @@ export class CurriculumAdmin extends BaseUser {
    */
   async addChapter(chapterName: string, explorationId: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.waitForStaticAssetsToLoad();
       const addChapterButtonElement = await this.page.$(addChapterButton);
       if (!addChapterButtonElement) {
-        await this.clickOn(mobileAddChapterDropdown);
+        await this.clickOn(mobileChapterCollapsibleCard);
       }
     }
     await this.clickOn(addChapterButton);
-    await this.type(chapterTitleField, chapterName);
-    await this.type(chapterExplorationIdField, explorationId);
+    await this.type(newChapterTitleField, chapterName);
+    await this.type(newChapterExplorationIdField, explorationId);
 
-    await this.clickOn(chapterPhotoBoxButton);
+    await this.clickOn(newChapterPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
