@@ -24,7 +24,7 @@ import {CommonModule} from '@angular/common';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {BarChartComponent} from './charts/bar-chart.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {FullExpandAccordionComponent} from './accordion/full-expand-accordion.component';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -32,11 +32,6 @@ import {FullExpandAccordionComponent} from './accordion/full-expand-accordion.co
     AboutPageRoutingModule,
     NgbModule,
   ],
-  declarations: [
-    AboutPageComponent,
-    AboutPageRootComponent,
-    BarChartComponent,
-    FullExpandAccordionComponent,
-  ],
+  declarations: [AboutPageComponent, AboutPageRootComponent, BarChartComponent],
 })
 export class AboutPageModule {}

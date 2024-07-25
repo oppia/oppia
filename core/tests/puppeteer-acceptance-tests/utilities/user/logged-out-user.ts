@@ -21,7 +21,6 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const aboutUrl = testConstants.URLs.About;
-const androidUrl = testConstants.URLs.Android;
 const blogPostUrlinPartnershipsPage =
   testConstants.URLs.BlogPostUrlInPartnershipsPage;
 const creatorDashboardCreateModeUrl =
@@ -138,26 +137,8 @@ const mobileSidevbarGetInvolvedMenuDonateButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
 const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
-const browseOurLessonsDesktopButtonInTeachPage =
-  '.e2e-test-teach-page-browse-our-lessons-desktop-button';
-const browseOurLessonsMobileButtonInTeachPage =
-  '.e2e-test-teach-page-browse-our-lessons-mobile-button';
-const accessAndroidAppDesktopButtonInTeachPage =
-  '.e2e-test-teach-page-access-android-app-desktop-button';
-const accessAndroidAppMobileButtonInTeachPage =
-  '.e2e-test-teach-page-access-android-app-mobile-button';
-const visitClassroomDesktopButtonInTeachPage =
-  '.e2e-test-teach-page-visit-classroom-desktop-button';
-const visitClassroomMobileButtonInTeachPage =
-  '.e2e-test-teach-page-visit-classroom-mobile-button';
-const exploreLessonsDesktopButtonInTeachPage =
-  '.e2e-test-teach-page-explore-lessons-desktop-button';
-const exploreLessonsMobileButtonInTeachPage =
-  '.e2e-test-teach-page-explore-lessons-mobile-button';
-const browseLibraryDesktopButtonInTeachPage =
-  '.e2e-test-teach-page-browse-library-desktop-button';
-const browseLibraryMobileButtonInTeachPage =
-  '.e2e-test-teach-page-browse-library-mobile-button';
+const exploreLessonsButtonInTeachPage =
+  '.e2e-test-teach-page-explore-lessons-button';
 const partnerWithUsButtonAtTheTopOfPartnershipsPage =
   '.e2e-test-partnerships-page-partner-with-us-button-at-the-top';
 const partnerWithUsButtonAtTheBottomOfPartnershipsPage =
@@ -1255,74 +1236,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to click the Browse Our Lessons button in the Teach page
    * and check if it opens the Math Classroom page.
    */
-  async clickBrowseOurLessonsButtonInTeachPage(): Promise<void> {
-    const browseOurLessonsButtonInTeachPage = this.isViewportAtMobileWidth()
-      ? browseOurLessonsMobileButtonInTeachPage
-      : browseOurLessonsDesktopButtonInTeachPage;
-    await this.clickButtonToNavigateToNewPage(
-      browseOurLessonsButtonInTeachPage,
-      'Browse Our Lessons button',
-      mathClassroomUrl,
-      'Math Classroom'
-    );
-  }
-
-  /**
-   * Function to click the Access Android App button in the Teach page
-   * and check if it opens the Android page.
-   */
-  async clickAccessAndroidAppButtonInTeachPage(): Promise<void> {
-    const accessAndroidAppButtonInTeachPage = this.isViewportAtMobileWidth()
-      ? accessAndroidAppMobileButtonInTeachPage
-      : accessAndroidAppDesktopButtonInTeachPage;
-    await this.clickButtonToNavigateToNewPage(
-      accessAndroidAppButtonInTeachPage,
-      'Access the Android App button',
-      androidUrl,
-      'Android'
-    );
-  }
-
-  /**
-   * Function to click the Visit Classroom button in the Teach page
-   * and check if it opens the Math Classroom page.
-   */
-  async clickVisitClassroomButtonInTeachPage(): Promise<void> {
-    const visitClassroomButtonInTeachPage = this.isViewportAtMobileWidth()
-      ? visitClassroomMobileButtonInTeachPage
-      : visitClassroomDesktopButtonInTeachPage;
-    await this.clickButtonToNavigateToNewPage(
-      visitClassroomButtonInTeachPage,
-      'Visit Classroom button',
-      mathClassroomUrl,
-      'Math Classroom'
-    );
-  }
-
-  /**
-   * Function to click the Browse Library button in the Teach page
-   * and check if it opens the Community Library page.
-   */
-  async clickBrowseLibraryButtonInTeachPage(): Promise<void> {
-    const browseLibraryButtonInTeachPage = this.isViewportAtMobileWidth()
-      ? browseLibraryMobileButtonInTeachPage
-      : browseLibraryDesktopButtonInTeachPage;
-    await this.clickButtonToNavigateToNewPage(
-      browseLibraryButtonInTeachPage,
-      'Browse Library button',
-      communityLibraryUrl,
-      'Community Library'
-    );
-  }
-
-  /**
-   * Function to click the Browse Our Lessons button in the Teach page
-   * and check if it opens the Math Classroom page.
-   */
   async clickExploreLessonsButtonInTeachPage(): Promise<void> {
-    const exploreLessonsButtonInTeachPage = this.isViewportAtMobileWidth()
-      ? exploreLessonsMobileButtonInTeachPage
-      : exploreLessonsDesktopButtonInTeachPage;
     await this.clickButtonToNavigateToNewPage(
       exploreLessonsButtonInTeachPage,
       'Explore Lessons button',

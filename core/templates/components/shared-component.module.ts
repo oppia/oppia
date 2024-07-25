@@ -40,6 +40,7 @@ import {CodeMirrorModule} from './code-mirror/codemirror.module';
 import {OppiaCkEditor4Module} from './ck-editor-helpers/ckeditor4.module';
 import {BaseModule} from 'base-components/base.module';
 import {NgBootstrapModule} from 'modules/ng-boostrap.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 
 // Components.
@@ -169,6 +170,7 @@ import {CopierComponent} from 'value_generators/templates/copier.component';
 import {UndoSnackbarComponent} from './custom-snackbar/undo-snackbar.component';
 import {TranslationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import {OppiaCkEditorCopyToolBarModule} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
+import {FullExpandAccordionComponent} from 'pages/about-page/accordion/full-expand-accordion.component';
 
 // Pipes.
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -228,6 +230,7 @@ import {DirectivesModule} from 'directives/directives.module';
     TranslateModule,
     DynamicComponentModule,
     DirectivesModule,
+    NgbModule,
   ],
 
   providers: [
@@ -370,6 +373,7 @@ import {DirectivesModule} from 'directives/directives.module';
     RteHelperModalComponent,
     UndoSnackbarComponent,
     TranslationModalComponent,
+    FullExpandAccordionComponent,
   ],
 
   entryComponents: [
@@ -507,6 +511,7 @@ import {DirectivesModule} from 'directives/directives.module';
     RteHelperModalComponent,
     UndoSnackbarComponent,
     TranslationModalComponent,
+    FullExpandAccordionComponent,
   ],
 
   exports: [
@@ -654,6 +659,7 @@ import {DirectivesModule} from 'directives/directives.module';
     RteHelperModalComponent,
     UndoSnackbarComponent,
     TranslationModalComponent,
+    FullExpandAccordionComponent,
   ],
 })
 export class SharedComponentsModule {}
