@@ -352,7 +352,7 @@ jobs:
             path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ matrix.suite.name }}.txt
         - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
           run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env --mobile
-        - name: Display Mobile Acceptance Test Output
+        - name: Display Mobile Acceptance Tests Output
           run: cat test_output.log
         - name: Uploading webpack bundles as an artifact
           if: ${{ failure() }}
