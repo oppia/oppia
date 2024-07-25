@@ -21,6 +21,7 @@ import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {FullExpandAccordionComponent} from './full-expand-accordion.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {MatIconModule} from '@angular/material/icon';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 describe('FullExpandAccordionComponent', () => {
   let component: FullExpandAccordionComponent;
@@ -30,6 +31,7 @@ describe('FullExpandAccordionComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [FullExpandAccordionComponent, MockTranslatePipe],
       imports: [NgbModule, MatIconModule],
+      providers: [UrlInterpolationService],
     }).compileComponents();
   });
 
@@ -80,5 +82,11 @@ describe('FullExpandAccordionComponent', () => {
     component.closePanel();
     expect(component.listIsCollapsed).toBeFalse();
     expect(component.panelIsCollapsed).toBeTrue();
+  });
+
+  it('should get static image url', () => {
+    expect(component.getStaticImageUrl('/path/to/image')).toBe(
+      '/assets/images/path/to/image'
+    );
   });
 });
