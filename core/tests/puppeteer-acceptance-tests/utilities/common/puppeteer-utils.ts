@@ -360,19 +360,6 @@ export class BaseUser {
   }
 
   /**
-   * This function retrieves the text content of a specified element.
-   */
-  async getElementText(selector: string): Promise<string> {
-    await this.page.waitForSelector(selector);
-    const element = await this.page.$(selector);
-    if (element === null) {
-      throw new Error(`No element found for the selector: ${selector}`);
-    }
-    const textContent = await this.page.evaluate(el => el.textContent, element);
-    return textContent ?? '';
-  }
-
-  /**
    * Checks if a given word is present on the page.
    * @param {string} word - The word to check.
    */

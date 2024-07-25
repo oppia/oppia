@@ -106,7 +106,7 @@ describe('FeedbackPopupComponent', () => {
     expect(component.feedbackSubmitted).toBe(false);
 
     component.saveFeedback();
-    tick(2001);
+    tick(3001);
 
     expect(component.feedbackSubmitted).toBe(true);
     expect(component.closePopover.emit).toHaveBeenCalled();
