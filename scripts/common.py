@@ -243,6 +243,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/click-all-links-on-terms-page',
     'logged-out-user/click-all-buttons-on-donate-page',
     'logged-out-user/visit-classroom-index-page',
+    'logged-out-user/browse-and-search-for-lessons-in-community-library',
+    'logged-out-user/select-and-play-topic-from-classroom-page',
     'logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers',
     'logged-out-user/sign-in-and-save-exploration-progress',
     'logged-out-user/track-and-resume-exploration-progress-via-url',
@@ -266,7 +268,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'topic-manager/assign-unassign-and-merge-skills',
     'topic-manager/cannot-do-curriculum-admin-actions',
     'topic-manager/edit-and-republish-a-skill',
-    'voiceover-admin/add-voiceover-artist-to-an-exploration',
+    'voiceover-admin/add-voiceover-artist-to-an-exploration'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181
