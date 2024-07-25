@@ -146,7 +146,7 @@ const mobileSaveTopicButton =
 const mobilePublishTopicButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-topic-button';
 
-const mobileNavToggelbutton = '.e2e-test-mobile-options';
+const mobileNavToggleButton = '.e2e-test-mobile-options';
 const mobileOptionsDropdown = '.e2e-test-mobile-options-dropdown';
 const mobileSettingsButton = 'li.e2e-test-mobile-settings-button';
 const explorationControlsSettingsDropdown =
@@ -154,26 +154,26 @@ const explorationControlsSettingsDropdown =
 
 const createNewClassroomModal = '.e2e-test-create-new-classroom-modal';
 const createNewClassroomButton = '.e2e-test-add-new-classroom-config';
-const newClassroomNameInputFeild = '.e2e-test-new-classroom-name';
-const newClassroomUrlFragmentInputFeild =
+const newClassroomNameInputField = '.e2e-test-new-classroom-name';
+const newClassroomUrlFragmentInputField =
   '.e2e-test-new-classroom-url-fragment';
 const saveNewClassroomButton = '.e2e-test-create-new-classroom';
 const classroomTileSelector = '.e2e-test-classroom-tile';
 
 const editClassroomConfigButton = '.e2e-test-edit-classroom-config-button';
 const closeClassroomConfigButton = '.e2e-cancel-classroom-changes';
-const editClassroomCourseDetailsInputFeild =
+const editClassroomCourseDetailsInputField =
   '.e2e-test-update-classroom-course-details';
-const editClassroomTeaserTextInputFeild =
+const editClassroomTeaserTextInputField =
   '.e2e-test-update-classroom-teaser-text';
-const editClassroomTopicListIntroInputFeild =
+const editClassroomTopicListIntroInputField =
   '.e2e-test-update-classroom-topic-list-intro';
 const classroomThumbnailContainer = '.e2e-test-classroom-thumbnail-container';
 const classroomBannerContainer = '.e2e-test-classroom-banner-container';
 const uploadClassroomImageButton = '.e2e-test-photo-upload-submit';
 const imageUploaderModal = '.e2e-test-thumbnail-editor';
 const openTopicDropdownButton = '.e2e-test-add-topic-to-classroom-button';
-const topicDropDownFormFeild = '.e2e-test-classroom-category-dropdown';
+const topicDropDownFormField = '.e2e-test-classroom-category-dropdown';
 const topicSelector = '.e2e-test-classroom-topic-selector-choice';
 const publishClassroomButton =
   '.e2e-test-toggle-classroom-publication-status-btn';
@@ -791,7 +791,7 @@ export class CurriculumAdmin extends BaseUser {
     }
     const editorUrl = `${baseURL}/create/${explorationId}`;
     await this.page.goto(editorUrl);
-    showMessage('Navigation to exploration editor is successfull.');
+    showMessage('Navigation to exploration editor is successful.');
   }
 
   /**
@@ -800,13 +800,13 @@ export class CurriculumAdmin extends BaseUser {
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavToggelbutton);
+      await this.clickOn(mobileNavToggleButton);
       await this.clickOn(mobileOptionsDropdown);
       await this.clickOn(mobileSettingsButton);
     } else {
       await this.clickOn(explorationSettingsTab);
     }
-    showMessage('Navigation to settings tab is successfull.');
+    showMessage('Navigation to settings tab is successful.');
   }
 
   /**
@@ -826,6 +826,7 @@ export class CurriculumAdmin extends BaseUser {
     try {
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
         visible: true,
+        timeout: 5000,
       });
       await this.clickOn(dismissWelcomeModalSelector);
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
@@ -874,7 +875,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(uploadPhotoButton);
 
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickOn(createStoryButton);
+    await this.clickAndWaitForNavigation(createStoryButton);
 
     await this.page.waitForSelector(storyMetaTagInput);
     await this.page.focus(storyMetaTagInput);
@@ -1308,6 +1309,7 @@ export class CurriculumAdmin extends BaseUser {
    */
   async editClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
+    await this.page.waitForSelector(classroomTileSelector);
     const classroomTiles = await this.page.$$(classroomTileSelector);
 
     if (classroomTiles.length === 0) {
@@ -1347,8 +1349,8 @@ export class CurriculumAdmin extends BaseUser {
     await this.navigateToClassroomAdminPage();
     await this.clickOn(createNewClassroomButton);
     await this.page.waitForSelector(createNewClassroomModal);
-    await this.page.type(newClassroomNameInputFeild, classroomName);
-    await this.page.type(newClassroomUrlFragmentInputFeild, urlFragment);
+    await this.page.type(newClassroomNameInputField, classroomName);
+    await this.page.type(newClassroomUrlFragmentInputField, urlFragment);
     await this.clickOn(saveNewClassroomButton);
     await this.page.waitForSelector(createNewClassroomModal, {visible: false});
     showMessage(`Created ${classroomName} classroom.`);
@@ -1366,9 +1368,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
 
-    await this.page.type(editClassroomTeaserTextInputFeild, teaserText);
-    await this.page.type(editClassroomTopicListIntroInputFeild, topicListIntro);
-    await this.page.type(editClassroomCourseDetailsInputFeild, courseDetails);
+    await this.page.type(editClassroomTeaserTextInputField, teaserText);
+    await this.page.type(editClassroomTopicListIntroInputField, topicListIntro);
+    await this.page.type(editClassroomCourseDetailsInputField, courseDetails);
     await this.clickOn(classroomThumbnailContainer);
     await this.page.waitForSelector(imageUploaderModal, {visible: true});
     await this.uploadFile(curriculumAdminThumbnailImage);
@@ -1399,7 +1401,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.editClassroom(classroomName);
 
     await this.clickOn(openTopicDropdownButton);
-    await this.clickOn(topicDropDownFormFeild);
+    await this.clickOn(topicDropDownFormField);
     await this.page.waitForSelector(addTopicFormFieldInput);
     await this.page.type(addTopicFormFieldInput, topicName);
     await this.clickOn(topicSelector);
@@ -1503,6 +1505,28 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.clickOn(closeTopicDependencyButton);
     await this.page.waitForSelector(topicDependencyGraphDiv, {visible: false});
+  }
+
+  /**
+   * Creates, updates, and publishes a new classroom with a topic.
+   * @param {string} classroomName - The name of the classroom.
+   * @param {string} urlFragment - The URL fragment for the classroom.
+   * @param {string} topicToBeAssigned - The name of the topic to be assigned to the classroom.
+   */
+  async createAndPublishClassroom(
+    classroomName: string,
+    urlFragment: string,
+    topicToBeAssigned: string
+  ): Promise<void> {
+    await this.createNewClassroom(classroomName, urlFragment);
+    await this.updateClassroom(
+      classroomName,
+      'Teaser text',
+      'Course details',
+      'Topic list intro'
+    );
+    await this.addTopicToClassroom(classroomName, topicToBeAssigned);
+    await this.publishClassroom(classroomName);
   }
 }
 

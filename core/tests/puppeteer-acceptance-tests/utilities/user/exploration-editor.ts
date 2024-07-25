@@ -174,7 +174,6 @@ const subscriberTabButton = '.e2e-test-subscription-tab';
 const subscriberCard = '.e2e-test-subscription-card';
 const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
 const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
-
 const destinationSelectorDropdown = '.e2e-test-destination-selector-dropdown';
 const destinationWhenStuckSelectorDropdown =
   '.e2e-test-destination-when-stuck-selector-dropdown';
@@ -305,12 +304,13 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to dismiss welcome modal.
+   * Function to dismiss exploration editor welcome modal.
    */
   async dismissWelcomeModal(): Promise<void> {
     try {
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
         visible: true,
+        timeout: 5000,
       });
       await this.clickOn(dismissWelcomeModalSelector);
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
@@ -1262,7 +1262,8 @@ export class ExplorationEditor extends BaseUser {
    * Function for creating an exploration with only EndExploration interaction with given title.
    */
   async createAndPublishAMinimalExplorationWithTitle(
-    title: string
+    title: string,
+    category: string = 'Algebra'
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
@@ -1275,7 +1276,7 @@ export class ExplorationEditor extends BaseUser {
     return await this.publishExplorationWithMetadata(
       title,
       'This is Goal here.',
-      'Algebra'
+      category
     );
   }
 
