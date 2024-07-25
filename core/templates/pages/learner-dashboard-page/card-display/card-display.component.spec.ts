@@ -69,7 +69,7 @@ describe('CardDisplayComponent', () => {
 
   describe('when shifting cards container to the right', () => {
     it('should shift by (cardWidth - 32) if first shift to the right', () => {
-      component.nextCard(1);
+      component.moveCard(1);
 
       fixture.detectChanges();
 
@@ -84,7 +84,7 @@ describe('CardDisplayComponent', () => {
       ).and.returnValue(200);
 
       component.currentShift = 1;
-      component.nextCard(2);
+      component.moveCard(2);
 
       fixture.detectChanges();
 
@@ -99,7 +99,7 @@ describe('CardDisplayComponent', () => {
       ).and.returnValue(664);
 
       component.currentShift = 3;
-      component.nextCard(4);
+      component.moveCard(4);
 
       fixture.detectChanges();
 
@@ -116,7 +116,7 @@ describe('CardDisplayComponent', () => {
       ).and.returnValue(756.5);
 
       component.currentShift = 4;
-      component.nextCard(3);
+      component.moveCard(3);
 
       fixture.detectChanges();
 
@@ -131,7 +131,7 @@ describe('CardDisplayComponent', () => {
       ).and.returnValue(664);
 
       component.currentShift = 3;
-      component.nextCard(2);
+      component.moveCard(2);
 
       fixture.detectChanges();
 
@@ -146,7 +146,7 @@ describe('CardDisplayComponent', () => {
       ).and.returnValue(200);
 
       component.currentShift = 1;
-      component.nextCard(0);
+      component.moveCard(0);
 
       fixture.detectChanges();
 

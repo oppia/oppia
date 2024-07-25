@@ -45,7 +45,7 @@ export class CardDisplayComponent {
     return this.numCards - Math.floor(width / this.cardWidth);
   }
 
-  nextCard(num: number): void {
+  moveCard(num: number): void {
     const allCards = this.cards.nativeElement;
     this.maxShifts = this.getMaxShifts(allCards.offsetWidth);
     this.lastShift =
@@ -55,23 +55,24 @@ export class CardDisplayComponent {
 
     if (allCards !== null) {
       if (this.currentShift > num) {
-        allCards.scrollLeft -= (this.isLanguageRTL ? -1 : 1) * this.shiftLeft();
+        allCards.scrollLeft -=
+          (this.isLanguageRTL ? -1 : 1) * this.goToPrevCard();
       } else {
         allCards.scrollLeft +=
-          (this.isLanguageRTL ? -1 : 1) * this.shiftRight(num);
+          (this.isLanguageRTL ? -1 : 1) * this.goToNextCard(num);
       }
     }
     this.currentShift = num;
   }
 
-  shiftLeft(): number {
+  goToPrevCard(): number {
     if (this.currentShift === this.maxShifts) {
       return this.lastShift;
     }
     return this.cardWidth - (this.currentShift === 1 ? 32 : 0);
   }
 
-  shiftRight(nextShift: number): number {
+  goToNextCard(nextShift: number): number {
     if (nextShift === 1) {
       return this.cardWidth - 32;
     }

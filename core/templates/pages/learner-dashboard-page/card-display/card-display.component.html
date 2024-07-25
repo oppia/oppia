@@ -2,10 +2,10 @@
   <div class="d-flex justify-content-between">
     <p class="card-display-heading"> {{ headingI18n | translate }} </p>
     <div class="card-display-button-container" *ngIf="(numCards > 1) && ((numCards - 1) * cardWidth + (cardWidth - 32) > cards.offsetWidth) && (tabType.includes('home'))">
-      <button [disabled]="currentShift === 0" class="px-0 card-display-button" (click)="nextCard(currentShift - 1)">
+      <button [disabled]="currentShift === 0" class="px-0 card-display-button" (click)="moveCard(currentShift - 1)">
         <span [ngClass]="'fas fa-chevron-' + (isLanguageRTL ? 'right' : 'left')"></span>
       </button>
-      <button [disabled]="currentShift === getMaxShifts(cards.offsetWidth)" class="px-0 card-display-button" (click)="nextCard(currentShift + 1)">
+      <button [disabled]="currentShift === getMaxShifts(cards.offsetWidth)" class="px-0 card-display-button" (click)="moveCard(currentShift + 1)">
         <span [ngClass]="'fas fa-chevron-' + (isLanguageRTL ? 'left' : 'right')"></span>
       </button>
     </div>
