@@ -1,4 +1,3 @@
-
 name: PR Merge Comment
 
 on:
@@ -15,23 +14,45 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - uses: ./.github/actions/merge
+      - name: Merge Action
+        uses: ./.github/actions/merge
+
+      - name: Set intermediate environment variables
+        run: |
+          echo "AUTHOR=${{ github.event.pull_request.user.login }}" >> $GITHUB_ENV
+          echo "REPO=${{ github.repository }}" >> $GITHUB_ENV
+          echo "OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
+
       - name: Count merged PRs
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const author = context.payload.pull_request.user.login;
-            const repo = context.repo.repo;
-            const owner = context.repo.owner;
-            
+            const author = process.env.AUTHOR;
+            const [owner, repo] = process.env.REPO.split('/');
+
+            // Validate inputs directly
+            const loginPattern = /^[a-zA-Z0-9-]{1,39}$/;
+            const repoPattern = /^[a-zA-Z0-9._-]+$/;
+
+            if (!loginPattern.test(author)) {
+              throw new Error(`Invalid login: ${author}`);
+            }
+            if (!loginPattern.test(owner)) {
+              throw new Error(`Invalid owner: ${owner}`);
+            }
+            if (!repoPattern.test(repo)) {
+              throw new Error(`Invalid repo: ${repo}`);
+            }
+
             const { data } = await github.rest.search.issuesAndPullRequests({
               q: `repo:${owner}/${repo} type:pr state:closed author:${author}`
             });
             const prCount = data.items.filter(pr => pr.pull_request.merged_at).length;
-            
+
             core.exportVariable('PR_COUNT', prCount);
             core.exportVariable('AUTHOR', author);
+
       - name: Comment on the PR
         uses: actions/github-script@v6
         with:
@@ -41,16 +62,16 @@ jobs:
             const author = process.env.AUTHOR;
             const mention = 'HardikGoyal2003';
             const prNumber = context.payload.pull_request.number;
-            
+
             let message;
             if (prCount === 1) {
               message = `Thanks @${author}, and congratulations on your first PR to Oppia! 🎉 🥳\n` +
-              `Feel free to take up a second issue if you'd like to help out more!\n\n` +
-              `Developer onboarding lead : @${mention}`;
+                        `Feel free to take up a second issue if you'd like to help out more!\n\n` +
+                        `Developer onboarding lead : @${mention}`;
             } else if (prCount === 2) {
               message = `@${author} Congratulations on your second merged PR to Oppia! 🎉 🥳\n` +
-              `Since you've merged two PRs, you might be eligible to join the Oppia dev team as a collaborator. If you'd like to do that, please fill in [this form](https://forms.gle/NxPjimCMqsSTNUgu5). Thanks!\n\n` +
-              `Developer onboarding lead : @${mention}`;
+                        `Since you've merged two PRs, you might be eligible to join the Oppia dev team as a collaborator. If you'd like to do that, please fill in [this form](https://forms.gle/NxPjimCMqsSTNUgu5). Thanks!\n\n` +
+                        `Developer onboarding lead : @${mention}`;
             }
 
             if (prCount === 1 || prCount === 2) {
@@ -61,4 +82,3 @@ jobs:
                 body: message
               });
             }
-            
