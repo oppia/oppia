@@ -23,6 +23,33 @@
   }
 }
 
+.oppia-learner-dash-button-sm {
+  border: 1px solid;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  height: 36px;
+  padding: 10px 8px;
+  text-decoration: none;
+  transition: all 300ms ease-out;
+}
+
+.oppia-learner-dash-button--inverse {
+  background-color: #fff;
+  border-color: #00645c;
+  color: #00645c;
+}
+
+.oppia-learner-dash-button--inverse:hover {
+  background-color: #cadbda;
+}
+
+.oppia-learner-dash--inverse:focus {
+  background-color: #429488;
+  border-color: #429488;
+  color: #fff;
+}
+
 .oppia-learner-dash-greeting {
   color: #00645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;

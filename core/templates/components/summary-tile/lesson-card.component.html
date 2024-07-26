@@ -15,7 +15,7 @@
     </div>
     <div class="align-items-center d-flex justify-content-between mt-2">
       <circle-progress [percent]="progress"> </circle-progress>
-      <a class="align-items-center d-inline-flex justify-content-center lesson-card-button text-decoration-none" [href]="lessonUrl" target="_self">
+      <a class="align-items-center d-inline-flex justify-content-center lesson-card-button oppia-learner-dash-button-sm oppia-learner-dash-button--inverse" [href]="lessonUrl" target="_self">
         {{ getButtonTranslationKey() | translate }}
       </a>
     </div>
@@ -24,20 +24,7 @@
 
 <style>
   .lesson-card-button {
-    background-color: #fff;
-    border: 1px solid #00645c;
-    border-radius: 4px;
-    color: #00645c;
-    font-size: 14px;
-    font-weight: 500;
-    height: 36px;
-    padding: 10px 8px;
     width: 122px;
-  }
-
-  .lesson-card-button:hover {
-    background-color: #00645c;
-    color: #fff;
   }
 
   .lesson-card-container {
