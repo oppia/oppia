@@ -218,22 +218,13 @@
   }
 }
 
-.oppia-learner-dash-home-classes {
-  -webkit-appearance: none;
-}
-
-.oppia-learner-dash-home-button {
+.oppia-learner-dash-lg-button-classroom {
   background-color: #fff;
   border: 2px solid #205d86;
-  border-radius: .25em;
   color: #205d86;
-  font-weight: 700;
-  padding: 10px 0;
-  text-decoration: none;
-  width: 344px;
 }
 
-.oppia-learner-dash-home-button:hover {
+.oppia-learner-dash-lg-button-classroom:hover {
   background-color: #cadbda;
   color: #205d86;
   text-decoration: none;
