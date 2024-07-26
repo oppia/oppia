@@ -39,6 +39,8 @@ export default {
     ClassroomAdmin: 'http://localhost:8181/classroom-admin',
     ClassroomsPage: 'http://localhost:8181/learn',
     CommunityLibrary: 'http://localhost:8181/community-library',
+    recentlyPublishedExplorations:
+      'http://localhost:8181/community-library/recently-published',
     Contact: 'http://localhost:8181/contact',
     ContributorDashboard: 'http://localhost:8181/contributor-dashboard',
     ContributorDashboardAdmin:
@@ -132,6 +134,7 @@ export default {
     TOPIC_MANAGER: 'topic manager',
     MODERATOR: 'moderator',
     RELEASE_COORDINATOR: 'release coordinator',
+    COLLECTION_EDITOR: 'collection editor',
   } as const,
 
   BlogRights: {
