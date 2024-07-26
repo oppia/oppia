@@ -7,7 +7,7 @@
       <a *ngIf="classroomSummaries.length === 1" class="single-classroom-nav-item-container">
         <div class="classroom-item">
           <div class="classroom-text-container">
-            <a class="classroom-name" [href]="'/learn/' + classroomSummaries[0].url_fragment">{{ classroomSummaries[0].name }}</a>
+            <a class="classroom-name e2e-mobile-test-classroom-link" [href]="'/learn/' + classroomSummaries[0].url_fragment">{{ classroomSummaries[0].name }}</a>
             <p class="classroom-intro-text">Foundational lessons to get started in {{ classroomSummaries[0].name }}</p>
           </div>
           <div class="classroom-thumbnail">
@@ -32,7 +32,7 @@
         <div *ngFor="let classroom of classroomSummaries" class="classroom-nav-item-container">
           <div class="classroom-item">
             <div class="classroom-text-container">
-              <a class="classroom-name" [href]="'/learn/' + classroom.url_fragment">{{ classroom.name }}</a>
+              <a class="classroom-name e2e-mobile-test-classroom-link" [href]="'/learn/' + classroom.url_fragment">{{ classroom.name }}</a>
               <p class="classroom-intro-text">Foundational lessons to get started in {{ classroomSummaries[0].name }}</p>
             </div>
             <div class="classroom-thumbnail">
