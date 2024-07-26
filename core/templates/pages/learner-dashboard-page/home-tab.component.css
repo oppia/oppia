@@ -218,14 +218,16 @@
   }
 }
 
-.oppia-learner-dash-lg-button-classroom {
+/*
+  TODO(#18384): focus class for classroom button.
+*/
+
+.oppia-learner-dash-button-lg--classroom {
   background-color: #fff;
-  border: 2px solid #205d86;
+  border-color: #205d86;
   color: #205d86;
 }
 
-.oppia-learner-dash-lg-button-classroom:hover {
+.oppia-learner-dash-button-lg--classroom:hover {
   background-color: #cadbda;
-  color: #205d86;
-  text-decoration: none;
 }
