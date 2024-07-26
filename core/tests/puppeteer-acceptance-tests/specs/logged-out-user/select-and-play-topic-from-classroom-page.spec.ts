@@ -60,7 +60,11 @@ describe('Logged-out User', function () {
         'Negative Numbers'
       );
 
-    await curriculumAdmin.createAndPublishTopic('Algebra I', 'Negative Numbers', 'Negative Numbers');
+    await curriculumAdmin.createAndPublishTopic(
+      'Algebra I',
+      'Negative Numbers',
+      'Negative Numbers'
+    );
 
     await curriculumAdmin.createAndPublishStoryWithChapter(
       'Algebra Story',

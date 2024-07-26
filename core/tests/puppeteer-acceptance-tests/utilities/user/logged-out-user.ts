@@ -200,8 +200,9 @@ const classroomNameHeading = '.e2e-test-classroom-name';
 const errorPageHeading = '.e2e-test-error-page-heading';
 const classroomTileContainer = '.oppia-classroom-tile-container';
 
-const floatFormInput = '.e2e-test-float-form-input';
+const submitResponseToInteractionInput = 'oppia-interaction-display input';
 const nextCardButton = '.e2e-test-next-card-button';
+const nextCardArrowButton = '.e2e-test-next-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 const searchInputSelector = '.e2e-test-search-input';
@@ -225,8 +226,6 @@ const loginPromptContainer = '.story-viewer-login-container';
 const NavbarBackButton = '.oppia-navbar-back-button';
 const lessonCardSelector = '.e2e-test-exploration-dashboard-card';
 const nextLessonButton = '.e2e-test-next-lesson-button';
-const lessonTitleInCommunityLibrarySelector =
-  '.e2e-test-exp-summary-tile-title';
 const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
 const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
 const generateAttributionSelector = '.e2e-test-generate-attribution';
@@ -238,12 +237,17 @@ const iconAccessibilityLabelSelector = '.oppia-icon-accessibility-label';
 const reportExplorationButtonSelector = '.e2e-test-report-exploration-button';
 const rateOptionsSelector = '.conversation-skin-final-ratings';
 const checkpointModalSelector = '.lesson-info-tooltip-add-ons';
-const feedbackSelector = 'e2e-test-conversation-feedback-latest';
+const feedbackSelector = '.e2e-test-conversation-feedback-latest';
 const previousCardButton = '.e2e-test-back-button';
-const hintButtonSelector = 'e2e-test-view-hint';
-const gotItButtonSelector = 'e2e-test-learner-got-it-button';
+const hintButtonSelector = '.e2e-test-view-hint';
+const gotItButtonSelector = '.e2e-test-learner-got-it-button';
 const responsesDropdownSelector = '.conversation-skin-responses-dropdown-text';
-const responseSelector = 'oppia-learner-response-display';
+const responseSelector = 'oppia-interaction-display';
+const closeLessonInfoTooltipSelector = '.e2e-test-close-lesson-info-tooltip';
+const viewSolutionButton = '.e2e-test-view-solution';
+const stateConversationContent = '.e2e-test-conversation-content';
+const closeSolutionModalButton = '.e2e-test-learner-got-it-button';
+const continueToSolutionButton = '.e2e-test-continue-to-solution-btn';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -1885,47 +1889,26 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the next card in the preview tab.
    */
   async continueToNextCard(): Promise<void> {
-    await this.clickOn(nextCardButton);
+    try {
+      await this.page.waitForSelector(nextCardButton, {timeout: 7000});
+      await this.clickOn(nextCardButton);
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        await this.clickOn(nextCardArrowButton);
+      } else {
+        throw error;
+      }
+    }
   }
 
   /**
    * Function to submit an answer to a form input field.
-   *
-   * This function first determines the type of the input field in the DOM using the getInputType function.
-   * Currently, it only supports 'text', 'number', and 'float' input types. If the input type is anything else, it throws an error.
    * @param {string} answer - The answer to submit.
    */
   async submitAnswer(answer: string): Promise<void> {
-    await this.waitForElementToBeClickable(floatFormInput);
-    const inputType = await this.getInputType(floatFormInput);
-
-    switch (inputType) {
-      case 'text':
-      case 'number':
-      case 'float':
-        await this.page.waitForSelector(floatFormInput);
-        await this.page.type(floatFormInput, answer);
-        break;
-      default:
-        throw new Error(`Unsupported input type: ${inputType}`);
-    }
-
+    await this.waitForElementToBeClickable(submitResponseToInteractionInput);
+    await this.type(submitResponseToInteractionInput, answer);
     await this.clickOn(submitAnswerButton);
-  }
-
-  /**
-   * Function to Get the type of an input field in the DOM.
-   * @param {string} selector - The CSS selector for the input field.
-   */
-  async getInputType(selector: string): Promise<string> {
-    const inputField = await this.page.$(selector);
-    if (!inputField) {
-      throw new Error(`Input field not found for selector: ${selector}`);
-    }
-    const inputType = (await (
-      await inputField.getProperty('type')
-    ).jsonValue()) as string;
-    return inputType;
   }
 
   /**
@@ -2423,42 +2406,45 @@ export class LoggedOutUser extends BaseUser {
    * Loads the next chapter from the last state of an exploration.
    */
   async loadNextChapterFromLastState(): Promise<void> {
-    await this.clickOn(nextLessonButton);
+    await this.clickAndWaitForNavigation(nextLessonButton);
   }
 
   /**
    * Returns to the story from the last state of an exploration.
    */
   async returnToStoryFromLastState(): Promise<void> {
-    await this.clickOn('Return to Story');
+    await this.clickAndWaitForNavigation('Return to Story');
   }
 
   /**
-   * Selects a lesson in the search results.
-   * @param {string} lessonName - The name of the lesson to select.
+   * Searches for a specific lesson in the search results and opens it.
+   * @param {string} lessonTitle - The title of the lesson to search for.
    */
-  async selectLessonInSearchResults(lessonName: string): Promise<void> {
+  async playLessonFromSearchResults(lessonTitle: string): Promise<void> {
     try {
-      const explorationTitles = await this.page.$$(
-        lessonTitleInCommunityLibrarySelector
+      await this.page.waitForSelector(lessonCardTitleSelector);
+      const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
+      const searchResults = await Promise.all(
+        searchResultsElements.map(result =>
+          this.page.evaluate(el => el.textContent.trim(), result)
+        )
       );
-      for (const title of explorationTitles) {
-        const titleText = await this.page.evaluate(
-          el => el.querySelector('span > span').textContent,
-          title
-        );
-        if (titleText === lessonName) {
-          await this.waitForElementToBeClickable(title);
-          await title.click();
-          return;
-        }
+
+      const lessonIndex = searchResults.indexOf(lessonTitle);
+      if (lessonIndex === -1) {
+        throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
       }
 
-      throw new Error(
-        `Lesson "${lessonName}" not found in exploration titles.`
+      await this.waitForElementToBeClickable(
+        searchResultsElements[lessonIndex]
       );
+      await searchResultsElements[lessonIndex].click();
+      await this.waitForStaticAssetsToLoad();
+      showMessage(`Lesson "${lessonTitle}" opened from search results.`);
     } catch (error) {
-      const newError = new Error(`Failed to select lesson: ${error}`);
+      const newError = new Error(
+        `Failed to open lesson from search results: ${error}`
+      );
       newError.stack = error.stack;
       throw newError;
     }
@@ -2540,7 +2526,9 @@ export class LoggedOutUser extends BaseUser {
     );
 
     if (!attributionHtmlCode.includes(htmlString)) {
-      throw new Error('HTML string not found in the HTML section.');
+      throw new Error(
+        `Expected HTML string "${htmlString}" not found in the HTML section. Actual HTML: "${attributionHtmlCode}"`
+      );
     }
   }
 
@@ -2562,7 +2550,9 @@ export class LoggedOutUser extends BaseUser {
     );
 
     if (!attributionPrintText.includes(textString)) {
-      throw new Error('Text string not found in the print text.');
+      throw new Error(
+        `Expected text string "${textString}" not found in the print text. Actual text: "${attributionPrintText}"`
+      );
     }
   }
 
@@ -2591,10 +2581,12 @@ export class LoggedOutUser extends BaseUser {
       }
     }
   }
+
   /**
    * Checks if the report exploration button is not available.
    */
   async expectReportOptionsNotAvailable(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
     const reportExplorationButton = await this.page.$(
       reportExplorationButtonSelector
     );
@@ -2607,6 +2599,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the rate options are not available.
    */
   async expectRateOptionsNotAvailable(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
     const rateOptions = await this.page.$(rateOptionsSelector);
     if (rateOptions !== null) {
       throw new Error('Rate options found.');
@@ -2618,8 +2611,13 @@ export class LoggedOutUser extends BaseUser {
    */
   async verifyCheckpointModalAppears(): Promise<void> {
     try {
-      await this.page.waitForSelector(checkpointModalSelector, {visible: true});
+      await this.page.waitForSelector(checkpointModalSelector, {
+        visible: true,
+        timeout: 5000,
+      });
       showMessage('Checkpoint modal found.');
+      // Closing the checkpoint modal.
+      await this.clickOn(closeLessonInfoTooltipSelector);
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
         const newError = new Error('Checkpoint modal not found.');
@@ -2650,7 +2648,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the previous card in an exploration.
    */
-  async navigateBackToPreviousCard(): Promise<void> {
+  async goBackToPreviousCard(): Promise<void> {
     await this.clickOn(previousCardButton);
   }
 
@@ -2663,12 +2661,13 @@ export class LoggedOutUser extends BaseUser {
     if (hasInputFields) {
       throw new Error('The page should not have any input fields.');
     }
+    showMessage('The page does not have any input fields, as expected.');
   }
 
   /**
    * Function to use a hint.
    */
-  async useHint(): Promise<void> {
+  async viewHint(): Promise<void> {
     await this.page.waitForSelector(hintButtonSelector);
     await this.clickOn(hintButtonSelector);
   }
@@ -2681,7 +2680,25 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(gotItButtonSelector);
     await this.page.waitForSelector(gotItButtonSelector, {hidden: true});
   }
+  /**
+   * Simulates the action of viewing the solution by clicking on the view solution button and the continue to solution button.
+   */
+  async viewSolution(): Promise<void> {
+    await this.clickOn(viewSolutionButton);
+    await this.clickOn(continueToSolutionButton);
+  }
 
+  /**
+   * Closes the solution modal by clicking on the close solution modal button.
+   */
+  async closeSolutionModal(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(closeSolutionModalButton, {visible: true});
+    const closeSolutionModalButtonElement = await this.page.$(
+      closeSolutionModalButton
+    );
+    await closeSolutionModalButtonElement?.click();
+  }
   /**
    * Function to view previous responses in a state.
    * This function clicks on the responses dropdown selector to display previous responses.
@@ -2704,16 +2721,34 @@ export class LoggedOutUser extends BaseUser {
       throw new Error(
         `Expected ${expectedNumberOfResponses} responses, but got ${responseElements.length}.`
       );
-    },
+    }
   }
 
-
-
-  async timeout(time){
-    await this.page.waitForTimeout(time);
+  /**
+   * Checks if the current card's content matches the expected content.
+   * @param {string} expectedCardContent - The expected content of the card.
+   */
+  async expectCardContentToBe(expectedCardContent: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(`${stateConversationContent} p`, {
+      visible: true,
+    });
+    const element = await this.page.$(`${stateConversationContent} p`);
+    const cardContent = await this.page.evaluate(
+      element => element.textContent,
+      element
+    );
+    if (cardContent.trim() !== expectedCardContent) {
+      throw new Error(
+        `Card content is not same as expected. Actual: ${cardContent.trim()}, Expected: ${expectedCardContent}.`
+      );
+    }
+    showMessage('Card content is as expected.');
   }
-  async screenshot(path){
-    await this.page.screenshot({path: `${path}`})
+
+  async simulateDelayToAvoidFatigueDetection(): Promise<void> {
+    // This timeout is important to avoid fatigue detection service, as otherwise it will get activated again post further submissions.
+    await this.page.waitForTimeout(10000);
   }
 }
 

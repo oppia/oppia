@@ -852,40 +852,40 @@ export class CurriculumAdmin extends BaseUser {
    * the story, and then publish the story.
    */
   async createAndPublishStoryWithChapter(
-      storyTitle: string,
-      storyUrlFragment: string,
-      chapterTitle: string,
-      explorationId: string,
-      topicName: string,
-      numOfChaptersToAdd: number = 1
-    ): Promise<void> {
-      await this.openTopicEditor(topicName);
-      if (this.isViewportAtMobileWidth()) {
-        await this.clickOn(mobileStoryDropdown);
-      }
-      await this.clickOn(addStoryButton);
-      await this.type(storyTitleField, storyTitle);
-      await this.type(storyUrlFragmentField, storyUrlFragment);
-      await this.type(
-        storyDescriptionField,
-        `Story creation description for ${storyTitle}.`
-      );
+    storyTitle: string,
+    storyUrlFragment: string,
+    chapterTitle: string,
+    explorationId: string,
+    topicName: string,
+    numOfChaptersToAdd: number = 1
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileStoryDropdown);
+    }
+    await this.clickOn(addStoryButton);
+    await this.type(storyTitleField, storyTitle);
+    await this.type(storyUrlFragmentField, storyUrlFragment);
+    await this.type(
+      storyDescriptionField,
+      `Story creation description for ${storyTitle}.`
+    );
 
-      await this.clickOn(storyPhotoBoxButton);
-      await this.uploadFile(curriculumAdminThumbnailImage);
-      await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-      await this.clickOn(uploadPhotoButton);
+    await this.clickOn(storyPhotoBoxButton);
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
 
-      await this.page.waitForSelector(photoUploadModal, {hidden: true});
-      await this.clickAndWaitForNavigation(createStoryButton);
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickAndWaitForNavigation(createStoryButton);
 
-      await this.page.waitForSelector(storyMetaTagInput);
-      await this.page.focus(storyMetaTagInput);
-      await this.page.type(storyMetaTagInput, 'meta');
-      await this.page.keyboard.press('Tab');
+    await this.page.waitForSelector(storyMetaTagInput);
+    await this.page.focus(storyMetaTagInput);
+    await this.page.type(storyMetaTagInput, 'meta');
+    await this.page.keyboard.press('Tab');
 
-    for(let i = 0; i<numOfChaptersToAdd; i++){
-    await this.addChapter(chapterTitle, explorationId);
+    for (let i = 0; i < numOfChaptersToAdd; i++) {
+      await this.addChapter(chapterTitle, explorationId);
     }
 
     await this.saveStoryDraft();

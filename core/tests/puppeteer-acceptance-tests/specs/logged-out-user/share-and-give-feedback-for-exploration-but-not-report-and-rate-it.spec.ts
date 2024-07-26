@@ -107,7 +107,7 @@ describe('Logged-out User', function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
 
       await loggedOutUser.searchForLessonInSearchBar('Algebra I');
-      await loggedOutUser.selectLessonInSearchResults('Algebra I');
+      await loggedOutUser.playLessonFromSearchResults('Algebra I');
 
       await loggedOutUser.continueToNextCard();
 
@@ -132,7 +132,6 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.shareExploration('Facebook');
       await loggedOutUser.shareExploration('Twitter');
-      ('');
 
       // Giving feedback after completing the exploration.
       await loggedOutUser.giveFeedback('This is a great lesson!');

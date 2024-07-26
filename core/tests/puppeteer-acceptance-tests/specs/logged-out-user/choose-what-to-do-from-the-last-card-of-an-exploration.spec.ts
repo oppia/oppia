@@ -41,7 +41,11 @@ describe('Logged-out User', function () {
       'curriculumAdmin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
-    await curriculumAdmin.createAndPublishClassroom('Math', 'math', 'Algebra I');
+    await curriculumAdmin.createAndPublishClassroom(
+      'Math',
+      'math',
+      'Algebra I'
+    );
 
     explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
@@ -52,8 +56,12 @@ describe('Logged-out User', function () {
         'positive-numbers'
       );
 
-     await curriculumAdmin.createAndPublishTopic('Math', 'Algebra', 'Multiplication');
-     await curriculumAdmin.createAndPublishStoryWithChapter(
+    await curriculumAdmin.createAndPublishTopic(
+      'Math',
+      'Algebra',
+      'Multiplication'
+    );
+    await curriculumAdmin.createAndPublishStoryWithChapter(
       'Algebra Story 1',
       'algebra-story-one',
       'Understanding Negative Numbers',
@@ -63,7 +71,6 @@ describe('Logged-out User', function () {
     );
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
-
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(

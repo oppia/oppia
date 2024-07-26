@@ -23,13 +23,17 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import escapeRegExp from 'lodash/escapeRegExp';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const REVISION_CARD_CONTENT =
+  'Remember, a fraction represents a part of a whole. It consists of a numerator and a denominator.';
+
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
   NUMERIC_INPUT = 'Number Input',
   FRACTION_INPUT = 'Fraction Input',
-  MULTIPLE_CHOICE = 'Multiple Choice',
   END_EXPLORATION = 'End Exploration',
 }
 
@@ -37,9 +41,25 @@ enum CARD_NAME {
   INTRODUCTION = 'Introduction',
   ALGEBRA_BASICS = 'Algebra Basics',
   FRACTION_CONVERSION = 'Fraction Conversion',
-  MULTIPLE_CHOICE_QUESTION = 'Multiple Choice Question',
+  REVISION_CARD = 'Revision Card',
   FINAL_CARD = 'Final Card',
 }
+
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /https:\/\/pencilcode\.net\/lib\/pencilcodeembed\.js Failed to load resource: net::ERR_CERT_.*/,
+  escapeRegExp(
+    "webpack:///./core/templates/services/contextual/logger.service.ts? ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'disabled: false'. Current value: 'disabled: true'."
+  ),
+  escapeRegExp(
+    "ng:///SharedComponentsModule/AddOrUpdateSolutionModalComponent.ngfactory.js  ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'disabled: false'. Current value: 'disabled: true'."
+  ),
+  escapeRegExp(
+    "webpack:///./core/templates/services/contextual/logger.service.ts? ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'ng-untouched: true'. Current value: 'ng-untouched: false'."
+  ),
+  escapeRegExp(
+    "ng:///FractionInputInteractionModule/InteractiveFractionInputComponent.ngfactory.js  ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'ng-untouched: true'. Current value: 'ng-untouched: false'."
+  ),
+]);
 
 describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
@@ -67,60 +87,60 @@ describe('Logged-out User', function () {
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.ALGEBRA_BASICS);
-    await explorationEditor.updateCardContent('Solve the equation 2x = 10.');
+    await explorationEditor.updateCardContent('Enter a negative number.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
-      '5',
+      '-1',
       'Perfect!',
       CARD_NAME.FRACTION_CONVERSION,
       true
     );
     await explorationEditor.editDefaultResponseFeedback('Wrong, try again!');
-
+    await explorationEditor.addHintToState(
+      'Remember that negative numbers are less than 0.'
+    );
+    await explorationEditor.addSolutionToState(
+      '-99',
+      'The number -99 is a negative number.'
+    );
     await explorationEditor.saveExplorationDraft();
 
     // Navigate to the new card and add a fraction conversion problem.
-    await explorationEditor.navigateToCard(CARD_NAME.FRACTION_CONVERSION);
+    await explorationEditor.navigateToCard('Fraction Con...');
     await explorationEditor.updateCardContent('Express 50% as a fraction.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
+    await explorationEditor.addMathInteraction(
+      INTERACTION_TYPES.FRACTION_INPUT
+    );
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.FRACTION_INPUT,
-      '1/2',
-      'Correct!',
-      CARD_NAME.MULTIPLE_CHOICE_QUESTION,
-      true
-    );
-    await explorationEditor.editDefaultResponseFeedback(
-      'Incorrect, try again!',
-      undefined,
-      CARD_NAME.MULTIPLE_CHOICE_QUESTION
-    );
-    await explorationEditor.addHintToState(
-      'Remember that 50% is the same as 1/2.'
-    );
-    await explorationEditor.addSolutionToState(
-      '1/2',
-      'The fraction 1/2 is equivalent to 50%.'
-    );
-
-    await explorationEditor.saveExplorationDraft();
-
-    // Navigate to the new card and add a multiple choice question.
-    await explorationEditor.navigateToCard(CARD_NAME.MULTIPLE_CHOICE_QUESTION);
-    await explorationEditor.updateCardContent(
-      'Which of the following is equivalent to 1/2?'
-    );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.MULTIPLE_CHOICE);
-    await explorationEditor.addResponsesToTheInteraction(
-      INTERACTION_TYPES.MULTIPLE_CHOICE,
-      '0.5',
+      '2',
       'Correct!',
       CARD_NAME.FINAL_CARD,
       true
     );
+
     await explorationEditor.editDefaultResponseFeedback(
-      'Incorrect, try again!'
+      'Incorrect, try again!',
+      undefined,
+      CARD_NAME.REVISION_CARD
+    );
+
+    await explorationEditor.addHintToState(
+      'Remember that 50% is the same as 1/2.'
+    );
+    await explorationEditor.setTheStateAsCheckpoint();
+    await explorationEditor.saveExplorationDraft();
+
+    // Navigate to the new card and add a multiple choice question.
+    await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
+    await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
+    await explorationEditor.updateCardContent(REVISION_CARD_CONTENT);
+    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.editDefaultResponseFeedback(
+      undefined,
+      CARD_NAME.FINAL_CARD
     );
 
     await explorationEditor.saveExplorationDraft();
@@ -147,53 +167,60 @@ describe('Logged-out User', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to interact with different interactions,receive feedback, navigates through cards, uses concept cards and hints, views previous responses, and reaches a checkpoint',
+    'should be able to interact with different interactions,receive feedback, navigates through cards, uses hints, views previous responses, and reaches a checkpoint',
     async function () {
-      const actions = [
-        { action: () => loggedOutUser.navigateToCommunityLibraryPage(), name: 'navigateToCommunityLibraryPage' },
-        { action: () => loggedOutUser.searchForLessonInSearchBar('Algebra Basics'), name: 'searchForLessonInSearchBar' },
-        { action: () => loggedOutUser.selectLessonInSearchResults('Algebra Basics'), name: 'selectLessonInSearchResults' },
-        { action: () => loggedOutUser.continueToNextCard(), name: 'continueToNextCard1' },
-        { action: () => loggedOutUser.verifyCheckpointModalAppears(), name: 'verifyCheckpointModalAppears' },
-        { action: () => loggedOutUser.submitAnswer('5'), name: 'submitAnswer1' },
-        { action: () => loggedOutUser.expectOppiaFeedbackToBe('Perfect!'), name: 'expectOppiaFeedbackToBe1' },
-        { action: () => loggedOutUser.continueToNextCard(), name: 'continueToNextCard2' },
-        { action: () => loggedOutUser.navigateBackToPreviousCard(), name: 'navigateBackToPreviousCard' },
-        { action: () => loggedOutUser.verifyCannotAnswerPreviouslyAnsweredQuestion(), name: 'verifyCannotAnswerPreviouslyAnsweredQuestion' },
-        { action: () => loggedOutUser.continueToNextCard(), name: 'continueToNextCard3' },
+      await loggedOutUser.navigateToCommunityLibraryPage();
+      await loggedOutUser.searchForLessonInSearchBar('Algebra Basics');
+      await loggedOutUser.playLessonFromSearchResults('Algebra Basics');
+      await loggedOutUser.continueToNextCard();
 
-        // Again wrong answer is submitted number of times to to get stuck and navigate to help card.
-        { action: () => loggedOutUser.submitAnswer('1/4'), name: 'submitAnswer2' },
-        { action: () => loggedOutUser.useHint(), name: 'useHint' },
-        { action: () => loggedOutUser.closeHintModal(), name: 'closeHintModal' },
-        
-        // Again wrong answer is submitted number of times to to get stuck and navigate to help card.
-        { action: () => loggedOutUser.submitAnswer('1/3'), name: 'submitAnswer3' },
-        { action: () => loggedOutUser.submitAnswer('1/4'), name: 'submitAnswer4' },
-        { action: () => loggedOutUser.submitAnswer('1/5'), name: 'submitAnswer5' },
-        { action: () => loggedOutUser.submitAnswer('1/6'), name: 'submitAnswer6' },
-        { action: () => loggedOutUser.viewPreviousResponses(), name: 'viewPreviousResponses' },
-        { action: () => loggedOutUser.verifyNumberOfPreviousResponsesDisplayed(5), name: 'verifyNumberOfPreviousResponsesDisplayed' },
-        { action: () => loggedOutUser.continueToNextCard(), name: 'continueToNextCard4' },
-        { action: () => loggedOutUser.submitAnswer('0.5'), name: 'submitAnswer7' },
-        { action: () => loggedOutUser.expectOppiaFeedbackToBe('Correct!'), name: 'expectOppiaFeedbackToBe2' },
-        { action: () => loggedOutUser.continueToNextCard(), name: 'continueToNextCard5' },
-        { action: () => loggedOutUser.expectExplorationCompletionToastMessage('Congratulations for completing this lesson!'), name: 'expectExplorationCompletionToastMessage' },
-        {
-          action: () => loggedOutUser.timeout(2147483647)
-        }
-      ];
+      // Wrong answer is submitted number of times to get to see hints.
+      await loggedOutUser.submitAnswer('40');
+      await loggedOutUser.expectOppiaFeedbackToBe('Wrong, try again!');
+      await loggedOutUser.submitAnswer('5');
+      await loggedOutUser.viewHint();
+      await loggedOutUser.closeHintModal();
 
-      for (const { action, name } of actions) {
-        try {
-          await action();
-        } catch (error) {
-          console.error('\x1b[31m%s\x1b[0m', error);
-          await loggedOutUser.screenshot(`error_${name}.png`);
-        }
-      }
+      // Again wrong answer is submitted number of times to get stuck and get to see the solution.
+      await loggedOutUser.submitAnswer('69');
+      await loggedOutUser.submitAnswer('39');
+      await loggedOutUser.simulateDelayToAvoidFatigueDetection();
+      await loggedOutUser.submitAnswer('59');
+      await loggedOutUser.viewSolution();
+      await loggedOutUser.closeSolutionModal();
+
+      await loggedOutUser.submitAnswer('-39');
+      await loggedOutUser.expectOppiaFeedbackToBe('Perfect!');
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.verifyCheckpointModalAppears();
+      await loggedOutUser.goBackToPreviousCard();
+      await loggedOutUser.verifyCannotAnswerPreviouslyAnsweredQuestion();
+      await loggedOutUser.continueToNextCard();
+
+      // Wrong answer is submitted to get to see hints.
+      await loggedOutUser.submitAnswer('1/4');
+      await loggedOutUser.submitAnswer('1/3');
+      await loggedOutUser.viewHint();
+      await loggedOutUser.closeHintModal();
+
+      // Again wrong answer is submitted number of times to get stuck and navigate to Revision card.
+      await loggedOutUser.submitAnswer('1/3');
+      await loggedOutUser.submitAnswer('1/4');
+      await loggedOutUser.simulateDelayToAvoidFatigueDetection();
+      await loggedOutUser.submitAnswer('1/5');
+      await loggedOutUser.viewPreviousResponses();
+      await loggedOutUser.verifyNumberOfPreviousResponsesDisplayed(5);
+      await loggedOutUser.continueToNextCard();
+
+      // Verifying if navigated to the expected card after getting stuck.
+      await loggedOutUser.expectCardContentToBe(REVISION_CARD_CONTENT);
+      await loggedOutUser.continueToNextCard();
+
+      await loggedOutUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
     },
-    2147483647
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
