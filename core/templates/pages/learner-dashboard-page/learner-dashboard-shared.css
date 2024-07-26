@@ -34,6 +34,14 @@
   transition: all 300ms ease-out;
 }
 
+.oppia-learner-dash-button-sm:hover {
+  text-decoration: none;
+}
+
+.oppia-learner-dash-button-sm:focus {
+  text-decoration: none;
+}
+
 .oppia-learner-dash-button--inverse {
   background-color: #fff;
   border-color: #00645c;
