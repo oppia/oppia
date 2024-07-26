@@ -69,6 +69,10 @@ const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
 const impactReportUrl = testConstants.URLs.ImpactReportUrl;
+const teacherStoryTaggedBlogsLink =
+  testConstants.URLs.TeacherStoryTaggedBlogsLink;
+const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
+const lessonCreatorLinkedInUrl = testConstants.URLs.LessonCreatorLinkedInUrl;
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const navbarLearnTabBasicMathematicsButton =
@@ -139,6 +143,12 @@ const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
 const exploreLessonsButtonInTeachPage =
   '.e2e-test-teach-page-explore-lessons-button';
+const blogButtonInTeachPage = '.e2e-test-teach-page-blog-button';
+const guideButtonInTeachPage = '.e2e-test-teach-page-guide-button';
+const lessonCreatorLinkedinButtonInTeachPage =
+  '.e2e-test-teach-page-linkedin-button';
+const lessonCreationSectionInTeachPage =
+  '.e2e-test-teach-page-lesson-creation-section';
 const partnerWithUsButtonAtTheTopOfPartnershipsPage =
   '.e2e-test-partnerships-page-partner-with-us-button-at-the-top';
 const partnerWithUsButtonAtTheBottomOfPartnershipsPage =
@@ -1229,6 +1239,61 @@ export class LoggedOutUser extends BaseUser {
       oppiaAndroidAppButton,
       testConstants.OppiaSocials.GooglePlay.Domain,
       testConstants.OppiaSocials.GooglePlay.Id
+    );
+  }
+
+  /**
+   * Function to click the first LinkedIn button in the Teach page
+   * and check if it opens corresponding Creator's LinkedIn Url link
+   */
+  async checkIfLessonCreationProcessIsVisibleInTeachPage(): Promise<void> {
+    const lessonCreationSection = await this.page.waitForSelector(
+      lessonCreationSectionInTeachPage
+    );
+    if (!lessonCreationSection) {
+      throw new Error(
+        'The lesson creation section is not visible on the teach page.'
+      );
+    } else {
+      showMessage('The lesson creation section is visible on the teach page.');
+    }
+  }
+
+  /**
+   * Function to click the first LinkedIn button in the Teach page
+   * and check if it opens corresponding Creator's LinkedIn Url link
+   */
+  async clickLinkedInButtonInTeachPage(): Promise<void> {
+    // Here we are verifying the href attribute of the first LinkedIn button.
+    // LinkedIn requires users to log in before accessing profile pages,
+    // so the profile page cannot be opened directly.
+    await this.openExternalPdfLink(
+      lessonCreatorLinkedinButtonInTeachPage,
+      lessonCreatorLinkedInUrl
+    );
+  }
+
+  /**
+   * Function to click the Check out our guide button in the Teach page
+   * and check if it opens the parents Teachers Guide Url link
+   */
+  async clickGuideButtonInTeachPage(): Promise<void> {
+    await this.openExternalPdfLink(
+      guideButtonInTeachPage,
+      parentsTeachersGuideUrl
+    );
+  }
+
+  /**
+   * Function to click the Check out our blog button in the Teach page
+   * and check if it opens the Teacher Story tagged blogs link
+   */
+  async clickBlogButtonInTeachPage(): Promise<void> {
+    await this.clickLinkButtonToNewTab(
+      blogButtonInTeachPage,
+      'Check out our blog button',
+      teacherStoryTaggedBlogsLink,
+      'Blog'
     );
   }
 
