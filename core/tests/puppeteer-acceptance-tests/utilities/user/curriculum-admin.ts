@@ -884,7 +884,10 @@ export class CurriculumAdmin extends BaseUser {
       await this.page.type(storyMetaTagInput, 'meta');
       await this.page.keyboard.press('Tab');
 
+    for(let i = 0; i<numOfChaptersToAdd; i++){
     await this.addChapter(chapterTitle, explorationId);
+    }
+
     await this.saveStoryDraft();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileSaveStoryChangesDropdown);

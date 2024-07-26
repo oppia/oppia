@@ -2704,7 +2704,16 @@ export class LoggedOutUser extends BaseUser {
       throw new Error(
         `Expected ${expectedNumberOfResponses} responses, but got ${responseElements.length}.`
       );
-    }
+    },
+  }
+
+
+
+  async timeout(time){
+    await this.page.waitForTimeout(time);
+  }
+  async screenshot(path){
+    await this.page.screenshot({path: `${path}`})
   }
 }
 

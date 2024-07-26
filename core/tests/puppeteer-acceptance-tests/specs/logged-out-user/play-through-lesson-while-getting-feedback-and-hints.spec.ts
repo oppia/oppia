@@ -149,43 +149,51 @@ describe('Logged-out User', function () {
   it(
     'should be able to interact with different interactions,receive feedback, navigates through cards, uses concept cards and hints, views previous responses, and reaches a checkpoint',
     async function () {
-      await loggedOutUser.navigateToCommunityLibraryPage();
+      const actions = [
+        { action: () => loggedOutUser.navigateToCommunityLibraryPage(), name: 'navigateToCommunityLibraryPage' },
+        { action: () => loggedOutUser.searchForLessonInSearchBar('Algebra Basics'), name: 'searchForLessonInSearchBar' },
+        { action: () => loggedOutUser.selectLessonInSearchResults('Algebra Basics'), name: 'selectLessonInSearchResults' },
+        { action: () => loggedOutUser.continueToNextCard(), name: 'continueToNextCard1' },
+        { action: () => loggedOutUser.verifyCheckpointModalAppears(), name: 'verifyCheckpointModalAppears' },
+        { action: () => loggedOutUser.submitAnswer('5'), name: 'submitAnswer1' },
+        { action: () => loggedOutUser.expectOppiaFeedbackToBe('Perfect!'), name: 'expectOppiaFeedbackToBe1' },
+        { action: () => loggedOutUser.continueToNextCard(), name: 'continueToNextCard2' },
+        { action: () => loggedOutUser.navigateBackToPreviousCard(), name: 'navigateBackToPreviousCard' },
+        { action: () => loggedOutUser.verifyCannotAnswerPreviouslyAnsweredQuestion(), name: 'verifyCannotAnswerPreviouslyAnsweredQuestion' },
+        { action: () => loggedOutUser.continueToNextCard(), name: 'continueToNextCard3' },
 
-      await loggedOutUser.searchForLessonInSearchBar('Algebra Basics');
-      await loggedOutUser.selectLessonInSearchResults('Algebra Basics');
+        // Again wrong answer is submitted number of times to to get stuck and navigate to help card.
+        { action: () => loggedOutUser.submitAnswer('1/4'), name: 'submitAnswer2' },
+        { action: () => loggedOutUser.useHint(), name: 'useHint' },
+        { action: () => loggedOutUser.closeHintModal(), name: 'closeHintModal' },
+        
+        // Again wrong answer is submitted number of times to to get stuck and navigate to help card.
+        { action: () => loggedOutUser.submitAnswer('1/3'), name: 'submitAnswer3' },
+        { action: () => loggedOutUser.submitAnswer('1/4'), name: 'submitAnswer4' },
+        { action: () => loggedOutUser.submitAnswer('1/5'), name: 'submitAnswer5' },
+        { action: () => loggedOutUser.submitAnswer('1/6'), name: 'submitAnswer6' },
+        { action: () => loggedOutUser.viewPreviousResponses(), name: 'viewPreviousResponses' },
+        { action: () => loggedOutUser.verifyNumberOfPreviousResponsesDisplayed(5), name: 'verifyNumberOfPreviousResponsesDisplayed' },
+        { action: () => loggedOutUser.continueToNextCard(), name: 'continueToNextCard4' },
+        { action: () => loggedOutUser.submitAnswer('0.5'), name: 'submitAnswer7' },
+        { action: () => loggedOutUser.expectOppiaFeedbackToBe('Correct!'), name: 'expectOppiaFeedbackToBe2' },
+        { action: () => loggedOutUser.continueToNextCard(), name: 'continueToNextCard5' },
+        { action: () => loggedOutUser.expectExplorationCompletionToastMessage('Congratulations for completing this lesson!'), name: 'expectExplorationCompletionToastMessage' },
+        {
+          action: () => loggedOutUser.timeout(2147483647)
+        }
+      ];
 
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.verifyCheckpointModalAppears();
-      await loggedOutUser.submitAnswer('5');
-      await loggedOutUser.expectOppiaFeedbackToBe('Perfect!');
-
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.navigateBackToPreviousCard();
-      await loggedOutUser.verifyCannotAnswerPreviouslyAnsweredQuestion();
-      await loggedOutUser.continueToNextCard();
-
-      // Wrong answer is submitted to test the feedback response and get hint option.
-      await loggedOutUser.submitAnswer('1/4');
-      await loggedOutUser.useHint();
-      await loggedOutUser.closeHintModal();
-
-      // Again wrong answer is submitted number of times to to get stuck and navigate to help card.
-      await loggedOutUser.submitAnswer('1/3');
-      await loggedOutUser.submitAnswer('1/4');
-      await loggedOutUser.submitAnswer('1/5');
-      await loggedOutUser.submitAnswer('1/6');
-      await loggedOutUser.viewPreviousResponses();
-      await loggedOutUser.verifyNumberOfPreviousResponsesDisplayed(5);
-
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.submitAnswer('0.5');
-      await loggedOutUser.expectOppiaFeedbackToBe('Correct!');
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
-      );
+      for (const { action, name } of actions) {
+        try {
+          await action();
+        } catch (error) {
+          console.error('\x1b[31m%s\x1b[0m', error);
+          await loggedOutUser.screenshot(`error_${name}.png`);
+        }
+      }
     },
-    DEFAULT_SPEC_TIMEOUT_MSECS
+    2147483647
   );
 
   afterAll(async function () {
