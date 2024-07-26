@@ -14,8 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Merge Action
-        uses: ./.github/actions/merge
+      - uses: ./.github/actions/merge
 
       - name: Set intermediate environment variables
         run: |
