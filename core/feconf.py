@@ -530,7 +530,7 @@ EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_MAILGUN
 MAILGUN_DOMAIN_NAME = None
 
 # Audience ID of the mailing list for Oppia in Mailchimp.
-MAILCHIMP_AUDIENCE_ID = None
+MAILCHIMP_AUDIENCE_ID = 'afd416e405'
 # Mailchimp username.
 MAILCHIMP_USERNAME = None
 # Valid Mailchimp merge keys.
