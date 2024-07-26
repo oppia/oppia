@@ -64,7 +64,10 @@ describe('Topic Manager', function () {
         await topicManager.filterTopicsByKeyword('Addition'),
         await topicManager.expectFilteredTopics(['Addition']),
         await topicManager.sortTopics('Least Recently Updated'),
-        await topicManager.expectTopicsInOrder(['Addition', 'Subtraction']),
+        await topicManager.expectFilteredTopicsInOrder([
+          'Addition',
+          'Subtraction',
+        ]),
         await topicManager.adjustPaginatorToShowItemsPerPage(15),
         await topicManager.checkIfTopicPageChangesAfterClickingNext(false);
     },
