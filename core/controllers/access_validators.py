@@ -536,7 +536,7 @@ class CollectionEditorAccessValidationPage(
         pass
 
 
-class TopicEditorAccessValidationHandler(
+class TopicEditorAccessValidationPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """The editor page for a single topic."""
 

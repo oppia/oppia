@@ -274,7 +274,7 @@ URLS = [
     get_redirect_route(
         r'%s/can_access_topic_editor/<topic_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
-        access_validators.TopicEditorAccessValidationHandler
+        access_validators.TopicEditorAccessValidationPage
     ),
 
     get_redirect_route(
