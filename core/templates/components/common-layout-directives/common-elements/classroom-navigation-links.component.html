@@ -8,7 +8,7 @@
         <div class="classroom-item">
           <div class="classroom-text-container">
             <a class="classroom-name e2e-mobile-test-classroom-link" [href]="'/learn/' + classroomSummaries[0].url_fragment">{{ classroomSummaries[0].name }}</a>
-            <p class="classroom-intro-text">Foundational lessons to get started in {{ classroomSummaries[0].name }}</p>
+            <p class="classroom-intro-text">{{ 'I18N_CLASSROOM_FOUNDATION_TEXT' | translate:{ classroomName: classroomSummaries[0].name } }}</p>
           </div>
           <div class="classroom-thumbnail">
             <img alt="Classroom thumbnail image"
@@ -26,14 +26,14 @@
       </a>
       <div class="multiple-classroom-nav-links" *ngIf="classroomSummaries.length > 1">
         <div class="multiple-classrooms-intro">
-          <a href="/learn">Start with Oppia Classrooms</a>
-          <p>Start your learning journey with our foundational lessons</p>
+          <a href="/learn">{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_INTRO' | translate }}</a>
+          <p>{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_DESCRIPTION' | translate }}</p>
         </div>
         <div *ngFor="let classroom of classroomSummaries" class="classroom-nav-item-container">
           <div class="classroom-item">
             <div class="classroom-text-container">
               <a class="classroom-name e2e-mobile-test-classroom-link" [href]="'/learn/' + classroom.url_fragment">{{ classroom.name }}</a>
-              <p class="classroom-intro-text">Foundational lessons to get started in {{ classroomSummaries[0].name }}</p>
+              <p class="classroom-intro-text">{{ 'I18N_CLASSROOM_FOUNDATION_TEXT' | translate:{ classroomName: classroomSummaries[0].name } }}</p>
             </div>
             <div class="classroom-thumbnail">
               <img alt="Classroom thumbnail image"
