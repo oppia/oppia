@@ -34,7 +34,6 @@ describe('Logged-out User', function () {
   let loggedOutUser: LoggedOutUser;
   let explorationId1: string | null;
   let explorationId2: string | null;
-  let storyId: string;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -42,66 +41,29 @@ describe('Logged-out User', function () {
       'curriculumAdmin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
-
-    loggedOutUser = await UserFactory.createLoggedOutUser();
+    await curriculumAdmin.createAndPublishClassroom('Math', 'math', 'Algebra I');
 
     explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'negative-numbers'
       );
-
     explorationId2 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'positive-numbers'
       );
 
-    await curriculumAdmin.createTopic('Algebra I', 'algebra-one');
-    await curriculumAdmin.createSubtopicForTopic(
-      'Negative Numbers',
-      'negative-numbers',
-      'Algebra I'
-    );
-
-    await curriculumAdmin.createSkillForTopic('Negative Numbers', 'Algebra I');
-    await curriculumAdmin.createQuestionsForSkill('Negative Numbers', 10);
-    await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
-      'Negative Numbers',
-      'Negative Numbers',
-      'Algebra I'
-    );
-    // await curriculumAdmin.enablePracticeTabForSkill('Negative Numbers');
-    await curriculumAdmin.addSkillToDiagnosticTest(
-      'Negative Numbers',
-      'Algebra I'
-    );
-
-    await curriculumAdmin.showPracticeTabToLearner('Negative Numbers');
-    storyId = await curriculumAdmin.createStory(
+     await curriculumAdmin.createAndPublishTopic('Math', 'Algebra', 'Multiplication');
+     await curriculumAdmin.createAndPublishStoryWithChapter(
       'Algebra Story 1',
       'algebra-story-one',
-      'Understanding Negative Numbers'
-    );
-    await curriculumAdmin.createChapter(
       'Understanding Negative Numbers',
-      explorationId1 as string
-    );
-    await curriculumAdmin.createChapter(
-      'Understanding Positive Numbers',
-      explorationId2 as string
+      explorationId1 as string,
+      'Understanding Negative Numbers',
+      2
     );
 
-    await curriculumAdmin.saveStoryDraft();
-    await curriculumAdmin.publishDraftStory(storyId);
+    loggedOutUser = await UserFactory.createLoggedOutUser();
 
-    await curriculumAdmin.createNewClassroom('Math', 'math');
-    await curriculumAdmin.updateClassroom(
-      'Math',
-      'Teaser text',
-      'Course details',
-      'Topic list intro'
-    );
-    await curriculumAdmin.addTopicToClassroom('Math', 'Algebra I');
-    await curriculumAdmin.publishClassroom('Math');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(

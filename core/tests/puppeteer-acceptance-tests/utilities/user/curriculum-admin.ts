@@ -851,49 +851,53 @@ export class CurriculumAdmin extends BaseUser {
    * the story, and then publish the story.
    */
   async createAndPublishStoryWithChapter(
-    storyTitle: string,
-    storyUrlFragment: string,
-    chapterTitle: string,
-    explorationId: string,
-    topicName: string
-  ): Promise<void> {
-    await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileStoryDropdown);
+      storyTitle: string,
+      storyUrlFragment: string,
+      chapterTitle: string,
+      explorationId: string,
+      topicName: string,
+      numOfChaptersToAdd: number = 1
+    ): Promise<void> {
+      await this.openTopicEditor(topicName);
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(mobileStoryDropdown);
+      }
+      await this.clickOn(addStoryButton);
+      await this.type(storyTitleField, storyTitle);
+      await this.type(storyUrlFragmentField, storyUrlFragment);
+      await this.type(
+        storyDescriptionField,
+        `Story creation description for ${storyTitle}.`
+      );
+
+      await this.clickOn(storyPhotoBoxButton);
+      await this.uploadFile(curriculumAdminThumbnailImage);
+      await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+      await this.clickOn(uploadPhotoButton);
+
+      await this.page.waitForSelector(photoUploadModal, {hidden: true});
+      await this.clickAndWaitForNavigation(createStoryButton);
+
+      await this.page.waitForSelector(storyMetaTagInput);
+      await this.page.focus(storyMetaTagInput);
+      await this.page.type(storyMetaTagInput, 'meta');
+      await this.page.keyboard.press('Tab');
+
+      for (let i = 0; i < numOfChaptersToAdd; i++) {
+        await this.addChapter(`${chapterTitle} ${i + 1}`, explorationId);
+      }
+
+      await this.saveStoryDraft();
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(mobileSaveStoryChangesDropdown);
+        await this.page.waitForSelector(mobilePublishStoryButton);
+        await this.clickOn(mobilePublishStoryButton);
+      } else {
+        await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
+        await this.clickOn(publishStoryButton);
+        await this.page.waitForSelector(unpublishStoryButton, {visible: true});
+      }
     }
-    await this.clickOn(addStoryButton);
-    await this.type(storyTitleField, storyTitle);
-    await this.type(storyUrlFragmentField, storyUrlFragment);
-    await this.type(
-      storyDescriptionField,
-      `Story creation description for ${storyTitle}.`
-    );
-
-    await this.clickOn(storyPhotoBoxButton);
-    await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadPhotoButton);
-
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickAndWaitForNavigation(createStoryButton);
-
-    await this.page.waitForSelector(storyMetaTagInput);
-    await this.page.focus(storyMetaTagInput);
-    await this.page.type(storyMetaTagInput, 'meta');
-    await this.page.keyboard.press('Tab');
-
-    await this.createChapter(chapterTitle, explorationId);
-    await this.saveStoryDraft();
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileSaveStoryChangesDropdown);
-      await this.page.waitForSelector(mobilePublishStoryButton);
-      await this.clickOn(mobilePublishStoryButton);
-    } else {
-      await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
-      await this.clickOn(publishStoryButton);
-      await this.page.waitForSelector(unpublishStoryButton, {visible: true});
-    }
-  }
 
   /**
    * Function to open the story editor page.
@@ -962,7 +966,7 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Create a chapter for a certain story.
    */
-  async createChapter(
+  async addChapter(
     chapterTitle: string,
     explorationId: string
   ): Promise<void> {
@@ -1505,6 +1509,39 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.clickOn(closeTopicDependencyButton);
     await this.page.waitForSelector(topicDependencyGraphDiv, {visible: false});
+  }
+
+   /**
+   * Creates and publishes a topic with a subtopic and skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} skillName - The name of the skill.
+   */
+   async createAndPublishTopic(
+    topicName: string,
+    subtopicName: string,
+    skillName: string
+  ): Promise<void> {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(' ', '-')
+    );
+    await this.createSubtopicForTopic(
+      subtopicName,
+      subtopicName.toLowerCase().replace(' ', '-'),
+      topicName
+    );
+
+    await this.createSkillForTopic(skillName, topicName);
+    await this.createQuestionsForSkill(skillName, 3);
+    await this.assignSkillToSubtopicInTopicEditor(
+      skillName,
+      subtopicName,
+      topicName
+    );
+    await this.addSkillToDiagnosticTest(skillName, topicName);
+
+    await this.publishDraftTopic(topicName);
   }
 
   /**

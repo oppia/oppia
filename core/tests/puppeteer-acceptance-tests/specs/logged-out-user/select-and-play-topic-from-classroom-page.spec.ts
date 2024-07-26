@@ -50,37 +50,17 @@ describe('Logged-out User', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    loggedOutUser = await UserFactory.createLoggedOutUser();
-
-    explorationId =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'Negative Numbers'
-      );
-
-    await curriculumAdmin.createTopic('Algebra I', 'algebra-one');
-    await curriculumAdmin.createSubtopicForTopic(
-      'Negative Numbers',
-      'negative-numbers',
-      'Algebra I'
-    );
-    await curriculumAdmin.createSkillForTopic('Negative Numbers', 'Algebra I');
-    await curriculumAdmin.createQuestionsForSkill('Negative Numbers', 3);
-    await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
-      'Negative Numbers',
-      'Negative Numbers',
-      'Algebra I'
-    );
-    await curriculumAdmin.addSkillToDiagnosticTest(
-      'Negative Numbers',
-      'Algebra I'
-    );
-    await curriculumAdmin.publishDraftTopic('Algebra I');
-
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',
       'Algebra I'
     );
+    explorationId =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'Negative Numbers'
+      );
+
+    await curriculumAdmin.createAndPublishTopic('Algebra I', 'Negative Numbers', 'Negative Numbers');
 
     await curriculumAdmin.createAndPublishStoryWithChapter(
       'Algebra Story',
@@ -89,6 +69,8 @@ describe('Logged-out User', function () {
       explorationId as string,
       'Algebra I'
     );
+
+    loggedOutUser = await UserFactory.createLoggedOutUser();
     // Setup taking longer than 300000ms.
   }, 420000);
 
