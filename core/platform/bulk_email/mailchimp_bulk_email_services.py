@@ -69,7 +69,7 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
         initialized.
     """
     mailchimp_api_key: Optional[str] = secrets_services.get_secret(
-        'MAILCHIMP_API_KEY')
+        'd7bd799a063cbd41069f10d91eb701dd-us13')
     if not mailchimp_api_key:
         logging.error('Mailchimp API key is not available.')
         return None
