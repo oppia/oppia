@@ -7708,6 +7708,7 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
             end_state_name='End',
             interaction_id='Continue',
             content_html='A content')
+
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         opportunity_models.ExplorationOpportunitySummaryModel(
