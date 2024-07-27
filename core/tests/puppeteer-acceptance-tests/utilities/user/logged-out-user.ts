@@ -2092,7 +2092,6 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToTopRatedLessonsPage(): Promise<void> {
     await this.navigateToCommunityLibraryPage();
-    await this.waitForStaticAssetsToLoad();
     await this.clickAndWaitForNavigation('Top-Rated Explorations');
   }
 
