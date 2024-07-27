@@ -2253,6 +2253,7 @@ export class LoggedOutUser extends BaseUser {
       : desktopStoryTitleSelector;
 
     try {
+      await this.page.waitForSelector(storyTitleSelector);
       const storyTitles = await this.page.$$(storyTitleSelector);
       for (const title of storyTitles) {
         const titleText = await this.page.evaluate(
@@ -2272,6 +2273,7 @@ export class LoggedOutUser extends BaseUser {
             await this.clickOn('SKIP');
           }
 
+          await this.page.waitForSelector(chapterTitleSelector);
           const chapterTitles = await this.page.$$(chapterTitleSelector);
           for (const chapter of chapterTitles) {
             const chapterText = await this.page.evaluate(
@@ -2419,7 +2421,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async returnToStoryFromLastState(): Promise<void> {
     await this.clickAndWaitForNavigation('Return to Story');
-    await showMessage('Returned to story from the last state.');
+    showMessage('Returned to story from the last state.');
   }
 
   /**
