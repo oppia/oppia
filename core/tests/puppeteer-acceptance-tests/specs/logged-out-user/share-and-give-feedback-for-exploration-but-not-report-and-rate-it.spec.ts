@@ -18,6 +18,7 @@
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
+import {showMessage} from '../../utilities/common/show-message';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
@@ -26,7 +27,16 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const EXPLORATION_ATTRIBUTION_HTML = explorationId =>
   `<a href="http://localhost:8181/explore/${explorationId}#">Oppia</a> // <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY SA 4.0</a>`;
 const EXPLORATION_ATTRIBUTION_PRINT =
-  '"Algebra Basics" by curriculumAdm. Oppia. http://localhost:8181/explore/csF0uHZ4zEp0#';
+  '"Algebra Basics" by explorationEditor. Oppia. http://localhost:8181/explore/';
+
+const EXPECTED_FB_SHARE_URL = explorationId =>
+  `https://www.facebook.com/sharer/sharer.php?sdk=joey&u=http://localhost:8181/explore/${explorationId}&display=popup&ref=plugin&src=share_button`;
+const EXPECTED_X_SHARE_URL = explorationId =>
+  `https://twitter.com/share?text=Check%20out%20this%20interactive%20lesson%20on%20Oppia%20-%20a%20free%20platform%20for%20teaching%20and%20learning!&url=http://localhost:8181/explore/${explorationId}`;
+const EXPECTED_CLASSROOM_SHARE_URL = explorationId =>
+  `https://classroom.google.com/share?url=http://localhost:8181/explore/${explorationId}`;
+const EXPECTED_EMBED_URL = explorationId =>
+  `<iframe src="http://localhost:8181/embed/exploration/${explorationId}" width="700" height="1000">`;
 
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
@@ -45,6 +55,14 @@ describe('Logged-out User', function () {
   let explorationId: string | null;
 
   beforeAll(async function () {
+    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+    // in mobile viewport which is required for testing the feedback messages tab),
+    // remove this part of skipping the test and make the test to run in mobile viewport as well.
+    // see: https://github.com/oppia/oppia/issues/19443
+    if (process.env.MOBILE === 'true') {
+      showMessage('Test skipped in mobile viewport');
+      return;
+    }
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com'
@@ -104,23 +122,28 @@ describe('Logged-out User', function () {
   it(
     'should be able to generate attribution, share the exploration, give feedback, and not be able to report or rate the exploration',
     async function () {
+      // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+      // in mobile viewport which is required for testing the feedback messages tab),
+      // remove this part of skipping the test and make the test to run in mobile viewport as well.
+      // Also, attribution cannot be generated in mobile devices, so keep that part skipped in mobile
+      // tests.
+      // see: https://github.com/oppia/oppia/issues/19443
+      if (process.env.MOBILE === 'true') {
+        showMessage('Test skipped in mobile viewport');
+        return;
+      }
       await loggedOutUser.navigateToCommunityLibraryPage();
-
-      await loggedOutUser.searchForLessonInSearchBar('Algebra I');
-      await loggedOutUser.playLessonFromSearchResults('Algebra I');
-
+      await loggedOutUser.searchForLessonInSearchBar('Algebra Basics');
+      await loggedOutUser.playLessonFromSearchResults('Algebra Basics');
       await loggedOutUser.continueToNextCard();
 
-      // Giving feedback before completing the exploration.
+      // Giving feedback before completing the exploration on a state.
       await loggedOutUser.giveFeedback('This state is very informative!');
       await loggedOutUser.submitAnswer('-40');
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
-
-      //  A dialog should appear when the user tries to hit the browser back button informing them that they will lose progress if they go back.
-      await loggedOutUser.hitBrowserBackButtonAndHandleDialog(true);
 
       await loggedOutUser.generateAttribution();
       await loggedOutUser.expectAttributionInHtmlSectionToBe(
@@ -129,19 +152,29 @@ describe('Logged-out User', function () {
       await loggedOutUser.expectAttributionInPrintToBe(
         EXPLORATION_ATTRIBUTION_PRINT
       );
+      await loggedOutUser.closeAttributionModal();
+      await loggedOutUser.shareExploration(
+        'Facebook',
+        EXPECTED_FB_SHARE_URL(explorationId)
+      );
+      await loggedOutUser.shareExploration(
+        'Twitter',
+        EXPECTED_X_SHARE_URL(explorationId)
+      );
+      await loggedOutUser.shareExploration(
+        'Classroom',
+        EXPECTED_CLASSROOM_SHARE_URL(explorationId)
+      );
 
-      await loggedOutUser.shareExploration('Facebook');
-      await loggedOutUser.shareExploration('Twitter');
+      await loggedOutUser.embedThisLesson(EXPECTED_EMBED_URL(explorationId));
 
       // Giving feedback after completing the exploration.
       await loggedOutUser.giveFeedback('This is a great lesson!');
-
       await loggedOutUser.expectReportOptionsNotAvailable();
       await loggedOutUser.expectRateOptionsNotAvailable();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
-
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

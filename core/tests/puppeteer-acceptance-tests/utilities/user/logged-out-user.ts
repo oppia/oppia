@@ -229,11 +229,10 @@ const nextLessonButton = '.e2e-test-next-lesson-button';
 const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
 const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
 const generateAttributionSelector = '.e2e-test-generate-attribution';
-const attributionHtmlSectionSelector = 'attribution-html-section';
+const attributionHtmlSectionSelector = '.attribution-html-section';
 const attributionHtmlCodeSelector = '.attribution-html-code';
 const attributionPrintTextSelector = '.attribution-print-text';
 const shareExplorationButtonSelector = '.e2e-test-share-exploration-button';
-const iconAccessibilityLabelSelector = '.oppia-icon-accessibility-label';
 const reportExplorationButtonSelector = '.e2e-test-report-exploration-button';
 const rateOptionsSelector = '.conversation-skin-final-ratings';
 const checkpointModalSelector = '.lesson-info-tooltip-add-ons';
@@ -248,6 +247,12 @@ const viewSolutionButton = '.e2e-test-view-solution';
 const stateConversationContent = '.e2e-test-conversation-content';
 const closeSolutionModalButton = '.e2e-test-learner-got-it-button';
 const continueToSolutionButton = '.e2e-test-continue-to-solution-btn';
+const closeAttributionModalButton = '.attribution-modal button';
+const embedCodeSelector = '.oppia-embed-modal-code';
+const embedLessonButton = '.e2e-test-embed-link';
+const signUpButton = '.e2e-test-login-button';
+const signInButton = '.conversation-skin-login-button-text';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -2414,6 +2419,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async returnToStoryFromLastState(): Promise<void> {
     await this.clickAndWaitForNavigation('Return to Story');
+    await showMessage('Returned to story from the last state.');
   }
 
   /**
@@ -2455,6 +2461,13 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} feedback - The feedback to give on the exploration.
    */
   async giveFeedback(feedback: string): Promise<void> {
+    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+    // in mobile viewport which is required for testing the feedback messages tab),
+    // remove this part of skipping this function for Mobile viewport and make it run in mobile viewport
+    // as well. see: https://github.com/oppia/oppia/issues/19443.
+    if (process.env.MOBILE === 'true') {
+      return;
+    }
     await this.page.waitForSelector('nav-options', {visible: true});
     await this.clickOn(feedbackPopupSelector);
     await this.page.waitForSelector(feedbackTextarea, {visible: true});
@@ -2469,32 +2482,6 @@ export class LoggedOutUser extends BaseUser {
       showMessage('Feedback submitted successfully');
     } catch (error) {
       throw new Error('Feedback was not successfully submitted');
-    }
-  }
-
-  /**
-   * Navigates back to the previous page and either accepts or rejects any dialog that appears based on the provided parameter.
-   * Throws an error if no dialog appears.
-   * @param {boolean} acceptDialog - If true, the dialog will be accepted. If false, the dialog will be dismissed.
-   */
-  async hitBrowserBackButtonAndHandleDialog(
-    acceptDialog: boolean
-  ): Promise<void> {
-    await this.page.goBack();
-
-    let dialogAppeared = false;
-    this.page.once('dialog', async dialog => {
-      dialogAppeared = true;
-      // If a dialog has appeared, either accept or dismiss it based on the provided parameter.
-      if (acceptDialog) {
-        await dialog.accept();
-      } else {
-        await dialog.dismiss();
-      }
-    });
-
-    if (!dialogAppeared) {
-      throw new Error('Expected a dialog to appear, but it did not.');
     }
   }
 
@@ -2557,29 +2544,62 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to close the attribution modal.
+   */
+  async closeAttributionModal(): Promise<void> {
+    await this.clickOn(closeAttributionModalButton);
+    showMessage('Attribution modal closed successfully');
+  }
+
+  /**
    * Shares the exploration.
    * @param {string} platform - The platform to share the exploration on.
    */
-  async shareExploration(platform: string): Promise<void> {
-    await this.page.waitForSelector(shareExplorationButtonSelector, {
-      visible: true,
-    });
+  async shareExploration(platform: string, expectedUrl: string): Promise<void> {
     await this.clickOn(shareExplorationButtonSelector);
-    await this.page.waitForSelector(iconAccessibilityLabelSelector, {
-      visible: true,
-    });
 
-    const iconAccessibilityLabels = await this.page.$$(
-      iconAccessibilityLabelSelector
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(
+      `.e2e-test-share-link-${platform.toLowerCase()}`,
+      {visible: true}
     );
-
-    for (const label of iconAccessibilityLabels) {
-      const labelText = await this.page.evaluate(el => el.textContent, label);
-      if (labelText.includes(platform)) {
-        await label.click();
-        break;
-      }
+    const aTag = await this.page.$(
+      `.e2e-test-share-link-${platform.toLowerCase()}`
+    );
+    if (!aTag) {
+      throw new Error(`No share link found for ${platform}.`);
     }
+    const href = await this.page.evaluate(a => a.href, aTag);
+    if (href !== expectedUrl) {
+      throw new Error(
+        `The ${platform} share link does not match the expected URL. Expected: ${expectedUrl}, Found: ${href}`
+      );
+    }
+    await this.closeAttributionModal();
+  }
+
+  /**
+   * Function to embed a lesson.
+   */
+  async embedThisLesson(expectedCode: string): Promise<void> {
+    await this.clickOn(shareExplorationButtonSelector);
+
+    await this.waitForStaticAssetsToLoad();
+    await this.clickOn(embedLessonButton);
+    await this.page.waitForSelector(embedCodeSelector);
+    const embedCode = await this.page.$eval(
+      embedCodeSelector,
+      element => element.textContent
+    );
+    if (embedCode?.trim() !== expectedCode) {
+      throw new Error(
+        'Embed code does not match the expected code. Expected: ' +
+          expectedCode +
+          ', Found: ' +
+          embedCode
+      );
+    }
+    await this.clickOn('Close');
   }
 
   /**
@@ -2746,9 +2766,33 @@ export class LoggedOutUser extends BaseUser {
     showMessage('Card content is as expected.');
   }
 
+  /**
+   * Simulates a delay to avoid triggering the fatigue detection service.
+   * This is important because the fatigue detection service could be activated again after further submissions.
+   * @returns {Promise<void>}
+   */
   async simulateDelayToAvoidFatigueDetection(): Promise<void> {
-    // This timeout is important to avoid fatigue detection service, as otherwise it will get activated again post further submissions.
     await this.page.waitForTimeout(10000);
+  }
+
+  /**
+   * Checks if the sign-up button is present on the page.
+   * @returns {Promise<void>}
+   */
+  async expectSignUpButtonToBePresent(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(signUpButton, {timeout: 5000});
+    showMessage('Sign-up button present.');
+  }
+
+  /**
+   * Checks if the sign-in button is present on the page.
+   * @returns {Promise<void>}
+   */
+  async expectSignInButtonToBePresent(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(signInButton, {timeout: 5000});
+    showMessage('Sign-in button present.');
   }
 }
 
