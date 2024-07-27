@@ -245,6 +245,10 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/visit-classroom-index-page',
     'logged-out-user/browse-and-search-for-lessons-in-community-library',
     'logged-out-user/select-and-play-topic-from-classroom-page',
+    'logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration',
+    'logged-out-user/play-through-lesson-while-getting-feedback-and-hints',
+    'logged-out-user/share-and-give-feedback-for-exploration-'
+    'but-not-report-and-rate-it',
     'logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers',
     'logged-out-user/sign-in-and-save-exploration-progress',
     'logged-out-user/track-and-resume-exploration-progress-via-url',

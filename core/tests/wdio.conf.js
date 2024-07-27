@@ -53,10 +53,6 @@ var suites = {
     './core/tests/webdriverio_desktop/blog.js'
   ],
 
-  checkpointFeatures: [
-    './core/tests/webdriverio_desktop/checkpointFeatures.js'
-  ],
-
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
   ],
