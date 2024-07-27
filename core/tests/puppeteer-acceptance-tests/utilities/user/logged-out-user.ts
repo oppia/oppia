@@ -2283,7 +2283,7 @@ export class LoggedOutUser extends BaseUser {
             if (chapterText.trim().includes(chapterName.trim())) {
               await Promise.all([
                 this.page.waitForNavigation({
-                  waitUntil: ['networkidle0', 'load'],
+                  waitUntil: ['networkidle2', 'load'],
                 }),
                 this.waitForElementToBeClickable(chapter),
                 chapter.click(),
@@ -2303,6 +2303,39 @@ export class LoggedOutUser extends BaseUser {
       const newError = new Error(
         `Failed to select and open chapter within story: ${error}`
       );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Selects and plays a chapter when in a story.
+   * @param {string} chapterName - The name of the chapter to play.
+   */
+  async selectAndPlayChapter(chapterName: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(chapterTitleSelector);
+      const chapterTitles = await this.page.$$(chapterTitleSelector);
+      for (const chapter of chapterTitles) {
+        const chapterText = await this.page.evaluate(
+          el => el.textContent.trim(),
+          chapter
+        );
+        if (chapterText.trim().includes(chapterName.trim())) {
+          await Promise.all([
+            this.page.waitForNavigation({
+              waitUntil: ['networkidle2', 'load'],
+            }),
+            this.waitForElementToBeClickable(chapter),
+            chapter.click(),
+          ]);
+          return;
+        }
+      }
+
+      throw new Error(`Chapter "${chapterName}" not found.`);
+    } catch (error) {
+      const newError = new Error(`Failed to play chapter: ${error}`);
       newError.stack = error.stack;
       throw newError;
     }

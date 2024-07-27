@@ -50,11 +50,6 @@ describe('Logged-out User', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    await curriculumAdmin.createAndPublishClassroom(
-      'Math',
-      'math',
-      'Algebra I'
-    );
     explorationId =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Negative Numbers'
@@ -64,6 +59,12 @@ describe('Logged-out User', function () {
       'Algebra I',
       'Negative Numbers',
       'Negative Numbers'
+    );
+
+    await curriculumAdmin.createAndPublishClassroom(
+      'Math',
+      'math',
+      'Algebra I'
     );
 
     await curriculumAdmin.createAndPublishStoryWithChapter(
