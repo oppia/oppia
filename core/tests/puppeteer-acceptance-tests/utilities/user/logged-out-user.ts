@@ -280,7 +280,7 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the community library page.
    */
   async navigateToCommunityLibrary(): Promise<void> {
-    await this.page.goto(communityLibraryUrl);
+    await this.goto(communityLibraryUrl);
   }
 
   /**
