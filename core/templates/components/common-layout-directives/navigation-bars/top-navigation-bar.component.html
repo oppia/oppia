@@ -64,7 +64,7 @@
             </span>
           </a>
         </li>
-        <li [ngClass]="{'open' : true}"
+        <li [ngClass]="{'open' : activeMenuName === 'learnMenu'}"
             ngbDropdown
             #learnDropdown="ngbDropdown"
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_LEARN"
