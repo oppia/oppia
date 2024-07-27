@@ -13,10 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the learner journey in the math classroom.
- * The test includes:
+ * @fileoverview Acceptance tests for the learner's journey from the last state/card of an exploration.
+ * The tests include:
  * - Setup: Creation of exploration, topic, subtopic, skill, story, and classroom by a curriculum admin.
- * - User Journey: Navigation to classroom, selection of topic, completion of exploration, and review of a card by a logged-out user.
+ * - User Journey: Navigation to classroom, selection of topic, completion of exploration by a logged-out user.
+ * - Loading the next chapter, loading the practice session page, and returning to the story from the last state of an exploration.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -24,24 +25,15 @@ import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-ConsoleReporter.setConsoleErrorsToIgnore([
-  /Occurred at http:\/\/localhost:8181\/story_editor\/[a-zA-Z0-9]+\/.*Cannot read properties of undefined \(reading 'getStory'\)/,
-  /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Invalid active state name: null/,
-  new RegExp('Invalid active state name: null'),
-  /Occurred at http:\/\/localhost:8181\/.*Failed to load resource: net::ERR_NETWORK_CHANGED/,
-  /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE\.NotSameOrigin/,
-  /.*404.*Not Found.*/,
-]);
-
 describe('Logged-out User', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let loggedOutUser: LoggedOutUser;
-  let explorationId: string | null;
+  let explorationId1: string | null;
+  let explorationId2: string | null;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -50,62 +42,71 @@ describe('Logged-out User', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    explorationId =
+    explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'Negative Numbers'
+        'negative-numbers'
+      );
+    explorationId2 =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'positive-numbers'
       );
 
     await curriculumAdmin.createAndPublishTopic(
-      'Algebra I',
-      'Negative Numbers',
-      'Negative Numbers'
+      'Arithmetic',
+      'Addition',
+      'Multiplication'
     );
 
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',
-      'Algebra I'
+      'Arithmetic'
     );
 
-    await curriculumAdmin.createAndPublishStoryWithChapter(
-      'Algebra Story',
-      'algebra-story',
-      'Understanding Negative Numbers',
-      explorationId as string,
-      'Algebra I'
+    await curriculumAdmin.addStoryToTopic(
+      'Algebra Story 1',
+      'algebra-story-one',
+      'Arithmetic'
     );
+    await curriculumAdmin.addChapter(
+      'Algebra Chapter 1',
+      explorationId1 as string
+    );
+    await curriculumAdmin.addChapter(
+      'Algebra Chapter 2',
+      explorationId2 as string
+    );
+    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.publishStoryDraft();
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
-    // Setup taking longer than 300000ms.
-  }, 420000);
+    // Setup taking longer than the default 300000 ms.
+  }, 400000);
 
   it(
-    'should be able to select and play a topic from the classroom page',
+    'should be able to return to the respective story, sign-in, sign-up and load the next chapter form the last state of an exploration',
     async function () {
       await loggedOutUser.navigateToClassroomPage('math');
-      await loggedOutUser.expectTopicsToBePresent(['Algebra I']);
 
-      await loggedOutUser.selectAndOpenTopic('Algebra I');
+      await loggedOutUser.selectAndOpenTopic('Arithmetic');
       await loggedOutUser.selectChapterWithinStoryToLearn(
-        'Understanding Negative Numbers',
-        'Algebra Story'
+        'Algebra Chapter 1',
+        'Algebra Story 1'
       );
 
-      // Check for the completion message as the exploration has a single state.
+      // Since the exploration has only one state, the learner should see the last state of the exploration immediately after selecting the chapter.
       await loggedOutUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
 
-      // Returning to the topic page from the exploration player itself.
-      await loggedOutUser.returnToTopicPageAfterCompletingExploration();
-      await loggedOutUser.navigateToRevisionTab();
+      await loggedOutUser.expectSignUpButtonToBePresent();
+      await loggedOutUser.expectSignInButtonToBePresent();
 
-      // Review cards are the subtopic that are created in the topic.
-      await loggedOutUser.selectReviewCardToLearn('Negative Numbers');
-      await loggedOutUser.expectReviewCardToHaveContent(
-        'Negative Numbers',
-        'Subtopic creation description text for Negative Numbers'
-      );
+      await loggedOutUser.returnToStoryFromLastState();
+
+      // Navigating back to the lesson's last state so to use the other options present onto that.
+      await loggedOutUser.selectAndPlayChapter('Algebra Chapter 1');
+      await loggedOutUser.loadNextChapterFromLastState();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
