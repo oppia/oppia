@@ -25,6 +25,7 @@ import {
 } from 'domain/classroom/classroom-backend-api.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 @Component({
   selector: 'oppia-classroom-navigation-links',
@@ -37,7 +38,8 @@ export class ClassroomNavigationLinksComponent implements OnInit {
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private classroomBackendApiService: ClassroomBackendApiService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   getClassroomThumbnail(
@@ -61,6 +63,10 @@ export class ClassroomNavigationLinksComponent implements OnInit {
     return this.i18nLanguageCodeService.isClassroomnNameTranslationAvailable(
       classroomName
     );
+  }
+
+  registerClassroomHeaderClickEvent(): void {
+    this.siteAnalyticsService.registerClassroomHeaderClickEvent();
   }
 
   ngOnInit(): void {

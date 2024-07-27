@@ -102,13 +102,6 @@ export class SideNavigationBarComponent {
     this.aboutSubmenuIsShown = !this.aboutSubmenuIsShown;
   }
 
-  navigateToClassroomPage(classroomUrl: string): void {
-    this.siteAnalyticsService.registerClassroomHeaderClickEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = classroomUrl;
-    }, 150);
-  }
-
   isHackyTopicTitleTranslationDisplayed(index: number): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(

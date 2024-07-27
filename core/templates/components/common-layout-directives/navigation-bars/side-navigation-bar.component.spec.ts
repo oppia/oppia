@@ -30,7 +30,6 @@ import {RouterModule} from '@angular/router';
 
 import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {SideNavigationBarComponent} from './side-navigation-bar.component';
@@ -56,7 +55,6 @@ describe('Side Navigation Bar Component', () => {
   let currentUrl: string = '/test';
   let imageUrl: string = 'image_url';
   let mockWindowRef: MockWindowRef;
-  let siteAnalyticsService: SiteAnalyticsService;
   let sidebarStatusService: SidebarStatusService;
   let userService: UserService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -100,7 +98,6 @@ describe('Side Navigation Bar Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SideNavigationBarComponent);
     sidebarStatusService = TestBed.inject(SidebarStatusService);
-    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     componentInstance = fixture.componentInstance;
     userService = TestBed.inject(UserService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
@@ -197,33 +194,6 @@ describe('Side Navigation Bar Component', () => {
       expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
       expect(mockWindowRef.nativeWindow.location.href).toBe('');
     })
-  );
-
-  it(
-    'should navigate to classroom page when user clicks on' +
-      "'Basic Mathematics'",
-    fakeAsync(() => {
-      expect(mockWindowRef.nativeWindow.location.href).toBe('');
-
-      componentInstance.navigateToClassroomPage('/classroom/url');
-      tick(151);
-
-      expect(mockWindowRef.nativeWindow.location.href).toBe('/classroom/url');
-    })
-  );
-
-  it(
-    'should registers classroom header click event when user clicks' +
-      " on 'Basic Mathematics'",
-    () => {
-      spyOn(siteAnalyticsService, 'registerClassroomHeaderClickEvent');
-
-      componentInstance.navigateToClassroomPage('/classroom/url');
-
-      expect(
-        siteAnalyticsService.registerClassroomHeaderClickEvent
-      ).toHaveBeenCalled();
-    }
   );
 
   it('should populate properties properly on component initialization', fakeAsync(() => {

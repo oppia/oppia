@@ -408,33 +408,6 @@ describe('TopNavigationBarComponent', () => {
     expect(component.isSidebarShown()).toBe(false);
   });
 
-  it(
-    'should navigate to classroom page when user clicks' +
-      " on 'Basic Mathematics'",
-    fakeAsync(() => {
-      expect(mockWindowRef.nativeWindow.location.href).toBe('');
-
-      component.navigateToClassroomPage('/classroom/url');
-      tick(151);
-
-      expect(mockWindowRef.nativeWindow.location.href).toBe('/classroom/url');
-    })
-  );
-
-  it(
-    'should registers classroom header click event when user clicks' +
-      " on 'Basic Mathematics'",
-    () => {
-      spyOn(siteAnalyticsService, 'registerClassroomHeaderClickEvent');
-
-      component.navigateToClassroomPage('/classroom/url');
-
-      expect(
-        siteAnalyticsService.registerClassroomHeaderClickEvent
-      ).toHaveBeenCalled();
-    }
-  );
-
   it('should check if i18n has been run', () => {
     spyOn(document, 'querySelectorAll')
       .withArgs('.oppia-navbar-tab-content')

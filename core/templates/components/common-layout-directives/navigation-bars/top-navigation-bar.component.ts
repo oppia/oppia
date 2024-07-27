@@ -463,13 +463,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigateToClassroomPage(classroomUrl: string): void {
-    this.siteAnalyticsService.registerClassroomHeaderClickEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = classroomUrl;
-    }, 150);
-  }
-
   /**
    * Checks if i18n has been run.
    * If i18n has not yet run, the <a> and <span> tags will have

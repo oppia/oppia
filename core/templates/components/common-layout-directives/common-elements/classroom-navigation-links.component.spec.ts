@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for ClassroomNavigationLinksComponent.
  */
 
+import {HttpClientModule} from '@angular/common/http';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
@@ -28,6 +29,7 @@ import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {ClassroomNavigationLinksComponent} from './classroom-navigation-links.component';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 describe('ClassroomNavigationLinksComponent', () => {
   let component: ClassroomNavigationLinksComponent;
@@ -35,6 +37,7 @@ describe('ClassroomNavigationLinksComponent', () => {
   let classroomBackendApiService: ClassroomBackendApiService;
   let assetsBackendApiService: AssetsBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   const dummyClassroomSummaries = [
     {
@@ -66,9 +69,13 @@ describe('ClassroomNavigationLinksComponent', () => {
       'AssetsBackendApiService',
       ['getThumbnailUrlForPreview']
     );
+    const siteAnalyticsServiceSpy = jasmine.createSpyObj(
+      'SiteAnalyticsService',
+      ['registerClassroomHeaderClickEvent']
+    );
 
     await TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientModule, HttpClientTestingModule],
       declarations: [ClassroomNavigationLinksComponent, MockTranslatePipe],
       providers: [
         {
@@ -79,15 +86,16 @@ describe('ClassroomNavigationLinksComponent', () => {
           provide: AssetsBackendApiService,
           useValue: assetsBackendApiServiceSpy,
         },
+        {
+          provide: SiteAnalyticsService,
+          useValue: siteAnalyticsServiceSpy,
+        },
       ],
     }).compileComponents();
 
-    classroomBackendApiService = TestBed.inject(
-      ClassroomBackendApiService
-    ) as jasmine.SpyObj<ClassroomBackendApiService>;
-    assetsBackendApiService = TestBed.inject(
-      AssetsBackendApiService
-    ) as jasmine.SpyObj<AssetsBackendApiService>;
+    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   beforeEach(() => {
@@ -159,5 +167,13 @@ describe('ClassroomNavigationLinksComponent', () => {
     expect(
       i18nLanguageCodeService.isClassroomnNameTranslationAvailable
     ).toHaveBeenCalledWith(classroomName);
+  });
+
+  it('should register classroom header click event', () => {
+    component.registerClassroomHeaderClickEvent();
+
+    expect(
+      siteAnalyticsService.registerClassroomHeaderClickEvent
+    ).toHaveBeenCalled();
   });
 });
