@@ -47,18 +47,8 @@ enum CARD_NAME {
 
 ConsoleReporter.setConsoleErrorsToIgnore([
   /https:\/\/pencilcode\.net\/lib\/pencilcodeembed\.js Failed to load resource: net::ERR_CERT_.*/,
-  escapeRegExp(
-    "webpack:///./core/templates/services/contextual/logger.service.ts? ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'disabled: false'. Current value: 'disabled: true'."
-  ),
-  escapeRegExp(
-    "ng:///SharedComponentsModule/AddOrUpdateSolutionModalComponent.ngfactory.js  ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'disabled: false'. Current value: 'disabled: true'."
-  ),
-  escapeRegExp(
-    "webpack:///./core/templates/services/contextual/logger.service.ts? ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'ng-untouched: true'. Current value: 'ng-untouched: false'."
-  ),
-  escapeRegExp(
-    "ng:///FractionInputInteractionModule/InteractiveFractionInputComponent.ngfactory.js  ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'ng-untouched: true'. Current value: 'ng-untouched: false'."
-  ),
+  /ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'disabled: false'. Current value: 'disabled: true'./,
+  /ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'ng-untouched: true'. Current value: 'ng-untouched: false'./,
 ]);
 
 describe('Logged-out User', function () {

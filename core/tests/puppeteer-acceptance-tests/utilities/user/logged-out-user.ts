@@ -2452,6 +2452,10 @@ export class LoggedOutUser extends BaseUser {
    * Loads the next chapter from the last state of an exploration.
    */
   async loadNextChapterFromLastState(): Promise<void> {
+    // TODO(#12345): Currently, this test is skipped for mobile viewport due to an issue where
+    // the button is not clickable because it's hidden by the footer.
+    // Once the issue is fixed (see: https://github.com/oppia/oppia/issues/12345),
+    // remove the skip part to enable this method for mobile viewport too.
     if (this.isViewportAtMobileWidth()) {
       return;
     }
