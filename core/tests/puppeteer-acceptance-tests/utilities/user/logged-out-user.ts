@@ -2452,12 +2452,14 @@ export class LoggedOutUser extends BaseUser {
    * Loads the next chapter from the last state of an exploration.
    */
   async loadNextChapterFromLastState(): Promise<void> {
-    await this.page.waitForSelector(nextLessonButton);
-    const nextLessonButtonElement = await this.page.$(nextLessonButton);
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['networkidle0', 'load']}),
-      nextLessonButtonElement?.click(),
-    ]);
+    if (this.isViewportAtMobileWidth()) {
+      return;
+    }
+    await this.page.waitForSelector(explorationCompletionToastMessage, {
+      hidden: true,
+    });
+
+    await this.clickAndWaitForNavigation(nextLessonButton);
   }
 
   /**

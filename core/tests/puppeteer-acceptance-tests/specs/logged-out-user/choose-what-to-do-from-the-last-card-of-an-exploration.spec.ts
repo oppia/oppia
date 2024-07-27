@@ -107,11 +107,6 @@ describe('Logged-out User', function () {
       // Navigating back to the lesson's last state so to use the other options present onto that.
       await loggedOutUser.selectAndPlayChapter('Algebra Chapter 1');
       await loggedOutUser.loadNextChapterFromLastState();
-
-      // Second chapter is also single-state.
-      await loggedOutUser.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
-      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

@@ -43,7 +43,7 @@ const subtopicPhotoBoxButton =
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 const photoUploadModal = 'edit-thumbnail-modal';
 
-const createQuestionButton = '.e2e-test-create-question-button ';
+const createQuestionButton = 'div.e2e-test-create-question';
 const removeQuestionConfirmationButton =
   '.e2e-test-remove-question-confirmation-button';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
@@ -218,8 +218,6 @@ const newChapterPhotoBoxButton =
   '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
 const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
-
-const enablePracticeTabToLearnersButton = '.e2e-test-toggle-practice-tab';
 export class CurriculumAdmin extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -290,17 +288,16 @@ export class CurriculumAdmin extends BaseUser {
     skillName: string,
     questionCount: number
   ): Promise<void> {
-    await this.openSkillEditor(skillName);
-    await this.navigateToSkillQuestionEditorTab();
     for (let i = 0; i < questionCount; i++) {
-      await this.addBasicAlgebraQuestionToSkill();
+      await this.addBasicAlgebraQuestionToSkill(skillName);
     }
   }
 
   /**
    * Create a basic algebra question in the skill editor page.
    */
-  async addBasicAlgebraQuestionToSkill(): Promise<void> {
+  async addBasicAlgebraQuestionToSkill(skillName: string): Promise<void> {
+    await this.openSkillEditor(skillName);
     await this.clickOn(createQuestionButton);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
@@ -1294,12 +1291,6 @@ export class CurriculumAdmin extends BaseUser {
         error.stack
       );
     }
-  }
-
-  async showPracticeTabToLearner(topicName: string): Promise<void> {
-    await this.openTopicEditor(topicName);
-    await this.clickOn(enablePracticeTabToLearnersButton);
-    await this.saveTopicDraft(topicName);
   }
 
   /**
