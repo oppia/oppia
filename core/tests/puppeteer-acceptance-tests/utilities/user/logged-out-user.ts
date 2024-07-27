@@ -2092,6 +2092,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToTopRatedLessonsPage(): Promise<void> {
     await this.navigateToCommunityLibraryPage();
+    await this.waitForStaticAssetsToLoad();
     await this.clickAndWaitForNavigation('Top-Rated Explorations');
   }
 
@@ -2313,7 +2314,13 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} chapterName - The name of the chapter to play.
    */
   async selectAndPlayChapter(chapterName: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
     try {
+      const isLoginPromptContainerPresent =
+        await this.page.$(loginPromptContainer);
+      if (isLoginPromptContainerPresent) {
+        await this.clickOn('SKIP');
+      }
       await this.page.waitForSelector(chapterTitleSelector);
       const chapterTitles = await this.page.$$(chapterTitleSelector);
       for (const chapter of chapterTitles) {
@@ -2446,7 +2453,12 @@ export class LoggedOutUser extends BaseUser {
    * Loads the next chapter from the last state of an exploration.
    */
   async loadNextChapterFromLastState(): Promise<void> {
-    await this.clickAndWaitForNavigation(nextLessonButton);
+    await this.page.waitForSelector(nextLessonButton);
+    const nextLessonButtonElement = await this.page.$(nextLessonButton);
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: ['networkidle0', 'load']}),
+      nextLessonButtonElement?.click(),
+    ]);
   }
 
   /**
