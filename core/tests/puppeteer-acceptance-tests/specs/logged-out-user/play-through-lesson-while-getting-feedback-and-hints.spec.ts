@@ -24,7 +24,6 @@ import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
-import escapeRegExp from 'lodash/escapeRegExp';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const REVISION_CARD_CONTENT =
