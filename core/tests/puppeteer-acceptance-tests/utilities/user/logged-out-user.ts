@@ -16,6 +16,7 @@
  * @fileoverview Logged-out users utility file.
  */
 
+import puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -199,8 +200,9 @@ const classroomNameHeading = '.e2e-test-classroom-name';
 const errorPageHeading = '.e2e-test-error-page-heading';
 const classroomTileContainer = '.oppia-classroom-tile-container';
 
-const floatFormInput = '.e2e-test-float-form-input';
+const submitResponseToInteractionInput = 'oppia-interaction-display input';
 const nextCardButton = '.e2e-test-next-card-button';
+const nextCardArrowButton = '.e2e-test-next-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 const searchInputSelector = '.e2e-test-search-input';
@@ -223,6 +225,34 @@ const topicNameSelector = '.e2e-test-topic-name';
 const loginPromptContainer = '.story-viewer-login-container';
 const NavbarBackButton = '.oppia-navbar-back-button';
 const lessonCardSelector = '.e2e-test-exploration-dashboard-card';
+const nextLessonButton = '.e2e-test-next-lesson-button';
+const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
+const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
+const generateAttributionSelector = '.e2e-test-generate-attribution';
+const attributionHtmlSectionSelector = '.attribution-html-section';
+const attributionHtmlCodeSelector = '.attribution-html-code';
+const attributionPrintTextSelector = '.attribution-print-text';
+const shareExplorationButtonSelector = '.e2e-test-share-exploration-button';
+const reportExplorationButtonSelector = '.e2e-test-report-exploration-button';
+const rateOptionsSelector = '.conversation-skin-final-ratings';
+const checkpointModalSelector = '.lesson-info-tooltip-add-ons';
+const feedbackSelector = '.e2e-test-conversation-feedback-latest';
+const previousCardButton = '.e2e-test-back-button';
+const hintButtonSelector = '.e2e-test-view-hint';
+const gotItButtonSelector = '.e2e-test-learner-got-it-button';
+const responsesDropdownSelector = '.conversation-skin-responses-dropdown-text';
+const responseSelector = 'oppia-interaction-display';
+const closeLessonInfoTooltipSelector = '.e2e-test-close-lesson-info-tooltip';
+const viewSolutionButton = '.e2e-test-view-solution';
+const stateConversationContent = '.e2e-test-conversation-content';
+const closeSolutionModalButton = '.e2e-test-learner-got-it-button';
+const continueToSolutionButton = '.e2e-test-continue-to-solution-btn';
+const closeAttributionModalButton = '.attribution-modal button';
+const embedCodeSelector = '.oppia-embed-modal-code';
+const embedLessonButton = '.e2e-test-embed-link';
+const signUpButton = '.e2e-test-login-button';
+const signInButton = '.conversation-skin-login-button-text';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -279,8 +309,8 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates to the community library page.
    */
-  async navigateToCommunitylibrary(): Promise<void> {
-    await this.page.goto(communityLibraryUrl);
+  async navigateToCommunityLibraryPage(): Promise<void> {
+    await this.goto(communityLibraryUrl);
   }
 
   /**
@@ -335,12 +365,6 @@ export class LoggedOutUser extends BaseUser {
     await this.goto(classroomsPage);
   }
 
-  /**
-   *  Function to navigate to the community library page.
-   */
-  async navigateToCommunityLibraryPage(): Promise<void> {
-    await this.goto(communityLibraryUrl);
-  }
   /**
    * Function to click a button and check if it opens the expected destination.
    */
@@ -1870,47 +1894,26 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the next card in the preview tab.
    */
   async continueToNextCard(): Promise<void> {
-    await this.clickOn(nextCardButton);
+    try {
+      await this.page.waitForSelector(nextCardButton, {timeout: 7000});
+      await this.clickOn(nextCardButton);
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        await this.clickOn(nextCardArrowButton);
+      } else {
+        throw error;
+      }
+    }
   }
 
   /**
    * Function to submit an answer to a form input field.
-   *
-   * This function first determines the type of the input field in the DOM using the getInputType function.
-   * Currently, it only supports 'text', 'number', and 'float' input types. If the input type is anything else, it throws an error.
    * @param {string} answer - The answer to submit.
    */
   async submitAnswer(answer: string): Promise<void> {
-    await this.waitForElementToBeClickable(floatFormInput);
-    const inputType = await this.getInputType(floatFormInput);
-
-    switch (inputType) {
-      case 'text':
-      case 'number':
-      case 'float':
-        await this.page.waitForSelector(floatFormInput);
-        await this.page.type(floatFormInput, answer);
-        break;
-      default:
-        throw new Error(`Unsupported input type: ${inputType}`);
-    }
-
+    await this.waitForElementToBeClickable(submitResponseToInteractionInput);
+    await this.type(submitResponseToInteractionInput, answer);
     await this.clickOn(submitAnswerButton);
-  }
-
-  /**
-   * Function to Get the type of an input field in the DOM.
-   * @param {string} selector - The CSS selector for the input field.
-   */
-  async getInputType(selector: string): Promise<string> {
-    const inputField = await this.page.$(selector);
-    if (!inputField) {
-      throw new Error(`Input field not found for selector: ${selector}`);
-    }
-    const inputType = (await (
-      await inputField.getProperty('type')
-    ).jsonValue()) as string;
-    return inputType;
   }
 
   /**
@@ -2250,6 +2253,7 @@ export class LoggedOutUser extends BaseUser {
       : desktopStoryTitleSelector;
 
     try {
+      await this.page.waitForSelector(storyTitleSelector);
       const storyTitles = await this.page.$$(storyTitleSelector);
       for (const title of storyTitles) {
         const titleText = await this.page.evaluate(
@@ -2269,6 +2273,7 @@ export class LoggedOutUser extends BaseUser {
             await this.clickOn('SKIP');
           }
 
+          await this.page.waitForSelector(chapterTitleSelector);
           const chapterTitles = await this.page.$$(chapterTitleSelector);
           for (const chapter of chapterTitles) {
             const chapterText = await this.page.evaluate(
@@ -2278,7 +2283,7 @@ export class LoggedOutUser extends BaseUser {
             if (chapterText.trim().includes(chapterName.trim())) {
               await Promise.all([
                 this.page.waitForNavigation({
-                  waitUntil: ['networkidle0', 'load'],
+                  waitUntil: ['networkidle2', 'load'],
                 }),
                 this.waitForElementToBeClickable(chapter),
                 chapter.click(),
@@ -2298,6 +2303,45 @@ export class LoggedOutUser extends BaseUser {
       const newError = new Error(
         `Failed to select and open chapter within story: ${error}`
       );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Selects and plays a chapter when in a story.
+   * @param {string} chapterName - The name of the chapter to play.
+   */
+  async selectAndPlayChapter(chapterName: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    try {
+      const isLoginPromptContainerPresent =
+        await this.page.$(loginPromptContainer);
+      if (isLoginPromptContainerPresent) {
+        await this.clickOn('SKIP');
+      }
+      await this.page.waitForSelector(chapterTitleSelector);
+      const chapterTitles = await this.page.$$(chapterTitleSelector);
+      for (const chapter of chapterTitles) {
+        const chapterText = await this.page.evaluate(
+          el => el.textContent.trim(),
+          chapter
+        );
+        if (chapterText.trim().includes(chapterName.trim())) {
+          await Promise.all([
+            this.page.waitForNavigation({
+              waitUntil: ['networkidle2', 'load'],
+            }),
+            this.waitForElementToBeClickable(chapter),
+            chapter.click(),
+          ]);
+          return;
+        }
+      }
+
+      throw new Error(`Chapter "${chapterName}" not found.`);
+    } catch (error) {
+      const newError = new Error(`Failed to play chapter: ${error}`);
       newError.stack = error.stack;
       throw newError;
     }
@@ -2402,6 +2446,405 @@ export class LoggedOutUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Loads the next chapter from the last state of an exploration.
+   */
+  async loadNextChapterFromLastState(): Promise<void> {
+    // TODO(#12345): Currently, this test is skipped for mobile viewport due to an issue where
+    // the button is not clickable because it's hidden by the footer.
+    // Once the issue is fixed (see: https://github.com/oppia/oppia/issues/12345),
+    // remove the skip part to enable this method for mobile viewport too.
+    if (this.isViewportAtMobileWidth()) {
+      return;
+    }
+    await this.page.waitForSelector(explorationCompletionToastMessage, {
+      hidden: true,
+    });
+
+    await this.clickAndWaitForNavigation(nextLessonButton);
+  }
+
+  /**
+   * Returns to the story from the last state of an exploration.
+   */
+  async returnToStoryFromLastState(): Promise<void> {
+    await this.clickAndWaitForNavigation('Return to Story');
+    showMessage('Returned to story from the last state.');
+  }
+
+  /**
+   * Searches for a specific lesson in the search results and opens it.
+   * @param {string} lessonTitle - The title of the lesson to search for.
+   */
+  async playLessonFromSearchResults(lessonTitle: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(lessonCardTitleSelector);
+      const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
+      const searchResults = await Promise.all(
+        searchResultsElements.map(result =>
+          this.page.evaluate(el => el.textContent.trim(), result)
+        )
+      );
+
+      const lessonIndex = searchResults.indexOf(lessonTitle);
+      if (lessonIndex === -1) {
+        throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
+      }
+
+      await this.waitForElementToBeClickable(
+        searchResultsElements[lessonIndex]
+      );
+      await searchResultsElements[lessonIndex].click();
+      await this.waitForStaticAssetsToLoad();
+      showMessage(`Lesson "${lessonTitle}" opened from search results.`);
+    } catch (error) {
+      const newError = new Error(
+        `Failed to open lesson from search results: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Gives feedback on the exploration.
+   * @param {string} feedback - The feedback to give on the exploration.
+   */
+  async giveFeedback(feedback: string): Promise<void> {
+    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+    // in mobile viewport which is required for testing the feedback messages tab),
+    // remove this part of skipping this function for Mobile viewport and make it run in mobile viewport
+    // as well. see: https://github.com/oppia/oppia/issues/19443.
+    if (process.env.MOBILE === 'true') {
+      return;
+    }
+    await this.page.waitForSelector('nav-options', {visible: true});
+    await this.clickOn(feedbackPopupSelector);
+    await this.page.waitForSelector(feedbackTextarea, {visible: true});
+    await this.type(feedbackTextarea, feedback);
+    await this.clickOn('Submit');
+
+    try {
+      await this.page.waitForFunction(
+        'document.querySelector(".oppia-feedback-popup-container") !== null',
+        {timeout: 5000}
+      );
+      showMessage('Feedback submitted successfully');
+    } catch (error) {
+      throw new Error('Feedback was not successfully submitted');
+    }
+  }
+
+  /**
+   * Generates attribution
+   */
+  async generateAttribution(): Promise<void> {
+    await this.page.waitForSelector(generateAttributionSelector, {
+      visible: true,
+    });
+    await this.clickOn(generateAttributionSelector);
+
+    await this.page.waitForSelector(attributionHtmlSectionSelector, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Checks if the HTML string is present in the HTML section.
+   * @param {string} htmlString - The HTML string to check for.
+   */
+  async expectAttributionInHtmlSectionToBe(htmlString: string): Promise<void> {
+    const attributionHtmlCodeElement = await this.page.$(
+      attributionHtmlCodeSelector
+    );
+    const attributionHtmlCode = await this.page.evaluate(
+      el => el.textContent,
+      attributionHtmlCodeElement
+    );
+
+    if (!attributionHtmlCode.includes(htmlString)) {
+      throw new Error(
+        `Expected HTML string "${htmlString}" not found in the HTML section. Actual HTML: "${attributionHtmlCode}"`
+      );
+    }
+  }
+
+  /**
+   * Checks if the text string is present in the print text.
+   * @param {string} textString - The text string to check for.
+   */
+  async expectAttributionInPrintToBe(textString: string): Promise<void> {
+    await this.page.waitForSelector(attributionPrintTextSelector, {
+      visible: true,
+    });
+
+    const attributionPrintTextElement = await this.page.$(
+      attributionPrintTextSelector
+    );
+    const attributionPrintText = await this.page.evaluate(
+      el => el.textContent,
+      attributionPrintTextElement
+    );
+
+    if (!attributionPrintText.includes(textString)) {
+      throw new Error(
+        `Expected text string "${textString}" not found in the print text. Actual text: "${attributionPrintText}"`
+      );
+    }
+  }
+
+  /**
+   * Function to close the attribution modal.
+   */
+  async closeAttributionModal(): Promise<void> {
+    await this.clickOn(closeAttributionModalButton);
+    showMessage('Attribution modal closed successfully');
+  }
+
+  /**
+   * Shares the exploration.
+   * @param {string} platform - The platform to share the exploration on.
+   */
+  async shareExploration(platform: string, expectedUrl: string): Promise<void> {
+    await this.clickOn(shareExplorationButtonSelector);
+
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(
+      `.e2e-test-share-link-${platform.toLowerCase()}`,
+      {visible: true}
+    );
+    const aTag = await this.page.$(
+      `.e2e-test-share-link-${platform.toLowerCase()}`
+    );
+    if (!aTag) {
+      throw new Error(`No share link found for ${platform}.`);
+    }
+    const href = await this.page.evaluate(a => a.href, aTag);
+    if (href !== expectedUrl) {
+      throw new Error(
+        `The ${platform} share link does not match the expected URL. Expected: ${expectedUrl}, Found: ${href}`
+      );
+    }
+    await this.closeAttributionModal();
+  }
+
+  /**
+   * Function to embed a lesson.
+   */
+  async embedThisLesson(expectedCode: string): Promise<void> {
+    await this.clickOn(shareExplorationButtonSelector);
+
+    await this.waitForStaticAssetsToLoad();
+    await this.clickOn(embedLessonButton);
+    await this.page.waitForSelector(embedCodeSelector);
+    const embedCode = await this.page.$eval(
+      embedCodeSelector,
+      element => element.textContent
+    );
+    if (embedCode?.trim() !== expectedCode) {
+      throw new Error(
+        'Embed code does not match the expected code. Expected: ' +
+          expectedCode +
+          ', Found: ' +
+          embedCode
+      );
+    }
+    await this.clickOn('Close');
+  }
+
+  /**
+   * Checks if the report exploration button is not available.
+   */
+  async expectReportOptionsNotAvailable(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    const reportExplorationButton = await this.page.$(
+      reportExplorationButtonSelector
+    );
+    if (reportExplorationButton !== null) {
+      throw new Error('Report exploration button found.');
+    }
+  }
+
+  /**
+   * Checks if the rate options are not available.
+   */
+  async expectRateOptionsNotAvailable(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    const rateOptions = await this.page.$(rateOptionsSelector);
+    if (rateOptions !== null) {
+      throw new Error('Rate options found.');
+    }
+  }
+
+  /*
+   * Function to verify if the checkpoint modal appears on the screen.
+   */
+  async verifyCheckpointModalAppears(): Promise<void> {
+    try {
+      await this.page.waitForSelector(checkpointModalSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+      showMessage('Checkpoint modal found.');
+      // Closing the checkpoint modal.
+      await this.clickOn(closeLessonInfoTooltipSelector);
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        const newError = new Error('Checkpoint modal not found.');
+        newError.stack = error.stack;
+        throw newError;
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Function to verify if the latest Oppia feedback matches the expected feedback.
+   * @param {string} expectedFeedback - The expected feedback.
+   */
+  async expectOppiaFeedbackToBe(expectedFeedback: string): Promise<void> {
+    await this.page.waitForSelector(feedbackSelector);
+    const feedbackText = await this.page.$eval(
+      `${feedbackSelector} > p`,
+      element => element.textContent
+    );
+    if (feedbackText !== expectedFeedback) {
+      throw new Error(
+        `Expected feedback to be '${expectedFeedback}', but got '${feedbackText}'.`
+      );
+    }
+  }
+
+  /**
+   * Function to navigate to the previous card in an exploration.
+   */
+  async goBackToPreviousCard(): Promise<void> {
+    await this.clickOn(previousCardButton);
+  }
+
+  /**
+   * Function to verify if the page does not have any input fields.
+   */
+  async verifyCannotAnswerPreviouslyAnsweredQuestion(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    const hasInputFields = await this.page.$('input');
+    if (hasInputFields) {
+      throw new Error('The page should not have any input fields.');
+    }
+    showMessage('The page does not have any input fields, as expected.');
+  }
+
+  /**
+   * Function to use a hint.
+   */
+  async viewHint(): Promise<void> {
+    await this.page.waitForSelector(hintButtonSelector);
+    await this.clickOn(hintButtonSelector);
+  }
+
+  /**
+   * Function to close the hint modal.
+   */
+  async closeHintModal(): Promise<void> {
+    await this.page.waitForSelector(gotItButtonSelector, {visible: true});
+    await this.clickOn(gotItButtonSelector);
+    await this.page.waitForSelector(gotItButtonSelector, {hidden: true});
+  }
+  /**
+   * Simulates the action of viewing the solution by clicking on the view solution button and the continue to solution button.
+   */
+  async viewSolution(): Promise<void> {
+    await this.clickOn(viewSolutionButton);
+    await this.clickOn(continueToSolutionButton);
+  }
+
+  /**
+   * Closes the solution modal by clicking on the close solution modal button.
+   */
+  async closeSolutionModal(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(closeSolutionModalButton, {visible: true});
+    const closeSolutionModalButtonElement = await this.page.$(
+      closeSolutionModalButton
+    );
+    await closeSolutionModalButtonElement?.click();
+  }
+  /**
+   * Function to view previous responses in a state.
+   * This function clicks on the responses dropdown selector to display previous responses.
+   */
+  async viewPreviousResponses(): Promise<void> {
+    await this.clickOn(responsesDropdownSelector);
+  }
+
+  /**
+   * Function to verify the number of previous responses displayed.
+   * @param {number} expectedNumberOfResponses - The expected number of responses.
+   */
+  async verifyNumberOfPreviousResponsesDisplayed(
+    expectedNumberOfResponses: number
+  ): Promise<void> {
+    await this.page.waitForSelector(responseSelector);
+
+    const responseElements = await this.page.$$(responseSelector);
+    if (responseElements.length !== expectedNumberOfResponses) {
+      throw new Error(
+        `Expected ${expectedNumberOfResponses} responses, but got ${responseElements.length}.`
+      );
+    }
+  }
+
+  /**
+   * Checks if the current card's content matches the expected content.
+   * @param {string} expectedCardContent - The expected content of the card.
+   */
+  async expectCardContentToBe(expectedCardContent: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(`${stateConversationContent} p`, {
+      visible: true,
+    });
+    const element = await this.page.$(`${stateConversationContent} p`);
+    const cardContent = await this.page.evaluate(
+      element => element.textContent,
+      element
+    );
+    if (cardContent.trim() !== expectedCardContent) {
+      throw new Error(
+        `Card content is not same as expected. Actual: ${cardContent.trim()}, Expected: ${expectedCardContent}.`
+      );
+    }
+    showMessage('Card content is as expected.');
+  }
+
+  /**
+   * Simulates a delay to avoid triggering the fatigue detection service.
+   * This is important because the fatigue detection service could be activated again after further submissions.
+   * @returns {Promise<void>}
+   */
+  async simulateDelayToAvoidFatigueDetection(): Promise<void> {
+    await this.page.waitForTimeout(10000);
+  }
+
+  /**
+   * Checks if the sign-up button is present on the page.
+   * @returns {Promise<void>}
+   */
+  async expectSignUpButtonToBePresent(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(signUpButton, {timeout: 5000});
+    showMessage('Sign-up button present.');
+  }
+
+  /**
+   * Checks if the sign-in button is present on the page.
+   * @returns {Promise<void>}
+   */
+  async expectSignInButtonToBePresent(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(signInButton, {timeout: 5000});
+    showMessage('Sign-in button present.');
   }
 }
 

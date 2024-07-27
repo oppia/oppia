@@ -218,7 +218,6 @@ const newChapterPhotoBoxButton =
   '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
 const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
-
 export class CurriculumAdmin extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -254,6 +253,32 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.clickOn(confirmSkillCreationButton);
     await this.page.bringToFront();
+  }
+
+  /**
+   * Navigate to the question editor tab present in the skills tab.
+   */
+  async navigateToSkillQuestionEditorTab(): Promise<void> {
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const skillQuestionTab = isMobileWidth
+      ? mobileSkillQuestionTab
+      : desktopSkillQuestionTab;
+
+    if (isMobileWidth) {
+      const currentUrl = new URL(this.page.url());
+      const hashParts = currentUrl.hash.split('/');
+
+      if (hashParts.length > 1) {
+        hashParts[1] = 'questions';
+      } else {
+        hashParts.push('questions');
+      }
+      currentUrl.hash = hashParts.join('/');
+      await this.goto(currentUrl.toString());
+      await this.page.reload({waitUntil: 'networkidle0'});
+    } else {
+      await this.clickAndWaitForNavigation(skillQuestionTab);
+    }
   }
 
   /**
@@ -856,6 +881,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.keyboard.press('Tab');
 
     await this.addChapter(chapterTitle, explorationId);
+
     await this.saveStoryDraft();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileSaveStoryChangesDropdown);
@@ -963,6 +989,21 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
+  }
+
+  /**
+   * Publish a story.
+   */
+  async publishStoryDraft(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileSaveStoryChangesDropdown);
+      await this.page.waitForSelector(mobilePublishStoryButton);
+      await this.clickOn(mobilePublishStoryButton);
+    } else {
+      await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
+      await this.clickOn(publishStoryButton);
+      await this.page.waitForSelector(unpublishStoryButton, {visible: true});
+    }
   }
 
   /**

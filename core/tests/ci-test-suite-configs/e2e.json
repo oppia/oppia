@@ -25,10 +25,6 @@
       "module": "core/tests/webdriverio_desktop/blog.js"
     },
     {
-      "name": "checkpointFeatures",
-      "module": "core/tests/webdriverio_desktop/checkpointFeatures.js"
-    },
-    {
       "name": "collections",
       "module": "core/tests/webdriverio_desktop/collections.js"
     },

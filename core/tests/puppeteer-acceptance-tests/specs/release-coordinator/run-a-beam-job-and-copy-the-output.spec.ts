@@ -64,6 +64,7 @@ describe('Release Coordinator', function () {
     await explorationEditor.addMathInteraction(
       INTERACTION_TYPES.NUMERIC_EXPRESSION_INPUT
     );
+    await explorationEditor.closeInteractionResponseModal();
 
     await explorationEditor.saveExplorationDraft();
     explorationId = await explorationEditor.getExplorationId();

@@ -125,6 +125,18 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/select-and-play-topic-from-classroom-page.spec.ts"
     },
     {
+      "name": "logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration.spec.ts"
+    },
+    {
+      "name": "logged-out-user/share-and-give-feedback-for-exploration-but-not-report-and-rate-it",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/share-and-give-feedback-for-exploration-but-not-report-and-rate-it.spec.ts"
+    },
+    {
+      "name": "logged-out-user/play-through-lesson-while-getting-feedback-and-hints",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-through-lesson-while-getting-feedback-and-hints.spec.ts"
+    },
+    {
       "name": "moderator/edit-featured-activities-list",
       "module": "core/tests/puppeteer-acceptance-tests/specs/moderator/edit-featured-activities-list.spec.ts"
     },
