@@ -4,42 +4,39 @@
   </ng-container>
   <ng-template #content>
     <div class="classroom-navigation-links-content">
-      <a *ngIf="classroomSummaries.length === 1" class="single-classroom-nav-item-container">
-        <div class="classroom-item">
-          <div class="classroom-text-container">
-            <a class="classroom-name e2e-mobile-test-classroom-link" [href]="'/learn/' + classroomSummaries[0].url_fragment">{{ classroomSummaries[0].name }}</a>
-            <p class="classroom-intro-text">{{ 'I18N_CLASSROOM_FOUNDATION_TEXT' | translate:{ classroomName: classroomSummaries[0].name } }}</p>
-          </div>
-          <div class="classroom-thumbnail">
-            <img alt="Classroom thumbnail image"
-                 [src]="getClassroomThumbnail(classroomSummaries[0].classroom_id, classroomSummaries[0].thumbnail_filename)">
-          </div>
-        </div>
-        <div class="nav-item-bottom-link classrooms-page-link">
-          <a class="underline nav-item-bottom-link" tabindex="0" href="/learn">
-            <span class="link">
-              {{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}
-            </span>
-            <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
-          </a>
-        </div>
-      </a>
-      <div class="multiple-classroom-nav-links" *ngIf="classroomSummaries.length > 1">
+      <div class="multiple-classroom-nav-links" *ngIf="classroomSummaries.length > 0">
         <div class="multiple-classrooms-intro">
           <a href="/learn">{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_INTRO' | translate }}</a>
           <p>{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_DESCRIPTION' | translate }}</p>
         </div>
-        <div *ngFor="let classroom of classroomSummaries" class="classroom-nav-item-container">
+        <div *ngFor="let classroom of classroomSummaries | slice:0:2" class="classroom-nav-item-container">
           <div class="classroom-item">
             <div class="classroom-text-container">
-              <a class="classroom-name e2e-mobile-test-classroom-link" [href]="'/learn/' + classroom.url_fragment">{{ classroom.name }}</a>
-              <p class="classroom-intro-text">{{ 'I18N_CLASSROOM_FOUNDATION_TEXT' | translate:{ classroomName: classroomSummaries[0].name } }}</p>
+              <a class="classroom-name e2e-mobile-test-classroom-link"
+                 [href]="'/learn/' + classroom.url_fragment"
+                 *ngIf="!isHackyClassroomNameTranslationDisplayed(classroom.name)">
+                 {{ classroom.name }}
+              </a>
+              <a class="classroom-name e2e-mobile-test-classroom-link"
+                 [href]="'/learn/' + classroom.url_fragment"
+                 *ngIf="isHackyClassroomNameTranslationDisplayed(classroom.name)">
+                 {{ getClassroomNameTranslationkey(classroom.name) | translate }}
+              </a>
+              <p class="classroom-intro-text">{{ 'I18N_CLASSROOM_FOUNDATION_TEXT' | translate:{ classroomName: classroom.name } }}</p>
             </div>
             <div class="classroom-thumbnail">
               <img alt="Classroom thumbnail image"
                    [src]="getClassroomThumbnail(classroom.classroom_id, classroom.thumbnail_filename)">
             </div>
           </div>
+        </div>
+        <div class="nav-item-bottom-link classrooms-page-link" *ngIf="classroomSummaries.length > 1">
+          <a class="underline nav-item-bottom-link" tabindex="0" href="/learn">
+            <span class="link">
+              {{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}
+            </span>
+            <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
+          </a>
         </div>
       </div>
     </div>
@@ -107,7 +104,7 @@
 
   .classrooms-page-link {
     position: relative;
-    top: 160px;
+    bottom: 0;
   }
 
   .multiple-classroom-nav-links {
@@ -115,6 +112,7 @@
     display: flex;
     flex-direction: column;
     justify-content: start;
+    position: relative;
   }
 
   .multiple-classroom-nav-links .multiple-classrooms-intro {
@@ -164,25 +162,8 @@
   }
 
   @media screen and (max-width: 768px) {
-    .single-classroom-nav-item-container {
-      align-items: start;
-      display: flex;
-      flex-direction: column;
-      height: 112px;
-      justify-content: center;
-      margin-top: 18px;
-      position: relative;
-      width: 100vw;
-    }
-
-    .single-classroom-nav-item-container .classroom-item {
-      left: 4%;
-      position: relative;
-      width: 90vw;
-    }
-
     .classrooms-page-link {
-      left: 18px;
+      left: 12px;
       top: -10px;
     }
 

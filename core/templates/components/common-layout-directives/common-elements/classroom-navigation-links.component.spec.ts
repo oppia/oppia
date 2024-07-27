@@ -27,12 +27,14 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {ClassroomNavigationLinksComponent} from './classroom-navigation-links.component';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 describe('ClassroomNavigationLinksComponent', () => {
   let component: ClassroomNavigationLinksComponent;
   let fixture: ComponentFixture<ClassroomNavigationLinksComponent>;
-  let classroomBackendApiService: jasmine.SpyObj<ClassroomBackendApiService>;
-  let assetsBackendApiService: jasmine.SpyObj<AssetsBackendApiService>;
+  let classroomBackendApiService: ClassroomBackendApiService;
+  let assetsBackendApiService: AssetsBackendApiService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   const dummyClassroomSummaries = [
     {
@@ -91,6 +93,7 @@ describe('ClassroomNavigationLinksComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ClassroomNavigationLinksComponent);
     component = fixture.componentInstance;
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
@@ -125,5 +128,36 @@ describe('ClassroomNavigationLinksComponent', () => {
     expect(
       assetsBackendApiService.getThumbnailUrlForPreview
     ).toHaveBeenCalledWith(jasmine.any(String), classroomId, thumbnailFilename);
+  });
+
+  it('should get classroom name translation key', () => {
+    const classroomName = 'math';
+    spyOn(
+      i18nLanguageCodeService,
+      'getClassroomTranslationKeys'
+    ).and.returnValue({name: 'I18N_CLASROOM_MATH_NAME'});
+
+    const result = component.getClassroomNameTranslationkey(classroomName);
+
+    expect(result).toBe('I18N_CLASROOM_MATH_NAME');
+    expect(
+      i18nLanguageCodeService.getClassroomTranslationKeys
+    ).toHaveBeenCalledWith(classroomName);
+  });
+
+  it('should check if hacky classroom name translation is displayed', () => {
+    const classroomName = 'science';
+    spyOn(
+      i18nLanguageCodeService,
+      'isClassroomnNameTranslationAvailable'
+    ).and.returnValue(true);
+
+    const result =
+      component.isHackyClassroomNameTranslationDisplayed(classroomName);
+
+    expect(result).toBeTrue();
+    expect(
+      i18nLanguageCodeService.isClassroomnNameTranslationAvailable
+    ).toHaveBeenCalledWith(classroomName);
   });
 });

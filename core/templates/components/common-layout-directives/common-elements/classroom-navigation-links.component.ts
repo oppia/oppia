@@ -24,6 +24,7 @@ import {
   ClassroomSummaryDict,
 } from 'domain/classroom/classroom-backend-api.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-classroom-navigation-links',
@@ -35,7 +36,8 @@ export class ClassroomNavigationLinksComponent implements OnInit {
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private classroomBackendApiService: ClassroomBackendApiService
+    private classroomBackendApiService: ClassroomBackendApiService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   getClassroomThumbnail(
@@ -46,6 +48,18 @@ export class ClassroomNavigationLinksComponent implements OnInit {
       AppConstants.ENTITY_TYPE.CLASSROOM,
       classroomId,
       thumbnailFilename
+    );
+  }
+
+  getClassroomNameTranslationkey(classroomName: string): string {
+    return this.i18nLanguageCodeService.getClassroomTranslationKeys(
+      classroomName
+    ).name;
+  }
+
+  isHackyClassroomNameTranslationDisplayed(classroomName: string): boolean {
+    return this.i18nLanguageCodeService.isClassroomnNameTranslationAvailable(
+      classroomName
     );
   }
 
