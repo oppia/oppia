@@ -86,33 +86,29 @@ describe('Logged-out User', function () {
   it(
     'should be able to return to the respective story, sign-in, sign-up and load the next chapter form the last state of an exploration',
     async function () {
-      try {
-        await loggedOutUser.navigateToClassroomPage('math');
+      await loggedOutUser.navigateToClassroomPage('math');
 
-        await loggedOutUser.selectAndOpenTopic('Arithmetic');
-        await loggedOutUser.selectChapterWithinStoryToLearn(
-          'Algebra Chapter 1',
-          'Algebra Story 1'
-        );
+      await loggedOutUser.selectAndOpenTopic('Arithmetic');
+      await loggedOutUser.selectChapterWithinStoryToLearn(
+        'Algebra Chapter 1',
+        'Algebra Story 1'
+      );
 
-        // Since the exploration has only one state, the learner should see the last state of the exploration immediately after selecting the chapter.
-        await loggedOutUser.expectExplorationCompletionToastMessage(
-          'Congratulations for completing this lesson!'
-        );
+      // Since the exploration has only one state, the learner should see the last state of the exploration immediately after selecting the chapter.
+      await loggedOutUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
 
-        await loggedOutUser.expectSignUpButtonToBePresent();
-        await loggedOutUser.expectSignInButtonToBePresent();
+      await loggedOutUser.expectSignUpButtonToBePresent();
+      await loggedOutUser.expectSignInButtonToBePresent();
 
-        await loggedOutUser.returnToStoryFromLastState();
+      await loggedOutUser.returnToStoryFromLastState();
 
-        await loggedOutUser.selectChapterWithinStoryToLearn(
-          'Algebra Chapter 1',
-          'Algebra Story 1'
-        );
-        await loggedOutUser.loadNextChapterFromLastState();
-      } catch (error) {
-        await loggedOutUser.timeout(DEFAULT_SPEC_TIMEOUT_MSECS);
-      }
+      await loggedOutUser.selectChapterWithinStoryToLearn(
+        'Algebra Chapter 1',
+        'Algebra Story 1'
+      );
+      await loggedOutUser.loadNextChapterFromLastState();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
