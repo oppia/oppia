@@ -52,7 +52,7 @@ describe('Parent/Teacher', function () {
       await loggedOutUser.clickOnForParentsSlashTeachersLinkInFooter();
 
       // Checking if the lesson creation process is visible in the "For Parent/Teacher" page.
-      await loggedOutUser.checkIfLessonCreationProcessIsVisibleInTeachPage();
+      await loggedOutUser.expectLessonCreationSectionToBeVisibleInTeachPage();
       // Navigating to "Parents/Teachers guide pdf" by clicking on the "Check out our guide" button.
       await loggedOutUser.clickGuideButtonInTeachPage();
       // Navigating to "lesson creator's LinkedIn profile" by clicking on the "LinkedIn profile" button.

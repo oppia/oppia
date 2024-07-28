@@ -500,13 +500,13 @@ export class LoggedOutUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandAboutMenuButton);
-      await this.openExternalPdfLink(
+      await this.openExternalLink(
         mobileSidebarImpactReportButton,
         impactReportUrl
       );
     } else {
       await this.clickOn(navbarAboutTab);
-      await this.openExternalPdfLink(
+      await this.openExternalLink(
         navbarAboutTabImpactReportButton,
         impactReportUrl
       );
@@ -1246,7 +1246,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to click the first LinkedIn button in the Teach page
    * and check if it opens corresponding Creator's LinkedIn Url link
    */
-  async checkIfLessonCreationProcessIsVisibleInTeachPage(): Promise<void> {
+  async expectLessonCreationSectionToBeVisibleInTeachPage(): Promise<void> {
     const lessonCreationSection = await this.page.waitForSelector(
       lessonCreationSectionInTeachPage
     );
@@ -1264,10 +1264,10 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens corresponding Creator's LinkedIn Url link
    */
   async clickLinkedInButtonInTeachPage(): Promise<void> {
-    // Here we are verifying the href attribute of the first LinkedIn button.
+    // Here we are verifying the href attribute of the first LinkedIn button, not clicking it.
     // LinkedIn requires users to log in before accessing profile pages,
     // so the profile page cannot be opened directly.
-    await this.openExternalPdfLink(
+    await this.openExternalLink(
       lessonCreatorLinkedinButtonInTeachPage,
       lessonCreatorLinkedInUrl
     );
@@ -1278,7 +1278,7 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the parents Teachers Guide Url link
    */
   async clickGuideButtonInTeachPage(): Promise<void> {
-    await this.openExternalPdfLink(
+    await this.openExternalLink(
       guideButtonInTeachPage,
       parentsTeachersGuideUrl
     );
@@ -1381,7 +1381,7 @@ export class LoggedOutUser extends BaseUser {
       element.scrollIntoView()
     );
 
-    await this.openExternalPdfLink(
+    await this.openExternalLink(
       brochureButtonInPartnershipsPage,
       partnershipsBrochureUrl
     );
@@ -1709,10 +1709,7 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Impact Report.
    */
   async clickViewReportButtonInAboutPage(): Promise<void> {
-    await this.openExternalPdfLink(
-      impactReportButtonInAboutPage,
-      impactReportUrl
-    );
+    await this.openExternalLink(impactReportButtonInAboutPage, impactReportUrl);
   }
 
   /**

@@ -416,15 +416,14 @@ export class BaseUser {
   }
 
   /**
-   * This function validates whether an anchor tag is correctly linked
-   * to external PDFs or not. Use this particularly when interacting with
-   * buttons associated with external PDF links, because Puppeteer,
-   * in headless-mode, does not natively support the opening of external PDFs.
+   * Validates whether an anchor tag correctly links to external PDFs or LinkedIn profiles.
+   * Use this function when interacting with buttons associated with external PDF links or
+   * buttons that redirect to a person's (not a company's) LinkedIn profile.
+   * Note:
+   * - Puppeteer, in headless mode, does not natively support opening external PDFs.
+   * - LinkedIn requires users to log in before accessing profile pages, so the profile page cannot be opened directly.
    */
-  async openExternalPdfLink(
-    selector: string,
-    expectedUrl: string
-  ): Promise<void> {
+  async openExternalLink(selector: string, expectedUrl: string): Promise<void> {
     await this.page.waitForSelector(selector, {visible: true});
     const href = await this.page.$eval(selector, element =>
       element.getAttribute('href')
