@@ -20,7 +20,6 @@ import logging
 import os
 import subprocess
 import sys
-import pprint
 
 TOPMOST_LEVEL_PATH = './'
 
@@ -102,7 +101,7 @@ def main() -> None:
         with open(file, 'r', encoding='utf8') as f:
             line_count = len(f.readlines())
         if line_count > 0:
-            non_empty_files.append(file)
+            non_empty_files.append(os.path.relpath(file, TOPMOST_LEVEL_PATH))
     errors = ''
     for file in non_empty_files:
         if file not in FILES_WITHOUT_ASSOCIATED_TEST_FILES:
