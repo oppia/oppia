@@ -3057,7 +3057,7 @@ version: 1
                 url, params=params, expect_errors=True
             )
         else:
-            self.assertIs(http_method,'DELETE')
+            self.assertIs(http_method, 'DELETE')
             response = self.testapp.delete(
                 url, params=params, expect_errors=True
             )
