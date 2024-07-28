@@ -3033,9 +3033,8 @@ version: 1
                 params, dict,
                 msg='Expected params to be a dict, received %s' % params)
 
-            if http_method != 'GET':
-                self.assertIn(
-                    http_method, ['POST', 'PUT', 'DELETE'])
+        self.assertIn(
+            http_method, ['GET', 'POST', 'PUT', 'DELETE'])
 
         # This swap is required to ensure that the templates are fetched from
         # source directory instead of webpack_bundles since webpack_bundles is
@@ -3056,8 +3055,7 @@ version: 1
             response = self.testapp.put(
                 url, params=params, expect_errors=True
             )
-        else:
-            self.assertIs(http_method, 'DELETE')
+        elif http_method == 'DELETE':
             response = self.testapp.delete(
                 url, params=params, expect_errors=True
             )
