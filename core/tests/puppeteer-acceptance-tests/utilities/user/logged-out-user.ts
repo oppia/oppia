@@ -2267,11 +2267,7 @@ export class LoggedOutUser extends BaseUser {
             title.click(),
           ]);
 
-          const isLoginPromptContainerPresent =
-            await this.page.$(loginPromptContainer);
-          if (isLoginPromptContainerPresent) {
-            await this.clickOn('SKIP');
-          }
+          await this.skipLoginPrompt();
 
           await this.page.waitForSelector(chapterTitleSelector);
           const chapterTitles = await this.page.$$(chapterTitleSelector);
@@ -2309,17 +2305,13 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Selects and plays a chapter when in a story.
+   * Selects and plays a chapter by it's name/title when inside a story.
    * @param {string} chapterName - The name of the chapter to play.
    */
   async selectAndPlayChapter(chapterName: string): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     try {
-      const isLoginPromptContainerPresent =
-        await this.page.$(loginPromptContainer);
-      if (isLoginPromptContainerPresent) {
-        await this.clickOn('SKIP');
-      }
+      await this.skipLoginPrompt();
       await this.page.waitForSelector(chapterTitleSelector);
       const chapterTitles = await this.page.$$(chapterTitleSelector);
       for (const chapter of chapterTitles) {
@@ -2344,6 +2336,19 @@ export class LoggedOutUser extends BaseUser {
       const newError = new Error(`Failed to play chapter: ${error}`);
       newError.stack = error.stack;
       throw newError;
+    }
+  }
+
+  /**
+   * Function to skip the login prompt that appears while surfing being logged out.
+   */
+  async skipLoginPrompt(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+
+    const isLoginPromptContainerPresent =
+      await this.page.$(loginPromptContainer);
+    if (isLoginPromptContainerPresent) {
+      await this.clickOn('SKIP');
     }
   }
 
@@ -2478,7 +2483,7 @@ export class LoggedOutUser extends BaseUser {
    * Searches for a specific lesson in the search results and opens it.
    * @param {string} lessonTitle - The title of the lesson to search for.
    */
-  async playLessonFromSearchResults(lessonTitle: string): Promise<void> {
+  async selectAndPlayLesson(lessonTitle: string): Promise<void> {
     try {
       await this.page.waitForSelector(lessonCardTitleSelector);
       const searchResultsElements = await this.page.$$(lessonCardTitleSelector);

@@ -122,7 +122,7 @@ describe('Logged-out User', function () {
     await explorationEditor.setTheStateAsCheckpoint();
     await explorationEditor.saveExplorationDraft();
 
-    // Navigate to the new card and add a multiple choice question.
+    // Navigate to the new card and Revision content.
     await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
     await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
     await explorationEditor.updateCardContent(REVISION_CARD_CONTENT);
@@ -160,7 +160,7 @@ describe('Logged-out User', function () {
     async function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
       await loggedOutUser.searchForLessonInSearchBar('Algebra Basics');
-      await loggedOutUser.playLessonFromSearchResults('Algebra Basics');
+      await loggedOutUser.selectAndPlayLesson('Algebra Basics');
       await loggedOutUser.continueToNextCard();
 
       // Wrong answer is submitted number of times to get to see hints.

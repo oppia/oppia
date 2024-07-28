@@ -23,55 +23,140 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
-const ROLES = testConstants.Roles;
+enum INTERACTION_TYPES {
+  CONTINUE_BUTTON = 'Continue Button',
+  NUMERIC_INPUT = 'Number Input',
+  END_EXPLORATION = 'End Exploration',
+}
+enum CARD_NAME {
+  INTRODUCTION = 'Introduction',
+  TEST_QUESTION = 'Test Question',
+  REVISION_CARD = 'Revision Card',
+  FINAL_CARD = 'Final Card',
+}
 
 describe('Logged-out User', function () {
-  let explorationEditor:  ExplorationEditor;
+  let explorationEditor: ExplorationEditor;
   let loggedOutUser: LoggedOutUser;
   let explorationId: string | null;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'explorationEditor@example.com',
-      [ROLES.CURRICULUM_ADMIN]
+      'exploration_editor@example.com'
     );
 
-    explorationId =
-      await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
-        'Negative Numbers'
-      );
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.updateCardContent('Enter a positive number.');
+    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+
+    // Add a new card with a question.
+    await explorationEditor.viewOppiaResponses();
+    await explorationEditor.directLearnersToNewCard('Test Question');
+    await explorationEditor.saveExplorationDraft();
+
+    // Navigate to the new card and update its content.
+    await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION);
+    await explorationEditor.updateCardContent(
+      'Enter a negative number greater than -100.'
+    );
+    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    await explorationEditor.addResponsesToTheInteraction(
+      INTERACTION_TYPES.NUMERIC_INPUT,
+      '-99',
+      'Prefect!',
+      CARD_NAME.REVISION_CARD,
+      true
+    );
+    await explorationEditor.saveExplorationDraft();
+
+    // Navigate to the new card and Revision content.
+    await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
+    await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
+    await explorationEditor.updateCardContent(
+      'Positive numbers are greater than zero.'
+    );
+    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.editDefaultResponseFeedback(
+      undefined,
+      CARD_NAME.FINAL_CARD
+    );
+    await explorationEditor.saveExplorationDraft();
+
+    // Navigate to the final card and update its content.
+    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
+    await explorationEditor.updateCardContent(
+      'We have practiced negative numbers.'
+    );
+    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+
+    // Navigate back to the introduction card and save the draft.
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.saveExplorationDraft();
+
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
+      'Positive Numbers',
+      'Learn positive numbers.',
+      'Algebra'
+    );
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS
-);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-it(
+  it(
     'should be able to check progress, answer states, generate and use progress URL in the exploration player.',
     async function () {
-        await loggedOutUser.navigateToCommunityLibrary();
-        await loggedOutUser.selectAndPlayLessson();
-  
-        await loggedOutUser.checkLessonInfoModal();
-        await loggedOutUser.checkProgressUrlModalButtons();
-        await loggedOutUser.checkProgressUrlValidityInfo();
-        await loggedOutUser.reloadPage();
+      await loggedOutUser.navigateToCommunityLibraryPage();
+      await loggedOutUser.selectAndPlayLesson('Negative Numbers');
+      await loggedOutUser.continueToNextCard();
 
-        await loggedOutUser.tryToReturnToMostRecentCheckpoint();
-        await loggedOutUser.tryToAnswerPreviouslyAnsweredState();
+      await loggedOutUser.openLessonInfoModal();
+      await loggedOutUser.expectLessonInfoToShowRating();
+      await loggedOutUser.expectLessonInfoToShowNoOfViews();
+      await loggedOutUser.expectLessonInfoToShowLastUpdted();
+      await loggedOutUser.expectLessonInfoToShowContributors();
+      await loggedOutUser.expectLessonInfoToShowTags();
+      await loggedOutUser.expectNoSaveProgressBeforeCheckpointInfo();
+      await loggedOutUser.shareExploration('Facebook', '');
+      await loggedOutUser.shareExploration('Twitter', '');
+      await loggedOutUser.closeLessonInfoModal();
 
-        await loggedOutUser.tryToGenerateProgressUrlBeforeFirstCheckpoint();
-        await loggedOutUser.submitAnswer();
-        await loggedOutUser.generateProgressUrl();
+      await loggedOutUser.submitAnswer('-25');
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.verifyCheckpointModalAppears();
 
+      await loggedOutUser.reloadPage();
+      await loggedOutUser.expectProgressRemainder(false);
 
-        const progressUrl = await loggedOutUser.copyProgressUrl();
-        await loggedOutUser.startExplorationUsingProgressUrl(progressUrl);
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.submitAnswer();
+      await loggedOutUser.continueToNextCard();
 
-        await loggedOutUser.chooseExplorationActionAfterUsingProgressUrl();
+      await loggedOutUser.openLessonInfoModal();
+      await loggedOutUser.saveProgress();
+      await loggedOutUser.expectSignInButtonToBePresent();
+      await loggedOutUser.expectCreateAccountToBePresent();
+      await loggedOutUser.checkProgressUrlValidityInfo();
+      const progressUrl = await loggedOutUser.copyProgressUrl();
+      await loggedOutUser.openLessonInfoModal();
+
+      await loggedOutUser.startExplorationUsingProgressUrl(progressUrl);
+      await loggedOutUser.expectProgressRemainder(true);
+
+      await loggedOutUser.chooseActionInProgressRemainder('Resume');
+
+      await loggedOutUser.goBackToPreviousCard();
+      await loggedOutUser.verifyCannotAnswerPreviouslyAnsweredQuestion();
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
-);
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

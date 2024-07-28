@@ -134,7 +134,7 @@ describe('Logged-out User', function () {
       }
       await loggedOutUser.navigateToCommunityLibraryPage();
       await loggedOutUser.searchForLessonInSearchBar('Algebra Basics');
-      await loggedOutUser.playLessonFromSearchResults('Algebra Basics');
+      await loggedOutUser.selectAndPlayLesson('Algebra Basics');
       await loggedOutUser.continueToNextCard();
 
       // Giving feedback before completing the exploration on a state.
