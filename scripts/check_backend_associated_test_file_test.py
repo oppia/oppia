@@ -51,7 +51,6 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
         topmost_level_path_swap = self.swap(
             check_backend_associated_test_file, 'TOPMOST_LEVEL_PATH',
             tempdir.name)
-
         with open(backend_file, 'w', encoding='utf8') as f:
             f.write('Example code')
         with open(frontend_file, 'w', encoding='utf8') as f:
@@ -66,10 +65,10 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             'Backend associated test file checks failed.', self.print_arr)
         self.assertIn(
             '\033[1m{}\033[0m needs an associated backend test file.\n'
-            .format(os.path.relpath(backend_file)), self.error_arr)
+            .format(backend_file), self.error_arr)
         self.assertNotIn(
             '\033[1m{}\033[0m needs an associated backend test file.\n'
-            .format(os.path.relpath(frontend_file)), self.error_arr)
+            .format(frontend_file), self.error_arr)
 
     def test_pass_when_file_in_exclusion_list_lacks_associated_test(
             self) -> None:
@@ -83,7 +82,7 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
         (
             check_backend_associated_test_file.
                 FILES_WITHOUT_ASSOCIATED_TEST_FILES.append(
-                    os.path.relpath(backend_file)))
+                    backend_file))
         with self.print_swap, self.swap_logging, self.swap_exit:
             with topmost_level_path_swap:
                 check_backend_associated_test_file.main()
@@ -93,7 +92,7 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             'Backend associated test file checks passed.', self.print_arr)
         self.assertNotIn(
             '\033[1m{}\033[0m needs an associated backend test file.\n'
-            .format(os.path.relpath(backend_file)), self.error_arr)
+            .format(backend_file), self.error_arr)
 
     def test_checks_pass_when_all_backend_files_have_an_associated_test_file(
             self) -> None:
