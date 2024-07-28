@@ -624,7 +624,7 @@ describe('Collection player page component', () => {
   );
 
   it(
-    'should close the exploration card and scroll into the' +
+    'should close the exploration card and scroll into the ' +
       'exploration icon location on clicking outside of the exploration card',
     fakeAsync(() => {
       spyOn(

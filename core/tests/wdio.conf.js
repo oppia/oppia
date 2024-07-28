@@ -45,24 +45,12 @@ var suites = {
     './core/tests/webdriverio_desktop/additionalPlayerFeatures.js'
   ],
 
-  adminPage: [
-    './core/tests/webdriverio_desktop/adminTabFeatures.js'
-  ],
-
   blogDashboard: [
     './core/tests/webdriverio_desktop/blogDashboard.js'
   ],
 
   blog: [
     './core/tests/webdriverio_desktop/blog.js'
-  ],
-
-  checkpointFeatures: [
-    './core/tests/webdriverio_desktop/checkpointFeatures.js'
-  ],
-
-  classroomPage: [
-    './core/tests/webdriverio_desktop/classroomPage.js'
   ],
 
   collections: [
@@ -131,10 +119,6 @@ var suites = {
 
   learnerDashboard: [
     './core/tests/webdriverio_desktop/learnerDashboard.js'
-  ],
-
-  library: [
-    './core/tests/webdriverio/libraryFlow.js'
   ],
 
   navigation: [

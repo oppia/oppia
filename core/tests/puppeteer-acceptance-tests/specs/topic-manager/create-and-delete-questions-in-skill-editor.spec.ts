@@ -25,7 +25,7 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 const questionText = 'Add 1+2';
 
-describe('Topic Manager User Journey', function () {
+describe('Topic Manager', function () {
   let topicManager: TopicManager & CurriculumAdmin;
   let curriculumAdmin: CurriculumAdmin;
 
@@ -55,8 +55,9 @@ describe('Topic Manager User Journey', function () {
       // this scenario (linking and unlinking a skill to a question) in the acceptance test.
       // See: https://github.com/oppia/oppia/issues/20590
       await topicManager.navigateToTopicAndSkillsDashboardPage();
+
       await topicManager.openSkillEditor('Addition');
-      await topicManager.navigateToQuestionEditorTab();
+      await topicManager.navigateToSkillQuestionEditorTab();
 
       await topicManager.createQuestionsForSkill('Addition', 1);
       await topicManager.expectToastMessageToBe(
@@ -68,7 +69,7 @@ describe('Topic Manager User Journey', function () {
       await topicManager.expectPreviewQuestionText(questionText);
       await topicManager.expectPreviewInteractionType('Numeric Input');
 
-      await topicManager.navigateToQuestionEditorTab();
+      await topicManager.navigateToSkillQuestionEditorTab();
       await topicManager.deleteQuestion(questionText);
       await topicManager.expectToastMessageToBe('Question Removed');
     },

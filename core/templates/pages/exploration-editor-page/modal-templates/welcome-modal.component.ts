@@ -51,9 +51,10 @@ export class WelcomeModalComponent
     this.siteAnalyticsService.registerTutorialModalOpenEvent(
       this.explorationId
     );
-    this.editorWelcomeImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/general/editor_welcome.svg'
-    );
+    this.editorWelcomeImgUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/general/editor_welcome.svg'
+      );
     this.welcomeHeading?.nativeElement.focus();
   }
 
