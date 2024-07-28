@@ -25,8 +25,6 @@ const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
 const baseUrl = testConstants.URLs.BaseURL;
-const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
-const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
 const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
 const ratingStarSelector = '.e2e-test-rating-star';
 const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
@@ -112,28 +110,6 @@ export class LoggedInUser extends BaseUser {
    */
   async playExploration(explorationId: string | null): Promise<void> {
     await this.goto(`${baseUrl}/explore/${explorationId as string}`);
-  }
-
-  /**
-   * Gives feedback on the exploration.
-   * @param {string} feedback - The feedback to give on the exploration.
-   */
-  async giveFeedback(feedback: string): Promise<void> {
-    await this.page.waitForSelector('nav-options', {visible: true});
-    await this.clickOn(feedbackPopupSelector);
-    await this.page.waitForSelector(feedbackTextarea, {visible: true});
-    await this.type(feedbackTextarea, feedback);
-    await this.clickOn('Submit');
-
-    try {
-      await this.page.waitForFunction(
-        'document.querySelector(".oppia-feedback-popup-container") !== null',
-        {timeout: 5000}
-      );
-      showMessage('Feedback submitted successfully');
-    } catch (error) {
-      throw new Error('Feedback was not successfully submitted');
-    }
   }
 
   /**
