@@ -3052,13 +3052,12 @@ version: 1
             response = self.testapp.post(
                 url, params=params, expect_errors=True
             )
-
         elif http_method == 'PUT':
             response = self.testapp.put(
                 url, params=params, expect_errors=True
             )
-
-        elif http_method == 'DELETE':
+        else:
+            self.assertIs(http_method,'DELETE')
             response = self.testapp.delete(
                 url, params=params, expect_errors=True
             )
