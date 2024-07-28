@@ -21,7 +21,6 @@ import {FormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {ToastrModule} from 'ngx-toastr';
-import {MatChipsModule} from '@angular/material/chips';
 
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {TopicManagerRoleEditorModalComponent} from './roles-tab/topic-manager-role-editor-modal.component';
@@ -38,7 +37,6 @@ import {OppiaAdminProdModeActivitiesTabComponent} from './activities-tab/admin-p
 import {AdminMiscTabComponent} from './misc-tab/admin-misc-tab.component';
 import {AdminRolesTabComponent} from './roles-tab/admin-roles-tab.component';
 import {AdminPageComponent} from './admin-page.component';
-import {DeleteUserGroupConfirmModalComponent} from './modals/delete-user-group-confirm-modal/delete-user-group-confirm-modal.component';
 
 @NgModule({
   imports: [
@@ -46,7 +44,6 @@ import {DeleteUserGroupConfirmModalComponent} from './modals/delete-user-group-c
     FormsModule,
     SharedComponentsModule,
     SharedFormsModule,
-    MatChipsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {
@@ -68,7 +65,6 @@ import {DeleteUserGroupConfirmModalComponent} from './modals/delete-user-group-c
     AdminPlatformParametersTabComponent,
     AdminPageRootComponent,
     TranslationCoordinatorRoleEditorModalComponent,
-    DeleteUserGroupConfirmModalComponent,
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
@@ -79,7 +75,6 @@ import {DeleteUserGroupConfirmModalComponent} from './modals/delete-user-group-c
     AdminDevModeActivitiesTabComponent,
     TopicManagerRoleEditorModalComponent,
     TranslationCoordinatorRoleEditorModalComponent,
-    DeleteUserGroupConfirmModalComponent,
   ],
 })
 export class AdminPageModule {}

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for UserGroupModel.
  */
 
-import {UserGroup} from 'domain/admin/user-group.model';
+import {UserGroup} from 'domain/release_coordinator/user-group.model';
 
 describe('UserGroupModel', () => {
   it('should create an instance from a backend dict.', () => {

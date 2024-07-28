@@ -234,10 +234,6 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
     exp_id: Optional[str]
     blog_post_title: Optional[str]
-    user_group_name: Optional[str]
-    user_group_users: Optional[List[str]]
-    old_user_group_name: Optional[str]
-    user_group_to_delete: Optional[str]
     default_value: Dict[str, parameter_domain.PlatformDataTypes]
 
 
@@ -267,41 +263,12 @@ class AdminHandler(
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
                         'update_platform_parameter_rules',
-                        'rollback_exploration_to_safe_state',
-                        'update_user_group',
-                        'delete_user_group'
+                        'rollback_exploration_to_safe_state'
                     ]
                 },
                 # TODO(#13331): Remove default_value when it is confirmed that,
                 # for clearing the search indices of exploration & collection
                 # 'action' field must be provided in the payload.
-                'default_value': None
-            },
-            'user_group_name': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            },
-            'user_group_users': {
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'basestring'
-                    }
-                },
-                'default_value': None
-            },
-            'old_user_group_name': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            },
-            'user_group_to_delete': {
-                'schema': {
-                    'type': 'basestring'
-                },
                 'default_value': None
             },
             'exploration_id': {
@@ -426,10 +393,6 @@ class AdminHandler(
             get_all_platform_parameters_dicts()
         )
 
-        user_group_models = user_services.get_all_user_groups()
-
-        all_users_usernames = user_services.get_all_users_usernames()
-
         # Removes promo-bar related and blog related platform params as
         # they are handled in release-coordinator page and blog admin page
         # respectively.
@@ -451,8 +414,6 @@ class AdminHandler(
             'role_to_actions': role_services.get_role_actions(),
             'topic_summaries': topic_summary_dicts,
             'platform_params_dicts': platform_params_dicts,
-            'user_group_models': user_group_models,
-            'all_users_usernames': all_users_usernames,
             'skill_list': skill_summary_dicts,
         })
 
@@ -622,23 +583,6 @@ class AdminHandler(
                 result = {
                     'version': version
                 }
-            elif action == 'update_user_group':
-                user_group_name = (
-                    self.normalized_payload.get('user_group_name'))
-                user_group_users = (
-                    self.normalized_payload.get('user_group_users'))
-                old_user_group_name = (
-                    self.normalized_payload.get('old_user_group_name'))
-                assert user_group_name is not None
-                assert user_group_users is not None
-                assert old_user_group_name is not None
-                user_services.update_user_group(
-                    user_group_name, user_group_users, old_user_group_name)
-            elif action == 'delete_user_group':
-                user_group_to_delete = (
-                    self.normalized_payload.get('user_group_to_delete'))
-                assert user_group_to_delete is not None
-                user_services.delete_user_group(user_group_to_delete)
             else:
                 # The handler schema defines the possible values of 'action'.
                 # If 'action' has a value other than those defined in the

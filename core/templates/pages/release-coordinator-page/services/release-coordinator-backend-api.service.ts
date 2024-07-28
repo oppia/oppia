@@ -31,6 +31,11 @@ import {
   BeamJobRunBackendDict,
 } from 'domain/jobs/beam-job-run.model';
 import {BeamJob, BeamJobBackendDict} from 'domain/jobs/beam-job.model';
+import {ReleaseCoordinatorPageConstants} from '../release-coordinator-page.constants';
+import {
+  UserGroup,
+  UserGroupBackendDict,
+} from 'domain/release_coordinator/user-group.model';
 
 interface MemoryCacheProfileResponse {
   peak_allocation: string;
@@ -44,6 +49,16 @@ interface BeamJobsResponse {
 
 interface BeamJobRunsResponse {
   runs: BeamJobRunBackendDict[];
+}
+
+export interface UserGroupsDict {
+  user_group_models: UserGroupBackendDict[];
+  all_users_usernames: string[];
+}
+
+export interface UserGroupsResponse {
+  userGroups: UserGroup[];
+  allUsersUsernames: string[];
 }
 
 @Injectable({
@@ -118,6 +133,81 @@ export class ReleaseCoordinatorBackendApiService {
         params: {job_id: beamJobRun.jobId},
       })
       .pipe(map(BeamJobRunResult.createFromBackendDict));
+  }
+
+  // This is a helper function to handle all post<void>
+  // requests.
+  private async _postRequestAsync(
+    handlerUrl: string,
+    payload?: Object,
+    action?: string
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .post<void>(handlerUrl, {action, ...payload})
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
+    });
+  }
+
+  async updateUserGroupAsync(
+    userGroupName: string,
+    userGroupUsers: string[],
+    oldUserGroupName: string
+  ): Promise<void> {
+    let action = 'update_user_group';
+    let payload = {
+      user_group_name: userGroupName,
+      user_group_users: userGroupUsers,
+      old_user_group_name: oldUserGroupName,
+    };
+    return this._postRequestAsync(
+      ReleaseCoordinatorPageConstants.USER_GROUPS_HANDLER_URL,
+      payload,
+      action
+    );
+  }
+
+  async deleteUserGroupAsync(data: string): Promise<void> {
+    let action = 'delete_user_group';
+    let payload = {
+      user_group_to_delete: data,
+    };
+    return this._postRequestAsync(
+      ReleaseCoordinatorPageConstants.USER_GROUPS_HANDLER_URL,
+      payload,
+      action
+    );
+  }
+
+  async getUserGroupsAsync(): Promise<UserGroupsResponse> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<UserGroupsDict>(
+          ReleaseCoordinatorPageConstants.USER_GROUPS_HANDLER_URL
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve({
+              userGroups: response.user_group_models.map(dict =>
+                UserGroup.createFromBackendDict(dict)
+              ),
+              allUsersUsernames: response.all_users_usernames,
+            });
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
+    });
   }
 }
 

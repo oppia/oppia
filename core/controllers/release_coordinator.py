@@ -25,8 +25,9 @@ from core.controllers import base
 from core.domain import caching_services
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_services as feature_services
+from core.domain import user_services
 
-from typing import Dict, List, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 
 class MemoryCacheHandler(
@@ -56,6 +57,117 @@ class MemoryCacheHandler(
         """Flushes the memory cache."""
         caching_services.flush_memory_caches()
         self.render_json({})
+
+
+class UserGroupHandlerNormalizePayloadDict(TypedDict):
+    """Dict representation of UserGroupHandler's normalized_payload
+    dictionary.
+    """
+
+    action: str
+    user_group_name: Optional[str]
+    user_group_users: Optional[List[str]]
+    old_user_group_name: Optional[str]
+    user_group_to_delete: Optional[str]
+
+
+class UserGroupHandler(
+    base.BaseHandler[
+        UserGroupHandlerNormalizePayloadDict, Dict[str, str]]
+):
+    """Handler for user groups."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'action': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        'update_user_group',
+                        'delete_user_group'
+                    ]
+                },
+                # TODO(#13331): Remove default_value when it is confirmed that,
+                # for clearing the search indices of exploration & collection
+                # 'action' field must be provided in the payload.
+                'default_value': None
+            },
+            'user_group_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'user_group_users': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'basestring'
+                    }
+                },
+                'default_value': None
+            },
+            'old_user_group_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'user_group_to_delete': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
+
+    @acl_decorators.can_access_release_coordinator_page
+    def get(self) -> None:
+        """Populates the data for user groups."""
+        user_group_models = user_services.get_all_user_groups()
+        all_users_usernames = user_services.get_all_users_usernames()
+
+        self.render_json({
+            'user_group_models': user_group_models,
+            'all_users_usernames': all_users_usernames
+        })
+
+    @acl_decorators.can_access_release_coordinator_page
+    def post(self) -> None:
+        """Performs series of action based on action parameter for user
+        groups.
+        """
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        action = self.normalized_payload.get('action')
+        try:
+            if action == 'update_user_group':
+                user_group_name = (
+                    self.normalized_payload.get('user_group_name'))
+                user_group_users = (
+                    self.normalized_payload.get('user_group_users'))
+                old_user_group_name = (
+                    self.normalized_payload.get('old_user_group_name'))
+                assert user_group_name is not None
+                assert user_group_users is not None
+                assert old_user_group_name is not None
+                user_services.update_user_group(
+                    user_group_name, user_group_users, old_user_group_name)
+            else:
+                assert action == 'delete_user_group'
+                user_group_to_delete = (
+                    self.normalized_payload.get('user_group_to_delete'))
+                assert user_group_to_delete is not None
+                user_services.delete_user_group(user_group_to_delete)
+            self.render_json(self.values)
+        except Exception as e:
+            logging.exception('[RELEASE-COORDINATOR] %s', e)
+            self.render_json({'error': str(e)})
+            raise e
 
 
 class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):

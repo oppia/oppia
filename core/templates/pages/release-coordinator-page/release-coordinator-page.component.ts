@@ -16,15 +16,31 @@
  * @fileoverview Component for the release coordinator page.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {ENTER} from '@angular/cdk/keycodes';
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {downgradeComponent} from '@angular/upgrade/static';
 
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+
+import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
+import {Subscription} from 'rxjs';
+
 import {PromoBarBackendApiService} from 'services/promo-bar-backend-api.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import {ReleaseCoordinatorBackendApiService} from './services/release-coordinator-backend-api.service';
 import {ReleaseCoordinatorPageConstants} from './release-coordinator-page.constants';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {DeleteUserGroupConfirmModalComponent} from 'pages/release-coordinator-page/modals/delete-user-group-confirm-modal.component';
+import {LoaderService} from 'services/loader.service';
+import {UserGroup} from 'domain/release_coordinator/user-group.model';
 
 interface MemoryCacheProfile {
   totalAllocatedInBytes: string;
@@ -37,6 +53,8 @@ interface MemoryCacheProfile {
   templateUrl: './release-coordinator-page.component.html',
 })
 export class ReleaseCoordinatorPageComponent implements OnInit {
+  @ViewChild('userInputToAddUserToGroup')
+  userInputToAddUserToGroup!: ElementRef<HTMLInputElement>;
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -46,6 +64,21 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   promoBarConfigForm!: FormGroup;
   memoryCacheDataFetched: boolean = false;
   submitButtonDisabled: boolean = false;
+  directiveSubscriptions = new Subscription();
+  loadingMessage: string = '';
+  newUserGroupName: string = '';
+  separatorKeysCodes: number[] = [ENTER];
+  userGroupsBackup!: Map<string, UserGroup>;
+  userGroups: UserGroup[] = [];
+  userGroupIdsToDetailsShowRecord: Record<string, boolean> = {};
+  allUsersUsernames: string[] = [];
+  userInUserGroupValidationError: string = '';
+  userGroupValidationError: string = '';
+  userGroupSaveError: string = '';
+  userGroupInEditMode: boolean = false;
+  oldUserGroupNameToNewUserGroupNameRecord: Record<string, string> = {};
+  irreversibleActionMessage: string =
+    'This action is irreversible. Are you sure?';
 
   TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
   TAB_ID_FEATURES: string = ReleaseCoordinatorPageConstants.TAB_ID_FEATURES;
@@ -53,9 +86,12 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private platformFeatureService: PlatformFeatureService,
     private backendApiService: ReleaseCoordinatorBackendApiService,
-    private promoBarBackendApiService: PromoBarBackendApiService
+    private promoBarBackendApiService: PromoBarBackendApiService,
+    private cdr: ChangeDetectorRef,
+    private ngbModal: NgbModal,
+    private windowRef: WindowRef,
+    private loaderService: LoaderService
   ) {}
 
   flushMemoryCache(): void {
@@ -105,6 +141,250 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
       );
   }
 
+  async fetchUserGroupData(): Promise<void> {
+    const data = await this.backendApiService.getUserGroupsAsync();
+    this.userGroups = data.userGroups;
+    this.allUsersUsernames = data.allUsersUsernames;
+    this.userGroupsBackup = new Map(
+      this.userGroups.map(userGroup => [
+        userGroup.userGroupName,
+        cloneDeep(userGroup),
+      ])
+    );
+    for (let userGroup of this.userGroups) {
+      this.userGroupIdsToDetailsShowRecord[userGroup.userGroupName] = false;
+      this.oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName] =
+        userGroup.userGroupName;
+    }
+    this.loaderService.hideLoadingScreen();
+  }
+
+  toggleUserGroupDetailsSection(userGroupId: string): void {
+    let currentValue = this.userGroupIdsToDetailsShowRecord[userGroupId];
+    if (currentValue === false && this.userGroupInEditMode === true) {
+      this.userGroupSaveError =
+        'Please save or cancel the changes before editing other user group.';
+      return;
+    }
+    this.userGroupIdsToDetailsShowRecord[userGroupId] =
+      currentValue === true ? false : true;
+    for (let useGroup in this.userGroupIdsToDetailsShowRecord) {
+      if (useGroup === userGroupId) {
+        continue;
+      }
+      this.userGroupIdsToDetailsShowRecord[useGroup] = false;
+    }
+    this.userGroupInEditMode = false;
+    this.cdr.detectChanges();
+  }
+
+  setUserGroupInEditMode(): void {
+    this.userGroupInEditMode = true;
+  }
+
+  deleteUserGroup(userGroupId: string): void {
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      DeleteUserGroupConfirmModalComponent,
+      {
+        backdrop: 'static',
+      }
+    );
+    modalRef.result.then(
+      () => {
+        this.backendApiService.deleteUserGroupAsync(userGroupId).then(
+          () => {
+            this.statusMessage = 'UserGroups successfully deleted.';
+            this.userGroups = this.userGroups.filter(
+              userGroup => userGroup.userGroupName !== userGroupId
+            );
+            this.userGroups = this.userGroups.filter(
+              obj => obj.userGroupName !== userGroupId
+            );
+            delete this.userGroupIdsToDetailsShowRecord[userGroupId];
+            delete this.oldUserGroupNameToNewUserGroupNameRecord[userGroupId];
+            this.userGroupsBackup.delete(userGroupId);
+            this.userGroupSaveError = '';
+            this.userGroupInEditMode = false;
+            this.cdr.detectChanges();
+          },
+          errorResponse => {
+            this.statusMessage = `Server error: ${errorResponse}`;
+          }
+        );
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is
+        // clicked. No further action is needed.
+      }
+    );
+  }
+
+  removeUserFromUserGroup(userGroup: UserGroup, username: string): void {
+    userGroup.users = userGroup.users.filter(obj => obj !== username);
+  }
+
+  addUserToUserGroup(event: {value: string}, userGroup: UserGroup): void {
+    this.userInUserGroupValidationError = '';
+    const value = (event.value || '').trim();
+    if (!value || value === '') {
+      return;
+    }
+
+    if (userGroup.users.includes(value)) {
+      this.userInUserGroupValidationError =
+        `The user '${value}' already exists in the ` +
+        `user group '${userGroup.userGroupName}'.`;
+      return;
+    }
+    if (!this.allUsersUsernames.includes(value)) {
+      this.userInUserGroupValidationError = `The user with username '${value}' does not exists.`;
+      return;
+    }
+    userGroup.users.push(value);
+    this.userInputToAddUserToGroup.nativeElement.value = '';
+  }
+
+  addUserGroup(): void {
+    const trimmedUserGroupName = this.newUserGroupName.trim();
+    if (
+      this.userGroups.some(
+        userGroup => userGroup.userGroupName === trimmedUserGroupName
+      )
+    ) {
+      this.userGroupValidationError = '';
+      this.userGroupValidationError = `The user group '${this.newUserGroupName}' already exists.`;
+      return;
+    }
+
+    if (trimmedUserGroupName !== '') {
+      this.backendApiService
+        .updateUserGroupAsync(trimmedUserGroupName, [], trimmedUserGroupName)
+        .then(
+          () => {
+            this.statusMessage = 'UserGroup added.';
+            let newUserGroup = new UserGroup(trimmedUserGroupName, []);
+            this.userGroups.push(newUserGroup);
+            this.userGroupIdsToDetailsShowRecord[trimmedUserGroupName] = false;
+            this.userGroupsBackup.set(
+              trimmedUserGroupName,
+              cloneDeep(newUserGroup)
+            );
+            this.oldUserGroupNameToNewUserGroupNameRecord[
+              trimmedUserGroupName
+            ] = trimmedUserGroupName;
+            this.newUserGroupName = '';
+            this.cdr.detectChanges();
+          },
+          errorResponse => {
+            this.statusMessage = `Server error: ${errorResponse}`;
+          }
+        );
+    }
+  }
+
+  onUserGroupUserInputChange(): void {
+    this.userInUserGroupValidationError = '';
+    this.userGroupSaveError = '';
+  }
+
+  onUserGroupInputChange(): void {
+    this.userGroupValidationError = '';
+  }
+
+  isUserGroupUpdated(userGroup: UserGroup, newUserGroupName: string): boolean {
+    if (userGroup.userGroupName !== newUserGroupName) {
+      return true;
+    }
+
+    return !isEqual(
+      userGroup.users,
+      this.userGroupsBackup.get(userGroup.userGroupName).users
+    );
+  }
+
+  updateUserGroup(userGroup: UserGroup, newUserGroupName: string): void {
+    if (!this.isUserGroupUpdated(userGroup, newUserGroupName)) {
+      return;
+    }
+
+    if (
+      userGroup.userGroupName !== newUserGroupName &&
+      newUserGroupName in this.oldUserGroupNameToNewUserGroupNameRecord
+    ) {
+      this.userGroupSaveError = '';
+      this.userGroupSaveError = `User group with name ${newUserGroupName} already exists.`;
+      return;
+    }
+
+    if (!this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)) {
+      return;
+    }
+
+    this.statusMessage = 'Updating UserGroups...';
+
+    this.backendApiService
+      .updateUserGroupAsync(
+        newUserGroupName,
+        userGroup.users,
+        userGroup.userGroupName
+      )
+      .then(
+        () => {
+          this.statusMessage = 'UserGroups successfully updated.';
+          if (userGroup.userGroupName !== newUserGroupName) {
+            this.oldUserGroupNameToNewUserGroupNameRecord[newUserGroupName] =
+              newUserGroupName;
+            delete this.oldUserGroupNameToNewUserGroupNameRecord[
+              userGroup.userGroupName
+            ];
+            this.userGroupIdsToDetailsShowRecord[newUserGroupName] = false;
+            delete this.userGroupIdsToDetailsShowRecord[
+              userGroup.userGroupName
+            ];
+            this.userGroupsBackup.set(newUserGroupName, cloneDeep(userGroup));
+            this.userGroupsBackup.delete(userGroup.userGroupName);
+            userGroup.userGroupName = newUserGroupName;
+          }
+          this.userGroupsBackup.set(
+            userGroup.userGroupName,
+            cloneDeep(userGroup)
+          );
+
+          this.userGroupSaveError = '';
+          this.userGroupInEditMode = false;
+          this.cdr.detectChanges();
+        },
+        errorResponse => {
+          this.statusMessage = `Server error: ${errorResponse}`;
+          this.userGroupSaveError = '';
+        }
+      );
+  }
+
+  resetUserGroup(userGroup: UserGroup, newUserGroupName: string): void {
+    if (this.isUserGroupUpdated(userGroup, newUserGroupName)) {
+      if (
+        !this.windowRef.nativeWindow.confirm(
+          'This will revert all changes you made. Are you sure?'
+        )
+      ) {
+        this.userGroupInEditMode = true;
+        return;
+      }
+      let backup = this.userGroupsBackup.get(userGroup.userGroupName);
+      userGroup.userGroupName = backup.userGroupName;
+      userGroup.users = backup.users;
+      this.oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName] =
+        userGroup.userGroupName;
+      this.userGroupSaveError = '';
+      this.userInUserGroupValidationError = '';
+      this.userGroupValidationError = '';
+      this.cdr.detectChanges();
+    }
+    this.userGroupInEditMode = false;
+  }
+
   ngOnInit(): void {
     this.statusMessage = '';
     this.submitButtonDisabled = true;
@@ -123,6 +403,13 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
         message: promoBar.promoBarMessage,
       });
     });
+    this.directiveSubscriptions.add(
+      this.loaderService.onLoadingMessageChange.subscribe((message: string) => {
+        this.loadingMessage = message;
+      })
+    );
+    this.loaderService.showLoadingScreen('Loading');
+    this.fetchUserGroupData();
   }
 }
 

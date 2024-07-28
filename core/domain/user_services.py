@@ -550,7 +550,20 @@ def update_user_group(
 
     Raises:
         Exception. The user group trying to update does not exists.
+        Exception. The user trying to add to the user group does not exists.
     """
+    if len(user_group_users) > 0:
+        all_users_usernames = get_all_users_usernames()
+        for user in user_group_users:
+            if not user in all_users_usernames:
+                raise Exception(
+                    f'The user {user} of user-group {old_user_group_name} '
+                    'does not exists.')
+    if len(user_group_users) != len(set(user_group_users)):
+        raise Exception(
+            f'Users list of user-group {old_user_group_name} contains '
+            'duplicates.'
+        )
     if old_user_group_name == user_group_name:
         user_group_model = user_models.UserGroupModel.get(
             user_group_name, strict=False)

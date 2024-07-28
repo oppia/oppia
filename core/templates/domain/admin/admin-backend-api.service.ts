@@ -34,7 +34,6 @@ import {
   SkillSummaryBackendDict,
 } from 'domain/skill/skill-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {UserGroup, UserGroupBackendDict} from 'domain/admin/user-group.model';
 
 export interface UserRolesBackendResponse {
   roles: string[];
@@ -87,8 +86,6 @@ export interface AdminPageDataBackendDict {
   human_readable_roles: HumanReadableRolesBackendResponse;
   topic_summaries: CreatorTopicSummaryBackendDict[];
   platform_params_dicts: PlatformParameterBackendDict[];
-  user_group_models: UserGroupBackendDict[];
-  all_users_usernames: string[];
   skill_list: SkillSummaryBackendDict[];
 }
 
@@ -102,8 +99,6 @@ export interface AdminPageData {
   humanReadableRoles: HumanReadableRolesBackendResponse;
   topicSummaries: CreatorTopicSummary[];
   platformParameters: PlatformParameter[];
-  userGroups: UserGroup[];
-  allUsersUsernames: string[];
   skillList: SkillSummary[];
 }
 
@@ -141,10 +136,6 @@ export class AdminBackendApiService {
               platformParameters: response.platform_params_dicts.map(dict =>
                 PlatformParameter.createFromBackendDict(dict)
               ),
-              userGroups: response.user_group_models.map(dict =>
-                UserGroup.createFromBackendDict(dict)
-              ),
-              allUsersUsernames: response.all_users_usernames,
               skillList: response.skill_list.map(dict =>
                 SkillSummary.createFromBackendDict(dict)
               ),
@@ -416,36 +407,6 @@ export class AdminBackendApiService {
     let action = 'upload_topic_similarities';
     let payload = {
       data: data,
-    };
-    return this._postRequestAsync(
-      AdminPageConstants.ADMIN_HANDLER_URL,
-      payload,
-      action
-    );
-  }
-
-  async updateUserGroupAsync(
-    userGroupName: string,
-    userGroupUsers: string[],
-    oldUserGroupName: string
-  ): Promise<void> {
-    let action = 'update_user_group';
-    let payload = {
-      user_group_name: userGroupName,
-      user_group_users: userGroupUsers,
-      old_user_group_name: oldUserGroupName,
-    };
-    return this._postRequestAsync(
-      AdminPageConstants.ADMIN_HANDLER_URL,
-      payload,
-      action
-    );
-  }
-
-  async deleteUserGroupAsync(data: string): Promise<void> {
-    let action = 'delete_user_group';
-    let payload = {
-      user_group_to_delete: data,
     };
     return this._postRequestAsync(
       AdminPageConstants.ADMIN_HANDLER_URL,
