@@ -48,6 +48,9 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
         tempdir = tempfile.TemporaryDirectory(prefix=os.getcwd() + '/core/')
         backend_file = os.path.join(tempdir.name, 'backend_file.py')
         frontend_file = os.path.join(tempdir.name, 'frontend_file.ts')
+        topmost_level_path_swap = self.swap(
+            check_backend_associated_test_file, 'TOPMOST_LEVEL_PATH',
+            tempdir.name)
 
         with open(backend_file, 'w', encoding='utf8') as f:
             f.write('Example code')
@@ -55,7 +58,8 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             f.write('Example code')
 
         with self.print_swap, self.swap_logging, self.swap_exit:
-            check_backend_associated_test_file.main()
+            with topmost_level_path_swap:
+                check_backend_associated_test_file.main()
 
         tempdir.cleanup()
         self.assertIn(
@@ -71,6 +75,9 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             self) -> None:
         tempdir = tempfile.TemporaryDirectory(prefix=os.getcwd() + '/core/')
         backend_file = os.path.join(tempdir.name, 'backend_file.py')
+        topmost_level_path_swap = self.swap(
+            check_backend_associated_test_file, 'TOPMOST_LEVEL_PATH',
+            tempdir.name)
         with open(backend_file, 'w', encoding='utf8') as f:
             f.write('Example code')
         (
@@ -78,7 +85,8 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
                 FILES_WITHOUT_ASSOCIATED_TEST_FILES.append(
                     os.path.relpath(backend_file)))
         with self.print_swap, self.swap_logging, self.swap_exit:
-            check_backend_associated_test_file.main()
+            with topmost_level_path_swap:
+                check_backend_associated_test_file.main()
 
         tempdir.cleanup()
         self.assertIn(
@@ -94,13 +102,17 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
         backend_file = os.path.join(tempdir.name, 'backend_file.py')
         backend_test_file = os.path.join(
             tempdir.name, 'backend_file_test.py')
+        topmost_level_path_swap = self.swap(
+            check_backend_associated_test_file, 'TOPMOST_LEVEL_PATH',
+            tempdir.name)
 
         with open(backend_file, 'w', encoding='utf8') as f:
             f.write('Example code')
         with open(backend_test_file, 'w', encoding='utf8') as f:
             f.write('Example code')
         with self.print_swap, self.swap_logging, self.swap_exit:
-            check_backend_associated_test_file.main()
+            with topmost_level_path_swap:
+                check_backend_associated_test_file.main()
 
         tempdir.cleanup()
         self.assertIn(
