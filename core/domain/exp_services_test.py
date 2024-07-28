@@ -7852,7 +7852,6 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
                     self.EXP_0_ID))
         if exp_opportunity_summary is not None:
             translation_counts = exp_opportunity_summary.translation_counts
-
         self.assertEqual(len(entity_translation_models), 2)
         self.assertEqual(len(
             entity_translation_models[1].translations), 2)
@@ -8029,7 +8028,6 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
                     self.EXP_0_ID))
         if exp_opportunity_summary is not None:
             translation_counts = exp_opportunity_summary.translation_counts
-
         self.assertEqual(len(entity_translation_models), 2)
         self.assertEqual(len(
             entity_translation_models[1].translations), 2)
@@ -8097,7 +8095,6 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
             translation_models.EntityTranslationsModel.get_all().fetch())
         translation_counts = translation_services.get_translation_counts(
                 feconf.TranslatableEntityType.EXPLORATION, exploration)
-
         self.assertEqual(len(entity_translation_models), 2)
         self.assertEqual(len(
             entity_translation_models[1].translations), 8)
@@ -8113,7 +8110,6 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
                     self.EXP_0_ID))
         if exp_opportunity_summary is not None:
             translation_counts = exp_opportunity_summary.translation_counts
-
         self.assertEqual(len(entity_translation_models), 3)
         self.assertEqual(len(
             entity_translation_models[2].translations), 3)
