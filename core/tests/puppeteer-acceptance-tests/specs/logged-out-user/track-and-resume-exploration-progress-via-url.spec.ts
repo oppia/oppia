@@ -23,6 +23,8 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const PROGRESS_URL_VALIDITY_INFO =
+  'Use the link below to save progress for 72 hours.';
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
   NUMERIC_INPUT = 'Number Input',
@@ -38,7 +40,6 @@ enum CARD_NAME {
 describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutUser: LoggedOutUser;
-  let explorationId: string | null;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
@@ -88,7 +89,7 @@ describe('Logged-out User', function () {
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.updateCardContent(
-      'We have practiced negative numbers.'
+      'We have practiced positive numbers.'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
@@ -96,7 +97,7 @@ describe('Logged-out User', function () {
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
 
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
+    await explorationEditor.publishExplorationWithMetadata(
       'Positive Numbers',
       'Learn positive numbers.',
       'Algebra'
@@ -109,15 +110,17 @@ describe('Logged-out User', function () {
     'should be able to check progress, answer states, generate and use progress URL in the exploration player.',
     async function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
-      await loggedOutUser.selectAndPlayLesson('Negative Numbers');
+      await loggedOutUser.selectAndPlayLesson('Positive Numbers');
       await loggedOutUser.continueToNextCard();
 
       await loggedOutUser.openLessonInfoModal();
-      await loggedOutUser.expectLessonInfoToShowRating();
-      await loggedOutUser.expectLessonInfoToShowNoOfViews();
-      await loggedOutUser.expectLessonInfoToShowLastUpdted();
-      await loggedOutUser.expectLessonInfoToShowContributors();
-      await loggedOutUser.expectLessonInfoToShowTags();
+      await loggedOutUser.expectLessonInfoToShowRating('unrated');
+      await loggedOutUser.expectLessonInfoToShowNoOfViews(0);
+      await loggedOutUser.expectLessonInfoToShowLastUpdated();
+      await loggedOutUser.expectLessonInfoToShowContributors(
+        'explorationEditor'
+      );
+      await loggedOutUser.expectLessonInfoToShowTags(['growth']);
       await loggedOutUser.expectNoSaveProgressBeforeCheckpointInfo();
       await loggedOutUser.shareExploration('Facebook', '');
       await loggedOutUser.shareExploration('Twitter', '');
@@ -131,14 +134,16 @@ describe('Logged-out User', function () {
       await loggedOutUser.expectProgressRemainder(false);
 
       await loggedOutUser.continueToNextCard();
-      await loggedOutUser.submitAnswer();
+      await loggedOutUser.submitAnswer('-35');
       await loggedOutUser.continueToNextCard();
 
       await loggedOutUser.openLessonInfoModal();
       await loggedOutUser.saveProgress();
       await loggedOutUser.expectSignInButtonToBePresent();
       await loggedOutUser.expectCreateAccountToBePresent();
-      await loggedOutUser.checkProgressUrlValidityInfo();
+      await loggedOutUser.checkProgressUrlValidityInfo(
+        PROGRESS_URL_VALIDITY_INFO
+      );
       const progressUrl = await loggedOutUser.copyProgressUrl();
       await loggedOutUser.openLessonInfoModal();
 

@@ -41,7 +41,6 @@ enum CARD_NAME {
 describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutUser: LoggedOutUser;
-  let explorationId: string | null;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
@@ -92,7 +91,7 @@ describe('Logged-out User', function () {
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.updateCardContent(
-      'We have practiced negative numbers.'
+      'We have practiced Positive Numbers.'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
@@ -100,7 +99,7 @@ describe('Logged-out User', function () {
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
 
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
+    await explorationEditor.publishExplorationWithMetadata(
       'Positive Numbers',
       'Learn positive numbers.',
       'Algebra'
@@ -113,21 +112,21 @@ describe('Logged-out User', function () {
     'should be able to play the exploration without signing in, sign in at any point, save progress, and clear progress',
     async function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
-      await loggedOutUser.selectAndPlayLesson('Negative Numbers');
+      await loggedOutUser.selectAndPlayLesson('Positive Numbers');
       await loggedOutUser.continueToNextCard();
 
-      // Make some progress in the exploration
+      // Make some progress in the exploration.
       await loggedOutUser.submitAnswer('-25');
       await loggedOutUser.continueToNextCard();
 
-      // Choose to sign up at this point
+      // Choose to sign up at this point.
       await loggedOutUser.signUpNewUser('learner', 'learner@example.com');
 
       // Rest of the action is done being logged-in in the same window as the same logged-out user needs to login and check if the progress is not lost.
 
-      // Verify that progress is saved
+      // Verify that progress is saved.
       await loggedOutUser.expectProgressRemainder(true);
-      // Continue the exploration from where they left off
+      // Continue the exploration from where they left off.
       await loggedOutUser.chooseActionInProgressRemainder('Restart');
 
       await loggedOutUser.continueToNextCard();

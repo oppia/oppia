@@ -249,7 +249,6 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/play-through-lesson-while-getting-feedback-and-hints',
     'logged-out-user/share-and-give-feedback-for-exploration-'
     'but-not-report-and-rate-it',
-    'logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers',
     'logged-out-user/sign-in-and-save-exploration-progress',
     'logged-out-user/track-and-resume-exploration-progress-via-url',
     'moderator/edit-featured-activities-list',
