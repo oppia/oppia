@@ -15,9 +15,9 @@
 /**
  * @fileoverview Acceptance tests for the user journey of signing in and saving exploration progress in
  * the middle of exploration.
- * User Journey: Starting an exploration without signing in, making progress, signing up during the
- * exploration, verifying that progress is saved, continuing the exploration, and completing the
- * exploration.
+ * User Journey: Starting an exploration without signing in, making progress,
+ * signing up during the exploration, verifying that progress is saved, continuing
+ * the exploration, and completing the exploration.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
