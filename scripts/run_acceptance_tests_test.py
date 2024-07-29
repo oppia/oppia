@@ -17,6 +17,8 @@
 from __future__ import annotations
 
 import contextlib
+import os
+import shutil
 import subprocess
 import sys
 
@@ -113,6 +115,57 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_popen_error_call)
         with popen_error_swap:
             with self.assertRaisesRegex(Exception, 'Some error'):
+                run_acceptance_tests.compile_test_ts_files()
+
+    def test_compile_test_ts_files_success(
+        self
+    ) -> None:
+        process = subprocess.Popen(
+            ['test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        def mock_os_path_exists(unused_path: str) -> bool:
+            return True
+
+        def mock_shutil_rmtree(unused_path: str) -> None:
+            pass
+
+        def mock_shutil_copytree(
+            src: str, dst: str, *args: str, **kwargs: str # pylint: disable=unused-argument
+        ) -> None:
+            pass
+
+        def mock_popen_call(
+            cmd_tokens: List[str], *args: str, **kwargs: str # pylint: disable=unused-argument
+        ) -> subprocess.Popen[str]:
+            return process
+
+        puppeteer_acceptance_tests_dir_path = os.path.join(
+            common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
+        build_dir_path = os.path.join(
+            puppeteer_acceptance_tests_dir_path,
+            'build', 'puppeteer-acceptance-tests')
+        os_path_exists_swap = self.swap(
+            os.path, 'exists', mock_os_path_exists)
+        shutil_rmtree_swap = self.swap_with_checks(
+            shutil, 'rmtree', mock_shutil_rmtree,
+            expected_args=[(build_dir_path,)])
+        shutil_copytree_swap = self.swap_with_checks(
+            shutil, 'copytree', mock_shutil_copytree,
+            expected_args=[
+                (
+                    os.path.join(puppeteer_acceptance_tests_dir_path, 'data'),
+                    os.path.join(build_dir_path, 'data'),
+                )
+            ])
+        expected_cmd = (
+            './node_modules/typescript/bin/tsc -p %s' %
+            './tsconfig.puppeteer-acceptance-tests.json')
+        process_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen_call,
+            expected_args=[(expected_cmd,)])
+
+        with os_path_exists_swap, shutil_rmtree_swap, process_swap:
+            with shutil_copytree_swap:
                 run_acceptance_tests.compile_test_ts_files()
 
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
