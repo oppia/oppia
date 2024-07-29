@@ -138,11 +138,11 @@
     },
     {
       "name": "logged-out-user/change-site-language-and-engage-with-original-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/change-site-language-and-engage-with-original-exploration.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/change-site-language-and-engage-with-original-exploration.spec.ts"
     },
     {
       "name": "logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/use-keyboard-shortcuts-to-navigate-and-shift-focus.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus.spec.ts"
     },
     {
       "name": "moderator/edit-featured-activities-list",

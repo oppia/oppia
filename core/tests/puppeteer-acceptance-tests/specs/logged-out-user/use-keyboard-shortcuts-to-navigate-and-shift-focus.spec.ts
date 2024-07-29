@@ -115,14 +115,14 @@ describe('Logged-out User', function () {
       // Navigate to the Community Library page using the ‘Ctrl+1’ shortcut.
       await loggedOutUser.navigateToCommunityLibraryPage();
       await loggedOutUser.expectToBeOnPage('community-library');
-      await loggedOutUser.verifyFocusAfterShortcut('/'); // Search bar
-      await loggedOutUser.verifyFocusAfterShortcut('s'); // Skips to the main content
-      await loggedOutUser.verifyFocusAfterShortcut('c'); // Category filter dropdown
+      await loggedOutUser.verifyFocusAfterShortcut('/'); // Search bar.
+      await loggedOutUser.verifyFocusAfterShortcut('s'); // Skips to the main content.
+      await loggedOutUser.verifyFocusAfterShortcut('c'); // Category filter dropdown.
 
       await loggedOutUser.selectAndPlayLesson('Positive Numbers');
-      await loggedOutUser.verifyFocusAfterShortcut('s'); // Skips to the main content
-      await loggedOutUser.verifyFocusAfterShortcut('j'); // "Back" button
-      await loggedOutUser.verifyFocusAfterShortcut('k'); // "Next" button
+      await loggedOutUser.verifyFocusAfterShortcut('s'); // Skips to the main content.
+      await loggedOutUser.verifyFocusAfterShortcut('j'); // "Back" button.
+      await loggedOutUser.verifyFocusAfterShortcut('k'); // "Next" button.
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
