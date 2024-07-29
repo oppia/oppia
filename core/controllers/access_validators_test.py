@@ -731,6 +731,7 @@ class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.add_user_role(
             self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
@@ -752,13 +753,6 @@ class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
             uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
 
-    def test_access_topic_editor_page_without_logging_in(self) -> None:
-        self.get_json(
-            '%s/can_access_topic_editor/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id
-            ), expected_status_int=401
-        )
-
     def test_access_topic_editor_page_with_curriculum_admin(
             self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -767,6 +761,14 @@ class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
                 ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id),
                 expected_status_int=200)
         self.logout()
+
+    def test_access_topic_editor_page_without_curriculum_admin(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id
+            ), expected_status_int=401
+        )
 
 
 class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
