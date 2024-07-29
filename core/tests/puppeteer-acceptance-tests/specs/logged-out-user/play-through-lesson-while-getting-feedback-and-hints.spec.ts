@@ -122,7 +122,7 @@ describe('Logged-out User', function () {
     await explorationEditor.setTheStateAsCheckpoint();
     await explorationEditor.saveExplorationDraft();
 
-    // Navigate to the new card and Revision content.
+    // Navigate to the new card and add revision content.
     await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
     await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
     await explorationEditor.updateCardContent(REVISION_CARD_CONTENT);

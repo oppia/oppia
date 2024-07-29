@@ -267,6 +267,7 @@ const viewsContainerSelector = '.e2e-test-info-card-views';
 const lastUpdatedInfoSelector = '.e2e-test-info-card-last-updated';
 const tagsContainerSelector = '.e2e-test-info-card-tags em';
 const ratingContainerSelector = '.e2e-test-info-card-rating span:nth-child(2)';
+const contributorProfileLinkImageSelector = 'profile-link-image';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -3025,7 +3026,9 @@ export class LoggedOutUser extends BaseUser {
       `${contributorsContainerSelector} li`,
       (liElements, contributorName) => {
         return liElements.some(li => {
-          const profileLinkImage = li.querySelector('profile-link-image');
+          const profileLinkImage = li.querySelector(
+            contributorProfileLinkImageSelector
+          );
           return (
             profileLinkImage &&
             profileLinkImage.getAttribute('ng-reflect-username') ===
