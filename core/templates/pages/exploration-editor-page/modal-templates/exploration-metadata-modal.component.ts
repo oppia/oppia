@@ -62,6 +62,7 @@ export class ExplorationMetadataModalComponent
   explorationTags: string[] = [];
   filteredChoices: CategoryChoices[] = [];
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
+  tagIsInvalid: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -101,6 +102,7 @@ export class ExplorationMetadataModalComponent
 
   add(event: MatChipInputEvent): void {
     const value = (event.value || '').trim();
+    let tagRegex = new RegExp(AppConstants.TAG_REGEX);
 
     // Add our explorationTags.
     if (value) {
@@ -109,10 +111,14 @@ export class ExplorationMetadataModalComponent
         (this.explorationTagsService.displayed as []).length < 10
       ) {
         if (
-          (this.explorationTagsService.displayed as string[]).includes(value)
+          (this.explorationTagsService.displayed as string[]).includes(
+            value.toLowerCase()
+          ) ||
+          !value.match(tagRegex)
         ) {
           // Clear the input value.
           event.input.value = '';
+          this.tagIsInvalid = true;
           return;
         }
 
@@ -122,6 +128,7 @@ export class ExplorationMetadataModalComponent
 
     // Clear the input value.
     event.input.value = '';
+    this.tagIsInvalid = false;
 
     this.explorationTagsService.displayed = this.explorationTags;
   }
