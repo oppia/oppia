@@ -187,7 +187,6 @@ describe('AudioPlayerService', () => {
     it('should stop playing track when called', fakeAsync(() => {
       spyOn(audioPlayerService, 'setCurrentTime');
       spyOn(console, 'error');
-      spyOn(audioTranslationManagerService, 'clearSecondaryAudioTranslations');
       let subjectNext = spyOn(Subject.prototype, 'next');
       audioPlayerService.loadAsync('test.mp3');
       flushMicrotasks();
@@ -196,9 +195,6 @@ describe('AudioPlayerService', () => {
 
       expect(console.error).toHaveBeenCalledWith('Howl.stop');
       expect(subjectNext).toHaveBeenCalledTimes(2);
-      expect(
-        audioTranslationManagerService.clearSecondaryAudioTranslations
-      ).toHaveBeenCalled();
     }));
 
     it(
@@ -444,39 +440,10 @@ describe('AudioPlayerService', () => {
     }));
   });
 
-  it(
-    'should clear secondary audio translations when audio ' + 'ends',
-    fakeAsync(async () => {
-      spyOn(howler, 'Howl').and.returnValue({
-        on: (evt: string, func: () => void) => {
-          if (evt === 'end') {
-            func();
-          }
-        },
-      } as Howl);
-      spyOn(assetsBackendApiService, 'loadAudio').and.returnValue(
-        Promise.resolve({
-          data: new Blob(),
-          filename: 'test',
-        })
-      );
-      spyOn(audioTranslationManagerService, 'clearSecondaryAudioTranslations');
-
-      audioPlayerService.loadAsync('test.mp3');
-      flushMicrotasks();
-
-      expect(
-        audioTranslationManagerService.clearSecondaryAudioTranslations
-      ).toHaveBeenCalled();
-    })
-  );
-
   it('should display error when audio fails to load', fakeAsync(() => {
     spyOn(assetsBackendApiService, 'loadAudio').and.returnValue(
       Promise.reject('Error')
     );
-    spyOn(audioTranslationManagerService, 'clearSecondaryAudioTranslations');
-
     audioPlayerService.loadAsync('test.mp3').then(successHandler, failHandler);
     flushMicrotasks();
 
