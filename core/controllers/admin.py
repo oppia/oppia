@@ -392,7 +392,6 @@ class AdminHandler(
             parameter_services.
             get_all_platform_parameters_dicts()
         )
-
         # Removes promo-bar related and blog related platform params as
         # they are handled in release-coordinator page and blog admin page
         # respectively.

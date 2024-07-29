@@ -30,11 +30,13 @@ import {NO_ERRORS_SCHEMA, ElementRef} from '@angular/core';
 
 import {PromoBarBackendApiService} from 'services/promo-bar-backend-api.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {ReleaseCoordinatorBackendApiService} from './services/release-coordinator-backend-api.service';
-import {ReleaseCoordinatorPageConstants} from './release-coordinator-page.constants';
-import {ReleaseCoordinatorPageComponent} from './release-coordinator-page.component';
+import {
+  ReleaseCoordinatorBackendApiService,
+  UserGroupsResponse,
+} from './services/release-coordinator-backend-api.service';
+import {ReleaseCoordinatorPageConstants} from 'pages/release-coordinator-page/release-coordinator-page.constants';
+import {ReleaseCoordinatorPageComponent} from 'pages/release-coordinator-page/release-coordinator-page.component';
 import {UserGroup} from 'domain/release_coordinator/user-group.model';
-import {UserGroupsResponse} from './release-coordinator-backend-api.service';
 import {PromoBar} from 'domain/promo_bar/promo-bar.model';
 
 class MockWindowRef {
@@ -639,5 +641,19 @@ describe('Release coordinator page', () => {
         );
       }));
     });
+
+    it('should throw error when user group backup not found', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+
+      const userGroup = UserGroup.createFromBackendDict({
+        user_group_name: 'random_user_group',
+        users: ['user', 'testuser'],
+      });
+
+      expect(() => {
+        component.isUserGroupUpdated(userGroup);
+      }).toThrowError();
+    }));
   });
 });

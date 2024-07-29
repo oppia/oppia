@@ -35,8 +35,8 @@ import {Subscription} from 'rxjs';
 
 import {PromoBarBackendApiService} from 'services/promo-bar-backend-api.service';
 
-import {ReleaseCoordinatorBackendApiService} from './services/release-coordinator-backend-api.service';
-import {ReleaseCoordinatorPageConstants} from './release-coordinator-page.constants';
+import {ReleaseCoordinatorBackendApiService} from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
+import {ReleaseCoordinatorPageConstants} from 'pages/release-coordinator-page/release-coordinator-page.constants';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {DeleteUserGroupConfirmModalComponent} from 'pages/release-coordinator-page/modals/delete-user-group-confirm-modal.component';
 import {LoaderService} from 'services/loader.service';
@@ -238,7 +238,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
       return;
     }
     if (!this.allUsersUsernames.includes(value)) {
-      this.userInUserGroupValidationError = `The user with username '${value}' does not exists.`;
+      this.userInUserGroupValidationError = `The user with username '${value}' does not exist.`;
       return;
     }
     userGroup.users.push(value);
@@ -293,14 +293,18 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   }
 
   isUserGroupUpdated(userGroup: UserGroup, newUserGroupName: string): boolean {
+    const original = this.userGroupsBackup.get(userGroup.userGroupName);
+    if (original === undefined) {
+      throw new Error(
+        'Backup not found for user group: ' + userGroup.userGroupName
+      );
+    }
+
     if (userGroup.userGroupName !== newUserGroupName) {
       return true;
     }
 
-    return !isEqual(
-      userGroup.users,
-      this.userGroupsBackup.get(userGroup.userGroupName).users
-    );
+    return !isEqual(userGroup.users, original.users);
   }
 
   updateUserGroup(userGroup: UserGroup, newUserGroupName: string): void {
@@ -373,14 +377,16 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
         return;
       }
       let backup = this.userGroupsBackup.get(userGroup.userGroupName);
-      userGroup.userGroupName = backup.userGroupName;
-      userGroup.users = backup.users;
-      this.oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName] =
-        userGroup.userGroupName;
-      this.userGroupSaveError = '';
-      this.userInUserGroupValidationError = '';
-      this.userGroupValidationError = '';
-      this.cdr.detectChanges();
+      if (backup) {
+        userGroup.userGroupName = backup.userGroupName;
+        userGroup.users = backup.users;
+        this.oldUserGroupNameToNewUserGroupNameRecord[userGroup.userGroupName] =
+          userGroup.userGroupName;
+        this.userGroupSaveError = '';
+        this.userInUserGroupValidationError = '';
+        this.userGroupValidationError = '';
+        this.cdr.detectChanges();
+      }
     }
     this.userGroupInEditMode = false;
   }

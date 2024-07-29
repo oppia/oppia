@@ -22,18 +22,20 @@ import {
 } from '@angular/common/http/testing';
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import {ReleaseCoordinatorBackendApiService} from './release-coordinator-backend-api.service';
 import {ReleaseCoordinatorPageConstants} from '../release-coordinator-page.constants';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {BeamJobRun} from 'domain/jobs/beam-job-run.model';
 import {BeamJob} from 'domain/jobs/beam-job.model';
 import {BeamJobRunResult} from 'domain/jobs/beam-job-run-result.model';
-import {UserGroup} from 'domain/release_coordinator/user-group.model';
 import {
+  UserGroup,
+  UserGroupBackendDict,
+} from 'domain/release_coordinator/user-group.model';
+import {
+  ReleaseCoordinatorBackendApiService,
   UserGroupsResponse,
   UserGroupsDict,
 } from './release-coordinator-backend-api.service';
-import {UserGroupBackendDict} from 'domain/release_coordinator/user_group.model';
 
 describe('Release coordinator backend api service', () => {
   let rcbas: ReleaseCoordinatorBackendApiService;
