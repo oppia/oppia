@@ -47,7 +47,7 @@ export class ExplorationTagsService extends ExplorationPropertyService {
     for (let i = 0; i < value.length; i++) {
       value[i] = value[i].trim().replace(/\s+/g, ' ');
     }
-    // TODO(#20447): Prevent duplicate tags from being added.
+
     return value;
   }
 
