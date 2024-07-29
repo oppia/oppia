@@ -136,8 +136,11 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
         def mock_popen_call(
             cmd_tokens: List[str], *args: str, **kwargs: str # pylint: disable=unused-argument
-        ) -> subprocess.Popen[str]:
+        ) -> subprocess.Popen[bytes]:
             return process
+
+        def mock_communicate(unused_self: str) -> Tuple[bytes, bytes]:
+            return (b'', b'')
 
         puppeteer_acceptance_tests_dir_path = os.path.join(
             common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
@@ -163,9 +166,11 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         process_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen_call,
             expected_args=[(expected_cmd,)])
+        communicate_swap = self.swap(
+            subprocess.Popen, 'communicate', mock_communicate)
 
         with os_path_exists_swap, shutil_rmtree_swap, process_swap:
-            with shutil_copytree_swap:
+            with shutil_copytree_swap, communicate_swap:
                 run_acceptance_tests.compile_test_ts_files()
 
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
