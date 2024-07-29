@@ -94,6 +94,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             print('mock_set_constants_to_default')
         self.swap_mock_set_constants_to_default = self.swap(
             common, 'set_constants_to_default', mock_constants)
+        self.compile_test_ts_files_swap = self.swap(
+            run_acceptance_tests, 'compile_test_ts_files', lambda: None)
 
     def tearDown(self) -> None:
         try:
@@ -119,7 +121,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
 
-        with self.assertRaisesRegex(
+        with self.compile_test_ts_files_swap, self.assertRaisesRegex(
             SystemExit, """
             Oppia server is already running. Try shutting all the servers down
             before running the script.
@@ -159,7 +161,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
         with self.swap_mock_set_constants_to_default:
-            run_acceptance_tests.main(args=['--suite', 'testSuite'])
+            with self.compile_test_ts_files_swap:
+                run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_work_with_non_ascii_chars(self) -> None:
         def mock_managed_acceptance_tests_server(
@@ -200,7 +203,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         args = run_acceptance_tests._PARSER.parse_args(args=['--suite', 'testSuite'])  # pylint: disable=protected-access, line-too-long
 
         with self.swap_mock_set_constants_to_default:
-            lines, _ = run_acceptance_tests.run_tests(args)
+            with self.compile_test_ts_files_swap:
+                lines, _ = run_acceptance_tests.run_tests(args)
 
         self.assertEqual(
             [line.decode('utf-8') for line in lines],
@@ -244,7 +248,9 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        run_acceptance_tests.main(args=['--suite', 'testSuite', '--skip-build'])
+        with self.compile_test_ts_files_swap:
+            run_acceptance_tests.main(
+                args=['--suite', 'testSuite', '--skip-build'])
 
     def test_start_tests_in_jasmine(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -279,7 +285,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
         with self.swap_mock_set_constants_to_default:
-            run_acceptance_tests.main(args=['--suite', 'testSuite'])
+            with self.compile_test_ts_files_swap:
+                run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_start_tests_with_emulator_mode_false(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -316,8 +323,9 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
         with self.swap_mock_set_constants_to_default:
-            with self.swap(constants, 'EMULATOR_MODE', False):
-                run_acceptance_tests.main(args=['--suite', 'testSuite'])
+            with self.compile_test_ts_files_swap:
+                with self.swap(constants, 'EMULATOR_MODE', False):
+                    run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_start_tests_for_long_lived_process(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -353,5 +361,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
         with self.swap_mock_set_constants_to_default:
-            with self.swap(constants, 'EMULATOR_MODE', True):
-                run_acceptance_tests.main(args=['--suite', 'testSuite'])
+            with self.compile_test_ts_files_swap:
+                with self.swap(constants, 'EMULATOR_MODE', True):
+                    run_acceptance_tests.main(args=['--suite', 'testSuite'])
