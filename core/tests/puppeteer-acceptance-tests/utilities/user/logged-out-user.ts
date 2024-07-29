@@ -31,6 +31,7 @@ const ccLicenseUrl = testConstants.URLs.CCLicense;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const recentlyPublishedExplorationsPageUrl =
   testConstants.URLs.recentlyPublishedExplorations;
+const splashPageUrl = testConstants.URLs.splash;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
 const classroomsPage = testConstants.URLs.ClassroomsPage;
@@ -252,7 +253,32 @@ const embedCodeSelector = '.oppia-embed-modal-code';
 const embedLessonButton = '.e2e-test-embed-link';
 const signUpButton = '.e2e-test-login-button';
 const signInButton = '.conversation-skin-login-button-text';
-
+const navbarButtonsSelector = '.oppia-navbar-tab-content';
+const dropdownNavbarLinkSelector = '.dropdown-item.nav-link';
+const skipLinkSelector = '.e2e-test-skip-link';
+type KeyInput =
+  | 'Shift'
+  | 'Control'
+  | 'Alt'
+  | 'Meta'
+  | 'Enter'
+  | 'Tab'
+  | 'Backspace'
+  | 'Delete'
+  | 'ArrowUp'
+  | 'ArrowDown'
+  | 'ArrowLeft'
+  | 'ArrowRight'
+  | 'Digit0'
+  | 'Digit1'
+  | 'Digit2'
+  | 'Digit3'
+  | 'Digit4'
+  | 'Digit5'
+  | 'Digit6'
+  | 'Digit7'
+  | 'Digit8'
+  | 'Digit9';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -363,6 +389,13 @@ export class LoggedOutUser extends BaseUser {
       await this.page.reload();
     }
     await this.goto(classroomsPage);
+  }
+
+  /**
+   * Navigates to the splash page.
+   */
+  async navigateToSplashPage(): Promise<void> {
+    await this.goto(splashPageUrl);
   }
 
   /**
@@ -1273,7 +1306,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to change the site language to the given language code.
    * @param langCode - The language code to change the site language to. Example: 'pt-br', 'en'
    */
-  private async changeSiteLanguage(langCode: string): Promise<void> {
+  async changeSiteLanguage(langCode: string): Promise<void> {
     const languageOption = `.e2e-test-i18n-language-${langCode} a`;
 
     if (this.isViewportAtMobileWidth()) {
@@ -2478,6 +2511,40 @@ export class LoggedOutUser extends BaseUser {
    * Searches for a specific lesson in the search results and opens it.
    * @param {string} lessonTitle - The title of the lesson to search for.
    */
+  async selectAndPlayLesson(lessonTitle: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(lessonCardTitleSelector);
+      const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
+      const searchResults = await Promise.all(
+        searchResultsElements.map(result =>
+          this.page.evaluate(el => el.textContent.trim(), result)
+        )
+      );
+
+      const lessonIndex = searchResults.indexOf(lessonTitle);
+      if (lessonIndex === -1) {
+        throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
+      }
+
+      await this.waitForElementToBeClickable(
+        searchResultsElements[lessonIndex]
+      );
+      await searchResultsElements[lessonIndex].click();
+      await this.waitForStaticAssetsToLoad();
+      showMessage(`Lesson "${lessonTitle}" opened from search results.`);
+    } catch (error) {
+      const newError = new Error(
+        `Failed to open lesson from search results: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Searches for a specific lesson in the search results and opens it.
+   * @param {string} lessonTitle - The title of the lesson to search for.
+   */
   async playLessonFromSearchResults(lessonTitle: string): Promise<void> {
     try {
       await this.page.waitForSelector(lessonCardTitleSelector);
@@ -2845,6 +2912,156 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(signInButton, {timeout: 5000});
     showMessage('Sign-in button present.');
+  }
+
+  /**
+   * Checks if the navbar buttons' text matches the expected text.
+   * @param {string[]} expectedText - The expected text for each navbar button.
+   */
+  async expectPageLanguageToMatch(expectedLanguage: string): Promise<void> {
+    // Get the 'lang' attribute from the <html> tag.
+    const actualLanguage = await this.page.evaluate(
+      () => document.documentElement.lang
+    );
+
+    if (actualLanguage !== expectedLanguage) {
+      throw new Error(
+        `Expected page language to be ${expectedLanguage}, but it was ${actualLanguage}`
+      );
+    }
+    showMessage('Page language matches the expected one.');
+  }
+
+  /**
+   * Checks if the navbar buttons' text matches any of the expected text.
+   * @param {string[]} expectedText - The expected text for each navbar button.
+   */
+  async expectNavbarButtonsToHaveText(expectedText: string[]): Promise<void> {
+    // Get the text content of all navbar buttons.
+    await this.page.waitForSelector(navbarButtonsSelector);
+    const navbarButtonsText = await this.page.evaluate(selector => {
+      return Array.from(
+        document.querySelectorAll(selector),
+        element => element.textContent
+      );
+    }, navbarButtonsSelector);
+
+    // Check if any of the navbar buttons' text matches the expected text.
+    const isMatchFound = expectedText.some(text =>
+      navbarButtonsText.includes(text)
+    );
+
+    if (!isMatchFound) {
+      throw new Error(
+        `None of the navbar buttons' text matches the expected text: ${expectedText}`
+      );
+    }
+  }
+
+  /**
+   * Checks if the profile dropdown links' text matches any of the expected text.
+   * @param {string[]} expectedText - The expected text for each profile dropdown link.
+   */
+  async expectProfileDropdownLinksToHaveText(
+    expectedText: string[]
+  ): Promise<void> {
+    // Get the text content of all profile dropdown links.
+    const dropdownLinksText = await this.page.evaluate(selector => {
+      return Array.from(
+        document.querySelectorAll(selector),
+        element => element.textContent
+      );
+    }, dropdownNavbarLinkSelector);
+
+    // Check if any of the profile dropdown links' text matches the expected text.
+    const isMatchFound = expectedText.some(text =>
+      dropdownLinksText.includes(text)
+    );
+
+    if (!isMatchFound) {
+      throw new Error(
+        `None of the profile dropdown links' text matches the expected text: ${expectedText}`
+      );
+    }
+  }
+
+  /**
+   * Simulates pressing a keyboard shortcut.
+   * @param {string} shortcut - The keyboard shortcut to press.
+   */
+  async simulateKeyboardShortcut(shortcut: string): Promise<void> {
+    const keys: KeyInput[] = shortcut.split('+') as KeyInput[];
+
+    // Press down all keys.
+    for (const key of keys) {
+      await this.page.keyboard.down(key);
+    }
+
+    // Release all keys.
+    for (const key of keys) {
+      await this.page.keyboard.up(key);
+    }
+  }
+
+  /**
+   * Verifies that the current page URL includes the expected page string.
+   */
+  async expectToBeOnPage(expectedPage: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    const url = await this.page.url();
+    if (!url.includes(expectedPage)) {
+      throw new Error(
+        `Expected to be on page ${expectedPage}, but found ${url}`
+      );
+    }
+  }
+
+  /**
+   * Simulates pressing a keyboard shortcut and verifies that the expected element is focused.
+   *
+   * @param {string} shortcut - The keyboard shortcut to press.
+   * @throws {Error} Will throw an error if the expected element is not focused.
+   */
+  async verifyFocusAfterShortcut(shortcut: string): Promise<void> {
+    await this.simulateKeyboardShortcut(shortcut);
+
+    // Determine the expected element to be focused.
+    let expectedFocusedElement;
+    switch (shortcut) {
+      case '/':
+        expectedFocusedElement = await this.page.$(searchInputSelector);
+        break;
+      case 's':
+        expectedFocusedElement = await this.page.$(skipLinkSelector);
+        break;
+      case 'c':
+        expectedFocusedElement = await this.page.$(
+          categoryFilterDropdownToggler
+        );
+        break;
+      case 'j':
+        expectedFocusedElement = await this.page.$(
+          `:is(${nextCardArrowButton}, ${nextCardButton})`
+        );
+        break;
+      case 'k':
+        expectedFocusedElement = await this.page.$(previousCardButton);
+        break;
+      default:
+        throw new Error(`Unsupported shortcut: ${shortcut}`);
+    }
+
+    // Check if the expected element is focused.
+    const isExpectedElementFocused = await this.page.evaluate(
+      element => document.activeElement === element,
+      expectedFocusedElement
+    );
+
+    if (!isExpectedElementFocused) {
+      throw new Error(
+        `Expected element is not focused after pressing ${shortcut}`
+      );
+    }
   }
 }
 
