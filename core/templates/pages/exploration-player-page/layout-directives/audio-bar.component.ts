@@ -41,6 +41,7 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 import {LanguageAccentToDescription} from 'domain/voiceover/voiceover-backend-api.service';
+import {LocalStorageService} from 'services/local-storage.service';
 
 @Component({
   selector: 'oppia-audio-bar',
@@ -60,7 +61,8 @@ export class AudioBarComponent {
   languageAccentCodesToDescriptions!: LanguageAccentToDescription;
   languageAccentDecriptions: string[] = [];
   selectedLanguageAccentDescription!: string;
-  voiceoverToBePlayed!: Voiceover;
+  voiceoverToBePlayed!: Voiceover | undefined;
+  currentVoiceoverTime: number = 0;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -75,7 +77,8 @@ export class AudioBarComponent {
     private siteAnalyticsService: SiteAnalyticsService,
     private entityVoiceoversService: EntityVoiceoversService,
     private platformFeatureService: PlatformFeatureService,
-    private voiceoverPlayerService: VoiceoverPlayerService
+    private voiceoverPlayerService: VoiceoverPlayerService,
+    private localStorageService: LocalStorageService
   ) {
     this.explorationPlayerModeIsActive =
       this.contextService.isInExplorationPlayerPage();
@@ -89,6 +92,10 @@ export class AudioBarComponent {
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.voiceoverPlayerService.onTranslationLanguageChanged.subscribe(() => {
+        this.audioPlayerService.stop();
+        this.audioPlayerService.clear();
+        this.voiceoverToBePlayed = undefined;
+        this.setProgress({value: 0});
         this.updateDisplayableLanguageAccentDescription();
       })
     );
@@ -123,6 +130,10 @@ export class AudioBarComponent {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  ngAfterContentChecked(): void {
+    this.currentVoiceoverTime = this.audioPlayerService.getCurrentTime();
   }
 
   setProgress(val: {value: number}): void {
@@ -202,6 +213,9 @@ export class AudioBarComponent {
   }
 
   updateSelectedLanguageAccent(): void {
+    this.audioPlayerService.stop();
+    this.audioPlayerService.clear();
+    this.setProgress({value: 0});
     let languageAccentCode =
       this.voiceoverPlayerService.languageAccentDescriptionsToCodes[
         this.selectedLanguageAccentDescription as string
@@ -276,7 +290,6 @@ export class AudioBarComponent {
 
   loadAndPlayAudioTranslation(): void {
     this.audioLoadingIndicatorIsShown = true;
-
     let audioTranslation = this.voiceoverToBePlayed;
 
     if (audioTranslation) {

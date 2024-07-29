@@ -262,28 +262,15 @@ describe('InputResponsePairComponent', () => {
   });
 
   it('should get the css class for feedback audio highlight', () => {
-    spyOn(
-      audioTranslationManagerService,
-      'getCurrentComponentName'
-    ).and.returnValue(AppConstants.COMPONENT_NAME_FEEDBACK);
+    spyOn(voiceoverPlayerService, 'getActiveComponentName').and.returnValue(
+      AppConstants.COMPONENT_NAME_FEEDBACK
+    );
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
     component.isLastPair = false;
 
     expect(component.getFeedbackAudioHighlightClass()).toBe('');
 
     component.isLastPair = true;
-
-    expect(component.getFeedbackAudioHighlightClass()).toBe(
-      ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS
-    );
-
-    spyOn(
-      component,
-      'isVoiceoverContributionWithAccentEnabled'
-    ).and.returnValue(true);
-    spyOn(voiceoverPlayerService, 'getActiveComponentName').and.returnValue(
-      AppConstants.COMPONENT_NAME_FEEDBACK
-    );
     expect(component.getFeedbackAudioHighlightClass()).toBe(
       ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS
     );
