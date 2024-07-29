@@ -22,19 +22,9 @@ var waitFor = require('./waitFor.js');
 
 var TopicAndStoryViewerPage = function () {
   var lessonTrack = $('.e2e-test-lesson-track');
-  var nextChapterButton = $('.e2e-test-recommended-next-chapter-button');
-  var startPracticeButton = $(
-    '.e2e-test-start-practice-from-recommendations-button'
-  );
-  var endChapterSignUpSection = $('.e2e-test-end-chapter-sign-up-section');
-  var conversationSkinCardsContainer = $(
-    '.e2e-test-conversation-skin-cards-container'
-  );
   var dismissSignUpSectionButton = $(
     '.e2e-test-dismiss-sign-up-section-button'
   );
-  var practicetabContainer = $('.e2e-test-practice-tab-container');
-  var practiceSessionContainer = $('.e2e-test-practice-session-container');
   var chapterTitleItem = $('.e2e-test-chapter-title');
   var chapterTitleListSelector = function () {
     return $$('.e2e-test-chapter-title');

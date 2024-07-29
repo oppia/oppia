@@ -60,7 +60,6 @@ var ExplorationPlayerPage = function () {
   var infoCardRating = $('.e2e-test-info-card-rating');
   var continueToNextCardButton = $('.e2e-test-continue-to-next-card-button');
   var forwardButton = $('.e2e-test-next-button');
-  var pauseButton = $('.e2e-test-pause-circle');
   var playButton = $('.e2e-test-play-circle');
   var radioButton = $('.e2e-test-report-exploration-radio-button');
   var radioButtonSelector = function () {
@@ -77,7 +76,6 @@ var ExplorationPlayerPage = function () {
   var suggestionPopupLink = $('.e2e-test-exploration-suggestion-popup-link');
   var viewHintButton = $('.e2e-test-view-hint');
   var viewSolutionButton = $('.e2e-test-view-solution');
-  var voiceoverLanguageSelector = $('.e2e-test-audio-lang-select');
   var waitingForResponseElem = $('.e2e-test-input-response-loading-dots');
   var skipQuestionButton = $('.e2e-test-skip-question-button');
 
