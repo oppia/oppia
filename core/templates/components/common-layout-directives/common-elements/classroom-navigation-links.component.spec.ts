@@ -58,6 +58,15 @@ describe('ClassroomNavigationLinksComponent', () => {
       thumbnail_filename: 'thumbnail.svg',
       thumbnail_bg_color: 'transparent',
     },
+    {
+      classroom_id: 'histroy',
+      name: 'histroy',
+      url_fragment: 'history',
+      teaser_text: 'Learn histroy',
+      is_published: true,
+      thumbnail_filename: 'thumbnail.svg',
+      thumbnail_bg_color: 'transparent',
+    },
   ];
 
   beforeEach(async () => {
@@ -115,6 +124,7 @@ describe('ClassroomNavigationLinksComponent', () => {
     component.ngOnInit();
     tick();
 
+    // It should store top 2 public classrooms.
     expect(component.classroomSummaries.length).toEqual(2);
     expect(component.isLoading).toBeFalse();
   }));

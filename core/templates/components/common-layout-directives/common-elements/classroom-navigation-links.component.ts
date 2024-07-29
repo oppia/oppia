@@ -73,7 +73,11 @@ export class ClassroomNavigationLinksComponent implements OnInit {
     this.classroomBackendApiService
       .getAllClassroomsSummaryAsync()
       .then((data: ClassroomSummaryDict[]) => {
-        for (let i = 0; i < data.length; i++) {
+        for (
+          let i = 0;
+          i < data.length && this.classroomSummaries.length < 2;
+          i++
+        ) {
           if (data[i].is_published) {
             this.classroomSummaries.push(data[i]);
           }

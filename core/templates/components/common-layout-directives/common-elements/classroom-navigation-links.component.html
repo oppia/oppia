@@ -9,7 +9,7 @@
           <a href="/learn">{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_INTRO' | translate }}</a>
           <p>{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_DESCRIPTION' | translate }}</p>
         </div>
-        <div *ngFor="let classroom of classroomSummaries | slice:0:2" class="classroom-nav-item-container">
+        <div *ngFor="let classroom of classroomSummaries" class="classroom-nav-item-container">
           <div class="classroom-item">
             <div class="classroom-text-container">
               <a class="classroom-name e2e-mobile-test-classroom-link"
