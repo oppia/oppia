@@ -23,6 +23,8 @@ import subprocess
 from core import utils
 from core.tests import test_utils
 
+from typing import List
+
 from . import run_typescript_checks
 
 TEST_SOURCE_DIR = os.path.join('core', 'tests', 'build_sources')
@@ -117,7 +119,23 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
     def test_error_is_raised_for_invalid_compilation_of_strict_tsconfig(
             self) -> None:
         """Test that error is produced if stdout is not empty."""
-        with self.swap(run_typescript_checks, 'TS_STRICT_EXCLUDE_PATHS', []):
+        empty_process = subprocess.Popen(
+            ['echo', ''], stdout=subprocess.PIPE, encoding='utf-8')
+        non_empty_process = subprocess.Popen(
+            ['echo', 'test'], stdout=subprocess.PIPE, encoding='utf-8')
+        def mock_popen_for_errors(
+            cmd_tokens: List[str], stdout: str, encoding: str  # pylint: disable=unused-argument
+        ) -> subprocess.Popen[str]:
+            if (
+                cmd_tokens == [
+                    './node_modules/typescript/bin/tsc', '--project',
+                    run_typescript_checks.STRICT_TSCONFIG_FILEPATH
+                ]
+            ):
+                return non_empty_process
+            return empty_process
+
+        with self.swap(subprocess, 'Popen', mock_popen_for_errors):
             with self.assertRaisesRegex(SystemExit, '1'):
                 run_typescript_checks.compile_and_check_typescript(
                     run_typescript_checks.STRICT_TSCONFIG_FILEPATH)
