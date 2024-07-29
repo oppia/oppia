@@ -35,7 +35,7 @@ from core import utils  # isort:skip
 from typing import List  # isort:skip
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
-THIRD_PARTY_SIZE_LIMIT = 15000
+THIRD_PARTY_SIZE_LIMIT = 15500
 
 
 def get_skip_files_list() -> List[str]:

@@ -25,7 +25,6 @@ html5lib==1.1
 mailchimp3==3.0.15
 mutagen==1.45.1
 Pillow==10.1.0
-protobuf==3.20.3
 pylatexenc==2.10
 pytest==7.4.4
 PyYAML==6.0

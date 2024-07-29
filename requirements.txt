@@ -1060,7 +1060,6 @@ protobuf==3.20.3 \
     --hash=sha256:f4bd856d702e5b0d96a00ec6b307b0f51c1982c2bf9c0052cf9019e9a544ba99 \
     --hash=sha256:f4c42102bc82a51108e449cbb32b19b180022941c727bac0cfd50170341f16ee
     # via
-    #   -r requirements.in
     #   apache-beam
     #   google-api-core
     #   google-cloud-aiplatform
