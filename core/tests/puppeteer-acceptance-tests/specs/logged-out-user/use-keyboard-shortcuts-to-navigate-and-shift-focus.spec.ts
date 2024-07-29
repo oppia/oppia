@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the learner journey in the math classroom.
- * User Journey: Lesson info modal usage, progress tracking, state answering, progress URL generation and usage.
+ * @fileoverview Acceptance tests for keyboard navigation and focus shifting.
+ * Tests cover the usage of keyboard shortcuts for navigation and ensuring the correct element is focused.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -94,7 +94,7 @@ describe('Logged-out User', function () {
     async function () {
       // Navigate to the Get Started page using the ‘Ctrl+6’ shortcut.
       await loggedOutUser.simulateKeyboardShortcut('Ctrl+6');
-      await loggedOutUser.expectToBeOnPage('get-started');
+      await loggedOutUser.expectToBeOnPage('get started');
 
       // Navigate to the About page using the ‘Ctrl+4’ shortcut.
       await loggedOutUser.simulateKeyboardShortcut('Ctrl+4');
@@ -114,7 +114,7 @@ describe('Logged-out User', function () {
 
       // Navigate to the Community Library page using the ‘Ctrl+1’ shortcut.
       await loggedOutUser.navigateToCommunityLibraryPage();
-      await loggedOutUser.expectToBeOnPage('community-library');
+      await loggedOutUser.expectToBeOnPage('community library');
       await loggedOutUser.verifyFocusAfterShortcut('/'); // Search bar.
       await loggedOutUser.verifyFocusAfterShortcut('s'); // Skips to the main content.
       await loggedOutUser.verifyFocusAfterShortcut('c'); // Category filter dropdown.

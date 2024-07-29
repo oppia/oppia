@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the learner journey in the math classroom.
- * User Journey: Lesson info modal usage, progress tracking, state answering, progress URL generation and usage.
+ * @fileoverview Acceptance test to cover the CUJ that includes changing site language, verifying
+ * translations, and interacting with an exploration in its original language.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';

@@ -3009,7 +3009,11 @@ export class LoggedOutUser extends BaseUser {
   async expectToBeOnPage(expectedPage: string): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     const url = await this.page.url();
-    if (!url.includes(expectedPage)) {
+
+    // Replace spaces in the expectedPage with hyphens
+    const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
+
+    if (!url.includes(expectedPageInUrl.toLowerCase())) {
       throw new Error(
         `Expected to be on page ${expectedPage}, but found ${url}`
       );
