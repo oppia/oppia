@@ -40,8 +40,10 @@ const confirmAccountDeletionButton = '.e2e-test-delete-my-account-button';
 const signUpUsernameField = 'input.e2e-test-username-input';
 const signUpEmailField = testConstants.SignInDetails.inputField;
 const invalidEmailErrorContainer = '#mat-error-0';
-const duplicateUsernameErrorContainer = '.oppia-warning-text';
-const optionText = 'mat-option-text';
+const invalidUsernameErrorContainer = '.oppia-warning-text';
+const optionText = '.mat-option-text';
+
+const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -234,28 +236,43 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Enters the provided email into the sign up email field and clicks the 'Sign In' button.
-   * @param {string} email - The email to enter.
+   * Enters the provided username into the sign up username field and sign in if the username is correct.
+   * @param {string} username - The username to enter.
    */
-  async enterEmail(email: string): Promise<void> {
-    await this.type(signUpEmailField, email);
-    await this.clickOn('Sign In');
-    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+  async signInWithUsername(username: string): Promise<void> {
+    await this.type(signUpUsernameField, username);
+    if (!invalidUsernameErrorContainer) {
+      await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
+      await this.page.waitForSelector(
+        'button.e2e-test-register-user:not([disabled])'
+      );
+      await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
+      await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+    }
   }
 
   /**
-   * Enters the provided username into the sign up username field.
-   * @param {string} username - The username to enter.
+   * Function to sign in the user with the given email to the Oppia website only when the email is valid.
    */
-  async enterUsername(username): Promise<void> {
-    await this.type(signUpUsernameField, username);
+  async enterEmail(email: string): Promise<void> {
+    await this.clearAllTextFrom(signUpEmailField);
+    await this.type(signUpEmailField, email);
+
+    await this.waitForPageToFullyLoad();
+    const invalidEmailErrorContainerElement = await this.page.$(
+      invalidEmailErrorContainer
+    );
+    if (!invalidEmailErrorContainerElement) {
+      await this.clickOn('Sign In');
+      await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+    }
   }
 
   /**
    * Waits for the invalid email error container to appear, then checks if the error message matches the expected error.
    * @param {string} expectedError - The expected error message.
    */
-  async expectValidationError(expectedError: string) {
+  async expectValidationError(expectedError: string): Promise<void> {
     await this.page.waitForSelector(invalidEmailErrorContainer);
     const errorMessage = await this.page.$eval(
       invalidEmailErrorContainer,
@@ -274,17 +291,15 @@ export class LoggedInUser extends BaseUser {
    * Waits for the duplicate username error container to appear, then checks if the error message matches the expected error.
    * @param {string} expectedError - The expected error message.
    */
-  async expectUsernameError(expectedError: string) {
-    await this.page.waitForSelector(deleteAccountButton);
+  async expectUsernameError(expectedError: string): Promise<void> {
+    await this.page.waitForSelector(invalidUsernameErrorContainer);
     const errorMessage = await this.page.$eval(
-      duplicateUsernameErrorContainer,
+      invalidUsernameErrorContainer,
       el => el.textContent
     );
-    const trimmedErrorMessage = errorMessage?.trim();
-
-    if (trimmedErrorMessage !== expectedError) {
+    if (errorMessage?.trim() !== expectedError) {
       throw new Error(
-        `D error does not match. Expected: ${expectedError}, but got: ${trimmedErrorMessage}`
+        `D error does not match. Expected: ${expectedError}, but got: ${errorMessage}`
       );
     }
   }
@@ -293,24 +308,36 @@ export class LoggedInUser extends BaseUser {
    * Clicks on the sign up email field, waits for the suggestion to appear, then checks if the suggestion matches the expected suggestion.
    * @param {string} expectedSuggestion - The expected suggestion.
    */
-  async expectAdminEmailSuggestion(expectedSuggestion: string) {
+  async expectAdminEmailSuggestion(expectedSuggestion: string): Promise<void> {
     await this.clickOn(signUpEmailField);
     await this.page.waitForSelector(optionText);
-    const suggestion = await this.page.$eval(
-      'mat-option-text',
-      el => el.textContent
-    );
-    const trimmedSuggestion = suggestion?.trim();
+    const suggestion = await this.page.$eval(optionText, el => el.textContent);
 
-    if (trimmedSuggestion !== expectedSuggestion) {
+    if (suggestion?.trim() !== expectedSuggestion) {
       throw new Error(
-        `Suggestion does not match. Expected: ${expectedSuggestion}, but got: ${trimmedSuggestion}`
+        `Suggestion does not match. Expected: ${expectedSuggestion}, but got: ${suggestion}`
       );
     }
+
+    // Click anywhere on the page to remove focus from the email field
+    await this.page.click('body');
   }
 
-  async timeout(time) {
-    await this.page.waitForTimeout(time);
+  /**
+   * Verifies that the current page URL includes the expected page pathname.
+   */
+  async expectToBeOnPage(expectedPage: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    const url = await this.page.url();
+
+    // Replace spaces in the expectedPage with hyphens
+    const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
+
+    if (!url.includes(expectedPageInUrl.toLowerCase())) {
+      throw new Error(
+        `Expected to be on page ${expectedPage}, but found ${url}`
+      );
+    }
   }
 }
 

@@ -28,55 +28,58 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-in User', function () {
   let loggedInUser1: LoggedInUser & LoggedOutUser;
-  let loggedInUser2: LoggedInUser & LoggedOutUser;
+  let loggedInUser2: LoggedInUser = new LoggedInUser();
 
   beforeAll(async function () {
     loggedInUser1 = await UserFactory.createNewUser(
       'loggedInUser1',
-      'logged_in_user@example.com'
+      'logged_in_user1@example.com'
     );
-    await loggedInUser1.timeout(2147483647);
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it('should be able to create an account, validate email, check admin suggestion, verify terms of use, login and delete account', async function () {
-    await loggedInUser2.openBrowser();
-    await loggedInUser2.navigateToSignUpPage();
+  it(
+    'should be able to create an account, validate email, check admin suggestion, verify terms of use, login and delete account',
+    async function () {
+      await loggedInUser2.openBrowser();
+      await loggedInUser2.navigateToSignUpPage();
 
-    await loggedInUser2.clickAdminAccessInfoLink();
+      await loggedInUser2.clickAdminAccessInfoLink();
+      await loggedInUser2.expectAdminEmailSuggestion('testadmin@example.com');
 
-    // Entering invalid email.
-    await loggedInUser2.enterEmail('123@gmail.');
-    await loggedInUser2.expectValidationError('Invalid email address');
-    await loggedInUser2.expectAdminEmailSuggestion('testAdmin@example.com');
+      // Entering invalid email.
+      await loggedInUser2.enterEmail('123@gmail.');
+      await loggedInUser2.expectValidationError('Invalid email address');
 
-    // Checking username availability via entering username that already exists.
-    await loggedInUser2.enterUsername('loggedInUser1');
-    await loggedInUser2.expectUsernameError(
-      'Sorry, this username is already taken.'
-    );
+      // Entering valid email.
+      await loggedInUser2.enterEmail('logged_in_user2@example.com');
 
-    // Checking username via entering a username with 'admin' term(which shall is not allowed as admin term is reserved).
-    await loggedInUser2.enterUsername('ImAdmin!');
-    await loggedInUser2.expectUsernameError(
-      "User names with 'admin' are reserved."
-    );
+      // Checking username availability via entering username that already exists.
+      await loggedInUser2.signInWithUsername('loggedInUser1');
+      await loggedInUser2.expectUsernameError(
+        'Sorry, this username is already taken.'
+      );
 
-    // Signing up with correct credentials.
-    await loggedInUser2.signUpNewUser(
-      'loggedInUser2',
-      'logged_in_user@example.com'
-    );
+      // Checking username via entering a username with 'admin' term(which shall is not allowed as admin term is reserved).
+      await loggedInUser2.signInWithUsername('ImAdmin!');
+      await loggedInUser2.expectUsernameError(
+        "User names with 'admin' are reserved."
+      );
 
-    // Delete the account
-    await loggedInUser2.navigateToPreferencesPage();
-    await loggedInUser2.deleteAccount();
-    // Initiating account deletion from /preferences page redirects to /delete-account page.
-    await loggedInUser2.expectToBeOnPage('delete account');
-    await loggedInUser2.confirmAccountDeletion();
+      // Entering valid username and signing up.
+      await loggedInUser2.signInWithUsername('loggedInUser2');
 
-    await loggedInUser2.navigateToPendingAccountDeletionPage();
-    await loggedInUser2.expectNoOfPendingAccountDeletionRequest();
-  }, 2147483647);
+      // Delete the account
+      await loggedInUser2.navigateToPreferencesPage();
+      await loggedInUser2.deleteAccount();
+      // Initiating account deletion from /preferences page redirects to /delete-account page.
+      await loggedInUser2.expectToBeOnPage('delete account');
+      await loggedInUser2.confirmAccountDeletion();
+
+      // After confirmation of account deletion, user is redirected to /pending-account-deletion page.
+      await loggedInUser2.expectToBeOnPage('pending account deletion');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

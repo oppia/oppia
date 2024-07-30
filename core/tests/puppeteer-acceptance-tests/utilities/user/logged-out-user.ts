@@ -2846,23 +2846,6 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(signInButton, {timeout: 5000});
     showMessage('Sign-in button present.');
   }
-
-  /**
-   * Verifies that the current page URL includes the expected page pathname.
-   */
-  async expectToBeOnPage(expectedPage: string): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
-    const url = await this.page.url();
-
-    // Replace spaces in the expectedPage with hyphens
-    const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
-
-    if (!url.includes(expectedPageInUrl.toLowerCase())) {
-      throw new Error(
-        `Expected to be on page ${expectedPage}, but found ${url}`
-      );
-    }
-  }
 }
 
 export let LoggedOutUserFactory = (): LoggedOutUser => new LoggedOutUser();
