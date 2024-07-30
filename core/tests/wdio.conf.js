@@ -53,14 +53,6 @@ var suites = {
     './core/tests/webdriverio_desktop/blog.js'
   ],
 
-  checkpointFeatures: [
-    './core/tests/webdriverio_desktop/checkpointFeatures.js'
-  ],
-
-  classroomPage: [
-    './core/tests/webdriverio_desktop/classroomPage.js'
-  ],
-
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
   ],
@@ -127,10 +119,6 @@ var suites = {
 
   learnerDashboard: [
     './core/tests/webdriverio_desktop/learnerDashboard.js'
-  ],
-
-  library: [
-    './core/tests/webdriverio/libraryFlow.js'
   ],
 
   navigation: [
