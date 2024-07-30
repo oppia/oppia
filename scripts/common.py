@@ -36,7 +36,7 @@ from urllib import request as urlrequest
 from core import feconf
 from scripts import servers
 
-from typing import Dict, Final, Generator, List, Optional, Union
+from typing import Dict, Final, Generator, List, Optional, Tuple, Union
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
@@ -221,6 +221,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'exploration-editor/create-exploration-and-change-basic-settings',
     'exploration-editor/modify-translations-through-modal',
     'exploration-editor/load-complete-and-restart-exploration-preview',
+    'exploration-editor/publish-the-exploration-with-an-interaction',
     'exploration-editor/save-draft-publish-and-discard-the-changes',
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
@@ -242,6 +243,12 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/click-all-links-on-terms-page',
     'logged-out-user/click-all-buttons-on-donate-page',
     'logged-out-user/visit-classroom-index-page',
+    'logged-out-user/browse-and-search-for-lessons-in-community-library',
+    'logged-out-user/select-and-play-topic-from-classroom-page',
+    'logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration',
+    'logged-out-user/play-through-lesson-while-getting-feedback-and-hints',
+    'logged-out-user/share-and-give-feedback-for-exploration-'
+    'but-not-report-and-rate-it',
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
@@ -253,13 +260,18 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'super-admin/load-dummy-data-in-dev-mode',
     'super-admin/edit-platform-parameters',
     'super-admin/use-misc-tab-features',
+    'topic-manager/edit-and-preview-a-subtopic',
+    'topic-manager/edit-and-preview-a-topic',
     'translation-admin/add-and-remove-translation-rights',
+    'topic-manager/create-and-delete-subtopic-and-story',
     'topic-manager/browse-skills-on-topics-and-skills-dashboard',
     'topic-manager/browse-topics-on-topics-and-skills-dashboard',
     'topic-manager/create-and-delete-questions-in-skill-editor',
     'topic-manager/assign-unassign-and-merge-skills',
     'topic-manager/cannot-do-curriculum-admin-actions',
-    'voiceover-admin/add-voiceover-artist-to-an-exploration',
+    'topic-manager/edit-and-republish-a-skill',
+    'topic-manager/edit-preview-and-save-a-chapter',
+    'voiceover-admin/add-voiceover-artist-to-an-exploration'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181
@@ -1014,3 +1026,11 @@ def is_oppia_server_already_running() -> bool:
                 'Exiting.' % port)
             return True
     return False
+
+
+def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
+    """Starts subprocess and returns (stdout, stderr)."""
+    task = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = task.communicate()
+    return out, err

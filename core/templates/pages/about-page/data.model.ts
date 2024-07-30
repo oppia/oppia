@@ -20,6 +20,7 @@ export interface AccordionPanelData {
   title: string;
   text: string;
   image?: string;
+  altText?: string;
   customPanelClassNames: string[];
   customTitleClassNames: string[];
   panelIsCollapsed: boolean;

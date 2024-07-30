@@ -33,6 +33,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/create-exploration-and-change-basic-settings.spec.ts"
     },
     {
+      "name": "exploration-editor/publish-the-exploration-with-an-interaction",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/publish-the-exploration-with-an-interaction.spec.ts"
+    },
+    {
       "name": "exploration-editor/save-draft-publish-and-discard-the-changes",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/save-draft-publish-and-discard-the-changes.spec.ts"
     },
@@ -113,6 +117,26 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/visit-classroom-index-page.spec.ts"
     },
     {
+      "name": "logged-out-user/browse-and-search-for-lessons-in-community-library",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/browse-and-search-for-lessons-in-community-library.spec.ts"
+    },
+    {
+      "name": "logged-out-user/select-and-play-topic-from-classroom-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/select-and-play-topic-from-classroom-page.spec.ts"
+    },
+    {
+      "name": "logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration.spec.ts"
+    },
+    {
+      "name": "logged-out-user/share-and-give-feedback-for-exploration-but-not-report-and-rate-it",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/share-and-give-feedback-for-exploration-but-not-report-and-rate-it.spec.ts"
+    },
+    {
+      "name": "logged-out-user/play-through-lesson-while-getting-feedback-and-hints",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-through-lesson-while-getting-feedback-and-hints.spec.ts"
+    },
+    {
       "name": "moderator/edit-featured-activities-list",
       "module": "core/tests/puppeteer-acceptance-tests/specs/moderator/edit-featured-activities-list.spec.ts"
     },
@@ -183,6 +207,26 @@
     {
       "name": "topic-manager/cannot-do-curriculum-admin-actions",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/cannot-do-curriculum-admin-actions.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-and-republish-a-skill",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-republish-a-skill.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-and-preview-a-subtopic",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-preview-a-subtopic.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-and-preview-a-topic",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-preview-a-topic.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-preview-and-save-a-chapter",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-preview-and-save-a-chapter.spec.ts"
+    },
+    {
+      "name": "topic-manager/create-and-delete-subtopic-and-story",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-delete-subtopic-and-story.spec.ts"
     }
   ]
 }
