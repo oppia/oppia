@@ -726,15 +726,20 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertIn('All tests passed.', self.print_arr)
         self.assertIn('Done!', self.print_arr)
 
-    def test_successful_test_run_with_run_on_changed_files_flag(self) -> None:
+    def test_successful_test_run_with_run_on_changed_files_in_branch_flag(
+        self
+    ) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
         git_refs = [git_changes_utils.GitRef(
             'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1')]
+
         def mock_get_remote_name() -> bytes:
             return b'remote'
+
         def mock_get_refs() -> List[git_changes_utils.GitRef]:
             return git_refs
+
         def mock_get_changed_files(
             unused_refs: List[git_changes_utils.GitRef],
             unused_remote_name: str
@@ -751,6 +756,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     []
                 )
             }
+
         def mock_get_staged_acmrt_files() -> List[bytes]:
             return [
                 b'test/file1.py',
@@ -758,6 +764,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 b'test/file3.py',
                 b'test/file4.py'
             ]
+
         def mock_get_python_dot_test_files_from_diff(
             diff_files: List[bytes]
         ) -> Set[str]:
@@ -782,12 +789,15 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     'test.file4_test.py'
                 }
             return set()
+
         executed_tasks = []
+
         def mock_execute(
             tasks: List[concurrent_task_utils.TaskThread], *_: str
         ) -> None:
             for task in tasks:
                 executed_tasks.append(task)
+
         swap_execute_task = self.swap(
             concurrent_task_utils, 'execute_tasks', mock_execute)
         get_remote_name_swap = self.swap(
@@ -834,17 +844,21 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     with get_changed_files_swap, get_staged_acmrt_files_swap:
                         with get_python_dot_test_files_from_diff_swap:
                             run_backend_tests.main(
-                                args=['--run_on_changed_files'])
+                                args=['--run_on_changed_files_in_branch'])
 
         self.assertEqual(len(executed_tasks), 3)
         self.assertIn('All tests passed.', self.print_arr)
         self.assertIn('Done!', self.print_arr)
 
-    def test_backend_tests_with_run_on_changed_files_no_remote(self) -> None:
+    def test_backend_tests_with_run_on_changed_files_in_branch_no_remote(
+        self
+    ) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
+
         def mock_get_remote_name() -> bytes:
             return b''
+
         get_remote_name_swap = self.swap(
             git_changes_utils, 'get_local_git_repository_remote_name',
             mock_get_remote_name)
@@ -853,7 +867,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             with self.swap_cloud_datastore_emulator, self.assertRaisesRegex(
                 SystemExit, 'Error: No remote repository found.'
             ):
-                run_backend_tests.main(args=['--run_on_changed_files'])
+                run_backend_tests.main(
+                    args=['--run_on_changed_files_in_branch'])
 
     def test_all_test_pass_successfully_with_full_coverage(self) -> None:
         with self.swap_install_third_party_libs:

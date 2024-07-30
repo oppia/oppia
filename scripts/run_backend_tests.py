@@ -115,6 +115,12 @@ _EXCLUSIVE_GROUP.add_argument(
     '--test_shard',
     help='optional name of shard to run',
     type=str)
+_EXCLUSIVE_GROUP.add_argument(
+    '--run_on_changed_files_in_branch',
+    help='optional; if specified, runs the backend tests on the files '
+    'that were changed in the current branch',
+    action='store_true'
+)
 _PARSER.add_argument(
     '--generate_coverage_report',
     help='optional; if specified, generates a coverage report',
@@ -137,12 +143,6 @@ _PARSER.add_argument(
     '--verbose',
     help='optional; if specified, display the output of the tests being run',
     action='store_true')
-_PARSER.add_argument(
-    '--run_on_changed_files',
-    help='optional; if specified, runs the backend tests on the files '
-    'that were changed in the current branch',
-    action='store_true'
-)
 
 
 def run_shell_cmd(
@@ -471,7 +471,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 raise Exception(validation_error)
             all_test_targets = get_all_test_targets_from_shard(
                 parsed_args.test_shard)
-        elif parsed_args.run_on_changed_files:
+        elif parsed_args.run_on_changed_files_in_branch:
             remote = git_changes_utils.get_local_git_repository_remote_name()
             if not remote:
                 sys.exit('Error: No remote repository found.')
