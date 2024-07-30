@@ -21,6 +21,9 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
+const WikiPrivilegesToFirebaseAccount =
+  testConstants.URLs.WikiPrivilegesToFirebaseAccount;
+const PendingAccountDeletionPage = testConstants.URLs.PendingAccountDeletion;
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
@@ -31,6 +34,14 @@ const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
 const anonymousCheckboxSelector = '.e2e-test-stay-anonymous-checkbox';
 const submitButtonSelector = '.e2e-test-exploration-feedback-submit-btn';
 const submittedMessageSelector = '.e2e-test-rating-submitted-message';
+const PreferencesPageUrl = testConstants.URLs.Preferences;
+const deleteAccountButton = '.e2e-test-delete-account-button';
+const confirmAccountDeletionButton = '.e2e-test-delete-my-account-button';
+const signUpUsernameField = 'input.e2e-test-username-input';
+const signUpEmailField = testConstants.SignInDetails.inputField;
+const invalidEmailErrorContainer = '#mat-error-0';
+const duplicateUsernameErrorContainer = '.oppia-warning-text';
+const optionText = 'mat-option-text';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -82,6 +93,33 @@ export class LoggedInUser extends BaseUser {
     } else {
       throw new Error(`Exploration with title ${title} is not present.`);
     }
+  }
+
+  async clickLinkAnchorToNewTab(
+    anchorInnerText: string,
+    expectedDestinationPageUrl: string
+  ): Promise<void> {
+    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
+    const pageTarget = this.page.target();
+    await this.clickOn(anchorInnerText);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
+    await newTabPage?.close();
+  }
+
+  /**
+   * Navigates to preference page.
+   */
+  async navigateToPreferencesPage() {
+    await this.goto(PreferencesPageUrl);
+  }
+
+  async navigateToPendingAccountDeletionPage() {
+    await this.goto(PendingAccountDeletionPage);
   }
 
   /**
@@ -156,6 +194,123 @@ export class LoggedInUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Clicks the delete account button and waits for navigation.
+   */
+  async deleteAccount(): Promise<void> {
+    await this.clickAndWaitForNavigation(deleteAccountButton);
+  }
+
+  /**
+   * Clicks on the delete button in the page /delete-account to confirm account deletion.
+   */
+  async confirmAccountDeletion(): Promise<void> {
+    await this.clickOn(confirmAccountDeletionButton);
+  }
+
+  /**
+   * Navigates to the sign up page. If the user hasn't accepted cookies, it clicks 'OK' to accept them.
+   * Then, it clicks on the 'Sign in' button.
+   */
+  async navigateToSignUpPage(): Promise<void> {
+    await this.goto(testConstants.URLs.Home);
+    if (!this.userHasAcceptedCookies) {
+      await this.clickOn('OK');
+      this.userHasAcceptedCookies = true;
+    }
+    await this.clickOn('Sign in');
+  }
+
+  /**
+   * Clicks on the link to the Oppia Wiki, which opens in a new tab.
+   */
+  async clickAdminAccessInfoLink(): Promise<void> {
+    await this.clickLinkAnchorToNewTab(
+      'Oppia Wiki',
+      WikiPrivilegesToFirebaseAccount
+    );
+  }
+
+  /**
+   * Enters the provided email into the sign up email field and clicks the 'Sign In' button.
+   * @param {string} email - The email to enter.
+   */
+  async enterEmail(email: string): Promise<void> {
+    await this.type(signUpEmailField, email);
+    await this.clickOn('Sign In');
+    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+  }
+
+  /**
+   * Enters the provided username into the sign up username field.
+   * @param {string} username - The username to enter.
+   */
+  async enterUsername(username): Promise<void> {
+    await this.type(signUpUsernameField, username);
+  }
+
+  /**
+   * Waits for the invalid email error container to appear, then checks if the error message matches the expected error.
+   * @param {string} expectedError - The expected error message.
+   */
+  async expectValidationError(expectedError: string) {
+    await this.page.waitForSelector(invalidEmailErrorContainer);
+    const errorMessage = await this.page.$eval(
+      invalidEmailErrorContainer,
+      el => el.textContent
+    );
+    const trimmedErrorMessage = errorMessage?.trim();
+
+    if (trimmedErrorMessage !== expectedError) {
+      throw new Error(
+        `Validation error does not match. Expected: ${expectedError}, but got: ${trimmedErrorMessage}`
+      );
+    }
+  }
+
+  /**
+   * Waits for the duplicate username error container to appear, then checks if the error message matches the expected error.
+   * @param {string} expectedError - The expected error message.
+   */
+  async expectUsernameError(expectedError: string) {
+    await this.page.waitForSelector(deleteAccountButton);
+    const errorMessage = await this.page.$eval(
+      duplicateUsernameErrorContainer,
+      el => el.textContent
+    );
+    const trimmedErrorMessage = errorMessage?.trim();
+
+    if (trimmedErrorMessage !== expectedError) {
+      throw new Error(
+        `D error does not match. Expected: ${expectedError}, but got: ${trimmedErrorMessage}`
+      );
+    }
+  }
+
+  /**
+   * Clicks on the sign up email field, waits for the suggestion to appear, then checks if the suggestion matches the expected suggestion.
+   * @param {string} expectedSuggestion - The expected suggestion.
+   */
+  async expectAdminEmailSuggestion(expectedSuggestion: string) {
+    await this.clickOn(signUpEmailField);
+    await this.page.waitForSelector(optionText);
+    const suggestion = await this.page.$eval(
+      'mat-option-text',
+      el => el.textContent
+    );
+    const trimmedSuggestion = suggestion?.trim();
+
+    if (trimmedSuggestion !== expectedSuggestion) {
+      throw new Error(
+        `Suggestion does not match. Expected: ${expectedSuggestion}, but got: ${trimmedSuggestion}`
+      );
+    }
+  }
+
+  async timeout(time) {
+    await this.page.waitForTimeout(time);
   }
 }
 
