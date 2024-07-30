@@ -7852,7 +7852,6 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
                     self.EXP_0_ID))
         if exp_opportunity_summary is not None:
             translation_counts = exp_opportunity_summary.translation_counts
-
         self.assertEqual(len(entity_translation_models), 2)
         self.assertEqual(len(
             entity_translation_models[1].translations), 2)
