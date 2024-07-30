@@ -2131,7 +2131,6 @@ def compute_models_to_put_when_saving_new_exp_version(
                 del new_translation_model.translations[content_id]
 
     models_to_put.extend(new_translation_models)
-
     # Auto-reject any pending translation suggestions that are now obsolete due
     # to the corresponding content being deleted. See issue #16022 for context.
     # TODO(#16022): Refactor to compute the suggestion, suggestion stats, and
