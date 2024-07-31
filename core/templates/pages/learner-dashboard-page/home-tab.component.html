@@ -109,7 +109,7 @@
         <!--TODO(#18384): Replace with recommended lessons data (placeholder with explorations); affects numCards and ng-content-->
         <!--TODO(#18384): Styling: https://shorturl.at/oAUY5 (links to Figma frame) -->
         <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_RECOMMEND_SECTION'" [numCards]="incompleteExplorationsList.length" [tabType]="'home'">
-          <ng-container *ngFor="let lesson of incompleteExplorationsList; last as last">
+          <ng-container *ngFor="let lesson of incompleteExplorationsList">
             <lesson-card [story]="lesson"></lesson-card>
           </ng-container>
         </oppia-card-display>
