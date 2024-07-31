@@ -30,9 +30,6 @@ import {StoryNode} from 'domain/story/story-node.model';
 @Component({
   selector: 'lesson-card',
   templateUrl: './lesson-card.component.html',
-  styleUrls: [
-    '../../pages/learner-dashboard-page/learner-dashboard-shared.css',
-  ],
 })
 export class LessonCardComponent implements OnInit {
   @Input() story!: StorySummary | LearnerExplorationSummary | CollectionSummary;
