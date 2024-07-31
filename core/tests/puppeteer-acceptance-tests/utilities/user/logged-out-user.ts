@@ -72,8 +72,6 @@ const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
 const impactReportUrl = testConstants.URLs.ImpactReportUrl;
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
-const navbarLearnTabBasicMathematicsButton =
-  'a.e2e-test-basic-mathematics-link';
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
 const navbarAboutTabTeachButton = 'a.e2e-test-navbar-about-menu-teach-button';
@@ -119,7 +117,7 @@ const thanksForDonatingClass = '.modal-open';
 const donatePage = '.donate-content-container';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
-const mobileSidebarClassroomButton = 'a.e2e-mobile-test-classroom-link';
+const classroomNavigationButton = 'a.e2e-mobile-test-classroom-link';
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
 const mobileSidebarTeachButton = 'a.e2e-mobile-test-sidebar-teach-button';
 const mobileSidebarImpactReportButton =
@@ -439,7 +437,7 @@ export class LoggedOutUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickButtonToNavigateToNewPage(
-        mobileSidebarClassroomButton,
+        classroomNavigationButton,
         'Basic Mathematics button in the Learn Menu on navbar',
         mathClassroomUrl,
         'Math Classroom'
@@ -447,7 +445,7 @@ export class LoggedOutUser extends BaseUser {
     } else {
       await this.clickOn(navbarLearnTab);
       await this.clickButtonToNavigateToNewPage(
-        navbarLearnTabBasicMathematicsButton,
+        classroomNavigationButton,
         'Basic Mathematics button in the Learn Menu on navbar',
         mathClassroomUrl,
         'Math Classroom'
