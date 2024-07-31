@@ -36,7 +36,7 @@ from scripts import git_changes_utils
 from scripts import install_third_party_libs
 from scripts import servers
 
-from typing import Callable, Dict, Final, List, Set, Tuple
+from typing import Callable, Final, List, Set, Tuple
 
 TEST_RUNNER_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'gae_suite.py'
@@ -731,64 +731,13 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     ) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
-        git_refs = [git_changes_utils.GitRef(
-            'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1')]
 
-        def mock_get_remote_name() -> bytes:
-            return b'remote'
-
-        def mock_get_refs() -> List[git_changes_utils.GitRef]:
-            return git_refs
-
-        def mock_get_changed_files(
-            unused_refs: List[git_changes_utils.GitRef],
-            unused_remote_name: str
-        ) -> Dict[str, Tuple[List[git_changes_utils.FileDiff], List[bytes]]]:
+        def mock_get_changed_python_test_files() -> Set[str]:
             return {
-                'branch1': (
-                    [git_changes_utils.FileDiff('M', b'test/file1.py'),
-                     git_changes_utils.FileDiff('M', b'file2.ts'),
-                     git_changes_utils.FileDiff('M', b'test/file3.py')],
-                    [b'test/file1.py', b'file2.ts', b'test/file3.py']
-                ),
-                'branch2': (
-                    [],
-                    []
-                )
+                'test.file1_test',
+                'test.file2_test',
+                'test.file3_test'
             }
-
-        def mock_get_staged_acmrt_files() -> List[bytes]:
-            return [
-                b'test/file1.py',
-                b'file2.ts',
-                b'test/file3.py',
-                b'test/file4.py'
-            ]
-
-        def mock_get_python_dot_test_files_from_diff(
-            diff_files: List[bytes]
-        ) -> Set[str]:
-            if diff_files == [
-                b'test/file1.py',
-                b'file2.ts',
-                b'test/file3.py'
-            ]:
-                return {
-                    'test.file1_test.py',
-                    'test.file3_test.py'
-                }
-            elif diff_files == [
-                b'test/file1.py',
-                b'file2.ts',
-                b'test/file3.py',
-                b'test/file4.py'
-            ]:
-                return {
-                    'test.file1_test.py',
-                    'test.file3_test.py',
-                    'test.file4_test.py'
-                }
-            return set()
 
         executed_tasks = []
 
@@ -800,51 +749,20 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         swap_execute_task = self.swap(
             concurrent_task_utils, 'execute_tasks', mock_execute)
-        get_remote_name_swap = self.swap(
-            git_changes_utils, 'get_local_git_repository_remote_name',
-            mock_get_remote_name)
-        get_refs_swap = self.swap(
-            git_changes_utils, 'get_refs', mock_get_refs)
-        get_changed_files_swap = self.swap_with_checks(
-            git_changes_utils, 'get_changed_files', mock_get_changed_files,
-            expected_args=[(git_refs, 'remote')])
-        get_staged_acmrt_files_swap = self.swap(
-            git_changes_utils, 'get_staged_acmrt_files',
-            mock_get_staged_acmrt_files)
-        get_python_dot_test_files_from_diff_swap = self.swap_with_checks(
-            git_changes_utils, 'get_python_dot_test_files_from_diff',
-            mock_get_python_dot_test_files_from_diff,
-            expected_args=[
-                (
-                    [
-                        b'test/file1.py',
-                        b'file2.ts',
-                        b'test/file3.py'
-                    ],
-                ),
-                (
-                    [
-                        b'test/file1.py',
-                        b'file2.ts',
-                        b'test/file3.py',
-                        b'test/file4.py'
-                    ],
-                )
-            ]
-        )
+        get_changed_python_test_files_swap = self.swap(
+            git_changes_utils, 'get_changed_python_test_files',
+            mock_get_changed_python_test_files)
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
             lambda *unused_args, **unused_kwargs: (
                 100, 0, 0, {})
         )
 
-        with swap_execute_task, get_refs_swap, self.print_swap:
+        with swap_execute_task, self.print_swap:
             with self.swap_cloud_datastore_emulator, swap_check_results:
-                with self.swap_redis_server, get_remote_name_swap:
-                    with get_changed_files_swap, get_staged_acmrt_files_swap:
-                        with get_python_dot_test_files_from_diff_swap:
-                            run_backend_tests.main(
-                                args=['--run_on_changed_files_in_branch'])
+                with self.swap_redis_server, get_changed_python_test_files_swap:
+                    run_backend_tests.main(
+                        args=['--run_on_changed_files_in_branch'])
 
         self.assertEqual(len(executed_tasks), 3)
         self.assertIn('All tests passed.', self.print_arr)

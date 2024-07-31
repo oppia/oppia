@@ -472,29 +472,8 @@ def main(args: Optional[List[str]] = None) -> None:
             all_test_targets = get_all_test_targets_from_shard(
                 parsed_args.test_shard)
         elif parsed_args.run_on_changed_files_in_branch:
-            remote = git_changes_utils.get_local_git_repository_remote_name()
-            if not remote:
-                sys.exit('Error: No remote repository found.')
-            refs = git_changes_utils.get_refs()
-            collected_files = git_changes_utils.get_changed_files(
-                refs, remote.decode('utf-8'))
-            test_targets_from_changed_files = set()
-            for _, (_, acmrt_files) in collected_files.items():
-                if not acmrt_files:
-                    continue
-
-                test_targets_from_changed_files.update(
-                    git_changes_utils.get_python_dot_test_files_from_diff(
-                        acmrt_files
-                    )
-                )
-            staged_files = git_changes_utils.get_staged_acmrt_files()
-            test_targets_from_changed_files.update(
-                git_changes_utils.get_python_dot_test_files_from_diff(
-                    staged_files
-                )
-            )
-            all_test_targets = list(test_targets_from_changed_files)
+            all_test_targets = list(
+                git_changes_utils.get_changed_python_test_files())
         else:
             include_load_tests = not parsed_args.exclude_load_tests
             all_test_targets = get_all_test_targets_from_path(

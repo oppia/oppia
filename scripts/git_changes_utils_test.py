@@ -27,7 +27,7 @@ from core.tests import test_utils
 from scripts import common
 from scripts import git_changes_utils
 
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 
 class GitChangesUtilsTests(test_utils.GenericTestBase):
@@ -701,3 +701,123 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                         b'test/file2.py',
                         b'test/file3.py']),
                 set())
+
+    def test_get_changed_python_test_files(self) -> None:
+        git_refs = [git_changes_utils.GitRef(
+            'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1')]
+
+        def mock_get_remote_name() -> str:
+            return b'remote'
+
+        def mock_get_refs() -> List[git_changes_utils.GitRef]:
+            return git_refs
+
+        def mock_get_changed_files(
+            unused_refs: List[git_changes_utils.GitRef],
+            unused_remote_name: str
+        ) -> Dict[str, Tuple[List[git_changes_utils.FileDiff], List[bytes]]]:
+            return {
+                'branch1': (
+                    [git_changes_utils.FileDiff('M', b'test/file1.py'),
+                     git_changes_utils.FileDiff('M', b'file2.ts'),
+                     git_changes_utils.FileDiff('M', b'test/file3.py')],
+                    [b'test/file1.py', b'file2.ts', b'test/file3.py']
+                ),
+                'branch2': (
+                    [],
+                    []
+                )
+            }
+
+        def mock_get_staged_acmrt_files() -> List[bytes]:
+            return [
+                b'test/file1.py',
+                b'file2.ts',
+                b'test/file3.py',
+                b'test/file4.py'
+            ]
+
+        def mock_get_python_dot_test_files_from_diff(
+            diff_files: List[bytes]
+        ) -> Set[str]:
+            if diff_files == [
+                b'test/file1.py',
+                b'file2.ts',
+                b'test/file3.py'
+            ]:
+                return {
+                    'test.file1_test.py',
+                    'test.file3_test.py'
+                }
+            elif diff_files == [
+                b'test/file1.py',
+                b'file2.ts',
+                b'test/file3.py',
+                b'test/file4.py'
+            ]:
+                return {
+                    'test.file1_test.py',
+                    'test.file3_test.py',
+                    'test.file4_test.py'
+                }
+            return set()
+
+        get_remote_name_swap = self.swap(
+            git_changes_utils, 'get_local_git_repository_remote_name',
+            mock_get_remote_name)
+        get_refs_swap = self.swap(
+            git_changes_utils, 'get_refs', mock_get_refs)
+        get_changed_files_swap = self.swap_with_checks(
+            git_changes_utils, 'get_changed_files', mock_get_changed_files,
+            expected_args=[(git_refs, 'remote')])
+        get_staged_acmrt_files_swap = self.swap(
+            git_changes_utils, 'get_staged_acmrt_files',
+            mock_get_staged_acmrt_files)
+        get_python_dot_test_files_from_diff_swap = self.swap_with_checks(
+            git_changes_utils, 'get_python_dot_test_files_from_diff',
+            mock_get_python_dot_test_files_from_diff,
+            expected_args=[
+                (
+                    [
+                        b'test/file1.py',
+                        b'file2.ts',
+                        b'test/file3.py'
+                    ],
+                ),
+                (
+                    [
+                        b'test/file1.py',
+                        b'file2.ts',
+                        b'test/file3.py',
+                        b'test/file4.py'
+                    ],
+                )
+            ]
+        )
+
+        with get_remote_name_swap, get_refs_swap, get_changed_files_swap:
+            with get_staged_acmrt_files_swap:
+                with get_python_dot_test_files_from_diff_swap:
+                    self.assertEqual(
+                        git_changes_utils.get_changed_python_test_files(),
+                        {
+                            'test.file1_test.py',
+                            'test.file3_test.py',
+                            'test.file4_test.py'
+                        }
+                    )
+
+    def test_get_changed_python_test_files_without_remote(
+        self
+    ) -> None:
+        def mock_get_remote_name() -> bytes:
+            return b''
+
+        get_remote_name_swap = self.swap(
+            git_changes_utils, 'get_local_git_repository_remote_name',
+            mock_get_remote_name)
+
+        with get_remote_name_swap, self.assertRaisesRegex(
+            SystemExit, 'Error: No remote repository found.'
+        ):
+            git_changes_utils.get_changed_python_test_files()
