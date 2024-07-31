@@ -68,7 +68,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText!: string;
   @Input() subheaderText!: string;
 
-  DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
   IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
   url!: URL;
   currentLanguageCode!: string;

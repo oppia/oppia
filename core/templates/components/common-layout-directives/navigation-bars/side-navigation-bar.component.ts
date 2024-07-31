@@ -37,7 +37,6 @@ export class SideNavigationBarComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() display!: boolean;
 
-  DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
   IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
   currentUrl!: string;
   classroomData: CreatorTopicSummary[] = [];

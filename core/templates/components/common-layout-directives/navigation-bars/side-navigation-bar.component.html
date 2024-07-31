@@ -234,7 +234,7 @@
       </button>
     </li>
 
-    <li [ngClass]="{'active': currentUrl === '/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}'}">
+    <li>
       <div (click)="togglelearnSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandable-button e2e-mobile-test-learn" >
         <span class="oppia-sidebar-submenu-toggle text-uppercase" [ngClass]="{'oppia-sidebar-submenu-toggle': learnSubmenuIsShown}">
               {{ 'I18N_SIDEBAR_LEARN' | translate }}
