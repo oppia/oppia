@@ -230,4 +230,6 @@
 
 .oppia-learner-dash-button-lg--classroom:hover {
   background-color: #cadbda;
+  border-color: #205d86;
+  color: #205d86;
 }

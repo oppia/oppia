@@ -399,6 +399,7 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
     font-size: 14px;
     height: max-content;
     margin-bottom: 0;
+    transition: all 300ms ease-out;
     width: 120px !important;
   }
 
