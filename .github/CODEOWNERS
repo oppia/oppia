@@ -752,6 +752,7 @@
 # Acceptance Tests.
 /core/tests/puppeteer-acceptance-tests/ @oppia/acceptance-test-reviewers
 /core/tests/puppeteer/ @oppia/acceptance-test-reviewers
+/core/tests/test-modules-mappings/acceptance/ @oppia/acceptance-test-reviewers
 /scripts/run_acceptance_tests_test.py @oppia/acceptance-test-reviewers
 /scripts/run_acceptance_tests.py @oppia/acceptance-test-reviewers
 
