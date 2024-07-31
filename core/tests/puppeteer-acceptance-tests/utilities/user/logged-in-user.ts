@@ -36,12 +36,15 @@ const submitButtonSelector = '.e2e-test-exploration-feedback-submit-btn';
 const submittedMessageSelector = '.e2e-test-rating-submitted-message';
 const PreferencesPageUrl = testConstants.URLs.Preferences;
 const deleteAccountButton = '.e2e-test-delete-account-button';
-const confirmAccountDeletionButton = '.e2e-test-delete-my-account-button';
+const accountDeletionButtonInDeleteAccountPage =
+  '.e2e-test-delete-my-account-button';
 const signUpUsernameField = 'input.e2e-test-username-input';
 const signUpEmailField = testConstants.SignInDetails.inputField;
-const invalidEmailErrorContainer = '#mat-error-0';
+const invalidEmailErrorContainer = '#mat-error-1';
 const invalidUsernameErrorContainer = '.oppia-warning-text';
 const optionText = '.mat-option-text';
+const confirmUsernameField = '.e2e-test-confirm-username-field';
+const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
@@ -116,11 +119,11 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to preference page.
    */
-  async navigateToPreferencesPage() {
+  async navigateToPreferencesPage(): Promise<void> {
     await this.goto(PreferencesPageUrl);
   }
 
-  async navigateToPendingAccountDeletionPage() {
+  async navigateToPendingAccountDeletionPage(): Promise<void> {
     await this.goto(PendingAccountDeletionPage);
   }
 
@@ -206,10 +209,13 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Clicks on the delete button in the page /delete-account to confirm account deletion.
+   * Clicks on the delete button in the page /delete-account to confirm account deletion, also, for confirmation username needs to be entered.
+   * @param {string} username - The username of the account.
    */
-  async confirmAccountDeletion(): Promise<void> {
-    await this.clickOn(confirmAccountDeletionButton);
+  async confirmAccountDeletion(username: string): Promise<void> {
+    await this.clickOn(accountDeletionButtonInDeleteAccountPage);
+    await this.type(confirmUsernameField, username);
+    await this.clickAndWaitForNavigation(confirmAccountDeletionButton);
   }
 
   /**
@@ -240,8 +246,18 @@ export class LoggedInUser extends BaseUser {
    * @param {string} username - The username to enter.
    */
   async signInWithUsername(username: string): Promise<void> {
+    await this.clearAllTextFrom(signUpUsernameField);
     await this.type(signUpUsernameField, username);
-    if (!invalidUsernameErrorContainer) {
+    // Using blur() to remove focus from signUpUsernameField.
+    await this.page.evaluate(selector => {
+      document.querySelector(selector).blur();
+    }, signUpUsernameField);
+
+    await this.waitForPageToFullyLoad();
+    const invalidUsernameErrorContainerElement = await this.page.$(
+      invalidUsernameErrorContainer
+    );
+    if (!invalidUsernameErrorContainerElement) {
       await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
       await this.page.waitForSelector(
         'button.e2e-test-register-user:not([disabled])'
@@ -305,7 +321,8 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Clicks on the sign up email field, waits for the suggestion to appear, then checks if the suggestion matches the expected suggestion.
+   * Clicks on the sign up email field, waits for the suggestion to appear, then checks if the
+   * suggestion matches the expected suggestion.
    * @param {string} expectedSuggestion - The expected suggestion.
    */
   async expectAdminEmailSuggestion(expectedSuggestion: string): Promise<void> {
@@ -319,7 +336,7 @@ export class LoggedInUser extends BaseUser {
       );
     }
 
-    // Click anywhere on the page to remove focus from the email field
+    // Click anywhere on the page to remove focus from the email field.
     await this.page.click('body');
   }
 
@@ -330,7 +347,7 @@ export class LoggedInUser extends BaseUser {
     await this.waitForStaticAssetsToLoad();
     const url = await this.page.url();
 
-    // Replace spaces in the expectedPage with hyphens
+    // Replace spaces in the expectedPage with hyphens.
     const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
 
     if (!url.includes(expectedPageInUrl.toLowerCase())) {

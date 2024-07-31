@@ -22,19 +22,18 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-in User', function () {
-  let loggedInUser1: LoggedInUser & LoggedOutUser;
   let loggedInUser2: LoggedInUser = new LoggedInUser();
 
   beforeAll(async function () {
-    loggedInUser1 = await UserFactory.createNewUser(
+    const loggedInUser1 = await UserFactory.createNewUser(
       'loggedInUser1',
       'logged_in_user1@example.com'
     );
+    await loggedInUser1.closeBrowser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -59,8 +58,8 @@ describe('Logged-in User', function () {
         'Sorry, this username is already taken.'
       );
 
-      // Checking username via entering a username with 'admin' term(which shall is not allowed as admin term is reserved).
-      await loggedInUser2.signInWithUsername('ImAdmin!');
+      // Checking username via entering a username with 'admin' term(which shall is not allowed as  term "admin" is reserved).
+      await loggedInUser2.signInWithUsername('ImAdmin');
       await loggedInUser2.expectUsernameError(
         "User names with 'admin' are reserved."
       );
@@ -68,12 +67,12 @@ describe('Logged-in User', function () {
       // Entering valid username and signing up.
       await loggedInUser2.signInWithUsername('loggedInUser2');
 
-      // Delete the account
+      // Delete the account.
       await loggedInUser2.navigateToPreferencesPage();
       await loggedInUser2.deleteAccount();
       // Initiating account deletion from /preferences page redirects to /delete-account page.
       await loggedInUser2.expectToBeOnPage('delete account');
-      await loggedInUser2.confirmAccountDeletion();
+      await loggedInUser2.confirmAccountDeletion('loggedInUser2');
 
       // After confirmation of account deletion, user is redirected to /pending-account-deletion page.
       await loggedInUser2.expectToBeOnPage('pending account deletion');
