@@ -436,9 +436,6 @@ export class UpgradedServices {
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
     upgradedServices['ExternalSaveService'] = new ExternalSaveService();
-    upgradedServices['EntityVoiceoversService'] = new EntityVoiceoversService(
-      upgradedServices['VoiceoverBackendApiService']
-    );
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();

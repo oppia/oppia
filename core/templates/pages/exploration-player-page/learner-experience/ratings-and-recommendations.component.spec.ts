@@ -88,6 +88,10 @@ describe('Ratings and recommendations component', () => {
         pathname: '/path/name',
         reload: () => {},
       },
+      navigator: {
+        onLine: true,
+        userAgent: null,
+      },
     };
   }
 

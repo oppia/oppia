@@ -2323,8 +2323,8 @@ describe('State translation component', () => {
       });
 
       it('should change active customization argument index', () => {
-        component.onTabClick('ca');
         spyOn(translationTabActiveContentIdService, 'setActiveContent');
+        component.onTabClick('ca');
 
         component.changeActiveCustomizationArgContentIndex(1);
         expect(

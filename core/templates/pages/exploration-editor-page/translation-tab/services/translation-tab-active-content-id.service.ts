@@ -20,7 +20,6 @@ import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter} from '@angular/core';
 import {Injectable} from '@angular/core';
 
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
@@ -29,7 +28,6 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 })
 export class TranslationTabActiveContentIdService {
   constructor(
-    private _stateRecordedVoiceoversService: StateRecordedVoiceoversService,
     private _explorationStatesService: ExplorationStatesService,
     private _stateEditorService: StateEditorService
   ) {}

@@ -310,7 +310,6 @@ export class StateCard {
    *        directive for the current card.
    * @param {Interaction} interaction - An interaction object that stores all
    *        the properties of the card's interaction.
-   * @param {RecordedVoiceovers} recordedVoiceovers
    * @param {string} contentId
    * @param {AudioTranslationLanguageService} audioTranslationLanguageService
    */

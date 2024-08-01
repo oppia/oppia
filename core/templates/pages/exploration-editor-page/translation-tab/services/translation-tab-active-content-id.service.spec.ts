@@ -17,46 +17,53 @@
  */
 
 import {EventEmitter} from '@angular/core';
+
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 import {TranslationTabActiveContentIdService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import {ExplorationStatesService} from '../../services/exploration-states.service';
 
 describe('Translation tab active content id service', () => {
   let ttacis: TranslationTabActiveContentIdService;
+  let explorationStatesService: ExplorationStatesService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        {
-          provide: StateRecordedVoiceoversService,
-          useValue: {
-            displayed: {
-              getAllContentIds: () => {
-                return ['content', 'feedback_1'];
-              },
-            },
-          },
-        },
-      ],
-    });
+      imports: [HttpClientTestingModule],
+      providers: [],
+    }).compileComponents();
 
     ttacis = TestBed.inject(TranslationTabActiveContentIdService);
+    explorationStatesService = TestBed.inject(ExplorationStatesService);
   });
 
   it('should correctly set and get active content id', () => {
     expect(ttacis.getActiveContentId()).toBeNull();
+    spyOn(
+      explorationStatesService,
+      'getAllContentIdsByStateName'
+    ).and.returnValue(['content']);
+
     ttacis.setActiveContent('content', 'html');
     expect(ttacis.getActiveContentId()).toBe('content');
   });
 
   it('should throw error on setting invalid content id', () => {
     expect(() => {
+      spyOn(
+        explorationStatesService,
+        'getAllContentIdsByStateName'
+      ).and.returnValue(['content']);
       ttacis.setActiveContent('feedback_2', 'html');
     }).toThrowError('Invalid active content id: feedback_2');
   });
 
   it('should return data format correctly', () => {
     expect(ttacis.getActiveDataFormat()).toBeNull();
+    spyOn(
+      explorationStatesService,
+      'getAllContentIdsByStateName'
+    ).and.returnValue(['content']);
     ttacis.setActiveContent('content', 'html');
     expect(ttacis.getActiveDataFormat()).toBe('html');
   });
