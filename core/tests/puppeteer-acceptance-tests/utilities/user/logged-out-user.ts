@@ -2905,7 +2905,8 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForPageToFullyLoad();
     try {
       await this.page.waitForSelector(progressRemainderModalSelector, {
-        timeout: 3000,
+        visible: true,
+        timeout: 5000,
       });
       if (!shouldBeFound) {
         throw new Error('Progress remainder is found, which is not expected.');
@@ -3054,14 +3055,26 @@ export class LoggedOutUser extends BaseUser {
   async expectLessonInfoToShowContributors(
     contributorName: string
   ): Promise<void> {
-    await this.waitForPageToFullyLoad();
-
     await this.page.waitForSelector(contributorsContainerSelector, {
       visible: true,
     });
     await this.page.waitForSelector(contributorProfileLinkImageSelector, {
       visible: true,
     });
+
+    // Wait for the 'ng-reflect-username' attribute to be present.
+    await this.page.waitForFunction(
+      contributorProfileLinkImageSelector => {
+        const elements = document.querySelectorAll(
+          contributorProfileLinkImageSelector
+        );
+        return Array.from(elements).every(
+          element => element.getAttribute('ng-reflect-username') !== null
+        );
+      },
+      {},
+      contributorProfileLinkImageSelector
+    );
 
     const isContributorPresent = await this.page.$$eval(
       `${contributorsContainerSelector} li`,

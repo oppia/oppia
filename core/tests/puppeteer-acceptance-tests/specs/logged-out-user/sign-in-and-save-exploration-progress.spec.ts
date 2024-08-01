@@ -152,6 +152,7 @@ describe('Logged-out User', function () {
 
       // Again reload the page to check the 'Resume' exploration in the progress remainder as well.
       await loggedOutUser.reloadPage();
+      await loggedOutUser.expectProgressRemainder(true);
       await loggedOutUser.chooseActionInProgressRemainder('Resume');
 
       await loggedOutUser.continueToNextCard();
