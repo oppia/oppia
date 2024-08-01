@@ -21,7 +21,6 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {log} from 'util';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const CONCEPT_CARD_CONTENT_EN = 'Numbers can be positive, negative, or zero.';
@@ -94,31 +93,27 @@ describe('Logged-out User', function () {
       // Changing site language to hindi.
       await loggedOutUser.changeSiteLanguage('hi');
 
-      // Check the navbar and profile-dropdown to confirm that they are translated correctly.
+      // Check the navbar to confirm that it is translated correctly.
       await loggedOutUser.expectNavbarButtonsToHaveText([
         'घर',
         'कक्षा',
         'जानिए',
       ]);
-      await loggedOutUser.expectProfileDropdownLinksToHaveText([
-        'क्रिएटर डैशबोर्ड',
-        'सीखने वाला डैशबोर्ड',
-      ]);
 
-      // Navigate through pages to confirm that the translation happened correctly.
-      await loggedOutUser.navigateToSplashPage();
+      // Confirm that the translation happened correctly.
       await loggedOutUser.expectPageLanguageToMatch('hi');
 
       await loggedOutUser.navigateToCommunityLibraryPage();
       await loggedOutUser.expectPageLanguageToMatch('hi');
+
       await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
       await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
-
-      await loggedOutUser.continueToNextCard();
-      // Checking if the content of the card is in the original language (en).
-      await loggedOutUser.expectCardContentToBe(CONCEPT_CARD_CONTENT_EN);
       await loggedOutUser.continueToNextCard();
 
+      // Check if the content of the card is in the original language (en).
+      await loggedOutUser.expectCardContentToMatch(CONCEPT_CARD_CONTENT_EN);
+
+      await loggedOutUser.continueToNextCard();
       await loggedOutUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );

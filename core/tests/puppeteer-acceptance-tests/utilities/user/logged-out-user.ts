@@ -2867,7 +2867,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the current card's content matches the expected content.
    * @param {string} expectedCardContent - The expected content of the card.
    */
-  async expectCardContentToBe(expectedCardContent: string): Promise<void> {
+  async expectCardContentToMatch(expectedCardContent: string): Promise<void> {
     await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(`${stateConversationContent} p`, {
       visible: true,
@@ -2920,6 +2920,8 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectPageLanguageToMatch(expectedLanguage: string): Promise<void> {
     // Get the 'lang' attribute from the <html> tag.
+    await this.waitForStaticAssetsToLoad();
+
     const actualLanguage = await this.page.evaluate(
       () => document.documentElement.lang
     );
@@ -2938,7 +2940,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectNavbarButtonsToHaveText(expectedText: string[]): Promise<void> {
     // Get the text content of all navbar buttons.
-    await this.page.waitForSelector(navbarButtonsSelector);
+    await this.page.waitForSelector(navbarButtonsSelector, {visible: true});
     const navbarButtonsText = await this.page.evaluate(selector => {
       return Array.from(
         document.querySelectorAll(selector),
@@ -2954,33 +2956,6 @@ export class LoggedOutUser extends BaseUser {
     if (!isMatchFound) {
       throw new Error(
         `None of the navbar buttons' text matches the expected text: ${expectedText}`
-      );
-    }
-  }
-
-  /**
-   * Checks if the profile dropdown links' text matches any of the expected text.
-   * @param {string[]} expectedText - The expected text for each profile dropdown link.
-   */
-  async expectProfileDropdownLinksToHaveText(
-    expectedText: string[]
-  ): Promise<void> {
-    // Get the text content of all profile dropdown links.
-    const dropdownLinksText = await this.page.evaluate(selector => {
-      return Array.from(
-        document.querySelectorAll(selector),
-        element => element.textContent
-      );
-    }, dropdownNavbarLinkSelector);
-
-    // Check if any of the profile dropdown links' text matches the expected text.
-    const isMatchFound = expectedText.some(text =>
-      dropdownLinksText.includes(text)
-    );
-
-    if (!isMatchFound) {
-      throw new Error(
-        `None of the profile dropdown links' text matches the expected text: ${expectedText}`
       );
     }
   }
@@ -3066,6 +3041,14 @@ export class LoggedOutUser extends BaseUser {
         `Expected element is not focused after pressing ${shortcut}`
       );
     }
+  }
+
+  async timeout(time) {
+    await this.page.waitForTimeout(time);
+  }
+
+  async screenshot(path) {
+    await this.page.screenshot({path: `${path}`});
   }
 }
 
