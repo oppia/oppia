@@ -21,6 +21,7 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {log} from 'util';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const CONCEPT_CARD_CONTENT_EN = 'Numbers can be positive, negative, or zero.';
@@ -53,7 +54,7 @@ describe('Logged-out User', function () {
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
 
-    // Add a new card with a question.
+    // Add a new card with revision content.
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard(CARD_NAME.CONCEPT_CARD);
     await explorationEditor.saveExplorationDraft();
@@ -62,10 +63,9 @@ describe('Logged-out User', function () {
     await explorationEditor.navigateToCard(CARD_NAME.CONCEPT_CARD);
     await explorationEditor.updateCardContent(CONCEPT_CARD_CONTENT_EN);
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-    await explorationEditor.editDefaultResponseFeedback(
-      undefined,
-      CARD_NAME.FINAL_CARD
-    );
+
+    await explorationEditor.viewOppiaResponses();
+    await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.saveExplorationDraft();
 
     // Navigate to the final card and update its content.
@@ -111,7 +111,8 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.navigateToCommunityLibraryPage();
       await loggedOutUser.expectPageLanguageToMatch('hi');
-      await loggedOutUser.selectAndPlayLesson('Positive Numbers');
+      await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
+      await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
 
       await loggedOutUser.continueToNextCard();
       // Checking if the content of the card is in the original language (en).
