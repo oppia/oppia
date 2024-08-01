@@ -24,6 +24,7 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {log} from 'util';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 enum INTERACTION_TYPES {
@@ -51,7 +52,9 @@ describe('Logged-out User', function () {
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorPage();
     await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent('Enter a positive number.');
+    await explorationEditor.updateCardContent(
+      'We will be learning positive numbers.'
+    );
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
 
     // Add a new card with a question.
@@ -72,19 +75,17 @@ describe('Logged-out User', function () {
       CARD_NAME.REVISION_CARD,
       true
     );
+    await explorationEditor.editDefaultResponseFeedback('Wrong, try again!');
     await explorationEditor.saveExplorationDraft();
 
     // Navigate to the new card and Revision content.
-    await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
     await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
     await explorationEditor.updateCardContent(
       'Positive numbers are greater than zero.'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-    await explorationEditor.editDefaultResponseFeedback(
-      undefined,
-      CARD_NAME.FINAL_CARD
-    );
+    await explorationEditor.viewOppiaResponses();
+    await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.setTheStateAsCheckpoint();
     await explorationEditor.saveExplorationDraft();
 
@@ -112,15 +113,20 @@ describe('Logged-out User', function () {
     'should be able to play the exploration without signing in, sign in at any point, save progress, and clear progress',
     async function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
-      await loggedOutUser.selectAndPlayLesson('Positive Numbers');
+      await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
+      await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
       await loggedOutUser.continueToNextCard();
 
       // Make some progress in the exploration.
       await loggedOutUser.submitAnswer('-25');
       await loggedOutUser.continueToNextCard();
+      await loggedOutUser.verifyCheckpointModalAppears();
 
       // Choose to sign up at this point.
-      await loggedOutUser.signUpNewUser('learner', 'learner@example.com');
+      await loggedOutUser.signUpFromTheLessonPlayer(
+        'learner@example.com',
+        'learner'
+      );
 
       // Rest of the action is done being logged-in in the same window as the same logged-out user needs to login and check if the progress is not lost.
 

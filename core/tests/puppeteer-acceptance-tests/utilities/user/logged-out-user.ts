@@ -252,6 +252,7 @@ const embedCodeSelector = '.oppia-embed-modal-code';
 const embedLessonButton = '.e2e-test-embed-link';
 const signUpButton = '.e2e-test-login-button';
 const signInButton = '.conversation-skin-login-button-text';
+const singInButtonInProgressModal = '.sign-in-link';
 const lessonInfoButton = '.oppia-lesson-info';
 const lessonInfoCardSelector = '.oppia-lesson-info-card';
 const closeLessonInfoButton = '.e2e-test-close-lesson-info-modal-button';
@@ -265,9 +266,11 @@ const progressRemainderModalSelector = '.oppia-progress-reminder-modal';
 const contributorsContainerSelector = '.named-contributors-container';
 const viewsContainerSelector = '.e2e-test-info-card-views';
 const lastUpdatedInfoSelector = '.e2e-test-info-card-last-updated';
-const tagsContainerSelector = '.e2e-test-info-card-tags em';
+const tagsContainerSelector = '.exploration-tags span';
 const ratingContainerSelector = '.e2e-test-info-card-rating span:nth-child(2)';
 const contributorProfileLinkImageSelector = 'profile-link-image';
+
+const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -2498,7 +2501,7 @@ export class LoggedOutUser extends BaseUser {
    * Searches for a specific lesson in the search results and opens it.
    * @param {string} lessonTitle - The title of the lesson to search for.
    */
-  async selectAndPlayLesson(lessonTitle: string): Promise<void> {
+  async playLessonFromSearchResults(lessonTitle: string): Promise<void> {
     try {
       await this.page.waitForSelector(lessonCardTitleSelector);
       const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
@@ -2625,7 +2628,8 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Shares the exploration.
-   * @param {string} platform - The platform to share the exploration on.
+   * @param {string} platform - The platform to share the exploration on. This should be the name of the platform (e.g., 'facebook', 'twitter')
+   * @param {string} expectedUrl - The expected URL of the shared exploration.
    */
   async shareExploration(platform: string, expectedUrl: string): Promise<void> {
     await this.clickOn(shareExplorationButtonSelector);
@@ -2863,7 +2867,17 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectSignInButtonToBePresent(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
-    await this.page.waitForSelector(signInButton, {timeout: 5000});
+    try {
+      await this.page.waitForSelector(signInButton, {timeout: 5000});
+    } catch (error) {
+      try {
+        await this.page.waitForSelector(singInButtonInProgressModal, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        throw new Error('Sign-in button not found.');
+      }
+    }
     showMessage('Sign-in button present.');
   }
 
@@ -2884,19 +2898,28 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Checks if the progress remainder is found or not, based on the shouldBeFound parameter. (It can be found when the an already played exploration is revisited or an ongoing exploration is reload, but only if the first checkpoint is reached.)
+   * Checks if the progress remainder is found or not, based on the shouldBeFound parameter. (It can be found when the an already played exploration is revisited or an ongoing exploration is reloaded, but only if the first checkpoint is reached.)
    * @param {boolean} shouldBeFound - Whether the progress remainder should be found or not.
    */
   async expectProgressRemainder(shouldBeFound: boolean): Promise<void> {
+    await this.waitForPageToFullyLoad();
     try {
       await this.page.waitForSelector(progressRemainderModalSelector, {
-        timeout: 5000,
+        timeout: 3000,
       });
       if (!shouldBeFound) {
         throw new Error('Progress remainder is found, which is not expected.');
       }
+      showMessage('Progress reminder modal found.');
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
+        // Closing checkpoint modal if appears.
+        const closeLessonInfoTooltipElement = await this.page.$(
+          closeLessonInfoTooltipSelector
+        );
+        if (closeLessonInfoTooltipElement) {
+          await this.clickOn(closeLessonInfoTooltipSelector);
+        }
         if (shouldBeFound) {
           throw new Error(
             'Progress remainder is not found, which is not expected.'
@@ -2920,9 +2943,16 @@ export class LoggedOutUser extends BaseUser {
     });
 
     if (action === 'Restart') {
-      await this.clickOn(restartExplorationButton);
+      await this.clickAndWaitForNavigation(restartExplorationButton);
     } else if (action === 'Resume') {
       await this.clickOn(resumeExplorationButton);
+      // Closing checkpoint modal if appears.
+      const closeLessonInfoTooltipElement = await this.page.$(
+        closeLessonInfoTooltipSelector
+      );
+      if (closeLessonInfoTooltipElement) {
+        await this.clickOn(closeLessonInfoTooltipSelector);
+      }
     } else {
       throw new Error(
         `Invalid action: ${action}. Expected 'Restart' or 'Resume'.`
@@ -2976,7 +3006,8 @@ export class LoggedOutUser extends BaseUser {
       ]);
 
       // Click on the copy button.
-      await this.clickOn(copyProgressUrlButton);
+      await this.page.waitForSelector(copyProgressUrlButton, {visible: true});
+      await this.page.click(copyProgressUrlButton);
 
       // Reading the clipboard data.
       const clipboardData = await this.page.evaluate(async () => {
@@ -3003,6 +3034,7 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} expectedRating - The expected rating.
    */
   async expectLessonInfoToShowRating(expectedRating: string): Promise<void> {
+    await this.page.waitForSelector(ratingContainerSelector);
     const ratingText = await this.page.evaluate(selector => {
       const element = document.querySelector(selector);
       return element ? element.textContent.trim() : null;
@@ -3022,12 +3054,14 @@ export class LoggedOutUser extends BaseUser {
   async expectLessonInfoToShowContributors(
     contributorName: string
   ): Promise<void> {
-    const contributors = await this.page.$$eval(
+    await this.page.waitForSelector(contributorsContainerSelector);
+    await this.page.waitForSelector(contributorProfileLinkImageSelector);
+    const isContributorPresent = await this.page.$$eval(
       `${contributorsContainerSelector} li`,
-      (liElements, contributorName) => {
+      (liElements, contributorName, contributorProfileLinkImageSelector) => {
         return liElements.some(li => {
           const profileLinkImage = li.querySelector(
-            contributorProfileLinkImageSelector
+            contributorProfileLinkImageSelector as string
           );
           return (
             profileLinkImage &&
@@ -3036,11 +3070,12 @@ export class LoggedOutUser extends BaseUser {
           );
         });
       },
-      contributorName
+      contributorName,
+      contributorProfileLinkImageSelector
     );
 
-    if (!contributors) {
-      throw new Error(`Contributor ${contributorName} not found.`);
+    if (!isContributorPresent) {
+      throw new Error(`Contributor ${contributorName} not found`);
     }
   }
 
@@ -3049,9 +3084,12 @@ export class LoggedOutUser extends BaseUser {
    * @param {number} expectedViews - The expected number of views.
    */
   async expectLessonInfoToShowNoOfViews(expectedViews: number): Promise<void> {
+    await this.page.waitForSelector(viewsContainerSelector);
     const viewsText = await this.page.evaluate(selector => {
       const element = document.querySelector(selector);
-      return element ? parseInt(element.textContent.trim(), 10) : null;
+      const textContent = element ? element.textContent : null;
+      const match = textContent ? textContent.match(/\d+/) : null;
+      return match ? parseInt(match[0], 10) : null;
     }, viewsContainerSelector);
 
     if (viewsText !== expectedViews) {
@@ -3075,6 +3113,7 @@ export class LoggedOutUser extends BaseUser {
    * @param {string[]} expectedTags - The expected tags.
    */
   async expectLessonInfoToShowTags(expectedTags: string[]): Promise<void> {
+    await this.page.waitForSelector(tagsContainerSelector);
     const tags = await this.page.$$eval(
       `${tagsContainerSelector}`,
       emElements => {
@@ -3098,10 +3137,56 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(saveProgressButton, {timeout: 3000});
       throw new Error('"Save Progress" button found, which is not expected.');
     } catch (error) {
-      if (error instanceof puppeteer.TimeoutError) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
         showMessage('"save Progress" button not found, as expected.');
       }
     }
+  }
+
+  /**
+   * Shares the exploration.
+   * @param {string} platform - The platform to share the exploration on. This should be the name of the platform (e.g., 'facebook', 'twitter')
+   * @param {string} expectedUrl - The expected URL of the shared exploration.
+   */
+  async shareExplorationFromLessonInfoModal(
+    platform: string,
+    expectedUrl: string
+  ) {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(
+      `.e2e-test-share-link-${platform.toLowerCase()}`,
+      {visible: true}
+    );
+    const aTag = await this.page.$(
+      `.e2e-test-share-link-${platform.toLowerCase()}`
+    );
+    if (!aTag) {
+      throw new Error(`No share link found for ${platform}.`);
+    }
+    const href = await this.page.evaluate(a => a.href, aTag);
+    if (href !== expectedUrl) {
+      throw new Error(
+        `The ${platform} share link does not match the expected URL. Expected: ${expectedUrl}, Found: ${href}`
+      );
+    }
+  }
+
+  async signUpFromTheLessonPlayer(
+    email: string,
+    username: string
+  ): Promise<void> {
+    await this.clickOn('Sign in');
+    await this.type(testConstants.SignInDetails.inputField, email);
+    await this.clickOn('Sign In');
+    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+    await this.type('input.e2e-test-username-input', username);
+    await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
+    await this.page.waitForSelector(
+      'button.e2e-test-register-user:not([disabled])'
+    );
+    await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
+    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+    await this.page.waitForTimeout(300000);
   }
 }
 
