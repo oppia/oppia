@@ -31,7 +31,6 @@ enum INTERACTION_TYPES {
 }
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',
-  TEST_QUESTION = 'Test Question',
   CONCEPT_CARD = 'Concept Card',
   FINAL_CARD = 'Final Card',
 }
@@ -63,10 +62,8 @@ describe('Logged-out User', function () {
     await explorationEditor.navigateToCard(CARD_NAME.CONCEPT_CARD);
     await explorationEditor.updateCardContent(CONCEPT_CARD_CONTENT_EN);
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-    await explorationEditor.editDefaultResponseFeedback(
-      undefined,
-      CARD_NAME.FINAL_CARD
-    );
+    await explorationEditor.viewOppiaResponses();
+    await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.saveExplorationDraft();
 
     // Navigate to the final card and update its content.
@@ -93,36 +90,51 @@ describe('Logged-out User', function () {
     'should be able to navigate the site using keyboard shortcuts, check focus, and interact with the exploration player.',
     async function () {
       // Navigate to the Get Started page using the ‘Ctrl+6’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Ctrl+6');
+      await loggedOutUser.simulateKeyboardShortcut('Control+Digit6');
       await loggedOutUser.expectToBeOnPage('get started');
 
       // Navigate to the About page using the ‘Ctrl+4’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Ctrl+4');
+      await loggedOutUser.simulateKeyboardShortcut('Control+Digit4');
       await loggedOutUser.expectToBeOnPage('about');
 
       // Navigate to the Preferences page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+5’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Ctrl+5');
+      await loggedOutUser.simulateKeyboardShortcut('Control+Digit5');
       await loggedOutUser.expectToBeOnPage('login');
 
       // Navigate to the learner-dashboard page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+2’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Ctrl+2');
+      await loggedOutUser.simulateKeyboardShortcut('Control+Digit2');
       await loggedOutUser.expectToBeOnPage('login');
 
       // Navigate to the creator-dashboard page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+3’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Ctrl+3');
+      await loggedOutUser.simulateKeyboardShortcut('Control+Digit3');
       await loggedOutUser.expectToBeOnPage('login');
 
       // Navigate to the Community Library page using the ‘Ctrl+1’ shortcut.
-      await loggedOutUser.navigateToCommunityLibraryPage();
+      await loggedOutUser.simulateKeyboardShortcut('Control+Digit1');
       await loggedOutUser.expectToBeOnPage('community library');
-      await loggedOutUser.verifyFocusAfterShortcut('/'); // Search bar.
-      await loggedOutUser.verifyFocusAfterShortcut('s'); // Skips to the main content.
-      await loggedOutUser.verifyFocusAfterShortcut('c'); // Category filter dropdown.
 
-      await loggedOutUser.selectAndPlayLesson('Positive Numbers');
-      await loggedOutUser.verifyFocusAfterShortcut('s'); // Skips to the main content.
-      await loggedOutUser.verifyFocusAfterShortcut('j'); // "Back" button.
-      await loggedOutUser.verifyFocusAfterShortcut('k'); // "Next" button.
+      // Expects the focus to be on Search bar in the Community Library page.
+      await loggedOutUser.verifyFocusAfterShortcut('/');
+
+      // Skips to the main content.
+      await loggedOutUser.verifyFocusAfterShortcut('s');
+
+      // Expects the focus to be on category dropdown in the Community Library page.
+      await loggedOutUser.verifyFocusAfterShortcut('c');
+
+      await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
+      await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
+
+      // Skips to the main content.
+      await loggedOutUser.verifyFocusAfterShortcut('s');
+
+      await loggedOutUser.continueToNextCard();
+
+      // Expects the focus to be on the back button in lesson player.
+      await loggedOutUser.verifyFocusAfterShortcut('j');
+
+      // Expects the focus to be on the continue or next button in lesson player.
+      await loggedOutUser.verifyFocusAfterShortcut('k');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

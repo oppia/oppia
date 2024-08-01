@@ -253,9 +253,19 @@ const embedCodeSelector = '.oppia-embed-modal-code';
 const embedLessonButton = '.e2e-test-embed-link';
 const signUpButton = '.e2e-test-login-button';
 const signInButton = '.conversation-skin-login-button-text';
-const navbarButtonsSelector = '.oppia-navbar-tab-content';
-const dropdownNavbarLinkSelector = '.dropdown-item.nav-link';
+const desktopNavbarButtonsSelector = '.oppia-navbar-tab-content';
+const mobileNavbarButtonSelector = '.text-uppercase';
 const skipLinkSelector = '.e2e-test-skip-link';
+const openMobileNavbarMenuButton = '.oppia-navbar-menu-icon';
+const closeMobileNavbarMenuButton = '.oppia-navbar-close-icon';
+
+/**
+ * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
+ * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
+ * The 'Control' key is also named as such in the specification and same with others.
+ * We use these key names to ensure that our key names match the official specification.
+ * For more details, see: https://www.w3.org/TR/uievents-key/#named-key-attribute-values
+ */
 type KeyInput =
   | 'Shift'
   | 'Control'
@@ -2511,40 +2521,6 @@ export class LoggedOutUser extends BaseUser {
    * Searches for a specific lesson in the search results and opens it.
    * @param {string} lessonTitle - The title of the lesson to search for.
    */
-  async selectAndPlayLesson(lessonTitle: string): Promise<void> {
-    try {
-      await this.page.waitForSelector(lessonCardTitleSelector);
-      const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
-      const searchResults = await Promise.all(
-        searchResultsElements.map(result =>
-          this.page.evaluate(el => el.textContent.trim(), result)
-        )
-      );
-
-      const lessonIndex = searchResults.indexOf(lessonTitle);
-      if (lessonIndex === -1) {
-        throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
-      }
-
-      await this.waitForElementToBeClickable(
-        searchResultsElements[lessonIndex]
-      );
-      await searchResultsElements[lessonIndex].click();
-      await this.waitForStaticAssetsToLoad();
-      showMessage(`Lesson "${lessonTitle}" opened from search results.`);
-    } catch (error) {
-      const newError = new Error(
-        `Failed to open lesson from search results: ${error}`
-      );
-      newError.stack = error.stack;
-      throw newError;
-    }
-  }
-
-  /**
-   * Searches for a specific lesson in the search results and opens it.
-   * @param {string} lessonTitle - The title of the lesson to search for.
-   */
   async playLessonFromSearchResults(lessonTitle: string): Promise<void> {
     try {
       await this.page.waitForSelector(lessonCardTitleSelector);
@@ -2939,12 +2915,20 @@ export class LoggedOutUser extends BaseUser {
    * @param {string[]} expectedText - The expected text for each navbar button.
    */
   async expectNavbarButtonsToHaveText(expectedText: string[]): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(openMobileNavbarMenuButton);
+    }
+
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const navbarButtonsSelector = isMobileViewport
+      ? mobileNavbarButtonSelector
+      : desktopNavbarButtonsSelector;
+
     // Get the text content of all navbar buttons.
     await this.page.waitForSelector(navbarButtonsSelector, {visible: true});
     const navbarButtonsText = await this.page.evaluate(selector => {
-      return Array.from(
-        document.querySelectorAll(selector),
-        element => element.textContent
+      return Array.from(document.querySelectorAll(selector), element =>
+        element.textContent.trim()
       );
     }, navbarButtonsSelector);
 
@@ -2952,6 +2936,18 @@ export class LoggedOutUser extends BaseUser {
     const isMatchFound = expectedText.some(text =>
       navbarButtonsText.includes(text)
     );
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(closeMobileNavbarMenuButton, {
+        visible: true,
+      });
+      const closeMobileNavbarMenuButtonElement = await this.page.$(
+        closeMobileNavbarMenuButton
+      );
+      if (closeMobileNavbarMenuButtonElement) {
+        await closeMobileNavbarMenuButtonElement.click();
+      }
+    }
 
     if (!isMatchFound) {
       throw new Error(
@@ -2976,16 +2972,30 @@ export class LoggedOutUser extends BaseUser {
     for (const key of keys) {
       await this.page.keyboard.up(key);
     }
+
+    try {
+      await this.page.waitForNavigation({
+        waitUntil: ['load', 'networkidle0'],
+        timeout: 5000,
+      });
+    } catch (error) {
+      // Ignoring the error if it's a timeout error.
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        // Navigation didn't happen, but that's okay as sometimes the shortcuts may not trigger navigation.
+      } else {
+        throw error;
+      }
+    }
   }
 
   /**
-   * Verifies that the current page URL includes the expected page string.
+   * Verifies that the current page URL includes the expected page pathname.
    */
   async expectToBeOnPage(expectedPage: string): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     const url = await this.page.url();
 
-    // Replace spaces in the expectedPage with hyphens
+    // Replace spaces in the expectedPage with hyphens.
     const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
 
     if (!url.includes(expectedPageInUrl.toLowerCase())) {
@@ -3002,6 +3012,7 @@ export class LoggedOutUser extends BaseUser {
    * @throws {Error} Will throw an error if the expected element is not focused.
    */
   async verifyFocusAfterShortcut(shortcut: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
     await this.simulateKeyboardShortcut(shortcut);
 
     // Determine the expected element to be focused.
@@ -3041,14 +3052,9 @@ export class LoggedOutUser extends BaseUser {
         `Expected element is not focused after pressing ${shortcut}`
       );
     }
-  }
 
-  async timeout(time) {
-    await this.page.waitForTimeout(time);
-  }
-
-  async screenshot(path) {
-    await this.page.screenshot({path: `${path}`});
+    // Remove focus from the focused element.
+    await this.page.evaluate(element => element.blur(), expectedFocusedElement);
   }
 }
 
