@@ -3007,9 +3007,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Simulates pressing a keyboard shortcut and verifies that the expected element is focused.
-   *
    * @param {string} shortcut - The keyboard shortcut to press.
-   * @throws {Error} Will throw an error if the expected element is not focused.
    */
   async verifyFocusAfterShortcut(shortcut: string): Promise<void> {
     await this.waitForPageToFullyLoad();
