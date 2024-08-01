@@ -706,7 +706,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         git_refs = [git_changes_utils.GitRef(
             'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1')]
 
-        def mock_get_remote_name() -> str:
+        def mock_get_remote_name() -> bytes:
             return b'remote'
 
         def mock_get_refs() -> List[git_changes_utils.GitRef]:
