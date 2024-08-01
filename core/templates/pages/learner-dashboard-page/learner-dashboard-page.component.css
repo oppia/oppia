@@ -487,6 +487,7 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
 
 @media screen and (max-width: 500px) {
   .oppia-learner-dash-button-lg {
+    padding: 10px 8px;
     width: 90%;
   }
 }

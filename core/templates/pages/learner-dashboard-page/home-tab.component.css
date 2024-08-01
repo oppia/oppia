@@ -218,10 +218,6 @@
   }
 }
 
-/*
-  TODO(#18384): focus class for classroom button.
-*/
-
 .oppia-learner-dash-button-lg--classroom {
   background-color: #fff;
   border-color: #205d86;
@@ -232,4 +228,10 @@
   background-color: #cadbda;
   border-color: #205d86;
   color: #205d86;
+}
+
+.oppia-learner-dash-button-lg--classroom:focus {
+  background-color: #429488;
+  border-color: #205d86;
+  color: #fff;
 }
