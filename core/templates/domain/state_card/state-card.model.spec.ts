@@ -26,8 +26,6 @@ import {
 } from 'domain/exploration/InteractionObjectFactory';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {Voiceover} from 'domain/exploration/voiceover.model';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';

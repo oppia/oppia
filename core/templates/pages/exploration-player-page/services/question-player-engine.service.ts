@@ -20,7 +20,6 @@ import {Injectable} from '@angular/core';
 import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
-import {BindableVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {
   Question,
   QuestionObjectFactory,
@@ -292,7 +291,6 @@ export class QuestionPlayerEngineService {
       answer: answerString,
     };
     const feedbackHtml = this.makeFeedback(outcome.feedback.html, [oldParams]);
-    const feedbackContentId = outcome.feedback.contentId;
     if (feedbackHtml === null) {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Feedback content should not be empty.');

@@ -3863,7 +3863,6 @@ class State(translation_domain.BaseTranslatableObject):
         Args:
             content: SubtitledHtml. Representation of updated content.
         """
-        old_content_id = self.content.content_id
         # TODO(sll): Must sanitize all content in RTE component attrs.
         self.content = content
 
@@ -3947,10 +3946,6 @@ class State(translation_domain.BaseTranslatableObject):
         )
         for ca_name in customization_args:
             customization_args[ca_name].validate_subtitled_html()
-
-        old_content_id_list = list(itertools.chain.from_iterable([
-            self.interaction.customization_args[ca_name].get_content_ids()
-            for ca_name in self.interaction.customization_args]))
 
         self.interaction.customization_args = customization_args
         new_content_id_list = list(itertools.chain.from_iterable([
@@ -4106,12 +4101,7 @@ class State(translation_domain.BaseTranslatableObject):
             raise Exception(
                 'Expected hints_list to be a list, received %s'
                 % hints_list)
-        old_content_id_list = [
-            hint.hint_content.content_id for hint in self.interaction.hints]
         self.interaction.hints = copy.deepcopy(hints_list)
-
-        new_content_id_list = [
-            hint.hint_content.content_id for hint in self.interaction.hints]
 
     def update_interaction_solution(
         self, solution: Optional[Solution]

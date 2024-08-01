@@ -18,21 +18,17 @@
 
 from __future__ import annotations
 
-import collections
 import json
 import os
 
-from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.domain import exp_domain
-from core.domain import feature_flag_services
 from core.domain import state_domain
-from core.domain import user_services
 from core.domain import voiceover_domain
 from core.platform import models
 
-from typing import Dict, List, Sequence, cast
+from typing import Dict, List, cast
 
 MYPY = False
 if MYPY: # pragma: no cover

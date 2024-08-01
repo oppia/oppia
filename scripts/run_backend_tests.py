@@ -67,7 +67,7 @@ from core import feconf, utils  # isort:skip  pylint: disable=wrong-import-posit
 
 # This installs third party libraries before importing other files or importing
 # libraries that use the builtins python module (e.g. build, utils).
-# install_third_party_libs.main()
+install_third_party_libs.main()
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order

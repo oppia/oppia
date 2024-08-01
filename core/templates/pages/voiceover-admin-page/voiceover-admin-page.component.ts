@@ -23,12 +23,8 @@ import {
   LanguageAccentToDescription,
   LanguageCodesMapping,
   LanguageAccentMasterList,
-  VoiceArtistIdToLanguageMapping,
-  VoiceArtistIdToVoiceArtistName,
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {VoiceoverRemovalConfirmModalComponent} from './modals/language-accent-removal-confirm-modal.component';
-import {VoiceArtistLanguageMapping} from './voice-artist-language-mapping.model';
-import {AddAccentToVoiceoverLanguageModalComponent} from './modals/add-accent-to-voiceover-language-modal.component';
 
 interface LanguageAccentCodeToLanguageCode {
   [languageAccentCode: string]: string;

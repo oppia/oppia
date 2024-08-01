@@ -340,8 +340,6 @@ describe('Translation status service', () => {
       let entityVoiceovers = EntityVoiceovers.createFromBackendDict(
         entityVoiceoversBackendDict
       );
-      console.log('Before syp');
-      console.log(entityVoiceovers);
 
       ttams.activateVoiceoverMode();
       var statesNeedingAudioUpdate = tss.getAllStatesNeedUpdatewarning();
@@ -569,7 +567,7 @@ describe('Translation status service', () => {
 
       expect(activeStateComponentStatus).toBe(FEW_ASSETS_AVAILABLE_COLOR);
 
-      entityVoiceovers.voiceoversMapping['content_0'] = {
+      entityVoiceovers.voiceoversMapping.content_0 = {
         manual: manualVoiceover2,
       };
       entityVoiceoversService.addEntityVoiceovers(entityVoiceovers);
@@ -591,7 +589,7 @@ describe('Translation status service', () => {
       expect(activeStateComponentStatus).toBe(NO_ASSETS_AVAILABLE_COLOR);
       ses.activeStateName = 'Third';
 
-      entityVoiceovers.voiceoversMapping['content_8'] = {
+      entityVoiceovers.voiceoversMapping.content_8 = {
         manual: manualVoiceover2,
       };
       entityVoiceoversService.addEntityVoiceovers(entityVoiceovers);
@@ -720,7 +718,7 @@ describe('Translation status service', () => {
         tss.getActiveStateContentIdStatusColor('feedback_3');
       expect(activeStateContentIdStatusColor).toBe(ALL_ASSETS_AVAILABLE_COLOR);
 
-      entityVoiceovers.voiceoversMapping['content_0'] = {
+      entityVoiceovers.voiceoversMapping.content_0 = {
         manual: manualVoiceover2,
       };
       entityVoiceoversService.addEntityVoiceovers(entityVoiceovers);
@@ -738,7 +736,7 @@ describe('Translation status service', () => {
       expect(activeStateContentIdStatusColor).toBe(NO_ASSETS_AVAILABLE_COLOR);
 
       ses.activeStateName = 'Third';
-      entityVoiceovers.voiceoversMapping['content_8'] = {
+      entityVoiceovers.voiceoversMapping.content_8 = {
         manual: manualVoiceover3,
       };
       entityVoiceoversService.addEntityVoiceovers(entityVoiceovers);

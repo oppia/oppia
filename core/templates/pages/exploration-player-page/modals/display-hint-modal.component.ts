@@ -18,7 +18,6 @@
 
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {AudioPlayerService} from 'services/audio-player.service';

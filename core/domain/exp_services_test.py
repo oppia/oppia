@@ -24,7 +24,6 @@ import os
 import re
 import zipfile
 
-from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants

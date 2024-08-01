@@ -62,8 +62,6 @@ import {RouterService} from 'pages/exploration-editor-page/services/router.servi
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 
 const DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 
@@ -71,19 +69,6 @@ class MockNgbModal {
   open() {
     return {
       result: Promise.resolve(),
-    };
-  }
-}
-
-class MockPlatformFeatureService {
-  get status(): object {
-    return {
-      EnableVoiceoverContribution: {
-        isEnabled: true,
-      },
-      AddVoiceoverWithAccent: {
-        isEnabled: false,
-      },
     };
   }
 }
@@ -133,7 +118,6 @@ describe('State translation component', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
-  let platformFeatureService: PlatformFeatureService;
 
   let explorationState1 = {
     Introduction: {
@@ -327,10 +311,6 @@ describe('State translation component', () => {
           provide: WrapTextWithEllipsisPipe,
           useClass: MockWrapTextWithEllipsisPipe,
         },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -358,7 +338,6 @@ describe('State translation component', () => {
     translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService
     );
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
     explorationStatesService.init(explorationState1, false);
     stateRecordedVoiceoversService.init(
       'Introduction',
@@ -995,10 +974,6 @@ describe('State translation component', () => {
           provide: WrapTextWithEllipsisPipe,
           useClass: MockWrapTextWithEllipsisPipe,
         },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -1517,10 +1492,6 @@ describe('State translation component', () => {
         {
           provide: WrapTextWithEllipsisPipe,
           useClass: MockWrapTextWithEllipsisPipe,
-        },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -2203,10 +2174,6 @@ describe('State translation component', () => {
         {
           provide: WrapTextWithEllipsisPipe,
           useClass: MockWrapTextWithEllipsisPipe,
-        },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],

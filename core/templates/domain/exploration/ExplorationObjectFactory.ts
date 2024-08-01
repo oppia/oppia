@@ -44,7 +44,6 @@ import {
   StateObjectsBackendDict,
   States,
   StatesObjectFactory,
-  VoiceoverObjectsDict,
 } from 'domain/exploration/StatesObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 

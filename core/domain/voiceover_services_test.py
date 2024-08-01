@@ -21,16 +21,11 @@ from __future__ import annotations
 import json
 import os
 
-from core import feature_flag_list
 from core import feconf
 from core import schema_utils
 from core import utils
 from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import feature_flag_services
 from core.domain import state_domain
-from core.domain import user_services
 from core.domain import voiceover_domain
 from core.domain import voiceover_services
 from core.platform import models

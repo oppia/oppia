@@ -94,20 +94,6 @@ describe('Voiceover Admin Page component ', () => {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping,
     };
-    let voiceArtistMetadataInfo = {
-      voiceArtistIdToLanguageMapping: {
-        voiceArtist1: {
-          en: 'en-US',
-        },
-        voiceArtist2: {
-          hi: 'hi-IN',
-        },
-      },
-      voiceArtistIdToVoiceArtistName: {
-        voiceArtist1: 'Voice Artist 1',
-        voiceArtist2: 'Voice Artist 2',
-      },
-    };
     spyOn(
       voiceoverBackendApiService,
       'fetchVoiceoverAdminDataAsync'

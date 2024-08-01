@@ -28,7 +28,6 @@ import {
   StateBackendDict,
   StateObjectFactory,
 } from 'domain/state/StateObjectFactory';
-import {Voiceover} from 'domain/exploration/voiceover.model';
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
 import {LoggerService} from 'services/contextual/logger.service';
 import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';

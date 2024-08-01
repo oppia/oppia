@@ -29,10 +29,6 @@ import {
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {
-  BindableVoiceovers,
-  RecordedVoiceovers,
-} from 'domain/exploration/recorded-voiceovers.model';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {State} from 'domain/state/StateObjectFactory';
@@ -408,12 +404,6 @@ export class ExplorationEngineService {
       this.exploration.setInitialStateName(this.initStateName);
       this.visitedStateNames = [this.exploration.getInitialState().name];
       this.initParams(this.manualParamChanges);
-      // this.audioTranslationLanguageService.init(
-      //   this.exploration.getAllVoiceoverLanguageCodes(),
-      //   null,
-      //   this.exploration.getLanguageCode(),
-      //   explorationDict.auto_tts_enabled
-      // );
       this.audioPreloaderService.init(this.exploration);
       this.audioPreloaderService.kickOffAudioPreloader(this.initStateName);
       this._loadInitialState(successCallback);
@@ -421,12 +411,6 @@ export class ExplorationEngineService {
       this.visitedStateNames.push(this.exploration.getInitialState().name);
       this.version = explorationVersion;
       this.initParams([]);
-      // this.audioTranslationLanguageService.init(
-      //   this.exploration.getAllVoiceoverLanguageCodes(),
-      //   preferredAudioLanguage,
-      //   this.exploration.getLanguageCode(),
-      //   autoTtsEnabled
-      // );
       this.audioPreloaderService.init(this.exploration);
       this.audioPreloaderService.kickOffAudioPreloader(
         this.exploration.getInitialState().name
@@ -588,7 +572,6 @@ export class ExplorationEngineService {
       classificationResult.outcome,
       [oldParams]
     );
-    let feedbackContentId: string = outcome.feedback.contentId;
 
     if (feedbackHtml === null) {
       this.answerIsBeingProcessed = false;

@@ -22,7 +22,6 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {MultipleChoiceInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
@@ -115,20 +114,6 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
 
   ngOnInit(): void {
     this.choices = this.getOrderedChoices();
-    // Setup voiceover.
-    this.displayedCard = this.playerTranscriptService.getCard(
-      this.playerPositionService.getDisplayedCardIndex()
-    );
-    if (this.displayedCard) {
-      // Combine labels for voiceover.
-      let combinedChoiceLabels = '';
-      for (const choice of this.choices) {
-        combinedChoiceLabels +=
-          this.audioTranslationManagerService.cleanUpHTMLforVoiceover(
-            choice.choice.html
-          );
-      }
-    }
 
     this.answer = null;
     this.currentInteractionService.registerCurrentInteraction(

@@ -967,11 +967,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             parent_user_id=self.PROFILE_ID_1
         ).put()
 
-        language_code_to_accent: Dict[str, str] = {
-            'en': 'en-US',
-            'hi': 'hi-IN'
-        }
-
         # Set-up for AppFeedbackReportModel scrubbed by user.
         report_id = '%s.%s.%s' % (
             self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP.second,
@@ -1232,7 +1227,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_blog_author_details: Dict[str, Dict[str, str]] = {}
         expected_learner_group_model_data: Dict[str, str] = {}
         expected_learner_grp_user_model_data: Dict[str, str] = {}
-        expected_voice_artist_data: Dict[str, str] = {}
 
         # Here we use type Any because this dictionary contains other
         # different types of dictionaries whose values can vary from int
@@ -2106,10 +2100,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         expected_translation_coordinator_stats_data = {
             'coordinated_language_ids': ['es', 'hi']
-        }
-        expected_language_code_to_accent: Dict[str, str] = {
-            'en': 'en-US',
-            'hi': 'hi-IN'
         }
         expected_user_data = {
             'user_stats': expected_stats_data,

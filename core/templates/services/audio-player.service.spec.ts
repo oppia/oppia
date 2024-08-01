@@ -30,7 +30,6 @@ import {ContextService} from './context.service';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import * as howler from 'howler';
-import {AudioTranslationManagerService} from 'pages/exploration-player-page/services/audio-translation-manager.service';
 import {Subject} from 'rxjs';
 import {Howl} from 'howler';
 
@@ -38,7 +37,6 @@ describe('AudioPlayerService', () => {
   let audioPlayerService: AudioPlayerService;
   let contextService: ContextService;
   let assetsBackendApiService: AssetsBackendApiService;
-  let audioTranslationManagerService: AudioTranslationManagerService;
   let successHandler: jasmine.Spy;
   let failHandler: jasmine.Spy;
 
@@ -51,9 +49,6 @@ describe('AudioPlayerService', () => {
   }));
 
   beforeEach(() => {
-    audioTranslationManagerService = TestBed.inject(
-      AudioTranslationManagerService
-    );
     audioPlayerService = TestBed.inject(AudioPlayerService);
     contextService = TestBed.inject(ContextService);
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);

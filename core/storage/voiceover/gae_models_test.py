@@ -22,8 +22,6 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict
-
 MYPY = False
 if MYPY: # pragma: no cover
     # Here, 'state_domain' is imported only for type checking.

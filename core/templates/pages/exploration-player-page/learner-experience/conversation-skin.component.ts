@@ -1370,12 +1370,6 @@ export class ConversationSkinComponent {
             AppConstants.COMPONENT_NAME_FEEDBACK
           );
 
-          // this.audioPlayerService.onAutoplayAudio.emit({
-          //   audioTranslations: feedbackAudioTranslations,
-          //   html: feedbackHtml,
-          //   componentName: AppConstants.COMPONENT_NAME_FEEDBACK,
-          // });
-
           if (remainOnCurrentCard) {
             this.giveFeedbackAndStayOnCurrentCard(
               feedbackHtml,

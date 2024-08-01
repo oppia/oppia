@@ -18,7 +18,6 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import state_domain
-from core.domain import user_services
 from core.domain import voiceover_domain
 from core.domain import voiceover_services
 from core.tests import test_utils

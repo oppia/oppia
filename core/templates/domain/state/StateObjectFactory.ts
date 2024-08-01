@@ -30,10 +30,6 @@ import {
 } from 'domain/exploration/ParamChangeObjectFactory';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {
-  RecordedVoiceOverBackendDict,
-  RecordedVoiceovers,
-} from 'domain/exploration/recorded-voiceovers.model';
-import {
   SubtitledHtmlBackendDict,
   SubtitledHtml,
 } from 'domain/exploration/subtitled-html.model';

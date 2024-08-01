@@ -304,10 +304,6 @@ describe('Audio preloader service', () => {
       edits_allowed: true,
     },
   };
-  let requestUrl1 = '/assetsdevhandler/exploration/1/assets/audio/en-1.mp3';
-  let requestUrl2 = '/assetsdevhandler/exploration/1/assets/audio/en-2.mp3';
-  let requestUrl3 = '/assetsdevhandler/exploration/1/assets/audio/en-3.mp3';
-  let requestUrl4 = '/assetsdevhandler/exploration/1/assets/audio/en-4.mp3';
 
   beforeEach(() => {
     audioPreloaderService = TestBed.inject(AudioPreloaderService);

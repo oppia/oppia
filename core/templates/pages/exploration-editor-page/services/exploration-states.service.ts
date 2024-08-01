@@ -292,24 +292,10 @@ export class ExplorationStatesService {
 
   markTranslationAndVoiceoverNeedsUpdate(contentId: string): void {
     this.changeListService.markTranslationsAsNeedingUpdate(contentId);
-    let stateName = this.stateEditorService.getActiveStateName();
-    let state = this.getState(stateName);
-    // let recordedVoiceovers = state.recordedVoiceovers;
-    // if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
-    //   recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(contentId);
-    //   this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
-    // }
   }
 
   removeTranslationAndVoiceover(contentId: string): void {
     this.changeListService.removeTranslations(contentId);
-    let stateName = this.stateEditorService.getActiveStateName();
-    let state = this.getState(stateName);
-    // let recordedVoiceovers = state.recordedVoiceovers;
-    // if (recordedVoiceovers.hasVoiceovers(contentId)) {
-    //   recordedVoiceovers.voiceoversMapping[contentId] = {};
-    //   this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
-    // }
     this.entityTranslationsService.removeAllTranslationsForContent(contentId);
   }
 
@@ -455,11 +441,6 @@ export class ExplorationStatesService {
   ): void;
   saveStateProperty(
     stateName: string,
-    backendName: 'recorded_voiceovers',
-    newValue: RecordedVoiceovers
-  ): void;
-  saveStateProperty(
-    stateName: string,
     backendName: 'solicit_answer_details',
     newValue: boolean
   ): void;
@@ -506,18 +487,6 @@ export class ExplorationStatesService {
         this._verifyChangesInitialContents(backendName, newValue);
       }
 
-      if (this._CONTENT_EXTRACTORS.hasOwnProperty(backendName)) {
-        let oldContentIds = this._extractContentIds(backendName, oldValue);
-        let newContentIds = this._extractContentIds(backendName, newValue);
-        let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
-          oldContentIds,
-          newContentIds
-        );
-        let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
-          newContentIds,
-          oldContentIds
-        );
-      }
       let propertyRef = newStateData;
       for (let i = 0; i < accessorList.length - 1; i++) {
         propertyRef = propertyRef[accessorList[i]];
@@ -583,7 +552,7 @@ export class ExplorationStatesService {
     return cloneDeep(this._states);
   }
 
-  getAllContentIdsByStateName(stateName: string) {
+  getAllContentIdsByStateName(stateName: string): string[] {
     let allContentIds = this._states.getState(stateName).getAllContentIds();
     return allContentIds.filter(contentId => contentId !== undefined);
   }
