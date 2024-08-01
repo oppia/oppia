@@ -94,6 +94,13 @@ class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
                 expected_status_int=404
             )
 
+    def test_validation_returns_true_in_dev_mode_if_no_classroom_are_present(
+            self) -> None:
+        with self.swap(constants, 'DEV_MODE', True):
+            self.get_html_response(
+                '%s/can_access_classrooms_page' %
+                    ACCESS_VALIDATION_HANDLER_PREFIX)
+
     def test_validation_returns_true_if_we_have_public_classrooms(
             self) -> None:
         self.save_new_valid_classroom()
