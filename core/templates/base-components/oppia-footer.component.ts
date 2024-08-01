@@ -101,12 +101,12 @@ export class OppiaFooterComponent {
   }
 
   navigateToAboutPage(): void {
-    this.siteAnalyticsService.registerClickNavbarButtonEvent('About');
+    this.siteAnalyticsService.registerClickFooterButtonEvent('About');
     this.windowRef.nativeWindow.location.href = '/about';
   }
 
   navigateToTeachPage(): void {
-    this.siteAnalyticsService.registerClickNavbarButtonEvent('Teach');
+    this.siteAnalyticsService.registerClickFooterButtonEvent('Teach');
     this.windowRef.nativeWindow.location.href = '/teach';
   }
 }

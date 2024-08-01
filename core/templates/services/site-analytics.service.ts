@@ -611,7 +611,9 @@ export class SiteAnalyticsService {
     });
   }
 
-  registerClickFooterButtonEvent(buttonName: string): void {
+  registerClickFooterButtonEvent(
+    buttonName: 'About' | 'Volunteer' | 'Teach'
+  ): void {
     this._sendEventToGoogleAnalytics('footer_button_click', {
       button_name: buttonName,
       page_path: this.windowRef.nativeWindow.location.pathname,

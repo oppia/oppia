@@ -58,13 +58,13 @@ describe('Thanks for subscribing modal component', function () {
   });
 
   it('should register Volunteer footer link click event', () => {
-    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
     expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
     component.navigateToVolunteerPage();
 
     expect(
-      siteAnalyticsService.registerClickNavbarButtonEvent
+      siteAnalyticsService.registerClickFooterButtonEvent
     ).toHaveBeenCalledWith('Volunteer');
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/volunteer');

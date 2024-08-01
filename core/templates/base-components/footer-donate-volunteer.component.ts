@@ -33,7 +33,7 @@ export class FooterDonateVolunteerComponent {
   ) {}
 
   navigateToVolunteerPage(): void {
-    this.siteAnalyticsService.registerClickNavbarButtonEvent('Volunteer');
+    this.siteAnalyticsService.registerClickFooterButtonEvent('Volunteer');
     this.windowRef.nativeWindow.location.href = '/volunteer';
   }
 }

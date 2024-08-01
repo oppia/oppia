@@ -167,26 +167,26 @@ describe('OppiaFooterComponent', () => {
   }));
 
   it('should register About footer link click event', () => {
-    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
     expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
     component.navigateToAboutPage();
 
     expect(
-      siteAnalyticsService.registerClickNavbarButtonEvent
+      siteAnalyticsService.registerClickFooterButtonEvent
     ).toHaveBeenCalledWith('About');
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
   });
 
   it('should register Teach footer link click event', () => {
-    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
     expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
     component.navigateToTeachPage();
 
     expect(
-      siteAnalyticsService.registerClickNavbarButtonEvent
+      siteAnalyticsService.registerClickFooterButtonEvent
     ).toHaveBeenCalledWith('Teach');
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/teach');
