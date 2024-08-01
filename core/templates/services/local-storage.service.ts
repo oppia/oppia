@@ -451,9 +451,7 @@ export class LocalStorageService {
       const lastPageViewTime = (this.storage as Storage).getItem(
         lastPageViewTimeKey
       );
-      const lastPageViewTimeNumber =
-        lastPageViewTime !== null ? Number(lastPageViewTime) : null;
-      return lastPageViewTimeNumber;
+      return lastPageViewTime !== null ? Number(lastPageViewTime) : null;
     }
     return null;
   }

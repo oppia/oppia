@@ -602,7 +602,9 @@ export class SiteAnalyticsService {
     });
   }
 
-  registerClickNavbarButtonEvent(buttonName: string): void {
+  registerClickNavbarButtonEvent(
+    buttonName: 'About' | 'Volunteer' | 'Teach'
+  ): void {
     this._sendEventToGoogleAnalytics('navbar_button_click', {
       button_name: buttonName,
       page_path: this.windowRef.nativeWindow.location.pathname,

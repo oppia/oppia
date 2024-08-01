@@ -1243,8 +1243,8 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the first LinkedIn button in the Teach page
-   * and check if it opens corresponding Creator's LinkedIn Url link
+   * Function to check if the lesson creation section is visible on the Teach page.
+   * If the section is not visible, an error is thrown.
    */
   async expectLessonCreationSectionToBeVisibleInTeachPage(): Promise<void> {
     const lessonCreationSection = await this.page.waitForSelector(
