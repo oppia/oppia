@@ -121,7 +121,8 @@
                                [matChipInputAddOnBlur]="addOnBlur"
                                (matChipInputTokenEnd)="add($event)">
                       </mat-chip-list>
-                      <mat-hint *ngIf="explorationTags.length >= 10" class="oppia-settings-tab-error-message" tabindex="0">Can only contain 10 tags max</mat-hint>
+                      <mat-hint *ngIf="tagIsInvalid" class="oppia-settings-tab-error-message" tabindex="0" align="start">Use only lowercase letters, spaces, and no duplicate tags</mat-hint>
+                      <mat-hint *ngIf="explorationTags.length >= 10" class="oppia-settings-tab-error-message" tabindex="0" align="end">Can only contain 10 tags max</mat-hint>
                     </mat-form-field>
                   </div>
                 </div>
