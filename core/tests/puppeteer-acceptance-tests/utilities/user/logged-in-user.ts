@@ -45,6 +45,8 @@ const invalidUsernameErrorContainer = '.oppia-warning-text';
 const optionText = '.mat-option-text';
 const confirmUsernameField = '.e2e-test-confirm-username-field';
 const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
+const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
+const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
@@ -98,22 +100,6 @@ export class LoggedInUser extends BaseUser {
     } else {
       throw new Error(`Exploration with title ${title} is not present.`);
     }
-  }
-
-  async clickLinkAnchorToNewTab(
-    anchorInnerText: string,
-    expectedDestinationPageUrl: string
-  ): Promise<void> {
-    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
-    const pageTarget = this.page.target();
-    await this.clickOn(anchorInnerText);
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
-    const newTabPage = await newTarget.page();
-    expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
-    await newTabPage?.close();
   }
 
   /**
@@ -258,10 +244,8 @@ export class LoggedInUser extends BaseUser {
       invalidUsernameErrorContainer
     );
     if (!invalidUsernameErrorContainerElement) {
-      await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
-      await this.page.waitForSelector(
-        'button.e2e-test-register-user:not([disabled])'
-      );
+      await this.clickOn(agreeToTermsCheckbox);
+      await this.page.waitForSelector(registerNewUserButton);
       await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
       await this.page.waitForNavigation({waitUntil: 'networkidle0'});
     }
