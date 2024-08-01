@@ -24,10 +24,13 @@ const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
   testConstants.URLs.WikiPrivilegesToFirebaseAccount;
 const PendingAccountDeletionPage = testConstants.URLs.PendingAccountDeletion;
+const baseUrl = testConstants.URLs.BaseURL;
+const homePageUrl = testConstants.URLs.Home;
+const signUpEmailField = testConstants.SignInDetails.inputField;
+
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
-const baseUrl = testConstants.URLs.BaseURL;
 const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
 const ratingStarSelector = '.e2e-test-rating-star';
 const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
@@ -39,7 +42,6 @@ const deleteAccountButton = '.e2e-test-delete-account-button';
 const accountDeletionButtonInDeleteAccountPage =
   '.e2e-test-delete-my-account-button';
 const signUpUsernameField = 'input.e2e-test-username-input';
-const signUpEmailField = testConstants.SignInDetails.inputField;
 const invalidEmailErrorContainer = '#mat-error-1';
 const invalidUsernameErrorContainer = '.oppia-warning-text';
 const optionText = '.mat-option-text';
@@ -209,7 +211,7 @@ export class LoggedInUser extends BaseUser {
    * Then, it clicks on the 'Sign in' button.
    */
   async navigateToSignUpPage(): Promise<void> {
-    await this.goto(testConstants.URLs.Home);
+    await this.goto(homePageUrl);
     if (!this.userHasAcceptedCookies) {
       await this.clickOn('OK');
       this.userHasAcceptedCookies = true;
