@@ -49,7 +49,7 @@ describe('Logged-out User', function () {
     await explorationEditor.navigateToExplorationEditorPage();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent(
-      'We wile be learning numbers today.'
+      'We will be learning numbers today.'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
 
@@ -69,7 +69,7 @@ describe('Logged-out User', function () {
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.updateCardContent(
-      'We have practiced positive numbers.'
+      'We have learnt positive numbers.'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 

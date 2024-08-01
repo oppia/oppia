@@ -2891,8 +2891,8 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Checks if the navbar buttons' text matches the expected text.
-   * @param {string[]} expectedText - The expected text for each navbar button.
+   * Checks if the page's language matches the expected language.
+   * @param {string} expectedLanguage - The expected language of the page.
    */
   async expectPageLanguageToMatch(expectedLanguage: string): Promise<void> {
     // Get the 'lang' attribute from the <html> tag.
