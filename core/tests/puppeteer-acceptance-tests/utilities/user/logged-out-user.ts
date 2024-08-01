@@ -3054,10 +3054,15 @@ export class LoggedOutUser extends BaseUser {
   async expectLessonInfoToShowContributors(
     contributorName: string
   ): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
+    await this.waitForPageToFullyLoad();
 
-    await this.page.waitForSelector(`${contributorsContainerSelector} li`);
-    await this.page.waitForSelector(contributorProfileLinkImageSelector);
+    await this.page.waitForSelector(contributorsContainerSelector, {
+      visible: true,
+    });
+    await this.page.waitForSelector(contributorProfileLinkImageSelector, {
+      visible: true,
+    });
+
     const isContributorPresent = await this.page.$$eval(
       `${contributorsContainerSelector} li`,
       (liElements, contributorName, contributorProfileLinkImageSelector) => {
