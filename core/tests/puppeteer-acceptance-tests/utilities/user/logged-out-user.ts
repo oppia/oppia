@@ -3151,7 +3151,7 @@ export class LoggedOutUser extends BaseUser {
   async shareExplorationFromLessonInfoModal(
     platform: string,
     expectedUrl: string
-  ) {
+  ): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(
       `.e2e-test-share-link-${platform.toLowerCase()}`,
