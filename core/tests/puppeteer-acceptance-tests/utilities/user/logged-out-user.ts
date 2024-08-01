@@ -3186,7 +3186,6 @@ export class LoggedOutUser extends BaseUser {
     );
     await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
     await this.page.waitForNavigation({waitUntil: 'networkidle0'});
-    await this.page.waitForTimeout(300000);
   }
 }
 

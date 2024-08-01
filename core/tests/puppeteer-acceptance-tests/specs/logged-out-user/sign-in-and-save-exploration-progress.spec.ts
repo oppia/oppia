@@ -24,7 +24,7 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {log} from 'util';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 enum INTERACTION_TYPES {
@@ -38,6 +38,10 @@ enum CARD_NAME {
   REVISION_CARD = 'Revision Card',
   FINAL_CARD = 'Final Card',
 }
+
+ConsoleReporter.setConsoleErrorsToIgnore([
+  'Failed to load resource: net::ERR_NETWORK_CHANGED',
+]);
 
 describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
@@ -128,9 +132,16 @@ describe('Logged-out User', function () {
         'learner'
       );
 
-      // Rest of the action is done being logged-in in the same window as the same logged-out user needs to login and check if the progress is not lost.
+      // Rest of the action is done being logged-in in the same window as the same logged-out user needs to login to check if the progress if moved to permanent mode.
 
-      // Verify that progress is saved.
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.submitAnswer('-50');
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.verifyCheckpointModalAppears();
+
+      // Reloading from the current progress.
+      await loggedOutUser.reloadPage();
+
       await loggedOutUser.expectProgressRemainder(true);
       // Continue the exploration from where they left off.
       await loggedOutUser.chooseActionInProgressRemainder('Restart');
