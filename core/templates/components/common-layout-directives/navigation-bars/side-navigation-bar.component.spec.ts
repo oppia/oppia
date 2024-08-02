@@ -38,6 +38,7 @@ import {UserService} from 'services/user.service';
 import {UserInfo} from 'domain/user/user-info.model';
 import {SidebarStatusService} from 'services/sidebar-status.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
 class MockWindowRef {
   nativeWindow = {
@@ -269,7 +270,7 @@ describe('Side Navigation Bar Component', () => {
 
     expect(
       siteAnalyticsService.registerClickNavbarButtonEvent
-    ).toHaveBeenCalledWith('About');
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.ABOUT);
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
   });
@@ -282,7 +283,7 @@ describe('Side Navigation Bar Component', () => {
 
     expect(
       siteAnalyticsService.registerClickNavbarButtonEvent
-    ).toHaveBeenCalledWith('Volunteer');
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.VOLUNTEER);
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/volunteer');
   });
@@ -295,7 +296,7 @@ describe('Side Navigation Bar Component', () => {
 
     expect(
       siteAnalyticsService.registerClickNavbarButtonEvent
-    ).toHaveBeenCalledWith('Teach');
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.TEACH);
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/teach');
   });

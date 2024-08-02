@@ -20,6 +20,7 @@ import {Component, ViewEncapsulation} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
 @Component({
   selector: 'oppia-footer-donate-volunteer',
@@ -33,7 +34,9 @@ export class FooterDonateVolunteerComponent {
   ) {}
 
   navigateToVolunteerPage(): void {
-    this.siteAnalyticsService.registerClickFooterButtonEvent('Volunteer');
+    this.siteAnalyticsService.registerClickFooterButtonEvent(
+      NavbarAndFooterGATrackingPages.VOLUNTEER
+    );
     this.windowRef.nativeWindow.location.href = '/volunteer';
   }
 }

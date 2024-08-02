@@ -20,6 +20,7 @@ import {TestBed} from '@angular/core/testing';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
 describe('Site Analytics Service', () => {
   let sas: SiteAnalyticsService;
@@ -829,7 +830,7 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register Navbar button click events', () => {
-      const buttonName = 'About';
+      const buttonName = NavbarAndFooterGATrackingPages.ABOUT;
       sas.registerClickNavbarButtonEvent(buttonName);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'navbar_button_click', {
@@ -839,17 +840,7 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register Footer button click events', () => {
-      const buttonName = 'About';
-      sas.registerClickFooterButtonEvent(buttonName);
-
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'footer_button_click', {
-        button_name: buttonName,
-        page_path: pathname,
-      });
-    });
-
-    it('should register Footer button click events', () => {
-      const buttonName = 'About';
+      const buttonName = NavbarAndFooterGATrackingPages.ABOUT;
       sas.registerClickFooterButtonEvent(buttonName);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'footer_button_click', {

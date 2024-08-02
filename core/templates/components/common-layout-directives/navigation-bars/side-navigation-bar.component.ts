@@ -19,6 +19,7 @@
 import {Component, Input} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
@@ -118,17 +119,23 @@ export class SideNavigationBarComponent {
   }
 
   navigateToAboutPage(): void {
-    this.siteAnalyticsService.registerClickNavbarButtonEvent('About');
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.ABOUT
+    );
     this.windowRef.nativeWindow.location.href = '/about';
   }
 
   navigateToVolunteerPage(): void {
-    this.siteAnalyticsService.registerClickNavbarButtonEvent('Volunteer');
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.VOLUNTEER
+    );
     this.windowRef.nativeWindow.location.href = '/volunteer';
   }
 
   navigateToTeachPage(): void {
-    this.siteAnalyticsService.registerClickNavbarButtonEvent('Teach');
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.TEACH
+    );
     this.windowRef.nativeWindow.location.href = '/teach';
   }
 }

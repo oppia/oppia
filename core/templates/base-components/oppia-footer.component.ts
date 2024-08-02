@@ -23,6 +23,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {AlertsService} from 'services/alerts.service';
 import {ThanksForSubscribingModalComponent} from './thanks-for-subscribing-modal.component';
 import {MailingListBackendApiService} from 'domain/mailing-list/mailing-list-backend-api.service';
@@ -101,12 +102,16 @@ export class OppiaFooterComponent {
   }
 
   navigateToAboutPage(): void {
-    this.siteAnalyticsService.registerClickFooterButtonEvent('About');
+    this.siteAnalyticsService.registerClickFooterButtonEvent(
+      NavbarAndFooterGATrackingPages.ABOUT
+    );
     this.windowRef.nativeWindow.location.href = '/about';
   }
 
   navigateToTeachPage(): void {
-    this.siteAnalyticsService.registerClickFooterButtonEvent('Teach');
+    this.siteAnalyticsService.registerClickFooterButtonEvent(
+      NavbarAndFooterGATrackingPages.TEACH
+    );
     this.windowRef.nativeWindow.location.href = '/teach';
   }
 }

@@ -28,6 +28,7 @@ import {
 import {Router} from '@angular/router';
 
 import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {MailingListBackendApiService} from 'domain/mailing-list/mailing-list-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
@@ -174,7 +175,7 @@ describe('OppiaFooterComponent', () => {
 
     expect(
       siteAnalyticsService.registerClickFooterButtonEvent
-    ).toHaveBeenCalledWith('About');
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.ABOUT);
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
   });
@@ -187,7 +188,7 @@ describe('OppiaFooterComponent', () => {
 
     expect(
       siteAnalyticsService.registerClickFooterButtonEvent
-    ).toHaveBeenCalledWith('Teach');
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.TEACH);
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/teach');
   });

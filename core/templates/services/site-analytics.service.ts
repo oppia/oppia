@@ -24,6 +24,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {initializeGoogleAnalytics} from 'google-analytics.initializer';
 import {LocalStorageService} from './local-storage.service';
 import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
 // Service for sending events to Google Analytics.
 //
@@ -603,7 +604,7 @@ export class SiteAnalyticsService {
   }
 
   registerClickNavbarButtonEvent(
-    buttonName: 'About' | 'Volunteer' | 'Teach'
+    buttonName: NavbarAndFooterGATrackingPages
   ): void {
     this._sendEventToGoogleAnalytics('navbar_button_click', {
       button_name: buttonName,
@@ -612,7 +613,7 @@ export class SiteAnalyticsService {
   }
 
   registerClickFooterButtonEvent(
-    buttonName: 'About' | 'Volunteer' | 'Teach'
+    buttonName: NavbarAndFooterGATrackingPages
   ): void {
     this._sendEventToGoogleAnalytics('footer_button_click', {
       button_name: buttonName,

@@ -47,6 +47,7 @@ import {CookieService} from 'ngx-cookie';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 class MockPlatformFeatureService {
@@ -443,7 +444,7 @@ describe('TopNavigationBarComponent', () => {
 
     expect(
       siteAnalyticsService.registerClickNavbarButtonEvent
-    ).toHaveBeenCalledWith('About');
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.ABOUT);
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
   });
@@ -456,7 +457,7 @@ describe('TopNavigationBarComponent', () => {
 
     expect(
       siteAnalyticsService.registerClickNavbarButtonEvent
-    ).toHaveBeenCalledWith('Volunteer');
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.VOLUNTEER);
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/volunteer');
   });
@@ -469,7 +470,7 @@ describe('TopNavigationBarComponent', () => {
 
     expect(
       siteAnalyticsService.registerClickNavbarButtonEvent
-    ).toHaveBeenCalledWith('Teach');
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.TEACH);
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/teach');
   });

@@ -21,6 +21,7 @@ import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {FooterDonateVolunteerComponent} from './footer-donate-volunteer.component';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
 class MockWindowRef {
   nativeWindow = {
@@ -65,7 +66,7 @@ describe('Thanks for subscribing modal component', function () {
 
     expect(
       siteAnalyticsService.registerClickFooterButtonEvent
-    ).toHaveBeenCalledWith('Volunteer');
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.VOLUNTEER);
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/volunteer');
   });
