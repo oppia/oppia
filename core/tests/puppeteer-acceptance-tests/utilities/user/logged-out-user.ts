@@ -263,12 +263,11 @@ const createAccountButton = '.create-account-btn';
 const validityInfoTextSelector = '.guide-text';
 const copyProgressUrlButton = '.oppia-uid-copy-btn';
 const progressRemainderModalSelector = '.oppia-progress-reminder-modal';
-const contributorsContainerSelector = '.named-contributors-container';
 const viewsContainerSelector = '.e2e-test-info-card-views';
 const lastUpdatedInfoSelector = '.e2e-test-info-card-last-updated';
 const tagsContainerSelector = '.exploration-tags span';
 const ratingContainerSelector = '.e2e-test-info-card-rating span:nth-child(2)';
-const contributorProfileLinkImageSelector = 'profile-link-image';
+const conversationSkinUserAvatar = '.conversation-skin-user-avatar';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 export class LoggedOutUser extends BaseUser {
@@ -1915,14 +1914,19 @@ export class LoggedOutUser extends BaseUser {
     try {
       await this.page.waitForSelector(nextCardButton, {timeout: 7000});
       await this.clickOn(nextCardButton);
+      await this.page.waitForSelector(conversationSkinUserAvatar, {
+        hidden: true,
+      });
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
         await this.clickOn(nextCardArrowButton);
+        await this.page.waitForSelector(conversationSkinUserAvatar, {
+          hidden: true,
+        });
       } else {
         throw error;
       }
     }
-    await this.waitForStaticAssetsToLoad();
   }
 
   /**
