@@ -37,11 +37,7 @@ enum CARD_NAME {
 }
 
 // This console would occur as we are try to access some of the pages only accessible to logged-in users being logged-out.
-ConsoleReporter.setConsoleErrorsToIgnore([
-  new RegExp(
-    'http://localhost:8181/preferences http://localhost:8181/access_validation_handler/can_manage_own_account Failed to load resource: the server responded with a status of 401 (Unauthorized)'
-  ),
-]);
+ConsoleReporter.setConsoleErrorsToIgnore([/.*401.*Unauthorized.*/]);
 
 describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
