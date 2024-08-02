@@ -247,6 +247,7 @@ export class BaseUser {
    * Function to reload the current page.
    */
   async reloadPage(): Promise<void> {
+    await this.page.waitForNetworkIdle();
     await this.page.reload({waitUntil: ['networkidle0', 'load']});
   }
 

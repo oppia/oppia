@@ -1914,19 +1914,16 @@ export class LoggedOutUser extends BaseUser {
     try {
       await this.page.waitForSelector(nextCardButton, {timeout: 7000});
       await this.clickOn(nextCardButton);
-      await this.page.waitForSelector(conversationSkinUserAvatar, {
-        hidden: true,
-      });
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
         await this.clickOn(nextCardArrowButton);
-        await this.page.waitForSelector(conversationSkinUserAvatar, {
-          hidden: true,
-        });
       } else {
         throw error;
       }
     }
+    await this.page.waitForSelector(conversationSkinUserAvatar, {
+      hidden: true,
+    });
   }
 
   /**
