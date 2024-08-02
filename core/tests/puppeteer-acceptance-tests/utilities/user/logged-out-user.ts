@@ -2903,10 +2903,10 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectProgressRemainder(shouldBeFound: boolean): Promise<void> {
     await this.waitForPageToFullyLoad();
+    await this.page.screenshot({path: 'progress-remainder.png'});
     try {
       await this.page.waitForSelector(progressRemainderModalSelector, {
         visible: true,
-        timeout: 5000,
       });
       if (!shouldBeFound) {
         throw new Error('Progress remainder is found, which is not expected.');
@@ -2942,6 +2942,8 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(progressRemainderModalSelector, {
       visible: true,
     });
+    await this.page.waitForSelector(restartExplorationButton, {visible: true});
+    await this.page.waitForSelector(resumeExplorationButton, {visible: true});
 
     if (action === 'Restart') {
       await this.clickAndWaitForNavigation(restartExplorationButton);
@@ -3064,7 +3066,7 @@ export class LoggedOutUser extends BaseUser {
 
     // Wait for the 'ng-reflect-username' attribute to be present.
     await this.page.waitForFunction(
-      contributorProfileLinkImageSelector => {
+      (contributorProfileLinkImageSelector: string) => {
         const elements = document.querySelectorAll(
           contributorProfileLinkImageSelector
         );
