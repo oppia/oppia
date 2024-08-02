@@ -37,7 +37,7 @@ enum CARD_NAME {
 }
 
 ConsoleReporter.setConsoleErrorsToIgnore([
-  'Failed to load resource: the server responded with a status of 401 (Unauthorized)',
+  'Occurred at http://localhost:8181/preferences http://localhost:8181/access_validation_handler/can_manage_own_account Failed to load resource: the server responded with a status of 401 (Unauthorized)',
 ]);
 
 describe('Logged-out User', function () {
