@@ -202,7 +202,7 @@ describe('Logged-out User', function () {
       await loggedOutUser.continueToNextCard();
 
       // Verifying if navigated to the expected card after getting stuck.
-      await loggedOutUser.expectCardContentToBe(REVISION_CARD_CONTENT);
+      await loggedOutUser.expectCardContentToMatch(REVISION_CARD_CONTENT);
       await loggedOutUser.continueToNextCard();
 
       await loggedOutUser.expectExplorationCompletionToastMessage(

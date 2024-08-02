@@ -249,6 +249,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/play-through-lesson-while-getting-feedback-and-hints',
     'logged-out-user/share-and-give-feedback-for-exploration-'
     'but-not-report-and-rate-it',
+    'logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus',
+    'logged-out-user/change-site-language-and-engage-with-original-exploration',
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
