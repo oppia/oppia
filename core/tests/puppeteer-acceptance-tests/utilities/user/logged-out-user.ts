@@ -3051,57 +3051,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Checks if the lesson info shows the given contributor.
-   * @param {string} contributorName - The name of the contributor.
-   */
-  async expectLessonInfoToShowContributors(
-    contributorName: string
-  ): Promise<void> {
-    await this.page.waitForSelector(contributorsContainerSelector, {
-      visible: true,
-    });
-    await this.page.waitForSelector(contributorProfileLinkImageSelector, {
-      visible: true,
-    });
-
-    // Wait for the 'ng-reflect-username' attribute to be present.
-    await this.page.waitForFunction(
-      (contributorProfileLinkImageSelector: string) => {
-        const elements = document.querySelectorAll(
-          contributorProfileLinkImageSelector
-        );
-        return Array.from(elements).every(
-          element => element.getAttribute('ng-reflect-username') !== null
-        );
-      },
-      {},
-      contributorProfileLinkImageSelector
-    );
-
-    const isContributorPresent = await this.page.$$eval(
-      `${contributorsContainerSelector} li`,
-      (liElements, contributorName, contributorProfileLinkImageSelector) => {
-        return liElements.some(li => {
-          const profileLinkImage = li.querySelector(
-            contributorProfileLinkImageSelector as string
-          );
-          return (
-            profileLinkImage &&
-            profileLinkImage.getAttribute('ng-reflect-username') ===
-              contributorName
-          );
-        });
-      },
-      contributorName,
-      contributorProfileLinkImageSelector
-    );
-
-    if (!isContributorPresent) {
-      throw new Error(`Contributor ${contributorName} not found`);
-    }
-  }
-
-  /**
    * Checks if the lesson info shows the expected number of views.
    * @param {number} expectedViews - The expected number of views.
    */
