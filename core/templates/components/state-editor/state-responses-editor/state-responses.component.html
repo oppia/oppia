@@ -189,12 +189,14 @@
                   <div *ngIf="skillWithMisconceptions.key + '-' + misconception.getId() === activeEditOption" class="optional-misconception-edit-options">
                     <div *ngIf="inapplicableSkillMisconceptionIds.includes(skillWithMisconceptions.key + '-' + misconception.getId())"
                          (click)="updateOptionalMisconceptionIdStatus(skillWithMisconceptions.key + '-' + misconception.getId(), true)"
-                         (mouseleave)="setActiveEditOption(null)">
+                         (mouseleave)="setActiveEditOption(null)"
+                         class="e2e-test-misconception-applicable-toggle">
                         Mark as "Applicable"
                     </div>
                     <div *ngIf="!inapplicableSkillMisconceptionIds.includes(skillWithMisconceptions.key + '-' + misconception.getId())"
                          (click)="updateOptionalMisconceptionIdStatus(skillWithMisconceptions.key + '-' + misconception.getId(), false)"
-                         (mouseleave)="setActiveEditOption(null)">
+                         (mouseleave)="setActiveEditOption(null)"
+                         class="e2e-test-misconception-applicable-toggle">
                         Mark as "Not Applicable"
                     </div>
                   </div>

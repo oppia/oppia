@@ -219,11 +219,25 @@ describe('Exploration Editor', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it('should not display misconceptions after skill is removed from state.', async function () {
-    await explorationEditor.reloadPage();
-    await explorationEditor.navigateToCard(CARD_NAME.MULTIPLE_CHOICE_QUESTION);
-    await explorationEditor.removeSkillFromState();
-  });
+  it(
+    'should not display misconceptions after skill is removed from state.',
+    async function () {
+      await explorationEditor.reloadPage();
+      await explorationEditor.navigateToCard(
+        CARD_NAME.MULTIPLE_CHOICE_QUESTION
+      );
+      await explorationEditor.removeSkillFromState();
+      await explorationEditor.verifyMisconceptionPresentForState(
+        'Addition Misconception',
+        false
+      );
+      await explorationEditor.verifyMisconceptionPresentForState(
+        'Subtraction Misconception',
+        false
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
