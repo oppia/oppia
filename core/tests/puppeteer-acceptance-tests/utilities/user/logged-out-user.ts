@@ -1922,6 +1922,7 @@ export class LoggedOutUser extends BaseUser {
         throw error;
       }
     }
+    await this.waitForStaticAssetsToLoad();
   }
 
   /**
@@ -2903,7 +2904,6 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectProgressRemainder(shouldBeFound: boolean): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.page.screenshot({path: 'progress-remainder.png'});
     try {
       await this.page.waitForSelector(progressRemainderModalSelector, {
         visible: true,
