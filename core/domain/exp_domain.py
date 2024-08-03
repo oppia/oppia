@@ -315,7 +315,8 @@ class ExplorationChange(change_domain.BaseChange):
         # Deprecated state properties.
         STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS_DEPRECATED,
-        STATE_PROPERTY_NEXT_CONTENT_ID_INDEX_DEPRECATED
+        STATE_PROPERTY_NEXT_CONTENT_ID_INDEX_DEPRECATED,
+        DEPRECATED_STATE_PROPERTY_RECORDED_VOICEOVERS
     ]
 
     # The allowed list of exploration properties which can be used in
@@ -3156,13 +3157,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
         state_dict['written_translations']['translations_mapping'] = (  # type: ignore[misc]
             new_translations_mapping)
 
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
         voiceovers_mapping = (
-            state_dict['recorded_voiceovers']['voiceovers_mapping'])
+            state_dict['recorded_voiceovers']['voiceovers_mapping']) # type: ignore[misc]
         new_voiceovers_mapping = {}
         for content_id, voiceover_item in voiceovers_mapping.items():
             if content_id in content_id_list:
                 new_voiceovers_mapping[content_id] = voiceover_item
-        state_dict['recorded_voiceovers']['voiceovers_mapping'] = (
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        state_dict['recorded_voiceovers']['voiceovers_mapping'] = ( # type: ignore[misc]
             new_voiceovers_mapping)
 
     @classmethod
@@ -3394,7 +3399,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for translation in choice_translations.values():
                 translation['needs_update'] = True
 
-            choice_voiceovers = state_dict['recorded_voiceovers'][
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains written_translations property.
+            choice_voiceovers = state_dict['recorded_voiceovers'][ # type: ignore[misc]
                 'voiceovers_mapping'][content_id]
             for choice_voiceover in choice_voiceovers.values():
                 choice_voiceover['needs_update'] = True
@@ -3677,7 +3684,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for translation in continue_button_translations.values():
                 translation['needs_update'] = True
 
-            choice_voiceovers = state_dict['recorded_voiceovers'][
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains written_translations property.
+            choice_voiceovers = state_dict['recorded_voiceovers'][ # type: ignore[misc]
                 'voiceovers_mapping'][content_id]
             for choice_voiceover in choice_voiceovers.values():
                 choice_voiceover['needs_update'] = True
@@ -5109,7 +5118,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def _convert_states_v55_dict_to_v56_dict(
         cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Tuple[Dict[str, state_domain.StateDict], int]:
+    ) -> Dict[str, state_domain.StateDict]:
         """Converts from v55 to v56. Version 56 removes and RecordedVoiceovers
         from State.
         """

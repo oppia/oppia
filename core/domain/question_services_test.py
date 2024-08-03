@@ -955,10 +955,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'tagged_skill_misconception_id': 'skillid12345-2'
             })
         ]
-        question_state_data.recorded_voiceovers.voiceovers_mapping.update({
-            content_id: {} for content_id in (
-                feedback_content_ids + rule_content_ids)
-        })
 
         inapplicable_skill_misconception_ids = [
             'skillid12345-3',
@@ -1114,10 +1110,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'tagged_skill_misconception_id': 'skillid12345-2'
             })
         ]
-        question_state_data.recorded_voiceovers.voiceovers_mapping.update({
-            content_id: {} for content_id in (
-                feedback_content_ids + rule_content_ids)
-        })
         inapplicable_skill_misconception_ids = [
             'skillid12345-3',
             'skillid12345-4'
@@ -1503,26 +1495,6 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
-        self.assertEqual(
-            question.question_state_data
-            .recorded_voiceovers.to_dict(), {
-                'voiceovers_mapping': {
-                    'ca_placeholder_6': {},
-                    'content_0': {
-                        'en': {
-                            'filename': 'test.mp3',
-                            'file_size_bytes': 100,
-                            'needs_update': False,
-                            'duration_secs': 0.0
-                        }
-                    },
-                    'rule_input_3': {},
-                    'hint_4': {},
-                    'default_outcome_1': {},
-                    'feedback_2': {},
-                    'solution_5': {}
-                }
-            })
 
     def test_migrate_question_state_from_v31_to_latest(self) -> None:
         answer_group = {
@@ -2320,10 +2292,6 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
         self.assertEqual(
             answer_groups[0].rule_specs[0].inputs, {'x': 'x=y', 'y': 'both'})
-        state_data = question.question_state_data
-        self.assertEqual(sorted(
-            state_data.recorded_voiceovers.voiceovers_mapping.keys()), [
-                'content_0', 'default_outcome_1', 'feedback_2'])
 
     def test_migrate_question_state_from_v35_to_latest(self) -> None:
         # Test restructuring of written_translations.

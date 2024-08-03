@@ -2571,8 +2571,7 @@ def save_new_exploration_from_yaml_and_assets(
     committer_id: str,
     yaml_content: str,
     exploration_id: str,
-    assets_list: List[Tuple[str, bytes]],
-    strip_voiceovers: bool = False
+    assets_list: List[Tuple[str, bytes]]
 ) -> None:
     """Saves a new exploration given its representation in YAML form and the
     list of assets associated with it.
@@ -2583,8 +2582,6 @@ def save_new_exploration_from_yaml_and_assets(
         exploration_id: str. The id of the exploration.
         assets_list: list(tuple(str, bytes)). A list of lists of assets, which
             contains asset's filename and content.
-        strip_voiceovers: bool. Whether to strip away all audio voiceovers
-            from the imported exploration.
 
     Raises:
         Exception. The yaml file is invalid due to a missing schema version.
@@ -2603,11 +2600,6 @@ def save_new_exploration_from_yaml_and_assets(
         fs.commit(asset_filename, asset_content)
 
     exploration = exp_domain.Exploration.from_yaml(exploration_id, yaml_content)
-
-    # Check whether audio translations should be stripped.
-    if strip_voiceovers:
-        for state in exploration.states.values():
-            state.recorded_voiceovers.strip_all_existing_voiceovers()
 
     create_commit_message = (
         'New exploration created from YAML file with title \'%s\'.'

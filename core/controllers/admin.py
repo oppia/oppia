@@ -87,23 +87,23 @@ EDUCATION_BLOG_POST_TITLE = 'Education'
 
 EDUCATION_BLOG_POST_CONTENT = """
     <p>
-        Education is a constantly evolving landscape, and innovation lies at its core. 
-        This summer, Oppia had the privilege of hosting a group of exceptional minds 
-        through the prestigious Google Summer of Code (GSoC) program. These talented 
+        Education is a constantly evolving landscape, and innovation lies at its core.
+        This summer, Oppia had the privilege of hosting a group of exceptional minds
+        through the prestigious Google Summer of Code (GSoC) program. These talented
         individuals embarked on a journey to transform learning, one code at a time.
     </p>\n
     <p>
-        You should check out main 
-        <oppia-noninteractive-link 
-            text-with-value=\"&amp;quot;website.&amp;quot;\" 
+        You should check out main
+        <oppia-noninteractive-link
+            text-with-value=\"&amp;quot;website.&amp;quot;\"
             url-with-value=\"&amp;quot;https://www.oppia.org&amp;quot;\">
         </oppia-noninteractive-link><br>\n&nbsp;
     </p>\n\n
     <p>Introduction to Oppia - Youtube Video</p>
-    <oppia-noninteractive-video 
-        autoplay-with-value=\"false\" 
-        end-with-value=\"0\" 
-        start-with-value=\"0\" 
+    <oppia-noninteractive-video
+        autoplay-with-value=\"false\"
+        end-with-value=\"0\"
+        start-with-value=\"0\"
         video_id-with-value=\"&amp;quot;Wmvt-HH5-dI&amp;quot;\">
     </oppia-noninteractive-video>
 """
@@ -155,7 +155,7 @@ SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict({
     'category': 'Algorithms',
     'author_notes': '',
     'blurb': '',
-    'states_schema_version': 55,
+    'states_schema_version': 56,
     'init_state_name': 'Introduction',
     'language_code': 'en',
     'objective': 'Learn the exploration',
@@ -191,11 +191,6 @@ SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict({
             },
             'classifier_model_id': None,
             'linked_skill_id': None,
-            'recorded_voiceovers': {
-                    'voiceovers_mapping': {
-                    'content_0': {}
-                }
-            },
         'solicit_answer_details': False,
         'card_is_checkpoint': True,
         }
@@ -431,7 +426,7 @@ class AdminHandler(
             Exception. The num_dummy_exps_to_publish must be provided when
                 the action is generate_dummy_explorations.
             Exception. The num_dummy_translation_opportunities_to_generate
-                must be provided when the action is 
+                must be provided when the action is
                 generate_dummy_translation_opportunities.
             InvalidInputException. Generate count cannot be less than publish
                 count.
@@ -450,7 +445,7 @@ class AdminHandler(
             InvalidInputException. The input provided is not valid.
             Exception. The skill_id must be provided when
                 the action is generate_dummy_question_suggestions.
-            Exception. The num_dummy_question_suggestions_generate must be 
+            Exception. The num_dummy_question_suggestions_generate must be
                 provided when the action is generate_dummy_question_suggestions.
         """
         assert self.user_id is not None
@@ -1120,7 +1115,7 @@ class AdminHandler(
                     'User does not have enough rights to generate data.')
             logging.info(
                 '[ADMIN] %s generated %s number of dummy '
-                'translation opportunities (explorations)' % 
+                'translation opportunities (explorations)' %
                 (self.user_id, num_dummy_translation_opportunities_to_generate)
             )
 

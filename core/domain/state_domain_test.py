@@ -1480,9 +1480,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     }
                 }
             },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
-            }
         }
 
         state_dict_with_new_math_schema = {
@@ -1561,9 +1558,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': '<p>This is solution for state1</p>'
                     }
                 }
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -1739,9 +1733,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'id': 'ItemSelectionInput',
                 'hints': []
             },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
-            }
         }
 
         state_dict_with_new_math_schema = {
@@ -1812,9 +1803,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'id': 'ItemSelectionInput',
                 'hints': []
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
         interaction_registry.Registry.get_all_specs_for_state_schema_version(
@@ -1948,9 +1936,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         }
                     }]
             },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
-            }
         }
 
         state_dict_with_new_math_schema = {
@@ -2013,9 +1998,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_new_math_schema
                         }
                     }]
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
         self.assertEqual(
@@ -2113,9 +2095,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'id': 'ItemSelectionInput',
                 'hints': []
             },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
-            }
         }
 
         mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
@@ -2231,9 +2210,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'id': 'ItemSelectionInput',
                 'hints': []
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -2332,9 +2308,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     }
                 ]
             },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
-            }
         }
 
         mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
@@ -2417,9 +2390,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         }
                     }]
             },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
-            }
         }
 
         state_dict_with_new_math_schema: state_domain.StateDict = {
@@ -2463,9 +2433,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         }
                     }]
             },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
-            }
         }
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,

@@ -59,16 +59,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             'Introduction': {
                 'card_is_checkpoint': True,
                 'solicit_answer_details': False,
-                'recorded_voiceovers': {
-                    'voiceovers_mapping': {
-                        'hint_5': {},
-                        'feedback_4': {},
-                        'content_0': {},
-                        'ca_placeholder_3': {},
-                        'default_outcome_1': {},
-                        'rule_input_6': {}
-                    }
-                },
                 'param_changes': [],
                 'classifier_model_id': None,
                 'content': {
