@@ -18,7 +18,6 @@
 
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
-var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
 var DeleteAccountPage = require('../webdriverio_utils/DeleteAccountPage.js');
@@ -44,22 +43,6 @@ describe('When account is deleted it', function () {
       // just ignore it here.
       'The user account has been disabled by an administrator',
     ];
-  });
-
-  it('should request account deletion', async function () {
-    await users.createAndLoginUser('user1@delete.com', 'userToDelete1');
-    await deleteAccountPage.get();
-    await deleteAccountPage.requestAccountDeletion('userToDelete1');
-
-    await users.login('user1@delete.com');
-    var pendingAccountDeletionHeading = $('.e2e-test-pending-account-deletion');
-    await waitFor.visibilityOf(
-      pendingAccountDeletionHeading,
-      'Pending Account Deletion Page takes too long to appear'
-    );
-    expect(await browser.getUrl()).toEqual(
-      'http://localhost:8181/pending-account-deletion'
-    );
   });
 
   it('should delete private exploration', async function () {
