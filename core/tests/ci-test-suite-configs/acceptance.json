@@ -41,6 +41,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/save-draft-publish-and-discard-the-changes.spec.ts"
     },
     {
+      "name": "logged-in-user/create-and-delete-account",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/create-and-delete-account.spec.ts"
+    },
+    {
       "name": "logged-out-user/click-all-buttons-on-about-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-about-page.spec.ts"
     },
