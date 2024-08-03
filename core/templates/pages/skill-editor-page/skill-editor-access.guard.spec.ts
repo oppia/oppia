@@ -75,9 +75,10 @@ describe('SkillEditorPageAccess', () => {
       Promise.resolve(true)
     );
 
-    const resultCanBeActivated = guard
+    let resultCanBeActivated = guard
       .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
-      .then(result => result);
+      .then(result => (resultCanBeActivated = result));
+
     tick();
 
     expect(resultCanBeActivated).toBeTrue();
@@ -94,9 +95,10 @@ describe('SkillEditorPageAccess', () => {
       Promise.resolve(true)
     );
 
-    const resultCanBeActivated = guard
+    let resultCanBeActivated = guard
       .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
-      .then(result => result);
+      .then(result => (resultCanBeActivated = result));
+
     tick();
 
     expect(resultCanBeActivated).toBeFalse();
