@@ -20,8 +20,8 @@ import datetime
 
 from core import feature_flag_list
 from core import feconf
-from core.domain import caching_services
 from core.constants import constants
+from core.domain import caching_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import rights_manager

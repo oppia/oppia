@@ -540,8 +540,10 @@ class SkillEditorPageAccessValidationHandler(
     @acl_decorators.can_edit_skill
     def get(self, skill_id: str) -> None:
         """Renders skill editor page.
+
         Args:
             skill_id: str. The skill ID.
+    
         Raises:
             Exception. The skill with the given ID doesn't exist.
         """
