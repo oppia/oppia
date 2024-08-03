@@ -543,7 +543,7 @@ class SkillEditorPageAccessValidationHandler(
 
         Args:
             skill_id: str. The skill ID.
-    
+
         Raises:
             Exception. The skill with the given ID doesn't exist.
         """
