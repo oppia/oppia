@@ -251,6 +251,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'but-not-report-and-rate-it',
     'logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus',
     'logged-out-user/change-site-language-and-engage-with-original-exploration',
+    'logged-out-user/sign-in-and-save-exploration-progress',
+    'logged-out-user/track-and-resume-exploration-progress-via-url',
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
