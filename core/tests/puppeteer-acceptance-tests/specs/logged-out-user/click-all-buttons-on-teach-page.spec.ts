@@ -31,6 +31,10 @@ ConsoleReporter.setConsoleErrorsToIgnore([
   /The requested path \/learn\/math is not found\./,
 ]);
 
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /http:\/\/localhost:8181\/access_validation_handler\/can_access_classrooms_page Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+]);
+
 describe('Logged-out User in Teach page', function () {
   let loggedOutUser: LoggedOutUser;
 
