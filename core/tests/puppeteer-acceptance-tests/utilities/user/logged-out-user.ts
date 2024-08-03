@@ -31,6 +31,7 @@ const ccLicenseUrl = testConstants.URLs.CCLicense;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const recentlyPublishedExplorationsPageUrl =
   testConstants.URLs.recentlyPublishedExplorations;
+const splashPageUrl = testConstants.URLs.splash;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
 const classroomsPage = testConstants.URLs.ClassroomsPage;
@@ -252,7 +253,42 @@ const embedCodeSelector = '.oppia-embed-modal-code';
 const embedLessonButton = '.e2e-test-embed-link';
 const signUpButton = '.e2e-test-login-button';
 const signInButton = '.conversation-skin-login-button-text';
+const desktopNavbarButtonsSelector = '.oppia-navbar-tab-content';
+const mobileNavbarButtonSelector = '.text-uppercase';
+const skipLinkSelector = '.e2e-test-skip-link';
+const openMobileNavbarMenuButton = '.oppia-navbar-menu-icon';
+const closeMobileNavbarMenuButton = '.oppia-navbar-close-icon';
 
+/**
+ * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
+ * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
+ * The 'Control' key is also named as such in the specification and same with others.
+ * We use these key names to ensure that our key names match the official specification.
+ * For more details, see: https://www.w3.org/TR/uievents-key/#named-key-attribute-values
+ */
+type KeyInput =
+  | 'Shift'
+  | 'Control'
+  | 'Alt'
+  | 'Meta'
+  | 'Enter'
+  | 'Tab'
+  | 'Backspace'
+  | 'Delete'
+  | 'ArrowUp'
+  | 'ArrowDown'
+  | 'ArrowLeft'
+  | 'ArrowRight'
+  | 'Digit0'
+  | 'Digit1'
+  | 'Digit2'
+  | 'Digit3'
+  | 'Digit4'
+  | 'Digit5'
+  | 'Digit6'
+  | 'Digit7'
+  | 'Digit8'
+  | 'Digit9';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -363,6 +399,13 @@ export class LoggedOutUser extends BaseUser {
       await this.page.reload();
     }
     await this.goto(classroomsPage);
+  }
+
+  /**
+   * Navigates to the splash page.
+   */
+  async navigateToSplashPage(): Promise<void> {
+    await this.goto(splashPageUrl);
   }
 
   /**
@@ -1273,7 +1316,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to change the site language to the given language code.
    * @param langCode - The language code to change the site language to. Example: 'pt-br', 'en'
    */
-  private async changeSiteLanguage(langCode: string): Promise<void> {
+  async changeSiteLanguage(langCode: string): Promise<void> {
     const languageOption = `.e2e-test-i18n-language-${langCode} a`;
 
     if (this.isViewportAtMobileWidth()) {
@@ -2800,7 +2843,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the current card's content matches the expected content.
    * @param {string} expectedCardContent - The expected content of the card.
    */
-  async expectCardContentToBe(expectedCardContent: string): Promise<void> {
+  async expectCardContentToMatch(expectedCardContent: string): Promise<void> {
     await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(`${stateConversationContent} p`, {
       visible: true,
@@ -2845,6 +2888,171 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(signInButton, {timeout: 5000});
     showMessage('Sign-in button present.');
+  }
+
+  /**
+   * Checks if the page's language matches the expected language.
+   * @param {string} expectedLanguage - The expected language of the page.
+   */
+  async expectPageLanguageToMatch(expectedLanguage: string): Promise<void> {
+    // Get the 'lang' attribute from the <html> tag.
+    await this.waitForStaticAssetsToLoad();
+
+    const actualLanguage = await this.page.evaluate(
+      () => document.documentElement.lang
+    );
+
+    if (actualLanguage !== expectedLanguage) {
+      throw new Error(
+        `Expected page language to be ${expectedLanguage}, but it was ${actualLanguage}`
+      );
+    }
+    showMessage('Page language matches the expected one.');
+  }
+
+  /**
+   * Checks if the navbar buttons' text matches any of the expected text.
+   * @param {string[]} expectedText - The expected text for each navbar button.
+   */
+  async expectNavbarButtonsToHaveText(expectedText: string[]): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(openMobileNavbarMenuButton);
+    }
+
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const navbarButtonsSelector = isMobileViewport
+      ? mobileNavbarButtonSelector
+      : desktopNavbarButtonsSelector;
+
+    // Get the text content of all navbar buttons.
+    await this.page.waitForSelector(navbarButtonsSelector, {visible: true});
+    const navbarButtonsText = await this.page.evaluate(selector => {
+      return Array.from(document.querySelectorAll(selector), element =>
+        element.textContent.trim()
+      );
+    }, navbarButtonsSelector);
+
+    // Check if any of the navbar buttons' text matches the expected text.
+    const isMatchFound = expectedText.some(text =>
+      navbarButtonsText.includes(text)
+    );
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(closeMobileNavbarMenuButton, {
+        visible: true,
+      });
+      const closeMobileNavbarMenuButtonElement = await this.page.$(
+        closeMobileNavbarMenuButton
+      );
+      if (closeMobileNavbarMenuButtonElement) {
+        await closeMobileNavbarMenuButtonElement.click();
+      }
+    }
+
+    if (!isMatchFound) {
+      throw new Error(
+        `None of the navbar buttons' text matches the expected text: ${expectedText}`
+      );
+    }
+  }
+
+  /**
+   * Simulates pressing a keyboard shortcut.
+   * @param {string} shortcut - The keyboard shortcut to press.
+   */
+  async simulateKeyboardShortcut(shortcut: string): Promise<void> {
+    const keys: KeyInput[] = shortcut.split('+') as KeyInput[];
+
+    // Press down all keys.
+    for (const key of keys) {
+      await this.page.keyboard.down(key);
+    }
+
+    // Release all keys.
+    for (const key of keys) {
+      await this.page.keyboard.up(key);
+    }
+
+    try {
+      await this.page.waitForNavigation({
+        waitUntil: ['load', 'networkidle0'],
+        timeout: 5000,
+      });
+    } catch (error) {
+      // Ignoring the error if it's a timeout error.
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        // Navigation didn't happen, but that's okay as sometimes the shortcuts may not trigger navigation.
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
+   * Verifies that the current page URL includes the expected page pathname.
+   */
+  async expectToBeOnPage(expectedPage: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    const url = await this.page.url();
+
+    // Replace spaces in the expectedPage with hyphens.
+    const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
+
+    if (!url.includes(expectedPageInUrl.toLowerCase())) {
+      throw new Error(
+        `Expected to be on page ${expectedPage}, but found ${url}`
+      );
+    }
+  }
+
+  /**
+   * Simulates pressing a keyboard shortcut and verifies that the expected element is focused.
+   * @param {string} shortcut - The keyboard shortcut to press.
+   */
+  async verifyFocusAfterShortcut(shortcut: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.simulateKeyboardShortcut(shortcut);
+
+    // Determine the expected element to be focused.
+    let expectedFocusedElement;
+    switch (shortcut) {
+      case '/':
+        expectedFocusedElement = await this.page.$(searchInputSelector);
+        break;
+      case 's':
+        expectedFocusedElement = await this.page.$(skipLinkSelector);
+        break;
+      case 'c':
+        expectedFocusedElement = await this.page.$(
+          categoryFilterDropdownToggler
+        );
+        break;
+      case 'j':
+        expectedFocusedElement = await this.page.$(
+          `:is(${nextCardArrowButton}, ${nextCardButton})`
+        );
+        break;
+      case 'k':
+        expectedFocusedElement = await this.page.$(previousCardButton);
+        break;
+      default:
+        throw new Error(`Unsupported shortcut: ${shortcut}`);
+    }
+
+    // Check if the expected element is focused.
+    const isExpectedElementFocused = await this.page.evaluate(
+      element => document.activeElement === element,
+      expectedFocusedElement
+    );
+
+    if (!isExpectedElementFocused) {
+      throw new Error(
+        `Expected element is not focused after pressing ${shortcut}`
+      );
+    }
+
+    // Remove focus from the focused element.
+    await this.page.evaluate(element => element.blur(), expectedFocusedElement);
   }
 }
 

@@ -241,7 +241,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                             args=['--specs_to_run', 'invalid.ts',
                                   '--allow_no_spec'])
 
-    def test_frontend_tests_with_run_on_changed_files(self) -> None:
+    def test_frontend_tests_with_run_on_changed_files_in_branch(self) -> None:
         git_refs = [git_changes_utils.GitRef(
             'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1')]
         def mock_get_remote_name() -> bytes:
@@ -294,7 +294,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                     with get_refs_swap, get_changed_files_swap:
                         with get_file_spec_swap, get_staged_acmrt_files_swap:
                             run_frontend_tests.main(
-                                args=['--run_on_changed_files'])
+                                args=['--run_on_changed_files_in_branch'])
 
         cmd = [
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
@@ -303,9 +303,12 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             '--specs_to_run=file1.spec.js,file2.spec.ts,file3.spec.ts']
         self.assertIn(cmd, self.cmd_token_list)
 
-    def test_frontend_tests_with_run_on_changed_files_no_remote(self) -> None:
+    def test_frontend_tests_with_run_on_changed_files_in_branch_no_remote(
+        self
+    ) -> None:
         def mock_get_remote_name() -> bytes:
             return b''
+
         get_remote_name_swap = self.swap(
             git_changes_utils, 'get_local_git_repository_remote_name',
             mock_get_remote_name)
@@ -318,7 +321,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                         'Error: No remote repository found.'
                     ):
                         run_frontend_tests.main(
-                            args=['--run_on_changed_files'])
+                            args=['--run_on_changed_files_in_branch'])
 
     def test_frontend_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
