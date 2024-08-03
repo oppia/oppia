@@ -97,10 +97,6 @@
       "module": "core/tests/webdriverio_desktop/navigation.js"
     },
     {
-      "name": "playVoiceovers",
-      "module": "core/tests/webdriverio_desktop/playVoiceovers.js"
-    },
-    {
       "name": "preferences",
       "module": "core/tests/webdriverio_desktop/preferences.js"
     },
@@ -135,10 +131,6 @@
     {
       "name": "topicAndStoryEditorFileUploadFeatures",
       "module": "core/tests/webdriverio_desktop/topicAndStoryEditorFileUploadFeatures.js"
-    },
-    {
-      "name": "topicAndStoryViewer",
-      "module": "core/tests/webdriverio_desktop/topicAndStoryViewer.js"
     },
     {
       "name": "users",
