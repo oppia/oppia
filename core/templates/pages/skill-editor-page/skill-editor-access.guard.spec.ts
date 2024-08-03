@@ -78,7 +78,6 @@ describe('SkillEditorPageAccess', () => {
     const resultCanBeActivated = guard
       .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
       .then(result => result);
-
     tick();
 
     expect(resultCanBeActivated).toBeTrue();
@@ -98,7 +97,6 @@ describe('SkillEditorPageAccess', () => {
     const resultCanBeActivated = guard
       .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
       .then(result => result);
-
     tick();
 
     expect(resultCanBeActivated).toBeFalse();
