@@ -22,7 +22,6 @@ import {
   Component,
   OnInit,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {SavePendingChangesModalComponent} from 'components/save-pending-changes/save-pending-changes-modal.component';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
@@ -141,10 +140,3 @@ export class SkillEditorMainTabComponent
     }, 0);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSkillEditorMainTab',
-  downgradeComponent({
-    component: SkillEditorMainTabComponent,
-  }) as angular.IDirectiveFactory
-);

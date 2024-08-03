@@ -96,8 +96,6 @@ module.exports = {
       '/pages/practice-session-page/practice-session-page.import.ts',
     review_test:
       commonPrefix + '/pages/review-test-page/review-test-page.import.ts',
-    skill_editor:
-      commonPrefix + '/pages/skill-editor-page/skill-editor-page.import.ts',
     story_editor:
       commonPrefix + '/pages/story-editor-page/story-editor-page.import.ts',
     topic_editor:
@@ -287,18 +285,6 @@ module.exports = {
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/review-test-page/review-test-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['skill_editor'],
-      filename: 'skill-editor-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/skill-editor-page/' +
-        'skill-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
     }),

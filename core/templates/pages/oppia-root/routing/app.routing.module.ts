@@ -432,6 +432,14 @@ const routes: Route[] = [
         m => m.CollectionPlayerPageModule
       ),
   },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SKILL_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/skill-editor-page/skill-editor-page.module').then(
+        m => m.SkillEditorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
+  },
 ];
 
 // Register stewards landing pages.
