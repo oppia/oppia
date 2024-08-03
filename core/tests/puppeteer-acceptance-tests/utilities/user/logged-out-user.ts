@@ -31,6 +31,7 @@ const ccLicenseUrl = testConstants.URLs.CCLicense;
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 const recentlyPublishedExplorationsPageUrl =
   testConstants.URLs.recentlyPublishedExplorations;
+const splashPageUrl = testConstants.URLs.splash;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
 const classroomsPage = testConstants.URLs.ClassroomsPage;
@@ -252,7 +253,60 @@ const embedCodeSelector = '.oppia-embed-modal-code';
 const embedLessonButton = '.e2e-test-embed-link';
 const signUpButton = '.e2e-test-login-button';
 const signInButton = '.conversation-skin-login-button-text';
+const singInButtonInProgressModal = '.sign-in-link';
+const lessonInfoButton = '.oppia-lesson-info';
+const lessonInfoCardSelector = '.oppia-lesson-info-card';
+const closeLessonInfoButton = '.e2e-test-close-lesson-info-modal-button';
+const resumeExplorationButton = '.resume-button';
+const restartExplorationButton = '.restart-button';
+const saveProgressButton = '.save-progress-btn';
+const createAccountButton = '.create-account-btn';
+const validityInfoTextSelector = '.guide-text';
+const copyProgressUrlButton = '.oppia-uid-copy-btn';
+const progressRemainderModalSelector = '.oppia-progress-reminder-modal';
+const viewsContainerSelector = '.e2e-test-info-card-views';
+const lastUpdatedInfoSelector = '.e2e-test-info-card-last-updated';
+const tagsContainerSelector = '.exploration-tags span';
+const ratingContainerSelector = '.e2e-test-info-card-rating span:nth-child(2)';
+const conversationSkinUserAvatar = '.conversation-skin-user-avatar';
 
+const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
+const desktopNavbarButtonsSelector = '.oppia-navbar-tab-content';
+const mobileNavbarButtonSelector = '.text-uppercase';
+const skipLinkSelector = '.e2e-test-skip-link';
+const openMobileNavbarMenuButton = '.oppia-navbar-menu-icon';
+const closeMobileNavbarMenuButton = '.oppia-navbar-close-icon';
+
+/**
+ * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
+ * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
+ * The 'Control' key is also named as such in the specification and same with others.
+ * We use these key names to ensure that our key names match the official specification.
+ * For more details, see: https://www.w3.org/TR/uievents-key/#named-key-attribute-values
+ */
+type KeyInput =
+  | 'Shift'
+  | 'Control'
+  | 'Alt'
+  | 'Meta'
+  | 'Enter'
+  | 'Tab'
+  | 'Backspace'
+  | 'Delete'
+  | 'ArrowUp'
+  | 'ArrowDown'
+  | 'ArrowLeft'
+  | 'ArrowRight'
+  | 'Digit0'
+  | 'Digit1'
+  | 'Digit2'
+  | 'Digit3'
+  | 'Digit4'
+  | 'Digit5'
+  | 'Digit6'
+  | 'Digit7'
+  | 'Digit8'
+  | 'Digit9';
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -363,6 +417,13 @@ export class LoggedOutUser extends BaseUser {
       await this.page.reload();
     }
     await this.goto(classroomsPage);
+  }
+
+  /**
+   * Navigates to the splash page.
+   */
+  async navigateToSplashPage(): Promise<void> {
+    await this.goto(splashPageUrl);
   }
 
   /**
@@ -1273,7 +1334,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to change the site language to the given language code.
    * @param langCode - The language code to change the site language to. Example: 'pt-br', 'en'
    */
-  private async changeSiteLanguage(langCode: string): Promise<void> {
+  async changeSiteLanguage(langCode: string): Promise<void> {
     const languageOption = `.e2e-test-i18n-language-${langCode} a`;
 
     if (this.isViewportAtMobileWidth()) {
@@ -1904,6 +1965,9 @@ export class LoggedOutUser extends BaseUser {
         throw error;
       }
     }
+    await this.page.waitForSelector(conversationSkinUserAvatar, {
+      hidden: true,
+    });
   }
 
   /**
@@ -2267,11 +2331,7 @@ export class LoggedOutUser extends BaseUser {
             title.click(),
           ]);
 
-          const isLoginPromptContainerPresent =
-            await this.page.$(loginPromptContainer);
-          if (isLoginPromptContainerPresent) {
-            await this.clickOn('SKIP');
-          }
+          await this.skipLoginPrompt();
 
           await this.page.waitForSelector(chapterTitleSelector);
           const chapterTitles = await this.page.$$(chapterTitleSelector);
@@ -2309,17 +2369,13 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Selects and plays a chapter when in a story.
+   * Selects and plays a chapter by it's name/title when inside a story.
    * @param {string} chapterName - The name of the chapter to play.
    */
   async selectAndPlayChapter(chapterName: string): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     try {
-      const isLoginPromptContainerPresent =
-        await this.page.$(loginPromptContainer);
-      if (isLoginPromptContainerPresent) {
-        await this.clickOn('SKIP');
-      }
+      await this.skipLoginPrompt();
       await this.page.waitForSelector(chapterTitleSelector);
       const chapterTitles = await this.page.$$(chapterTitleSelector);
       for (const chapter of chapterTitles) {
@@ -2344,6 +2400,19 @@ export class LoggedOutUser extends BaseUser {
       const newError = new Error(`Failed to play chapter: ${error}`);
       newError.stack = error.stack;
       throw newError;
+    }
+  }
+
+  /**
+   * Function to skip the login prompt that appears while surfing being logged out.
+   */
+  async skipLoginPrompt(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+
+    const isLoginPromptContainerPresent =
+      await this.page.$(loginPromptContainer);
+    if (isLoginPromptContainerPresent) {
+      await this.clickOn('SKIP');
     }
   }
 
@@ -2605,7 +2674,8 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Shares the exploration.
-   * @param {string} platform - The platform to share the exploration on.
+   * @param {string} platform - The platform to share the exploration on. This should be the name of the platform (e.g., 'facebook', 'twitter')
+   * @param {string} expectedUrl - The expected URL of the shared exploration.
    */
   async shareExploration(platform: string, expectedUrl: string): Promise<void> {
     await this.clickOn(shareExplorationButtonSelector);
@@ -2800,7 +2870,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the current card's content matches the expected content.
    * @param {string} expectedCardContent - The expected content of the card.
    */
-  async expectCardContentToBe(expectedCardContent: string): Promise<void> {
+  async expectCardContentToMatch(expectedCardContent: string): Promise<void> {
     await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(`${stateConversationContent} p`, {
       visible: true,
@@ -2820,7 +2890,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Simulates a delay to avoid triggering the fatigue detection service.
-   * This is important because the fatigue detection service could be activated again after further submissions.
+   * This is important because the fatigue detection service could be activated again after further submissions. It can by-passed if there is 10 seconds of gap post quick 3 submissions.
    * @returns {Promise<void>}
    */
   async simulateDelayToAvoidFatigueDetection(): Promise<void> {
@@ -2843,8 +2913,465 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectSignInButtonToBePresent(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
-    await this.page.waitForSelector(signInButton, {timeout: 5000});
+    try {
+      await this.page.waitForSelector(signInButton, {timeout: 5000});
+    } catch (error) {
+      try {
+        await this.page.waitForSelector(singInButtonInProgressModal, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        throw new Error('Sign-in button not found.');
+      }
+    }
     showMessage('Sign-in button present.');
+  }
+
+  /**
+   * Opens the lesson info modal.
+   */
+  async openLessonInfoModal(): Promise<void> {
+    await this.clickOn(lessonInfoButton);
+    await this.page.waitForSelector(lessonInfoCardSelector, {visible: true});
+  }
+
+  /**
+   * Closes the lesson info modal.
+   */
+  async closeLessonInfoModal(): Promise<void> {
+    await this.clickOn(closeLessonInfoButton);
+    await this.page.waitForSelector(lessonInfoCardSelector, {hidden: true});
+  }
+
+  /**
+   * Checks if the progress remainder is found or not, based on the shouldBeFound parameter. (It can be found when the an already played exploration is revisited or an ongoing exploration is reloaded, but only if the first checkpoint is reached.)
+   * @param {boolean} shouldBeFound - Whether the progress remainder should be found or not.
+   */
+  async expectProgressRemainder(shouldBeFound: boolean): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    try {
+      await this.page.waitForSelector(progressRemainderModalSelector, {
+        visible: true,
+      });
+      if (!shouldBeFound) {
+        throw new Error('Progress remainder is found, which is not expected.');
+      }
+      showMessage('Progress reminder modal found.');
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        // Closing checkpoint modal if appears.
+        const closeLessonInfoTooltipElement = await this.page.$(
+          closeLessonInfoTooltipSelector
+        );
+        if (closeLessonInfoTooltipElement) {
+          await this.clickOn(closeLessonInfoTooltipSelector);
+        }
+        if (shouldBeFound) {
+          throw new Error(
+            'Progress remainder is not found, which is not expected.'
+          );
+        }
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
+   * Chooses an action in the progress remainder.
+   * @param {string} action - The action to choose. Can be 'Restart' or 'Resume'.
+   */
+  async chooseActionInProgressRemainder(
+    action: 'Restart' | 'Resume'
+  ): Promise<void> {
+    await this.page.waitForSelector(progressRemainderModalSelector, {
+      visible: true,
+    });
+    await this.page.waitForSelector(restartExplorationButton, {visible: true});
+    await this.page.waitForSelector(resumeExplorationButton, {visible: true});
+
+    if (action === 'Restart') {
+      await this.clickAndWaitForNavigation(restartExplorationButton);
+    } else if (action === 'Resume') {
+      await this.clickOn(resumeExplorationButton);
+      // Closing checkpoint modal if appears.
+      const closeLessonInfoTooltipElement = await this.page.$(
+        closeLessonInfoTooltipSelector
+      );
+      if (closeLessonInfoTooltipElement) {
+        await this.clickOn(closeLessonInfoTooltipSelector);
+      }
+    } else {
+      throw new Error(
+        `Invalid action: ${action}. Expected 'Restart' or 'Resume'.`
+      );
+    }
+  }
+
+  /**
+   * Saves the progress.(To be used when save progress modal is opened.)
+   */
+  async saveProgress(): Promise<void> {
+    await this.clickOn(saveProgressButton);
+  }
+
+  /**
+   * Checks if the "Create Account" button is present in the save progress modal (which can be opened from the lesson info modal once first checkpoint is reached).
+   */
+  async expectCreateAccountToBePresent(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(createAccountButton, {timeout: 3000});
+    showMessage('Create Account button is present.');
+  }
+
+  /**
+   * Checks if the progress URL validity info matches the expected text. (To be used when save progress modal is opened.)
+   * @param {string} expectedText - The expected validity info text.
+   */
+  async checkProgressUrlValidityInfo(expectedText: string): Promise<void> {
+    const validityInfoText = await this.page.evaluate(selector => {
+      const element = document.querySelector(selector);
+      return element ? element.textContent.trim() : null;
+    }, validityInfoTextSelector);
+
+    if (validityInfoText !== expectedText) {
+      throw new Error(
+        `Validity info text does not match expected text. Found: ${validityInfoText}, Expected: ${expectedText}`
+      );
+    }
+  }
+
+  /**
+   * Copies the progress URL to the clipboard and returns the copied text. (To be used when save progress modal is opened.)
+   */
+  async copyProgressUrl(): Promise<string> {
+    try {
+      // OverridePermissions is used to allow clipboard access.
+      const context = await this.page.browser().defaultBrowserContext();
+      await context.overridePermissions('http://localhost:8181', [
+        'clipboard-read',
+        'clipboard-write',
+      ]);
+
+      // Click on the copy button.
+      await this.page.waitForSelector(copyProgressUrlButton, {visible: true});
+      await this.page.click(copyProgressUrlButton);
+
+      // Reading the clipboard data.
+      const clipboardData = await this.page.evaluate(async () => {
+        return await navigator.clipboard.readText();
+      });
+
+      return clipboardData;
+    } catch (error) {
+      console.error('An error occurred:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Starts an exploration with a progress URL.
+   * @param {string} progressUrl - The URL to navigate to.
+   */
+  async startExplorationUsingProgressUrl(progressUrl: string): Promise<void> {
+    await this.goto(progressUrl);
+  }
+
+  /**
+   * Checks if the lesson info shows the expected rating.
+   * @param {string} expectedRating - The expected rating.
+   */
+  async expectLessonInfoToShowRating(expectedRating: string): Promise<void> {
+    await this.page.waitForSelector(ratingContainerSelector);
+    const ratingText = await this.page.evaluate(selector => {
+      const element = document.querySelector(selector);
+      return element ? element.textContent.trim() : null;
+    }, ratingContainerSelector);
+
+    if (ratingText !== expectedRating) {
+      throw new Error(
+        `Rating text does not match expected rating. Found: ${ratingText}, Expected: ${expectedRating}`
+      );
+    }
+  }
+
+  /**
+   * Checks if the lesson info shows the expected number of views.
+   * @param {number} expectedViews - The expected number of views.
+   */
+  async expectLessonInfoToShowNoOfViews(expectedViews: number): Promise<void> {
+    await this.page.waitForSelector(viewsContainerSelector);
+    const viewsText = await this.page.evaluate(selector => {
+      const element = document.querySelector(selector);
+      const textContent = element ? element.textContent : null;
+      const match = textContent ? textContent.match(/\d+/) : null;
+      return match ? parseInt(match[0], 10) : null;
+    }, viewsContainerSelector);
+
+    if (viewsText !== expectedViews) {
+      throw new Error(
+        `Number of views does not match expected number. Found: ${viewsText}, Expected: ${expectedViews}`
+      );
+    }
+  }
+
+  /**
+   * Checks if the lesson info shows the last updated information.
+   */
+  async expectLessonInfoToShowLastUpdated(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(lastUpdatedInfoSelector, {timeout: 3000});
+    showMessage('Last updated info is present.');
+  }
+
+  /**
+   * Checks if the lesson info shows the expected tags.
+   * @param {string[]} expectedTags - The expected tags.
+   */
+  async expectLessonInfoToShowTags(expectedTags: string[]): Promise<void> {
+    await this.page.waitForSelector(tagsContainerSelector);
+    const tags = await this.page.$$eval(
+      `${tagsContainerSelector}`,
+      emElements => {
+        return emElements.map(em => em.textContent?.trim());
+      }
+    );
+
+    for (const tag of expectedTags) {
+      if (!tags.includes(tag)) {
+        throw new Error(`Tag ${tag} not found.`);
+      }
+    }
+  }
+
+  /**
+   * Checks if the "Save Progress" button is not present. Use this function before the first checkpoint is
+   * reached.
+   */
+  async expectNoSaveProgressBeforeCheckpointInfo(): Promise<void> {
+    try {
+      await this.page.waitForSelector(saveProgressButton, {timeout: 3000});
+      throw new Error('"Save Progress" button found, which is not expected.');
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        showMessage('"save Progress" button not found, as expected.');
+      }
+    }
+  }
+
+  /**
+   * Shares the exploration.
+   * @param {string} platform - The platform to share the exploration on. This should be the name of the platform (e.g., 'facebook', 'twitter')
+   * @param {string} expectedUrl - The expected URL of the shared exploration.
+   */
+  async shareExplorationFromLessonInfoModal(
+    platform: string,
+    expectedUrl: string
+  ): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(
+      `.e2e-test-share-link-${platform.toLowerCase()}`,
+      {visible: true}
+    );
+    const aTag = await this.page.$(
+      `.e2e-test-share-link-${platform.toLowerCase()}`
+    );
+    if (!aTag) {
+      throw new Error(`No share link found for ${platform}.`);
+    }
+    const href = await this.page.evaluate(a => a.href, aTag);
+    if (href !== expectedUrl) {
+      throw new Error(
+        `The ${platform} share link does not match the expected URL. Expected: ${expectedUrl}, Found: ${href}`
+      );
+    }
+  }
+
+  /**
+   * Signs up a new user from the lesson player.
+   * @param email - User's email
+   * @param username - User's chosen username
+   */
+  async signUpFromTheLessonPlayer(
+    email: string,
+    username: string
+  ): Promise<void> {
+    await this.clickOn('Sign in');
+    await this.type(testConstants.SignInDetails.inputField, email);
+    await this.clickOn('Sign In');
+    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+    await this.type('input.e2e-test-username-input', username);
+    await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
+    await this.page.waitForSelector(
+      'button.e2e-test-register-user:not([disabled])'
+    );
+    await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
+    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+  }
+
+  /**
+   * Checks if the page's language matches the expected language.
+   * @param {string} expectedLanguage - The expected language of the page.
+   */
+  async expectPageLanguageToMatch(expectedLanguage: string): Promise<void> {
+    // Get the 'lang' attribute from the <html> tag.
+    await this.waitForStaticAssetsToLoad();
+
+    const actualLanguage = await this.page.evaluate(
+      () => document.documentElement.lang
+    );
+
+    if (actualLanguage !== expectedLanguage) {
+      throw new Error(
+        `Expected page language to be ${expectedLanguage}, but it was ${actualLanguage}`
+      );
+    }
+    showMessage('Page language matches the expected one.');
+  }
+
+  /**
+   * Checks if the navbar buttons' text matches any of the expected text.
+   * @param {string[]} expectedText - The expected text for each navbar button.
+   */
+  async expectNavbarButtonsToHaveText(expectedText: string[]): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(openMobileNavbarMenuButton);
+    }
+
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const navbarButtonsSelector = isMobileViewport
+      ? mobileNavbarButtonSelector
+      : desktopNavbarButtonsSelector;
+
+    // Get the text content of all navbar buttons.
+    await this.page.waitForSelector(navbarButtonsSelector, {visible: true});
+    const navbarButtonsText = await this.page.evaluate(selector => {
+      return Array.from(document.querySelectorAll(selector), element =>
+        element.textContent.trim()
+      );
+    }, navbarButtonsSelector);
+
+    // Check if any of the navbar buttons' text matches the expected text.
+    const isMatchFound = expectedText.some(text =>
+      navbarButtonsText.includes(text)
+    );
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(closeMobileNavbarMenuButton, {
+        visible: true,
+      });
+      const closeMobileNavbarMenuButtonElement = await this.page.$(
+        closeMobileNavbarMenuButton
+      );
+      if (closeMobileNavbarMenuButtonElement) {
+        await closeMobileNavbarMenuButtonElement.click();
+      }
+    }
+
+    if (!isMatchFound) {
+      throw new Error(
+        `None of the navbar buttons' text matches the expected text: ${expectedText}`
+      );
+    }
+  }
+
+  /**
+   * Simulates pressing a keyboard shortcut.
+   * @param {string} shortcut - The keyboard shortcut to press.
+   */
+  async simulateKeyboardShortcut(shortcut: string): Promise<void> {
+    const keys: KeyInput[] = shortcut.split('+') as KeyInput[];
+
+    // Press down all keys.
+    for (const key of keys) {
+      await this.page.keyboard.down(key);
+    }
+
+    // Release all keys.
+    for (const key of keys) {
+      await this.page.keyboard.up(key);
+    }
+
+    try {
+      await this.page.waitForNavigation({
+        waitUntil: ['load', 'networkidle0'],
+        timeout: 5000,
+      });
+    } catch (error) {
+      // Ignoring the error if it's a timeout error.
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        // Navigation didn't happen, but that's okay as sometimes the shortcuts may not trigger navigation.
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
+   * Verifies that the current page URL includes the expected page pathname.
+   */
+  async expectToBeOnPage(expectedPage: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    const url = await this.page.url();
+
+    // Replace spaces in the expectedPage with hyphens.
+    const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
+
+    if (!url.includes(expectedPageInUrl.toLowerCase())) {
+      throw new Error(
+        `Expected to be on page ${expectedPage}, but found ${url}`
+      );
+    }
+  }
+
+  /**
+   * Simulates pressing a keyboard shortcut and verifies that the expected element is focused.
+   * @param {string} shortcut - The keyboard shortcut to press.
+   */
+  async verifyFocusAfterShortcut(shortcut: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.simulateKeyboardShortcut(shortcut);
+
+    // Determine the expected element to be focused.
+    let expectedFocusedElement;
+    switch (shortcut) {
+      case '/':
+        expectedFocusedElement = await this.page.$(searchInputSelector);
+        break;
+      case 's':
+        expectedFocusedElement = await this.page.$(skipLinkSelector);
+        break;
+      case 'c':
+        expectedFocusedElement = await this.page.$(
+          categoryFilterDropdownToggler
+        );
+        break;
+      case 'j':
+        expectedFocusedElement = await this.page.$(
+          `:is(${nextCardArrowButton}, ${nextCardButton})`
+        );
+        break;
+      case 'k':
+        expectedFocusedElement = await this.page.$(previousCardButton);
+        break;
+      default:
+        throw new Error(`Unsupported shortcut: ${shortcut}`);
+    }
+
+    // Check if the expected element is focused.
+    const isExpectedElementFocused = await this.page.evaluate(
+      element => document.activeElement === element,
+      expectedFocusedElement
+    );
+
+    if (!isExpectedElementFocused) {
+      throw new Error(
+        `Expected element is not focused after pressing ${shortcut}`
+      );
+    }
+
+    // Remove focus from the focused element.
+    await this.page.evaluate(element => element.blur(), expectedFocusedElement);
   }
 }
 
