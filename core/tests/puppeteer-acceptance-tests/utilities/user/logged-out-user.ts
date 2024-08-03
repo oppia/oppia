@@ -34,7 +34,7 @@ const recentlyPublishedExplorationsPageUrl =
 const splashPageUrl = testConstants.URLs.splash;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
-const classroomsPage = testConstants.URLs.ClassroomsPage;
+const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const desktopWatchAVideoUrl = testConstants.URLs.DesktopExternalLinkWatchAVideo;
 const donateUrl = testConstants.URLs.Donate;
 const electromagnetismUrl = testConstants.URLs.Electromagnetism;
@@ -72,6 +72,9 @@ const volunteerUrl = testConstants.URLs.Volunteer;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
 const impactReportUrl = testConstants.URLs.ImpactReportUrl;
 
+const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
+const navbarLearnTabBasicMathematicsButton =
+  'a.e2e-test-basic-mathematics-link';
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
 const navbarAboutTabTeachButton = 'a.e2e-test-navbar-about-menu-teach-button';
@@ -117,6 +120,8 @@ const thanksForDonatingClass = '.modal-open';
 const donatePage = '.donate-content-container';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
+const mobileSidebarBasicMathematicsButton =
+  'a.e2e-mobile-test-mathematics-link';
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
 const mobileSidebarTeachButton = 'a.e2e-mobile-test-sidebar-teach-button';
 const mobileSidebarImpactReportButton =
@@ -401,17 +406,17 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the classroom page.
    */
   async navigateToClassroomPage(urlFragment: string): Promise<void> {
-    await this.goto(`${classroomsPage}/${urlFragment}`);
+    await this.goto(`${classroomsPageUrl}/${urlFragment}`);
   }
 
   /**
    * Function to navigate to the classrooms page.
    */
-  async navigateToClassroomsPage(): Promise<void> {
-    if (this.page.url() === classroomsPage) {
+  async navigateToClassroomsPageUrl(): Promise<void> {
+    if (this.page.url() === classroomsPageUrl) {
       await this.page.reload();
     }
-    await this.goto(classroomsPage);
+    await this.goto(classroomsPageUrl);
   }
 
   /**
@@ -486,6 +491,30 @@ export class LoggedOutUser extends BaseUser {
       )
       .toBe(expectedDestinationPageUrl);
     await newTabPage?.close();
+  }
+
+  /**
+   * Function to click the Basic Mathematics button in the Learn Menu on navbar
+   * and check if it opens the Math Classroom page.
+   */
+  async clickBasicMathematicsButtonInLearnMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarBasicMathematicsButton,
+        'Basic Mathematics button in the Learn Menu on navbar',
+        mathClassroomUrl,
+        'Math Classroom'
+      );
+    } else {
+      await this.clickOn(navbarLearnTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarLearnTabBasicMathematicsButton,
+        'Basic Mathematics button in the Learn Menu on navbar',
+        mathClassroomUrl,
+        'Math Classroom'
+      );
+    }
   }
 
   /**
@@ -1290,14 +1319,14 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to click the Browse Our Lessons button in the Teach page
-   * and check if it opens the Math Classroom page.
+   * and check if it opens the classrooms page.
    */
   async clickExploreLessonsButtonInTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       exploreLessonsButtonInTeachPage,
       'Explore Lessons button',
-      mathClassroomUrl,
-      'Math Classroom'
+      classroomsPageUrl,
+      'Classrooms page'
     );
   }
 
@@ -1879,7 +1908,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * This function verifies that the classroom cards in classrooms page.
    */
-  async expectClassroomCountInClassroomsPageToBe(
+  async expectClassroomCountInClassroomsPageUrlToBe(
     classroomsCount: number
   ): Promise<void> {
     await this.page.waitForSelector(classroomTileContainer);

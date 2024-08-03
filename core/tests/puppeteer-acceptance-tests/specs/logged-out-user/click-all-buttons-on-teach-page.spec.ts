@@ -43,7 +43,7 @@ describe('Logged-out User in Teach page', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should open the Math Classroom page when "Explore Lessons" button is clicked',
+    'should open the classrooms page when "Explore Lessons" button is clicked',
     async function () {
       await loggedOutUser.clickExploreLessonsButtonInTeachPage();
     },
