@@ -3981,12 +3981,12 @@ class State(translation_domain.BaseTranslatableObject):
 
     def update_inapplicable_skill_misconception_ids(
             self,
-            inapplicable_skill_misconception_ids: List[str]
+            inapplicable_skill_misconception_ids: Optional[List[str]]
     ) -> None:
         """Update the inapplicable skill misconception ids attribute.
 
         Args:
-            inapplicable_skill_misconception_ids: List[str]. The
+            inapplicable_skill_misconception_ids: List[str]|None. The
                 list of inapplicable skill misconception ids for state.
         """
         self.inapplicable_skill_misconception_ids = list(
