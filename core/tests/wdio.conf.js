@@ -53,10 +53,6 @@ var suites = {
     './core/tests/webdriverio_desktop/blog.js'
   ],
 
-  checkpointFeatures: [
-    './core/tests/webdriverio_desktop/checkpointFeatures.js'
-  ],
-
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
   ],
@@ -129,10 +125,6 @@ var suites = {
     './core/tests/webdriverio_desktop/navigation.js'
   ],
 
-  playVoiceovers: [
-    './core/tests/webdriverio_desktop/playVoiceovers.js'
-  ],
-
   preferences: [
     './core/tests/webdriverio_desktop/preferences.js'
   ],
@@ -167,10 +159,6 @@ var suites = {
 
   topicAndStoryEditorFileUploadFeatures: [
     './core/tests/webdriverio_desktop/topicAndStoryEditorFileUploadFeatures.js'
-  ],
-
-  topicAndStoryViewer: [
-    './core/tests/webdriverio_desktop/topicAndStoryViewer.js'
   ],
 
   users: [

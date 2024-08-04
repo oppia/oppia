@@ -858,7 +858,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 }
             },
             'solicit_answer_details': False,
-            'card_is_checkpoint': False
+            'card_is_checkpoint': False,
+            'inapplicable_skill_misconception_ids': None
         }
         self.assertEqual(expected_dict, state_dict)
 
@@ -1430,6 +1431,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'card_is_checkpoint': False,
             'linked_skill_id': None,
             'classifier_model_id': None,
+            'inapplicable_skill_misconception_ids': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_old_math_schema],
                 'default_outcome': {
@@ -1500,6 +1502,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'card_is_checkpoint': False,
             'linked_skill_id': None,
             'classifier_model_id': None,
+            'inapplicable_skill_misconception_ids': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_new_math_schema],
                 'default_outcome': {
@@ -1697,6 +1700,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'card_is_checkpoint': False,
             'linked_skill_id': None,
             'classifier_model_id': None,
+            'inapplicable_skill_misconception_ids': None,
             'interaction': {
                 'solution': {
                     'answer_is_exclusive': True,
@@ -1758,6 +1762,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -1901,6 +1906,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -1967,6 +1973,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2077,6 +2084,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -2196,6 +2204,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -2297,6 +2306,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': old_solution_dict,
@@ -2390,6 +2400,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -2436,6 +2447,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
