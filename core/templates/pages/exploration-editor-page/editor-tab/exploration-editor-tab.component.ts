@@ -359,10 +359,6 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     this.misconceptionsBySkill = {};
     this.skillBackendApiService.fetchSkillAsync(skillId).then(
       skillResponse => {
-        const skillMisconceptions = skillResponse.skill.getMisconceptions();
-        this.stateEditorService.setMisconceptionsBySkill({
-          [skillId]: skillMisconceptions,
-        });
         this.misconceptionsBySkill[skillResponse.skill.getId()] =
           skillResponse.skill.getMisconceptions();
         this.stateEditorService.setMisconceptionsBySkill(
@@ -384,7 +380,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     this.stateEditorService.setInQuestionMode(false);
 
     let stateData = this.explorationStatesService.getState(this.stateName);
-    if (stateData.linkedSkillId) {
+    if (stateData && stateData.linkedSkillId) {
       this.populateMisconceptionsForState(stateData.linkedSkillId);
     }
 
