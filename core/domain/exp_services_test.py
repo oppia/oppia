@@ -4531,7 +4531,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             })], 'Add state name')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
-            exploration.states['State1'].inapplicable_skill_misconception_ids, None)
+            exploration.states['State1'].inapplicable_skill_misconception_ids,
+            None
+        )
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 'State1',
@@ -4540,7 +4542,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             '')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
-            exploration.states['State1'].inapplicable_skill_misconception_ids, ['string_1'])
+            exploration.states['State1'].inapplicable_skill_misconception_ids,
+            ['string_1']
+        )
 
         # Check that the property can be changed when working
         # on old version.
@@ -4569,7 +4573,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             exploration.init_state.content.html,
             '<p><strong>Test content</strong></p>')
         self.assertEqual(
-            exploration.states['State1'].inapplicable_skill_misconception_ids, 'string_2')
+            exploration.states['State1'].inapplicable_skill_misconception_ids,
+            ['string_2']
+        )
 
     def test_update_card_is_checkpoint(self) -> None:
         """Test updating of card_is_checkpoint."""
