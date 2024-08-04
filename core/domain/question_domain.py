@@ -1814,6 +1814,26 @@ class Question(translation_domain.BaseTranslatableObject):
         return states_dict['question_state'], next_content_id_index
 
     @classmethod
+    def _convert_state_v55_dict_to_v56_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
+        """Converts from version 55 to 56. Version 56 adds a field for
+        inapplicable skill misconception IDs for the exploration.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+
+        question_state_dict['inapplicable_skill_misconception_ids'] = None
+
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
         cls,
         versioned_question_state: VersionedQuestionStateDict,

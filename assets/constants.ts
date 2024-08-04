@@ -6287,6 +6287,7 @@ export default {
       "html": "",
       "content_id": "content"
     },
+    "inapplicable_skill_misconception_ids": null,
     "interaction": {
       "id": null,
       "customization_args": {},
