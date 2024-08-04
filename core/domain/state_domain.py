@@ -3779,8 +3779,9 @@ class State(translation_domain.BaseTranslatableObject):
         if self.inapplicable_skill_misconception_ids is not None:
             if not isinstance(self.inapplicable_skill_misconception_ids, list):
                 raise utils.ValidationError(
-                    'Expected inapplicable_skill_misconception_ids to be a list, '
-                    'received %s.' % self.inapplicable_skill_misconception_ids)
+                    'Expected inapplicable_skill_misconception_ids to be a '
+                    'list, received %s.'
+                    % self.inapplicable_skill_misconception_ids)
 
     def is_rte_content_supported_on_android(self) -> bool:
         """Checks whether the RTE components used in the state are supported by
@@ -3985,8 +3986,8 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the inapplicable skill misconception ids attribute.
 
         Args:
-            inapplicable_skill_misconception_ids: List[str]|None. The
-            list of inapplicable skill misconception ids for state.
+            inapplicable_skill_misconception_ids: List[str]. The
+                list of inapplicable skill misconception ids for state.
         """
         self.inapplicable_skill_misconception_ids = list(
             set(inapplicable_skill_misconception_ids))

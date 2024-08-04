@@ -628,7 +628,9 @@ class EditExpStatePropertyLinkedSkillIdCmd(ExplorationChange):
     old_value: str
 
 
-class EditExpStatePropertyInapplicableSkillMisconceptionIdsCmd(ExplorationChange):
+class EditExpStatePropertyInapplicableSkillMisconceptionIdsCmd(
+    ExplorationChange
+):
     """Class representing the ExplorationChange's
     CMD_EDIT_STATE_PROPERTY command with
     STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS
