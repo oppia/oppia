@@ -79,7 +79,7 @@ _PARSER.add_argument(
     action='store_true'
 )
 _PARSER.add_argument(
-    '--run_on_changed_files',
+    '--run_on_changed_files_in_branch',
     help='optional; if specified, runs the frontend karma tests on the '
     'files that were changed in the current branch.',
     action='store_true'
@@ -188,7 +188,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             if spec_file:
                 specs_to_run.add(spec_file)
 
-    if parsed_args.run_on_changed_files:
+    if parsed_args.run_on_changed_files_in_branch:
         remote = git_changes_utils.get_local_git_repository_remote_name()
         if not remote:
             sys.exit('Error: No remote repository found.')
@@ -213,7 +213,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             if spec_file:
                 specs_to_run.add(spec_file)
 
-    if parsed_args.specs_to_run or parsed_args.run_on_changed_files:
+    if parsed_args.specs_to_run or parsed_args.run_on_changed_files_in_branch:
         if len(specs_to_run) == 0:
             print('No valid specs found to run.')
             exit_code = 0 if parsed_args.allow_no_spec else 1
