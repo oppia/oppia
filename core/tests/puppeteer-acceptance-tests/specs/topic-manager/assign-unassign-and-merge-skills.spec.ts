@@ -52,7 +52,7 @@ describe('Topic Manager', function () {
     'should be able to assign and unassign a skill to a topic and merge skills',
     async function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.navigateToSkillTab();
+      await topicManager.navigateToSkillsTab();
 
       // The skill is unassigned first because it was previously assigned during the setup phase in the beforeAll block.
       await topicManager.unassignSkillFromTopic('Addition', 'Mathematics');
