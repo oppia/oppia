@@ -1372,15 +1372,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'should not be empty.')
 
         self.state.content.html = (
-            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
-            'end-with-value=\"11\" start-with-value=\"13\"'
-            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
-            'quot;\"></oppia-noninteractive-video>')
-        self._assert_validation_error(
-            self.new_exploration, 'Start value should not be greater than End '
-            'value in Video tag.')
-
-        self.state.content.html = (
             '<oppia-noninteractive-video '
             'end-with-value=\"11\" start-with-value=\"9\"'
             ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'

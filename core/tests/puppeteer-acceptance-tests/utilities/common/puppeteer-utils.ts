@@ -121,7 +121,7 @@ export class BaseUser {
               'Mobile/15A372 Safari/604.1'
           );
         } else {
-          this.page.setViewport({width: 1200, height: 800});
+          this.page.setViewport({width: 1920, height: 1080});
         }
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
@@ -138,7 +138,7 @@ export class BaseUser {
   }
 
   /**
-   * Checks if the application is in development mode.
+   * Checks if the application is in production mode.
    * @returns {Promise<boolean>} Returns true if the application is in development mode,
    * false otherwise.
    */
@@ -247,7 +247,8 @@ export class BaseUser {
    * Function to reload the current page.
    */
   async reloadPage(): Promise<void> {
-    await this.page.reload({waitUntil: ['networkidle0', 'domcontentloaded']});
+    await this.page.waitForNetworkIdle();
+    await this.page.reload({waitUntil: ['networkidle0', 'load']});
   }
 
   /**
@@ -357,19 +358,6 @@ export class BaseUser {
         this.page.click(selector),
       ]);
     }
-  }
-
-  /**
-   * This function retrieves the text content of a specified element.
-   */
-  async getElementText(selector: string): Promise<string> {
-    await this.page.waitForSelector(selector);
-    const element = await this.page.$(selector);
-    if (element === null) {
-      throw new Error(`No element found for the selector: ${selector}`);
-    }
-    const textContent = await this.page.evaluate(el => el.textContent, element);
-    return textContent ?? '';
   }
 
   /**
@@ -529,10 +517,101 @@ export class BaseUser {
   }
 
   /**
-   * Waits for the page to fully load by checking the document's ready state.
+   * Checks if an element is visible on the page.
+   */
+  async isElementVisible(selector: string): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(selector, {visible: true, timeout: 3000});
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Waits for the static assets on the page to load.
+   */
+  async waitForStaticAssetsToLoad(): Promise<void> {
+    await this.page.waitForFunction('document.readyState === "complete"');
+  }
+
+  /**
+   * Waits for the page to fully load by checking the document's ready state and waiting for the respective
+   * HTML to load completely.
+   *
+   * Caution: Using this function multiple times in the same test can increase the test execution time,
+   * as it waits for the page to fully load.
    */
   async waitForPageToFullyLoad(): Promise<void> {
     await this.page.waitForFunction('document.readyState === "complete"');
+    await this.waitTillHTMLRendered(this.page);
+  }
+
+  /**
+   * This function waits until a page is fully rendered.
+   * It does so via checking every second if the size of the HTML content of the page is stable.
+   * If the size is stable for at least 3 checks, it considers the page fully rendered.
+   * If the size is not stable within the timeout, it stops checking.
+   * @param {Page} page - The page to wait for.
+   * @param {number} timeout - The maximum amount of time to wait, in milliseconds. Default is 30000.
+   */
+  private async waitTillHTMLRendered(
+    page: Page,
+    timeout: number = 30000
+  ): Promise<void> {
+    const checkDurationMsecs = 1000;
+    const maxChecks = timeout / checkDurationMsecs;
+    let lastHTMLSize = 0;
+    let checkCounts = 1;
+    let countStableSizeIterations = 0;
+    const minStableSizeIterations = 3;
+
+    while (checkCounts++ <= maxChecks) {
+      let html = await page.content();
+      let currentHTMLSize = html.length;
+
+      if (lastHTMLSize !== 0 && currentHTMLSize === lastHTMLSize) {
+        countStableSizeIterations++;
+      } else {
+        countStableSizeIterations = 0;
+      }
+      if (countStableSizeIterations >= minStableSizeIterations) {
+        showMessage('Page rendered fully.');
+        break;
+      }
+
+      lastHTMLSize = currentHTMLSize;
+      await page.waitForTimeout(checkDurationMsecs);
+    }
+  }
+
+  /**
+   * Function to click an anchor tag and check if it opens the expected destination
+   * in a new tab. Closes the tab afterwards.
+   */
+  async clickLinkAnchorToNewTab(
+    anchorInnerText: string,
+    expectedDestinationPageUrl: string
+  ): Promise<void> {
+    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
+    const pageTarget = this.page.target();
+    await this.clickOn(anchorInnerText);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
+    await newTabPage?.close();
+  }
+
+  /**
+   * Creates a new tab in the browser and switches to it.
+   */
+  async createAndSwitchToNewTab(): Promise<puppeteer.Page> {
+    const newPage = await this.browserObject.newPage();
+    await newPage.bringToFront();
+    return newPage;
   }
 }
 
