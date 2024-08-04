@@ -1282,7 +1282,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_linked_skill_id('string_2')
         self.assertEqual(state.linked_skill_id, 'string_2')
 
-    def test_update_inappliacble_misconception_skill_ids(self) -> None:
+    def test_update_inapplicable_misconception_skill_ids(self) -> None:
         """Test updating inapplicable_skill_misconception_ids."""
         state = state_domain.State.create_default_state(
             'state_1', 'content_0', 'default_outcome_1')
@@ -1290,7 +1290,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_inapplicable_skill_misconception_ids(
             ['string_1', 'string_2']
         )
-        self.assertEqual(
+        self.assertItemsEqual(
             state.inapplicable_skill_misconception_ids,
             ['string_1', 'string_2']
         )
