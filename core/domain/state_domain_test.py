@@ -2839,8 +2839,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.inapplicable_skill_misconception_ids, None)
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected inapplicable_skill_misconception_ids '
-            'to be a list, received 12.'):
+            utils.ValidationError, 'Expected '
+            'inapplicable_skill_misconception_ids to be a list, received 12.'):
             with self.swap(
                 init_state, 'inapplicable_skill_misconception_ids', 12
             ):
