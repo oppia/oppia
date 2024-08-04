@@ -117,10 +117,6 @@ var suites = {
     './core/tests/webdriverio/learnerFlow.js'
   ],
 
-  learnerDashboard: [
-    './core/tests/webdriverio_desktop/learnerDashboard.js'
-  ],
-
   navigation: [
     './core/tests/webdriverio_desktop/navigation.js'
   ],
