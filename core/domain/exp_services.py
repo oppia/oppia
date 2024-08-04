@@ -562,7 +562,7 @@ def apply_change_list(
                     # EditExpStatePropertyInapplicableSkillMisconceptionIdsCmd.
                     edit_inapplicable_skill_misconception_ids = cast(
                         exp_domain.
-                        EditExpStatePropertyInapplicableSkillMisconceptionIdsCmd,
+                        EditExpStatePropertyInapplicableSkillMisconceptionIdsCmd, # pylint: disable=line-too-long
                         change
                     )
                     state.update_inapplicable_skill_misconception_ids(
