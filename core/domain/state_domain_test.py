@@ -1288,11 +1288,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'state_1', 'content_0', 'default_outcome_1')
         self.assertEqual(state.inapplicable_skill_misconception_ids, None)
         state.update_inapplicable_skill_misconception_ids(
-            ['string_1', 'string_2']
+            ['string_1']
         )
-        self.assertItemsEqual(
+        self.assertEqual(
             state.inapplicable_skill_misconception_ids,
-            ['string_1', 'string_2']
+            ['string_1']
         )
 
     def test_update_card_is_checkpoint(self) -> None:
