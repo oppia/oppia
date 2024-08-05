@@ -68,6 +68,9 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
       () => {
         this.storyUrlFragmentExists =
           this.storyEditorStateService.getStoryWithUrlFragmentExists();
+      },
+      () => {
+        return;
       }
     );
   }
