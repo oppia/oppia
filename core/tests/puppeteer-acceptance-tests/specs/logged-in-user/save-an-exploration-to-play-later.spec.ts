@@ -58,25 +58,33 @@ describe('Logged-in User', function () {
       // Add a lesson to 'play later'.
       await loggedInUser.addLessonToPlayLater('Positive Numbers');
       await loggedInUser.expectToolTipMessage(
-        'Successfully to your "Play Later" list.'
+        "Successfully added to your 'Play Later' list."
       );
 
-      // The exploration has a single state.
-      await loggedInUser.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
+      // Add a lesson to 'play later'.
+      await loggedInUser.addLessonToPlayLater('Negative Numbers');
+      await loggedInUser.expectToolTipMessage(
+        "Successfully added to your 'Play Later' list."
       );
 
       // Navigate to the learner dashboard and play the lesson.
       await loggedInUser.navigateToLearnerDashboardPage();
-      await loggedInUser.navigateToCommunityLessonsTab();
+      await loggedInUser.navigateToCommunityLessonsSection();
       await loggedInUser.verifyLessonPresenceInPlayLater(
         'Positive Numbers',
         true
       );
       await loggedInUser.playLessonFromDashboard('Positive Numbers');
 
-      // Navigate back to the learner dashboard and remove the lesson form play later.
+      // The exploration has a single state.
+      await loggedInUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
+
+      // Navigate back to the learner dashboard and remove the lesson from play later.
       await loggedInUser.navigateToLearnerDashboardPage();
+      await loggedInUser.navigateToCommunityLessonsSection();
+
       // Since the exploration played, it should have been automatically removed from the "play later" list.
       await loggedInUser.verifyLessonPresenceInPlayLater(
         'Positive Numbers',
@@ -84,7 +92,7 @@ describe('Logged-in User', function () {
       );
 
       // Removing a lesson from play later list.
-      await loggedInUser.removeLessonFromPlayLater('Positive Numbers');
+      await loggedInUser.removeLessonFromPlayLater('Negative Numbers');
       await loggedInUser.verifyLessonPresenceInPlayLater(
         'Positive Numbers',
         false

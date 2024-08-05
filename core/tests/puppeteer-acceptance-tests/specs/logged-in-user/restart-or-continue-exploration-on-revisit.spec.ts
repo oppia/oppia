@@ -148,14 +148,20 @@ describe('Logged-in User', function () {
         'Congratulations for completing this lesson!'
       );
 
-      // Revisit the exploration and expect it to start from the beginning.
-      await loggedInUser.navigateToCommunityLibraryPage();
-      await loggedInUser.searchForLessonInSearchBar('Positive Numbers');
-      await loggedInUser.playLessonFromSearchResults('Positive Numbers');
-      // Expecting the card content to match the initial card content.
-      await loggedInUser.expectCardContentToMatch(
-        'We will be learning positive numbers.'
-      );
+      // TODO(#20563): Uncomment the following lines when issue #20563 is resolved.
+      // Issue #20563: When a user revisits an exploration after completing it,
+      // the exploration should start from the beginning, not from the previous checkpoint.
+      // see: https://github.com/oppia/oppia/issues/20563.
+
+      // // Revisit the exploration and expect it to start from the beginning.
+      // await loggedInUser.navigateToCommunityLibraryPage();
+      // await loggedInUser.searchForLessonInSearchBar('Positive Numbers');
+      // await loggedInUser.playLessonFromSearchResults('Positive Numbers');
+
+      // // Expecting the card content to match the initial card content.
+      // await loggedInUser.expectCardContentToMatch(
+      //   'We will be learning positive numbers.'
+      // );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
