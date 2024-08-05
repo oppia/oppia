@@ -447,6 +447,10 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  /**
+   * Function to play a specific lesson from the community library tab in learner dashboard.
+   * @param {string} lessonName - The name of the lesson to be played.
+   */
   async playLessonFromDashboard(lessonName: string): Promise<void> {
     try {
       await this.page.waitForSelector(lessonCardTitleSelector);
@@ -474,6 +478,7 @@ export class LoggedInUser extends BaseUser {
       throw newError;
     }
   }
+
   /**
    * Removes a lesson from the 'Play Later' list in the learner dashboard.
    * @param {string} lessonName - The name of the lesson to remove from the 'Play Later' list.
@@ -495,7 +500,7 @@ export class LoggedInUser extends BaseUser {
         );
       }
 
-      // Scroll to the element before hovering.
+      // Scroll to the element before hovering so the remove button could be visible.
       await this.page.evaluate(
         el => el.scrollIntoView(),
         lessonCards[lessonIndex]
