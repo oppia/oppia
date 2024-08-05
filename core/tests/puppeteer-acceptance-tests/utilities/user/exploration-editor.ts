@@ -16,6 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
+import puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -34,7 +35,6 @@ const saveChangesButton = 'button.e2e-test-save-changes';
 const mathInteractionsTab = '.e2e-test-interaction-tab-math';
 const closeResponseModalButton = '.e2e-test-close-add-response-modal';
 
-// Settings Tab elements.
 const settingsTab = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
 const explorationTitleSelector = '.e2e-test-exploration-title-input';
@@ -114,8 +114,7 @@ const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
 const addHintButton = 'button.e2e-test-oppia-add-hint-button';
 const saveHintButton = 'button.e2e-test-save-hint';
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
-const solutionInput =
-  'oppia-add-or-update-solution-modal textarea.e2e-test-description-box';
+const solutionInput = 'oppia-add-or-update-solution-modal input';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 
 const dismissTranslationWelcomeModalSelector =
@@ -143,7 +142,6 @@ const modalSaveButton = '.e2e-test-save-button';
 const modifyTranslationsModalDoneButton =
   '.e2e-test-modify-translations-done-button';
 
-// For mobile.
 const mobileSettingsBar = 'li.e2e-test-mobile-settings-button';
 const mobileChangesDropdown = 'div.e2e-test-mobile-changes-dropdown';
 const mobileSaveChangesButton =
@@ -165,8 +163,8 @@ const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
 const explorationControlsSettingsDropdown =
   'h3.e2e-test-controls-bar-settings-container';
 
-// Preview tab elements.
 const nextCardButton = '.e2e-test-next-card-button';
+const nextCardArrowButton = '.e2e-test-next-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const previewRestartButton = '.e2e-test-preview-restart-button';
 const stateConversationContent = '.e2e-test-conversation-content';
@@ -177,7 +175,17 @@ const subscriberTabButton = '.e2e-test-subscription-tab';
 const subscriberCard = '.e2e-test-subscription-card';
 const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
 const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
+const destinationSelectorDropdown = '.e2e-test-destination-selector-dropdown';
+const destinationWhenStuckSelectorDropdown =
+  '.e2e-test-destination-when-stuck-selector-dropdown';
+const addDestinationStateWhenStuckInput = '.protractor-test-add-state-input';
+const outcomeDestWhenStuckSelector =
+  '.protractor-test-open-outcome-dest-if-stuck-editor';
+const intEditorField = '.e2e-test-editor-int';
+const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
+const tagsField = '.e2e-test-chip-list-tags';
 
+const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to creator dashboard page.
@@ -246,12 +254,13 @@ export class ExplorationEditor extends BaseUser {
    * This is a composite function that can be used when a straightforward, simple exploration published is required.
    * @param {string} title - The title of the exploration.
    * @param {string} goal - The goal of the exploration.
-   * @param {string} category - The category of the exploration.
+   * @param {string} category - The category of the exploration.,
    */
   async publishExplorationWithMetadata(
     title: string,
     goal: string,
-    category: string
+    category: string,
+    tags?: string
   ): Promise<string | null> {
     if (this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(toastMessage, {
@@ -271,6 +280,9 @@ export class ExplorationEditor extends BaseUser {
     await this.type(explorationGoalInput, `${goal}`);
     await this.clickOn(explorationCategoryDropdown);
     await this.clickOn(`${category}`);
+    if (tags) {
+      await this.type(tagsField, tags);
+    }
     await this.clickOn(saveExplorationChangesButton);
     await this.clickOn(explorationConfirmPublishButton);
     await this.page.waitForSelector(explorationIdElement);
@@ -301,17 +313,22 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to dismiss welcome modal.
+   * Function to dismiss exploration editor welcome modal.
    */
   async dismissWelcomeModal(): Promise<void> {
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      visible: true,
-    });
-    await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      hidden: true,
-    });
-    showMessage('Tutorial pop-up closed successfully.');
+    try {
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+      await this.clickOn(dismissWelcomeModalSelector);
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        hidden: true,
+      });
+      showMessage('Tutorial pop-up closed successfully.');
+    } catch (error) {
+      showMessage(`welcome modal not found: ${error.message}`);
+    }
   }
 
   /**
@@ -424,9 +441,15 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
+    showMessage(`${interactionToAdd} interaction has been added successfully.`);
+  }
+
+  /**
+   * Function to close the interaction's response modal.
+   */
+  async closeInteractionResponseModal(): Promise<void> {
     await this.page.waitForSelector(closeResponseModalButton, {visible: true});
     await this.clickOn(closeResponseModalButton);
-    showMessage(`${interactionToAdd} interaction has been added successfully.`);
   }
 
   /**
@@ -939,7 +962,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} destination - The destination state for the response.
    * @param {boolean} responseIsCorrect - Whether the response is marked as correct.
    */
-  async addResponseToTheInteraction(
+  async addResponsesToTheInteraction(
     interactionType: string,
     answer: string,
     feedback: string,
@@ -980,6 +1003,10 @@ export class ExplorationEditor extends BaseUser {
         await this.page.waitForSelector(textInputInteractionOption);
         await this.page.type(textInputInteractionOption, answer);
         break;
+      case 'Fraction Input':
+        await this.clearAllTextFrom(intEditorField);
+        await this.type(intEditorField, answer);
+        break;
       // Add cases for other interaction types here
       // case 'otherInteractionType':
       //   await this.type(otherFormInput, answer);
@@ -1005,15 +1032,36 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to add feedback for default responses of a state interaction.
    * @param {string} defaultResponseFeedback - The feedback for the default responses.
+   * @param {string} [directToCard] - The card to direct to (optional).
+   * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
    */
   async editDefaultResponseFeedback(
-    defaultResponseFeedback: string
+    defaultResponseFeedback?: string,
+    directToCard?: string,
+    directToCardWhenStuck?: string
   ): Promise<void> {
     await this.clickOn(defaultFeedbackTab);
-    await this.clickOn(openOutcomeFeedBackEditor);
-    await this.clickOn(stateContentInputField);
-    await this.type(stateContentInputField, `${defaultResponseFeedback}`);
-    await this.clickOn(saveOutcomeFeedbackButton);
+
+    if (defaultResponseFeedback) {
+      await this.clickOn(openOutcomeFeedBackEditor);
+      await this.clickOn(stateContentInputField);
+      await this.type(stateContentInputField, `${defaultResponseFeedback}`);
+      await this.clickOn(saveOutcomeFeedbackButton);
+    }
+
+    if (directToCard) {
+      await this.clickOn(openOutcomeDestButton);
+      await this.page.select(destinationSelectorDropdown, directToCard);
+      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+    }
+
+    if (directToCardWhenStuck) {
+      await this.clickOn(outcomeDestWhenStuckSelector);
+      // The '4: /' value is used to select the 'a new card called' option in the dropdown.
+      await this.select(destinationWhenStuckSelectorDropdown, '4: /');
+      await this.type(addDestinationStateWhenStuckInput, directToCardWhenStuck);
+      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+    }
   }
 
   /**
@@ -1044,6 +1092,13 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(editStateSolutionExplanationSelector);
     await this.type(stateContentInputField, explanation);
     await this.clickOn(saveSolutionEditButton);
+  }
+
+  /**
+   * Sets a state as a checkpoint in the exploration.
+   */
+  async setTheStateAsCheckpoint(): Promise<void> {
+    await this.clickOn(setAsCheckpointButton);
   }
 
   /**
@@ -1151,7 +1206,16 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the next card in the preview tab.
    */
   async continueToNextCard(): Promise<void> {
-    await this.clickOn(nextCardButton);
+    try {
+      await this.page.waitForSelector(nextCardButton, {timeout: 7000});
+      await this.clickOn(nextCardButton);
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        await this.clickOn(nextCardArrowButton);
+      } else {
+        throw error;
+      }
+    }
   }
 
   /**
@@ -1235,7 +1299,8 @@ export class ExplorationEditor extends BaseUser {
    * Function for creating an exploration with only EndExploration interaction with given title.
    */
   async createAndPublishAMinimalExplorationWithTitle(
-    title: string
+    title: string,
+    category: string = 'Algebra'
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
@@ -1248,7 +1313,7 @@ export class ExplorationEditor extends BaseUser {
     return await this.publishExplorationWithMetadata(
       title,
       'This is Goal here.',
-      'Algebra'
+      category
     );
   }
 

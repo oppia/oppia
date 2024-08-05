@@ -115,6 +115,15 @@ export class VoiceoverCardComponent implements OnInit {
         }
       )
     );
+    this.voiceoversAreLoaded =
+      Object.keys(
+        this.entityVoiceoversService.languageAccentCodeToEntityVoiceovers
+      ).length !== 0;
+    this.directiveSubscriptions.add(
+      this.entityVoiceoversService.onVoiceoverLoad.subscribe(() => {
+        this.voiceoversAreLoaded = true;
+      })
+    );
 
     setInterval(() => {
       if (
@@ -174,7 +183,6 @@ export class VoiceoverCardComponent implements OnInit {
   }
 
   updateActiveContent(): void {
-    this.voiceoversAreLoaded = false;
     this.activeContentId =
       this.translationTabActiveContentIdService.getActiveContentId() as string;
 
@@ -190,7 +198,6 @@ export class VoiceoverCardComponent implements OnInit {
         languageAccentCode
       );
     }
-    this.voiceoversAreLoaded = true;
   }
 
   updateLanguageCode(): void {
@@ -214,10 +221,6 @@ export class VoiceoverCardComponent implements OnInit {
           this.updateStatusGraph();
         }
       });
-    } else if (this.languageCode !== newLanguageCode) {
-      this.localStorageService.setLastSelectedLanguageAccentCode('');
-      this.languageAccentCode = '';
-      this.languageAccentCodeIsSelected = false;
     }
 
     this.languageCode = newLanguageCode;

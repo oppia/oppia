@@ -11,7 +11,7 @@
   </div>
   <div class="form-group oppia-form-group">
     <span>
-      <select class="form-control oppia-form-control"
+      <select class="form-control oppia-form-control e2e-test-destination-when-stuck-selector-dropdown"
               [(ngModel)]="outcome.destIfReallyStuck"
               (ngModelChange)="onDestIfStuckSelectorChange()">
         <option *ngFor="let choice of destinationChoices" [ngValue]="choice.id">{{ choice.text }}</option>
