@@ -183,6 +183,7 @@ const outcomeDestWhenStuckSelector =
   '.protractor-test-open-outcome-dest-if-stuck-editor';
 const intEditorField = '.e2e-test-editor-int';
 const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
+const tagsField = '.e2e-test-chip-list-tags';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
@@ -258,7 +259,8 @@ export class ExplorationEditor extends BaseUser {
   async publishExplorationWithMetadata(
     title: string,
     goal: string,
-    category: string
+    category: string,
+    tags?: string
   ): Promise<string | null> {
     if (this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(toastMessage, {
@@ -278,6 +280,9 @@ export class ExplorationEditor extends BaseUser {
     await this.type(explorationGoalInput, `${goal}`);
     await this.clickOn(explorationCategoryDropdown);
     await this.clickOn(`${category}`);
+    if (tags) {
+      await this.type(tagsField, tags);
+    }
     await this.clickOn(saveExplorationChangesButton);
     await this.clickOn(explorationConfirmPublishButton);
     await this.page.waitForSelector(explorationIdElement);
