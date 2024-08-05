@@ -592,6 +592,25 @@ describe('Story Editor Component having three story nodes', () => {
     expect(component.storyUrlFragmentExists).toEqual(false);
   });
 
+  it(
+    'should not call the getStoryWithUrlFragmentExists if url fragment' +
+      'is not correct',
+    () => {
+      let storyUrlFragmentSpy = spyOn(
+        storyUpdateService,
+        'setStoryUrlFragment'
+      );
+      spyOn(
+        storyEditorStateService,
+        'updateExistenceOfStoryUrlFragment'
+      ).and.callFake((newUrlFragment, successCallback, errorCallback) =>
+        errorCallback()
+      );
+      component.updateStoryUrlFragment('story-url fragment');
+      expect(storyUrlFragmentSpy).not.toHaveBeenCalled();
+    }
+  );
+
   it('should update the existence of story url fragment', () => {
     let storyUpdateSpy = spyOn(
       storyEditorStateService,
