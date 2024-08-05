@@ -23,7 +23,7 @@ import sys
 
 from scripts import common
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
@@ -331,3 +331,58 @@ def get_js_or_ts_files_from_diff(diff_files: List[bytes]) -> List[str]:
         if file_path.endswith((b'.ts', b'.js')):
             js_or_ts_files.append(file_path.decode())
     return js_or_ts_files
+
+
+def get_python_dot_test_files_from_diff(diff_files: List[bytes]) -> Set[str]:
+    """Returns the list of Python test files from the diff in dot format.
+
+    Args:
+        diff_files: list(bytes). List of files changed.
+
+    Returns:
+        set(str). List of Python test files in dot format.
+    """
+    python_test_files: Set[str] = set()
+    for file_path in diff_files:
+        decoded_file_path = file_path.decode()
+        if not decoded_file_path.endswith('.py'):
+            continue
+        if decoded_file_path.endswith('_test.py'):
+            test_file_path = decoded_file_path
+        else:
+            test_file_path = decoded_file_path.replace('.py', '_test.py')
+        if os.path.exists(test_file_path):
+            python_test_files.add(
+                test_file_path.replace('.py', '').replace('/', '.')
+            )
+
+    return python_test_files
+
+
+def get_changed_python_test_files() -> Set[str]:
+    """Returns all of the Python test files that have been changed in the
+    current branch.
+
+    Returns:
+        set(str). The set of Python test files that have been changed.
+
+    Raises:
+        SystemExit. No remote repository found.
+    """
+    python_test_files: Set[str] = set()
+    remote = get_local_git_repository_remote_name()
+    if not remote:
+        sys.exit('Error: No remote repository found.')
+    refs = get_refs()
+    collected_files = get_changed_files(
+        refs, remote.decode('utf-8'))
+    for _, (_, acmrt_files) in collected_files.items():
+        if not acmrt_files:
+            continue
+
+        python_test_files.update(
+            get_python_dot_test_files_from_diff(acmrt_files))
+    staged_files = get_staged_acmrt_files()
+    python_test_files.update(
+        get_python_dot_test_files_from_diff(staged_files))
+    return python_test_files
