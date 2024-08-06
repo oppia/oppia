@@ -2421,6 +2421,9 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
+
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForNetworkIdle();
   }
 
   /**
@@ -2814,6 +2817,9 @@ export class TopicManager extends BaseUser {
       showMessage(
         `Chapter ${chapterName} is ${shouldExist ? 'found' : 'not found'} in story ${storyName}, as expected.`
       );
+
+      await this.waitForPageToFullyLoad();
+      await this.page.waitForNetworkIdle();
     } catch (error) {
       const newError = new Error(
         `Failed to verify chapter presence in story: ${error}`
