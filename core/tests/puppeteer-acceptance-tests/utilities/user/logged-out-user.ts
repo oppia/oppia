@@ -411,7 +411,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToClassroomsPage(): Promise<void> {
     if (this.page.url() === classroomsPage) {
-      await this.page.reload();
+      await this.reloadPage();
     }
     await this.goto(classroomsPage);
   }
@@ -1050,7 +1050,7 @@ export class LoggedOutUser extends BaseUser {
       this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
       this.clickOn('forum'),
     ]);
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
 
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
@@ -1320,7 +1320,7 @@ export class LoggedOutUser extends BaseUser {
       // This reload is required to ensure the language dropdown is visible in mobile view,
       // if the earlier movements of the page have hidden it and since the inbuilt
       // scrollIntoView function call of the clickOn function didn't work as expected.
-      await this.page.reload();
+      await this.reloadPage();
     }
     await this.page.waitForSelector(languageDropdown);
     const languageDropdownElement = await this.page.$(languageDropdown);
@@ -1329,7 +1329,7 @@ export class LoggedOutUser extends BaseUser {
     }
     await this.clickOn(languageOption);
     // Here we need to reload the page again to confirm the language change.
-    await this.page.reload();
+    await this.reloadPage();
   }
 
   /**
@@ -1679,7 +1679,7 @@ export class LoggedOutUser extends BaseUser {
     expectedActivityTitles: string[] = []
   ): Promise<void> {
     // Reloading to ensure the page is updated with the newly added/removed featured activities.
-    await this.page.reload({waitUntil: 'networkidle0'});
+    await this.reloadPage;
     const featuredActivities: {title: string}[] =
       (await this.viewAllFeaturedActivities()) as {title: string}[];
 

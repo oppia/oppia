@@ -221,7 +221,7 @@ export class TopicManager extends BaseUser {
    */
   async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
     await this.page.bringToFront();
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
     await this.goto(topicAndSkillsDashboardUrl);
   }
 
@@ -2421,14 +2421,11 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
-
-    await this.waitForPageToFullyLoad();
-    await this.page.waitForNetworkIdle();
+    await this.createAndSwitchToNewTab();
   }
 
   /**
    * Opens the story editor for a given story and topic.
-   *
    * @param {string} storyName - The name of the story.
    * @param {string} topicName - The name of the topic.
    */
@@ -2818,8 +2815,8 @@ export class TopicManager extends BaseUser {
         `Chapter ${chapterName} is ${shouldExist ? 'found' : 'not found'} in story ${storyName}, as expected.`
       );
 
-      await this.waitForPageToFullyLoad();
-      await this.page.waitForNetworkIdle();
+      await this.waitForNetworkIdle({});
+      await this.createAndSwitchToNewTab();
     } catch (error) {
       const newError = new Error(
         `Failed to verify chapter presence in story: ${error}`
