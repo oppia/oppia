@@ -6893,6 +6893,7 @@ export default {
     "SKILL_EDITOR": {
       "ROUTE": "skill_editor/:skill_id",
       "TITLE": "Skill Editor",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
