@@ -94,6 +94,7 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the community library tab of the learner dashboard.
    */
   async navigateToCommunityLessonsSection(): Promise<void> {
+    await this.waitForPageToFullyLoad();
     if (await this.isViewportAtMobileWidth()) {
       await this.clickOn(progressSectionButton);
 
