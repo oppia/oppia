@@ -38,6 +38,7 @@ from typing import ContextManager, Deque, Dict, Iterator, List, Tuple, Union
 from . import build
 from . import common
 from . import install_python_dev_dependencies
+from . import install_third_party_libs
 from . import scripts_test_utils
 from . import servers
 
@@ -902,132 +903,70 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_build_with_prod_env(self) -> None:
-        check_function_calls = {
-            'build_using_webpack_gets_called': False,
-            'ensure_files_exist_gets_called': False,
-            'modify_constants_gets_called': False,
-            'compare_file_count_gets_called': False,
-            'generate_python_package_called': False,
-            'clean_gets_called': False,
-        }
-        expected_check_function_calls = {
-            'build_using_webpack_gets_called': True,
-            'ensure_files_exist_gets_called': True,
-            'modify_constants_gets_called': True,
-            'compare_file_count_gets_called': True,
-            'generate_python_package_called': True,
-            'clean_gets_called': True,
-        }
-
-        expected_config_path = build.WEBPACK_PROD_CONFIG
-
-        def mock_build_using_webpack(config_path: str) -> None:
-            self.assertEqual(config_path, expected_config_path)
-            check_function_calls['build_using_webpack_gets_called'] = True
-
-        def mock_ensure_files_exist(unused_filepaths: List[str]) -> None:
-            check_function_calls['ensure_files_exist_gets_called'] = True
-
-        def mock_modify_constants(
-            prod_env: bool,  # pylint: disable=unused-argument
-            emulator_mode: bool,  # pylint: disable=unused-argument
-            maintenance_mode: bool  # pylint: disable=unused-argument
-        ) -> None:  # pylint: disable=unused-argument
-            check_function_calls['modify_constants_gets_called'] = True
-
-        def mock_compare_file_count(
-            unused_first_dir: str,
-            unused_second_dir: str
-        ) -> None:
-            check_function_calls['compare_file_count_gets_called'] = True
-
-        def mock_generate_python_package() -> None:
-            check_function_calls['generate_python_package_called'] = True
-
-        def mock_clean() -> None:
-            check_function_calls['clean_gets_called'] = True
-
         ensure_files_exist_swap = self.swap(
-            build, '_ensure_files_exist', mock_ensure_files_exist)
-        build_using_webpack_swap = self.swap(
-            build, 'build_using_webpack', mock_build_using_webpack)
-        modify_constants_swap = self.swap(
-            common, 'modify_constants', mock_modify_constants)
-        compare_file_count_swap = self.swap(
-            build, '_compare_file_count', mock_compare_file_count)
-        generate_python_package_swap = self.swap(
-            build, 'generate_python_package', mock_generate_python_package)
-        clean_swap = self.swap(build, 'clean', mock_clean)
+            build, '_ensure_files_exist', lambda _: None)
+        build_using_webpack_swap = self.swap_with_checks(
+            build, 'build_using_webpack', lambda _: None,
+            expected_args=[(build.WEBPACK_PROD_CONFIG,)])
+        build_using_ng_swap = self.swap_with_checks(
+            build, 'build_using_ng', lambda: None, expected_args=[()])
+        modify_constants_swap = self.swap_with_checks(
+            common, 'modify_constants', lambda **_: None,
+            expected_kwargs=[
+                {
+                    'prod_env': True,
+                    'emulator_mode': True,
+                    'maintenance_mode': False
+                }
+            ])
+        generate_python_package_swap = self.swap_with_checks(
+            build, 'generate_python_package', lambda: None,
+            expected_args=[()])
+        clean_swap = self.swap_with_checks(
+            build, 'clean', lambda: None, expected_args=[()])
 
         with ensure_files_exist_swap, build_using_webpack_swap, clean_swap:
-            with modify_constants_swap, compare_file_count_swap:
+            with modify_constants_swap, build_using_ng_swap:
                 with generate_python_package_swap:
                     build.main(args=['--prod_env'])
 
-        self.assertEqual(check_function_calls, expected_check_function_calls)
-
     def test_build_with_prod_source_maps(self) -> None:
-        check_function_calls = {
-            'build_using_webpack_gets_called': False,
-            'ensure_files_exist_gets_called': False,
-            'modify_constants_gets_called': False,
-            'compare_file_count_gets_called': False,
-            'clean_gets_called': False,
-        }
-        expected_check_function_calls = {
-            'build_using_webpack_gets_called': True,
-            'ensure_files_exist_gets_called': True,
-            'modify_constants_gets_called': True,
-            'compare_file_count_gets_called': True,
-            'clean_gets_called': True,
-        }
-
-        expected_config_path = build.WEBPACK_PROD_SOURCE_MAPS_CONFIG
-
-        def mock_build_using_webpack(config_path: str) -> None:
-            self.assertEqual(config_path, expected_config_path)
-            check_function_calls['build_using_webpack_gets_called'] = True
-
-        def mock_ensure_files_exist(unused_filepaths: List[str]) -> None:
-            check_function_calls['ensure_files_exist_gets_called'] = True
-
-        def mock_modify_constants(
-            prod_env: bool,  # pylint: disable=unused-argument
-            emulator_mode: bool,  # pylint: disable=unused-argument
-            maintenance_mode: bool  # pylint: disable=unused-argument
-        ) -> None:
-            check_function_calls['modify_constants_gets_called'] = True
-
-        def mock_compare_file_count(
-            unused_first_dir: str, unused_second_dir: str
-        ) -> None:
-            check_function_calls['compare_file_count_gets_called'] = True
-
-        def mock_clean() -> None:
-            check_function_calls['clean_gets_called'] = True
-
         ensure_files_exist_swap = self.swap(
-            build, '_ensure_files_exist', mock_ensure_files_exist)
-        build_using_webpack_swap = self.swap(
-            build, 'build_using_webpack', mock_build_using_webpack)
-        modify_constants_swap = self.swap(
-            common, 'modify_constants', mock_modify_constants)
+            build, '_ensure_files_exist', lambda _: None)
+        build_using_webpack_swap = self.swap_with_checks(
+            build, 'build_using_webpack', lambda _: None,
+            expected_args=[(build.WEBPACK_PROD_SOURCE_MAPS_CONFIG,)])
+        build_using_ng_swap = self.swap_with_checks(
+            build, 'build_using_ng', lambda: None, expected_args=[()])
+        modify_constants_swap = self.swap_with_checks(
+            common, 'modify_constants', lambda **_: None,
+            expected_kwargs=[
+                {
+                    'prod_env': True,
+                    'emulator_mode': True,
+                    'maintenance_mode': False
+                }
+            ])
         compare_file_count_swap = self.swap(
-            build, '_compare_file_count', mock_compare_file_count)
-        clean_swap = self.swap(build, 'clean', mock_clean)
+            build, '_compare_file_count', lambda *_: None)
+        clean_swap = self.swap_with_checks(
+            build, 'clean', lambda: None, expected_args=[()])
         install_python_dev_dependencies_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'main',
             lambda _: None,
-            expected_args=[(['--uninstall'],)]
-        )
+            expected_args=[(['--uninstall'],)])
+        install_third_party_libs_swap = self.swap_with_checks(
+            install_third_party_libs,
+            'main',
+            lambda: None,
+            expected_args=[()])
 
         with ensure_files_exist_swap, build_using_webpack_swap:
             with modify_constants_swap, compare_file_count_swap:
                 with clean_swap, install_python_dev_dependencies_swap:
-                    build.main(args=['--prod_env', '--source_maps'])
-
-        self.assertEqual(check_function_calls, expected_check_function_calls)
+                    with build_using_ng_swap, install_third_party_libs_swap:
+                        build.main(args=['--prod_env', '--source_maps'])
 
     def test_build_with_watcher(self) -> None:
         check_function_calls = {
@@ -1184,6 +1123,54 @@ class BuildTests(test_utils.GenericTestBase):
             ):
                 build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
 
+    def test_build_using_ng_command(self) -> None:
+
+        @contextlib.contextmanager
+        def mock_managed_ng_build(
+            use_prod_env: bool, watch_mode: bool # pylint: disable=unused-argument
+        ) -> Iterator[scripts_test_utils.PopenStub]:
+            yield scripts_test_utils.PopenStub()
+
+        def mock_get_file_count(unused_path: str) -> int:
+            return 1
+
+        ng_build_swap = self.swap_with_checks(
+            servers, 'managed_ng_build', mock_managed_ng_build,
+            expected_kwargs=[{'use_prod_env': True, 'watch_mode': False}])
+        get_file_count_swap = self.swap_with_checks(
+            build, 'get_file_count', mock_get_file_count,
+            expected_args=[('dist/oppia-angular-prod',)])
+
+        with ng_build_swap, get_file_count_swap:
+            build.build_using_ng()
+
+    def test_build_using_ng_command_with_incorrect_filecount_fails(
+        self
+    ) -> None:
+
+        @contextlib.contextmanager
+        def mock_managed_ng_build(
+            use_prod_env: bool, watch_mode: bool # pylint: disable=unused-argument
+        ) -> Iterator[scripts_test_utils.PopenStub]:
+            yield scripts_test_utils.PopenStub()
+
+        def mock_get_file_count(unused_path: str) -> int:
+            return 0
+
+        ng_build_swap = self.swap_with_checks(
+            servers, 'managed_ng_build', mock_managed_ng_build,
+            expected_kwargs=[{'use_prod_env': True, 'watch_mode': False}])
+        get_file_count_swap = self.swap_with_checks(
+            build, 'get_file_count', mock_get_file_count,
+            expected_args=[('dist/oppia-angular-prod',)])
+
+        with ng_build_swap, get_file_count_swap:
+            with self.assertRaisesRegex(
+                AssertionError,
+                'angular generated bundle should be non-empty'
+            ):
+                build.build_using_ng()
+
 
 class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
     """Test the end to end build methods."""
@@ -1249,6 +1236,9 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
             build, 'main', lambda *_, **__: None,
             expected_kwargs=[{'args': []}]))
         self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'run_ng_compilation', lambda: None,
+            expected_args=[()]))
+        self.exit_stack.enter_context(self.swap_with_checks(
             os.path, 'isdir', mock_os_path_isdir))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, called=False))
@@ -1263,6 +1253,9 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'main', lambda *_, **__: None,
             expected_kwargs=[{'args': []}]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'run_ng_compilation', lambda: None,
+            expected_args=[()]))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None,
             expected_args=[
@@ -1307,6 +1300,9 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'main', lambda *_, **__: None,
             expected_kwargs=[{'args': []}]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'run_ng_compilation', lambda: None,
+            expected_args=[()]))
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'run_webpack_compilation', lambda **_: None,
             expected_kwargs=[{'source_maps': True}]))
