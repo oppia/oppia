@@ -427,7 +427,11 @@ export class LoggedInUser extends BaseUser {
           mobileLessonCardOptionsDropdownButton
         );
         await optionsDropdownButtons[lessonIndex].click();
-        await this.clickOn(mobileAddToPlayLaterButton);
+        await this.page.waitForSelector(mobileAddToPlayLaterButton);
+        const mobileAddToPlayLaterButtons = await this.page.$$(
+          mobileAddToPlayLaterButton
+        );
+        await mobileAddToPlayLaterButtons[lessonIndex].click();
       } else {
         await this.page.waitForSelector(desktopAddToPlayLaterButton);
         const addToPlayLaterButtons = await this.page.$$(
@@ -464,6 +468,7 @@ export class LoggedInUser extends BaseUser {
           `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
         );
       }
+      await this.page.waitForSelector(toastMessageSelector, {hidden: true});
     } catch (error) {
       const newError = new Error(`Failed to match toast message: ${error}`);
       newError.stack = error.stack;
@@ -593,13 +598,6 @@ export class LoggedInUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
-  }
-
-  async timeout(time) {
-    await this.page.waitForTimeout(time);
-  }
-  async screenshot(path) {
-    await this.page.screenshot({path: `${path}`});
   }
 }
 

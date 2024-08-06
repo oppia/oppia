@@ -52,17 +52,16 @@ describe('Logged-in User', function () {
   it(
     'should be able to add an exploration to play later, play it from the learner dashboard, and then remove it.',
     async function () {
-      // Navigate to the community library page.
       await loggedInUser.navigateToCommunityLibraryPage();
 
       // Add a lesson to 'play later'.
-      await loggedInUser.addLessonToPlayLater('Positive Numbers');
+      await loggedInUser.addLessonToPlayLater('Negative Numbers');
       await loggedInUser.expectToolTipMessage(
         "Successfully added to your 'Play Later' list."
       );
 
       // Add a lesson to 'play later'.
-      await loggedInUser.addLessonToPlayLater('Negative Numbers');
+      await loggedInUser.addLessonToPlayLater('Positive Numbers');
       await loggedInUser.expectToolTipMessage(
         "Successfully added to your 'Play Later' list."
       );
