@@ -1221,6 +1221,10 @@ URLS.extend((
     get_redirect_route(
         r'%s/<author_username>' % feconf.BLOG_AUTHOR_PROFILE_PAGE_URL_PREFIX,
         oppia_root.OppiaRootPage
+    ),
+    get_redirect_route(
+        r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
+        oppia_root.OppiaRootPage
     )
 ))
 
