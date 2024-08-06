@@ -6690,6 +6690,7 @@ export default {
     "STORY_EDITOR": {
       "ROUTE": "story_editor/:story_id",
       "TITLE": "Story Editor Page",
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
