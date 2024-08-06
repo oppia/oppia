@@ -85,6 +85,7 @@ export default {
       'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform' +
       '?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp',
     PartnershipsFormShortUrl: 'https://forms.gle/Y71U8FdhQwZpicJj8',
+    PendingAccountDeletion: 'http://localhost:8181/pending-account-deletion',
     PrivacyPolicy: 'http://localhost:8181/privacy-policy',
     ReleaseCoordinator: 'http://localhost:8181/release-coordinator',
     splash: 'http://localhost:8181/splash',
@@ -98,6 +99,9 @@ export default {
       'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
     VolunteerFormShortUrl: 'https://forms.gle/rhFYoLLSFr3JEZHy8',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
+    WikiPrivilegesToFirebaseAccount:
+      'https://github.com/oppia/oppia/wiki/#2-add-custom-claims-to-a-firebase-account',
+    Preferences: 'http://localhost:8181/preferences',
     ProfilePagePrefix: 'http://localhost:8181/profile',
     OppiaAnnounceGoogleGroup: 'https://groups.google.com/g/oppia-announce',
     GoogleGroups: {

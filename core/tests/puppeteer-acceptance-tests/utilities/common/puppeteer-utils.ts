@@ -138,7 +138,7 @@ export class BaseUser {
   }
 
   /**
-   * Checks if the application is in development mode.
+   * Checks if the application is in production mode.
    * @returns {Promise<boolean>} Returns true if the application is in development mode,
    * false otherwise.
    */
@@ -247,7 +247,8 @@ export class BaseUser {
    * Function to reload the current page.
    */
   async reloadPage(): Promise<void> {
-    await this.page.reload({waitUntil: ['networkidle0', 'domcontentloaded']});
+    await this.page.waitForNetworkIdle();
+    await this.page.reload({waitUntil: ['networkidle0', 'load']});
   }
 
   /**
@@ -512,6 +513,18 @@ export class BaseUser {
   }
 
   /**
+   * Checks if an element is visible on the page.
+   */
+  async isElementVisible(selector: string): Promise<boolean> {
+    try {
+      await this.page.waitForSelector(selector, {visible: true, timeout: 3000});
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * Waits for the static assets on the page to load.
    */
   async waitForStaticAssetsToLoad(): Promise<void> {
@@ -566,6 +579,35 @@ export class BaseUser {
       lastHTMLSize = currentHTMLSize;
       await page.waitForTimeout(checkDurationMsecs);
     }
+  }
+
+  /**
+   * Function to click an anchor tag and check if it opens the expected destination
+   * in a new tab. Closes the tab afterwards.
+   */
+  async clickLinkAnchorToNewTab(
+    anchorInnerText: string,
+    expectedDestinationPageUrl: string
+  ): Promise<void> {
+    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
+    const pageTarget = this.page.target();
+    await this.clickOn(anchorInnerText);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
+    await newTabPage?.close();
+  }
+
+  /**
+   * Creates a new tab in the browser and switches to it.
+   */
+  async createAndSwitchToNewTab(): Promise<puppeteer.Page> {
+    const newPage = await this.browserObject.newPage();
+    await newPage.bringToFront();
+    return newPage;
   }
 }
 
