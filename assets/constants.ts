@@ -26,10 +26,6 @@ export default {
   // Acceptable URL schemes for links.
   "ACCEPTABLE_SCHEMES": ["https", ""],
 
-  // The default classroom URL fragment to use when the provided classroom URL
-  // fragment in the controller is invalid.
-  "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",
-
   "FEATURED_TRANSLATION_LANGUAGES": [
     {
       "language_code": "pt",

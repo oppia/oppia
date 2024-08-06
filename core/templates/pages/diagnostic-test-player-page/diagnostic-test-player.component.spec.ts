@@ -320,6 +320,7 @@ describe('Diagnostic test player component', () => {
 
   it('should be able to get the topic URL from the URL fragment', () => {
     windowRef.nativeWindow.location.search = '?classroom=math';
+    component.classroomUrlFragment = 'math';
     let topicUrlFragment = 'subtraction';
 
     expect(component.getTopicUrlFromUrlFragment(topicUrlFragment)).toEqual(
