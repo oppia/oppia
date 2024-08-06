@@ -170,7 +170,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
   getTopicUrlFromUrlFragment(urlFragment: string): string {
     return this.urlInterpolationService.interpolateUrl(
-      '/learn/math/<topicUrlFragment>',
+      `/learn/${this.classroomUrlFragment}/<topicUrlFragment>`,
       {
         topicUrlFragment: urlFragment,
       }

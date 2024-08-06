@@ -146,7 +146,6 @@ describe('Teach Page', () => {
   it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
     expect(component.displayedTestimonialId).toBe(0);
-    expect(component.classroomUrl).toBe('/learn/math');
     spyOn(windowDimensionsService, 'isWindowNarrow').and.callThrough;
     expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
     expect(component.isWindowNarrow).toBe(true);

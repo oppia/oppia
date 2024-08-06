@@ -32,8 +32,6 @@ import {PageTitleService} from 'services/page-title.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
-import {AppConstants} from 'app.constants';
-
 class MockWindowRef {
   _window = {
     location: {
@@ -144,9 +142,7 @@ describe('Topic Landing Page', () => {
     tick(150);
     fixture.detectChanges();
 
-    expect(windowRef.nativeWindow.location.href).toBe(
-      `/learn/${AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT}`
-    );
+    expect(windowRef.nativeWindow.location.href).toBe('/learn');
   }));
 
   it('should return correct lesson quality image src', function () {

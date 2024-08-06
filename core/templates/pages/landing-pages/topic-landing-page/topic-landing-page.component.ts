@@ -30,8 +30,6 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {PageTitleService} from 'services/page-title.service';
 
-import {AppConstants} from 'app.constants';
-
 type TopicLandingPageDataKey =
   keyof typeof TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA;
 
@@ -187,7 +185,7 @@ export class TopicLandingPageComponent implements OnInit, OnDestroy {
 
   goToClassroom(): void {
     setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = `/learn/${AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT}`;
+      this.windowRef.nativeWindow.location.href = '/learn';
     }, 150);
   }
 
