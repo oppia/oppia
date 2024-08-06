@@ -845,7 +845,8 @@ export class TopicManager extends BaseUser {
         skillSelector,
         skillName
       ),
-      this.page.waitForNavigation(),
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
+      this.waitForStaticAssetsToLoad(),
     ]);
   }
 
@@ -2106,8 +2107,8 @@ export class TopicManager extends BaseUser {
   }
 
   private async openAllMobileDropdownsInSkillEditor(): Promise<void> {
-    await this.clickOn('Worked Examples');
     await this.clickOn('Misconceptions');
+    await this.clickOn('Worked Examples');
     await this.clickOn(' Prerequisite Skills ');
     await this.clickOn('Rubrics');
   }
