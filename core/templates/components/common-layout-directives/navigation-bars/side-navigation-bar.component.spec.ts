@@ -31,6 +31,7 @@ import {RouterModule} from '@angular/router';
 import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {SideNavigationBarComponent} from './side-navigation-bar.component';
 import {UserService} from 'services/user.service';
@@ -56,6 +57,7 @@ describe('Side Navigation Bar Component', () => {
   let currentUrl: string = '/test';
   let imageUrl: string = 'image_url';
   let mockWindowRef: MockWindowRef;
+  let siteAnalyticsService: SiteAnalyticsService;
   let sidebarStatusService: SidebarStatusService;
   let userService: UserService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -98,6 +100,7 @@ describe('Side Navigation Bar Component', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SideNavigationBarComponent);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     componentInstance = fixture.componentInstance;
     userService = TestBed.inject(UserService);
