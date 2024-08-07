@@ -83,7 +83,7 @@ from core.controllers import voiceover
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
-import google.cloud.logging
+import google
 from typing import Dict, Optional, Type, TypeVar
 import webapp2
 from webapp2_extras import routes
@@ -443,9 +443,10 @@ URLS = [
         r'/<story_url_fragment>' % feconf.REVIEW_TEST_DATA_URL_PREFIX,
         review_tests.ReviewTestsPageDataHandler),
     get_redirect_route(
-        r'%s/review-test/<story_url_fragment>'
-        % feconf.TOPIC_VIEWER_URL_PREFIX,
-        review_tests.ReviewTestsPage),
+        r'%s/can_access_review_tests_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>/<story_url_fragment>'
+        % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ReviewTestsPageAccessValidationHandler),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         r'/<story_url_fragment>' % feconf.STORY_DATA_HANDLER,
