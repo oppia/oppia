@@ -14,8 +14,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - uses: ./.github/actions/merge
-      
       - name: Set environment variables
         env:
           AUTHOR: ${{ github.event.pull_request.user.login }}
