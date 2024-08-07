@@ -1153,7 +1153,7 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_email_provider_error(self) -> None:
-        def raise_exception() -> None:
+        def raise_exception(*args, **kwargs: True) -> None:
             raise Exception('Backend error')
         swap_add_fn = self.swap(
             user_services, 'add_user_to_mailing_list', raise_exception)
@@ -1168,7 +1168,7 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
                     'email': 'email@example.com',
                     'tag': 'Web',
                     'name': 'Name'
-                }, csrf_token=csrf_token, expected_status_int=405)
+                }, csrf_token=csrf_token, expected_status_int=500)
 
         self.logout()
 
