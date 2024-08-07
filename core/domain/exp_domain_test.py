@@ -1372,15 +1372,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'should not be empty.')
 
         self.state.content.html = (
-            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
-            'end-with-value=\"11\" start-with-value=\"13\"'
-            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
-            'quot;\"></oppia-noninteractive-video>')
-        self._assert_validation_error(
-            self.new_exploration, 'Start value should not be greater than End '
-            'value in Video tag.')
-
-        self.state.content.html = (
             '<oppia-noninteractive-video '
             'end-with-value=\"11\" start-with-value=\"9\"'
             ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
@@ -4657,6 +4648,7 @@ states:
     content:
       content_id: content_0
       html: ''
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4683,6 +4675,7 @@ states:
     content:
       content_id: content_2
       html: ''
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4731,6 +4724,7 @@ states:
     content:
       content_id: content
       html: ''
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -4793,6 +4787,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4817,6 +4812,7 @@ states:
     content:
       content_id: content
       html: ''
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6837,7 +6833,156 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT: Final = YAML_CONTENT_V59
+    YAML_CONTENT_V61: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 61
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    inapplicable_skill_misconception_ids: null
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 6
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: (untitled state)
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    inapplicable_skill_misconception_ids: null
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    inapplicable_skill_misconception_ids: null
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+        catchMisspellings:
+          value: false
+      default_outcome:
+        dest: END
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 56
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT: Final = YAML_CONTENT_V61
 
     def test_load_from_v46_with_item_selection_input_interaction(self) -> None:
         """Tests the migration of ItemSelectionInput rule inputs."""
@@ -6979,6 +7124,7 @@ states:
     content:
       content_id: content_0
       html: ''
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -7040,6 +7186,7 @@ states:
     content:
       content_id: content_6
       html: <p>Congratulations, you have finished!</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -7215,6 +7362,7 @@ states:
     content:
       content_id: content_0
       html: ''
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -7286,6 +7434,7 @@ states:
     content:
       content_id: content_6
       html: <p>Congratulations, you have finished!</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -7422,6 +7571,7 @@ states:
     content:
       content_id: content_0
       html: ''
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -7452,6 +7602,7 @@ states:
     content:
       content_id: content_3
       html: <p>Congratulations, you have finished!</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -7608,6 +7759,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -7652,6 +7804,7 @@ states:
     content:
       content_id: content_3
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -7896,6 +8049,7 @@ states:
         alt-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
         caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
         filepath-with-value=\&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]"></oppia-noninteractive-tabs>     '
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -7926,6 +8080,7 @@ states:
     content:
       content_id: content_3
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -8089,6 +8244,7 @@ states:
     content:
       content_id: content_0
       html: <p>Continue and End interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -8124,6 +8280,7 @@ states:
     content:
       content_id: content_3
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -8261,6 +8418,7 @@ states:
     content:
       content_id: content_0
       html: <p>Continue and End interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -8291,6 +8449,7 @@ states:
     content:
       content_id: content_3
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -8646,6 +8805,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -8750,6 +8910,7 @@ states:
     content:
       content_id: content_6
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -9052,6 +9213,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -9164,6 +9326,7 @@ states:
     content:
       content_id: content_7
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -9335,6 +9498,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -9391,6 +9555,7 @@ states:
     content:
       content_id: content_4
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -9615,6 +9780,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -9683,6 +9849,7 @@ states:
     content:
       content_id: content_7
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -9902,6 +10069,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -9995,6 +10163,7 @@ states:
     content:
       content_id: content_9
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -10238,6 +10407,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -10301,6 +10471,7 @@ states:
     content:
       content_id: content_6
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -10487,6 +10658,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -10545,6 +10717,7 @@ states:
     content:
       content_id: content_7
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -10703,6 +10876,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -10756,6 +10930,7 @@ states:
     content:
       content_id: content_5
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -11030,6 +11205,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -11109,6 +11285,7 @@ states:
     content:
       content_id: content_8
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -11299,6 +11476,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -11375,6 +11553,7 @@ states:
     content:
       content_id: content_7
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -11572,6 +11751,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -11636,6 +11816,7 @@ states:
     content:
       content_id: content_6
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -11961,6 +12142,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -12097,6 +12279,7 @@ states:
     content:
       content_id: content_14
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -12253,6 +12436,7 @@ states:
     content:
       content_id: content_0
       html: <p>Numeric interaction validation</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -12307,6 +12491,7 @@ states:
     content:
       content_id: content_5
       html: <p>End interaction</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -12357,6 +12542,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 translation_domain.ContentType.DEFAULT_OUTCOME)
             return {
                 'linked_skill_id': None,
+                'inapplicable_skill_misconception_ids': None,
                 'classifier_model_id': None,
                 'content': {
                     'content_id': content_id_for_content,

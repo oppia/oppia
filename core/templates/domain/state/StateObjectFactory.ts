@@ -48,6 +48,7 @@ export interface StateBackendDict {
   card_is_checkpoint: boolean;
   // This property is null if no skill is linked to the State.
   linked_skill_id: string | null;
+  inapplicable_skill_misconception_ids: string[] | null;
 }
 
 export class State extends BaseTranslatableObject {
@@ -60,6 +61,7 @@ export class State extends BaseTranslatableObject {
   paramChanges: ParamChange[];
   solicitAnswerDetails: boolean;
   cardIsCheckpoint: boolean;
+  inapplicableSkillMisconceptionIds: string[] | null;
 
   constructor(
     name: string | null,
@@ -69,7 +71,8 @@ export class State extends BaseTranslatableObject {
     interaction: Interaction,
     paramChanges: ParamChange[],
     solicitAnswerDetails: boolean,
-    cardIsCheckpoint: boolean
+    cardIsCheckpoint: boolean,
+    inapplicableSkillMisconceptionIds: string[] | null
   ) {
     super();
     this.name = name;
@@ -80,6 +83,7 @@ export class State extends BaseTranslatableObject {
     this.paramChanges = paramChanges;
     this.solicitAnswerDetails = solicitAnswerDetails;
     this.cardIsCheckpoint = cardIsCheckpoint;
+    this.inapplicableSkillMisconceptionIds = inapplicableSkillMisconceptionIds;
   }
 
   getTranslatableFields(): SubtitledHtml[] {
@@ -105,6 +109,8 @@ export class State extends BaseTranslatableObject {
       }),
       solicit_answer_details: this.solicitAnswerDetails,
       card_is_checkpoint: this.cardIsCheckpoint,
+      inapplicable_skill_misconception_ids:
+        this.inapplicableSkillMisconceptionIds,
     };
   }
 
@@ -150,6 +156,8 @@ export class StateObjectFactory {
       param_changes: newStateTemplate.param_changes,
       solicit_answer_details: newStateTemplate.solicit_answer_details,
       card_is_checkpoint: newStateTemplate.card_is_checkpoint,
+      inapplicable_skill_misconception_ids:
+        newStateTemplate.inapplicable_skill_misconception_ids,
     });
     newState.content.contentId = contentIdForContent;
     let defaultOutcome = newState.interaction.defaultOutcome;
@@ -177,7 +185,8 @@ export class StateObjectFactory {
       this.interactionObject.createFromBackendDict(stateDict.interaction),
       this.paramchangesObject.createFromBackendList(stateDict.param_changes),
       stateDict.solicit_answer_details,
-      stateDict.card_is_checkpoint
+      stateDict.card_is_checkpoint,
+      stateDict.inapplicable_skill_misconception_ids
     );
   }
 }

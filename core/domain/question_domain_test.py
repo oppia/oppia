@@ -753,7 +753,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         }
 
-        test_data = self.question_state_dict['recorded_voiceovers']
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        test_data = self.question_state_dict['recorded_voiceovers']# type: ignore[misc]
+
         # Here we use MyPy ignore because we are defining an older version
         # dictionary of state which contains `content_ids_to_audio_translations`
         # key, but question_data is of type StateDict (latest version dictionary

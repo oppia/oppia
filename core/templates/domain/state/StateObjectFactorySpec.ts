@@ -32,6 +32,7 @@ describe('State Object Factory', () => {
       html: '',
       content_id: 'content',
     },
+    inapplicable_skill_misconception_ids: null,
     interaction: {
       id: 'TextInput',
       customization_args: {
@@ -91,6 +92,7 @@ describe('State Object Factory', () => {
         content_id: 'content_0',
         html: '',
       },
+      inapplicable_skill_misconception_ids: null,
       interaction: {
         answer_groups: [],
         confirmed_unclassified_answers: [],

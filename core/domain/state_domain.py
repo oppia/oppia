@@ -3614,6 +3614,7 @@ class StateDict(TypedDict):
     card_is_checkpoint: bool
     linked_skill_id: Optional[str]
     classifier_model_id: Optional[str]
+    inapplicable_skill_misconception_ids: Optional[List[str]]
 
 
 class State(translation_domain.BaseTranslatableObject):
@@ -3627,7 +3628,8 @@ class State(translation_domain.BaseTranslatableObject):
         solicit_answer_details: bool,
         card_is_checkpoint: bool,
         linked_skill_id: Optional[str] = None,
-        classifier_model_id: Optional[str] = None
+        classifier_model_id: Optional[str] = None,
+        inapplicable_skill_misconception_ids: Optional[List[str]] = None
     ) -> None:
         """Initializes a State domain object.
 
@@ -3647,6 +3649,9 @@ class State(translation_domain.BaseTranslatableObject):
                 this state.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
+            inapplicable_skill_misconception_ids: list[str] or None. The list of
+                misconception IDs associated with the linked skill that are
+                inapplicable for this state.
         """
         # The content displayed to the reader in this state.
         self.content = content
@@ -3665,6 +3670,9 @@ class State(translation_domain.BaseTranslatableObject):
         self.linked_skill_id = linked_skill_id
         self.solicit_answer_details = solicit_answer_details
         self.card_is_checkpoint = card_is_checkpoint
+        self.inapplicable_skill_misconception_ids = (
+            inapplicable_skill_misconception_ids
+        )
 
     def get_translatable_contents_collection(
         self,
@@ -4179,7 +4187,10 @@ class State(translation_domain.BaseTranslatableObject):
             'classifier_model_id': self.classifier_model_id,
             'linked_skill_id': self.linked_skill_id,
             'solicit_answer_details': self.solicit_answer_details,
-            'card_is_checkpoint': self.card_is_checkpoint
+            'card_is_checkpoint': self.card_is_checkpoint,
+            'inapplicable_skill_misconception_ids': (
+                self.inapplicable_skill_misconception_ids
+            )
         }
 
     # TODO(#16467): Remove `validate` argument after validating all Question
@@ -4210,7 +4221,8 @@ class State(translation_domain.BaseTranslatableObject):
             state_dict['solicit_answer_details'],
             state_dict['card_is_checkpoint'],
             state_dict['linked_skill_id'],
-            state_dict['classifier_model_id'])
+            state_dict['classifier_model_id'],
+            state_dict['inapplicable_skill_misconception_ids'])
 
     @classmethod
     def create_default_state(

@@ -78,6 +78,7 @@ describe('Exploration object factory', () => {
           default_outcome: {},
         },
       },
+      inapplicable_skill_misconception_ids: null,
       interaction: {
         answer_groups: [],
         confirmed_unclassified_answers: [],
@@ -130,6 +131,7 @@ describe('Exploration object factory', () => {
           default_outcome: {},
         },
       },
+      inapplicable_skill_misconception_ids: null,
       interaction: {
         answer_groups: [],
         confirmed_unclassified_answers: [],

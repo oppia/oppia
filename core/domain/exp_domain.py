@@ -1585,6 +1585,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             state.card_is_checkpoint = sdict['card_is_checkpoint']
 
+            state.inapplicable_skill_misconception_ids = (
+                sdict['inapplicable_skill_misconception_ids'])
+
             exploration.states[state_name] = state
 
         exploration.param_changes = [
@@ -5119,8 +5122,38 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _convert_states_v55_dict_to_v56_dict(
         cls, states_dict: Dict[str, state_domain.StateDict]
     ) -> Dict[str, state_domain.StateDict]:
+        """Converts from v55 to v56. Version 56 adds an
+        inapplicable_skill_misconception_ids list to the state.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            Dict[str, state_domain.StateDict]. The converted
+            v56 state dictionary.
+        """
+        for _, state_dict in states_dict.items():
+            state_dict['inapplicable_skill_misconception_ids'] = []
+
+        return states_dict
+
+    @classmethod
+    def _convert_states_v56_dict_to_v57_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
         """Converts from v55 to v56. Version 56 removes and RecordedVoiceovers
         from State.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            Dict[str, state_domain.StateDict]. The converted v57
+            state dictionary.
         """
         for _, state_dict in states_dict.items():
             # Here we use MyPy ignore because the latest schema of state
@@ -5184,7 +5217,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 61
+    CURRENT_EXP_SCHEMA_VERSION = 62
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -5538,7 +5571,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls, exploration_dict: VersionedExplorationDict
     ) -> VersionedExplorationDict:
         """Converts a v60 exploration dict into a v61 exploration dict.
-        Removes recorded_voiceovers field from state property.
+        Introduces the inapplicable_skill_misconception_ids list into
+        the state properties.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
@@ -5550,9 +5584,34 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         exploration_dict['schema_version'] = 61
 
-        exploration_dict['states'] = cls._convert_states_v55_dict_to_v56_dict(
-            exploration_dict['states'])
+        exploration_dict['states'] = (
+            cls._convert_states_v55_dict_to_v56_dict(
+                exploration_dict['states'])
+        )
         exploration_dict['states_schema_version'] = 56
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v61_dict_to_v62_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
+        """Converts a v60 exploration dict into a v61 exploration dict.
+        Removes recorded_voiceovers field from state property.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v61.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v62.
+        """
+        exploration_dict['schema_version'] = 61
+
+        exploration_dict['states'] = cls._convert_states_v56_dict_to_v57_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 57
 
         return exploration_dict
 
@@ -5672,6 +5731,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v60_dict_to_v61_dict(
                 exploration_dict)
             exploration_schema_version = 61
+
+        if exploration_schema_version == 61:
+            exploration_dict = cls._convert_v61_dict_to_v62_dict(
+                exploration_dict)
+            exploration_schema_version = 62
 
         return exploration_dict
 

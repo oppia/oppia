@@ -400,13 +400,17 @@ class Question(translation_domain.BaseTranslatableObject):
         # strict typing because here we are working with previous versions of
         # the domain object and in previous versions of the domain object there
         # are some fields that are discontinued in the latest domain object and
-        # here 'content_ids_to_audio_translations' and 'recorded_voiceovers'
-        # are discontinued in the latest schema. So, while accessing these
-        # discontinued fields MyPy throws an error. Thus to avoid the error,
-        # we used ignore.
+        # here 'content_ids_to_audio_translations' is discontinued in the
+        # latest recorded_voiceovers. So, while accessing these discontinued
+        # fields MyPy throws an error. Thus to avoid the error, we used ignore.
+        content_ids_to_audio_translations = question_state_dict.pop( # type: ignore[misc]
+            'content_ids_to_audio_translations')
+
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
         question_state_dict['recorded_voiceovers'] = { # type: ignore[misc]
             'voiceovers_mapping': (
-                question_state_dict.pop('content_ids_to_audio_translations'))
+                content_ids_to_audio_translations)
         }
         return question_state_dict
 
@@ -1833,6 +1837,26 @@ class Question(translation_domain.BaseTranslatableObject):
     def _convert_state_v55_dict_to_v56_dict(
         cls, question_state_dict: state_domain.StateDict
     ) -> state_domain.StateDict:
+        """Converts from version 55 to 56. Version 56 adds a field for
+        inapplicable skill misconception IDs for the exploration.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+
+        question_state_dict['inapplicable_skill_misconception_ids'] = None
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v56_dict_to_v57_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from v55 to v56. Version 56 removes and RecordedVoiceovers
         from State.
 
@@ -1845,8 +1869,9 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted question_state_dict.
         """
         # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains next_content_id_index property.
+        # dict doesn't contains recorded_voiceovers property.
         del question_state_dict['recorded_voiceovers'] # type: ignore[misc]
+
         return question_state_dict
 
     @classmethod

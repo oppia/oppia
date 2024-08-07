@@ -1145,7 +1145,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         state_with_training_data = exploration.states['Home']
         self.assertIsNotNone(
             state_with_training_data)
-        self.assertEqual(len(state_with_training_data.to_dict()), 7)
+        self.assertEqual(len(state_with_training_data.to_dict()), 8)
 
     def test_save_and_retrieve_exploration(self) -> None:
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
@@ -2420,6 +2420,7 @@ states:
     content:
       content_id: content_0
       html: ''
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2454,6 +2455,7 @@ states:
     content:
       content_id: content_3
       html: %s
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2514,6 +2516,7 @@ states:
     content:
       content_id: content_0
       html: ''
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2548,6 +2551,7 @@ states:
     content:
       content_id: content_3
       html: %s
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2949,6 +2953,7 @@ classifier_model_id: null
 content:
   content_id: content_0
   html: ''
+inapplicable_skill_misconception_ids: null
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -2987,6 +2992,7 @@ classifier_model_id: null
 content:
   content_id: content_3
   html: ''
+inapplicable_skill_misconception_ids: null
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -3026,6 +3032,7 @@ classifier_model_id: null
 content:
   content_id: content_3
   html: ''
+inapplicable_skill_misconception_ids: null
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -6333,6 +6340,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6355,6 +6363,7 @@ states:
     content:
       content_id: content
       html: ''
+    inapplicable_skill_misconception_ids: null
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -7847,7 +7856,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
 
         migration_change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': 54,
+            'from_version': 55,
             'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         })]
         exp_services.update_exploration(
