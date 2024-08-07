@@ -623,9 +623,9 @@ export class BaseUser {
       if (this.isViewportAtMobileWidth()) {
         failureTrigger = (await this.isInProdMode()) ? 0 : devModeMobile;
 
-        // if (await currentPage.$(backgroundBanner)) {
+        // If (await currentPage.$(backgroundBanner)) {
         //   failureTrigger += 0.03;
-        // } else
+        // } else.
         if (await currentPage.$(libraryBanner)) {
           failureTrigger += 0.0039;
         }
