@@ -28,6 +28,9 @@ var path = require('path');
 import {toMatchImageSnapshot} from 'jest-image-snapshot';
 expect.extend({toMatchImageSnapshot});
 const backgroundBanner = '.oppia-background-image';
+const libraryBanner = '.e2e-test-library-banner';
+const devModeDesktop = 0.0012;
+const devModeMobile = 0.01;
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
@@ -615,19 +618,38 @@ export class BaseUser {
        * then the percentage to trigger a failure is 0.03 (3%) for the randomness of the banner.
        * Otherwise, the percentage is 0.003 (0.3%) for the randomness of the page that are small enough to be ignored
        */
+
+      var failureTrigger = 0;
+      if (this.isViewportAtMobileWidth()) {
+        failureTrigger = (await this.isInProdMode()) ? 0 : devModeMobile;
+
+        // if (await currentPage.$(backgroundBanner)) {
+        //   failureTrigger += 0.03;
+        // } else
+        if (await currentPage.$(libraryBanner)) {
+          failureTrigger += 0.0039;
+        }
+      } else {
+        failureTrigger = (await this.isInProdMode()) ? 0 : devModeDesktop;
+
+        if (await currentPage.$(backgroundBanner)) {
+          failureTrigger += 0.03;
+        } else if (await currentPage.$(libraryBanner)) {
+          failureTrigger += 0.006;
+        }
+      }
+
       expect(await currentPage.screenshot()).toMatchImageSnapshot({
-        failureThreshold: (await currentPage.$(backgroundBanner))
-          ? 0.03
-          : 0.003,
+        failureThreshold: failureTrigger,
         failureThresholdType: 'percent',
+        dumpInlineDiffToConsole: true,
         customSnapshotIdentifier: imageName,
         customSnapshotsDir: path.join(
           testPath,
-          process.env.MOBILE
+          this.isViewportAtMobileWidth()
             ? '/mobile_golden_screenshots'
             : '/desktop_golden_screenshots'
         ),
-        storeReceivedOnFailure: true,
       });
       if (typeof newPage !== 'undefined') {
         await newPage.close();

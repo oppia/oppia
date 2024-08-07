@@ -46,6 +46,10 @@ describe('Logged-out User in Teach page', function () {
     'should open the Math Classroom page when "Browse Our Lessons" button is clicked',
     async function () {
       await loggedOutUser.clickBrowseOurLessonsButtonInTeachPage();
+      await loggedOutUser.expectScreenshotToMatch(
+        'clickBrowseOurLessonsButtonInTeachPage',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -54,6 +58,10 @@ describe('Logged-out User in Teach page', function () {
     'should open the Android page when "Access Android App" button is clicked',
     async function () {
       await loggedOutUser.clickAccessAndroidAppButtonInTeachPage();
+      await loggedOutUser.expectScreenshotToMatch(
+        'clickAccessAndroidAppButtonInTeachPage',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -62,6 +70,10 @@ describe('Logged-out User in Teach page', function () {
     'should open the Math Classroom page when "Visit Classroom" button is clicked',
     async function () {
       await loggedOutUser.clickVisitClassroomButtonInTeachPage();
+      await loggedOutUser.expectScreenshotToMatch(
+        'clickVisitClassroomButtonInTeachPage',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -70,6 +82,10 @@ describe('Logged-out User in Teach page', function () {
     'should open the Community Library page when "Browse Library" button is clicked',
     async function () {
       await loggedOutUser.clickBrowseLibraryButtonInTeachPage();
+      await loggedOutUser.expectScreenshotToMatch(
+        'clickBrowseLibraryButtonInTeachPage',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -78,6 +94,10 @@ describe('Logged-out User in Teach page', function () {
     'should open the Math Classroom page when "Explore Lessons" button is clicked',
     async function () {
       await loggedOutUser.clickExploreLessonsButtonInTeachPage();
+      await loggedOutUser.expectScreenshotToMatch(
+        'clickExploreLessonsButtonInTeachPage',
+        __dirname
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
