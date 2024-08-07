@@ -1,3 +1,68 @@
+<div class="classroom-cards-wrapper" *ngIf="publicClassroomsCount > 0">
+  <div class="classroom-cards-inner-container">
+    <div class="classroom-cards-text-container">
+      <h1>{{ 'I18N_COMMUNITY_LIBRARY_PAGE_CLASSROOMS_HINT_TEXT' | translate }}</h1>
+      <p>{{ 'I18N_BROWSE_LESSONS_TEXT' | translate }}</p>
+    </div>
+    <div class="individual-classroom-cards" *ngIf="publicClassroomsCount <= 2">
+      <ng-container *ngFor="let classroomSummary of classroomSummaries">
+        <oppia-classroom-card
+          *ngIf="classroomSummary.is_published"
+          [classroomSummary]="classroomSummary"
+          [usedInCarousel]="false">
+        </oppia-classroom-card>
+      </ng-container>
+    </div>
+    <div class="classrooms-carousel" *ngIf="publicClassroomsCount > 2">
+      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn"
+              (click)="moveClassroomCarouselToPreviousSlide()"
+              aria-label="Previous Slide"
+              [ngClass]="{'show-change-classroom-chunk-btn': shouldShowPreviousClassroomChunkButton(), 'hide-change-classroom-chunk-btn': !shouldShowPreviousClassroomChunkButton()}">
+        <i class="fa fa-angle-left"></i>
+      </button>
+      <div class="carousel-container">
+        <ngb-carousel #classroomCarousel
+                      [interval]="0"
+                      [showNavigationArrows]="false"
+                      [showNavigationIndicators]="publicClassroomsCount > 3"
+                      (slide)="onClassroomNavigationIndicatorClicked()"
+        >
+          <ng-template ngbSlide *ngFor="let chunkIndex of getClassroomChunkIndices(classroomSummaries.length); let i = index">
+            <div class="classrooms-card-container">
+              <ng-container *ngFor="let classroomSummary of getClassroomsForChunk(classroomSummaries, chunkIndex)">
+                <oppia-classroom-card
+                  *ngIf="classroomSummary.is_published"
+                  [classroomSummary]="classroomSummary"
+                  [usedInCarousel]="true">
+                </oppia-classroom-card>
+              </ng-container>
+            </div>
+          </ng-template>
+        </ngb-carousel>
+      </div>
+      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn"
+              (click)="moveClassroomCarouselToNextSlide()"
+              aria-label="Next Slide"
+              [ngClass]="{'show-change-classroom-chunk-btn': shouldShowNextClassroomChunkButton(), 'hide-change-classroom-chunk-btn': !shouldShowNextClassroomChunkButton()}">
+        <i class="fa fa-angle-right"></i>
+      </button>
+      <button class="mobile-carousel-btn mobile-prev-btn"
+              (click)="moveClassroomCarouselToPreviousSlide()"
+              *ngIf="shouldShowPreviousClassroomChunkButton()"
+              aria-label="Previous Slide"
+      >
+        <i class="fa fa-angle-left"></i>
+      </button>
+      <button class="mobile-carousel-btn mobile-next-btn"
+              (click)="moveClassroomCarouselToNextSlide()"
+              *ngIf="shouldShowNextClassroomChunkButton()"
+              aria-label="Next Slide"
+      >
+        <i class="fa fa-angle-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
 <div class="oppia-library-container d-flex">
   <div class="oppia-library-container-inner m-auto">
     <div>
@@ -58,8 +123,8 @@
             <p class="oppia-classroom-p" tabindex="0">{{ 'I18N_CLASSROOM_CALLOUT_PARAGRAPH_1' | translate }}</p>
             <a class="btn oppia-dashboard-intro-button oppia-transition-200"
                tabindex="0"
-               href="/learn/math"
-               smartRouterLink="/learn/math">
+               href="/learn"
+               smartRouterLink="/learn">
                {{ 'I18N_CLASSROOM_CALLOUT_BUTTON' | translate }}
             </a>
           </div>

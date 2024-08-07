@@ -50,7 +50,7 @@ describe('Topic Manager User Journey', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should add a sub-topic to a topic, assign skills to the sub-topic, and change the assignments, open an existing sub-topic, modify its data and publish the topic again, and preview the sub-topic in the preview tab.',
+    'should add a sub-topic to a topic, assign skills to the sub-topic, and change the assignments, open an existing sub-topic, modify its data and save the topic again, and preview the sub-topic in the preview tab.',
     async function () {
       await topicManager.openTopicEditor('Mathematics');
 
@@ -70,14 +70,14 @@ describe('Topic Manager User Journey', function () {
       await topicManager.openSubtopicEditor('Add', 'Mathematics');
       await topicManager.editSubTopicDetails(
         'Addition',
-        'Add numbers',
+        'add-numbers',
         'Subtopic to learn addition',
         testConstants.data.curriculumAdminThumbnailImage
       );
       await topicManager.saveTopicDraft('Mathematics');
 
       await topicManager.navigateToSubtopicPreviewTab('Add', 'Mathematics');
-      await topicManager.expectPreviewSubtopicToHave(
+      await topicManager.expectSubtopicPreviewToHave(
         'Addition',
         'Subtopic creation description text for Addition'
       );
