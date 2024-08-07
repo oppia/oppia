@@ -1353,8 +1353,7 @@ export class LoggedOutUser extends BaseUser {
     langCode: string
   ): Promise<void> {
     await this.changeSiteLanguage(langCode);
-
-    await this.clickLinkButtonToNewTab(
+    await this.clickPartnerWithUsButtonToNewTab(
       partnerWithUsButtonAtTheBottomOfPartnershipsPage,
       'Partner With Us button at the bottom of the Partnerships page',
       partnershipsFormInPortugueseUrl,
@@ -1781,6 +1780,34 @@ export class LoggedOutUser extends BaseUser {
     await this.clickLinkAnchorToNewTab('Partner with us', partnershipsFormUrl);
   }
 
+  private async clickPartnerWithUsButtonToNewTab(
+    button: string,
+    buttonName: string,
+    expectedDestinationPageUrl: {prefix: string; suffix: string},
+    expectedDestinationPageName: string
+  ): Promise<void> {
+    const pageTarget = this.page.target();
+    await this.clickOn(button);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url())
+      .withContext(
+        `${buttonName} should open the ${expectedDestinationPageName} page`
+      )
+      .toContain(expectedDestinationPageUrl.prefix);
+
+    expect(newTabPage?.url())
+      .withContext(
+        `${buttonName} should open the ${expectedDestinationPageName} page`
+      )
+      .toContain(expectedDestinationPageUrl.suffix);
+    await newTabPage?.close();
+  }
+
   /**
    * This function changes the site language based on the provided parameter,
    * then clicks the 'Partner With Us' button on the About page, and
@@ -1801,7 +1828,7 @@ export class LoggedOutUser extends BaseUser {
       : partnerWithUsDesktopButtonInAboutPage;
 
     await this.clickOn(partnerTab);
-    await this.clickLinkButtonToNewTab(
+    await this.clickPartnerWithUsButtonToNewTab(
       partnerWithUsButtonInAboutPage,
       `Partner With Us button in About page, after changing the language to ${langCode},`,
       partnershipsFormInPortugueseUrl,

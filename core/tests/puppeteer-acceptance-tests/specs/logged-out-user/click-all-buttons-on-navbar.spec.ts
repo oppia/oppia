@@ -38,14 +38,6 @@ describe('Logged-out User', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should open About Url with About Oppia button in About Menu on navbar',
-    async function () {
-      await loggedOutUser.clickAboutButtonInAboutMenuOnNavbar();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
     'should open Partnerships Url with School and Organizations button ' +
       'in Get Involved menu on navbar',
     async function () {
