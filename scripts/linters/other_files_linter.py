@@ -73,7 +73,8 @@ WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT: Final = (
     'develop_commit_notification.yml',
     'pending-review-notification.yml',
     'revert-web-wiki-updates.yml',
-    'frontend_tests.yml'
+    'frontend_tests.yml',
+    'developer_onboarding_notification.yml'
 )
 JOBS_EXEMPT_FROM_MERGE_REQUIREMENT: Final = [
     'check_test_suites_to_run'
