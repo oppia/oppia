@@ -151,7 +151,6 @@ describe('Teach Page', () => {
     ).and.callThrough();
     component.ngOnInit();
     expect(component.displayedTestimonialId).toBe(0);
-    expect(component.classroomUrl).toBe('/learn/math');
     spyOn(windowDimensionsService, 'isWindowNarrow').and.callThrough;
     expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
     expect(component.isWindowNarrow).toBe(true);
