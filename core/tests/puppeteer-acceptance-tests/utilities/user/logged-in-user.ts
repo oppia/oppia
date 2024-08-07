@@ -64,7 +64,7 @@ const playLaterSectionSelector = '.e2e-test-play-later-section';
 const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-test-exploration-tile-title`;
 const mobileLessonCardOptionsDropdownButton =
   '.e2e-test-mobile-lesson-card-dropdown';
-const progressSectionButton = '.oppia-learner-dashboard-button-menu > div';
+const mobileProgressSectionButton = '.e2e-test-mobile-progress-section';
 const mobileLessonTabInProgressSectionButton =
   '.oppia-learner-dashboard-progress-button-menu-options';
 
@@ -93,12 +93,8 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the community library tab of the learner dashboard.
    */
   async navigateToCommunityLessonsSection(): Promise<void> {
-    await this.waitForPageToFullyLoad();
     if (await this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(progressSectionButton);
-      const menuOptions = await this.page.$$(progressSectionButton);
-      // Clicking on the third option in the menu to navigate to the 'In Progress' section.
-      await menuOptions[2].click();
+      await this.clickOn(mobileProgressSectionButton);
 
       await this.page.waitForSelector(mobileLessonTabInProgressSectionButton);
       const lessonOptions = await this.page.$$(
