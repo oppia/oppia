@@ -68,7 +68,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText!: string;
   @Input() subheaderText!: string;
 
-  DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
   IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
   url!: URL;
   currentLanguageCode!: string;
@@ -461,13 +460,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     } else {
       this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
     }
-  }
-
-  navigateToClassroomPage(classroomUrl: string): void {
-    this.siteAnalyticsService.registerClassroomHeaderClickEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = classroomUrl;
-    }, 150);
   }
 
   /**
