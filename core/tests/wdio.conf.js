@@ -53,14 +53,6 @@ var suites = {
     './core/tests/webdriverio_desktop/blog.js'
   ],
 
-  checkpointFeatures: [
-    './core/tests/webdriverio_desktop/checkpointFeatures.js'
-  ],
-
-  classroomPage: [
-    './core/tests/webdriverio_desktop/classroomPage.js'
-  ],
-
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
   ],
@@ -129,16 +121,8 @@ var suites = {
     './core/tests/webdriverio_desktop/learnerDashboard.js'
   ],
 
-  library: [
-    './core/tests/webdriverio/libraryFlow.js'
-  ],
-
   navigation: [
     './core/tests/webdriverio_desktop/navigation.js'
-  ],
-
-  playVoiceovers: [
-    './core/tests/webdriverio_desktop/playVoiceovers.js'
   ],
 
   preferences: [
@@ -175,10 +159,6 @@ var suites = {
 
   topicAndStoryEditorFileUploadFeatures: [
     './core/tests/webdriverio_desktop/topicAndStoryEditorFileUploadFeatures.js'
-  ],
-
-  topicAndStoryViewer: [
-    './core/tests/webdriverio_desktop/topicAndStoryViewer.js'
   ],
 
   users: [

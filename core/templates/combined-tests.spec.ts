@@ -87,6 +87,7 @@ jasmine.getEnv().addReporter({
 // The '@nodelib' and 'openapi3-ts' are excluded from the tests since they are
 // coming from third party library.
 /* eslint-disable-next-line max-len */
+/* 
 const context = require.context(
   '../../',
   true,
@@ -94,4 +95,7 @@ const context = require.context(
 );
 
 // And load the modules.
-context.keys().map(context);
+context.keys().map(context);*/
+
+const context = require.context('../../', true, /(:?)/);
+context.keys().forEach(context);

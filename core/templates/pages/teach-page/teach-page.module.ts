@@ -22,9 +22,15 @@ import {SharedComponentsModule} from 'components/shared-component.module';
 import {TeachPageRootComponent} from './teach-page-root.component';
 import {CommonModule} from '@angular/common';
 import {TeachPageRoutingModule} from './teach-page-routing.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
-  imports: [CommonModule, SharedComponentsModule, TeachPageRoutingModule],
+  imports: [
+    CommonModule,
+    SharedComponentsModule,
+    TeachPageRoutingModule,
+    NgbModule,
+  ],
   declarations: [TeachPageComponent, TeachPageRootComponent],
   entryComponents: [TeachPageComponent, TeachPageRootComponent],
 })

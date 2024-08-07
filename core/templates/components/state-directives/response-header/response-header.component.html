@@ -2,7 +2,7 @@
   <div class="oppia-response-header">
     <span *ngIf="showWarning">⚠</span>
     <div class="oppia-response-container-desktop">
-      <i class="fas fa-times oppia-response-tick-cross oppia-response-cross" *ngIf="!isCorrect() && isResponse && !isCurrentInteractionLinear()"></i>
+      <i class="fas fa-times oppia-response-tick-cross oppia-response-cross e2e-test-incorrect-response-icon" *ngIf="!isCorrect() && isResponse && !isCurrentInteractionLinear()"></i>
       <i class="fas fa-check oppia-response-tick-cross  oppia-response-tick e2e-test-correct-tick-mark" *ngIf="isCorrect() && isResponse && !isCurrentInteractionLinear()"></i>
     </div>
     <div class="oppia-responses-mobile">
