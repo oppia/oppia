@@ -36,7 +36,9 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Final
+from typing import (
+    Final, Any
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1153,7 +1155,7 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_email_provider_error(self) -> None:
-        def raise_exception(*args: True, **kwargs: True) -> None:
+        def raise_exception(*args: Any, **kwargs: Any) -> None:
             raise Exception('Backend error')
         swap_add_fn = self.swap(
             user_services, 'add_user_to_mailing_list', raise_exception)
