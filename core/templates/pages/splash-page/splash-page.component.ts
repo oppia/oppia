@@ -17,7 +17,6 @@
  */
 import {Component, OnInit} from '@angular/core';
 
-import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -44,8 +43,6 @@ export class SplashPageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  classroomUrlFragment!: string;
-  classroomUrl!: string;
   displayedTestimonialId!: number;
   testimonialCount!: number;
   isWindowNarrow: boolean = false;
@@ -78,7 +75,7 @@ export class SplashPageComponent implements OnInit {
   }
 
   private _nagivateToClassroomPage(): void {
-    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    this.windowRef.nativeWindow.location.href = '/learn';
   }
 
   onClickStartLearningButton(): void {
@@ -162,12 +159,6 @@ export class SplashPageComponent implements OnInit {
     this.displayedTestimonialId = 0;
     this.testimonialCount = 4;
     this.testimonials = this.getTestimonials();
-    this.classroomUrl = this.urlInterpolationService.interpolateUrl(
-      '/learn/<classroomUrlFragment>',
-      {
-        classroomUrlFragment: AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT,
-      }
-    );
     this.loaderService.showLoadingScreen('Loading');
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
