@@ -56,6 +56,7 @@ const desktopAddToPlayLaterButton = '.e2e-test-add-to-playlist-btn';
 const mobileAddToPlayLaterButton = '.e2e-test-mobile-add-to-playlist-btn';
 const toastMessageSelector = '.e2e-test-toast-message';
 const mobileLessonCardTitleSelector = '.e2e-test-exp-summary-tile-title';
+const mobileCommunityLessonSectionButton = '.e2e-test-mobile-lessons-secotion';
 const communityLessonsSectionButton = '.e2e-test-community-lessons-section';
 const removeFromPlayLaterButtonSelector = '.e2e-test-remove-from-playlist-btn';
 const confirmRemovalFromPlayLaterButton =
@@ -95,22 +96,7 @@ export class LoggedInUser extends BaseUser {
   async navigateToCommunityLessonsSection(): Promise<void> {
     if (await this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileProgressSectionButton);
-
-      await this.page.waitForSelector(mobileLessonTabInProgressSectionButton);
-      const lessonOptions = await this.page.$$(
-        mobileLessonTabInProgressSectionButton
-      );
-
-      for (const option of lessonOptions) {
-        const optionText = await this.page.evaluate(
-          el => el.textContent.trim(),
-          option
-        );
-        if (optionText.includes('Lessons')) {
-          await option.click();
-          break;
-        }
-      }
+      await this.clickOn(mobileCommunityLessonSectionButton);
     } else {
       await this.page.click(communityLessonsSectionButton);
     }
