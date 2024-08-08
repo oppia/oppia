@@ -19,8 +19,6 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import {timeHours} from 'd3';
-import {tickStep} from 'd3-array';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -87,25 +85,30 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToLearnerDashboardPage(): Promise<void> {
     await this.goto(LearnerDashboardUrl);
-    showMessage(this.page.url());
   }
 
   /**
    * Navigates to the community library tab of the learner dashboard.
    */
   async navigateToCommunityLessonsSection(): Promise<void> {
-    if (await this.isViewportAtMobileWidth()) {
-      showMessage(this.page.url());
+    if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileProgressSectionButton);
-
-      await this.waitForPageToFullyLoad();
-      showMessage(this.page.url());
       await this.clickOn('Lessons');
     } else {
       await this.page.click(communityLessonsSectionButton);
     }
-  }
 
+    await this.page.waitForSelector(
+      '.oppia-learner-dashboard-section-active-button',
+      {visible: true}
+    );
+    const activeButtonText = await this.page.$eval(
+      '.oppia-learner-dashboard-section-active-button',
+      element => element.textContent
+    );
+
+    console.log(activeButtonText);
+  }
   /**
    * Function to subscribe to a creator with the given username.
    */
