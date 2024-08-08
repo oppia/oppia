@@ -92,23 +92,21 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToCommunityLessonsSection(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      const test1 = await this.isTextPresentOnPage(
+        ' Good Morning, loggedInUser1! '
+      );
+      showMessage(`Test1: ${test1}`);
       await this.clickOn(mobileProgressSectionButton);
-      await this.clickOn('Lessons');
-
-      await this.page.waitForSelector(
-        '.oppia-learner-dashboard-section-active-button',
-        {visible: true}
-      );
-      const activeButtonText = await this.page.$eval(
-        '.oppia-learner-dashboard-section-active-button',
-        element => element.textContent
-      );
-
-      console.log(activeButtonText);
+      const test2 = await this.isTextPresentOnPage('Skill Progress');
+      showMessage(`Test2: ${test2}`);
+      await this.clickOn(mobileCommunityLessonSectionButton);
+      const test3 = await this.isTextPresentOnPage('Play Later');
+      showMessage(`Test1: ${test3}`);
     } else {
       await this.page.click(communityLessonsSectionButton);
     }
   }
+
   /**
    * Function to subscribe to a creator with the given username.
    */
