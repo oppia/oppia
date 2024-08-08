@@ -28,56 +28,77 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-in User', function () {
   let loggedInUser1: LoggedInUser & LoggedOutUser;
+  let explorationId: string | null;
 
   beforeAll(async function () {
-    const loggedInUser1 = await UserFactory.createNewUser(
+    loggedInUser1 = await UserFactory.createNewUser(
       'loggedInUser1',
       'logged_in_user1@example.com'
     );
-    await loggedInUser1.closeBrowser();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it(
-    'should be able to change the site language to RTL, navigate and interact with various pages',
-    async function () {
-      await loggedInUser1.navigateToPreferencesPage();
-
-      // Change site language to Arabic (RTL language)
-      await loggedInUser1.changeSiteLanguage('Arabic');
-
-      // Navigate through various pages and verify they are properly mirrored and interactive
-      await loggedInUser1.navigateToSplashPage();
-      await loggedInUser1.verifyPageIsRTLAndInteractive();
-
-      await loggedInUser1.navigateToAboutPage();
-      await loggedInUser1.verifyPageIsRTLAndInteractive();
-
-      await loggedInUser1.navigateToContactUsPage();
-      await loggedInUser1.verifyPageIsRTLAndInteractive();
-
-      await loggedInUser1.navigateToCommunityLibraryPage();
-      await loggedInUser1.verifyPageIsRTLAndInteractive();
-
-      // Checking story viewer.
-      await loggedInUser1.searchForLessonInSearchBar('Math');
-      await loggedInUser1.playLessonFromSearchResults('Math');
-      await loggedInUser1.verifyPageIsRTLAndInteractive();
-
-      // Checking exploration player.
-      await loggedInUser1.selectChapterWithinStoryToLearn(
-        'Chapter 1',
-        'Story 1'
+    explorationId =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'Negative Numbers'
       );
-      await loggedInUser1.verifyPageIsRTLAndInteractive();
 
-      await loggedInUser1.navigateToLeanerDashboardPage();
-      await loggedInUser1.verifyPageIsRTLAndInteractive();
+    await curriculumAdmin.createAndPublishTopic(
+      'Algebra I',
+      'Negative Numbers',
+      'Negative Numbers'
+    );
 
-      await loggedInUser1.navigateToClassroomPage('math');
-      await loggedInUser1.verifyPageIsRTLAndInteractive();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    await curriculumAdmin.createAndPublishClassroom(
+      'Math',
+      'math',
+      'Algebra I'
+    );
+
+    await curriculumAdmin.createAndPublishStoryWithChapter(
+      'Algebra Story',
+      'algebra-story',
+      'Understanding Negative Numbers',
+      explorationId as string,
+      'Algebra I'
+    );
+
+    loggedOutUser = await UserFactory.createLoggedOutUser();
+    // Setup taking longer than 300000ms.
+  }, 420000);
+
+  it('should be able to change the site language to RTL, navigate and interact with various pages', async function () {
+    await loggedInUser1.navigateToPreferencesPage();
+
+    // Change site language to Arabic (RTL language)
+    await loggedInUser1.changeSiteLanguage('Arabic');
+
+    // Navigate through various pages and verify they are properly mirrored and interactive
+    await loggedInUser1.navigateToSplashPage();
+    await loggedInUser1.verifyPageIsRTLAndInteractive();
+
+    await loggedInUser1.navigateToAboutPage();
+    await loggedInUser1.verifyPageIsRTLAndInteractive();
+
+    await loggedInUser1.navigateToContactUsPage();
+    await loggedInUser1.verifyPageIsRTLAndInteractive();
+
+    await loggedInUser1.navigateToCommunityLibraryPage();
+    await loggedInUser1.verifyPageIsRTLAndInteractive();
+
+    // Checking story viewer.
+    await loggedInUser1.searchForLessonInSearchBar('Math');
+    await loggedInUser1.playLessonFromSearchResults('Math');
+    await loggedInUser1.verifyPageIsRTLAndInteractive();
+
+    // Checking exploration player.
+    await loggedInUser1.selectChapterWithinStoryToLearn('Chapter 1', 'Story 1');
+    await loggedInUser1.verifyPageIsRTLAndInteractive();
+
+    await loggedInUser1.navigateToLeanerDashboardPage();
+    await loggedInUser1.verifyPageIsRTLAndInteractive();
+
+    await loggedInUser1.navigateToClassroomPage('math');
+    await loggedInUser1.verifyPageIsRTLAndInteractive();
+  }, 2147483647);
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

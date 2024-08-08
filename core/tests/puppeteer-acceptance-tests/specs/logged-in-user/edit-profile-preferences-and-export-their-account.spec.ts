@@ -30,11 +30,10 @@ describe('Logged-in User', function () {
   let loggedInUser1: LoggedInUser & LoggedOutUser;
 
   beforeAll(async function () {
-    const loggedInUser1 = await UserFactory.createNewUser(
+    loggedInUser1 = await UserFactory.createNewUser(
       'loggedInUser1',
       'logged_in_user1@example.com'
     );
-    await loggedInUser1.closeBrowser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
