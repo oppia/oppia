@@ -34,7 +34,7 @@ const recentlyPublishedExplorationsPageUrl =
 const splashPageUrl = testConstants.URLs.splash;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
-const classroomsPage = testConstants.URLs.ClassroomsPage;
+const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const desktopWatchAVideoUrl = testConstants.URLs.DesktopExternalLinkWatchAVideo;
 const donateUrl = testConstants.URLs.Donate;
 const electromagnetismUrl = testConstants.URLs.Electromagnetism;
@@ -406,17 +406,17 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the classroom page.
    */
   async navigateToClassroomPage(urlFragment: string): Promise<void> {
-    await this.goto(`${classroomsPage}/${urlFragment}`);
+    await this.goto(`${classroomsPageUrl}/${urlFragment}`);
   }
 
   /**
    * Function to navigate to the classrooms page.
    */
   async navigateToClassroomsPage(): Promise<void> {
-    if (this.page.url() === classroomsPage) {
+    if (this.page.url() === classroomsPageUrl) {
       await this.page.reload();
     }
-    await this.goto(classroomsPage);
+    await this.goto(classroomsPageUrl);
   }
 
   /**
@@ -445,26 +445,6 @@ export class LoggedOutUser extends BaseUser {
         `${buttonName} should open the ${expectedDestinationPageName} page`
       )
       .toBe(expectedDestinationPageUrl);
-  }
-
-  /**
-   * Function to click an anchor tag and check if it opens the expected destination
-   * in a new tab. Closes the tab afterwards.
-   */
-  private async clickLinkAnchorToNewTab(
-    anchorInnerText: string,
-    expectedDestinationPageUrl: string
-  ): Promise<void> {
-    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
-    const pageTarget = this.page.target();
-    await this.clickOn(anchorInnerText);
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
-    const newTabPage = await newTarget.page();
-    expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
-    await newTabPage?.close();
   }
 
   /**
@@ -1319,14 +1299,14 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to click the Browse Our Lessons button in the Teach page
-   * and check if it opens the Math Classroom page.
+   * and check if it opens the classrooms page.
    */
   async clickExploreLessonsButtonInTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       exploreLessonsButtonInTeachPage,
       'Explore Lessons button',
-      mathClassroomUrl,
-      'Math Classroom'
+      classroomsPageUrl,
+      'Classrooms page'
     );
   }
 
@@ -1908,7 +1888,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * This function verifies that the classroom cards in classrooms page.
    */
-  async expectClassroomCountInClassroomsPageToBe(
+  async expectClassroomCountInClassroomsPageUrlToBe(
     classroomsCount: number
   ): Promise<void> {
     await this.page.waitForSelector(classroomTileContainer);
