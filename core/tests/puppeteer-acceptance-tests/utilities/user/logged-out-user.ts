@@ -1679,7 +1679,7 @@ export class LoggedOutUser extends BaseUser {
     expectedActivityTitles: string[] = []
   ): Promise<void> {
     // Reloading to ensure the page is updated with the newly added/removed featured activities.
-    await this.reloadPage;
+    await this.page.reload({waitUntil: 'networkidle0'});
     const featuredActivities: {title: string}[] =
       (await this.viewAllFeaturedActivities()) as {title: string}[];
 
@@ -3216,7 +3216,15 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectNavbarButtonsToHaveText(expectedText: string[]): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(openMobileNavbarMenuButton);
+      await this.page.waitForSelector(openMobileNavbarMenuButton, {
+        visible: true,
+      });
+      const openMobileNavbarMenuButtonElement = await this.page.$(
+        openMobileNavbarMenuButton
+      );
+      if (openMobileNavbarMenuButtonElement) {
+        await openMobileNavbarMenuButtonElement.click();
+      }
     }
 
     const isMobileViewport = this.isViewportAtMobileWidth();
