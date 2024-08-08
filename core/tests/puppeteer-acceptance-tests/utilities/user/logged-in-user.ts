@@ -94,20 +94,20 @@ export class LoggedInUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileProgressSectionButton);
       await this.clickOn('Lessons');
+
+      await this.page.waitForSelector(
+        '.oppia-learner-dashboard-section-active-button',
+        {visible: true}
+      );
+      const activeButtonText = await this.page.$eval(
+        '.oppia-learner-dashboard-section-active-button',
+        element => element.textContent
+      );
+
+      console.log(activeButtonText);
     } else {
       await this.page.click(communityLessonsSectionButton);
     }
-
-    await this.page.waitForSelector(
-      '.oppia-learner-dashboard-section-active-button',
-      {visible: true}
-    );
-    const activeButtonText = await this.page.$eval(
-      '.oppia-learner-dashboard-section-active-button',
-      element => element.textContent
-    );
-
-    console.log(activeButtonText);
   }
   /**
    * Function to subscribe to a creator with the given username.
