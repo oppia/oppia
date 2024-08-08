@@ -183,6 +183,7 @@ const outcomeDestWhenStuckSelector =
   '.protractor-test-open-outcome-dest-if-stuck-editor';
 const intEditorField = '.e2e-test-editor-int';
 const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
+const tagsField = '.e2e-test-chip-list-tags';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
@@ -258,7 +259,8 @@ export class ExplorationEditor extends BaseUser {
   async publishExplorationWithMetadata(
     title: string,
     goal: string,
-    category: string
+    category: string,
+    tags?: string
   ): Promise<string | null> {
     if (this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(toastMessage, {
@@ -278,6 +280,9 @@ export class ExplorationEditor extends BaseUser {
     await this.type(explorationGoalInput, `${goal}`);
     await this.clickOn(explorationCategoryDropdown);
     await this.clickOn(`${category}`);
+    if (tags) {
+      await this.type(tagsField, tags);
+    }
     await this.clickOn(saveExplorationChangesButton);
     await this.clickOn(explorationConfirmPublishButton);
     await this.page.waitForSelector(explorationIdElement);
@@ -829,7 +834,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
     showMessage('Exploration is saved successfully.');
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   async publishExploration(): Promise<string | null> {
@@ -939,7 +944,7 @@ export class ExplorationEditor extends BaseUser {
         await elements[cardIndex].click();
       }
 
-      await this.page.waitForNetworkIdle({idleTime: 700});
+      await this.waitForNetworkIdle({idleTime: 700});
     } catch (error) {
       const newError = new Error(
         `Error navigating to card ${cardName}: ${error.message}`
@@ -1169,7 +1174,7 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(mainTabButton);
     }
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**
@@ -1454,7 +1459,7 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Invalid content type: ${contentType}`);
     }
     await this.clickOn(saveTranslationButton);
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**
@@ -1466,7 +1471,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(modifyExistingTranslationsButton);
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**
