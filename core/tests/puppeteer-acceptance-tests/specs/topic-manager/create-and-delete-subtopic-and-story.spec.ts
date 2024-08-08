@@ -111,7 +111,6 @@ describe('Topic Manager', function () {
   it(
     'should delete a chapter from a story, delete the story from a topic, and delete the subtopic from a topic.',
     async function () {
-      await topicManager.createAndSwitchToNewTab();
       await topicManager.deleteSubtopicFromTopic('Test Subtopic 1', 'Addition');
       await topicManager.saveTopicDraft('Addition');
       await topicManager.verifySubtopicPresenceInTopic(
@@ -120,6 +119,7 @@ describe('Topic Manager', function () {
         false
       );
 
+      // Deleting 2nd chapter since topic manager cannot delete the first chapter.
       await topicManager.deleteChapterFromStory(
         'Test Chapter 2',
         'Test Story 1',
@@ -127,8 +127,6 @@ describe('Topic Manager', function () {
       );
       await topicManager.saveStoryDraft();
 
-      await topicManager.createAndSwitchToNewTab();
-      // Deleting 2nd chapter since topic manager cannot delete the first chapter.
       await topicManager.verifyChapterPresenceInStory(
         'Test Chapter 2',
         'Test Story 1',
@@ -136,7 +134,6 @@ describe('Topic Manager', function () {
         false
       );
 
-      await topicManager.createAndSwitchToNewTab();
       await topicManager.deleteStoryFromTopic('Test Story 1', 'Addition');
       await topicManager.saveTopicDraft('Addition');
       await topicManager.verifyStoryPresenceInTopic(
