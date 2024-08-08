@@ -52,20 +52,22 @@ describe('Logged-in User', function () {
       await loggedInUser1.updatePreferredExplorationLanguage('Hinglish');
       await loggedInUser1.updatePreferredSiteLanguage('English');
       await loggedInUser1.updatePreferredAudioLanguage('English');
-      await loggedInUser1.updateEmailPreferences('Weekly Updates');
+      await loggedInUser1.updateEmailPreferences([
+        'Receive news and updates about the site',
+        ' Receive emails when someone sends you feedback on an exploration',
+      ]);
 
       // Navigate to Profile page and verify changes
-      await loggedInUser1.navigateToProfilePage();
-      await loggedInUser1.expectProfilePictureToBe('path/to/new/picture');
+      await loggedInUser1.navigateToProfilePageFromPreferencePage();
+      await loggedInUser1.expectProfilePictureToBe(
+        testConstants.data.profilePicture
+      );
       await loggedInUser1.expectBioToBe('This is my new bio');
-      await loggedInUser1.expectSubjectInterestsToBe('Math, Science');
+      await loggedInUser1.expectSubjectInterestsToBe(['Math, Science']);
 
       // Export account from Preferences page
       await loggedInUser1.navigateToPreferencesPage();
       await loggedInUser1.exportAccount();
-
-      // Verify account export
-      await loggedInUser1.expectAccountExportSuccess();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

@@ -21,7 +21,7 @@
                  aria-label="Go to profile page"
                  href="/profile/{{ username }}"
                  [smartRouterLink]="'/profile/' + username"
-                 class="preferences-page-tab-focus">
+                 class="preferences-page-tab-focus e2e-test-go-to-profile-page">
                   {{ username }}
               </a>
               <em *ngIf="!username">
