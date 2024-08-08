@@ -23,7 +23,6 @@ import {showMessage} from '../common/show-message';
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
   testConstants.URLs.WikiPrivilegesToFirebaseAccount;
-const PendingAccountDeletionPage = testConstants.URLs.PendingAccountDeletion;
 const baseUrl = testConstants.URLs.BaseURL;
 const homePageUrl = testConstants.URLs.Home;
 const signUpEmailField = testConstants.SignInDetails.inputField;
@@ -49,6 +48,15 @@ const confirmUsernameField = '.e2e-test-confirm-username-field';
 const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
 const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
 const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
+const addProfilePictureButton = '.e2e-test-photo-upload-submit';
+const editProfilePictureButton = '.oppia-editor-profile-edit-icon';
+const bioTextareaSelector = '.bio-textarea-selector';
+const saveChangesButtonSelector = '.e2e-test-save-changes-button';
+const subjectInterestsInputSelector = '.e2e-test-subject-interests-input';
+const explorationLanguageInputSelector =
+  '.e2e-test-preferred-exploration-language-input';
+const siteLanguageInputSelector = '.e2e-test-site-language-selector';
+const audioLanguageInputSelector = '.e2e-test-audio-language-selector';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
@@ -110,10 +118,6 @@ export class LoggedInUser extends BaseUser {
   async navigateToPreferencesPage(): Promise<void> {
     await this.goto(PreferencesPageUrl);
     await this.page.waitForTimeout(2147483647);
-  }
-
-  async navigateToPendingAccountDeletionPage(): Promise<void> {
-    await this.goto(PendingAccountDeletionPage);
   }
 
   /**
@@ -342,6 +346,93 @@ export class LoggedInUser extends BaseUser {
         `Expected to be on page ${expectedPage}, but found ${url}`
       );
     }
+  }
+
+  /**
+   * Updates the profile picture.
+   * @param {string} picturePath - The path of the picture to upload.
+   */
+  async updateProfilePicture(picturePath: string): Promise<void> {
+    await this.clickOn(editProfilePictureButton);
+    await this.uploadFile(picturePath);
+    await this.clickOn(addProfilePictureButton);
+  }
+
+  /**
+   * Updates the user's bio.
+   * @param {string} bio - The new bio to set for the user.
+   */
+  async updateBio(bio: string): Promise<void> {
+    await this.clickOn(bioTextareaSelector);
+    await this.type(bioTextareaSelector, bio);
+    await this.clickOn(saveChangesButtonSelector);
+  }
+
+  /**
+   * Updates the user's preferred dashboard.
+   *
+   * @param {string} dashboard - The new dashboard to set for the user. Can be one of 'Learner Dashboard', 'Creator Dashboard', or 'Contributor Dashboard'.
+   */
+  async updatePreferredDashboard(dashboard: string): Promise<void> {
+    const allowedDashboards = [
+      'Learner Dashboard',
+      'Creator Dashboard',
+      'Contributor Dashboard',
+    ];
+
+    if (!allowedDashboards.includes(dashboard)) {
+      throw new Error(
+        `Invalid dashboard: ${dashboard}. Must be one of ${allowedDashboards.join(', ')}.`
+      );
+    }
+
+    // Converting the dashboard to lowercase and replace spaces with hyphens to match the selector
+    const dashboardInSelector = dashboard.toLowerCase().replace(/\s+/g, '-');
+    const dashboardSelector = `.e2e-test-${dashboardInSelector}-radio`;
+
+    await this.clickOn(dashboardSelector);
+  }
+
+  /**
+   * Updates the user's subject interests.
+   * @param {string[]} interests - The new interests to set for the user.
+   */
+  async updateSubjectInterests(interests: string[]): Promise<void> {
+    for (const interest of interests) {
+      await this.clickOn(subjectInterestsInputSelector);
+      await this.type(subjectInterestsInputSelector, interest);
+      await this.page.keyboard.press('Enter');
+    }
+  }
+
+  /**
+   * Updates the user's preferred exploration language.
+   * @param {string} language - The new language to set for the user.
+   */
+  async updatePreferredExplorationLanguage(language: string): Promise<void> {
+    await this.clickOn(explorationLanguageInputSelector);
+    await this.type(explorationLanguageInputSelector, language);
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Updates the user's preferred site language.
+   * @param {string} language - The new language to set for the user.
+   */
+  async updatePreferredSiteLanguage(language: string): Promise<void> {
+    await this.clickOn(siteLanguageInputSelector);
+    await this.type(siteLanguageInputSelector, language);
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Updates the user's preferred audio language.
+   * @param {string} language - The new language to set for the user.
+   */
+  async updatePreferredAudioLanguage(language: string): Promise<void> {
+    await this.clickOn(audioLanguageInputSelector);
+    await this.type(auidLanguageInputSelector, language);
+    await this.page.keyboard.press('Enter');
   }
 }
 

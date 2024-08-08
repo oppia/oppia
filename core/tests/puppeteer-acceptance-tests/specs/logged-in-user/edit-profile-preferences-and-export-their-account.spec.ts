@@ -23,6 +23,7 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {log} from 'util';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
@@ -42,10 +43,14 @@ describe('Logged-in User', function () {
       await loggedInUser1.navigateToPreferencesPage();
 
       // Update profile preferences
-      await loggedInUser1.updateProfilePicture('path/to/new/picture');
+      await loggedInUser1.updateProfilePicture(
+        testConstants.data.profilePicture
+      );
       await loggedInUser1.updateBio('This is my new bio');
-      await loggedInUser1.updatePreferredDashboard('Learner');
-      await loggedInUser1.updateSubjectInterests('Math, Science');
+      await loggedInUser1.updatePreferredDashboard('Creator Dashboard');
+      await loggedInUser1.updateSubjectInterests(['Math, Science']);
+      await loggedInUser1.updatePreferredExplorationLanguage('Hinglish');
+      await loggedInUser1.updatePreferredSiteLanguage('English');
       await loggedInUser1.updatePreferredAudioLanguage('English');
       await loggedInUser1.updateEmailPreferences('Weekly Updates');
 
