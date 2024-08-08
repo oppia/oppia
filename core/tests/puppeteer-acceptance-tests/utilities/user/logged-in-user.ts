@@ -19,6 +19,8 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import {timeHours} from 'd3';
+import {tickStep} from 'd3-array';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -56,7 +58,7 @@ const desktopAddToPlayLaterButton = '.e2e-test-add-to-playlist-btn';
 const mobileAddToPlayLaterButton = '.e2e-test-mobile-add-to-playlist-btn';
 const toastMessageSelector = '.e2e-test-toast-message';
 const mobileLessonCardTitleSelector = '.e2e-test-exp-summary-tile-title';
-const mobileCommunityLessonSectionButton = '.e2e-test-mobile-lessons-secotion';
+const mobileCommunityLessonSectionButton = '.e2e-test-mobile-lessons-section';
 const communityLessonsSectionButton = '.e2e-test-community-lessons-section';
 const removeFromPlayLaterButtonSelector = '.e2e-test-remove-from-playlist-btn';
 const confirmRemovalFromPlayLaterButton =
@@ -66,9 +68,6 @@ const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-tes
 const mobileLessonCardOptionsDropdownButton =
   '.e2e-test-mobile-lesson-card-dropdown';
 const mobileProgressSectionButton = '.e2e-test-mobile-progress-section';
-const mobileLessonTabInProgressSectionButton =
-  '.oppia-learner-dashboard-progress-button-menu-options';
-
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
 export class LoggedInUser extends BaseUser {
@@ -88,6 +87,7 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToLearnerDashboardPage(): Promise<void> {
     await this.goto(LearnerDashboardUrl);
+    showMessage(this.page.url());
   }
 
   /**
@@ -95,8 +95,12 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToCommunityLessonsSection(): Promise<void> {
     if (await this.isViewportAtMobileWidth()) {
+      showMessage(this.page.url());
       await this.clickOn(mobileProgressSectionButton);
-      await this.clickOn(mobileCommunityLessonSectionButton);
+
+      await this.waitForPageToFullyLoad();
+      showMessage(this.page.url());
+      await this.clickOn('Lessons');
     } else {
       await this.page.click(communityLessonsSectionButton);
     }
