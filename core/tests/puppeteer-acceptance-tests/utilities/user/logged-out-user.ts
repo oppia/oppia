@@ -326,7 +326,10 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the Thanks for Donating page.
    */
   async navigateToThanksForDonatingPage(): Promise<void> {
-    await Promise.all([this.goto(thanksForDonatingUrl)]);
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.page.goto(thanksForDonatingUrl),
+    ]);
   }
 
   /**
@@ -411,7 +414,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToClassroomsPage(): Promise<void> {
     if (this.page.url() === classroomsPageUrl) {
-      await this.reloadPage();
+      await this.page.reload();
     }
     await this.goto(classroomsPageUrl);
   }
@@ -432,7 +435,10 @@ export class LoggedOutUser extends BaseUser {
     expectedDestinationPageUrl: string,
     expectedDestinationPageName: string
   ): Promise<void> {
-    await Promise.all([this.clickAndWaitForNavigation(button)]);
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
+      this.clickOn(button),
+    ]);
 
     expect(this.page.url())
       .withContext(
@@ -722,7 +728,10 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Read our blog') {
       throw new Error('The Read Our Blog button does not exist!');
     }
-    await Promise.all([this.clickAndWaitForNavigation(readOurBlogButton)]);
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.clickOn(readOurBlogButton),
+    ]);
     if (this.page.url() !== blogUrl) {
       throw new Error(
         `The Read Our Blog button should open the Blog page,
@@ -840,7 +849,10 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the Forum page using the oppia website footer.
    */
   async clickOnForumLinkInFooter(): Promise<void> {
-    await Promise.all([await this.clickAndWaitForNavigation(footerForumlink)]);
+    await Promise.all([
+      this.page.waitForNavigation(),
+      await this.clickOn(footerForumlink),
+    ]);
 
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
@@ -942,10 +954,7 @@ export class LoggedOutUser extends BaseUser {
   async clickOnDonateLinkInFooter(): Promise<void> {
     await this.page.waitForXPath('(//a[contains(text(),"Donate")])');
     const [link] = await this.page.$x('(//a[contains(text(),"Donate")])');
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      await link.click(),
-    ]);
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
 
     expect(this.page.url()).toBe(donateUrl);
   }
@@ -956,10 +965,7 @@ export class LoggedOutUser extends BaseUser {
   async clickOnVolunteerLinkInFooter(): Promise<void> {
     await this.page.waitForXPath('(//a[contains(text(),"volunteer")])');
     const [link] = await this.page.$x('(//a[contains(text(),"volunteer")])');
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      await link.click(),
-    ]);
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
 
     expect(this.page.url()).toBe(volunteerUrl);
   }
@@ -1033,9 +1039,8 @@ export class LoggedOutUser extends BaseUser {
       '//a[contains(text(),"discover more ways to get involved")]'
     );
     await Promise.all([
-      await this.clickAndWaitForNavigation(
-        'discover more ways to get involved'
-      ),
+      this.page.waitForNavigation(),
+      await this.clickOn('discover more ways to get involved'),
     ]);
 
     expect(this.page.url()).toBe(contactUrl);
@@ -1046,11 +1051,8 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickForumLinkOnCreatorGuidelinesPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"forum")]');
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      this.clickOn('forum'),
-    ]);
-    await this.waitForNetworkIdle();
+    await Promise.all([this.page.waitForNavigation(), this.clickOn('forum')]);
+    await this.page.waitForNetworkIdle();
 
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
@@ -1061,7 +1063,10 @@ export class LoggedOutUser extends BaseUser {
   async clickDesignTipsLinkOnCreatorGuidelinesPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"Design Tips")]');
 
-    await Promise.all([await this.clickAndWaitForNavigation('Design Tips')]);
+    await Promise.all([
+      this.page.waitForNavigation(),
+      await this.clickOn('Design Tips'),
+    ]);
 
     expect(this.page.url()).toBe(explorationDesignTipsUrl);
   }
@@ -1091,7 +1096,8 @@ export class LoggedOutUser extends BaseUser {
     );
 
     await Promise.all([
-      await this.clickAndWaitForNavigation('Browse our Explorations'),
+      this.page.waitForNavigation(),
+      await this.clickOn('Browse our Explorations'),
     ]);
 
     expect(this.page.url()).toBe(communityLibraryUrl);
@@ -1103,10 +1109,7 @@ export class LoggedOutUser extends BaseUser {
   async clickLinkToPrivacyPolicyOnTermsPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"Privacy Policy")]');
     const [link] = await this.page.$x('//a[contains(text(),"Privacy Policy")]');
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      await link.click(),
-    ]);
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
 
     expect(this.page.url()).toBe(privacyPolicyUrl);
   }
@@ -1117,10 +1120,7 @@ export class LoggedOutUser extends BaseUser {
   async clickLinkToLicenseOnTermsPage(): Promise<void> {
     await this.page.waitForXPath('(//a[contains(text(),"here")])[1]');
     const [link] = await this.page.$x('(//a[contains(text(),"here")])[1]');
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      await link.click(),
-    ]);
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
 
     expect(this.page.url()).toBe(CreativeCommonsLegalCodeUrl);
   }
@@ -1131,10 +1131,7 @@ export class LoggedOutUser extends BaseUser {
   async clickLinkToGoogleGroupOnTermsPage(): Promise<void> {
     await this.page.waitForXPath('(//a[contains(text(),"here")])[2]');
     const [link] = await this.page.$x('(//a[contains(text(),"here")])[2]');
-    await Promise.all([
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      await link.click(),
-    ]);
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
 
     expect(this.page.url()).toBe(googleGroupsOppiaAnnouceUrl);
   }
@@ -1147,7 +1144,8 @@ export class LoggedOutUser extends BaseUser {
       '//a[contains(text(),"https://www.oppia.org")]'
     );
     await Promise.all([
-      this.clickAndWaitForNavigation('https://www.oppia.org'),
+      this.page.waitForNavigation({waitUntil: 'networkidle0'}),
+      this.clickOn('https://www.oppia.org'),
     ]);
 
     expect(this.page.url()).toBe(homeUrl);
@@ -1320,7 +1318,7 @@ export class LoggedOutUser extends BaseUser {
       // This reload is required to ensure the language dropdown is visible in mobile view,
       // if the earlier movements of the page have hidden it and since the inbuilt
       // scrollIntoView function call of the clickOn function didn't work as expected.
-      await this.reloadPage();
+      await this.page.reload();
     }
     await this.page.waitForSelector(languageDropdown);
     const languageDropdownElement = await this.page.$(languageDropdown);
@@ -1329,7 +1327,7 @@ export class LoggedOutUser extends BaseUser {
     }
     await this.clickOn(languageOption);
     // Here we need to reload the page again to confirm the language change.
-    await this.reloadPage();
+    await this.page.reload();
   }
 
   /**
@@ -1973,9 +1971,10 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(explorationCompletionToastMessage, {
       visible: true,
     });
-    const toastMessage = await this.page.$eval(
-      explorationCompletionToastMessage,
-      element => element.textContent
+    const element = await this.page.$(explorationCompletionToastMessage);
+    const toastMessage = await this.page.evaluate(
+      element => element.textContent,
+      element
     );
     if (!toastMessage || !toastMessage.includes(message)) {
       throw new Error('Exploration did not complete successfully');
@@ -3180,13 +3179,15 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.clickOn('Sign in');
     await this.type(testConstants.SignInDetails.inputField, email);
-    await this.clickAndWaitForNavigation('Sign In');
+    await this.clickOn('Sign In');
+    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
     await this.type('input.e2e-test-username-input', username);
     await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );
-    await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
+    await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
+    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
   }
 
   /**
@@ -3215,15 +3216,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectNavbarButtonsToHaveText(expectedText: string[]): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(openMobileNavbarMenuButton, {
-        visible: true,
-      });
-      const openMobileNavbarMenuButtonElement = await this.page.$(
-        openMobileNavbarMenuButton
-      );
-      if (openMobileNavbarMenuButtonElement) {
-        await openMobileNavbarMenuButtonElement.click();
-      }
+      await this.clickOn(openMobileNavbarMenuButton);
     }
 
     const isMobileViewport = this.isViewportAtMobileWidth();
