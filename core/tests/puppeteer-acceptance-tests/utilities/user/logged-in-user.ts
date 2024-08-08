@@ -83,7 +83,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the learner dashboard.
    */
-  async navigateToLearnerDashboard() {
+  async navigateToLearnerDashboard(): Promise<void> {
     await this.goto(learnerDashboardUrl);
   }
 
@@ -627,7 +627,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Verifies if the page is displayed in Right-to-Left (RTL) mode.
    */
-  async verifyPageIsRTL() {
+  async verifyPageIsRTL(): Promise<void> {
     const pageDirection = await this.page.evaluate(() => {
       const oppiaRoot = document.querySelector(angularRootElementSelector);
       if (!oppiaRoot) {
