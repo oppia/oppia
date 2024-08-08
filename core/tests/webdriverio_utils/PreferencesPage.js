@@ -206,14 +206,6 @@ var PreferencesPage = function () {
     }
   };
 
-  this.isFeedbackEmailsCheckboxSelected = async function () {
-    return await feedbackMessageEmailsCheckbox.isSelected();
-  };
-
-  this.isEditorRoleEmailsCheckboxSelected = async function () {
-    return await editorRoleEmailsCheckbox.isSelected();
-  };
-
   // This function only compares the text displayed on the subscription (which
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
@@ -280,40 +272,6 @@ var PreferencesPage = function () {
     }
     let actualCount = await subscriptionsSelector().length;
     expect(actualCount).toEqual(expectedCount);
-  };
-
-  this.expectUserBioToBe = async function (bio) {
-    await waitFor.visibilityOf(
-      userBioElement,
-      'User bio field takes too long to appear.'
-    );
-    expect(await userBioElement.getValue()).toMatch(bio);
-  };
-
-  this.selectCreatorDashboard = async function () {
-    await action.click('Creator Dashboard radio', creatorDashboardRadio);
-    await saveNewChanges('Creator Dashboard Option');
-  };
-
-  this.selectContributorDashboard = async function () {
-    await action.click(
-      'Contributor Dashboard radio',
-      contributorDashboardRadio
-    );
-    await saveNewChanges('Contributor Dashboard Option');
-  };
-
-  this.selectLearnerDashboard = async function () {
-    await action.click('Learner Dashboard radio', learnerDashboardRadio);
-    await saveNewChanges('Learner Dashboard Option');
-  };
-
-  this.clickDeleteAccountButton = async function () {
-    await action.click('Delete Account button', deleteAccountButton);
-  };
-
-  this.clickExportAccountButton = async function () {
-    await action.click('Export Account button', exportAccountButton);
   };
 };
 
