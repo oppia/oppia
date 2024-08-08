@@ -13,27 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the user journey of account creation, profile preference editing, and account export.
- * The test includes:
- * - Navigation to preferences page, editing profile preferences,
- *   verifying changes on profile page, exporting account, and account deletion by a logged-out user.
+ * @fileoverview Acceptance Test for the user journey of changing the site language to an RTL
+ * language and navigating through various pages.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const ROLES = testConstants.Roles;
 
 describe('Logged-in User', function () {
   let loggedInUser1: LoggedInUser & LoggedOutUser;
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let explorationId: string | null;
 
   beforeAll(async function () {
-    loggedInUser1 = await UserFactory.createNewUser(
-      'loggedInUser1',
-      'logged_in_user1@example.com'
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculumAdmin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
     );
 
     explorationId =
@@ -61,7 +64,11 @@ describe('Logged-in User', function () {
       'Algebra I'
     );
 
-    loggedOutUser = await UserFactory.createLoggedOutUser();
+    loggedInUser1 = await UserFactory.createNewUser(
+      'loggedInUser1',
+      'logged_in_user1@example.com'
+    );
+
     // Setup taking longer than 300000ms.
   }, 420000);
 
