@@ -80,7 +80,7 @@ export class TranslationAdmin extends BaseUser {
     await this.select(addContributonRightsLanguageDropdown, languageCode);
     await this.clickOn(addContributionRightsSubmitButton);
 
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**
@@ -98,7 +98,7 @@ export class TranslationAdmin extends BaseUser {
     await this.select(removeContributonRightsLanguageSelect, languageCode);
     await this.clickOn(removeContributionRightsSubmitButton);
 
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**
@@ -109,7 +109,7 @@ export class TranslationAdmin extends BaseUser {
     await this.type(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
 
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**
@@ -123,7 +123,7 @@ export class TranslationAdmin extends BaseUser {
     await this.select(viewContributorLanguageSelect, languageCode);
     await this.clickOn(viewContributorSubmitButton);
 
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**

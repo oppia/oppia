@@ -700,10 +700,7 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error('The Watch A Video button does not exist!');
     }
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(watchAVideoButton),
-    ]);
+    await Promise.all([this.clickAndWaitForNavigation(watchAVideoButton)]);
 
     const url = this.getCurrentUrlWithoutParameters();
     const expectedWatchAVideoUrl = this.isViewportAtMobileWidth()
@@ -1055,7 +1052,7 @@ export class LoggedOutUser extends BaseUser {
   async clickForumLinkOnCreatorGuidelinesPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"forum")]');
     await Promise.all([this.page.waitForNavigation(), this.clickOn('forum')]);
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
 
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
@@ -1323,7 +1320,11 @@ export class LoggedOutUser extends BaseUser {
       // scrollIntoView function call of the clickOn function didn't work as expected.
       await this.page.reload();
     }
-    await this.clickOn(languageDropdown);
+    await this.page.waitForSelector(languageDropdown);
+    const languageDropdownElement = await this.page.$(languageDropdown);
+    if (languageDropdownElement) {
+      await languageDropdownElement.click();
+    }
     await this.clickOn(languageOption);
     // Here we need to reload the page again to confirm the language change.
     await this.page.reload();
