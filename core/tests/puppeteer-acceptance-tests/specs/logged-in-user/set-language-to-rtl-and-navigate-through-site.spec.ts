@@ -72,40 +72,50 @@ describe('Logged-in User', function () {
     // Setup taking longer than 300000ms.
   }, 420000);
 
-  it('should be able to change the site language to RTL, navigate and interact with various pages', async function () {
-    await loggedInUser1.navigateToPreferencesPage();
+  it(
+    'should be able to change the site language to RTL, navigate and interact with various pages',
+    async function () {
+      await loggedInUser1.navigateToPreferencesPage();
 
-    // Change site language to Arabic (RTL language)
-    await loggedInUser1.changeSiteLanguage('Arabic');
+      // Change site language to Arabic (RTL language)
+      await loggedInUser1.changeSiteLanguage('ar');
 
-    // Navigate through various pages and verify they are properly mirrored and interactive
-    await loggedInUser1.navigateToSplashPage();
-    await loggedInUser1.verifyPageIsRTLAndInteractive();
+      // Navigate through various pages and verify they are properly mirrored and interactive.
+      await loggedInUser1.navigateToSplashPage();
+      await loggedInUser1.verifyPageIsRTL();
 
-    await loggedInUser1.navigateToAboutPage();
-    await loggedInUser1.verifyPageIsRTLAndInteractive();
+      await loggedInUser1.navigateToAboutPage();
+      await loggedInUser1.verifyPageIsRTL();
 
-    await loggedInUser1.navigateToContactUsPage();
-    await loggedInUser1.verifyPageIsRTLAndInteractive();
+      await loggedInUser1.navigateToContactUsPage();
+      await loggedInUser1.verifyPageIsRTL();
 
-    await loggedInUser1.navigateToCommunityLibraryPage();
-    await loggedInUser1.verifyPageIsRTLAndInteractive();
+      await loggedInUser1.navigateToCommunityLibraryPage();
+      await loggedInUser1.verifyPageIsRTL();
 
-    // Checking story viewer.
-    await loggedInUser1.searchForLessonInSearchBar('Math');
-    await loggedInUser1.playLessonFromSearchResults('Math');
-    await loggedInUser1.verifyPageIsRTLAndInteractive();
+      await loggedInUser1.navigateToClassroomPage('math');
+      await loggedInUser1.verifyPageIsRTL();
 
-    // Checking exploration player.
-    await loggedInUser1.selectChapterWithinStoryToLearn('Chapter 1', 'Story 1');
-    await loggedInUser1.verifyPageIsRTLAndInteractive();
+      // Checking story viewer.
+      await loggedInUser1.searchForLessonInSearchBar('Algebra I');
+      await loggedInUser1.playLessonFromSearchResults('Algebra I');
+      await loggedInUser1.verifyPageIsRTL();
 
-    await loggedInUser1.navigateToLeanerDashboardPage();
-    await loggedInUser1.verifyPageIsRTLAndInteractive();
+      // Checking exploration player.
+      await loggedInUser1.selectChapterWithinStoryToLearn(
+        'Chapter 1',
+        'Story 1'
+      );
+      await loggedInUser1.verifyPageIsRTL();
 
-    await loggedInUser1.navigateToClassroomPage('math');
-    await loggedInUser1.verifyPageIsRTLAndInteractive();
-  }, 2147483647);
+      await loggedInUser1.navigateToLearnerDashboard();
+      await loggedInUser1.verifyPageIsRTL();
+
+      await loggedInUser1.navigateToClassroomPage('math');
+      await loggedInUser1.verifyPageIsRTL();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

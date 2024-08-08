@@ -26,6 +26,7 @@ const WikiPrivilegesToFirebaseAccount =
 const baseUrl = testConstants.URLs.BaseURL;
 const homePageUrl = testConstants.URLs.Home;
 const signUpEmailField = testConstants.SignInDetails.inputField;
+const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -62,9 +63,9 @@ const profilePictureSelector = '.e2e-test-profile-user-photo';
 const bioSelector = '.oppia-user-bio-text';
 const subjectInterestSelector = '.e2e-test-profile-interest';
 const exportButtonSelector = '.e2e-test-export-account-button';
+const angularRootElementSelector = 'oppia-angular-root';
 const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE =
   'Your data is currently being loaded and will be downloaded as a JSON formatted text file upon completion.';
-
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
 export class LoggedInUser extends BaseUser {
@@ -77,6 +78,13 @@ export class LoggedInUser extends BaseUser {
       return;
     }
     await this.goto(profilePageUrl);
+  }
+
+  /**
+   * Navigates to the learner dashboard.
+   */
+  async navigateToLearnerDashboard() {
+    await this.goto(learnerDashboardUrl);
   }
 
   /**
@@ -393,7 +401,7 @@ export class LoggedInUser extends BaseUser {
       );
     }
 
-    // Converting the dashboard to lowercase and replace spaces with hyphens to match the selector
+    // Converting the dashboard to lowercase and replace spaces with hyphens to match the selector.
     const dashboardInSelector = dashboard.toLowerCase().replace(/\s+/g, '-');
     const dashboardSelector = `.e2e-test-${dashboardInSelector}-radio`;
 
@@ -454,7 +462,7 @@ export class LoggedInUser extends BaseUser {
         let found = false;
 
         for (const checkbox of checkboxes) {
-          // Get the adjacent child which is a span tag and get its text content
+          // Get the adjacent child which is a span tag and get its text content.
           const label = await checkbox.$eval(
             '+ span',
             span => span.textContent
@@ -573,7 +581,7 @@ export class LoggedInUser extends BaseUser {
         )
       );
 
-      // Check if the actual interests match the expected interests
+      // Check if the actual interests match the expected interests.
       for (const interest of expectedInterests) {
         if (!actualInterests.includes(interest)) {
           throw new Error(`Interest not found: ${interest}`);
@@ -613,6 +621,29 @@ export class LoggedInUser extends BaseUser {
       const newError = new Error(`Failed to export account: ${error}`);
       newError.stack = error.stack;
       throw newError;
+    }
+  }
+
+  /**
+   * Verifies if the page is displayed in Right-to-Left (RTL) mode.
+   */
+  async verifyPageIsRTL() {
+    const pageDirection = await this.page.evaluate(() => {
+      const oppiaRoot = document.querySelector(angularRootElementSelector);
+      if (!oppiaRoot) {
+        throw new Error(`${angularRootElementSelector} not found`);
+      }
+
+      const childDiv = oppiaRoot.querySelector('div');
+      if (!childDiv) {
+        throw new Error('Child div not found');
+      }
+
+      return childDiv.getAttribute('dir');
+    });
+
+    if (pageDirection !== 'rtl') {
+      throw new Error('Page is not in RTL mode');
     }
   }
 }

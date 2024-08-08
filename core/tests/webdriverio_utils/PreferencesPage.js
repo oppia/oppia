@@ -24,18 +24,13 @@ var workflow = require('../webdriverio_utils/workflow.js');
 var PreferencesPage = function () {
   var USER_PREFERENCES_URL = '/preferences';
   var audioLanguageSelector = $('.e2e-test-audio-language-selector');
-  var creatorDashboardRadio = $('.e2e-test-creator-dashboard-radio');
-  var contributorDashboardRadio = $('.e2e-test-contributor-dashboard-radio');
   var customProfilePhoto = $('.e2e-test-custom-photo');
-  var deleteAccountButton = $('.e2e-test-delete-account-button');
   var editorRoleEmailsCheckbox = $('.e2e-test-editor-role-email-checkbox');
   var emailUpdatesCheckbox = $('.e2e-test-email-updates-checkbox');
-  var exportAccountButton = $('.e2e-test-export-account-button');
   var feedbackMessageEmailsCheckbox = $(
     '.e2e-test-feedback-message-email-checkbox'
   );
   var languageSelector = $('.e2e-test-site-language-selector');
-  var learnerDashboardRadio = $('.e2e-test-learner-dashboard-radio');
   var navBar = $('.e2e-test-navbar-dropdown-toggle');
   var pageHeader = $('.e2e-test-preferences-title');
   var profilePhotoClickable = $('.e2e-test-photo-clickable');

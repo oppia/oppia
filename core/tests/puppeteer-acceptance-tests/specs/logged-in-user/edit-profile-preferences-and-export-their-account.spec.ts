@@ -23,7 +23,6 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {log} from 'util';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
@@ -42,7 +41,7 @@ describe('Logged-in User', function () {
     async function () {
       await loggedInUser1.navigateToPreferencesPage();
 
-      // Update profile preferences
+      // Update profile preferences.
       await loggedInUser1.updateProfilePicture(
         testConstants.data.profilePicture
       );
@@ -57,7 +56,7 @@ describe('Logged-in User', function () {
         ' Receive emails when someone sends you feedback on an exploration',
       ]);
 
-      // Navigate to Profile page and verify changes
+      // Navigate to Profile page and verify changes.
       await loggedInUser1.navigateToProfilePageFromPreferencePage();
       await loggedInUser1.expectProfilePictureToBe(
         testConstants.data.profilePicture
@@ -65,7 +64,7 @@ describe('Logged-in User', function () {
       await loggedInUser1.expectBioToBe('This is my new bio');
       await loggedInUser1.expectSubjectInterestsToBe(['Math, Science']);
 
-      // Export account from Preferences page
+      // Export account from Preferences page.
       await loggedInUser1.navigateToPreferencesPage();
       await loggedInUser1.exportAccount();
     },
