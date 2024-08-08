@@ -474,9 +474,9 @@
 .teach-page .oppia-teach-creators-arrows-container button {
   background-color: #fff;
   border: none;
-  height: 40px;
+  height: 36px;
   outline: none;
-  width: 40px;
+  width: 36px;
 }
 
 .teach-page .oppia-teach-lesson-panel button {
@@ -625,6 +625,23 @@
 }
 
 @media only screen and (max-width: 976px) {
+  .teach-page .oppia-teach-hero-title {
+    font-size: 3rem;
+    line-height: 33.6px;
+  }
+  .teach-page .oppia-teach-hero-section {
+    background-size: cover;
+    min-height: 364px;
+    padding: 32px 48px;
+  }
+  .teach-page .oppia-teach-hero-box {
+    max-width: 64%;
+    padding: 32px;
+  }
+  .teach-page .oppia-teach-hero-subtext {
+    font-size: 1.6rem;
+    line-height: 19.2px;
+  }
   .teach-page .oppia-teach-lesson-bottom {
     flex-direction: column;
     gap: 48px;
@@ -679,10 +696,6 @@
 }
 
 @media only screen and (max-width: 769px) {
-  .teach-page .oppia-teach-hero-title {
-    font-size: 3rem;
-    line-height: 33.6px;
-  }
   .teach-page .oppia-teach-title {
     font-size: 3rem;
     line-height: 40.5px;
@@ -692,19 +705,6 @@
     line-height: 24px;
   }
   .teach-page .oppia-teach-subtext {
-    font-size: 1.6rem;
-    line-height: 19.2px;
-  }
-  .teach-page .oppia-teach-hero-section {
-    background-size: cover;
-    min-height: 364px;
-    padding: 32px 48px;
-  }
-  .teach-page .oppia-teach-hero-box {
-    max-width: 64%;
-    padding: 32px;
-  }
-  .teach-page .oppia-teach-hero-subtext {
     font-size: 1.6rem;
     line-height: 19.2px;
   }
@@ -737,6 +737,16 @@
     line-height: 15.6px;
     min-height: 40px;
     padding: 4px 8px;
+  }
+  .teach-page .oppia-teach-creators-arrows-container {
+    margin-top: 16px;
+  }
+  .teach-page .oppia-teach-creators-arrows-container button {
+    height: 28px;
+    width: 28px;
+  }
+  .teach-page .oppia-teach-creators-arrows-container i {
+    font-size: 28px;
   }
   .teach-page .oppia-teach-lesson-section {
     padding: 0 48px 80px;
@@ -806,6 +816,16 @@
   }
   .teach-page .oppia-teach-creators-section {
     padding: 0 40px 64px;
+  }
+  .teach-page .oppia-teach-creators-arrows-container {
+    padding: 16px 0;
+  }
+  .teach-page .oppia-teach-creators-arrows-container button {
+    height: 24px;
+    width: 24px;
+  }
+  .teach-page .oppia-teach-creators-arrows-container i {
+    font-size: 24px;
   }
   .teach-page .oppia-teach-creators-carousel {
     gap: 16px;
@@ -906,6 +926,12 @@
     min-height: 0;
     min-width: 0;
     padding: 6px;
+  }
+  .teach-page .oppia-teach-creators-carousel-item-image .oppia-teach-subtext {
+    padding: 4px 4px;
+  }
+  .teach-page .oppia-teach-creators-carousel-item-image p {
+    bottom: 4px;
   }
   .teach-page .oppia-teach-lesson-section {
     padding: 0 20px 56px;

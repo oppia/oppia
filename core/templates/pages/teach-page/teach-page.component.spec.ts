@@ -268,13 +268,13 @@ describe('Teach Page', () => {
     expect(windowRef.nativeWindow.location.href).toEqual('/android');
   });
 
-  it('should set screen type to mobile when window width is less than or equal to 360', () => {
+  it('should set screen type to mobile when window width is less than or equal to 553', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(360);
     component.setScreenType();
     expect(component.screenType).toEqual('mobile');
   });
 
-  it('should set screen type to tablet when window width is between 361 and 768', () => {
+  it('should set screen type to tablet when window width is between 553 and 768', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(765);
     component.setScreenType();
     expect(component.screenType).toEqual('tablet');
