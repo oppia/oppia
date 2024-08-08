@@ -27,6 +27,8 @@ const PendingAccountDeletionPage = testConstants.URLs.PendingAccountDeletion;
 const baseUrl = testConstants.URLs.BaseURL;
 const homePageUrl = testConstants.URLs.Home;
 const signUpEmailField = testConstants.SignInDetails.inputField;
+const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const feedbackUpdatesUrl = testConstants.URLs.FeedbackUpdates;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -49,6 +51,12 @@ const confirmUsernameField = '.e2e-test-confirm-username-field';
 const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
 const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
 const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
+const reportExplorationButtonSelector = '.e2e-test-report-exploration-button';
+const reportExplorationTextAreaSelector =
+  '.e2e-test-report-exploration-text-area';
+const submitReportButtonSelector = '.e2e-test-submit-report-button';
+const feedbackThreadSelector = '.e2e-test-feedback-thread';
+const feedbackMessageSelector = '.e2e-test-feedback-message';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
@@ -77,6 +85,20 @@ export class LoggedInUser extends BaseUser {
     await this.clickOn(subscribeButton);
     await this.page.waitForSelector(unsubscribeLabel);
     showMessage(`Subscribed to the creator with username ${username}.`);
+  }
+
+  /**
+   * Navigates to the learner dashboard.
+   */
+  async navigateToLearnerDashboard() {
+    await this.goto(learnerDashboardUrl);
+  }
+
+  /**
+   * Navigates to the feedback updates page.
+   */
+  async navigateToFeedbackUpdatesPage() {
+    await this.goto(feedbackUpdatesUrl);
   }
 
   /**
@@ -339,6 +361,71 @@ export class LoggedInUser extends BaseUser {
     if (!url.includes(expectedPageInUrl.toLowerCase())) {
       throw new Error(
         `Expected to be on page ${expectedPage}, but found ${url}`
+      );
+    }
+  }
+
+  /**
+   * This function is used to report an exploration. It clicks on the report button,
+   * opens the report modal, selects an issue, types a description, and submits the report.
+   * @param {string} issueName - The name of the issue to report.
+   * @param {string} issueDescription - The description of the issue.
+   */
+  async reportExploration(issueName: string, issueDescription: string) {
+    await this.clickOn(reportExplorationButtonSelector);
+    await this.clickOn(` ${issueName} `);
+    await this.clickOn(reportExplorationTextAreaSelector);
+    await this.type(reportExplorationTextAreaSelector, issueDescription);
+
+    await this.clickOn(submitReportButtonSelector);
+  }
+
+  /**
+   * Views a feedback update thread.
+   * @param {number} threadNumber - The 0-indexed position of the thread.
+   */
+  async viewFeedbackUpdateThread(threadNumber: number) {
+    await this.page.waitForSelector(feedbackThreadSelector);
+    const feedbackThreads = await this.page.$$(feedbackThreadSelector);
+
+    if (threadNumber >= 0 && threadNumber < feedbackThreads.length) {
+      await feedbackThreads[threadNumber].click();
+    } else {
+      throw new Error(`Thread not found: ${threadNumber}`);
+    }
+  }
+
+  /**
+   * Checks if the feedback and response match the expected values.
+   * @param {string} expectedFeedback - The expected feedback.
+   * @param {string} expectedResponse - The expected response.
+   */
+
+  async expectFeedbackAndResponseToMatch(
+    expectedFeedback: string,
+    expectedResponse: string
+  ) {
+    const feedbackMessages = await this.page.$$(feedbackMessageSelector);
+
+    if (feedbackMessages.length < 2) {
+      throw new Error('Not enough feedback messages found.');
+    }
+
+    const actualFeedback = await feedbackMessages[0].$eval('.', el =>
+      el.textContent?.trim()
+    );
+    const actualResponse = await feedbackMessages[1].$eval('.', el =>
+      el.textContent?.trim()
+    );
+
+    if (actualFeedback !== expectedFeedback) {
+      throw new Error(
+        `Feedback does not match the expected value. Expected: ${expectedFeedback}, Found: ${actualFeedback}`
+      );
+    }
+    if (actualResponse !== expectedResponse) {
+      throw new Error(
+        `Response does not match the expected value. Expected: ${expectedResponse}, Found: ${actualResponse}`
       );
     }
   }

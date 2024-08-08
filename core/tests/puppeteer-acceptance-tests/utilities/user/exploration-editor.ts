@@ -184,6 +184,14 @@ const outcomeDestWhenStuckSelector =
 const intEditorField = '.e2e-test-editor-int';
 const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
 const tagsField = '.e2e-test-chip-list-tags';
+const feedBackButtonTab = '.e2e-test-feedback-tab';
+const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
+const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
+const feedbackBackButtonSelector = '.e2e-test-oppia-feedback-back-button';
+const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
+const feedbackSelector = '.e2e-test-exploration-feedback';
+const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
+const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
@@ -294,6 +302,16 @@ export class ExplorationEditor extends BaseUser {
 
     await this.clickOn(closePublishedPopUpButton);
     return explorationId;
+  }
+
+  async navigateToFeedbackTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOn(mobileFeedbackTabButton);
+    } else {
+      await this.clickAndWaitForNavigation(feedBackButtonTab);
+    }
   }
 
   /**
@@ -1606,6 +1624,97 @@ export class ExplorationEditor extends BaseUser {
         `The expected translation does not exist in the translations tab. Found "${translation}", expected "${expectedTranslation}"`
       );
     }
+  }
+
+  /**
+   * Opens an exploration in the editor.
+   * @param {string} explorationName - The name of the exploration.
+   */
+  async openExplorationInExplorationEditor(explorationName: string) {
+    await this.page.waitForSelector(explorationSummaryTileTitleSelector);
+    const title = await this.page.$eval(
+      explorationSummaryTileTitleSelector,
+      el => el.textContent?.trim()
+    );
+
+    if (title === explorationName) {
+      await this.page.click(explorationSummaryTileTitleSelector);
+    } else {
+      throw new Error(`Exploration not found: ${explorationName}`);
+    }
+  }
+
+  /**
+   * Checks the number of suggestions in the exploration editor.
+   * @param {number} expectedNumber - The expected number of suggestions.
+   */
+  async expectNoOfSuggestionsToBe(expectedNumber: number) {
+    await this.page.waitForSelector(feedbackSubjectSelector);
+    const feedbackSubjects = await this.page.$$(feedbackSubjectSelector);
+
+    if (feedbackSubjects.length === expectedNumber) {
+      showMessage('Number of suggestions matches the expected number.');
+    } else {
+      throw new Error(
+        `Number of suggestions does not match the expected number. Expected: ${expectedNumber}, Found: ${feedbackSubjects.length}`
+      );
+    }
+  }
+
+  /**
+   * Views a feedback thread.
+   * @param {number} expectedThread - The 1-indexed position of the expected thread.
+   */
+  async viewFeedbackThread(expectedThread: number) {
+    if (await this.page.$(feedbackBackButtonSelector)) {
+      await this.page.click(feedbackBackButtonSelector);
+    }
+
+    const feedbackSubjects = await this.page.$$(feedbackSubjectSelector);
+    if (expectedThread > 0 && expectedThread <= feedbackSubjects.length) {
+      await feedbackSubjects[expectedThread - 1].click();
+    } else {
+      throw new Error(`Expected thread not found: ${expectedThread}`);
+    }
+  }
+
+  /**
+   * Checks if a suggestion is anonymous.
+   * @param {string} suggestion - The expected suggestion.
+   * @param {boolean} anonymouslySubmitted - Indicates whether the suggestion is expected to be anonymous.
+   */
+  async expectSuggestionToBeAnonymous(
+    suggestion: string,
+    anonymouslySubmitted: boolean
+  ) {
+    const actualSuggestion = await this.page.$eval(feedbackSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (actualSuggestion !== suggestion) {
+      throw new Error(
+        `Suggestion does not match the expected value. Expected: ${suggestion}, Found: ${actualSuggestion}`
+      );
+    }
+
+    const isAnonymouslySubmitted = await this.isTextPresentOnPage(
+      '(anonymously submitted)'
+    );
+
+    if (isAnonymouslySubmitted !== anonymouslySubmitted) {
+      throw new Error(
+        `Anonymity does not match the expected value. Expected: ${anonymouslySubmitted ? 'Anonymous' : 'Not anonymous'}, Found: ${isAnonymouslySubmitted ? 'Anonymous' : 'Not anonymous'}`
+      );
+    }
+  }
+
+  /**
+   * Replies to a suggestion.
+   * @param {string} reply - The reply to the suggestion.
+   */
+  async replyToSuggestion(reply: string) {
+    await this.type(responseTextareaSelector, reply);
+    await this.clickOn(sendButtonSelector);
   }
 }
 

@@ -132,29 +132,39 @@ describe('Logged-out User', function () {
 
       // Giving anonymous feedback after completing the exploration.
       await loggedInUser.giveFeedback('This is a great lesson!', true);
-      await loggedInUser.reportExploration('Inappropriate content');
+      await loggedInUser.reportExploration('Other', 'Inappropriate content');
       await loggedInUser.rateExploration(5, 'Nice!', false);
 
       // Check the exploration editor page.
-      await loggedInUser.navigateToExplorationEditorPage(explorationId);
-      await loggedInUser.expectSuggestionsToBe([
+      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.openExplorationInExplorationEditor(
+        'Algebra Basics'
+      );
+      await explorationEditor.navigateToFeedbackTab();
+
+      await explorationEditor.expectNoOfSuggestionsToBe(2);
+      await explorationEditor.viewFeedbackThread(1);
+      await explorationEditor.expectSuggestionToBeAnonymous(
         'This state is very informative!',
+        true
+      );
+      await explorationEditor.replyToSuggestion('Thanks for the feedback!');
+
+      await explorationEditor.viewFeedbackThread(2);
+      await explorationEditor.expectSuggestionToBeAnonymous(
         'This is a great lesson!',
-      ]);
-      await loggedInUser.expectSuggestionToBeAnonymous([
-        'This state is very informative!',
-        true,
-      ]);
-      await loggedInUser.expectSuggestionToBeAnonymous([
-        'This is a great lesson!',
-        false,
-      ]);
+        false
+      );
+      await explorationEditor.replyToSuggestion(
+        'Thanks for the feedback, We will update!'
+      );
 
       // Check feedback updates page.
       await loggedInUser.navigateToFeedbackUpdatesPage();
-      await loggedInUser.expectFeedbackToBe([
+      await loggedInUser.viewFeedbackUpdateThread(1);
+      await loggedInUser.expectFeedbackAndReponseToMatch([
         'This state is very informative!',
-        'This is a great lesson!',
+        'Thanks for the feedback!',
       ]);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
