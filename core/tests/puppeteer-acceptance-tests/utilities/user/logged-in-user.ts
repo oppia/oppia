@@ -92,16 +92,11 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToCommunityLessonsSection(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      const test1 = await this.isTextPresentOnPage(
-        ' Good Morning, loggedInUser1! '
-      );
-      showMessage(`Test1: ${test1}`);
+      showMessage(await this.page.content());
       await this.clickOn(mobileProgressSectionButton);
-      const test2 = await this.isTextPresentOnPage('Skill Progress');
-      showMessage(`Test2: ${test2}`);
-      await this.clickOn(mobileCommunityLessonSectionButton);
-      const test3 = await this.isTextPresentOnPage('Play Later');
-      showMessage(`Test1: ${test3}`);
+      showMessage(await this.page.content());
+      await this.clickOn('Lessons');
+      showMessage(await this.page.content());
     } else {
       await this.page.click(communityLessonsSectionButton);
     }
