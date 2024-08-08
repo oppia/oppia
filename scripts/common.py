@@ -225,6 +225,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'exploration-editor/save-draft-publish-and-discard-the-changes',
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
+    'logged-in-user/create-and-delete-account',
     'logged-out-user/check-all-user-flow-of-donor',
     'logged-out-user/check-all-user-flow-of-parent-teacher',
     'logged-out-user/check-all-user-flow-of-partner',
@@ -243,6 +244,16 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/click-all-links-on-terms-page',
     'logged-out-user/click-all-buttons-on-donate-page',
     'logged-out-user/visit-classroom-index-page',
+    'logged-out-user/browse-and-search-for-lessons-in-community-library',
+    'logged-out-user/select-and-play-topic-from-classroom-page',
+    'logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration',
+    'logged-out-user/play-through-lesson-while-getting-feedback-and-hints',
+    'logged-out-user/share-and-give-feedback-for-exploration-'
+    'but-not-report-and-rate-it',
+    'logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus',
+    'logged-out-user/change-site-language-and-engage-with-original-exploration',
+    'logged-out-user/sign-in-and-save-exploration-progress',
+    'logged-out-user/track-and-resume-exploration-progress-via-url',
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
@@ -257,13 +268,15 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'topic-manager/edit-and-preview-a-subtopic',
     'topic-manager/edit-and-preview-a-topic',
     'translation-admin/add-and-remove-translation-rights',
+    'topic-manager/create-and-delete-subtopic-and-story',
     'topic-manager/browse-skills-on-topics-and-skills-dashboard',
     'topic-manager/browse-topics-on-topics-and-skills-dashboard',
     'topic-manager/create-and-delete-questions-in-skill-editor',
     'topic-manager/assign-unassign-and-merge-skills',
     'topic-manager/cannot-do-curriculum-admin-actions',
     'topic-manager/edit-and-republish-a-skill',
-    'voiceover-admin/add-voiceover-artist-to-an-exploration',
+    'topic-manager/edit-preview-and-save-a-chapter',
+    'voiceover-admin/add-voiceover-artist-to-an-exploration'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181

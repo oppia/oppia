@@ -23,7 +23,7 @@
                 </i>
               </span>
             </div>
-            <input id="storyNodeTitle" type="text" class="form-control"
+            <input id="storyNodeTitle" type="text" class="form-control e2e-test-chapter-title-field"
                    [(ngModel)]="editableTitle" [ngModelOptions]="{standalone: true}" (blur)="updateTitle(editableTitle)"
                    placeholder="Enter a title for the chapter." [maxlength]="MAX_CHARS_IN_EXPLORATION_TITLE">
             <span class="oppia-input-box-subtitle">
