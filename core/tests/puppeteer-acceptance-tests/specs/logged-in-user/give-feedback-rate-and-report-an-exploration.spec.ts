@@ -141,7 +141,14 @@ describe('Logged-out User', function () {
         'This state is very informative!',
         'This is a great lesson!',
       ]);
-      await loggedInUser.expectAnonymityOfSuggestionsToBe([false, true]);
+      await loggedInUser.expectSuggestionToBeAnonymous([
+        'This state is very informative!',
+        true,
+      ]);
+      await loggedInUser.expectSuggestionToBeAnonymous([
+        'This is a great lesson!',
+        false,
+      ]);
 
       // Check feedback updates page.
       await loggedInUser.navigateToFeedbackUpdatesPage();

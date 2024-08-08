@@ -276,6 +276,7 @@ const mobileNavbarButtonSelector = '.text-uppercase';
 const skipLinkSelector = '.e2e-test-skip-link';
 const openMobileNavbarMenuButton = '.oppia-navbar-menu-icon';
 const closeMobileNavbarMenuButton = '.oppia-navbar-close-icon';
+const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -2560,8 +2561,13 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Gives feedback on the exploration.
    * @param {string} feedback - The feedback to give on the exploration.
+   * @param {boolean} stayAnonymous - Whether to stay anonymous while giving feedback, default is
+   * false.
    */
-  async giveFeedback(feedback: string): Promise<void> {
+  async giveFeedback(
+    feedback: string,
+    stayAnonymous: boolean = false
+  ): Promise<void> {
     // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
     // in mobile viewport which is required for testing the feedback messages tab),
     // remove this part of skipping this function for Mobile viewport and make it run in mobile viewport
@@ -2573,6 +2579,12 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(feedbackPopupSelector);
     await this.page.waitForSelector(feedbackTextarea, {visible: true});
     await this.type(feedbackTextarea, feedback);
+
+    // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
+    if (stayAnonymous) {
+      await this.clickOn('stay-anonymous-checkbox');
+    }
+
     await this.clickOn('Submit');
 
     try {
