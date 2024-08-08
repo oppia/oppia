@@ -352,10 +352,6 @@ export class ExplorationStatesService {
   ): SubtitledHtml;
   getStatePropertyMemento(
     stateName: string,
-    backendName: 'recorded_voiceovers'
-  ): RecordedVoiceovers;
-  getStatePropertyMemento(
-    stateName: string,
     backendName: 'solicit_answer_details'
   ): boolean;
   getStatePropertyMemento(
