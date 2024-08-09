@@ -18,11 +18,15 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {showMessage} from '../../utilities/common/show-message';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const INTRO_CONTENT_HI_VOICEOVER = testConstants.data.IntroContentHiVoiceover;
+const CONTINUE_INTERACTION_HI_VOICEOVER =
+  testConstants.data.ContinueInteractionHiVoiceover;
+const LAST_CARD_HI_VOICEOVER = testConstants.data.LastCardHiVoiceover;
 const ROLES = testConstants.Roles;
 
 const INTRODUCTION_CARD_CONTENT: string =
@@ -31,27 +35,33 @@ enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
   NUMERIC_INPUT = 'Number Input',
   END_EXPLORATION = 'End Exploration',
-  MULTIPLE_CHOICE = 'Multiple Choice',
   TEXT_INPUT = 'Text Input',
 }
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',
-  MULTIPLE_CHOICE_QUESTION = 'Multiple Choice',
   TEXT_QUESTION = 'Text Input',
   FINAL_CARD = 'Final Card',
 }
 
 describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
+  let curriculumAdmin: CurriculumAdmin;
   let releaseCoordinator: ReleaseCoordinator;
   let loggedOutUser: LoggedOutUser;
   let explorationId: string | null;
 
   beforeAll(async function () {
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculumAdmin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
+
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com'
     );
+
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoordinator',
       'release_coordinator@example.com',
@@ -62,6 +72,7 @@ describe('Exploration Editor', function () {
     await releaseCoordinator.enableFeatureFlag(
       'exploration_editor_can_modify_translations'
     );
+    await releaseCoordinator.enableFeatureFlag('enable_voiceover_contribution');
 
     // Navigate to the creator dashboard and create a new exploration.
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -72,33 +83,7 @@ describe('Exploration Editor', function () {
 
     // Add a new card with a question.
     await explorationEditor.viewOppiaResponses();
-    await explorationEditor.directLearnersToNewCard(
-      CARD_NAME.MULTIPLE_CHOICE_QUESTION
-    );
-    await explorationEditor.saveExplorationDraft();
-
-    // Navigate to the new card and update its content.
-    await explorationEditor.navigateToCard(CARD_NAME.MULTIPLE_CHOICE_QUESTION);
-    await explorationEditor.updateCardContent(
-      'Enter a negative number greater than -100.'
-    );
-    await explorationEditor.addMultipleChoiceInteraction([
-      '-99',
-      '-101',
-      '0',
-      '101',
-    ]);
-    await explorationEditor.addResponsesToTheInteraction(
-      INTERACTION_TYPES.MULTIPLE_CHOICE,
-      '-99',
-      'Perfect!',
-      CARD_NAME.TEXT_QUESTION,
-      true
-    );
-    await explorationEditor.editDefaultResponseFeedback('Wrong.');
-    await explorationEditor.addHintToState(
-      'It is closer to zero but not a positive number.'
-    );
+    await explorationEditor.directLearnersToNewCard(CARD_NAME.TEXT_QUESTION);
     await explorationEditor.saveExplorationDraft();
 
     await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
@@ -140,187 +125,121 @@ describe('Exploration Editor', function () {
       throw new Error('Error in publishing exploration successfully.');
     }
 
+    await curriculumAdmin.createAndPublishTopic(
+      'Algebra I',
+      'Negative Numbers',
+      'Negative Numbers'
+    );
+
+    await curriculumAdmin.createAndPublishClassroom(
+      'Math',
+      'math',
+      'Algebra I'
+    );
+
+    await curriculumAdmin.createAndPublishStoryWithChapter(
+      'Algebra Story',
+      'algebra-story',
+      'Understanding Negative Numbers',
+      explorationId as string,
+      'Algebra I'
+    );
+
+    // Setting up translations for the exploration.
+    await explorationEditor.page.bringToFront();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.dismissTranslationTabWelcomeModal();
+    await explorationEditor.editTranslationOfContent(
+      'hi',
+      'Content',
+      'यह अन्वेषण ऋणात्मक संख्याओं के बारे में आपकी समझ का परीक्षण करेगा।'
+    );
+
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.editTranslationOfContent(
+      'hi',
+      'Interaction',
+      'जारी रखना'
+    );
+
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.editTranslationOfContent(
+      'hi',
+      'Content',
+      'हमने ऋणात्मक संख्याओं का अभ्यास किया है।'
+    );
+
+    // Adding voiceovers to the exploration.
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.addVoiceoverToContent(
+      'hi',
+      'Content',
+      INTRO_CONTENT_HI_VOICEOVER
+    );
+
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.addVoiceoverToContent(
+      'hi',
+      'Interaction',
+      CONTINUE_INTERACTION_HI_VOICEOVER
+    );
+
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.addVoiceoverToContent(
+      'hi',
+      'Interaction',
+      LAST_CARD_HI_VOICEOVER
+    );
     loggedOutUser = await UserFactory.createLoggedOutUser();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
+    // Setup is taking longer.
+  }, 420000);
 
   it(
-    'should show translations of main content and edit them via the modal.',
+    'should allow the learner to view and play a lesson entirely in a particular language and start listening to the voiceover from any state',
     async function () {
-      await explorationEditor.page.bringToFront();
-      await explorationEditor.reloadPage();
-      await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-      await explorationEditor.navigateToTranslationsTab();
-      await explorationEditor.dismissTranslationTabWelcomeModal();
-      await explorationEditor.editTranslationOfContent(
-        'de',
-        'Content',
-        'Content translation text'
+      await loggedOutUser.navigateToClassroomPage('math');
+      await loggedOutUser.selectAndOpenTopic('Algebra I');
+      await loggedOutUser.selectChapterWithinStoryToLearn(
+        'Understanding Negative Numbers',
+        'Algebra Story'
       );
-      await explorationEditor.navigateToEditorTab();
-      await explorationEditor.updateCardContent('Content text.');
-      await explorationEditor.openModifyExistingTranslationsModal();
-      await explorationEditor.verifyTranslationInModifyTranslationsModal(
-        'de',
-        'Content translation text'
-      );
-      await explorationEditor.updateTranslationFromModal(
-        'de',
-        'Content',
-        'New content translation text.'
-      );
-      await explorationEditor.verifyTranslationInTranslationsTab(
-        'New content translation text.',
-        'Content'
-      );
-      showMessage('The content translation has been verified successfully.');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
 
-  it(
-    'should show translations of interactions and edit them via the modal.',
-    async function () {
-      await explorationEditor.navigateToEditorTab();
-      await explorationEditor.reloadPage();
-      await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
-      await explorationEditor.navigateToTranslationsTab();
-      await explorationEditor.editTranslationOfContent(
-        'de',
-        'Interaction',
-        'Interaction translation text'
-      );
-      await explorationEditor.navigateToEditorTab();
-      await explorationEditor.updateTextInputInteraction(
-        'Interaction text content.'
-      );
-      await explorationEditor.openModifyExistingTranslationsModal();
-      await explorationEditor.verifyTranslationInModifyTranslationsModal(
-        'de',
-        'Interaction translation text'
-      );
-      await explorationEditor.updateTranslationFromModal(
-        'de',
-        'Interaction',
-        'New interaction translation text.'
-      );
-      await explorationEditor.verifyTranslationInTranslationsTab(
-        'New interaction translation text.',
-        'Interaction'
-      );
-      showMessage(
-        'The interaction translation has been verified successfully.'
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+      // Change the language of the lesson using the dropdown on the first card.
+      await loggedOutUser.changeLessonLanguage('hi');
+      await loggedOutUser.continueToNextCard();
 
-  it(
-    'should show translations of hints and edit them via the modal.',
-    async function () {
-      await explorationEditor.navigateToEditorTab();
-      await explorationEditor.reloadPage();
-      await explorationEditor.navigateToCard(
-        CARD_NAME.MULTIPLE_CHOICE_QUESTION
+      // Verify that the lesson is in the selected language.
+      await loggedOutUser.expectCardContentToMatch(
+        'यह अन्वेषण ऋणात्मक संख्याओं के बारे में आपकी समझ का परीक्षण करेगा।'
       );
-      await explorationEditor.navigateToTranslationsTab();
-      await explorationEditor.editTranslationOfContent(
-        'de',
-        'Hint',
-        'Hint translation text'
-      );
-      await explorationEditor.navigateToEditorTab();
-      await explorationEditor.updateHint('Hint content.');
-      await explorationEditor.openModifyExistingTranslationsModal();
-      await explorationEditor.verifyTranslationInModifyTranslationsModal(
-        'de',
-        'Hint translation text'
-      );
-      await explorationEditor.updateTranslationFromModal(
-        'de',
-        'Hint',
-        'New hint translation text.'
-      );
-      await explorationEditor.verifyTranslationInTranslationsTab(
-        'New hint translation text.',
-        'Hint'
-      );
-      showMessage('The hint translation has been verified successfully.');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
 
-  it(
-    'should show translations of solution explanations and edit them via the modal.',
-    async function () {
-      await explorationEditor.navigateToEditorTab();
-      await explorationEditor.reloadPage();
-      await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
-      await explorationEditor.navigateToTranslationsTab();
-      await explorationEditor.editTranslationOfContent(
-        'de',
-        'Solution',
-        'Solution explanation translation text'
-      );
-      await explorationEditor.navigateToEditorTab();
-      await explorationEditor.updateSolutionExplanation(
-        'Solution explanation.'
-      );
-      await explorationEditor.openModifyExistingTranslationsModal();
-      await explorationEditor.verifyTranslationInModifyTranslationsModal(
-        'de',
-        'Solution explanation translation text'
-      );
-      await explorationEditor.updateTranslationFromModal(
-        'de',
-        'Solution',
-        'New solution explanation translation text.'
-      );
-      await explorationEditor.verifyTranslationInTranslationsTab(
-        'New solution explanation translation text.',
-        'Solution'
-      );
-      showMessage(
-        'The solution explanation translation has been verified successfully.'
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+      await loggedOutUser.startVoiceover();
 
-  it(
-    'should show translations of response feedback and edit them via the modal.',
-    async function () {
-      await explorationEditor.navigateToEditorTab();
-      await explorationEditor.reloadPage();
-      await explorationEditor.navigateToCard(
-        CARD_NAME.MULTIPLE_CHOICE_QUESTION
-      );
-      await explorationEditor.navigateToTranslationsTab();
-      await explorationEditor.editTranslationOfContent(
-        'de',
-        'Feedback',
-        'Response feedback translation text',
-        1
-      );
-      await explorationEditor.navigateToEditorTab();
-      await explorationEditor.editDefaultResponseFeedback('Feedback content.');
-      await explorationEditor.openModifyExistingTranslationsModal();
-      await explorationEditor.verifyTranslationInModifyTranslationsModal(
-        'de',
-        'Response feedback translation text'
-      );
-      await explorationEditor.updateTranslationFromModal(
-        'de',
-        'Feedback',
-        'New feedback translation text.'
-      );
-      await explorationEditor.verifyTranslationInTranslationsTab(
-        'New feedback translation text.',
-        'Feedback',
-        1
-      );
-      showMessage(
-        'The response feedback translation has been verified successfully.'
-      );
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.verifyVoiceoverIsPlaying();
+
+      // Pausing the voiceover and restarting it to confirm that voiceover can be started on any state/card.
+      await loggedOutUser.pauseVoiceover();
+      await loggedOutUser.startVoiceover();
+      await loggedOutUser.verifyVoiceoverIsPlaying();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

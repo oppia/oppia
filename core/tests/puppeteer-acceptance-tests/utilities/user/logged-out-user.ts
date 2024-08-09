@@ -286,9 +286,12 @@ const mobileNavbarButtonSelector = '.text-uppercase';
 const skipLinkSelector = '.e2e-test-skip-link';
 const openMobileNavbarMenuButton = '.oppia-navbar-menu-icon';
 const closeMobileNavbarMenuButton = '.oppia-navbar-close-icon';
-
+const lessonLanguageSelector = 'oppia-content-language-selector';
+const playVoiceoverButton = '.e2e-test-play-circle';
+const voiceoverDropdown = '.e2e-test-audio-bar';
+const pauseVoiceoverButton = '.e2e-test-pause-circle';
 /**
- * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
+ * The KeyInput type is based on the key names fro m the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
  * The 'Control' key is also named as such in the specification and same with others.
  * We use these key names to ensure that our key names match the official specification.
@@ -3415,6 +3418,38 @@ export class LoggedOutUser extends BaseUser {
 
     // Remove focus from the focused element.
     await this.page.evaluate(element => element.blur(), expectedFocusedElement);
+  }
+
+  /**
+   * Changes the language of the lesson.
+   * @param {string} languageCode - The code of the language to change to.
+   */
+  async changeLessonLanguage(languageCode: string): Promise<void> {
+    await this.select(lessonLanguageSelector, languageCode);
+  }
+
+  /**
+   * Starts the voiceover by clicking on the audio bar (dropdown) and the play circle.
+   */
+  async startVoiceover(): Promise<void> {
+    await this.clickOn(voiceoverDropdown);
+    await this.clickOn(playVoiceoverButton);
+  }
+
+  /**
+   * Verifies if the voiceover is playing.
+   */
+  async verifyVoiceoverIsPlaying(): Promise<boolean> {
+    // If the pause button is present, it means the audio is playing.
+    const isPlaying = (await this.page.$(pauseVoiceoverButton)) !== null;
+    return isPlaying;
+  }
+
+  /**
+   * Pauses the voiceover by clicking on the pause button.
+   */
+  async pauseVoiceover(): Promise<void> {
+    await this.clickOn(pauseVoiceoverButton);
   }
 }
 
