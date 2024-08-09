@@ -293,13 +293,12 @@
   <div *ngIf="isDiagramCreated()" class="diagram-editor-save-box mt-4 d-flex justify-content-end">
     <button type="button"
             class="btn btn-secondary mr-3"
-            (click)="discardSvgFile()"
-            [disabled]="isUserDrawing()">
+            (click)="discardSvgFile()">
       Discard
     </button>
     <button class="btn btn-success e2e-test-save-diagram"
             (click)="saveSvgFile()"
-            [disabled]="isUserDrawing() || loadingIndicatorIsShown">
+            [disabled]="loadingIndicatorIsShown">
       <span *ngIf="!loadingIndicatorIsShown">Use This Image</span>
       <span *ngIf="loadingIndicatorIsShown">
         <mat-progress-spinner [diameter]="25"
