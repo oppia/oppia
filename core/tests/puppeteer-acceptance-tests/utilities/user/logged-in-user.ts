@@ -67,6 +67,16 @@ const progressSectionSelector = '.e2e-test-progress-section';
 const mobileProgressSectionSelector = '.e2e-test-mobile-progress-section';
 const mobileGoalsSectionSelector = '.e2e-test-mobile-goals-section';
 const goalsSectionSelector = '.e2e-test-goals-section';
+const communityLessonsSectionButton = '.e2e-test-community-lessons-section';
+const homeSectionSelector = '.e2e-test-home-section';
+const mobileHomeSectionSelector = '.e2e-test-mobile-home-section';
+const topicNameInEditGoalsSelector = '.e2e-test-topic-name-in-edit-goals';
+const completedGoalsSectionSelector = '.e2e-test-completed-goals-section';
+const completedGoalsTopicNameSelector = '.e2e-test-completed-goals-topic-name';
+const completedStoriesSectionSelector = '.e2e-test-completed-stories-section';
+const storyNameSelector = '.e2e-test-story-name-in-learner-story-summary-tile';
+const lessonObjectiveSelector = '.e2e-test-exp-summary-tile-objective > span';
+const learnSomethingNewSectionSelector = '.e2e-test-suggested-for-you';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
@@ -100,14 +110,14 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the learner dashboard.
    */
-  async navigateToLearnerDashboard() {
+  async navigateToLearnerDashboard(): Promise<void> {
     await this.goto(learnerDashboardUrl);
   }
 
   /**
    * Navigates to the progress section.
    */
-  async navigateToProgressSection() {
+  async navigateToProgressSection(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileProgressSectionSelector);
     } else {
@@ -121,9 +131,35 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates to the community library tab of the learner dashboard.
+   */
+  async navigateToCommunityLessonsSection(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileProgressSectionSelector);
+      await this.clickOn('Lessons');
+    } else {
+      await this.page.click(communityLessonsSectionButton);
+    }
+  }
+
+  /**
+   * Navigates to the home section.
+   */
+  async navigateToHomeSection(): Promise<void> {
+    const isMobile = await this.isViewportAtMobileWidth();
+    const selector = isMobile ? mobileHomeSectionSelector : homeSectionSelector;
+    const homeSection = await this.page.$(selector);
+    if (!homeSection) {
+      throw new Error('Home section not found.');
+    }
+
+    await homeSection.click();
+  }
+
+  /**
    * Navigates to the goals section.
    */
-  async navigateToGoalsSection() {
+  async navigateToGoalsSection(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileGoalsSectionSelector);
     } else {
@@ -139,7 +175,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the feedback updates page.
    */
-  async navigateToFeedbackUpdatesPage() {
+  async navigateToFeedbackUpdatesPage(): Promise<void> {
     await this.goto(feedbackUpdatesUrl);
   }
 
@@ -545,7 +581,8 @@ export class LoggedInUser extends BaseUser {
    * Plays a lesson from the completed lessons section.
    * @param {string} lessonName - The name of the lesson.
    */
-  async playLessonFromCompleted(lessonName: string) {
+  async playLessonFromCompleted(lessonName: string): Promise<void> {
+    await this.page.waitForSelector(completedLessonsSectionSelector);
     const lessonTileTitles = await this.page.$$(
       completedLessonsSectionSelector + ' ' + lessonTileTitleSelector
     );
@@ -562,6 +599,126 @@ export class LoggedInUser extends BaseUser {
       }
     }
 
+    throw new Error(`Lesson not found: ${lessonName}`);
+  }
+
+  /**
+   * Adds goals from the goals section in the learner dashboard.
+   * @param {string[]} goals - The goals to add.
+   */
+  async addGoals(goals: string[]): Promise<void> {
+    const topicNames = await this.page.$$(topicNameInEditGoalsSelector);
+    for (const goal of goals) {
+      const matchingTopicName = topicNames.find(async topicName => {
+        const actualTopicName = await this.page.evaluate(
+          el => el.textContent.trim(),
+          topicName
+        );
+        return actualTopicName === goal;
+      });
+
+      if (matchingTopicName) {
+        const inputElement = await matchingTopicName.$('+ input');
+        await inputElement?.click();
+      } else {
+        throw new Error(`Goal not found: ${goal}`);
+      }
+    }
+  }
+
+  /**
+   * Checks if the completed goals include the expected goals.
+   * @param {string[]} expectedGoals - The expected goals.
+   */
+  async expectCompletedGoalsToInclude(expectedGoals: string[]): Promise<void> {
+    const completedGoalsTopicNames = await this.page.$$(
+      completedGoalsSectionSelector + ' ' + completedGoalsTopicNameSelector
+    );
+
+    const actualGoals = await Promise.all(
+      completedGoalsTopicNames.map(async topicName => {
+        return await this.page.evaluate(el => el.textContent.trim(), topicName);
+      })
+    );
+
+    for (const expectedGoal of expectedGoals) {
+      if (!actualGoals.includes(expectedGoal)) {
+        throw new Error(`Goal not found: ${expectedGoal}`);
+      }
+    }
+  }
+  /**
+   * Checks if the completed stories include the expected stories.
+   * @param {string[]} expectedStories - The expected stories.
+   */
+  async expectStoriesCompletedToInclude(
+    expectedStories: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(completedLessonsSectionSelector);
+    const storyNames = await this.page.$$(
+      completedStoriesSectionSelector + ' ' + storyNameSelector
+    );
+    const actualStories = await Promise.all(
+      storyNames.map(async storyName => {
+        return await this.page.evaluate(el => el.textContent.trim(), storyName);
+      })
+    );
+
+    for (const expectedStory of expectedStories) {
+      if (!actualStories.includes(expectedStory)) {
+        throw new Error(`Story not found: ${expectedStory}`);
+      }
+    }
+  }
+
+  /**
+   * Checks if the completed lessons include the expected lessons.
+   * @param {string[]} expectedLessons - The expected lessons.
+   */
+  async expectCompletedLessonsToInclude(
+    expectedLessons: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(completedLessonsSectionSelector);
+    const lessonObjectives = await this.page.$$(
+      completedLessonsSectionSelector + ' ' + lessonObjectiveSelector
+    );
+
+    const actualLessons = await Promise.all(
+      lessonObjectives.map(async lessonObjective => {
+        return await this.page.evaluate(
+          el => el.textContent.trim(),
+          lessonObjective
+        );
+      })
+    );
+
+    for (const expectedLesson of expectedLessons) {
+      if (!actualLessons.includes(expectedLesson)) {
+        throw new Error(`Lesson not found: ${expectedLesson}`);
+      }
+    }
+  }
+
+  /**
+   * Plays a lesson from the "Learn Something New" section.
+   * @param {string} lessonName - The name of the lesson.
+   */
+  async playLessonFromLearnSomethingNew(lessonName: string): Promise<void> {
+    const lessonTileTitles = await this.page.$$(
+      learnSomethingNewSectionSelector + ' ' + lessonTileTitleSelector
+    );
+
+    for (const lessonTileTitle of lessonTileTitles) {
+      const actualLessonName = await this.page.evaluate(
+        el => el.textContent.trim(),
+        lessonTileTitle
+      );
+
+      if (actualLessonName === lessonName) {
+        await lessonTileTitle.click();
+        return;
+      }
+    }
     throw new Error(`Lesson not found: ${lessonName}`);
   }
 }

@@ -2583,7 +2583,7 @@ export class LoggedOutUser extends BaseUser {
 
     // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
     if (stayAnonymous) {
-      await this.clickOn('stay-anonymous-checkbox');
+      await this.clickOn(stayAnonymousCheckbox);
     }
 
     await this.clickOn('Submit');

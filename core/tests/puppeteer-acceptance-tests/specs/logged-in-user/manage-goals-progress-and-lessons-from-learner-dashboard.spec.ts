@@ -86,7 +86,7 @@ describe('Logged-in User', function () {
   }, 420000);
 
   it(
-    'should be able to replay a completed or incomplete exploration or collection, learn something new, manage goals, and see completed sections',
+    'should be able to replay a completed or incomplete exploration or collection, learn something new, manage goals, and see completed lesson in the respective sections.',
     async function () {
       await loggedInUser.navigateToClassroomPage('math');
       await loggedInUser.selectAndOpenTopic('Algebra I');
@@ -107,7 +107,7 @@ describe('Logged-in User', function () {
       await loggedInUser.expectToolTipMessage(
         "Successfully added to you 'Current Goals' list."
       );
-      await loggedInUser.expectCompletedGoalsToBe([]);
+      await loggedInUser.expectCompletedGoalsToInclude([]);
 
       await loggedInUser.navigateToHomeSection();
       await loggedInUser.playLessonFromLearnSomethingNew('Test Chapter 2');
@@ -118,7 +118,7 @@ describe('Logged-in User', function () {
       await loggedInUser.navigateToProgressSection();
       await loggedInUser.expectStoriesCompletedToInclude(['Test Story 1']);
 
-      await loggedInUser.navigateToCommunityLessonsTab();
+      await loggedInUser.navigateToCommunityLessonsSection();
       await loggedInUser.expectCompletedLessonsToInclude([
         'Positive Numbers',
         'Negative Numbers',
