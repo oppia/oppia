@@ -555,6 +555,20 @@ def apply_change_list(
                         edit_linked_skill_id_cmd.new_value
                     )
                 elif (change.property_name ==
+                      exp_domain.
+                      STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyInapplicableSkillMisconceptionIdsCmd.
+                    edit_inapplicable_skill_misconception_ids = cast(
+                        exp_domain.
+                        EditExpStatePropertyInapplicableSkillMisconceptionIdsCmd, # pylint: disable=line-too-long
+                        change
+                    )
+                    state.update_inapplicable_skill_misconception_ids(
+                        edit_inapplicable_skill_misconception_ids.new_value
+                    )
+                elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type

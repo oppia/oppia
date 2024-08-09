@@ -138,6 +138,20 @@ const stateHintTab = '.e2e-test-hint-tab';
 const editStateHintSelector = '.e2e-test-open-hint-editor';
 const saveHintEditButton = 'button.e2e-test-save-hint-edit';
 
+const addSkillButton = '.e2e-test-add-skill-button';
+const skillNameInput = '.e2e-test-skill-name-input';
+const skillItem = '.e2e-test-skills-list-item';
+const confirmSkillButton = '.e2e-test-confirm-skill-selection-button';
+const deleteSkillButton = 'i.skill-delete-button';
+
+const misconceptionDiv = '.misconception-list-item';
+const optionalMisconceptionDiv = '.optional-misconception-list-item';
+const inapplicableMisconceptionDiv = '.optional-misconception-list-no-action';
+const optionalMisconceptionOptionsButton =
+  '.optional-misconception-options-button';
+const misconceptionApplicableToggle =
+  '.e2e-test-misconception-applicable-toggle';
+
 const modalSaveButton = '.e2e-test-save-button';
 const modifyTranslationsModalDoneButton =
   '.e2e-test-modify-translations-done-button';
@@ -1120,6 +1134,151 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(editStateHintSelector);
     await this.type(stateContentInputField, hint);
     await this.clickOn(saveHintEditButton);
+  }
+
+  /**
+   * Adds a particular skill to the current state card.
+   * @param skillName - Name of the skill to be linked to state.
+   */
+  async addSkillToState(skillName: string): Promise<void> {
+    await this.clickOn(addSkillButton);
+    await this.type(skillNameInput, skillName);
+    await this.clickOn(skillItem);
+    await this.clickOn(confirmSkillButton);
+  }
+
+  /**
+   * Verifies if a misconception is present on the page.
+   * @param {string} misconceptionName - The name of the misconception to verify.
+   * @param {boolean} isPresent - Whether the misconception is expected to be present.
+   */
+  async verifyMisconceptionPresentForState(
+    misconceptionName: string,
+    isPresent: boolean
+  ): Promise<void> {
+    try {
+      await this.page.waitForSelector(misconceptionDiv, {
+        timeout: 5000,
+        visible: true,
+      });
+      const misconceptions = await this.page.$$(misconceptionDiv);
+
+      for (const misconception of misconceptions) {
+        const title = await this.page.evaluate(
+          el => el.textContent,
+          misconception
+        );
+        if (title.trim() === misconceptionName) {
+          if (!isPresent) {
+            throw new Error(
+              `The misconception ${misconceptionName} is present, which was not expected`
+            );
+          }
+          return;
+        }
+      }
+
+      if (isPresent) {
+        throw new Error(
+          `The misconception ${misconceptionName} is not present, which was expected`
+        );
+      }
+    } catch (error) {
+      if (isPresent) {
+        throw new Error(
+          `The misconception ${misconceptionName} is not present, which was expected`
+        );
+      }
+    }
+
+    showMessage(
+      `The misconception is ${isPresent ? '' : 'not'} present as expected.`
+    );
+  }
+
+  /**
+   * Toggles the applicability status of an optional misconception.
+   * @param misconceptionName - The name of the misconception to be toggled.
+   */
+  async toggleMisconceptionApplicableStatus(
+    misconceptionName: string
+  ): Promise<void> {
+    await this.page.waitForSelector(optionalMisconceptionDiv, {
+      timeout: 5000,
+      visible: true,
+    });
+    let misconceptions = await this.page.$$(optionalMisconceptionDiv);
+    let misconceptionFound = false;
+    for (const misconception of misconceptions) {
+      const optionalMisconceptionName = await misconception.evaluate(el =>
+        el.textContent?.trim()
+      );
+      if (optionalMisconceptionName?.startsWith(misconceptionName)) {
+        const misconceptionOptions = await misconception.$(
+          optionalMisconceptionOptionsButton
+        );
+        if (!misconceptionOptions) {
+          throw new Error(
+            `Options not found for misconception "${misconceptionName}"`
+          );
+        }
+        await misconceptionOptions.click();
+        await this.page.waitForSelector(misconceptionApplicableToggle, {
+          visible: true,
+        });
+        await this.clickOn(misconceptionApplicableToggle);
+        misconceptionFound = true;
+        break;
+      }
+    }
+    if (!misconceptionFound) {
+      throw new Error(
+        `Couldn't find misconception with name ${misconceptionName}.`
+      );
+    }
+  }
+
+  /**
+   * Verifies whether a given optional misconception is applicable or not.
+   * @param misconceptionName - The name of the misconception to be verified.
+   * @param isApplicable - The expected applicability status of the misconception.
+   */
+  async verifyOptionalMisconceptionApplicableStatus(
+    misconceptionName: string,
+    isApplicable: boolean
+  ): Promise<void> {
+    await this.verifyMisconceptionPresentForState(misconceptionName, true);
+    const inapplicableMisconceptions = await this.page.$$(
+      inapplicableMisconceptionDiv
+    );
+
+    for (const misconception of inapplicableMisconceptions) {
+      const title = await this.page.evaluate(
+        el => el.textContent.trim(),
+        misconception
+      );
+      if (title === misconceptionName && !isApplicable) {
+        return;
+      } else if (title.startsWith(misconceptionName) && isApplicable) {
+        // We use startsWith since misconception title divs can have an icon at
+        // the end indicating that the misconception needs to be addressed.
+        throw new Error(
+          `The misconception ${misconceptionName} is expected to be applicable, found not applicable.`
+        );
+      }
+    }
+
+    showMessage(
+      `The misconception is ${isApplicable ? '' : 'not'} applicable as expected.`
+    );
+  }
+
+  /**
+   * Removes the attached skill from the current state card.
+   */
+  async removeSkillFromState(): Promise<void> {
+    await this.clickOn(deleteSkillButton);
+    await this.clickOn('Delete skill');
   }
 
   /**
