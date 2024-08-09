@@ -247,7 +247,7 @@ export class BaseUser {
    * Function to reload the current page.
    */
   async reloadPage(): Promise<void> {
-    await this.page.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
     await this.page.reload({waitUntil: ['networkidle0', 'load']});
   }
 
@@ -417,15 +417,11 @@ export class BaseUser {
   }
 
   /**
-   * This function validates whether an anchor tag is correctly linked
-   * to external PDFs or not. Use this particularly when interacting with
-   * buttons associated with external PDF links, because Puppeteer,
-   * in headless-mode, does not natively support the opening of external PDFs.
+   * This function validates whether an anchor tag correctly links to external PDFs or links
+   * that cannot be opened directly. Puppeteer, in headless mode, does not
+   * natively support opening external PDFs.
    */
-  async openExternalPdfLink(
-    selector: string,
-    expectedUrl: string
-  ): Promise<void> {
+  async openExternalLink(selector: string, expectedUrl: string): Promise<void> {
     await this.page.waitForSelector(selector, {visible: true});
     const href = await this.page.$eval(selector, element =>
       element.getAttribute('href')
@@ -582,6 +578,37 @@ export class BaseUser {
 
       lastHTMLSize = currentHTMLSize;
       await page.waitForTimeout(checkDurationMsecs);
+    }
+  }
+
+  /**
+   * Waits for the network to become idle on the given page.
+   *
+   * If the network does not become idle within the specified timeout, this function will log a message and continue. This is
+   * because the main objective of the test is to interact with the page, not specifically to ensure that the network becomes
+   * idle within a certain timeframe. However, a timeout of 30 seconds should be sufficient for the network to become idle in
+   * almost all cases and for the page to fully load.
+   *
+   * @param {Object} options The options to pass to page.waitForNetworkIdle. Defaults to {timeout: 30000, idleTime: 500}.
+   * @param {Page} page The page to wait for network idle. Defaults to the current page.
+   */
+  async waitForNetworkIdle(
+    options: {timeout?: number; idleTime?: number} = {
+      timeout: 30000,
+      idleTime: 500,
+    },
+    page: Page = this.page
+  ): Promise<void> {
+    try {
+      await page.waitForNetworkIdle(options);
+    } catch (error) {
+      if (error.message.includes('Timeout')) {
+        showMessage(
+          'Network did not become idle within the specified timeout, but we can continue.'
+        );
+      } else {
+        throw error;
+      }
     }
   }
 

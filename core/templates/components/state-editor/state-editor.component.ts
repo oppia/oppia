@@ -212,6 +212,12 @@ export class StateEditorComponent implements OnInit, OnDestroy {
         this.stateData = stateData;
         this.stateName = this.stateEditorService.getActiveStateName();
         this.stateEditorService.setInteraction(stateData.interaction);
+        this.stateEditorService.setLinkedSkillId(stateData.linkedSkillId);
+        if (!this.stateEditorService.isInQuestionMode()) {
+          this.stateEditorService.setInapplicableSkillMisconceptionIds(
+            stateData.inapplicableSkillMisconceptionIds
+          );
+        }
         this.stateContentService.init(this.stateName, stateData.content);
         this.stateLinkedSkillIdService.init(
           this.stateName,

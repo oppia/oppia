@@ -65,8 +65,6 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('testimonialsCarousel') testimonialsCarousel!: NgbCarousel;
   parentsTeachersPdfGuideLink = AppConstants.PARENTS_TEACHERS_PDF_GUIDE_LINK;
   teacherStoryTaggedBlogsLink = AppConstants.TEACHER_STORY_TAGGED_BLOGS_LINK;
-  classroomUrlFragment!: string;
-  classroomUrl!: string;
   androidUrl = `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.ROUTE}`;
   displayedTestimonialId!: number;
   libraryUrl!: string;
@@ -156,12 +154,6 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.displayedTestimonialId = 0;
     this.setScreenType();
     this.testimonials = AppConstants.TESTIMONIAlS_DATA_TEACHERS;
-    this.classroomUrl = this.urlInterpolationService.interpolateUrl(
-      '/learn/<classroomUrlFragment>',
-      {
-        classroomUrlFragment: AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT,
-      }
-    );
     this.libraryUrl = '/community-library';
     this.loaderService.showLoadingScreen('Loading');
     this.userService.getUserInfoAsync().then(userInfo => {
@@ -175,6 +167,7 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
         this.isWindowNarrow = this.windowDimensionsService.isWindowNarrow();
       })
     );
+    this.registerFirstTimePageViewEvent();
   }
 
   ngAfterViewInit(): void {
@@ -295,13 +288,13 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onClickStartLearningButton(): void {
     this.siteAnalyticsService.registerClickStartLearningButtonEvent();
-    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    this.windowRef.nativeWindow.location.href = '/learn';
     return;
   }
 
   onClickVisitClassroomButton(): void {
     this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
-    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    this.windowRef.nativeWindow.location.href = '/learn';
     return;
   }
 
@@ -323,18 +316,26 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
     return;
   }
 
-  onClickExploreLessonsButton(): void {
-    this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
-    this.windowRef.nativeWindow.location.href = this.classroomUrl;
-    return;
-  }
-
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  onClickExploreLessonsButton(): void {
+    this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
+  }
+
+  onClickDownloadAndroidAppButton(): void {
+    this.siteAnalyticsService.registerClickDownloadAndroidAppButtonEvent();
+  }
+
+  registerFirstTimePageViewEvent(): void {
+    this.siteAnalyticsService.registerFirstTimePageViewEvent(
+      AppConstants.LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA.TEACH
+    );
   }
 
   ngOnDestroy(): void {
