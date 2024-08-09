@@ -35,6 +35,13 @@
   background-color: #e6e6e6;
   border-top: 1px solid #000;
 }
+
+@media screen and (min-width: 769px) {
+  .show-mobile-navbar-icon {
+    display: none;
+  }
+}
+
 .show-mobile-navbar-icon {
   background-color: #e6e6e6;
   border-left: 1.5px solid #000;
