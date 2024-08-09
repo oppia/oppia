@@ -123,6 +123,7 @@
     "extensions/objects/objectComponentsRequiresForPlayers.ts",
     "core/templates/pages/error-pages/error-page.import.ts",
     "core/templates/pages/error-pages/error-iframed-page/error-iframed-page.import.ts",
-    "core/templates/pages/maintenance-page/maintenance-page.import.ts"
+    "core/templates/pages/maintenance-page/maintenance-page.import.ts",
+    "core/templates/pages/blog-dashboard-page/blog-dashboard-page.import.ts"
   ]
 }
