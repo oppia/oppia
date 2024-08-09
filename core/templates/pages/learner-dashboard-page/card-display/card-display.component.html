@@ -1,13 +1,12 @@
 <div class="d-flex flex-column h-100 mb-4 w-100" [ngStyle]="{'max-width': (tabType === 'homeFull' || tabType.includes('progress') ? '100%' : 'fit-content')}">
   <div class="d-flex justify-content-between">
     <p class="card-display-heading"> {{ headingI18n | translate }} </p>
-    <div class="d-flex" *ngIf="(numCards > 1) && ((numCards - 1) * cardWidth + (cardWidth - 32) > cards.offsetWidth) && (tabType.includes('home'))">
-      <button [disabled]="currentShift === 0" class="mr-2 px-0 card-display-button" (click)="nextCard(currentShift - 1)">
-        <span class="fas fa-chevron-left"></span>
+    <div class="card-display-button-container" *ngIf="(numCards > 1) && ((numCards - 1) * cardWidth + (cardWidth - 32) > cards.offsetWidth) && (tabType.includes('home'))">
+      <button [disabled]="currentShift === 0" class="px-0 card-display-button" (click)="moveCard(currentShift - 1)">
+        <span [ngClass]="'fas fa-chevron-' + (isLanguageRTL ? 'right' : 'left')"></span>
       </button>
-      <p> </p>
-      <button [disabled]="currentShift === getMaxShifts(cards.offsetWidth)" class="px-0 card-display-button" (click)="nextCard(currentShift + 1)">
-        <span class="fas fa-chevron-right"></span>
+      <button [disabled]="currentShift === getMaxShifts(cards.offsetWidth)" class="px-0 card-display-button" (click)="moveCard(currentShift + 1)">
+        <span [ngClass]="'fas fa-chevron-' + (isLanguageRTL ? 'left' : 'right')"></span>
       </button>
     </div>
   </div>
@@ -63,6 +62,7 @@
 
   .card-display-content-container {
     display: flex;
+    gap: 0 16px;
     max-width: 100%;
     overflow-x: hidden;
     padding: .5px;
@@ -73,5 +73,10 @@
     font-size: 20px;
     font-weight: 500;
     margin-bottom: 0;
+  }
+
+  .card-display-button-container {
+    display: flex;
+    gap: 0 5px;
   }
 </style>
