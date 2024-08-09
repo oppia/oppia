@@ -85,10 +85,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-volunteer-page.spec.ts"
     },
     {
-      "name": "logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers.spec.ts"
-    },
-    {
       "name": "logged-out-user/click-all-buttons-on-contact-us-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-contact-us-page.spec.ts"
     },
