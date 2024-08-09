@@ -2423,9 +2423,9 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
     try {
-      await this.page.waitForNavigation({timeout: 10000});
+      await this.page.waitForNavigation({timeout: 20000});
     } catch (error) {
-      return;
+      this.createAndSwitchToNewTab();
     }
   }
 
@@ -2809,9 +2809,9 @@ export class TopicManager extends BaseUser {
           );
 
           try {
-            await this.page.waitForNavigation({timeout: 10000});
+            await this.page.waitForNavigation({timeout: 20000});
           } catch (error) {
-            return;
+            this.createAndSwitchToNewTab;
           }
           return;
         }
@@ -2827,9 +2827,9 @@ export class TopicManager extends BaseUser {
       );
 
       try {
-        await this.page.waitForNavigation({timeout: 10000});
+        await this.page.waitForNavigation({timeout: 20000});
       } catch (error) {
-        return;
+        await this.createAndSwitchToNewTab();
       }
     } catch (error) {
       const newError = new Error(
