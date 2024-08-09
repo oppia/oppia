@@ -57,6 +57,16 @@ const reportExplorationTextAreaSelector =
 const submitReportButtonSelector = '.e2e-test-submit-report-button';
 const feedbackThreadSelector = '.e2e-test-feedback-thread';
 const feedbackMessageSelector = '.e2e-test-feedback-message';
+const toastMessageSelector = '.e2e-test-toast-message';
+const playLaterSectionSelector = '.e2e-test-play-later-section';
+const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-test-exploration-tile-title`;
+const completedLessonsSectionSelector =
+  '.e2e-test-completed-community-lessons-section';
+const lessonTileTitleSelector = '.e2e-test-exploration-tile-title';
+const progressSectionSelector = '.e2e-test-progress-section';
+const mobileProgressSectionSelector = '.e2e-test-mobile-progress-section';
+const mobileGoalsSectionSelector = '.e2e-test-mobile-goals-section';
+const goalsSectionSelector = '.e2e-test-goals-section';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
@@ -92,6 +102,38 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToLearnerDashboard() {
     await this.goto(learnerDashboardUrl);
+  }
+
+  /**
+   * Navigates to the progress section.
+   */
+  async navigateToProgressSection() {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileProgressSectionSelector);
+    } else {
+      await this.page.waitForSelector(progressSectionSelector);
+      const progressSection = await this.page.$(progressSectionSelector);
+      if (!progressSection) {
+        throw new Error('Progress section not found.');
+      }
+      await progressSection.click();
+    }
+  }
+
+  /**
+   * Navigates to the goals section.
+   */
+  async navigateToGoalsSection() {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileGoalsSectionSelector);
+    } else {
+      await this.page.waitForSelector(goalsSectionSelector);
+      const progressSection = await this.page.$(goalsSectionSelector);
+      if (!progressSection) {
+        throw new Error('Progress section not found.');
+      }
+      await progressSection.click();
+    }
   }
 
   /**
@@ -428,6 +470,99 @@ export class LoggedInUser extends BaseUser {
         `Response does not match the expected value. Expected: ${expectedResponse}, Found: ${actualResponse}`
       );
     }
+  }
+
+  /**
+   * Expects the text content of the toast message to match the given expected message.
+   * @param {string} expectedMessage - The expected message to match the toast message against.
+   */
+  async expectToolTipMessage(expectedMessage: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(toastMessageSelector);
+      const toastMessageElement = await this.page.$(toastMessageSelector);
+      const toastMessage = await this.page.evaluate(
+        el => el.textContent.trim(),
+        toastMessageElement
+      );
+
+      if (toastMessage !== expectedMessage) {
+        throw new Error(
+          `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
+        );
+      }
+      await this.page.waitForSelector(toastMessageSelector, {hidden: true});
+    } catch (error) {
+      const newError = new Error(`Failed to match toast message: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Verifies whether a lesson is in the 'Play Later' list.
+   * @param {string} lessonName - The name of the lesson to check.
+   * @param {boolean} shouldBePresent - Whether the lesson should be present in the 'Play Later' list.
+   */
+  async verifyLessonPresenceInPlayLater(
+    lessonName: string,
+    shouldBePresent: boolean
+  ): Promise<void> {
+    try {
+      await this.waitForStaticAssetsToLoad();
+      await this.page.waitForSelector(playLaterSectionSelector);
+      const lessonCards = await this.page.$$(
+        lessonCardTitleInPlayLaterSelector
+      );
+      const lessonNames = await Promise.all(
+        lessonCards.map(card =>
+          this.page.evaluate(el => el.textContent.trim(), card)
+        )
+      );
+
+      const lessonIndex = lessonNames.indexOf(lessonName);
+      if (lessonIndex !== -1 && !shouldBePresent) {
+        throw new Error(
+          `Lesson "${lessonName}" was found in 'Play Later' list, but it should not be.`
+        );
+      }
+
+      if (lessonIndex === -1 && shouldBePresent) {
+        throw new Error(
+          `Lesson "${lessonName}" was not found in 'Play Later' list, but it should be.`
+        );
+      }
+      showMessage('Lesson is present in "Play Later" list.');
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify presence of lesson in 'Play Later' list: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Plays a lesson from the completed lessons section.
+   * @param {string} lessonName - The name of the lesson.
+   */
+  async playLessonFromCompleted(lessonName: string) {
+    const lessonTileTitles = await this.page.$$(
+      completedLessonsSectionSelector + ' ' + lessonTileTitleSelector
+    );
+
+    for (const lessonTileTitle of lessonTileTitles) {
+      const actualLessonName = await this.page.evaluate(
+        el => el.textContent.trim(),
+        lessonTileTitle
+      );
+
+      if (actualLessonName === lessonName) {
+        await lessonTileTitle.click();
+        return;
+      }
+    }
+
+    throw new Error(`Lesson not found: ${lessonName}`);
   }
 }
 

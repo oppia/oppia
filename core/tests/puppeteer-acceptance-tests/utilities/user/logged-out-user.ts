@@ -34,7 +34,7 @@ const recentlyPublishedExplorationsPageUrl =
 const splashPageUrl = testConstants.URLs.splash;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
-const classroomsPage = testConstants.URLs.ClassroomsPage;
+const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const desktopWatchAVideoUrl = testConstants.URLs.DesktopExternalLinkWatchAVideo;
 const donateUrl = testConstants.URLs.Donate;
 const electromagnetismUrl = testConstants.URLs.Electromagnetism;
@@ -407,17 +407,17 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the classroom page.
    */
   async navigateToClassroomPage(urlFragment: string): Promise<void> {
-    await this.goto(`${classroomsPage}/${urlFragment}`);
+    await this.goto(`${classroomsPageUrl}/${urlFragment}`);
   }
 
   /**
    * Function to navigate to the classrooms page.
    */
   async navigateToClassroomsPage(): Promise<void> {
-    if (this.page.url() === classroomsPage) {
+    if (this.page.url() === classroomsPageUrl) {
       await this.page.reload();
     }
-    await this.goto(classroomsPage);
+    await this.goto(classroomsPageUrl);
   }
 
   /**
@@ -701,10 +701,7 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error('The Watch A Video button does not exist!');
     }
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(watchAVideoButton),
-    ]);
+    await Promise.all([this.clickAndWaitForNavigation(watchAVideoButton)]);
 
     const url = this.getCurrentUrlWithoutParameters();
     const expectedWatchAVideoUrl = this.isViewportAtMobileWidth()
@@ -1056,7 +1053,7 @@ export class LoggedOutUser extends BaseUser {
   async clickForumLinkOnCreatorGuidelinesPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"forum")]');
     await Promise.all([this.page.waitForNavigation(), this.clickOn('forum')]);
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
 
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
@@ -1300,14 +1297,14 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to click the Browse Our Lessons button in the Teach page
-   * and check if it opens the Math Classroom page.
+   * and check if it opens the classrooms page.
    */
   async clickExploreLessonsButtonInTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       exploreLessonsButtonInTeachPage,
       'Explore Lessons button',
-      mathClassroomUrl,
-      'Math Classroom'
+      classroomsPageUrl,
+      'Classrooms page'
     );
   }
 
@@ -1324,7 +1321,11 @@ export class LoggedOutUser extends BaseUser {
       // scrollIntoView function call of the clickOn function didn't work as expected.
       await this.page.reload();
     }
-    await this.clickOn(languageDropdown);
+    await this.page.waitForSelector(languageDropdown);
+    const languageDropdownElement = await this.page.$(languageDropdown);
+    if (languageDropdownElement) {
+      await languageDropdownElement.click();
+    }
     await this.clickOn(languageOption);
     // Here we need to reload the page again to confirm the language change.
     await this.page.reload();
@@ -1889,7 +1890,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * This function verifies that the classroom cards in classrooms page.
    */
-  async expectClassroomCountInClassroomsPageToBe(
+  async expectClassroomCountInClassroomsPageUrlToBe(
     classroomsCount: number
   ): Promise<void> {
     await this.page.waitForSelector(classroomTileContainer);

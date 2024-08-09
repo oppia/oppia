@@ -162,10 +162,10 @@ describe('Logged-out User', function () {
       // Check feedback updates page.
       await loggedInUser.navigateToFeedbackUpdatesPage();
       await loggedInUser.viewFeedbackUpdateThread(1);
-      await loggedInUser.expectFeedbackAndReponseToMatch([
+      await loggedInUser.expectFeedbackAndResponseToMatch(
         'This state is very informative!',
-        'Thanks for the feedback!',
-      ]);
+        'Thanks for the feedback!'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
