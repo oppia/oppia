@@ -132,7 +132,6 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToPreferencesPage(): Promise<void> {
     await this.goto(PreferencesPageUrl);
-    await this.page.waitForTimeout(2147483647);
   }
 
   /**
