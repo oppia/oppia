@@ -62,6 +62,7 @@ import {CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 import {EditabilityService} from 'services/editability.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-state-responses',
@@ -103,6 +104,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   responseCardIsShown: boolean = false;
   enableSolicitAnswerDetailsFeature: boolean = false;
   containsOptionalMisconceptions: boolean = false;
+  tagMisconceptionsFeatureFlagIsEnabled: boolean = false;
 
   constructor(
     private stateEditorService: StateEditorService,
@@ -119,7 +121,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     private parameterizeRuleDescription: ParameterizeRuleDescriptionPipe,
     private truncate: TruncatePipe,
     private wrapTextWithEllipsis: WrapTextWithEllipsisPipe,
-    private editabilityService: EditabilityService
+    private editabilityService: EditabilityService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   sendOnSaveNextContentIdIndex(event: number): void {
@@ -586,19 +589,39 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
         taggedSkillMisconceptionIds[taggedSkillMisconceptionId] = true;
       }
     }
+
     let unaddressedMisconceptionNames: string[] = [];
-    Object.keys(this.misconceptionsBySkill).forEach(skillId => {
-      let misconceptions = this.misconceptionsBySkill[skillId];
-      for (let i = 0; i < misconceptions.length; i++) {
-        if (!misconceptions[i].isMandatory()) {
-          continue;
-        }
-        let skillMisconceptionId = skillId + '-' + misconceptions[i].getId();
-        if (!taggedSkillMisconceptionIds.hasOwnProperty(skillMisconceptionId)) {
-          unaddressedMisconceptionNames.push(misconceptions[i].getName());
-        }
+    if (!this.stateEditorService.isInQuestionMode()) {
+      const skillId = this.stateEditorService.getLinkedSkillId();
+      const misconceptions = this.misconceptionsBySkill[skillId];
+      if (misconceptions) {
+        misconceptions.forEach(misconception => {
+          if (misconception.isMandatory()) {
+            const skillMisconceptionId = `${skillId}-${misconception.getId()}`;
+            if (
+              !taggedSkillMisconceptionIds.hasOwnProperty(skillMisconceptionId)
+            ) {
+              unaddressedMisconceptionNames.push(misconception.getName());
+            }
+          }
+        });
       }
-    });
+    } else {
+      Object.keys(this.misconceptionsBySkill).forEach(skillId => {
+        let misconceptions = this.misconceptionsBySkill[skillId];
+        for (let i = 0; i < misconceptions.length; i++) {
+          if (!misconceptions[i].isMandatory()) {
+            continue;
+          }
+          let skillMisconceptionId = skillId + '-' + misconceptions[i].getId();
+          if (
+            !taggedSkillMisconceptionIds.hasOwnProperty(skillMisconceptionId)
+          ) {
+            unaddressedMisconceptionNames.push(misconceptions[i].getName());
+          }
+        }
+      });
+    }
     return unaddressedMisconceptionNames;
   }
 
@@ -669,6 +692,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.enableSolicitAnswerDetailsFeature =
       AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE;
     this.misconceptionsBySkill = {};
+    this.tagMisconceptionsFeatureFlagIsEnabled =
+      this.platformFeatureService.status.ExplorationEditorCanTagMisconceptions.isEnabled;
     this.directiveSubscriptions.add(
       this.responsesService.onInitializeAnswerGroups.subscribe(data => {
         this.responsesService.init(data as Interaction);
@@ -765,7 +790,20 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       this.stateEditorService.onStateEditorInitialized.subscribe(() => {
         this.misconceptionsBySkill =
           this.stateEditorService.getMisconceptionsBySkill();
+        this.inapplicableSkillMisconceptionIds =
+          this.stateEditorService.getInapplicableSkillMisconceptionIds();
+        this.containsOptionalMisconceptions = Object.values(
+          this.misconceptionsBySkill
+        ).some((misconceptions: Misconception[]) =>
+          misconceptions.some(misconception => !misconception.isMandatory())
+        );
+      })
+    );
 
+    this.directiveSubscriptions.add(
+      this.stateEditorService.onUpdateMisconceptions.subscribe(() => {
+        this.misconceptionsBySkill =
+          this.stateEditorService.getMisconceptionsBySkill();
         this.containsOptionalMisconceptions = Object.values(
           this.misconceptionsBySkill
         ).some((misconceptions: Misconception[]) =>

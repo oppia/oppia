@@ -4502,6 +4502,81 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.states['State1'].linked_skill_id, 'string_2')
 
+    def test_update_inapplicable_skill_misconception_ids(
+        self
+    ) -> None:
+        """Test updating inapplicable_skill_misconception_ids."""
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        self.assertEqual(
+            exploration.init_state.inapplicable_skill_misconception_ids, None)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'State1',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
+            })], 'Add state name')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.states['State1'].inapplicable_skill_misconception_ids,
+            None
+        )
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, _get_change_list(
+                'State1',
+                exp_domain.STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
+                ['string_1']),
+            '')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.states['State1'].inapplicable_skill_misconception_ids,
+            ['string_1']
+        )
+
+        # Check that the property can be changed when working
+        # on old version.
+        # Adding a content change just to upgrade the version.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, _get_change_list(
+                self.init_state_name, 'content', {
+                    'html': '<p><strong>Test content</strong></p>',
+                    'content_id': 'content_0',
+                }),
+            '')
+
+        change_list = _get_change_list(
+            'State1',
+            exp_domain.STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
+            ['string_2'])
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list)
+        self.assertTrue(changes_are_mergeable)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, '')
+        # Assert that exploration's final version consist of all the
+        # changes.
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.init_state.content.html,
+            '<p><strong>Test content</strong></p>')
+        self.assertEqual(
+            exploration.states['State1'].inapplicable_skill_misconception_ids,
+            ['string_2']
+        )
+
     def test_update_card_is_checkpoint(self) -> None:
         """Test updating of card_is_checkpoint."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
