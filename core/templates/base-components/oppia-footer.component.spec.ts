@@ -28,11 +28,24 @@ import {
 import {Router} from '@angular/router';
 
 import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {MailingListBackendApiService} from 'domain/mailing-list/mailing-list-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {OppiaFooterComponent} from './oppia-footer.component';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      pathname: '/learn/math',
+      href: '',
+    },
+    gtag: () => {},
+  };
+}
 
 class MockRouter {
   url = '/about';
@@ -43,8 +56,11 @@ describe('OppiaFooterComponent', () => {
   let fixture: ComponentFixture<OppiaFooterComponent>;
   let mailingListBackendApiService: MailingListBackendApiService;
   let alertsService: AlertsService;
+  let siteAnalyticsService: SiteAnalyticsService;
+  let mockWindowRef: MockWindowRef;
 
   beforeEach(waitForAsync(() => {
+    mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [OppiaFooterComponent, MockTranslatePipe],
@@ -52,6 +68,10 @@ describe('OppiaFooterComponent', () => {
         {
           provide: Router,
           useClass: MockRouter,
+        },
+        {
+          provide: WindowRef,
+          useValue: mockWindowRef,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -63,6 +83,7 @@ describe('OppiaFooterComponent', () => {
     alertsService = TestBed.inject(AlertsService);
     mailingListBackendApiService = TestBed.inject(MailingListBackendApiService);
     component = fixture.componentInstance;
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   it('should get the siteFeedbackFormURL', () => {
@@ -145,4 +166,30 @@ describe('OppiaFooterComponent', () => {
       10000
     );
   }));
+
+  it('should register About footer link click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.navigateToAboutPage();
+
+    expect(
+      siteAnalyticsService.registerClickFooterButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.ABOUT);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
+  });
+
+  it('should register Teach footer link click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.navigateToTeachPage();
+
+    expect(
+      siteAnalyticsService.registerClickFooterButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.TEACH);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/teach');
+  });
 });

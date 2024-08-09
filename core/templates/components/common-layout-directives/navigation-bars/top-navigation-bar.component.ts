@@ -38,6 +38,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {SearchService} from 'services/search.service';
 import {EventToCodes, NavigationService} from 'services/navigation.service';
 import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {downgradeComponent} from '@angular/upgrade/static';
@@ -530,6 +531,27 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.topicTitlesTranslationKeys[index]
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
+  }
+
+  navigateToAboutPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.ABOUT
+    );
+    this.windowRef.nativeWindow.location.href = '/about';
+  }
+
+  navigateToVolunteerPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.VOLUNTEER
+    );
+    this.windowRef.nativeWindow.location.href = '/volunteer';
+  }
+
+  navigateToTeachPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.TEACH
+    );
+    this.windowRef.nativeWindow.location.href = '/teach';
   }
 
   ngOnDestroy(): void {

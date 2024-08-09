@@ -344,5 +344,24 @@ describe('LocalStorageService', () => {
         localStorageService.getUniqueProgressIdOfLoggedOutLearner()
       ).toBeNull();
     });
+
+    it('should set Last Page View Time of a page correctly', () => {
+      const key = 'lastAboutPageViewTime';
+      const currentTime = new Date().getTime();
+      localStorageService.setLastPageViewTime(key);
+
+      expect(
+        localStorageService.getLastPageViewTime(key)
+      ).toBeGreaterThanOrEqual(currentTime);
+    });
+
+    it('should not save Last Page View Time of a page when storage is not available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
+      const key = 'lastAboutPageViewTime';
+      localStorageService.setLastPageViewTime(key);
+
+      expect(localStorageService.getLastPageViewTime()).toBeNull();
+    });
   });
 });

@@ -436,6 +436,25 @@ export class LocalStorageService {
       callbackFn(event);
     });
   }
+
+  setLastPageViewTime(lastPageViewTimeKey: string): void {
+    if (this.isStorageAvailable()) {
+      (this.storage as Storage).setItem(
+        lastPageViewTimeKey,
+        Date.now().toString()
+      );
+    }
+  }
+
+  getLastPageViewTime(lastPageViewTimeKey: string): number | null {
+    if (this.isStorageAvailable()) {
+      const lastPageViewTime = (this.storage as Storage).getItem(
+        lastPageViewTimeKey
+      );
+      return lastPageViewTime !== null ? Number(lastPageViewTime) : null;
+    }
+    return null;
+  }
 }
 
 angular

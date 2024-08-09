@@ -205,6 +205,7 @@ export class AboutPageComponent implements OnInit, OnDestroy {
         this.setScreenType();
       })
     );
+    this.registerFirstTimePageViewEvent();
   }
 
   setScreenType(): void {
@@ -301,6 +302,45 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     } else {
       this.volunteerCarousel.next();
     }
+  }
+
+  onClickExploreLessonsButton(): void {
+    this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
+  }
+
+  onClickDownloadAndroidAppButton(): void {
+    this.siteAnalyticsService.registerClickDownloadAndroidAppButtonEvent();
+  }
+
+  onClickDonateCTAButton(): void {
+    this.siteAnalyticsService.registerClickDonateCTAButtonEvent();
+    this.openDonationBoxModal();
+  }
+
+  onClickVolunteerCTAButton(): void {
+    this.siteAnalyticsService.registerClickVolunteerCTAButtonEvent(
+      'CTA button at the bottom of the About page'
+    );
+  }
+
+  onClickPartnerCTAButton(): void {
+    this.siteAnalyticsService.registerClickPartnerCTAButtonEvent(
+      'CTA button at the bottom of the About page'
+    );
+  }
+
+  onClickVolunteerLearnMoreButton(): void {
+    this.siteAnalyticsService.registerClickLearnMoreVolunteerButtonEvent();
+  }
+
+  onClickPartnerLearnMoreButton(): void {
+    this.siteAnalyticsService.registerClickLearnMorePartnerButtonEvent();
+  }
+
+  registerFirstTimePageViewEvent(): void {
+    this.siteAnalyticsService.registerFirstTimePageViewEvent(
+      AppConstants.LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA.ABOUT
+    );
   }
 
   ngOnDestroy(): void {
