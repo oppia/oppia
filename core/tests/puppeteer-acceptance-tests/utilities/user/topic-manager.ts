@@ -2423,9 +2423,9 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
     try {
-      await this.page.waitForNavigation({timeout: 20000});
+      await this.page.waitForNavigation({waitUntil: 'networkidle0'});
     } catch (error) {
-      this.createAndSwitchToNewTab();
+      return;
     }
   }
 
@@ -2809,9 +2809,9 @@ export class TopicManager extends BaseUser {
           );
 
           try {
-            await this.page.waitForNavigation({timeout: 20000});
+            await this.page.waitForNavigation({waitUntil: 'networkidle0'});
           } catch (error) {
-            this.createAndSwitchToNewTab;
+            return;
           }
           return;
         }
@@ -2827,9 +2827,9 @@ export class TopicManager extends BaseUser {
       );
 
       try {
-        await this.page.waitForNavigation({timeout: 20000});
+        await this.page.waitForNavigation({waitUntil: 'networkidle0'});
       } catch (error) {
-        await this.createAndSwitchToNewTab();
+        return;
       }
     } catch (error) {
       const newError = new Error(
