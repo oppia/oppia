@@ -1069,6 +1069,8 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
         blog_dashboard.BlogDashboardDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_DASHBOARD_URL, blog_dashboard.BlogDashboardPage),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
