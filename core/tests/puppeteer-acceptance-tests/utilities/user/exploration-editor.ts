@@ -1136,6 +1136,10 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(saveHintEditButton);
   }
 
+  /**
+   * Adds a particular skill to the current state card.
+   * @param skillName - Name of the skill to be linked to state.
+   */
   async addSkillToState(skillName: string): Promise<void> {
     await this.clickOn(addSkillButton);
     await this.type(skillNameInput, skillName);
@@ -1192,6 +1196,10 @@ export class ExplorationEditor extends BaseUser {
     );
   }
 
+  /**
+   * Toggles the applicability status of an optional misconception.
+   * @param misconceptionName - The name of the misconception to be toggled.
+   */
   async toggleMisconceptionApplicableStatus(
     misconceptionName: string
   ): Promise<void> {
@@ -1230,6 +1238,11 @@ export class ExplorationEditor extends BaseUser {
     }
   }
 
+  /**
+   * Verifies whether a given optional misconception is applicable or not.
+   * @param misconceptionName - The name of the misconception to be verified.
+   * @param isApplicable - The expected applicability status of the misconception.
+   */
   async verifyOptionalMisconceptionApplicableStatus(
     misconceptionName: string,
     isApplicable: boolean
@@ -1258,6 +1271,9 @@ export class ExplorationEditor extends BaseUser {
     );
   }
 
+  /**
+   * Removes the attached skill from the current state card.
+   */
   async removeSkillFromState(): Promise<void> {
     await this.clickOn(deleteSkillButton);
     await this.clickOn('Delete skill');
