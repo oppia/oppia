@@ -1260,6 +1260,8 @@ export class ExplorationEditor extends BaseUser {
       if (title === misconceptionName && !isApplicable) {
         return;
       } else if (title.startsWith(misconceptionName) && isApplicable) {
+        // We use startsWith since misconception title divs can have an icon at
+        // the end indicating that the misconception needs to be addressed.
         throw new Error(
           `The misconception ${misconceptionName} is expected to be applicable, found not applicable.`
         );
