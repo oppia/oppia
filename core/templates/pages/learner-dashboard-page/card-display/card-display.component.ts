@@ -17,7 +17,7 @@
  */
 import {Component, ElementRef, Input, ViewChild} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
-
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 @Component({
   selector: 'oppia-card-display',
   templateUrl: './card-display.component.html',
@@ -33,12 +33,19 @@ export class CardDisplayComponent {
   currentShift: number = 0;
   maxShifts: number = 0;
   lastShift: number = 0;
+  isLanguageRTL: boolean = false;
+
+  constructor(private I18nLanguageCodeService: I18nLanguageCodeService) {}
+
+  ngOnInit(): void {
+    this.isLanguageRTL = this.I18nLanguageCodeService.isCurrentLanguageRTL();
+  }
 
   getMaxShifts(width: number): number {
     return this.numCards - Math.floor(width / this.cardWidth);
   }
 
-  nextCard(num: number): void {
+  moveCard(num: number): void {
     const allCards = this.cards.nativeElement;
     this.maxShifts = this.getMaxShifts(allCards.offsetWidth);
     this.lastShift =
@@ -48,22 +55,24 @@ export class CardDisplayComponent {
 
     if (allCards !== null) {
       if (this.currentShift > num) {
-        allCards.scrollLeft -= this.shiftLeft();
+        allCards.scrollLeft -=
+          (this.isLanguageRTL ? -1 : 1) * this.goToPrevCard();
       } else {
-        allCards.scrollLeft += this.shiftRight(num);
+        allCards.scrollLeft +=
+          (this.isLanguageRTL ? -1 : 1) * this.goToNextCard(num);
       }
     }
     this.currentShift = num;
   }
 
-  shiftLeft(): number {
+  goToPrevCard(): number {
     if (this.currentShift === this.maxShifts) {
       return this.lastShift;
     }
     return this.cardWidth - (this.currentShift === 1 ? 32 : 0);
   }
 
-  shiftRight(nextShift: number): number {
+  goToNextCard(nextShift: number): number {
     if (nextShift === 1) {
       return this.cardWidth - 32;
     }

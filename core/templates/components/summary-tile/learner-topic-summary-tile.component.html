@@ -23,7 +23,7 @@
       </div>
     </a>
   </mat-card>
-  <a *ngIf="redesignFeatureFlag" class="d-flex flex-column flex-shrink-0 oppia-class-card text-decoration-none" [href]="getTopicLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" [ngClass]="{'oppia-class-card-not-last': !lastCard}">
+  <a *ngIf="redesignFeatureFlag" class="d-flex flex-column flex-shrink-0 oppia-class-card text-decoration-none" [href]="getTopicLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
     <div class="oppia-class-card-img rounded-top" [ngStyle]="{'background-color': thumbnailBgColor}">
       <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl">
     </div>
@@ -100,10 +100,6 @@
   .oppia-class-card:hover {
     background-color: #00609c;
     box-shadow: 0 0 8px 0 #00000040;
-  }
-
-  .oppia-class-card-not-last {
-    margin-right: 16px;
   }
 
   .oppia-class-card-button {
