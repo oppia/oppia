@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for translation modification modal in exploration editor.
+ * @fileoverview Acceptance Test for covering usage of voiceovers and available translation in an exploration.
  */
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
