@@ -19,12 +19,15 @@
 import {TestBed} from '@angular/core/testing';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {LocalStorageService} from 'services/local-storage.service';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
 describe('Site Analytics Service', () => {
   let sas: SiteAnalyticsService;
   let ws: WindowRef;
   let gtagSpy: jasmine.Spy;
   let pathname = 'pathname';
+  let localStorageService: jasmine.SpyObj<LocalStorageService>;
   const explorationId = 'abc1';
 
   class MockWindowRef {
@@ -37,17 +40,23 @@ describe('Site Analytics Service', () => {
   }
 
   beforeEach(() => {
+    const localStorageServiceSpy = jasmine.createSpyObj('LocalStorageService', [
+      'getLastPageViewTime',
+      'setLastPageViewTime',
+    ]);
     TestBed.configureTestingModule({
       providers: [
         {
           provide: WindowRef,
           useClass: MockWindowRef,
         },
+        {provide: LocalStorageService, useValue: localStorageServiceSpy},
       ],
     }).compileComponents();
 
     sas = TestBed.inject(SiteAnalyticsService);
     ws = TestBed.inject(WindowRef);
+    localStorageService = TestBed.inject(LocalStorageService);
   });
 
   it('should initialize google analytics', () => {
@@ -746,6 +755,160 @@ describe('Site Analytics Service', () => {
         exploration_id: explorationId,
         answer_is_correct: answerIsCorrect,
       });
+    });
+
+    it('should register Volunteer CTA button click event', () => {
+      const srcElement = 'Volunteer with Oppia';
+      sas.registerClickVolunteerCTAButtonEvent(srcElement);
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'volunteer_cta_button_click',
+        {
+          page_path: pathname,
+          source_element: srcElement,
+        }
+      );
+    });
+
+    it('should register Partner CTA button click event', () => {
+      const srcElement = 'Partner with us at the top of the page';
+      sas.registerClickPartnerCTAButtonEvent(srcElement);
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'partner_cta_button_click',
+        {
+          page_path: pathname,
+          source_element: srcElement,
+        }
+      );
+    });
+
+    it('should register Donate CTA button click event', () => {
+      sas.registerClickDonateCTAButtonEvent();
+
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'donate_cta_button_click', {
+        page_path: pathname,
+      });
+    });
+
+    it('should register Download the Android App button click event', () => {
+      sas.registerClickDownloadAndroidAppButtonEvent();
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'download_android_app_button_click',
+        {
+          page_path: pathname,
+        }
+      );
+    });
+
+    it('should register Volunteer Learn more button click event', () => {
+      sas.registerClickLearnMoreVolunteerButtonEvent();
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'learn_more_volunteer_button_click',
+        {
+          page_path: pathname,
+        }
+      );
+    });
+
+    it('should register Partner Learn more button click event', () => {
+      sas.registerClickLearnMorePartnerButtonEvent();
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'learn_more_partner_button_click',
+        {
+          page_path: pathname,
+        }
+      );
+    });
+
+    it('should register Navbar button click events', () => {
+      const buttonName = NavbarAndFooterGATrackingPages.ABOUT;
+      sas.registerClickNavbarButtonEvent(buttonName);
+
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'navbar_button_click', {
+        button_name: buttonName,
+        page_path: pathname,
+      });
+    });
+
+    it('should register Footer button click events', () => {
+      const buttonName = NavbarAndFooterGATrackingPages.ABOUT;
+      sas.registerClickFooterButtonEvent(buttonName);
+
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'footer_button_click', {
+        button_name: buttonName,
+        page_path: pathname,
+      });
+    });
+
+    it('should send first time page view in month event if time difference is more than one month', () => {
+      const thiryOneDaysInMillis = 31 * 24 * 60 * 60 * 1000;
+      const lastPageViewTime = new Date().getTime() - thiryOneDaysInMillis;
+      localStorageService.getLastPageViewTime.and.returnValue(lastPageViewTime);
+      const testKey = 'testKey';
+      sas.registerFirstTimePageViewEvent(testKey);
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'first_time_page_view_in_month',
+        {
+          page_path: pathname,
+        }
+      );
+      expect(localStorageService.setLastPageViewTime).toHaveBeenCalledWith(
+        testKey
+      );
+    });
+
+    it('should send first time page view in week event if time difference is more than one week', () => {
+      const eightDaysInMillis = 8 * 24 * 60 * 60 * 1000;
+      const lastPageViewTime = new Date().getTime() - eightDaysInMillis;
+      localStorageService.getLastPageViewTime.and.returnValue(lastPageViewTime);
+      const testKey = 'testKey';
+      sas.registerFirstTimePageViewEvent(testKey);
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'first_time_page_view_in_week',
+        {
+          page_path: pathname,
+        }
+      );
+      expect(localStorageService.setLastPageViewTime).toHaveBeenCalledWith(
+        testKey
+      );
+    });
+
+    it('should not send any event if time difference is less than one week', () => {
+      const sixDaysInMillis = 6 * 24 * 60 * 60 * 1000;
+      const lastPageViewTime = new Date().getTime() - sixDaysInMillis;
+      localStorageService.getLastPageViewTime.and.returnValue(lastPageViewTime);
+      const testKey = 'testKey';
+      sas.registerFirstTimePageViewEvent(testKey);
+
+      expect(gtagSpy).not.toHaveBeenCalled();
+      expect(localStorageService.setLastPageViewTime).toHaveBeenCalledWith(
+        testKey
+      );
+    });
+
+    it('should set last page view time if lastPageViewTime is null', () => {
+      localStorageService.getLastPageViewTime.and.returnValue(null);
+      const testKey = 'testKey';
+      sas.registerFirstTimePageViewEvent(testKey);
+
+      expect(gtagSpy).not.toHaveBeenCalled();
+      expect(localStorageService.setLastPageViewTime).toHaveBeenCalledWith(
+        testKey
+      );
     });
   });
 });

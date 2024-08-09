@@ -409,8 +409,8 @@
       </div>
       <div class="incomplete-section e2e-test-incomplete-community-lessons-section" *ngIf="totalIncompleteLessonsList.length !== 0">
         <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION'" [numCards]="totalIncompleteLessonsList.length" [tabType]="'progress'">
-          <ng-container *ngFor="let summaryTile of displayIncompleteLessonsList; last as last">
-            <lesson-card [story]="summaryTile" [lastCard]="last"> </lesson-card>
+          <ng-container *ngFor="let summaryTile of displayIncompleteLessonsList">
+            <lesson-card [story]="summaryTile"> </lesson-card>
           </ng-container>
         </oppia-card-display>
       </div>
@@ -418,8 +418,8 @@
     <div tabindex="0" class="oppia-learner-dash-section e2e-test-completed-community-lessons-section" *ngIf="totalCompletedLessonsList.length !== 0">
       <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate }} </p>
       <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION'" [numCards]="totalCompletedLessonsList.length" [tabType]="'progress'">
-        <ng-container *ngFor="let summaryTile of displayCompletedLessonsList; last as last">
-          <lesson-card [story]="summaryTile" [lastCard]="last" [isCommunityLessonComplete]="true"> </lesson-card>
+        <ng-container *ngFor="let summaryTile of displayCompletedLessonsList">
+          <lesson-card [story]="summaryTile" [isCommunityLessonComplete]="true"> </lesson-card>
         </ng-container>
       </oppia-card-display>
     </div>
