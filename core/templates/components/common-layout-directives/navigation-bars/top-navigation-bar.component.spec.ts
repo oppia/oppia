@@ -47,6 +47,7 @@ import {CookieService} from 'ngx-cookie';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 class MockPlatformFeatureService {
@@ -408,32 +409,44 @@ describe('TopNavigationBarComponent', () => {
     expect(component.isSidebarShown()).toBe(false);
   });
 
-  it(
-    'should navigate to classroom page when user clicks' +
-      " on 'Basic Mathematics'",
-    fakeAsync(() => {
-      expect(mockWindowRef.nativeWindow.location.href).toBe('');
+  it('should register About header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
-      component.navigateToClassroomPage('/classroom/url');
-      tick(151);
+    component.navigateToAboutPage();
 
-      expect(mockWindowRef.nativeWindow.location.href).toBe('/classroom/url');
-    })
-  );
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.ABOUT);
 
-  it(
-    'should registers classroom header click event when user clicks' +
-      " on 'Basic Mathematics'",
-    () => {
-      spyOn(siteAnalyticsService, 'registerClassroomHeaderClickEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
+  });
 
-      component.navigateToClassroomPage('/classroom/url');
+  it('should register Volunteer header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
-      expect(
-        siteAnalyticsService.registerClassroomHeaderClickEvent
-      ).toHaveBeenCalled();
-    }
-  );
+    component.navigateToVolunteerPage();
+
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.VOLUNTEER);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/volunteer');
+  });
+
+  it('should register Teach header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.navigateToTeachPage();
+
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.TEACH);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/teach');
+  });
 
   it('should check if i18n has been run', () => {
     spyOn(document, 'querySelectorAll')

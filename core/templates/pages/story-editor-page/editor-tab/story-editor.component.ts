@@ -396,6 +396,9 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
             this.story,
             newUrlFragment
           );
+        },
+        () => {
+          return;
         }
       );
     } else {

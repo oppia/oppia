@@ -29,6 +29,7 @@ import {UserInfo} from 'domain/user/user-info.model';
 import {UserService} from 'services/user.service';
 import {of} from 'rxjs';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {AppConstants} from '../../app.constants';
 class MockWindowRef {
   _window = {
     location: {
@@ -144,12 +145,20 @@ describe('Teach Page', () => {
   });
 
   it('should set component properties when ngOnInit() is called', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerFirstTimePageViewEvent'
+    ).and.callThrough();
     component.ngOnInit();
     expect(component.displayedTestimonialId).toBe(0);
-    expect(component.classroomUrl).toBe('/learn/math');
     spyOn(windowDimensionsService, 'isWindowNarrow').and.callThrough;
     expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
     expect(component.isWindowNarrow).toBe(true);
+    expect(
+      siteAnalyticsService.registerFirstTimePageViewEvent
+    ).toHaveBeenCalledWith(
+      AppConstants.LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA.TEACH
+    );
   });
 
   it('should check if loader screen is working', () =>
@@ -258,6 +267,17 @@ describe('Teach Page', () => {
     component.onClickExploreLessonsButton();
     expect(
       siteAnalyticsService.registerClickExploreLessonsButtonEvent
+    ).toHaveBeenCalled();
+  });
+
+  it('should regiester GA event when Download Android App is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickDownloadAndroidAppButtonEvent'
+    ).and.callThrough();
+    component.onClickDownloadAndroidAppButton();
+    expect(
+      siteAnalyticsService.registerClickDownloadAndroidAppButtonEvent
     ).toHaveBeenCalled();
   });
 
