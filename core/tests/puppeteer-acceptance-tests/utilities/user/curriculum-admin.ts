@@ -146,7 +146,7 @@ const mobileSaveTopicButton =
 const mobilePublishTopicButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-topic-button';
 
-const mobileNavToggelbutton = '.e2e-test-mobile-options';
+const mobileNavToggleButton = '.e2e-test-mobile-options';
 const mobileOptionsDropdown = '.e2e-test-mobile-options-dropdown';
 const mobileSettingsButton = 'li.e2e-test-mobile-settings-button';
 const explorationControlsSettingsDropdown =
@@ -154,28 +154,29 @@ const explorationControlsSettingsDropdown =
 
 const createNewClassroomModal = '.e2e-test-create-new-classroom-modal';
 const createNewClassroomButton = '.e2e-test-add-new-classroom-config';
-const newClassroomNameInputFeild = '.e2e-test-new-classroom-name';
-const newClassroomUrlFragmentInputFeild =
+const newClassroomNameInputField = '.e2e-test-new-classroom-name';
+const newClassroomUrlFragmentInputField =
   '.e2e-test-new-classroom-url-fragment';
 const saveNewClassroomButton = '.e2e-test-create-new-classroom';
 const classroomTileSelector = '.e2e-test-classroom-tile';
 
 const editClassroomConfigButton = '.e2e-test-edit-classroom-config-button';
 const closeClassroomConfigButton = '.e2e-cancel-classroom-changes';
-const editClassroomCourseDetailsInputFeild =
+const editClassroomCourseDetailsInputField =
   '.e2e-test-update-classroom-course-details';
-const editClassroomTeaserTextInputFeild =
+const editClassroomTeaserTextInputField =
   '.e2e-test-update-classroom-teaser-text';
-const editClassroomTopicListIntroInputFeild =
+const editClassroomTopicListIntroInputField =
   '.e2e-test-update-classroom-topic-list-intro';
 const classroomThumbnailContainer = '.e2e-test-classroom-thumbnail-container';
 const classroomBannerContainer = '.e2e-test-classroom-banner-container';
 const uploadClassroomImageButton = '.e2e-test-photo-upload-submit';
 const imageUploaderModal = '.e2e-test-thumbnail-editor';
 const openTopicDropdownButton = '.e2e-test-add-topic-to-classroom-button';
-const topicDropDownFormFeild = '.e2e-test-classroom-category-dropdown';
+const topicDropDownFormField = '.e2e-test-classroom-category-dropdown';
 const topicSelector = '.e2e-test-classroom-topic-selector-choice';
-const publishClassroomButton = '.e2e-test-publish-classroom-btn';
+const publishClassroomButton =
+  '.e2e-test-toggle-classroom-publication-status-btn';
 const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const classroomTileNameSpan = '.e2e-test-classroom-tile-name';
 const deleteClassroomButton = '.e2e-test-delete-classroom-button';
@@ -187,14 +188,43 @@ const topicNode = '.e2e-test-topic-node';
 const closeTopicDependencyButton = '.e2e-test-close-topic-dependency-modal';
 const addTopicFormFieldInput = '.mat-input-element';
 const createNewTopicButton = '.e2e-test-create-topic-button';
+const createNewTopicMobileButton = '.e2e-test-create-topic-mobile-button';
 
+const addStoryButton = 'button.e2e-test-create-story-button';
+const storyTitleField = 'input.e2e-test-new-story-title-field';
+const storyDescriptionField = 'textarea.e2e-test-new-story-description-field';
+const storyUrlFragmentField = 'input.e2e-test-new-story-url-fragment-field';
+const createStoryButton = 'button.e2e-test-confirm-story-creation-button';
+const storyPhotoBoxButton =
+  'oppia-create-new-story-modal .e2e-test-photo-button';
+const storyMetaTagInput = '.e2e-test-story-meta-tag-content-field';
+const publishStoryButton = 'button.e2e-test-publish-story-button';
+const unpublishStoryButton = 'button.e2e-test-unpublish-story-button';
+
+const mobileStoryDropdown = '.e2e-test-story-dropdown';
+const mobileSaveStoryChangesDropdown =
+  'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
+const mobilePublishStoryButton =
+  'div.navbar-mobile-options .e2e-test-mobile-publish-button';
+
+const addChapterButton = 'button.e2e-test-add-chapter-button';
+
+const saveStoryButton = 'button.e2e-test-save-story-button';
+const mobileSaveStoryChangesButton =
+  'div.navbar-mobile-options .e2e-test-mobile-save-changes';
+const newChapterTitleField = 'input.e2e-test-new-chapter-title-field';
+const newChapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
+const newChapterPhotoBoxButton =
+  '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
+const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
+const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 export class CurriculumAdmin extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
    */
   async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
     await this.page.bringToFront();
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
     await this.goto(topicAndSkillsDashboardUrl);
   }
 
@@ -223,6 +253,32 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.clickOn(confirmSkillCreationButton);
     await this.page.bringToFront();
+  }
+
+  /**
+   * Navigate to the question editor tab present in the skills tab.
+   */
+  async navigateToSkillQuestionEditorTab(): Promise<void> {
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const skillQuestionTab = isMobileWidth
+      ? mobileSkillQuestionTab
+      : desktopSkillQuestionTab;
+
+    if (isMobileWidth) {
+      const currentUrl = new URL(this.page.url());
+      const hashParts = currentUrl.hash.split('/');
+
+      if (hashParts.length > 1) {
+        hashParts[1] = 'questions';
+      } else {
+        hashParts.push('questions');
+      }
+      currentUrl.hash = hashParts.join('/');
+      await this.goto(currentUrl.toString());
+      await this.page.reload({waitUntil: 'networkidle0'});
+    } else {
+      await this.clickAndWaitForNavigation(skillQuestionTab);
+    }
   }
 
   /**
@@ -310,7 +366,15 @@ export class CurriculumAdmin extends BaseUser {
    * Create a topic in the topics-and-skills dashboard.
    */
   async createTopic(name: string, urlFragment: string): Promise<string> {
-    await this.clickOn(createNewTopicButton);
+    await this.navigateToTopicAndSkillsDashboardPage();
+    const TopicSelectorElement = await this.page.$(desktopTopicSelector);
+
+    if (!TopicSelectorElement || !this.isViewportAtMobileWidth()) {
+      await this.clickOn(createNewTopicButton);
+    } else {
+      await this.clickOn(createNewTopicMobileButton);
+    }
+
     await this.type(topicNameField, name);
     await this.type(topicUrlFragmentField, urlFragment);
     await this.type(topicWebFragmentField, name);
@@ -472,6 +536,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickOn(createSubtopicButton);
     await this.saveTopicDraft(topicName);
+    showMessage(`Subtopic ${title} is created.`);
   }
 
   /**
@@ -609,12 +674,18 @@ export class CurriculumAdmin extends BaseUser {
    * Check if the topic has been published successfully, by verifying
    * the status and the counts in the topics and skills dashboard.
    */
+  /**
+   * Check if the topic has been published successfully, by verifying
+   * the status and the counts in the topics and skills dashboard.
+   */
   async expectTopicToBePublishedInTopicsAndSkillsDashboard(
     topicName: string,
+    expectedPublishedStoryCount: number,
     expectedSubtopicCount: number,
     expectedSkillsCount: number
   ): Promise<void> {
     let topicDetails: {
+      publishedStoryCount: string | null;
       subtopicCount: string | null;
       skillsCount: string | null;
       topicStatus: string | null;
@@ -664,6 +735,7 @@ export class CurriculumAdmin extends BaseUser {
         }
 
         return {
+          publishedStoryCount: tds[0].innerText,
           subtopicCount: tds[1].innerText,
           skillsCount: tds[2].innerText,
           topicStatus: tds[3].innerText,
@@ -686,6 +758,7 @@ export class CurriculumAdmin extends BaseUser {
         }
 
         return {
+          publishedStoryCount: tds[2].innerText,
           subtopicCount: tds[3].innerText,
           skillsCount: tds[4].innerText,
           topicStatus: tds[5].innerText,
@@ -694,6 +767,9 @@ export class CurriculumAdmin extends BaseUser {
     }
 
     expect(topicDetails.topicStatus).toEqual('Published');
+    expect(topicDetails.publishedStoryCount).toEqual(
+      expectedPublishedStoryCount.toString()
+    );
     expect(topicDetails.subtopicCount).toEqual(
       expectedSubtopicCount.toString()
     );
@@ -713,22 +789,22 @@ export class CurriculumAdmin extends BaseUser {
     }
     const editorUrl = `${baseURL}/create/${explorationId}`;
     await this.page.goto(editorUrl);
-    showMessage('Navigation to exploration editor is successfull.');
+    showMessage('Navigation to exploration editor is successful.');
   }
 
   /**
    * Function to navigate to exploration settings tab
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavToggelbutton);
+      await this.clickOn(mobileNavToggleButton);
       await this.clickOn(mobileOptionsDropdown);
       await this.clickOn(mobileSettingsButton);
     } else {
       await this.clickOn(explorationSettingsTab);
     }
-    showMessage('Navigation to settings tab is successfull.');
+    showMessage('Navigation to settings tab is successful.');
   }
 
   /**
@@ -736,7 +812,7 @@ export class CurriculumAdmin extends BaseUser {
    * Note: This action requires Curriculum Admin role.
    */
   async deleteExplorationPermanently(): Promise<void> {
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     await this.clickOn(deleteExplorationButton);
     await this.clickOn(confirmDeletionButton);
   }
@@ -745,15 +821,19 @@ export class CurriculumAdmin extends BaseUser {
    * Function to dismiss welcome modal
    */
   async dismissWelcomeModal(): Promise<void> {
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      visible: true,
-    });
-    await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      hidden: true,
-    });
-
-    showMessage('Tutorial pop is closed.');
+    try {
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+      await this.clickOn(dismissWelcomeModalSelector);
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        hidden: true,
+      });
+      showMessage('Tutorial pop-up closed successfully.');
+    } catch (error) {
+      showMessage(`welcome modal not found: ${error.message}`);
+    }
   }
 
   /**
@@ -762,6 +842,168 @@ export class CurriculumAdmin extends BaseUser {
    */
   async openExplorationControlDropdown(): Promise<void> {
     await this.clickOn(explorationControlsSettingsDropdown);
+  }
+
+  /**
+   * Create a story, execute chapter creation for
+   * the story, and then publish the story.
+   */
+  async createAndPublishStoryWithChapter(
+    storyTitle: string,
+    storyUrlFragment: string,
+    chapterTitle: string,
+    explorationId: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileStoryDropdown);
+    }
+    await this.clickOn(addStoryButton);
+    await this.type(storyTitleField, storyTitle);
+    await this.type(storyUrlFragmentField, storyUrlFragment);
+    await this.type(
+      storyDescriptionField,
+      `Story creation description for ${storyTitle}.`
+    );
+
+    await this.clickOn(storyPhotoBoxButton);
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickAndWaitForNavigation(createStoryButton);
+
+    await this.page.waitForSelector(storyMetaTagInput);
+    await this.page.focus(storyMetaTagInput);
+    await this.page.type(storyMetaTagInput, 'meta');
+    await this.page.keyboard.press('Tab');
+
+    await this.addChapter(chapterTitle, explorationId);
+
+    await this.saveStoryDraft();
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileSaveStoryChangesDropdown);
+      await this.page.waitForSelector(mobilePublishStoryButton);
+      await this.clickOn(mobilePublishStoryButton);
+    } else {
+      await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
+      await this.clickOn(publishStoryButton);
+      await this.page.waitForSelector(unpublishStoryButton, {visible: true});
+    }
+  }
+
+  /**
+   * Creates a new story with the given title, URL fragment, and topic name.
+   * Note: This function only creates a story and does not add any chapters to it.
+   * @param {string} storyTitle - The title of the story.
+   * @param {string} storyUrlFragment - The URL fragment of the story.
+   * @param {string} topicName - The name of the topic.
+   */
+  async addStoryToTopic(
+    storyTitle: string,
+    storyUrlFragment: string,
+    topicName: string
+  ): Promise<string> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileStoryDropdown);
+    }
+    await this.clickOn(addStoryButton);
+    await this.type(storyTitleField, storyTitle);
+    await this.type(storyUrlFragmentField, storyUrlFragment);
+    await this.type(
+      storyDescriptionField,
+      `Story creation description for ${storyTitle}.`
+    );
+
+    await this.clickOn(storyPhotoBoxButton);
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickAndWaitForNavigation(createStoryButton);
+
+    await this.page.waitForSelector(storyMetaTagInput);
+    await this.page.focus(storyMetaTagInput);
+    await this.page.type(storyMetaTagInput, 'meta');
+    await this.page.keyboard.press('Tab');
+    await this.saveStoryDraft();
+
+    const url = new URL(this.page.url());
+    const pathSegments = url.pathname.split('/');
+    const storyId = pathSegments[pathSegments.length - 1];
+    showMessage(`Story ${storyTitle} is created.`);
+    await this.waitForNetworkIdle();
+
+    return storyId;
+  }
+
+  /**
+   * Create a chapter for a certain story.
+   */
+  async addChapter(chapterName: string, explorationId: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.waitForStaticAssetsToLoad();
+      const addChapterButtonElement = await this.page.$(addChapterButton);
+      if (!addChapterButtonElement) {
+        await this.clickOn(mobileChapterCollapsibleCard);
+      }
+    }
+    await this.clickOn(addChapterButton);
+    await this.type(newChapterTitleField, chapterName);
+    await this.type(newChapterExplorationIdField, explorationId);
+
+    await this.clickOn(newChapterPhotoBoxButton);
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createChapterButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+    showMessage(`Chapter ${chapterName} is created.`);
+  }
+
+  /**
+   * Save a story.
+   */
+  async saveStoryDraft(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const isMobileSaveButtonVisible = await this.isElementVisible(
+        mobileSaveStoryChangesButton
+      );
+      if (!isMobileSaveButtonVisible) {
+        await this.clickOn(mobileOptionsSelector);
+      }
+      await this.clickOn(mobileSaveStoryChangesButton);
+    } else {
+      await this.clickOn(saveStoryButton);
+    }
+    await this.type(
+      saveChangesMessageInput,
+      'Test saving story as curriculum admin.'
+    );
+    await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
+    await this.clickOn(closeSaveModalButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+  }
+
+  /**
+   * Publish a story.
+   */
+  async publishStoryDraft(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileSaveStoryChangesDropdown);
+      await this.page.waitForSelector(mobilePublishStoryButton);
+      await this.clickOn(mobilePublishStoryButton);
+    } else {
+      await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
+      await this.clickOn(publishStoryButton);
+      await this.page.waitForSelector(unpublishStoryButton, {visible: true});
+    }
   }
 
   /**
@@ -797,7 +1039,7 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} topicName - The name of the topic to delete.
    */
   async deleteTopic(topicName: string): Promise<void> {
-    await this.page.goto(topicAndSkillsDashboardUrl);
+    await this.goto(topicAndSkillsDashboardUrl);
 
     const isMobileWidth = this.isViewportAtMobileWidth();
     const topicListItemSelector = isMobileWidth
@@ -894,6 +1136,8 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} skillName - The name of the skill to delete.
    */
   async deleteSkill(skillName: string): Promise<void> {
+    await this.goto(topicAndSkillsDashboardUrl);
+
     const isMobileWidth = this.isViewportAtMobileWidth();
     const skillSelector = isMobileWidth
       ? mobileSkillSelector
@@ -908,25 +1152,26 @@ export class CurriculumAdmin extends BaseUser {
       ? mobileDeleteSkillButton
       : desktopDeleteSkillButton;
 
-    await this.page.goto(topicAndSkillsDashboardUrl);
     await this.page.waitForSelector(skillsTab, {visible: true});
     await this.clickOn(skillsTab);
     await this.page.waitForSelector(skillSelector, {visible: true});
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(skillListItemSelector, {visible: true});
 
     const skills = await this.page.$$(skillListItemSelector);
     for (let skill of skills) {
       const skillNameElement = await skill.$(skillSelector);
       if (skillNameElement) {
-        const name = await (
+        const name: string = await (
           await skillNameElement.getProperty('textContent')
         ).jsonValue();
 
-        if (name === `${skillName}`) {
-          await skill.waitForSelector(skillListItemOptions, {visible: true});
+        if (name.trim() === `${skillName}`) {
+          await this.page.waitForSelector(skillListItemOptions, {
+            visible: true,
+          });
           const editBox = await skill.$(skillListItemOptions);
           if (editBox) {
-            await this.waitForElementToBeClickable(editBox);
             await editBox.click();
             await this.page.waitForSelector(deleteSkillButton);
           } else {
@@ -1052,9 +1297,9 @@ export class CurriculumAdmin extends BaseUser {
    * Function for navigating to the classroom admin page.
    */
   async navigateToClassroomAdminPage(): Promise<void> {
-    await this.page.goto(classroomAdminUrl, {
-      waitUntil: ['networkidle2', 'load'],
-    });
+    await this.page.bringToFront();
+    await this.waitForNetworkIdle();
+    await this.goto(classroomAdminUrl);
   }
 
   /**
@@ -1062,6 +1307,7 @@ export class CurriculumAdmin extends BaseUser {
    */
   async editClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
+    await this.page.waitForSelector(classroomTileSelector);
     const classroomTiles = await this.page.$$(classroomTileSelector);
 
     if (classroomTiles.length === 0) {
@@ -1101,8 +1347,8 @@ export class CurriculumAdmin extends BaseUser {
     await this.navigateToClassroomAdminPage();
     await this.clickOn(createNewClassroomButton);
     await this.page.waitForSelector(createNewClassroomModal);
-    await this.page.type(newClassroomNameInputFeild, classroomName);
-    await this.page.type(newClassroomUrlFragmentInputFeild, urlFragment);
+    await this.page.type(newClassroomNameInputField, classroomName);
+    await this.page.type(newClassroomUrlFragmentInputField, urlFragment);
     await this.clickOn(saveNewClassroomButton);
     await this.page.waitForSelector(createNewClassroomModal, {visible: false});
     showMessage(`Created ${classroomName} classroom.`);
@@ -1120,9 +1366,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
 
-    await this.page.type(editClassroomTeaserTextInputFeild, teaserText);
-    await this.page.type(editClassroomTopicListIntroInputFeild, topicListIntro);
-    await this.page.type(editClassroomCourseDetailsInputFeild, courseDetails);
+    await this.page.type(editClassroomTeaserTextInputField, teaserText);
+    await this.page.type(editClassroomTopicListIntroInputField, topicListIntro);
+    await this.page.type(editClassroomCourseDetailsInputField, courseDetails);
     await this.clickOn(classroomThumbnailContainer);
     await this.page.waitForSelector(imageUploaderModal, {visible: true});
     await this.uploadFile(curriculumAdminThumbnailImage);
@@ -1153,7 +1399,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.editClassroom(classroomName);
 
     await this.clickOn(openTopicDropdownButton);
-    await this.clickOn(topicDropDownFormFeild);
+    await this.clickOn(topicDropDownFormField);
     await this.page.waitForSelector(addTopicFormFieldInput);
     await this.page.type(addTopicFormFieldInput, topicName);
     await this.clickOn(topicSelector);
@@ -1185,8 +1431,9 @@ export class CurriculumAdmin extends BaseUser {
   async publishClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
-
     await this.clickOn(publishClassroomButton);
+    await this.clickOn(saveClassroomButton);
+    showMessage(`Published ${classroomName} classroom.`);
   }
 
   /**
@@ -1256,6 +1503,61 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.clickOn(closeTopicDependencyButton);
     await this.page.waitForSelector(topicDependencyGraphDiv, {visible: false});
+  }
+
+  /**
+   * Creates and publishes a topic with a subtopic and skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} skillName - The name of the skill.
+   */
+  async createAndPublishTopic(
+    topicName: string,
+    subtopicName: string,
+    skillName: string
+  ): Promise<void> {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(' ', '-')
+    );
+    await this.createSubtopicForTopic(
+      subtopicName,
+      subtopicName.toLowerCase().replace(' ', '-'),
+      topicName
+    );
+
+    await this.createSkillForTopic(skillName, topicName);
+    await this.createQuestionsForSkill(skillName, 3);
+    await this.assignSkillToSubtopicInTopicEditor(
+      skillName,
+      subtopicName,
+      topicName
+    );
+    await this.addSkillToDiagnosticTest(skillName, topicName);
+
+    await this.publishDraftTopic(topicName);
+  }
+
+  /**
+   * Creates, updates, and publishes a new classroom with a topic.
+   * @param {string} classroomName - The name of the classroom.
+   * @param {string} urlFragment - The URL fragment for the classroom.
+   * @param {string} topicToBeAssigned - The name of the topic to be assigned to the classroom.
+   */
+  async createAndPublishClassroom(
+    classroomName: string,
+    urlFragment: string,
+    topicToBeAssigned: string
+  ): Promise<void> {
+    await this.createNewClassroom(classroomName, urlFragment);
+    await this.updateClassroom(
+      classroomName,
+      'Teaser text',
+      'Course details',
+      'Topic list intro'
+    );
+    await this.addTopicToClassroom(classroomName, topicToBeAssigned);
+    await this.publishClassroom(classroomName);
   }
 }
 

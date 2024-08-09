@@ -65,6 +65,7 @@ describe('About Page', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let translateService: TranslateService;
   let windowDimensionsService: WindowDimensionsService;
+  let siteAnalyticsService: SiteAnalyticsService;
   let ngbModal: NgbModal;
   let resizeEvent = new Event('resize');
 
@@ -106,6 +107,7 @@ describe('About Page', () => {
   });
   beforeEach(() => {
     translateService = TestBed.inject(TranslateService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     ngbModal = TestBed.inject(NgbModal);
     spyOn(ngbModal, 'open');
@@ -136,20 +138,20 @@ describe('About Page', () => {
     expect(component.setPartnershipsFormLink).toHaveBeenCalled();
   });
 
-  it('should set screen type to mobile when window width is less than or equal to 361', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(360);
+  it('should set screen type to mobile when window width is less than or equal to 580', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(580);
     component.setScreenType();
     expect(component.screenType).toEqual('mobile');
   });
 
-  it('should set screen type to tablet when window width is between 362 and 768', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(500);
+  it('should set screen type to tablet when window width is between 581 and 976', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(975);
     component.setScreenType();
     expect(component.screenType).toEqual('tablet');
   });
 
-  it('should set screen type to desktop when window width is greater than 768', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(800);
+  it('should set screen type to desktop when window width is greater than 975', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(976);
     component.setScreenType();
     expect(component.screenType).toEqual('desktop');
   });
@@ -310,6 +312,96 @@ describe('About Page', () => {
     component.screenType = 'desktop';
     component.moveCarouselToNextSlide();
     expect(component.volunteerCarousel.next).toHaveBeenCalled();
+  });
+
+  it('should record analytics when Explore Lessons is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickExploreLessonsButtonEvent'
+    ).and.callThrough();
+    component.onClickExploreLessonsButton();
+    expect(
+      siteAnalyticsService.registerClickExploreLessonsButtonEvent
+    ).toHaveBeenCalled();
+  });
+
+  it('should register GA event when Download Android App is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickDownloadAndroidAppButtonEvent'
+    ).and.callThrough();
+    component.onClickDownloadAndroidAppButton();
+    expect(
+      siteAnalyticsService.registerClickDownloadAndroidAppButtonEvent
+    ).toHaveBeenCalled();
+  });
+
+  it('should register GA event when Donate CTA button is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickDonateCTAButtonEvent'
+    ).and.callThrough();
+    component.onClickDonateCTAButton();
+    expect(
+      siteAnalyticsService.registerClickDonateCTAButtonEvent
+    ).toHaveBeenCalled();
+  });
+
+  it('should register GA event when Volunteer CTA button is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickVolunteerCTAButtonEvent'
+    ).and.callThrough();
+    component.onClickVolunteerCTAButton();
+    expect(
+      siteAnalyticsService.registerClickVolunteerCTAButtonEvent
+    ).toHaveBeenCalledWith('CTA button at the bottom of the About page');
+  });
+
+  it('should register GA event when Partner CTA button is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickPartnerCTAButtonEvent'
+    ).and.callThrough();
+    component.onClickPartnerCTAButton();
+    expect(
+      siteAnalyticsService.registerClickPartnerCTAButtonEvent
+    ).toHaveBeenCalledWith('CTA button at the bottom of the About page');
+  });
+
+  it('should register GA event when Volunteer Learn More button is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickLearnMoreVolunteerButtonEvent'
+    ).and.callThrough();
+    component.onClickVolunteerLearnMoreButton();
+    expect(
+      siteAnalyticsService.registerClickLearnMoreVolunteerButtonEvent
+    ).toHaveBeenCalled();
+  });
+
+  it('should register GA event when Partner Learn More button is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickLearnMorePartnerButtonEvent'
+    ).and.callThrough();
+    component.onClickPartnerLearnMoreButton();
+    expect(
+      siteAnalyticsService.registerClickLearnMorePartnerButtonEvent
+    ).toHaveBeenCalled();
+  });
+
+  it('should register GA event when About Page is loaded', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerFirstTimePageViewEvent'
+    ).and.callThrough();
+    component.registerFirstTimePageViewEvent();
+    expect(
+      siteAnalyticsService.registerFirstTimePageViewEvent
+    ).toHaveBeenCalledWith(
+      AppConstants.LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA.ABOUT
+    );
   });
 
   it('should unsubscribe on component destruction', () => {

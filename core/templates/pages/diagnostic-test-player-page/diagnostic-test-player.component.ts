@@ -21,10 +21,16 @@ import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {DiagnosticTestTopicTrackerModel} from './diagnostic-test-topic-tracker.model';
+import {ClassroomData} from 'domain/classroom/classroom-data.model';
 import {Subscription} from 'rxjs';
 import {DiagnosticTestPlayerStatusService} from './diagnostic-test-player-status.service';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {TranslateService} from '@ngx-translate/core';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {AppConstants} from 'app.constants';
+import {Router} from '@angular/router';
+import {LoaderService} from 'services/loader.service';
+import {AlertsService} from 'services/alerts.service';
 
 @Component({
   selector: 'oppia-diagnostic-test-player',
@@ -35,28 +41,48 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   diagnosticTestTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
   diagnosticTestIsStarted: boolean = false;
   diagnosticTestIsFinished = false;
-  classroomUrlFragment: string = 'math';
+  classroomData!: ClassroomData;
+  classroomUrlFragment!: string;
   recommendedTopicSummaries: CreatorTopicSummary[] = [];
   recommendedTopicIds: string[] = [];
   progressPercentage: number = 0;
   componentSubscription = new Subscription();
-  classroomId: string = '';
+  isStartTestButtonDisabled: boolean = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private classroomBackendApiService: ClassroomBackendApiService,
     private translateService: TranslateService,
-    private diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService
+    private diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService,
+    private windowRef: WindowRef,
+    private router: Router,
+    private loaderService: LoaderService,
+    private alertsService: AlertsService
   ) {}
 
   ngOnInit(): void {
+    this.loaderService.showLoadingScreen('Loading');
+
+    const searchParams = Object.fromEntries(
+      new URLSearchParams(this.windowRef.nativeWindow.location.search)
+    );
+
+    if (!searchParams.hasOwnProperty('classroom')) {
+      this.router.navigate([
+        `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+      ]);
+      return;
+    }
+
+    this.classroomUrlFragment = searchParams.classroom;
+
     this.preventPageUnloadEventService.addListener(() => {
       return this.diagnosticTestIsStarted && !this.diagnosticTestIsFinished;
     });
 
     this.OPPIA_AVATAR_IMAGE_URL =
-      this.urlInterpolationService.getStaticImageUrl(
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
 
@@ -78,10 +104,20 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     );
 
     this.getProgressText();
+
     this.classroomBackendApiService
-      .getClassroomIdAsync(this.classroomUrlFragment)
-      .then(classroomId => {
-        this.classroomId = classroomId;
+      .fetchClassroomDataAsync(this.classroomUrlFragment)
+      .then(classroomData => {
+        this.classroomData = classroomData;
+      })
+      .catch(() => {
+        this.isStartTestButtonDisabled = true;
+        this.alertsService.addWarning(
+          'Failed to get classroom data. The URL fragment is invalid, or the classroom does not exist.'
+        );
+      })
+      .finally(() => {
+        this.loaderService.hideLoadingScreen();
       });
   }
 
@@ -96,27 +132,31 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
   startDiagnosticTest(): void {
     this.classroomBackendApiService
-      .getClassroomDataAsync(this.classroomId)
+      .getClassroomDataAsync(this.classroomData.getClassroomId())
       .then(response => {
         this.diagnosticTestTopicTrackerModel =
           new DiagnosticTestTopicTrackerModel(
             response.classroomDict.topicIdToPrerequisiteTopicIds
           );
         this.diagnosticTestIsStarted = true;
+      })
+      .catch(() => {
+        this.isStartTestButtonDisabled = true;
+        this.alertsService.addWarning('Failed to start the test.');
       });
   }
 
   getRecommendedTopicSummaries(recommendedTopicIds: string[]): void {
-    this.classroomBackendApiService
-      .fetchClassroomDataAsync(this.classroomUrlFragment)
-      .then(classroomData => {
-        let topicSummaries: CreatorTopicSummary[] =
-          classroomData.getTopicSummaries();
-        this.recommendedTopicSummaries = topicSummaries.filter(topicSummary => {
-          return recommendedTopicIds.indexOf(topicSummary.getId()) !== -1;
-        });
-        this.diagnosticTestIsFinished = true;
+    if (!this.classroomData) {
+      this.recommendedTopicSummaries = [];
+      return;
+    }
+    this.recommendedTopicSummaries = this.classroomData
+      .getTopicSummaries()
+      .filter(topicSummary => {
+        return recommendedTopicIds.indexOf(topicSummary.getId()) !== -1;
       });
+    this.diagnosticTestIsFinished = true;
   }
 
   getTopicButtonText(topicName: string): string {
@@ -130,7 +170,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
 
   getTopicUrlFromUrlFragment(urlFragment: string): string {
     return this.urlInterpolationService.interpolateUrl(
-      '/learn/math/<topicUrlFragment>',
+      `/learn/${this.classroomUrlFragment}/<topicUrlFragment>`,
       {
         topicUrlFragment: urlFragment,
       }

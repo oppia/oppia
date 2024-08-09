@@ -82,6 +82,11 @@ const CONSOLE_ERRORS_TO_FIX = [
   new RegExp(
     'Uncaught \\(in promise\\).*learner_groups_feature_status_handler'
   ),
+  // TODO(#20748): SyntaxError: Unexpected token < in JSON at position 0.
+  new RegExp(
+    'Uncaught \\(in promise\\): SyntaxError: Unexpected token < in JSON.*',
+    'm'
+  ),
   // TODO(#19733): 404 (Not Found) for resources used in midi-js.
   escapeRegExp(
     'http://localhost:8181/dist/oppia-angular/midi/examples/soundfont/acoustic' +

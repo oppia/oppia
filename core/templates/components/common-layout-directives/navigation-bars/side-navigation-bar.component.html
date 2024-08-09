@@ -234,7 +234,7 @@
       </button>
     </li>
 
-    <li [ngClass]="{'active': currentUrl === '/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}'}">
+    <li>
       <div (click)="togglelearnSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandable-button e2e-mobile-test-learn" >
         <span class="oppia-sidebar-submenu-toggle text-uppercase" [ngClass]="{'oppia-sidebar-submenu-toggle': learnSubmenuIsShown}">
               {{ 'I18N_SIDEBAR_LEARN' | translate }}
@@ -244,42 +244,7 @@
         </i>
       </div>
       <div [hidden]="!learnSubmenuIsShown" class="oppia-sidebar-submenu-upperborder oppia-learn-submenu">
-        <div class="oppia-submenu">
-          <!-- We set tabindex to -1 because this should not be focusable while tabbing on desktop -->
-          <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" tabindex="-1" smartRouterLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="e2e-mobile-test-mathematics-link mb-1">
-            <span>{{ 'I18N_SIDEBAR_CLASSROOM_BASIC_MATHS' | translate }}</span>
-            <p class="oppia-sidebar-learn-subtext mt-2">{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS_DESCRIPTION' | translate }}</p>
-          </a>
-          <div class="w-50">
-            <img [src]="getStaticImageUrl('/sidebar/learn-math-logo.svg')" class="w-100" alt="learn-math-logo">
-          </div>
-        </div>
-        <div *ngIf="classroomData.length > 0">
-          <div *ngFor="let topicSummary of classroomData.slice(0, 3); index as idx">
-            <div class="submenu-notop-margin">
-              <a (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT + '/' + topicSummary.getUrlFragment()); $event.stopPropagation()"
-                 class="underline"
-                 tabindex="-1"
-                 href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/{{topicSummary.getUrlFragment()}}">
-                <span *ngIf="!isHackyTopicTitleTranslationDisplayed(idx)">
-                  {{ topicSummary.getName() }}
-                </span>
-                <span *ngIf="isHackyTopicTitleTranslationDisplayed(idx)">
-                  {{ topicTitlesTranslationKeys[idx] | translate }}
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="submenu-notop-margin">
-          <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
-             tabindex="-1"
-             smartRouterLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
-             class="e2e-mobile-test-mathematics-link">
-            <span class="learn-submenu-links">{{ 'I18N_SIDEBAR_SUBMENU_SEE_ALL_LESSONS' | translate }}</span>
-            <i class="fas fa-arrow-right oppia-sidebar-menu-icon float-none learn-submenu-links"></i>
-          </a>
-        </div>
+        <oppia-classroom-navigation-links></oppia-classroom-navigation-links>
       </div>
       <div [hidden]="!learnSubmenuIsShown" class="oppia-community-library-section">
         <a href="/community-library" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE" tabindex="-1" class="e2e-mobile-test-library-link">
@@ -305,7 +270,7 @@
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" href="/volunteer" smartRouterLink="/volunteer" class="e2e-mobile-test-sidebar-get-involved-menu-volunteer-button">
+          <a tabindex="-1" (click)="navigateToVolunteerPage()" smartRouterLink="/volunteer" class="e2e-mobile-test-sidebar-get-involved-menu-volunteer-button">
             <i class="fas fa-user-friends oppia-sidebar-submenu-icon volunteer-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_VOLUNTEER_DESCRIPTION' | translate }}</p>
@@ -336,12 +301,12 @@
       </div>
       <div [hidden]="!aboutSubmenuIsShown">
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" href="/about" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE" class="oppia-sidebar-menu-link e2e-mobile-test-sidebar-about-button">
+          <a tabindex="-1" (click)="navigateToAboutPage()" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE" class="oppia-sidebar-menu-link e2e-mobile-test-sidebar-about-button">
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_ABOUT_LINK' | translate }}</span>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" href="/teach" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE" class="oppia-sidebar-menu-link e2e-mobile-test-sidebar-teach-button">
+          <a tabindex="-1" (click)="navigateToTeachPage()" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE" class="oppia-sidebar-menu-link e2e-mobile-test-sidebar-teach-button">
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_TEACH' | translate }}</span>
           </a>
         </div>

@@ -24,7 +24,10 @@ import {Subscription} from 'rxjs';
 
 import {PageTitleService} from 'services/page-title.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {AppConstants} from 'app.constants';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 @Component({
   selector: 'volunteer-page',
@@ -72,11 +75,40 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
     caption: {content: string; name: string; type: string}[];
   };
 
+  volunteerExpectations = AppConstants.VOLUNTEER_EXPECTATIONS;
+
+  growthSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.GROWTH;
+
+  developmentSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.DEVELOPMENT;
+
+  artAndDesignSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.ART_AND_DESIGN;
+
+  translationSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.TRANSLATION;
+
+  lessonCreationSkills =
+    AppConstants.VOLUNTEER_PREFERRED_SKILLS.LESSON_CREATION;
+
+  screenType!: 'desktop' | 'tablet' | 'mobile' | 'smallMobile';
+  activeTabGroupIndex = 0;
+  tabGroups = {
+    desktop: [[0, 1, 2, 3, 4]],
+    tablet: [
+      [0, 1, 2],
+      [3, 4],
+    ],
+    mobile: [[0, 1], [2, 3], [4]],
+    smallMobile: [[0], [1], [2], [3], [4]],
+  };
+  selectedIndex = 0;
+
   constructor(
     private pageTitleService: PageTitleService,
     private urlInterpolationService: UrlInterpolationService,
     private ngbCarouselConfig: NgbCarouselConfig,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private windowDimensionsService: WindowDimensionsService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   getWebpExtendedName(fileName: string): string {
@@ -100,6 +132,14 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
+
+    this.setScreenType();
+    this.directiveSubscriptions.add(
+      this.windowDimensionsService.getResizeEvent().subscribe(() => {
+        this.setScreenType();
+      })
+    );
+
     this.bannerImgPath = '/volunteer/banner.webp';
     this.footerImgPath = '/volunteer/footer.webp';
     this.mobBannerImgPath = '/volunteer/mob.webp';
@@ -338,6 +378,58 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
     this.ngbCarouselConfig.keyboard = true;
     this.ngbCarouselConfig.pauseOnHover = true;
     this.ngbCarouselConfig.pauseOnFocus = true;
+    this.registerFirstTimePageViewEvent();
+  }
+
+  setScreenType(): void {
+    const width = this.windowDimensionsService.getWidth();
+    if (width < 440) {
+      this.screenType = 'smallMobile';
+    } else if (width < 641) {
+      this.screenType = 'mobile';
+    } else if (width < 769) {
+      this.screenType = 'tablet';
+    } else {
+      this.screenType = 'desktop';
+    }
+    this.activeTabGroupIndex = 0;
+  }
+
+  incrementTabGroupIndex(): void {
+    if (
+      this.activeTabGroupIndex !==
+      this.tabGroups[this.screenType].length - 1
+    ) {
+      this.activeTabGroupIndex++;
+    }
+  }
+
+  decrementTabGroupIndex(): void {
+    if (this.activeTabGroupIndex !== 0) {
+      this.activeTabGroupIndex--;
+    }
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  onClickVolunteerCTAButtonAtTop(): void {
+    this.siteAnalyticsService.registerClickVolunteerCTAButtonEvent(
+      'CTA button at the top of the Volunteer page'
+    );
+  }
+
+  onClickVolunteerCTAButtonAtBottom(): void {
+    this.siteAnalyticsService.registerClickVolunteerCTAButtonEvent(
+      'CTA button at the bottom of the Volunteer page'
+    );
+  }
+
+  registerFirstTimePageViewEvent(): void {
+    this.siteAnalyticsService.registerFirstTimePageViewEvent(
+      AppConstants.LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA.VOLUNTEER
+    );
   }
 
   ngOnDestroy(): void {
