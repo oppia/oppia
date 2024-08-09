@@ -410,4 +410,17 @@ export const AppConstants = {
       },
     ],
   },
+  LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA: {
+    ABOUT: 'lastAboutPageViewTime',
+    TEACH: 'lastTeachPageViewTime',
+    VOLUNTEER: 'lastVolunteerPageViewTime',
+  },
+  ONE_WEEK_IN_MILLIS: 7 * 24 * 60 * 60 * 1000,
+  ONE_MONTH_IN_MILLIS: 30 * 24 * 60 * 60 * 1000,
 } as const;
+
+export enum NavbarAndFooterGATrackingPages {
+  ABOUT = 'About',
+  VOLUNTEER = 'Volunteer',
+  TEACH = 'Teach',
+}
