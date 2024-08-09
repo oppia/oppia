@@ -52,6 +52,10 @@ describe('Exploration Editor', function () {
   let explorationId: string | null;
 
   beforeAll(async function () {
+    // We assign curriculum admin privileges to the exploration editor in
+    // order to provide the ability to link particular state cards of
+    // explorations with skills, which will often be repeated to test
+    // the exploration editor user journey.
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com',
