@@ -26,6 +26,7 @@ import {
 import {LoaderService} from 'services/loader.service';
 import {AppConstants} from 'app.constants';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 @Component({
   selector: 'oppia-classrooms-page',
@@ -51,11 +52,19 @@ export class ClassroomsPageComponent {
     private alertsService: AlertsService,
     private loaderService: LoaderService,
     private router: Router,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  onClickClassroomCard(classroomName: string): void {
+    this.siteAnalyticsService.registerClickClassroomCardEvent(
+      'Classroom card in the classrooms page',
+      classroomName
+    );
   }
 
   ngOnInit(): void {

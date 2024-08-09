@@ -32,6 +32,7 @@ import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {ClassroomsPageComponent} from './classrooms-page.component';
 import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
 import {Router} from '@angular/router';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 class MockCapitalizePipe {
   transform(input: string): string {
@@ -51,13 +52,14 @@ class MockRouter {
   }
 }
 
-describe('Classroom Page Component', () => {
+describe('Classrooms Page Component', () => {
   let component: ClassroomsPageComponent;
   let fixture: ComponentFixture<ClassroomsPageComponent>;
   let classroomBackendApiService: ClassroomBackendApiService;
   let alertsService: AlertsService;
   let router: Router;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -80,6 +82,7 @@ describe('Classroom Page Component', () => {
     }).compileComponents();
     router = TestBed.inject(Router);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   }));
 
   beforeEach(() => {
@@ -204,5 +207,16 @@ describe('Classroom Page Component', () => {
       true
     );
     expect(component.isLanguageRTL()).toBeTrue();
+  });
+
+  it('should record analytics when classroom card is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickClassroomCardEvent'
+    ).and.callThrough();
+    component.onClickClassroomCard('Math');
+    expect(
+      siteAnalyticsService.registerClickClassroomCardEvent
+    ).toHaveBeenCalled();
   });
 });

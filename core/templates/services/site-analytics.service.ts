@@ -641,6 +641,17 @@ export class SiteAnalyticsService {
     }
     this.localStorageService.setLastPageViewTime(lastPageViewTimeKey);
   }
+
+  registerClickClassroomCardEvent(
+    srcElement: string,
+    classroomName: string
+  ): void {
+    this._sendEventToGoogleAnalytics('classroom_card_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+      source_element: srcElement,
+      classroom_name: classroomName,
+    });
+  }
 }
 
 angular

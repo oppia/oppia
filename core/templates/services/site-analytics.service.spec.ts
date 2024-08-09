@@ -910,5 +910,16 @@ describe('Site Analytics Service', () => {
         testKey
       );
     });
+
+    it('should register classroom card click event', () => {
+      const srcElement = 'Classroom card in the navigation dropdown';
+      sas.registerClickClassroomCardEvent(srcElement, 'Math');
+
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'classroom_card_click', {
+        page_path: pathname,
+        source_element: srcElement,
+        classroom_name: 'Math',
+      });
+    });
   });
 });

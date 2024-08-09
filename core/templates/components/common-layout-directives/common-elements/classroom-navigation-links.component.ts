@@ -65,8 +65,11 @@ export class ClassroomNavigationLinksComponent implements OnInit {
     );
   }
 
-  registerClassroomHeaderClickEvent(): void {
-    this.siteAnalyticsService.registerClassroomHeaderClickEvent();
+  onClickClassroomCard(classroomName: string): void {
+    this.siteAnalyticsService.registerClickClassroomCardEvent(
+      'Classroom card in the navigation dropdown',
+      classroomName
+    );
   }
 
   ngOnInit(): void {
