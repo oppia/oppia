@@ -270,7 +270,7 @@
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" href="/volunteer" smartRouterLink="/volunteer" class="e2e-mobile-test-sidebar-get-involved-menu-volunteer-button">
+          <a tabindex="-1" (click)="navigateToVolunteerPage()" smartRouterLink="/volunteer" class="e2e-mobile-test-sidebar-get-involved-menu-volunteer-button">
             <i class="fas fa-user-friends oppia-sidebar-submenu-icon volunteer-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_VOLUNTEER_DESCRIPTION' | translate }}</p>
@@ -301,12 +301,12 @@
       </div>
       <div [hidden]="!aboutSubmenuIsShown">
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" href="/about" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE" class="oppia-sidebar-menu-link e2e-mobile-test-sidebar-about-button">
+          <a tabindex="-1" (click)="navigateToAboutPage()" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE" class="oppia-sidebar-menu-link e2e-mobile-test-sidebar-about-button">
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_ABOUT_LINK' | translate }}</span>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" href="/teach" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE" class="oppia-sidebar-menu-link e2e-mobile-test-sidebar-teach-button">
+          <a tabindex="-1" (click)="navigateToTeachPage()" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE" class="oppia-sidebar-menu-link e2e-mobile-test-sidebar-teach-button">
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_TEACH' | translate }}</span>
           </a>
         </div>

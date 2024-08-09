@@ -47,6 +47,7 @@ import {CookieService} from 'ngx-cookie';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 class MockPlatformFeatureService {
@@ -406,6 +407,45 @@ describe('TopNavigationBarComponent', () => {
     expect(component.isSidebarShown()).toBe(true);
     component.toggleSidebar(clickEvent);
     expect(component.isSidebarShown()).toBe(false);
+  });
+
+  it('should register About header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.navigateToAboutPage();
+
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.ABOUT);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
+  });
+
+  it('should register Volunteer header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.navigateToVolunteerPage();
+
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.VOLUNTEER);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/volunteer');
+  });
+
+  it('should register Teach header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.navigateToTeachPage();
+
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.TEACH);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/teach');
   });
 
   it('should check if i18n has been run', () => {

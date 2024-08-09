@@ -27,6 +27,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {AppConstants} from 'app.constants';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 @Component({
   selector: 'volunteer-page',
@@ -106,7 +107,8 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
     private ngbCarouselConfig: NgbCarouselConfig,
     private translateService: TranslateService,
     private windowDimensionsService: WindowDimensionsService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   getWebpExtendedName(fileName: string): string {
@@ -376,6 +378,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
     this.ngbCarouselConfig.keyboard = true;
     this.ngbCarouselConfig.pauseOnHover = true;
     this.ngbCarouselConfig.pauseOnFocus = true;
+    this.registerFirstTimePageViewEvent();
   }
 
   setScreenType(): void {
@@ -409,6 +412,24 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  onClickVolunteerCTAButtonAtTop(): void {
+    this.siteAnalyticsService.registerClickVolunteerCTAButtonEvent(
+      'CTA button at the top of the Volunteer page'
+    );
+  }
+
+  onClickVolunteerCTAButtonAtBottom(): void {
+    this.siteAnalyticsService.registerClickVolunteerCTAButtonEvent(
+      'CTA button at the bottom of the Volunteer page'
+    );
+  }
+
+  registerFirstTimePageViewEvent(): void {
+    this.siteAnalyticsService.registerFirstTimePageViewEvent(
+      AppConstants.LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA.VOLUNTEER
+    );
   }
 
   ngOnDestroy(): void {

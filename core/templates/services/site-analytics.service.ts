@@ -22,6 +22,9 @@ import {Injectable} from '@angular/core';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {initializeGoogleAnalytics} from 'google-analytics.initializer';
+import {LocalStorageService} from './local-storage.service';
+import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
 // Service for sending events to Google Analytics.
 //
@@ -35,7 +38,10 @@ import {initializeGoogleAnalytics} from 'google-analytics.initializer';
 export class SiteAnalyticsService {
   static googleAnalyticsIsInitialized: boolean = false;
 
-  constructor(private windowRef: WindowRef) {
+  constructor(
+    private windowRef: WindowRef,
+    private localStorageService: LocalStorageService
+  ) {
     if (!SiteAnalyticsService.googleAnalyticsIsInitialized) {
       // This ensures that google analytics is initialized whenever this
       // service is used.
@@ -557,6 +563,83 @@ export class SiteAnalyticsService {
       exploration_id: explorationId,
       answer_is_correct: answerIsCorrect,
     });
+  }
+
+  registerClickVolunteerCTAButtonEvent(srcElement: string): void {
+    this._sendEventToGoogleAnalytics('volunteer_cta_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+      source_element: srcElement,
+    });
+  }
+
+  registerClickPartnerCTAButtonEvent(srcElement: string): void {
+    this._sendEventToGoogleAnalytics('partner_cta_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+      source_element: srcElement,
+    });
+  }
+
+  registerClickDonateCTAButtonEvent(): void {
+    this._sendEventToGoogleAnalytics('donate_cta_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
+  }
+
+  registerClickDownloadAndroidAppButtonEvent(): void {
+    this._sendEventToGoogleAnalytics('download_android_app_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
+  }
+
+  registerClickLearnMoreVolunteerButtonEvent(): void {
+    this._sendEventToGoogleAnalytics('learn_more_volunteer_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
+  }
+
+  registerClickLearnMorePartnerButtonEvent(): void {
+    this._sendEventToGoogleAnalytics('learn_more_partner_button_click', {
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
+  }
+
+  registerClickNavbarButtonEvent(
+    buttonName: NavbarAndFooterGATrackingPages
+  ): void {
+    this._sendEventToGoogleAnalytics('navbar_button_click', {
+      button_name: buttonName,
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
+  }
+
+  registerClickFooterButtonEvent(
+    buttonName: NavbarAndFooterGATrackingPages
+  ): void {
+    this._sendEventToGoogleAnalytics('footer_button_click', {
+      button_name: buttonName,
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
+  }
+
+  registerFirstTimePageViewEvent(lastPageViewTimeKey: string): void {
+    const lastPageViewTime =
+      this.localStorageService.getLastPageViewTime(lastPageViewTimeKey);
+    const oneWeekInMillis = AppConstants.ONE_WEEK_IN_MILLIS;
+    const oneMonthInMillis = AppConstants.ONE_MONTH_IN_MILLIS;
+    if (lastPageViewTime) {
+      const timeDifferenceInMillis = new Date().getTime() - lastPageViewTime;
+      if (timeDifferenceInMillis > oneMonthInMillis) {
+        this._sendEventToGoogleAnalytics('first_time_page_view_in_month', {
+          page_path: this.windowRef.nativeWindow.location.pathname,
+        });
+      }
+      if (timeDifferenceInMillis > oneWeekInMillis) {
+        this._sendEventToGoogleAnalytics('first_time_page_view_in_week', {
+          page_path: this.windowRef.nativeWindow.location.pathname,
+        });
+      }
+    }
+    this.localStorageService.setLastPageViewTime(lastPageViewTimeKey);
   }
 }
 

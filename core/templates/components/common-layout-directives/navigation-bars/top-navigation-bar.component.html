@@ -164,8 +164,7 @@
             <li class="nav-item">
               <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
                  class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-about-link about-link"
-                 href="/about"
-                 [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
+                 (click)="navigateToAboutPage()">
                 <span class="link">
                   {{'I18N_TOPNAV_ABOUT' | translate}}
                 </span>
@@ -173,8 +172,7 @@
             </li>
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-navbar-about-menu-teach-button"
-                 href="/teach"
-                 [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE"
+                 (click)="navigateToTeachPage()"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">
@@ -237,8 +235,7 @@
                   </div>
                 </a>
                 <a class="item d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-volunteer-button"
-                   href="/volunteer"
-                   [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
+                   (click)="navigateToVolunteerPage()"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">
