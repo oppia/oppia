@@ -25,11 +25,13 @@ import math
 import re
 
 from core import android_validation_constants
+from core import feature_flag_list
 from core import feconf
 from core import schema_utils
 from core import utils
 from core.constants import constants
 from core.domain import customization_args_util
+from core.domain import feature_flag_services
 from core.domain import param_domain
 from core.domain import translation_domain
 from extensions import domain
@@ -239,7 +241,12 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
 
         if (
             self.tagged_skill_misconception_id is not None and
-            not tagged_skill_misconception_id_required
+            not tagged_skill_misconception_id_required and
+            not feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.
+                EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value,
+                None
+            )
         ):
             raise utils.ValidationError(
                 'Expected tagged skill misconception id to be None, '

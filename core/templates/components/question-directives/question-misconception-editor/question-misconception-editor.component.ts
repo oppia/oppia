@@ -30,6 +30,7 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {TagMisconceptionModalComponent} from './tag-misconception-modal-component';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 import {Rule} from 'domain/exploration/rule.model';
+import {Subscription} from 'rxjs';
 
 export interface MisconceptionUpdatedValues {
   misconception: Misconception;
@@ -65,6 +66,7 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   selectedMisconceptionSkillId!: string;
   feedbackIsUsed: boolean = false;
   misconceptionEditorIsOpen: boolean = false;
+  directiveSubscriptions = new Subscription();
 
   constructor(
     private externalSaveService: ExternalSaveService,
@@ -76,6 +78,20 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
     this.misconceptionsBySkill =
       this.stateEditorService.getMisconceptionsBySkill();
     this.misconceptionEditorIsOpen = false;
+    this.initValues();
+    if (!this.stateEditorService.isInQuestionMode()) {
+      this.directiveSubscriptions.add(
+        this.stateEditorService.onUpdateMisconceptions.subscribe(() => {
+          this.misconceptionsBySkill =
+            this.stateEditorService.getMisconceptionsBySkill();
+          this.initValues();
+        })
+      );
+    }
+    this.feedbackIsUsed = true;
+  }
+
+  initValues(): void {
     let skillMisconceptionId = this.taggedSkillMisconceptionId;
     if (skillMisconceptionId) {
       if (
@@ -100,7 +116,6 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
         );
       }
     }
-    this.feedbackIsUsed = true;
   }
 
   containsMisconceptions(): boolean {
