@@ -19,6 +19,7 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import puppeteer from 'puppeteer';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -91,12 +92,24 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the community library tab of the learner dashboard.
    */
   async navigateToCommunityLessonsSection(): Promise<void> {
+    await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
-      showMessage(await this.page.content());
+      await this.page.waitForSelector(mobileProgressSectionButton);
       await this.clickOn(mobileProgressSectionButton);
-      showMessage(await this.page.content());
-      await this.clickOn('Lessons');
-      showMessage(await this.page.content());
+
+      try {
+        await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          // Try clicking again if does not opens the expected page.
+          await this.clickOn(mobileProgressSectionButton);
+        } else {
+          throw error;
+        }
+      }
+      await this.clickOn(mobileCommunityLessonSectionButton);
     } else {
       await this.page.click(communityLessonsSectionButton);
     }
