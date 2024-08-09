@@ -53,7 +53,6 @@ const explorationDesignTipsUrl = testConstants.URLs.ExplorationDesignTips;
 const googleSignUpUrl = testConstants.URLs.ExternalLink.GoogleSignUp;
 const getStartedUrl = testConstants.URLs.GetStarted;
 const homeUrl = testConstants.URLs.Home;
-const mathClassroomUrl = testConstants.URLs.MathClassroom;
 const mobileWatchAVideoUrl = testConstants.URLs.MobileExternalLinkWatchAVideo;
 const OppiaAnnounceGoogleGroupUrl = testConstants.URLs.OppiaAnnounceGoogleGroup;
 const partnershipsBrochureUrl = testConstants.URLs.PartnershipsBrochure;
@@ -76,9 +75,7 @@ const teacherStoryTaggedBlogsLink =
 const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
 const lessonCreatorLinkedInUrl = testConstants.URLs.LessonCreatorLinkedInUrl;
 
-const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
-const navbarLearnTabBasicMathematicsButton =
-  'a.e2e-test-basic-mathematics-link';
+('a.e2e-test-basic-mathematics-link');
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
 const navbarAboutTabTeachButton = 'a.e2e-test-navbar-about-menu-teach-button';
@@ -124,8 +121,6 @@ const thanksForDonatingClass = '.modal-open';
 const donatePage = '.donate-content-container';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
-const mobileSidebarBasicMathematicsButton =
-  'a.e2e-mobile-test-mathematics-link';
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
 const mobileSidebarTeachButton = 'a.e2e-mobile-test-sidebar-teach-button';
 const mobileSidebarImpactReportButton =
@@ -207,9 +202,6 @@ const googleGroupSignUpLinkInTermsPage =
 const emailLinkSelector = '.oppia-contact-mail';
 const mobileDonateButtonOnDonatePage = '.donate-modal-button';
 const donateModalIframeSelector = '.e2e-test-donate-page-iframe';
-const classroomNameHeading = '.e2e-test-classroom-name';
-const errorPageHeading = '.e2e-test-error-page-heading';
-const classroomTileContainer = '.oppia-classroom-tile-container';
 
 const submitResponseToInteractionInput = 'oppia-interaction-display input';
 const nextCardButton = '.e2e-test-next-card-button';
@@ -481,30 +473,6 @@ export class LoggedOutUser extends BaseUser {
       )
       .toBe(expectedDestinationPageUrl);
     await newTabPage?.close();
-  }
-
-  /**
-   * Function to click the Basic Mathematics button in the Learn Menu on navbar
-   * and check if it opens the Math Classroom page.
-   */
-  async clickBasicMathematicsButtonInLearnMenuOnNavbar(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavbarOpenSidebarButton);
-      await this.clickButtonToNavigateToNewPage(
-        mobileSidebarBasicMathematicsButton,
-        'Basic Mathematics button in the Learn Menu on navbar',
-        mathClassroomUrl,
-        'Math Classroom'
-      );
-    } else {
-      await this.clickOn(navbarLearnTab);
-      await this.clickButtonToNavigateToNewPage(
-        navbarLearnTabBasicMathematicsButton,
-        'Basic Mathematics button in the Learn Menu on navbar',
-        mathClassroomUrl,
-        'Math Classroom'
-      );
-    }
   }
 
   /**
@@ -1926,72 +1894,6 @@ export class LoggedOutUser extends BaseUser {
     } else {
       return;
     }
-  }
-
-  /**
-   * This function verifies that the user is on the correct classroom page.
-   */
-  async expectToBeOnClassroomPage(classroomName: string): Promise<void> {
-    await this.page.waitForSelector(classroomNameHeading);
-
-    const buttonText = await this.page.$eval(
-      classroomNameHeading,
-      element => (element as HTMLHeadElement).innerText
-    );
-
-    if (buttonText !== classroomName) {
-      throw new Error(
-        `The ${classroomName} classroom name is not visible. URL: ${this.page.url()}`
-      );
-    } else {
-      showMessage(`The ${classroomName} classroom name is visible.`);
-    }
-  }
-
-  /**
-   * This function verifies that the classroom cards in classrooms page.
-   */
-  async expectClassroomCountInClassroomsPageUrlToBe(
-    classroomsCount: number
-  ): Promise<void> {
-    await this.page.waitForSelector(classroomTileContainer);
-    const classroomTiles = await this.page.$$(classroomTileContainer);
-
-    if (classroomTiles.length === classroomsCount) {
-      showMessage(
-        `${classroomsCount} classrooms are present in classrooms page.`
-      );
-    } else {
-      throw new Error(
-        `Expect ${classroomsCount} classrooms to be present in classrooms page, found: ${classroomTiles.length} classrooms.`
-      );
-    }
-  }
-
-  /**
-   * This function verifies that the user is on the correct classroom page.
-   */
-  async expectToBeOnErrorPage(statusCode: number): Promise<void> {
-    await this.page.waitForSelector(errorPageHeading);
-
-    const errorText = await this.page.$eval(
-      errorPageHeading,
-      element => (element as HTMLSpanElement).textContent
-    );
-
-    if (!errorText) {
-      throw new Error(`Error text is not visible. URL: ${this.page.url()}`);
-    }
-
-    const currentStatusCode = Number(errorText.split(' ')[1]);
-
-    if (currentStatusCode !== statusCode) {
-      throw new Error(
-        `Expected status code to be ${statusCode}, found: ${currentStatusCode}`
-      );
-    }
-
-    showMessage(`User is on error page with status code ${statusCode}.`);
   }
 
   /**

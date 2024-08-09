@@ -179,13 +179,6 @@ const publishClassroomButton =
   '.e2e-test-toggle-classroom-publication-status-btn';
 const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const classroomTileNameSpan = '.e2e-test-classroom-tile-name';
-const deleteClassroomButton = '.e2e-test-delete-classroom-button';
-const deleteClassroomModal = '.e2e-test-delete-classroom-modal';
-const confirmDeleteClassroomButton = '.e2e-test-confirm-delete-classroom';
-const viewTopicGraphButton = 'button.view-graph-button';
-const topicDependencyGraphDiv = '.e2e-test-topic-dependency-graph-container';
-const topicNode = '.e2e-test-topic-node';
-const closeTopicDependencyButton = '.e2e-test-close-topic-dependency-modal';
 const addTopicFormFieldInput = '.mat-input-element';
 const createNewTopicButton = '.e2e-test-create-topic-button';
 const createNewTopicMobileButton = '.e2e-test-create-topic-mobile-button';
@@ -1410,22 +1403,6 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function to check number of classrooms present in classroom-admin page.
-   */
-  async expectNumberOfClassroomsToBe(classroomsCount: number): Promise<void> {
-    await this.navigateToClassroomAdminPage();
-    const classroomTiles = await this.page.$$(classroomTileSelector);
-
-    if (classroomTiles.length === classroomsCount) {
-      showMessage(`There are ${classroomsCount} classrooms present.`);
-    } else {
-      throw new Error(
-        `Expected ${classroomTiles.length} classrooms found ${classroomsCount} classrooms.`
-      );
-    }
-  }
-
-  /**
    * Function for publishing a classroom.
    */
   async publishClassroom(classroomName: string): Promise<void> {
@@ -1434,75 +1411,6 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(publishClassroomButton);
     await this.clickOn(saveClassroomButton);
     showMessage(`Published ${classroomName} classroom.`);
-  }
-
-  /**
-   * Function for deleting a classroom.
-   */
-  async deleteClassroom(classroomName: string): Promise<void> {
-    await this.navigateToClassroomAdminPage();
-    const classroomTiles = await this.page.$$(classroomTileSelector);
-
-    if (classroomTiles.length === 0) {
-      throw new Error('No classrooms are present.');
-    }
-
-    let foundClassroom = false;
-
-    for (let i = 0; i < classroomTiles.length; i++) {
-      const currentClassroomName = await classroomTiles[i].$eval(
-        classroomTileNameSpan,
-        element => (element as HTMLSpanElement).innerText.trim()
-      );
-
-      if (currentClassroomName === classroomName) {
-        const classroomTile = classroomTiles[i];
-        await classroomTile.$eval(deleteClassroomButton, element =>
-          (element as HTMLButtonElement).click()
-        );
-        await this.page.waitForSelector(deleteClassroomModal, {visible: true});
-        await this.clickOn(confirmDeleteClassroomButton);
-        await this.page.waitForSelector(deleteClassroomModal, {visible: false});
-
-        showMessage(`Deleted ${classroomName} classroom.`);
-        foundClassroom = true;
-        break;
-      }
-    }
-
-    if (!foundClassroom) {
-      throw new Error(`${classroomName} classroom does not exists.`);
-    }
-  }
-
-  /**
-   * Function for opening topic dependency graph modal.
-   * And checking the number of topics in a classroom.
-   */
-  async expectNumberOfTopicsInTopicDependencyGraphToBe(
-    classroomName: string,
-    numberOfTopics: number
-  ): Promise<void> {
-    await this.navigateToClassroomAdminPage();
-    await this.editClassroom(classroomName);
-
-    await this.clickOn(viewTopicGraphButton);
-    await this.page.waitForSelector(topicDependencyGraphDiv);
-
-    const topicNodes = await this.page.$$(topicNode);
-
-    if (topicNodes.length === numberOfTopics) {
-      showMessage(
-        `The ${classroomName} classroom has ${numberOfTopics} topics.`
-      );
-    } else {
-      throw new Error(
-        `${classroomName} classroom has ${topicNodes.length} topics, expected ${numberOfTopics} topics.`
-      );
-    }
-
-    await this.clickOn(closeTopicDependencyButton);
-    await this.page.waitForSelector(topicDependencyGraphDiv, {visible: false});
   }
 
   /**
