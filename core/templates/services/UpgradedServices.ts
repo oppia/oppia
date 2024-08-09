@@ -695,7 +695,8 @@ export class UpgradedServices {
         upgradedServices['SubtitledUnicodeObjectFactory']
       );
     upgradedServices['SiteAnalyticsService'] = new SiteAnalyticsService(
-      upgradedServices['WindowRef']
+      upgradedServices['WindowRef'],
+      upgradedServices['LocalStorageService']
     );
     upgradedServices['StateEditorService'] = new StateEditorService(
       upgradedServices['SolutionValidityService']

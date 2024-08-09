@@ -71,6 +71,13 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {ExplorationNextContentIdIndexService} from '../services/exploration-next-content-id-index.service';
 import {VersionHistoryService} from '../services/version-history.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
+import {
+  FetchSkillResponse,
+  SkillBackendApiService,
+} from 'domain/skill/skill-backend-api.service';
+import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
+import {AlertsService} from 'services/alerts.service';
 
 describe('Exploration editor tab component', () => {
   let component: ExplorationEditorTabComponent;
@@ -98,6 +105,10 @@ describe('Exploration editor tab component', () => {
   let stateObjectFactory: StateObjectFactory;
   let stateObject: StateBackendDict;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
+  let skillBackendApiService: SkillBackendApiService;
+  let skillObjectFactory: SkillObjectFactory;
+  let misconceptionObjectFactory: MisconceptionObjectFactory;
+  let alertsService: AlertsService;
 
   class MockJoyrideService {
     startTour() {
@@ -232,6 +243,10 @@ describe('Exploration editor tab component', () => {
     versionHistoryBackendApiService = TestBed.inject(
       VersionHistoryBackendApiService
     );
+    skillBackendApiService = TestBed.inject(SkillBackendApiService);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
+    alertsService = TestBed.inject(AlertsService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
     spyOn(contextService, 'getExplorationId').and.returnValue('explorationId');
@@ -659,6 +674,102 @@ describe('Exploration editor tab component', () => {
       'skill_id1'
     );
   });
+
+  it('should save inapplicable misconception ids', () => {
+    stateEditorService.setActiveStateName('First State');
+    expect(
+      explorationStatesService.getState('First State')
+        .inapplicableSkillMisconceptionIds
+    ).toEqual(undefined);
+
+    component.saveInapplicableSkillMisconceptionIds(['skill_id1']);
+    expect(
+      explorationStatesService.getState('First State')
+        .inapplicableSkillMisconceptionIds
+    ).toEqual(['skill_id1']);
+  });
+
+  it('should populate misconceptions for state', fakeAsync(() => {
+    spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+      Promise.resolve({
+        skill: skillObjectFactory.createFromBackendDict({
+          id: 'skill_id1',
+          description: 'test description 1',
+          misconceptions: [
+            {
+              id: 2,
+              name: 'test name',
+              notes: 'test notes',
+              feedback: 'test feedback',
+              must_be_addressed: true,
+            },
+          ],
+          rubrics: [
+            {
+              difficulty: 'Easy',
+              explanations: ['explanation'],
+            },
+          ],
+          skill_contents: {
+            explanation: {
+              html: 'test explanation',
+              content_id: 'explanation',
+            },
+            worked_examples: [],
+            recorded_voiceovers: {
+              voiceovers_mapping: {},
+            },
+          },
+          language_code: 'en',
+          version: 3,
+          prerequisite_skill_ids: ['skill_id1'],
+          all_questions_merged: false,
+          next_misconception_id: 0,
+          superseding_skill_id: '',
+        }),
+      } as FetchSkillResponse)
+    );
+    spyOn(stateEditorService, 'setMisconceptionsBySkill');
+
+    component.populateMisconceptionsForState('skill_id1');
+    tick();
+
+    expect(component.misconceptionsBySkill).toEqual({
+      skill_id1: [
+        misconceptionObjectFactory.createFromBackendDict({
+          id: 2,
+          name: 'test name',
+          notes: 'test notes',
+          feedback: 'test feedback',
+          must_be_addressed: true,
+        }),
+      ],
+    });
+    expect(stateEditorService.setMisconceptionsBySkill).toHaveBeenCalledWith({
+      skill_id1: [
+        misconceptionObjectFactory.createFromBackendDict({
+          id: 2,
+          name: 'test name',
+          notes: 'test notes',
+          feedback: 'test feedback',
+          must_be_addressed: true,
+        }),
+      ],
+    });
+  }));
+
+  it('should show warning message if fetching skill fails', fakeAsync(() => {
+    spyOn(alertsService, 'addWarning');
+    spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+      Promise.reject('Error occurred.')
+    );
+
+    component.populateMisconceptionsForState('');
+    tick();
+
+    expect(skillBackendApiService.fetchSkillAsync).toHaveBeenCalled();
+    expect(alertsService.addWarning).toHaveBeenCalled();
+  }));
 
   it('should save interaction answer groups', () => {
     stateEditorService.setActiveStateName('First State');

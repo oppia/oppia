@@ -172,6 +172,7 @@ const confirmDeleteWorkedExampleButton =
   '.e2e-test-confirm-delete-worked-example-button';
 const confirmDeleteMisconceptionButton =
   '.e2e-test-confirm-delete-misconception-button';
+const optionalMisconceptionToggle = '.e2e-test-misconception-optional-check';
 const topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
 const updateTopicWebFragmentField = '.e2e-test-topic-page-title-fragment-field';
 const updateTopicDescriptionField = '.e2e-test-topic-description-field';
@@ -221,7 +222,7 @@ export class TopicManager extends BaseUser {
    */
   async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
     await this.page.bringToFront();
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
     await this.goto(topicAndSkillsDashboardUrl);
   }
 
@@ -845,7 +846,8 @@ export class TopicManager extends BaseUser {
         skillSelector,
         skillName
       ),
-      this.page.waitForNavigation(),
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
+      this.waitForStaticAssetsToLoad(),
     ]);
   }
 
@@ -1728,17 +1730,22 @@ export class TopicManager extends BaseUser {
    * @param {string} misconceptionName - The name of the misconception to add.
    * @param {string} notes - The notes for question creators to understand how handling this misconception is useful for the skill being tested.
    * @param {string} feedback - The feedback for the misconception to add.
+   * @param {boolean} optional - Whether the misconception is optional or not.
    */
   async addMisconception(
     misconceptionName: string,
     notes: string,
-    feedback: string
+    feedback: string,
+    optional: boolean = false
   ): Promise<void> {
     await this.clickOn(addButtonSelector);
     await this.type(nameFieldSelector, misconceptionName);
     await this.type(rteSelector, notes);
     const rteElements = await this.page.$$(rteSelector);
     await rteElements[1].type(feedback);
+    if (optional) {
+      await this.clickOn(optionalMisconceptionToggle);
+    }
     await this.clickOn(saveMisconceptionButton);
   }
 
@@ -2106,8 +2113,8 @@ export class TopicManager extends BaseUser {
   }
 
   private async openAllMobileDropdownsInSkillEditor(): Promise<void> {
-    await this.clickOn('Worked Examples');
     await this.clickOn('Misconceptions');
+    await this.clickOn('Worked Examples');
     await this.clickOn(' Prerequisite Skills ');
     await this.clickOn('Rubrics');
   }
@@ -2420,11 +2427,16 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
+
+    try {
+      await this.page.waitForNavigation({timeout: 10000});
+    } catch (error) {
+      return;
+    }
   }
 
   /**
    * Opens the story editor for a given story and topic.
-   *
    * @param {string} storyName - The name of the story.
    * @param {string} topicName - The name of the topic.
    */
@@ -2801,6 +2813,12 @@ export class TopicManager extends BaseUser {
           showMessage(
             `Chapter ${chapterName} is ${shouldExist ? 'found' : 'not found'} in story ${storyName}, as expected.`
           );
+
+          try {
+            await this.page.waitForNavigation({timeout: 10000});
+          } catch (error) {
+            return;
+          }
           return;
         }
       }
@@ -2813,6 +2831,12 @@ export class TopicManager extends BaseUser {
       showMessage(
         `Chapter ${chapterName} is ${shouldExist ? 'found' : 'not found'} in story ${storyName}, as expected.`
       );
+
+      try {
+        await this.page.waitForNavigation({timeout: 10000});
+      } catch (error) {
+        return;
+      }
     } catch (error) {
       const newError = new Error(
         `Failed to verify chapter presence in story: ${error}`
