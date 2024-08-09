@@ -53,6 +53,10 @@ var suites = {
     './core/tests/webdriverio_desktop/blog.js'
   ],
 
+  classroomPageFileUploadFeatures: [
+    './core/tests/webdriverio_desktop/classroomPageFileUploadFeatures.js'
+  ],
+
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
   ],

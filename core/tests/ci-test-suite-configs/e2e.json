@@ -25,6 +25,10 @@
       "module": "core/tests/webdriverio_desktop/blog.js"
     },
     {
+      "name": "classroomPageFileUploadFeatures",
+      "module": "core/tests/webdriverio_desktop/classroomPageFileUploadFeatures.js"
+    },
+    {
       "name": "collections",
       "module": "core/tests/webdriverio_desktop/collections.js"
     },
