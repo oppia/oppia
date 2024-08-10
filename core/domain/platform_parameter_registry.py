@@ -461,7 +461,7 @@ Registry.create_platform_parameter(
 
 Registry.create_platform_parameter(
     ParamName.SYSTEM_EMAIL_ADDRESS,
-    'Email address used for system issued actions',
+    'Email address used for system issued actions.',
     platform_parameter_domain.DataTypes.STRING,
     # TODO(release-scripts#130): Update post the first trial release.
     default=feconf.SYSTEM_EMAIL_ADDRESS
@@ -469,7 +469,7 @@ Registry.create_platform_parameter(
 
 Registry.create_platform_parameter(
     ParamName.SYSTEM_EMAIL_NAME,
-    'Email name for system issued actions',
+    'Email name for system issued actions.',
     platform_parameter_domain.DataTypes.STRING,
     # TODO(release-scripts#130): Update post the first trial release.
     default=feconf.SYSTEM_EMAIL_NAME
@@ -477,7 +477,7 @@ Registry.create_platform_parameter(
 
 Registry.create_platform_parameter(
     ParamName.ADMIN_EMAIL_ADDRESS,
-    'Email address used for admin issued actions',
+    'Email address used for admin issued actions.',
     platform_parameter_domain.DataTypes.STRING,
     # TODO(release-scripts#130): Update post the first trial release.
     default=feconf.ADMIN_EMAIL_ADDRESS
@@ -485,7 +485,7 @@ Registry.create_platform_parameter(
 
 Registry.create_platform_parameter(
     ParamName.NOREPLY_EMAIL_ADDRESS,
-    'Email address used for mails sent by Oppia',
+    'Email address used for mails sent by Oppia.',
     platform_parameter_domain.DataTypes.STRING,
     # TODO(release-scripts#130): Update post the first trial release.
     default=feconf.NOREPLY_EMAIL_ADDRESS
