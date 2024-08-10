@@ -2008,9 +2008,6 @@ export class LoggedOutUser extends BaseUser {
         throw error;
       }
     }
-    await this.page.waitForSelector(conversationSkinUserAvatar, {
-      hidden: true,
-    });
   }
 
   /**
