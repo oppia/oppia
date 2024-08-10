@@ -222,7 +222,7 @@ export class TopicManager extends BaseUser {
    */
   async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
     await this.page.bringToFront();
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
     await this.goto(topicAndSkillsDashboardUrl);
   }
 
@@ -846,7 +846,8 @@ export class TopicManager extends BaseUser {
         skillSelector,
         skillName
       ),
-      this.page.waitForNavigation(),
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
+      this.waitForStaticAssetsToLoad(),
     ]);
   }
 
@@ -2112,8 +2113,8 @@ export class TopicManager extends BaseUser {
   }
 
   private async openAllMobileDropdownsInSkillEditor(): Promise<void> {
-    await this.clickOn('Worked Examples');
     await this.clickOn('Misconceptions');
+    await this.clickOn('Worked Examples');
     await this.clickOn(' Prerequisite Skills ');
     await this.clickOn('Rubrics');
   }
@@ -2426,11 +2427,16 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
+
+    try {
+      await this.page.waitForNavigation({timeout: 10000});
+    } catch (error) {
+      return;
+    }
   }
 
   /**
    * Opens the story editor for a given story and topic.
-   *
    * @param {string} storyName - The name of the story.
    * @param {string} topicName - The name of the topic.
    */
@@ -2807,6 +2813,12 @@ export class TopicManager extends BaseUser {
           showMessage(
             `Chapter ${chapterName} is ${shouldExist ? 'found' : 'not found'} in story ${storyName}, as expected.`
           );
+
+          try {
+            await this.page.waitForNavigation({timeout: 10000});
+          } catch (error) {
+            return;
+          }
           return;
         }
       }
@@ -2819,6 +2831,12 @@ export class TopicManager extends BaseUser {
       showMessage(
         `Chapter ${chapterName} is ${shouldExist ? 'found' : 'not found'} in story ${storyName}, as expected.`
       );
+
+      try {
+        await this.page.waitForNavigation({timeout: 10000});
+      } catch (error) {
+        return;
+      }
     } catch (error) {
       const newError = new Error(
         `Failed to verify chapter presence in story: ${error}`

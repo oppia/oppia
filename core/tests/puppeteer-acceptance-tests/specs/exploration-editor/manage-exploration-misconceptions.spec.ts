@@ -19,7 +19,6 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {showMessage} from '../../utilities/common/show-message';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
@@ -51,9 +50,12 @@ describe('Exploration Editor', function () {
   let curriculumAdmin: CurriculumAdmin & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
   let explorationId: string | null;
-  let topicId: string | null;
 
   beforeAll(async function () {
+    // We assign curriculum admin privileges to the exploration editor in
+    // order to provide the ability to link particular state cards of
+    // explorations with skills, which will often be repeated to test
+    // the exploration editor user journey.
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com',
@@ -100,7 +102,7 @@ describe('Exploration Editor', function () {
       '0',
       '101',
     ]);
-    await explorationEditor.addResponseToTheInteraction(
+    await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.MULTIPLE_CHOICE,
       '-99',
       'Perfect!',
@@ -134,30 +136,10 @@ describe('Exploration Editor', function () {
     }
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    topicId = await curriculumAdmin.createTopic(
+    await curriculumAdmin.createAndPublishTopic(
       'Test Topic 1',
-      'test-topic-one'
-    );
-    if (!topicId) {
-      throw new Error('Error in publishing topic successfully.');
-    }
-
-    await curriculumAdmin.createSubtopicForTopic(
       'Test Subtopic 1',
-      'test-subtopic-one',
-      'Test Topic 1'
-    );
-
-    await curriculumAdmin.createSkillForTopic('Test Skill 1', 'Test Topic 1');
-    await curriculumAdmin.createQuestionsForSkill('Test Skill 1', 3);
-    await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
-      'Test Skill 1',
-      'Test Subtopic 1',
-      'Test Topic 1'
-    );
-    await curriculumAdmin.addSkillToDiagnosticTest(
-      'Test Skill 1',
-      'Test Topic 1'
+      'Test Skill 1'
     );
     await curriculumAdmin.openSkillEditor('Test Skill 1');
     await curriculumAdmin.addMisconception(
@@ -177,6 +159,7 @@ describe('Exploration Editor', function () {
     await curriculumAdmin.createAndPublishStoryWithChapter(
       'Test Story 1',
       'test-story-one',
+      'Test Chapter',
       explorationId,
       'Test Topic 1'
     );
@@ -187,6 +170,8 @@ describe('Exploration Editor', function () {
     'should show the relevant linked misconception in state editor.',
     async function () {
       await explorationEditor.page.bringToFront();
+      // We reload the page here and elsewhere in order to fetch the curated version of the
+      // exploration since it isn't curated by default on initialization.
       await explorationEditor.reloadPage();
       await explorationEditor.navigateToCard(
         CARD_NAME.MULTIPLE_CHOICE_QUESTION
@@ -196,7 +181,6 @@ describe('Exploration Editor', function () {
         'Addition Misconception',
         true
       );
-      showMessage('The content translation has been verified successfully.');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

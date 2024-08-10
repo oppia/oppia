@@ -34,7 +34,7 @@ const recentlyPublishedExplorationsPageUrl =
 const splashPageUrl = testConstants.URLs.splash;
 const contactUrl = testConstants.URLs.Contact;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
-const classroomsPage = testConstants.URLs.ClassroomsPage;
+const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 const desktopWatchAVideoUrl = testConstants.URLs.DesktopExternalLinkWatchAVideo;
 const donateUrl = testConstants.URLs.Donate;
 const electromagnetismUrl = testConstants.URLs.Electromagnetism;
@@ -71,6 +71,10 @@ const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
 const impactReportUrl = testConstants.URLs.ImpactReportUrl;
+const teacherStoryTaggedBlogsLink =
+  testConstants.URLs.TeacherStoryTaggedBlogsLink;
+const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
+const lessonCreatorLinkedInUrl = testConstants.URLs.LessonCreatorLinkedInUrl;
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const navbarLearnTabBasicMathematicsButton =
@@ -141,6 +145,12 @@ const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
 const exploreLessonsButtonInTeachPage =
   '.e2e-test-teach-page-explore-lessons-button';
+const blogButtonInTeachPage = '.e2e-test-teach-page-blog-button';
+const guideButtonInTeachPage = '.e2e-test-teach-page-guide-button';
+const lessonCreatorLinkedinButtonInTeachPage =
+  '.e2e-test-teach-page-linkedin-button';
+const lessonCreationSectionInTeachPage =
+  '.e2e-test-teach-page-lesson-creation-section';
 const partnerWithUsButtonAtTheTopOfPartnershipsPage =
   '.e2e-test-partnerships-page-partner-with-us-button-at-the-top';
 const partnerWithUsButtonAtTheBottomOfPartnershipsPage =
@@ -406,17 +416,17 @@ export class LoggedOutUser extends BaseUser {
    * Function to navigate to the classroom page.
    */
   async navigateToClassroomPage(urlFragment: string): Promise<void> {
-    await this.goto(`${classroomsPage}/${urlFragment}`);
+    await this.goto(`${classroomsPageUrl}/${urlFragment}`);
   }
 
   /**
    * Function to navigate to the classrooms page.
    */
   async navigateToClassroomsPage(): Promise<void> {
-    if (this.page.url() === classroomsPage) {
+    if (this.page.url() === classroomsPageUrl) {
       await this.page.reload();
     }
-    await this.goto(classroomsPage);
+    await this.goto(classroomsPageUrl);
   }
 
   /**
@@ -555,13 +565,13 @@ export class LoggedOutUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandAboutMenuButton);
-      await this.openExternalPdfLink(
+      await this.openExternalLink(
         mobileSidebarImpactReportButton,
         impactReportUrl
       );
     } else {
       await this.clickOn(navbarAboutTab);
-      await this.openExternalPdfLink(
+      await this.openExternalLink(
         navbarAboutTabImpactReportButton,
         impactReportUrl
       );
@@ -700,10 +710,7 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error('The Watch A Video button does not exist!');
     }
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(watchAVideoButton),
-    ]);
+    await Promise.all([this.clickAndWaitForNavigation(watchAVideoButton)]);
 
     const url = this.getCurrentUrlWithoutParameters();
     const expectedWatchAVideoUrl = this.isViewportAtMobileWidth()
@@ -1055,7 +1062,7 @@ export class LoggedOutUser extends BaseUser {
   async clickForumLinkOnCreatorGuidelinesPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"forum")]');
     await Promise.all([this.page.waitForNavigation(), this.clickOn('forum')]);
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
 
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
@@ -1298,15 +1305,70 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to check if the lesson creation section is visible on the Teach page.
+   * If the section is not visible, an error is thrown.
+   */
+  async expectLessonCreationSectionToBeVisibleInTeachPage(): Promise<void> {
+    const lessonCreationSection = await this.page.waitForSelector(
+      lessonCreationSectionInTeachPage
+    );
+    if (!lessonCreationSection) {
+      throw new Error(
+        'The lesson creation section is not visible on the teach page.'
+      );
+    } else {
+      showMessage('The lesson creation section is visible on the teach page.');
+    }
+  }
+
+  /**
+   * Function to click the first LinkedIn button in the Teach page
+   * and check if it opens corresponding Creator's LinkedIn Url link
+   */
+  async clickLinkedInButtonInTeachPage(): Promise<void> {
+    // Here we are verifying the href attribute of the first LinkedIn button, not clicking it.
+    // LinkedIn requires users to log in before accessing profile pages,
+    // so the profile page cannot be opened directly.
+    await this.openExternalLink(
+      lessonCreatorLinkedinButtonInTeachPage,
+      lessonCreatorLinkedInUrl
+    );
+  }
+
+  /**
+   * Function to click the Check out our guide button in the Teach page
+   * and check if it opens the parents Teachers Guide Url link
+   */
+  async clickGuideButtonInTeachPage(): Promise<void> {
+    await this.openExternalLink(
+      guideButtonInTeachPage,
+      parentsTeachersGuideUrl
+    );
+  }
+
+  /**
+   * Function to click the Check out our blog button in the Teach page
+   * and check if it opens the Teacher Story tagged blogs link
+   */
+  async clickBlogButtonInTeachPage(): Promise<void> {
+    await this.clickLinkButtonToNewTab(
+      blogButtonInTeachPage,
+      'Check out our blog button',
+      teacherStoryTaggedBlogsLink,
+      'Blog'
+    );
+  }
+
+  /**
    * Function to click the Browse Our Lessons button in the Teach page
-   * and check if it opens the Math Classroom page.
+   * and check if it opens the classrooms page.
    */
   async clickExploreLessonsButtonInTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       exploreLessonsButtonInTeachPage,
       'Explore Lessons button',
-      mathClassroomUrl,
-      'Math Classroom'
+      classroomsPageUrl,
+      'Classrooms page'
     );
   }
 
@@ -1323,7 +1385,11 @@ export class LoggedOutUser extends BaseUser {
       // scrollIntoView function call of the clickOn function didn't work as expected.
       await this.page.reload();
     }
-    await this.clickOn(languageDropdown);
+    await this.page.waitForSelector(languageDropdown);
+    const languageDropdownElement = await this.page.$(languageDropdown);
+    if (languageDropdownElement) {
+      await languageDropdownElement.click();
+    }
     await this.clickOn(languageOption);
     // Here we need to reload the page again to confirm the language change.
     await this.page.reload();
@@ -1381,7 +1447,7 @@ export class LoggedOutUser extends BaseUser {
       element.scrollIntoView()
     );
 
-    await this.openExternalPdfLink(
+    await this.openExternalLink(
       brochureButtonInPartnershipsPage,
       partnershipsBrochureUrl
     );
@@ -1709,10 +1775,7 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Impact Report.
    */
   async clickViewReportButtonInAboutPage(): Promise<void> {
-    await this.openExternalPdfLink(
-      impactReportButtonInAboutPage,
-      impactReportUrl
-    );
+    await this.openExternalLink(impactReportButtonInAboutPage, impactReportUrl);
   }
 
   /**
@@ -1888,7 +1951,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * This function verifies that the classroom cards in classrooms page.
    */
-  async expectClassroomCountInClassroomsPageToBe(
+  async expectClassroomCountInClassroomsPageUrlToBe(
     classroomsCount: number
   ): Promise<void> {
     await this.page.waitForSelector(classroomTileContainer);

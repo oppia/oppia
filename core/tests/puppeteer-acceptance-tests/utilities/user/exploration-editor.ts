@@ -848,7 +848,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
     showMessage('Exploration is saved successfully.');
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   async publishExploration(): Promise<string | null> {
@@ -958,7 +958,7 @@ export class ExplorationEditor extends BaseUser {
         await elements[cardIndex].click();
       }
 
-      await this.page.waitForNetworkIdle({idleTime: 700});
+      await this.waitForNetworkIdle({idleTime: 700});
     } catch (error) {
       const newError = new Error(
         `Error navigating to card ${cardName}: ${error.message}`
@@ -1264,6 +1264,151 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Adds a particular skill to the current state card.
+   * @param skillName - Name of the skill to be linked to state.
+   */
+  async addSkillToState(skillName: string): Promise<void> {
+    await this.clickOn(addSkillButton);
+    await this.type(skillNameInput, skillName);
+    await this.clickOn(skillItem);
+    await this.clickOn(confirmSkillButton);
+  }
+
+  /**
+   * Verifies if a misconception is present on the page.
+   * @param {string} misconceptionName - The name of the misconception to verify.
+   * @param {boolean} isPresent - Whether the misconception is expected to be present.
+   */
+  async verifyMisconceptionPresentForState(
+    misconceptionName: string,
+    isPresent: boolean
+  ): Promise<void> {
+    try {
+      await this.page.waitForSelector(misconceptionDiv, {
+        timeout: 5000,
+        visible: true,
+      });
+      const misconceptions = await this.page.$$(misconceptionDiv);
+
+      for (const misconception of misconceptions) {
+        const title = await this.page.evaluate(
+          el => el.textContent,
+          misconception
+        );
+        if (title.trim() === misconceptionName) {
+          if (!isPresent) {
+            throw new Error(
+              `The misconception ${misconceptionName} is present, which was not expected`
+            );
+          }
+          return;
+        }
+      }
+
+      if (isPresent) {
+        throw new Error(
+          `The misconception ${misconceptionName} is not present, which was expected`
+        );
+      }
+    } catch (error) {
+      if (isPresent) {
+        throw new Error(
+          `The misconception ${misconceptionName} is not present, which was expected`
+        );
+      }
+    }
+
+    showMessage(
+      `The misconception is ${isPresent ? '' : 'not'} present as expected.`
+    );
+  }
+
+  /**
+   * Toggles the applicability status of an optional misconception.
+   * @param misconceptionName - The name of the misconception to be toggled.
+   */
+  async toggleMisconceptionApplicableStatus(
+    misconceptionName: string
+  ): Promise<void> {
+    await this.page.waitForSelector(optionalMisconceptionDiv, {
+      timeout: 5000,
+      visible: true,
+    });
+    let misconceptions = await this.page.$$(optionalMisconceptionDiv);
+    let misconceptionFound = false;
+    for (const misconception of misconceptions) {
+      const optionalMisconceptionName = await misconception.evaluate(el =>
+        el.textContent?.trim()
+      );
+      if (optionalMisconceptionName?.startsWith(misconceptionName)) {
+        const misconceptionOptions = await misconception.$(
+          optionalMisconceptionOptionsButton
+        );
+        if (!misconceptionOptions) {
+          throw new Error(
+            `Options not found for misconception "${misconceptionName}"`
+          );
+        }
+        await misconceptionOptions.click();
+        await this.page.waitForSelector(misconceptionApplicableToggle, {
+          visible: true,
+        });
+        await this.clickOn(misconceptionApplicableToggle);
+        misconceptionFound = true;
+        break;
+      }
+    }
+    if (!misconceptionFound) {
+      throw new Error(
+        `Couldn't find misconception with name ${misconceptionName}.`
+      );
+    }
+  }
+
+  /**
+   * Verifies whether a given optional misconception is applicable or not.
+   * @param misconceptionName - The name of the misconception to be verified.
+   * @param isApplicable - The expected applicability status of the misconception.
+   */
+  async verifyOptionalMisconceptionApplicableStatus(
+    misconceptionName: string,
+    isApplicable: boolean
+  ): Promise<void> {
+    await this.verifyMisconceptionPresentForState(misconceptionName, true);
+    const inapplicableMisconceptions = await this.page.$$(
+      inapplicableMisconceptionDiv
+    );
+
+    for (const misconception of inapplicableMisconceptions) {
+      const title = await this.page.evaluate(
+        el => el.textContent.trim(),
+        misconception
+      );
+      if (title === misconceptionName && !isApplicable) {
+        return;
+      } else if (title.startsWith(misconceptionName) && isApplicable) {
+        // We use startsWith since misconception title divs can have an icon at
+        // the end indicating that the misconception needs to be addressed.
+        throw new Error(
+          `The misconception ${misconceptionName} is expected to be applicable, found not applicable.`
+        );
+      }
+    }
+
+    showMessage(
+      `The misconception is ${isApplicable ? '' : 'not'} applicable as expected.`
+    );
+  }
+
+  /**
+   * Removes the attached skill from the current state card.
+   */
+  async removeSkillFromState(): Promise<void> {
+    await this.clickOn(deleteSkillButton);
+    await this.clickOn('Delete skill');
+  }
+
+  /**
    * Function to navigate to the preview tab.
    */
   async navigateToPreviewTab(): Promise<void> {
@@ -1315,7 +1460,7 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(mainTabButton);
     }
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**
@@ -1600,7 +1745,7 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Invalid content type: ${contentType}`);
     }
     await this.clickOn(saveTranslationButton);
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**
@@ -1612,7 +1757,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(modifyExistingTranslationsButton);
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**

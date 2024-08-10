@@ -667,11 +667,14 @@ export class ExplorationStatesService {
     this.saveStateProperty(stateName, 'linked_skill_id', newLinkedSkillId);
   }
 
-  saveInapplicableSkillMisconceptionIds(stateName: string, s: string[]): void {
+  saveInapplicableSkillMisconceptionIds(
+    stateName: string,
+    newInapplicableSkillMisconceptionIds: string[]
+  ): void {
     this.saveStateProperty(
       stateName,
       'inapplicable_skill_misconception_ids',
-      s
+      newInapplicableSkillMisconceptionIds
     );
   }
 
