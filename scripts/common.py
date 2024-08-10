@@ -227,6 +227,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
     'logged-in-user/create-and-delete-account',
+    'logged-in-user/save-an-exploration-to-play-later',
+    'logged-in-user/restart-or-continue-exploration-on-revisit',
     'logged-out-user/check-all-user-flow-of-donor',
     'logged-out-user/check-all-user-flow-of-parent-teacher',
     'logged-out-user/check-all-user-flow-of-partner',
