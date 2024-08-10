@@ -70,7 +70,7 @@ describe('Topic Manager User Journey', function () {
       await topicManager.openSubtopicEditor('Add', 'Mathematics');
       await topicManager.editSubTopicDetails(
         'Addition',
-        'Add numbers',
+        'add-numbers',
         'Subtopic to learn addition',
         testConstants.data.curriculumAdminThumbnailImage
       );

@@ -38,6 +38,7 @@ import {LoadingMessageComponent} from './loading-message.component';
 import {OppiaFooterComponent} from './oppia-footer.component';
 import {ThanksForSubscribingModalComponent} from './thanks-for-subscribing-modal.component';
 import {WarningsAndAlertsComponent} from './warnings-and-alerts.component';
+import {ClassroomNavigationLinksComponent} from 'components/common-layout-directives/common-elements/classroom-navigation-links.component';
 
 // Directives.
 import {
@@ -90,6 +91,7 @@ import {PrimaryButtonComponent} from 'components/button-directives/primary-butto
     ThanksForSubscribingModalComponent,
     TopNavigationBarComponent,
     WarningsAndAlertsComponent,
+    ClassroomNavigationLinksComponent,
   ],
 
   entryComponents: [
@@ -106,6 +108,7 @@ import {PrimaryButtonComponent} from 'components/button-directives/primary-butto
     TopNavigationBarComponent,
     ThanksForSubscribingModalComponent,
     WarningsAndAlertsComponent,
+    ClassroomNavigationLinksComponent,
   ],
 
   exports: [
@@ -132,6 +135,7 @@ import {PrimaryButtonComponent} from 'components/button-directives/primary-butto
     ThanksForSubscribingModalComponent,
     TopNavigationBarComponent,
     WarningsAndAlertsComponent,
+    ClassroomNavigationLinksComponent,
   ],
 })
 export class BaseModule {}
