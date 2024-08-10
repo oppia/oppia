@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import urllib
 
-from core import feconf
 from core import utils
 from core.domain import platform_parameter_list
 from core.platform import models

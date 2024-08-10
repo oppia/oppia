@@ -29,6 +29,7 @@ from typing import Dict, List, Mapping, Optional, Union
 
 REDISHOST = platform_parameter_services.get_platform_parameter_value(
     platform_parameter_list.ParamName.REDISHOST.value)
+assert isinstance(REDISHOST, str)
 REDIS_CLIENT = redis.StrictRedis(
     host=REDISHOST,
     port=feconf.REDISPORT,

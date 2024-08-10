@@ -238,12 +238,6 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                     logs, ['Mailchimp API key is not available.']
                 )
 
-    @test_utils.set_platform_parameters(
-        [(
-            platform_parameter_list.ParamName.MAILCHIMP_USERNAME,
-            None
-        )]
-    )
     def test_get_mailchimp_class_errors_when_username_is_not_available(
         self
     ) -> None:

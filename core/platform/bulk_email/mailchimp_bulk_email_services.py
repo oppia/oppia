@@ -79,7 +79,8 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
     mailchimp_username = (
         platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.MAILCHIMP_USERNAME.value))
-    if not mailchimp_username:
+    assert isinstance(mailchimp_username, str)
+    if not len(mailchimp_username):
         logging.error('Mailchimp username is not set.')
         return None
 
@@ -119,6 +120,7 @@ def _create_user_in_mailchimp_db(
         mailchimp_audience_id = (
             platform_parameter_services.get_platform_parameter_value(
                 platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value))
+        assert isinstance(mailchimp_audience_id, str)
         client.lists.members.create(
             mailchimp_audience_id, subscribed_mailchimp_data)
     except mailchimpclient.MailChimpError as error:
@@ -161,6 +163,7 @@ def permanently_delete_user_from_list(user_email: str) -> None:
         mailchimp_audience_id = (
             platform_parameter_services.get_platform_parameter_value(
                 platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value))
+        assert isinstance(mailchimp_audience_id, str)
         client.lists.members.get(
             mailchimp_audience_id, subscriber_hash)
         client.lists.members.delete_permanent(
@@ -284,6 +287,7 @@ def add_or_update_user_status(
             mailchimp_audience_id = (
             platform_parameter_services.get_platform_parameter_value(
                 platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value))
+            assert isinstance(mailchimp_audience_id, str)
             client.lists.members.get(
                 mailchimp_audience_id, subscriber_hash)
 

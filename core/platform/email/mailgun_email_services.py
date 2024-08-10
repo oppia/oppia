@@ -21,7 +21,6 @@ from __future__ import annotations
 import base64
 import urllib
 
-from core import feconf
 from core import utils
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_services

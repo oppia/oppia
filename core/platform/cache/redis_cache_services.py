@@ -28,6 +28,7 @@ from typing import Dict, List, Optional
 
 REDISHOST = platform_parameter_services.get_platform_parameter_value(
     platform_parameter_list.ParamName.REDISHOST.value)
+assert isinstance(REDISHOST, str)
 
 # Redis client for our own implementation of caching.
 OPPIA_REDIS_CLIENT = redis.StrictRedis(
