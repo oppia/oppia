@@ -224,7 +224,7 @@ export class CurriculumAdmin extends BaseUser {
    */
   async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
     await this.page.bringToFront();
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
     await this.goto(topicAndSkillsDashboardUrl);
   }
 
@@ -936,7 +936,7 @@ export class CurriculumAdmin extends BaseUser {
     const pathSegments = url.pathname.split('/');
     const storyId = pathSegments[pathSegments.length - 1];
     showMessage(`Story ${storyTitle} is created.`);
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
 
     return storyId;
   }
@@ -1298,7 +1298,7 @@ export class CurriculumAdmin extends BaseUser {
    */
   async navigateToClassroomAdminPage(): Promise<void> {
     await this.page.bringToFront();
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
     await this.goto(classroomAdminUrl);
   }
 
