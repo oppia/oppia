@@ -22,16 +22,26 @@ import mimetypes
 
 from core import feconf
 from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
 
 import redis
 from typing import Dict, List, Mapping, Optional, Union
 
-REDISHOST = platform_parameter_services.get_platform_parameter_value(
-    platform_parameter_list.ParamName.REDISHOST.value)
-assert isinstance(REDISHOST, str)
+
+def get_redis_host() -> str:
+    """Returns redis host address.
+
+    Returns:
+        str. Address of redis host.
+    """
+    from core.domain import platform_parameter_services
+    redishost = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.REDISHOST.value)
+    assert isinstance(redishost, str)
+    return redishost
+
+
 REDIS_CLIENT = redis.StrictRedis(
-    host=REDISHOST,
+    host=get_redis_host(),
     port=feconf.REDISPORT,
     db=feconf.STORAGE_EMULATOR_REDIS_DB_INDEX,
     decode_responses=False
