@@ -3776,6 +3776,13 @@ class State(translation_domain.BaseTranslatableObject):
                     'Expected linked_skill_id to be a str, '
                     'received %s.' % self.linked_skill_id)
 
+        if self.inapplicable_skill_misconception_ids is not None:
+            if not isinstance(self.inapplicable_skill_misconception_ids, list):
+                raise utils.ValidationError(
+                    'Expected inapplicable_skill_misconception_ids to be a '
+                    'list, received %s.'
+                    % self.inapplicable_skill_misconception_ids)
+
     def is_rte_content_supported_on_android(self) -> bool:
         """Checks whether the RTE components used in the state are supported by
         Android.
@@ -3971,6 +3978,19 @@ class State(translation_domain.BaseTranslatableObject):
             linked_skill_id: str|None. The linked skill id to state.
         """
         self.linked_skill_id = linked_skill_id
+
+    def update_inapplicable_skill_misconception_ids(
+            self,
+            inapplicable_skill_misconception_ids: List[str]
+    ) -> None:
+        """Update the inapplicable skill misconception ids attribute.
+
+        Args:
+            inapplicable_skill_misconception_ids: List[str]. The
+                list of inapplicable skill misconception ids for state.
+        """
+        self.inapplicable_skill_misconception_ids = list(
+            set(inapplicable_skill_misconception_ids))
 
     def update_interaction_customization_args(
         self,
