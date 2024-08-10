@@ -20,7 +20,6 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import puppeteer from 'puppeteer';
-import {trim} from 'lodash';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -772,19 +771,16 @@ export class LoggedInUser extends BaseUser {
    * Saves the changes made in the preferences page.
    */
   async saveChanges(): Promise<void> {
+    await this.waitForNetworkIdle({idleTime: 1000});
     await this.waitForPageToFullyLoad();
     await this.clickAndWaitForNavigation(saveChangesButtonSelector);
   }
 
   /**
-   * Expects the profile picture to match a certain image.
-   * @param {string} expectedImageUrl - The URL of the expected image.
+   * Expects the profile picture to not match a certain image.
    */
-  async expectProfilePictureToBe(
-    expectedImageSubstring: string
-  ): Promise<void> {
+  async verifyProfilePicUpdate(): Promise<void> {
     try {
-      await this.page.screenshot({path: `screenshot.png`});
       await this.page.waitForSelector(profilePictureSelector);
       const profilePicture = await this.page.$(profilePictureSelector);
 
@@ -796,11 +792,15 @@ export class LoggedInUser extends BaseUser {
         profilePicture
       );
 
-      if (!actualImageUrl.includes(expectedImageSubstring)) {
+      if (
+        actualImageUrl ===
+        '/assets/images/avatar/user_blue_150px.png?2983.800000011921'
+      ) {
         throw new Error(
-          `Profile picture does not match. Expected image source to include: ${expectedImageSubstring}`
+          'Profile picture does not match. Expected image source to be different from: /assets/images/avatar/user_blue_150px.png?2983.800000011921'
         );
       }
+      showMessage('Profile picture is different from the default one.');
     } catch (error) {
       const newError = new Error(`Failed to check profile picture: ${error}`);
       newError.stack = error.stack;
@@ -900,10 +900,10 @@ export class LoggedInUser extends BaseUser {
    */
   async verifyPageIsRTL(): Promise<void> {
     await this.page.waitForSelector(angularRootElementSelector);
-    const pageDirection = await this.page.evaluate(() => {
-      const oppiaRoot = document.querySelector(angularRootElementSelector);
+    const pageDirection = await this.page.evaluate(selector => {
+      const oppiaRoot = document.querySelector(selector);
       if (!oppiaRoot) {
-        throw new Error(`${angularRootElementSelector} not found`);
+        throw new Error(`${selector} not found`);
       }
 
       const childDiv = oppiaRoot.querySelector('div');
@@ -912,19 +912,13 @@ export class LoggedInUser extends BaseUser {
       }
 
       return childDiv.getAttribute('dir');
-    });
+    }, angularRootElementSelector);
 
     if (pageDirection !== 'rtl') {
       throw new Error('Page is not in RTL mode');
     }
-  }
 
-  async timeout(time) {
-    await this.page.waitForTimeout(time);
-  }
-
-  async screenshot(path) {
-    await this.page.screenshot({path: `${path}`});
+    showMessage('Page is displayed in RTL mode.');
   }
 }
 

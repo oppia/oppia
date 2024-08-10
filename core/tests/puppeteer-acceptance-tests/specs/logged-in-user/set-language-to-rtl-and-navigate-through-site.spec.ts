@@ -75,12 +75,12 @@ describe('Logged-in User', function () {
   it(
     'should be able to change the site language to RTL, navigate and interact with various pages',
     async function () {
-      await loggedInUser1.navigateToPreferencesPage();
-
-      // Change site language to Arabic (RTL language)
       await loggedInUser1.changeSiteLanguage('ar');
 
-      // Navigate through various pages and verify they are properly mirrored and interactive.
+      // Navigate through various pages and verify they are properly mirrored.
+      await loggedInUser1.navigateToLearnerDashboard();
+      await loggedInUser1.verifyPageIsRTL();
+
       await loggedInUser1.navigateToSplashPage();
       await loggedInUser1.verifyPageIsRTL();
 
@@ -93,25 +93,19 @@ describe('Logged-in User', function () {
       await loggedInUser1.navigateToCommunityLibraryPage();
       await loggedInUser1.verifyPageIsRTL();
 
-      await loggedInUser1.navigateToClassroomPage('math');
+      // Checking story viewer.
+      await loggedInUser1.searchForLessonInSearchBar('Negative Numbers');
+      await loggedInUser1.playLessonFromSearchResults('Negative Numbers');
       await loggedInUser1.verifyPageIsRTL();
 
-      // Checking story viewer.
-      await loggedInUser1.searchForLessonInSearchBar('Algebra I');
-      await loggedInUser1.playLessonFromSearchResults('Algebra I');
-      await loggedInUser1.verifyPageIsRTL();
+      await loggedInUser1.navigateToClassroomPage('math');
+      await loggedInUser1.selectAndOpenTopic('Algebra I');
 
       // Checking exploration player.
       await loggedInUser1.selectChapterWithinStoryToLearn(
-        'Chapter 1',
-        'Story 1'
+        'Understanding Negative Numbers',
+        'Algebra Story'
       );
-      await loggedInUser1.verifyPageIsRTL();
-
-      await loggedInUser1.navigateToLearnerDashboard();
-      await loggedInUser1.verifyPageIsRTL();
-
-      await loggedInUser1.navigateToClassroomPage('math');
       await loggedInUser1.verifyPageIsRTL();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
