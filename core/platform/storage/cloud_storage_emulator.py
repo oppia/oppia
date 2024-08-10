@@ -21,13 +21,16 @@ from __future__ import annotations
 import mimetypes
 
 from core import feconf
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 
 import redis
 from typing import Dict, List, Mapping, Optional, Union
 
-
+REDISHOST = platform_parameter_services.get_platform_parameter_value(
+    platform_parameter_list.ParamName.REDISHOST.value)
 REDIS_CLIENT = redis.StrictRedis(
-    host=feconf.REDISHOST,
+    host=REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.STORAGE_EMULATOR_REDIS_DB_INDEX,
     decode_responses=False

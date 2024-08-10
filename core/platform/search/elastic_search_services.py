@@ -21,6 +21,8 @@ API.
 from __future__ import annotations
 
 from core import feconf
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import search_services
 from core.platform import models
 
@@ -38,13 +40,17 @@ secrets_services = models.Registry.import_secrets_services()
 # exp_services.load_demo() failing with a ReadTimeoutError
 # where loading a exploration from local yaml file takes
 # longer than ElasticSearch expects.
+ES_CLOUD_ID = platform_parameter_services.get_platform_parameter_value(
+    platform_parameter_list.ParamName.ES_CLOUD_ID.value)
+ES_USERNAME = platform_parameter_services.get_platform_parameter_value(
+    platform_parameter_list.ParamName.ES_USERNAME.value)
 ES = elasticsearch.Elasticsearch(
     ('%s:%s' % (feconf.ES_HOST, feconf.ES_LOCALHOST_PORT))
-    if feconf.ES_CLOUD_ID is None else None,
-    cloud_id=feconf.ES_CLOUD_ID,
+    if ES_CLOUD_ID is None else None,
+    cloud_id=ES_CLOUD_ID,
     http_auth=(
-        (feconf.ES_USERNAME, secrets_services.get_secret('ES_PASSWORD'))
-        if feconf.ES_CLOUD_ID else None), timeout=30)
+        (ES_USERNAME, secrets_services.get_secret('ES_PASSWORD'))
+        if ES_CLOUD_ID else None), timeout=30)
 
 
 class SearchException(Exception):

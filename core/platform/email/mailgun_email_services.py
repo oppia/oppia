@@ -23,6 +23,8 @@ import urllib
 
 from core import feconf
 from core import utils
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.platform import models
 
 from typing import Dict, List, Optional, Union
@@ -79,7 +81,7 @@ def send_email_to_recipients(
         Exception. The mailgun api key is not stored in
             feconf.MAILGUN_API_KEY.
         Exception. The mailgun domain name is not stored in
-            feconf.MAILGUN_DOMAIN_NAME.
+            MAILGUN_DOMAIN_NAME platform param.
 
     Returns:
         bool. Whether the emails are sent successfully.
@@ -89,7 +91,10 @@ def send_email_to_recipients(
     if mailgun_api_key is None:
         raise Exception('Mailgun API key is not available.')
 
-    if not feconf.MAILGUN_DOMAIN_NAME:
+    mailgun_domain_name = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME.value))
+    if not mailgun_domain_name:
         raise Exception('Mailgun domain name is not set.')
 
     # To send bulk emails we pass list of recipients in 'to' paarameter of
@@ -127,8 +132,12 @@ def send_email_to_recipients(
         ).strip().decode('utf-8')
         auth_str = 'Basic %s' % base64_mailgun_api_key
         header = {'Authorization': auth_str}
+        mailgun_domain_name = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME.value))
+        assert isinstance(mailgun_domain_name, str)
         server = 'https://api.mailgun.net/v3/%s/messages' % (
-            feconf.MAILGUN_DOMAIN_NAME
+            mailgun_domain_name
         )
         # The 'ascii' is used here, because only ASCII char are allowed in url,
         # also the docs recommend this approach:

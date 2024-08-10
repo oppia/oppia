@@ -20,13 +20,18 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import caching_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 
 import redis
 from typing import Dict, List, Optional
 
+REDISHOST = platform_parameter_services.get_platform_parameter_value(
+    platform_parameter_list.ParamName.REDISHOST.value)
+
 # Redis client for our own implementation of caching.
 OPPIA_REDIS_CLIENT = redis.StrictRedis(
-    host=feconf.REDISHOST,
+    host=REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.OPPIA_REDIS_DB_INDEX,
     decode_responses=True
@@ -34,7 +39,7 @@ OPPIA_REDIS_CLIENT = redis.StrictRedis(
 
 # Redis client for the Cloud NDB cache.
 CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis(
-    host=feconf.REDISHOST,
+    host=REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.CLOUD_NDB_REDIS_DB_INDEX
 )
