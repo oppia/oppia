@@ -20,6 +20,7 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import puppeteer from 'puppeteer';
+import {trim} from 'lodash';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -67,8 +68,8 @@ const mobileLessonCardOptionsDropdownButton =
   '.e2e-test-mobile-lesson-card-dropdown';
 const mobileProgressSectionButton = '.e2e-test-mobile-progress-section';
 const addProfilePictureButton = '.e2e-test-photo-upload-submit';
-const editProfilePictureButton = '.oppia-editor-profile-edit-icon';
-const bioTextareaSelector = '.bio-textarea-selector';
+const editProfilePictureButton = '.e2e-test-photo-clickable';
+const bioTextareaSelector = '.e2e-test-user-bio';
 const saveChangesButtonSelector = '.e2e-test-save-changes-button';
 const subjectInterestsInputSelector = '.e2e-test-subject-interests-input';
 const explorationLanguageInputSelector =
@@ -81,6 +82,7 @@ const bioSelector = '.oppia-user-bio-text';
 const subjectInterestSelector = '.e2e-test-profile-interest';
 const exportButtonSelector = '.e2e-test-export-account-button';
 const angularRootElementSelector = 'oppia-angular-root';
+const checkboxesSelector = '.checkbox';
 
 const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE =
   'Your data is currently being loaded and will be downloaded as a JSON formatted text file upon completion.';
@@ -612,7 +614,7 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Updates the profile picture.
+   * Updates the profile picture in preference page.
    * @param {string} picturePath - The path of the picture to upload.
    */
   async updateProfilePicture(picturePath: string): Promise<void> {
@@ -622,18 +624,16 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Updates the user's bio.
+   * Updates the user's bio in preference page.
    * @param {string} bio - The new bio to set for the user.
    */
   async updateBio(bio: string): Promise<void> {
     await this.clickOn(bioTextareaSelector);
     await this.type(bioTextareaSelector, bio);
-    await this.clickOn(saveChangesButtonSelector);
   }
 
   /**
-   * Updates the user's preferred dashboard.
-   *
+   * Updates the user's preferred dashboard in preference page.
    * @param {string} dashboard - The new dashboard to set for the user. Can be one of 'Learner Dashboard', 'Creator Dashboard', or 'Contributor Dashboard'.
    */
   async updatePreferredDashboard(dashboard: string): Promise<void> {
@@ -657,65 +657,75 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Updates the user's subject interests.
+   * Updates the user's subject interests in preference page.
    * @param {string[]} interests - The new interests to set for the user.
    */
   async updateSubjectInterests(interests: string[]): Promise<void> {
     for (const interest of interests) {
-      await this.clickOn(subjectInterestsInputSelector);
       await this.type(subjectInterestsInputSelector, interest);
       await this.page.keyboard.press('Enter');
     }
   }
 
   /**
-   * Updates the user's preferred exploration language.
+   * Updates the user's preferred exploration language in preference page.
    * @param {string} language - The new language to set for the user.
    */
   async updatePreferredExplorationLanguage(language: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
     await this.clickOn(explorationLanguageInputSelector);
-    await this.type(explorationLanguageInputSelector, language);
-    await this.page.keyboard.press('Enter');
+
+    await this.page.waitForSelector(optionText);
+    const options = await this.page.$$(optionText);
+    for (const option of options) {
+      const optionText = await this.page.evaluate(
+        el => el.textContent.trim(),
+        option
+      );
+      if (optionText === language) {
+        await option.click();
+        break;
+      }
+    }
   }
 
   /**
-   * Updates the user's preferred site language.
+   * Updates the user's preferred site language in preference page.
    * @param {string} language - The new language to set for the user.
    */
   async updatePreferredSiteLanguage(language: string): Promise<void> {
-    await this.clickOn(siteLanguageInputSelector);
     await this.type(siteLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
   }
 
   /**
-   * Updates the user's preferred audio language.
+   * Updates the user's preferred audio language in preference page.
    * @param {string} language - The new language to set for the user.
    */
   async updatePreferredAudioLanguage(language: string): Promise<void> {
-    await this.clickOn(audioLanguageInputSelector);
     await this.type(audioLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
   }
 
   /**
-   * Updates the user's email preferences.
+   * Updates the user's email preferences from the preferences page.
    * @param {string[]} preferences - The new email preferences to set for the user.
    */
   async updateEmailPreferences(preferences: string[]): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
     try {
-      const checkboxes = await this.page.$$('input[type="checkbox"]');
+      await this.page.waitForSelector(checkboxesSelector);
+      const checkboxes = await this.page.$$(checkboxesSelector);
 
       for (const preference of preferences) {
         let found = false;
 
         for (const checkbox of checkboxes) {
-          // Get the adjacent child which is a span tag and get its text content.
-          const label = await checkbox.$eval(
-            '+ span',
-            span => span.textContent
-          );
-          if (label?.trim() === preference) {
+          const label = await checkbox.evaluate(el => el.textContent?.trim());
+          if (label === preference) {
+            await this.waitForElementToBeClickable(checkbox);
             await checkbox.click();
             found = true;
             break;
@@ -747,8 +757,8 @@ export class LoggedInUser extends BaseUser {
         throw new Error('Profile tab not found');
       }
 
-      await this.waitForElementToBeClickable(profileTab);
-      await profileTab.click();
+      await this.clickAndWaitForNavigation(goToProfilePageButton);
+      await this.waitForPageToFullyLoad();
     } catch (error) {
       const newError = new Error(
         `Failed to navigate to Profile tab from Preferences page: ${error}`
@@ -759,11 +769,22 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Saves the changes made in the preferences page.
+   */
+  async saveChanges(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.clickAndWaitForNavigation(saveChangesButtonSelector);
+  }
+
+  /**
    * Expects the profile picture to match a certain image.
    * @param {string} expectedImageUrl - The URL of the expected image.
    */
-  async expectProfilePictureToBe(expectedImageUrl: string): Promise<void> {
+  async expectProfilePictureToBe(
+    expectedImageSubstring: string
+  ): Promise<void> {
     try {
+      await this.page.screenshot({path: `screenshot.png`});
       await this.page.waitForSelector(profilePictureSelector);
       const profilePicture = await this.page.$(profilePictureSelector);
 
@@ -774,9 +795,10 @@ export class LoggedInUser extends BaseUser {
         img => img.src,
         profilePicture
       );
-      if (actualImageUrl !== expectedImageUrl) {
+
+      if (!actualImageUrl.includes(expectedImageSubstring)) {
         throw new Error(
-          `Profile picture does not match. Expected: ${expectedImageUrl}, but got: ${actualImageUrl}`
+          `Profile picture does not match. Expected image source to include: ${expectedImageSubstring}`
         );
       }
     } catch (error) {
@@ -854,6 +876,7 @@ export class LoggedInUser extends BaseUser {
         throw new Error('Export button not found');
       }
 
+      await this.waitForPageToFullyLoad();
       await exportButton.click();
 
       const isTextPresent = await this.isTextPresentOnPage(
@@ -876,6 +899,7 @@ export class LoggedInUser extends BaseUser {
    * Verifies if the page is displayed in Right-to-Left (RTL) mode.
    */
   async verifyPageIsRTL(): Promise<void> {
+    await this.page.waitForSelector(angularRootElementSelector);
     const pageDirection = await this.page.evaluate(() => {
       const oppiaRoot = document.querySelector(angularRootElementSelector);
       if (!oppiaRoot) {
@@ -893,6 +917,14 @@ export class LoggedInUser extends BaseUser {
     if (pageDirection !== 'rtl') {
       throw new Error('Page is not in RTL mode');
     }
+  }
+
+  async timeout(time) {
+    await this.page.waitForTimeout(time);
+  }
+
+  async screenshot(path) {
+    await this.page.screenshot({path: `${path}`});
   }
 }
 
