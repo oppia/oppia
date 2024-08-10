@@ -391,6 +391,7 @@ classifier_model_id: null
 content:
   content_id: content_3
   html: ''
+inapplicable_skill_misconception_ids: null
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -431,6 +432,7 @@ classifier_model_id: null
 content:
   content_id: content_5
   html: ''
+inapplicable_skill_misconception_ids: null
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -471,6 +473,7 @@ classifier_model_id: null
 content:
   content_id: content_0
   html: ''
+inapplicable_skill_misconception_ids: null
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -513,6 +516,7 @@ classifier_model_id: null
 content:
   content_id: content_3
   html: ''
+inapplicable_skill_misconception_ids: null
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []

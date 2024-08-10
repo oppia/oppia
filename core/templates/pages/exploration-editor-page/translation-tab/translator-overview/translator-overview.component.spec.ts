@@ -49,6 +49,7 @@ import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api
 import {EntityVoiceovers} from '../../../../domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from '../../../../domain/exploration/voiceover.model';
 import {LocalStorageService} from 'services/local-storage.service';
+import {VoiceoverPlayerService} from '../../../exploration-player-page/services/voiceover-player.service';
 
 class MockNgbModal {
   open() {
@@ -101,6 +102,7 @@ describe('Translator Overview component', () => {
   let entityTranslation: EntityTranslation;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
   let localStorageService: LocalStorageService;
+  let voiceoverPlayerService: VoiceoverPlayerService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -150,6 +152,7 @@ describe('Translator Overview component', () => {
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     windowRef = TestBed.inject(WindowRef);
     localStorageService = TestBed.inject(LocalStorageService);
+    voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
 
     spyOn(
       translationTabActiveModeService,
@@ -191,6 +194,7 @@ describe('Translator Overview component', () => {
       voiceoverBackendApiService,
       'fetchVoiceoverAdminDataAsync'
     ).and.resolveTo(Promise.resolve(voiceoverAdminDataResponse));
+    spyOn(voiceoverPlayerService, 'setLanguageAccentCodesDescriptions');
 
     explorationLanguageCodeService.init(explorationLanguageCode);
     component.isTranslationTabBusy = false;

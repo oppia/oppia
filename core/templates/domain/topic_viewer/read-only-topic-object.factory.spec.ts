@@ -102,6 +102,7 @@ describe('Read only topic object Factory', () => {
       practice_tab_is_displayed: false,
       meta_tag_content: 'Topic meta tag content',
       page_title_fragment_for_web: 'topic page title',
+      classroom_name: 'math',
     };
 
     _sampleReadOnlyTopic =

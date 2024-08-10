@@ -33,8 +33,24 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/create-exploration-and-change-basic-settings.spec.ts"
     },
     {
+      "name": "exploration-editor/publish-the-exploration-with-an-interaction",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/publish-the-exploration-with-an-interaction.spec.ts"
+    },
+    {
       "name": "exploration-editor/save-draft-publish-and-discard-the-changes",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/save-draft-publish-and-discard-the-changes.spec.ts"
+    },
+    {
+      "name": "logged-in-user/create-and-delete-account",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/create-and-delete-account.spec.ts"
+    },
+    {
+      "name": "logged-in-user/restart-or-continue-exploration-on-revisit",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/restart-or-continue-exploration-on-revisit.spec.ts"
+    },
+    {
+      "name": "logged-in-user/save-an-exploration-to-play-later",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/save-an-exploration-to-play-later.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-about-page",
@@ -111,6 +127,42 @@
     {
       "name": "logged-out-user/visit-classroom-index-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/visit-classroom-index-page.spec.ts"
+    },
+    {
+      "name": "logged-out-user/browse-and-search-for-lessons-in-community-library",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/browse-and-search-for-lessons-in-community-library.spec.ts"
+    },
+    {
+      "name": "logged-out-user/select-and-play-topic-from-classroom-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/select-and-play-topic-from-classroom-page.spec.ts"
+    },
+    {
+      "name": "logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration.spec.ts"
+    },
+    {
+      "name": "logged-out-user/share-and-give-feedback-for-exploration-but-not-report-and-rate-it",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/share-and-give-feedback-for-exploration-but-not-report-and-rate-it.spec.ts"
+    },
+    {
+      "name": "logged-out-user/play-through-lesson-while-getting-feedback-and-hints",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-through-lesson-while-getting-feedback-and-hints.spec.ts"
+    },
+    {
+      "name": "logged-out-user/change-site-language-and-engage-with-original-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/change-site-language-and-engage-with-original-exploration.spec.ts"
+    },
+    {
+      "name": "logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus.spec.ts"
+    },
+    {
+      "name": "logged-out-user/sign-in-and-save-exploration-progress",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/sign-in-and-save-exploration-progress.spec.ts"
+    },
+    {
+      "name": "logged-out-user/track-and-resume-exploration-progress-via-url",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/track-and-resume-exploration-progress-via-url.spec.ts"
     },
     {
       "name": "moderator/edit-featured-activities-list",
@@ -195,6 +247,14 @@
     {
       "name": "topic-manager/edit-and-preview-a-topic",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-preview-a-topic.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-preview-and-save-a-chapter",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-preview-and-save-a-chapter.spec.ts"
+    },
+    {
+      "name": "topic-manager/create-and-delete-subtopic-and-story",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-delete-subtopic-and-story.spec.ts"
     }
   ]
 }

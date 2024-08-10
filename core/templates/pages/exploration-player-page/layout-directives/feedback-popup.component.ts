@@ -83,7 +83,7 @@ export class FeedbackPopupComponent {
           this.feedbackSubmitted = true;
           setTimeout(() => {
             this.close();
-          }, 2000);
+          }, 3000);
         });
     }
   }

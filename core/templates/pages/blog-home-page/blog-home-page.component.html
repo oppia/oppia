@@ -78,9 +78,11 @@
            class="posts-display-heading text-center e2e-test-no-results-found"
            [ngClass]="{'col-8': !isSmallScreenViewActive()}">
         <picture>
-          <source type="image/webp" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.webp')">
-          <source type="image/png" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.png')">
-          <img [src]="getStaticImageUrl('/general/no_explorations_found.png')">
+          <source type="image/webp"
+                  [srcset]="getStaticCopyrightedImageUrl('/general/no_explorations_found.webp')">
+          <source type="image/png"
+                  [srcset]="getStaticCopyrightedImageUrl('/general/no_explorations_found.png')">
+          <img [src]="getStaticCopyrightedImageUrl('/general/no_explorations_found.png')">
         </picture>
         <p class="text-center no-result-found">
           {{ 'I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND' | translate }}

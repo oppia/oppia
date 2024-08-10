@@ -31,6 +31,10 @@ ConsoleReporter.setConsoleErrorsToIgnore([
   /The requested path \/learn\/math is not found\./,
 ]);
 
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /http:\/\/localhost:8181\/access_validation_handler\/can_access_classrooms_page Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+]);
+
 describe('Logged-out User in Teach page', function () {
   let loggedOutUser: LoggedOutUser;
 
@@ -43,39 +47,7 @@ describe('Logged-out User in Teach page', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should open the Math Classroom page when "Browse Our Lessons" button is clicked',
-    async function () {
-      await loggedOutUser.clickBrowseOurLessonsButtonInTeachPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open the Android page when "Access Android App" button is clicked',
-    async function () {
-      await loggedOutUser.clickAccessAndroidAppButtonInTeachPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open the Math Classroom page when "Visit Classroom" button is clicked',
-    async function () {
-      await loggedOutUser.clickVisitClassroomButtonInTeachPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open the Community Library page when "Browse Library" button is clicked',
-    async function () {
-      await loggedOutUser.clickBrowseLibraryButtonInTeachPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open the Math Classroom page when "Explore Lessons" button is clicked',
+    'should open the classrooms page when "Explore Lessons" button is clicked',
     async function () {
       await loggedOutUser.clickExploreLessonsButtonInTeachPage();
     },

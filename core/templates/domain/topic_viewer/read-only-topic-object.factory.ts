@@ -49,6 +49,7 @@ export interface ReadOnlyTopicBackendDict {
   practice_tab_is_displayed: boolean;
   meta_tag_content: string;
   page_title_fragment_for_web: string;
+  classroom_name: string | null;
 }
 
 export class ReadOnlyTopic {
@@ -64,6 +65,7 @@ export class ReadOnlyTopic {
   _practiceTabIsDisplayed: boolean;
   _metaTagContent: string;
   _pageTitleFragmentForWeb: string;
+  _classroomName: string | null;
 
   constructor(
     topicName: string,
@@ -77,7 +79,8 @@ export class ReadOnlyTopic {
     skillDescriptions: SkillIdToDescriptionMap,
     practiceTabIsDisplayed: boolean,
     metaTagContent: string,
-    pageTitleFragmentForWeb: string
+    pageTitleFragmentForWeb: string,
+    classroomName: string | null
   ) {
     this._topicName = topicName;
     this._topicId = topicId;
@@ -91,6 +94,7 @@ export class ReadOnlyTopic {
     this._practiceTabIsDisplayed = practiceTabIsDisplayed;
     this._metaTagContent = metaTagContent;
     this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
+    this._classroomName = classroomName;
   }
 
   getTopicName(): string {
@@ -139,6 +143,10 @@ export class ReadOnlyTopic {
 
   getPageTitleFragmentForWeb(): string {
     return this._pageTitleFragmentForWeb;
+  }
+
+  getClassroomName(): string | null {
+    return this._classroomName;
   }
 }
 
@@ -233,7 +241,8 @@ export class ReadOnlyTopicObjectFactory {
       skillDescriptions,
       topicDataDict.practice_tab_is_displayed,
       topicDataDict.meta_tag_content,
-      topicDataDict.page_title_fragment_for_web
+      topicDataDict.page_title_fragment_for_web,
+      topicDataDict.classroom_name
     );
   }
 }

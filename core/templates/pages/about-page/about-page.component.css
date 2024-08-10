@@ -37,6 +37,7 @@
   font-size: 4.8rem;
   line-height: 60px;
   margin: 0;
+  text-align: start;
 }
 
 .about-page .oppia-about-hero-subtext {
@@ -460,8 +461,8 @@
   font-weight: 700;
   height: 44px;
   line-height: 21.6px;
+  min-width: 240px;
   padding: 10px;
-  width: 240px;
 }
 
 .about-page .oppia-about-impact-charts-container {
@@ -757,8 +758,8 @@
   font-weight: 700;
   height: 44px;
   margin: 0;
+  min-width: 240px;
   padding: 10px;
-  width: 240px;
 }
 
 .about-page .oppia-about-cta-link {
@@ -902,9 +903,6 @@
 }
 
 .about-page .oppia-about-cta-donor {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
   padding: 48px 64px;
 }
 
@@ -931,6 +929,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   gap: 16px;
+  margin: 32px 0;
 }
 
 .about-page .oppia-about-statement-type1 {
@@ -1060,6 +1059,19 @@
   background-color: transparent;
   padding: 0;
 }
+
+.feature-panel button,
+.oppia-about-features-list button,
+.feature-panel button:active,
+.feature-panel button:focus,
+.feature-panel button:hover,
+.oppia-about-features-list button:active,
+.oppia-about-features-list button:focus,
+.oppia-about-features-list button:hover {
+  border: none;
+  outline: none;
+}
+
 .about-page .oppia-cta-carousel-container button, 
 .about-page .oppia-cta-carousel-container button:focus,
 .about-page .oppia-cta-carousel-container button:hover,
@@ -1074,8 +1086,11 @@
   }
 
   .about-page .oppia-about-cta-donor {
-    gap: 16px;
     padding: 48px 32px;
+  }
+
+  .about-page .oppia-about-cta-donor-impact-statements {
+    margin: 16px 0;
   }
 
   .about-page .oppia-about-cta-donate-button {
@@ -1267,8 +1282,8 @@
   height: 44px;
   letter-spacing: normal;
   margin: 0;
+  min-width: 252px;
   padding: 10px;
-  width: 252px;
 }
 
 .about-page .oppia-about-secondary-button {

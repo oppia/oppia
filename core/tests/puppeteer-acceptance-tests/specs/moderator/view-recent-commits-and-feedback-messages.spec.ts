@@ -40,6 +40,7 @@ describe('Moderator', function () {
     // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
     // in mobile viewport which is required for testing the feedback messages tab),
     // remove this part of skipping the test and make the test to run in mobile viewport as well.
+    // see: https://github.com/oppia/oppia/issues/19443
     if (process.env.MOBILE === 'true') {
       showMessage('Test skipped in mobile viewport');
       return;
@@ -82,6 +83,7 @@ describe('Moderator', function () {
       // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
       // in mobile viewport which is required for testing the feedback messages tab),
       // remove this part of skipping the test and make the test to run in mobile viewport as well.
+      // see: https://github.com/oppia/oppia/issues/19443
       if (process.env.MOBILE === 'true') {
         showMessage('Test skipped in mobile viewport');
         return;

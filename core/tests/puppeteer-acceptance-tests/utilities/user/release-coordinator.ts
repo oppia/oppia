@@ -345,7 +345,7 @@ export class ReleaseCoordinator extends BaseUser {
     await this.page.waitForSelector(getMemoryCacheProfileButton, {
       visible: true,
     });
-    await this.waitForPageToFullyLoad();
+    await this.waitForStaticAssetsToLoad();
     await this.page.evaluate(selector => {
       document.querySelector(selector).click();
     }, getMemoryCacheProfileButton);
