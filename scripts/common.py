@@ -218,6 +218,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked',
     'curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill',
     'exploration-editor/create-exploration-and-change-basic-settings',
+    'exploration-editor/manage-exploration-misconceptions',
     'exploration-editor/modify-translations-through-modal',
     'exploration-editor/load-complete-and-restart-exploration-preview',
     'exploration-editor/publish-the-exploration-with-an-interaction',
@@ -225,6 +226,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
     'logged-in-user/create-and-delete-account',
+    'logged-in-user/save-an-exploration-to-play-later',
+    'logged-in-user/restart-or-continue-exploration-on-revisit',
     'logged-out-user/check-all-user-flow-of-donor',
     'logged-out-user/check-all-user-flow-of-parent-teacher',
     'logged-out-user/check-all-user-flow-of-partner',
