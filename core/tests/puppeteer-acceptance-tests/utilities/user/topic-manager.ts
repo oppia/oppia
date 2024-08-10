@@ -2419,14 +2419,12 @@ export class TopicManager extends BaseUser {
       'Test saving story as curriculum admin.'
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
-    await this.clickOn(closeSaveModalButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
-
-    try {
-      await this.page.waitForNavigation({waitUntil: 'networkidle0'});
-    } catch (error) {
-      return;
-    }
+    await Promise.all([
+      this.clickOn(closeSaveModalButton),
+      this.page.waitForNavigation({waitUntil: 'networkidle0'}).catch(error => {
+        showMessage(error);
+      }),
+    ]);
   }
 
   /**
@@ -2779,7 +2777,14 @@ export class TopicManager extends BaseUser {
     shouldExist: boolean
   ): Promise<void> {
     try {
-      await this.openStoryEditor(storyName, topicName);
+      await Promise.all([
+        this.openStoryEditor(storyName, topicName),
+        this.page
+          .waitForNavigation({waitUntil: 'networkidle0'})
+          .catch(error => {
+            showMessage(error);
+          }),
+      ]);
 
       if (this.isViewportAtMobileWidth()) {
         await this.page.waitForSelector(mobileChapterCollapsibleCard);
@@ -2808,11 +2813,6 @@ export class TopicManager extends BaseUser {
             `Chapter ${chapterName} is ${shouldExist ? 'found' : 'not found'} in story ${storyName}, as expected.`
           );
 
-          try {
-            await this.page.waitForNavigation({waitUntil: 'networkidle0'});
-          } catch (error) {
-            return;
-          }
           return;
         }
       }
@@ -2825,12 +2825,6 @@ export class TopicManager extends BaseUser {
       showMessage(
         `Chapter ${chapterName} is ${shouldExist ? 'found' : 'not found'} in story ${storyName}, as expected.`
       );
-
-      try {
-        await this.page.waitForNavigation({waitUntil: 'networkidle0'});
-      } catch (error) {
-        return;
-      }
     } catch (error) {
       const newError = new Error(
         `Failed to verify chapter presence in story: ${error}`
