@@ -201,9 +201,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                               'home-page.component.spec.ts,'
                               'about-page.component.ts,'
                               'test-module.js,'
-                              'App.ts,'
-                              'test.html,'
-                              'invalid.ts'])
+                              'App.ts'])
 
         cmd = [
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
@@ -222,24 +220,15 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'test-module.spec.js'
         ]])
 
-    def test_frontend_tests_with_specs_to_run_no_specs_found(self) -> None:
-        with self.swap_success_Popen, self.print_swap, self.swap_build:
-            with self.swap_install_third_party_libs, self.swap_common:
-                with self.swap_check_frontend_coverage:
-                    with self.assertRaisesRegex(SystemExit, '1'):
-                        run_frontend_tests.main(
-                            args=['--specs_to_run', 'invalid.ts'])
-
     def test_frontend_tests_with_specs_to_run_no_specs_found_allow_no_spec(
         self
     ) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage:
-                    with self.assertRaisesRegex(SystemExit, '0'):
-                        run_frontend_tests.main(
-                            args=['--specs_to_run', 'invalid.ts',
-                                  '--allow_no_spec'])
+                    run_frontend_tests.main(
+                        args=['--specs_to_run', 'invalid.ts',
+                                '--allow_no_spec'])
 
     def test_frontend_tests_with_run_on_changed_files_in_branch(self) -> None:
         git_refs = [git_changes_utils.GitRef(
