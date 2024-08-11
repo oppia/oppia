@@ -39,6 +39,8 @@ export default {
     ClassroomAdmin: 'http://localhost:8181/classroom-admin',
     ClassroomsPage: 'http://localhost:8181/learn',
     CommunityLibrary: 'http://localhost:8181/community-library',
+    recentlyPublishedExplorations:
+      'http://localhost:8181/community-library/recently-published',
     Contact: 'http://localhost:8181/contact',
     ContributorDashboard: 'http://localhost:8181/contributor-dashboard',
     ContributorDashboardAdmin:
@@ -83,6 +85,7 @@ export default {
       'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform' +
       '?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp',
     PartnershipsFormShortUrl: 'https://forms.gle/Y71U8FdhQwZpicJj8',
+    PendingAccountDeletion: 'http://localhost:8181/pending-account-deletion',
     PrivacyPolicy: 'http://localhost:8181/privacy-policy',
     ReleaseCoordinator: 'http://localhost:8181/release-coordinator',
     splash: 'http://localhost:8181/splash',
@@ -96,6 +99,9 @@ export default {
       'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
     VolunteerFormShortUrl: 'https://forms.gle/rhFYoLLSFr3JEZHy8',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
+    WikiPrivilegesToFirebaseAccount:
+      'https://github.com/oppia/oppia/wiki/#2-add-custom-claims-to-a-firebase-account',
+    Preferences: 'http://localhost:8181/preferences',
     ProfilePagePrefix: 'http://localhost:8181/profile',
     OppiaAnnounceGoogleGroup: 'https://groups.google.com/g/oppia-announce',
     GoogleGroups: {
@@ -112,6 +118,12 @@ export default {
         'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
       GoogleSignUp: 'https://accounts.google.com/lifecycle/steps/signup/name',
     },
+    TeacherStoryTaggedBlogsLink:
+      'https://www.oppia.org/blog/search/find?q=&tags=(%22Teacher%20story%22)',
+    ParentsTeachersGuideUrl:
+      'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
+    LessonCreatorLinkedInUrl:
+      'https://www.linkedin.com/in/rita-santos-guimaraes-prof-matematica/',
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
@@ -132,6 +144,7 @@ export default {
     TOPIC_MANAGER: 'topic manager',
     MODERATOR: 'moderator',
     RELEASE_COORDINATOR: 'release coordinator',
+    COLLECTION_EDITOR: 'collection editor',
   } as const,
 
   BlogRights: {

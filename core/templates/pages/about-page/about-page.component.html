@@ -129,12 +129,14 @@
       </div>
       <div class="oppia-about-platform-button-container">
         <oppia-primary-button
-          buttonHref="/learn/math"
+          buttonHref="/learn"
+          (onClickPrimaryButton)="onClickExploreLessonsButton()"
           [customClasses]="['oppia-about-platform-button', 'oppia-about-platform-subtext']"
           buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate }}">
         </oppia-primary-button>
         <oppia-primary-button
           buttonHref="/android"
+          (onClickPrimaryButton)="onClickDownloadAndroidAppButton()"
           [customClasses]="['oppia-about-platform-button', 'oppia-about-secondary-button', 'oppia-about-platform-subtext']"
           buttonText="{{ 'I18N_ACTION_DOWNLOAD_ANDRIOD_APP' | translate }}">
         </oppia-primary-button>
@@ -390,7 +392,7 @@
                 </p>
               </div>
             </div>
-            <button class="oppia-about-cta-button oppia-about-cta-donate-button oppia-about-cta-subtext e2e-test-donate-desktop-button" (click)="openDonationBoxModal()">
+            <button class="oppia-about-cta-button oppia-about-cta-donate-button oppia-about-cta-subtext e2e-test-donate-desktop-button" (click)="onClickDonateCTAButton()">
               <img [src]="getStaticImageUrl('/icons/white-heart-icon.svg')" alt="A white heart icon">
               <span> {{ 'I18N_ABOUT_PAGE_CTA_DONATE' | translate }} </span>
             </button>
@@ -451,11 +453,13 @@
             <div class="oppia-about-cta-volunteer-buttons-container">
               <oppia-primary-button
                 [buttonHref]="volunteerFormLink"
+                (onClickPrimaryButton)="onClickVolunteerCTAButton()"
                 [customClasses]="['oppia-about-cta-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-desktop-volunteer-button']"
                 buttonText="{{ 'I18N_ABOUT_PAGE_CTA_VOLUNTEER_BUTTON_TEXT' | translate }}">
               </oppia-primary-button>
               <oppia-primary-button
                 buttonHref="/volunteer"
+                (onClickPrimaryButton)="onClickVolunteerLearnMoreButton()"
                 [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-volunteer-learn-more-desktop-button']"
                 buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
               </oppia-primary-button>
@@ -492,6 +496,7 @@
                 </div>
                 <oppia-primary-button
                   [buttonHref]="partnershipsFormLink"
+                  (onClickPrimaryButton)="onClickPartnerCTAButton()"
                   [customClasses]="['oppia-about-cta-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-desktop-partner-button']"
                   buttonText="{{ 'I18N_ABOUT_PAGE_CTA_PARTNER_BUTTON_TEXT' | translate }}">
                 </oppia-primary-button>
@@ -515,6 +520,7 @@
                 </div>
                 <oppia-primary-button
                   buttonHref="/partnerships"
+                  (onClickPrimaryButton)="onClickPartnerLearnMoreButton()"
                   [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-partner-learn-more-desktop-button']"
                   buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
                 </oppia-primary-button>
@@ -580,7 +586,7 @@
                 </p>
               </div>
             </div>
-            <button class="oppia-about-cta-button oppia-about-cta-donate-button oppia-about-cta-subtext e2e-test-donate-mobile-button" (click)="openDonationBoxModal()">
+            <button class="oppia-about-cta-button oppia-about-cta-donate-button oppia-about-cta-subtext e2e-test-donate-mobile-button" (click)="onClickDonateCTAButton()">
               <img [src]="getStaticImageUrl('/icons/white-heart-icon.svg')" alt="A white heart icon">
               <span> {{ 'I18N_ABOUT_PAGE_CTA_DONATE' | translate }} </span>
             </button>
@@ -650,11 +656,13 @@
             <div class="oppia-about-cta-volunteer-buttons-container">
               <oppia-primary-button
                 [buttonHref]="volunteerFormLink"
+                (onClickPrimaryButton)="onClickVolunteerCTAButton()"
                 [customClasses]="['oppia-about-cta-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-mobile-volunteer-button']"
                 buttonText="{{ 'I18N_ABOUT_PAGE_CTA_VOLUNTEER_BUTTON_TEXT' | translate }}">
               </oppia-primary-button>
               <oppia-primary-button
                 buttonHref="/volunteer"
+                (onClickPrimaryButton)="onClickVolunteerLearnMoreButton()"
                 [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-volunteer-learn-more-mobile-button']"
                 buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
               </oppia-primary-button>
@@ -698,6 +706,7 @@
                 </div>
                 <oppia-primary-button
                   [buttonHref]="partnershipsFormLink"
+                  (onClickPrimaryButton)="onClickPartnerCTAButton()"
                   [customClasses]="['oppia-about-cta-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-mobile-partner-button']"
                   buttonText="{{ 'I18N_ABOUT_PAGE_CTA_PARTNER_BUTTON_TEXT' | translate }}">
                 </oppia-primary-button>
@@ -721,6 +730,7 @@
                 </div>
                 <oppia-primary-button
                   buttonHref="/partnerships"
+                  (onClickPrimaryButton)="onClickPartnerLearnMoreButton()"
                   [customClasses]="['oppia-about-cta-button', 'oppia-about-secondary-button', 'oppia-about-cta-subtext', 'e2e-test-about-page-partner-learn-more-mobile-button']"
                   buttonText="{{ 'I18N_ABOUT_PAGE_LEARN_MORE' | translate }}">
                 </oppia-primary-button>

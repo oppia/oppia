@@ -16,6 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
+import puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -34,7 +35,6 @@ const saveChangesButton = 'button.e2e-test-save-changes';
 const mathInteractionsTab = '.e2e-test-interaction-tab-math';
 const closeResponseModalButton = '.e2e-test-close-add-response-modal';
 
-// Settings Tab elements.
 const settingsTab = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
 const explorationTitleSelector = '.e2e-test-exploration-title-input';
@@ -114,8 +114,7 @@ const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
 const addHintButton = 'button.e2e-test-oppia-add-hint-button';
 const saveHintButton = 'button.e2e-test-save-hint';
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
-const solutionInput =
-  'oppia-add-or-update-solution-modal textarea.e2e-test-description-box';
+const solutionInput = 'oppia-add-or-update-solution-modal input';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 
 const dismissTranslationWelcomeModalSelector =
@@ -139,11 +138,24 @@ const stateHintTab = '.e2e-test-hint-tab';
 const editStateHintSelector = '.e2e-test-open-hint-editor';
 const saveHintEditButton = 'button.e2e-test-save-hint-edit';
 
+const addSkillButton = '.e2e-test-add-skill-button';
+const skillNameInput = '.e2e-test-skill-name-input';
+const skillItem = '.e2e-test-skills-list-item';
+const confirmSkillButton = '.e2e-test-confirm-skill-selection-button';
+const deleteSkillButton = 'i.skill-delete-button';
+
+const misconceptionDiv = '.misconception-list-item';
+const optionalMisconceptionDiv = '.optional-misconception-list-item';
+const inapplicableMisconceptionDiv = '.optional-misconception-list-no-action';
+const optionalMisconceptionOptionsButton =
+  '.optional-misconception-options-button';
+const misconceptionApplicableToggle =
+  '.e2e-test-misconception-applicable-toggle';
+
 const modalSaveButton = '.e2e-test-save-button';
 const modifyTranslationsModalDoneButton =
   '.e2e-test-modify-translations-done-button';
 
-// For mobile.
 const mobileSettingsBar = 'li.e2e-test-mobile-settings-button';
 const mobileChangesDropdown = 'div.e2e-test-mobile-changes-dropdown';
 const mobileSaveChangesButton =
@@ -165,8 +177,8 @@ const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
 const explorationControlsSettingsDropdown =
   'h3.e2e-test-controls-bar-settings-container';
 
-// Preview tab elements.
 const nextCardButton = '.e2e-test-next-card-button';
+const nextCardArrowButton = '.e2e-test-next-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const previewRestartButton = '.e2e-test-preview-restart-button';
 const stateConversationContent = '.e2e-test-conversation-content';
@@ -177,7 +189,17 @@ const subscriberTabButton = '.e2e-test-subscription-tab';
 const subscriberCard = '.e2e-test-subscription-card';
 const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
 const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
+const destinationSelectorDropdown = '.e2e-test-destination-selector-dropdown';
+const destinationWhenStuckSelectorDropdown =
+  '.e2e-test-destination-when-stuck-selector-dropdown';
+const addDestinationStateWhenStuckInput = '.protractor-test-add-state-input';
+const outcomeDestWhenStuckSelector =
+  '.protractor-test-open-outcome-dest-if-stuck-editor';
+const intEditorField = '.e2e-test-editor-int';
+const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
+const tagsField = '.e2e-test-chip-list-tags';
 
+const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to creator dashboard page.
@@ -246,12 +268,13 @@ export class ExplorationEditor extends BaseUser {
    * This is a composite function that can be used when a straightforward, simple exploration published is required.
    * @param {string} title - The title of the exploration.
    * @param {string} goal - The goal of the exploration.
-   * @param {string} category - The category of the exploration.
+   * @param {string} category - The category of the exploration.,
    */
   async publishExplorationWithMetadata(
     title: string,
     goal: string,
-    category: string
+    category: string,
+    tags?: string
   ): Promise<string | null> {
     if (this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(toastMessage, {
@@ -271,6 +294,9 @@ export class ExplorationEditor extends BaseUser {
     await this.type(explorationGoalInput, `${goal}`);
     await this.clickOn(explorationCategoryDropdown);
     await this.clickOn(`${category}`);
+    if (tags) {
+      await this.type(tagsField, tags);
+    }
     await this.clickOn(saveExplorationChangesButton);
     await this.clickOn(explorationConfirmPublishButton);
     await this.page.waitForSelector(explorationIdElement);
@@ -301,17 +327,22 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to dismiss welcome modal.
+   * Function to dismiss exploration editor welcome modal.
    */
   async dismissWelcomeModal(): Promise<void> {
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      visible: true,
-    });
-    await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      hidden: true,
-    });
-    showMessage('Tutorial pop-up closed successfully.');
+    try {
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+      await this.clickOn(dismissWelcomeModalSelector);
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        hidden: true,
+      });
+      showMessage('Tutorial pop-up closed successfully.');
+    } catch (error) {
+      showMessage(`welcome modal not found: ${error.message}`);
+    }
   }
 
   /**
@@ -424,9 +455,15 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
+    showMessage(`${interactionToAdd} interaction has been added successfully.`);
+  }
+
+  /**
+   * Function to close the interaction's response modal.
+   */
+  async closeInteractionResponseModal(): Promise<void> {
     await this.page.waitForSelector(closeResponseModalButton, {visible: true});
     await this.clickOn(closeResponseModalButton);
-    showMessage(`${interactionToAdd} interaction has been added successfully.`);
   }
 
   /**
@@ -811,7 +848,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
     showMessage('Exploration is saved successfully.');
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   async publishExploration(): Promise<string | null> {
@@ -921,7 +958,7 @@ export class ExplorationEditor extends BaseUser {
         await elements[cardIndex].click();
       }
 
-      await this.page.waitForNetworkIdle({idleTime: 700});
+      await this.waitForNetworkIdle({idleTime: 700});
     } catch (error) {
       const newError = new Error(
         `Error navigating to card ${cardName}: ${error.message}`
@@ -939,7 +976,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} destination - The destination state for the response.
    * @param {boolean} responseIsCorrect - Whether the response is marked as correct.
    */
-  async addResponseToTheInteraction(
+  async addResponsesToTheInteraction(
     interactionType: string,
     answer: string,
     feedback: string,
@@ -980,6 +1017,10 @@ export class ExplorationEditor extends BaseUser {
         await this.page.waitForSelector(textInputInteractionOption);
         await this.page.type(textInputInteractionOption, answer);
         break;
+      case 'Fraction Input':
+        await this.clearAllTextFrom(intEditorField);
+        await this.type(intEditorField, answer);
+        break;
       // Add cases for other interaction types here
       // case 'otherInteractionType':
       //   await this.type(otherFormInput, answer);
@@ -1005,15 +1046,36 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to add feedback for default responses of a state interaction.
    * @param {string} defaultResponseFeedback - The feedback for the default responses.
+   * @param {string} [directToCard] - The card to direct to (optional).
+   * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
    */
   async editDefaultResponseFeedback(
-    defaultResponseFeedback: string
+    defaultResponseFeedback?: string,
+    directToCard?: string,
+    directToCardWhenStuck?: string
   ): Promise<void> {
     await this.clickOn(defaultFeedbackTab);
-    await this.clickOn(openOutcomeFeedBackEditor);
-    await this.clickOn(stateContentInputField);
-    await this.type(stateContentInputField, `${defaultResponseFeedback}`);
-    await this.clickOn(saveOutcomeFeedbackButton);
+
+    if (defaultResponseFeedback) {
+      await this.clickOn(openOutcomeFeedBackEditor);
+      await this.clickOn(stateContentInputField);
+      await this.type(stateContentInputField, `${defaultResponseFeedback}`);
+      await this.clickOn(saveOutcomeFeedbackButton);
+    }
+
+    if (directToCard) {
+      await this.clickOn(openOutcomeDestButton);
+      await this.page.select(destinationSelectorDropdown, directToCard);
+      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+    }
+
+    if (directToCardWhenStuck) {
+      await this.clickOn(outcomeDestWhenStuckSelector);
+      // The '4: /' value is used to select the 'a new card called' option in the dropdown.
+      await this.select(destinationWhenStuckSelectorDropdown, '4: /');
+      await this.type(addDestinationStateWhenStuckInput, directToCardWhenStuck);
+      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+    }
   }
 
   /**
@@ -1047,6 +1109,13 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Sets a state as a checkpoint in the exploration.
+   */
+  async setTheStateAsCheckpoint(): Promise<void> {
+    await this.clickOn(setAsCheckpointButton);
+  }
+
+  /**
    * Function to add a hint for a state card.
    * @param {string} hint - The hint to be added for the current card.
    */
@@ -1065,6 +1134,151 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(editStateHintSelector);
     await this.type(stateContentInputField, hint);
     await this.clickOn(saveHintEditButton);
+  }
+
+  /**
+   * Adds a particular skill to the current state card.
+   * @param skillName - Name of the skill to be linked to state.
+   */
+  async addSkillToState(skillName: string): Promise<void> {
+    await this.clickOn(addSkillButton);
+    await this.type(skillNameInput, skillName);
+    await this.clickOn(skillItem);
+    await this.clickOn(confirmSkillButton);
+  }
+
+  /**
+   * Verifies if a misconception is present on the page.
+   * @param {string} misconceptionName - The name of the misconception to verify.
+   * @param {boolean} isPresent - Whether the misconception is expected to be present.
+   */
+  async verifyMisconceptionPresentForState(
+    misconceptionName: string,
+    isPresent: boolean
+  ): Promise<void> {
+    try {
+      await this.page.waitForSelector(misconceptionDiv, {
+        timeout: 5000,
+        visible: true,
+      });
+      const misconceptions = await this.page.$$(misconceptionDiv);
+
+      for (const misconception of misconceptions) {
+        const title = await this.page.evaluate(
+          el => el.textContent,
+          misconception
+        );
+        if (title.trim() === misconceptionName) {
+          if (!isPresent) {
+            throw new Error(
+              `The misconception ${misconceptionName} is present, which was not expected`
+            );
+          }
+          return;
+        }
+      }
+
+      if (isPresent) {
+        throw new Error(
+          `The misconception ${misconceptionName} is not present, which was expected`
+        );
+      }
+    } catch (error) {
+      if (isPresent) {
+        throw new Error(
+          `The misconception ${misconceptionName} is not present, which was expected`
+        );
+      }
+    }
+
+    showMessage(
+      `The misconception is ${isPresent ? '' : 'not'} present as expected.`
+    );
+  }
+
+  /**
+   * Toggles the applicability status of an optional misconception.
+   * @param misconceptionName - The name of the misconception to be toggled.
+   */
+  async toggleMisconceptionApplicableStatus(
+    misconceptionName: string
+  ): Promise<void> {
+    await this.page.waitForSelector(optionalMisconceptionDiv, {
+      timeout: 5000,
+      visible: true,
+    });
+    let misconceptions = await this.page.$$(optionalMisconceptionDiv);
+    let misconceptionFound = false;
+    for (const misconception of misconceptions) {
+      const optionalMisconceptionName = await misconception.evaluate(el =>
+        el.textContent?.trim()
+      );
+      if (optionalMisconceptionName?.startsWith(misconceptionName)) {
+        const misconceptionOptions = await misconception.$(
+          optionalMisconceptionOptionsButton
+        );
+        if (!misconceptionOptions) {
+          throw new Error(
+            `Options not found for misconception "${misconceptionName}"`
+          );
+        }
+        await misconceptionOptions.click();
+        await this.page.waitForSelector(misconceptionApplicableToggle, {
+          visible: true,
+        });
+        await this.clickOn(misconceptionApplicableToggle);
+        misconceptionFound = true;
+        break;
+      }
+    }
+    if (!misconceptionFound) {
+      throw new Error(
+        `Couldn't find misconception with name ${misconceptionName}.`
+      );
+    }
+  }
+
+  /**
+   * Verifies whether a given optional misconception is applicable or not.
+   * @param misconceptionName - The name of the misconception to be verified.
+   * @param isApplicable - The expected applicability status of the misconception.
+   */
+  async verifyOptionalMisconceptionApplicableStatus(
+    misconceptionName: string,
+    isApplicable: boolean
+  ): Promise<void> {
+    await this.verifyMisconceptionPresentForState(misconceptionName, true);
+    const inapplicableMisconceptions = await this.page.$$(
+      inapplicableMisconceptionDiv
+    );
+
+    for (const misconception of inapplicableMisconceptions) {
+      const title = await this.page.evaluate(
+        el => el.textContent.trim(),
+        misconception
+      );
+      if (title === misconceptionName && !isApplicable) {
+        return;
+      } else if (title.startsWith(misconceptionName) && isApplicable) {
+        // We use startsWith since misconception title divs can have an icon at
+        // the end indicating that the misconception needs to be addressed.
+        throw new Error(
+          `The misconception ${misconceptionName} is expected to be applicable, found not applicable.`
+        );
+      }
+    }
+
+    showMessage(
+      `The misconception is ${isApplicable ? '' : 'not'} applicable as expected.`
+    );
+  }
+
+  /**
+   * Removes the attached skill from the current state card.
+   */
+  async removeSkillFromState(): Promise<void> {
+    await this.clickOn(deleteSkillButton);
+    await this.clickOn('Delete skill');
   }
 
   /**
@@ -1119,7 +1333,7 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(mainTabButton);
     }
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**
@@ -1151,7 +1365,16 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the next card in the preview tab.
    */
   async continueToNextCard(): Promise<void> {
-    await this.clickOn(nextCardButton);
+    try {
+      await this.page.waitForSelector(nextCardButton, {timeout: 7000});
+      await this.clickOn(nextCardButton);
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        await this.clickOn(nextCardArrowButton);
+      } else {
+        throw error;
+      }
+    }
   }
 
   /**
@@ -1235,7 +1458,8 @@ export class ExplorationEditor extends BaseUser {
    * Function for creating an exploration with only EndExploration interaction with given title.
    */
   async createAndPublishAMinimalExplorationWithTitle(
-    title: string
+    title: string,
+    category: string = 'Algebra'
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
@@ -1248,7 +1472,7 @@ export class ExplorationEditor extends BaseUser {
     return await this.publishExplorationWithMetadata(
       title,
       'This is Goal here.',
-      'Algebra'
+      category
     );
   }
 
@@ -1394,7 +1618,7 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Invalid content type: ${contentType}`);
     }
     await this.clickOn(saveTranslationButton);
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**
@@ -1406,7 +1630,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(modifyExistingTranslationsButton);
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
   }
 
   /**

@@ -87,14 +87,6 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
 class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
-    def test_validation_returns_false_if_multiple_classrooms_is_disabled(
-            self) -> None:
-        self.get_json(
-            '%s/can_access_classrooms_page' % ACCESS_VALIDATION_HANDLER_PREFIX,
-            expected_status_int=404)
-
-    @test_utils.enable_feature_flags(
-            [feature_flag_list.FeatureNames.ENABLE_MULTIPLE_CLASSROOMS])
     def test_validation_returns_false_if_no_public_classrooms_are_present(
             self) -> None:
         with self.swap(constants, 'DEV_MODE', False):
@@ -104,8 +96,13 @@ class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
                 expected_status_int=404
             )
 
-    @test_utils.enable_feature_flags(
-            [feature_flag_list.FeatureNames.ENABLE_MULTIPLE_CLASSROOMS])
+    def test_validation_returns_true_in_dev_mode_if_no_classroom_are_present(
+            self) -> None:
+        with self.swap(constants, 'DEV_MODE', True):
+            self.get_html_response(
+                '%s/can_access_classrooms_page' %
+                    ACCESS_VALIDATION_HANDLER_PREFIX)
+
     def test_validation_returns_true_if_we_have_public_classrooms(
             self) -> None:
         self.save_new_valid_classroom()

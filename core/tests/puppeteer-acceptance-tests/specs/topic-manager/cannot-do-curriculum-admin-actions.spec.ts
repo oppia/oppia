@@ -50,7 +50,7 @@ describe('Topic Manager', function () {
     );
 
     await curriculumAdmin.createTopic('Subtraction', 'subtract');
-    storyID = await curriculumAdmin.createStory(
+    storyID = await curriculumAdmin.addStoryToTopic(
       'Subtraction Story',
       'story',
       'Subtraction'
@@ -73,7 +73,7 @@ describe('Topic Manager', function () {
       // Topic "Subtraction" is not owned by the topic manager as it is not assigned to them during the setup.
       await topicManager.expectTopicNameFieldDisabled();
 
-      await topicManager.openStoryEditor(storyID);
+      await topicManager.openStoryEditorWithId(storyID);
       // Story "Subtraction Story" belongs to the topic "Subtraction" which is not owned by the topic manager.
       await topicManager.expectError401Unauthorized();
     },

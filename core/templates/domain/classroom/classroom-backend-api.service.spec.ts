@@ -98,6 +98,7 @@ describe('Classroom backend API service', function () {
       size_in_bytes: 1000,
       bg_color: 'transparent',
     },
+    public_classrooms_count: 1,
   };
   let classroomBackendDict = {
     classroom_id: 'math_classroom_id',
@@ -139,7 +140,8 @@ describe('Classroom backend API service', function () {
       responseDictionaries.teaser_text,
       responseDictionaries.is_published,
       responseDictionaries.thumbnail_data,
-      responseDictionaries.banner_data
+      responseDictionaries.banner_data,
+      responseDictionaries.public_classrooms_count
     );
   });
 
