@@ -82,6 +82,8 @@ const subjectInterestSelector = '.e2e-test-profile-interest';
 const exportButtonSelector = '.e2e-test-export-account-button';
 const angularRootElementSelector = 'oppia-angular-root';
 const checkboxesSelector = '.checkbox';
+const defaultProfilePicture =
+  '/assets/images/avatar/user_blue_150px.png?2983.800000011921';
 
 const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE =
   'Your data is currently being loaded and will be downloaded as a JSON formatted text file upon completion.';
@@ -792,12 +794,9 @@ export class LoggedInUser extends BaseUser {
         profilePicture
       );
 
-      if (
-        actualImageUrl ===
-        '/assets/images/avatar/user_blue_150px.png?2983.800000011921'
-      ) {
+      if (actualImageUrl === defaultProfilePicture) {
         throw new Error(
-          'Profile picture does not match. Expected image source to be different from: /assets/images/avatar/user_blue_150px.png?2983.800000011921'
+          `Profile picture does not match. Expected image source to be different from: ${defaultProfilePicture}`
         );
       }
       showMessage('Profile picture is different from the default one.');
