@@ -1383,7 +1383,7 @@ export class LoggedOutUser extends BaseUser {
       // This reload is required to ensure the language dropdown is visible in mobile view,
       // if the earlier movements of the page have hidden it and since the inbuilt
       // scrollIntoView function call of the clickOn function didn't work as expected.
-      await this.page.reload();
+      await this.page.reload({waitUntil: 'domcontentloaded'});
     }
     await this.page.waitForSelector(languageDropdown);
     const languageDropdownElement = await this.page.$(languageDropdown);
@@ -1837,8 +1837,15 @@ export class LoggedOutUser extends BaseUser {
       ? partnerMobileTabInAboutPage
       : partnerDesktopTabInAboutPage;
 
+    const partnerWithUsButtonInAboutPage = this.isViewportAtMobileWidth()
+      ? partnerWithUsMobileButtonInAboutPage
+      : partnerWithUsDesktopButtonInAboutPage;
+
     await this.clickOn(partnerTab);
-    await this.clickLinkAnchorToNewTab('Partner with us', partnershipsFormUrl);
+    await this.openExternalLink(
+      partnerWithUsButtonInAboutPage,
+      partnershipsFormUrl
+    );
   }
 
   /**
