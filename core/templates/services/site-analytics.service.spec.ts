@@ -666,12 +666,6 @@ describe('Site Analytics Service', () => {
       );
     });
 
-    it('should register classroom header click event', () => {
-      sas.registerClassroomHeaderClickEvent();
-
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'click_on_classroom', {});
-    });
-
     it('should register community lesson completed event', () => {
       sas.registerCommunityLessonCompleted('exp_id');
 

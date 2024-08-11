@@ -15,14 +15,12 @@
               <a class="classroom-name e2e-mobile-test-classroom-link"
                  [href]="'/learn/' + classroom.url_fragment"
                  *ngIf="!isHackyClassroomNameTranslationDisplayed(classroom.name)"
-                 (click)="registerClassroomHeaderClickEvent()"
                  >
                  {{ classroom.name }}
               </a>
               <a class="classroom-name e2e-mobile-test-classroom-link"
                  [href]="'/learn/' + classroom.url_fragment"
                  *ngIf="isHackyClassroomNameTranslationDisplayed(classroom.name)"
-                 (click)="registerClassroomHeaderClickEvent()"
                  >
                  {{ getClassroomNameTranslationkey(classroom.name) | translate }}
               </a>

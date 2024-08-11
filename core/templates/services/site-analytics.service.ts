@@ -543,10 +543,6 @@ export class SiteAnalyticsService {
     });
   }
 
-  registerClassroomHeaderClickEvent(): void {
-    this._sendEventToGoogleAnalytics('click_on_classroom', {});
-  }
-
   registerClassroomPageViewed(): void {
     this._sendEventToGoogleAnalytics('view_classroom', {});
   }
