@@ -74,6 +74,9 @@ DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS: Final = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID: Final = 'widget_id'
 DEPRECATED_STATE_PROPERTY_NEXT_CONTENT_ID_INDEX: Final = 'next_content_id_index'
 STATE_PROPERTY_LINKED_SKILL_ID: Final = 'linked_skill_id'
+STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS: Final = (
+    'inapplicable_skill_misconception_ids'
+)
 STATE_PROPERTY_INTERACTION_CUST_ARGS: Final = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS: Final = 'answer_groups'
 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME: Final = 'default_outcome'
@@ -305,6 +308,7 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_LINKED_SKILL_ID,
+        STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_STICKY,
         STATE_PROPERTY_INTERACTION_HANDLERS,
@@ -622,6 +626,21 @@ class EditExpStatePropertyLinkedSkillIdCmd(ExplorationChange):
     state_name: str
     new_value: str
     old_value: str
+
+
+class EditExpStatePropertyInapplicableSkillMisconceptionIdsCmd(
+    ExplorationChange
+):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS
+    as allowed value.
+    """
+
+    property_name: Literal['inapplicable_skill_misconception_ids']
+    state_name: str
+    new_value: List[str]
+    old_value: Optional[List[str]]
 
 
 class EditExpStatePropertyInteractionCustArgsCmd(ExplorationChange):
@@ -6276,6 +6295,7 @@ class ExplorationChangeMergeVerifier:
     NON_CONFLICTING_PROPERTIES: List[str] = [
         STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
         STATE_PROPERTY_LINKED_SKILL_ID,
+        STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
         STATE_PROPERTY_CARD_IS_CHECKPOINT
     ]
 

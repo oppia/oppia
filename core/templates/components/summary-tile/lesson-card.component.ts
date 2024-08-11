@@ -34,7 +34,6 @@ import {StoryNode} from 'domain/story/story-node.model';
 export class LessonCardComponent implements OnInit {
   @Input() story!: StorySummary | LearnerExplorationSummary | CollectionSummary;
   @Input() topic!: string;
-  @Input() lastCard!: boolean;
   @Input() isCommunityLessonComplete?: boolean;
 
   desc!: string;

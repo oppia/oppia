@@ -665,6 +665,9 @@
 /core/templates/pages/classrooms-page/classrooms-page-root.component.html @oppia/lace-frontend-reviewers
 /core/templates/pages/classrooms-page/classrooms-page-root.component.spec.ts @oppia/lace-frontend-reviewers
 /core/templates/pages/classrooms-page/classrooms-page-root.component.ts @oppia/lace-frontend-reviewers
+/core/templates/components/common-layout-directives/common-elements/classroom-navigation-links.component.spec.ts @oppia/lace-frontend-reviewers
+/core/templates/components/common-layout-directives/common-elements/classroom-navigation-links.component.ts @oppia/lace-frontend-reviewers
+/core/templates/components/common-layout-directives/common-elements/classroom-navigation-links.component.html @oppia/lace-frontend-reviewers
 
 
 # Speed Improvement team.

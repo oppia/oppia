@@ -70,6 +70,7 @@ export class StateEditorService {
   >();
 
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
+  private _updateMisconceptionsEventEmitter = new EventEmitter<void>();
   private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
 
   activeStateName: string | null = null;
@@ -292,7 +293,7 @@ export class StateEditorService {
   }
 
   getInapplicableSkillMisconceptionIds(): string[] {
-    return this.inapplicableSkillMisconceptionIds;
+    return this.inapplicableSkillMisconceptionIds || [];
   }
 
   isCurrentSolutionValid(): boolean {
@@ -355,6 +356,10 @@ export class StateEditorService {
 
   get onObjectFormValidityChange(): EventEmitter<boolean> {
     return this._objectFormValidityChangeEventEmitter;
+  }
+
+  get onUpdateMisconceptions(): EventEmitter<void> {
+    return this._updateMisconceptionsEventEmitter;
   }
 }
 

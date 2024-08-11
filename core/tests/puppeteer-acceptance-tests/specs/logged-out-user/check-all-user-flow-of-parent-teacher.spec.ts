@@ -37,6 +37,10 @@ ConsoleReporter.setConsoleErrorsToIgnore([
   /The requested path \/learn\/math is not found\./,
 ]);
 
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /http:\/\/localhost:8181\/access_validation_handler\/can_access_classrooms_page Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+]);
+
 describe('Parent/Teacher', function () {
   let loggedOutUser: LoggedOutUser;
 
@@ -50,6 +54,15 @@ describe('Parent/Teacher', function () {
     async function () {
       // Navigating to "For Parent/Teacher page" via footer from home page.
       await loggedOutUser.clickOnForParentsSlashTeachersLinkInFooter();
+
+      // Checking if the lesson creation process is visible in the "For Parent/Teacher" page.
+      await loggedOutUser.expectLessonCreationSectionToBeVisibleInTeachPage();
+      // Navigating to "Parents/Teachers guide pdf" by clicking on the "Check out our guide" button.
+      await loggedOutUser.clickGuideButtonInTeachPage();
+      // Navigating to "lesson creator's LinkedIn profile" by clicking on the "LinkedIn profile" button.
+      await loggedOutUser.clickLinkedInButtonInTeachPage();
+      // Navigating to "Teacher Story tagged blogs page" by clicking on the "Check out our blog" button.
+      await loggedOutUser.clickBlogButtonInTeachPage();
       // Navigating to lessons/classroom page by clicking on the
       // "Explore Lessons" button on the "For Parent/Teacher" page.
       await loggedOutUser.clickExploreLessonsButtonInTeachPage();

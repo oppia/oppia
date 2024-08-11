@@ -407,7 +407,7 @@ export class SuperAdmin extends BaseUser {
         }
         await this.waitForElementToBeClickable(reloadButton);
         await reloadButton.click();
-        await this.page.waitForNetworkIdle();
+        await this.waitForNetworkIdle();
         showMessage(`Reloaded exploration ${explorationName}`);
         return;
       }
