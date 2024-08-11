@@ -509,7 +509,7 @@ export class LibraryPageComponent {
 
   onClassroomNavigationIndicatorClicked(slideEvent: NgbSlideEvent): void {
     // Extract numeric index from slide id (format: 'ngb-slide-{index}')
-    this.classroomCarouselIndex = parseInt(slideEvent.current.split('-')[2]);
+    this.classroomCarouselIndex = parseInt(slideEvent?.current?.split('-')[2]);
   }
 
   getClassroomChunkIndices(length: number): number[] {
