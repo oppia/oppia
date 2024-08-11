@@ -219,6 +219,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill',
     'curriculum-admin/create-edit-and-delete-classroom',
     'exploration-editor/create-exploration-and-change-basic-settings',
+    'exploration-editor/manage-exploration-misconceptions',
     'exploration-editor/modify-translations-through-modal',
     'exploration-editor/load-complete-and-restart-exploration-preview',
     'exploration-editor/publish-the-exploration-with-an-interaction',
@@ -226,6 +227,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
     'logged-in-user/create-and-delete-account',
+    'logged-in-user/save-an-exploration-to-play-later',
+    'logged-in-user/restart-or-continue-exploration-on-revisit',
     'logged-in-user/give-feedback-rate-and-report-an-exploration',
     'logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard',
     'logged-out-user/check-all-user-flow-of-donor',

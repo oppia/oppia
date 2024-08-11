@@ -119,6 +119,12 @@ export default {
         'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
       GoogleSignUp: 'https://accounts.google.com/lifecycle/steps/signup/name',
     },
+    TeacherStoryTaggedBlogsLink:
+      'https://www.oppia.org/blog/search/find?q=&tags=(%22Teacher%20story%22)',
+    ParentsTeachersGuideUrl:
+      'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
+    LessonCreatorLinkedInUrl:
+      'https://www.linkedin.com/in/rita-santos-guimaraes-prof-matematica/',
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',

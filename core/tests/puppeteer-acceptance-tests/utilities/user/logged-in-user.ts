@@ -19,6 +19,7 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import puppeteer from 'puppeteer';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -27,6 +28,7 @@ const PendingAccountDeletionPage = testConstants.URLs.PendingAccountDeletion;
 const baseUrl = testConstants.URLs.BaseURL;
 const homePageUrl = testConstants.URLs.Home;
 const signUpEmailField = testConstants.SignInDetails.inputField;
+const LearnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const feedbackUpdatesUrl = testConstants.URLs.FeedbackUpdates;
 
@@ -51,15 +53,28 @@ const confirmUsernameField = '.e2e-test-confirm-username-field';
 const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
 const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
 const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
+const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
+const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
+const desktopAddToPlayLaterButton = '.e2e-test-add-to-playlist-btn';
+const mobileAddToPlayLaterButton = '.e2e-test-mobile-add-to-playlist-btn';
+const toastMessageSelector = '.e2e-test-toast-message';
+const mobileLessonCardTitleSelector = '.e2e-test-exp-summary-tile-title';
+const mobileCommunityLessonSectionButton = '.e2e-test-mobile-lessons-section';
+const communityLessonsSectionButton = '.e2e-test-community-lessons-section';
+const removeFromPlayLaterButtonSelector = '.e2e-test-remove-from-playlist-btn';
+const confirmRemovalFromPlayLaterButton =
+  '.e2e-test-confirm-delete-interaction';
+const playLaterSectionSelector = '.e2e-test-play-later-section';
+const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-test-exploration-tile-title`;
+const mobileLessonCardOptionsDropdownButton =
+  '.e2e-test-mobile-lesson-card-dropdown';
+const mobileProgressSectionButton = '.e2e-test-mobile-progress-section';
 const reportExplorationButtonSelector = '.e2e-test-report-exploration-button';
 const reportExplorationTextAreaSelector =
   '.e2e-test-report-exploration-text-area';
 const submitReportButtonSelector = '.e2e-test-submit-report-button';
 const feedbackThreadSelector = '.e2e-test-feedback-thread';
 const feedbackMessageSelector = '.e2e-test-feedback-message';
-const toastMessageSelector = '.e2e-test-toast-message';
-const playLaterSectionSelector = '.e2e-test-play-later-section';
-const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-test-exploration-tile-title`;
 const completedLessonsSectionSelector =
   '.e2e-test-completed-community-lessons-section';
 const lessonTileTitleSelector = '.e2e-test-exploration-tile-title';
@@ -67,7 +82,6 @@ const progressSectionSelector = '.e2e-test-progress-section';
 const mobileProgressSectionSelector = '.e2e-test-mobile-progress-section';
 const mobileGoalsSectionSelector = '.e2e-test-mobile-goals-section';
 const goalsSectionSelector = '.e2e-test-goals-section';
-const communityLessonsSectionButton = '.e2e-test-community-lessons-section';
 const homeSectionSelector = '.e2e-test-home-section';
 const mobileHomeSectionSelector = '.e2e-test-mobile-home-section';
 const topicNameInEditGoalsSelector = '.e2e-test-topic-name-in-edit-goals';
@@ -90,6 +104,40 @@ export class LoggedInUser extends BaseUser {
       return;
     }
     await this.goto(profilePageUrl);
+  }
+
+  /**
+   * Function for navigating to the Learner dashboard page.
+   */
+  async navigateToLearnerDashboardPage(): Promise<void> {
+    await this.goto(LearnerDashboardUrl);
+  }
+
+  /**
+   * Navigates to the community library tab of the learner dashboard.
+   */
+  async navigateToCommunityLessonsSection(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileProgressSectionButton);
+      await this.clickOn(mobileProgressSectionButton);
+
+      try {
+        await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          // Try clicking again if does not opens the expected page.
+          await this.clickOn(mobileProgressSectionButton);
+        } else {
+          throw error;
+        }
+      }
+      await this.clickOn(mobileCommunityLessonSectionButton);
+    } else {
+      await this.page.click(communityLessonsSectionButton);
+    }
   }
 
   /**
@@ -127,18 +175,6 @@ export class LoggedInUser extends BaseUser {
         throw new Error('Progress section not found.');
       }
       await progressSection.click();
-    }
-  }
-
-  /**
-   * Navigates to the community library tab of the learner dashboard.
-   */
-  async navigateToCommunityLessonsSection(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileProgressSectionSelector);
-      await this.clickOn('Lessons');
-    } else {
-      await this.page.click(communityLessonsSectionButton);
     }
   }
 
@@ -444,6 +480,210 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+  /**
+   * Adds a lesson to the 'Play Later' list from community library page.
+   * @param {string} lessonTitle - The title of the lesson to add to the 'Play Later' list.
+   */
+  async addLessonToPlayLater(lessonTitle: string): Promise<void> {
+    try {
+      await this.waitForPageToFullyLoad();
+      const isMobileViewport = await this.isViewportAtMobileWidth();
+      const lessonCardTitleSelector = isMobileViewport
+        ? mobileLessonCardTitleSelector
+        : desktopLessonCardTitleSelector;
+
+      await this.page.waitForSelector(lessonCardTitleSelector);
+      const lessonTitles = await this.page.$$eval(
+        lessonCardTitleSelector,
+        elements => elements.map(el => el.textContent?.trim())
+      );
+
+      const lessonIndex = lessonTitles.indexOf(lessonTitle);
+
+      if (lessonIndex === -1) {
+        throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
+      }
+
+      if (isMobileViewport) {
+        await this.page.waitForSelector(mobileLessonCardOptionsDropdownButton);
+        const optionsDropdownButtons = await this.page.$$(
+          mobileLessonCardOptionsDropdownButton
+        );
+        await optionsDropdownButtons[lessonIndex].click();
+        await this.page.waitForSelector(mobileAddToPlayLaterButton);
+        const mobileAddToPlayLaterButtons = await this.page.$$(
+          mobileAddToPlayLaterButton
+        );
+        await mobileAddToPlayLaterButtons[lessonIndex].click();
+      } else {
+        await this.page.waitForSelector(desktopAddToPlayLaterButton);
+        const addToPlayLaterButtons = await this.page.$$(
+          desktopAddToPlayLaterButton
+        );
+        await addToPlayLaterButtons[lessonIndex].click();
+      }
+
+      showMessage(`Lesson "${lessonTitle}" added to 'Play Later' list.`);
+    } catch (error) {
+      const newError = new Error(
+        `Failed to add lesson to 'Play Later' list: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Expects the text content of the toast message to match the given expected message.
+   * @param {string} expectedMessage - The expected message to match the toast message against.
+   */
+  async expectToolTipMessage(expectedMessage: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(toastMessageSelector);
+      const toastMessageElement = await this.page.$(toastMessageSelector);
+      const toastMessage = await this.page.evaluate(
+        el => el.textContent.trim(),
+        toastMessageElement
+      );
+
+      if (toastMessage !== expectedMessage) {
+        throw new Error(
+          `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
+        );
+      }
+      await this.page.waitForSelector(toastMessageSelector, {hidden: true});
+    } catch (error) {
+      const newError = new Error(`Failed to match toast message: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Function to play a specific lesson from the community library tab in learner dashboard.
+   * @param {string} lessonName - The name of the lesson to be played.
+   */
+  async playLessonFromDashboard(lessonName: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(lessonCardTitleSelector);
+      const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
+      const searchResults = await Promise.all(
+        searchResultsElements.map(result =>
+          this.page.evaluate(el => el.textContent.trim(), result)
+        )
+      );
+
+      const lessonIndex = searchResults.indexOf(lessonName);
+      if (lessonIndex === -1) {
+        throw new Error(`Lesson "${lessonName}" not found in search results.`);
+      }
+
+      await this.waitForElementToBeClickable(
+        searchResultsElements[lessonIndex]
+      );
+      await searchResultsElements[lessonIndex].click();
+    } catch (error) {
+      const newError = new Error(
+        `Failed to play lesson from dashboard: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Removes a lesson from the 'Play Later' list in the learner dashboard.
+   * @param {string} lessonName - The name of the lesson to remove from the 'Play Later' list.
+   */
+  async removeLessonFromPlayLater(lessonName: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(lessonCardTitleInPlayLaterSelector);
+      const lessonCards = await this.page.$$(
+        lessonCardTitleInPlayLaterSelector
+      );
+      const lessonNames = await Promise.all(
+        lessonCards.map(card =>
+          this.page.evaluate(el => el.textContent.trim(), card)
+        )
+      );
+
+      const lessonIndex = lessonNames.indexOf(lessonName);
+      if (lessonIndex === -1) {
+        throw new Error(
+          `Lesson "${lessonName}" not found in 'Play Later' list.`
+        );
+      }
+
+      // Scroll to the element before hovering so the remove button could be visible.
+      await this.page.evaluate(
+        el => el.scrollIntoView(),
+        lessonCards[lessonIndex]
+      );
+      await this.page.hover(lessonCardTitleInPlayLaterSelector);
+
+      await this.page.waitForSelector(removeFromPlayLaterButtonSelector);
+      const removeFromPlayLaterButton = await this.page.$(
+        removeFromPlayLaterButtonSelector
+      );
+      await removeFromPlayLaterButton?.click();
+
+      // Confirm removal.
+      await this.clickOn(confirmRemovalFromPlayLaterButton);
+
+      showMessage(`Lesson "${lessonName}" removed from 'Play Later' list.`);
+    } catch (error) {
+      const newError = new Error(
+        `Failed to remove lesson from 'Play Later' list: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Verifies whether a lesson is in the 'Play Later' list.
+   * @param {string} lessonName - The name of the lesson to check.
+   * @param {boolean} shouldBePresent - Whether the lesson should be present in the 'Play Later' list.
+   */
+  async verifyLessonPresenceInPlayLater(
+    lessonName: string,
+    shouldBePresent: boolean
+  ): Promise<void> {
+    try {
+      await this.waitForStaticAssetsToLoad();
+      await this.page.waitForSelector(playLaterSectionSelector);
+      const lessonCards = await this.page.$$(
+        lessonCardTitleInPlayLaterSelector
+      );
+      const lessonNames = await Promise.all(
+        lessonCards.map(card =>
+          this.page.evaluate(el => el.textContent.trim(), card)
+        )
+      );
+
+      const lessonIndex = lessonNames.indexOf(lessonName);
+      if (lessonIndex !== -1 && !shouldBePresent) {
+        throw new Error(
+          `Lesson "${lessonName}" was found in 'Play Later' list, but it should not be.`
+        );
+      }
+
+      if (lessonIndex === -1 && shouldBePresent) {
+        throw new Error(
+          `Lesson "${lessonName}" was not found in 'Play Later' list, but it should be.`
+        );
+      }
+      showMessage('Lesson is present in "Play Later" list.');
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify presence of lesson in 'Play Later' list: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
    * This function is used to report an exploration. It clicks on the report button,
    * opens the report modal, selects an issue, types a description, and submits the report.
    * @param {string} issueName - The name of the issue to report.
@@ -505,75 +745,6 @@ export class LoggedInUser extends BaseUser {
       throw new Error(
         `Response does not match the expected value. Expected: ${expectedResponse}, Found: ${actualResponse}`
       );
-    }
-  }
-
-  /**
-   * Expects the text content of the toast message to match the given expected message.
-   * @param {string} expectedMessage - The expected message to match the toast message against.
-   */
-  async expectToolTipMessage(expectedMessage: string): Promise<void> {
-    try {
-      await this.page.waitForSelector(toastMessageSelector);
-      const toastMessageElement = await this.page.$(toastMessageSelector);
-      const toastMessage = await this.page.evaluate(
-        el => el.textContent.trim(),
-        toastMessageElement
-      );
-
-      if (toastMessage !== expectedMessage) {
-        throw new Error(
-          `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
-        );
-      }
-      await this.page.waitForSelector(toastMessageSelector, {hidden: true});
-    } catch (error) {
-      const newError = new Error(`Failed to match toast message: ${error}`);
-      newError.stack = error.stack;
-      throw newError;
-    }
-  }
-
-  /**
-   * Verifies whether a lesson is in the 'Play Later' list.
-   * @param {string} lessonName - The name of the lesson to check.
-   * @param {boolean} shouldBePresent - Whether the lesson should be present in the 'Play Later' list.
-   */
-  async verifyLessonPresenceInPlayLater(
-    lessonName: string,
-    shouldBePresent: boolean
-  ): Promise<void> {
-    try {
-      await this.waitForStaticAssetsToLoad();
-      await this.page.waitForSelector(playLaterSectionSelector);
-      const lessonCards = await this.page.$$(
-        lessonCardTitleInPlayLaterSelector
-      );
-      const lessonNames = await Promise.all(
-        lessonCards.map(card =>
-          this.page.evaluate(el => el.textContent.trim(), card)
-        )
-      );
-
-      const lessonIndex = lessonNames.indexOf(lessonName);
-      if (lessonIndex !== -1 && !shouldBePresent) {
-        throw new Error(
-          `Lesson "${lessonName}" was found in 'Play Later' list, but it should not be.`
-        );
-      }
-
-      if (lessonIndex === -1 && shouldBePresent) {
-        throw new Error(
-          `Lesson "${lessonName}" was not found in 'Play Later' list, but it should be.`
-        );
-      }
-      showMessage('Lesson is present in "Play Later" list.');
-    } catch (error) {
-      const newError = new Error(
-        `Failed to verify presence of lesson in 'Play Later' list: ${error}`
-      );
-      newError.stack = error.stack;
-      throw newError;
     }
   }
 

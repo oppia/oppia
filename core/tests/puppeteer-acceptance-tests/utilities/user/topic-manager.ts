@@ -172,6 +172,7 @@ const confirmDeleteWorkedExampleButton =
   '.e2e-test-confirm-delete-worked-example-button';
 const confirmDeleteMisconceptionButton =
   '.e2e-test-confirm-delete-misconception-button';
+const optionalMisconceptionToggle = '.e2e-test-misconception-optional-check';
 const topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
 const updateTopicWebFragmentField = '.e2e-test-topic-page-title-fragment-field';
 const updateTopicDescriptionField = '.e2e-test-topic-description-field';
@@ -1729,17 +1730,22 @@ export class TopicManager extends BaseUser {
    * @param {string} misconceptionName - The name of the misconception to add.
    * @param {string} notes - The notes for question creators to understand how handling this misconception is useful for the skill being tested.
    * @param {string} feedback - The feedback for the misconception to add.
+   * @param {boolean} optional - Whether the misconception is optional or not.
    */
   async addMisconception(
     misconceptionName: string,
     notes: string,
-    feedback: string
+    feedback: string,
+    optional: boolean = false
   ): Promise<void> {
     await this.clickOn(addButtonSelector);
     await this.type(nameFieldSelector, misconceptionName);
     await this.type(rteSelector, notes);
     const rteElements = await this.page.$$(rteSelector);
     await rteElements[1].type(feedback);
+    if (optional) {
+      await this.clickOn(optionalMisconceptionToggle);
+    }
     await this.clickOn(saveMisconceptionButton);
   }
 
