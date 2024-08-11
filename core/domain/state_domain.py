@@ -31,7 +31,7 @@ from core import schema_utils
 from core import utils
 from core.constants import constants
 from core.domain import customization_args_util
-from core.domain import feature_flag_services
+from core.domain import feature_flag_services # pylint: disable=invalid-import-from
 from core.domain import param_domain
 from core.domain import translation_domain
 from extensions import domain
