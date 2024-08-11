@@ -35,15 +35,17 @@ if MYPY: # pragma: no cover
     from mypy_imports import secrets_services
 
 secrets_services = models.Registry.import_secrets_services()
+datastore_services = models.Registry.import_datastore_services()
 
 # A timeout of 30 seconds is needed to avoid calls to
 # exp_services.load_demo() failing with a ReadTimeoutError
 # where loading a exploration from local yaml file takes
 # longer than ElasticSearch expects.
-ES_CLOUD_ID = platform_parameter_services.get_platform_parameter_value(
-    platform_parameter_list.ParamName.ES_CLOUD_ID.value)
-ES_USERNAME = platform_parameter_services.get_platform_parameter_value(
-    platform_parameter_list.ParamName.ES_USERNAME.value)
+with datastore_services.get_ndb_context():
+    ES_CLOUD_ID = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.ES_CLOUD_ID.value)
+    ES_USERNAME = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.ES_USERNAME.value)
 ES = elasticsearch.Elasticsearch(
     ('%s:%s' % (feconf.ES_HOST, feconf.ES_LOCALHOST_PORT))
     if ES_CLOUD_ID is None else None,
