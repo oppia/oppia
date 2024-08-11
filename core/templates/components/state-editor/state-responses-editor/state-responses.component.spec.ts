@@ -56,6 +56,7 @@ import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-descrip
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {CdkDragSortEvent} from '@angular/cdk/drag-drop';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Pipe({name: 'parameterizeRuleDescriptionPipe'})
 class MockParameterizeRuleDescriptionPipe {
@@ -96,6 +97,14 @@ class MockNgbModal {
   }
 }
 
+class MockPlatformFeatureService {
+  status = {
+    ExplorationEditorCanTagMisconceptions: {
+      isEnabled: true,
+    },
+  };
+}
+
 describe('State Responses Component', () => {
   let component: StateResponsesComponent;
   let fixture: ComponentFixture<StateResponsesComponent>;
@@ -115,6 +124,7 @@ describe('State Responses Component', () => {
   let ngbModal: NgbModal;
   let answerGroups: AnswerGroup[];
   let defaultOutcome: Outcome;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   let defaultsOutcomesToSuppressWarnings = [
     {
@@ -177,6 +187,10 @@ describe('State Responses Component', () => {
         {
           provide: WrapTextWithEllipsisPipe,
           useClass: MockWrapTextWithEllipsisPipe,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -372,6 +386,7 @@ describe('State Responses Component', () => {
     spyOn(stateEditorService.onUpdateAnswerChoices, 'subscribe');
     spyOn(stateEditorService.onHandleCustomArgsUpdate, 'subscribe');
     spyOn(stateEditorService.onStateEditorInitialized, 'subscribe');
+    spyOn(stateEditorService.onUpdateMisconceptions, 'subscribe');
 
     component.ngOnInit();
 
@@ -390,6 +405,9 @@ describe('State Responses Component', () => {
     ).toHaveBeenCalled();
     expect(
       stateEditorService.onStateEditorInitialized.subscribe
+    ).toHaveBeenCalled();
+    expect(
+      stateEditorService.onUpdateMisconceptions.subscribe
     ).toHaveBeenCalled();
 
     component.ngOnDestroy();
@@ -588,6 +606,45 @@ describe('State Responses Component', () => {
 
     component.ngOnInit();
     onStateEditorInitializedEmitter.emit();
+
+    expect(component.misconceptionsBySkill).toEqual({
+      skill1: [
+        misconceptionObjectFactory.create(
+          1,
+          'Misconception 1',
+          'note',
+          '',
+          false
+        ),
+      ],
+    });
+    expect(component.containsOptionalMisconceptions).toBe(true);
+
+    component.ngOnDestroy();
+  });
+
+  it('should update misconceptions when state editor emits update event', () => {
+    let onUpdateMisconceptionsEmitter = new EventEmitter();
+    spyOnProperty(stateEditorService, 'onUpdateMisconceptions').and.returnValue(
+      onUpdateMisconceptionsEmitter
+    );
+    spyOn(stateEditorService, 'getMisconceptionsBySkill').and.returnValue({
+      skill1: [
+        misconceptionObjectFactory.create(
+          1,
+          'Misconception 1',
+          'note',
+          '',
+          false
+        ),
+      ],
+    });
+
+    expect(component.misconceptionsBySkill).toBe(undefined);
+    expect(component.containsOptionalMisconceptions).toBeFalse();
+
+    component.ngOnInit();
+    onUpdateMisconceptionsEmitter.emit();
 
     expect(component.misconceptionsBySkill).toEqual({
       skill1: [
@@ -1484,8 +1541,37 @@ describe('State Responses Component', () => {
     }
   );
 
-  it('should get unaddressed misconception names', () => {
+  it('should get unaddressed misconception names in question mode', () => {
     spyOn(responsesService, 'getAnswerGroups').and.returnValue(answerGroups);
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
+    component.misconceptionsBySkill = {
+      skill1: [
+        misconceptionObjectFactory.create(
+          1,
+          'Misconception 1',
+          'note',
+          '',
+          false
+        ),
+        misconceptionObjectFactory.create(
+          2,
+          'Misconception 2',
+          'note',
+          '',
+          true
+        ),
+      ],
+    };
+
+    expect(component.getUnaddressedMisconceptionNames()).toEqual([
+      'Misconception 2',
+    ]);
+  });
+
+  it('should get unaddressed misconception names in exploration mode', () => {
+    spyOn(responsesService, 'getAnswerGroups').and.returnValue(answerGroups);
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
+    spyOn(stateEditorService, 'getLinkedSkillId').and.returnValue('skill1');
     component.misconceptionsBySkill = {
       skill1: [
         misconceptionObjectFactory.create(
