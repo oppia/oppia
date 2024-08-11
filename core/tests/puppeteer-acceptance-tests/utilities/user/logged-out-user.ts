@@ -2032,15 +2032,18 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(explorationCompletionToastMessage, {
       visible: true,
     });
-    const element = await this.page.$(explorationCompletionToastMessage);
-    const toastMessage = await this.page.evaluate(
-      element => element.textContent,
-      element
+
+    const toastMessage = await this.page.$eval(
+      explorationCompletionToastMessage,
+      element => element.textContent
     );
+
     if (!toastMessage || !toastMessage.includes(message)) {
       throw new Error('Exploration did not complete successfully');
     }
+
     showMessage('Exploration has completed successfully');
+
     await this.page.waitForSelector(explorationCompletionToastMessage, {
       hidden: true,
     });

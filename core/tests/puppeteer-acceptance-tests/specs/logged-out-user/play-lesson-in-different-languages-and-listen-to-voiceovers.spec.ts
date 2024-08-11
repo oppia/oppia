@@ -21,6 +21,7 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const INTRO_CONTENT_VOICEOVER_IN_HI =
@@ -41,6 +42,11 @@ enum CARD_NAME {
   INTRODUCTION = 'Introduction',
   FINAL_CARD = 'Final Card',
 }
+
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Invalid active state name: null/,
+  new RegExp('Invalid active state name: null'),
+]);
 
 describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
