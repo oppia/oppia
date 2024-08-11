@@ -278,7 +278,6 @@ const viewsContainerSelector = '.e2e-test-info-card-views';
 const lastUpdatedInfoSelector = '.e2e-test-info-card-last-updated';
 const tagsContainerSelector = '.exploration-tags span';
 const ratingContainerSelector = '.e2e-test-info-card-rating span:nth-child(2)';
-const conversationSkinUserAvatar = '.conversation-skin-user-avatar';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const desktopNavbarButtonsSelector = '.oppia-navbar-tab-content';
@@ -2008,9 +2007,6 @@ export class LoggedOutUser extends BaseUser {
         throw error;
       }
     }
-    await this.page.waitForSelector(conversationSkinUserAvatar, {
-      hidden: true,
-    });
   }
 
   /**

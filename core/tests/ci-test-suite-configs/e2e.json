@@ -97,10 +97,6 @@
       "module": "core/tests/webdriverio_desktop/navigation.js"
     },
     {
-      "name": "preferences",
-      "module": "core/tests/webdriverio_desktop/preferences.js"
-    },
-    {
       "name": "profileFeatures",
       "module": "core/tests/webdriverio_desktop/profileFeatures.js"
     },

@@ -380,7 +380,7 @@ export class PreferencesPageComponent {
           formGrp.controls.canReceiveEmailUpdates.setValue(false);
           this.showEmailSignupLink = true;
         } else {
-          this.alertsService.addInfoMessage('Saved!', 1000);
+          this.alertsService.addInfoMessage('Saved!', 3000);
         }
         if (this.preferencesForm.controls.profilePicturePngDataUrl.dirty) {
           // TODO(#19737): Remove the following 'if' condition.
