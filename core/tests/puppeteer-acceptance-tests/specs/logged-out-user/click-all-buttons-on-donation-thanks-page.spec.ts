@@ -37,7 +37,7 @@ describe('Logged-out User in Thanks for Donating page', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
-    await loggedOutUser.navigateToThanksForDonatingPage();
+    await loggedOutUser.navigateToThanksForDonatingPageOfDonatePage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -60,7 +60,7 @@ describe('Logged-out User in Thanks for Donating page', function () {
     'should close the thanks for donating popup and show the Donate Page ' +
       'with the dismiss button.',
     async function () {
-      await loggedOutUser.clickDismissButtonInThanksForDonatingPage();
+      await loggedOutUser.clickDismissButtonInThanksForDonatingPageOfDonatePage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

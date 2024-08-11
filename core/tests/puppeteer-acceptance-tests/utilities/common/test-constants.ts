@@ -51,7 +51,8 @@ export default {
     CreatingAnExploration: 'https://oppia.github.io/#/CreatingAnExploration',
     CreatorGuidelines: 'http://localhost:8181/creator-guidelines',
     Donate: 'http://localhost:8181/donate',
-    DonateWithThanksModal: 'http://localhost:8181/donate?thanks=',
+    DonateWithThanksModalOfDonatePage: 'http://localhost:8181/donate?thanks=',
+    DonateWithThanksModalOfAboutPage: 'http://localhost:8181/about?thanks=',
     EmbeddingAnExploration: 'https://oppia.github.io/#/EmbeddingAnExploration',
     ExplorationDesignTips: 'http://oppia.github.io/#/DesignTips',
     ExternalLink61MillionChildren:

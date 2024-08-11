@@ -66,7 +66,10 @@ const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
 const teachUrl = testConstants.URLs.Teach;
 const termsUrl = testConstants.URLs.Terms;
-const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
+const thanksForDonatingUrlOfDonatePage =
+  testConstants.URLs.DonateWithThanksModalOfDonatePage;
+const thanksForDonatingUrlOfAboutPage =
+  testConstants.URLs.DonateWithThanksModalOfAboutPage;
 const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
@@ -122,6 +125,7 @@ const readOurBlogButton =
 const dismissButton = 'i.e2e-test-thanks-for-donating-page-dismiss-button';
 const thanksForDonatingClass = '.modal-open';
 const donatePage = '.donate-content-container';
+const aboutPage = '.e2e-test-about-page';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
 const mobileSidebarBasicMathematicsButton =
@@ -333,12 +337,22 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to navigate to the Thanks for Donating page.
+   * Function to navigate to the Thanks for Donating page of Donate page.
    */
-  async navigateToThanksForDonatingPage(): Promise<void> {
+  async navigateToThanksForDonatingPageOfDonatePage(): Promise<void> {
     await Promise.all([
       this.page.waitForNavigation(),
-      this.page.goto(thanksForDonatingUrl),
+      this.page.goto(thanksForDonatingUrlOfDonatePage),
+    ]);
+  }
+
+  /**
+   * Function to navigate to the Thanks for Donating page of About page.
+   */
+  async navigateToThanksForDonatingPageOfAboutPage(): Promise<void> {
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.page.goto(thanksForDonatingUrlOfAboutPage),
     ]);
   }
 
@@ -808,7 +822,7 @@ export class LoggedOutUser extends BaseUser {
    * and check if the Thanks for Donating popup disappears
    * and if the Donate page is shown.
    */
-  async clickDismissButtonInThanksForDonatingPage(): Promise<void> {
+  async clickDismissButtonInThanksForDonatingPageOfDonatePage(): Promise<void> {
     await this.clickOn(dismissButton);
     await this.page.waitForSelector(thanksForDonatingClass, {hidden: true});
     const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
@@ -828,6 +842,36 @@ export class LoggedOutUser extends BaseUser {
       showMessage(
         'The dismiss button closes the Thanks for Donating popup ' +
           'and shows the Donate page.'
+      );
+    }
+  }
+
+  /**
+   * Function to click the dismiss button on the Thanks for Donating popup,
+   * and check if the Thanks for Donating popup disappears
+   * and if the About page is shown.
+   */
+  async clickDismissButtonInThanksForDonatingPageOfAboutPage(): Promise<void> {
+    await this.clickOn(dismissButton);
+    await this.page.waitForSelector(thanksForDonatingClass, {hidden: true});
+    const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
+    if (thanksForDonatingHeader !== null) {
+      throw new Error(
+        'The dismiss button does not close the Thanks for Donating popup!'
+      );
+    }
+
+    await this.page.waitForSelector(aboutPage);
+    const donatePageShowed = await this.page.$(aboutPage);
+    if (donatePageShowed === null) {
+      throw new Error(
+        `The dismiss button should show the About page,
+          but it opens ${this.page.url()} instead.`
+      );
+    } else {
+      showMessage(
+        'The dismiss button closes the Thanks for Donating popup ' +
+          'and shows the About page.'
       );
     }
   }
