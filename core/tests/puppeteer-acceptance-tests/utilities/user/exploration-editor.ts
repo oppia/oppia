@@ -198,7 +198,7 @@ const outcomeDestWhenStuckSelector =
 const intEditorField = '.e2e-test-editor-int';
 const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
 const tagsField = '.e2e-test-chip-list-tags';
-const uploadAudioButton = '.e2e-test-upload-audio-button';
+const uploadAudioButton = '.e2e-test-accessibility-translation-upload-audio';
 const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
@@ -1779,8 +1779,7 @@ export class ExplorationEditor extends BaseUser {
   async addVoiceoverToContent(
     languageCode: string,
     contentType: string,
-    voiceoverFilePath: string,
-    feedbackIndex?: number
+    voiceoverFilePath: string
   ): Promise<void> {
     await this.select(translationLanguageSelector, languageCode);
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
@@ -1793,23 +1792,13 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(contentType);
     }
     await this.clickOn(uploadAudioButton);
-    switch (contentType) {
-      case 'Content':
-      case 'Hint':
-      case 'Solution':
-      case 'Interaction':
-        await this.uploadFile(voiceoverFilePath);
-        break;
-      case 'Feedback':
-        await this.clickOn(`.e2e-test-feedback-${feedbackIndex}`);
-        await this.clickOn(uploadAudioButton);
-        await this.uploadFile(voiceoverFilePath);
-        break;
-      default:
-        throw new Error(`Invalid content type: ${contentType}`);
-    }
+    await this.uploadFile(voiceoverFilePath);
     await this.clickOn(saveUploadedAudioButton);
     await this.waitForNetworkIdle();
+  }
+
+  async timeout(time) {
+    await this.page.waitForTimeout(time);
   }
 }
 

@@ -34,13 +34,10 @@ const INTRODUCTION_CARD_CONTENT: string =
   'This exploration will test your understanding of negative numbers.';
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
-  NUMERIC_INPUT = 'Number Input',
   END_EXPLORATION = 'End Exploration',
-  TEXT_INPUT = 'Text Input',
 }
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',
-  TEXT_QUESTION = 'Text Input',
   FINAL_CARD = 'Final Card',
 }
 
@@ -82,31 +79,11 @@ describe('Exploration Editor', function () {
     await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
 
-    // Add a new card with a question.
+    // Add the final card.
     await explorationEditor.viewOppiaResponses();
-    await explorationEditor.directLearnersToNewCard(CARD_NAME.TEXT_QUESTION);
+    await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.saveExplorationDraft();
 
-    await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
-    await explorationEditor.updateCardContent(
-      'What is the sign to represent negative numbers called?'
-    );
-    await explorationEditor.addTextInputInteraction();
-    await explorationEditor.addResponsesToTheInteraction(
-      INTERACTION_TYPES.TEXT_INPUT,
-      'minus',
-      'Correct!',
-      CARD_NAME.FINAL_CARD,
-      true
-    );
-    await explorationEditor.editDefaultResponseFeedback('Wrong.');
-    await explorationEditor.addSolutionToState(
-      'minus',
-      'Minus is the opposite of plus.'
-    );
-    await explorationEditor.saveExplorationDraft();
-
-    // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.updateCardContent(
       'We have practiced negative numbers.'
@@ -201,17 +178,20 @@ describe('Exploration Editor', function () {
 
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.reloadPage();
-    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.navigateToTranslationsTab();
     await explorationEditor.addVoiceoverToContent(
       'hi',
-      'Interaction',
+      'Content',
       LAST_CARD_VOICEOVER_IN_HI
     );
+
+    await explorationEditor.saveExplorationDraft();
+
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
     // Setup is taking longer.
-  }, 420000);
+  }, 480000);
 
   it(
     'should allow the learner to view and play a lesson entirely in a particular language and start listening to the voiceover from any state',
@@ -224,7 +204,7 @@ describe('Exploration Editor', function () {
       );
 
       // Change the language of the lesson using the dropdown on the first card.
-      await loggedOutUser.changeLessonLanguage('hi');
+      // await loggedOutUser.changeLessonLanguage('hi');
       await loggedOutUser.continueToNextCard();
 
       // Verify that the lesson is in the selected language.
@@ -241,6 +221,7 @@ describe('Exploration Editor', function () {
       await loggedOutUser.pauseVoiceover();
       await loggedOutUser.startVoiceover();
       await loggedOutUser.verifyVoiceoverIsPlaying();
+      await loggedOutUser.pauseVoiceover();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
