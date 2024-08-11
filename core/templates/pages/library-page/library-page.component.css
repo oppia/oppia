@@ -3,15 +3,6 @@
   compilation, here are sme additional rules that can be added to the CSS files:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
-oppia-library-page .oppia-classroom-div {
-  background-color: whitesmoke;
-  border: 4px solid #04857c;
-  border-radius: 10px;
-  height: 400px;
-  margin: 0 45px;
-  overflow: hidden;
-  padding: 30px 45px 45px 45px;
-}
 oppia-library-page .oppia-classroom-text {
   float: left;
   width: 62%;
@@ -30,12 +21,6 @@ oppia-library-page .oppia-classroom-p {
   font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
   line-height: 1.5;
   margin-top: 25px;
-}
-oppia-library-page .oppia-classroom-div > img {
-  bottom: 0;
-  height: 100%;
-  position: absolute;
-  transform: translateY(50px);
 }
 oppia-library-page .oppia-classroom-text > a {
   width: 180px;
@@ -209,8 +194,7 @@ oppia-library-page .oppia-exploration-summary-header {
 oppia-library-page .oppia-search-bar-container {
   display: flex;
   justify-content: center;
-  margin: 0 auto 6vh auto;
-  padding-bottom: 60px;
+  margin: 0 auto 0 auto;
   width: 100%;
 }
 
@@ -347,11 +331,6 @@ oppia-library-page .hide-change-classroom-chunk-btn {
     font-size: 1.05em;
   }
 }
-@media (max-width: 1126px) {
-  oppia-library-page .oppia-classroom-div {
-    margin-top: 100px;
-  }
-}
 @media (max-width: 900px) {
   oppia-library-page .oppia-classroom-h1 {
     font-size: 1.45em;
@@ -362,10 +341,6 @@ oppia-library-page .hide-change-classroom-chunk-btn {
   oppia-library-page .oppia-classroom-p {
     font-size: 0.95em;
     margin-top: 20px;
-  }
-  oppia-library-page .oppia-classroom-div > img {
-    height: 80%;
-    transform: translateY(35px);
   }
 
   oppia-library-page .classroom-cards-wrapper .classroom-cards-inner-container {
@@ -440,10 +415,6 @@ oppia-library-page .hide-change-classroom-chunk-btn {
   }
 }
 @media (max-width: 727px) {
-  oppia-library-page .oppia-classroom-div {
-    height: 400px;
-    padding: 20px;
-  }
   oppia-library-page .oppia-classroom-text {
     float: none;
     width: 100%;
@@ -452,11 +423,6 @@ oppia-library-page .hide-change-classroom-chunk-btn {
     float: left;
     margin-top: 50px;
     width: 140px;
-  }
-  oppia-library-page .oppia-classroom-div > img {
-    height: 60%;
-    right: 10px;
-    transform: translateY(45px);
   }
 }
 @media (max-width: 536px) {
@@ -484,10 +450,6 @@ oppia-library-page .hide-change-classroom-chunk-btn {
     margin-top: 40px;
     width: fit-content;
   }
-  oppia-library-page .oppia-classroom-div > img {
-    height: 45%;
-    transform: translateY(25px);
-  }
   oppia-library-page .oppia-classroom-h1 {
     font-size: 1.3em;
   }
@@ -499,10 +461,6 @@ oppia-library-page .hide-change-classroom-chunk-btn {
   }
 }
 @media (max-width: 344px) {
-  oppia-library-page .oppia-classroom-div > img {
-    height: 35%;
-    transform: translateY(25px);
-  }
   oppia-library-page .oppia-classroom-text > a {
     margin-top: 40px;
   }

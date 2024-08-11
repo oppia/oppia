@@ -116,28 +116,6 @@
           <oppia-search-bar [enableDropup]="false"></oppia-search-bar>
         </div>
 
-        <div class="oppia-classroom-div">
-          <div class="oppia-classroom-text">
-            <h1 class="oppia-classroom-h2" tabindex="0">{{ 'I18N_CLASSROOM_CALLOUT_HEADING_2' | translate }}</h1>
-            <h2 class="oppia-classroom-h1" tabindex="0">{{ 'I18N_CLASSROOM_CALLOUT_HEADING_1' | translate }}</h2>
-            <p class="oppia-classroom-p" tabindex="0">{{ 'I18N_CLASSROOM_CALLOUT_PARAGRAPH_1' | translate }}</p>
-            <a class="btn oppia-dashboard-intro-button oppia-transition-200"
-               tabindex="0"
-               href="/learn"
-               smartRouterLink="/learn">
-               {{ 'I18N_CLASSROOM_CALLOUT_BUTTON' | translate }}
-            </a>
-          </div>
-          <picture class="classroom-promo-image">
-            <source type="image/webp"
-                    [srcset]="getStaticImageUrl('/landing/math/fractions/matthew_paper.webp')">
-            <source type="image/png"
-                    [srcset]="getStaticImageUrl('/landing/math/fractions/matthew_paper.png')">
-            <img [src]="getStaticImageUrl('/assets/images/landing/math/fractions/matthew_paper.png')"
-                 alt="math classroom illustration">
-          </picture>
-        </div>
-
         <div *ngIf="libraryGroups?.length === 0"
              class="text-center w-100 oppia-library-no-exploration-groups">
              {{ 'I18N_LIBRARY_NO_EXPLORATION_GROUPS' | translate }}
