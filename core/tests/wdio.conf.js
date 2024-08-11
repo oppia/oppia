@@ -125,10 +125,6 @@ var suites = {
     './core/tests/webdriverio_desktop/navigation.js'
   ],
 
-  preferences: [
-    './core/tests/webdriverio_desktop/preferences.js'
-  ],
-
   profileFeatures: [
     './core/tests/webdriverio_desktop/profileFeatures.js'
   ],

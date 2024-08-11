@@ -1,0 +1,2 @@
+core/templates/pages/preferences-page/preferences-page.module.ts
+core/templates/pages/profile-page/profile-page.module.ts
