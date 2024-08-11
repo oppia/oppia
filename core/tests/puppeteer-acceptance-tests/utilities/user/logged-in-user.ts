@@ -163,7 +163,7 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the progress section.
+   * Navigates to the progress section of the learner dashboard.
    */
   async navigateToProgressSection(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -179,7 +179,7 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the home section.
+   * Navigates to the home section of the learner dashboard.
    */
   async navigateToHomeSection(): Promise<void> {
     const isMobile = await this.isViewportAtMobileWidth();
@@ -193,18 +193,18 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the goals section.
+   * Navigates to the goals section of the learner dashboard.
    */
   async navigateToGoalsSection(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileGoalsSectionSelector);
     } else {
       await this.page.waitForSelector(goalsSectionSelector);
-      const progressSection = await this.page.$(goalsSectionSelector);
-      if (!progressSection) {
+      const goalSectionElement = await this.page.$(goalsSectionSelector);
+      if (!goalSectionElement) {
         throw new Error('Progress section not found.');
       }
-      await progressSection.click();
+      await goalSectionElement.click();
     }
   }
 
