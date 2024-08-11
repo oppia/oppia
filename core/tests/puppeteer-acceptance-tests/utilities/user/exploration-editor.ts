@@ -975,13 +975,15 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} feedback - The feedback for the response.
    * @param {string} destination - The destination state for the response.
    * @param {boolean} responseIsCorrect - Whether the response is marked as correct.
+   * @param {boolean} isLastResponse - Whether the response is last and more aren't going to be added.
    */
   async addResponsesToTheInteraction(
     interactionType: string,
     answer: string,
     feedback: string,
     destination: string,
-    responseIsCorrect: boolean
+    responseIsCorrect: boolean,
+    isLastResponse: boolean = true
   ): Promise<void> {
     switch (interactionType) {
       case 'Number Input':
@@ -1032,15 +1034,21 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(feedbackEditorSelector);
     await this.type(stateContentInputField, feedback);
     // The '/' value is used to select the 'a new card called' option in the dropdown.
-    await this.select(destinationCardSelector, '/');
-    await this.type(addStateInput, destination);
+    if (destination) {
+      await this.select(destinationCardSelector, '/');
+      await this.type(addStateInput, destination);
+    }
     if (responseIsCorrect) {
       await this.clickOn(correctAnswerInTheGroupSelector);
     }
-    await this.clickOn(addNewResponseButton);
-    await this.page.waitForSelector(responseModalHeaderSelector, {
-      hidden: true,
-    });
+    if (isLastResponse) {
+      await this.clickOn(addNewResponseButton);
+      await this.page.waitForSelector(responseModalHeaderSelector, {
+        hidden: true,
+      });
+    } else {
+      await this.clickOn('.e2e-test-add-another-response');
+    }
   }
 
   /**
@@ -1136,133 +1144,6 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(saveHintEditButton);
   }
 
-  async addSkillToState(skillName: string): Promise<void> {
-    await this.clickOn(addSkillButton);
-    await this.type(skillNameInput, skillName);
-    await this.clickOn(skillItem);
-    await this.clickOn(confirmSkillButton);
-  }
-
-  /**
-   * Verifies if a misconception is present on the page.
-   * @param {string} misconceptionName - The name of the misconception to verify.
-   * @param {boolean} isPresent - Whether the misconception is expected to be present.
-   */
-  async verifyMisconceptionPresentForState(
-    misconceptionName: string,
-    isPresent: boolean
-  ): Promise<void> {
-    try {
-      await this.page.waitForSelector(misconceptionDiv, {
-        timeout: 5000,
-        visible: true,
-      });
-      const misconceptions = await this.page.$$(misconceptionDiv);
-
-      for (const misconception of misconceptions) {
-        const title = await this.page.evaluate(
-          el => el.textContent,
-          misconception
-        );
-        if (title.trim() === misconceptionName) {
-          if (!isPresent) {
-            throw new Error(
-              `The misconception ${misconceptionName} is present, which was not expected`
-            );
-          }
-          return;
-        }
-      }
-
-      if (isPresent) {
-        throw new Error(
-          `The misconception ${misconceptionName} is not present, which was expected`
-        );
-      }
-    } catch (error) {
-      if (isPresent) {
-        throw new Error(
-          `The misconception ${misconceptionName} is not present, which was expected`
-        );
-      }
-    }
-
-    showMessage(
-      `The misconception is ${isPresent ? '' : 'not'} present as expected.`
-    );
-  }
-
-  async toggleMisconceptionApplicableStatus(
-    misconceptionName: string
-  ): Promise<void> {
-    await this.page.waitForSelector(optionalMisconceptionDiv, {
-      timeout: 5000,
-      visible: true,
-    });
-    let misconceptions = await this.page.$$(optionalMisconceptionDiv);
-    let misconceptionFound = false;
-    for (const misconception of misconceptions) {
-      const optionalMisconceptionName = await misconception.evaluate(el =>
-        el.textContent?.trim()
-      );
-      if (optionalMisconceptionName?.startsWith(misconceptionName)) {
-        const misconceptionOptions = await misconception.$(
-          optionalMisconceptionOptionsButton
-        );
-        if (!misconceptionOptions) {
-          throw new Error(
-            `Options not found for misconception "${misconceptionName}"`
-          );
-        }
-        await misconceptionOptions.click();
-        await this.page.waitForSelector(misconceptionApplicableToggle, {
-          visible: true,
-        });
-        await this.clickOn(misconceptionApplicableToggle);
-        misconceptionFound = true;
-        break;
-      }
-    }
-    if (!misconceptionFound) {
-      throw new Error(
-        `Couldn't find misconception with name ${misconceptionName}.`
-      );
-    }
-  }
-
-  async verifyOptionalMisconceptionApplicableStatus(
-    misconceptionName: string,
-    isApplicable: boolean
-  ): Promise<void> {
-    await this.verifyMisconceptionPresentForState(misconceptionName, true);
-    const inapplicableMisconceptions = await this.page.$$(
-      inapplicableMisconceptionDiv
-    );
-
-    for (const misconception of inapplicableMisconceptions) {
-      const title = await this.page.evaluate(
-        el => el.textContent.trim(),
-        misconception
-      );
-      if (title === misconceptionName && !isApplicable) {
-        return;
-      } else if (title.startsWith(misconceptionName) && isApplicable) {
-        throw new Error(
-          `The misconception ${misconceptionName} is expected to be applicable, found not applicable.`
-        );
-      }
-    }
-
-    showMessage(
-      `The misconception is ${isApplicable ? '' : 'not'} applicable as expected.`
-    );
-  }
-
-  async removeSkillFromState(): Promise<void> {
-    await this.clickOn(deleteSkillButton);
-    await this.clickOn('Delete skill');
-  }
-
   /**
    * Adds a particular skill to the current state card.
    * @param skillName - Name of the skill to be linked to state.
@@ -1272,6 +1153,28 @@ export class ExplorationEditor extends BaseUser {
     await this.type(skillNameInput, skillName);
     await this.clickOn(skillItem);
     await this.clickOn(confirmSkillButton);
+  }
+
+  /**
+   * Tag an answer response group with a misconception for a state card.
+   * @param responseIndex - The index of the response group to be tagged.
+   * @param misconceptionName - The name of the misconception to tag response with.
+   * @param isOptional - Whether the misconception is optional or compulsory.
+   */
+  async tagAnswerGroupWithMisconception(
+    responseIndex: number,
+    misconceptionName: string,
+    isOptional: boolean
+  ): Promise<void> {
+    let responseTabs = await this.page.$$('.e2e-test-response-tab');
+    await responseTabs[responseIndex].click();
+    await this.clickOn('Tag with misconception');
+    if (!isOptional) {
+      await this.clickOn(misconceptionName);
+    } else {
+      await this.clickOn(`(Optional) ${misconceptionName}`);
+    }
+    await this.clickOn('Done');
   }
 
   /**

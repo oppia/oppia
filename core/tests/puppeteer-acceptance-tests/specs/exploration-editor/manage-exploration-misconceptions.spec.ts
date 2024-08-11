@@ -107,7 +107,15 @@ describe('Exploration Editor', function () {
       '-99',
       'Perfect!',
       CARD_NAME.FINAL_CARD,
-      true
+      true,
+      false
+    );
+    await explorationEditor.addResponsesToTheInteraction(
+      INTERACTION_TYPES.MULTIPLE_CHOICE,
+      '-101',
+      'Wrong! -101 is smaller than -100.',
+      '',
+      false
     );
     await explorationEditor.editDefaultResponseFeedback('Wrong.');
     await explorationEditor.addHintToState(
@@ -197,6 +205,22 @@ describe('Exploration Editor', function () {
       );
       await explorationEditor.verifyOptionalMisconceptionApplicableStatus(
         'Subtraction Misconception',
+        false
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should tag answer group with misconception.',
+    async function () {
+      await explorationEditor.tagAnswerGroupWithMisconception(
+        1,
+        'Addition Misconception',
+        false
+      );
+      await explorationEditor.verifyMisconceptionPresentForState(
+        'Addition Misconception',
         false
       );
     },
