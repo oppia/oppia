@@ -19,6 +19,7 @@
 import {Component, Input} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
@@ -37,7 +38,6 @@ export class SideNavigationBarComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() display!: boolean;
 
-  DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
   IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
   currentUrl!: string;
   classroomData: CreatorTopicSummary[] = [];
@@ -102,19 +102,33 @@ export class SideNavigationBarComponent {
     this.aboutSubmenuIsShown = !this.aboutSubmenuIsShown;
   }
 
-  navigateToClassroomPage(classroomUrl: string): void {
-    this.siteAnalyticsService.registerClassroomHeaderClickEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = classroomUrl;
-    }, 150);
-  }
-
   isHackyTopicTitleTranslationDisplayed(index: number): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
         this.topicTitlesTranslationKeys[index]
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
+  }
+
+  navigateToAboutPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.ABOUT
+    );
+    this.windowRef.nativeWindow.location.href = '/about';
+  }
+
+  navigateToVolunteerPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.VOLUNTEER
+    );
+    this.windowRef.nativeWindow.location.href = '/volunteer';
+  }
+
+  navigateToTeachPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.TEACH
+    );
+    this.windowRef.nativeWindow.location.href = '/teach';
   }
 }
 

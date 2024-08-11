@@ -5,6 +5,7 @@
 */
 .oppia-arrow-button {
   color: #00645c;
+  cursor: pointer;
   float: left;
   height: 44px;
   position: relative;
