@@ -24,10 +24,11 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const INTRO_CONTENT_VOICEOVER_IN_HI =
-  testConstants.data.IntroContentHiVoiceover;
+  testConstants.data.IntroContentVoiceoverInHindi;
 const CONTINUE_INTERACTION_VOICEOVER_In_HI =
-  testConstants.data.ContinueInteractionHiVoiceover;
-const LAST_CARD_VOICEOVER_IN_HI = testConstants.data.LastCardHiVoiceover;
+  testConstants.data.ContinueInteractionVoiceoverInHindi;
+const LAST_CARD_VOICEOVER_IN_HI =
+  testConstants.data.LastCardContentVoiceoverInHindi;
 const ROLES = testConstants.Roles;
 
 const INTRODUCTION_CARD_CONTENT: string =

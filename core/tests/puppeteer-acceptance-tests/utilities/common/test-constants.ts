@@ -169,15 +169,18 @@ export default {
       __dirname,
       '../../data/classroom-banner.png'
     ),
-    IntroContentHiVoiceover: path.resolve(
+    IntroContentVoiceoverInHindi: path.resolve(
       __dirname,
       '../../data/intro-content-hi.mp3'
     ),
-    ContinueInteractionHiVoiceover: path.resolve(
+    ContinueInteractionVoiceoverInHindi: path.resolve(
       __dirname,
       '../../data/continue-interaction-hi.mp3'
     ),
-    LastCardHiVoiceover: path.resolve(__dirname, '../../data/last-card-hi.mp3'),
+    LastCardContentVoiceoverInHindi: path.resolve(
+      __dirname,
+      '../../data/last-card-hi.mp3'
+    ),
   },
   OppiaSocials: {
     YouTube: {

@@ -1796,10 +1796,6 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(saveUploadedAudioButton);
     await this.waitForNetworkIdle();
   }
-
-  async timeout(time) {
-    await this.page.waitForTimeout(time);
-  }
 }
 
 export let ExplorationEditorFactory = (): ExplorationEditor =>
