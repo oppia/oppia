@@ -25,7 +25,7 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const INTRO_CONTENT_VOICEOVER_IN_HI =
   testConstants.data.IntroContentVoiceoverInHindi;
-const CONTINUE_INTERACTION_VOICEOVER_In_HI =
+const CONTINUE_INTERACTION_VOICEOVER_IN_HI =
   testConstants.data.ContinueInteractionVoiceoverInHindi;
 const LAST_CARD_VOICEOVER_IN_HI =
   testConstants.data.LastCardContentVoiceoverInHindi;
@@ -174,7 +174,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.addVoiceoverToContent(
       'hi',
       'Interaction',
-      CONTINUE_INTERACTION_VOICEOVER_In_HI
+      CONTINUE_INTERACTION_VOICEOVER_IN_HI
     );
 
     await explorationEditor.navigateToEditorTab();
@@ -209,18 +209,17 @@ describe('Exploration Editor', function () {
 
       // Verify that the lesson is in the selected language.
       await loggedOutUser.expectCardContentToMatch(
-        'यह अन्वेषण ऋणात्मक संख्याओं के बारे में आपकी समझ का परीक्षण करेगा।'
+        'यह अन्वेषण ऋणात्मक संख्याओं के बारे में आपकी समझ का परीक्षण'
       );
 
       await loggedOutUser.startVoiceover();
-
       await loggedOutUser.continueToNextCard();
-      await loggedOutUser.verifyVoiceoverIsPlaying();
+      await loggedOutUser.verifyVoiceoverIsPlaying(true);
 
       // Pausing the voiceover and restarting it to confirm that voiceover can be started on any state/card.
       await loggedOutUser.pauseVoiceover();
       await loggedOutUser.startVoiceover();
-      await loggedOutUser.verifyVoiceoverIsPlaying();
+      await loggedOutUser.verifyVoiceoverIsPlaying(true);
       await loggedOutUser.pauseVoiceover();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

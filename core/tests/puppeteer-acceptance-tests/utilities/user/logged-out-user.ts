@@ -285,7 +285,7 @@ const mobileNavbarButtonSelector = '.text-uppercase';
 const skipLinkSelector = '.e2e-test-skip-link';
 const openMobileNavbarMenuButton = '.oppia-navbar-menu-icon';
 const closeMobileNavbarMenuButton = '.oppia-navbar-close-icon';
-const lessonLanguageSelector = 'oppia-content-language-selector';
+const lessonLanguageSelector = '.oppia-content-language-selector';
 const playVoiceoverButton = '.e2e-test-play-circle';
 const voiceoverDropdown = '.e2e-test-audio-bar';
 const pauseVoiceoverButton = '.e2e-test-pause-circle';
@@ -3430,17 +3430,22 @@ export class LoggedOutUser extends BaseUser {
    * Starts the voiceover by clicking on the audio bar (dropdown) and the play circle.
    */
   async startVoiceover(): Promise<void> {
-    await this.clickOn(voiceoverDropdown);
+    await this.waitForPageToFullyLoad();
+    const voiceoverDropdownElement = await this.page.$(voiceoverDropdown);
+    if (voiceoverDropdownElement) {
+      await this.clickOn(voiceoverDropdown);
+    }
     await this.clickOn(playVoiceoverButton);
+    await this.page.waitForSelector(pauseVoiceoverButton);
   }
 
   /**
    * Verifies if the voiceover is playing.
    */
-  async verifyVoiceoverIsPlaying(): Promise<boolean> {
+  async verifyVoiceoverIsPlaying(shouldBePlaying: true): Promise<void> {
     // If the pause button is present, it means the audio is playing.
-    const isPlaying = (await this.page.$(pauseVoiceoverButton)) !== null;
-    return isPlaying;
+    await this.page.waitForSelector(pauseVoiceoverButton);
+    showMessage(`Voiceover is ${shouldBePlaying ? 'playing' : 'paused'}.`);
   }
 
   /**
