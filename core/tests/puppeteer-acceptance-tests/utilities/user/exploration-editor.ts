@@ -1624,7 +1624,6 @@ export class ExplorationEditor extends BaseUser {
     feedbackIndex?: number
   ): Promise<void> {
     await this.select(translationLanguageSelector, languageCode);
-    await this.clickOn(translationModeButton);
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
     );

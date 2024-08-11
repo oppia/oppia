@@ -291,7 +291,7 @@ const playVoiceoverButton = '.e2e-test-play-circle';
 const voiceoverDropdown = '.e2e-test-audio-bar';
 const pauseVoiceoverButton = '.e2e-test-pause-circle';
 /**
- * The KeyInput type is based on the key names fro m the UI Events KeyboardEvent key Values specification.
+ * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
  * The 'Control' key is also named as such in the specification and same with others.
  * We use these key names to ensure that our key names match the official specification.

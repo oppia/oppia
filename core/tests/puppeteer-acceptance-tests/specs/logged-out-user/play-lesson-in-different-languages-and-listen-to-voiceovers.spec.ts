@@ -23,10 +23,11 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
-const INTRO_CONTENT_HI_VOICEOVER = testConstants.data.IntroContentHiVoiceover;
-const CONTINUE_INTERACTION_HI_VOICEOVER =
+const INTRO_CONTENT_VOICEOVER_IN_HI =
+  testConstants.data.IntroContentHiVoiceover;
+const CONTINUE_INTERACTION_VOICEOVER_In_HI =
   testConstants.data.ContinueInteractionHiVoiceover;
-const LAST_CARD_HI_VOICEOVER = testConstants.data.LastCardHiVoiceover;
+const LAST_CARD_VOICEOVER_IN_HI = testConstants.data.LastCardHiVoiceover;
 const ROLES = testConstants.Roles;
 
 const INTRODUCTION_CARD_CONTENT: string =
@@ -185,7 +186,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.addVoiceoverToContent(
       'hi',
       'Content',
-      INTRO_CONTENT_HI_VOICEOVER
+      INTRO_CONTENT_VOICEOVER_IN_HI
     );
 
     await explorationEditor.navigateToEditorTab();
@@ -195,7 +196,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.addVoiceoverToContent(
       'hi',
       'Interaction',
-      CONTINUE_INTERACTION_HI_VOICEOVER
+      CONTINUE_INTERACTION_VOICEOVER_In_HI
     );
 
     await explorationEditor.navigateToEditorTab();
@@ -205,7 +206,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.addVoiceoverToContent(
       'hi',
       'Interaction',
-      LAST_CARD_HI_VOICEOVER
+      LAST_CARD_VOICEOVER_IN_HI
     );
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
