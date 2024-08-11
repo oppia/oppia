@@ -191,8 +191,8 @@ describe('Exploration Editor', function () {
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
-    // Setup is taking longer.
-  }, 480000);
+    // Setup is taking really long.
+  }, 600000);
 
   it(
     'should allow the learner to view and play a lesson entirely in a particular language and start listening to the voiceover from any state',
@@ -205,8 +205,7 @@ describe('Exploration Editor', function () {
       );
 
       // Change the language of the lesson using the dropdown on the first card.
-      // await loggedOutUser.changeLessonLanguage('hi');
-      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.changeLessonLanguage('hi');
 
       // Verify that the lesson is in the selected language.
       await loggedOutUser.expectCardContentToMatch(

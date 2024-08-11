@@ -3422,6 +3422,8 @@ export class LoggedOutUser extends BaseUser {
    */
   async changeLessonLanguage(languageCode: string): Promise<void> {
     await this.select(lessonLanguageSelector, languageCode);
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**
