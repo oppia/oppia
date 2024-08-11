@@ -77,30 +77,30 @@
         <mat-tab *ngIf="tabGroups[screenType][activeTabGroupIndex].includes(0)">
           <ng-template mat-tab-label>
             <picture>
-              <source type="image/webp" [srcset]="getStaticImageUrl('/icons/growth-icon.webp')">
-              <source type="image/png" [srcset]="getStaticImageUrl('/icons/growth-icon.png')">
-              <img [src]="getStaticImageUrl('/icons/growth-icon.png')" alt="Growth icon" width="28px" height="28px">
+              <source type="image/webp" [srcset]="getStaticImageUrl('/icons/outreach-icon.webp')">
+              <source type="image/png" [srcset]="getStaticImageUrl('/icons/outreach-icon.png')">
+              <img [src]="getStaticImageUrl('/icons/outreach-icon.png')" alt="Outreach icon" width="28px" height="28px">
             </picture>
-            <span>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH' | translate }}</span>
+            <span>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH' | translate }}</span>
           </ng-template>
           <div class="oppia-volunteer-tab-content pt-3">
             <div class="oppia-volunteer-tab-content-top">
               <div class=" oppia-volunteer-tab-description">
                 <p class="oppia-volunteer-tab-subtitle">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_HEADING' | translate }}</p>
-                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_WHAT_WE' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_WHAT_WE' | translate }}</p>
 
-                <p class="oppia-volunteer-tab-heading pt-2">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_SUB_HEADING_1' | translate }}</p>
-                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_CONTENT_1' | translate }}</p>
+                <p class="oppia-volunteer-tab-heading pt-2">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_SUB_HEADING_1' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_CONTENT_1' | translate }}</p>
 
-                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_SUB_HEADING_2' | translate }}</p>
-                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_CONTENT_2' | translate }}</p>
+                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_SUB_HEADING_2' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_CONTENT_2' | translate }}</p>
 
-                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_SUB_HEADING_3' | translate }}</p>
-                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_CONTENT_3' | translate }}</p>
+                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_SUB_HEADING_3' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_CONTENT_3' | translate }}</p>
               </div>
               <div class="oppia-volunteer-carousel-container">
-                <ngb-carousel [showNavigationIndicators]="false" *ngIf="growth.images.length > 0">
-                  <ng-template *ngFor="let image of growth.images; index as index" ngbSlide>
+                <ngb-carousel [showNavigationIndicators]="false" *ngIf="outreach.images.length > 0">
+                  <ng-template *ngFor="let image of outreach.images; index as index" ngbSlide>
                     <div class="oppia-carousel-wrapper">
                       <picture>
                         <source type="image/webp"
@@ -111,10 +111,10 @@
                       </picture>
                     </div>
                     <div class="carousel-caption">
-                      <p> "{{ growth.caption[index].content }}" </p>
+                      <p> "{{ outreach.caption[index].content }}" </p>
                       <div class="oppia-volunteer-name">
-                        <p><b> {{ growth.caption[index].name }} </b></p>
-                        <p> {{ growth.caption[index].type }} </p>
+                        <p><b> {{ outreach.caption[index].name }} </b></p>
+                        <p> {{ outreach.caption[index].type }} </p>
                       </div>
                     </div>
                   </ng-template>
@@ -124,7 +124,7 @@
 
             <div class="oppia-volunteer-tab-content-bottom">
               <p class="oppia-volunteer-tab-title">
-                {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH' | translate }}
+                {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH' | translate }}
               </p>
               <div class="oppia-volunteer-tab-content-boxes-container">
                 <div class="oppia-volunteer-tab-expectations">
@@ -146,8 +146,8 @@
                   </p>
                   <div class="oppia-volunteer-tab-skill-boxes">
                     <div class="oppia-volunteer-tab-skill-box"
-                         [ngStyle]="{'width': screenType==='smallMobile' ? '100%' : (growthSkills.length === 1  ? '75%' : 'calc(50% - 12px)') }"
-                         *ngFor="let skillSet of growthSkills">
+                         [ngStyle]="{'width': screenType==='smallMobile' ? '100%' : (outreachSkills.length === 1  ? '75%' : 'calc(50% - 12px)') }"
+                         *ngFor="let skillSet of outreachSkills">
                       <p class="oppia-volunteer-subtext oppia-volunteer-tab-heading">{{ skillSet.title | translate }}</p>
                       <ul>
                         <li class="oppia-volunteer-subtext" *ngFor="let skill of skillSet.skills">

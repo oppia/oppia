@@ -59,7 +59,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
     }[];
   };
 
-  growth!: {
+  outreach!: {
     images: string[];
     caption: {content: string; name: string; type: string}[];
   };
@@ -76,7 +76,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
 
   volunteerExpectations = AppConstants.VOLUNTEER_EXPECTATIONS;
 
-  growthSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.GROWTH;
+  outreachSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.OUTREACH;
 
   developmentSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.DEVELOPMENT;
 
@@ -221,7 +221,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
       ],
     };
 
-    this.growth = {
+    this.outreach = {
       images: [
         '/volunteer/profile_images/yiga.jpg',
         '/volunteer/profile_images/jennifer.jpg',
