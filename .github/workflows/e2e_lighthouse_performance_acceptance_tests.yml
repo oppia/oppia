@@ -82,6 +82,7 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
         suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).lighthouse_performance.suites }}
+      fail-fast: false
     name: lighthouse (${{ matrix.os }}, ${{ matrix.suite.name }})
     steps:
       - uses: actions/checkout@v3
@@ -126,6 +127,7 @@ jobs:
         matrix:
           os: [ubuntu-22.04]
           suite: ${{ fromJson(needs.check_test_suites_to_run.outputs.test_suites_to_run).acceptance.suites }}
+        fail-fast: false
       name: acceptance_test (${{ matrix.os }}, ${{ matrix.suite.name }})
       steps:
         - uses: actions/checkout@v3
