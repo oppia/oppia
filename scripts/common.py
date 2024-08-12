@@ -261,6 +261,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/change-site-language-and-engage-with-original-exploration',
     'logged-out-user/sign-in-and-save-exploration-progress',
     'logged-out-user/track-and-resume-exploration-progress-via-url',
+    'logged-out-user/play-lesson-in-different-languages-and-listen-'
+    'to-voiceovers',
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',

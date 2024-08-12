@@ -198,6 +198,8 @@ const outcomeDestWhenStuckSelector =
 const intEditorField = '.e2e-test-editor-int';
 const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
 const tagsField = '.e2e-test-chip-list-tags';
+const uploadAudioButton = '.e2e-test-accessibility-translation-upload-audio';
+const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
 const feedBackButtonTab = '.e2e-test-feedback-tab';
 const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
@@ -1797,6 +1799,34 @@ export class ExplorationEditor extends BaseUser {
         `The expected translation does not exist in the translations tab. Found "${translation}", expected "${expectedTranslation}"`
       );
     }
+  }
+
+  /**
+   * Function to add a voiceover for specific content of the current card.
+   * @param {string} languageCode - Code of language for which the voiceover has to be added.
+   * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
+   * @param {string} voiceoverFilePath - The path of the voiceover file which will be added for the content.
+   * @param {number} feedbackIndex - The index of the feedback to edit, since multiple feedback responses exist.
+   */
+  async addVoiceoverToContent(
+    languageCode: string,
+    contentType: string,
+    voiceoverFilePath: string
+  ): Promise<void> {
+    await this.select(translationLanguageSelector, languageCode);
+    const activeContentType = await this.page.$eval(activeTranslationTab, el =>
+      el.textContent?.trim()
+    );
+    if (!activeContentType?.includes(contentType)) {
+      showMessage(
+        `Switching content type from ${activeContentType} to ${contentType}`
+      );
+      await this.clickOn(contentType);
+    }
+    await this.clickOn(uploadAudioButton);
+    await this.uploadFile(voiceoverFilePath);
+    await this.clickOn(saveUploadedAudioButton);
+    await this.waitForNetworkIdle();
   }
 
   /**
