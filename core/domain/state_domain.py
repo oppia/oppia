@@ -3629,9 +3629,9 @@ class State(translation_domain.BaseTranslatableObject):
         recorded_voiceovers: RecordedVoiceovers,
         solicit_answer_details: bool,
         card_is_checkpoint: bool,
-        inapplicable_skill_misconception_ids: List[str],
         linked_skill_id: Optional[str] = None,
         classifier_model_id: Optional[str] = None,
+        inapplicable_skill_misconception_ids: List[str] = None
     ) -> None:
         """Initializes a State domain object.
 
