@@ -3631,7 +3631,7 @@ class State(translation_domain.BaseTranslatableObject):
         card_is_checkpoint: bool,
         linked_skill_id: Optional[str] = None,
         classifier_model_id: Optional[str] = None,
-        inapplicable_skill_misconception_ids: List[str] = []
+        inapplicable_skill_misconception_ids: Optional[List[str]] = None
     ) -> None:
         """Initializes a State domain object.
 
@@ -3676,7 +3676,8 @@ class State(translation_domain.BaseTranslatableObject):
         self.solicit_answer_details = solicit_answer_details
         self.card_is_checkpoint = card_is_checkpoint
         self.inapplicable_skill_misconception_ids = (
-            inapplicable_skill_misconception_ids
+            inapplicable_skill_misconception_ids if inapplicable_skill_misconception_ids
+            else []
         )
 
     def get_translatable_contents_collection(
