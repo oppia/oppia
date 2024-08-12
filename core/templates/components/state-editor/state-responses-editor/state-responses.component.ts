@@ -687,7 +687,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   }
 
   resetTaggedSkillMisconceptions(): void {
-    if (this.linkedSkillId != this.stateEditorService.getLinkedSkillId()) {
+    if (this.linkedSkillId !== this.stateEditorService.getLinkedSkillId()) {
       this.linkedSkillId = this.stateEditorService.getLinkedSkillId();
       this.answerGroups.forEach(answerGroup => {
         answerGroup.taggedSkillMisconceptionId = null;

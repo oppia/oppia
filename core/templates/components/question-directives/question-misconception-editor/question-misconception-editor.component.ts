@@ -139,7 +139,7 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
       let linkedSkillId = this.stateEditorService.getLinkedSkillId();
       Object.keys(this.misconceptionsBySkill).forEach(skillId => {
         if (
-          skillId == linkedSkillId &&
+          skillId === linkedSkillId &&
           this.misconceptionsBySkill[skillId].length > 0
         ) {
           containsMisconceptions = true;
