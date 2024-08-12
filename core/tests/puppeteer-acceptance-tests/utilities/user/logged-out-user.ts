@@ -285,7 +285,10 @@ const mobileNavbarButtonSelector = '.text-uppercase';
 const skipLinkSelector = '.e2e-test-skip-link';
 const openMobileNavbarMenuButton = '.oppia-navbar-menu-icon';
 const closeMobileNavbarMenuButton = '.oppia-navbar-close-icon';
-
+const lessonLanguageSelector = '.oppia-content-language-selector';
+const playVoiceoverButton = '.e2e-test-play-circle';
+const voiceoverDropdown = '.e2e-test-audio-bar';
+const pauseVoiceoverButton = '.e2e-test-pause-circle';
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -2026,14 +2029,13 @@ export class LoggedOutUser extends BaseUser {
   async expectExplorationCompletionToastMessage(
     message: string
   ): Promise<void> {
-    await this.page.waitForSelector(explorationCompletionToastMessage, {
-      visible: true,
-    });
-    const element = await this.page.$(explorationCompletionToastMessage);
-    const toastMessage = await this.page.evaluate(
-      element => element.textContent,
-      element
+    await this.page.waitForSelector(explorationCompletionToastMessage);
+
+    const toastMessage = await this.page.$eval(
+      explorationCompletionToastMessage,
+      element => element.textContent
     );
+
     if (!toastMessage || !toastMessage.includes(message)) {
       throw new Error('Exploration did not complete successfully');
     }
@@ -3411,6 +3413,45 @@ export class LoggedOutUser extends BaseUser {
 
     // Remove focus from the focused element.
     await this.page.evaluate(element => element.blur(), expectedFocusedElement);
+  }
+
+  /**
+   * Changes the language of the lesson.
+   * @param {string} languageCode - The code of the language to change to.
+   */
+  async changeLessonLanguage(languageCode: string): Promise<void> {
+    await this.select(lessonLanguageSelector, languageCode);
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Starts the voiceover by clicking on the audio bar (dropdown) and the play circle.
+   */
+  async startVoiceover(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    const voiceoverDropdownElement = await this.page.$(voiceoverDropdown);
+    if (voiceoverDropdownElement) {
+      await this.clickOn(voiceoverDropdown);
+    }
+    await this.clickOn(playVoiceoverButton);
+    await this.page.waitForSelector(pauseVoiceoverButton);
+  }
+
+  /**
+   * Verifies if the voiceover is playing.
+   */
+  async verifyVoiceoverIsPlaying(shouldBePlaying: true): Promise<void> {
+    // If the pause button is present, it means the audio is playing.
+    await this.page.waitForSelector(pauseVoiceoverButton);
+    showMessage(`Voiceover is ${shouldBePlaying ? 'playing' : 'paused'}.`);
+  }
+
+  /**
+   * Pauses the voiceover by clicking on the pause button.
+   */
+  async pauseVoiceover(): Promise<void> {
+    await this.clickOn(pauseVoiceoverButton);
   }
 }
 
