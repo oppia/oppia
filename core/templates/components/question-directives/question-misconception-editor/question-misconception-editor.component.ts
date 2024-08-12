@@ -59,7 +59,7 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   @Input() outcome!: Outcome;
   @Input() isEditable!: boolean;
   @Input() rules!: Rule;
-  @Input() taggedSkillMisconceptionId!: string;
+  @Input() taggedSkillMisconceptionId!: string | null;
   misconceptionName!: string;
   misconceptionsBySkill!: MisconceptionSkillMap;
   selectedMisconception!: Misconception;
