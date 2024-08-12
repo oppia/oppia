@@ -169,6 +169,7 @@ export default {
       __dirname,
       '../../data/classroom-banner.png'
     ),
+    profilePicture: path.resolve(__dirname, '../../data/profile-picture.svg'),
     IntroContentVoiceoverInHindi: path.resolve(
       __dirname,
       '../../data/intro-content-hi.mp3'
