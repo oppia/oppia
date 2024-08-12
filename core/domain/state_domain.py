@@ -3615,7 +3615,7 @@ class StateDict(TypedDict):
     card_is_checkpoint: bool
     linked_skill_id: Optional[str]
     classifier_model_id: Optional[str]
-    inapplicable_skill_misconception_ids: Optional[List[str]]
+    inapplicable_skill_misconception_ids: List[str]
 
 
 class State(translation_domain.BaseTranslatableObject):
@@ -3631,7 +3631,7 @@ class State(translation_domain.BaseTranslatableObject):
         card_is_checkpoint: bool,
         linked_skill_id: Optional[str] = None,
         classifier_model_id: Optional[str] = None,
-        inapplicable_skill_misconception_ids: Optional[List[str]] = None
+        inapplicable_skill_misconception_ids: List[str] = []
     ) -> None:
         """Initializes a State domain object.
 
@@ -3653,7 +3653,7 @@ class State(translation_domain.BaseTranslatableObject):
                 this state.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
-            inapplicable_skill_misconception_ids: list[str] or None. The list of
+            inapplicable_skill_misconception_ids: list[str]. The list of
                 misconception IDs associated with the linked skill that are
                 inapplicable for this state.
         """
@@ -3776,12 +3776,11 @@ class State(translation_domain.BaseTranslatableObject):
                     'Expected linked_skill_id to be a str, '
                     'received %s.' % self.linked_skill_id)
 
-        if self.inapplicable_skill_misconception_ids is not None:
-            if not isinstance(self.inapplicable_skill_misconception_ids, list):
-                raise utils.ValidationError(
-                    'Expected inapplicable_skill_misconception_ids to be a '
-                    'list, received %s.'
-                    % self.inapplicable_skill_misconception_ids)
+        if not isinstance(self.inapplicable_skill_misconception_ids, list):
+            raise utils.ValidationError(
+                'Expected inapplicable_skill_misconception_ids to be a '
+                'list, received %s.'
+                % self.inapplicable_skill_misconception_ids)
 
     def is_rte_content_supported_on_android(self) -> bool:
         """Checks whether the RTE components used in the state are supported by
@@ -3989,8 +3988,8 @@ class State(translation_domain.BaseTranslatableObject):
             inapplicable_skill_misconception_ids: List[str]. The
                 list of inapplicable skill misconception ids for state.
         """
-        self.inapplicable_skill_misconception_ids = list(
-            set(inapplicable_skill_misconception_ids))
+        self.inapplicable_skill_misconception_ids = (
+            inapplicable_skill_misconception_ids)
 
     def update_interaction_customization_args(
         self,
