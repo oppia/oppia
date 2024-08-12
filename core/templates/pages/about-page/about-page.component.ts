@@ -121,13 +121,13 @@ export class AboutPageComponent implements OnInit, OnDestroy {
       ],
     },
     {
-      title: 'I18N_ABOUT_PAGE_CTA_DEV_TITLE',
-      iconUrl: '/icons/dev-icon',
-      description: 'I18N_ABOUT_PAGE_CTA_DEV_DESCRIPTION',
+      title: 'I18N_ABOUT_PAGE_CTA_SOFTWARE_TITLE',
+      iconUrl: '/icons/software-icon',
+      description: 'I18N_ABOUT_PAGE_CTA_SOFTWARE_DESCRIPTION',
       listItems: [
-        'I18N_ABOUT_PAGE_CTA_DEV_LIST_ITEM1',
-        'I18N_ABOUT_PAGE_CTA_DEV_LIST_ITEM2',
-        'I18N_ABOUT_PAGE_CTA_DEV_LIST_ITEM3',
+        'I18N_ABOUT_PAGE_CTA_SOFTWARE_LIST_ITEM1',
+        'I18N_ABOUT_PAGE_CTA_SOFTWARE_LIST_ITEM2',
+        'I18N_ABOUT_PAGE_CTA_SOFTWARE_LIST_ITEM3',
       ],
     },
     {

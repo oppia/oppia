@@ -129,7 +129,7 @@
               <div class="oppia-volunteer-tab-content-boxes-container">
                 <div class="oppia-volunteer-tab-expectations">
                   <p class="oppia-volunteer-tab-subtitle">
-                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_HEADING' | translate }}
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_EXPECTATIONS_HEADING' | translate }}
                   </p>
                   <p class="oppia-volunteer-subtext">
                     {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_CONTENT' | translate }}
@@ -165,30 +165,30 @@
         <mat-tab *ngIf="tabGroups[screenType][activeTabGroupIndex].includes(1)">
           <ng-template mat-tab-label>
             <picture>
-              <source type="image/webp" [srcset]="getStaticImageUrl('/icons/dev-icon.webp')">
-              <source type="image/png" [srcset]="getStaticImageUrl('/icons/dev-icon.png')">
-              <img [src]="getStaticImageUrl('/icons/dev-icon.png')" alt="Development icon" width="28px" height="28px">
+              <source type="image/webp" [srcset]="getStaticImageUrl('/icons/software-icon.webp')">
+              <source type="image/png" [srcset]="getStaticImageUrl('/icons/software-icon.png')">
+              <img [src]="getStaticImageUrl('/icons/software-icon.png')" alt="Software icon" width="28px" height="28px">
             </picture>
-            <span>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT' | translate }}</span>
+            <span>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE' | translate }}</span>
           </ng-template>
           <div class="oppia-volunteer-tab-content pt-3">
             <div class="oppia-volunteer-tab-content-top">
               <div class=" oppia-volunteer-tab-description">
                 <p class="oppia-volunteer-tab-subtitle">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_HEADING' | translate }}</p>
-                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_WHAT_WE' | translate }}</p>
 
-                <p class="oppia-volunteer-tab-heading pt-2">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_SUB_HEADING_1' | translate }}</p>
-                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_CONTENT_1' | translate }}</p>
+                <p class="oppia-volunteer-tab-heading pt-2">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_SUB_HEADING_1' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_CONTENT_1' | translate }}</p>
 
-                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_SUB_HEADING_2' | translate }}</p>
-                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_CONTENT_2' | translate }}</p>
+                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_SUB_HEADING_2' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_CONTENT_2' | translate }}</p>
 
-                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_SUB_HEADING_3' | translate }}</p>
-                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_CONTENT_3' | translate }}</p>
+                <p class="oppia-volunteer-tab-heading">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_SUB_HEADING_3' | translate }}</p>
+                <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_CONTENT_3' | translate }}</p>
               </div>
               <div class="oppia-volunteer-carousel-container">
-                <ngb-carousel [showNavigationIndicators]="false" *ngIf="development.images.length > 0">
-                  <ng-template *ngFor="let image of development.images; index as index" ngbSlide>
+                <ngb-carousel [showNavigationIndicators]="false" *ngIf="software.images.length > 0">
+                  <ng-template *ngFor="let image of software.images; index as index" ngbSlide>
                     <div class="oppia-carousel-wrapper">
                       <picture>
                         <source type="image/webp"
@@ -199,10 +199,10 @@
                       </picture>
                     </div>
                     <div class="carousel-caption">
-                      <p> "{{ development.caption[index].content }}" </p>
+                      <p> "{{ software.caption[index].content }}" </p>
                       <div class="oppia-volunteer-name">
-                        <p><b> {{ development.caption[index].name }} </b></p>
-                        <p> {{ development.caption[index].type }} </p>
+                        <p><b> {{ software.caption[index].name }} </b></p>
+                        <p> {{ software.caption[index].type }} </p>
                       </div>
                     </div>
                   </ng-template>
@@ -212,12 +212,12 @@
 
             <div class="oppia-volunteer-tab-content-bottom">
               <p class="oppia-volunteer-tab-title">
-                {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT' | translate }}
+                {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE' | translate }}
               </p>
               <div class="oppia-volunteer-tab-content-boxes-container">
                 <div class="oppia-volunteer-tab-expectations">
                   <p class="oppia-volunteer-tab-subtitle">
-                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_HEADING' | translate }}
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_EXPECTATIONS_HEADING' | translate }}
                   </p>
                   <p class="oppia-volunteer-subtext">
                     {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_CONTENT' | translate }}
@@ -234,8 +234,8 @@
                   </p>
                   <div class="oppia-volunteer-tab-skill-boxes">
                     <div class="oppia-volunteer-tab-skill-box"
-                         [ngStyle]="{'width': screenType==='smallMobile' ? '100%' : (developmentSkills.length === 1  ? '75%' : 'calc(50% - 12px)') }"
-                          *ngFor="let skillSet of developmentSkills">
+                         [ngStyle]="{'width': screenType==='smallMobile' ? '100%' : (softwareSkills.length === 1  ? '75%' : 'calc(50% - 12px)') }"
+                          *ngFor="let skillSet of softwareSkills">
                       <p class="oppia-volunteer-subtext oppia-volunteer-tab-heading">{{ skillSet.title | translate }}</p>
                       <ul>
                         <li class="oppia-volunteer-subtext" *ngFor="let skill of skillSet.skills">
@@ -303,7 +303,7 @@
               <div class="oppia-volunteer-tab-content-boxes-container">
                 <div class="oppia-volunteer-tab-expectations">
                   <p class="oppia-volunteer-tab-subtitle">
-                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_HEADING' | translate }}
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_AND_DESIGN_EXPECTATIONS_HEADING' | translate }}
                   </p>
                   <p class="oppia-volunteer-subtext">
                     {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_CONTENT' | translate }}
@@ -391,7 +391,7 @@
               <div class="oppia-volunteer-tab-content-boxes-container">
                 <div class="oppia-volunteer-tab-expectations">
                   <p class="oppia-volunteer-tab-subtitle">
-                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_HEADING' | translate }}
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_EXPECTATIONS_HEADING' | translate }}
                   </p>
                   <p class="oppia-volunteer-subtext">
                     {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_CONTENT' | translate }}
@@ -479,7 +479,7 @@
               <div class="oppia-volunteer-tab-content-boxes-container">
                 <div class="oppia-volunteer-tab-expectations">
                   <p class="oppia-volunteer-tab-subtitle">
-                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_HEADING' | translate }}
+                    {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_EXPECTATIONS_HEADING' | translate }}
                   </p>
                   <p class="oppia-volunteer-subtext">
                     {{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_CONTENT' | translate }}

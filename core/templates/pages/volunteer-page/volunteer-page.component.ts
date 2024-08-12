@@ -50,7 +50,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
     }[];
   };
 
-  development!: {
+  software!: {
     images: string[];
     caption: {
       content: string;
@@ -78,7 +78,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
 
   outreachSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.OUTREACH;
 
-  developmentSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.DEVELOPMENT;
+  softwareSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.SOFTWARE;
 
   artAndDesignSkills = AppConstants.VOLUNTEER_PREFERRED_SKILLS.ART_AND_DESIGN;
 
@@ -186,7 +186,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
       ],
     };
 
-    this.development = {
+    this.software = {
       images: [
         '/volunteer/profile_images/akshay.jpg',
         '/volunteer/profile_images/kevin-thomas.jpg',
