@@ -3631,7 +3631,7 @@ class State(translation_domain.BaseTranslatableObject):
         card_is_checkpoint: bool,
         linked_skill_id: Optional[str] = None,
         classifier_model_id: Optional[str] = None,
-        inapplicable_skill_misconception_ids: List[str] = None
+        inapplicable_skill_misconception_ids: List[str] = []
     ) -> None:
         """Initializes a State domain object.
 
