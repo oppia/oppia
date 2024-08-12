@@ -87,6 +87,15 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
           this.initValues();
         })
       );
+
+      this.directiveSubscriptions.add(
+        this.stateEditorService.onChangeLinkedSkillId.subscribe(() => {
+          this.misconceptionsBySkill =
+            this.stateEditorService.getMisconceptionsBySkill();
+          this.taggedSkillMisconceptionId = null;
+          this.initValues();
+        })
+      );
     }
     this.feedbackIsUsed = true;
   }
@@ -120,11 +129,23 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
 
   containsMisconceptions(): boolean {
     let containsMisconceptions = false;
-    Object.keys(this.misconceptionsBySkill).forEach(skillId => {
-      if (this.misconceptionsBySkill[skillId].length > 0) {
-        containsMisconceptions = true;
-      }
-    });
+    if (this.stateEditorService.isInQuestionMode()) {
+      Object.keys(this.misconceptionsBySkill).forEach(skillId => {
+        if (this.misconceptionsBySkill[skillId].length > 0) {
+          containsMisconceptions = true;
+        }
+      });
+    } else {
+      let linkedSkillId = this.stateEditorService.getLinkedSkillId();
+      Object.keys(this.misconceptionsBySkill).forEach(skillId => {
+        if (
+          skillId == linkedSkillId &&
+          this.misconceptionsBySkill[skillId].length > 0
+        ) {
+          containsMisconceptions = true;
+        }
+      });
+    }
     return containsMisconceptions;
   }
 
@@ -178,6 +199,10 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
 
   editMisconception(): void {
     this.misconceptionEditorIsOpen = true;
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 

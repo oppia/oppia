@@ -151,6 +151,8 @@ const optionalMisconceptionOptionsButton =
   '.optional-misconception-options-button';
 const misconceptionApplicableToggle =
   '.e2e-test-misconception-applicable-toggle';
+const responseGroupDiv = '.e2e-test-response-tab';
+const misconceptionEditorTab = '.e2e-test-open-misconception-editor';
 
 const modalSaveButton = '.e2e-test-save-button';
 const modifyTranslationsModalDoneButton =
@@ -1166,7 +1168,7 @@ export class ExplorationEditor extends BaseUser {
     misconceptionName: string,
     isOptional: boolean
   ): Promise<void> {
-    let responseTabs = await this.page.$$('.e2e-test-response-tab');
+    let responseTabs = await this.page.$$(responseGroupDiv);
     await responseTabs[responseIndex].click();
     await this.clickOn('Tag with misconception');
     if (!isOptional) {
@@ -1175,6 +1177,28 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(`(Optional) ${misconceptionName}`);
     }
     await this.clickOn('Done');
+  }
+
+  /**
+   * Replace a misconception tagged to a response group with a new one.
+   * @param responseIndex - The index of the response group to change.
+   * @param misconceptionName - The name of the new misconception to be tagged.
+   * @param isOptional - Whether the new misconception is optional or not.
+   */
+  async changeTaggedAnswerGroupMisconception(
+    responseIndex: number,
+    misconceptionName: string,
+    isOptional: boolean
+  ): Promise<void> {
+    let responseTabs = await this.page.$$(responseGroupDiv);
+    await responseTabs[responseIndex].click();
+    await this.clickOn(misconceptionEditorTab);
+    if (!isOptional) {
+      await this.clickOn(misconceptionName);
+    } else {
+      await this.clickOn(`(Optional) ${misconceptionName}`);
+    }
+    await this.clickOn('Save Misconception');
   }
 
   /**

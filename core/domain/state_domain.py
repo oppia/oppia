@@ -31,7 +31,6 @@ from core import schema_utils
 from core import utils
 from core.constants import constants
 from core.domain import customization_args_util
-from core.domain import feature_flag_services # pylint: disable=invalid-import-from
 from core.domain import param_domain
 from core.domain import translation_domain
 from extensions import domain
@@ -42,6 +41,7 @@ from typing import (
     Type, TypedDict, TypeVar, Union, cast, overload
 )
 
+from core.domain import feature_flag_services # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip

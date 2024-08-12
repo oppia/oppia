@@ -207,6 +207,13 @@ describe('Exploration Editor', function () {
         'Subtraction Misconception',
         false
       );
+      await explorationEditor.toggleMisconceptionApplicableStatus(
+        'Subtraction Misconception'
+      );
+      await explorationEditor.verifyOptionalMisconceptionApplicableStatus(
+        'Subtraction Misconception',
+        true
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -222,6 +229,22 @@ describe('Exploration Editor', function () {
       await explorationEditor.verifyMisconceptionPresentForState(
         'Addition Misconception',
         false
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should change tagged misconception for response group',
+    async function () {
+      await explorationEditor.changeTaggedAnswerGroupMisconception(
+        1,
+        'Subtraction Misconception',
+        false
+      );
+      await explorationEditor.verifyMisconceptionPresentForState(
+        'Addition Misconception',
+        true
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
