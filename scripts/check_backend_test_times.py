@@ -19,7 +19,7 @@ from __future__ import annotations
 import json
 import os
 
-from typing import Final, List, TypedDict
+from typing import Final, List, Tuple, TypedDict
 
 BACKEND_TEST_TIME_REPORTS_DIRECTORY: Final = os.path.join(
     os.getcwd(), 'backend_test_time_reports'
@@ -38,13 +38,14 @@ class BackendTestDict(TypedDict):
     test_time_by_average_test_case: float
 
 
-def get_sorted_backend_test_times_from_reports() -> List[BackendTestDict]:
+def get_sorted_backend_test_times_from_reports(
+) -> Tuple[List[BackendTestDict], List[BackendTestDict]]:
     """Returns a list of sorted backend test times from all backend time
     reports.
 
     Returns:
-        list(dict). A list of sorted backend test times from all backend
-        time reports.
+        tuple(list(dict), list(dict)). A tuple of two lists of backend test
+        times sorted by time and by average test case time respectively.
 
     Raises:
         RuntimeError. No backend test time reports found in the directory.
@@ -89,25 +90,42 @@ def get_sorted_backend_test_times_from_reports() -> List[BackendTestDict]:
     return sorted(
         backend_test_times,
         key=lambda test: (test['test_time'], test['test_name'])
+    ), sorted(
+        backend_test_times,
+        key=lambda test: (
+            test['test_time_by_average_test_case'], test['test_name']
+        )
     )
 
 
 def main() -> None:
     """Checks the backend test times by combining all backend time reports."""
-    sorted_backend_test_times = get_sorted_backend_test_times_from_reports()
+    sorted_backend_test_times, sorted_backend_test_times_by_avg_test_case = (
+        get_sorted_backend_test_times_from_reports())
 
     print('\033[1mBACKEND TEST TIMES SORTED BY TIME:\033[0m')
     for backend_test in sorted_backend_test_times:
-        print('%s: %s SECONDS. %s SECONDS BY AVERAGE TEST CASE TIME.' % (
-            backend_test['test_name'], backend_test['test_time'],
-            backend_test['test_time_by_average_test_case']))
+        print('%s: %s SECONDS.' % (
+            backend_test['test_name'], backend_test['test_time']))
     print('\033[1mBACKEND TEST TIMES OVER %s SECONDS:\033[0m' % (
         LONG_BACKEND_TEST_TIME_THRESHOLD))
     for backend_test in sorted_backend_test_times:
         if backend_test['test_time'] > LONG_BACKEND_TEST_TIME_THRESHOLD:
-            print('%s: %s SECONDS. %s SECONDS BY AVERAGE TEST CASE TIME.' % (
-                backend_test['test_name'], backend_test['test_time'],
-                backend_test['test_time_by_average_test_case']))
+            print('%s: %s SECONDS.' % (
+                backend_test['test_name'], backend_test['test_time']))
+    print(
+        '\033[1mBACKEND TEST TIMES WITH AVERAGE TEST CASE TIME OVER %s '
+        'SECONDS:\033[0m' % LONG_BACKEND_TEST_TIME_THRESHOLD)
+    for backend_test in sorted_backend_test_times_by_avg_test_case:
+        if (
+            backend_test['test_time_by_average_test_case'] >
+            LONG_BACKEND_TEST_TIME_THRESHOLD
+        ):
+            print(
+                '%s: %s SECONDS BY AVERAGE TEST CASE TIME.' % (
+                    backend_test['test_name'],
+                    backend_test['test_time_by_average_test_case']
+                ))
 
     with open(
         BACKEND_TEST_TIMES_FILE, 'w', encoding='utf-8'

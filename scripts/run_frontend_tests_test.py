@@ -220,6 +220,17 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'test-module.spec.js'
         ]])
 
+    def test_frontend_tests_with_specs_to_run_invalid_spec(self) -> None:
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage:
+                    with self.assertRaisesRegex(
+                        ValueError,
+                        'No spec file found for the name: invalid.ts'
+                    ):
+                        run_frontend_tests.main(
+                            args=['--specs_to_run', 'invalid.ts'])
+
     def test_frontend_tests_with_specs_to_run_no_specs_found_allow_no_spec(
         self
     ) -> None:
