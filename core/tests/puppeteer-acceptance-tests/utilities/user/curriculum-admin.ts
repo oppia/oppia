@@ -1154,8 +1154,8 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.page.waitForSelector(skillsTab, {visible: true});
     await this.clickOn(skillsTab);
-    await this.page.waitForSelector(skillSelector, {visible: true});
     await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(skillSelector, {visible: true});
     await this.page.waitForSelector(skillListItemSelector, {visible: true});
 
     const skills = await this.page.$$(skillListItemSelector);
