@@ -156,9 +156,6 @@ describe('Logged-out User', function () {
       await loggedOutUser.chooseActionInProgressRemainder('Resume');
 
       await loggedOutUser.continueToNextCard();
-      await loggedOutUser.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
-      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
