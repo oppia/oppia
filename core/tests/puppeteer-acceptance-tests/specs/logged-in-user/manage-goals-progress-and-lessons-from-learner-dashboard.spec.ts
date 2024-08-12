@@ -86,72 +86,47 @@ describe('Logged-in User', function () {
     // Setup taking longer than 300000ms.
   }, 420000);
 
-  it('should be able to replay a completed or incomplete exploration or collection, learn something new, manage goals, and see completed lesson in the respective sections.', async function () {
-    const actions = [
-      {action: () => loggedInUser.navigateToClassroomPage('math')},
-      {action: () => loggedInUser.selectAndOpenTopic('Algebra I')},
-      {
-        action: () =>
-          loggedInUser.selectChapterWithinStoryToLearn(
-            'Test Story 1',
-            'Test Chapter 1'
-          ),
-      },
+  it(
+    'should be able to replay a completed or incomplete exploration or collection, learn something new, manage goals, and see completed lesson in the respective sections.',
+    async function () {
+      await loggedInUser.navigateToClassroomPage('math');
+      await loggedInUser.selectAndOpenTopic('Algebra I');
+      await loggedInUser.selectChapterWithinStoryToLearn(
+        'Test Story 1',
+        'Test Chapter 1'
+      );
       // The exploration has a single state.
-      {
-        action: () =>
-          loggedInUser.expectExplorationCompletionToastMessage(
-            'Congratulations for completing this lesson!'
-          ),
-      },
-      {action: () => loggedInUser.navigateToLearnerDashboard()},
-      {action: () => loggedInUser.navigateToGoalsSection()},
-      {action: () => loggedInUser.addGoals(['Algebra I'])},
-      {
-        action: () =>
-          loggedInUser.expectToolTipMessage(
-            "Successfully added to your 'Current Goals' list."
-          ),
-      },
-      {action: () => loggedInUser.expectCompletedGoalsToInclude([])},
-      {action: () => loggedInUser.navigateToHomeSection()},
-      {
-        action: () =>
-          loggedInUser.playLessonFromContinueWhereLeftOff('Algebra I'),
-      },
-      {action: () => loggedInUser.navigateToLearnerDashboard()},
-      {action: () => loggedInUser.navigateToGoalsSection()},
-      {action: () => loggedInUser.expectCompletedGoalsToInclude(['Algebra I'])},
-      {action: () => loggedInUser.navigateToProgressSection()},
-      {
-        action: () =>
-          loggedInUser.expectStoriesCompletedToInclude(['Test Story 1']),
-      },
-      {action: () => loggedInUser.navigateToCommunityLessonsSection()},
-      {
-        action: () =>
-          loggedInUser.expectCompletedLessonsToInclude(['Negative Numbers']),
-      },
-      {
-        action: () =>
-          loggedInUser.verifyLessonPresenceInPlayLater(
-            'Positive Numbers',
-            false
-          ),
-      },
-      {action: () => loggedInUser.page.waitForTimeout(2147483647)},
-    ];
+      await loggedInUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
 
-    let i = 1;
-    for (const {action} of actions) {
-      try {
-        await action();
-      } catch (error) {
-        console.error('\x1b[31m%s\x1b[0m', error);
-        await loggedInUser.page.screenshot({path: `error_${i++}.png`});
-      }
-    }
-  }, 2147483647);
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToGoalsSection();
+      await loggedInUser.addGoals(['Algebra I']);
+      await loggedInUser.expectToolTipMessage(
+        "Successfully added to your 'Current Goals' list."
+      );
+      await loggedInUser.expectCompletedGoalsToInclude([]);
+
+      await loggedInUser.navigateToHomeSection();
+      await loggedInUser.playLessonFromContinueWhereLeftOff('Algebra I');
+
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToGoalsSection();
+      await loggedInUser.expectCompletedGoalsToInclude(['Algebra I']);
+
+      await loggedInUser.navigateToProgressSection();
+      await loggedInUser.expectStoriesCompletedToInclude(['Test Story 1']);
+
+      await loggedInUser.navigateToCommunityLessonsSection();
+      await loggedInUser.expectCompletedLessonsToInclude(['Negative Numbers']);
+      await loggedInUser.verifyLessonPresenceInPlayLater(
+        'Positive Numbers',
+        false
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

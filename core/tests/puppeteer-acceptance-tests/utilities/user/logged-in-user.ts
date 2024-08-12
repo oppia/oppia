@@ -707,7 +707,6 @@ export class LoggedInUser extends BaseUser {
           `Lesson "${lessonName}" was not found in 'Play Later' list, but it should be.`
         );
       }
-      showMessage('Lesson is present in "Play Later" list.');
     } catch (error) {
       const newError = new Error(
         `Failed to verify presence of lesson in 'Play Later' list: ${error}`
@@ -1145,7 +1144,8 @@ export class LoggedInUser extends BaseUser {
           el => el.textContent.trim(),
           topicName
         );
-        return fullGoalText.replace('Learnt ', ''); // Remove the "Learnt " prefix
+        // Remove the "Learnt " prefix.
+        return fullGoalText.replace('Learnt ', '');
       })
     );
 
