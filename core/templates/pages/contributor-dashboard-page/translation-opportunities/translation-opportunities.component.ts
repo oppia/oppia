@@ -34,6 +34,8 @@ import {
   ExplorationOpportunitiesDict,
 } from '../services/contribution-opportunities.service';
 import {TranslateTextService} from '../services/translate-text.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {typeOf} from 'mathjs';
 
 @Component({
   selector: 'oppia-translation-opportunities',
@@ -59,7 +61,8 @@ export class TranslationOpportunitiesComponent {
     private readonly translateTextService: TranslateTextService,
     private readonly urlInterpolationService: UrlInterpolationService,
     private readonly userService: UserService,
-    private readonly injector: Injector
+    private readonly injector: Injector,
+    private readonly loggerService: LoggerService
   ) {}
 
   getOpportunitySummary(expId: string): TranslationOpportunity {
@@ -73,6 +76,18 @@ export class TranslationOpportunitiesComponent {
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   } {
+    this.loggerService.debug(
+      '*********** Inside getPresentableOpportunitiesData ***********\n'
+    );
+    this.loggerService.debug(
+      `this.translationTopicService.getActiveTopicName(): ${this.translationTopicService.getActiveTopicName()}`
+    );
+    this.loggerService.debug(
+      `this.translationLanguageService.getActiveLanguageCode(): ${this.translationLanguageService.getActiveLanguageCode()}`
+    );
+    this.loggerService.debug(`typeOf(opportunities): ${typeOf(opportunities)}`);
+    this.loggerService.debug(`opportunities: ${JSON.stringify(opportunities)}`);
+    this.loggerService.debug(`more: ${more}`);
     const opportunitiesDicts: TranslationOpportunity[] = [];
     const untranslatableOpportunitiesDicts: TranslationOpportunity[] = [];
     for (const index in opportunities) {
@@ -151,6 +166,16 @@ export class TranslationOpportunitiesComponent {
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   }> {
+    this.loggerService.debug(
+      '*********** Inside loadMoreOpportunitiesAsync ***********\n'
+    );
+    this.loggerService.debug(
+      `this.translationTopicService.getActiveTopicName(): ${this.translationTopicService.getActiveTopicName()}`
+    );
+    this.loggerService.debug(
+      `this.translationLanguageService.getActiveLanguageCode(): ${this.translationLanguageService.getActiveLanguageCode()}`
+    );
+    this.loggerService.debug(`this ${typeOf(this)}`);
     return this.contributionOpportunitiesService
       .getMoreTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode(),
@@ -163,6 +188,16 @@ export class TranslationOpportunitiesComponent {
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   }> {
+    this.loggerService.debug(
+      '*********** Inside loadOpportunitiesAsync ***********\n'
+    );
+    this.loggerService.debug(
+      `this.translationTopicService.getActiveTopicName(): ${this.translationTopicService.getActiveTopicName()}`
+    );
+    this.loggerService.debug(
+      `this.translationLanguageService.getActiveLanguageCode(): ${this.translationLanguageService.getActiveLanguageCode()}`
+    );
+    this.loggerService.debug(`this ${typeOf(this)}`);
     return this.contributionOpportunitiesService
       .getTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode(),
