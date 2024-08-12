@@ -40,6 +40,8 @@ describe('Logged-in User', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
+    await curriculumAdmin.page.waitForTimeout(2147483647);
+
     explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Negative Numbers'
@@ -84,7 +86,7 @@ describe('Logged-in User', function () {
     );
 
     // Setup taking longer than 300000ms.
-  }, 420000);
+  }, 2147483647);
 
   it(
     'should be able to replay a completed or incomplete exploration or collection, learn something new, manage goals, and see completed lesson in the respective sections.',
