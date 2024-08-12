@@ -30,7 +30,6 @@ describe('Learner dashboard functionality', function () {
   var adminPage = null;
   var collectionEditorPage = null;
   var explorationEditorPage = null;
-  var explorationEditorMainTab = null;
   var libraryPage = null;
 
   beforeAll(function () {
