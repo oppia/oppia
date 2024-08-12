@@ -1804,7 +1804,9 @@ export class ExplorationEditor extends BaseUser {
    * Opens an exploration in the editor.
    * @param {string} explorationName - The name of the exploration.
    */
-  async openExplorationInExplorationEditor(explorationName: string) {
+  async openExplorationInExplorationEditor(
+    explorationName: string
+  ): Promise<void> {
     await this.page.waitForSelector(explorationSummaryTileTitleSelector);
     const title = await this.page.$eval(
       explorationSummaryTileTitleSelector,
@@ -1822,7 +1824,7 @@ export class ExplorationEditor extends BaseUser {
    * Checks the number of suggestions in the exploration editor.
    * @param {number} expectedNumber - The expected number of suggestions.
    */
-  async expectNoOfSuggestionsToBe(expectedNumber: number) {
+  async expectNoOfSuggestionsToBe(expectedNumber: number): Promise<void> {
     await this.page.waitForSelector(feedbackSubjectSelector);
     const feedbackSubjects = await this.page.$$(feedbackSubjectSelector);
 
@@ -1839,7 +1841,7 @@ export class ExplorationEditor extends BaseUser {
    * Views a feedback thread.
    * @param {number} expectedThread - The 1-indexed position of the expected thread.
    */
-  async viewFeedbackThread(expectedThread: number) {
+  async viewFeedbackThread(expectedThread: number): Promise<void> {
     // Reloading to make sure the feedback threads are updated.
     await this.reloadPage();
     await this.page.waitForSelector(feedbackSubjectSelector);
@@ -1860,7 +1862,7 @@ export class ExplorationEditor extends BaseUser {
   async expectSuggestionToBeAnonymous(
     suggestion: string,
     anonymouslySubmitted: boolean
-  ) {
+  ): Promise<void> {
     await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(feedbackSelector);
     const actualSuggestion = await this.page.$eval(feedbackSelector, el =>
@@ -1888,7 +1890,7 @@ export class ExplorationEditor extends BaseUser {
    * Replies to a suggestion.
    * @param {string} reply - The reply to the suggestion.
    */
-  async replyToSuggestion(reply: string) {
+  async replyToSuggestion(reply: string): Promise<void> {
     await this.type(responseTextareaSelector, reply);
     await this.clickOn(sendButtonSelector);
   }

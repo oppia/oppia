@@ -65,7 +65,7 @@ describe('Logged-in User', function () {
     await curriculumAdmin.addStoryToTopic(
       'Test Story 1',
       'test-story-one',
-      'Addition'
+      'Algebra I'
     );
     await curriculumAdmin.addChapter(
       'Test Chapter 1',
@@ -76,6 +76,7 @@ describe('Logged-in User', function () {
       explorationId2 as string
     );
     await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.publishStoryDraft();
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser1',
@@ -100,25 +101,25 @@ describe('Logged-in User', function () {
       {
         action: () =>
           loggedInUser.expectExplorationCompletionToastMessage(
-            'Congratulations! You have completed the chapter.'
+            'Congratulations for completing this lesson!'
           ),
       },
       {action: () => loggedInUser.navigateToLearnerDashboard()},
-      {action: () => loggedInUser.playLessonFromCompleted('Test Chapter 1')},
       {action: () => loggedInUser.navigateToGoalsSection()},
       {action: () => loggedInUser.addGoals(['Algebra I'])},
       {
         action: () =>
           loggedInUser.expectToolTipMessage(
-            "Successfully added to you 'Current Goals' list."
+            "Successfully added to your 'Current Goals' list."
           ),
       },
       {action: () => loggedInUser.expectCompletedGoalsToInclude([])},
       {action: () => loggedInUser.navigateToHomeSection()},
       {
         action: () =>
-          loggedInUser.playLessonFromLearnSomethingNew('Test Chapter 2'),
+          loggedInUser.playLessonFromContinueWhereLeftOff('Algebra I'),
       },
+      {action: () => loggedInUser.navigateToLearnerDashboard()},
       {action: () => loggedInUser.navigateToGoalsSection()},
       {action: () => loggedInUser.expectCompletedGoalsToInclude(['Algebra I'])},
       {action: () => loggedInUser.navigateToProgressSection()},
@@ -129,10 +130,7 @@ describe('Logged-in User', function () {
       {action: () => loggedInUser.navigateToCommunityLessonsSection()},
       {
         action: () =>
-          loggedInUser.expectCompletedLessonsToInclude([
-            'Positive Numbers',
-            'Negative Numbers',
-          ]),
+          loggedInUser.expectCompletedLessonsToInclude(['Negative Numbers']),
       },
       {
         action: () =>
@@ -144,13 +142,14 @@ describe('Logged-in User', function () {
       {action: () => loggedInUser.page.waitForTimeout(2147483647)},
     ];
 
-    try {
-      for (const action of actions) {
-        await action.action();
+    let i = 1;
+    for (const {action} of actions) {
+      try {
+        await action();
+      } catch (error) {
+        console.error('\x1b[31m%s\x1b[0m', error);
+        await loggedInUser.page.screenshot({path: `error_${i++}.png`});
       }
-    } catch (error) {
-      console.error('An error occurred: ' + error.message);
-      await loggedInUser.page.screenshot({path: 'error.png'});
     }
   }, 2147483647);
 

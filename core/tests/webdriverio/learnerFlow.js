@@ -16,11 +16,8 @@ f; // Copyright 2022 The Oppia Authors. All Rights Reserved.
  * @fileoverview End-to-end tests for the learner flow.
  */
 
-var action = require('../webdriverio_utils/action.js');
-var forms = require('../webdriverio_utils/forms.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
-var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
@@ -36,77 +33,11 @@ describe('Learner dashboard functionality', function () {
   var adminPage = null;
   var creatorDashboardPage = null;
   var collectionEditorPage = null;
-  var collectionPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
-  var explorationPlayerPage = null;
   var libraryPage = null;
-  var learnerDashboardPage = null;
-  var clickContinueButton = async function () {
-    var continueButton = $('.e2e-test-continue-button');
-    await action.click('Continue button', continueButton);
-    await waitFor.pageToFullyLoad();
-  };
   var testExplorationId = null;
-  var collectionExplorationId = null;
-  var dummyExplorationId = null;
-
-  var createDummyExplorationOnDesktop = async function (welcomeModalIsShown) {
-    await creatorDashboardPage.get();
-    await creatorDashboardPage.clickCreateActivityButton();
-    await waitFor.pageToFullyLoad();
-    if (welcomeModalIsShown) {
-      await explorationEditorMainTab.exitTutorial();
-    }
-    await explorationEditorMainTab.setStateName('First');
-    await explorationEditorMainTab.setContent(
-      await forms.toRichText(
-        'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'
-      ),
-      true
-    );
-    await explorationEditorMainTab.setInteraction('Continue');
-    var responseEditor =
-      await explorationEditorMainTab.getResponseEditor('default');
-    await responseEditor.setDestination('Second', true, null);
-    await explorationEditorMainTab.moveToState('Second');
-    await explorationEditorMainTab.setContent(
-      await forms.toRichText('So what can I tell you?'),
-      true
-    );
-    await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
-      await forms.toRichText('How do your explorations work?'),
-      await forms.toRichText('What can you tell me about this website?'),
-      await forms.toRichText('How can I contribute to Oppia?'),
-      await forms.toRichText('Those were all the questions I had!'),
-    ]);
-    await explorationEditorMainTab.addResponse(
-      'MultipleChoiceInput',
-      null,
-      'End Card',
-      true,
-      'Equals',
-      'Those were all the questions I had!'
-    );
-    responseEditor =
-      await explorationEditorMainTab.getResponseEditor('default');
-    await responseEditor.setFeedback(await forms.toRichText('I do not know!'));
-    await explorationEditorMainTab.moveToState('End Card');
-    await explorationEditorMainTab.setContent(
-      await forms.toRichText('Congratulations, you have finished!'),
-      true
-    );
-    await explorationEditorMainTab.setInteraction('EndExploration');
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle('Dummy Exploration');
-    await explorationEditorSettingsTab.setCategory('Algorithms');
-    await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
-    await explorationEditorSettingsTab.setLanguage('English');
-    await explorationEditorPage.saveChanges();
-    await workflow.publishExploration();
-    dummyExplorationId = await general.getExplorationIdFromEditor();
-  };
 
   beforeAll(function () {
     adminPage = new AdminPage.AdminPage();

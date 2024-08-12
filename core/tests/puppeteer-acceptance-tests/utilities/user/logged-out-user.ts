@@ -2344,12 +2344,12 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Selects and opens a chapter within a story to learn.
-   * @param {string} chapterName - The name of the chapter to select and open.
    * @param {string} storyName - The name of the story containing the chapter.
+   * @param {string} chapterName - The name of the chapter to select and open.
    */
   async selectChapterWithinStoryToLearn(
-    chapterName: string,
-    storyName: string
+    storyName: string,
+    chapterName: string
   ): Promise<void> {
     const isMobileViewport = this.isViewportAtMobileWidth();
     const storyTitleSelector = isMobileViewport
