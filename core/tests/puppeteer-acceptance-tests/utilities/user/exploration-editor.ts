@@ -204,6 +204,7 @@ const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const feedbackBackButtonSelector = '.e2e-test-oppia-feedback-back-button';
 const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
 const feedbackSelector = '.e2e-test-exploration-feedback';
+const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
 const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
 
@@ -324,7 +325,8 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(mobileNavbarPane);
       await this.clickOn(mobileFeedbackTabButton);
     } else {
-      await this.clickAndWaitForNavigation(feedBackButtonTab);
+      await this.clickOn(feedBackButtonTab);
+      await this.waitForNetworkIdle();
     }
   }
 
@@ -1572,11 +1574,24 @@ export class ExplorationEditor extends BaseUser {
    * Gives feedback on the exploration.
    * @param {string} feedback - The feedback to give on the exploration.
    */
-  async giveFeedback(feedback: string): Promise<void> {
+  async giveFeedback(feedback: string, stayAnonymous?: boolean): Promise<void> {
+    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+    // in mobile viewport which is required for testing the feedback messages tab),
+    // remove this part of skipping this function for Mobile viewport and make it run in mobile viewport
+    // as well. see: https://github.com/oppia/oppia/issues/19443.
+    if (process.env.MOBILE === 'true') {
+      return;
+    }
     await this.page.waitForSelector('nav-options', {visible: true});
     await this.clickOn(feedbackPopupSelector);
     await this.page.waitForSelector(feedbackTextarea, {visible: true});
     await this.type(feedbackTextarea, feedback);
+
+    // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
+    if (stayAnonymous) {
+      await this.clickOn(stayAnonymousCheckbox);
+    }
+
     await this.clickOn('Submit');
 
     try {
@@ -1825,11 +1840,11 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} expectedThread - The 1-indexed position of the expected thread.
    */
   async viewFeedbackThread(expectedThread: number) {
-    if (await this.page.$(feedbackBackButtonSelector)) {
-      await this.page.click(feedbackBackButtonSelector);
-    }
-
+    // Reloading to make sure the feedback threads are updated.
+    await this.reloadPage();
+    await this.page.waitForSelector(feedbackSubjectSelector);
     const feedbackSubjects = await this.page.$$(feedbackSubjectSelector);
+
     if (expectedThread > 0 && expectedThread <= feedbackSubjects.length) {
       await feedbackSubjects[expectedThread - 1].click();
     } else {
@@ -1846,6 +1861,8 @@ export class ExplorationEditor extends BaseUser {
     suggestion: string,
     anonymouslySubmitted: boolean
   ) {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(feedbackSelector);
     const actualSuggestion = await this.page.$eval(feedbackSelector, el =>
       el.textContent?.trim()
     );

@@ -2624,13 +2624,9 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Gives feedback on the exploration.
    * @param {string} feedback - The feedback to give on the exploration.
-   * @param {boolean} stayAnonymous - Whether to stay anonymous while giving feedback, default is
-   * false.
+   * @param {boolean} stayAnonymous - Whether to stay anonymous while giving feedback.
    */
-  async giveFeedback(
-    feedback: string,
-    stayAnonymous: boolean = false
-  ): Promise<void> {
+  async giveFeedback(feedback: string, stayAnonymous?: boolean): Promise<void> {
     // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
     // in mobile viewport which is required for testing the feedback messages tab),
     // remove this part of skipping this function for Mobile viewport and make it run in mobile viewport

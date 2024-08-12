@@ -22,6 +22,7 @@ import {showMessage} from '../../utilities/common/show-message';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
@@ -35,6 +36,10 @@ enum CARD_NAME {
   ALGEBRA_BASICS = 'Algebra Basics',
   FINAL_CARD = 'Final Card',
 }
+
+ConsoleReporter.setConsoleErrorsToIgnore([
+  "Failed to execute 'convertToSpecifiedUnits' on 'SVGLength': Could not resolve relative length.",
+]);
 
 describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
@@ -112,6 +117,10 @@ describe('Logged-out User', function () {
   it(
     'should be able to give feedback (identified and anonymous), rate the exploration, report at any point, and check feedback updates and exploration editor pages',
     async function () {
+      // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+      // in mobile viewport which is required for testing the feedback messages tab),
+      // remove this part of skipping the test and make the test to run in mobile viewport as well.
+      // see: https://github.com/oppia/oppia/issues/19443
       if (process.env.MOBILE === 'true') {
         showMessage('Test skipped in mobile viewport');
         return;
@@ -120,55 +129,54 @@ describe('Logged-out User', function () {
       await loggedInUser.navigateToCommunityLibraryPage();
       await loggedInUser.searchForLessonInSearchBar('Algebra Basics');
       await loggedInUser.playLessonFromSearchResults('Algebra Basics');
-      await loggedInUser.continueToNextCard();
 
-      // Giving identified feedback before completing the exploration on a state.
-      await loggedInUser.giveFeedback('This state is very informative!', false);
+      await loggedInUser.continueToNextCard();
+      // Giving anonymous feedback after completing the exploration.
+      await loggedInUser.giveFeedback('This state is very informative!', true);
       await loggedInUser.submitAnswer('-40');
       await loggedInUser.continueToNextCard();
       await loggedInUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
 
-      // Giving anonymous feedback after completing the exploration.
-      await loggedInUser.giveFeedback('This is a great lesson!', true);
-      await loggedInUser.reportExploration('Other', 'Inappropriate content');
+      // Giving identified feedback before completing the exploration on a state.
+      await loggedInUser.giveFeedback('This is a great lesson!', false);
+      await loggedInUser.reportExploration('It is an ad');
       await loggedInUser.rateExploration(5, 'Nice!', false);
 
       // Check the exploration editor page.
+      await explorationEditor.page.bringToFront();
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.openExplorationInExplorationEditor(
         'Algebra Basics'
       );
-      await explorationEditor.navigateToFeedbackTab();
 
-      await explorationEditor.expectNoOfSuggestionsToBe(2);
+      await explorationEditor.navigateToFeedbackTab();
+      await explorationEditor.expectNoOfSuggestionsToBe(3);
       await explorationEditor.viewFeedbackThread(1);
       await explorationEditor.expectSuggestionToBeAnonymous(
         'This state is very informative!',
         true
       );
       await explorationEditor.replyToSuggestion('Thanks for the feedback!');
-
       await explorationEditor.viewFeedbackThread(2);
-      await explorationEditor.expectSuggestionToBeAnonymous(
-        'This is a great lesson!',
-        false
-      );
+      await explorationEditor.expectSuggestionToBeAnonymous('Nice!', false);
       await explorationEditor.replyToSuggestion(
         'Thanks for the feedback, We will update!'
       );
 
       // Check feedback updates page.
+      await loggedInUser.page.bringToFront();
       await loggedInUser.navigateToFeedbackUpdatesPage();
       await loggedInUser.viewFeedbackUpdateThread(1);
       await loggedInUser.expectFeedbackAndResponseToMatch(
-        'This state is very informative!',
-        'Thanks for the feedback!'
+        'Nice!',
+        'Thanks for the feedback, We will update!'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

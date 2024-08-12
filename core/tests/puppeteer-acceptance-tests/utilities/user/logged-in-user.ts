@@ -91,6 +91,7 @@ const completedStoriesSectionSelector = '.e2e-test-completed-stories-section';
 const storyNameSelector = '.e2e-test-story-name-in-learner-story-summary-tile';
 const lessonObjectiveSelector = '.e2e-test-exp-summary-tile-objective > span';
 const learnSomethingNewSectionSelector = '.e2e-test-suggested-for-you';
+const issueTypeSelector = '.e2e-test-report-exploration-radio-button';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
@@ -689,13 +690,17 @@ export class LoggedInUser extends BaseUser {
    * @param {string} issueName - The name of the issue to report.
    * @param {string} issueDescription - The description of the issue.
    */
-  async reportExploration(issueName: string, issueDescription: string) {
+  async reportExploration(issueDescription: string) {
     await this.clickOn(reportExplorationButtonSelector);
-    await this.clickOn(` ${issueName} `);
+    await this.page.waitForSelector(issueTypeSelector);
+    const issueTypeElement = await this.page.$(issueTypeSelector);
+    await issueTypeElement?.click();
     await this.clickOn(reportExplorationTextAreaSelector);
     await this.type(reportExplorationTextAreaSelector, issueDescription);
 
     await this.clickOn(submitReportButtonSelector);
+
+    await this.clickOn('Close');
   }
 
   /**
@@ -707,7 +712,7 @@ export class LoggedInUser extends BaseUser {
     const feedbackThreads = await this.page.$$(feedbackThreadSelector);
 
     if (threadNumber >= 0 && threadNumber < feedbackThreads.length) {
-      await feedbackThreads[threadNumber].click();
+      await feedbackThreads[threadNumber - 1].click();
     } else {
       throw new Error(`Thread not found: ${threadNumber}`);
     }
@@ -723,17 +728,21 @@ export class LoggedInUser extends BaseUser {
     expectedFeedback: string,
     expectedResponse: string
   ) {
+    await this.page.waitForSelector(feedbackMessageSelector);
     const feedbackMessages = await this.page.$$(feedbackMessageSelector);
 
     if (feedbackMessages.length < 2) {
       throw new Error('Not enough feedback messages found.');
     }
 
-    const actualFeedback = await feedbackMessages[0].$eval('.', el =>
+    const actualFeedback = await this.page.$eval(feedbackMessageSelector, el =>
       el.textContent?.trim()
     );
-    const actualResponse = await feedbackMessages[1].$eval('.', el =>
-      el.textContent?.trim()
+
+    // Fetch the text content of the second feedbackMessageSelector
+    const actualResponse = await this.page.$$eval(
+      feedbackMessageSelector,
+      elements => elements[1]?.textContent?.trim()
     );
 
     if (actualFeedback !== expectedFeedback) {
@@ -891,6 +900,10 @@ export class LoggedInUser extends BaseUser {
       }
     }
     throw new Error(`Lesson not found: ${lessonName}`);
+  }
+
+  async screenshot(path) {
+    await this.page.screenshot({path: `${path}`});
   }
 }
 

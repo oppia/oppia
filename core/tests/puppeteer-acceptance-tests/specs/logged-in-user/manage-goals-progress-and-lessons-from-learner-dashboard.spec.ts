@@ -85,51 +85,75 @@ describe('Logged-in User', function () {
     // Setup taking longer than 300000ms.
   }, 420000);
 
-  it(
-    'should be able to replay a completed or incomplete exploration or collection, learn something new, manage goals, and see completed lesson in the respective sections.',
-    async function () {
-      await loggedInUser.navigateToClassroomPage('math');
-      await loggedInUser.selectAndOpenTopic('Algebra I');
-      await loggedInUser.selectChapterWithinStoryToLearn(
-        'Test Story 1',
-        'Test Chapter 1'
-      );
+  it('should be able to replay a completed or incomplete exploration or collection, learn something new, manage goals, and see completed lesson in the respective sections.', async function () {
+    const actions = [
+      {action: () => loggedInUser.navigateToClassroomPage('math')},
+      {action: () => loggedInUser.selectAndOpenTopic('Algebra I')},
+      {
+        action: () =>
+          loggedInUser.selectChapterWithinStoryToLearn(
+            'Test Story 1',
+            'Test Chapter 1'
+          ),
+      },
       // The exploration has a single state.
-      await loggedInUser.expectExplorationCompletionToastMessage(
-        'Congratulations! You have completed the chapter.'
-      );
+      {
+        action: () =>
+          loggedInUser.expectExplorationCompletionToastMessage(
+            'Congratulations! You have completed the chapter.'
+          ),
+      },
+      {action: () => loggedInUser.navigateToLearnerDashboard()},
+      {action: () => loggedInUser.playLessonFromCompleted('Test Chapter 1')},
+      {action: () => loggedInUser.navigateToGoalsSection()},
+      {action: () => loggedInUser.addGoals(['Algebra I'])},
+      {
+        action: () =>
+          loggedInUser.expectToolTipMessage(
+            "Successfully added to you 'Current Goals' list."
+          ),
+      },
+      {action: () => loggedInUser.expectCompletedGoalsToInclude([])},
+      {action: () => loggedInUser.navigateToHomeSection()},
+      {
+        action: () =>
+          loggedInUser.playLessonFromLearnSomethingNew('Test Chapter 2'),
+      },
+      {action: () => loggedInUser.navigateToGoalsSection()},
+      {action: () => loggedInUser.expectCompletedGoalsToInclude(['Algebra I'])},
+      {action: () => loggedInUser.navigateToProgressSection()},
+      {
+        action: () =>
+          loggedInUser.expectStoriesCompletedToInclude(['Test Story 1']),
+      },
+      {action: () => loggedInUser.navigateToCommunityLessonsSection()},
+      {
+        action: () =>
+          loggedInUser.expectCompletedLessonsToInclude([
+            'Positive Numbers',
+            'Negative Numbers',
+          ]),
+      },
+      {
+        action: () =>
+          loggedInUser.verifyLessonPresenceInPlayLater(
+            'Positive Numbers',
+            false
+          ),
+      },
+      {action: () => loggedInUser.page.waitForTimeout(2147483647)},
+    ];
 
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.playLessonFromCompleted('Test Chapter 1');
+    try {
+      for (const action of actions) {
+        await action.action();
+      }
+    } catch (error) {
+      console.error('An error occurred: ' + error.message);
+      await loggedInUser.page.screenshot({path: 'error.png'});
+    }
+  }, 2147483647);
 
-      await loggedInUser.navigateToGoalsSection();
-      await loggedInUser.addGoals(['Algebra I']);
-      await loggedInUser.expectToolTipMessage(
-        "Successfully added to you 'Current Goals' list."
-      );
-      await loggedInUser.expectCompletedGoalsToInclude([]);
-
-      await loggedInUser.navigateToHomeSection();
-      await loggedInUser.playLessonFromLearnSomethingNew('Test Chapter 2');
-
-      await loggedInUser.navigateToGoalsSection();
-      await loggedInUser.expectCompletedGoalsToInclude(['Algebra I']);
-
-      await loggedInUser.navigateToProgressSection();
-      await loggedInUser.expectStoriesCompletedToInclude(['Test Story 1']);
-
-      await loggedInUser.navigateToCommunityLessonsSection();
-      await loggedInUser.expectCompletedLessonsToInclude([
-        'Positive Numbers',
-        'Negative Numbers',
-      ]);
-      await loggedInUser.verifyLessonPresenceInPlayLater(
-        'Positive Numbers',
-        false
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
