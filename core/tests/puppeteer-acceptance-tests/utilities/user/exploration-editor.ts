@@ -201,7 +201,6 @@ const tagsField = '.e2e-test-chip-list-tags';
 const feedBackButtonTab = '.e2e-test-feedback-tab';
 const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
-const feedbackBackButtonSelector = '.e2e-test-oppia-feedback-back-button';
 const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
 const feedbackSelector = '.e2e-test-exploration-feedback';
 const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
