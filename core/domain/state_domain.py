@@ -3629,9 +3629,9 @@ class State(translation_domain.BaseTranslatableObject):
         recorded_voiceovers: RecordedVoiceovers,
         solicit_answer_details: bool,
         card_is_checkpoint: bool,
+        inapplicable_skill_misconception_ids: List[str],
         linked_skill_id: Optional[str] = None,
         classifier_model_id: Optional[str] = None,
-        inapplicable_skill_misconception_ids: List[str] = []
     ) -> None:
         """Initializes a State domain object.
 
@@ -3988,8 +3988,8 @@ class State(translation_domain.BaseTranslatableObject):
             inapplicable_skill_misconception_ids: List[str]. The
                 list of inapplicable skill misconception ids for state.
         """
-        self.inapplicable_skill_misconception_ids = (
-            inapplicable_skill_misconception_ids)
+        self.inapplicable_skill_misconception_ids = list(
+            set(inapplicable_skill_misconception_ids))
 
     def update_interaction_customization_args(
         self,
