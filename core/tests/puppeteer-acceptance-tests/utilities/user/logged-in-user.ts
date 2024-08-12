@@ -24,11 +24,9 @@ import puppeteer from 'puppeteer';
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
   testConstants.URLs.WikiPrivilegesToFirebaseAccount;
-const PendingAccountDeletionPage = testConstants.URLs.PendingAccountDeletion;
 const baseUrl = testConstants.URLs.BaseURL;
 const homePageUrl = testConstants.URLs.Home;
 const signUpEmailField = testConstants.SignInDetails.inputField;
-const LearnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const feedbackUpdatesUrl = testConstants.URLs.FeedbackUpdates;
 
@@ -69,6 +67,27 @@ const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-tes
 const mobileLessonCardOptionsDropdownButton =
   '.e2e-test-mobile-lesson-card-dropdown';
 const mobileProgressSectionButton = '.e2e-test-mobile-progress-section';
+const addProfilePictureButton = '.e2e-test-photo-upload-submit';
+const editProfilePictureButton = '.e2e-test-photo-clickable';
+const bioTextareaSelector = '.e2e-test-user-bio';
+const saveChangesButtonSelector = '.e2e-test-save-changes-button';
+const subjectInterestsInputSelector = '.e2e-test-subject-interests-input';
+const explorationLanguageInputSelector =
+  '.e2e-test-preferred-exploration-language-input';
+const siteLanguageInputSelector = '.e2e-test-site-language-selector';
+const audioLanguageInputSelector = '.e2e-test-audio-language-selector';
+const goToProfilePageButton = '.e2e-test-go-to-profile-page';
+const profilePictureSelector = '.e2e-test-profile-user-photo';
+const bioSelector = '.oppia-user-bio-text';
+const subjectInterestSelector = '.e2e-test-profile-interest';
+const exportButtonSelector = '.e2e-test-export-account-button';
+const angularRootElementSelector = 'oppia-angular-root';
+const checkboxesSelector = '.checkbox';
+const defaultProfilePicture =
+  '/assets/images/avatar/user_blue_150px.png?2983.800000011921';
+
+const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE =
+  'Your data is currently being loaded and will be downloaded as a JSON formatted text file upon completion.';
 const reportExplorationButtonSelector = '.e2e-test-report-exploration-button';
 const reportExplorationTextAreaSelector =
   '.e2e-test-report-exploration-text-area';
@@ -105,13 +124,6 @@ export class LoggedInUser extends BaseUser {
       return;
     }
     await this.goto(profilePageUrl);
-  }
-
-  /**
-   * Function for navigating to the Learner dashboard page.
-   */
-  async navigateToLearnerDashboardPage(): Promise<void> {
-    await this.goto(LearnerDashboardUrl);
   }
 
   /**
@@ -246,10 +258,6 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToPreferencesPage(): Promise<void> {
     await this.goto(PreferencesPageUrl);
-  }
-
-  async navigateToPendingAccountDeletionPage(): Promise<void> {
-    await this.goto(PendingAccountDeletionPage);
   }
 
   /**
@@ -682,6 +690,312 @@ export class LoggedInUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Updates the profile picture in preference page.
+   * @param {string} picturePath - The path of the picture to upload.
+   */
+  async updateProfilePicture(picturePath: string): Promise<void> {
+    await this.clickOn(editProfilePictureButton);
+    await this.uploadFile(picturePath);
+    await this.clickOn(addProfilePictureButton);
+  }
+
+  /**
+   * Updates the user's bio in preference page.
+   * @param {string} bio - The new bio to set for the user.
+   */
+  async updateBio(bio: string): Promise<void> {
+    await this.clickOn(bioTextareaSelector);
+    await this.type(bioTextareaSelector, bio);
+  }
+
+  /**
+   * Updates the user's preferred dashboard in preference page.
+   * @param {string} dashboard - The new dashboard to set for the user. Can be one of 'Learner Dashboard', 'Creator Dashboard', or 'Contributor Dashboard'.
+   */
+  async updatePreferredDashboard(dashboard: string): Promise<void> {
+    const allowedDashboards = [
+      'Learner Dashboard',
+      'Creator Dashboard',
+      'Contributor Dashboard',
+    ];
+
+    if (!allowedDashboards.includes(dashboard)) {
+      throw new Error(
+        `Invalid dashboard: ${dashboard}. Must be one of ${allowedDashboards.join(', ')}.`
+      );
+    }
+
+    // Converting the dashboard to lowercase and replace spaces with hyphens to match the selector.
+    const dashboardInSelector = dashboard.toLowerCase().replace(/\s+/g, '-');
+    const dashboardSelector = `.e2e-test-${dashboardInSelector}-radio`;
+
+    await this.clickOn(dashboardSelector);
+  }
+
+  /**
+   * Updates the user's subject interests in preference page.
+   * @param {string[]} interests - The new interests to set for the user.
+   */
+  async updateSubjectInterests(interests: string[]): Promise<void> {
+    for (const interest of interests) {
+      await this.type(subjectInterestsInputSelector, interest);
+      await this.page.keyboard.press('Enter');
+    }
+  }
+
+  /**
+   * Updates the user's preferred exploration language in preference page.
+   * @param {string} language - The new language to set for the user.
+   */
+  async updatePreferredExplorationLanguage(language: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    await this.clickOn(explorationLanguageInputSelector);
+
+    await this.page.waitForSelector(optionText);
+    const options = await this.page.$$(optionText);
+    for (const option of options) {
+      const optionText = await this.page.evaluate(
+        el => el.textContent.trim(),
+        option
+      );
+      if (optionText === language) {
+        await option.click();
+        break;
+      }
+    }
+  }
+
+  /**
+   * Updates the user's preferred site language in preference page.
+   * @param {string} language - The new language to set for the user.
+   */
+  async updatePreferredSiteLanguage(language: string): Promise<void> {
+    await this.type(siteLanguageInputSelector, language);
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Updates the user's preferred audio language in preference page.
+   * @param {string} language - The new language to set for the user.
+   */
+  async updatePreferredAudioLanguage(language: string): Promise<void> {
+    await this.type(audioLanguageInputSelector, language);
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Updates the user's email preferences from the preferences page.
+   * @param {string[]} preferences - The new email preferences to set for the user.
+   */
+  async updateEmailPreferences(preferences: string[]): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    try {
+      await this.page.waitForSelector(checkboxesSelector);
+      const checkboxes = await this.page.$$(checkboxesSelector);
+
+      for (const preference of preferences) {
+        let found = false;
+
+        for (const checkbox of checkboxes) {
+          const label = await checkbox.evaluate(el => el.textContent?.trim());
+          if (label === preference) {
+            await this.waitForElementToBeClickable(checkbox);
+            await checkbox.click();
+            found = true;
+            break;
+          }
+        }
+
+        if (!found) {
+          throw new Error(`Preference not found: ${preference}`);
+        }
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to update email preferences: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Navigates to the Profile tab from the Preferences page.
+   */
+  async navigateToProfilePageFromPreferencePage(): Promise<void> {
+    try {
+      await this.page.waitForSelector(goToProfilePageButton);
+      const profileTab = await this.page.$(goToProfilePageButton);
+
+      if (!profileTab) {
+        throw new Error('Profile tab not found');
+      }
+
+      await this.clickAndWaitForNavigation(goToProfilePageButton);
+      await this.waitForPageToFullyLoad();
+    } catch (error) {
+      const newError = new Error(
+        `Failed to navigate to Profile tab from Preferences page: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Saves the changes made in the preferences page.
+   */
+  async saveChanges(): Promise<void> {
+    await this.waitForNetworkIdle({idleTime: 1000});
+    await this.waitForPageToFullyLoad();
+    await this.clickAndWaitForNavigation(saveChangesButtonSelector);
+  }
+
+  /**
+   * Expects the profile picture to not match a certain image.
+   */
+  async verifyProfilePicUpdate(): Promise<void> {
+    try {
+      await this.page.waitForSelector(profilePictureSelector);
+      const profilePicture = await this.page.$(profilePictureSelector);
+
+      if (!profilePicture) {
+        throw new Error('Profile picture not found');
+      }
+      const actualImageUrl = await this.page.evaluate(
+        img => img.src,
+        profilePicture
+      );
+
+      if (actualImageUrl === defaultProfilePicture) {
+        throw new Error(
+          `Profile picture does not match. Expected image source to be different from: ${defaultProfilePicture}`
+        );
+      }
+      showMessage('Profile picture is different from the default one.');
+    } catch (error) {
+      const newError = new Error(`Failed to check profile picture: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Expects the user's bio to match a certain text.
+   * @param {string} expectedBio - The expected bio text.
+   */
+  async expectBioToBe(expectedBio: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(bioSelector);
+      const bioElement = await this.page.$(bioSelector);
+
+      if (!bioElement) {
+        throw new Error('Bio not found');
+      }
+
+      const actualBio = await this.page.evaluate(
+        el => el.textContent,
+        bioElement
+      );
+      if (actualBio.trim() !== expectedBio) {
+        throw new Error(
+          `Bio does not match. Expected: ${expectedBio}, but got: ${actualBio}`
+        );
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to check bio: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Expects the user's subject interests to match a certain list.
+   * @param {string[]} expectedInterests - The expected list of interests.
+   */
+  async expectSubjectInterestsToBe(expectedInterests: string[]): Promise<void> {
+    try {
+      await this.page.waitForSelector(subjectInterestSelector);
+      const interestElements = await this.page.$$(subjectInterestSelector);
+      const actualInterests = await Promise.all(
+        interestElements.map(el =>
+          this.page.evaluate(el => el.textContent.trim(), el)
+        )
+      );
+
+      // Check if the actual interests match the expected interests.
+      for (const interest of expectedInterests) {
+        if (!actualInterests.includes(interest)) {
+          throw new Error(`Interest not found: ${interest}`);
+        }
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to check interests: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Exports the user's account data.
+   */
+  async exportAccount(): Promise<void> {
+    try {
+      await this.page.waitForSelector(exportButtonSelector);
+      const exportButton = await this.page.$(exportButtonSelector);
+
+      if (!exportButton) {
+        throw new Error('Export button not found');
+      }
+
+      await this.waitForPageToFullyLoad();
+      await exportButton.click();
+
+      const isTextPresent = await this.isTextPresentOnPage(
+        ACCOUNT_EXPORT_CONFIRMATION_MESSAGE
+      );
+
+      if (!isTextPresent) {
+        throw new Error(
+          `Expected text not found on page: ${ACCOUNT_EXPORT_CONFIRMATION_MESSAGE}`
+        );
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to export account: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Verifies if the page is displayed in Right-to-Left (RTL) mode.
+   */
+  async verifyPageIsRTL(): Promise<void> {
+    await this.page.waitForSelector(angularRootElementSelector);
+    const pageDirection = await this.page.evaluate(selector => {
+      const oppiaRoot = document.querySelector(selector);
+      if (!oppiaRoot) {
+        throw new Error(`${selector} not found`);
+      }
+
+      const childDiv = oppiaRoot.querySelector('div');
+      if (!childDiv) {
+        throw new Error('Child div not found');
+      }
+
+      return childDiv.getAttribute('dir');
+    }, angularRootElementSelector);
+
+    if (pageDirection !== 'rtl') {
+      throw new Error('Page is not in RTL mode');
+    }
+
+    showMessage('Page is displayed in RTL mode.');
   }
 
   /**

@@ -53,6 +53,14 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/save-an-exploration-to-play-later.spec.ts"
     },
     {
+      "name": "logged-in-user/edit-profile-preferences-and-export-their-account",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/edit-profile-preferences-and-export-their-account.spec.ts"
+    },
+    {
+      "name": "logged-in-user/set-language-to-rtl-and-navigate-through-site",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/set-language-to-rtl-and-navigate-through-site.spec.ts"
+    },
+    {
       "name": "logged-in-user/give-feedback-rate-and-report-an-exploration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/give-feedback-rate-and-report-an-exploration.spec.ts"
     },
