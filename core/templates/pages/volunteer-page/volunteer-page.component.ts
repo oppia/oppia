@@ -28,10 +28,12 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {AppConstants} from 'app.constants';
 
+import './volunteer-page.component.css';
+
 @Component({
   selector: 'volunteer-page',
   templateUrl: './volunteer-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./volunteer-page.component.css'],
   encapsulation: ViewEncapsulation.None,
   providers: [NgbCarouselConfig],
 })
@@ -39,7 +41,6 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   bannerImgPath = '';
   footerImgPath = '';
-  mobBannerImgPath = '';
   formLink = AppConstants.VOLUNTEER_FORM_LINK;
   art!: {
     images: string[];
@@ -140,7 +141,6 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
 
     this.bannerImgPath = '/volunteer/banner.webp';
     this.footerImgPath = '/volunteer/footer.webp';
-    this.mobBannerImgPath = '/volunteer/mob.webp';
 
     this.art = {
       images: [
@@ -249,9 +249,9 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
         },
         {
           content:
-            'I love to tell stories through content creation. This not only' +
+            'I love to tell stories through content creation. This not only ' +
             "amplifies Oppia's mission of providing free accessible " +
-            'education but also fosters a sense of community and inspiration,' +
+            'education but also fosters a sense of community and inspiration, ' +
             "encouraging more individuals to engage with Oppia's " +
             'educational resources.',
           name: 'Erio Crucecia',
