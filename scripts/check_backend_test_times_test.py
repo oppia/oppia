@@ -199,7 +199,7 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
             'test_three: 1.7 SECONDS. 4.0 SECONDS BY AVERAGE TEST CASE TIME.\n'
             'test_one: 1.8 SECONDS. 4.0 SECONDS BY AVERAGE TEST CASE TIME.\n'
             'test_four: 2.3 SECONDS. 4.0 SECONDS BY AVERAGE TEST CASE TIME.\n'
-            'test_eleven: 164.4 SECONDS. 200.0 SECONDS BY AVERAGE TEST CASE'
+            'test_eleven: 164.4 SECONDS. 200.0 SECONDS BY AVERAGE TEST CASE '
             'TIME. \n\033[1mBACKEND TEST TIMES OVER 150.0 SECONDS:\033[0m\n'
             'test_eleven: 164.4 SECONDS. 200.0 SECONDS BY AVERAGE TEST CASE '
             'TIME.'
