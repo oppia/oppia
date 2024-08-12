@@ -35,6 +35,7 @@ class BackendTestDict(TypedDict):
 
     test_name: str
     test_time: float
+    test_time_by_average_test_case: float
 
 
 def get_sorted_backend_test_times_from_reports() -> List[BackendTestDict]:
@@ -72,9 +73,18 @@ def get_sorted_backend_test_times_from_reports() -> List[BackendTestDict]:
             loaded_backend_test_times = json.loads(
                 backend_test_time_report.read()
             )
-            for test_name, test_time in loaded_backend_test_times.items():
+            for test_name, (
+                test_time,
+                test_time_by_average_test_case
+            ) in loaded_backend_test_times.items():
                 backend_test_times.append(
-                    {'test_name': test_name, 'test_time': float(test_time)}
+                    {
+                        'test_name': test_name,
+                        'test_time': float(test_time),
+                        'test_time_by_average_test_case': (
+                            float(test_time_by_average_test_case)
+                        )
+                    }
                 )
     return sorted(
         backend_test_times,
@@ -88,23 +98,26 @@ def main() -> None:
 
     print('\033[1mBACKEND TEST TIMES SORTED BY TIME:\033[0m')
     for backend_test in sorted_backend_test_times:
-        print('%s: %s SECONDS' % (
-            backend_test['test_name'], backend_test['test_time']))
+        print('%s: %s SECONDS. %s SECONDS BY AVERAGE TEST CASE TIME.' % (
+            backend_test['test_name'], backend_test['test_time'],
+            backend_test['test_time_by_average_test_case']))
     print('\033[1mBACKEND TEST TIMES OVER %s SECONDS:\033[0m' % (
         LONG_BACKEND_TEST_TIME_THRESHOLD))
     for backend_test in sorted_backend_test_times:
         if backend_test['test_time'] > LONG_BACKEND_TEST_TIME_THRESHOLD:
-            print('%s: %s SECONDS' % (
-                backend_test['test_name'], backend_test['test_time']))
+            print('%s: %s SECONDS. %s SECONDS BY AVERAGE TEST CASE TIME.' % (
+                backend_test['test_name'], backend_test['test_time'],
+                backend_test['test_time_by_average_test_case']))
 
     with open(
         BACKEND_TEST_TIMES_FILE, 'w', encoding='utf-8'
     ) as backend_test_times_file:
         for backend_test in sorted_backend_test_times:
             backend_test_times_file.write(
-                '%s:%s\n' % (
+                '%s:%s:%s\n' % (
                     backend_test['test_name'],
-                    backend_test['test_time']
+                    backend_test['test_time'],
+                    backend_test['test_time_by_average_test_case']
                 )
             )
 

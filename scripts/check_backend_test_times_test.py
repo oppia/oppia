@@ -46,25 +46,25 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
 
         with open(backend_test_time_report_one, 'w', encoding='utf-8') as f:
             f.write(json.dumps({
-                'test_one': 1.8,
-                'test_two': 1.4,
-                'test_three': 1.7,
-                'test_four': 2.3
+                'test_one': (1.8, 4),
+                'test_two': (1.4, 4),
+                'test_three': (1.7, 4),
+                'test_four': (2.3, 4)
             }))
 
         with open(backend_test_time_report_two, 'w', encoding='utf-8') as f:
             f.write(json.dumps({
-                'test_five': 1.2,
-                'test_six': 1.1,
-                'test_seven': 1.3
+                'test_five': (1.2, 5),
+                'test_six': (1.1, 5),
+                'test_seven': (1.3, 5)
             }))
 
         with open(backend_test_time_report_three, 'w', encoding='utf-8') as f:
             f.write(json.dumps({
-                'test_eight': 1.5,
-                'test_nine': 1.6,
-                'test_ten': 1.4,
-                'test_eleven': 164.4
+                'test_eight': (1.5, 6),
+                'test_nine': (1.6, 6),
+                'test_ten': (1.4, 6),
+                'test_eleven': (164.4, 200)
             }))
 
         self.backend_test_time_reports_swap = self.swap(
@@ -72,17 +72,61 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
             self.backend_test_time_reports_directory.name
         )
         self.sorted_backend_test_times = [
-            {'test_name': 'test_six', 'test_time': 1.1},
-            {'test_name': 'test_five', 'test_time': 1.2},
-            {'test_name': 'test_seven', 'test_time': 1.3},
-            {'test_name': 'test_ten', 'test_time': 1.4},
-            {'test_name': 'test_two', 'test_time': 1.4},
-            {'test_name': 'test_eight', 'test_time': 1.5},
-            {'test_name': 'test_nine', 'test_time': 1.6},
-            {'test_name': 'test_three', 'test_time': 1.7},
-            {'test_name': 'test_one', 'test_time': 1.8},
-            {'test_name': 'test_four', 'test_time': 2.3},
-            {'test_name': 'test_eleven', 'test_time': 164.4}
+            {
+                'test_name': 'test_six',
+                'test_time': 1.1,
+                'test_time_by_average_test_case': 5
+            },
+            {
+                'test_name': 'test_five',
+                'test_time': 1.2,
+                'test_time_by_average_test_case': 5
+            },
+            {
+                'test_name': 'test_seven',
+                'test_time': 1.3,
+                'test_time_by_average_test_case': 5
+            },
+            {
+                'test_name': 'test_ten',
+                'test_time': 1.4,
+                'test_time_by_average_test_case': 6
+            },
+            {
+                'test_name': 'test_two',
+                'test_time': 1.4,
+                'test_time_by_average_test_case': 4
+            },
+            {
+                'test_name': 'test_eight',
+                'test_time': 1.5,
+                'test_time_by_average_test_case': 6
+            },
+            {
+                'test_name': 'test_nine',
+                'test_time': 1.6,
+                'test_time_by_average_test_case': 6
+            },
+            {
+                'test_name': 'test_three',
+                'test_time': 1.7,
+                'test_time_by_average_test_case': 4
+            },
+            {
+                'test_name': 'test_one',
+                'test_time': 1.8,
+                'test_time_by_average_test_case': 4
+            },
+            {
+                'test_name': 'test_four',
+                'test_time': 2.3,
+                'test_time_by_average_test_case': 4
+            },
+            {
+                'test_name': 'test_eleven',
+                'test_time': 164.4,
+                'test_time_by_average_test_case': 200
+            }
         ]
 
     def tearDown(self) -> None:
@@ -128,10 +172,16 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
                 check_backend_test_times.main()
         sorted_backend_test_times_from_file = []
         for line in backend_test_times_temp_file.readlines():
-            test_name, test_time = line.strip().split(':')
+            print(line.strip().split(':'))
+            test_name, test_time, test_time_by_average_test_case = line.strip().split(':') # pylint: disable=line-too-long
             print(test_time)
             sorted_backend_test_times_from_file.append(
-                {'test_name': test_name, 'test_time': float(test_time)}
+                {
+                    'test_name': test_name,
+                    'test_time': float(test_time),
+                    'test_time_by_average_test_case': float(
+                        test_time_by_average_test_case)
+                }
             )
         self.assertEqual(
             sorted_backend_test_times_from_file,
@@ -139,14 +189,20 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
         )
         sorted_backend_test_times_message = (
             '\033[1mBACKEND TEST TIMES SORTED BY TIME:\033[0m\n'
-            'test_six: 1.1 SECONDS\ntest_five: 1.2 SECONDS\n'
-            'test_seven: 1.3 SECONDS\ntest_ten: 1.4 SECONDS\n'
-            'test_two: 1.4 SECONDS\ntest_eight: 1.5 SECONDS\n'
-            'test_nine: 1.6 SECONDS\ntest_three: 1.7 SECONDS\n'
-            'test_one: 1.8 SECONDS\ntest_four: 2.3 SECONDS\n'
-            'test_eleven: 164.4 SECONDS\n'
-            '\033[1mBACKEND TEST TIMES OVER 150.0 SECONDS:\033[0m\n'
-            'test_eleven: 164.4 SECONDS'
+            'test_six: 1.1 SECONDS. 5.0 SECONDS BY AVERAGE TEST CASE TIME.\n'
+            'test_five: 1.2 SECONDS. 5.0 SECONDS BY AVERAGE TEST CASE TIME.\n'
+            'test_seven: 1.3 SECONDS. 5.0 SECONDS BY AVERAGE TEST CASE TIME.\n'
+            'test_ten: 1.4 SECONDS. 6.0 SECONDS BY AVERAGE TEST CASE TIME.\n'
+            'test_two: 1.4 SECONDS. 4.0 SECONDS BY AVERAGE TEST CASE TIME.\n'
+            'test_eight: 1.5 SECONDS. 6.0 SECONDS BY AVERAGE TEST CASE TIME.\n'
+            'test_nine: 1.6 SECONDS. 6.0 SECONDS BY AVERAGE TEST CASE TIME.\n'
+            'test_three: 1.7 SECONDS. 4.0 SECONDS BY AVERAGE TEST CASE TIME.\n'
+            'test_one: 1.8 SECONDS. 4.0 SECONDS BY AVERAGE TEST CASE TIME.\n'
+            'test_four: 2.3 SECONDS. 4.0 SECONDS BY AVERAGE TEST CASE TIME.\n'
+            'test_eleven: 164.4 SECONDS. 200.0 SECONDS BY AVERAGE TEST CASE'
+            'TIME. \n\033[1mBACKEND TEST TIMES OVER 150.0 SECONDS:\033[0m\n'
+            'test_eleven: 164.4 SECONDS. 200.0 SECONDS BY AVERAGE TEST CASE '
+            'TIME.'
         )
         self.assertEqual(
             sorted_backend_test_times_message, '\n'.join(self.print_arr))
