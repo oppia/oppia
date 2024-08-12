@@ -226,7 +226,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 with self.swap_check_frontend_coverage:
                     with self.assertRaisesRegex(
                         ValueError,
-                        'No spec file found for the name: invalid.ts'
+                        'No spec file found for the file: invalid.ts'
                     ):
                         run_frontend_tests.main(
                             args=['--specs_to_run', 'invalid.ts'])
