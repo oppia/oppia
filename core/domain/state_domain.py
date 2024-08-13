@@ -3676,7 +3676,7 @@ class State(translation_domain.BaseTranslatableObject):
         self.solicit_answer_details = solicit_answer_details
         self.card_is_checkpoint = card_is_checkpoint
         self.inapplicable_skill_misconception_ids = (
-            inapplicable_skill_misconception_ids 
+            inapplicable_skill_misconception_ids
             if inapplicable_skill_misconception_ids
             else []
         )
