@@ -16,7 +16,6 @@
  * @fileoverview Service for emitting events when a skill editor tab is stale.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Injectable} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -124,10 +123,3 @@ export class SkillEditorStalenessDetectionService {
     return this._presenceOfUnsavedChangesEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SkillEditorStalenessDetectionService',
-    downgradeInjectable(SkillEditorStalenessDetectionService)
-  );
