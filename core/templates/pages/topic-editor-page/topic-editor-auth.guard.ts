@@ -26,14 +26,14 @@ import {
 } from '@angular/router';
 
 import {AppConstants} from 'app.constants';
-import {UserService} from 'services/user.service';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TopicEditorAuthGuard implements CanActivate {
   constructor(
-    private userService: UserService,
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
     private router: Router,
     private location: Location
   ) {}
@@ -42,18 +42,24 @@ export class TopicEditorAuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Promise<boolean> {
-    const userInfo = await this.userService.getUserInfoAsync();
-    if (userInfo.isCurriculumAdmin()) {
-      return true;
-    }
-
-    this.router
-      .navigate([
-        `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
-      ])
-      .then(() => {
-        this.location.replaceState(state.url);
-      });
-    return false;
+    return new Promise<boolean>(resolve => {
+      let topicId = route.paramMap.get('topic_id') || '';
+      this.accessValidationBackendApiService
+        .validateAccessToTopicEditorPage(topicId)
+        .then(() => {
+          resolve(true);
+        })
+        .catch(err => {
+          let statusCode = 401;
+          this.router
+            .navigate([
+              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/${statusCode}`,
+            ])
+            .then(() => {
+              this.location.replaceState(state.url);
+              resolve(false);
+            });
+        });
+    });
   }
 }

@@ -13,86 +13,105 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for TopicEditorAuthGuard.
+ * @fileoverview Tests for EditLearnerGroupPageAuthGuard
  */
-
-import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {TestBed} from '@angular/core/testing';
+import {Location} from '@angular/common';
+import {TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {
   ActivatedRouteSnapshot,
-  Router,
   RouterStateSnapshot,
-  NavigationExtras,
+  Router,
 } from '@angular/router';
+import {RouterTestingModule} from '@angular/router/testing';
 
 import {AppConstants} from 'app.constants';
-import {UserInfo} from 'domain/user/user-info.model';
-import {UserService} from 'services/user.service';
 import {TopicEditorAuthGuard} from './topic-editor-auth.guard';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+
+class MockAccessValidationBackendApiService {
+  validateAccessToTopicEditorPage(topicId: string) {
+    return Promise.resolve();
+  }
+}
 
 class MockRouter {
-  navigate(commands: string[], extras?: NavigationExtras): Promise<boolean> {
+  navigate(commands: string[]): Promise<boolean> {
     return Promise.resolve(true);
   }
 }
 
-describe('Topic editor access guard', () => {
-  let topicEditorAccessGuard: TopicEditorAuthGuard;
-  let userService: UserService;
+describe('TopicEditorAuthGuard', () => {
+  let guard: TopicEditorAuthGuard;
+  let accessValidationBackendApiService: AccessValidationBackendApiService;
   let router: Router;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [RouterTestingModule],
       providers: [
-        UserService,
-        {provide: Router, useClass: MockRouter},
         TopicEditorAuthGuard,
+        {
+          provide: AccessValidationBackendApiService,
+          useClass: MockAccessValidationBackendApiService,
+        },
+        {provide: Router, useClass: MockRouter},
+        Location,
       ],
-    }).compileComponents();
+    });
 
-    topicEditorAccessGuard = TestBed.inject(TopicEditorAuthGuard);
-    userService = TestBed.inject(UserService);
+    guard = TestBed.inject(TopicEditorAuthGuard);
+    accessValidationBackendApiService = TestBed.inject(
+      AccessValidationBackendApiService
+    );
     router = TestBed.inject(Router);
   });
 
-  it('should redirect user to 401 page if user is not curriculum admin', async () => {
-    const getUserInfoAsyncSpy = spyOn(
-      userService,
-      'getUserInfoAsync'
-    ).and.returnValue(Promise.resolve(UserInfo.createDefault()));
-    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
-
-    const canActivate = await topicEditorAccessGuard.canActivate(
-      {} as ActivatedRouteSnapshot,
-      {} as RouterStateSnapshot
+  it('should allow access if validation succeeds', fakeAsync(() => {
+    const validateAccessSpy = spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToTopicEditorPage'
+    ).and.returnValue(Promise.resolve());
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
     );
 
-    expect(canActivate).toBeFalse();
-    expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
+    let canActivateResult: boolean | null = null;
+
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then(result => {
+        canActivateResult = result;
+      });
+
+    tick();
+
+    expect(canActivateResult).toBeTrue();
+    expect(validateAccessSpy).toHaveBeenCalled();
+    expect(navigateSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should redirect to 401 page if validation fails', fakeAsync(() => {
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToTopicEditorPage'
+    ).and.returnValue(Promise.reject());
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
+
+    let canActivateResult: boolean | null = null;
+
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then(result => {
+        canActivateResult = result;
+      });
+
+    tick();
+
+    expect(canActivateResult).toBeFalse();
     expect(navigateSpy).toHaveBeenCalledWith([
       `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
     ]);
-  });
-
-  it('should allow user to access the page if user is curriculum admin', async () => {
-    const getUserInfoAsyncSpy = spyOn(
-      userService,
-      'getUserInfoAsync'
-    ).and.returnValue(
-      Promise.resolve(
-        new UserInfo([], false, true, false, false, false, '', '', '', true)
-      )
-    );
-    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
-
-    const canActivate = await topicEditorAccessGuard.canActivate(
-      {} as ActivatedRouteSnapshot,
-      {} as RouterStateSnapshot
-    );
-
-    expect(canActivate).toBeTrue();
-    expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
-    expect(navigateSpy).not.toHaveBeenCalled();
-  });
+  }));
 });
