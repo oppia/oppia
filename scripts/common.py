@@ -229,6 +229,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user/create-and-delete-account',
     'logged-in-user/save-an-exploration-to-play-later',
     'logged-in-user/restart-or-continue-exploration-on-revisit',
+    'logged-in-user/edit-profile-preferences-and-export-their-account',
+    'logged-in-user/set-language-to-rtl-and-navigate-through-site',
     'logged-out-user/check-all-user-flow-of-donor',
     'logged-out-user/check-all-user-flow-of-parent-teacher',
     'logged-out-user/check-all-user-flow-of-partner',
@@ -257,6 +259,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/change-site-language-and-engage-with-original-exploration',
     'logged-out-user/sign-in-and-save-exploration-progress',
     'logged-out-user/track-and-resume-exploration-progress-via-url',
+    'logged-out-user/play-lesson-in-different-languages-and-listen-'
+    'to-voiceovers',
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
