@@ -80,17 +80,17 @@
     </nav>
     <footer class="oppia-learner-dashboard-buttons" *ngIf="windowIsNarrow && !isShowRedesignedLearnerDashboardActive()" headroom>
       <mat-card class="oppia-learner-dashboard-button-menu d-flex justify-content-around">
-        <div class="oppia-buttons" (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)" [ngClass]="{'oppia-learner-dashboard-section-active-button': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME, 'oppia-learner-dashboard-section-not-active-button': activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}">
+        <div class="oppia-buttons e2e-test-mobile-home-section" (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)" [ngClass]="{'oppia-learner-dashboard-section-active-button': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME, 'oppia-learner-dashboard-section-not-active-button': activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}">
           <img [src]="homeImageUrl" alt="home image" class="oppia-svg-image">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME | translate" class="home-button"></span>
         </div>
-        <div class="oppia-buttons" (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)" [ngClass]="{'oppia-learner-dashboard-section-active-button': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS, 'oppia-learner-dashboard-section-not-active-button': activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS}">
+        <div class="oppia-buttons e2e-test-mobile-goals-section" (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)" [ngClass]="{'oppia-learner-dashboard-section-active-button': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS, 'oppia-learner-dashboard-section-not-active-button': activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS}">
           <img [src]="todolistImageUrl" alt="todolist image" class="oppia-svg-image">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS | translate" class="goals-button"></span>
         </div>
-        <div class="oppia-buttons" (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)" [ngClass]="{'oppia-learner-dashboard-section-active-button': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS, 'oppia-learner-dashboard-section-not-active-button': activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS}">
+        <div class="oppia-buttons e2e-test-mobile-progress-section" (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)" [ngClass]="{'oppia-learner-dashboard-section-active-button': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS, 'oppia-learner-dashboard-section-not-active-button': activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS}">
           <img [src]="progressImageUrl" alt="progress image" class="oppia-svg-image">
-          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate" class="progress-button"></span>
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate" class="progress-button e2e-test-mobile-progress-section"></span>
         </div>
         <div class="oppia-buttons" *ngIf="LEARNER_GROUP_FEATURE_IS_ENABLED" (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS)" [ngClass]="{'oppia-learner-dashboard-section-active-button': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS, 'oppia-learner-dashboard-section-not-active-button': activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS}">
           <i class="fa fa-users learner-groups-icon" aria-hidden="true"></i>
@@ -108,7 +108,7 @@
           <p [innerHTML]="'I18N_DASHBOARD_STORIES' | translate">
           </p>
         </div>
-        <div class="oppia-learner-dashboard-progress-button-menu-options" [ngStyle]="activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS && {'border-bottom': '2px solid #00645C'}" (click)="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS)">
+        <div class="oppia-learner-dashboard-progress-button-menu-options e2e-test-mobile-lessons-section" [ngStyle]="activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS && {'border-bottom': '2px solid #00645C'}" (click)="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LESSONS)">
           <p [innerHTML]="'I18N_DASHBOARD_LESSONS' | translate">
           </p>
         </div>

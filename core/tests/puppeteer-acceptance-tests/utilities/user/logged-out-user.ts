@@ -282,7 +282,6 @@ const viewsContainerSelector = '.e2e-test-info-card-views';
 const lastUpdatedInfoSelector = '.e2e-test-info-card-last-updated';
 const tagsContainerSelector = '.exploration-tags span';
 const ratingContainerSelector = '.e2e-test-info-card-rating span:nth-child(2)';
-const conversationSkinUserAvatar = '.conversation-skin-user-avatar';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const desktopNavbarButtonsSelector = '.oppia-navbar-tab-content';
@@ -290,6 +289,11 @@ const mobileNavbarButtonSelector = '.text-uppercase';
 const skipLinkSelector = '.e2e-test-skip-link';
 const openMobileNavbarMenuButton = '.oppia-navbar-menu-icon';
 const closeMobileNavbarMenuButton = '.oppia-navbar-close-icon';
+const lessonLanguageSelector = '.oppia-content-language-selector';
+const playVoiceoverButton = '.e2e-test-play-circle';
+const voiceoverDropdown = '.e2e-test-audio-bar';
+const pauseVoiceoverButton = '.e2e-test-pause-circle';
+const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -2054,9 +2058,6 @@ export class LoggedOutUser extends BaseUser {
         throw error;
       }
     }
-    await this.page.waitForSelector(conversationSkinUserAvatar, {
-      hidden: true,
-    });
   }
 
   /**
@@ -2076,14 +2077,13 @@ export class LoggedOutUser extends BaseUser {
   async expectExplorationCompletionToastMessage(
     message: string
   ): Promise<void> {
-    await this.page.waitForSelector(explorationCompletionToastMessage, {
-      visible: true,
-    });
-    const element = await this.page.$(explorationCompletionToastMessage);
-    const toastMessage = await this.page.evaluate(
-      element => element.textContent,
-      element
+    await this.page.waitForSelector(explorationCompletionToastMessage);
+
+    const toastMessage = await this.page.$eval(
+      explorationCompletionToastMessage,
+      element => element.textContent
     );
+
     if (!toastMessage || !toastMessage.includes(message)) {
       throw new Error('Exploration did not complete successfully');
     }
@@ -2393,12 +2393,12 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Selects and opens a chapter within a story to learn.
-   * @param {string} chapterName - The name of the chapter to select and open.
    * @param {string} storyName - The name of the story containing the chapter.
+   * @param {string} chapterName - The name of the chapter to select and open.
    */
   async selectChapterWithinStoryToLearn(
-    chapterName: string,
-    storyName: string
+    storyName: string,
+    chapterName: string
   ): Promise<void> {
     const isMobileViewport = this.isViewportAtMobileWidth();
     const storyTitleSelector = isMobileViewport
@@ -2669,8 +2669,9 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Gives feedback on the exploration.
    * @param {string} feedback - The feedback to give on the exploration.
+   * @param {boolean} stayAnonymous - Whether to stay anonymous while giving feedback.
    */
-  async giveFeedback(feedback: string): Promise<void> {
+  async giveFeedback(feedback: string, stayAnonymous?: boolean): Promise<void> {
     // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
     // in mobile viewport which is required for testing the feedback messages tab),
     // remove this part of skipping this function for Mobile viewport and make it run in mobile viewport
@@ -2682,6 +2683,12 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(feedbackPopupSelector);
     await this.page.waitForSelector(feedbackTextarea, {visible: true});
     await this.type(feedbackTextarea, feedback);
+
+    // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
+    if (stayAnonymous) {
+      await this.clickOn(stayAnonymousCheckbox);
+    }
+
     await this.clickOn('Submit');
 
     try {
@@ -3461,6 +3468,45 @@ export class LoggedOutUser extends BaseUser {
 
     // Remove focus from the focused element.
     await this.page.evaluate(element => element.blur(), expectedFocusedElement);
+  }
+
+  /**
+   * Changes the language of the lesson.
+   * @param {string} languageCode - The code of the language to change to.
+   */
+  async changeLessonLanguage(languageCode: string): Promise<void> {
+    await this.select(lessonLanguageSelector, languageCode);
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Starts the voiceover by clicking on the audio bar (dropdown) and the play circle.
+   */
+  async startVoiceover(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    const voiceoverDropdownElement = await this.page.$(voiceoverDropdown);
+    if (voiceoverDropdownElement) {
+      await this.clickOn(voiceoverDropdown);
+    }
+    await this.clickOn(playVoiceoverButton);
+    await this.page.waitForSelector(pauseVoiceoverButton);
+  }
+
+  /**
+   * Verifies if the voiceover is playing.
+   */
+  async verifyVoiceoverIsPlaying(shouldBePlaying: true): Promise<void> {
+    // If the pause button is present, it means the audio is playing.
+    await this.page.waitForSelector(pauseVoiceoverButton);
+    showMessage(`Voiceover is ${shouldBePlaying ? 'playing' : 'paused'}.`);
+  }
+
+  /**
+   * Pauses the voiceover by clicking on the pause button.
+   */
+  async pauseVoiceover(): Promise<void> {
+    await this.clickOn(pauseVoiceoverButton);
   }
 }
 
