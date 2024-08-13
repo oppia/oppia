@@ -1420,10 +1420,12 @@ export class LoggedOutUser extends BaseUser {
     const languageOption = `.e2e-test-i18n-language-${langCode} a`;
 
     if (this.isViewportAtMobileWidth()) {
-      // This reload is required to ensure the language dropdown is visible in mobile view,
+      // This is required to ensure the language dropdown is visible in mobile view,
       // if the earlier movements of the page have hidden it and since the inbuilt
       // scrollIntoView function call of the clickOn function didn't work as expected.
-      await this.page.reload({waitUntil: 'domcontentloaded'});
+      await this.page.evaluate(() => {
+        window.scrollTo(0, 0);
+      });
     }
     await this.page.waitForSelector(languageDropdown);
     const languageDropdownElement = await this.page.$(languageDropdown);
