@@ -23,6 +23,13 @@
 .playbook .oppia-about-buttons-container {
   text-align: center;
 }
+
+.oppia-about-button{
+  margin: 0 1rem;
+  background-color: #007066;
+  color: white;
+}
+
 .playbook .oppia-about-extra-info {
   background-color: #009788;
   color: #fff;
