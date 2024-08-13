@@ -67,7 +67,7 @@ describe('Logged-in User', function () {
       );
 
       // Navigate to the learner dashboard and play the lesson.
-      await loggedInUser.navigateToLearnerDashboardPage();
+      await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToCommunityLessonsSection();
       await loggedInUser.verifyLessonPresenceInPlayLater(
         'Positive Numbers',
@@ -81,7 +81,7 @@ describe('Logged-in User', function () {
       );
 
       // Navigate back to the learner dashboard and remove the lesson from play later.
-      await loggedInUser.navigateToLearnerDashboardPage();
+      await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToCommunityLessonsSection();
 
       // Since the exploration played, it should have been automatically removed from the "play later" list.
