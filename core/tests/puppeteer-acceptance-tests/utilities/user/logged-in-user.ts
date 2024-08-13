@@ -1165,6 +1165,8 @@ export class LoggedInUser extends BaseUser {
    */
   async expectCompletedGoalsToInclude(expectedGoals: string[]): Promise<void> {
     await this.page.waitForSelector(completedGoalsSectionSelector);
+    await this.page.waitForSelector(completedGoalsTopicNameSelector);
+
     const completedGoalsTopicNames = await this.page.$$(
       completedGoalsSectionSelector + ' ' + completedGoalsTopicNameSelector
     );
@@ -1197,6 +1199,8 @@ export class LoggedInUser extends BaseUser {
     expectedStories: string[]
   ): Promise<void> {
     await this.page.waitForSelector(completedStoriesSectionSelector);
+    await this.page.waitForSelector(storyNameSelector);
+
     const storyNames = await this.page.$$(
       completedStoriesSectionSelector + ' ' + storyNameSelector
     );
@@ -1224,7 +1228,9 @@ export class LoggedInUser extends BaseUser {
     const completedLessonsSection = isMobileViewport
       ? mobileCompletedLessonSection
       : desktopCompletedLessonsSectionSelector;
+
     await this.page.waitForSelector(completedLessonsSection);
+    await this.page.waitForSelector(lessonCardTitleSelector);
     const lessonObjectives = await this.page.$$(
       completedLessonsSection + ' ' + lessonCardTitleSelector
     );
@@ -1250,6 +1256,9 @@ export class LoggedInUser extends BaseUser {
    * @param {string} lessonName - The name of the lesson.
    */
   async playLessonFromContinueWhereLeftOff(lessonName: string): Promise<void> {
+    await this.page.waitForSelector(continueFromWhereLeftOffSectionSelector);
+    await this.page.waitForSelector(lessonTileTitleSelector);
+
     const lessonTileTitles = await this.page.$$(
       continueFromWhereLeftOffSectionSelector + ' ' + lessonTileTitleSelector
     );
@@ -1262,7 +1271,7 @@ export class LoggedInUser extends BaseUser {
 
       if (actualLessonName === lessonName) {
         await Promise.all([
-          this.page.waitForNavigation({waitUntil: ['networkidle0', 'load']}),
+          this.page.waitForNavigation({waitUntil: 'networkidle0'}),
           await this.waitForElementToBeClickable(lessonTileTitle),
           lessonTileTitle.click(),
         ]);

@@ -110,6 +110,10 @@ describe('Logged-in User', function () {
 
       await loggedInUser.navigateToHomeSection();
       await loggedInUser.playLessonFromContinueWhereLeftOff('Algebra I');
+      // The exploration has a single state.
+      await loggedInUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
 
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToGoalsSection();
