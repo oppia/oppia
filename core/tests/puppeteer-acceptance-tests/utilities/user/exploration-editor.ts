@@ -60,6 +60,7 @@ const addInteractionModalSelector = 'customize-interaction-body-container';
 const multipleChoiceInteractionButton =
   'div.e2e-test-interaction-tile-MultipleChoiceInput';
 const addResponseOptionButton = 'button.e2e-test-add-list-entry';
+const addAnotherResponseButton = 'button.e2e-test-add-another-response';
 const multipleChoiceResponseDropdown =
   'mat-select.e2e-test-main-html-select-selector';
 const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
@@ -1049,7 +1050,7 @@ export class ExplorationEditor extends BaseUser {
         hidden: true,
       });
     } else {
-      await this.clickOn('.e2e-test-add-another-response');
+      await this.clickOn(addAnotherResponseButton);
     }
   }
 
