@@ -1164,9 +1164,9 @@ export class LoggedInUser extends BaseUser {
    * @param {string[]} expectedGoals - The expected goals.
    */
   async expectCompletedGoalsToInclude(expectedGoals: string[]): Promise<void> {
-    await this.page.waitForSelector(completedGoalsSectionSelector);
-    await this.page.waitForSelector(completedGoalsTopicNameSelector);
+    await this.waitForPageToFullyLoad();
 
+    await this.page.waitForSelector(completedGoalsSectionSelector);
     const completedGoalsTopicNames = await this.page.$$(
       completedGoalsSectionSelector + ' ' + completedGoalsTopicNameSelector
     );
@@ -1198,9 +1198,9 @@ export class LoggedInUser extends BaseUser {
   async expectStoriesCompletedToInclude(
     expectedStories: string[]
   ): Promise<void> {
-    await this.page.waitForSelector(completedStoriesSectionSelector);
-    await this.page.waitForSelector(storyNameSelector);
+    await this.waitForPageToFullyLoad();
 
+    await this.page.waitForSelector(completedStoriesSectionSelector);
     const storyNames = await this.page.$$(
       completedStoriesSectionSelector + ' ' + storyNameSelector
     );
