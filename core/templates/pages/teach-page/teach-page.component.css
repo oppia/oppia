@@ -98,7 +98,7 @@
 
 .teach-page .oppia-teach-hero-section {
   align-items: end;
-  background-image: url("/assets/images/teach/banner-desktop.webp"), url("/assets/images/teach/banner-desktop.png") ;
+  background-image: url("/assets/images/teach/banner-desktop.webp");
   background-repeat: no-repeat;
   background-size: cover;
   display: flex;
@@ -986,7 +986,7 @@
     line-height: 27px;
   }
   .teach-page .oppia-teach-hero-section {
-    background-image: url("/assets/images/teach/banner-mobile.webp"), url("/assets/images/teach/banner-mobile.png");
+    background-image: url("/assets/images/teach/banner-mobile.webp");
     min-height: 376px;
     padding: 32px 12px;
   }
