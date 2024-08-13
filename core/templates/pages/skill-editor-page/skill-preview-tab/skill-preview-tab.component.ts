@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {
   QuestionBackendDict,
@@ -183,10 +182,3 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     this.contextService.clearQuestionPlayerIsOpen();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSkillPreviewTab',
-  downgradeComponent({
-    component: SkillPreviewTabComponent,
-  }) as angular.IDirectiveFactory
-);
