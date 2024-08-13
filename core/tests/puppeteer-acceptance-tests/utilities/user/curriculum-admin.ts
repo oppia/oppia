@@ -924,11 +924,12 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(uploadPhotoButton);
 
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.waitForNetworkIdle();
     await this.clickAndWaitForNavigation(createStoryButton);
+    await this.waitForNetworkIdle();
 
     await this.page.waitForSelector(storyMetaTagInput);
-    await this.page.focus(storyMetaTagInput);
-    await this.page.type(storyMetaTagInput, 'meta');
+    await this.type(storyMetaTagInput, 'meta');
     await this.page.keyboard.press('Tab');
     await this.saveStoryDraft();
 

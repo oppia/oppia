@@ -2425,12 +2425,7 @@ export class TopicManager extends BaseUser {
       'Test saving story as curriculum admin.'
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
-    await Promise.all([
-      this.clickOn(closeSaveModalButton),
-      this.page.waitForNavigation({waitUntil: 'networkidle0'}).catch(error => {
-        showMessage(error);
-      }),
-    ]);
+    await this.clickOn(closeSaveModalButton);
   }
 
   /**
@@ -2783,14 +2778,7 @@ export class TopicManager extends BaseUser {
     shouldExist: boolean
   ): Promise<void> {
     try {
-      await Promise.all([
-        this.openStoryEditor(storyName, topicName),
-        this.page
-          .waitForNavigation({waitUntil: 'networkidle0'})
-          .catch(error => {
-            showMessage(error);
-          }),
-      ]);
+      await this.openStoryEditor(storyName, topicName);
 
       if (this.isViewportAtMobileWidth()) {
         await this.page.waitForSelector(mobileChapterCollapsibleCard);
