@@ -43,7 +43,7 @@ describe('Logged-out User in Thanks for Donating page', function () {
   it(
     'should open the right page with the Watch A Video button.',
     async function () {
-      await loggedOutUser.clickWatchAVideoButtonInThanksForDonatingPage();
+      await loggedOutUser.clickWatchAVideoButtonInDonationThanksModalOnDonatePage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -51,7 +51,7 @@ describe('Logged-out User in Thanks for Donating page', function () {
   it(
     'should open the Blog page with the Read Our Blog button.',
     async function () {
-      await loggedOutUser.clickReadOurBlogButtonInThanksForDonatingPage();
+      await loggedOutUser.clickReadOurBlogButtonInDonationThanksModalOnDonatePage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

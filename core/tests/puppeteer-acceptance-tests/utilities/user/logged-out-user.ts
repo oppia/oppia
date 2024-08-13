@@ -339,14 +339,14 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to navigate to the Thanks for Donating page of Donate page.
+   * Function to navigate to the Donation thanks modal on donate page.
    */
   async navigateToDonationThanksModalOnDonatePage(): Promise<void> {
     await this.goto(donatePageThanksModalURL);
   }
 
   /**
-   * Function to navigate to the Thanks for Donating page of About page.
+   * Function to navigate to the Donation thanks modal on About page.
    */
   async navigateToDonationThanksModalOnAboutPage(): Promise<void> {
     await this.goto(aboutPageThanksModalURL);
@@ -709,9 +709,9 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to click the Watch A Video button
-   * in the Thanks for Donating page and check if it opens the right page.
+   * in the Donation thanks modal on donate page and check if it opens the right page.
    */
-  async clickWatchAVideoButtonInThanksForDonatingPage(): Promise<void> {
+  async clickWatchAVideoButtonInDonationThanksModalOnDonatePage(): Promise<void> {
     await this.page.waitForSelector(watchAVideoButton);
     const buttonText = await this.page.$eval(
       watchAVideoButton,
@@ -737,9 +737,9 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to click the Read Our Blog button
-   * in the Thanks for Donating page and check if it opens the Blog page.
+   * in the Donation thanks modal on donate page and check if it opens the Blog page.
    */
-  async clickReadOurBlogButtonInThanksForDonatingPage(): Promise<void> {
+  async clickReadOurBlogButtonInDonationThanksModalOnDonatePage(): Promise<void> {
     await this.page.waitForSelector(readOurBlogButton);
     const buttonText = await this.page.$eval(
       readOurBlogButton,
@@ -814,8 +814,8 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the dismiss button in the Thanks for Donating page,
-   * and check if the Thanks for Donating modal disappears
+   * Function to click the dismiss button in the Donation thanks modal on Donate page,
+   * and check if the Donation thanks modal disappears
    * and if the Donate page is shown.
    */
   async dismissDonationThanksModalOnDonatePage(): Promise<void> {
@@ -824,7 +824,7 @@ export class LoggedOutUser extends BaseUser {
     const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
     if (thanksForDonatingHeader !== null) {
       throw new Error(
-        'The dismiss button does not close the Thanks for Donating modal!'
+        'The dismiss button does not close the Donation thanks modal on Donate page!'
       );
     }
     await this.page.waitForSelector(donatePage);
@@ -836,15 +836,15 @@ export class LoggedOutUser extends BaseUser {
       );
     } else {
       showMessage(
-        'The dismiss button closes the Thanks for Donating modal ' +
+        'The dismiss button closes the Donation thanks modal on Donate page ' +
           'and shows the Donate page.'
       );
     }
   }
 
   /**
-   * Function to click the dismiss button on the Thanks for Donating modal,
-   * and check if the Thanks for Donating modal disappears
+   * Function to click the dismiss button on the Donation thanks modal on About page,
+   * and check if the Donation thanks modal disappears
    * and if the About page is shown.
    */
   async dismissDonationThanksModalOnAboutPage(): Promise<void> {
@@ -853,7 +853,7 @@ export class LoggedOutUser extends BaseUser {
     const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
     if (thanksForDonatingHeader !== null) {
       throw new Error(
-        'The dismiss button does not close the Thanks for Donating modal!'
+        'The dismiss button does not close the Donation thanks modal on About page!'
       );
     }
 
@@ -866,7 +866,7 @@ export class LoggedOutUser extends BaseUser {
       );
     } else {
       showMessage(
-        'The dismiss button closes the Thanks for Donating modal ' +
+        'The dismiss button closes the Donation thanks modal on About page ' +
           'and shows the About page.'
       );
     }
