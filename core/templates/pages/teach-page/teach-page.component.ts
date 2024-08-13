@@ -168,6 +168,7 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
         this.isWindowNarrow = this.windowDimensionsService.isWindowNarrow();
       })
     );
+    this.registerFirstTimePageViewEvent();
   }
 
   ngAfterViewInit(): void {
@@ -328,18 +329,26 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
     return;
   }
 
-  onClickExploreLessonsButton(): void {
-    this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
-    this.windowRef.nativeWindow.location.href = '/learn';
-    return;
-  }
-
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  onClickExploreLessonsButton(): void {
+    this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
+  }
+
+  onClickDownloadAndroidAppButton(): void {
+    this.siteAnalyticsService.registerClickDownloadAndroidAppButtonEvent();
+  }
+
+  registerFirstTimePageViewEvent(): void {
+    this.siteAnalyticsService.registerFirstTimePageViewEvent(
+      AppConstants.LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA.TEACH
+    );
   }
 
   ngOnDestroy(): void {

@@ -19,14 +19,15 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import puppeteer from 'puppeteer';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
   testConstants.URLs.WikiPrivilegesToFirebaseAccount;
-const PendingAccountDeletionPage = testConstants.URLs.PendingAccountDeletion;
 const baseUrl = testConstants.URLs.BaseURL;
 const homePageUrl = testConstants.URLs.Home;
 const signUpEmailField = testConstants.SignInDetails.inputField;
+const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -49,7 +50,43 @@ const confirmUsernameField = '.e2e-test-confirm-username-field';
 const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
 const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
 const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
+const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
+const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
+const desktopAddToPlayLaterButton = '.e2e-test-add-to-playlist-btn';
+const mobileAddToPlayLaterButton = '.e2e-test-mobile-add-to-playlist-btn';
+const toastMessageSelector = '.e2e-test-toast-message';
+const mobileLessonCardTitleSelector = '.e2e-test-exp-summary-tile-title';
+const mobileCommunityLessonSectionButton = '.e2e-test-mobile-lessons-section';
+const communityLessonsSectionButton = '.e2e-test-community-lessons-section';
+const removeFromPlayLaterButtonSelector = '.e2e-test-remove-from-playlist-btn';
+const confirmRemovalFromPlayLaterButton =
+  '.e2e-test-confirm-delete-interaction';
+const playLaterSectionSelector = '.e2e-test-play-later-section';
+const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-test-exploration-tile-title`;
+const mobileLessonCardOptionsDropdownButton =
+  '.e2e-test-mobile-lesson-card-dropdown';
+const mobileProgressSectionButton = '.e2e-test-mobile-progress-section';
+const addProfilePictureButton = '.e2e-test-photo-upload-submit';
+const editProfilePictureButton = '.e2e-test-photo-clickable';
+const bioTextareaSelector = '.e2e-test-user-bio';
+const saveChangesButtonSelector = '.e2e-test-save-changes-button';
+const subjectInterestsInputSelector = '.e2e-test-subject-interests-input';
+const explorationLanguageInputSelector =
+  '.e2e-test-preferred-exploration-language-input';
+const siteLanguageInputSelector = '.e2e-test-site-language-selector';
+const audioLanguageInputSelector = '.e2e-test-audio-language-selector';
+const goToProfilePageButton = '.e2e-test-go-to-profile-page';
+const profilePictureSelector = '.e2e-test-profile-user-photo';
+const bioSelector = '.oppia-user-bio-text';
+const subjectInterestSelector = '.e2e-test-profile-interest';
+const exportButtonSelector = '.e2e-test-export-account-button';
+const angularRootElementSelector = 'oppia-angular-root';
+const checkboxesSelector = '.checkbox';
+const defaultProfilePicture =
+  '/assets/images/avatar/user_blue_150px.png?2983.800000011921';
 
+const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE =
+  'Your data is currently being loaded and will be downloaded as a JSON formatted text file upon completion.';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
 export class LoggedInUser extends BaseUser {
@@ -62,6 +99,40 @@ export class LoggedInUser extends BaseUser {
       return;
     }
     await this.goto(profilePageUrl);
+  }
+
+  /**
+   * Navigates to the community library tab of the learner dashboard.
+   */
+  async navigateToCommunityLessonsSection(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileProgressSectionButton);
+      await this.clickOn(mobileProgressSectionButton);
+
+      try {
+        await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          // Try clicking again if does not opens the expected page.
+          await this.clickOn(mobileProgressSectionButton);
+        } else {
+          throw error;
+        }
+      }
+      await this.clickOn(mobileCommunityLessonSectionButton);
+    } else {
+      await this.page.click(communityLessonsSectionButton);
+    }
+  }
+
+  /**
+   * Navigates to the learner dashboard.
+   */
+  async navigateToLearnerDashboard(): Promise<void> {
+    await this.goto(learnerDashboardUrl);
   }
 
   /**
@@ -109,10 +180,6 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToPreferencesPage(): Promise<void> {
     await this.goto(PreferencesPageUrl);
-  }
-
-  async navigateToPendingAccountDeletionPage(): Promise<void> {
-    await this.goto(PendingAccountDeletionPage);
   }
 
   /**
@@ -341,6 +408,516 @@ export class LoggedInUser extends BaseUser {
         `Expected to be on page ${expectedPage}, but found ${url}`
       );
     }
+  }
+
+  /**
+  /**
+   * Adds a lesson to the 'Play Later' list from community library page.
+   * @param {string} lessonTitle - The title of the lesson to add to the 'Play Later' list.
+   */
+  async addLessonToPlayLater(lessonTitle: string): Promise<void> {
+    try {
+      await this.waitForPageToFullyLoad();
+      const isMobileViewport = await this.isViewportAtMobileWidth();
+      const lessonCardTitleSelector = isMobileViewport
+        ? mobileLessonCardTitleSelector
+        : desktopLessonCardTitleSelector;
+
+      await this.page.waitForSelector(lessonCardTitleSelector);
+      const lessonTitles = await this.page.$$eval(
+        lessonCardTitleSelector,
+        elements => elements.map(el => el.textContent?.trim())
+      );
+
+      const lessonIndex = lessonTitles.indexOf(lessonTitle);
+
+      if (lessonIndex === -1) {
+        throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
+      }
+
+      if (isMobileViewport) {
+        await this.page.waitForSelector(mobileLessonCardOptionsDropdownButton);
+        const optionsDropdownButtons = await this.page.$$(
+          mobileLessonCardOptionsDropdownButton
+        );
+        await optionsDropdownButtons[lessonIndex].click();
+        await this.page.waitForSelector(mobileAddToPlayLaterButton);
+        const mobileAddToPlayLaterButtons = await this.page.$$(
+          mobileAddToPlayLaterButton
+        );
+        await mobileAddToPlayLaterButtons[lessonIndex].click();
+      } else {
+        await this.page.waitForSelector(desktopAddToPlayLaterButton);
+        const addToPlayLaterButtons = await this.page.$$(
+          desktopAddToPlayLaterButton
+        );
+        await addToPlayLaterButtons[lessonIndex].click();
+      }
+
+      showMessage(`Lesson "${lessonTitle}" added to 'Play Later' list.`);
+    } catch (error) {
+      const newError = new Error(
+        `Failed to add lesson to 'Play Later' list: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Expects the text content of the toast message to match the given expected message.
+   * @param {string} expectedMessage - The expected message to match the toast message against.
+   */
+  async expectToolTipMessage(expectedMessage: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(toastMessageSelector);
+      const toastMessageElement = await this.page.$(toastMessageSelector);
+      const toastMessage = await this.page.evaluate(
+        el => el.textContent.trim(),
+        toastMessageElement
+      );
+
+      if (toastMessage !== expectedMessage) {
+        throw new Error(
+          `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
+        );
+      }
+      await this.page.waitForSelector(toastMessageSelector, {hidden: true});
+    } catch (error) {
+      const newError = new Error(`Failed to match toast message: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Function to play a specific lesson from the community library tab in learner dashboard.
+   * @param {string} lessonName - The name of the lesson to be played.
+   */
+  async playLessonFromDashboard(lessonName: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(lessonCardTitleSelector);
+      const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
+      const searchResults = await Promise.all(
+        searchResultsElements.map(result =>
+          this.page.evaluate(el => el.textContent.trim(), result)
+        )
+      );
+
+      const lessonIndex = searchResults.indexOf(lessonName);
+      if (lessonIndex === -1) {
+        throw new Error(`Lesson "${lessonName}" not found in search results.`);
+      }
+
+      await this.waitForElementToBeClickable(
+        searchResultsElements[lessonIndex]
+      );
+      await searchResultsElements[lessonIndex].click();
+    } catch (error) {
+      const newError = new Error(
+        `Failed to play lesson from dashboard: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Removes a lesson from the 'Play Later' list in the learner dashboard.
+   * @param {string} lessonName - The name of the lesson to remove from the 'Play Later' list.
+   */
+  async removeLessonFromPlayLater(lessonName: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(lessonCardTitleInPlayLaterSelector);
+      const lessonCards = await this.page.$$(
+        lessonCardTitleInPlayLaterSelector
+      );
+      const lessonNames = await Promise.all(
+        lessonCards.map(card =>
+          this.page.evaluate(el => el.textContent.trim(), card)
+        )
+      );
+
+      const lessonIndex = lessonNames.indexOf(lessonName);
+      if (lessonIndex === -1) {
+        throw new Error(
+          `Lesson "${lessonName}" not found in 'Play Later' list.`
+        );
+      }
+
+      // Scroll to the element before hovering so the remove button could be visible.
+      await this.page.evaluate(
+        el => el.scrollIntoView(),
+        lessonCards[lessonIndex]
+      );
+      await this.page.hover(lessonCardTitleInPlayLaterSelector);
+
+      await this.page.waitForSelector(removeFromPlayLaterButtonSelector);
+      const removeFromPlayLaterButton = await this.page.$(
+        removeFromPlayLaterButtonSelector
+      );
+      await removeFromPlayLaterButton?.click();
+
+      // Confirm removal.
+      await this.clickOn(confirmRemovalFromPlayLaterButton);
+
+      showMessage(`Lesson "${lessonName}" removed from 'Play Later' list.`);
+    } catch (error) {
+      const newError = new Error(
+        `Failed to remove lesson from 'Play Later' list: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Verifies whether a lesson is in the 'Play Later' list.
+   * @param {string} lessonName - The name of the lesson to check.
+   * @param {boolean} shouldBePresent - Whether the lesson should be present in the 'Play Later' list.
+   */
+  async verifyLessonPresenceInPlayLater(
+    lessonName: string,
+    shouldBePresent: boolean
+  ): Promise<void> {
+    try {
+      await this.waitForStaticAssetsToLoad();
+      await this.page.waitForSelector(playLaterSectionSelector);
+      const lessonCards = await this.page.$$(
+        lessonCardTitleInPlayLaterSelector
+      );
+      const lessonNames = await Promise.all(
+        lessonCards.map(card =>
+          this.page.evaluate(el => el.textContent.trim(), card)
+        )
+      );
+
+      const lessonIndex = lessonNames.indexOf(lessonName);
+      if (lessonIndex !== -1 && !shouldBePresent) {
+        throw new Error(
+          `Lesson "${lessonName}" was found in 'Play Later' list, but it should not be.`
+        );
+      }
+
+      if (lessonIndex === -1 && shouldBePresent) {
+        throw new Error(
+          `Lesson "${lessonName}" was not found in 'Play Later' list, but it should be.`
+        );
+      }
+      showMessage('Lesson is present in "Play Later" list.');
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify presence of lesson in 'Play Later' list: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Updates the profile picture in preference page.
+   * @param {string} picturePath - The path of the picture to upload.
+   */
+  async updateProfilePicture(picturePath: string): Promise<void> {
+    await this.clickOn(editProfilePictureButton);
+    await this.uploadFile(picturePath);
+    await this.clickOn(addProfilePictureButton);
+  }
+
+  /**
+   * Updates the user's bio in preference page.
+   * @param {string} bio - The new bio to set for the user.
+   */
+  async updateBio(bio: string): Promise<void> {
+    await this.clickOn(bioTextareaSelector);
+    await this.type(bioTextareaSelector, bio);
+  }
+
+  /**
+   * Updates the user's preferred dashboard in preference page.
+   * @param {string} dashboard - The new dashboard to set for the user. Can be one of 'Learner Dashboard', 'Creator Dashboard', or 'Contributor Dashboard'.
+   */
+  async updatePreferredDashboard(dashboard: string): Promise<void> {
+    const allowedDashboards = [
+      'Learner Dashboard',
+      'Creator Dashboard',
+      'Contributor Dashboard',
+    ];
+
+    if (!allowedDashboards.includes(dashboard)) {
+      throw new Error(
+        `Invalid dashboard: ${dashboard}. Must be one of ${allowedDashboards.join(', ')}.`
+      );
+    }
+
+    // Converting the dashboard to lowercase and replace spaces with hyphens to match the selector.
+    const dashboardInSelector = dashboard.toLowerCase().replace(/\s+/g, '-');
+    const dashboardSelector = `.e2e-test-${dashboardInSelector}-radio`;
+
+    await this.clickOn(dashboardSelector);
+  }
+
+  /**
+   * Updates the user's subject interests in preference page.
+   * @param {string[]} interests - The new interests to set for the user.
+   */
+  async updateSubjectInterests(interests: string[]): Promise<void> {
+    for (const interest of interests) {
+      await this.type(subjectInterestsInputSelector, interest);
+      await this.page.keyboard.press('Enter');
+    }
+  }
+
+  /**
+   * Updates the user's preferred exploration language in preference page.
+   * @param {string} language - The new language to set for the user.
+   */
+  async updatePreferredExplorationLanguage(language: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    await this.clickOn(explorationLanguageInputSelector);
+
+    await this.page.waitForSelector(optionText);
+    const options = await this.page.$$(optionText);
+    for (const option of options) {
+      const optionText = await this.page.evaluate(
+        el => el.textContent.trim(),
+        option
+      );
+      if (optionText === language) {
+        await option.click();
+        break;
+      }
+    }
+  }
+
+  /**
+   * Updates the user's preferred site language in preference page.
+   * @param {string} language - The new language to set for the user.
+   */
+  async updatePreferredSiteLanguage(language: string): Promise<void> {
+    await this.type(siteLanguageInputSelector, language);
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Updates the user's preferred audio language in preference page.
+   * @param {string} language - The new language to set for the user.
+   */
+  async updatePreferredAudioLanguage(language: string): Promise<void> {
+    await this.type(audioLanguageInputSelector, language);
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Updates the user's email preferences from the preferences page.
+   * @param {string[]} preferences - The new email preferences to set for the user.
+   */
+  async updateEmailPreferences(preferences: string[]): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    try {
+      await this.page.waitForSelector(checkboxesSelector);
+      const checkboxes = await this.page.$$(checkboxesSelector);
+
+      for (const preference of preferences) {
+        let found = false;
+
+        for (const checkbox of checkboxes) {
+          const label = await checkbox.evaluate(el => el.textContent?.trim());
+          if (label === preference) {
+            await this.waitForElementToBeClickable(checkbox);
+            await checkbox.click();
+            found = true;
+            break;
+          }
+        }
+
+        if (!found) {
+          throw new Error(`Preference not found: ${preference}`);
+        }
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to update email preferences: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Navigates to the Profile tab from the Preferences page.
+   */
+  async navigateToProfilePageFromPreferencePage(): Promise<void> {
+    try {
+      await this.page.waitForSelector(goToProfilePageButton);
+      const profileTab = await this.page.$(goToProfilePageButton);
+
+      if (!profileTab) {
+        throw new Error('Profile tab not found');
+      }
+
+      await this.clickAndWaitForNavigation(goToProfilePageButton);
+      await this.waitForPageToFullyLoad();
+    } catch (error) {
+      const newError = new Error(
+        `Failed to navigate to Profile tab from Preferences page: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Saves the changes made in the preferences page.
+   */
+  async saveChanges(): Promise<void> {
+    await this.waitForNetworkIdle({idleTime: 1000});
+    await this.waitForPageToFullyLoad();
+    await this.clickAndWaitForNavigation(saveChangesButtonSelector);
+  }
+
+  /**
+   * Expects the profile picture to not match a certain image.
+   */
+  async verifyProfilePicUpdate(): Promise<void> {
+    try {
+      await this.page.waitForSelector(profilePictureSelector);
+      const profilePicture = await this.page.$(profilePictureSelector);
+
+      if (!profilePicture) {
+        throw new Error('Profile picture not found');
+      }
+      const actualImageUrl = await this.page.evaluate(
+        img => img.src,
+        profilePicture
+      );
+
+      if (actualImageUrl === defaultProfilePicture) {
+        throw new Error(
+          `Profile picture does not match. Expected image source to be different from: ${defaultProfilePicture}`
+        );
+      }
+      showMessage('Profile picture is different from the default one.');
+    } catch (error) {
+      const newError = new Error(`Failed to check profile picture: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Expects the user's bio to match a certain text.
+   * @param {string} expectedBio - The expected bio text.
+   */
+  async expectBioToBe(expectedBio: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(bioSelector);
+      const bioElement = await this.page.$(bioSelector);
+
+      if (!bioElement) {
+        throw new Error('Bio not found');
+      }
+
+      const actualBio = await this.page.evaluate(
+        el => el.textContent,
+        bioElement
+      );
+      if (actualBio.trim() !== expectedBio) {
+        throw new Error(
+          `Bio does not match. Expected: ${expectedBio}, but got: ${actualBio}`
+        );
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to check bio: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Expects the user's subject interests to match a certain list.
+   * @param {string[]} expectedInterests - The expected list of interests.
+   */
+  async expectSubjectInterestsToBe(expectedInterests: string[]): Promise<void> {
+    try {
+      await this.page.waitForSelector(subjectInterestSelector);
+      const interestElements = await this.page.$$(subjectInterestSelector);
+      const actualInterests = await Promise.all(
+        interestElements.map(el =>
+          this.page.evaluate(el => el.textContent.trim(), el)
+        )
+      );
+
+      // Check if the actual interests match the expected interests.
+      for (const interest of expectedInterests) {
+        if (!actualInterests.includes(interest)) {
+          throw new Error(`Interest not found: ${interest}`);
+        }
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to check interests: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Exports the user's account data.
+   */
+  async exportAccount(): Promise<void> {
+    try {
+      await this.page.waitForSelector(exportButtonSelector);
+      const exportButton = await this.page.$(exportButtonSelector);
+
+      if (!exportButton) {
+        throw new Error('Export button not found');
+      }
+
+      await this.waitForPageToFullyLoad();
+      await exportButton.click();
+
+      const isTextPresent = await this.isTextPresentOnPage(
+        ACCOUNT_EXPORT_CONFIRMATION_MESSAGE
+      );
+
+      if (!isTextPresent) {
+        throw new Error(
+          `Expected text not found on page: ${ACCOUNT_EXPORT_CONFIRMATION_MESSAGE}`
+        );
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to export account: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Verifies if the page is displayed in Right-to-Left (RTL) mode.
+   */
+  async verifyPageIsRTL(): Promise<void> {
+    await this.page.waitForSelector(angularRootElementSelector);
+    const pageDirection = await this.page.evaluate(selector => {
+      const oppiaRoot = document.querySelector(selector);
+      if (!oppiaRoot) {
+        throw new Error(`${selector} not found`);
+      }
+
+      const childDiv = oppiaRoot.querySelector('div');
+      if (!childDiv) {
+        throw new Error('Child div not found');
+      }
+
+      return childDiv.getAttribute('dir');
+    }, angularRootElementSelector);
+
+    if (pageDirection !== 'rtl') {
+      throw new Error('Page is not in RTL mode');
+    }
+
+    showMessage('Page is displayed in RTL mode.');
   }
 }
 

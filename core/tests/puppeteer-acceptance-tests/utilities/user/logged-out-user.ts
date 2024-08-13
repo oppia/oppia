@@ -71,6 +71,10 @@ const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
 const impactReportUrl = testConstants.URLs.ImpactReportUrl;
+const teacherStoryTaggedBlogsLink =
+  testConstants.URLs.TeacherStoryTaggedBlogsLink;
+const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
+const lessonCreatorLinkedInUrl = testConstants.URLs.LessonCreatorLinkedInUrl;
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const navbarLearnTabBasicMathematicsButton =
@@ -141,6 +145,12 @@ const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
 const exploreLessonsButtonInTeachPage =
   '.e2e-test-teach-page-explore-lessons-button';
+const blogButtonInTeachPage = '.e2e-test-teach-page-blog-button';
+const guideButtonInTeachPage = '.e2e-test-teach-page-guide-button';
+const lessonCreatorLinkedinButtonInTeachPage =
+  '.e2e-test-teach-page-linkedin-button';
+const lessonCreationSectionInTeachPage =
+  '.e2e-test-teach-page-lesson-creation-section';
 const partnerWithUsButtonAtTheTopOfPartnershipsPage =
   '.e2e-test-partnerships-page-partner-with-us-button-at-the-top';
 const partnerWithUsButtonAtTheBottomOfPartnershipsPage =
@@ -268,7 +278,6 @@ const viewsContainerSelector = '.e2e-test-info-card-views';
 const lastUpdatedInfoSelector = '.e2e-test-info-card-last-updated';
 const tagsContainerSelector = '.exploration-tags span';
 const ratingContainerSelector = '.e2e-test-info-card-rating span:nth-child(2)';
-const conversationSkinUserAvatar = '.conversation-skin-user-avatar';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const desktopNavbarButtonsSelector = '.oppia-navbar-tab-content';
@@ -276,7 +285,10 @@ const mobileNavbarButtonSelector = '.text-uppercase';
 const skipLinkSelector = '.e2e-test-skip-link';
 const openMobileNavbarMenuButton = '.oppia-navbar-menu-icon';
 const closeMobileNavbarMenuButton = '.oppia-navbar-close-icon';
-
+const lessonLanguageSelector = '.oppia-content-language-selector';
+const playVoiceoverButton = '.e2e-test-play-circle';
+const voiceoverDropdown = '.e2e-test-audio-bar';
+const pauseVoiceoverButton = '.e2e-test-pause-circle';
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -555,13 +567,13 @@ export class LoggedOutUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandAboutMenuButton);
-      await this.openExternalPdfLink(
+      await this.openExternalLink(
         mobileSidebarImpactReportButton,
         impactReportUrl
       );
     } else {
       await this.clickOn(navbarAboutTab);
-      await this.openExternalPdfLink(
+      await this.openExternalLink(
         navbarAboutTabImpactReportButton,
         impactReportUrl
       );
@@ -1295,6 +1307,61 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to check if the lesson creation section is visible on the Teach page.
+   * If the section is not visible, an error is thrown.
+   */
+  async expectLessonCreationSectionToBeVisibleInTeachPage(): Promise<void> {
+    const lessonCreationSection = await this.page.waitForSelector(
+      lessonCreationSectionInTeachPage
+    );
+    if (!lessonCreationSection) {
+      throw new Error(
+        'The lesson creation section is not visible on the teach page.'
+      );
+    } else {
+      showMessage('The lesson creation section is visible on the teach page.');
+    }
+  }
+
+  /**
+   * Function to click the first LinkedIn button in the Teach page
+   * and check if it opens corresponding Creator's LinkedIn Url link
+   */
+  async clickLinkedInButtonInTeachPage(): Promise<void> {
+    // Here we are verifying the href attribute of the first LinkedIn button, not clicking it.
+    // LinkedIn requires users to log in before accessing profile pages,
+    // so the profile page cannot be opened directly.
+    await this.openExternalLink(
+      lessonCreatorLinkedinButtonInTeachPage,
+      lessonCreatorLinkedInUrl
+    );
+  }
+
+  /**
+   * Function to click the Check out our guide button in the Teach page
+   * and check if it opens the parents Teachers Guide Url link
+   */
+  async clickGuideButtonInTeachPage(): Promise<void> {
+    await this.openExternalLink(
+      guideButtonInTeachPage,
+      parentsTeachersGuideUrl
+    );
+  }
+
+  /**
+   * Function to click the Check out our blog button in the Teach page
+   * and check if it opens the Teacher Story tagged blogs link
+   */
+  async clickBlogButtonInTeachPage(): Promise<void> {
+    await this.clickLinkButtonToNewTab(
+      blogButtonInTeachPage,
+      'Check out our blog button',
+      teacherStoryTaggedBlogsLink,
+      'Blog'
+    );
+  }
+
+  /**
    * Function to click the Browse Our Lessons button in the Teach page
    * and check if it opens the classrooms page.
    */
@@ -1382,7 +1449,7 @@ export class LoggedOutUser extends BaseUser {
       element.scrollIntoView()
     );
 
-    await this.openExternalPdfLink(
+    await this.openExternalLink(
       brochureButtonInPartnershipsPage,
       partnershipsBrochureUrl
     );
@@ -1710,10 +1777,7 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Impact Report.
    */
   async clickViewReportButtonInAboutPage(): Promise<void> {
-    await this.openExternalPdfLink(
-      impactReportButtonInAboutPage,
-      impactReportUrl
-    );
+    await this.openExternalLink(impactReportButtonInAboutPage, impactReportUrl);
   }
 
   /**
@@ -1946,9 +2010,6 @@ export class LoggedOutUser extends BaseUser {
         throw error;
       }
     }
-    await this.page.waitForSelector(conversationSkinUserAvatar, {
-      hidden: true,
-    });
   }
 
   /**
@@ -1968,14 +2029,13 @@ export class LoggedOutUser extends BaseUser {
   async expectExplorationCompletionToastMessage(
     message: string
   ): Promise<void> {
-    await this.page.waitForSelector(explorationCompletionToastMessage, {
-      visible: true,
-    });
-    const element = await this.page.$(explorationCompletionToastMessage);
-    const toastMessage = await this.page.evaluate(
-      element => element.textContent,
-      element
+    await this.page.waitForSelector(explorationCompletionToastMessage);
+
+    const toastMessage = await this.page.$eval(
+      explorationCompletionToastMessage,
+      element => element.textContent
     );
+
     if (!toastMessage || !toastMessage.includes(message)) {
       throw new Error('Exploration did not complete successfully');
     }
@@ -3353,6 +3413,45 @@ export class LoggedOutUser extends BaseUser {
 
     // Remove focus from the focused element.
     await this.page.evaluate(element => element.blur(), expectedFocusedElement);
+  }
+
+  /**
+   * Changes the language of the lesson.
+   * @param {string} languageCode - The code of the language to change to.
+   */
+  async changeLessonLanguage(languageCode: string): Promise<void> {
+    await this.select(lessonLanguageSelector, languageCode);
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Starts the voiceover by clicking on the audio bar (dropdown) and the play circle.
+   */
+  async startVoiceover(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    const voiceoverDropdownElement = await this.page.$(voiceoverDropdown);
+    if (voiceoverDropdownElement) {
+      await this.clickOn(voiceoverDropdown);
+    }
+    await this.clickOn(playVoiceoverButton);
+    await this.page.waitForSelector(pauseVoiceoverButton);
+  }
+
+  /**
+   * Verifies if the voiceover is playing.
+   */
+  async verifyVoiceoverIsPlaying(shouldBePlaying: true): Promise<void> {
+    // If the pause button is present, it means the audio is playing.
+    await this.page.waitForSelector(pauseVoiceoverButton);
+    showMessage(`Voiceover is ${shouldBePlaying ? 'playing' : 'paused'}.`);
+  }
+
+  /**
+   * Pauses the voiceover by clicking on the pause button.
+   */
+  async pauseVoiceover(): Promise<void> {
+    await this.clickOn(pauseVoiceoverButton);
   }
 }
 

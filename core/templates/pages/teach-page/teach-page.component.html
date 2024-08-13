@@ -25,7 +25,7 @@
         </p>
         <oppia-primary-button
           [buttonHref]="parentsTeachersPdfGuideLink"
-          [customClasses]="['oppia-teach-btn']"
+          [customClasses]="['oppia-teach-btn', 'e2e-test-teach-page-guide-button']"
           buttonText="{{ 'I18N_TEACH_PAGE_TIPS_GUIDE_BUTTON' | translate }}">
         </oppia-primary-button>
       </div>
@@ -38,7 +38,7 @@
         </p>
         <oppia-primary-button
           [buttonHref]="teacherStoryTaggedBlogsLink"
-          [customClasses]="['oppia-teach-btn','oppia-teach-secondary-btn']"
+          [customClasses]="['oppia-teach-btn','oppia-teach-secondary-btn', 'e2e-test-teach-page-blog-button']"
           buttonText="{{ 'I18N_TEACH_PAGE_TIPS_BLOG_BUTTON' | translate }}">
         </oppia-primary-button>
       </div>
@@ -67,7 +67,7 @@
         </div>
         <oppia-primary-button
           [buttonHref]="creatorsData[index].linkedInUrl"
-          [customClasses]="['oppia-teach-btn', 'oppia-teach-secondary-btn']"
+          [customClasses]="['oppia-teach-btn', 'oppia-teach-secondary-btn', index === 0 ? 'e2e-test-teach-page-linkedin-button' : '']"
           buttonText="{{ 'I18N_TEACH_PAGE_LINKEDIN_BUTTON' | translate }}">
         </oppia-primary-button>
       </div>
@@ -92,7 +92,7 @@
     </div>
   </div>
 
-  <div class="oppia-teach-lesson-section">
+  <div class="oppia-teach-lesson-section e2e-test-teach-page-lesson-creation-section">
     <div class="oppia-teach-lesson-top">
       <p class="oppia-teach-subtitle">
         {{ 'I18N_TEACH_PAGE_LESSON_CREATION_SECTION_TITLE' | translate }}
@@ -137,6 +137,7 @@
         </div>
         <oppia-primary-button
           buttonHref="/learn"
+          (onClickPrimaryButton)="onClickExploreLessonsButton()"
           [customClasses]="['oppia-teach-btn', 'oppia-teach-lesson-mobile-content']"
           buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate }}">
         </oppia-primary-button>
@@ -320,11 +321,13 @@
     <div class="oppia-teach-cta-buttons-container">
       <oppia-primary-button
         buttonHref="/learn"
+        (onClickPrimaryButton)="onClickExploreLessonsButton()"
         [customClasses]="['oppia-teach-btn', 'e2e-test-teach-page-explore-lessons-button']"
         buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate }}">
       </oppia-primary-button>
       <oppia-primary-button
         [buttonHref]="androidUrl"
+        (onClickPrimaryButton)="onClickDownloadAndroidAppButton()"
         [customClasses]="['oppia-teach-btn', 'oppia-teach-secondary-btn']"
         buttonText="{{ 'I18N_ACTION_DOWNLOAD_ANDRIOD_APP' | translate }}">
       </oppia-primary-button>

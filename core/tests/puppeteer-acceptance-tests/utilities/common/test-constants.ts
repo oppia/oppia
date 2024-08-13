@@ -118,6 +118,12 @@ export default {
         'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
       GoogleSignUp: 'https://accounts.google.com/lifecycle/steps/signup/name',
     },
+    TeacherStoryTaggedBlogsLink:
+      'https://www.oppia.org/blog/search/find?q=&tags=(%22Teacher%20story%22)',
+    ParentsTeachersGuideUrl:
+      'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
+    LessonCreatorLinkedInUrl:
+      'https://www.linkedin.com/in/rita-santos-guimaraes-prof-matematica/',
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
@@ -162,6 +168,19 @@ export default {
     classroomBannerImage: path.resolve(
       __dirname,
       '../../data/classroom-banner.png'
+    ),
+    profilePicture: path.resolve(__dirname, '../../data/profile-picture.svg'),
+    IntroContentVoiceoverInHindi: path.resolve(
+      __dirname,
+      '../../data/intro-content-hi.mp3'
+    ),
+    ContinueInteractionVoiceoverInHindi: path.resolve(
+      __dirname,
+      '../../data/continue-interaction-hi.mp3'
+    ),
+    LastCardContentVoiceoverInHindi: path.resolve(
+      __dirname,
+      '../../data/last-card-hi.mp3'
     ),
   },
   OppiaSocials: {

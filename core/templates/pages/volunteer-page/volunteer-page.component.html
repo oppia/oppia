@@ -9,6 +9,7 @@
 
       <oppia-primary-button
           [buttonHref]="formLink"
+          (onClickPrimaryButton)="onClickVolunteerCTAButtonAtTop()"
           [customClasses]="['volunteer-btn','oppia-volunteer-subtext','e2e-test-volunteer-page-apply-to-volunteer-button-at-the-top']"
           buttonText="{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_BUTTON' | translate }}">
       </oppia-primary-button>
@@ -511,6 +512,7 @@
 
     <oppia-primary-button
         [buttonHref]="formLink"
+        (onClickPrimaryButton)="onClickVolunteerCTAButtonAtBottom()"
         [customClasses]="['volunteer-btn','oppia-volunteer-subtext','e2e-test-volunteer-page-apply-to-volunteer-button-at-the-bottom']"
         buttonText="{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_BUTTON' | translate }}">
     </oppia-primary-button>
