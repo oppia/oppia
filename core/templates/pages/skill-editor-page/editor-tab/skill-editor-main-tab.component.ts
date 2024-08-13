@@ -131,7 +131,11 @@ export class SkillEditorMainTabComponent
   }
 
   ngOnInit(): void {
-    this.pageTitleService.setNavbarTitleForMobileView('Skill Editor');
+    // To avoid ExpressionChangedAfterItHasBeenCheckedError
+    // $timeout is required.
+    setTimeout(() => {
+      this.pageTitleService.setNavbarTitleForMobileView('Skill Editor');
+    });
     // To ensure that the focus event function executes only after
     // all the functions in the main thread have executed,
     // $timeout is required.
