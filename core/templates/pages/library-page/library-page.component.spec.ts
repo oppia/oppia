@@ -49,6 +49,12 @@ import {
   LibraryIndexData,
   LibraryPageBackendApiService,
 } from './services/library-page-backend-api.service';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {
+  NgbCarousel,
+  NgbSlideEvent,
+  NgbSlideEventDirection,
+} from '@ng-bootstrap/ng-bootstrap';
 
 class MockWindowRef {
   nativeWindow = {
@@ -98,6 +104,13 @@ describe('Library Page Component', () => {
   let loggerService: LoggerService;
   let searchService: SearchService;
   let translateService: TranslateService;
+  let classroomBackendApiService: ClassroomBackendApiService;
+
+  const mockNgbCarousel: Partial<NgbCarousel> = {
+    next: jasmine.createSpy('next'),
+    prev: jasmine.createSpy('prev'),
+    select: jasmine.createSpy('select'),
+  };
 
   let explorationList: CreatorExplorationSummaryBackendDict[] = [
     {
@@ -142,6 +155,45 @@ describe('Library Page Component', () => {
       thumbnail_icon_url: '',
       title: '',
       node_count: 2,
+    },
+  ];
+
+  const dummyClassroomSummaries = [
+    {
+      classroom_id: 'mathclassroom',
+      name: 'math',
+      url_fragment: 'math',
+      teaser_text: 'Learn math',
+      is_published: true,
+      thumbnail_filename: 'thumbnail.svg',
+      thumbnail_bg_color: 'transparent',
+    },
+    {
+      classroom_id: 'scienceclassroom',
+      name: 'science',
+      url_fragment: 'science',
+      teaser_text: 'Learn science',
+      is_published: true,
+      thumbnail_filename: 'thumbnail.svg',
+      thumbnail_bg_color: 'transparent',
+    },
+    {
+      classroom_id: 'history',
+      name: 'history',
+      url_fragment: 'history',
+      teaser_text: 'Learn history',
+      is_published: true,
+      thumbnail_filename: 'thumbnail.svg',
+      thumbnail_bg_color: 'transparent',
+    },
+    {
+      classroom_id: 'english',
+      name: 'english',
+      url_fragment: 'english',
+      teaser_text: 'Learn english',
+      is_published: true,
+      thumbnail_filename: 'thumbnail.svg',
+      thumbnail_bg_color: 'transparent',
     },
   ];
 
@@ -229,6 +281,7 @@ describe('Library Page Component', () => {
           provide: TranslateService,
           useClass: MockTranslateService,
         },
+        ClassroomBackendApiService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -248,6 +301,7 @@ describe('Library Page Component', () => {
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
     loggerService = TestBed.inject(LoggerService);
     searchService = TestBed.inject(SearchService);
+    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
   });
 
   afterEach(() => {
@@ -751,5 +805,99 @@ describe('Library Page Component', () => {
       componentInstance.translateSubscription.unsubscribe
     ).toHaveBeenCalled();
     expect(componentInstance.resizeSubscription.unsubscribe).toHaveBeenCalled();
+  });
+
+  it('should get all classrooms data', fakeAsync(() => {
+    let response = [
+      {
+        classroom_id: 'mathclassroom',
+        name: 'math',
+        url_fragment: 'math',
+        teaser_text: 'Learn math',
+        is_published: true,
+        thumbnail_filename: 'thumbnail.svg',
+        thumbnail_bg_color: 'transparent',
+      },
+    ];
+    spyOn(
+      classroomBackendApiService,
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(Promise.resolve(response));
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(
+      classroomBackendApiService.getAllClassroomsSummaryAsync
+    ).toHaveBeenCalled();
+    expect(componentInstance.classroomSummaries).toEqual(response);
+    expect(componentInstance.publicClassroomsCount).toEqual(1);
+  }));
+
+  it('should handle more than 3 classrooms correctly in the classroom carousel', () => {
+    componentInstance.classroomCarousel = mockNgbCarousel as NgbCarousel;
+    componentInstance.classroomSummaries = [...dummyClassroomSummaries];
+    componentInstance.publicClassroomsCount =
+      componentInstance.classroomSummaries.length;
+
+    const mockSlideEvent: NgbSlideEvent = {
+      current: 'ngb-slide-0',
+      paused: false,
+      prev: '',
+      direction: 'left' as NgbSlideEventDirection,
+    };
+
+    expect(
+      componentInstance.getClassroomChunkIndices(
+        componentInstance.classroomSummaries.length
+      )
+    ).toEqual([0, 1]);
+    expect(componentInstance.classroomCarouselIndex).toEqual(0);
+    expect(
+      componentInstance.getClassroomsForChunk(
+        componentInstance.classroomSummaries,
+        0
+      )
+    ).toEqual(componentInstance.classroomSummaries.slice(0, 3));
+    expect(
+      componentInstance.getClassroomsForChunk(
+        componentInstance.classroomSummaries,
+        1
+      )
+    ).toEqual(componentInstance.classroomSummaries.slice(3));
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(true);
+    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
+      false
+    );
+
+    componentInstance.moveClassroomCarouselToNextSlide();
+    expect(componentInstance.classroomCarouselIndex).toEqual(1);
+
+    componentInstance.onClassroomNavigationIndicatorClicked(mockSlideEvent);
+    expect(componentInstance.classroomCarouselIndex).toEqual(0);
+
+    componentInstance.moveClassroomCarouselToNextSlide();
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(false);
+    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
+      true
+    );
+
+    componentInstance.moveClassroomCarouselToPreviousSlide();
+    expect(componentInstance.classroomCarouselIndex).toEqual(0);
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(true);
+    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
+      false
+    );
+  });
+
+  it('should handle less than 3 classrooms correctly in the classroom carousel', () => {
+    componentInstance.classroomCarousel = mockNgbCarousel as NgbCarousel;
+    componentInstance.classroomSummaries = dummyClassroomSummaries.slice(0, 3);
+    componentInstance.publicClassroomsCount =
+      componentInstance.classroomSummaries.length;
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(false);
+    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
+      false
+    );
   });
 });

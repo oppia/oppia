@@ -21,8 +21,6 @@ import testConstants from '../common/test-constants';
 import {ElementHandle} from 'puppeteer';
 import puppeteer from 'puppeteer';
 
-const curriculumAdminThumbnailImage =
-  testConstants.data.curriculumAdminThumbnailImage;
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 
 const modalDiv = 'div.modal-content';
@@ -30,8 +28,7 @@ const closeSaveModalButton = '.e2e-test-close-save-modal-button';
 const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
 
 // Photo Upload Modal.
-const chapterPhotoBoxButton =
-  '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
+const chapterPhotoBoxButton = '.e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 const photoUploadModal = 'edit-thumbnail-modal';
 
@@ -40,7 +37,6 @@ const topicsTab = 'a.e2e-test-topics-tab';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
 const mobileOptionsSelector = '.e2e-test-mobile-options-base';
 const mobileTopicSelector = 'div.e2e-test-mobile-topic-name a';
-const skillTab = '.e2e-test-skills-tab';
 const skillEditBox = '.e2e-test-skill-edit-box';
 const mobileSkillsOption = '.e2e-test-mobile-skills-option';
 const unassignSkillButtonDesktop = '.e2e-test-unassign-skill-button';
@@ -68,28 +64,22 @@ const mobileSaveStoryChangesButton =
 
 // Chapter Creation Modal.
 const addChapterButton = 'button.e2e-test-add-chapter-button';
-const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
-const chapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
-const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
+const chapterTitleField = '.e2e-test-chapter-title-field';
+const chapterExplorationIdField = '.e2e-test-exploration-id-input';
 
 const subtopicReassignHeader = 'div.subtopic-reassign-header';
-const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
-const newSubtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
 const subtopicTitleField = '.e2e-test-subtopic-title-field';
-const newSubtopicUrlFragmentField =
-  'input.e2e-test-new-subtopic-url-fragment-field';
+('input.e2e-test-new-subtopic-url-fragment-field');
 const subtopicUrlFragmentField = '.e2e-test-subtopic-url-fragment-field';
-const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
 const richTextAreaField = 'div.e2e-test-rte';
 const subtopicPhotoBoxButton =
   '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
-const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
 const mobileSaveTopicButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
 const mobileNavbarDropdown =
   'div.navbar-mobile-options .e2e-test-mobile-navbar-dropdown';
 const saveTopicButton = 'button.e2e-test-save-topic-button';
-const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
+const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
 
 // Question Editor.
 const desktopSkillQuestionTab = '.e2e-test-questions-tab';
@@ -182,6 +172,7 @@ const confirmDeleteWorkedExampleButton =
   '.e2e-test-confirm-delete-worked-example-button';
 const confirmDeleteMisconceptionButton =
   '.e2e-test-confirm-delete-misconception-button';
+const optionalMisconceptionToggle = '.e2e-test-misconception-optional-check';
 const topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
 const updateTopicWebFragmentField = '.e2e-test-topic-page-title-fragment-field';
 const updateTopicDescriptionField = '.e2e-test-topic-description-field';
@@ -195,27 +186,50 @@ const renameSubtopicField = '.e2e-test-rename-subtopic-field';
 const saveReassignments = '.e2e-test-save-reassignments';
 const saveRearrangeSkills = '.e2e-test-save-rearrange-skills';
 const subtopicCardHeader = '.subtopic-name-card-header';
-const testSubtopicTitleSelector = '.e2e-test-subtopic';
+const subtopicTitleSelector = '.e2e-test-subtopic';
 const topicPreviewTab = '.e2e-test-topic-preview-button';
 const contentTitle = '.content-title';
 const htmlContent = '.html-content';
 const subtopicAssignmentContainer = '.subtopics-container';
 const editSubtopicExplanationSelector = '.e2e-test-edit-html-content';
 const topicMobilePreviewTab = '.e2e-test-mobile-preview-tab';
+const storyTitleSelector = '.e2e-test-story-title';
+const chapterTitleSelector = '.e2e-test-chapter-title';
+const chapterDescriptionField = '.e2e-test-add-chapter-description';
+const showChapterPreviewButton = '.show-chapter-preview-button';
+const titleSelector = '.oppia-thumbnail-preview-title';
+const descriptionSelector = '.oppia-thumbnail-preview-description';
+const optionsSelector = '.e2e-test-show-subtopic-options';
+const deleteSubtopicButtonSelector = '.e2e-test-delete-subtopic-button';
+const storyListItemSelector = '.e2e-test-story-list-item';
+const deleteStoryButtonSelector = '.e2e-test-delete-story-button';
+const confirmStoryDeletionButton = '.e2e-test-confirm-story-deletion-button';
+const editOptionsSelector = '.e2e-test-edit-options';
+const deleteChapterButtonSelector = '.e2e-test-delete-chapter-button';
+const storyEditorNodeSelector = '.story-editor-node';
+const resetChapterThumbnailButton = '.e2e-test-thumbnail-reset-button';
+const saveExplorationIDButton = '.e2e-test-exploration-id-save-button';
+const addPrerequisiteSkillButton = '.e2e-test-add-prerequisite-skill';
+const addAcquiredSkillButton = '.e2e-test-add-acquired-skill';
+const mobileCollapsibleCardHeaderSelector =
+  '.oppia-mobile-collapsible-card-header';
+const mobileStoryDropdown = '.e2e-test-story-dropdown';
+const confirmDeleteChapterButton = '.e2e-test-confirm-delete-chapter-button';
+
 export class TopicManager extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
    */
   async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
     await this.page.bringToFront();
-    await this.page.waitForNetworkIdle();
+    await this.waitForNetworkIdle();
     await this.goto(topicAndSkillsDashboardUrl);
   }
 
   /**
-   * Navigate to the question editor tab.
+   * Navigate to the skill's question editor tab.
    */
-  async navigateToQuestionEditorTab(): Promise<void> {
+  async navigateToSkillQuestionEditorTab(): Promise<void> {
     const isMobileWidth = this.isViewportAtMobileWidth();
     const skillQuestionTab = isMobileWidth
       ? mobileSkillQuestionTab
@@ -242,12 +256,12 @@ export class TopicManager extends BaseUser {
    * Function to open the story editor page.
    * @param {string} storyID - The Id of the story to open.
    */
-  async openStoryEditor(storyID: string): Promise<void> {
+  async openStoryEditorWithId(storyID: string): Promise<void> {
     await this.goto(`http://localhost:8181/story_editor/${storyID}`);
   }
 
   /**
-   * Function to navigate to the question preview tab.
+   * Function to navigate to the skill's question preview tab.
    */
   async navigateToQuestionPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -274,15 +288,57 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Function to navigate the skills tab in topics and skills dashboard.
+   * Expects a toast message to match a given string.
+   * @param {string} expectedMessage - The message that the toast is expected to display.
    */
-  async navigateToSkillsTab(): Promise<void> {
-    const skillSelector = this.isViewportAtMobileWidth()
-      ? mobileSkillSelector
-      : desktopSkillSelector;
-    await this.page.waitForSelector(skillsTab, {visible: true});
-    await this.clickOn(skillsTab);
-    await this.page.waitForSelector(skillSelector, {visible: true});
+  async expectToastMessageToBe(expectedMessage: string): Promise<void> {
+    try {
+      await this.page.waitForFunction(
+        (selector: string, expectedText: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.trim() === expectedText.trim();
+        },
+        {timeout: 5000},
+        toastMessageSelector,
+        expectedMessage
+      );
+    } catch (error) {
+      const actualMessage = await this.page.$eval(toastMessageSelector, el =>
+        el.textContent?.trim()
+      );
+
+      throw new Error(
+        `Text did not match within the specified time. Actual message: "${actualMessage}", expected message: "${expectedMessage}"`
+      );
+    }
+  }
+
+  /**
+   * This function checks if the error page heading is "Error 401".
+   */
+  async expectError401Unauthorized(): Promise<void> {
+    try {
+      await this.page.waitForSelector(errorPageHeadingSelector);
+      const errorPageHeadingElement = await this.page.$(
+        errorPageHeadingSelector
+      );
+      const errorPageHeadingText = await this.page.evaluate(
+        element => element.textContent,
+        errorPageHeadingElement
+      );
+      const trimmedErrorPageHeadingText = errorPageHeadingText.trim();
+
+      if (trimmedErrorPageHeadingText !== 'Error 401') {
+        throw new Error(
+          `Expected error page heading to be "Error 401", but got "${trimmedErrorPageHeadingText}"`
+        );
+      }
+
+      showMessage('Verified: Error 401 Unauthorized is displayed as expected.');
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
   }
 
   /**
@@ -314,59 +370,485 @@ export class TopicManager extends BaseUser {
         topicNameSelector,
         topicName
       ),
-      this.page.waitForNavigation(),
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
     ]);
     await this.waitForStaticAssetsToLoad();
   }
 
-  /**   * Create a chapter for a certain story.
+  /**
+   * Edits the details of a topic.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} urlFragment - The URL fragment of the topic.
+   * @param {string} description - The description of the topic.
+   * @param {string} titleFragments - The title fragments of the topic.
+   * @param {string} metaTags - The meta tags of the topic.
+   * @param {string} thumbnail - The thumbnail of the topic.
    */
-  async createChapter(
-    explorationId: string,
-    chapterName: string
+  async editTopicDetails(
+    description: string,
+    titleFragments: string,
+    metaTags: string,
+    thumbnail: string,
+    topicName?: string,
+    urlFragment?: string
   ): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileAddChapterDropdown);
+    if (topicName) {
+      await this.clearAllTextFrom(topicNameField);
+      await this.type(topicNameField, topicName);
     }
-    await this.clickOn(addChapterButton);
-    await this.type(chapterTitleField, chapterName);
-    await this.type(chapterExplorationIdField, explorationId);
+    if (urlFragment) {
+      await this.clearAllTextFrom(updateTopicUrlFragmentField);
+      await this.type(updateTopicUrlFragmentField, urlFragment);
+    }
+    await this.clearAllTextFrom(updateTopicWebFragmentField);
+    await this.type(updateTopicWebFragmentField, titleFragments);
+    await this.clearAllTextFrom(updateTopicDescriptionField);
+    await this.type(updateTopicDescriptionField, description);
 
-    await this.clickOn(chapterPhotoBoxButton);
-    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.clickOn(photoBoxButton);
+    await this.page.waitForSelector(photoUploadModal, {visible: true});
+    await this.uploadFile(thumbnail);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickOn(createChapterButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
+
+    await this.page.waitForSelector(topicMetaTagInput);
+    await this.page.focus(topicMetaTagInput);
+    await this.clearAllTextFrom(topicMetaTagInput);
+    await this.page.type(topicMetaTagInput, metaTags);
+    await this.page.keyboard.press('Tab');
   }
 
   /**
-   * Save a story as a curriculum admin.
+   * Save a topic draft.
+   * @param {string} topicName - name of the topic to be saved.
    */
-  async saveStoryDraft(): Promise<void> {
+  async saveTopicDraft(topicName: string): Promise<void> {
+    await this.page.waitForSelector(modalDiv, {hidden: true});
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsSelector);
-      await this.clickOn(mobileSaveStoryChangesButton);
+      await this.clickOn(mobileSaveTopicButton);
+      await this.page.waitForSelector('oppia-topic-editor-save-modal', {
+        visible: true,
+      });
+      await this.type(
+        saveChangesMessageInput,
+        'Test saving topic as curriculum admin.'
+      );
+      await this.page.waitForSelector(
+        `${closeSaveModalButton}:not([disabled])`
+      );
+      await this.clickOn(closeSaveModalButton);
+      await this.page.waitForSelector('oppia-topic-editor-save-modal', {
+        hidden: true,
+      });
+      await this.openTopicEditor(topicName);
     } else {
-      await this.clickOn(saveStoryButton);
+      await this.clickOn(saveTopicButton);
+      await this.page.waitForSelector(modalDiv, {visible: true});
+      await this.clickOn(closeSaveModalButton);
+      await this.page.waitForSelector(modalDiv, {hidden: true});
     }
-    await this.type(
-      saveChangesMessageInput,
-      'Test saving story as curriculum admin.'
-    );
-    await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
-    await this.clickOn(closeSaveModalButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
   }
 
   /**
-   * Navigate to the skill tab.
+   * Filters topics by status.
+   * @param {string} status - The status to filter by.
    */
-  async navigateToSkillTab(): Promise<void> {
-    await this.page.waitForSelector(skillTab);
-    await this.clickOn(skillTab);
+  async filterTopicsByStatus(status: string): Promise<void> {
+    try {
+      await this.navigateToTopicAndSkillsDashboardPage();
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(displayMobileFiltersButton);
+      }
+      await this.page.waitForSelector(topicStatusDropdownSelector);
+      await this.selectOption(topicStatusDropdownSelector, status);
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(closeMobileFiltersButton);
+      }
+      showMessage(`Filtered topics by status: ${status}`);
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
+  }
+
+  /**
+   * Filters topics by classroom.
+   * @param {string} classroom - The classroom to filter by.
+   */
+  async filterTopicsByClassroom(classroom: string): Promise<void> {
+    try {
+      await this.navigateToTopicAndSkillsDashboardPage();
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(displayMobileFiltersButton);
+      }
+      await this.page.waitForSelector(classroomDropdownSelector);
+      await this.selectOption(classroomDropdownSelector, classroom);
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(closeMobileFiltersButton);
+      }
+      showMessage(`Filtered topics by classroom: ${classroom}`);
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
+  }
+
+  /**
+   * Filters topics by keyword.
+   * @param {string} keyword - The keyword to filter by.
+   */
+  async filterTopicsByKeyword(keyword: string): Promise<void> {
+    try {
+      await this.navigateToTopicAndSkillsDashboardPage();
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(displayMobileFiltersButton);
+      }
+      await this.page.waitForSelector(keywordDropdownSelector);
+      await this.clickOn(keywordDropdownSelector);
+      await this.page.waitForSelector(multiSelectionInputSelector);
+      await this.type(multiSelectionInputSelector, keyword);
+      await this.page.keyboard.press('Enter');
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(closeMobileFiltersButton);
+      }
+      showMessage(`Filtered topics by keyword: ${keyword}`);
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
+  }
+
+  /**
+   * Sorts topics by a given option.
+   * @param {string} sortOption - The option to sort by.
+   */
+  async sortTopics(sortOption: string): Promise<void> {
+    try {
+      await this.navigateToTopicAndSkillsDashboardPage();
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(displayMobileFiltersButton);
+      }
+      await this.page.waitForSelector(sortDropdownSelector);
+      await this.selectOption(sortDropdownSelector, sortOption);
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(closeMobileFiltersButton);
+      }
+      showMessage(`Sorted topics by: ${sortOption}`);
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
+  }
+
+  /**
+   * Checks if the filtered topics match the expected topics.
+   * @param {string[]} expectedTopics - The expected topics.
+   */
+  async expectFilteredTopics(expectedTopics: string[]): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const topicNameSelector = isMobileViewport
+      ? mobileTopicSelector
+      : desktopTopicSelector;
+    try {
+      await this.waitForStaticAssetsToLoad();
+      const topicElements = await this.page.$$(topicNameSelector);
+
+      if (expectedTopics.length === 0) {
+        if (topicElements.length !== 0) {
+          throw new Error('Expected no topics, but some were found.');
+        }
+        showMessage('No topics found, as expected.');
+        return;
+      }
+
+      if (!topicElements || topicElements.length === 0) {
+        throw new Error(`No elements found for selector ${topicNameSelector}`);
+      }
+
+      const topicNames = await Promise.all(
+        topicElements.map(element =>
+          this.page.evaluate(el => el.textContent.trim(), element)
+        )
+      );
+
+      const missingTopics = expectedTopics.filter(
+        topic => !topicNames.includes(topic)
+      );
+
+      if (missingTopics.length > 0) {
+        throw new Error(
+          `Expected topics ${missingTopics.join(', ')} to be present, but they were not found.`
+        );
+      }
+
+      showMessage('Filtered topics match the expected topics.');
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
+  }
+
+  /**
+   * Checks if the topics are in the expected order.
+   * @param {string[]} expectedOrder - The expected order of topics.
+   */
+  async expectFilteredTopicsInOrder(expectedOrder: string[]): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const topicNameSelector = isMobileViewport
+      ? mobileTopicSelector
+      : desktopTopicSelector;
+
+    try {
+      await this.waitForStaticAssetsToLoad();
+      await this.page.waitForSelector(topicNameSelector);
+      const topicElements = await this.page.$$(topicNameSelector);
+      const topicNames = await Promise.all(
+        topicElements.map(element =>
+          this.page.evaluate(el => el.textContent.trim(), element)
+        )
+      );
+      if (!topicNames.every((name, index) => name === expectedOrder[index])) {
+        throw new Error('Topics are not in the expected order.');
+      }
+      showMessage('Topics are in the expected order.');
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
+  }
+
+  /**
+   * Verifies the status of the practice tab.
+   * @param {string} expectedStatus - The expected status of the practice tab.
+   */
+  async verifyStatusOfPracticeTab(expectedStatus: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('Subtopics');
+    }
+    try {
+      const practiceTab = await this.page.$(practiceTabToggle);
+      if (practiceTab === null) {
+        throw new Error('Practice tab not found.');
+      }
+      const actualStatus = await (
+        await practiceTab.getProperty('disabled')
+      ).jsonValue();
+
+      if (expectedStatus === 'disabled' && actualStatus !== true) {
+        throw new Error(
+          'Expected practice tab to be disabled, but it was enabled.'
+        );
+      } else if (expectedStatus === 'enabled' && actualStatus !== false) {
+        throw new Error(
+          'Expected practice tab to be enabled, but it was disabled.'
+        );
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify status of practice tab: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Opens the topic editor for a given topic and previews it by clicking on the third navbar-tab-icon.
+   * @param {string} topicName - The name of the topic to be opened in the topic editor.
+   */
+  async navigateToTopicPreviewTab(topicName: string): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOn(topicMobilePreviewTab);
+    } else {
+      await this.page.waitForSelector(topicPreviewTab);
+      await this.clickOn(topicPreviewTab);
+    }
+  }
+
+  /**
+   * Checks if the topic preview has the expected title and description.
+   * @param {string} title - The expected title of the topic.
+   * @param {string} description - The expected description of the topic.
+   */
+  async expectTopicPreviewToHaveTitleAndDescription(
+    title: string,
+    description: string
+  ): Promise<void> {
+    await this.page.waitForSelector(topicPreviewTitleSelector);
+    const titleElement = await this.page.$(topicPreviewTitleSelector);
+    const actualTitle = await this.page.evaluate(
+      el => el.textContent,
+      titleElement
+    );
+    if (actualTitle.trim() !== title) {
+      throw new Error(
+        `Expected topic title to be "${title}", but was "${actualTitle}".`
+      );
+    }
+
+    await this.page.waitForSelector(topicPreviewDescriptionSelector);
+    const descriptionElement = await this.page.$(
+      topicPreviewDescriptionSelector
+    );
+    const actualDescription = await this.page.evaluate(
+      el => el.textContent,
+      descriptionElement
+    );
+    if (actualDescription.trim() !== description) {
+      throw new Error(
+        `Expected topic description to be "${description}", but was "${actualDescription}".`
+      );
+    }
+  }
+
+  /**
+   * This function checks if the topic name field is disabled as a topic manager cannot edit the topic name.
+   */
+  async expectTopicNameFieldDisabled(): Promise<void> {
+    try {
+      await this.page.waitForSelector(topicNameField);
+      const topicNameFieldElement = await this.page.$(topicNameField);
+      const isDisabled = await this.page.evaluate(
+        el => el.disabled,
+        topicNameFieldElement
+      );
+
+      if (!isDisabled) {
+        throw new Error(
+          'Expected topic name field to be disabled, but it is not.'
+        );
+      }
+
+      showMessage('Verified: Topic name field is disabled as expected.');
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
+  }
+
+  /**
+   * This function verifies the absence of the delete topic button for a given topic as topic manager cannot delete a topic.
+   * @param {string} topicName - The name of the topic to check.
+   */
+  async verifyAbsenceOfDeleteTopicButtonInTopic(
+    topicName: string
+  ): Promise<void> {
+    await this.goto(topicAndSkillsDashboardUrl);
+
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const topicListItemSelector = isMobileWidth
+      ? mobileTopicListItemSelector
+      : desktopTopicListItemSelector;
+    const topicSelector = isMobileWidth
+      ? mobileTopicSelector
+      : desktopTopicSelector;
+    const topicListItemOptions = isMobileWidth
+      ? mobileTopicListItemOptions
+      : desktopTopicListItemOptions;
+    const deleteTopicButton = isMobileWidth
+      ? mobileDeleteTopicButton
+      : desktopDeleteTopicButton;
+
+    await this.page.waitForSelector(topicListItemSelector);
+
+    const topics = await this.page.$$(topicListItemSelector);
+    for (let topic of topics) {
+      const topicNameElement = await topic.$(topicSelector);
+      if (topicNameElement) {
+        const name: string = await (
+          await topicNameElement.getProperty('textContent')
+        ).jsonValue();
+
+        if (name.trim() === topicName) {
+          await this.page.waitForSelector(topicListItemOptions);
+          const editBox = await topic.$(topicListItemOptions);
+          if (editBox) {
+            await this.waitForElementToBeClickable(editBox);
+            await editBox.click();
+          } else {
+            throw new Error('Edit button not found');
+          }
+
+          const deleteButton = await topic.$(deleteTopicButton);
+          if (deleteButton) {
+            throw new Error('Delete button is available');
+          }
+        }
+      }
+    }
+    showMessage('Delete button is not available in the topic');
+  }
+
+  /**
+   * This function checks if "Create Topic" button is present or not as topic manager cannot create topics.
+   */
+  async expectCreateTopicButtonNotPresent(): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const createTopicButton = isMobileViewport
+      ? createNewTopicMobileButton
+      : createNewTopicButton;
+    try {
+      await this.page.waitForSelector(createTopicButton, {timeout: 5000});
+      throw new Error('Create topic button is present, which is not expected.');
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        showMessage('Create topic button is not present as expected.');
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
+   * Function to navigate the skills tab in topics and skills dashboard.
+   */
+  async navigateToSkillsTab(): Promise<void> {
+    const skillSelector = this.isViewportAtMobileWidth()
+      ? mobileSkillSelector
+      : desktopSkillSelector;
+    await this.page.waitForSelector(skillsTab, {visible: true});
+    await this.clickOn(skillsTab);
+    await this.page.waitForSelector(skillSelector, {visible: true});
+  }
+
+  /**
+   * Open the skill editor page for a skill.
+   */
+  async openSkillEditor(skillName: string): Promise<void> {
+    const skillSelector = this.isViewportAtMobileWidth()
+      ? mobileSkillSelector
+      : desktopSkillSelector;
+    await this.page.bringToFront();
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.clickOn(skillsTab);
+    await this.page.waitForSelector(skillSelector, {visible: true});
+
+    await Promise.all([
+      this.page.evaluate(
+        (skillSelector, skillName) => {
+          const skillDivs = Array.from(
+            document.querySelectorAll(skillSelector)
+          );
+          const skillDivToSelect = skillDivs.find(
+            element => element?.textContent.trim() === skillName
+          ) as HTMLElement;
+          if (skillDivToSelect) {
+            skillDivToSelect.click();
+          } else {
+            throw new Error('Cannot open skill editor page.');
+          }
+        },
+        skillSelector,
+        skillName
+      ),
+      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
+      this.waitForStaticAssetsToLoad(),
+    ]);
   }
 
   /**
@@ -385,7 +867,7 @@ export class TopicManager extends BaseUser {
     const skillOptions = isMobileWidth ? mobileSkillsOption : skillEditBox;
 
     await this.navigateToTopicAndSkillsDashboardPage();
-    await this.navigateToSkillTab();
+    await this.navigateToSkillsTab();
 
     const skillItem = await this.selectSkill(skillName);
     if (!skillItem) {
@@ -489,32 +971,6 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Create questions for a skill.
-   * @param {string} skillName - The name of the skill for which to create questions.
-   */
-  async expectToastMessageToBe(expectedMessage: string): Promise<void> {
-    try {
-      await this.page.waitForFunction(
-        (selector: string, expectedText: string) => {
-          const element = document.querySelector(selector);
-          return element?.textContent?.trim() === expectedText.trim();
-        },
-        {timeout: 5000},
-        toastMessageSelector,
-        expectedMessage
-      );
-    } catch (error) {
-      const actualMessage = await this.page.$eval(toastMessageSelector, el =>
-        el.textContent?.trim()
-      );
-
-      throw new Error(
-        `Text did not match within the specified time. Actual message: "${actualMessage}", expected message: "${expectedMessage}"`
-      );
-    }
-  }
-
-  /**
    * Assign a skill to a topic.
    *
    * @param {string} topicName - The name of the topic to assign the skill to.
@@ -531,7 +987,7 @@ export class TopicManager extends BaseUser {
       : assignSkillButtonDesktop;
 
     await this.navigateToTopicAndSkillsDashboardPage();
-    await this.navigateToSkillTab();
+    await this.navigateToSkillsTab();
 
     const skillItem = await this.selectSkill(skillName);
     if (!skillItem) {
@@ -578,6 +1034,36 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Filters skills by name and selects the first matching skill.
+   *
+   * @param {string} skillName - The name of the skill to select.
+   */
+  async filterAndSelectSkill(skillName: string): Promise<void> {
+    // Searching by skill name.
+    await this.type(skillNameInputSelector, skillName);
+
+    await this.page.waitForSelector(radioInnerCircleSelector);
+    const radioInnerCircleSelectorElement = await this.page.$(
+      radioInnerCircleSelector
+    );
+    if (!radioInnerCircleSelectorElement) {
+      throw new Error('Radio inner circle selector not found');
+    }
+    await this.page.evaluate(selector => {
+      document.querySelector(selector).click();
+    }, radioInnerCircleSelector);
+
+    await this.page.waitForSelector(confirmSkillSelectionButtonSelector);
+    const confirmSkillSelectionButtonSelectorElement = await this.page.$(
+      confirmSkillSelectionButtonSelector
+    );
+    if (!confirmSkillSelectionButtonSelectorElement) {
+      throw new Error('Confirm skill selection button selector not found');
+    }
+    await this.clickOn(confirmSkillSelectionButtonSelector);
+  }
+
+  /**
    * Function to merge two skills with the given names.
    * @param {string} skillName1 - The name of the first skill to merge.
    * @param {string} skillName2 - The name of the second skill to merge.
@@ -591,7 +1077,7 @@ export class TopicManager extends BaseUser {
       : mergeSkillsButtonDesktop;
 
     await this.navigateToTopicAndSkillsDashboardPage();
-    await this.navigateToSkillTab();
+    await this.navigateToSkillsTab();
 
     const skillItem1 = await this.selectSkill(skillName1);
     if (!skillItem1) {
@@ -624,31 +1110,11 @@ export class TopicManager extends BaseUser {
       throw new Error('Skill name input selector not found');
     }
     // Searching by skill name.
-    await this.type(skillNameInputSelector, skillName2);
-
-    await this.page.waitForSelector(radioInnerCircleSelector);
-    const radioInnerCircleSelectorElement = await this.page.$(
-      radioInnerCircleSelector
-    );
-    if (!radioInnerCircleSelectorElement) {
-      throw new Error('Radio inner circle selector not found');
-    }
-    await this.page.evaluate(selector => {
-      document.querySelector(selector).click();
-    }, radioInnerCircleSelector);
-
-    await this.page.waitForSelector(confirmSkillSelectionButtonSelector);
-    const confirmSkillSelectionButtonSelectorElement = await this.page.$(
-      confirmSkillSelectionButtonSelector
-    );
-    if (!confirmSkillSelectionButtonSelectorElement) {
-      throw new Error('Confirm skill selection button selector not found');
-    }
-    await this.clickOn(confirmSkillSelectionButtonSelector);
+    await this.filterAndSelectSkill(skillName2);
   }
 
   /**
-   * Function to delete a question with the given text.
+   * Function to delete a question with the given text in the skill's question editor.
    * @param {string} questionText - The text of the question to delete.
    */
   async deleteQuestion(questionText: string): Promise<void> {
@@ -717,7 +1183,7 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Function to expect the preview question text.
+   * Function to expect the preview question text of the question previewed.
    * @param {string} expectedText - The expected question text.
    */
   async expectPreviewQuestionText(expectedText: string): Promise<void> {
@@ -746,7 +1212,7 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Function to expect the preview interaction type.
+   * Function to expect the preview interaction type of the question previewed.
    * @param {string} expectedType - The expected interaction type.
    */
   async expectPreviewInteractionType(expectedType: string): Promise<void> {
@@ -778,100 +1244,13 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Create a subtopic as a topic manager
-   */
-  async createSubtopicForTopic(
-    title: string,
-    urlFragment: string,
-    topicName: string
-  ): Promise<void> {
-    await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(subtopicReassignHeader);
-    }
-    await this.clickOn(addSubtopicButton);
-    await this.type(newSubtopicTitleField, title);
-    await this.type(newSubtopicUrlFragmentField, urlFragment);
-
-    await this.clickOn(subtopicDescriptionEditorToggle);
-    await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(
-      richTextAreaField,
-      `Subtopic creation description text for ${title}`
-    );
-
-    await this.clickOn(subtopicPhotoBoxButton);
-    await this.page.waitForSelector(photoUploadModal, {visible: true});
-    await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadPhotoButton);
-
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickOn(createSubtopicButton);
-    await this.saveTopicDraft(topicName);
-  }
-
-  /**
-   * Save a topic as a curriculum admin.
-   */
-  async saveTopicDraft(topicName: string): Promise<void> {
-    await this.page.waitForSelector(modalDiv, {hidden: true});
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileOptionsSelector);
-      await this.clickOn(mobileSaveTopicButton);
-      await this.page.waitForSelector('oppia-topic-editor-save-modal', {
-        visible: true,
-      });
-      await this.type(
-        saveChangesMessageInput,
-        'Test saving topic as curriculum admin.'
-      );
-      await this.page.waitForSelector(
-        `${closeSaveModalButton}:not([disabled])`
-      );
-      await this.clickOn(closeSaveModalButton);
-      await this.page.waitForSelector('oppia-topic-editor-save-modal', {
-        hidden: true,
-      });
-      await this.openTopicEditor(topicName);
-    } else {
-      await this.clickOn(saveTopicButton);
-      await this.page.waitForSelector(modalDiv, {visible: true});
-      await this.clickOn(closeSaveModalButton);
-      await this.page.waitForSelector(modalDiv, {hidden: true});
-    }
-  }
-
-  /**
-   * Filters topics by status.
-   * @param {string} status - The status to filter by.
-   */
-  async filterTopicsByStatus(status: string): Promise<void> {
-    try {
-      await this.navigateToTopicAndSkillsDashboardPage();
-      if (this.isViewportAtMobileWidth()) {
-        await this.clickOn(displayMobileFiltersButton);
-      }
-      await this.page.waitForSelector(topicStatusDropdownSelector);
-      await this.selectOption(topicStatusDropdownSelector, status);
-      if (this.isViewportAtMobileWidth()) {
-        await this.clickOn(closeMobileFiltersButton);
-      }
-      showMessage(`Filtered topics by status: ${status}`);
-    } catch (error) {
-      console.error(error.stack);
-      throw error;
-    }
-  }
-
-  /**
-   * Filters skills by status.
+   * Filters skills by status like assigned or unassigned.
    * @param {string} status - The status to filter by.
    */
   async filterSkillsByStatus(status: string): Promise<void> {
     try {
       await this.navigateToTopicAndSkillsDashboardPage();
-      await this.navigateToSkillTab();
+      await this.navigateToSkillsTab();
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(displayMobileFiltersButton);
       }
@@ -888,82 +1267,13 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Filters topics by classroom.
-   * @param {string} classroom - The classroom to filter by.
-   */
-  async filterTopicsByClassroom(classroom: string): Promise<void> {
-    try {
-      await this.navigateToTopicAndSkillsDashboardPage();
-      if (this.isViewportAtMobileWidth()) {
-        await this.clickOn(displayMobileFiltersButton);
-      }
-      await this.page.waitForSelector(classroomDropdownSelector);
-      await this.selectOption(classroomDropdownSelector, classroom);
-      if (this.isViewportAtMobileWidth()) {
-        await this.clickOn(closeMobileFiltersButton);
-      }
-      showMessage(`Filtered topics by classroom: ${classroom}`);
-    } catch (error) {
-      console.error(error.stack);
-      throw error;
-    }
-  }
-
-  /**
-   * Filters topics by keyword.
-   * @param {string} keyword - The keyword to filter by.
-   */
-  async filterTopicsByKeyword(keyword: string): Promise<void> {
-    try {
-      await this.navigateToTopicAndSkillsDashboardPage();
-      if (this.isViewportAtMobileWidth()) {
-        await this.clickOn(displayMobileFiltersButton);
-      }
-      await this.page.waitForSelector(keywordDropdownSelector);
-      await this.clickOn(keywordDropdownSelector);
-      await this.page.waitForSelector(multiSelectionInputSelector);
-      await this.type(multiSelectionInputSelector, keyword);
-      await this.page.keyboard.press('Enter');
-      if (this.isViewportAtMobileWidth()) {
-        await this.clickOn(closeMobileFiltersButton);
-      }
-      showMessage(`Filtered topics by keyword: ${keyword}`);
-    } catch (error) {
-      console.error(error.stack);
-      throw error;
-    }
-  }
-
-  /**
-   * Sorts topics by a given option.
-   * @param {string} sortOption - The option to sort by.
-   */
-  async sortTopics(sortOption: string): Promise<void> {
-    try {
-      await this.navigateToTopicAndSkillsDashboardPage();
-      if (this.isViewportAtMobileWidth()) {
-        await this.clickOn(displayMobileFiltersButton);
-      }
-      await this.page.waitForSelector(sortDropdownSelector);
-      await this.selectOption(sortDropdownSelector, sortOption);
-      if (this.isViewportAtMobileWidth()) {
-        await this.clickOn(closeMobileFiltersButton);
-      }
-      showMessage(`Sorted topics by: ${sortOption}`);
-    } catch (error) {
-      console.error(error.stack);
-      throw error;
-    }
-  }
-
-  /**
    * Filters skills by keyword.
    * @param {string} keyword - The keyword to filter by.
    */
   async filterSkillsByKeyword(keyword: string): Promise<void> {
     try {
       await this.navigateToTopicAndSkillsDashboardPage();
-      await this.navigateToSkillTab();
+      await this.navigateToSkillsTab();
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(displayMobileFiltersButton);
       }
@@ -989,7 +1299,7 @@ export class TopicManager extends BaseUser {
   async sortSkills(sortOption: string): Promise<void> {
     try {
       await this.navigateToTopicAndSkillsDashboardPage();
-      await this.navigateToSkillTab();
+      await this.navigateToSkillsTab();
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(displayMobileFiltersButton);
       }
@@ -1030,83 +1340,6 @@ export class TopicManager extends BaseUser {
         await optionElement.click();
         break;
       }
-    }
-  }
-
-  /**
-   * Checks if the filtered topics match the expected topics.
-   * @param {string[]} expectedTopics - The expected topics.
-   */
-  async expectFilteredTopics(expectedTopics: string[]): Promise<void> {
-    const isMobileViewport = this.isViewportAtMobileWidth();
-    const topicNameSelector = isMobileViewport
-      ? mobileTopicSelector
-      : desktopTopicSelector;
-    try {
-      await this.waitForStaticAssetsToLoad();
-      const topicElements = await this.page.$$(topicNameSelector);
-
-      if (expectedTopics.length === 0) {
-        if (topicElements.length !== 0) {
-          throw new Error('Expected no topics, but some were found.');
-        }
-        showMessage('No topics found, as expected.');
-        return;
-      }
-
-      if (!topicElements || topicElements.length === 0) {
-        throw new Error(`No elements found for selector ${topicNameSelector}`);
-      }
-
-      const topicNames = await Promise.all(
-        topicElements.map(element =>
-          this.page.evaluate(el => el.textContent.trim(), element)
-        )
-      );
-
-      const missingTopics = expectedTopics.filter(
-        topic => !topicNames.includes(topic)
-      );
-
-      if (missingTopics.length > 0) {
-        throw new Error(
-          `Expected topics ${missingTopics.join(', ')} to be present, but they were not found.`
-        );
-      }
-
-      showMessage('Filtered topics match the expected topics.');
-    } catch (error) {
-      console.error(error.stack);
-      throw error;
-    }
-  }
-
-  /**
-   * Checks if the topics are in the expected order.
-   * @param {string[]} expectedOrder - The expected order of topics.
-   */
-  async expectTopicsInOrder(expectedOrder: string[]): Promise<void> {
-    const isMobileViewport = this.isViewportAtMobileWidth();
-    const topicNameSelector = isMobileViewport
-      ? mobileTopicSelector
-      : desktopTopicSelector;
-
-    try {
-      await this.waitForStaticAssetsToLoad();
-      await this.page.waitForSelector(topicNameSelector);
-      const topicElements = await this.page.$$(topicNameSelector);
-      const topicNames = await Promise.all(
-        topicElements.map(element =>
-          this.page.evaluate(el => el.textContent.trim(), element)
-        )
-      );
-      if (!topicNames.every((name, index) => name === expectedOrder[index])) {
-        throw new Error('Topics are not in the expected order.');
-      }
-      showMessage('Topics are in the expected order.');
-    } catch (error) {
-      console.error(error.stack);
-      throw error;
     }
   }
 
@@ -1228,7 +1461,7 @@ export class TopicManager extends BaseUser {
    * Expects the skills to be in a certain order.
    * @param {string[]} expectedOrder - The expected order of skills.
    */
-  async expectSkillsInOrder(expectedOrder: string[]): Promise<void> {
+  async expectFilteredSkillsInOrder(expectedOrder: string[]): Promise<void> {
     const isMobileViewport = this.isViewportAtMobileWidth();
     const skillNameSelector = isMobileViewport
       ? mobileSkillSelector
@@ -1303,80 +1536,7 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * This function checks if the topic name field is disabled.
-   */
-  async expectTopicNameFieldDisabled(): Promise<void> {
-    try {
-      await this.page.waitForSelector(topicNameField);
-      const topicNameFieldElement = await this.page.$(topicNameField);
-      const isDisabled = await this.page.evaluate(
-        el => el.disabled,
-        topicNameFieldElement
-      );
-
-      if (!isDisabled) {
-        throw new Error(
-          'Expected topic name field to be disabled, but it is not.'
-        );
-      }
-
-      showMessage('Verified: Topic name field is disabled as expected.');
-    } catch (error) {
-      console.error(error.stack);
-      throw error;
-    }
-  }
-
-  /**
-   * This function checks if the error page heading is "Error 401".
-   */
-  async expectError401Unauthorized(): Promise<void> {
-    try {
-      await this.page.waitForSelector(errorPageHeadingSelector);
-      const errorPageHeadingElement = await this.page.$(
-        errorPageHeadingSelector
-      );
-      const errorPageHeadingText = await this.page.evaluate(
-        element => element.textContent,
-        errorPageHeadingElement
-      );
-      const trimmedErrorPageHeadingText = errorPageHeadingText.trim();
-
-      if (trimmedErrorPageHeadingText !== 'Error 401') {
-        throw new Error(
-          `Expected error page heading to be "Error 401", but got "${trimmedErrorPageHeadingText}"`
-        );
-      }
-
-      showMessage('Verified: Error 401 Unauthorized is displayed as expected.');
-    } catch (error) {
-      console.error(error.stack);
-      throw error;
-    }
-  }
-
-  /**
-   * This function checks if "Create Topic" button is present or not.
-   */
-  async expectCreateTopicButtonNotPresent(): Promise<void> {
-    const isMobileViewport = this.isViewportAtMobileWidth();
-    const createTopicButton = isMobileViewport
-      ? createNewTopicMobileButton
-      : createNewTopicButton;
-    try {
-      await this.page.waitForSelector(createTopicButton, {timeout: 5000});
-      throw new Error('Create topic button is present, which is not expected.');
-    } catch (error) {
-      if (error instanceof puppeteer.errors.TimeoutError) {
-        showMessage('Create topic button is not present as expected.');
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  /**
-   * This function checks if "Create Skill" button is not present.
+   * This function checks if "Create Skill" button is not present as topic manager cannot create skills.
    */
   async expectCreateSkillButtonNotPresent(): Promise<void> {
     const isMobileViewport = this.isViewportAtMobileWidth();
@@ -1393,59 +1553,6 @@ export class TopicManager extends BaseUser {
         throw error;
       }
     }
-  }
-
-  /**
-   * This function verifies the absence of the delete topic button for a given topic.
-   * @param {string} topicName - The name of the topic to check.
-   */
-  async verifyAbsenceOfDeleteTopicButtonInTopic(
-    topicName: string
-  ): Promise<void> {
-    await this.goto(topicAndSkillsDashboardUrl);
-
-    const isMobileWidth = this.isViewportAtMobileWidth();
-    const topicListItemSelector = isMobileWidth
-      ? mobileTopicListItemSelector
-      : desktopTopicListItemSelector;
-    const topicSelector = isMobileWidth
-      ? mobileTopicSelector
-      : desktopTopicSelector;
-    const topicListItemOptions = isMobileWidth
-      ? mobileTopicListItemOptions
-      : desktopTopicListItemOptions;
-    const deleteTopicButton = isMobileWidth
-      ? mobileDeleteTopicButton
-      : desktopDeleteTopicButton;
-
-    await this.page.waitForSelector(topicListItemSelector);
-
-    const topics = await this.page.$$(topicListItemSelector);
-    for (let topic of topics) {
-      const topicNameElement = await topic.$(topicSelector);
-      if (topicNameElement) {
-        const name: string = await (
-          await topicNameElement.getProperty('textContent')
-        ).jsonValue();
-
-        if (name.trim() === topicName) {
-          await this.page.waitForSelector(topicListItemOptions);
-          const editBox = await topic.$(topicListItemOptions);
-          if (editBox) {
-            await this.waitForElementToBeClickable(editBox);
-            await editBox.click();
-          } else {
-            throw new Error('Edit button not found');
-          }
-
-          const deleteButton = await topic.$(deleteTopicButton);
-          if (deleteButton) {
-            throw new Error('Delete button is available');
-          }
-        }
-      }
-    }
-    showMessage('Delete button is not available in the topic');
   }
 
   /**
@@ -1472,7 +1579,7 @@ export class TopicManager extends BaseUser {
       : desktopDeleteSkillButton;
 
     await this.page.waitForSelector(skillsTab, {visible: true});
-    await this.navigateToSkillTab();
+    await this.navigateToSkillsTab();
     await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(skillListItemSelector, {visible: true});
 
@@ -1503,40 +1610,6 @@ export class TopicManager extends BaseUser {
       }
     }
     showMessage('Delete button is not available in the skill');
-  }
-
-  /**
-   * Open the skill editor page for a skill.
-   */
-  async openSkillEditor(skillName: string): Promise<void> {
-    const skillSelector = this.isViewportAtMobileWidth()
-      ? mobileSkillSelector
-      : desktopSkillSelector;
-    await this.page.bringToFront();
-    await this.navigateToTopicAndSkillsDashboardPage();
-    await this.clickOn(skillsTab);
-    await this.page.waitForSelector(skillSelector, {visible: true});
-
-    await Promise.all([
-      this.page.evaluate(
-        (skillSelector, skillName) => {
-          const skillDivs = Array.from(
-            document.querySelectorAll(skillSelector)
-          );
-          const skillDivToSelect = skillDivs.find(
-            element => element?.textContent.trim() === skillName
-          ) as HTMLElement;
-          if (skillDivToSelect) {
-            skillDivToSelect.click();
-          } else {
-            throw new Error('Cannot open skill editor page.');
-          }
-        },
-        skillSelector,
-        skillName
-      ),
-      this.page.waitForNavigation(),
-    ]);
   }
 
   /**
@@ -1657,17 +1730,22 @@ export class TopicManager extends BaseUser {
    * @param {string} misconceptionName - The name of the misconception to add.
    * @param {string} notes - The notes for question creators to understand how handling this misconception is useful for the skill being tested.
    * @param {string} feedback - The feedback for the misconception to add.
+   * @param {boolean} optional - Whether the misconception is optional or not.
    */
   async addMisconception(
     misconceptionName: string,
     notes: string,
-    feedback: string
+    feedback: string,
+    optional: boolean = false
   ): Promise<void> {
     await this.clickOn(addButtonSelector);
     await this.type(nameFieldSelector, misconceptionName);
     await this.type(rteSelector, notes);
     const rteElements = await this.page.$$(rteSelector);
     await rteElements[1].type(feedback);
+    if (optional) {
+      await this.clickOn(optionalMisconceptionToggle);
+    }
     await this.clickOn(saveMisconceptionButton);
   }
 
@@ -1784,10 +1862,32 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Adds a prerequisite skill.
+   * Adds a prerequisite skill to a chapter in chapter editor.
    * @param {string} skillName - The name of the skill to add.
    */
   async addPrerequisiteSkill(skillName: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(addPrerequisiteSkillButton);
+    const elements = await this.page.$$(addPrerequisiteSkillButton);
+
+    if (this.isViewportAtMobileWidth()) {
+      if (elements.length < 2) {
+        throw new Error('Did not find 2 "add prerequisite" button.');
+      }
+      await this.waitForElementToBeClickable(elements[1]);
+      await elements[1].click();
+    } else {
+      await this.waitForElementToBeClickable(elements[0]);
+      await elements[0].click();
+    }
+    await this.filterAndSelectSkill(skillName);
+  }
+
+  /**
+   * Adds a prerequisite skill to a skill in skill chapter.
+   * @param {string} skillName - The name of the skill to add.
+   */
+  async addPrerequisiteSkillInSkillEditor(skillName: string): Promise<void> {
     try {
       await this.clickOn('+ ADD PREREQUISITE SKILL');
       await this.type(skillNameInputSelector, skillName);
@@ -2013,10 +2113,249 @@ export class TopicManager extends BaseUser {
   }
 
   private async openAllMobileDropdownsInSkillEditor(): Promise<void> {
-    await this.clickOn('Worked Examples');
     await this.clickOn('Misconceptions');
+    await this.clickOn('Worked Examples');
     await this.clickOn(' Prerequisite Skills ');
     await this.clickOn('Rubrics');
+  }
+
+  /**
+   * Opens the subtopic editor for a given subtopic and topic.
+   * @param {string} subtopicName - The name of the subtopic to open.
+   * @param {string} topicName - The name of the topic that contains the subtopic.
+   */
+  async openSubtopicEditor(
+    subtopicName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+
+    await this.page.waitForSelector(subtopicReassignHeader);
+    let elementToClick = await this.page.$(subtopicReassignHeader);
+    if (this.isViewportAtMobileWidth() && elementToClick) {
+      await elementToClick.click();
+    }
+
+    try {
+      await this.page.waitForSelector(subtopicCardHeader);
+      const subtopicElements = await this.page.$$(subtopicCardHeader);
+      for (let i = 0; i < subtopicElements.length; i++) {
+        const element = subtopicElements[i];
+        await this.page.waitForSelector(subtopicTitleSelector);
+        const titleElement = await element.$(subtopicTitleSelector);
+        if (titleElement) {
+          const titleTextContent = await this.page.evaluate(
+            el => el.textContent,
+            titleElement
+          );
+          if (titleTextContent.includes(subtopicName)) {
+            await this.waitForElementToBeClickable(titleElement);
+            await titleElement.click();
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to open subtopic editor: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Edits the details of a subtopic.
+   *
+   * @param {string} title - The new title of the subtopic.
+   * @param {string} urlFragment - The new URL fragment of the subtopic.
+   * @param {string} explanation - The new explanation of the subtopic.
+   * @param {string} thumbnail - The path to the new thumbnail image for the subtopic.
+   */
+  async editSubTopicDetails(
+    title: string,
+    urlFragment: string,
+    explanation: string,
+    thumbnail: string
+  ): Promise<void> {
+    await this.clearAllTextFrom(subtopicTitleField);
+    await this.type(subtopicTitleField, title);
+    await this.clearAllTextFrom(subtopicUrlFragmentField);
+    await this.type(subtopicUrlFragmentField, urlFragment);
+
+    await this.clickOn(editSubtopicExplanationSelector);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.clearAllTextFrom(richTextAreaField);
+    await this.type(richTextAreaField, explanation);
+
+    await this.clickOn(subtopicPhotoBoxButton);
+    await this.page.waitForSelector(photoUploadModal, {visible: true});
+    await this.uploadFile(thumbnail);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+  }
+
+  /**
+   * Deletes a subtopic from a topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} topicName - The name of the topic.
+   */
+  async deleteSubtopicFromTopic(
+    subtopicName: string,
+    topicName: string
+  ): Promise<void> {
+    try {
+      await this.openTopicEditor(topicName);
+      await this.waitForStaticAssetsToLoad();
+
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(subtopicReassignHeader);
+      }
+
+      await this.page.waitForSelector(subtopicCardHeader);
+      const subtopics = await this.page.$$(subtopicCardHeader);
+
+      for (const subtopic of subtopics) {
+        const subtopicTitle = await subtopic.$eval(
+          subtopicTitleSelector,
+          el => el.textContent?.trim() || ''
+        );
+
+        if (subtopicTitle === subtopicName) {
+          await subtopic.waitForSelector(optionsSelector);
+          const optionsButton = await subtopic.$(optionsSelector);
+          if (optionsButton) {
+            await this.waitForElementToBeClickable(optionsButton);
+            await optionsButton.click();
+            await subtopic.waitForSelector(deleteSubtopicButtonSelector);
+            const deleteButton = await subtopic.$(deleteSubtopicButtonSelector);
+            if (deleteButton) {
+              await this.waitForElementToBeClickable(deleteButton);
+              await deleteButton.click();
+              showMessage(
+                `Subtopic ${subtopicName} deleted from the topic ${topicName}.`
+              );
+              return;
+            }
+          }
+        }
+      }
+
+      throw new Error(
+        `Subtopic ${subtopicName} not found in topic ${topicName}.`
+      );
+    } catch (error) {
+      const newError = new Error(
+        `Failed to delete subtopic from topic: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Verifies the presence of a subtopic in a topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} topicName - The name of the topic.
+   * @param {boolean} shouldExist - Whether the subtopic should exist.
+   */
+  async verifySubtopicPresenceInTopic(
+    subtopicName: string,
+    topicName: string,
+    shouldExist: boolean
+  ): Promise<void> {
+    try {
+      await this.openTopicEditor(topicName);
+      await this.waitForStaticAssetsToLoad();
+
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(subtopicReassignHeader);
+      }
+
+      const subtopics = await this.page.$$(subtopicTitleSelector);
+
+      for (const subtopicElement of subtopics) {
+        const subtopic = await this.page.evaluate(
+          el => el.textContent.trim(),
+          subtopicElement
+        );
+
+        if (subtopic === subtopicName) {
+          if (!shouldExist) {
+            throw new Error(
+              `Subtopic ${subtopicName} exists in topic ${topicName}, but it shouldn't.`
+            );
+          }
+          showMessage(
+            `Subtopic ${subtopicName} is ${shouldExist ? 'found' : 'not found'} in topic ${topicName}, as expected.`
+          );
+          return;
+        }
+      }
+
+      if (shouldExist) {
+        throw new Error(
+          `Subtopic ${subtopicName} not found in topic ${topicName}, but it should exist.`
+        );
+      }
+
+      showMessage(
+        `Subtopic ${subtopicName} is ${shouldExist ? 'found' : 'not found'} in topic ${topicName}, as expected.`
+      );
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify subtopic presence in topic: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Navigates to the subtopic preview tab.
+   */
+  async navigateToSubtopicPreviewTab(
+    subtopicName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openSubtopicEditor(subtopicName, topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOn(topicMobilePreviewTab);
+    } else {
+      await this.page.waitForSelector(topicPreviewTab);
+      await this.clickOn(topicPreviewTab);
+    }
+  }
+
+  /**
+   * Checks if the preview subtopic has the expected name and explanation.
+   * @param {string} subtopicName - The expected name of the subtopic.
+   * @param {string} explanation - The expected explanation of the subtopic.
+   */
+  async expectSubtopicPreviewToHave(
+    subtopicName: string,
+    explanation: string
+  ): Promise<void> {
+    await this.page.waitForSelector(contentTitle);
+    const previewSubtopicName = await this.page.$eval(
+      contentTitle,
+      el => el.textContent
+    );
+    if (previewSubtopicName !== subtopicName) {
+      throw new Error(
+        `Expected subtopic name to be "${subtopicName}", but it was "${previewSubtopicName}"`
+      );
+    }
+
+    await this.page.waitForSelector(htmlContent);
+    const isExplanationPresent = await this.isTextPresentOnPage(explanation);
+    if (!isExplanationPresent) {
+      throw new Error(
+        `Expected explanation "${explanation}" to be present on the page, but it was not`
+      );
+    }
   }
 
   /**
@@ -2067,190 +2406,340 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Opens the subtopic editor for a given subtopic and topic.
-   * @param {string} subtopicName - The name of the subtopic to open.
-   * @param {string} topicName - The name of the topic that contains the subtopic.
+   * Save a story as a curriculum admin.
    */
-  async openSubtopicEditor(
-    subtopicName: string,
-    topicName: string
-  ): Promise<void> {
-    await this.openTopicEditor(topicName);
-    await this.page.waitForSelector(subtopicReassignHeader);
-    let elementToClick = await this.page.$(subtopicReassignHeader);
-    if (this.isViewportAtMobileWidth() && elementToClick) {
-      await elementToClick.click();
+  async saveStoryDraft(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const isMobileSaveButtonVisible = await this.isElementVisible(
+        mobileSaveStoryChangesButton
+      );
+      if (!isMobileSaveButtonVisible) {
+        await this.clickOn(mobileOptionsSelector);
+      }
+      await this.clickOn(mobileSaveStoryChangesButton);
+    } else {
+      await this.clickOn(saveStoryButton);
     }
+    await this.type(
+      saveChangesMessageInput,
+      'Test saving story as curriculum admin.'
+    );
+    await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
+    await this.clickOn(closeSaveModalButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+
     try {
-      await this.page.waitForSelector(subtopicCardHeader);
-      const subtopicElements = await this.page.$$(subtopicCardHeader);
-      for (let i = 0; i < subtopicElements.length; i++) {
-        const element = subtopicElements[i];
-        await this.page.waitForSelector(testSubtopicTitleSelector);
-        const titleElement = await element.$(testSubtopicTitleSelector);
-        if (titleElement) {
-          const titleTextContent = await this.page.evaluate(
-            el => el.textContent,
-            titleElement
-          );
-          if (titleTextContent.includes(subtopicName)) {
-            await this.waitForElementToBeClickable(titleElement);
-            await titleElement.click();
-            break;
-          }
+      await this.page.waitForNavigation({timeout: 10000});
+    } catch (error) {
+      return;
+    }
+  }
+
+  /**
+   * Opens the story editor for a given story and topic.
+   * @param {string} storyName - The name of the story.
+   * @param {string} topicName - The name of the topic.
+   */
+  async openStoryEditor(storyName: string, topicName: string): Promise<void> {
+    try {
+      await this.openTopicEditor(topicName);
+      if (this.isViewportAtMobileWidth()) {
+        const elements = await this.page.$$(
+          mobileCollapsibleCardHeaderSelector
+        );
+        if (elements.length < 4) {
+          throw new Error('Not enough collapsible cards found');
+        }
+        // 4th collapsible card is for stories.
+        await elements[3].click();
+      }
+
+      await this.page.waitForSelector(storyTitleSelector);
+      const storyTitles = await this.page.$$(storyTitleSelector);
+
+      for (const titleElement of storyTitles) {
+        const title = await this.page.evaluate(
+          el => el.textContent.trim(),
+          titleElement
+        );
+
+        if (title === storyName) {
+          await titleElement.click();
+          await this.page.waitForNavigation({
+            waitUntil: ['load', 'networkidle0'],
+          });
+          return;
         }
       }
+
+      throw new Error(
+        `Story with name ${storyName} not found in topic ${topicName}.`
+      );
     } catch (error) {
-      const newError = new Error(`Failed to open subtopic editor: ${error}`);
+      const newError = new Error(
+        `Failed to open story editor for story ${storyName} in topic ${topicName}: ${error}`
+      );
       newError.stack = error.stack;
       throw newError;
     }
   }
 
-  async editSubTopicDetails(
-    title: string,
-    urlFragment: string,
-    explanation: string,
-    thumbnail: string
+  /**
+   * Verifies the presence of a story in a topic.
+   * @param {string} storyName - The name of the story.
+   * @param {string} topicName - The name of the topic.
+   * @param {boolean} shouldExist - Whether the story should exist.
+   */
+  async verifyStoryPresenceInTopic(
+    storyName: string,
+    topicName: string,
+    shouldExist: boolean
   ): Promise<void> {
-    await this.clearAllTextFrom(subtopicTitleField);
-    await this.type(subtopicTitleField, title);
-    await this.clearAllTextFrom(subtopicUrlFragmentField);
-    await this.type(subtopicUrlFragmentField, urlFragment);
+    try {
+      await this.openTopicEditor(topicName);
+      await this.waitForStaticAssetsToLoad();
 
-    await this.clickOn(editSubtopicExplanationSelector);
-    await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.clearAllTextFrom(richTextAreaField);
-    await this.type(richTextAreaField, explanation);
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(mobileStoryDropdown);
+      }
 
-    await this.clickOn(subtopicPhotoBoxButton);
-    await this.page.waitForSelector(photoUploadModal, {visible: true});
-    await this.uploadFile(thumbnail);
-    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadPhotoButton);
+      const stories = await this.page.$$(storyTitleSelector);
 
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+      for (const storyElement of stories) {
+        const story = await this.page.evaluate(
+          el => el.textContent.trim(),
+          storyElement
+        );
+
+        if (story === storyName) {
+          if (!shouldExist) {
+            throw new Error(
+              `Story ${storyName} exists in topic ${topicName}, but it shouldn't.`
+            );
+          }
+          showMessage(
+            `Story ${storyName} is ${shouldExist ? 'found' : 'not found'} in topic ${topicName}, as expected.`
+          );
+          return;
+        }
+      }
+
+      if (shouldExist) {
+        throw new Error(
+          `Story ${storyName} not found in topic ${topicName}, but it should exist.`
+        );
+      }
+      showMessage(
+        `Story ${storyName} is ${shouldExist ? 'found' : 'not found'} in topic ${topicName}, as expected.`
+      );
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify story presence in topic: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
   }
 
   /**
-   * Navigates to the subtopic preview tab.
+   * Deletes a story from a topic.
+   * @param {string} storyName - The name of the story.
+   * @param {string} topicName - The name of the topic.
    */
-  async navigateToSubtopicPreviewTab(
-    subtopicName: string,
+  async deleteStoryFromTopic(
+    storyName: string,
     topicName: string
   ): Promise<void> {
-    await this.openSubtopicEditor(subtopicName, topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileOptionsSelector);
-      await this.clickOn(mobileNavbarDropdown);
-      await this.clickOn(topicMobilePreviewTab);
-    } else {
-      await this.page.waitForSelector(topicPreviewTab);
-      await this.clickOn(topicPreviewTab);
+    try {
+      await this.openTopicEditor(topicName);
+      await this.waitForStaticAssetsToLoad();
+
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(mobileStoryDropdown);
+      }
+
+      await this.page.waitForSelector(storyListItemSelector);
+      const storyListItems = await this.page.$$(storyListItemSelector);
+
+      for (const storyListItem of storyListItems) {
+        const storyTitleElement = await storyListItem.$(storyTitleSelector);
+        if (storyTitleElement) {
+          const storyTitle = await storyTitleElement.evaluate(
+            el => el.textContent?.trim() || ''
+          );
+          if (storyTitle === storyName) {
+            const deleteButton = await storyListItem.$(
+              deleteStoryButtonSelector
+            );
+            if (deleteButton) {
+              await this.waitForElementToBeClickable(deleteButton);
+              await deleteButton.click();
+              await this.clickOn(confirmStoryDeletionButton);
+              showMessage(
+                `Story ${storyName} deleted from the topic ${topicName}.`
+              );
+              return;
+            }
+          }
+        }
+      }
+
+      throw new Error(`Story ${storyName} not found in topic ${topicName}.`);
+    } catch (error) {
+      const newError = new Error(`Failed to delete story from topic: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
     }
   }
 
   /**
-   * Checks if the preview subtopic has the expected name and explanation.
-   * @param {string} subtopicName - The expected name of the subtopic.
-   * @param {string} explanation - The expected explanation of the subtopic.
-   */
-  async expectPreviewSubtopicToHave(
-    subtopicName: string,
-    explanation: string
-  ): Promise<void> {
-    await this.page.waitForSelector(contentTitle);
-    const previewSubtopicName = await this.page.$eval(
-      contentTitle,
-      el => el.textContent
-    );
-    if (previewSubtopicName !== subtopicName) {
-      throw new Error(
-        `Expected subtopic name to be "${subtopicName}", but it was "${previewSubtopicName}"`
-      );
-    }
-
-    await this.page.waitForSelector(htmlContent);
-    const isExplanationPresent = await this.isTextPresentOnPage(explanation);
-    if (!isExplanationPresent) {
-      throw new Error(
-        `Expected explanation "${explanation}" to be present on the page, but it was not`
-      );
-    }
-  }
-
-  /**
-   * Edits the details of a topic.
+   * Opens the chapter editor for a given chapter, story, and topic.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {string} storyName - The name of the story.
    * @param {string} topicName - The name of the topic.
-   * @param {string} urlFragment - The URL fragment of the topic.
-   * @param {string} description - The description of the topic.
-   * @param {string} titleFragments - The title fragments of the topic.
-   * @param {string} metaTags - The meta tags of the topic.
-   * @param {string} thumbnail - The thumbnail of the topic.
    */
-  async editTopicDetails(
-    description: string,
-    titleFragments: string,
-    metaTags: string,
-    thumbnail: string,
-    topicName?: string,
-    urlFragment?: string
+  async openChapterEditor(
+    chapterName: string,
+    storyName: string,
+    topicName: string
   ): Promise<void> {
-    if (topicName) {
-      await this.clearAllTextFrom(topicNameField);
-      await this.type(topicNameField, topicName);
-    }
-    if (urlFragment) {
-      await this.clearAllTextFrom(updateTopicUrlFragmentField);
-      await this.type(updateTopicUrlFragmentField, urlFragment);
-    }
-    await this.clearAllTextFrom(updateTopicWebFragmentField);
-    await this.type(updateTopicWebFragmentField, titleFragments);
-    await this.clearAllTextFrom(updateTopicDescriptionField);
-    await this.type(updateTopicDescriptionField, description);
+    try {
+      await this.openStoryEditor(storyName, topicName);
+      const addChapterButtonElement = await this.page.$(addChapterButton);
+      if (!addChapterButtonElement) {
+        const mobileChapterCollapsibleCardElement = await this.page.$(
+          mobileChapterCollapsibleCard
+        );
+        mobileChapterCollapsibleCardElement?.click();
+        await this.waitForStaticAssetsToLoad();
+      }
 
-    await this.clickOn(photoBoxButton);
-    await this.page.waitForSelector(photoUploadModal, {visible: true});
-    await this.uploadFile(thumbnail);
+      await this.page.waitForSelector(chapterTitleSelector);
+      const chapterTitles = await this.page.$$(chapterTitleSelector);
+
+      for (const titleElement of chapterTitles) {
+        const title = await this.page.evaluate(
+          el => el.textContent.trim(),
+          titleElement
+        );
+
+        if (title === chapterName) {
+          await titleElement.click();
+          await this.waitForStaticAssetsToLoad();
+          showMessage(`Chapter ${chapterName} opened in chapter editor.`);
+
+          // Collapsing all the collapsible card of chapter editor in the mobile viewport.
+          if (this.isViewportAtMobileWidth()) {
+            await this.page.waitForSelector(
+              mobileCollapsibleCardHeaderSelector
+            );
+            const elements = await this.page.$$(
+              mobileCollapsibleCardHeaderSelector
+            );
+            if (elements.length < 5) {
+              throw new Error('Not enough elements collapsible headers found,');
+            }
+            await elements[2].click();
+            await elements[3].click();
+            await elements[4].click();
+          }
+          return;
+        }
+      }
+
+      throw new Error(
+        `Chapter with name ${chapterName} not found in story ${storyName} and topic ${topicName}.`
+      );
+    } catch (error) {
+      const newError = new Error(
+        `Failed to open chapter editor for chapter ${chapterName} in story ${storyName} and topic ${topicName}: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Edits the details of a chapter.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {string} description - The description of the chapter.
+   * @param {string} explorationId - The ID of the exploration.
+   * @param {string} thumbnailImage - The thumbnail image of the chapter.
+   */
+  async editChapterDetails(
+    chapterName: string,
+    description: string,
+    explorationId: string,
+    thumbnailImage: string
+  ): Promise<void> {
+    await this.clearAllTextFrom(chapterTitleField);
+    await this.type(chapterTitleField, chapterName);
+    await this.type(chapterDescriptionField, description);
+
+    await this.clearAllTextFrom(chapterExplorationIdField);
+    await this.type(chapterExplorationIdField, explorationId);
+    await this.clickOn(saveExplorationIDButton);
+
+    await this.clickOn(chapterPhotoBoxButton);
+    await this.clickOn(resetChapterThumbnailButton);
+    await this.uploadFile(thumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
-
-    await this.page.waitForSelector(topicMetaTagInput);
-    await this.page.focus(topicMetaTagInput);
-    await this.clearAllTextFrom(topicMetaTagInput);
-    await this.page.type(topicMetaTagInput, metaTags);
-    await this.page.keyboard.press('Tab');
   }
-  /**
-   * Verifies the status of the practice tab.
-   * @param {string} expectedStatus - The expected status of the practice tab.
-   */
-  async verifyStatusOfPracticeTab(expectedStatus: string): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn('Subtopics');
-    }
-    try {
-      const practiceTab = await this.page.$(practiceTabToggle);
-      if (practiceTab === null) {
-        throw new Error('Practice tab not found.');
-      }
-      const actualStatus = await (
-        await practiceTab.getProperty('disabled')
-      ).jsonValue();
 
-      if (expectedStatus === 'disabled' && actualStatus !== true) {
+  /**
+   * Previews the chapter card.
+   */
+  async previewChapterCard(): Promise<void> {
+    const elementHandle = await this.page.waitForSelector(
+      showChapterPreviewButton
+    );
+    if (!elementHandle) {
+      throw new Error('Chapter preview button not found');
+    }
+    await elementHandle.click();
+  }
+
+  /**
+   * Expects the chapter preview to have a certain name and explanation.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {string} explanation - The explanation of the chapter.
+   */
+
+  async expectChapterPreviewToHave(
+    chapterName: string,
+    explanation: string
+  ): Promise<void> {
+    try {
+      await this.page.waitForSelector(titleSelector);
+      await this.page.waitForSelector(descriptionSelector);
+
+      const titleElement = await this.page.$(titleSelector);
+      const descriptionElement = await this.page.$(descriptionSelector);
+
+      const title = await this.page.evaluate(
+        el => el.textContent.trim(),
+        titleElement
+      );
+      const description = await this.page.evaluate(
+        el => el.textContent.trim(),
+        descriptionElement
+      );
+
+      if (title !== chapterName) {
         throw new Error(
-          'Expected practice tab to be disabled, but it was enabled.'
+          `Expected title to be ${chapterName} but found ${title}`
         );
-      } else if (expectedStatus === 'enabled' && actualStatus !== false) {
+      }
+
+      if (description !== explanation) {
         throw new Error(
-          'Expected practice tab to be enabled, but it was disabled.'
+          `Expected description to be ${explanation} but found ${description}`
         );
       }
     } catch (error) {
       const newError = new Error(
-        `Failed to verify status of practice tab: ${error}`
+        `Failed to validate chapter preview: ${error}`
       );
       newError.stack = error.stack;
       throw newError;
@@ -2258,54 +2747,172 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Opens the topic editor for a given topic and previews it by clicking on the third navbar-tab-icon.
-   * @param {string} topicName - The name of the topic to be opened in the topic editor.
+   * Assigns an acquired skill.
+   * @param {string} skillName - The name of the skill.
+   * @returns {Promise<void>}
    */
-  async navigateToTopicPreviewTopic(topicName: string): Promise<void> {
-    await this.openTopicEditor(topicName);
+  async addAcquiredSkill(skillName: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(addAcquiredSkillButton);
+    const elements = await this.page.$$(addAcquiredSkillButton);
+    if (elements.length < 2) {
+      throw new Error('Add Acquired skill button not found.');
+    }
+
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileOptionsSelector);
-      await this.clickOn(mobileNavbarDropdown);
-      await this.clickOn(topicMobilePreviewTab);
+      if (elements.length < 2) {
+        throw new Error('Did not find 2 "Add Acquired Skill" buttons');
+      }
+      await this.waitForElementToBeClickable(elements[1]);
+      await elements[1].click();
     } else {
-      await this.page.waitForSelector(topicPreviewTab);
-      await this.clickOn(topicPreviewTab);
+      await this.waitForElementToBeClickable(elements[0]);
+      await elements[0].click();
+    }
+    await this.filterAndSelectSkill(skillName);
+  }
+
+  /**
+   * Verifies the presence of a chapter in a story.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {string} storyName - The name of the story.
+   * @param {boolean} shouldExist - Whether the chapter should exist.
+   */
+  async verifyChapterPresenceInStory(
+    chapterName: string,
+    storyName: string,
+    topicName: string,
+    shouldExist: boolean
+  ): Promise<void> {
+    try {
+      await this.openStoryEditor(storyName, topicName);
+
+      if (this.isViewportAtMobileWidth()) {
+        await this.page.waitForSelector(mobileChapterCollapsibleCard);
+        const mobileChapterCollapsibleCardElement = await this.page.$(
+          mobileChapterCollapsibleCard
+        );
+        mobileChapterCollapsibleCardElement?.click();
+        await this.waitForPageToFullyLoad();
+      }
+
+      const chapters = await this.page.$$(chapterTitleSelector);
+
+      for (const chapterElement of chapters) {
+        const chapter = await this.page.evaluate(
+          el => el.textContent.trim(),
+          chapterElement
+        );
+
+        if (chapter === chapterName) {
+          if (!shouldExist) {
+            throw new Error(
+              `Chapter ${chapterName} exists in story ${storyName} of topic ${topicName}, but it shouldn't.`
+            );
+          }
+          showMessage(
+            `Chapter ${chapterName} is ${shouldExist ? 'found' : 'not found'} in story ${storyName}, as expected.`
+          );
+
+          try {
+            await this.page.waitForNavigation({timeout: 10000});
+          } catch (error) {
+            return;
+          }
+          return;
+        }
+      }
+
+      if (shouldExist) {
+        throw new Error(
+          `Chapter ${chapterName} not found in story ${storyName} of topic ${topicName}, but it should exist.`
+        );
+      }
+      showMessage(
+        `Chapter ${chapterName} is ${shouldExist ? 'found' : 'not found'} in story ${storyName}, as expected.`
+      );
+
+      try {
+        await this.page.waitForNavigation({timeout: 10000});
+      } catch (error) {
+        return;
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify chapter presence in story: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
     }
   }
 
   /**
-   * Checks if the topic preview has the expected title and description.
-   * @param {string} title - The expected title of the topic.
-   * @param {string} description - The expected description of the topic.
+   * Deletes a chapter from a story.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {string} storyName - The name of the story.
    */
-  async expectTopicPreviewToHaveTitleAndDescription(
-    title: string,
-    description: string
+  async deleteChapterFromStory(
+    chapterName: string,
+    storyName: string,
+    topicName: string
   ): Promise<void> {
-    await this.page.waitForSelector(topicPreviewTitleSelector);
-    const titleElement = await this.page.$(topicPreviewTitleSelector);
-    const actualTitle = await this.page.evaluate(
-      el => el.textContent,
-      titleElement
-    );
-    if (actualTitle.trim() !== title) {
-      throw new Error(
-        `Expected topic title to be "${title}", but was "${actualTitle}".`
-      );
-    }
+    try {
+      await this.openStoryEditor(storyName, topicName);
+      await this.waitForStaticAssetsToLoad();
 
-    await this.page.waitForSelector(topicPreviewDescriptionSelector);
-    const descriptionElement = await this.page.$(
-      topicPreviewDescriptionSelector
-    );
-    const actualDescription = await this.page.evaluate(
-      el => el.textContent,
-      descriptionElement
-    );
-    if (actualDescription.trim() !== description) {
+      const addChapterButtonElement = await this.page.$(addChapterButton);
+      if (!addChapterButtonElement) {
+        await this.page.waitForSelector(mobileChapterCollapsibleCard);
+        const mobileChapterCollapsibleCardElement = await this.page.$(
+          mobileChapterCollapsibleCard
+        );
+        mobileChapterCollapsibleCardElement?.click();
+        await this.waitForStaticAssetsToLoad();
+      }
+
+      await this.page.waitForSelector(storyEditorNodeSelector);
+      const storyEditorNodes = await this.page.$$(storyEditorNodeSelector);
+
+      for (const storyEditorNode of storyEditorNodes) {
+        const chapter = await storyEditorNode.$eval(chapterTitleSelector, el =>
+          el.textContent ? el.textContent.trim() : ''
+        );
+
+        if (chapter === chapterName) {
+          await storyEditorNode.waitForSelector(editOptionsSelector);
+          const editOptionsButton =
+            await storyEditorNode.$(editOptionsSelector);
+          if (editOptionsButton) {
+            await this.waitForElementToBeClickable(editOptionsButton);
+            await editOptionsButton.click();
+
+            await storyEditorNode.waitForSelector(deleteChapterButtonSelector);
+            const deleteButton = await storyEditorNode.$(
+              deleteChapterButtonSelector
+            );
+            if (deleteButton) {
+              await this.waitForElementToBeClickable(deleteButton);
+              await deleteButton.click();
+              await this.clickOn(confirmDeleteChapterButton);
+
+              showMessage(
+                `Chapter ${chapterName} deleted from the story ${storyName}.`
+              );
+              return;
+            }
+          }
+        }
+      }
+
       throw new Error(
-        `Expected topic description to be "${description}", but was "${actualDescription}".`
+        `Chapter ${chapterName} not found in story ${storyName} of topic ${topicName}.`
       );
+    } catch (error) {
+      const newError = new Error(
+        `Failed to delete chapter from story: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
     }
   }
 }

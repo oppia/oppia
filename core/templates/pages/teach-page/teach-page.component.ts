@@ -15,7 +15,15 @@
 /**
  * @fileoverview Component for the teach page.
  */
-import {Component, OnInit} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  Renderer2,
+  ViewChild,
+} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
@@ -25,117 +33,253 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {LoaderService} from 'services/loader.service';
 import {UserService} from 'services/user.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {Subscription} from 'rxjs';
+import {NgbCarousel} from '@ng-bootstrap/ng-bootstrap';
+import {AccordionPanelData} from 'pages/about-page/data.model';
+
+import './teach-page.component.css';
 
 export interface Testimonial {
+  personDetails: string;
+  role:
+    | 'I18N_TEACH_PAGE_TESTIMONIAL_ROLE_TEACHER'
+    | 'I18N_TEACH_PAGE_TESTIMONIAL_ROLE_PARENT';
   quote: string;
-  studentDetails: string;
   imageUrl: string;
   imageUrlWebp: string;
-  borderPresent: boolean;
   altText: string;
 }
 
 @Component({
   selector: 'teach-page',
   templateUrl: './teach-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./teach-page.component.css'],
 })
-export class TeachPageComponent implements OnInit {
+export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  classroomUrlFragment!: string;
-  classroomUrl!: string;
+  @ViewChild('creatorsCarouselContainer')
+  creatorsCarouselContainer!: ElementRef;
+  @ViewChild('testimonialsCarousel') testimonialsCarousel!: NgbCarousel;
+  parentsTeachersPdfGuideLink = AppConstants.PARENTS_TEACHERS_PDF_GUIDE_LINK;
+  teacherStoryTaggedBlogsLink = AppConstants.TEACHER_STORY_TAGGED_BLOGS_LINK;
+  androidUrl = `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.ROUTE}`;
   displayedTestimonialId!: number;
   libraryUrl!: string;
-  testimonialCount!: number;
-  testimonials: Testimonial[] = [];
+  testimonials: readonly Testimonial[] = [];
   isWindowNarrow: boolean = false;
   userIsLoggedIn: boolean = false;
   directiveSubscriptions = new Subscription();
+  lessonCreationData: AccordionPanelData[] = [
+    {
+      title: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_1_TITLE',
+      text: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_1_TEXT',
+      customPanelClassNames: ['oppia-teach-lesson-panel'],
+      customTitleClassNames: ['oppia-teach-lesson-panel-title'],
+      image: '/teach/skill-tree-image',
+      altText: 'Skill tree image',
+      panelIsCollapsed: true,
+    },
+    {
+      title: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_2_TITLE',
+      text: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_2_TEXT',
+      customPanelClassNames: ['oppia-teach-lesson-panel'],
+      customTitleClassNames: ['oppia-teach-lesson-panel-title'],
+      image: '/teach/skill-table-image',
+      altText: 'Skill table image',
+      panelIsCollapsed: true,
+    },
+    {
+      title: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_3_TITLE',
+      text: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_3_TEXT',
+      customPanelClassNames: ['oppia-teach-lesson-panel'],
+      customTitleClassNames: ['oppia-teach-lesson-panel-title'],
+      panelIsCollapsed: true,
+    },
+    {
+      title: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_4_TITLE',
+      text: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_4_TEXT',
+      customPanelClassNames: ['oppia-teach-lesson-panel'],
+      customTitleClassNames: ['oppia-teach-lesson-panel-title'],
+      panelIsCollapsed: true,
+    },
+    {
+      title: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_5_TITLE',
+      text: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_5_TEXT',
+      customPanelClassNames: ['oppia-teach-lesson-panel'],
+      customTitleClassNames: ['oppia-teach-lesson-panel-title'],
+      panelIsCollapsed: true,
+    },
+    {
+      title: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_6_TITLE',
+      text: 'I18N_TEACH_PAGE_LESSON_CREATION_STEP_6_TEXT',
+      customPanelClassNames: ['oppia-teach-lesson-panel'],
+      customTitleClassNames: ['oppia-teach-lesson-panel-title'],
+      panelIsCollapsed: true,
+    },
+  ];
+  creatorsData = AppConstants.LESSON_CREATORS_DATA_TEACH_PAGE;
+  screenType!: 'desktop' | 'tablet' | 'mobile';
+  creatorsIndicesObject = {
+    desktop: [[0, 1, 2, 3, 4, 5]],
+    tablet: [
+      [0, 1, 2],
+      [3, 4, 5],
+    ],
+    mobile: [
+      [0, 1],
+      [2, 3],
+      [4, 5],
+    ],
+  };
+  activeCreatorsSlideIndex = 0;
+  activeCreatorsIndices!: number[];
+  creatorsCarouselLeftArrowIsDisabled = true;
+  creatorsCarouselRightArrowIsDisabled = false;
 
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowDimensionService: WindowDimensionsService,
+    private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
     private userService: UserService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    public renderer: Renderer2,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   ngOnInit(): void {
     this.displayedTestimonialId = 0;
-    // Change count after all testimonials are available.
-    this.testimonialCount = 3;
-    this.testimonials = this.getTestimonials();
-    this.classroomUrl = this.urlInterpolationService.interpolateUrl(
-      '/learn/<classroomUrlFragment>',
-      {
-        classroomUrlFragment: AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT,
-      }
-    );
+    this.setScreenType();
+    this.testimonials = AppConstants.TESTIMONIAlS_DATA_TEACHERS;
     this.libraryUrl = '/community-library';
     this.loaderService.showLoadingScreen('Loading');
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.loaderService.hideLoadingScreen();
     });
-    this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
+    this.isWindowNarrow = this.windowDimensionsService.isWindowNarrow();
     this.directiveSubscriptions.add(
-      this.windowDimensionService.getResizeEvent().subscribe(() => {
-        this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
+      this.windowDimensionsService.getResizeEvent().subscribe(() => {
+        this.setScreenType();
+        this.isWindowNarrow = this.windowDimensionsService.isWindowNarrow();
       })
+    );
+    this.registerFirstTimePageViewEvent();
+  }
+
+  ngAfterViewInit(): void {
+    this.creatorsCarouselContainer.nativeElement.addEventListener(
+      'scroll',
+      this.toggleCreatorsCarouselArrowsDisablityStatusDesktop.bind(this)
     );
   }
 
-  // TODO(#11657): Extract the testimonials code into a separate component.
-  // The 2 functions below are to cycle between values:
-  // 0 to (testimonialCount - 1) for displayedTestimonialId.
-  incrementDisplayedTestimonialId(): void {
-    // This makes sure that incrementing from (testimonialCount - 1)
-    // returns 0 instead of testimonialCount,since we want the testimonials
-    // to cycle through.
-    this.displayedTestimonialId =
-      (this.displayedTestimonialId + 1) % this.testimonialCount;
+  setScreenType(): void {
+    const width = this.windowDimensionsService.getWidth();
+    if (width < 361) {
+      this.screenType = 'mobile';
+    } else if (width < 769) {
+      this.screenType = 'tablet';
+    } else {
+      this.screenType = 'desktop';
+    }
+    this.setActiveCreatorsIndices();
   }
 
-  decrementDisplayedTestimonialId(): void {
-    // This makes sure that decrementing from 0, returns
-    // (testimonialCount - 1) instead of -1, since we want the testimonials
-    // to cycle through.
-    this.displayedTestimonialId =
-      (this.displayedTestimonialId + this.testimonialCount - 1) %
-      this.testimonialCount;
+  showPreviousCreators(): void {
+    if (this.screenType === 'desktop') {
+      this.renderer.setProperty(
+        this.creatorsCarouselContainer.nativeElement,
+        'scrollLeft',
+        0
+      );
+      this.toggleCreatorsCarouselArrowsDisablityStatusDesktop();
+    } else {
+      if (this.activeCreatorsSlideIndex === 0) {
+        return;
+      }
+      this.activeCreatorsSlideIndex--;
+      this.setActiveCreatorsIndices();
+      this.toggleCreatorsCarouselArrowsDisablityStatusMobile();
+    }
   }
 
-  getTestimonials(): [Testimonial, Testimonial, Testimonial] {
-    return [
-      {
-        quote: 'I18N_TEACH_TESTIMONIAL_1',
-        studentDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
-        imageUrl: '/teach/riya.jpg',
-        imageUrlWebp: '/teach/riya.webp',
-        borderPresent: true,
-        altText: 'Photo of Riya',
-      },
-      {
-        quote: 'I18N_TEACH_TESTIMONIAL_2',
-        studentDetails: 'I18N_TEACH_STUDENT_DETAILS_2',
-        imageUrl: '/teach/awad.jpg',
-        imageUrlWebp: '/teach/awad.webp',
-        borderPresent: true,
-        altText: 'Photo of Awad',
-      },
-      {
-        quote: 'I18N_TEACH_TESTIMONIAL_3',
-        studentDetails: 'I18N_TEACH_STUDENT_DETAILS_3',
-        imageUrl: '/teach/himanshu.jpg',
-        imageUrlWebp: '/teach/himanshu.webp',
-        borderPresent: true,
-        altText: 'Photo of Himanshu',
-      },
-    ];
+  showNextCreators(): void {
+    if (this.screenType === 'desktop') {
+      const scrollWidth =
+        this.creatorsCarouselContainer.nativeElement.scrollWidth;
+      if (!this.isLanguageRTL()) {
+        this.renderer.setProperty(
+          this.creatorsCarouselContainer.nativeElement,
+          'scrollLeft',
+          scrollWidth
+        );
+      } else {
+        this.renderer.setProperty(
+          this.creatorsCarouselContainer.nativeElement,
+          'scrollLeft',
+          -scrollWidth
+        );
+      }
+      this.toggleCreatorsCarouselArrowsDisablityStatusDesktop();
+    } else {
+      if (
+        this.activeCreatorsSlideIndex ===
+        this.creatorsIndicesObject[this.screenType].length - 1
+      ) {
+        return;
+      }
+      this.activeCreatorsSlideIndex++;
+      this.setActiveCreatorsIndices();
+      this.toggleCreatorsCarouselArrowsDisablityStatusMobile();
+    }
+  }
+
+  setActiveCreatorsIndices(): void {
+    this.activeCreatorsIndices =
+      this.creatorsIndicesObject[this.screenType][
+        this.activeCreatorsSlideIndex
+      ];
+  }
+
+  toggleCreatorsCarouselArrowsDisablityStatusMobile(): void {
+    if (this.screenType === 'desktop') {
+      return;
+    }
+    this.creatorsCarouselLeftArrowIsDisabled =
+      this.activeCreatorsSlideIndex === 0;
+    this.creatorsCarouselRightArrowIsDisabled =
+      this.activeCreatorsSlideIndex ===
+      this.creatorsIndicesObject[this.screenType].length - 1;
+  }
+
+  toggleCreatorsCarouselArrowsDisablityStatusDesktop(): void {
+    if (this.screenType !== 'desktop') {
+      return;
+    }
+    // The bitwise OR operator is used to convert the float to an integer.
+    const scrollLeft =
+      this.creatorsCarouselContainer.nativeElement.scrollLeft | 0;
+    const scrollWidth =
+      this.creatorsCarouselContainer.nativeElement.scrollWidth | 0;
+    const clientWidth =
+      this.creatorsCarouselContainer.nativeElement.clientWidth | 0;
+
+    this.creatorsCarouselLeftArrowIsDisabled = scrollLeft === 0;
+    this.creatorsCarouselRightArrowIsDisabled =
+      Math.abs(scrollLeft) === Math.abs(scrollWidth - clientWidth);
+    // Here, the absolute value is used to accomodate the RTL UI logic.
+  }
+
+  moveTestimonialCarouselToPreviousSlide(): void {
+    this.testimonialsCarousel.prev();
+  }
+
+  moveTestimonialCarouselToNextSlide(): void {
+    this.testimonialsCarousel.next();
   }
 
   onClickAccessAndroidButton(): void {
@@ -144,13 +288,13 @@ export class TeachPageComponent implements OnInit {
 
   onClickStartLearningButton(): void {
     this.siteAnalyticsService.registerClickStartLearningButtonEvent();
-    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    this.windowRef.nativeWindow.location.href = '/learn';
     return;
   }
 
   onClickVisitClassroomButton(): void {
     this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
-    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    this.windowRef.nativeWindow.location.href = '/learn';
     return;
   }
 
@@ -172,14 +316,34 @@ export class TeachPageComponent implements OnInit {
     return;
   }
 
-  onClickExploreLessonsButton(): void {
-    this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
-    this.windowRef.nativeWindow.location.href = this.classroomUrl;
-    return;
-  }
-
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  onClickExploreLessonsButton(): void {
+    this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
+  }
+
+  onClickDownloadAndroidAppButton(): void {
+    this.siteAnalyticsService.registerClickDownloadAndroidAppButtonEvent();
+  }
+
+  registerFirstTimePageViewEvent(): void {
+    this.siteAnalyticsService.registerFirstTimePageViewEvent(
+      AppConstants.LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA.TEACH
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+    this.creatorsCarouselContainer.nativeElement.removeEventListener(
+      'scroll',
+      this.toggleCreatorsCarouselArrowsDisablityStatusDesktop.bind(this)
+    );
   }
 }
 

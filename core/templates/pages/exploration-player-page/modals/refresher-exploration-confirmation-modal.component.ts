@@ -74,7 +74,7 @@ export class RefresherExplorationConfirmationModal extends ConfirmOrCancelModal 
     // Wait a little before redirecting the page to ensure other
     // tasks started here (e.g. event recording) have sufficient
     // time to complete.
-    // TODO(bhenning): Find a reliable way to send events that
+    // TODO(#20446): Find a reliable way to send events that
     // does not get interrupted with browser redirection.
     setTimeout(() => {
       this.windowRef.nativeWindow.open(url, '_self');

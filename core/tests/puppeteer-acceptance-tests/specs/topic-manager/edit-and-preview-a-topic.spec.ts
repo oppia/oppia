@@ -67,7 +67,7 @@ describe('Topic Manager User Journey', function () {
         // Refer to the issue: [https://github.com/oppia/oppia/issues/20665]
         return;
       }
-      await topicManager.navigateToTopicPreviewTopic('Mathematics');
+      await topicManager.navigateToTopicPreviewTab('Mathematics');
       await topicManager.expectTopicPreviewToHaveTitleAndDescription(
         'Mathematics',
         'A comprehensive course on advanced mathematics'

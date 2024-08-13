@@ -92,65 +92,13 @@
               role="menu">
             <li class="nav-item">
               <div class="nav-item-main d-flex">
-                <a class="nav-item-left d-flex flex-column justify-content-between"
-                   tabindex="0" href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
-                   (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT)">
-                  <div class="nav-item-top d-flex justify-content-between">
-                    <div class="nav-content d-flex flex-column">
-                      <div class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-classroom-link nav-item-top-link">
-                        <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
-                           (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                           class="nav-item-left-head underline e2e-test-basic-mathematics-link" tabindex="0">
-                           {{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
-                        </a>
-                      </div>
-                      <div class="des">
-                        {{ 'I18N_TOPNAV_LEARN_DESCRIPTION_1' | translate }}
-                      </div>
-                    </div>
-                    <picture>
-                      <source type="image/png"
-                              [srcset]="getStaticImageUrl('/topnav/learn.png')">
-                      <source type="image/webp"
-                              [srcset]="getStaticImageUrl('/ltopnav/learn.webp')">
-                      <img [src]="getStaticImageUrl('/topnav/learn.png')"
-                           class="learn"
-                           alt="Learn">
-                    </picture>
-                  </div>
-                  <div class="nav-item-bottom d-flex flex-column">
-                    <div *ngIf="classroomData.length > 0">
-                      <div class="nav-item-links"  *ngFor="let topicSummary of classroomData.slice(0, 3); index as idx">
-                        <a (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                           (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT + '/' + topicSummary.getUrlFragment()); $event.stopPropagation()"
-                           tabindex="0"
-                           class="underline"
-                           href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/{{topicSummary.getUrlFragment()}}">
-                          <span *ngIf="!isHackyTopicTitleTranslationDisplayed(idx)">
-                            {{ topicSummary.getName() }}
-                          </span>
-                          <span *ngIf="isHackyTopicTitleTranslationDisplayed(idx)">
-                            {{ topicTitlesTranslationKeys[idx] | translate }}
-                          </span>
-                        </a>
-                      </div>
-                    </div>
-                    <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
-                         class="nav-item-bottom-link">
-                      <a class="underline nav-item-bottom-link" tabindex="0" href="/learn/math">
-                        <span class="link">
-                          {{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}
-                        </span>
-                        <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
-                      </a>
-                    </div>
-                  </div>
-                </a>
+                <div class="nav-item-left d-flex flex-column justify-content-between">
+                  <oppia-classroom-navigation-links></oppia-classroom-navigation-links>
+                </div>
                 <span class="nav-item-right d-flex flex-column">
                   <a class="nav-content mb-5"
                      tabindex="0"
-                     href="/community-library"
-                     (click)="navigateToClassroomPage('/community-library')">
+                     href="/community-library">
                     <div class="nav-item-right-head">
                       {{ 'I18N_TOPNAV_LEARN_HEADING' | translate }}
                     </div>
@@ -216,8 +164,7 @@
             <li class="nav-item">
               <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
                  class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-about-link about-link"
-                 href="/about"
-                 [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
+                 (click)="navigateToAboutPage()">
                 <span class="link">
                   {{'I18N_TOPNAV_ABOUT' | translate}}
                 </span>
@@ -225,8 +172,7 @@
             </li>
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-navbar-about-menu-teach-button"
-                 href="/teach"
-                 [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE"
+                 (click)="navigateToTeachPage()"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">
@@ -289,8 +235,7 @@
                   </div>
                 </a>
                 <a class="item d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-volunteer-button"
-                   href="/volunteer"
-                   [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
+                   (click)="navigateToVolunteerPage()"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">

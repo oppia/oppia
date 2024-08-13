@@ -3,7 +3,8 @@
     <div *ngIf="previewWarning">
       <div class="oppia-preview-state-warning">{{ previewWarning }}</div>
     </div>
-    <oppia-conversation-skin></oppia-conversation-skin>
+    <oppia-loading-message [message]="'Loading'" *ngIf="!voiceoversAreLoaded"></oppia-loading-message>
+    <oppia-conversation-skin *ngIf="voiceoversAreLoaded"></oppia-conversation-skin>
     <page-footer>
       <oppia-exploration-footer></oppia-exploration-footer>
     </page-footer>
