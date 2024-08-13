@@ -87,8 +87,8 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.selectAndOpenTopic('Algebra I');
       await loggedOutUser.selectChapterWithinStoryToLearn(
-        'Understanding Negative Numbers',
-        'Algebra Story'
+        'Algebra Story',
+        'Understanding Negative Numbers'
       );
 
       // Check for the completion message as the exploration has a single state.

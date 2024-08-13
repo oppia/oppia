@@ -101,10 +101,6 @@ var suites = {
     './core/tests/webdriverio_desktop/extensions.js'
   ],
 
-  feedbackUpdates: [
-    './core/tests/webdriverio_desktop/feedbackUpdates.js'
-  ],
-
   fileUploadExtensions: [
     './core/tests/webdriverio_desktop/fileUploadExtensions.js'
   ],
@@ -115,10 +111,6 @@ var suites = {
 
   learner: [
     './core/tests/webdriverio/learnerFlow.js'
-  ],
-
-  learnerDashboard: [
-    './core/tests/webdriverio_desktop/learnerDashboard.js'
   ],
 
   navigation: [

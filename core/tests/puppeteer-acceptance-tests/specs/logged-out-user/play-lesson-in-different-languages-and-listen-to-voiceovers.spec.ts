@@ -206,8 +206,8 @@ describe('Exploration Editor', function () {
       await loggedOutUser.navigateToClassroomPage('math');
       await loggedOutUser.selectAndOpenTopic('Algebra I');
       await loggedOutUser.selectChapterWithinStoryToLearn(
-        'Understanding Negative Numbers',
-        'Algebra Story'
+        'Algebra Story',
+        'Understanding Negative Numbers'
       );
 
       // Change the language of the lesson using the dropdown on the first card.

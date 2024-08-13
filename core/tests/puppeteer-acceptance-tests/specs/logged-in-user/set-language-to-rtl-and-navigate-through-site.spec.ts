@@ -103,8 +103,8 @@ describe('Logged-in User', function () {
 
       // Checking exploration player.
       await loggedInUser1.selectChapterWithinStoryToLearn(
-        'Understanding Negative Numbers',
-        'Algebra Story'
+        'Algebra Story',
+        'Understanding Negative Numbers'
       );
       await loggedInUser1.verifyPageIsRTL();
     },
