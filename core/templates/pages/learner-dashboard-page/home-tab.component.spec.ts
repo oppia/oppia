@@ -272,4 +272,15 @@ describe('Home tab Component', () => {
       siteAnalyticsService.registerNewClassroomLessonEngagedWithEvent
     ).toHaveBeenCalled();
   });
+
+  it('should record analytics when in-progress lesson card in home tab clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerInProgressClassroomLessonEngagedWithEvent'
+    ).and.callThrough();
+    component.registerClassroomInProgressLessonEvent('Math', 'Addition');
+    expect(
+      siteAnalyticsService.registerInProgressClassroomLessonEngagedWithEvent
+    ).toHaveBeenCalled();
+  });
 });

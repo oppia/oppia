@@ -150,6 +150,16 @@ export class HomeTabComponent {
     );
   }
 
+  registerClassroomInProgressLessonEvent(
+    classroomName: string,
+    topicName: string
+  ): void {
+    this.siteAnalyticsService.registerInProgressClassroomLessonEngagedWithEvent(
+      classroomName,
+      topicName
+    );
+  }
+
   registerNewClassroomLessonEvent(
     classroomName: string,
     topicName: string

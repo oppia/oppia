@@ -649,6 +649,19 @@ export class SiteAnalyticsService {
     });
   }
 
+  registerInProgressClassroomLessonEngagedWithEvent(
+    classroomName: string,
+    topicName: string
+  ): void {
+    this._sendEventToGoogleAnalytics(
+      'classroom_lesson_in_progress_engaged_with',
+      {
+        classroom_name: classroomName,
+        topic_name: topicName,
+      }
+    );
+  }
+
   registerNewClassroomLessonEngagedWithEvent(
     classroomName: string,
     topicName: string
