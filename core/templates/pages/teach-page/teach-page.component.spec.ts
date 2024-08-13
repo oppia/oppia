@@ -138,6 +138,7 @@ describe('Teach Page', () => {
   it('should successfully instantiate the component from beforeEach block', () => {
     expect(component).toBeDefined();
   });
+
   it('should get static image url', () => {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image'
@@ -159,6 +160,20 @@ describe('Teach Page', () => {
     ).toHaveBeenCalledWith(
       AppConstants.LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA.TEACH
     );
+  });
+
+  it('should toggle creators carousel arrows disablitiy after page is loaded', () => {
+    component.ngOnInit();
+    component.ngAfterViewInit();
+    spyOn(component, 'toggleCreatorsCarouselArrowsDisablityStatusDesktop');
+    spyOn(component, 'toggleCreatorsCarouselArrowsDisablityStatusMobile');
+    component.setScreenType();
+    expect(
+      component.toggleCreatorsCarouselArrowsDisablityStatusDesktop
+    ).toHaveBeenCalled();
+    expect(
+      component.toggleCreatorsCarouselArrowsDisablityStatusMobile
+    ).toHaveBeenCalled();
   });
 
   it('should check if loader screen is working', () =>

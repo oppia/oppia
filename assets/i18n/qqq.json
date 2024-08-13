@@ -199,6 +199,7 @@
 	"I18N_ACTION_EXPLORE_LESSONS": "Third button in last section of Oppia's About page targeting lessons in library.",
 	"I18N_ACTION_GUIDE_FOR_TEACHERS": "First button in last section of Oppia's About page targeting guide for teachers page.",
 	"I18N_ACTION_TIPS_FOR_PARENTS": "Second button in last section of Oppia's about page targeting tips for parents and guardians page.",
+	"I18N_ACTION_VIEW_LESSONS": "Text on a button in Oppia's teach page targeting lessons in library.",
 	"I18N_ACTION_VISIT_CLASSROOM": "Button below paragraph in first and fourth section in Oppia's About page targeting the classroom.",
 	"I18N_ADD_NEW_SYLLABUS_CANCEL_BUTTON_TEXT": "Cancel button text on the add new syllabus items section on the edit learner group page.",
 	"I18N_ADD_NEW_SYLLABUS_DONE_BUTTON_TEXT": "Text of button to be clicked when user is done adding new syllabus items on the add new syllabus items section on the edit learner group page.",
