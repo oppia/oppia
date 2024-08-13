@@ -99,7 +99,7 @@
       </div>
     </div>
   </div>
-  <div tabindex="0" class="completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
+  <div tabindex="0" class="completed-stories e2e-test-compeleted-stories-section" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
        *ngIf="(!windowIsNarrow && completedStoriesList.length !== 0) || (windowIsNarrow && completedStoriesList.length !== 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES)">
     <div class="completed-stories-heading">
       <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">

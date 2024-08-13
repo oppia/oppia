@@ -73,10 +73,6 @@
       "module": "core/tests/webdriverio_desktop/extensions.js"
     },
     {
-      "name": "feedbackUpdates",
-      "module": "core/tests/webdriverio_desktop/feedbackUpdates.js"
-    },
-    {
       "name": "fileUploadExtensions",
       "module": "core/tests/webdriverio_desktop/fileUploadExtensions.js"
     },
@@ -87,10 +83,6 @@
     {
       "name": "learner",
       "module": "core/tests/webdriverio/learnerFlow.js"
-    },
-    {
-      "name": "learnerDashboard",
-      "module": "core/tests/webdriverio_desktop/learnerDashboard.js"
     },
     {
       "name": "navigation",
