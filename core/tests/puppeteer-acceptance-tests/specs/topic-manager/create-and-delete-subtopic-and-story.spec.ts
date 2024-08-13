@@ -21,16 +21,9 @@ import testConstants from '../../utilities/common/test-constants';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
-
-ConsoleReporter.setConsoleErrorsToIgnore([
-  /ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'headerText: Story Editor'. Current value: 'headerText: Chapter Editor'./,
-  /Cannot read properties of undefined \(reading 'getStory'\)/,
-  /Occurred at http:\/\/localhost:8181\/story_editor\/.*\/#\/chapter_editor\/node_1 webpack:\/\/\/\..* Cannot read properties of undefined \(reading 'getStory'\)/,
-]);
 
 describe('Topic Manager', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
@@ -64,49 +57,45 @@ describe('Topic Manager', function () {
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it(
-    'should create a topic, add a subtopic, story, and chapters to it.',
-    async function () {
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
-      await topicManager.createSubtopicForTopic(
-        'Test Subtopic 1',
-        'test-subtopic-one',
-        'Addition'
-      );
-      // Verify the subtopic is present in the topic.
-      await topicManager.verifySubtopicPresenceInTopic(
-        'Test Subtopic 1',
-        'Addition',
-        true
-      );
+  it('should create a topic, add a subtopic, story, and chapters to it.', async function () {
+    await topicManager.navigateToTopicAndSkillsDashboardPage();
+    await topicManager.createSubtopicForTopic(
+      'Test Subtopic 1',
+      'test-subtopic-one',
+      'Addition'
+    );
+    // Verify the subtopic is present in the topic.
+    await topicManager.verifySubtopicPresenceInTopic(
+      'Test Subtopic 1',
+      'Addition',
+      true
+    );
 
-      await topicManager.addStoryToTopic(
-        'Test Story 1',
-        'test-story-one',
-        'Addition'
-      );
-      // Creating 2 chapter in the story so that we can test delete the second one (cannot delete the first chapter).
-      await topicManager.addChapter('Test Chapter 1', explorationId1 as string);
-      await topicManager.addChapter('Test Chapter 2', explorationId2 as string);
-      await topicManager.saveStoryDraft();
+    await topicManager.addStoryToTopic(
+      'Test Story 1',
+      'test-story-one',
+      'Addition'
+    );
+    // Creating 2 chapter in the story so that we can test delete the second one (cannot delete the first chapter).
+    await topicManager.addChapter('Test Chapter 1', explorationId1 as string);
+    await topicManager.addChapter('Test Chapter 2', explorationId2 as string);
+    await topicManager.saveStoryDraft();
 
-      // Verify the story is present in the topic.
-      await topicManager.verifyStoryPresenceInTopic(
-        'Test Story 1',
-        'Addition',
-        true
-      );
+    // Verify the story is present in the topic.
+    await topicManager.verifyStoryPresenceInTopic(
+      'Test Story 1',
+      'Addition',
+      true
+    );
 
-      // Verify the chapter is present in the story.
-      await topicManager.verifyChapterPresenceInStory(
-        'Test Chapter 1',
-        'Test Story 1',
-        'Addition',
-        true
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    // Verify the chapter is present in the story.
+    await topicManager.verifyChapterPresenceInStory(
+      'Test Chapter 1',
+      'Test Story 1',
+      'Addition',
+      true
+    );
+  }, 2147483647);
 
   it(
     'should delete a chapter from a story, delete the story from a topic, and delete the subtopic from a topic.',

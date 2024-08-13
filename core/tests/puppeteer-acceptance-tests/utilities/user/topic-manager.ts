@@ -2840,7 +2840,7 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     try {
       await this.openStoryEditor(storyName, topicName);
-      await this.waitForStaticAssetsToLoad();
+      await this.waitForPageToFullyLoad();
 
       const addChapterButtonElement = await this.page.$(addChapterButton);
       if (!addChapterButtonElement) {

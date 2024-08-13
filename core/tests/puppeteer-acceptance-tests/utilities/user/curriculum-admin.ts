@@ -19,6 +19,7 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import {tickStep} from 'd3-array';
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
@@ -924,9 +925,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(uploadPhotoButton);
 
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.waitForNetworkIdle();
     await this.clickAndWaitForNavigation(createStoryButton);
-    await this.waitForNetworkIdle();
 
     await this.page.waitForSelector(storyMetaTagInput);
     await this.type(storyMetaTagInput, 'meta');
