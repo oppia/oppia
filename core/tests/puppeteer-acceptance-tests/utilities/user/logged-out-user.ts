@@ -66,10 +66,8 @@ const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
 const teachUrl = testConstants.URLs.Teach;
 const termsUrl = testConstants.URLs.Terms;
-const thanksForDonatingUrlOfDonatePage =
-  testConstants.URLs.DonateWithThanksModalOfDonatePage;
-const thanksForDonatingUrlOfAboutPage =
-  testConstants.URLs.DonateWithThanksModalOfAboutPage;
+const donatePageThanksModalURL = testConstants.URLs.DonatePageThanksModalURL;
+const aboutPageThanksModalURL = testConstants.URLs.AboutPageThanksModalURL;
 const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
@@ -343,21 +341,15 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the Thanks for Donating page of Donate page.
    */
-  async navigateToThanksForDonatingPageOfDonatePage(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.page.goto(thanksForDonatingUrlOfDonatePage),
-    ]);
+  async navigateToDonationThanksModalOnDonatePage(): Promise<void> {
+    await this.goto(donatePageThanksModalURL);
   }
 
   /**
    * Function to navigate to the Thanks for Donating page of About page.
    */
-  async navigateToThanksForDonatingPageOfAboutPage(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.page.goto(thanksForDonatingUrlOfAboutPage),
-    ]);
+  async navigateToDonationThanksModalOnAboutPage(): Promise<void> {
+    await this.goto(aboutPageThanksModalURL);
   }
 
   /**
@@ -823,16 +815,16 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to click the dismiss button in the Thanks for Donating page,
-   * and check if the Thanks for Donating popup disappears
+   * and check if the Thanks for Donating modal disappears
    * and if the Donate page is shown.
    */
-  async clickDismissButtonInThanksForDonatingPageOfDonatePage(): Promise<void> {
+  async dismissDonationThanksModalOnDonatePage(): Promise<void> {
     await this.clickOn(dismissButton);
     await this.page.waitForSelector(thanksForDonatingClass, {hidden: true});
     const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
     if (thanksForDonatingHeader !== null) {
       throw new Error(
-        'The dismiss button does not close the Thanks for Donating popup!'
+        'The dismiss button does not close the Thanks for Donating modal!'
       );
     }
     await this.page.waitForSelector(donatePage);
@@ -844,24 +836,24 @@ export class LoggedOutUser extends BaseUser {
       );
     } else {
       showMessage(
-        'The dismiss button closes the Thanks for Donating popup ' +
+        'The dismiss button closes the Thanks for Donating modal ' +
           'and shows the Donate page.'
       );
     }
   }
 
   /**
-   * Function to click the dismiss button on the Thanks for Donating popup,
-   * and check if the Thanks for Donating popup disappears
+   * Function to click the dismiss button on the Thanks for Donating modal,
+   * and check if the Thanks for Donating modal disappears
    * and if the About page is shown.
    */
-  async clickDismissButtonInThanksForDonatingPageOfAboutPage(): Promise<void> {
+  async dismissDonationThanksModalOnAboutPage(): Promise<void> {
     await this.clickOn(dismissButton);
     await this.page.waitForSelector(thanksForDonatingClass, {hidden: true});
     const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
     if (thanksForDonatingHeader !== null) {
       throw new Error(
-        'The dismiss button does not close the Thanks for Donating popup!'
+        'The dismiss button does not close the Thanks for Donating modal!'
       );
     }
 
@@ -874,7 +866,7 @@ export class LoggedOutUser extends BaseUser {
       );
     } else {
       showMessage(
-        'The dismiss button closes the Thanks for Donating popup ' +
+        'The dismiss button closes the Thanks for Donating modal ' +
           'and shows the About page.'
       );
     }
