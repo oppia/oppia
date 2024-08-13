@@ -114,7 +114,8 @@ const issueTypeSelector = '.e2e-test-report-exploration-radio-button';
 const addTopicToCurrentGoalsButton =
   '.e2e-test-add-topic-to-current-goals-button';
 const mobileCompletedLessonSection = '.community-lessons-section';
-
+const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
+const homeSectionGreetingElement = '.greeting';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
 export class LoggedInUser extends BaseUser {
@@ -215,15 +216,31 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the home section of the learner dashboard.
    */
   async navigateToHomeSection(): Promise<void> {
-    const isMobile = await this.isViewportAtMobileWidth();
-    const selector = isMobile ? mobileHomeSectionSelector : homeSectionSelector;
-    const homeSection = await this.page.$(selector);
-    if (!homeSection) {
-      throw new Error('Home section not found.');
-    }
+    if (await this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileHomeSectionSelector);
+      await this.clickOn(mobileHomeSectionSelector);
 
-    await this.waitForElementToBeClickable(homeSection);
-    await homeSection.click();
+      try {
+        await this.page.waitForSelector(homeSectionGreetingElement, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          // Try clicking again if does not opens the expected page.
+          await this.clickOn(mobileHomeSectionSelector);
+        } else {
+          throw error;
+        }
+      }
+    } else {
+      await this.page.waitForSelector(homeSectionSelector);
+      const homeSectionElement = await this.page.$(homeSectionSelector);
+      if (!homeSectionElement) {
+        throw new Error('Home section not found.');
+      }
+      await this.waitForElementToBeClickable(homeSectionElement);
+      await homeSectionElement.click();
+    }
 
     await this.waitForPageToFullyLoad();
   }
@@ -233,7 +250,21 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToGoalsSection(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileGoalsSectionSelector);
       await this.clickOn(mobileGoalsSectionSelector);
+
+      try {
+        await this.page.waitForSelector(currentGoalsSectionSelector, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          // Try clicking again if does not opens the expected page.
+          await this.clickOn(mobileGoalsSectionSelector);
+        } else {
+          throw error;
+        }
+      }
     } else {
       await this.page.waitForSelector(goalsSectionSelector);
       const goalSectionElement = await this.page.$(goalsSectionSelector);
