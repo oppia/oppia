@@ -28,6 +28,7 @@ import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 describe('Home tab Component', () => {
   let component: HomeTabComponent;
@@ -36,6 +37,7 @@ describe('Home tab Component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let mockResizeEmitter: EventEmitter<void>;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   beforeEach(async(() => {
     mockResizeEmitter = new EventEmitter();
@@ -62,6 +64,7 @@ describe('Home tab Component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
@@ -258,4 +261,15 @@ describe('Home tab Component', () => {
       expect(component.isGoalLimitReached()).toBeFalse();
     }
   );
+
+  it('should record analytics when lesson card in home tab clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerNewClassroomLessonEngagedWithEvent'
+    ).and.callThrough();
+    component.registerNewClassroomLessonEvent('Math', 'Addition');
+    expect(
+      siteAnalyticsService.registerNewClassroomLessonEngagedWithEvent
+    ).toHaveBeenCalled();
+  });
 });

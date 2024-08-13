@@ -648,6 +648,16 @@ export class SiteAnalyticsService {
       classroom_name: classroomName,
     });
   }
+
+  registerNewClassroomLessonEngagedWithEvent(
+    classroomName: string,
+    topicName: string
+  ): void {
+    this._sendEventToGoogleAnalytics('new_classroom_lesson_engaged_with', {
+      classroom_name: classroomName,
+      topic_name: topicName,
+    });
+  }
 }
 
 angular
