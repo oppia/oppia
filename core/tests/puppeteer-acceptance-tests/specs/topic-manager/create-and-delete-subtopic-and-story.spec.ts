@@ -55,6 +55,8 @@ describe('Topic Manager', function () {
       [ROLES.TOPIC_MANAGER],
       'Addition'
     );
+
+    await topicManager.page.on('console', () => {});
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -137,6 +139,7 @@ describe('Topic Manager', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

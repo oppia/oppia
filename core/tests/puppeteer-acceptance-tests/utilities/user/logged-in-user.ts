@@ -1177,13 +1177,18 @@ export class LoggedInUser extends BaseUser {
             const completedGoalsElement = document.querySelector(
               completedGoalsSectionSelector
             );
-            if (!completedGoalsElement) return false;
+            if (!completedGoalsElement) {
+              return false;
+            }
 
             const completedGoals = Array.from(
               completedGoalsElement.querySelectorAll(
                 completedGoalsTopicNameSelector
               ),
-              (el: Element) => el.textContent!.trim().replace('Learnt ', '')
+              (el: Element) =>
+                el.textContent
+                  ? el.textContent.trim().replace('Learnt ', '')
+                  : ''
             );
 
             return completedGoals.includes(expectedGoal);

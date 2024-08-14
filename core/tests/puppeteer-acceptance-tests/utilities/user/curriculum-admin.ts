@@ -435,7 +435,7 @@ export class CurriculumAdmin extends BaseUser {
         topicNameSelector,
         topicName
       ),
-      this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
+      this.page.waitForNavigation(),
     ]);
   }
 
@@ -927,7 +927,8 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickAndWaitForNavigation(createStoryButton);
 
     await this.page.waitForSelector(storyMetaTagInput);
-    await this.type(storyMetaTagInput, 'meta');
+    await this.page.focus(storyMetaTagInput);
+    await this.page.type(storyMetaTagInput, 'meta');
     await this.page.keyboard.press('Tab');
     await this.saveStoryDraft();
 
