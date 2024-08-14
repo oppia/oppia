@@ -114,7 +114,8 @@ const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
 const addHintButton = 'button.e2e-test-oppia-add-hint-button';
 const saveHintButton = 'button.e2e-test-save-hint';
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
-const solutionInput = 'oppia-add-or-update-solution-modal input';
+const solutionInput =
+  'oppia-add-or-update-solution-modal textarea.e2e-test-description-box';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 
 const dismissTranslationWelcomeModalSelector =
@@ -1655,6 +1656,7 @@ export class ExplorationEditor extends BaseUser {
       );
       return element ? element.textContent : null;
     }, languageCode);
+    this.page.waitForTimeout(30000);
 
     if (translationElementText === expectedTranslation) {
       showMessage('The expected translation exists in the modal.');
