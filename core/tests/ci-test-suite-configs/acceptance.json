@@ -41,6 +41,34 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/save-draft-publish-and-discard-the-changes.spec.ts"
     },
     {
+      "name": "logged-in-user/create-and-delete-account",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/create-and-delete-account.spec.ts"
+    },
+    {
+      "name": "logged-in-user/restart-or-continue-exploration-on-revisit",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/restart-or-continue-exploration-on-revisit.spec.ts"
+    },
+    {
+      "name": "logged-in-user/save-an-exploration-to-play-later",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/save-an-exploration-to-play-later.spec.ts"
+    },
+    {
+      "name": "logged-in-user/edit-profile-preferences-and-export-their-account",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/edit-profile-preferences-and-export-their-account.spec.ts"
+    },
+    {
+      "name": "logged-in-user/set-language-to-rtl-and-navigate-through-site",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/set-language-to-rtl-and-navigate-through-site.spec.ts"
+    },
+    {
+      "name": "logged-in-user/give-feedback-rate-and-report-an-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/give-feedback-rate-and-report-an-exploration.spec.ts"
+    },
+    {
+      "name": "logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard.spec.ts"
+    },
+    {
       "name": "logged-out-user/click-all-buttons-on-about-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-about-page.spec.ts"
     },
@@ -83,6 +111,10 @@
     {
       "name": "logged-out-user/click-all-buttons-on-volunteer-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-volunteer-page.spec.ts"
+    },
+    {
+      "name": "logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-contact-us-page",
@@ -135,6 +167,22 @@
     {
       "name": "logged-out-user/play-through-lesson-while-getting-feedback-and-hints",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-through-lesson-while-getting-feedback-and-hints.spec.ts"
+    },
+    {
+      "name": "logged-out-user/change-site-language-and-engage-with-original-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/change-site-language-and-engage-with-original-exploration.spec.ts"
+    },
+    {
+      "name": "logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus.spec.ts"
+    },
+    {
+      "name": "logged-out-user/sign-in-and-save-exploration-progress",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/sign-in-and-save-exploration-progress.spec.ts"
+    },
+    {
+      "name": "logged-out-user/track-and-resume-exploration-progress-via-url",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/track-and-resume-exploration-progress-via-url.spec.ts"
     },
     {
       "name": "moderator/edit-featured-activities-list",

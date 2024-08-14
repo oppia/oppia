@@ -23,6 +23,8 @@ import subprocess
 from core import utils
 from core.tests import test_utils
 
+from typing import List
+
 from . import run_typescript_checks
 
 TEST_SOURCE_DIR = os.path.join('core', 'tests', 'build_sources')
@@ -88,6 +90,27 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             self.assertFalse(
                 os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
 
+    def test_compiled_js_dir_is_deleted_before_temp_compilation(self) -> None:
+        """Test that compiled_js_dir is deleted before a fresh temp
+        compilation.
+        """
+        def mock_validate_compiled_js_dir() -> None:
+            pass
+
+        compiled_js_dir_swap = self.swap(
+            run_typescript_checks, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR)
+        validate_swap = self.swap(
+            run_typescript_checks, 'validate_compiled_js_dir',
+            mock_validate_compiled_js_dir)
+        with self.popen_swap, compiled_js_dir_swap, validate_swap:
+            if not os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)):
+                os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
+
+            run_typescript_checks.compile_temp_strict_tsconfig(
+                run_typescript_checks.STRICT_TSCONFIG_FILEPATH, [])
+            self.assertFalse(
+                os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
+
     def test_no_error_for_valid_compilation_of_tsconfig(self) -> None:
         """Test that no error is produced if stdout is empty."""
         with self.popen_swap:
@@ -117,7 +140,23 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
     def test_error_is_raised_for_invalid_compilation_of_strict_tsconfig(
             self) -> None:
         """Test that error is produced if stdout is not empty."""
-        with self.swap(run_typescript_checks, 'TS_STRICT_EXCLUDE_PATHS', []):
+        empty_process = subprocess.Popen(
+            ['echo', ''], stdout=subprocess.PIPE, encoding='utf-8')
+        non_empty_process = subprocess.Popen(
+            ['echo', 'test'], stdout=subprocess.PIPE, encoding='utf-8')
+        def mock_popen_for_errors(
+            cmd_tokens: List[str], stdout: str, encoding: str  # pylint: disable=unused-argument
+        ) -> subprocess.Popen[str]:
+            if (
+                cmd_tokens == [
+                    './node_modules/typescript/bin/tsc', '--project',
+                    run_typescript_checks.STRICT_TSCONFIG_FILEPATH
+                ]
+            ):
+                return non_empty_process
+            return empty_process
+
+        with self.swap(subprocess, 'Popen', mock_popen_for_errors):
             with self.assertRaisesRegex(SystemExit, '1'):
                 run_typescript_checks.compile_and_check_typescript(
                     run_typescript_checks.STRICT_TSCONFIG_FILEPATH)

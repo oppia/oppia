@@ -66,6 +66,8 @@ OPPIA_PARENT_DIR: Final = os.path.join(
 )
 FRONTEND_TEST_CMDS: Final = [
     PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
+BACKEND_TEST_CMDS: Final = [
+    PYTHON_CMD, '-m', 'scripts.run_backend_tests']
 BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD: Final = [
     PYTHON_CMD, '-m', 'scripts.check_backend_associated_test_file']
 TYPESCRIPT_CHECKS_CMDS: Final = [
@@ -348,6 +350,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
             frontend_status = 0
             ci_check_status = 0
+            backend_status = 0
             js_or_ts_files = git_changes_utils.get_js_or_ts_files_from_diff(
                 files_to_lint)
             if js_or_ts_files:
@@ -367,6 +370,20 @@ def main(args: Optional[List[str]] = None) -> None:
                 print(
                     'Push aborted due to failing tests are captured '
                     'in ci check.')
+                sys.exit(1)
+            python_test_files = (
+                git_changes_utils.get_python_dot_test_files_from_diff(
+                    files_to_lint
+                )
+            )
+            if python_test_files:
+                backend_test_cmds = BACKEND_TEST_CMDS.copy()
+                backend_test_cmds.append(
+                    '--test_targets=%s' % ','.join(python_test_files))
+                backend_status = run_script_and_get_returncode(
+                    backend_test_cmds)
+            if backend_status != 0:
+                print('Push aborted due to failing backend tests.')
                 sys.exit(1)
     return
 

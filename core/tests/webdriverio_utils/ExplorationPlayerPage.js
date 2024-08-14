@@ -60,7 +60,6 @@ var ExplorationPlayerPage = function () {
   var infoCardRating = $('.e2e-test-info-card-rating');
   var continueToNextCardButton = $('.e2e-test-continue-to-next-card-button');
   var forwardButton = $('.e2e-test-next-button');
-  var pauseButton = $('.e2e-test-pause-circle');
   var playButton = $('.e2e-test-play-circle');
   var radioButton = $('.e2e-test-report-exploration-radio-button');
   var radioButtonSelector = function () {
@@ -77,7 +76,6 @@ var ExplorationPlayerPage = function () {
   var suggestionPopupLink = $('.e2e-test-exploration-suggestion-popup-link');
   var viewHintButton = $('.e2e-test-view-hint');
   var viewSolutionButton = $('.e2e-test-view-solution');
-  var voiceoverLanguageSelector = $('.e2e-test-audio-lang-select');
   var waitingForResponseElem = $('.e2e-test-input-response-loading-dots');
   var skipQuestionButton = $('.e2e-test-skip-question-button');
 
@@ -85,34 +83,11 @@ var ExplorationPlayerPage = function () {
     await action.click('Audio Bar Expand Button', audioBarExpandButton);
   };
 
-  this.pressPlayButton = async function () {
-    await action.click('Play Button', playButton);
-  };
-
-  this.expectAudioToBePlaying = async function () {
-    await waitFor.visibilityOf(
-      pauseButton,
-      'Pause button taking too long to show up.'
-    );
-  };
-
-  this.pressPauseButton = async function () {
-    await action.click('Pause Button', pauseButton);
-  };
-
   this.expectAudioToBePaused = async function () {
     await waitFor.visibilityOf(
       playButton,
       'Play button taking too long to show up.'
     );
-  };
-
-  this.changeVoiceoverLanguage = async function (language) {
-    await waitFor.visibilityOf(
-      voiceoverLanguageSelector,
-      'Language selector takes too long to appear.'
-    );
-    await voiceoverLanguageSelector.selectByVisibleText(language);
   };
 
   this.clickThroughToNextCard = async function () {

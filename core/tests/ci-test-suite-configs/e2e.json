@@ -73,10 +73,6 @@
       "module": "core/tests/webdriverio_desktop/extensions.js"
     },
     {
-      "name": "feedbackUpdates",
-      "module": "core/tests/webdriverio_desktop/feedbackUpdates.js"
-    },
-    {
       "name": "fileUploadExtensions",
       "module": "core/tests/webdriverio_desktop/fileUploadExtensions.js"
     },
@@ -89,20 +85,8 @@
       "module": "core/tests/webdriverio/learnerFlow.js"
     },
     {
-      "name": "learnerDashboard",
-      "module": "core/tests/webdriverio_desktop/learnerDashboard.js"
-    },
-    {
       "name": "navigation",
       "module": "core/tests/webdriverio_desktop/navigation.js"
-    },
-    {
-      "name": "playVoiceovers",
-      "module": "core/tests/webdriverio_desktop/playVoiceovers.js"
-    },
-    {
-      "name": "preferences",
-      "module": "core/tests/webdriverio_desktop/preferences.js"
     },
     {
       "name": "profileFeatures",
@@ -135,10 +119,6 @@
     {
       "name": "topicAndStoryEditorFileUploadFeatures",
       "module": "core/tests/webdriverio_desktop/topicAndStoryEditorFileUploadFeatures.js"
-    },
-    {
-      "name": "topicAndStoryViewer",
-      "module": "core/tests/webdriverio_desktop/topicAndStoryViewer.js"
     },
     {
       "name": "users",

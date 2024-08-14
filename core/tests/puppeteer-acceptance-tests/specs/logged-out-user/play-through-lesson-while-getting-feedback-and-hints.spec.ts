@@ -122,8 +122,7 @@ describe('Logged-out User', function () {
     await explorationEditor.setTheStateAsCheckpoint();
     await explorationEditor.saveExplorationDraft();
 
-    // Navigate to the new card and add a multiple choice question.
-    await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
+    // Navigate to the new card and add revision content.
     await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
     await explorationEditor.updateCardContent(REVISION_CARD_CONTENT);
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
@@ -202,7 +201,7 @@ describe('Logged-out User', function () {
       await loggedOutUser.continueToNextCard();
 
       // Verifying if navigated to the expected card after getting stuck.
-      await loggedOutUser.expectCardContentToBe(REVISION_CARD_CONTENT);
+      await loggedOutUser.expectCardContentToMatch(REVISION_CARD_CONTENT);
       await loggedOutUser.continueToNextCard();
 
       await loggedOutUser.expectExplorationCompletionToastMessage(
