@@ -28,6 +28,7 @@ const baseUrl = testConstants.URLs.BaseURL;
 const homePageUrl = testConstants.URLs.Home;
 const signUpEmailField = testConstants.SignInDetails.inputField;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const feedbackUpdatesUrl = testConstants.URLs.FeedbackUpdates;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -87,6 +88,34 @@ const defaultProfilePicture =
 
 const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE =
   'Your data is currently being loaded and will be downloaded as a JSON formatted text file upon completion.';
+const reportExplorationButtonSelector = '.e2e-test-report-exploration-button';
+const reportExplorationTextAreaSelector =
+  '.e2e-test-report-exploration-text-area';
+const submitReportButtonSelector = '.e2e-test-submit-report-button';
+const feedbackThreadSelector = '.e2e-test-feedback-thread';
+const feedbackMessageSelector = '.e2e-test-feedback-message';
+const desktopCompletedLessonsSectionSelector =
+  '.e2e-test-completed-community-lessons-section';
+const lessonTileTitleSelector =
+  '.e2e-test-topic-name-in-learner-story-summary-tile';
+const progressSectionSelector = '.e2e-test-progress-section';
+const mobileGoalsSectionSelector = '.e2e-test-mobile-goals-section';
+const goalsSectionSelector = '.e2e-test-goals-section';
+const homeSectionSelector = '.e2e-test-home-section';
+const mobileHomeSectionSelector = '.e2e-test-mobile-home-section';
+const topicNameInEditGoalsSelector = '.e2e-test-topic-name-in-edit-goals';
+const completedGoalsSectionSelector = '.e2e-test-completed-goals-section';
+const completedGoalsTopicNameSelector = '.e2e-test-completed-goals-topic-name';
+const completedStoriesSectionSelector = '.completed-stories';
+const storyNameSelector = '.e2e-test-story-name-in-learner-story-summary-tile';
+const continueFromWhereLeftOffSectionSelector =
+  '.continue-where-you-left-off-section';
+const issueTypeSelector = '.e2e-test-report-exploration-radio-button';
+const addTopicToCurrentGoalsButton =
+  '.e2e-test-add-topic-to-current-goals-button';
+const mobileCompletedLessonSection = '.community-lessons-section';
+const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
+const homeSectionGreetingElement = '.greeting';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
 export class LoggedInUser extends BaseUser {
@@ -129,13 +158,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the learner dashboard.
-   */
-  async navigateToLearnerDashboard(): Promise<void> {
-    await this.goto(learnerDashboardUrl);
-  }
-
-  /**
    * Function to subscribe to a creator with the given username.
    */
   async subscribeToCreator(username: string): Promise<void> {
@@ -148,6 +170,118 @@ export class LoggedInUser extends BaseUser {
     await this.clickOn(subscribeButton);
     await this.page.waitForSelector(unsubscribeLabel);
     showMessage(`Subscribed to the creator with username ${username}.`);
+  }
+
+  /**
+   * Navigates to the learner dashboard.
+   */
+  async navigateToLearnerDashboard(): Promise<void> {
+    await this.goto(learnerDashboardUrl);
+  }
+
+  /**
+   * Navigates to the progress section of the learner dashboard.
+   */
+  async navigateToProgressSection(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileProgressSectionButton);
+      await this.clickOn(mobileProgressSectionButton);
+
+      try {
+        await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          // Try clicking again if does not opens the expected page.
+          await this.clickOn(mobileProgressSectionButton);
+        } else {
+          throw error;
+        }
+      }
+      await this.clickOn('Stories');
+    } else {
+      await this.page.waitForSelector(progressSectionSelector);
+      const progressSection = await this.page.$(progressSectionSelector);
+      if (!progressSection) {
+        throw new Error('Progress section not found.');
+      }
+      await progressSection.click();
+    }
+
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Navigates to the home section of the learner dashboard.
+   */
+  async navigateToHomeSection(): Promise<void> {
+    if (await this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileHomeSectionSelector);
+      await this.clickOn(mobileHomeSectionSelector);
+
+      try {
+        await this.page.waitForSelector(homeSectionGreetingElement, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          // Try clicking again if does not opens the expected page.
+          await this.clickOn(mobileHomeSectionSelector);
+        } else {
+          throw error;
+        }
+      }
+    } else {
+      await this.page.waitForSelector(homeSectionSelector);
+      const homeSectionElement = await this.page.$(homeSectionSelector);
+      if (!homeSectionElement) {
+        throw new Error('Home section not found.');
+      }
+      await this.waitForElementToBeClickable(homeSectionElement);
+      await homeSectionElement.click();
+    }
+
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Navigates to the goals section of the learner dashboard.
+   */
+  async navigateToGoalsSection(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileGoalsSectionSelector);
+      await this.clickOn(mobileGoalsSectionSelector);
+
+      try {
+        await this.page.waitForSelector(currentGoalsSectionSelector, {
+          timeout: 5000,
+        });
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          // Try clicking again if does not opens the expected page.
+          await this.clickOn(mobileGoalsSectionSelector);
+        } else {
+          throw error;
+        }
+      }
+    } else {
+      await this.page.waitForSelector(goalsSectionSelector);
+      const goalSectionElement = await this.page.$(goalsSectionSelector);
+      if (!goalSectionElement) {
+        throw new Error('Progress section not found.');
+      }
+      await goalSectionElement.click();
+    }
+
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Navigates to the feedback updates page.
+   */
+  async navigateToFeedbackUpdatesPage(): Promise<void> {
+    await this.goto(feedbackUpdatesUrl);
   }
 
   /**
@@ -604,7 +738,6 @@ export class LoggedInUser extends BaseUser {
           `Lesson "${lessonName}" was not found in 'Play Later' list, but it should be.`
         );
       }
-      showMessage('Lesson is present in "Play Later" list.');
     } catch (error) {
       const newError = new Error(
         `Failed to verify presence of lesson in 'Play Later' list: ${error}`
@@ -918,6 +1051,234 @@ export class LoggedInUser extends BaseUser {
     }
 
     showMessage('Page is displayed in RTL mode.');
+  }
+
+  /**
+   * This function is used to report an exploration. It clicks on the report button,
+   * opens the report modal, selects an issue, types a description, and submits the report.
+   * @param {string} issueName - The name of the issue to report.
+   * @param {string} issueDescription - The description of the issue.
+   */
+  async reportExploration(issueDescription: string): Promise<void> {
+    await this.clickOn(reportExplorationButtonSelector);
+    await this.page.waitForSelector(issueTypeSelector);
+    const issueTypeElement = await this.page.$(issueTypeSelector);
+    await issueTypeElement?.click();
+    await this.clickOn(reportExplorationTextAreaSelector);
+    await this.type(reportExplorationTextAreaSelector, issueDescription);
+
+    await this.clickOn(submitReportButtonSelector);
+
+    await this.clickOn('Close');
+  }
+
+  /**
+   * Views a feedback update thread.
+   * @param {number} threadNumber - The 0-indexed position of the thread.
+   */
+  async viewFeedbackUpdateThread(threadNumber: number): Promise<void> {
+    await this.page.waitForSelector(feedbackThreadSelector);
+    const feedbackThreads = await this.page.$$(feedbackThreadSelector);
+
+    if (threadNumber >= 0 && threadNumber < feedbackThreads.length) {
+      await feedbackThreads[threadNumber - 1].click();
+    } else {
+      throw new Error(`Thread not found: ${threadNumber}`);
+    }
+  }
+
+  /**
+   * Checks if the feedback and response match the expected values.
+   * @param {string} expectedFeedback - The expected feedback.
+   * @param {string} expectedResponse - The expected response.
+   */
+
+  async expectFeedbackAndResponseToMatch(
+    expectedFeedback: string,
+    expectedResponse: string
+  ): Promise<void> {
+    await this.page.waitForSelector(feedbackMessageSelector);
+    const feedbackMessages = await this.page.$$(feedbackMessageSelector);
+
+    if (feedbackMessages.length < 2) {
+      throw new Error('Not enough feedback messages found.');
+    }
+
+    const actualFeedback = await this.page.$eval(feedbackMessageSelector, el =>
+      el.textContent?.trim()
+    );
+
+    // Fetch the text content of the second feedbackMessageSelector.
+    const actualResponse = await this.page.$$eval(
+      feedbackMessageSelector,
+      elements => elements[1]?.textContent?.trim()
+    );
+
+    if (actualFeedback !== expectedFeedback) {
+      throw new Error(
+        `Feedback does not match the expected value. Expected: ${expectedFeedback}, Found: ${actualFeedback}`
+      );
+    }
+    if (actualResponse !== expectedResponse) {
+      throw new Error(
+        `Response does not match the expected value. Expected: ${expectedResponse}, Found: ${actualResponse}`
+      );
+    }
+  }
+
+  /**
+   * Adds goals from the goals section in the learner dashboard.
+   * @param {string[]} goals - The goals to add.
+   */
+  async addGoals(goals: string[]): Promise<void> {
+    await this.page.waitForSelector(topicNameInEditGoalsSelector);
+    await this.page.waitForSelector(addTopicToCurrentGoalsButton);
+
+    const topicNames = await this.page.$$(topicNameInEditGoalsSelector);
+    const addGoalButtons = await this.page.$$(addTopicToCurrentGoalsButton);
+
+    const actualTopicNames = await Promise.all(
+      topicNames.map(topicName =>
+        this.page.evaluate(el => el.textContent.trim(), topicName)
+      )
+    );
+
+    for (const goal of goals) {
+      const matchingTopicIndex = actualTopicNames.findIndex(
+        topicName => topicName === goal
+      );
+
+      if (matchingTopicIndex !== -1) {
+        await this.waitForElementToBeClickable(
+          addGoalButtons[matchingTopicIndex]
+        );
+        await addGoalButtons[matchingTopicIndex]?.click();
+      } else {
+        throw new Error(`Goal not found: ${goal}`);
+      }
+    }
+  }
+
+  /**
+   * Checks if the completed goals include the expected goals.
+   * @param {string[]} expectedGoals - The expected goals.
+   */
+  async expectCompletedGoalsToInclude(expectedGoals: string[]): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    await this.page.waitForSelector(completedGoalsSectionSelector);
+    const completedGoalsTopicNames = await this.page.$$(
+      completedGoalsSectionSelector + ' ' + completedGoalsTopicNameSelector
+    );
+
+    const actualGoals = await Promise.all(
+      completedGoalsTopicNames.map(async topicName => {
+        const fullGoalText = await this.page.evaluate(
+          el => el.textContent.trim(),
+          topicName
+        );
+        // Remove the "Learnt " prefix.
+        return fullGoalText.replace('Learnt ', '');
+      })
+    );
+
+    for (const expectedGoal of expectedGoals) {
+      if (!actualGoals.includes(expectedGoal)) {
+        throw new Error(
+          `Goal not found in completed lesson section: ${expectedGoal}`
+        );
+      }
+    }
+  }
+
+  /**
+   * Checks if the completed stories include the expected stories.
+   * @param {string[]} expectedStories - The expected stories.
+   */
+  async expectStoriesCompletedToInclude(
+    expectedStories: string[]
+  ): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    await this.page.waitForSelector(completedStoriesSectionSelector);
+    const storyNames = await this.page.$$(
+      completedStoriesSectionSelector + ' ' + storyNameSelector
+    );
+    const actualStories = await Promise.all(
+      storyNames.map(async storyName => {
+        return await this.page.evaluate(el => el.textContent.trim(), storyName);
+      })
+    );
+
+    for (const expectedStory of expectedStories) {
+      if (!actualStories.includes(expectedStory)) {
+        throw new Error(`Story not found: ${expectedStory}`);
+      }
+    }
+  }
+
+  /**
+   * Checks if the completed lessons include the expected lessons in the community lessons section of learner dashboard.
+   * @param {string[]} expectedLessons - The expected lessons.
+   */
+  async expectCompletedLessonsToInclude(
+    expectedLessons: string[]
+  ): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const completedLessonsSection = isMobileViewport
+      ? mobileCompletedLessonSection
+      : desktopCompletedLessonsSectionSelector;
+
+    await this.page.waitForSelector(completedLessonsSection);
+    await this.page.waitForSelector(lessonCardTitleSelector);
+    const lessonObjectives = await this.page.$$(
+      completedLessonsSection + ' ' + lessonCardTitleSelector
+    );
+
+    const actualLessons = await Promise.all(
+      lessonObjectives.map(async lessonObjective => {
+        return await this.page.evaluate(
+          el => el.textContent.trim(),
+          lessonObjective
+        );
+      })
+    );
+
+    for (const expectedLesson of expectedLessons) {
+      if (!actualLessons.includes(expectedLesson)) {
+        throw new Error(`Lesson not found: ${expectedLesson}`);
+      }
+    }
+  }
+
+  /**
+   * Plays a lesson from the "Continue Where you Left off section" section in learner dashboard.
+   * @param {string} lessonName - The name of the lesson.
+   */
+  async playLessonFromContinueWhereLeftOff(lessonName: string): Promise<void> {
+    await this.page.waitForSelector(continueFromWhereLeftOffSectionSelector);
+    await this.page.waitForSelector(lessonTileTitleSelector);
+
+    const lessonTileTitles = await this.page.$$(
+      continueFromWhereLeftOffSectionSelector + ' ' + lessonTileTitleSelector
+    );
+
+    for (const lessonTileTitle of lessonTileTitles) {
+      const actualLessonName = await this.page.evaluate(
+        el => el.textContent.trim(),
+        lessonTileTitle
+      );
+
+      if (actualLessonName === lessonName) {
+        await Promise.all([
+          this.page.waitForNavigation({waitUntil: 'networkidle0'}),
+          await this.waitForElementToBeClickable(lessonTileTitle),
+          lessonTileTitle.click(),
+        ]);
+        return;
+      }
+    }
+    throw new Error(`Lesson not found: ${lessonName}`);
   }
 }
 

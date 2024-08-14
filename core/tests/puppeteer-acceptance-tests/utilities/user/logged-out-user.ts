@@ -289,6 +289,8 @@ const lessonLanguageSelector = '.oppia-content-language-selector';
 const playVoiceoverButton = '.e2e-test-play-circle';
 const voiceoverDropdown = '.e2e-test-audio-bar';
 const pauseVoiceoverButton = '.e2e-test-pause-circle';
+const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -2345,12 +2347,12 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Selects and opens a chapter within a story to learn.
-   * @param {string} chapterName - The name of the chapter to select and open.
    * @param {string} storyName - The name of the story containing the chapter.
+   * @param {string} chapterName - The name of the chapter to select and open.
    */
   async selectChapterWithinStoryToLearn(
-    chapterName: string,
-    storyName: string
+    storyName: string,
+    chapterName: string
   ): Promise<void> {
     const isMobileViewport = this.isViewportAtMobileWidth();
     const storyTitleSelector = isMobileViewport
@@ -2621,8 +2623,9 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Gives feedback on the exploration.
    * @param {string} feedback - The feedback to give on the exploration.
+   * @param {boolean} stayAnonymous - Whether to stay anonymous while giving feedback.
    */
-  async giveFeedback(feedback: string): Promise<void> {
+  async giveFeedback(feedback: string, stayAnonymous?: boolean): Promise<void> {
     // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
     // in mobile viewport which is required for testing the feedback messages tab),
     // remove this part of skipping this function for Mobile viewport and make it run in mobile viewport
@@ -2634,6 +2637,12 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(feedbackPopupSelector);
     await this.page.waitForSelector(feedbackTextarea, {visible: true});
     await this.type(feedbackTextarea, feedback);
+
+    // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
+    if (stayAnonymous) {
+      await this.clickOn(stayAnonymousCheckbox);
+    }
+
     await this.clickOn('Submit');
 
     try {
