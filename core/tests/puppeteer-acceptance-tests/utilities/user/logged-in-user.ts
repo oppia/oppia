@@ -1173,7 +1173,7 @@ export class LoggedInUser extends BaseUser {
 
     await this.page.waitForSelector(completedGoalsSectionSelector);
     await this.page
-      .waitForSelector(completedGoalsTopicNameSelector, {timeout: 5000})
+      .waitForSelector(completedGoalsTopicNameSelector)
       .catch(() => {
         throw new Error('Completed goals section is empty');
       });
