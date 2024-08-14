@@ -1131,8 +1131,12 @@ export class LoggedInUser extends BaseUser {
    * @param {string[]} goals - The goals to add.
    */
   async addGoals(goals: string[]): Promise<void> {
-    await this.page.waitForSelector(topicNameInEditGoalsSelector);
-    await this.page.waitForSelector(addTopicToCurrentGoalsButton);
+    await this.page.waitForSelector(topicNameInEditGoalsSelector, {
+      visible: true,
+    });
+    await this.page.waitForSelector(addTopicToCurrentGoalsButton, {
+      visible: true,
+    });
 
     const topicNames = await this.page.$$(topicNameInEditGoalsSelector);
     const addGoalButtons = await this.page.$$(addTopicToCurrentGoalsButton);
@@ -1166,46 +1170,29 @@ export class LoggedInUser extends BaseUser {
   async expectCompletedGoalsToInclude(expectedGoals: string[]): Promise<void> {
     await this.waitForPageToFullyLoad();
 
+    await this.page.waitForSelector(completedGoalsSectionSelector);
+    await this.page
+      .waitForSelector(completedGoalsTopicNameSelector, {timeout: 5000})
+      .catch(() => {
+        throw new Error('Completed goals section is empty');
+      });
+
+    const completedGoals = await this.page.$$eval(
+      `${completedGoalsSectionSelector} ${completedGoalsTopicNameSelector}`,
+      (elements: Element[]) =>
+        elements.map(el =>
+          el.textContent ? el.textContent.trim().replace('Learnt ', '') : ''
+        )
+    );
+
     for (const expectedGoal of expectedGoals) {
-      try {
-        await this.page.waitForFunction(
-          (
-            expectedGoal: string,
-            completedGoalsSectionSelector: string,
-            completedGoalsTopicNameSelector: string
-          ) => {
-            const completedGoalsElement = document.querySelector(
-              completedGoalsSectionSelector
-            );
-            if (!completedGoalsElement) {
-              return false;
-            }
-
-            const completedGoals = Array.from(
-              completedGoalsElement.querySelectorAll(
-                completedGoalsTopicNameSelector
-              ),
-              (el: Element) =>
-                el.textContent
-                  ? el.textContent.trim().replace('Learnt ', '')
-                  : ''
-            );
-
-            return completedGoals.includes(expectedGoal);
-          },
-          {},
-          expectedGoal,
-          completedGoalsSectionSelector,
-          completedGoalsTopicNameSelector
-        );
-      } catch (error) {
+      if (!completedGoals.includes(expectedGoal)) {
         throw new Error(
           `Goal not found in completed lesson section: ${expectedGoal}`
         );
       }
     }
   }
-
   /**
    * Checks if the completed stories include the expected stories.
    * @param {string[]} expectedStories - The expected stories.
