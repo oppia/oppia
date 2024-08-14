@@ -68,7 +68,6 @@ export class HomeTabComponent {
   ) {}
 
   ngOnInit(): void {
-    console.log('DEBUG', this.continueWhereYouLeftOffList);
     this.width = this.widthConst * this.currentGoals.length;
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
