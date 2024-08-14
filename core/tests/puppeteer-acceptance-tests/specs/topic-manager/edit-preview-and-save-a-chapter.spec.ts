@@ -22,16 +22,9 @@ import testConstants from '../../utilities/common/test-constants';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
-
-ConsoleReporter.setConsoleErrorsToIgnore([
-  /ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'headerText: Story Editor'. Current value: 'headerText: Chapter Editor'./,
-  /Cannot read properties of undefined \(reading 'getStory'\)/,
-  /Occurred at http:\/\/localhost:8181\/story_editor\/.*\/#\/chapter_editor\/node_1 webpack:\/\/\/\..* Cannot read properties of undefined \(reading 'getStory'\)/,
-]);
 
 describe('Topic Manager', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
