@@ -2924,6 +2924,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectCardContentToMatch(expectedCardContent: string): Promise<void> {
     await this.waitForPageToFullyLoad();
+
     await this.page.waitForSelector(`${stateConversationContent} p`, {
       visible: true,
     });

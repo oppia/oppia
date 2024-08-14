@@ -2426,6 +2426,7 @@ export class TopicManager extends BaseUser {
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
   }
 
   /**
