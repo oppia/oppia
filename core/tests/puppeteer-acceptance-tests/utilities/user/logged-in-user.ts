@@ -604,7 +604,7 @@ export class LoggedInUser extends BaseUser {
    */
   async expectToolTipMessage(expectedMessage: string): Promise<void> {
     try {
-      await this.page.waitForSelector(toastMessageSelector);
+      await this.page.waitForSelector(toastMessageSelector, {visible: true});
       const toastMessageElement = await this.page.$(toastMessageSelector);
       const toastMessage = await this.page.evaluate(
         el => el.textContent.trim(),
@@ -1157,6 +1157,7 @@ export class LoggedInUser extends BaseUser {
           addGoalButtons[matchingTopicIndex]
         );
         await addGoalButtons[matchingTopicIndex]?.click();
+        showMessage(`Goal "${goal}" added.`);
       } else {
         throw new Error(`Goal not found: ${goal}`);
       }
