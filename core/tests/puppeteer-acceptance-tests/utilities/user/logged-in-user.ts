@@ -1170,9 +1170,9 @@ export class LoggedInUser extends BaseUser {
       try {
         await this.page.waitForFunction(
           (
-            expectedGoal,
-            completedGoalsSectionSelector,
-            completedGoalsTopicNameSelector
+            expectedGoal: string,
+            completedGoalsSectionSelector: string,
+            completedGoalsTopicNameSelector: string
           ) => {
             const completedGoalsElement = document.querySelector(
               completedGoalsSectionSelector

@@ -55,8 +55,6 @@ describe('Topic Manager', function () {
       [ROLES.TOPIC_MANAGER],
       'Addition'
     );
-
-    await topicManager.page.on('console', () => {});
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(

@@ -138,12 +138,16 @@ export class ConsoleReporter {
         if (messageText.includes('JSHandle@error')) {
           const messages = await Promise.all(
             message.args().map((arg: JSHandle) =>
-              arg.executionContext().evaluate((arg: unknown) => {
-                if (arg instanceof Error) {
-                  return arg.message;
-                }
-                return null;
-              }, arg)
+              arg
+                .executionContext()
+                .evaluateHandle((arg: unknown) => {
+                  if (arg instanceof Error) {
+                    return arg.message;
+                  }
+                  return null;
+                  // TODO(#20829): Console error "Cannot read properties of undefined (reading 'getStory')" on navigation or reload in Story Editor. Since this error is getting triggered on navigation only, it is causing "Execution context destroyed error".
+                }, arg)
+                .catch(() => 'Context was destroyed before evaluation')
             )
           );
           messageText = messages.join(' ');
@@ -155,11 +159,14 @@ export class ConsoleReporter {
           ? `${messageSource} ${messageText}`
           : messageText;
 
-        ConsoleReporter.consoleMessages.push({
-          type: message.type(),
-          text: messageText,
-          url: page.url(),
-        });
+        // Check if the page's context still exists before pushing the message
+        if (!page.isClosed()) {
+          ConsoleReporter.consoleMessages.push({
+            type: message.type(),
+            text: messageText,
+            url: page.url(),
+          });
+        }
       });
     });
   }
