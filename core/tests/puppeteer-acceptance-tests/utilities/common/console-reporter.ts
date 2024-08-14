@@ -159,14 +159,11 @@ export class ConsoleReporter {
           ? `${messageSource} ${messageText}`
           : messageText;
 
-        // Check if the page's context still exists before pushing the message
-        if (!page.isClosed()) {
-          ConsoleReporter.consoleMessages.push({
-            type: message.type(),
-            text: messageText,
-            url: page.url(),
-          });
-        }
+        ConsoleReporter.consoleMessages.push({
+          type: message.type(),
+          text: messageText,
+          url: page.url(),
+        });
       });
     });
   }
