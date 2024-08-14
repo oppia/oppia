@@ -1166,24 +1166,34 @@ export class LoggedInUser extends BaseUser {
   async expectCompletedGoalsToInclude(expectedGoals: string[]): Promise<void> {
     await this.waitForPageToFullyLoad();
 
-    await this.page.waitForSelector(completedGoalsSectionSelector);
-    const completedGoalsTopicNames = await this.page.$$(
-      completedGoalsSectionSelector + ' ' + completedGoalsTopicNameSelector
-    );
-
-    const actualGoals = await Promise.all(
-      completedGoalsTopicNames.map(async topicName => {
-        const fullGoalText = await this.page.evaluate(
-          el => el.textContent.trim(),
-          topicName
-        );
-        // Remove the "Learnt " prefix.
-        return fullGoalText.replace('Learnt ', '');
-      })
-    );
-
     for (const expectedGoal of expectedGoals) {
-      if (!actualGoals.includes(expectedGoal)) {
+      try {
+        await this.page.waitForFunction(
+          (
+            expectedGoal,
+            completedGoalsSectionSelector,
+            completedGoalsTopicNameSelector
+          ) => {
+            const completedGoalsElement = document.querySelector(
+              completedGoalsSectionSelector
+            );
+            if (!completedGoalsElement) return false;
+
+            const completedGoals = Array.from(
+              completedGoalsElement.querySelectorAll(
+                completedGoalsTopicNameSelector
+              ),
+              (el: Element) => el.textContent!.trim().replace('Learnt ', '')
+            );
+
+            return completedGoals.includes(expectedGoal);
+          },
+          {},
+          expectedGoal,
+          completedGoalsSectionSelector,
+          completedGoalsTopicNameSelector
+        );
+      } catch (error) {
         throw new Error(
           `Goal not found in completed lesson section: ${expectedGoal}`
         );
