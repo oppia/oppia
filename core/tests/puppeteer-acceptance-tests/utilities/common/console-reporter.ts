@@ -138,7 +138,7 @@ export class ConsoleReporter {
         if (messageText.includes('JSHandle@error')) {
           const messages = await Promise.all(
             message.args().map((arg: JSHandle) =>
-              arg.executionContext().evaluateHandle((arg: unknown) => {
+              arg.executionContext().evaluate((arg: unknown) => {
                 if (arg instanceof Error) {
                   return arg.message;
                 }
