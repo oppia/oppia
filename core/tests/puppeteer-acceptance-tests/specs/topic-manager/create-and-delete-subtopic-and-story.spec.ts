@@ -13,24 +13,7 @@ describe('Topic Manager', function () {
   let explorationId1: string | null;
   let explorationId2: string | null;
 
-  const originalConsoleError = console.error;
-
   beforeAll(async function () {
-    // Override console.error to filter out specific messages
-    console.error = (message?: any, ...optionalParams: any[]) => {
-      if (
-        message &&
-        message.includes(
-          "Cannot read properties of undefined (reading 'getStory')"
-        )
-      ) {
-        // Ignore the specific error message
-        return;
-      }
-      // Call the original console.error method for other messages
-      originalConsoleError(message, ...optionalParams);
-    };
-
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_Admin@example.com',
@@ -138,7 +121,6 @@ describe('Topic Manager', function () {
   );
 
   afterAll(async function () {
-    console.error = originalConsoleError;
     await UserFactory.closeAllBrowsers();
   });
 });
