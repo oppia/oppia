@@ -106,6 +106,7 @@ describe('Topic Manager', function () {
         explorationId3 as string,
         testConstants.data.curriculumAdminThumbnailImage
       );
+
       await topicManager.addAcquiredSkill('Quadratic Equations');
 
       await topicManager.saveStoryDraft();
