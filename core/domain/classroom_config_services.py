@@ -328,3 +328,146 @@ def delete_classroom(classroom_id: str) -> None:
         classroom_id: str. ID of the classroom which is to be deleted.
     """
     classroom_models.ClassroomModel.get(classroom_id).delete()
+
+
+def get_all_classroom_id_to_index_mappings() -> List[
+    classroom_config_domain.ClassroomIdToIndex]:
+    """Returns all the classroom ID to index mappings present in the datastore.
+
+    Returns:
+        list(ClassroomIdToIndex). The list of mappings present in the datastore.
+    """
+    backend_models = classroom_models.ClassroomIdToIndexModel.get_all()
+    mappings: List[classroom_config_domain.ClassroomIdToIndex] = [
+        get_classroom_id_to_index_from_model(model)
+        for model in backend_models
+    ]
+    return mappings
+
+
+def get_classroom_id_to_index_from_model(
+    model: classroom_models.ClassroomIdToIndexModel
+) -> classroom_config_domain.ClassroomIdToIndex:
+    """Returns a ClassroomIdToIndex domain object given a model loaded
+    from the datastore.
+
+    Args:
+        model: ClassroomIdToIndexModel. The model loaded from the datastore.
+
+    Returns:
+        ClassroomIdToIndex. A domain object corresponding to the given model.
+    """
+    return classroom_config_domain.ClassroomIdToIndex(
+        model.classroom_id,
+        model.classroom_index
+    )
+
+
+@overload
+def get_classroom_id_to_index_by_id(
+    classroom_id: str
+) -> classroom_config_domain.ClassroomIdToIndex: ...
+
+
+@overload
+def get_classroom_id_to_index_by_id(
+    classroom_id: str, *, strict: Literal[True]
+) -> classroom_config_domain.ClassroomIdToIndex: ...
+
+
+@overload
+def get_classroom_id_to_index_by_id(
+    classroom_id: str, *, strict: Literal[False]
+) -> Optional[classroom_config_domain.ClassroomIdToIndex]: ...
+
+
+def get_classroom_id_to_index_by_id(
+    classroom_id: str,
+    strict: bool = True
+) -> Optional[classroom_config_domain.ClassroomIdToIndex]:
+    """Returns a domain object representing a classroom ID to index mapping.
+
+    Args:
+        classroom_id: str. ID of the classroom.
+        strict: bool. Fails noisily if the model doesn't exist.
+
+    Returns:
+        ClassroomIdToIndex or None. The domain object representing a mapping
+        with the given id, or None if it does not exist.
+    """
+    model = classroom_models.ClassroomIdToIndexModel.get(
+        classroom_id, strict=strict)
+    if model:
+        return get_classroom_id_to_index_from_model(model)
+    else:
+        return None
+
+
+def get_index_for_classroom_id(classroom_id: str) -> int:
+    """Returns the index for a given classroom ID.
+
+    Args:
+        classroom_id: str. The ID of the classroom.
+
+    Returns:
+        int. The index of the classroom.
+
+    Raises:
+        Exception. No mapping found for the given classroom ID.
+    """
+    mapping = get_classroom_id_to_index_by_id(classroom_id, strict=False)
+    if mapping is None:
+        raise Exception(f'No mapping found for classroom ID: {classroom_id}')
+    return mapping.classroom_index
+
+
+def create_new_classroom_id_to_index_mapping(
+    classroom_id_to_index: classroom_config_domain.ClassroomIdToIndex
+) -> None:
+    """Creates a new ClassroomIdToIndexModel from using the domain object.
+
+    Args:
+        classroom_id_to_index: ClassroomIdToIndex. The domain object for the
+            given mapping.
+    """
+    classroom_id_to_index.validate()
+    classroom_models.ClassroomIdToIndexModel.create(
+        classroom_id_to_index.classroom_id,
+        classroom_id_to_index.classroom_index
+    )
+
+
+def update_classroom_id_to_index_mapping(
+    classroom_id_to_index: classroom_config_domain.ClassroomIdToIndex
+) -> None:
+    """Updates an existing ClassroomIdToIndexModel in the datastore.
+
+    Args:
+        classroom_id_to_index: ClassroomIdToIndex. The domain object for the
+            given mapping.
+
+    Raises:
+        Exception. No mapping found for the given classroom ID.
+    """
+    classroom_id_to_index.validate()
+    model = classroom_models.ClassroomIdToIndexModel.get(
+        classroom_id_to_index.classroom_id, strict=False)
+
+    if not model:
+        raise Exception(
+            f'No mapping found for classroom ID: '
+            f'{classroom_id_to_index.classroom_id}'
+        )
+
+    model.classroom_index = classroom_id_to_index.classroom_index
+    model.update_timestamps()
+    model.put()
+
+
+def delete_classroom_id_to_index_mapping(classroom_id: str) -> None:
+    """Deletes the ClassroomIdToIndexModel.
+
+    Args:
+        classroom_id: str. Classrom ID for which the mapping is to be deleted.
+    """
+    classroom_models.ClassroomIdToIndexModel.get(classroom_id).delete()

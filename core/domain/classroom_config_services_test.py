@@ -304,3 +304,83 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             history_classroom.url_fragment, history_classroom_data.url_fragment
         )
         self.assertFalse(history_classroom_data.is_published)
+
+
+class ClassroomIdToIndexServicesTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.classroom_id = 'classroom_1'
+        self.classroom_index = 5
+        self.classroom_id_to_index = classroom_config_domain.ClassroomIdToIndex(
+            self.classroom_id, self.classroom_index
+        )
+        classroom_config_services.create_new_classroom_id_to_index_mapping(
+            self.classroom_id_to_index
+        )
+
+    def test_get_all_classroom_id_to_index_mappings(self) -> None:
+        mappings = (
+            classroom_config_services.get_all_classroom_id_to_index_mappings()
+        )
+        self.assertEqual(len(mappings), 1)
+        self.assertEqual(mappings[0].classroom_id, self.classroom_id)
+        self.assertEqual(mappings[0].classroom_index, self.classroom_index)
+
+    def test_get_index_for_classroom_id(self) -> None:
+        index = classroom_config_services.get_index_for_classroom_id(
+            self.classroom_id)
+        self.assertEqual(index, self.classroom_index)
+
+        with self.assertRaisesRegex(
+            Exception, 'No mapping found for classroom ID: non_existing_id'):
+            classroom_config_services.get_index_for_classroom_id(
+                'non_existing_id')
+
+    def test_create_new_classroom_id_to_index_mapping(self) -> None:
+        new_classroom_id = 'classroom_2'
+        new_classroom_index = 10
+        new_mapping = classroom_config_domain.ClassroomIdToIndex(
+            new_classroom_id, new_classroom_index)
+        classroom_config_services.create_new_classroom_id_to_index_mapping(
+            new_mapping
+        )
+
+        retrieved_mapping = (
+            classroom_config_services.get_classroom_id_to_index_by_id(
+                new_classroom_id
+            )
+        )
+        self.assertIsNotNone(retrieved_mapping)
+        self.assertEqual(retrieved_mapping.classroom_id, new_classroom_id)
+        self.assertEqual(retrieved_mapping.classroom_index, new_classroom_index)
+
+    def test_update_classroom_id_to_index_mapping(self) -> None:
+        updated_index = 20
+        self.classroom_id_to_index.classroom_index = updated_index
+        classroom_config_services.update_classroom_id_to_index_mapping(
+            self.classroom_id_to_index
+        )
+
+        mapping = classroom_config_services.get_classroom_id_to_index_by_id(
+            self.classroom_id)
+        self.assertEqual(mapping.classroom_index, updated_index)
+
+        # Testing update with non-existing classroom_id.
+        invalid_mapping = classroom_config_domain.ClassroomIdToIndex(
+            'non_existing_id', updated_index)
+        with self.assertRaisesRegex(
+            Exception, 'No mapping found for classroom ID: non_existing_id'):
+            classroom_config_services.update_classroom_id_to_index_mapping(
+                invalid_mapping)
+
+    def test_delete_classroom_id_to_index_mapping(self) -> None:
+        self.assertIsNotNone(
+            classroom_config_services.get_classroom_id_to_index_by_id(
+                self.classroom_id)
+        )
+        classroom_config_services.delete_classroom_id_to_index_mapping(
+            self.classroom_id)
+        self.assertIsNone(
+            classroom_config_services.get_classroom_id_to_index_by_id(
+            self.classroom_id, strict=False))

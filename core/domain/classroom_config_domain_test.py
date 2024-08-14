@@ -529,3 +529,81 @@ class ImageDomainTests(test_utils.GenericTestBase):
         self.assertEqual(image_from_dict.filename, self.filename)
         self.assertEqual(image_from_dict.bg_color, self.bg_color)
         self.assertEqual(image_from_dict.size_in_bytes, self.size_in_bytes)
+
+
+class ClassroomIdToIndexTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.classroom_id = 'classroom_1'
+        self.classroom_index = 5
+        self.classroom_id_to_index = classroom_config_domain.ClassroomIdToIndex(
+            self.classroom_id, self.classroom_index
+        )
+        self.classroom_id_to_index_dict: (
+            classroom_config_domain.ClassroomIdToIndexDict
+        ) = {
+            'classroom_id': self.classroom_id,
+            'classroom_index': self.classroom_index
+        }
+
+    def test_initialization(self) -> None:
+        self.assertEqual(
+            self.classroom_id_to_index.classroom_id, self.classroom_id)
+        self.assertEqual(
+            self.classroom_id_to_index.classroom_index, self.classroom_index)
+
+    def test_from_dict_method(self) -> None:
+        classroom_id_to_index = (
+            classroom_config_domain.ClassroomIdToIndex.from_dict(
+                self.classroom_id_to_index_dict
+            )
+        )
+        self.assertEqual(
+            classroom_id_to_index.classroom_id, self.classroom_id
+        )
+        self.assertEqual(
+            classroom_id_to_index.classroom_index, self.classroom_index
+        )
+
+    def test_to_dict_method(self) -> None:
+        self.assertEqual(
+            self.classroom_id_to_index.to_dict(),
+            self.classroom_id_to_index_dict
+        )
+
+    def test_invalid_classroom_id_should_raise_exception(self) -> None:
+        error_msg = 'classroom_id field should not be empty'
+        with self.assertRaisesRegex(utils.ValidationError, error_msg):
+            classroom_config_domain.ClassroomIdToIndex(
+                '', self.classroom_index
+            ).validate()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.classroom_id_to_index.classroom_id = 1 # type: ignore[assignment]
+        error_msg = (
+            'Expected classroom_id to be a string, received: 1.')
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom_id_to_index.validate()
+
+    def test_invalid_classroom_index_should_raise_exception(
+            self) -> None:
+        error_msg = (
+            'classroom_index must be a non-negative integer, received: -1.'
+        )
+        with self.assertRaisesRegex(utils.ValidationError, error_msg):
+            classroom_config_domain.ClassroomIdToIndex(
+                self.classroom_id, -1).validate()
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally
+        # test wrong inputs that we can normally catch by typing.
+        self.classroom_id_to_index.classroom_index = 'index' # type: ignore[assignment]
+        self.classroom_id_to_index.classroom_id = 'id'
+        error_msg = (
+            'Expected classroom_index to be an integer, received: index.')
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom_id_to_index.validate()

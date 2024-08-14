@@ -225,3 +225,106 @@ class ClassroomModel(base_models.BaseModel):
                 cls.deleted == False  # pylint: disable=singleton-comparison
             )
         ).get()
+
+
+class ClassroomIdToIndexModel(base_models.BaseModel):
+    """Model to store the mapping between classroom ID and index.
+
+    The id of instances of this class is the classroom ID.
+    """
+
+    # The ID of the classroom.
+    classroom_id = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The index of the classroom.
+    classroom_index = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'classroom_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'classroom_index': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        })
+
+    @classmethod
+    def create(
+        cls, classroom_id: str, classroom_index: int
+    ) -> 'ClassroomIdToIndexModel':
+        """Creates a new ClassroomIdToIndexModel entry.
+
+        Args:
+            classroom_id: str. Classroom ID of the classroom.
+            classroom_index: int. The index of the classroom.
+
+        Returns:
+            ClassroomIdToIndexModel. The newly created ClassroomIdToIndexModel.
+
+        Raises:
+            Exception. A mapping with the given classroom ID already exists.
+        """
+        if cls.get_by_id(classroom_id):
+            raise Exception(
+                'A mapping with the given classroom ID already exists.')
+
+        entity = cls(
+            id=classroom_id,
+            classroom_id=classroom_id,
+            classroom_index=classroom_index
+        )
+        entity.update_timestamps()
+        entity.put()
+
+        return entity
+
+    @classmethod
+    def get_index_by_classroom_id(cls, classroom_id: str) -> int:
+        """Gets the index for a given classroom ID.
+
+        Args:
+            classroom_id: str. The ID of the classroom.
+
+        Returns:
+            int. The index of the classroom.
+
+        Raises:
+            Exception. No mapping found for the given classroom ID.
+        """
+        entity = cls.get_by_id(classroom_id)
+        if entity is None:
+            raise Exception(
+                f'No mapping found for classroom ID: {classroom_id}'
+            )
+        return int(entity.classroom_index)
+
+    @classmethod
+    def get_by_classroom_id(
+        cls, classroom_id: str) -> 'ClassroomIdToIndexModel':
+        """Gets the ClassroomIdToIndexModel instance for a given classroom ID.
+
+        Args:
+            classroom_id: str. The ID of the classroom.
+
+        Returns:
+            ClassroomIdToIndexModel. The instance corresponding to classroom ID.
+
+        Raises:
+            Exception. No mapping found for the given classroom ID.
+        """
+        entity = cls.get_by_id(classroom_id)
+        if entity is None:
+            raise Exception(
+                f'No mapping found for classroom ID: {classroom_id}')
+        return entity

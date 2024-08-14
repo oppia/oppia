@@ -192,3 +192,74 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
                 )
             ):
                 classroom_model_cls.generate_new_classroom_id()
+
+
+class ClassroomIdToIndexModelUnitTest(test_utils.GenericTestBase):
+    """Test the ClassroomIdToIndexModel class."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.model = classroom_models.ClassroomIdToIndexModel(
+            id='classroom_id_1',
+            classroom_id='classroom_id_1',
+            classroom_index=1
+        )
+        self.model.update_timestamps()
+        self.model.put()
+
+    def test_create_new_model(self) -> None:
+        model_instance = classroom_models.ClassroomIdToIndexModel.create(
+            'classroom_id_2', 2)
+
+        self.assertEqual(model_instance.classroom_id, 'classroom_id_2')
+        self.assertEqual(model_instance.classroom_index, 2)
+
+    def test_get_export_policy_not_applicable(self) -> None:
+        self.assertEqual(
+            classroom_models.ClassroomIdToIndexModel.get_export_policy(),
+            {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'classroom_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'classroom_index': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            }
+        )
+
+    def test_get_model_association_to_user_not_corresponding_to_user(
+            self) -> None:
+        self.assertEqual(
+            classroom_models.ClassroomIdToIndexModel.
+            get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_deletion_policy_not_applicable(self) -> None:
+        self.assertEqual(
+            classroom_models.ClassroomIdToIndexModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_index_by_classroom_id(self) -> None:
+        self.assertEqual(
+            classroom_models.ClassroomIdToIndexModel.get_index_by_classroom_id(
+                'classroom_id_1'
+            ), 1)
+        with self.assertRaisesRegex(
+            Exception, 'No mapping found for classroom ID'):
+            classroom_models.ClassroomIdToIndexModel.get_index_by_classroom_id(
+                'non_existent_id')
+
+    def test_get_by_classroom_id(self) -> None:
+        model = classroom_models.ClassroomIdToIndexModel.get_by_classroom_id(
+            'classroom_id_1')
+        self.assertEqual(model.classroom_id, 'classroom_id_1')
+        self.assertEqual(model.classroom_index, 1)
+        with self.assertRaisesRegex(
+            Exception, 'No mapping found for classroom ID'):
+            classroom_models.ClassroomIdToIndexModel.get_by_classroom_id(
+                'non_existent_id')
+
+    def test_create_duplicate_classroom_id(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'A mapping with the given classroom ID already exists'):
+            classroom_models.ClassroomIdToIndexModel.create('classroom_id_1', 3)
