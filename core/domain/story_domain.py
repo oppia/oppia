@@ -699,18 +699,6 @@ class StoryNode:
         Returns:
             StoryNode. The corresponding StoryNode domain object.
         """
-        planned_publication_date_msecs = (
-            node_dict['planned_publication_date_msecs'] if
-            'planned_publication_date_msecs' in node_dict and
-            node_dict['planned_publication_date_msecs'] else None)
-        last_modified_msecs = (
-                node_dict['last_modified_msecs'] if
-                'last_modified_msecs' in node_dict and
-                node_dict['last_modified_msecs'] else None)
-        first_publication_date_msecs = (
-                node_dict['first_publication_date_msecs'] if
-                'first_publication_date_msecs' in node_dict and
-                node_dict['first_publication_date_msecs'] else None)
         node = cls(
             node_dict['id'],
             node_dict['title'],
@@ -725,17 +713,10 @@ class StoryNode:
             node_dict['outline_is_finalized'],
             node_dict['exploration_id'],
             node_dict['status'] if 'status' in node_dict else None,
-            utils.convert_millisecs_time_to_datetime_object(
-                planned_publication_date_msecs) if
-                planned_publication_date_msecs else None,
-            utils.convert_millisecs_time_to_datetime_object(
-                last_modified_msecs) if
-                last_modified_msecs else None,
-            utils.convert_millisecs_time_to_datetime_object(
-                first_publication_date_msecs) if
-                first_publication_date_msecs else None,
-            node_dict['unpublishing_reason'] if
-            'unpublishing_reason' in node_dict else None
+            node_dict['planned_publication_date_msecs'] if 'planned_publication_date_msecs' in node_dict else None,
+            node_dict['last_modified_msecs'] if 'last_modified_msecs' in node_dict else None,
+            node_dict['first_publication_date_msecs'] if 'first_publication_date_msecs' in node_dict else None,
+            node_dict['unpublishing_reason'] if 'unpublishing_reason' in node_dict else None
         )
         return node
 
@@ -2092,9 +2073,7 @@ class Story:
         """
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].planned_publication_date = (
-            utils.convert_millisecs_time_to_datetime_object(
-                new_planned_publication_date_msecs) if
-                new_planned_publication_date_msecs else None)
+            new_planned_publication_date_msecs if new_planned_publication_date_msecs else None)
 
     def update_node_last_modified(
             self, node_id: str, new_last_modified_msecs: float) -> None:
@@ -2107,8 +2086,7 @@ class Story:
         """
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].last_modified = (
-            utils.convert_millisecs_time_to_datetime_object(
-            new_last_modified_msecs)) if new_last_modified_msecs else None
+            new_last_modified_msecs) if new_last_modified_msecs else None
 
     def update_node_first_publication_date(
             self, node_id: str, new_publication_date_msecs: float) -> None:
@@ -2121,9 +2099,7 @@ class Story:
         """
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].first_publication_date = (
-            utils.convert_millisecs_time_to_datetime_object(
-                new_publication_date_msecs) if
-                new_publication_date_msecs else None)
+        new_publication_date_msecs) if new_publication_date_msecs else None
 
     def update_node_unpublishing_reason(
             self, node_id: str, new_unpublishing_reason: str) -> None:
