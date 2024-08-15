@@ -91,7 +91,7 @@
                 <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_OUTREACH_CONTENT_3' | translate }}</p>
               </div>
               <div class="oppia-volunteer-carousel-container">
-                <ngb-carousel [showNavigationIndicators]="false" *ngIf="outreach.images.length > 0">
+                <ngb-carousel [showNavigationIndicators]="false" *ngIf="outreach.images.length > 0" [animation]="false">
                   <ng-template *ngFor="let image of outreach.images; index as index" ngbSlide>
                     <div class="oppia-carousel-wrapper">
                       <picture>
@@ -176,7 +176,7 @@
                 <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_CONTENT_3' | translate }}</p>
               </div>
               <div class="oppia-volunteer-carousel-container">
-                <ngb-carousel [showNavigationIndicators]="false" *ngIf="software.images.length > 0">
+                <ngb-carousel [showNavigationIndicators]="false" *ngIf="software.images.length > 0" [animation]="false">
                   <ng-template *ngFor="let image of software.images; index as index" ngbSlide>
                     <div class="oppia-carousel-wrapper">
                       <picture>
@@ -259,7 +259,7 @@
 
               </div>
               <div class="oppia-volunteer-carousel-container">
-                <ngb-carousel [showNavigationIndicators]="false" *ngIf="art.images.length > 0">
+                <ngb-carousel [showNavigationIndicators]="false" *ngIf="art.images.length > 0" [animation]="false">
                   <ng-template *ngFor="let image of art.images; index as index" ngbSlide>
                     <div class="oppia-carousel-wrapper">
                       <picture>
@@ -344,7 +344,7 @@
                 <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_CONTENT_3' | translate }}</p>
               </div>
               <div class="oppia-volunteer-carousel-container">
-                <ngb-carousel [showNavigationIndicators]="false" *ngIf="translation.images.length > 0">
+                <ngb-carousel [showNavigationIndicators]="false" *ngIf="translation.images.length > 0" [animation]="false">
                   <ng-template *ngFor="let image of translation.images; index as index" ngbSlide>
                     <div class="oppia-carousel-wrapper">
                       <picture>
@@ -429,7 +429,7 @@
                 <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_3' | translate }}</p>
               </div>
               <div class="oppia-volunteer-carousel-container">
-                <ngb-carousel [showNavigationIndicators]="false" *ngIf="lessonCreation.images.length > 0">
+                <ngb-carousel [showNavigationIndicators]="false" *ngIf="lessonCreation.images.length > 0" [animation]="false">
                   <ng-template *ngFor="let image of lessonCreation.images; index as index" ngbSlide>
                     <div class="oppia-carousel-wrapper">
                       <picture>
