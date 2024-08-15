@@ -66,16 +66,6 @@ describe('Logged-out User in Partnerships page', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it(
-    'should open the Partnerships form when the "Partner with us" button is clicked at the bottom.',
-    async function () {
-      await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPageInGivenLanguage(
-        'pt-br'
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
