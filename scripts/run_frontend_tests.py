@@ -187,6 +187,10 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             spec_file = get_file_spec(spec.strip())
             if spec_file:
                 specs_to_run.add(spec_file)
+            elif not parsed_args.allow_no_spec:
+                raise ValueError(
+                    'No spec file found for the file: %s' % spec
+                )
 
     if parsed_args.run_on_changed_files_in_branch:
         remote = git_changes_utils.get_local_git_repository_remote_name()
@@ -213,14 +217,9 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             if spec_file:
                 specs_to_run.add(spec_file)
 
-    if parsed_args.specs_to_run or parsed_args.run_on_changed_files_in_branch:
-        if len(specs_to_run) == 0:
-            print('No valid specs found to run.')
-            exit_code = 0 if parsed_args.allow_no_spec else 1
-            sys.exit(exit_code)
-        else:
-            print('Running the following specs:', specs_to_run)
-            cmd.append('--specs_to_run=%s' % ','.join(sorted(specs_to_run)))
+    if specs_to_run:
+        print('Running the following specs:', specs_to_run)
+        cmd.append('--specs_to_run=%s' % ','.join(sorted(specs_to_run)))
 
     if parsed_args.run_minified_tests:
         print('Running test in production environment')
