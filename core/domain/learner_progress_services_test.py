@@ -1602,6 +1602,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.TOPIC_ID_1: []
             }
         )
+        self.save_new_valid_classroom(
+            is_published=False,
+            name='History',
+            url_fragment='history',
+            classroom_id='historyid'
+        )
 
         self.login(self.USER_EMAIL)
         partially_learnt_topic_ids = (
