@@ -637,7 +637,29 @@ export class BaseUser {
    */
   async createAndSwitchToNewTab(): Promise<puppeteer.Page> {
     const newPage = await this.browserObject.newPage();
+
+    if (this.isViewportAtMobileWidth()) {
+      // Set viewport for mobile.
+      await newPage.setViewport({
+        width: 375,
+        height: 667,
+        deviceScaleFactor: 2,
+        isMobile: true,
+        hasTouch: true,
+        isLandscape: false,
+      });
+      await newPage.setUserAgent(
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) ' +
+          'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
+          'Mobile/15A372 Safari/604.1'
+      );
+    } else {
+      // Set viewport for desktop.
+      await newPage.setViewport({width: 1920, height: 1080});
+    }
+
     await newPage.bringToFront();
+    this.page = newPage;
     return newPage;
   }
 }

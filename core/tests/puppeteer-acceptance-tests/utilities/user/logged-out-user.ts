@@ -2081,7 +2081,9 @@ export class LoggedOutUser extends BaseUser {
     if (!toastMessage || !toastMessage.includes(message)) {
       throw new Error('Exploration did not complete successfully');
     }
+
     showMessage('Exploration has completed successfully');
+
     await this.page.waitForSelector(explorationCompletionToastMessage, {
       hidden: true,
     });
@@ -2962,6 +2964,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectCardContentToMatch(expectedCardContent: string): Promise<void> {
     await this.waitForPageToFullyLoad();
+
     await this.page.waitForSelector(`${stateConversationContent} p`, {
       visible: true,
     });
