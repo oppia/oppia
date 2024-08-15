@@ -639,7 +639,7 @@ export class BaseUser {
     const newPage = await this.browserObject.newPage();
 
     if (this.isViewportAtMobileWidth()) {
-      // Set viewport for mobile
+      // Set viewport for mobile.
       await newPage.setViewport({
         width: 375,
         height: 667,
@@ -654,7 +654,7 @@ export class BaseUser {
           'Mobile/15A372 Safari/604.1'
       );
     } else {
-      // Set viewport for desktop
+      // Set viewport for desktop.
       await newPage.setViewport({width: 1920, height: 1080});
     }
 
