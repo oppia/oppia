@@ -1,4 +1,3 @@
-core/templates/pages/about-page/about-page.module.ts
 core/templates/pages/contact-page/contact-page.module.ts
 core/templates/pages/donate-page/donate-page.module.ts
 core/templates/pages/partnerships-page/partnerships-page.module.ts

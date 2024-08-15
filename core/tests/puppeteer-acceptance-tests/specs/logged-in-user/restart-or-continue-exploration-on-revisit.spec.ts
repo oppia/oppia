@@ -13,20 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance tests for the user journey of signing in and saving exploration progress in
- * the middle of exploration.
- * User Journey: Starting an exploration without signing in, making progress,
- * signing up during the exploration, verifying that progress is saved, continuing
- * the exploration, and completing the exploration.
+ * @fileoverview Acceptance test coverage for restarting or continuing a lesson from the most recently
+ * visited checkpoint in an exploration, completing it, and starting it from the beginning upon revisiting.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
   NUMERIC_INPUT = 'Number Input',
@@ -39,13 +37,9 @@ enum CARD_NAME {
   FINAL_CARD = 'Final Card',
 }
 
-ConsoleReporter.setConsoleErrorsToIgnore([
-  'Failed to load resource: net::ERR_NETWORK_CHANGED',
-]);
-
-describe('Logged-out User', function () {
+describe('Logged-in User', function () {
   let explorationEditor: ExplorationEditor;
-  let loggedOutUser: LoggedOutUser;
+  let loggedInUser: LoggedInUser & LoggedOutUser;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
@@ -107,58 +101,67 @@ describe('Logged-out User', function () {
     await explorationEditor.publishExplorationWithMetadata(
       'Positive Numbers',
       'Learn positive numbers.',
-      'Algebra'
+      'Algebra',
+      'growth'
     );
 
-    loggedOutUser = await UserFactory.createLoggedOutUser();
+    loggedInUser = await UserFactory.createNewUser(
+      'loggedInUser',
+      'logged_in_user@example.com'
+    );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to play the exploration without signing in, sign in at any point, save progress, and clear progress',
+    'should be able to restart or continue from the most recently visited checkpoint in an exploration, complete it, and expect it to start from the beginning upon revisiting.',
     async function () {
-      await loggedOutUser.navigateToCommunityLibraryPage();
-      await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
-      await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
-      await loggedOutUser.continueToNextCard();
+      // Navigate to the community library page and start an exploration.
+      await loggedInUser.navigateToCommunityLibraryPage();
+      await loggedInUser.searchForLessonInSearchBar('Positive Numbers');
+      await loggedInUser.playLessonFromSearchResults('Positive Numbers');
 
-      // Make some progress in the exploration.
-      await loggedOutUser.submitAnswer('-25');
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.verifyCheckpointModalAppears();
+      // Continue to the next card and submit an answer.
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.submitAnswer('-25');
+      await loggedInUser.continueToNextCard();
 
-      // Choose to sign up at this point.
-      await loggedOutUser.signUpFromTheLessonPlayer(
-        'learner@example.com',
-        'learner'
-      );
-
-      // Rest of the action is done being logged-in in the same window as the same logged-out user needs to login to check if the progress if moved to permanent mode.
-
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.submitAnswer('-50');
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.verifyCheckpointModalAppears();
+      // Verify that the checkpoint modal appears and reload the page.
+      await loggedInUser.verifyCheckpointModalAppears();
 
       // Reloading from the current progress.
-      await loggedOutUser.reloadPage();
+      await loggedInUser.reloadPage();
 
-      await loggedOutUser.expectProgressRemainder(true);
+      await loggedInUser.expectProgressRemainder(true);
       // Continue the exploration from where they left off.
-      await loggedOutUser.chooseActionInProgressRemainder('Restart');
+      await loggedInUser.chooseActionInProgressRemainder('Restart');
 
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.submitAnswer('-99');
-      await loggedOutUser.continueToNextCard();
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.submitAnswer('-99');
+      await loggedInUser.continueToNextCard();
 
       // Again reload the page to check the 'Resume' exploration in the progress remainder as well.
-      await loggedOutUser.reloadPage();
-      await loggedOutUser.expectProgressRemainder(true);
-      await loggedOutUser.chooseActionInProgressRemainder('Resume');
+      await loggedInUser.reloadPage();
+      await loggedInUser.expectProgressRemainder(true);
+      await loggedInUser.chooseActionInProgressRemainder('Resume');
 
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.expectCardContentToMatch(
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.expectCardContentToMatch(
         'Lesson completed successfully. We have practiced negative numbers.'
       );
+
+      // TODO(#20563): Uncomment the following lines when issue #20563 is resolved.
+      // Issue #20563: When a user revisits an exploration after completing it,
+      // the exploration should start from the beginning, not from the previous checkpoint.
+      // see: https://github.com/oppia/oppia/issues/20563.
+
+      // // Revisit the exploration and expect it to start from the beginning.
+      // await loggedInUser.navigateToCommunityLibraryPage();
+      // await loggedInUser.searchForLessonInSearchBar('Positive Numbers');
+      // await loggedInUser.playLessonFromSearchResults('Positive Numbers');
+
+      // // Expecting the card content to match the initial card content.
+      // await loggedInUser.expectCardContentToMatch(
+      //   'We will be learning positive numbers.'
+      // );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
