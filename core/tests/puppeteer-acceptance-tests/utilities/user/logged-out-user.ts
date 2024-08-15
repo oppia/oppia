@@ -66,7 +66,8 @@ const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
 const teachUrl = testConstants.URLs.Teach;
 const termsUrl = testConstants.URLs.Terms;
-const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
+const donatePageThanksModalURL = testConstants.URLs.DonatePageThanksModalURL;
+const aboutPageThanksModalURL = testConstants.URLs.AboutPageThanksModalURL;
 const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
@@ -122,6 +123,7 @@ const readOurBlogButton =
 const dismissButton = 'i.e2e-test-thanks-for-donating-page-dismiss-button';
 const thanksForDonatingClass = '.modal-open';
 const donatePage = '.donate-content-container';
+const aboutPage = '.e2e-test-about-page';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
 const mobileSidebarBasicMathematicsButton =
@@ -285,6 +287,11 @@ const mobileNavbarButtonSelector = '.text-uppercase';
 const skipLinkSelector = '.e2e-test-skip-link';
 const openMobileNavbarMenuButton = '.oppia-navbar-menu-icon';
 const closeMobileNavbarMenuButton = '.oppia-navbar-close-icon';
+const lessonLanguageSelector = '.oppia-content-language-selector';
+const playVoiceoverButton = '.e2e-test-play-circle';
+const voiceoverDropdown = '.e2e-test-audio-bar';
+const pauseVoiceoverButton = '.e2e-test-pause-circle';
+const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -332,13 +339,17 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to navigate to the Thanks for Donating page.
+   * Function to navigate to the Donation thanks modal on donate page.
    */
-  async navigateToThanksForDonatingPage(): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.page.goto(thanksForDonatingUrl),
-    ]);
+  async navigateToDonationThanksModalOnDonatePage(): Promise<void> {
+    await this.goto(donatePageThanksModalURL);
+  }
+
+  /**
+   * Function to navigate to the Donation thanks modal on About page.
+   */
+  async navigateToDonationThanksModalOnAboutPage(): Promise<void> {
+    await this.goto(aboutPageThanksModalURL);
   }
 
   /**
@@ -698,9 +709,9 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to click the Watch A Video button
-   * in the Thanks for Donating page and check if it opens the right page.
+   * in the Donation thanks modal on donate page and check if it opens the right page.
    */
-  async clickWatchAVideoButtonInThanksForDonatingPage(): Promise<void> {
+  async clickWatchAVideoButtonInDonationThanksModalOnDonatePage(): Promise<void> {
     await this.page.waitForSelector(watchAVideoButton);
     const buttonText = await this.page.$eval(
       watchAVideoButton,
@@ -726,9 +737,9 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Function to click the Read Our Blog button
-   * in the Thanks for Donating page and check if it opens the Blog page.
+   * in the Donation thanks modal on donate page and check if it opens the Blog page.
    */
-  async clickReadOurBlogButtonInThanksForDonatingPage(): Promise<void> {
+  async clickReadOurBlogButtonInDonationThanksModalOnDonatePage(): Promise<void> {
     await this.page.waitForSelector(readOurBlogButton);
     const buttonText = await this.page.$eval(
       readOurBlogButton,
@@ -803,17 +814,17 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the dismiss button in the Thanks for Donating page,
-   * and check if the Thanks for Donating popup disappears
+   * Function to click the dismiss button in the Donation thanks modal on Donate page,
+   * and check if the Donation thanks modal disappears
    * and if the Donate page is shown.
    */
-  async clickDismissButtonInThanksForDonatingPage(): Promise<void> {
+  async dismissDonationThanksModalOnDonatePage(): Promise<void> {
     await this.clickOn(dismissButton);
     await this.page.waitForSelector(thanksForDonatingClass, {hidden: true});
     const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
     if (thanksForDonatingHeader !== null) {
       throw new Error(
-        'The dismiss button does not close the Thanks for Donating popup!'
+        'The dismiss button does not close the Donation thanks modal on Donate page!'
       );
     }
     await this.page.waitForSelector(donatePage);
@@ -825,8 +836,38 @@ export class LoggedOutUser extends BaseUser {
       );
     } else {
       showMessage(
-        'The dismiss button closes the Thanks for Donating popup ' +
+        'The dismiss button closes the Donation thanks modal on Donate page ' +
           'and shows the Donate page.'
+      );
+    }
+  }
+
+  /**
+   * Function to click the dismiss button on the Donation thanks modal on About page,
+   * and check if the Donation thanks modal disappears
+   * and if the About page is shown.
+   */
+  async dismissDonationThanksModalOnAboutPage(): Promise<void> {
+    await this.clickOn(dismissButton);
+    await this.page.waitForSelector(thanksForDonatingClass, {hidden: true});
+    const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
+    if (thanksForDonatingHeader !== null) {
+      throw new Error(
+        'The dismiss button does not close the Donation thanks modal on About page!'
+      );
+    }
+
+    await this.page.waitForSelector(aboutPage);
+    const donatePageShowed = await this.page.$(aboutPage);
+    if (donatePageShowed === null) {
+      throw new Error(
+        `The dismiss button should show the About page,
+          but it opens ${this.page.url()} instead.`
+      );
+    } else {
+      showMessage(
+        'The dismiss button closes the Donation thanks modal on About page ' +
+          'and shows the About page.'
       );
     }
   }
@@ -1379,10 +1420,12 @@ export class LoggedOutUser extends BaseUser {
     const languageOption = `.e2e-test-i18n-language-${langCode} a`;
 
     if (this.isViewportAtMobileWidth()) {
-      // This reload is required to ensure the language dropdown is visible in mobile view,
+      // This is required to ensure the language dropdown is visible in mobile view,
       // if the earlier movements of the page have hidden it and since the inbuilt
       // scrollIntoView function call of the clickOn function didn't work as expected.
-      await this.page.reload();
+      await this.page.evaluate(() => {
+        window.scrollTo(0, 0);
+      });
     }
     await this.page.waitForSelector(languageDropdown);
     const languageDropdownElement = await this.page.$(languageDropdown);
@@ -1418,12 +1461,9 @@ export class LoggedOutUser extends BaseUser {
     langCode: string
   ): Promise<void> {
     await this.changeSiteLanguage(langCode);
-
-    await this.clickLinkButtonToNewTab(
+    await this.openExternalLink(
       partnerWithUsButtonAtTheBottomOfPartnershipsPage,
-      'Partner With Us button at the bottom of the Partnerships page',
-      partnershipsFormInPortugueseUrl,
-      'Partnerships Google Form'
+      partnershipsFormInPortugueseUrl
     );
     await this.changeSiteLanguage('en');
   }
@@ -1839,8 +1879,15 @@ export class LoggedOutUser extends BaseUser {
       ? partnerMobileTabInAboutPage
       : partnerDesktopTabInAboutPage;
 
+    const partnerWithUsButtonInAboutPage = this.isViewportAtMobileWidth()
+      ? partnerWithUsMobileButtonInAboutPage
+      : partnerWithUsDesktopButtonInAboutPage;
+
     await this.clickOn(partnerTab);
-    await this.clickLinkAnchorToNewTab('Partner with us', partnershipsFormUrl);
+    await this.openExternalLink(
+      partnerWithUsButtonInAboutPage,
+      partnershipsFormUrl
+    );
   }
 
   /**
@@ -1863,11 +1910,9 @@ export class LoggedOutUser extends BaseUser {
       : partnerWithUsDesktopButtonInAboutPage;
 
     await this.clickOn(partnerTab);
-    await this.clickLinkButtonToNewTab(
+    await this.openExternalLink(
       partnerWithUsButtonInAboutPage,
-      `Partner With Us button in About page, after changing the language to ${langCode},`,
-      partnershipsFormInPortugueseUrl,
-      'Partnerships Google Form'
+      partnershipsFormInPortugueseUrl
     );
     await this.changeSiteLanguage('en');
   }
@@ -2026,14 +2071,13 @@ export class LoggedOutUser extends BaseUser {
   async expectExplorationCompletionToastMessage(
     message: string
   ): Promise<void> {
-    await this.page.waitForSelector(explorationCompletionToastMessage, {
-      visible: true,
-    });
-    const element = await this.page.$(explorationCompletionToastMessage);
-    const toastMessage = await this.page.evaluate(
-      element => element.textContent,
-      element
+    await this.page.waitForSelector(explorationCompletionToastMessage);
+
+    const toastMessage = await this.page.$eval(
+      explorationCompletionToastMessage,
+      element => element.textContent
     );
+
     if (!toastMessage || !toastMessage.includes(message)) {
       throw new Error('Exploration did not complete successfully');
     }
@@ -2343,12 +2387,12 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Selects and opens a chapter within a story to learn.
-   * @param {string} chapterName - The name of the chapter to select and open.
    * @param {string} storyName - The name of the story containing the chapter.
+   * @param {string} chapterName - The name of the chapter to select and open.
    */
   async selectChapterWithinStoryToLearn(
-    chapterName: string,
-    storyName: string
+    storyName: string,
+    chapterName: string
   ): Promise<void> {
     const isMobileViewport = this.isViewportAtMobileWidth();
     const storyTitleSelector = isMobileViewport
@@ -2619,8 +2663,9 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Gives feedback on the exploration.
    * @param {string} feedback - The feedback to give on the exploration.
+   * @param {boolean} stayAnonymous - Whether to stay anonymous while giving feedback.
    */
-  async giveFeedback(feedback: string): Promise<void> {
+  async giveFeedback(feedback: string, stayAnonymous?: boolean): Promise<void> {
     // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
     // in mobile viewport which is required for testing the feedback messages tab),
     // remove this part of skipping this function for Mobile viewport and make it run in mobile viewport
@@ -2632,6 +2677,12 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(feedbackPopupSelector);
     await this.page.waitForSelector(feedbackTextarea, {visible: true});
     await this.type(feedbackTextarea, feedback);
+
+    // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
+    if (stayAnonymous) {
+      await this.clickOn(stayAnonymousCheckbox);
+    }
+
     await this.clickOn('Submit');
 
     try {
@@ -3411,6 +3462,45 @@ export class LoggedOutUser extends BaseUser {
 
     // Remove focus from the focused element.
     await this.page.evaluate(element => element.blur(), expectedFocusedElement);
+  }
+
+  /**
+   * Changes the language of the lesson.
+   * @param {string} languageCode - The code of the language to change to.
+   */
+  async changeLessonLanguage(languageCode: string): Promise<void> {
+    await this.select(lessonLanguageSelector, languageCode);
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Starts the voiceover by clicking on the audio bar (dropdown) and the play circle.
+   */
+  async startVoiceover(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    const voiceoverDropdownElement = await this.page.$(voiceoverDropdown);
+    if (voiceoverDropdownElement) {
+      await this.clickOn(voiceoverDropdown);
+    }
+    await this.clickOn(playVoiceoverButton);
+    await this.page.waitForSelector(pauseVoiceoverButton);
+  }
+
+  /**
+   * Verifies if the voiceover is playing.
+   */
+  async verifyVoiceoverIsPlaying(shouldBePlaying: true): Promise<void> {
+    // If the pause button is present, it means the audio is playing.
+    await this.page.waitForSelector(pauseVoiceoverButton);
+    showMessage(`Voiceover is ${shouldBePlaying ? 'playing' : 'paused'}.`);
+  }
+
+  /**
+   * Pauses the voiceover by clicking on the pause button.
+   */
+  async pauseVoiceover(): Promise<void> {
+    await this.clickOn(pauseVoiceoverButton);
   }
 }
 

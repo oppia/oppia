@@ -51,7 +51,10 @@ export default {
     CreatingAnExploration: 'https://oppia.github.io/#/CreatingAnExploration',
     CreatorGuidelines: 'http://localhost:8181/creator-guidelines',
     Donate: 'http://localhost:8181/donate',
-    DonateWithThanksModal: 'http://localhost:8181/donate?thanks=',
+    DonatePageThanksModalURL: 'http://localhost:8181/donate?thanks=',
+    AboutPageThanksModalURL: 'http://localhost:8181/about?thanks=',
+    DesktopExternalLinkWatchAVideo:
+      'https://www.facebook.com/oppiaorg/videos/189487953721583/',
     EmbeddingAnExploration: 'https://oppia.github.io/#/EmbeddingAnExploration',
     ExplorationDesignTips: 'http://oppia.github.io/#/DesignTips',
     ExternalLink61MillionChildren:
@@ -62,9 +65,8 @@ export default {
       'fs46-more-than-half-children-not-learning-en-2017.pdf',
     ExternalLinkSourceUnesco:
       'https://uis.unesco.org/en/news/new-report-how-measure-equity-education',
-    DesktopExternalLinkWatchAVideo:
-      'https://www.facebook.com/oppiaorg/videos/189487953721583/',
     Electromagnetism: 'https://www.oppia.org/collection/wqCTKpKA0LBe',
+    FeedbackUpdates: 'http://localhost:8181/feedback-updates',
     GetStarted: 'http://localhost:8181/get-started',
     Home: 'http://localhost:8181/',
     ImpactReportUrl:
@@ -170,6 +172,18 @@ export default {
       '../../data/classroom-banner.png'
     ),
     profilePicture: path.resolve(__dirname, '../../data/profile-picture.svg'),
+    IntroContentVoiceoverInHindi: path.resolve(
+      __dirname,
+      '../../data/intro-content-hi.mp3'
+    ),
+    ContinueInteractionVoiceoverInHindi: path.resolve(
+      __dirname,
+      '../../data/continue-interaction-hi.mp3'
+    ),
+    LastCardContentVoiceoverInHindi: path.resolve(
+      __dirname,
+      '../../data/last-card-hi.mp3'
+    ),
   },
   OppiaSocials: {
     YouTube: {
