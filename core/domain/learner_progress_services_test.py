@@ -1655,6 +1655,14 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_and_untracked_topic_ids_for_user(
                 partially_learnt_topic_ids, learnt_topic_ids,
                 topic_ids_to_learn))
+        untracked_topic_summary_dicts = (
+            learner_progress_services
+            .get_displayable_untracked_topic_summary_dicts(
+                self.user_id,
+                topic_fetchers.get_all_topic_summaries()
+            )
+        )
+        self.assertEqual(len(untracked_topic_summary_dicts), 1)
         self.assertEqual(len(all_topics), 2)
         self.assertEqual(len(untracked_topics), 0)
 
