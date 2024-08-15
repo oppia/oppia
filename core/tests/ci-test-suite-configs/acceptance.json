@@ -65,6 +65,14 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/set-language-to-rtl-and-navigate-through-site.spec.ts"
     },
     {
+      "name": "logged-in-user/give-feedback-rate-and-report-an-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/give-feedback-rate-and-report-an-exploration.spec.ts"
+    },
+    {
+      "name": "logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard.spec.ts"
+    },
+    {
       "name": "logged-out-user/click-all-buttons-on-about-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-about-page.spec.ts"
     },
