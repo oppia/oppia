@@ -341,18 +341,21 @@ def delete_classroom(classroom_id: str) -> None:
     Args:
         classroom_id: str. ID of the classroom which is to be deleted.
     """
-    index_to_delete = next(
-        mapping.classroom_index
-        for mapping in get_all_classroom_id_to_index_mappings()
-        if mapping.classroom_id == classroom_id
-    )
     classroom_models.ClassroomModel.get(classroom_id).delete()
-    delete_classroom_id_to_index_mapping(classroom_id)
+    index_to_delete = None
 
     for mapping in get_all_classroom_id_to_index_mappings():
-        if mapping.classroom_index > index_to_delete:
-            mapping.classroom_index -= 1
-            update_classroom_id_to_index_mapping(mapping)
+        if mapping.classroom_id == classroom_id:
+            index_to_delete = mapping.classroom_index
+            break
+
+    if index_to_delete is not None:
+        delete_classroom_id_to_index_mapping(classroom_id)
+
+        for mapping in get_all_classroom_id_to_index_mappings():
+            if mapping.classroom_index > index_to_delete:
+                mapping.classroom_index -= 1
+                update_classroom_id_to_index_mapping(mapping)
 
 
 def get_all_classroom_id_to_index_mappings() -> List[
