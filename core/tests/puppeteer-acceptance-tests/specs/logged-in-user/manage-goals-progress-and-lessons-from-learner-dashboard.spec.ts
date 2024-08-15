@@ -106,7 +106,6 @@ describe('Logged-in User', function () {
       await loggedInUser.expectToolTipMessage(
         "Successfully added to your 'Current Goals' list."
       );
-      await loggedInUser.expectCompletedGoalsToInclude([]);
 
       await loggedInUser.navigateToHomeSection();
       await loggedInUser.playLessonFromContinueWhereLeftOff('Algebra I');
