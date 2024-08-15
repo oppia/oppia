@@ -28,8 +28,10 @@ from typing import Dict, List, Literal, Optional, overload
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classroom_models
+    from mypy_imports import transaction_services
 
 (classroom_models,) = models.Registry.import_models([models.Names.CLASSROOM])
+transaction_services = models.Registry.import_transaction_services()
 
 # TODO(#17246): Currently, the classroom data is stored in the config model and
 # we are planning to migrate the storage into a new Classroom model. After the
@@ -248,6 +250,7 @@ def update_classroom(
     classroom_model.put()
 
 
+@transaction_services.run_in_transaction_wrapper
 def create_new_classroom(
     classroom: classroom_config_domain.Classroom
 ) -> None:
@@ -258,6 +261,10 @@ def create_new_classroom(
             classroom.
     """
     classroom.validate()
+    classroom_models.ClassroomIdToIndexModel.create(
+        classroom.classroom_id,
+        len(get_all_classroom_id_to_index_mappings())
+    )
     classroom_models.ClassroomModel.create(
         classroom.classroom_id,
         classroom.name,
@@ -276,6 +283,7 @@ def create_new_classroom(
     )
 
 
+@transaction_services.run_in_transaction_wrapper
 def create_new_default_classroom(
         classroom_id: str, name: str, url_fragment: str
     ) -> classroom_config_domain.Classroom:
@@ -301,6 +309,11 @@ def create_new_default_classroom(
     classroom.require_valid_name(name)
     classroom.require_valid_url_fragment(url_fragment)
 
+    classroom_models.ClassroomIdToIndexModel.create(
+        classroom.classroom_id,
+        len(get_all_classroom_id_to_index_mappings())
+    )
+
     classroom_models.ClassroomModel.create(
         classroom.classroom_id,
         classroom.name,
@@ -321,13 +334,25 @@ def create_new_default_classroom(
     return classroom
 
 
+@transaction_services.run_in_transaction_wrapper
 def delete_classroom(classroom_id: str) -> None:
     """Deletes the classroom model.
 
     Args:
         classroom_id: str. ID of the classroom which is to be deleted.
     """
+    index_to_delete = next(
+        mapping.classroom_index
+        for mapping in get_all_classroom_id_to_index_mappings()
+        if mapping.classroom_id == classroom_id
+    )
     classroom_models.ClassroomModel.get(classroom_id).delete()
+    delete_classroom_id_to_index_mapping(classroom_id)
+
+    for mapping in get_all_classroom_id_to_index_mappings():
+        if mapping.classroom_index > index_to_delete:
+            mapping.classroom_index -= 1
+            update_classroom_id_to_index_mapping(mapping)
 
 
 def get_all_classroom_id_to_index_mappings() -> List[
@@ -337,12 +362,12 @@ def get_all_classroom_id_to_index_mappings() -> List[
     Returns:
         list(ClassroomIdToIndex). The list of mappings present in the datastore.
     """
-    backend_models = classroom_models.ClassroomIdToIndexModel.get_all()
-    mappings: List[classroom_config_domain.ClassroomIdToIndex] = [
+    all_classroom_models = classroom_models.ClassroomIdToIndexModel.get_all()
+    classroom_mappings: List[classroom_config_domain.ClassroomIdToIndex] = [
         get_classroom_id_to_index_from_model(model)
-        for model in backend_models
+        for model in all_classroom_models
     ]
-    return mappings
+    return classroom_mappings
 
 
 def get_classroom_id_to_index_from_model(
