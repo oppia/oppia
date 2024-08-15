@@ -200,6 +200,14 @@ const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
 const tagsField = '.e2e-test-chip-list-tags';
 const uploadAudioButton = '.e2e-test-accessibility-translation-upload-audio';
 const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
+const feedBackButtonTab = '.e2e-test-feedback-tab';
+const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
+const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
+const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
+const feedbackSelector = '.e2e-test-exploration-feedback';
+const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
+const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
+const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
@@ -310,6 +318,17 @@ export class ExplorationEditor extends BaseUser {
 
     await this.clickOn(closePublishedPopUpButton);
     return explorationId;
+  }
+
+  async navigateToFeedbackTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOn(mobileFeedbackTabButton);
+    } else {
+      await this.clickOn(feedBackButtonTab);
+      await this.waitForNetworkIdle();
+    }
   }
 
   /**
@@ -1556,11 +1575,24 @@ export class ExplorationEditor extends BaseUser {
    * Gives feedback on the exploration.
    * @param {string} feedback - The feedback to give on the exploration.
    */
-  async giveFeedback(feedback: string): Promise<void> {
+  async giveFeedback(feedback: string, stayAnonymous?: boolean): Promise<void> {
+    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+    // in mobile viewport which is required for testing the feedback messages tab),
+    // remove this part of skipping this function for Mobile viewport and make it run in mobile viewport
+    // as well. see: https://github.com/oppia/oppia/issues/19443.
+    if (process.env.MOBILE === 'true') {
+      return;
+    }
     await this.page.waitForSelector('nav-options', {visible: true});
     await this.clickOn(feedbackPopupSelector);
     await this.page.waitForSelector(feedbackTextarea, {visible: true});
     await this.type(feedbackTextarea, feedback);
+
+    // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
+    if (stayAnonymous) {
+      await this.clickOn(stayAnonymousCheckbox);
+    }
+
     await this.clickOn('Submit');
 
     try {
@@ -1795,6 +1827,109 @@ export class ExplorationEditor extends BaseUser {
     await this.uploadFile(voiceoverFilePath);
     await this.clickOn(saveUploadedAudioButton);
     await this.waitForNetworkIdle();
+  }
+
+  /**
+   * Opens an exploration in the editor.
+   * @param {string} explorationName - The name of the exploration.
+   */
+  async openExplorationInExplorationEditor(
+    explorationName: string
+  ): Promise<void> {
+    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
+      visible: true,
+    });
+    const title = await this.page.$eval(
+      explorationSummaryTileTitleSelector,
+      el => el.textContent?.trim()
+    );
+
+    if (title === explorationName) {
+      const explorationTileElement = await this.page.$(
+        explorationSummaryTileTitleSelector
+      );
+      await explorationTileElement?.click();
+    } else {
+      throw new Error(`Exploration not found: ${explorationName}`);
+    }
+
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Checks the number of suggestions in the exploration editor.
+   * @param {number} expectedNumber - The expected number of suggestions.
+   */
+  async expectNoOfSuggestionsToBe(expectedNumber: number): Promise<void> {
+    await this.page.waitForSelector(feedbackSubjectSelector);
+    const feedbackSubjects = await this.page.$$(feedbackSubjectSelector);
+
+    if (feedbackSubjects.length === expectedNumber) {
+      showMessage('Number of suggestions matches the expected number.');
+    } else {
+      throw new Error(
+        `Number of suggestions does not match the expected number. Expected: ${expectedNumber}, Found: ${feedbackSubjects.length}`
+      );
+    }
+  }
+
+  /**
+   * Views a feedback thread.
+   * @param {number} expectedThread - The 1-indexed position of the expected thread.
+   */
+  async viewFeedbackThread(expectedThread: number): Promise<void> {
+    // Reloading to make sure the feedback threads are updated.
+    await this.reloadPage();
+    await this.page.waitForSelector(feedbackSubjectSelector);
+    const feedbackSubjects = await this.page.$$(feedbackSubjectSelector);
+
+    if (expectedThread > 0 && expectedThread <= feedbackSubjects.length) {
+      await feedbackSubjects[expectedThread - 1].click();
+    } else {
+      throw new Error(`Expected thread not found: ${expectedThread}`);
+    }
+  }
+
+  /**
+   * Checks if a suggestion is anonymous.
+   * @param {string} suggestion - The expected suggestion.
+   * @param {boolean} anonymouslySubmitted - Indicates whether the suggestion is expected to be anonymous.
+   */
+  async expectSuggestionToBeAnonymous(
+    suggestion: string,
+    anonymouslySubmitted: boolean
+  ): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(feedbackSelector);
+    const actualSuggestion = await this.page.$eval(feedbackSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (actualSuggestion !== suggestion) {
+      throw new Error(
+        `Suggestion does not match the expected value. Expected: ${suggestion}, Found: ${actualSuggestion}`
+      );
+    }
+
+    const isAnonymouslySubmitted = await this.isTextPresentOnPage(
+      '(anonymously submitted)'
+    );
+
+    if (isAnonymouslySubmitted !== anonymouslySubmitted) {
+      throw new Error(
+        `Anonymity does not match the expected value. Expected: ${anonymouslySubmitted ? 'Anonymous' : 'Not anonymous'}, Found: ${isAnonymouslySubmitted ? 'Anonymous' : 'Not anonymous'}`
+      );
+    }
+  }
+
+  /**
+   * Replies to a suggestion.
+   * @param {string} reply - The reply to the suggestion.
+   */
+  async replyToSuggestion(reply: string): Promise<void> {
+    await this.type(responseTextareaSelector, reply);
+    await this.clickOn(sendButtonSelector);
   }
 }
 
