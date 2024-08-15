@@ -90,8 +90,8 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.selectAndOpenTopic('Arithmetic');
       await loggedOutUser.selectChapterWithinStoryToLearn(
-        'Algebra Chapter 1',
-        'Algebra Story 1'
+        'Algebra Story 1',
+        'Algebra Chapter 1'
       );
 
       // Since the exploration has only one state, the learner should see the last state of the exploration immediately after selecting the chapter.
