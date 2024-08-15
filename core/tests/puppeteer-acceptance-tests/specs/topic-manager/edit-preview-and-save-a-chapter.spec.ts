@@ -27,11 +27,12 @@ import {ConsoleReporter} from '../../utilities/common/console-reporter';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-ConsoleReporter.setConsoleErrorsToIgnore([
-  /ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'headerText: Story Editor'. Current value: 'headerText: Chapter Editor'./,
-  /Cannot read properties of undefined \(reading 'getStory'\)/,
-  /Occurred at http:\/\/localhost:8181\/story_editor\/.*\/#\/chapter_editor\/node_1 webpack:\/\/\/\..* Cannot read properties of undefined \(reading 'getStory'\)/,
-]);
+// TODO(#20829): Console error "Cannot read properties of undefined (reading 'getStory')" on navigation or reload in Story Editor. Since this error is getting triggered on navigation only, it is causing "Execution context destroyed error". So, creating and switching to a new tab to avoid this error. Please remove the statement below that creates and switches to new tab and this errorToIgnore below.
+const errorsToIgnore = [
+  /Cannot read properties of undefined \(reading 'storyEditorStalenessDetectionService'\)/,
+];
+
+ConsoleReporter.setConsoleErrorsToIgnore(errorsToIgnore);
 
 describe('Topic Manager', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
@@ -125,6 +126,7 @@ describe('Topic Manager', function () {
       );
 
       // Opening second chapter in chapter editor to add prerequisite skill as it only can be added if the skill is acquired in previous chapters, which is acquired in the chapter above.
+      await topicManager.createAndSwitchToNewTab();
       await topicManager.openChapterEditor(
         'Introduction to Polynomial Functions',
         'Journey into Quadratic Equations',

@@ -102,6 +102,11 @@ const CONSOLE_ERRORS_TO_FIX = [
     'ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was ' +
       "checked. Previous value: 'srcset: .*'\\. Current value: 'srcset: .*'\\."
   ),
+  // TODO(#20829): Console error "Cannot read properties of undefined (reading 'getStory')" on navigation or reload in Story Editor.
+  /Cannot read properties of undefined \(reading 'getStory'\)/,
+  /Occurred at http:\/\/localhost:8181\/story_editor\/.*\/#\/chapter_editor\/node_1 webpack:\/\/\/\..* Cannot read properties of undefined \(reading 'getStory'\)/,
+  // TODO(#20830): ExpressionChangedAfterItHasBeenCheckedError in Story Editor.
+  /ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'headerText: Story Editor'. Current value: 'headerText: Chapter Editor'./,
 ];
 
 export class ConsoleReporter {

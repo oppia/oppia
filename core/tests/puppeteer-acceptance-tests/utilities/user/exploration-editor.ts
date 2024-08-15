@@ -1836,17 +1836,25 @@ export class ExplorationEditor extends BaseUser {
   async openExplorationInExplorationEditor(
     explorationName: string
   ): Promise<void> {
-    await this.page.waitForSelector(explorationSummaryTileTitleSelector);
+    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
+      visible: true,
+    });
     const title = await this.page.$eval(
       explorationSummaryTileTitleSelector,
       el => el.textContent?.trim()
     );
 
     if (title === explorationName) {
-      await this.page.click(explorationSummaryTileTitleSelector);
+      const explorationTileElement = await this.page.$(
+        explorationSummaryTileTitleSelector
+      );
+      await explorationTileElement?.click();
     } else {
       throw new Error(`Exploration not found: ${explorationName}`);
     }
+
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**
