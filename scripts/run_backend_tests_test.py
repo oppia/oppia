@@ -398,15 +398,17 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         task_to_taskspec[tasks[1]] = run_backend_tests.TestingTaskSpec(
             task2_target, True)
 
-        with self.print_swap:
+        with self.print_swap, self.swap(
+            run_backend_tests, 'AVERAGE_TEST_CASE_TIME', 1
+        ):
             _, _, _, time_report = run_backend_tests.check_test_results(
                 tasks, task_to_taskspec)
 
         self.assertEqual(
             time_report,
             {
-                'scripts.new_script_one_test.py': 1.234,
-                'scripts.new_script_two_test.py': 2.542
+                'scripts.new_script_one_test.py': (1.234, 9),
+                'scripts.new_script_two_test.py': (2.542, 9)
             }
         )
         self.assertIn(
@@ -420,8 +422,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
         expected_time_report = {
-            'scripts.new_script_one_test.py': 1.234,
-            'scripts.new_script_two_test.py': 2.542
+            'scripts.new_script_one_test.py': [1.234, 9],
+            'scripts.new_script_two_test.py': [2.542, 9]
         }
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
@@ -440,8 +442,11 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_execute_task, swap_check_coverage:
             with self.swap_cloud_datastore_emulator, swap_check_results:
                 with swap_time_report_path, self.swap_redis_server:
-                    run_backend_tests.main(
-                        args=['--generate_time_report'])
+                    with self.swap(
+                        run_backend_tests, 'AVERAGE_TEST_CASE_TIME', 1
+                    ), self.print_swap:
+                        run_backend_tests.main(
+                            args=['--generate_time_report'])
         loaded_time_report = json.loads(time_report_temp_file.read())
         self.assertEqual(loaded_time_report, expected_time_report)
         time_report_temp_file.close()
