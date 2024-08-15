@@ -1656,7 +1656,6 @@ export class ExplorationEditor extends BaseUser {
       );
       return element ? element.textContent : null;
     }, languageCode);
-    this.page.waitForTimeout(30000);
 
     if (translationElementText === expectedTranslation) {
       showMessage('The expected translation exists in the modal.');
