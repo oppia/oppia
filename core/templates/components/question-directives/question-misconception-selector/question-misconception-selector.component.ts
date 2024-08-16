@@ -68,5 +68,11 @@ export class QuestionMisconceptionSelectorComponent implements OnInit {
 
   toggleMisconceptionFeedbackUsage(): void {
     this.misconceptionFeedbackIsUsed = !this.misconceptionFeedbackIsUsed;
+    let updatedValues = {
+      misconception: this.selectedMisconception,
+      skillId: this.selectedMisconceptionSkillId,
+      feedbackIsUsed: this.misconceptionFeedbackIsUsed,
+    };
+    this.updateMisconceptionValues.emit(updatedValues);
   }
 }

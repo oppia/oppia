@@ -19,13 +19,27 @@
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {ResponsesService} from '../../services/responses.service';
 
 @Component({
   selector: 'delete-state-skill-modal',
   templateUrl: './delete-state-skill-modal.component.html',
 })
 export class DeleteStateSkillModalComponent extends ConfirmOrCancelModal {
-  constructor(ngbActiveModal: NgbActiveModal) {
+  constructor(
+    ngbActiveModal: NgbActiveModal,
+    private responsesService: ResponsesService
+  ) {
     super(ngbActiveModal);
+  }
+
+  isAnyMisconceptionTagged(): boolean {
+    let answerGroups = this.responsesService.getAnswerGroups();
+    for (let answerGroup of answerGroups) {
+      if (answerGroup.taggedSkillMisconceptionId) {
+        return true;
+      }
+    }
+    return false;
   }
 }

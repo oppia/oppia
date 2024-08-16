@@ -34,6 +34,15 @@ import {TrainingDataEditorPanelService} from 'pages/exploration-editor-page/edit
 import {AlertsService} from 'services/alerts.service';
 import {ExternalSaveService} from 'services/external-save.service';
 import {AnswerGroupEditor} from './answer-group-editor.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    ExplorationEditorCanTagMisconceptions: {
+      isEnabled: true,
+    },
+  };
+}
 
 describe('Answer Group Editor Component', () => {
   let component: AnswerGroupEditor;
@@ -47,6 +56,7 @@ describe('Answer Group Editor Component', () => {
   let mockOnExternalSave = new EventEmitter();
   let mockOnUpdateAnswerChoices = new EventEmitter();
   let mockOnInteractionIdChanged = new EventEmitter();
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   let answerChoices = [
     {
@@ -74,6 +84,10 @@ describe('Answer Group Editor Component', () => {
         ResponsesService,
         AlertsService,
         TrainingDataEditorPanelService,
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
