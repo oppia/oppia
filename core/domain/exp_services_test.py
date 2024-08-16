@@ -2550,7 +2550,7 @@ states:
     content:
       content_id: content_0
       html: ''
-    inapplicable_skill_misconception_ids: null
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2590,7 +2590,7 @@ states:
     content:
       content_id: content_3
       html: %s
-    inapplicable_skill_misconception_ids: null
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2656,7 +2656,7 @@ states:
     content:
       content_id: content_0
       html: ''
-    inapplicable_skill_misconception_ids: null
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2696,7 +2696,7 @@ states:
     content:
       content_id: content_3
       html: %s
-    inapplicable_skill_misconception_ids: null
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3103,7 +3103,7 @@ classifier_model_id: null
 content:
   content_id: content_0
   html: ''
-inapplicable_skill_misconception_ids: null
+inapplicable_skill_misconception_ids: []
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -3147,7 +3147,7 @@ classifier_model_id: null
 content:
   content_id: content_3
   html: ''
-inapplicable_skill_misconception_ids: null
+inapplicable_skill_misconception_ids: []
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -3192,7 +3192,7 @@ classifier_model_id: null
 content:
   content_id: content_3
   html: ''
-inapplicable_skill_misconception_ids: null
+inapplicable_skill_misconception_ids: []
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -4513,7 +4513,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             exploration.next_content_id_index
         )
         self.assertEqual(
-            exploration.init_state.inapplicable_skill_misconception_ids, None)
+            exploration.init_state.inapplicable_skill_misconception_ids, [])
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
@@ -4534,7 +4534,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.states['State1'].inapplicable_skill_misconception_ids,
-            None
+            []
         )
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
@@ -6580,7 +6580,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
-    inapplicable_skill_misconception_ids: null
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6603,7 +6603,7 @@ states:
     content:
       content_id: content
       html: ''
-    inapplicable_skill_misconception_ids: null
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []

@@ -76,7 +76,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                     'html': '<p>Unicode Characters 😍😍😍😍</p>'
                 },
                 'linked_skill_id': None,
-                'inapplicable_skill_misconception_ids': None,
+                'inapplicable_skill_misconception_ids': [],
                 'interaction': {
                     'hints': [{
                         'hint_content': {
@@ -155,8 +155,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         '"next_content_id_index": 7, "tags"'
         ': [], "states_schema_version": 56, "title": "", "param_specs": {}, "id'
         '": "h51Bu72rDIqO", "states": {"Introduction": {"param_changes": [], "c'
-        'ard_is_checkpoint": true, "inapplicable_skill_misconception_ids": null'
-        ', "interaction": {"solution": null, "answer_gr'
+        'ard_is_checkpoint": true, "inapplicable_skill_misconception_ids": [], '
+        '"interaction": {"solution": null, "answer_gr'
         'oups": [{"tagged_skill_misconception_id": null, "outcome": {"param_cha'
         'nges": [], "feedback": {"content_id": "feedback_4", "html": "<p>This i'
         's great! \\u00ae\\u00ae</p>"}, "dest": "Introduction", "dest_if_really'

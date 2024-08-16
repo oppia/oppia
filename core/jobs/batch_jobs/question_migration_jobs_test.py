@@ -674,7 +674,7 @@ class MigrateQuestionJobTests(job_test_utils.JobTestBase):
         'card_is_checkpoint': False,
         'linked_skill_id': None,
         'classifier_model_id': None,
-        'inapplicable_skill_misconception_ids': None
+        'inapplicable_skill_misconception_ids': []
     }
 
     def test_empty_storage(self) -> None:
@@ -1051,7 +1051,7 @@ class AuditQuestionMigrationJobTests(job_test_utils.JobTestBase):
         'card_is_checkpoint': False,
         'linked_skill_id': None,
         'classifier_model_id': None,
-        'inapplicable_skill_misconception_ids': None
+        'inapplicable_skill_misconception_ids': []
     }
 
     def test_empty_storage(self) -> None:
