@@ -551,12 +551,8 @@ class TopicsToClassroomsRelationHandler(
         })
 
 
-class AllClassroomsSummaryHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """return a list of properties which are needed
-        to show a classroom card.
-    """
+class AllClassroomsSummaryHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Return a list of properties needed to show a classroom card."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -565,10 +561,21 @@ class AllClassroomsSummaryHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         classrooms = classroom_config_services.get_all_classrooms()
-        all_classrooms_summary_dicts: List[Dict[str, str|bool]] = []
+        classroom_id_to_index_mapping = {
+            mapping.classroom_id: mapping.classroom_index
+            for mapping in classroom_config_services
+            .get_all_classroom_id_to_index_mappings()
+        }
 
-        for classroom in classrooms:
-            classroom_summary_dict: Dict[str, str|bool] = {
+        sorted_classrooms = sorted(
+            classrooms,
+            key=lambda classroom: classroom_id_to_index_mapping.get(
+                classroom.classroom_id, float('inf')
+            )
+        )
+
+        all_classrooms_summary_dicts: List[Dict[str, str | bool]] = [
+            {
                 'classroom_id': classroom.classroom_id,
                 'name': classroom.name,
                 'url_fragment': classroom.url_fragment,
@@ -577,9 +584,8 @@ class AllClassroomsSummaryHandler(
                 'thumbnail_filename': classroom.thumbnail_data.filename,
                 'thumbnail_bg_color': classroom.banner_data.bg_color
             }
-            all_classrooms_summary_dicts.append(
-                classroom_summary_dict
-            )
+            for classroom in sorted_classrooms
+        ]
 
         self.render_json({
             'all_classrooms_summary': all_classrooms_summary_dicts
