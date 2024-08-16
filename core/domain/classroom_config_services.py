@@ -499,3 +499,21 @@ def delete_classroom_id_to_index_mapping(classroom_id: str) -> None:
         classroom_id: str. Classrom ID for which the mapping is to be deleted.
     """
     classroom_models.ClassroomIdToIndexModel.get(classroom_id).delete()
+
+
+@transaction_services.run_in_transaction_wrapper
+def update_classroom_id_to_index_mappings(
+        classroom_id_index_mappings: List[classroom_config_domain.ClassroomIdToIndex]
+) -> None:
+    """Updates an multiple ClassroomIdToIndexModel in the datastore.
+
+    Args:
+        classroom_id_index_mappings: List[ClassroomIdToIndex]. The domain objects for the
+            given mapping.
+
+    Raises:
+        Exception. No mapping found for the given classroom ID.
+    """
+
+    for mapping in classroom_id_index_mappings:
+        update_classroom_id_to_index_mapping(mapping)

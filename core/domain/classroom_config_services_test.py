@@ -384,3 +384,31 @@ class ClassroomIdToIndexServicesTests(test_utils.GenericTestBase):
         self.assertIsNone(
             classroom_config_services.get_classroom_id_to_index_by_id(
             self.classroom_id, strict=False))
+
+    def test_update_classroom_id_to_index_mappings(self) -> None:
+        mapping1 = classroom_config_services.get_classroom_id_to_index_by_id(
+            'classroom_1'
+        )
+        mapping2 = classroom_config_services.get_classroom_id_to_index_by_id(
+            'classroom_2'
+        )
+
+        self.assertEqual(mapping1.classroom_index, 0)
+        self.assertEqual(mapping2.classroom_index, 1)
+
+        mapping1.classroom_index = 1
+        mapping2.classroom_index = 0
+
+        classroom_config_services.update_classroom_id_to_index_mappings(
+            [mapping1, mapping2]
+        )
+
+        mapping1 = classroom_config_services.get_classroom_id_to_index_by_id(
+            'classroom_1'
+        )
+        mapping2 = classroom_config_services.get_classroom_id_to_index_by_id(
+            'classroom_2'
+        )
+
+        self.assertEqual(mapping1.classroom_index, 1)
+        self.assertEqual(mapping2.classroom_index, 0)

@@ -583,3 +583,48 @@ class AllClassroomsSummaryHandler(
         self.render_json({
             'all_classrooms_summary': all_classrooms_summary_dicts
         })
+
+
+class UpdateClassroomIndexMappingHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of UpdateClassroomOrderHandler's
+    normalized_payload dictionary.
+    """
+    classroom_index_mappings: List[classroom_config_domain.ClassroomIdToIndex]
+
+
+class UpdateClassroomIndexMappingHandler(
+    base.BaseHandler[
+        UpdateClassroomIndexMappingHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
+    """Updates the order of classrooms."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'classroom_index_mappings': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': classroom_config_domain.ClassroomIdToIndex
+                    }
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_classroom_admin_page
+    def put(self) -> None:
+        """Updates the order of classrooms.
+
+        Raise:
+            InvalidInputException: If there are validation errors
+                with classroom_order.
+        """
+        assert self.normalized_payload is not None
+        classroom_config_services.update_classroom_id_to_index_mappings(
+            self.normalized_payload['classroom_index_mappings']
+        )
+        self.render_json({})

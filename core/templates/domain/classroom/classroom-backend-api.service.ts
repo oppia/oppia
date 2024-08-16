@@ -481,6 +481,27 @@ export class ClassroomBackendApiService {
         );
     });
   }
+
+  updateClassroomIndexMappingAsync(classroomIdToNameIndexMappings: ClassroomIdToNameIndexMapping[]): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const body = new FormData();
+      body.append('payload', JSON.stringify({
+        'classroom_index_mappings': classroomIdToNameIndexMappings
+      }));
+
+      this.http
+        .put<void>('/update_classrooms_order', body)
+        .toPromise()
+        .then(
+          () => {
+            resolve();
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error);
+          }
+        );
+    });
+  }  
 }
 
 angular

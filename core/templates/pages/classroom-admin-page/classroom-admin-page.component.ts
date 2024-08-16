@@ -32,6 +32,7 @@ import {
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ClassroomEditorConfirmModalComponent} from './modals/classroom-editor-confirm-modal.component';
 import {DeleteClassroomConfirmModalComponent} from './modals/delete-classroom-confirm-modal.component';
+import {UpdateClassroomsOrderModalComponent} from './modals/update-classrooms-order-modal.component';
 import {CreateNewClassroomModalComponent} from './modals/create-new-classroom-modal.component';
 import {DeleteTopicFromClassroomModalComponent} from './modals/delete-topic-from-classroom-modal.component';
 import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
@@ -73,7 +74,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   tempClassroomData!: ExistingClassroomData;
 
   classroomCount: number = 0;
-  classroomIdToClassroomName: ClassroomIdToNameIndexMapping[] = [];
+  classroomIdToClassroomNameIndex: ClassroomIdToNameIndexMapping[] = [];
   existingClassroomNames: string[] = [];
 
   currentTopicOnEdit!: string;
@@ -191,7 +192,7 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.eligibleTopicNamesForPrerequisites = [];
         this.tempEligibleTopicNamesForPrerequisites = [];
 
-        this.existingClassroomNames = this.classroomIdToClassroomName.map(
+        this.existingClassroomNames = this.classroomIdToClassroomNameIndex.map(
           classroomMapping => classroomMapping.classroom_name
         );
         const index = this.existingClassroomNames.indexOf(
@@ -235,7 +236,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       .getAllClassroomIdToClassroomNameIndexDictAsync()
       .then(response => {
         this.pageIsInitialized = true;
-        this.classroomIdToClassroomName = response;
+        this.classroomIdToClassroomNameIndex = response;
         this.classroomCount = response.length;
       });
   }
@@ -429,18 +430,18 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomBackendApiService
           .deleteClassroomAsync(classroomId)
           .then(() => {
-            let classroomIndexToDelete = this.classroomIdToClassroomName.find(
+            let classroomIndexToDelete = this.classroomIdToClassroomNameIndex.find(
               classroomMapping => classroomMapping.classroom_id === classroomId
             )?.classroom_index;
 
-            this.classroomIdToClassroomName =
-              this.classroomIdToClassroomName.filter(
+            this.classroomIdToClassroomNameIndex =
+              this.classroomIdToClassroomNameIndex.filter(
                 classroomMapping =>
                   classroomMapping.classroom_id !== classroomId
               );
 
-            this.classroomIdToClassroomName =
-              this.classroomIdToClassroomName.map(classroomMapping => {
+            this.classroomIdToClassroomNameIndex =
+              this.classroomIdToClassroomNameIndex.map(classroomMapping => {
                 if (
                   classroomIndexToDelete &&
                   classroomMapping.classroom_index > classroomIndexToDelete
@@ -518,17 +519,39 @@ export class ClassroomAdminPageComponent implements OnInit {
       }
     );
     modalRef.componentInstance.existingClassroomNames =
-      this.classroomIdToClassroomName.map(
+      this.classroomIdToClassroomNameIndex.map(
         classroomMapping => classroomMapping.classroom_name
       );
     modalRef.result.then(
       classroomDict => {
-        this.classroomIdToClassroomName.push({
+        this.classroomIdToClassroomNameIndex.push({
           classroom_id: classroomDict.classroom_id,
           classroom_name: classroomDict.name,
-          classroom_index: this.classroomIdToClassroomName.length,
+          classroom_index: this.classroomIdToClassroomNameIndex.length,
         });
         this.classroomCount++;
+      },
+      () => {
+        this.classroomAdminDataService.reinitializeErrorMsgs();
+      }
+    );
+  }
+
+  changeClassroomsOrder(): void {
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      UpdateClassroomsOrderModalComponent,
+      {
+        backdrop: 'static',
+      }
+    );
+    modalRef.componentInstance.classroomIdToClassroomNameIndex = cloneDeep(this.classroomIdToClassroomNameIndex);
+    modalRef.result.then(
+      data => {
+        this.classroomBackendApiService.updateClassroomIndexMappingAsync(
+          data
+        ).then(() => {
+          this.classroomIdToClassroomNameIndex = data;
+        })
       },
       () => {
         this.classroomAdminDataService.reinitializeErrorMsgs();

@@ -35,6 +35,7 @@ import {TopicsDependencyGraphModalComponent} from './modals/topic-dependency-gra
 import {CommonModule} from '@angular/common';
 import {ClassroomAdminPageRootComponent} from './classroom-admin-page-root.component';
 import {ClassroomAdminAuthGuard} from './classroom-admin-auth.guard';
+import {UpdateClassroomsOrderModalComponent} from './modals/update-classrooms-order-modal.component';
 
 @NgModule({
   imports: [
@@ -62,6 +63,7 @@ import {ClassroomAdminAuthGuard} from './classroom-admin-auth.guard';
     CreateNewClassroomModalComponent,
     DeleteTopicFromClassroomModalComponent,
     TopicsDependencyGraphModalComponent,
+    UpdateClassroomsOrderModalComponent
   ],
   entryComponents: [
     ClassroomAdminNavbarComponent,
@@ -71,6 +73,7 @@ import {ClassroomAdminAuthGuard} from './classroom-admin-auth.guard';
     CreateNewClassroomModalComponent,
     DeleteTopicFromClassroomModalComponent,
     TopicsDependencyGraphModalComponent,
+    UpdateClassroomsOrderModalComponent
   ],
 })
 export class ClassroomAdminPageModule {}

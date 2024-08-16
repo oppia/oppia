@@ -712,4 +712,52 @@ describe('Classroom backend API service', function () {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
   }));
+
+
+  it('should update classroom index mappings successfully', fakeAsync(() => {
+    const mappings = [
+      { classroomId: 'classroom_1', classroomName: 'Math', classroomIndex: 1 },
+      { classroomId: 'classroom_2', classroomName: 'Science', classroomIndex: 2 },
+    ];
+    let service = classroomBackendApiService;
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    
+    service.updateClassroomIndexMappingAsync(mappings).then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne('/update_classrooms_order');
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body instanceof FormData).toBeTrue();
+
+    req.flush(null);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should handle error during classroom index mappings update', fakeAsync(() => {
+    const mappings = [
+      { classroomId: 'classroom_1', classroomName: 'Math', classroomIndex: 1 },
+    ];
+    let service = classroomBackendApiService;
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    service.updateClassroomIndexMappingAsync(mappings).then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne('/update_classrooms_order');
+    expect(req.request.method).toEqual('PUT');
+
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });

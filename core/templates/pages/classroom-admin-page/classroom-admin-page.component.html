@@ -1,7 +1,8 @@
 <mat-card class="oppia-editor-card-with-avatar">
   <div class="card-content">
-    <div>
+    <div class="top-content-container">
       <h3>Classroom details</h3>
+      <button class="btn add-new-classroom" (click)="changeClassroomsOrder()">Change Order</button>
     </div>
     <hr>
     <div>
@@ -14,7 +15,7 @@
         No classroom exists at this moment.
       </em>
 
-      <div *ngFor="let classroom of classroomIdToClassroomName">
+      <div *ngFor="let classroom of classroomIdToClassroomNameIndex">
         <div class="oppia-classroom-tile e2e-test-classroom-tile"
              (click)="getClassroomData(classroom.classroom_id)">
           <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())" class="e2e-test-classroom-tile-name">
@@ -563,6 +564,12 @@
 
   .oppia-on-off-switch-main {
     right: 44px;
+  }
+
+  .top-content-container {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
   }
 
   @media screen and (max-width: 768px) {
