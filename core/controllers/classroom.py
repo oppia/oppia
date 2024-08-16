@@ -139,7 +139,7 @@ class ClassroomDataHandler(
         self.render_json(self.values)
 
 
-class ClassroomIdToNameHandler(
+class ClassroomIdToNameIndexHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Fetches a list of classroom names corresponding to the given ids."""
@@ -151,11 +151,36 @@ class ClassroomIdToNameHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves a mapping of classroom IDs to classroom names."""
-        classroom_id_to_classroom_name = (
-            classroom_config_services.get_classroom_id_to_classroom_name_dict())
+
+        classroom_id_index_mappings = []
+        classrooms = classroom_config_services.get_all_classrooms()
+        classroom_index_mappings = {
+            mapping.classroom_id: mapping.classroom_index
+            for mapping in classroom_config_services
+            .get_all_classroom_id_to_index_mappings()
+        }
+
+        for classroom in classrooms:
+            # TODO(#20845): Remove this custom logic once we have
+            # populated the ClassroomIdToIndexModel for the math classroom.
+            if classroom.classroom_id in classroom_index_mappings.keys():
+                classroom_id_index_mapping_dict = {
+                    'classroom_id': classroom.classroom_id,
+                    'classroom_name': classroom.name,
+                    'classroom_index': (
+                        classroom_index_mappings[classroom.classroom_id]
+                    )
+                }
+            else:
+                classroom_id_index_mapping_dict = {
+                    'classroom_id': classroom.classroom_id,
+                    'classroom_name': classroom.name,
+                    'classroom_index': 0
+                }
+            classroom_id_index_mappings.append(classroom_id_index_mapping_dict)
 
         self.values.update({
-            'classroom_id_to_classroom_name': classroom_id_to_classroom_name
+            'classroom_id_to_name_index_mappings': classroom_id_index_mappings
         })
         self.render_json(self.values)
 

@@ -242,30 +242,40 @@ describe('Classroom backend API service', function () {
     expect(failHandler).toHaveBeenCalled();
   }));
 
-  it('should get all classroom id to classroom name dict', fakeAsync(() => {
+  it('should get all classroom id to name and index mappings', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
     let service = classroomBackendApiService;
 
     service
-      .getAllClassroomIdToClassroomNameDictAsync()
+      .getAllClassroomIdToClassroomNameIndexDictAsync()
       .then(successHandler, failHandler);
+
     let req = httpTestingController.expectOne(
-      ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE
+      ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_INDEX_HANDLER_URL_TEMPLATE
     );
     expect(req.request.method).toEqual('GET');
 
-    let classroomIdToClassroomNameDict = {
-      math_classroom_id: 'math',
-      physics_classroom_id: 'physics',
-    };
+    let classroomIdToNameIndexMappings = [
+      {
+        classroom_id: 'math_classroom_id',
+        classroom_name: 'math',
+        classroom_index: 1,
+      },
+      {
+        classroom_id: 'physics_classroom_id',
+        classroom_name: 'physics',
+        classroom_index: 2,
+      },
+    ];
+
     req.flush({
-      classroom_id_to_classroom_name: classroomIdToClassroomNameDict,
+      classroom_id_to_name_index_mappings: classroomIdToNameIndexMappings,
     });
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(classroomIdToClassroomNameDict);
+    expect(successHandler).toHaveBeenCalledWith(classroomIdToNameIndexMappings);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -278,10 +288,10 @@ describe('Classroom backend API service', function () {
       let service = classroomBackendApiService;
 
       service
-        .getAllClassroomIdToClassroomNameDictAsync()
+        .getAllClassroomIdToClassroomNameIndexDictAsync()
         .then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE
+        ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_INDEX_HANDLER_URL_TEMPLATE
       );
       expect(req.request.method).toEqual('GET');
 

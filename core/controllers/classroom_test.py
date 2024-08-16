@@ -286,18 +286,34 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         classroom_config_services.create_new_classroom(
             self.math_classroom)
 
-    def test_get_classroom_id_to_classroom_name(self) -> None:
+    def test_get_classroom_id_to_name_index_mappings(self) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        classroom_id_to_classroom_name = {
-            self.math_classroom_id: 'math',
-            self.physics_classroom_id: 'physics'
-        }
-        json_response = self.get_json(feconf.CLASSROOM_ID_TO_NAME_HANDLER_URL)
-        self.assertEqual(
-            json_response['classroom_id_to_classroom_name'],
-            classroom_id_to_classroom_name
+        classroom_config_services.delete_classroom_id_to_index_mapping(
+            self.physics_classroom_id
         )
+        expected_mappings = [
+            {
+                'classroom_id': self.physics_classroom_id,
+                'classroom_name': 'physics',
+                'classroom_index': 0
+            },
+            {
+                'classroom_id': self.math_classroom_id,
+                'classroom_name': 'math',
+                'classroom_index': 1
+            }
+        ]
+        json_response = self.get_json(
+            feconf.CLASSROOM_ID_TO_NAME_INDEX_HANDLER_URL)
+        self.assertEqual(
+            sorted(
+                json_response['classroom_id_to_name_index_mappings'],
+                key=lambda x: int(x['classroom_index'])
+            ),
+            sorted(expected_mappings, key=lambda x: int(x['classroom_index']))
+        )
+
         self.logout()
 
     def test_get_new_classroom_id(self) -> None:

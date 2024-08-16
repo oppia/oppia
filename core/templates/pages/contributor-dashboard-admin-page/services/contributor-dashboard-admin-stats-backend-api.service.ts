@@ -357,10 +357,10 @@ export class ContributorDashboardAdminStatsBackendApiService {
   async fetchTopicChoices(): Promise<TopicChoice[][]> {
     let topicPromises: Promise<TopicChoice[]>[] = [];
     return this.classroomBackendApiService
-      .getAllClassroomIdToClassroomNameDictAsync()
+      .getAllClassroomIdToClassroomNameIndexDictAsync()
       .then(classResponse => {
-        Object.keys(classResponse).forEach(classroomId =>
-          topicPromises.push(this.fetchTopics(classroomId))
+        classResponse.forEach(classroomMapping =>
+          topicPromises.push(this.fetchTopics(classroomMapping.classroom_id))
         );
         return Promise.all(topicPromises);
       });

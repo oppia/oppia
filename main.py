@@ -477,8 +477,8 @@ URLS = [
         diagnostic_test_player.DiagnosticTestQuestionsHandler
     ),
     get_redirect_route(
-        r'%s' % feconf.CLASSROOM_ID_TO_NAME_HANDLER_URL,
-        classroom.ClassroomIdToNameHandler),
+        r'%s' % feconf.CLASSROOM_ID_TO_NAME_INDEX_HANDLER_URL,
+        classroom.ClassroomIdToNameIndexHandler),
     get_redirect_route(
         r'%s' % feconf.UNUSED_TOPICS_HANDLER_URL,
         classroom.UnusedTopicsHandler),

@@ -27,6 +27,7 @@ import {
   ClassroomBackendDict,
   ClassroomDict,
   TopicClassroomRelationDict,
+  ClassroomIdToNameIndexMapping,
 } from '../../domain/classroom/classroom-backend-api.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ClassroomEditorConfirmModalComponent} from './modals/classroom-editor-confirm-modal.component';
@@ -72,7 +73,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   tempClassroomData!: ExistingClassroomData;
 
   classroomCount: number = 0;
-  classroomIdToClassroomName: {[classroomId: string]: string} = {};
+  classroomIdToClassroomName: ClassroomIdToNameIndexMapping[] = [];
   existingClassroomNames: string[] = [];
 
   currentTopicOnEdit!: string;
@@ -190,8 +191,8 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.eligibleTopicNamesForPrerequisites = [];
         this.tempEligibleTopicNamesForPrerequisites = [];
 
-        this.existingClassroomNames = Object.values(
-          this.classroomIdToClassroomName
+        this.existingClassroomNames = this.classroomIdToClassroomName.map(
+          classroomMapping => classroomMapping.classroom_name
         );
         const index = this.existingClassroomNames.indexOf(
           this.tempClassroomData.getClassroomName()
@@ -231,11 +232,11 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   getAllClassroomIdToClassroomName(): void {
     this.classroomBackendApiService
-      .getAllClassroomIdToClassroomNameDictAsync()
+      .getAllClassroomIdToClassroomNameIndexDictAsync()
       .then(response => {
         this.pageIsInitialized = true;
         this.classroomIdToClassroomName = response;
-        this.classroomCount = Object.keys(response).length;
+        this.classroomCount = response.length;
       });
   }
 
@@ -404,9 +405,6 @@ export class ClassroomAdminPageComponent implements OnInit {
       .updateClassroomDataAsync(classroomId, backendDict)
       .then(
         () => {
-          this.classroomIdToClassroomName[
-            this.tempClassroomData.getClassroomId()
-          ] = this.tempClassroomData.getClassroomName();
           this.classroomData = cloneDeep(this.tempClassroomData);
           this.classroomDataSaveInProgress = false;
         },
@@ -431,7 +429,11 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomBackendApiService
           .deleteClassroomAsync(classroomId)
           .then(() => {
-            delete this.classroomIdToClassroomName[classroomId];
+            this.classroomIdToClassroomName =
+              this.classroomIdToClassroomName.filter(
+                classroomMapping =>
+                  classroomMapping.classroom_id !== classroomId
+              );
             this.classroomCount--;
           });
       },
@@ -497,13 +499,17 @@ export class ClassroomAdminPageComponent implements OnInit {
         backdrop: 'static',
       }
     );
-    modalRef.componentInstance.existingClassroomNames = Object.values(
-      this.classroomIdToClassroomName
-    );
+    modalRef.componentInstance.existingClassroomNames =
+      this.classroomIdToClassroomName.map(
+        classroomMapping => classroomMapping.classroom_name
+      );
     modalRef.result.then(
       classroomDict => {
-        this.classroomIdToClassroomName[classroomDict.classroom_id] =
-          classroomDict.name;
+        this.classroomIdToClassroomName.push({
+          classroom_id: classroomDict.classroom_id,
+          classroom_name: classroomDict.name,
+          classroom_index: this.classroomIdToClassroomName.length,
+        });
         this.classroomCount++;
       },
       () => {

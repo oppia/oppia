@@ -142,13 +142,22 @@ describe('Classroom Admin Page component ', () => {
   });
 
   it('should initialize the component', fakeAsync(() => {
-    let response = {
-      mathClassroomId: 'math',
-      physicsClassroomId: 'physics',
-    };
+    let response = [
+      {
+        classroom_id: 'math_classroom_id',
+        classroom_name: 'math',
+        classroom_index: 1,
+      },
+      {
+        classroom_id: 'physics_classroom_id',
+        classroom_name: 'physics',
+        classroom_index: 2,
+      },
+    ];
+
     spyOn(
       classroomBackendApiService,
-      'getAllClassroomIdToClassroomNameDictAsync'
+      'getAllClassroomIdToClassroomNameIndexDictAsync'
     ).and.returnValue(Promise.resolve(response));
 
     expect(component.pageIsInitialized).toBeFalse();
@@ -298,13 +307,21 @@ describe('Classroom Admin Page component ', () => {
   }));
 
   it('should get classroom ID to classroom name and update classroom count', fakeAsync(() => {
-    let response = {
-      mathClassroomId: 'math',
-      physicsClassroomId: 'physics',
-    };
+    let response = [
+      {
+        classroom_id: 'math_classroom_id',
+        classroom_name: 'math',
+        classroom_index: 1,
+      },
+      {
+        classroom_id: 'physics_classroom_id',
+        classroom_name: 'physics',
+        classroom_index: 2,
+      },
+    ];
     spyOn(
       classroomBackendApiService,
-      'getAllClassroomIdToClassroomNameDictAsync'
+      'getAllClassroomIdToClassroomNameIndexDictAsync'
     ).and.returnValue(Promise.resolve(response));
 
     expect(component.pageIsInitialized).toBeFalse();

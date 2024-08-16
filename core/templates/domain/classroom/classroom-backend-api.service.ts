@@ -40,14 +40,14 @@ export interface ClassroomDataBackendDict {
   public_classrooms_count: number;
 }
 
-interface ClassroomIdToClassroomNameBackendDict {
-  classroom_id_to_classroom_name: {
-    [classroomId: string]: string;
-  };
+export interface ClassroomIdToNameIndexMapping {
+  classroom_id: string;
+  classroom_name: string;
+  classroom_index: number;
 }
 
-interface ClassroomIdToClassroomNameResponse {
-  [classroomId: string]: string;
+interface ClassroomIdToNameIndexMappingBackendDict {
+  classroom_id_to_name_index_mappings: ClassroomIdToNameIndexMapping[];
 }
 
 interface NewClassroomIdBackendDict {
@@ -359,16 +359,18 @@ export class ClassroomBackendApiService {
     });
   }
 
-  async getAllClassroomIdToClassroomNameDictAsync(): Promise<ClassroomIdToClassroomNameResponse> {
+  async getAllClassroomIdToClassroomNameIndexDictAsync(): Promise<
+    ClassroomIdToNameIndexMapping[]
+  > {
     return new Promise((resolve, reject) => {
       this.http
-        .get<ClassroomIdToClassroomNameBackendDict>(
-          ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE
+        .get<ClassroomIdToNameIndexMappingBackendDict>(
+          '/classroom_id_to_name_index_handler'
         )
         .toPromise()
         .then(
           response => {
-            resolve(response.classroom_id_to_classroom_name);
+            resolve(response.classroom_id_to_name_index_mappings);
           },
           errorResponse => {
             reject(errorResponse?.error?.error);
