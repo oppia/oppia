@@ -430,9 +430,11 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomBackendApiService
           .deleteClassroomAsync(classroomId)
           .then(() => {
-            let classroomIndexToDelete = this.classroomIdToClassroomNameIndex.find(
-              classroomMapping => classroomMapping.classroom_id === classroomId
-            )?.classroom_index;
+            let classroomIndexToDelete =
+              this.classroomIdToClassroomNameIndex.find(
+                classroomMapping =>
+                  classroomMapping.classroom_id === classroomId
+              )?.classroom_index;
 
             this.classroomIdToClassroomNameIndex =
               this.classroomIdToClassroomNameIndex.filter(
@@ -544,14 +546,16 @@ export class ClassroomAdminPageComponent implements OnInit {
         backdrop: 'static',
       }
     );
-    modalRef.componentInstance.classroomIdToClassroomNameIndex = cloneDeep(this.classroomIdToClassroomNameIndex);
+    modalRef.componentInstance.classroomIdToClassroomNameIndex = cloneDeep(
+      this.classroomIdToClassroomNameIndex
+    );
     modalRef.result.then(
       data => {
-        this.classroomBackendApiService.updateClassroomIndexMappingAsync(
-          data
-        ).then(() => {
-          this.classroomIdToClassroomNameIndex = data;
-        })
+        this.classroomBackendApiService
+          .updateClassroomIndexMappingAsync(data)
+          .then(() => {
+            this.classroomIdToClassroomNameIndex = data;
+          });
       },
       () => {
         this.classroomAdminDataService.reinitializeErrorMsgs();

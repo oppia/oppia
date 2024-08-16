@@ -1086,7 +1086,7 @@ TOPICS_TO_CLASSROOM_RELATION_HANDLER_URL = (
     '/topics_to_classrooms_relation'
 )
 ALL_CLASSROOMS_SUMMARY_HANDLER_URL = '/all_classrooms_summary'
-UPDATE_CLASSROOMS_ORDER_HANDLER_URL='/update_classrooms_order'
+UPDATE_CLASSROOMS_ORDER_HANDLER_URL = '/update_classrooms_order'
 CLASSROOM_HANDLER_URL = '/classroom'
 CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
 CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'

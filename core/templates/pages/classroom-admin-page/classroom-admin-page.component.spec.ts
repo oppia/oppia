@@ -689,7 +689,9 @@ describe('Classroom Admin Page component ', () => {
     tick();
 
     expect(ngbModal.open).toHaveBeenCalled();
-    expect(component.classroomIdToClassroomNameIndex).toEqual(expectedClassroom);
+    expect(component.classroomIdToClassroomNameIndex).toEqual(
+      expectedClassroom
+    );
     expect(component.classroomCount).toEqual(2);
   }));
 
@@ -1543,17 +1545,31 @@ describe('Classroom Admin Page component ', () => {
   it('should open the UpdateClassroomsOrderModal and update classroom index mappings', fakeAsync(() => {
     const modalRef = {
       componentInstance: {},
-      result: Promise.resolve([{ classroom_id: 'classroomId_1', classroom_index: 2 }])
+      result: Promise.resolve([
+        {classroom_id: 'classroomId_1', classroom_index: 2},
+      ]),
     } as NgbModalRef;
-  
+
     spyOn(ngbModal, 'open').and.returnValue(modalRef);
-    spyOn(classroomBackendApiService, 'updateClassroomIndexMappingAsync').and.returnValue(Promise.resolve());
-  
+    spyOn(
+      classroomBackendApiService,
+      'updateClassroomIndexMappingAsync'
+    ).and.returnValue(Promise.resolve());
+
     component.changeClassroomsOrder();
     tick();
-  
-    expect(ngbModal.open).toHaveBeenCalledWith(UpdateClassroomsOrderModalComponent, { backdrop: 'static' });
-    expect(classroomBackendApiService.updateClassroomIndexMappingAsync).toHaveBeenCalledWith([{ classroom_id: 'classroomId_1', classroom_index: 2 }]);
-    expect(component.classroomIdToClassroomNameIndex).toEqual([{ classroom_id: 'classroomId_1', classroom_index: 2 }]);
+
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      UpdateClassroomsOrderModalComponent,
+      {backdrop: 'static'}
+    );
+    expect(
+      classroomBackendApiService.updateClassroomIndexMappingAsync
+    ).toHaveBeenCalledWith([
+      {classroom_id: 'classroomId_1', classroom_index: 2},
+    ]);
+    expect(component.classroomIdToClassroomNameIndex).toEqual([
+      {classroom_id: 'classroomId_1', classroom_index: 2},
+    ]);
   }));
 });

@@ -16,11 +16,11 @@
  * @fileoverview Update classrooms order modal component.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { ClassroomIdToNameIndexMapping } from '../../../domain/classroom/classroom-backend-api.service';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {ClassroomIdToNameIndexMapping} from '../../../domain/classroom/classroom-backend-api.service';
+import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'oppia-update-classrooms-order-modal',
@@ -33,8 +33,12 @@ export class UpdateClassroomsOrderModalComponent extends ConfirmOrCancelModal {
 
   classroomIdToClassroomNameIndex: ClassroomIdToNameIndexMapping[] = [];
 
-  drop(event: CdkDragDrop<ClassroomIdToNameIndexMapping[]>) {
-    moveItemInArray(this.classroomIdToClassroomNameIndex, event.previousIndex, event.currentIndex);
+  drop(event: CdkDragDrop<ClassroomIdToNameIndexMapping[]>): void {
+    moveItemInArray(
+      this.classroomIdToClassroomNameIndex,
+      event.previousIndex,
+      event.currentIndex
+    );
     this.classroomIdToClassroomNameIndex.forEach((classroom, index) => {
       classroom.classroom_index = index;
     });

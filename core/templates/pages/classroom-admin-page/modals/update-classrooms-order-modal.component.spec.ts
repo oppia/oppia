@@ -16,11 +16,11 @@
  * @fileoverview Tests for update classrooms order modal.
  */
 
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UpdateClassroomsOrderModalComponent } from './update-classrooms-order-modal.component';
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ClassroomIdToNameIndexMapping } from '../../../domain/classroom/classroom-backend-api.service';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {UpdateClassroomsOrderModalComponent} from './update-classrooms-order-modal.component';
+import {CdkDragDrop} from '@angular/cdk/drag-drop';
+import {ClassroomIdToNameIndexMapping} from '../../../domain/classroom/classroom-backend-api.service';
 
 describe('UpdateClassroomsOrderModalComponent', () => {
   let component: UpdateClassroomsOrderModalComponent;
@@ -28,13 +28,14 @@ describe('UpdateClassroomsOrderModalComponent', () => {
   let mockNgbActiveModal: jasmine.SpyObj<NgbActiveModal>;
 
   beforeEach(async () => {
-    mockNgbActiveModal = jasmine.createSpyObj('NgbActiveModal', ['close', 'dismiss']);
+    mockNgbActiveModal = jasmine.createSpyObj('NgbActiveModal', [
+      'close',
+      'dismiss',
+    ]);
 
     await TestBed.configureTestingModule({
-      declarations: [ UpdateClassroomsOrderModalComponent ],
-      providers: [
-        { provide: NgbActiveModal, useValue: mockNgbActiveModal }
-      ]
+      declarations: [UpdateClassroomsOrderModalComponent],
+      providers: [{provide: NgbActiveModal, useValue: mockNgbActiveModal}],
     }).compileComponents();
 
     fixture = TestBed.createComponent(UpdateClassroomsOrderModalComponent);
@@ -52,34 +53,36 @@ describe('UpdateClassroomsOrderModalComponent', () => {
 
   it('should reorder items and update classroom_index when drop is called', () => {
     component.classroomIdToClassroomNameIndex = [
-      { classroom_id: '1', classroom_name: 'Math', classroom_index: 0 },
-      { classroom_id: '2', classroom_name: 'Science', classroom_index: 1 },
-      { classroom_id: '3', classroom_name: 'History', classroom_index: 2 }
+      {classroom_id: '1', classroom_name: 'Math', classroom_index: 0},
+      {classroom_id: '2', classroom_name: 'Science', classroom_index: 1},
+      {classroom_id: '3', classroom_name: 'History', classroom_index: 2},
     ];
 
     const dropEvent = {
       previousIndex: 0,
-      currentIndex: 2
+      currentIndex: 2,
     } as CdkDragDrop<ClassroomIdToNameIndexMapping[]>;
 
     component.drop(dropEvent);
 
     expect(component.classroomIdToClassroomNameIndex).toEqual([
-      { classroom_id: '2', classroom_name: 'Science', classroom_index: 0 },
-      { classroom_id: '3', classroom_name: 'History', classroom_index: 1 },
-      { classroom_id: '1', classroom_name: 'Math', classroom_index: 2 }
+      {classroom_id: '2', classroom_name: 'Science', classroom_index: 0},
+      {classroom_id: '3', classroom_name: 'History', classroom_index: 1},
+      {classroom_id: '1', classroom_name: 'Math', classroom_index: 2},
     ]);
   });
 
   it('should close the modal with the updated classroomIdToClassroomNameIndex when save is called', () => {
     component.classroomIdToClassroomNameIndex = [
-      { classroom_id: '1', classroom_name: 'Math', classroom_index: 0 },
-      { classroom_id: '2', classroom_name: 'Science', classroom_index: 1 }
+      {classroom_id: '1', classroom_name: 'Math', classroom_index: 0},
+      {classroom_id: '2', classroom_name: 'Science', classroom_index: 1},
     ];
 
     component.save();
 
-    expect(mockNgbActiveModal.close).toHaveBeenCalledWith(component.classroomIdToClassroomNameIndex);
+    expect(mockNgbActiveModal.close).toHaveBeenCalledWith(
+      component.classroomIdToClassroomNameIndex
+    );
   });
 
   it('should dismiss the modal when close is called', () => {

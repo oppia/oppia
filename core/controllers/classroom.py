@@ -152,7 +152,7 @@ class ClassroomIdToNameIndexHandler(
     def get(self) -> None:
         """Retrieves a mapping of classroom IDs to classroom names."""
 
-        classroom_id_index_mappings = []
+        classroom_id_index_mappings: List[Dict[str, str|int]] = []
         classrooms = classroom_config_services.get_all_classrooms()
         classroom_index_mappings = {
             mapping.classroom_id: mapping.classroom_index
@@ -161,6 +161,7 @@ class ClassroomIdToNameIndexHandler(
         }
 
         for classroom in classrooms:
+            classroom_id_index_mapping_dict: Dict[str, str | int]
             # TODO(#20845): Remove this custom logic once we have
             # populated the ClassroomIdToIndexModel for the math classroom.
             if classroom.classroom_id in classroom_index_mappings.keys():
@@ -168,7 +169,7 @@ class ClassroomIdToNameIndexHandler(
                     'classroom_id': classroom.classroom_id,
                     'classroom_name': classroom.name,
                     'classroom_index': (
-                        classroom_index_mappings[classroom.classroom_id]
+                        int(classroom_index_mappings[classroom.classroom_id])
                     )
                 }
             else:
@@ -589,6 +590,7 @@ class UpdateClassroomIndexMappingHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of UpdateClassroomOrderHandler's
     normalized_payload dictionary.
     """
+
     classroom_index_mappings: List[classroom_config_domain.ClassroomIdToIndex]
 
 
@@ -608,7 +610,9 @@ class UpdateClassroomIndexMappingHandler(
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'object_class': classroom_config_domain.ClassroomIdToIndex
+                        'object_class': (
+                            classroom_config_domain.ClassroomIdToIndex
+                        )
                     }
                 }
             }

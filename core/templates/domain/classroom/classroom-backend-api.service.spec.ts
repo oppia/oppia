@@ -25,7 +25,6 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {ClassroomData} from 'domain/classroom/classroom-data.model';
 import {CreatorTopicSummaryBackendDict} from 'domain/topic/creator-topic-summary.model';
-import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 
 describe('Classroom backend API service', function () {
   let classroomBackendApiService: ClassroomBackendApiService;
@@ -713,17 +712,18 @@ describe('Classroom backend API service', function () {
     expect(failHandler).toHaveBeenCalled();
   }));
 
-
   it('should update classroom index mappings successfully', fakeAsync(() => {
     const mappings = [
-      { classroomId: 'classroom_1', classroomName: 'Math', classroomIndex: 1 },
-      { classroomId: 'classroom_2', classroomName: 'Science', classroomIndex: 2 },
+      {classroomId: 'classroom_1', classroomName: 'Math', classroomIndex: 1},
+      {classroomId: 'classroom_2', classroomName: 'Science', classroomIndex: 2},
     ];
     let service = classroomBackendApiService;
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    
-    service.updateClassroomIndexMappingAsync(mappings).then(successHandler, failHandler);
+
+    service
+      .updateClassroomIndexMappingAsync(mappings)
+      .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne('/update_classrooms_order');
     expect(req.request.method).toEqual('PUT');
@@ -739,13 +739,15 @@ describe('Classroom backend API service', function () {
 
   it('should handle error during classroom index mappings update', fakeAsync(() => {
     const mappings = [
-      { classroomId: 'classroom_1', classroomName: 'Math', classroomIndex: 1 },
+      {classroomId: 'classroom_1', classroomName: 'Math', classroomIndex: 1},
     ];
     let service = classroomBackendApiService;
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    service.updateClassroomIndexMappingAsync(mappings).then(successHandler, failHandler);
+    service
+      .updateClassroomIndexMappingAsync(mappings)
+      .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne('/update_classrooms_order');
     expect(req.request.method).toEqual('PUT');
