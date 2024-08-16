@@ -230,7 +230,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.getAllTopicsToClassroomRelation();
   }
 
-  getAllClassroomIdToClassroomName(): void {
+  getAllClassroomIdToClassroomNameIndex(): void {
     this.classroomBackendApiService
       .getAllClassroomIdToClassroomNameIndexDictAsync()
       .then(response => {
@@ -429,11 +429,29 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomBackendApiService
           .deleteClassroomAsync(classroomId)
           .then(() => {
+            let classroomIndexToDelete = this.classroomIdToClassroomName.find(
+              classroomMapping => classroomMapping.classroom_id === classroomId
+            )?.classroom_index;
+
             this.classroomIdToClassroomName =
               this.classroomIdToClassroomName.filter(
                 classroomMapping =>
                   classroomMapping.classroom_id !== classroomId
               );
+
+            this.classroomIdToClassroomName =
+              this.classroomIdToClassroomName.map(classroomMapping => {
+                if (
+                  classroomIndexToDelete &&
+                  classroomMapping.classroom_index > classroomIndexToDelete
+                ) {
+                  return {
+                    ...classroomMapping,
+                    classroom_index: classroomMapping.classroom_index - 1,
+                  };
+                }
+                return classroomMapping;
+              });
             this.classroomCount--;
           });
       },
@@ -519,7 +537,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getAllClassroomIdToClassroomName();
+    this.getAllClassroomIdToClassroomNameIndex();
   }
 
   setTopicDependencyByTopicName(

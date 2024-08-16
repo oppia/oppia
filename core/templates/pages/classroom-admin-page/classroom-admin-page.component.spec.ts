@@ -326,7 +326,7 @@ describe('Classroom Admin Page component ', () => {
 
     expect(component.pageIsInitialized).toBeFalse();
 
-    component.getAllClassroomIdToClassroomName();
+    component.getAllClassroomIdToClassroomNameIndex();
     tick();
 
     expect(component.pageIsInitialized).toBeTrue();
@@ -524,7 +524,7 @@ describe('Classroom Admin Page component ', () => {
     component.classroomViewerMode = false;
     component.classroomEditorMode = true;
     component.classroomDataIsChanged = true;
-    component.classroomIdToClassroomName = {};
+    component.classroomIdToClassroomName = [];
     component.tempClassroomData =
       ExistingClassroomData.createClassroomFromDict(dummyClassroomDict);
     component.classroomData =
@@ -638,15 +638,35 @@ describe('Classroom Admin Page component ', () => {
   );
 
   it('should be able to delete classroom', fakeAsync(() => {
-    component.classroomIdToClassroomName = {
-      mathClassroomId: 'math',
-      chemistryClassroomId: 'chemistry',
-      physicsClassroomId: 'physics',
-    };
-    let expectedClassroom = {
-      chemistryClassroomId: 'chemistry',
-      physicsClassroomId: 'physics',
-    };
+    component.classroomIdToClassroomName = [
+      {
+        classroom_name: 'math',
+        classroom_id: 'mathClassroomId',
+        classroom_index: 0,
+      },
+      {
+        classroom_name: 'chemistry',
+        classroom_id: 'chemistryClassroomId',
+        classroom_index: 1,
+      },
+      {
+        classroom_name: 'physics',
+        classroom_id: 'physicsClassroomId',
+        classroom_index: 2,
+      },
+    ];
+    let expectedClassroom = [
+      {
+        classroom_name: 'chemistry',
+        classroom_id: 'chemistryClassroomId',
+        classroom_index: 0,
+      },
+      {
+        classroom_name: 'physics',
+        classroom_id: 'physicsClassroomId',
+        classroom_index: 1,
+      },
+    ];
     component.classroomCount = 3;
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {},
@@ -665,16 +685,40 @@ describe('Classroom Admin Page component ', () => {
   }));
 
   it('should be able to cancel modal for not deleting the classroom', fakeAsync(() => {
-    component.classroomIdToClassroomName = {
-      mathClassroomId: 'math',
-      chemistryClassroomId: 'chemistry',
-      physicsClassroomId: 'physics',
-    };
-    let expectedClassroomIdToName = {
-      mathClassroomId: 'math',
-      chemistryClassroomId: 'chemistry',
-      physicsClassroomId: 'physics',
-    };
+    component.classroomIdToClassroomName = [
+      {
+        classroom_name: 'math',
+        classroom_id: 'mathClassroomId',
+        classroom_index: 0,
+      },
+      {
+        classroom_name: 'chemistry',
+        classroom_id: 'chemistryClassroomId',
+        classroom_index: 2,
+      },
+      {
+        classroom_name: 'physics',
+        classroom_id: 'physicsClassroomId',
+        classroom_index: 2,
+      },
+    ];
+    let expectedClassroomIdToName = [
+      {
+        classroom_name: 'math',
+        classroom_id: 'mathClassroomId',
+        classroom_index: 0,
+      },
+      {
+        classroom_name: 'chemistry',
+        classroom_id: 'chemistryClassroomId',
+        classroom_index: 2,
+      },
+      {
+        classroom_name: 'physics',
+        classroom_id: 'physicsClassroomId',
+        classroom_index: 2,
+      },
+    ];
     component.classroomCount = 3;
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {},
@@ -695,15 +739,35 @@ describe('Classroom Admin Page component ', () => {
   }));
 
   it('should be able to create new classroom', fakeAsync(() => {
-    component.classroomIdToClassroomName = {
-      mathClassroomId: 'math',
-      chemistryClassroomId: 'chemistry',
-    };
-    let expectedClassroomIdToName = {
-      mathClassroomId: 'math',
-      chemistryClassroomId: 'chemistry',
-      physicsClassroomId: 'physics',
-    };
+    component.classroomIdToClassroomName = [
+      {
+        classroom_name: 'math',
+        classroom_id: 'mathClassroomId',
+        classroom_index: 0,
+      },
+      {
+        classroom_name: 'chemistry',
+        classroom_id: 'chemistryClassroomId',
+        classroom_index: 2,
+      },
+    ];
+    let expectedClassroomIdToName = [
+      {
+        classroom_name: 'math',
+        classroom_id: 'mathClassroomId',
+        classroom_index: 0,
+      },
+      {
+        classroom_name: 'chemistry',
+        classroom_id: 'chemistryClassroomId',
+        classroom_index: 2,
+      },
+      {
+        classroom_name: 'physics',
+        classroom_id: 'physicsClassroomId',
+        classroom_index: 2,
+      },
+    ];
     let classroomDict = {
       classroom_id: 'physicsClassroomId',
       name: 'physics',
@@ -729,14 +793,30 @@ describe('Classroom Admin Page component ', () => {
   }));
 
   it('should be able to cancel create classsroom modal', fakeAsync(() => {
-    component.classroomIdToClassroomName = {
-      mathClassroomId: 'math',
-      chemistryClassroomId: 'chemistry',
-    };
-    let expectedClassroomIdToName = {
-      mathClassroomId: 'math',
-      chemistryClassroomId: 'chemistry',
-    };
+    component.classroomIdToClassroomName = [
+      {
+        classroom_name: 'math',
+        classroom_id: 'mathClassroomId',
+        classroom_index: 0,
+      },
+      {
+        classroom_name: 'chemistry',
+        classroom_id: 'chemistryClassroomId',
+        classroom_index: 2,
+      },
+    ];
+    let expectedClassroomIdToName = [
+      {
+        classroom_name: 'math',
+        classroom_id: 'mathClassroomId',
+        classroom_index: 0,
+      },
+      {
+        classroom_name: 'chemistry',
+        classroom_id: 'chemistryClassroomId',
+        classroom_index: 2,
+      },
+    ];
 
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {
