@@ -4661,7 +4661,7 @@ states:
     content:
       content_id: content_0
       html: ''
-    inapplicable_skill_misconception_ids: null
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4692,7 +4692,7 @@ states:
     content:
       content_id: content_2
       html: ''
-    inapplicable_skill_misconception_ids: null
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6872,7 +6872,7 @@ states:
     content:
       content_id: content
       html: ''
-    inapplicable_skill_misconception_ids: null
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -6932,7 +6932,7 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
-    inapplicable_skill_misconception_ids: null
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -6958,7 +6958,7 @@ states:
     content:
       content_id: content
       html: ''
-    inapplicable_skill_misconception_ids: null
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -12796,7 +12796,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 translation_domain.ContentType.DEFAULT_OUTCOME)
             return {
                 'linked_skill_id': None,
-                'inapplicable_skill_misconception_ids': None,
+                'inapplicable_skill_misconception_ids': [],
                 'classifier_model_id': None,
                 'content': {
                     'content_id': content_id_for_content,
