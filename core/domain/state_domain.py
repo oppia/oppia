@@ -25,6 +25,7 @@ import math
 import re
 
 from core import android_validation_constants
+from core import feature_flag_list
 from core import feconf
 from core import schema_utils
 from core import utils
@@ -40,6 +41,7 @@ from typing import (
     Type, TypedDict, TypeVar, Union, cast, overload
 )
 
+from core.domain import feature_flag_services # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
@@ -239,7 +241,12 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
 
         if (
             self.tagged_skill_misconception_id is not None and
-            not tagged_skill_misconception_id_required
+            not tagged_skill_misconception_id_required and
+            not feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.
+                EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value,
+                None
+            )
         ):
             raise utils.ValidationError(
                 'Expected tagged skill misconception id to be None, '
