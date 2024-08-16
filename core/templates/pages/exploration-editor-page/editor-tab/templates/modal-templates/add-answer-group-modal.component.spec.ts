@@ -37,6 +37,7 @@ import {AddAnswerGroupModalComponent} from './add-answer-group-modal.component';
 import {NO_ERRORS_SCHEMA, ElementRef} from '@angular/core';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockActiveModal {
   close(): void {
@@ -48,6 +49,14 @@ class MockActiveModal {
   }
 }
 
+class MockPlatformFeatureService {
+  status = {
+    ExplorationEditorCanTagMisconceptions: {
+      isEnabled: true,
+    },
+  };
+}
+
 describe('Add Answer Group Modal Component', () => {
   let component: AddAnswerGroupModalComponent;
   let fixture: ComponentFixture<AddAnswerGroupModalComponent>;
@@ -55,6 +64,7 @@ describe('Add Answer Group Modal Component', () => {
   var stateEditorService: StateEditorService;
   var generateContentIdService: GenerateContentIdService;
   var testSubscriptions: Subscription;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   const saveOutcomeDestDetailsSpy = jasmine.createSpy('saveOutcomeDestDetails');
 
@@ -69,6 +79,10 @@ describe('Add Answer Group Modal Component', () => {
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
