@@ -252,7 +252,7 @@ describe('Classroom backend API service', function () {
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_INDEX_HANDLER_URL_TEMPLATE
+      '/classroom_id_to_name_index_handler'
     );
     expect(req.request.method).toEqual('GET');
 
@@ -291,7 +291,7 @@ describe('Classroom backend API service', function () {
         .getAllClassroomIdToClassroomNameIndexDictAsync()
         .then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_INDEX_HANDLER_URL_TEMPLATE
+        '/classroom_id_to_name_index_handler'
       );
       expect(req.request.method).toEqual('GET');
 
