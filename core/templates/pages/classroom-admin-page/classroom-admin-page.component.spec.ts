@@ -638,7 +638,7 @@ describe('Classroom Admin Page component ', () => {
   );
 
   it('should be able to delete classroom', fakeAsync(() => {
-    component.classroomIdToClassroomName = [
+    const response = [
       {
         classroom_name: 'math',
         classroom_id: 'mathClassroomId',
@@ -655,6 +655,14 @@ describe('Classroom Admin Page component ', () => {
         classroom_index: 2,
       },
     ];
+    spyOn(
+      classroomBackendApiService,
+      'getAllClassroomIdToClassroomNameIndexDictAsync'
+    ).and.returnValue(Promise.resolve(response));
+
+    component.ngOnInit();
+    tick();
+
     let expectedClassroom = [
       {
         classroom_name: 'chemistry',
@@ -694,7 +702,7 @@ describe('Classroom Admin Page component ', () => {
       {
         classroom_name: 'chemistry',
         classroom_id: 'chemistryClassroomId',
-        classroom_index: 2,
+        classroom_index: 1,
       },
       {
         classroom_name: 'physics',
@@ -711,7 +719,7 @@ describe('Classroom Admin Page component ', () => {
       {
         classroom_name: 'chemistry',
         classroom_id: 'chemistryClassroomId',
-        classroom_index: 2,
+        classroom_index: 1,
       },
       {
         classroom_name: 'physics',
