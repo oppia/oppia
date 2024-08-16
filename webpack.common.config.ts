@@ -65,6 +65,8 @@ module.exports = {
     },
   },
   entry: {
+    blog_dashboard:
+      commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
     console_errors: commonPrefix + '/tests/console_errors.import.ts',
     creator_dashboard:
       commonPrefix +
@@ -204,6 +206,18 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false,
       statusCode: 400,
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['blog_dashboard'],
+      filename: 'blog-dashboard-page.mainpage.html',
+      hybrid: true,
+      meta: defaultMeta,
+      template:
+        commonPrefix +
+        '/pages/blog-dashboard-page/' +
+        'blog-dashboard-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false,
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
