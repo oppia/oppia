@@ -640,7 +640,7 @@ class EditExpStatePropertyInapplicableSkillMisconceptionIdsCmd(
     property_name: Literal['inapplicable_skill_misconception_ids']
     state_name: str
     new_value: List[str]
-    old_value: Optional[List[str]]
+    old_value: List[str]
 
 
 class EditExpStatePropertyInteractionCustArgsCmd(ExplorationChange):
