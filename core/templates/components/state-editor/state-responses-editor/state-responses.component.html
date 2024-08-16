@@ -128,9 +128,9 @@
                 <div class="oppia-editor-card-section">
                   <div class="oppia-rule-body-container e2e-test-response-body-default">
                     <oppia-answer-group-editor class="e2e-test-response-body"
-                                               [rules]="null"
+                                               [rules]="answerGroups[activeAnswerGroupIndex]?.rules"
                                                [outcome]="defaultOutcome"
-                                               [taggedSkillMisconceptionId]="null"
+                                               [taggedSkillMisconceptionId]="answerGroups[activeAnswerGroupIndex]?.taggedSkillMisconceptionId"
                                                [isEditable]="editabilityService.isEditable()"
                                                [suppressWarnings]="shouldHideDefaultAnswerGroup()"
                                                [displayFeedback]="!isLinearWithNoFeedback(defaultOutcome)"

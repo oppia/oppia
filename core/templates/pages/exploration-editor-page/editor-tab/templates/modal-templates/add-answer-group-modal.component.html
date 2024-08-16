@@ -66,7 +66,7 @@
     <strong><label for="labelledAsCorrect">The answers in this group are correct</label></strong>
   </div>
 
-  <oppia-question-misconception-editor *ngIf="questionModeEnabled"
+  <oppia-question-misconception-editor *ngIf="questionModeEnabled || tagMisconceptionsFeatureFlagIsEnabled"
                                        (saveTaggedMisconception)="updateTaggedMisconception($event)"
                                        (saveAnswerGroupFeedback)="updateAnswerGroupFeedback($event)"
                                        [isEditable]="true"
@@ -79,7 +79,7 @@
 <div class="modal-footer">
   <button class="btn btn-secondary e2e-test-close-add-response-modal" (click)="cancel()">Cancel</button>
   <button class="btn btn-success e2e-test-add-new-response" (click)="saveResponse(false)" [disabled]="(isInvalid || validation) || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save Response</button>
-  <button class="btn btn-success" (click)="saveResponse(true)" [disabled]="(isInvalid || validation) || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save and Add Another</button>
+  <button class="btn btn-success e2e-test-add-another-response" (click)="saveResponse(true)" [disabled]="(isInvalid || validation) || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save and Add Another</button>
 </div>
 
 <style>

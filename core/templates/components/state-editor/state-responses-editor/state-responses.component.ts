@@ -105,6 +105,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   enableSolicitAnswerDetailsFeature: boolean = false;
   containsOptionalMisconceptions: boolean = false;
   tagMisconceptionsFeatureFlagIsEnabled: boolean = false;
+  linkedSkillId!: string;
 
   constructor(
     private stateEditorService: StateEditorService,
@@ -685,6 +686,24 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  resetTaggedSkillMisconceptions(): void {
+    if (this.linkedSkillId !== this.stateEditorService.getLinkedSkillId()) {
+      this.linkedSkillId = this.stateEditorService.getLinkedSkillId();
+      this.answerGroups.forEach(answerGroup => {
+        answerGroup.taggedSkillMisconceptionId = null;
+      });
+      this.responsesService.save(
+        this.answerGroups,
+        this.defaultOutcome,
+        (newAnswerGroups, newDefaultOutcome) => {
+          this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
+          this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
+          this.refreshWarnings.emit();
+        }
+      );
+    }
+  }
+
   ngOnInit(): void {
     this.SHOW_TRAINABLE_UNRESOLVED_ANSWERS =
       AppConstants.SHOW_TRAINABLE_UNRESOLVED_ANSWERS;
@@ -694,6 +713,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.misconceptionsBySkill = {};
     this.tagMisconceptionsFeatureFlagIsEnabled =
       this.platformFeatureService.status.ExplorationEditorCanTagMisconceptions.isEnabled;
+    this.linkedSkillId = this.stateEditorService.getLinkedSkillId();
     this.directiveSubscriptions.add(
       this.responsesService.onInitializeAnswerGroups.subscribe(data => {
         this.responsesService.init(data as Interaction);
@@ -809,6 +829,12 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
         ).some((misconceptions: Misconception[]) =>
           misconceptions.some(misconception => !misconception.isMandatory())
         );
+      })
+    );
+
+    this.directiveSubscriptions.add(
+      this.stateEditorService.onChangeLinkedSkillId.subscribe(() => {
+        this.resetTaggedSkillMisconceptions();
       })
     );
 

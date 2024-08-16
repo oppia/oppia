@@ -662,6 +662,74 @@ describe('State Responses Component', () => {
     component.ngOnDestroy();
   });
 
+  it('should reset tagged misconceptions when change linked skill id event is emitted', () => {
+    let onChangeLinkedSkillIdEmitter = new EventEmitter();
+    spyOnProperty(stateEditorService, 'onChangeLinkedSkillId').and.returnValue(
+      onChangeLinkedSkillIdEmitter
+    );
+    stateEditorService.setLinkedSkillId('123');
+    spyOn(component, 'resetTaggedSkillMisconceptions').and.callThrough();
+
+    component.answerGroups = answerGroups;
+
+    component.ngOnInit();
+    onChangeLinkedSkillIdEmitter.emit();
+
+    expect(component.resetTaggedSkillMisconceptions).toHaveBeenCalled();
+    component.ngOnDestroy();
+  });
+
+  it('should reset tagged skill misconceptions', () => {
+    spyOn(stateEditorService, 'getLinkedSkillId').and.returnValue('skill1');
+
+    component.linkedSkillId = '123';
+    component.answerGroups = answerGroups;
+
+    let newAnswerGroups = [
+      answerGroupObjectFactory.createFromBackendDict(
+        {
+          rule_specs: [
+            {
+              rule_type: 'Contains',
+              inputs: {
+                x: {
+                  contentId: 'rule_input',
+                  normalizedStrSet: ['abc'],
+                },
+              },
+            },
+          ],
+          outcome: {
+            dest: 'State',
+            dest_if_really_stuck: null,
+            feedback: {
+              html: '',
+              content_id: 'This is a new feedback text',
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: 'test',
+            missing_prerequisite_skill_id: 'test_skill_id',
+          },
+          training_data: [],
+          tagged_skill_misconception_id: null,
+        },
+        'TextInput'
+      ),
+    ];
+
+    spyOn(responsesService, 'save').and.callFake(
+      (answerGroups, defaultOutcome, callback) => {
+        callback(newAnswerGroups, defaultOutcome);
+      }
+    );
+
+    component.resetTaggedSkillMisconceptions();
+
+    expect(component.answerGroups).toEqual(newAnswerGroups);
+    expect(responsesService.save).toHaveBeenCalled();
+  });
+
   it('should get static image URL', () => {
     component.ngOnInit();
 

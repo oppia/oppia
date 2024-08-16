@@ -62,7 +62,7 @@
   </oppia-outcome-editor>
 
   <oppia-question-misconception-editor [isEditable]="isEditable"
-                                       *ngIf="isInQuestionMode()"
+                                       *ngIf="isInQuestionMode() || tagMisconceptionsFeatureFlagIsEnabled"
                                        (saveTaggedMisconception)="sendOnSaveTaggedMisconception($event)"
                                        (saveAnswerGroupFeedback)="sendOnSaveAnswerGroupFeedback($event)"
                                        [outcome]="outcome"
