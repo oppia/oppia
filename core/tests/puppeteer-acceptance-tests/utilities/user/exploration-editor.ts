@@ -114,7 +114,8 @@ const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
 const addHintButton = 'button.e2e-test-oppia-add-hint-button';
 const saveHintButton = 'button.e2e-test-save-hint';
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
-const solutionInput =
+const solutionInputNumeric = 'oppia-add-or-update-solution-modal input';
+const solutionInputTextArea =
   'oppia-add-or-update-solution-modal textarea.e2e-test-description-box';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 
@@ -1104,14 +1105,19 @@ export class ExplorationEditor extends BaseUser {
    * Function to add a solution for a state interaction.
    * @param {string} answer - The solution of the current state card.
    * @param {string} answerExplanation - The explanation for this state card's solution.
+   * @param {boolean} isSolutionNumericInput - Whether the solution is for a numeric input interaction.
    */
   async addSolutionToState(
     answer: string,
-    answerExplanation: string
+    answerExplanation: string,
+    isSolutionNumericInput: boolean
   ): Promise<void> {
+    const solutionSelector = isSolutionNumericInput
+      ? solutionInputNumeric
+      : solutionInputTextArea;
     await this.clickOn(addSolutionButton);
-    await this.page.waitForSelector(solutionInput, {visible: true});
-    await this.type(solutionInput, answer);
+    await this.page.waitForSelector(solutionSelector, {visible: true});
+    await this.type(solutionSelector, answer);
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
     await this.clickOn(submitAnswerButton);
     await this.type(stateContentInputField, answerExplanation);
