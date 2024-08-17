@@ -314,6 +314,11 @@
 }
 
 @media screen and (max-width: 498px) {
+  .classroom-content-container {
+    position: relative;
+    right: 6px;
+  }
+
   .classroom-content-container .classroom-content .topic-tiles-container .oppia-topic-summary-tile {
     height: 157px;
     width: 45%;

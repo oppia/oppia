@@ -103,7 +103,7 @@
     flex-wrap: wrap;
     gap: 20px;
     justify-content: start;
-    max-width: 884px;
+    width: 884px;
   }
 
   .classrooms-main-content .description-container {
@@ -243,6 +243,7 @@
 @media screen and (max-width: 768px) {
     .classrooms-main-content .classroom-tile-container {
       justify-content: center;
+      width: fit-content;
     }
 
     .breadcrumbs-container .classrooms-breadcrumbs,
@@ -287,9 +288,10 @@
     }
   }
 
-  @media screen and (max-width: 375px) {
+  @media screen and (max-width: 395px) {
     .classrooms-page-content .classrooms-heading {
       font-size: 24px;
+      margin-bottom: 0;
     }
   }
 </style>
