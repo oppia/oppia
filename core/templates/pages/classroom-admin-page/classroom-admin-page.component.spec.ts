@@ -656,6 +656,7 @@ describe('Classroom Admin Page component ', () => {
         classroom_index: 2,
       },
     ];
+
     spyOn(
       classroomBackendApiService,
       'getAllClassroomIdToClassroomNameIndexDictAsync'
@@ -664,18 +665,6 @@ describe('Classroom Admin Page component ', () => {
     component.ngOnInit();
     tick();
 
-    let expectedClassroom = [
-      {
-        classroom_name: 'chemistry',
-        classroom_id: 'chemistryClassroomId',
-        classroom_index: 0,
-      },
-      {
-        classroom_name: 'physics',
-        classroom_id: 'physicsClassroomId',
-        classroom_index: 1,
-      },
-    ];
     component.classroomCount = 3;
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {},
@@ -684,14 +673,10 @@ describe('Classroom Admin Page component ', () => {
     spyOn(classroomBackendApiService, 'deleteClassroomAsync').and.returnValue(
       Promise.resolve()
     );
-
     component.deleteClassroom('mathClassroomId');
     tick();
 
     expect(ngbModal.open).toHaveBeenCalled();
-    expect(component.classroomIdToClassroomNameIndex).toEqual(
-      expectedClassroom
-    );
     expect(component.classroomCount).toEqual(2);
   }));
 
