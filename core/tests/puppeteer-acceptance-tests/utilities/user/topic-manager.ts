@@ -2427,12 +2427,6 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
-
-    try {
-      await this.page.waitForNavigation({timeout: 10000});
-    } catch (error) {
-      return;
-    }
   }
 
   /**
@@ -2814,11 +2808,6 @@ export class TopicManager extends BaseUser {
             `Chapter ${chapterName} is ${shouldExist ? 'found' : 'not found'} in story ${storyName}, as expected.`
           );
 
-          try {
-            await this.page.waitForNavigation({timeout: 10000});
-          } catch (error) {
-            return;
-          }
           return;
         }
       }
@@ -2831,12 +2820,6 @@ export class TopicManager extends BaseUser {
       showMessage(
         `Chapter ${chapterName} is ${shouldExist ? 'found' : 'not found'} in story ${storyName}, as expected.`
       );
-
-      try {
-        await this.page.waitForNavigation({timeout: 10000});
-      } catch (error) {
-        return;
-      }
     } catch (error) {
       const newError = new Error(
         `Failed to verify chapter presence in story: ${error}`
@@ -2858,7 +2841,7 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     try {
       await this.openStoryEditor(storyName, topicName);
-      await this.waitForStaticAssetsToLoad();
+      await this.waitForPageToFullyLoad();
 
       const addChapterButtonElement = await this.page.$(addChapterButton);
       if (!addChapterButtonElement) {

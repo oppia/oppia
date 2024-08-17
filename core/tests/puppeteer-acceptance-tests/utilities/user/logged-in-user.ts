@@ -604,7 +604,7 @@ export class LoggedInUser extends BaseUser {
    */
   async expectToolTipMessage(expectedMessage: string): Promise<void> {
     try {
-      await this.page.waitForSelector(toastMessageSelector);
+      await this.page.waitForSelector(toastMessageSelector, {visible: true});
       const toastMessageElement = await this.page.$(toastMessageSelector);
       const toastMessage = await this.page.evaluate(
         el => el.textContent.trim(),
@@ -1131,8 +1131,12 @@ export class LoggedInUser extends BaseUser {
    * @param {string[]} goals - The goals to add.
    */
   async addGoals(goals: string[]): Promise<void> {
-    await this.page.waitForSelector(topicNameInEditGoalsSelector);
-    await this.page.waitForSelector(addTopicToCurrentGoalsButton);
+    await this.page.waitForSelector(topicNameInEditGoalsSelector, {
+      visible: true,
+    });
+    await this.page.waitForSelector(addTopicToCurrentGoalsButton, {
+      visible: true,
+    });
 
     const topicNames = await this.page.$$(topicNameInEditGoalsSelector);
     const addGoalButtons = await this.page.$$(addTopicToCurrentGoalsButton);
@@ -1153,6 +1157,7 @@ export class LoggedInUser extends BaseUser {
           addGoalButtons[matchingTopicIndex]
         );
         await addGoalButtons[matchingTopicIndex]?.click();
+        showMessage(`Goal "${goal}" added.`);
       } else {
         throw new Error(`Goal not found: ${goal}`);
       }
@@ -1167,30 +1172,28 @@ export class LoggedInUser extends BaseUser {
     await this.waitForPageToFullyLoad();
 
     await this.page.waitForSelector(completedGoalsSectionSelector);
-    const completedGoalsTopicNames = await this.page.$$(
-      completedGoalsSectionSelector + ' ' + completedGoalsTopicNameSelector
-    );
+    await this.page
+      .waitForSelector(completedGoalsTopicNameSelector)
+      .catch(() => {
+        throw new Error('Completed goals section is empty');
+      });
 
-    const actualGoals = await Promise.all(
-      completedGoalsTopicNames.map(async topicName => {
-        const fullGoalText = await this.page.evaluate(
-          el => el.textContent.trim(),
-          topicName
-        );
-        // Remove the "Learnt " prefix.
-        return fullGoalText.replace('Learnt ', '');
-      })
+    const completedGoals = await this.page.$$eval(
+      `${completedGoalsSectionSelector} ${completedGoalsTopicNameSelector}`,
+      (elements: Element[]) =>
+        elements.map(el =>
+          el.textContent ? el.textContent.trim().replace('Learnt ', '') : ''
+        )
     );
 
     for (const expectedGoal of expectedGoals) {
-      if (!actualGoals.includes(expectedGoal)) {
+      if (!completedGoals.includes(expectedGoal)) {
         throw new Error(
           `Goal not found in completed lesson section: ${expectedGoal}`
         );
       }
     }
   }
-
   /**
    * Checks if the completed stories include the expected stories.
    * @param {string[]} expectedStories - The expected stories.
