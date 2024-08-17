@@ -673,7 +673,7 @@ describe('Classroom Admin Page component ', () => {
     spyOn(classroomBackendApiService, 'deleteClassroomAsync').and.returnValue(
       Promise.resolve()
     );
-    component.deleteClassroom('mathClassroomId');
+    component.deleteClassroom('chemistryClassroomId');
     tick();
 
     expect(ngbModal.open).toHaveBeenCalled();
