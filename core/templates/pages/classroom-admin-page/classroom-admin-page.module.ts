@@ -63,7 +63,7 @@ import {UpdateClassroomsOrderModalComponent} from './modals/update-classrooms-or
     CreateNewClassroomModalComponent,
     DeleteTopicFromClassroomModalComponent,
     TopicsDependencyGraphModalComponent,
-    UpdateClassroomsOrderModalComponent
+    UpdateClassroomsOrderModalComponent,
   ],
   entryComponents: [
     ClassroomAdminNavbarComponent,
@@ -73,7 +73,7 @@ import {UpdateClassroomsOrderModalComponent} from './modals/update-classrooms-or
     CreateNewClassroomModalComponent,
     DeleteTopicFromClassroomModalComponent,
     TopicsDependencyGraphModalComponent,
-    UpdateClassroomsOrderModalComponent
+    UpdateClassroomsOrderModalComponent,
   ],
 })
 export class ClassroomAdminPageModule {}
