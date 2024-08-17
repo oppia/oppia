@@ -26,11 +26,12 @@ import {ConsoleReporter} from '../../utilities/common/console-reporter';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-ConsoleReporter.setConsoleErrorsToIgnore([
-  /ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'headerText: Story Editor'. Current value: 'headerText: Chapter Editor'./,
-  /Cannot read properties of undefined \(reading 'getStory'\)/,
-  /Occurred at http:\/\/localhost:8181\/story_editor\/.*\/#\/chapter_editor\/node_1 webpack:\/\/\/\..* Cannot read properties of undefined \(reading 'getStory'\)/,
-]);
+// TODO(#20829): Console error "Cannot read properties of undefined (reading 'getStory')" on navigation or reload in Story Editor. Since this error is getting triggered on navigation only, it is causing "Execution context destroyed error". So, creating and switching to a new tab to avoid this error. Please remove the statement below that creates and switches to new tab and this errorToIgnore below.
+const errorsToIgnore = [
+  /Cannot read properties of undefined \(reading 'storyEditorStalenessDetectionService'\)/,
+];
+
+ConsoleReporter.setConsoleErrorsToIgnore(errorsToIgnore);
 
 describe('Topic Manager', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
@@ -91,6 +92,7 @@ describe('Topic Manager', function () {
       await topicManager.saveStoryDraft();
 
       // Verify the story is present in the topic.
+      await topicManager.createAndSwitchToNewTab();
       await topicManager.verifyStoryPresenceInTopic(
         'Test Story 1',
         'Addition',
@@ -111,13 +113,7 @@ describe('Topic Manager', function () {
   it(
     'should delete a chapter from a story, delete the story from a topic, and delete the subtopic from a topic.',
     async function () {
-      await topicManager.deleteSubtopicFromTopic('Test Subtopic 1', 'Addition');
-      await topicManager.saveTopicDraft('Addition');
-      await topicManager.verifySubtopicPresenceInTopic(
-        'Test Subtopic 1',
-        'Addition',
-        false
-      );
+      await topicManager.createAndSwitchToNewTab();
 
       // Deleting 2nd chapter since topic manager cannot delete the first chapter.
       await topicManager.deleteChapterFromStory(
@@ -127,6 +123,7 @@ describe('Topic Manager', function () {
       );
       await topicManager.saveStoryDraft();
 
+      await topicManager.createAndSwitchToNewTab();
       await topicManager.verifyChapterPresenceInStory(
         'Test Chapter 2',
         'Test Story 1',
@@ -134,6 +131,7 @@ describe('Topic Manager', function () {
         false
       );
 
+      await topicManager.createAndSwitchToNewTab();
       await topicManager.deleteStoryFromTopic('Test Story 1', 'Addition');
       await topicManager.saveTopicDraft('Addition');
       await topicManager.verifyStoryPresenceInTopic(
@@ -141,9 +139,18 @@ describe('Topic Manager', function () {
         'Addition',
         false
       );
+
+      await topicManager.deleteSubtopicFromTopic('Test Subtopic 1', 'Addition');
+      await topicManager.saveTopicDraft('Addition');
+      await topicManager.verifySubtopicPresenceInTopic(
+        'Test Subtopic 1',
+        'Addition',
+        false
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
