@@ -550,7 +550,7 @@ export class LibraryPageComponent {
     return true;
   }
 
-  onClickClassroomCard(classroomName: string): void {
+  registerClassroomCardClickEvent(classroomName: string): void {
     this.siteAnalyticsService.registerClickClassroomCardEvent(
       'Classroom card in the community library page',
       classroomName

@@ -60,7 +60,7 @@ export class ClassroomsPageComponent {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
-  onClickClassroomCard(classroomName: string): void {
+  registerClassroomCardClickEvent(classroomName: string): void {
     this.siteAnalyticsService.registerClickClassroomCardEvent(
       'Classroom card in the classrooms page',
       classroomName

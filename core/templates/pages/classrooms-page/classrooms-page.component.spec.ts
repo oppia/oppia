@@ -214,7 +214,7 @@ describe('Classrooms Page Component', () => {
       siteAnalyticsService,
       'registerClickClassroomCardEvent'
     ).and.callThrough();
-    component.onClickClassroomCard('Math');
+    component.registerClassroomCardClickEvent('Math');
     expect(
       siteAnalyticsService.registerClickClassroomCardEvent
     ).toHaveBeenCalled();

@@ -65,7 +65,7 @@ export class ClassroomNavigationLinksComponent implements OnInit {
     );
   }
 
-  onClickClassroomCard(classroomName: string): void {
+  registerClassroomCardClickEvent(classroomName: string): void {
     this.siteAnalyticsService.registerClickClassroomCardEvent(
       'Classroom card in the navigation dropdown',
       classroomName

@@ -6,7 +6,7 @@
     </div>
     <div class="individual-classroom-cards" *ngIf="publicClassroomsCount <= 2">
       <ng-container *ngFor="let classroomSummary of classroomSummaries">
-        <oppia-classroom-card (click)="onClickClassroomCard(classroomSummary.name)"
+        <oppia-classroom-card (click)="registerClassroomCardClickEvent(classroomSummary.name)"
                               *ngIf="classroomSummary.is_published"
                               [classroomSummary]="classroomSummary"
                               [usedInCarousel]="false"
@@ -31,7 +31,7 @@
           <ng-template ngbSlide *ngFor="let chunkIndex of getClassroomChunkIndices(classroomSummaries.length); let i = index">
             <div class="classrooms-card-container">
               <ng-container *ngFor="let classroomSummary of getClassroomsForChunk(classroomSummaries, chunkIndex)">
-                <oppia-classroom-card (click)="onClickClassroomCard(classroomSummary.name)"
+                <oppia-classroom-card (click)="registerClassroomCardClickEvent(classroomSummary.name)"
                                       *ngIf="classroomSummary.is_published"
                                       [classroomSummary]="classroomSummary"
                                       [usedInCarousel]="true"

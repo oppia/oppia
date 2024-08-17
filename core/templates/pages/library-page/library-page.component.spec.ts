@@ -910,7 +910,7 @@ describe('Library Page Component', () => {
       siteAnalyticsService,
       'registerClickClassroomCardEvent'
     ).and.callThrough();
-    componentInstance.onClickClassroomCard('Math');
+    componentInstance.registerClassroomCardClickEvent('Math');
     expect(
       siteAnalyticsService.registerClickClassroomCardEvent
     ).toHaveBeenCalled();

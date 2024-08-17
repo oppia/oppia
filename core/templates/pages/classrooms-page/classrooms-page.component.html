@@ -36,7 +36,7 @@
         <div class="classroom-tile-container">
           <ng-container *ngFor="let classroomSummary of classroomSummaries">
             <ng-container *ngIf="classroomSummary.is_published">
-              <oppia-classroom-summary-tile [classroomSummary]="classroomSummary" (click)="onClickClassroomCard(classroomSummary.name)"></oppia-classroom-summary-tile>
+              <oppia-classroom-summary-tile [classroomSummary]="classroomSummary" (click)="registerClassroomCardClickEvent(classroomSummary.name)"></oppia-classroom-summary-tile>
             </ng-container>
           </ng-container>
           <ng-container *ngIf="hasPublicClassrooms">
