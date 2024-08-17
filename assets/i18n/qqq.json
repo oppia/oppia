@@ -1753,6 +1753,7 @@
 	"I18N_TOPNAV_LEARN_LINK_2": "Text displayed in the navigation bar. - When the user clicks the button the library page is loaded.",
 	"I18N_TOPNAV_LIBRARY": "Text displayed in the navigation bar. - When the user clicks the button the library page is loaded. The library page lists all the exploration available in the site and allows the user to search and filter them.\n{{Identical|Library}}",
 	"I18N_TOPNAV_LIBRARY_DESCRIPTION": "Text displayed inside drop-down menu. - The list is shown after the user hovers over the I18N_TOPNAV_LEARN button.",
+	"I18N_TOPNAV_LIBRARY_TEXT": "Text displayed in the community library pages breadcrumb.",
 	"I18N_TOPNAV_LOGOUT": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over their profile picture. When the option is clicked, the user's account is closed. This button is only available when the user is logged in.\n{{Identical|Logout}}",
 	"I18N_TOPNAV_MODERATOR_PAGE": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over their profile picture. When the option is clicked, the moderator page is loaded.",
 	"I18N_TOPNAV_PARTICIPATION_PLAYBOOK": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the participation playbook page is loaded.",

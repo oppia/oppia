@@ -103,12 +103,19 @@
       </div>
 
       <div class="oppia-exp-summary-tiles-container" *ngIf="pageMode === LIBRARY_PAGE_MODES.INDEX">
+        <div class="community-library-breadcrumbs-container">
+          <a href="/">{{ 'I18N_TOPNAV_HOME' | translate }}</a>
+          <i class="fa fa-angle-right"></i>
+          <span>{{ 'I18N_TOPNAV_LIBRARY_TEXT' | translate }}</span>
+        </div>
+        <div class="text-center w-100 mt-4" tabindex="0">
+          <h1 class="oppia-library-h1 e2e-test-library-main-header">{{ 'I18N_LIBRARY_MAIN_HEADER' | translate }}</h1>
+        </div>
         <img [src]="bannerImageFileUrl"
              align="center"
              width="100%"
              alt="page banner">
         <div class="text-center w-100 mt-4" tabindex="0">
-          <h1 class="oppia-library-h1 e2e-test-library-main-header">{{ 'I18N_LIBRARY_MAIN_HEADER' | translate }}</h1>
           <h2 class="oppia-library-h2">{{ 'I18N_LIBRARY_SUB_HEADER' | translate }}</h2>
         </div>
 

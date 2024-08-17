@@ -116,6 +116,17 @@ oppia-library-page .oppia-library-group-header a,
   color: inherit;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
 }
+
+oppia-library-page .community-library-breadcrumbs-container a,
+oppia-library-page .community-library-breadcrumbs-container span {
+  color: #00645c;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 16px;
+}
+
 .oppia-library-group-header a:hover,
 .oppia-library-group-header a:focus {
   color: #04857c;
@@ -328,6 +339,14 @@ oppia-library-page .show-change-classroom-chunk-btn {
 
 oppia-library-page .hide-change-classroom-chunk-btn {
   visibility: hidden;
+}
+
+oppia-library-page .community-library-breadcrumbs-container {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+  left: 86px;
+  position: relative;
 }
 
 @media (min-width: 630px) {

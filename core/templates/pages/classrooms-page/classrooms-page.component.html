@@ -102,8 +102,8 @@
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    justify-content: center;
-    width: 100vw;
+    justify-content: start;
+    max-width: 884px;
   }
 
   .classrooms-main-content .description-container {
@@ -241,6 +241,10 @@
   }
 
 @media screen and (max-width: 768px) {
+    .classrooms-main-content .classroom-tile-container {
+      justify-content: center;
+    }
+
     .breadcrumbs-container .classrooms-breadcrumbs,
     .classrooms-main-content .description-container {
         width: 90vw;
