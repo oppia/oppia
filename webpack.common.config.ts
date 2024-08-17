@@ -68,10 +68,6 @@ module.exports = {
     blog_dashboard:
       commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
     console_errors: commonPrefix + '/tests/console_errors.import.ts',
-    creator_dashboard:
-      commonPrefix +
-      '/pages/creator-dashboard-page/' +
-      'creator-dashboard-page.import.ts',
     contributor_dashboard:
       commonPrefix +
       '/pages/contributor-dashboard-page/' +
@@ -150,18 +146,6 @@ module.exports = {
           'how to get involved with the Oppia project.',
       },
       template: commonPrefix + '/tests/console_errors.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['creator_dashboard'],
-      filename: 'creator-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/creator-dashboard-page/' +
-        'creator-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
     }),

@@ -29,7 +29,7 @@
   },
   "creator-dashboard": {
     "url": "http://localhost:8181/creator-dashboard",
-    "page_module": "core/templates/pages/creator-dashboard-page/creator-dashboard-page.import.ts"
+    "page_module": "core/templates/pages/creator-dashboard-page/creator-dashboard-page.module.ts"
   },
   "creator-guidelines": {
     "url": "http://localhost:8181/creator-guidelines",

@@ -509,14 +509,6 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_creator_dashboard_page(self) -> None:
-        self.login(self.OWNER_EMAIL)
-
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        self.assertIn(b'Creator Dashboard | Oppia', response.body)
-
-        self.logout()
-
 
 class CreationButtonsTests(test_utils.GenericTestBase):
     with utils.open_file(
