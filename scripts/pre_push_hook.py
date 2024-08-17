@@ -356,7 +356,7 @@ def main(args: Optional[List[str]] = None) -> None:
             if js_or_ts_files:
                 frontend_test_cmds = FRONTEND_TEST_CMDS.copy()
                 frontend_test_cmds.append(
-                    '--specs_to_run=%s --allow_no_spec'
+                    '--specs_to_run="%s" --allow_no_spec'
                         % ','.join(js_or_ts_files))
                 frontend_status = run_script_and_get_returncode(
                     frontend_test_cmds)
