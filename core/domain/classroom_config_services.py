@@ -261,9 +261,11 @@ def create_new_classroom(
             classroom.
     """
     classroom.validate()
-    classroom_models.ClassroomIdToIndexModel.create(
-        classroom.classroom_id,
-        len(get_all_classroom_id_to_index_mappings())
+    create_new_classroom_id_to_index_mapping(
+        classroom_config_domain.ClassroomIdToIndex(
+            classroom_id=classroom.classroom_id,
+            classroom_index=len(get_all_classroom_id_to_index_mappings())
+        )
     )
     classroom_models.ClassroomModel.create(
         classroom.classroom_id,
@@ -309,9 +311,11 @@ def create_new_default_classroom(
     classroom.require_valid_name(name)
     classroom.require_valid_url_fragment(url_fragment)
 
-    classroom_models.ClassroomIdToIndexModel.create(
-        classroom.classroom_id,
-        len(get_all_classroom_id_to_index_mappings())
+    create_new_classroom_id_to_index_mapping(
+        classroom_config_domain.ClassroomIdToIndex(
+            classroom_id=classroom.classroom_id,
+            classroom_index=len(get_all_classroom_id_to_index_mappings())
+        )
     )
 
     classroom_models.ClassroomModel.create(
@@ -429,24 +433,6 @@ def get_classroom_id_to_index_by_id(
         return get_classroom_id_to_index_from_model(model)
     else:
         return None
-
-
-def get_index_for_classroom_id(classroom_id: str) -> int:
-    """Returns the index for a given classroom ID.
-
-    Args:
-        classroom_id: str. The ID of the classroom.
-
-    Returns:
-        int. The index of the classroom.
-
-    Raises:
-        Exception. No mapping found for the given classroom ID.
-    """
-    mapping = get_classroom_id_to_index_by_id(classroom_id, strict=False)
-    if mapping is None:
-        raise Exception(f'No mapping found for classroom ID: {classroom_id}')
-    return mapping.classroom_index
 
 
 def create_new_classroom_id_to_index_mapping(

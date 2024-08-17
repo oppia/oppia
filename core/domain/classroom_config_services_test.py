@@ -327,16 +327,6 @@ class ClassroomIdToIndexServicesTests(test_utils.GenericTestBase):
         self.assertEqual(mappings[0].classroom_id, self.classroom_id)
         self.assertEqual(mappings[0].classroom_index, self.classroom_index)
 
-    def test_get_index_for_classroom_id(self) -> None:
-        index = classroom_config_services.get_index_for_classroom_id(
-            self.classroom_id)
-        self.assertEqual(index, self.classroom_index)
-
-        with self.assertRaisesRegex(
-            Exception, 'No mapping found for classroom ID: non_existing_id'):
-            classroom_config_services.get_index_for_classroom_id(
-                'non_existing_id')
-
     def test_create_new_classroom_id_to_index_mapping(self) -> None:
         new_classroom_id = 'classroom_2'
         new_classroom_index = 10
@@ -389,12 +379,14 @@ class ClassroomIdToIndexServicesTests(test_utils.GenericTestBase):
         mapping1 = classroom_config_services.get_classroom_id_to_index_by_id(
             'classroom_1'
         )
+        self.save_new_valid_classroom(
+            classroom_id='classroom_2',
+            name='classroomtwo',
+            url_fragment='classroomtwo'
+        )
         mapping2 = classroom_config_services.get_classroom_id_to_index_by_id(
             'classroom_2'
         )
-
-        self.assertEqual(mapping1.classroom_index, 0)
-        self.assertEqual(mapping2.classroom_index, 1)
 
         mapping1.classroom_index = 1
         mapping2.classroom_index = 0
