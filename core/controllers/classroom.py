@@ -142,7 +142,8 @@ class ClassroomDataHandler(
 class ClassroomIdToNameIndexHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Fetches a list of classroom names corresponding to the given ids."""
+    """Fetches a list of classroom names and indexes corresponding
+    to the given ids."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -150,7 +151,9 @@ class ClassroomIdToNameIndexHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Retrieves a mapping of classroom IDs to classroom names."""
+        """Retrieves a mapping of classroom IDs to classroom names
+        and indexes.
+        """
 
         classroom_id_index_mappings: List[Dict[str, str|int]] = []
         classrooms = classroom_config_services.get_all_classrooms()
@@ -551,7 +554,8 @@ class TopicsToClassroomsRelationHandler(
         })
 
 
-class AllClassroomsSummaryHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+class AllClassroomsSummaryHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Return a list of properties needed to show a classroom card."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -593,7 +597,7 @@ class AllClassroomsSummaryHandler(base.BaseHandler[Dict[str, str], Dict[str, str
 
 
 class UpdateClassroomIndexMappingHandlerNormalizedPayloadDict(TypedDict):
-    """Dict representation of UpdateClassroomOrderHandler's
+    """Dict representation of UpdateClassroomIndexMappingHandler's
     normalized_payload dictionary.
     """
 
