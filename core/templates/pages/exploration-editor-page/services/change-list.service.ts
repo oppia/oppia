@@ -85,6 +85,7 @@ export type StatePropertyNames =
   | 'content'
   | 'default_outcome'
   | 'hints'
+  | 'inapplicable_skill_misconception_ids'
   | 'linked_skill_id'
   | 'param_changes'
   | 'param_specs'
@@ -130,6 +131,7 @@ export class ChangeListService {
     content: true,
     default_outcome: true,
     hints: true,
+    inapplicable_skill_misconception_ids: true,
     linked_skill_id: true,
     param_changes: true,
     param_specs: true,

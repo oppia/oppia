@@ -42,6 +42,7 @@ import {AppConstants} from 'app.constants';
 import {ExternalSaveService} from 'services/external-save.service';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface TaggedMisconception {
   skillId: string;
@@ -74,6 +75,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   activeRuleIndex: number;
   answerChoices: AnswerChoice[];
   editAnswerGroupForm: object;
+  tagMisconceptionsFeatureFlagIsEnabled: boolean = false;
 
   constructor(
     private stateEditorService: StateEditorService,
@@ -81,7 +83,8 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     private stateInteractionIdService: StateInteractionIdService,
     private alertsService: AlertsService,
     private trainingDataEditorPanelService: TrainingDataEditorPanelService,
-    private externalSaveService: ExternalSaveService
+    private externalSaveService: ExternalSaveService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   sendOnSaveTaggedMisconception(event: TaggedMisconception): void {
@@ -414,6 +417,8 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     this.activeRuleIndex = this.responsesService.getActiveRuleIndex();
     this.editAnswerGroupForm = {};
     this.answerChoices = this.getAnswerChoices();
+    this.tagMisconceptionsFeatureFlagIsEnabled =
+      this.platformFeatureService.status.ExplorationEditorCanTagMisconceptions.isEnabled;
   }
 
   ngOnDestroy(): void {

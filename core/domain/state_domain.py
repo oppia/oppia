@@ -25,6 +25,7 @@ import math
 import re
 
 from core import android_validation_constants
+from core import feature_flag_list
 from core import feconf
 from core import schema_utils
 from core import utils
@@ -40,6 +41,7 @@ from typing import (
     Type, TypedDict, TypeVar, Union, cast, overload
 )
 
+from core.domain import feature_flag_services # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
@@ -239,7 +241,12 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
 
         if (
             self.tagged_skill_misconception_id is not None and
-            not tagged_skill_misconception_id_required
+            not tagged_skill_misconception_id_required and
+            not feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.
+                EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value,
+                None
+            )
         ):
             raise utils.ValidationError(
                 'Expected tagged skill misconception id to be None, '
@@ -3614,7 +3621,7 @@ class StateDict(TypedDict):
     card_is_checkpoint: bool
     linked_skill_id: Optional[str]
     classifier_model_id: Optional[str]
-    inapplicable_skill_misconception_ids: Optional[List[str]]
+    inapplicable_skill_misconception_ids: List[str]
 
 
 class State(translation_domain.BaseTranslatableObject):
@@ -3649,7 +3656,7 @@ class State(translation_domain.BaseTranslatableObject):
                 this state.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
-            inapplicable_skill_misconception_ids: list[str] or None. The list of
+            inapplicable_skill_misconception_ids: list[str]. The list of
                 misconception IDs associated with the linked skill that are
                 inapplicable for this state.
         """
@@ -3672,6 +3679,8 @@ class State(translation_domain.BaseTranslatableObject):
         self.card_is_checkpoint = card_is_checkpoint
         self.inapplicable_skill_misconception_ids = (
             inapplicable_skill_misconception_ids
+            if inapplicable_skill_misconception_ids
+            else []
         )
 
     def get_translatable_contents_collection(
@@ -3768,6 +3777,12 @@ class State(translation_domain.BaseTranslatableObject):
                 raise utils.ValidationError(
                     'Expected linked_skill_id to be a str, '
                     'received %s.' % self.linked_skill_id)
+
+        if not isinstance(self.inapplicable_skill_misconception_ids, list):
+            raise utils.ValidationError(
+                'Expected inapplicable_skill_misconception_ids to be a '
+                'list, received %s.'
+                % self.inapplicable_skill_misconception_ids)
 
     def is_rte_content_supported_on_android(self) -> bool:
         """Checks whether the RTE components used in the state are supported by
@@ -3920,6 +3935,19 @@ class State(translation_domain.BaseTranslatableObject):
             linked_skill_id: str|None. The linked skill id to state.
         """
         self.linked_skill_id = linked_skill_id
+
+    def update_inapplicable_skill_misconception_ids(
+            self,
+            inapplicable_skill_misconception_ids: List[str]
+    ) -> None:
+        """Update the inapplicable skill misconception ids attribute.
+
+        Args:
+            inapplicable_skill_misconception_ids: List[str]. The
+                list of inapplicable skill misconception ids for state.
+        """
+        self.inapplicable_skill_misconception_ids = list(
+            set(inapplicable_skill_misconception_ids))
 
     def update_interaction_customization_args(
         self,

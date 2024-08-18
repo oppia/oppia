@@ -24,18 +24,13 @@ var workflow = require('../webdriverio_utils/workflow.js');
 var PreferencesPage = function () {
   var USER_PREFERENCES_URL = '/preferences';
   var audioLanguageSelector = $('.e2e-test-audio-language-selector');
-  var creatorDashboardRadio = $('.e2e-test-creator-dashboard-radio');
-  var contributorDashboardRadio = $('.e2e-test-contributor-dashboard-radio');
   var customProfilePhoto = $('.e2e-test-custom-photo');
-  var deleteAccountButton = $('.e2e-test-delete-account-button');
   var editorRoleEmailsCheckbox = $('.e2e-test-editor-role-email-checkbox');
   var emailUpdatesCheckbox = $('.e2e-test-email-updates-checkbox');
-  var exportAccountButton = $('.e2e-test-export-account-button');
   var feedbackMessageEmailsCheckbox = $(
     '.e2e-test-feedback-message-email-checkbox'
   );
   var languageSelector = $('.e2e-test-site-language-selector');
-  var learnerDashboardRadio = $('.e2e-test-learner-dashboard-radio');
   var navBar = $('.e2e-test-navbar-dropdown-toggle');
   var pageHeader = $('.e2e-test-preferences-title');
   var profilePhotoClickable = $('.e2e-test-photo-clickable');
@@ -206,14 +201,6 @@ var PreferencesPage = function () {
     }
   };
 
-  this.isFeedbackEmailsCheckboxSelected = async function () {
-    return await feedbackMessageEmailsCheckbox.isSelected();
-  };
-
-  this.isEditorRoleEmailsCheckboxSelected = async function () {
-    return await editorRoleEmailsCheckbox.isSelected();
-  };
-
   // This function only compares the text displayed on the subscription (which
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
@@ -280,40 +267,6 @@ var PreferencesPage = function () {
     }
     let actualCount = await subscriptionsSelector().length;
     expect(actualCount).toEqual(expectedCount);
-  };
-
-  this.expectUserBioToBe = async function (bio) {
-    await waitFor.visibilityOf(
-      userBioElement,
-      'User bio field takes too long to appear.'
-    );
-    expect(await userBioElement.getValue()).toMatch(bio);
-  };
-
-  this.selectCreatorDashboard = async function () {
-    await action.click('Creator Dashboard radio', creatorDashboardRadio);
-    await saveNewChanges('Creator Dashboard Option');
-  };
-
-  this.selectContributorDashboard = async function () {
-    await action.click(
-      'Contributor Dashboard radio',
-      contributorDashboardRadio
-    );
-    await saveNewChanges('Contributor Dashboard Option');
-  };
-
-  this.selectLearnerDashboard = async function () {
-    await action.click('Learner Dashboard radio', learnerDashboardRadio);
-    await saveNewChanges('Learner Dashboard Option');
-  };
-
-  this.clickDeleteAccountButton = async function () {
-    await action.click('Delete Account button', deleteAccountButton);
-  };
-
-  this.clickExportAccountButton = async function () {
-    await action.click('Export Account button', exportAccountButton);
   };
 };
 

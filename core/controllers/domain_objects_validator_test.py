@@ -386,7 +386,7 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
             'classifier_model_id': None,
             'card_is_checkpoint': False,
             'solicit_answer_details': False,
-            'inapplicable_skill_misconception_ids': None
+            'inapplicable_skill_misconception_ids': []
         }
         domain_objects_validator.validate_state_dict(state_dict)
 
@@ -481,7 +481,7 @@ class ValidateQuestionStateDict(test_utils.GenericTestBase):
             'param_changes': [],
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
-            'inapplicable_skill_misconception_ids': None
+            'inapplicable_skill_misconception_ids': []
         }
         domain_objects_validator.validate_question_state_dict(
             question_state_dict)

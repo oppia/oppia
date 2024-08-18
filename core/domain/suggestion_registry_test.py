@@ -2883,7 +2883,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'param_changes': [],
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
-            'inapplicable_skill_misconception_ids': None
+            'inapplicable_skill_misconception_ids': []
         }
         suggestion_dict: suggestion_registry.BaseSuggestionDict = {
             'suggestion_id': 'skill1.thread1',

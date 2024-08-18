@@ -194,6 +194,7 @@ export class ExplorationStatesService {
     solution: ['interaction', 'solution'],
     widget_id: ['interaction', 'id'],
     widget_customization_args: ['interaction', 'customizationArgs'],
+    inapplicable_skill_misconception_ids: ['inapplicableSkillMisconceptionIds'],
   };
 
   private _CONTENT_EXTRACTORS = {
@@ -452,6 +453,11 @@ export class ExplorationStatesService {
   ): void;
   saveStateProperty(
     stateName: string,
+    backendName: 'inapplicable_skill_misconception_ids',
+    newValue: string[]
+  ): void;
+  saveStateProperty(
+    stateName: string,
     backendName: StatePropertyNames,
     newValue: StatePropertyValues
   ): void {
@@ -623,6 +629,17 @@ export class ExplorationStatesService {
 
   saveLinkedSkillId(stateName: string, newLinkedSkillId: string): void {
     this.saveStateProperty(stateName, 'linked_skill_id', newLinkedSkillId);
+  }
+
+  saveInapplicableSkillMisconceptionIds(
+    stateName: string,
+    newInapplicableSkillMisconceptionIds: string[]
+  ): void {
+    this.saveStateProperty(
+      stateName,
+      'inapplicable_skill_misconception_ids',
+      newInapplicableSkillMisconceptionIds
+    );
   }
 
   getInteractionCustomizationArgsMemento(

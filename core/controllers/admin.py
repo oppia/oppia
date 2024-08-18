@@ -193,7 +193,7 @@ SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict({
             'linked_skill_id': None,
             'solicit_answer_details': False,
             'card_is_checkpoint': True,
-            'inapplicable_skill_misconception_ids': None
+            'inapplicable_skill_misconception_ids': []
         }
     },
     'version': 3
