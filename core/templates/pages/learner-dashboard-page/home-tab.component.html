@@ -26,7 +26,7 @@
             <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
                  class="story-summary-tile">
               <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
-                [topicName]="topicSummaryTile.name">
+                [topicName]="topicSummaryTile.name" (click)="registerClassroomInProgressLessonEvent(topicSummaryTile.classroom, topicSummaryTile.name)">
               </oppia-learner-story-summary-tile>
             </div>
           </div>
@@ -44,7 +44,7 @@
           <div class="topic-summary-tile-scroll">
             <div class="topic-summary-tile-section d-flex"
               [ngStyle]="windowIsNarrow && {'width': getWidth(item.value.length) + 'px'}">
-              <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile">
+              <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile" (click)="registerNewClassroomLessonEvent(item.key, topicSummaryTile.name)">
                 <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
                 </oppia-learner-topic-summary-tile>
               </div>

@@ -26,6 +26,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 import './home-tab.component.css';
 
@@ -62,7 +63,8 @@ export class HomeTabComponent {
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -145,6 +147,26 @@ export class HomeTabComponent {
   changeActiveSection(): void {
     this.setActiveSection.emit(
       LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS
+    );
+  }
+
+  registerClassroomInProgressLessonEvent(
+    classroomName: string,
+    topicName: string
+  ): void {
+    this.siteAnalyticsService.registerInProgressClassroomLessonEngagedWithEvent(
+      classroomName,
+      topicName
+    );
+  }
+
+  registerNewClassroomLessonEvent(
+    classroomName: string,
+    topicName: string
+  ): void {
+    this.siteAnalyticsService.registerNewClassroomLessonEngagedWithEvent(
+      classroomName,
+      topicName
     );
   }
 }
