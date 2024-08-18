@@ -61,9 +61,9 @@ describe('Donor', function () {
       await loggedOutUser.clickDonateButtonInAboutPage();
       // Here we assume that the user has successfully donated. Successful donation
       // redirects the user to the "Thanks for donating" page in the Oppia website.
-      await loggedOutUser.navigateToThanksForDonatingPage();
+      await loggedOutUser.navigateToDonationThanksModalOnAboutPage();
       // Dismissing the "Thanks for donating" page by clicking on the dismiss button.
-      await loggedOutUser.clickDismissButtonInThanksForDonatingPage();
+      await loggedOutUser.dismissDonationThanksModalOnAboutPage();
 
       // Navigating to Donate page via navbar.
       await loggedOutUser.clickDonateButtonOnNavbar();
@@ -74,9 +74,9 @@ describe('Donor', function () {
 
       // Here we assume that the user has successfully donated. Successful donation
       // redirects the user to the "Thanks for donating" page in the Oppia website.
-      await loggedOutUser.navigateToThanksForDonatingPage();
+      await loggedOutUser.navigateToDonationThanksModalOnDonatePage();
       // Dismissing the "Thanks for donating" page by clicking on the dismiss button.
-      await loggedOutUser.clickDismissButtonInThanksForDonatingPage();
+      await loggedOutUser.dismissDonationThanksModalOnDonatePage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

@@ -26,6 +26,8 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {PageTitleService} from 'services/page-title.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {AppConstants} from '../../app.constants';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {of} from 'rxjs';
 
@@ -41,6 +43,7 @@ describe('Volunteer page', () => {
   let pageTitleService: PageTitleService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let windowDimensionsService: WindowDimensionsService;
+  let siteAnalyticsService: SiteAnalyticsService;
   let resizeEvent = new Event('resize');
 
   beforeEach(async () => {
@@ -77,6 +80,7 @@ describe('Volunteer page', () => {
     pageTitleService = TestBed.inject(PageTitleService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   it('should successfully instantiate the component from beforeEach block', () => {
@@ -235,6 +239,41 @@ describe('Volunteer page', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(800);
     component.setScreenType();
     expect(component.screenType).toEqual('desktop');
+  });
+
+  it('should register GA event when top Volunteer CTA button is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickVolunteerCTAButtonEvent'
+    ).and.callThrough();
+    component.onClickVolunteerCTAButtonAtTop();
+    expect(
+      siteAnalyticsService.registerClickVolunteerCTAButtonEvent
+    ).toHaveBeenCalledWith('CTA button at the top of the Volunteer page');
+  });
+
+  it('should register GA event when bottom Volunteer CTA button is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickVolunteerCTAButtonEvent'
+    ).and.callThrough();
+    component.onClickVolunteerCTAButtonAtBottom();
+    expect(
+      siteAnalyticsService.registerClickVolunteerCTAButtonEvent
+    ).toHaveBeenCalledWith('CTA button at the bottom of the Volunteer page');
+  });
+
+  it('should register GA event when About Page is loaded', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerFirstTimePageViewEvent'
+    ).and.callThrough();
+    component.registerFirstTimePageViewEvent();
+    expect(
+      siteAnalyticsService.registerFirstTimePageViewEvent
+    ).toHaveBeenCalledWith(
+      AppConstants.LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA.VOLUNTEER
+    );
   });
 
   it('should unsubscribe on component destruction', () => {
