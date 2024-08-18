@@ -43,6 +43,7 @@ import {
 } from './services/library-page-backend-api.service';
 import {NgbCarousel, NgbSlideEvent} from '@ng-bootstrap/ng-bootstrap';
 import './library-page.component.css';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 interface MobileLibraryGroupProperties {
   inCollapsedState: boolean;
@@ -113,7 +114,8 @@ export class LibraryPageComponent {
     private windowDimensionsService: WindowDimensionsService,
     private classroomBackendApiService: ClassroomBackendApiService,
     private pageTitleService: PageTitleService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   setActiveGroup(groupIndex: number): void {
@@ -507,7 +509,7 @@ export class LibraryPageComponent {
 
   onClassroomNavigationIndicatorClicked(slideEvent: NgbSlideEvent): void {
     // Extract numeric index from slide id (format: 'ngb-slide-{index}')
-    this.classroomCarouselIndex = parseInt(slideEvent.current.split('-')[2]);
+    this.classroomCarouselIndex = parseInt(slideEvent?.current?.split('-')[2]);
   }
 
   getClassroomChunkIndices(length: number): number[] {
@@ -546,6 +548,13 @@ export class LibraryPageComponent {
       return false;
     }
     return true;
+  }
+
+  registerClassroomCardClickEvent(classroomName: string): void {
+    this.siteAnalyticsService.registerClickClassroomCardEvent(
+      'Classroom card in the community library page',
+      classroomName
+    );
   }
 
   ngOnDestroy(): void {

@@ -10,19 +10,17 @@
           <p>{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_DESCRIPTION' | translate }}</p>
         </div>
         <div *ngFor="let classroom of classroomSummaries" class="classroom-nav-item-container">
-          <div class="classroom-item">
+          <div class="classroom-item" (click)="registerClassroomCardClickEvent(classroom.name)">
             <div class="classroom-text-container">
               <a class="classroom-name e2e-mobile-test-classroom-link"
                  [href]="'/learn/' + classroom.url_fragment"
                  *ngIf="!isHackyClassroomNameTranslationDisplayed(classroom.name)"
-                 (click)="registerClassroomHeaderClickEvent()"
                  >
                  {{ classroom.name }}
               </a>
               <a class="classroom-name e2e-mobile-test-classroom-link"
                  [href]="'/learn/' + classroom.url_fragment"
                  *ngIf="isHackyClassroomNameTranslationDisplayed(classroom.name)"
-                 (click)="registerClassroomHeaderClickEvent()"
                  >
                  {{ getClassroomNameTranslationkey(classroom.name) | translate }}
               </a>
