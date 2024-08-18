@@ -469,7 +469,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 ]
             ):
                 return 1
-            print(script)
             return 0
         def mock_get_js_or_ts_files_from_diff(
             unused_diff_files: List[git_changes_utils.FileDiff]
