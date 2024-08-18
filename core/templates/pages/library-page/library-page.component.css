@@ -341,12 +341,17 @@ oppia-library-page .hide-change-classroom-chunk-btn {
   visibility: hidden;
 }
 
+oppia-library-page .community-library-mobile-breadcrumbs-container {
+  display: none;
+}
+
 oppia-library-page .community-library-breadcrumbs-container {
   align-items: center;
   display: flex;
   gap: 4px;
   left: 86px;
-  position: relative;
+  position: sticky;
+  margin-left: 88px;
 }
 
 @media (min-width: 630px) {
@@ -372,6 +377,10 @@ oppia-library-page .community-library-breadcrumbs-container {
   }
 }
 @media (max-width: 900px) {
+  oppia-library-page .community-library-breadcrumbs-container {
+    margin-left: 75px;
+  }
+
   oppia-library-page .oppia-classroom-h1 {
     font-size: 1.45em;
   }
@@ -459,6 +468,10 @@ oppia-library-page .community-library-breadcrumbs-container {
   }
 }
 @media (max-width: 727px) {
+  oppia-library-page .community-library-breadcrumbs-container {
+    margin-left: 56px;
+  }
+
   oppia-library-page .oppia-classroom-div {
     height: 400px;
     padding: 20px;
@@ -479,6 +492,27 @@ oppia-library-page .community-library-breadcrumbs-container {
   }
 }
 @media (max-width: 536px) {
+  oppia-library-page .community-library-breadcrumbs-container {
+    display: none;
+  }
+
+  oppia-library-page .community-library-mobile-breadcrumbs-container {
+    align-items: center;
+    display: flex;
+    gap: 2px;
+    position: sticky;
+    margin-left: 8px;
+  }
+
+  oppia-library-page .community-library-mobile-breadcrumbs-container a {
+    color: #00645c;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px;
+  }
+
   .oppia-library-group-header {
     font-size: 1.2em;
     margin-left: 7%;
@@ -531,6 +565,11 @@ oppia-library-page .community-library-breadcrumbs-container {
   oppia-library-page .classroom-cards-wrapper {
     height: 358px;
     padding-top: 2px;
+  }
+
+  oppia-library-page .oppia-library-h1 {
+    text-align: left;
+    margin-left: 8px;
   }
 
   oppia-library-page .classroom-cards-text-container {
