@@ -51,7 +51,7 @@ export class CollectionEditorPageAuthGuard implements CanActivate {
           resolve(true);
         })
         .catch(err => {
-          let statusCode = err ? err.error.status_code : 401;
+          let statusCode = err ? err.status : 401;
           this.router
             .navigate([
               `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/${statusCode}`,

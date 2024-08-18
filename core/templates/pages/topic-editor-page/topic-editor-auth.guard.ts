@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ export class TopicEditorAuthGuard implements CanActivate {
           resolve(true);
         })
         .catch(err => {
-          let statusCode = 401;
+          let statusCode = err ? err.status : 401;
           this.router
             .navigate([
               `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/${statusCode}`,

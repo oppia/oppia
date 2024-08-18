@@ -759,6 +759,15 @@ class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
                 expected_status_int=200)
         self.logout()
 
+    def test_cannot_access_topic_editor_page_with_invalid_topic_id(
+        self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/can_access_topic_editor/invalid' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX),
+                expected_status_int=404)
+        self.logout()
+
     def test_access_topic_editor_page_without_curriculum_admin(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         self.get_html_response(
@@ -766,6 +775,7 @@ class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
                 ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id
             ), expected_status_int=401
         )
+        self.logout()
 
 
 class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):

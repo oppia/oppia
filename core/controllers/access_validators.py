@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from core import feature_flag_list
 from core import feconf
+
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -553,9 +554,6 @@ class TopicEditorAccessValidationPage(
 
         Args:
             topic_id: str. The ID of the topic.
-
-        Raises:
-            Exception. The topic with the given id doesn't exist.
         """
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
