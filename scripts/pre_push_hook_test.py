@@ -464,11 +464,12 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_run_script_and_get_returncode(script: List[str]) -> int:
             if (
                 script == pre_push_hook.FRONTEND_TEST_CMDS + [
+                    '--allow_no_spec',
                     '--specs_to_run=files1.js,file2.ts',
-                    '--allow_no_spec'
                 ]
             ):
                 return 1
+            print(script)
             return 0
         def mock_get_js_or_ts_files_from_diff(
             unused_diff_files: List[git_changes_utils.FileDiff]
