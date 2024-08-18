@@ -566,30 +566,60 @@
   }
 
   @media screen and (max-width: 768px) {
-    .oppia-editor-card-with-avatar {
-      margin-top: 20px;
-    }
-
-    .oppia-classroom-input-container span {
-      padding-left: 0;
-    }
-
-    .topic-dependency-container {
-      overflow: auto;
-    }
-
-    .oppia-classroom-tile {
-      margin: 0;
-      width: 100%;
-    }
-
-    .classroom-details {
-      padding: 0;
-    }
-
-    .topic-and-prerequisites-container {
-      position: relative;
-      right: 18px;
-    }
+  .oppia-editor-card-with-avatar {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    max-width: 100%;
   }
+
+  .card-content {
+    padding: 35px 10px;
+  }
+
+  .oppia-classroom-input-container {
+    padding-left: 0;
+    width: 100%;
+  }
+
+  .oppia-classroom-input-container span {
+    display: block;
+    padding-left: 0;
+  }
+
+  .oppia-classroom-tile {
+    box-sizing: border-box;
+    margin: 10px 0;
+    width: 100%;
+  }
+
+  .classroom-details {
+    margin-bottom: 10px;
+    padding: 0;
+  }
+
+  .topic-and-prerequisites-container {
+    margin: 0;
+    position: static;
+    right: auto;
+  }
+
+  .new-topic-input-container {
+    width: 100%;
+  }
+
+  .create-new-classroom-button-wrapper {
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .btn.add-new-classroom {
+    width: 100%;
+  }
+
+  .topic-dependency-container {
+    margin-bottom: 10px;
+    overflow: auto;
+  }
+}
 </style>
