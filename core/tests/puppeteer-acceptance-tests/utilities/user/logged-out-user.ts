@@ -1891,6 +1891,26 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * This function verifies that the classroom cards in classrooms page.
+   */
+  async expectClassroomCountInClassroomsPageToBe(
+    classroomsCount: number
+  ): Promise<void> {
+    await this.page.waitForSelector(classroomTileContainer);
+    const classroomTiles = await this.page.$$(classroomTileContainer);
+
+    if (classroomTiles.length === classroomsCount) {
+      showMessage(
+        `${classroomsCount} classrooms are present in classrooms page.`
+      );
+    } else {
+      throw new Error(
+        `Expect ${classroomsCount} classrooms to be present in classrooms page, found: ${classroomTiles.length} classrooms.`
+      );
+    }
+  }
+
+  /**
    * This function changes the site language based on the provided parameter,
    * then clicks the 'Partner With Us' button on the About page, and
    * verifies if the Partnerships Google form opens in the specified language.

@@ -1,1 +1,7 @@
+core/templates/pages/classroom-admin-page/classroom-admin-page.module.ts
+core/templates/pages/classroom-page/classroom-page.module.ts
 core/templates/pages/classrooms-page/classrooms-page.module.ts
+core/templates/pages/error-pages/error-page.module.ts
+core/templates/pages/library-page/library-page.module.ts
+core/templates/pages/topic-editor-page/topic-editor-page.import.ts
+core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.import.ts

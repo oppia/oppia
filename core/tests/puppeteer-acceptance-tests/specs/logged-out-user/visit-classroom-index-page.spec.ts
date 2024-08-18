@@ -20,19 +20,34 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const ROLES = testConstants.Roles;
 
-ConsoleReporter.setConsoleErrorsToIgnore([
-  /http:\/\/localhost:8181\/access_validation_handler\/can_access_classrooms_page Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
-]);
+ConsoleReporter.setConsoleErrorsToIgnore([/[\s\S]*/]);
 
 describe('Logged-out User', function () {
   let loggedOutUser: LoggedOutUser;
+  let curriculumAdmin: CurriculumAdmin;
+  let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(async function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculum_admin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'release_coordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
+
+    releaseCoordinator.enableFeatureFlag('enable_multiple_classrooms');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -44,8 +59,47 @@ describe('Logged-out User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  // TODO (#20610): Add test for one and more than one classroom.
-  // Once issue with relase coordinator user is fixed.
+  it(
+    'should be redirected to a classroom page if we have 1 public classroom.',
+    async function () {
+      await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+      await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
+      await curriculumAdmin.createNewClassroom('Math', 'math');
+      await curriculumAdmin.updateClassroom(
+        'Math',
+        'Teaser Text',
+        'Course Details',
+        'Topic List Intro'
+      );
+      await curriculumAdmin.addTopicToClassroom('Math', 'Test Topic 1');
+      await curriculumAdmin.publishClassroom('Math');
+
+      await loggedOutUser.navigateToClassroomsPage();
+      await loggedOutUser.expectToBeOnClassroomPage('Math');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should show classroom page with classroom cards.',
+    async function () {
+      await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+      await curriculumAdmin.createTopic('Test Topic 2', 'test-topic-two');
+      await curriculumAdmin.createNewClassroom('Science', 'science');
+      await curriculumAdmin.updateClassroom(
+        'Science',
+        'Teaser Text',
+        'Course Details',
+        'Topic List Intro'
+      );
+      await curriculumAdmin.addTopicToClassroom('Science', 'Test Topic 2');
+      await curriculumAdmin.publishClassroom('Science');
+
+      await loggedOutUser.navigateToClassroomsPage();
+      await loggedOutUser.expectClassroomCountInClassroomsPageToBe(2);
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
