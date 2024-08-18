@@ -597,6 +597,7 @@
 	"I18N_EXPLORATION_C8QUgzIETvRv_TITLE": "Title of the chapters displayed on topic viewer and story viewer page. Should be at most 36 characters.",
 	"I18N_EXPLORATION_FMH1Ii1ztP4j_DESCRIPTION": "Description of the chapters displayed on story viewer page. Should be at most 100 characters.",
 	"I18N_EXPLORATION_FMH1Ii1ztP4j_TITLE": "Title of the chapters displayed on topic viewer and story viewer page. Should be at most 36 characters.",
+	"I18N_EXPLORE_OPPIA_CLASSROOM": "Text of button which redirects user to classrooms page present in splash page.",
 	"I18N_EXPLORATION_Gh6AzOEDLcz2_DESCRIPTION": "Description of the chapters displayed on story viewer page. Should be at most 100 characters.",
 	"I18N_EXPLORATION_Gh6AzOEDLcz2_TITLE": "Title of the chapters displayed on topic viewer and story viewer page. Should be at most 36 characters.",
 	"I18N_EXPLORATION_IrbGLTicm0BI_DESCRIPTION": "Description of the chapters displayed on story viewer page. Should be at most 100 characters.",
