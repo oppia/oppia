@@ -237,9 +237,10 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         with self.swap_success_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage:
-                    run_frontend_tests.main(
-                        args=['--specs_to_run', 'invalid.ts',
-                                '--allow_no_spec'])
+                    with self.assertRaisesRegex(SystemExit, '0'):
+                        run_frontend_tests.main(
+                            args=['--specs_to_run', 'invalid.ts',
+                                    '--allow_no_spec'])
 
     def test_frontend_tests_with_run_on_changed_files_in_branch(self) -> None:
         git_refs = [git_changes_utils.GitRef(

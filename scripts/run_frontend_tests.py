@@ -217,6 +217,15 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             if spec_file:
                 specs_to_run.add(spec_file)
 
+    if (
+        (parsed_args.specs_to_run or
+        parsed_args.run_on_changed_files_in_branch) and
+        not specs_to_run
+    ):
+        print('No valid specs found to run.')
+        exit_code = 0 if parsed_args.allow_no_spec else 1
+        sys.exit(exit_code)
+
     if specs_to_run:
         print('Running the following specs:', specs_to_run)
         cmd.append('--specs_to_run=%s' % ','.join(sorted(specs_to_run)))
