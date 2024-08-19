@@ -54,7 +54,7 @@ def get_all_classrooms() -> List[classroom_config_domain.Classroom]:
     return classrooms
 
 
-def get_classroom_id_to_classroom_name_dict() -> Dict[str, Dict[str, str]]:
+def get_classroom_id_to_classroom_name_dict() -> Dict[str, str]:
     """Returns a dict with classroom id as key and classroom name as value for
     all the classrooms present in the datastore.
 
@@ -338,7 +338,6 @@ def delete_classroom(classroom_id: str) -> None:
     Args:
         classroom_id: str. ID of the classroom which is to be deleted.
     """
-    index_to_delete = None
     classrooms = get_all_classrooms()
 
     for classroom in classrooms:
@@ -355,14 +354,13 @@ def delete_classroom(classroom_id: str) -> None:
 
 
 @transaction_services.run_in_transaction_wrapper
-def update_classroom_id_to_index_mappings(classroom_index_mappings: List[
-                                          classroom_config_domain.ClassroomIdToIndex]
+def update_classroom_id_to_index_mappings(
+    classroom_index_mappings: List[classroom_config_domain.ClassroomIdToIndex]
 ) -> None:
-    """Updates an multiple ClassroomIdToIndexModel in the datastore.
+    """Updates the index of multiple classrooms.
 
     Args:
-        classroom_id_index_mappings: List[
-            classroom_config_domain.ClassroomIdToIndex]. The domain
+        classroom_id_index_mappings: List[ClassroomIdToIndex]. The domain
             objects for the given mapping.
 
     Raises:

@@ -307,10 +307,10 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
         self.assertEqual(
             sorted(
                 json_response['classroom_id_to_name_index_mappings'],
-                key=lambda x: x['classroom_id']
+                key=lambda x: int(x['classroom_id'])
             ),
             sorted(
-                classroom_id_to_classroom_name, key=lambda x: x['classroom_id'])
+                classroom_id_to_classroom_name, key=lambda x: int(x['classroom_id']))
         )
         self.logout()
 

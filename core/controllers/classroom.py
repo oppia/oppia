@@ -561,10 +561,10 @@ class AllClassroomsSummaryHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         classrooms = classroom_config_services.get_all_classrooms()
-        all_classrooms_summary_dicts: List[Dict[str, str|bool]] = []
+        all_classrooms_summary_dicts: List[Dict[str, str|bool|int]] = []
 
         for classroom in classrooms:
-            classroom_summary_dict: Dict[str, str|bool] = {
+            classroom_summary_dict: Dict[str, str|bool|int] = {
                 'classroom_id': classroom.classroom_id,
                 'name': classroom.name,
                 'url_fragment': classroom.url_fragment,
