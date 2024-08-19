@@ -50,7 +50,6 @@ import {
   LibraryPageBackendApiService,
 } from './services/library-page-backend-api.service';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
-import {NgbCarousel} from '@ng-bootstrap/ng-bootstrap';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 class MockWindowRef {
@@ -104,12 +103,6 @@ describe('Library Page Component', () => {
   let translateService: TranslateService;
   let classroomBackendApiService: ClassroomBackendApiService;
   let siteAnalyticsService: SiteAnalyticsService;
-
-  const mockNgbCarousel: Partial<NgbCarousel> = {
-    next: jasmine.createSpy('next'),
-    prev: jasmine.createSpy('prev'),
-    select: jasmine.createSpy('select'),
-  };
 
   let explorationList: CreatorExplorationSummaryBackendDict[] = [
     {

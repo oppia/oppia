@@ -16,7 +16,7 @@
  * @fileoverview Data and component for the Oppia contributors' library page.
  */
 
-import {Component, ViewChild} from '@angular/core';
+import {Component} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -99,7 +99,7 @@ export class LibraryPageComponent {
   translateX: number = 0;
   currentCardIndex: number = 0;
   cardsToShow: number = 3;
-  dots: any[] = [];
+  dots: number[] = [];
 
   constructor(
     private loggerService: LoggerService,

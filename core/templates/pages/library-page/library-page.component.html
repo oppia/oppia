@@ -6,11 +6,11 @@
     </div>
     <div class="individual-classroom-cards" *ngIf="publicClassroomsCount <= 2">
       <ng-container *ngFor="let classroomSummary of classroomSummaries">
-        <oppia-classroom-card
-          (click)="registerClassroomCardClickEvent(classroomSummary.name)"
-          *ngIf="classroomSummary.is_published"
-          [classroomSummary]="classroomSummary"
-          [usedInCarousel]="false">
+        <oppia-classroom-card (click)="registerClassroomCardClickEvent(classroomSummary.name)"
+                              *ngIf="classroomSummary.is_published"
+                              [classroomSummary]="classroomSummary"
+                              [usedInCarousel]="false"
+        >
         </oppia-classroom-card>
       </ng-container>
     </div>
@@ -23,7 +23,7 @@
       <div class="carousel-container"
            (swipeleft)="moveClassroomCarouselToNextSlide()"
            (swiperight)="moveClassroomCarouselToPreviousSlide()">
-        <div class="classrooms-card-container" 
+        <div class="classrooms-card-container"
              [ngStyle]="{'transform': 'translateX(' + translateX + 'px)'}">
           <ng-container *ngFor="let classroomSummary of classroomSummaries">
             <oppia-classroom-card

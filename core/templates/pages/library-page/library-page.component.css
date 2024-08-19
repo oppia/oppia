@@ -159,8 +159,8 @@ oppia-library-page .community-library-breadcrumbs-container span {
 }
 .carousel-container {
   overflow: hidden;
-  width: 100%;
   position: relative;
+  width: 100%;
 }
 .oppia-library-carousel-tiles {
   /*The height is adjusted to hide the scrollbars*/
@@ -270,12 +270,16 @@ oppia-library-page .classroom-cards-text-container p {
   line-height: 25px;
 }
 
+oppia-library-page .classrooms-carousel {
+  position: relative;
+}
+
 oppia-library-page .classroom-cards-wrapper .classroom-cards-inner-container .classrooms-carousel {
   align-items: center;
   display: flex;
   gap: 4px;
-  position: relative;
   height: 184px;
+  position: relative;
   justify-content: center;
   width: 565px;
 }
@@ -456,10 +460,6 @@ oppia-library-page .community-library-breadcrumbs-container {
     margin: 0;
     transform: translateX(-50%);
     width: fit-content;
-  }
-
-  oppia-library-page .classrooms-carousel {
-    position: relative;
   }
 
   oppia-library-page .classrooms-carousel .mobile-carousel-btn {
