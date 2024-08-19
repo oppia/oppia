@@ -279,8 +279,8 @@ oppia-library-page .classroom-cards-wrapper .classroom-cards-inner-container .cl
   display: flex;
   gap: 4px;
   height: 184px;
-  position: relative;
   justify-content: center;
+  position: relative;
   width: 565px;
 }
 
