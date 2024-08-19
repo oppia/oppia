@@ -870,6 +870,28 @@ describe('Library Page Component', () => {
     );
   });
 
+  it('should move to a specific slide correctly', () => {
+    componentInstance.classroomSummaries = [...dummyClassroomSummaries];
+    componentInstance.publicClassroomsCount =
+      componentInstance.classroomSummaries.length;
+    componentInstance.currentCardIndex = 0;
+
+    spyOn(componentInstance, 'getCardWidth').and.returnValue(100);
+    spyOn(componentInstance, 'updateActiveDot');
+
+    componentInstance.moveToSlide(1);
+
+    expect(componentInstance.currentCardIndex).toEqual(1);
+    expect(componentInstance.translateX).toEqual(-100);
+    expect(componentInstance.updateActiveDot).toHaveBeenCalled();
+
+    componentInstance.moveToSlide(2);
+
+    expect(componentInstance.currentCardIndex).toEqual(2);
+    expect(componentInstance.translateX).toEqual(-200);
+    expect(componentInstance.updateActiveDot).toHaveBeenCalled();
+  });
+
   it('should record analytics when classroom card is clicked', () => {
     spyOn(
       siteAnalyticsService,
