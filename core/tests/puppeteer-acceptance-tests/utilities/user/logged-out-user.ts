@@ -169,7 +169,7 @@ const testimonialCarouselPrevButton =
   '.e2e-test-teach-page-testimonial-carousel-prev-btn';
 const testimonialCarouselNextButton =
   '.e2e-test-teach-page-testimonial-carousel-next-btn';
-// Below 2 are external components' selectors so they are not prefixed with "e2e-test".
+// The following two are external components' selectors so they are not prefixed with "e2e-test".
 const testimonialCarouselNameInTeachPage =
   '.carousel-item.active .e2e-test-teach-page-testimonial-name';
 const testimonialCarouselIndicatorsInTeachPage = '.carousel-indicators li';
