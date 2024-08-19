@@ -27,7 +27,9 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-ConsoleReporter.setConsoleErrorsToIgnore([/[\s\S]*/]);
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /http:\/\/localhost:8181\/access_validation_handler\/can_access_classrooms_page Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+]);
 
 describe('Logged-out User', function () {
   let loggedOutUser: LoggedOutUser;
