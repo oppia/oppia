@@ -39,14 +39,14 @@
         <i class="fa fa-angle-right"></i>
       </button>
       <div class="navigation-dots">
-        <span *ngFor="let dot of dots; let i = index" 
-              [class.active]="dot === 1" 
+        <span *ngFor="let dot of dots; let i = index"
+              [class.active]="dot === 1"
               (click)="moveToSlide(i)">
         </span>
       </div>
       <div class="mobile-buttons">
         <button class="mobile-carousel-btn mobile-prev-btn"
-                (click)="moveClassroomCarouselToPreviousSlide()" 
+                (click)="moveClassroomCarouselToPreviousSlide()"
                 *ngIf="shouldShowPreviousClassroomChunkButton()"
                 aria-label="Previous Slide">
           <i class="fa fa-angle-left"></i>

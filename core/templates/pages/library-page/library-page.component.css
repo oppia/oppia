@@ -77,19 +77,19 @@ oppia-library-page .oppia-group-page-header {
 }
 
 .navigation-dots {
-  position: absolute;
   display: flex;
-  top: 195px;
   justify-content: center;
+  position: absolute;
+  top: 195px;  
 }
 
 .navigation-dots span {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
   background-color: #ccc;
-  margin: 0 5px;
+  border-radius: 50%;
   cursor: pointer;
+  height: 10px;
+  margin: 0 5px;
+  width: 10px;  
 }
 
 .navigation-dots span.active {
