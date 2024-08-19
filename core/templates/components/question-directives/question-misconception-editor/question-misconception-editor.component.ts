@@ -30,6 +30,7 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {TagMisconceptionModalComponent} from './tag-misconception-modal-component';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 import {Rule} from 'domain/exploration/rule.model';
+import {Subscription} from 'rxjs';
 
 export interface MisconceptionUpdatedValues {
   misconception: Misconception;
@@ -58,13 +59,14 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   @Input() outcome!: Outcome;
   @Input() isEditable!: boolean;
   @Input() rules!: Rule;
-  @Input() taggedSkillMisconceptionId!: string;
+  @Input() taggedSkillMisconceptionId!: string | null;
   misconceptionName!: string;
   misconceptionsBySkill!: MisconceptionSkillMap;
   selectedMisconception!: Misconception;
   selectedMisconceptionSkillId!: string;
   feedbackIsUsed: boolean = false;
   misconceptionEditorIsOpen: boolean = false;
+  directiveSubscriptions = new Subscription();
 
   constructor(
     private externalSaveService: ExternalSaveService,
@@ -76,6 +78,29 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
     this.misconceptionsBySkill =
       this.stateEditorService.getMisconceptionsBySkill();
     this.misconceptionEditorIsOpen = false;
+    this.initValues();
+    if (!this.stateEditorService.isInQuestionMode()) {
+      this.directiveSubscriptions.add(
+        this.stateEditorService.onUpdateMisconceptions.subscribe(() => {
+          this.misconceptionsBySkill =
+            this.stateEditorService.getMisconceptionsBySkill();
+          this.initValues();
+        })
+      );
+
+      this.directiveSubscriptions.add(
+        this.stateEditorService.onChangeLinkedSkillId.subscribe(() => {
+          this.misconceptionsBySkill =
+            this.stateEditorService.getMisconceptionsBySkill();
+          this.taggedSkillMisconceptionId = null;
+          this.initValues();
+        })
+      );
+    }
+    this.feedbackIsUsed = true;
+  }
+
+  initValues(): void {
     let skillMisconceptionId = this.taggedSkillMisconceptionId;
     if (skillMisconceptionId) {
       if (
@@ -100,16 +125,27 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
         );
       }
     }
-    this.feedbackIsUsed = true;
   }
 
   containsMisconceptions(): boolean {
     let containsMisconceptions = false;
-    Object.keys(this.misconceptionsBySkill).forEach(skillId => {
-      if (this.misconceptionsBySkill[skillId].length > 0) {
-        containsMisconceptions = true;
-      }
-    });
+    if (this.stateEditorService.isInQuestionMode()) {
+      Object.keys(this.misconceptionsBySkill).forEach(skillId => {
+        if (this.misconceptionsBySkill[skillId].length > 0) {
+          containsMisconceptions = true;
+        }
+      });
+    } else {
+      let linkedSkillId = this.stateEditorService.getLinkedSkillId();
+      Object.keys(this.misconceptionsBySkill).forEach(skillId => {
+        if (
+          skillId === linkedSkillId &&
+          this.misconceptionsBySkill[skillId].length > 0
+        ) {
+          containsMisconceptions = true;
+        }
+      });
+    }
     return containsMisconceptions;
   }
 
@@ -163,6 +199,10 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
 
   editMisconception(): void {
     this.misconceptionEditorIsOpen = true;
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 

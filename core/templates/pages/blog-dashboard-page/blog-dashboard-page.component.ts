@@ -17,6 +17,7 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {AlertsService} from 'services/alerts.service';
 import {
@@ -207,3 +208,10 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
       );
   }
 }
+
+angular.module('oppia').directive(
+  'oppiaBlogDashboardPage',
+  downgradeComponent({
+    component: BlogDashboardPageComponent,
+  }) as angular.IDirectiveFactory
+);
