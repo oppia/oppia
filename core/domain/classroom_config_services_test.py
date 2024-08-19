@@ -63,7 +63,8 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             },
             'is_published': True,
             'thumbnail_data': self.dummy_thumbnail_data.to_dict(),
-            'banner_data': self.dummy_banner_data.to_dict()
+            'banner_data': self.dummy_banner_data.to_dict(),
+            'index': 0
         }
         self.math_classroom = classroom_config_domain.Classroom.from_dict(
             self.math_classroom_dict)
@@ -82,6 +83,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.math_classroom.banner_data.filename,
             self.math_classroom.banner_data.bg_color,
             self.math_classroom.banner_data.size_in_bytes,
+            self.math_classroom.index
         )
 
         self.physics_classroom_dict: classroom_config_domain.ClassroomDict = {
@@ -98,7 +100,8 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             },
             'is_published': True,
             'thumbnail_data': self.dummy_thumbnail_data.to_dict(),
-            'banner_data': self.dummy_banner_data.to_dict()
+            'banner_data': self.dummy_banner_data.to_dict(),
+            'index': 1
         }
         self.physics_classroom = classroom_config_domain.Classroom.from_dict(
             self.physics_classroom_dict)
@@ -116,7 +119,8 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.physics_classroom.thumbnail_data.size_in_bytes,
             self.physics_classroom.banner_data.filename,
             self.physics_classroom.banner_data.bg_color,
-            self.physics_classroom.banner_data.size_in_bytes
+            self.physics_classroom.banner_data.size_in_bytes,
+            self.physics_classroom.index
         )
 
     def test_get_classroom_by_id(self) -> None:
@@ -152,7 +156,8 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             'topic_id_to_prerequisite_topic_ids': {'topic_id_chem': []},
             'is_published': True,
             'thumbnail_data': self.dummy_thumbnail_data.to_dict(),
-            'banner_data': self.dummy_banner_data.to_dict()
+            'banner_data': self.dummy_banner_data.to_dict(),
+            'index': 2
         }
         chemistry_classroom = classroom_config_domain.Classroom.from_dict(
             chemistry_classroom_dict)
@@ -170,7 +175,8 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             chemistry_classroom.thumbnail_data.size_in_bytes,
             chemistry_classroom.banner_data.filename,
             chemistry_classroom.banner_data.bg_color,
-            chemistry_classroom.banner_data.size_in_bytes
+            chemistry_classroom.banner_data.size_in_bytes,
+            chemistry_classroom.index
         )
         classroom_url_fragment = (
             classroom_config_services.
@@ -235,7 +241,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
                 'topic_id_1': ['topic_id_2', 'topic_id_3'],
                 'topic_id_2': [],
                 'topic_id_3': []
-            }, True, self.dummy_thumbnail_data, self.dummy_banner_data
+            }, True, self.dummy_thumbnail_data, self.dummy_banner_data, 2
         )
         self.assertIsNone(
             classroom_config_services.get_classroom_by_id(
@@ -277,6 +283,11 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             classroom_config_services.get_classroom_by_id(
                 'physics_classroom_id').name,
             'physics'
+        )
+        self.assertEqual(
+            classroom_config_services.get_classroom_by_id(
+                'physics_classroom_id').index,
+            1
         )
 
     def test_delete_classroom_model(self) -> None:

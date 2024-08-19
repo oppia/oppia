@@ -1079,6 +1079,7 @@ LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER = (
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
 EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
 CLASSROOM_ID_TO_NAME_HANDLER_URL = '/classroom_id_to_name_handler'
+UPDATE_CLASSROOMS_ORDER_HANDLER_URL = '/update_classrooms_order'
 UNUSED_TOPICS_HANDLER_URL = '/unused_topics'
 NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 NEW_CLASSROOM_HANDLER_URL = '/classroom_admin/create_new'

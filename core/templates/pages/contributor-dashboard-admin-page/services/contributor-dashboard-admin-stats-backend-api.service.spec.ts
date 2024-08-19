@@ -567,7 +567,13 @@ describe('Contribution Admin dashboard stats service', () => {
 
   it('should return data for all classrooms', fakeAsync(() => {
     spyOn(crbas, 'getAllClassroomIdToClassroomNameDictAsync').and.returnValue(
-      Promise.resolve({mathClassroomId: 'math'})
+      Promise.resolve([
+        {
+          classroom_id: 'mathClassroomId',
+          classroom_name: 'math',
+          classroom_index: 1,
+        },
+      ])
     );
     spyOn(cdasbas, 'fetchTopics').and.returnValue(
       Promise.resolve([

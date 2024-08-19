@@ -151,11 +151,32 @@ class ClassroomIdToNameHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves a mapping of classroom IDs to classroom names."""
-        classroom_id_to_classroom_name = (
-            classroom_config_services.get_classroom_id_to_classroom_name_dict())
+        classroom_id_index_mappings: List[Dict[str, str|int]] = []
+        classrooms = classroom_config_services.get_all_classrooms()
+
+        for classroom in classrooms:
+            classroom_id_index_mapping_dict: Dict[str, str | int]
+            # TODO(#20845): Remove this custom logic once we have
+            # populated the ClassroomIdToIndexModel for the math classroom.
+            if classroom.index is not None:
+                classroom_id_index_mapping_dict = {
+                    'classroom_id': classroom.classroom_id,
+                    'classroom_name': classroom.name,
+                    'classroom_index': classroom.index
+                }
+            else:
+                classroom_id_index_mapping_dict = {
+                    'classroom_id': classroom.classroom_id,
+                    'classroom_name': classroom.name,
+                    'classroom_index': 0
+                }
+            classroom_id_index_mappings.append(classroom_id_index_mapping_dict)
 
         self.values.update({
-            'classroom_id_to_classroom_name': classroom_id_to_classroom_name
+            'classroom_id_to_name_index_mappings': sorted(
+                classroom_id_index_mappings,
+                key=lambda x: int(x['classroom_index'])
+            )
         })
         self.render_json(self.values)
 
@@ -340,6 +361,10 @@ class ClassroomHandler(
                 raw_banner_image, banner_filename, 'image',
                 feconf.ENTITY_TYPE_CLASSROOM, classroom_id
             )
+
+        for cls in classrooms:
+            if cls.classroom_id == classroom_id:
+                classroom.index = cls.index
 
         classroom_config_services.update_classroom(
             classroom, strict=classroom.is_published
@@ -546,12 +571,64 @@ class AllClassroomsSummaryHandler(
                 'teaser_text': classroom.teaser_text,
                 'is_published': classroom.is_published,
                 'thumbnail_filename': classroom.thumbnail_data.filename,
-                'thumbnail_bg_color': classroom.banner_data.bg_color
+                'thumbnail_bg_color': classroom.banner_data.bg_color,
+                'index': classroom.index
             }
             all_classrooms_summary_dicts.append(
                 classroom_summary_dict
             )
 
         self.render_json({
-            'all_classrooms_summary': all_classrooms_summary_dicts
+            'all_classrooms_summary': sorted(
+                all_classrooms_summary_dicts,
+                key=lambda x:int(x['index'])
+            )
         })
+
+
+class UpdateClassroomIndexMappingHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of UpdateClassroomIndexMappingHandler's
+    normalized_payload dictionary.
+    """
+
+    classroom_index_mappings: List[classroom_config_domain.ClassroomIdToIndex]
+
+
+class UpdateClassroomIndexMappingHandler(
+    base.BaseHandler[
+        UpdateClassroomIndexMappingHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
+    """Updates the order of classrooms."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'classroom_index_mappings': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': (
+                            classroom_config_domain.ClassroomIdToIndex
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_classroom_admin_page
+    def put(self) -> None:
+        """Updates the order of classrooms.
+
+        Raise:
+            InvalidInputException: If there are validation errors
+                with classroom_order.
+        """
+        assert self.normalized_payload is not None
+        classroom_config_services.update_classroom_id_to_index_mappings(
+            self.normalized_payload['classroom_index_mappings']
+        )
+        self.render_json({})

@@ -38,6 +38,7 @@ class ClassroomDict(TypedDict):
     is_published: bool
     thumbnail_data: ImageDataDict
     banner_data: ImageDataDict
+    index: int
 
 # TODO(#17246): Currently, the classroom data is stored in the config model and
 # we are planning to migrate the storage into a new Classroom model. After the
@@ -60,7 +61,8 @@ class Classroom:
         topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
         is_published: bool,
         thumbnail_data: ImageData,
-        banner_data: ImageData
+        banner_data: ImageData,
+        index: int
     ) -> None:
         """Constructs a Classroom domain object.
 
@@ -78,6 +80,7 @@ class Classroom:
             thumbnail_data: ImageData. Image data object for classroom
                 thumbnail.
             banner_data: ImageData. Image data object for classroom banner.
+            index: int. The index of the classroom.
         """
         self.classroom_id = classroom_id
         self.name = name
@@ -90,6 +93,7 @@ class Classroom:
         self.is_published = is_published
         self.thumbnail_data = thumbnail_data
         self.banner_data = banner_data
+        self.index = index
 
     @classmethod
     def from_dict(cls, classroom_dict: ClassroomDict) -> Classroom:
@@ -112,7 +116,8 @@ class Classroom:
             classroom_dict['topic_id_to_prerequisite_topic_ids'],
             classroom_dict['is_published'],
             ImageData.from_dict(classroom_dict['thumbnail_data']),
-            ImageData.from_dict(classroom_dict['banner_data'])
+            ImageData.from_dict(classroom_dict['banner_data']),
+            classroom_dict['index']
         )
 
     def to_dict(self) -> ClassroomDict:
@@ -132,7 +137,8 @@ class Classroom:
                 self.topic_id_to_prerequisite_topic_ids),
             'is_published': self.is_published,
             'thumbnail_data': self.thumbnail_data.to_dict(),
-            'banner_data': self.banner_data.to_dict()
+            'banner_data': self.banner_data.to_dict(),
+            'index': self.index
         }
 
     def get_topic_ids(self) -> List[str]:
@@ -342,6 +348,10 @@ class Classroom:
             raise utils.ValidationError(
                 'Expected is_published of the classroom to be a boolean, '
                 'received: %s.' % self.is_published)
+        if not isinstance(self.index, int):
+            raise utils.ValidationError(
+                'Expected index of the classroom to be a boolean, '
+                'received: %s.' % self.index)
 
         if strict:
             if not isinstance(self.thumbnail_data, ImageData):
@@ -429,3 +439,79 @@ class ImageData:
             'bg_color': self.bg_color,
             'size_in_bytes': self.size_in_bytes,
         }
+
+
+class ClassroomIdToIndexDict(TypedDict):
+    """Dict type for ClassroomIdToIndex object."""
+
+    classroom_id: str
+    classroom_index: int
+
+
+class ClassroomIdToIndex:
+    """Domain object for a classroom ID to index mapping."""
+
+    def __init__(
+        self,
+        classroom_id: str,
+        classroom_index: int
+    ) -> None:
+        """Constructs a ClassroomIdToIndex domain object.
+
+        Args:
+            classroom_id: str. The ID of the classroom.
+            classroom_index: int. The index of the classroom.
+        """
+        self.classroom_id = classroom_id
+        self.classroom_index = classroom_index
+
+    @classmethod
+    def from_dict(
+        cls, classroom_id_to_index_dict: ClassroomIdToIndexDict
+    ) -> ClassroomIdToIndex:
+        """Returns a ClassroomIdToIndex domain object from a dict.
+
+        Args:
+            classroom_id_to_index_dict: dict. The dict representation of the
+                ClassroomIdToIndex object.
+
+        Returns:
+            ClassroomIdToIndex. The ClassroomIdToIndex object instance.
+        """
+        return cls(
+            classroom_id_to_index_dict['classroom_id'],
+            classroom_id_to_index_dict['classroom_index']
+        )
+
+    def to_dict(self) -> ClassroomIdToIndexDict:
+        """Returns a dict representing a ClassroomIdToIndex domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of ClassroomIdToIndex instance.
+        """
+        return {
+            'classroom_id': self.classroom_id,
+            'classroom_index': self.classroom_index
+        }
+
+    def validate(self) -> None:
+        """Validates various properties of the ClassroomIdToIndex."""
+        if not isinstance(self.classroom_id, str):
+            raise utils.ValidationError(
+                'Expected classroom_id to be a string, received: %s.'
+                % self.classroom_id)
+
+        if self.classroom_id == '':
+            raise utils.ValidationError(
+                'classroom_id field should not be empty'
+            )
+
+        if not isinstance(self.classroom_index, int):
+            raise utils.ValidationError(
+                'Expected classroom_index to be an integer, received: %s.'
+                % self.classroom_index)
+
+        if self.classroom_index < 0:
+            raise utils.ValidationError(
+                'classroom_index must be a non-negative integer, received: %d.'
+                % self.classroom_index)
