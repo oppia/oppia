@@ -310,7 +310,9 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
                 key=lambda x: int(x['classroom_id'])
             ),
             sorted(
-                classroom_id_to_classroom_name, key=lambda x: int(x['classroom_id']))
+                classroom_id_to_classroom_name,
+                key=lambda x: int(x['classroom_id'])
+            )
         )
         self.logout()
 

@@ -360,7 +360,7 @@ def update_classroom_id_to_index_mappings(
     """Updates the index of multiple classrooms.
 
     Args:
-        classroom_id_index_mappings: List[ClassroomIdToIndex]. The domain
+        classroom_index_mappings: List[ClassroomIdToIndex]. The domain
             objects for the given mapping.
 
     Raises:
