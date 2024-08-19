@@ -50,11 +50,7 @@ import {
   LibraryPageBackendApiService,
 } from './services/library-page-backend-api.service';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
-import {
-  NgbCarousel,
-  NgbSlideEvent,
-  NgbSlideEventDirection,
-} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCarousel} from '@ng-bootstrap/ng-bootstrap';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 class MockWindowRef {
@@ -839,55 +835,31 @@ describe('Library Page Component', () => {
   }));
 
   it('should handle more than 3 classrooms correctly in the classroom carousel', () => {
-    componentInstance.classroomCarousel = mockNgbCarousel as NgbCarousel;
     componentInstance.classroomSummaries = [...dummyClassroomSummaries];
     componentInstance.publicClassroomsCount =
       componentInstance.classroomSummaries.length;
 
-    const mockSlideEvent: NgbSlideEvent = {
-      current: 'ngb-slide-0',
-      paused: false,
-      prev: '',
-      direction: 'left' as NgbSlideEventDirection,
-    };
-
-    expect(
-      componentInstance.getClassroomChunkIndices(
-        componentInstance.classroomSummaries.length
-      )
-    ).toEqual([0, 1]);
-    expect(componentInstance.classroomCarouselIndex).toEqual(0);
-    expect(
-      componentInstance.getClassroomsForChunk(
-        componentInstance.classroomSummaries,
-        0
-      )
-    ).toEqual(componentInstance.classroomSummaries.slice(0, 3));
-    expect(
-      componentInstance.getClassroomsForChunk(
-        componentInstance.classroomSummaries,
-        1
-      )
-    ).toEqual(componentInstance.classroomSummaries.slice(3));
     expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(true);
     expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
       false
     );
 
     componentInstance.moveClassroomCarouselToNextSlide();
-    expect(componentInstance.classroomCarouselIndex).toEqual(1);
+    expect(componentInstance.currentCardIndex).toEqual(1);
 
-    componentInstance.onClassroomNavigationIndicatorClicked(mockSlideEvent);
-    expect(componentInstance.classroomCarouselIndex).toEqual(0);
+    componentInstance.moveClassroomCarouselToPreviousSlide();
+    expect(componentInstance.currentCardIndex).toEqual(0);
 
     componentInstance.moveClassroomCarouselToNextSlide();
+    componentInstance.moveClassroomCarouselToNextSlide();
+    expect(componentInstance.currentCardIndex).toEqual(1);
     expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(false);
     expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
       true
     );
 
     componentInstance.moveClassroomCarouselToPreviousSlide();
-    expect(componentInstance.classroomCarouselIndex).toEqual(0);
+    expect(componentInstance.currentCardIndex).toEqual(0);
     expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(true);
     expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
       false
@@ -895,10 +867,10 @@ describe('Library Page Component', () => {
   });
 
   it('should handle less than 3 classrooms correctly in the classroom carousel', () => {
-    componentInstance.classroomCarousel = mockNgbCarousel as NgbCarousel;
-    componentInstance.classroomSummaries = dummyClassroomSummaries.slice(0, 3);
+    componentInstance.classroomSummaries = dummyClassroomSummaries.slice(0, 2);
     componentInstance.publicClassroomsCount =
       componentInstance.classroomSummaries.length;
+
     expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(false);
     expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
       false

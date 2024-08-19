@@ -41,7 +41,6 @@ import {
   LibraryPageBackendApiService,
   SummaryDict,
 } from './services/library-page-backend-api.service';
-import {NgbCarousel, NgbSlideEvent} from '@ng-bootstrap/ng-bootstrap';
 import './library-page.component.css';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
@@ -56,8 +55,6 @@ interface MobileLibraryGroupProperties {
   styleUrls: ['./library-page.component.css'],
 })
 export class LibraryPageComponent {
-  @ViewChild('classroomCarousel') classroomCarousel!: NgbCarousel;
-
   possibleBannerFilenames: string[] = [
     'banner1.svg',
     'banner2.svg',
@@ -99,7 +96,10 @@ export class LibraryPageComponent {
   pageMode!: string;
   classroomSummaries: ClassroomSummaryDict[] = [];
   publicClassroomsCount: number = 0;
-  classroomCarouselIndex: number = 0;
+  translateX: number = 0;
+  currentCardIndex: number = 0;
+  cardsToShow: number = 3;
+  dots: any[] = [];
 
   constructor(
     private loggerService: LoggerService,
@@ -307,6 +307,9 @@ export class LibraryPageComponent {
   }
 
   ngOnInit(): void {
+    this.dots = Array(
+      Math.ceil(this.classroomSummaries.length / this.cardsToShow)
+    ).fill(0);
     let libraryWindowCutoffPx = 536;
     this.libraryWindowIsNarrow =
       this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx;
@@ -498,56 +501,54 @@ export class LibraryPageComponent {
   }
 
   moveClassroomCarouselToPreviousSlide(): void {
-    this.classroomCarouselIndex -= 1;
-    this.classroomCarousel.prev();
+    if (this.currentCardIndex > 0) {
+      this.currentCardIndex -= 1;
+      this.translateX += this.getCardWidth();
+      this.updateActiveDot();
+    }
   }
 
   moveClassroomCarouselToNextSlide(): void {
-    this.classroomCarouselIndex += 1;
-    this.classroomCarousel.next();
+    if (
+      this.currentCardIndex <
+      this.classroomSummaries.length - this.cardsToShow
+    ) {
+      this.currentCardIndex += 1;
+      this.translateX -= this.getCardWidth();
+      this.updateActiveDot();
+    }
   }
 
-  onClassroomNavigationIndicatorClicked(slideEvent: NgbSlideEvent): void {
-    // Extract numeric index from slide id (format: 'ngb-slide-{index}')
-    this.classroomCarouselIndex = parseInt(slideEvent?.current?.split('-')[2]);
+  moveToSlide(index: number): void {
+    this.translateX = -index * this.getCardWidth();
+    this.currentCardIndex = index;
+    this.updateActiveDot();
   }
 
-  getClassroomChunkIndices(length: number): number[] {
-    const chunkSize = 3;
-    const numChunks = Math.ceil(length / chunkSize);
-    return Array(numChunks)
-      .fill(0)
-      .map((_, index) => index);
+  getCardWidth(): number {
+    const cardContainerWidth =
+      document.querySelector('.carousel-container')?.clientWidth || 0;
+    return cardContainerWidth / this.cardsToShow;
   }
 
-  getClassroomsForChunk(
-    classroomSummaries: ClassroomSummaryDict[],
-    chunkIndex: number
-  ): ClassroomSummaryDict[] {
-    const chunkSize = 3;
-    const start = chunkIndex * chunkSize;
-    const end = start + chunkSize;
-    return classroomSummaries.slice(start, end);
+  updateActiveDot(): void {
+    this.dots = this.dots.map((_, i) => (i === this.currentCardIndex ? 1 : 0));
   }
 
   shouldShowNextClassroomChunkButton(): boolean {
-    const numberOfClassroomSlides = this.getClassroomChunkIndices(
-      this.classroomSummaries.length
-    ).length;
-    if (
-      this.publicClassroomsCount <= 3 ||
-      this.classroomCarouselIndex === numberOfClassroomSlides - 1
-    ) {
-      return false;
-    }
-    return true;
+    const numberOfClassroomSlides = Math.ceil(
+      this.classroomSummaries.length / this.cardsToShow
+    );
+    return (
+      this.publicClassroomsCount > this.cardsToShow &&
+      this.currentCardIndex < numberOfClassroomSlides - 1
+    );
   }
 
   shouldShowPreviousClassroomChunkButton(): boolean {
-    if (this.publicClassroomsCount <= 3 || this.classroomCarouselIndex === 0) {
-      return false;
-    }
-    return true;
+    return (
+      this.publicClassroomsCount > this.cardsToShow && this.currentCardIndex > 0
+    );
   }
 
   registerClassroomCardClickEvent(classroomName: string): void {

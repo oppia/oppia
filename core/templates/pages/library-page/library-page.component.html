@@ -6,60 +6,38 @@
     </div>
     <div class="individual-classroom-cards" *ngIf="publicClassroomsCount <= 2">
       <ng-container *ngFor="let classroomSummary of classroomSummaries">
-        <oppia-classroom-card (click)="registerClassroomCardClickEvent(classroomSummary.name)"
-                              *ngIf="classroomSummary.is_published"
-                              [classroomSummary]="classroomSummary"
-                              [usedInCarousel]="false"
-        >
+        <oppia-classroom-card
+          (click)="registerClassroomCardClickEvent(classroomSummary.name)"
+          *ngIf="classroomSummary.is_published"
+          [classroomSummary]="classroomSummary"
+          [usedInCarousel]="false">
         </oppia-classroom-card>
       </ng-container>
     </div>
     <div class="classrooms-carousel" *ngIf="publicClassroomsCount > 2">
-      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn"
+      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn left"
               (click)="moveClassroomCarouselToPreviousSlide()"
-              aria-label="Previous Slide"
-              [ngClass]="{'show-change-classroom-chunk-btn': shouldShowPreviousClassroomChunkButton(), 'hide-change-classroom-chunk-btn': !shouldShowPreviousClassroomChunkButton()}">
+              aria-label="Previous Slide">
         <i class="fa fa-angle-left"></i>
       </button>
-      <div class="carousel-container">
-        <ngb-carousel #classroomCarousel
-                      [interval]="0"
-                      [showNavigationArrows]="false"
-                      [showNavigationIndicators]="publicClassroomsCount > 3"
-                      (slide)="onClassroomNavigationIndicatorClicked()"
-        >
-          <ng-template ngbSlide *ngFor="let chunkIndex of getClassroomChunkIndices(classroomSummaries.length); let i = index">
-            <div class="classrooms-card-container">
-              <ng-container *ngFor="let classroomSummary of getClassroomsForChunk(classroomSummaries, chunkIndex)">
-                <oppia-classroom-card (click)="registerClassroomCardClickEvent(classroomSummary.name)"
-                                      *ngIf="classroomSummary.is_published"
-                                      [classroomSummary]="classroomSummary"
-                                      [usedInCarousel]="true"
-                >
-                </oppia-classroom-card>
-              </ng-container>
-            </div>
-          </ng-template>
-        </ngb-carousel>
+      <div class="carousel-container"
+           (swipeleft)="moveClassroomCarouselToNextSlide()"
+           (swiperight)="moveClassroomCarouselToPreviousSlide()">
+        <div class="classrooms-card-container" 
+             [ngStyle]="{'transform': 'translateX(' + translateX + 'px)'}">
+          <ng-container *ngFor="let classroomSummary of classroomSummaries">
+            <oppia-classroom-card
+              (click)="registerClassroomCardClickEvent(classroomSummary.name)"
+              *ngIf="classroomSummary.is_published"
+              [classroomSummary]="classroomSummary"
+              [usedInCarousel]="true">
+            </oppia-classroom-card>
+          </ng-container>
+        </div>
       </div>
-      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn"
+      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn right"
               (click)="moveClassroomCarouselToNextSlide()"
-              aria-label="Next Slide"
-              [ngClass]="{'show-change-classroom-chunk-btn': shouldShowNextClassroomChunkButton(), 'hide-change-classroom-chunk-btn': !shouldShowNextClassroomChunkButton()}">
-        <i class="fa fa-angle-right"></i>
-      </button>
-      <button class="mobile-carousel-btn mobile-prev-btn"
-              (click)="moveClassroomCarouselToPreviousSlide()"
-              *ngIf="shouldShowPreviousClassroomChunkButton()"
-              aria-label="Previous Slide"
-      >
-        <i class="fa fa-angle-left"></i>
-      </button>
-      <button class="mobile-carousel-btn mobile-next-btn"
-              (click)="moveClassroomCarouselToNextSlide()"
-              *ngIf="shouldShowNextClassroomChunkButton()"
-              aria-label="Next Slide"
-      >
+              aria-label="Next Slide">
         <i class="fa fa-angle-right"></i>
       </button>
     </div>
