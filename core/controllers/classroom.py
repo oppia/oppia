@@ -581,7 +581,7 @@ class AllClassroomsSummaryHandler(
         self.render_json({
             'all_classrooms_summary': sorted(
                 all_classrooms_summary_dicts,
-                key=lambda x:int(x['index'])
+                key=lambda x : int(x['index'])
             )
         })
 

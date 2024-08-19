@@ -134,9 +134,13 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         )
         self.assertTrue(classroom.is_published)
         self.assertEqual(
-            classroom.thumbnail_data.to_dict(), self.dummy_thumbnail_data.to_dict()
+            classroom.thumbnail_data.to_dict(),
+            self.dummy_thumbnail_data.to_dict()
         )
-        self.assertEqual(classroom.banner_data.to_dict(), self.dummy_banner_data.to_dict())
+        self.assertEqual(
+            classroom.banner_data.to_dict(),
+            self.dummy_banner_data.to_dict()
+        )
         self.assertEqual(classroom.index, 0)
 
     def test_to_dict_method(self) -> None:

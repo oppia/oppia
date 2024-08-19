@@ -285,7 +285,7 @@ def create_new_classroom(
 
 
 def create_new_default_classroom(
-        classroom_id: str, name: str, url_fragment: str, index: int = 0
+        classroom_id: str, name: str, url_fragment: str
     ) -> classroom_config_domain.Classroom:
     """Creates a new default classroom model.
 
@@ -355,13 +355,16 @@ def delete_classroom(classroom_id: str) -> None:
 
 
 @transaction_services.run_in_transaction_wrapper
-def update_classroom_id_to_index_mappings(
-        classroom_index_mappings: List[classroom_config_domain.ClassroomIdToIndex]
+def update_classroom_id_to_index_mappings(classroom_index_mappings: List[
+                classroom_config_domain.ClassroomIdToIndex]
 ) -> None:
     """Updates an multiple ClassroomIdToIndexModel in the datastore.
+
     Args:
-        classroom_id_index_mappings: List[ClassroomIdToIndex]. The domain
+        classroom_id_index_mappings: List[
+            classroom_config_domain.ClassroomIdToIndex]. The domain
             objects for the given mapping.
+
     Raises:
         Exception. No mapping found for the given classroom ID.
     """

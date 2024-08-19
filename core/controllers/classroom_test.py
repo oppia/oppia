@@ -258,7 +258,8 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             },
             'is_published': True,
             'thumbnail_data': dummy_thumbnail_data.to_dict(),
-            'banner_data': dummy_banner_data.to_dict()
+            'banner_data': dummy_banner_data.to_dict(),
+            'index': 0
         }
         self.physics_classroom = classroom_config_domain.Classroom.from_dict(
             self.physics_classroom_dict)
@@ -279,7 +280,8 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
             },
             'is_published': True,
             'thumbnail_data': dummy_thumbnail_data.to_dict(),
-            'banner_data': dummy_banner_data.to_dict()
+            'banner_data': dummy_banner_data.to_dict(),
+            'index': 1
         }
         self.math_classroom = classroom_config_domain.Classroom.from_dict(
             self.math_classroom_dict)
@@ -289,14 +291,26 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
     def test_get_classroom_id_to_classroom_name(self) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        classroom_id_to_classroom_name = {
-            self.math_classroom_id: 'math',
-            self.physics_classroom_id: 'physics'
-        }
+        classroom_id_to_classroom_name = [
+            {
+                'classroom_id': self.math_classroom.classroom_id,
+                'classroom_name': self.math_classroom.name,
+                'classroom_index': self.math_classroom.index
+            },
+            {
+                'classroom_id': self.physics_classroom.classroom_id,
+                'classroom_name': self.physics_classroom.name,
+                'classroom_index': self.physics_classroom.index
+            }
+        ]
         json_response = self.get_json(feconf.CLASSROOM_ID_TO_NAME_HANDLER_URL)
         self.assertEqual(
-            json_response['classroom_id_to_classroom_name'],
-            classroom_id_to_classroom_name
+            sorted(
+                json_response['classroom_id_to_name_index_mappings'],
+                key=lambda x: x['classroom_id']
+            ),
+            sorted(
+                classroom_id_to_classroom_name, key=lambda x: x['classroom_id'])
         )
         self.logout()
 
@@ -523,7 +537,8 @@ class UnusedTopicsHandlerTests(test_utils.GenericTestBase):
             },
             'is_published': True,
             'thumbnail_data': dummy_thumbnail_data.to_dict(),
-            'banner_data': dummy_banner_data.to_dict()
+            'banner_data': dummy_banner_data.to_dict(),
+            'index': 0
         }
         self.physics_classroom = classroom_config_domain.Classroom.from_dict(
             self.physics_classroom_dict)
@@ -655,7 +670,7 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
                 'teaser_text': 'Teaser Text',
                 'is_published': True,
                 'thumbnail_filename': 'thumbnail.svg',
-                'thumbnail_bg_color': 'transparent'
+                'thumbnail_bg_color': 'transparent', 'index': 0
             },
             {
                 'classroom_id': 'classroom2',
@@ -664,7 +679,7 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
                 'teaser_text': 'Teaser Text',
                 'is_published': True,
                 'thumbnail_filename': 'thumbnail.svg',
-                'thumbnail_bg_color': 'transparent'
+                'thumbnail_bg_color': 'transparent', 'index': 1
             }
         ]
 
@@ -772,3 +787,44 @@ class NewClassroomHandlerTests(BaseClassroomControllerTests):
             'Schema validation for \'name\' failed: '
             'Validation failed: is_nonempty ({}) for object '
         )
+
+
+class UpdateClassroomIndexMappingHandlerTests(
+    BaseClassroomControllerTests):
+    def setUp(self) -> None:
+        """Set up for testing the classroom order feature."""
+        super().setUp()
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        self.save_new_valid_classroom(
+            'classroom1', 'classroom1', 'classroomone')
+        self.save_new_valid_classroom(
+            'classroom2', 'classroom2', 'classroomtwo')
+        self.save_new_valid_classroom(
+            'classroom3', 'classroom3', 'classroomthree')
+
+    def test_put_updates_classroom_order(self) -> None:
+        self.assertEqual(
+            classroom_config_services.get_classroom_by_id(
+                'classroom1').index, 0)
+        self.assertEqual(
+            classroom_config_services.get_classroom_by_id(
+                'classroom2').index, 1)
+        self.assertEqual(
+            classroom_config_services.get_classroom_by_id(
+                'classroom3').index, 2)
+
+        classroom_config_services.update_classroom_id_to_index_mappings(
+            [classroom_config_domain.ClassroomIdToIndex('classroom1', 1),
+            classroom_config_domain.ClassroomIdToIndex('classroom2', 0)]
+        )
+
+        self.assertEqual(
+            classroom_config_services.get_classroom_by_id(
+                'classroom1').index, 1)
+        self.assertEqual(
+            classroom_config_services.get_classroom_by_id(
+                'classroom2').index, 0)
+        self.assertEqual(
+            classroom_config_services.get_classroom_by_id(
+                'classroom3').index, 2)
