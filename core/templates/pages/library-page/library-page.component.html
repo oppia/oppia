@@ -9,8 +9,7 @@
         <oppia-classroom-card (click)="registerClassroomCardClickEvent(classroomSummary.name)"
                               *ngIf="classroomSummary.is_published"
                               [classroomSummary]="classroomSummary"
-                              [usedInCarousel]="false"
-        >
+                              [usedInCarousel]="false">
         </oppia-classroom-card>
       </ng-container>
     </div>
@@ -29,8 +28,7 @@
             <oppia-classroom-card (click)="registerClassroomCardClickEvent(classroomSummary.name)"
                                   *ngIf="classroomSummary.is_published"
                                   [classroomSummary]="classroomSummary"
-                                  [usedInCarousel]="true"
-            >
+                                  [usedInCarousel]="true">
             </oppia-classroom-card>
           </ng-container>
         </div>
@@ -40,6 +38,26 @@
               aria-label="Next Slide">
         <i class="fa fa-angle-right"></i>
       </button>
+      <div class="navigation-dots">
+        <span *ngFor="let dot of dots; let i = index" 
+              [class.active]="dot === 1" 
+              (click)="moveToSlide(i)">
+        </span>
+      </div>
+      <div class="mobile-buttons">
+        <button class="mobile-carousel-btn mobile-prev-btn"
+                (click)="moveClassroomCarouselToPreviousSlide()" 
+                *ngIf="shouldShowPreviousClassroomChunkButton()"
+                aria-label="Previous Slide">
+          <i class="fa fa-angle-left"></i>
+        </button>
+        <button class="mobile-carousel-btn mobile-next-btn"
+                (click)="moveClassroomCarouselToNextSlide()"
+                *ngIf="shouldShowNextClassroomChunkButton()"
+                aria-label="Next Slide">
+          <i class="fa fa-angle-right"></i>
+        </button>
+      </div>
     </div>
   </div>
 </div>

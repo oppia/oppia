@@ -831,17 +831,23 @@ describe('Library Page Component', () => {
     componentInstance.classroomSummaries = [...dummyClassroomSummaries];
     componentInstance.publicClassroomsCount =
       componentInstance.classroomSummaries.length;
+    componentInstance.cardsToShow = 3;
+
+    componentInstance.updateActiveDot();
 
     expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(true);
     expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
       false
     );
+    expect(componentInstance.dots).toEqual([1, 0]);
 
     componentInstance.moveClassroomCarouselToNextSlide();
     expect(componentInstance.currentCardIndex).toEqual(1);
+    expect(componentInstance.dots).toEqual([0, 1]);
 
     componentInstance.moveClassroomCarouselToPreviousSlide();
     expect(componentInstance.currentCardIndex).toEqual(0);
+    expect(componentInstance.dots).toEqual([1, 0]);
 
     componentInstance.moveClassroomCarouselToNextSlide();
     componentInstance.moveClassroomCarouselToNextSlide();
@@ -850,6 +856,7 @@ describe('Library Page Component', () => {
     expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
       true
     );
+    expect(componentInstance.dots).toEqual([0, 1]);
 
     componentInstance.moveClassroomCarouselToPreviousSlide();
     expect(componentInstance.currentCardIndex).toEqual(0);
@@ -857,6 +864,15 @@ describe('Library Page Component', () => {
     expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
       false
     );
+    expect(componentInstance.dots).toEqual([1, 0]);
+
+    componentInstance.moveToSlide(1);
+    expect(componentInstance.currentCardIndex).toEqual(1);
+    expect(componentInstance.dots).toEqual([0, 1]);
+
+    componentInstance.moveToSlide(0);
+    expect(componentInstance.currentCardIndex).toEqual(0);
+    expect(componentInstance.dots).toEqual([1, 0]);
   });
 
   it('should handle less than 3 classrooms correctly in the classroom carousel', () => {
@@ -868,28 +884,6 @@ describe('Library Page Component', () => {
     expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
       false
     );
-  });
-
-  it('should move to a specific slide correctly', () => {
-    componentInstance.classroomSummaries = [...dummyClassroomSummaries];
-    componentInstance.publicClassroomsCount =
-      componentInstance.classroomSummaries.length;
-    componentInstance.currentCardIndex = 0;
-
-    spyOn(componentInstance, 'getCardWidth').and.returnValue(100);
-    spyOn(componentInstance, 'updateActiveDot');
-
-    componentInstance.moveToSlide(1);
-
-    expect(componentInstance.currentCardIndex).toEqual(1);
-    expect(componentInstance.translateX).toEqual(-100);
-    expect(componentInstance.updateActiveDot).toHaveBeenCalled();
-
-    componentInstance.moveToSlide(2);
-
-    expect(componentInstance.currentCardIndex).toEqual(2);
-    expect(componentInstance.translateX).toEqual(-200);
-    expect(componentInstance.updateActiveDot).toHaveBeenCalled();
   });
 
   it('should record analytics when classroom card is clicked', () => {

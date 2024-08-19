@@ -307,9 +307,6 @@ export class LibraryPageComponent {
   }
 
   ngOnInit(): void {
-    this.dots = Array(
-      Math.ceil(this.classroomSummaries.length / this.cardsToShow)
-    ).fill(0);
     let libraryWindowCutoffPx = 536;
     this.libraryWindowIsNarrow =
       this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx;
@@ -351,6 +348,7 @@ export class LibraryPageComponent {
             this.classroomSummaries.push(classroomSummaries[i]);
           }
         }
+        this.updateActiveDot();
       });
 
     // Keeps track of the index of the left-most visible card of each
@@ -532,7 +530,12 @@ export class LibraryPageComponent {
   }
 
   updateActiveDot(): void {
-    this.dots = this.dots.map((_, i) => (i === this.currentCardIndex ? 1 : 0));
+    const numberOfDots = Math.ceil(
+      this.classroomSummaries.length / this.cardsToShow
+    );
+    this.dots = Array(numberOfDots)
+      .fill(0)
+      .map((_, i) => (i === this.currentCardIndex ? 1 : 0));
   }
 
   shouldShowNextClassroomChunkButton(): boolean {
