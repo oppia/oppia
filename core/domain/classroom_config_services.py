@@ -355,9 +355,8 @@ def delete_classroom(classroom_id: str) -> None:
 
 
 @transaction_services.run_in_transaction_wrapper
-def update_classroom_id_to_index_mappings(classroom_index_mappings: List[
-                classroom_config_domain.ClassroomIdToIndex]
-) -> None:
+def update_classroom_id_to_index_mappings(
+    classroom_index_mappings: List[classroom_config_domain.ClassroomIdToIndex]) -> None:
     """Updates an multiple ClassroomIdToIndexModel in the datastore.
 
     Args:
