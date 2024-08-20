@@ -1557,4 +1557,30 @@ describe('Classroom Admin Page component ', () => {
       {classroom_id: 'classroomId_1', classroom_index: 2},
     ]);
   }));
+
+  it('should set existingClassroomNames correctly when getting classroom data', fakeAsync(() => {
+    component.classroomEditorMode = false;
+    component.classroomViewerMode = false;
+    const response = {
+      classroomDict: dummyClassroomDict,
+    };
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+
+    component.classroomIdToClassroomNameIndex = [
+      {classroom_id: 'id1', classroom_name: 'Classroom 1', classroom_index: 0},
+      {classroom_id: 'id2', classroom_name: 'Classroom 2', classroom_index: 1},
+    ];
+
+    spyOn(
+      component.classroomBackendApiService,
+      'getClassroomDataAsync'
+    ).and.returnValue(Promise.resolve(response));
+
+    component.getClassroomData('id1');
+    tick();
+
+    expect(component.existingClassroomNames).toEqual(['Classroom 1']);
+  }));
 });
