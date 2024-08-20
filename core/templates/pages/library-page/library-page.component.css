@@ -145,7 +145,7 @@ oppia-library-page .oppia-library-group-header a,
 
 oppia-library-page .community-library-breadcrumbs-container a,
 oppia-library-page .community-library-breadcrumbs-container span {
-  color: #00645c;
+  color: #00423D;
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 14px;
   font-style: normal;
@@ -596,7 +596,7 @@ oppia-library-page .community-library-breadcrumbs-container {
   }
 
   oppia-library-page .community-library-mobile-breadcrumbs-container a {
-    color: #00645c;
+    color: #00423D;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 14px;
     font-style: normal;
