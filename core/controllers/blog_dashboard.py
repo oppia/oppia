@@ -354,8 +354,8 @@ class BlogPostHandler(
         thumbnail_filename = self.normalized_payload['thumbnail_filename']
         try:
            fs_services.validate_and_save_image(
-            raw_image, thumbnail_filename, 'thumbnail',
-            feconf.ENTITY_TYPE_BLOG_POST, blog_post_id)
+              raw_image, thumbnail_filename, 'thumbnail',
+              feconf.ENTITY_TYPE_BLOG_POST, blog_post_id)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
