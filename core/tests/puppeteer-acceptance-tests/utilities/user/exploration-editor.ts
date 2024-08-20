@@ -218,7 +218,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to creator dashboard page.
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
-    await this.page.goto(creatorDashboardPage);
+    await this.goto(creatorDashboardPage);
     showMessage('Creator dashboard page is opened successfully.');
   }
 
