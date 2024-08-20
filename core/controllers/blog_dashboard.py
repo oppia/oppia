@@ -343,7 +343,7 @@ class BlogPostHandler(
             raw_image, thumbnail_filename, 'thumbnail',
             feconf.ENTITY_TYPE_BLOG_POST, blog_post_id)
         except utils.ValidationError as e:
-        raise self.InvalidInputException(e)
+            raise self.InvalidInputException(e)
 
         self.render_json(self.values)
 
