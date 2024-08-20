@@ -157,7 +157,7 @@ class ClassroomIdToNameHandler(
         for classroom in classrooms:
             classroom_id_index_mapping_dict: Dict[str, str | int]
             # TODO(#20845): Remove this custom logic once we have
-            # populated the ClassroomIdToIndexModel for the math classroom.
+            # populated the index field of the math classroom.
             if classroom.index is not None:
                 classroom_id_index_mapping_dict = {
                     'classroom_id': classroom.classroom_id,
