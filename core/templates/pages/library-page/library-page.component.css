@@ -235,6 +235,17 @@ oppia-library-page .button-alignment-div {
   position: relative;
   z-index: 3;
 }
+
+.left-carousel-btn {
+  position: relative;
+  right: 4px;
+}
+
+.right-carousel-btn {
+  position: relative;
+  left: 4px;
+}
+
 oppia-library-page .oppia-exp-summary-tiles-container-extra-info {
   margin-bottom: 20px;
 }
@@ -560,6 +571,11 @@ oppia-library-page .community-library-breadcrumbs-container {
 }
 @media (max-width: 536px) {
   .navigation-dots {
+    top: 138px;
+  }
+
+  .mobile-buttons {
+    position: absolute;
     top: 132px;
   }
 
@@ -637,6 +653,10 @@ oppia-library-page .community-library-breadcrumbs-container {
 }
 
 @media only screen and (max-width: 416px) {
+  .mobile-buttons {
+    top: 180px;
+  }
+
   oppia-library-page .classroom-cards-wrapper {
     height: 358px;
     padding-top: 2px;

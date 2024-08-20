@@ -14,7 +14,9 @@
       </ng-container>
     </div>
     <div class="classrooms-carousel" *ngIf="publicClassroomsCount > 2">
-      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn left"
+      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn left-carousel-btn"
+              *ngIf="publicClassroomsCount > 3"
+              [disabled]="!shouldShowPreviousClassroomChunkButton()"
               (click)="moveClassroomCarouselToPreviousSlide()"
               aria-label="Previous Slide">
         <i class="fa fa-angle-left"></i>
@@ -33,27 +35,31 @@
           </ng-container>
         </div>
       </div>
-      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn right"
+      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn right-carousel-btn"
+              *ngIf="publicClassroomsCount > 3"
+              [disabled]="!shouldShowNextClassroomChunkButton()"
               (click)="moveClassroomCarouselToNextSlide()"
               aria-label="Next Slide">
         <i class="fa fa-angle-right"></i>
       </button>
-      <div class="navigation-dots">
+      <div class="navigation-dots" *ngIf="publicClassroomsCount > 3">
         <span *ngFor="let dot of dots; let i = index"
               [class.active]="dot === 1"
               (click)="moveToSlide(i)">
         </span>
       </div>
-      <div class="mobile-buttons">
+      <div class="mobile-buttons" *ngIf="publicClassroomsCount > 3">
         <button class="mobile-carousel-btn mobile-prev-btn"
                 (click)="moveClassroomCarouselToPreviousSlide()"
-                *ngIf="shouldShowPreviousClassroomChunkButton()"
+                *ngIf="publicClassroomsCount > 3"
+                [disabled]="!shouldShowPreviousClassroomChunkButton()"
                 aria-label="Previous Slide">
           <i class="fa fa-angle-left"></i>
         </button>
         <button class="mobile-carousel-btn mobile-next-btn"
                 (click)="moveClassroomCarouselToNextSlide()"
-                *ngIf="shouldShowNextClassroomChunkButton()"
+                *ngIf="publicClassroomsCount > 3"
+                [disabled]="!shouldShowNextClassroomChunkButton()"
                 aria-label="Next Slide">
           <i class="fa fa-angle-right"></i>
         </button>
