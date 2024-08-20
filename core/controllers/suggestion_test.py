@@ -2384,7 +2384,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             },
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
-            'inapplicable_skill_misconception_ids': None
+            'inapplicable_skill_misconception_ids': []
         }
         question_dict: question_domain.QuestionSuggestionChangeDict = {
             'question_state_data': question_state_dict,

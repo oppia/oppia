@@ -130,6 +130,12 @@ const MANUAL_ROUTE_TO_MODULE_MAPPING: Map<Route, string> = new Map([
     },
     'core/templates/pages/topic-viewer-page/topic-viewer-page.import.ts',
   ],
+  [
+    {
+      path: 'blog-dashboard',
+    },
+    'core/templates/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
+  ],
 ]);
 
 // List of page modules which aren't scraped from routing modules. These page modules are manually
