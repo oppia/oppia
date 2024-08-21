@@ -291,24 +291,24 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
     def test_get_classroom_id_to_classroom_name(self) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        math_classroom = classroom_config_services.get_classroom_by_id(
-            self.math_classroom_id
+        physics_classroom = classroom_config_services.get_classroom_by_id(
+            self.physics_classroom_id
         )
         # TODO (#20845): Here we use MyPy ignore because we have a
         # Test that checks if the index is None, it returns 0. The MyPy ignore
         # Can be removed once the index for the math classroom is populated.
-        math_classroom.index = None # type: ignore[assignment]
-        classroom_config_services.update_classroom(math_classroom)
+        physics_classroom.index = None # type: ignore[assignment]
+        classroom_config_services.update_classroom(physics_classroom)
         classroom_id_to_classroom_name = [
-            {
-                'classroom_id': self.math_classroom.classroom_id,
-                'classroom_name': self.math_classroom.name,
-                'classroom_index': 0
-            },
             {
                 'classroom_id': self.physics_classroom.classroom_id,
                 'classroom_name': self.physics_classroom.name,
-                'classroom_index': self.physics_classroom.index
+                'classroom_index': 0
+            },
+            {
+                'classroom_id': self.math_classroom.classroom_id,
+                'classroom_name': self.math_classroom.name,
+                'classroom_index': 1
             }
         ]
         json_response = self.get_json(feconf.CLASSROOM_DISPLAY_INFO_HANDLER_URL)
