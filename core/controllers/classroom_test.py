@@ -794,7 +794,7 @@ class NewClassroomHandlerTests(BaseClassroomControllerTests):
 class TestUpdateClassroomIndexMappingHandler(BaseClassroomControllerTests):
     """Test for updating classrooms order."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test data and environment."""
         super().setUp()
         self.classroom_1 = self.save_new_valid_classroom(
@@ -804,7 +804,7 @@ class TestUpdateClassroomIndexMappingHandler(BaseClassroomControllerTests):
             'classroomtwo', 'Math', 'classroomtwo'
         )
 
-    def test_successful_update_classroom_index(self):
+    def test_successful_update_classroom_index(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         payload = {
             'classroom_index_mappings': [
