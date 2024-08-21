@@ -47,22 +47,20 @@ describe('UpdateClassroomsOrderModalComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize classroomIdToClassroomNameIndex as an empty array', () => {
+  it('should initialize with empty classroomIdToClassroomNameIndex', () => {
     expect(component.classroomIdToClassroomNameIndex).toEqual([]);
   });
 
-  it('should reorder items and update classroom_index when drop is called', () => {
+  it('should reorder items on drop', () => {
     component.classroomIdToClassroomNameIndex = [
       {classroom_id: '1', classroom_name: 'Math', classroom_index: 0},
       {classroom_id: '2', classroom_name: 'Science', classroom_index: 1},
       {classroom_id: '3', classroom_name: 'History', classroom_index: 2},
     ];
 
-    const dropEvent = {
-      previousIndex: 0,
-      currentIndex: 2,
-    } as CdkDragDrop<classroomDisplayInfo[]>;
-
+    const dropEvent = {previousIndex: 0, currentIndex: 2} as CdkDragDrop<
+      classroomDisplayInfo[]
+    >;
     component.drop(dropEvent);
 
     expect(component.classroomIdToClassroomNameIndex).toEqual([
@@ -72,22 +70,20 @@ describe('UpdateClassroomsOrderModalComponent', () => {
     ]);
   });
 
-  it('should close the modal with the updated classroomIdToClassroomNameIndex when save is called', () => {
+  it('should close modal with updated data on save', () => {
     component.classroomIdToClassroomNameIndex = [
       {classroom_id: '1', classroom_name: 'Math', classroom_index: 0},
       {classroom_id: '2', classroom_name: 'Science', classroom_index: 1},
     ];
 
     component.save();
-
     expect(mockNgbActiveModal.close).toHaveBeenCalledWith(
       component.classroomIdToClassroomNameIndex
     );
   });
 
-  it('should dismiss the modal when close is called', () => {
+  it('should dismiss modal on close', () => {
     component.close();
-
     expect(mockNgbActiveModal.dismiss).toHaveBeenCalled();
   });
 });

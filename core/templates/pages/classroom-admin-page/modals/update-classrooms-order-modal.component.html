@@ -4,7 +4,9 @@
   <div cdkDropList (cdkDropListDropped)="drop($event)">
     <div *ngFor="let classroom of classroomIdToClassroomNameIndex"
          class="classroom-tile"
-         cdkDrag>
+         cdkDrag
+         (cdkDragStarted)="onDragStarted($event)"
+         (cdkDragEnded)="onDragEnded($event)">
       {{ classroom.classroom_name }}
     </div>
   </div>
@@ -14,34 +16,39 @@
   </div>
 </div>
 <style>
-  .update-classroom-order-modal {
-    padding: 20px;
+.update-classroom-order-modal {
+  padding: 20px;
 
-    h3 {
-      margin-bottom: 10px;
-    }
+  h3 {
+    margin-bottom: 10px;
+  }
 
-    .hint {
-      color: #666;
-      margin-bottom: 20px;
-    }
+  .hint {
+    color: #666;
+    margin-bottom: 20px;
+  }
 
-    .classroom-tile {
-      background-color: #e0f2f1;
-      color: black;
-      cursor: move;
-      margin-bottom: 10px;
-      padding: 10px;
-    }
+  .classroom-tile {
+    background-color: #e0f2f1;
+    color: black;
+    cursor: move;
+    margin-bottom: 10px;
+    padding: 10px;
+    transition: transform 0.2s ease;
+  }
 
-    .button-container {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 20px;
+  .cdk-drag-placeholder {
+    transform: scale(1.1);
+  }
 
-      button {
-        margin-left: 10px;
-      }
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+
+    button {
+      margin-left: 10px;
     }
   }
+}
 </style>
