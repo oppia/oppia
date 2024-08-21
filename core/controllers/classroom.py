@@ -573,7 +573,7 @@ class AllClassroomsSummaryHandler(
                 'is_published': classroom.is_published,
                 'thumbnail_filename': classroom.thumbnail_data.filename,
                 'thumbnail_bg_color': classroom.banner_data.bg_color,
-                'index': classroom.index
+                'index': 0 if classroom.index is None else classroom.index
             }
             all_classrooms_summary_dicts.append(
                 classroom_summary_dict
