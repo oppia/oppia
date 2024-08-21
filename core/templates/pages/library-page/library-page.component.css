@@ -153,6 +153,13 @@ oppia-library-page .community-library-breadcrumbs-container span {
   line-height: 16px;
 }
 
+.oppia-library-carousel-scroller i {
+  font-size: 36px;
+  margin: 0;
+  padding: 0;
+  top: 50%;
+}
+
 oppia-library-page .community-library-breadcrumbs-container i {
   transform: scale(0.75);
 }
@@ -179,12 +186,6 @@ oppia-library-page .community-library-breadcrumbs-container i {
 }
 .mat-button.oppia-library-carousel-scroller {
   cursor: pointer;
-}
-.oppia-library-carousel-scroller i {
-  font-size: 36px;
-  margin: 0;
-  padding: 0;
-  top: 50%;
 }
 .carousel-container {
   overflow: hidden;
